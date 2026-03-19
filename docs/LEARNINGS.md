@@ -283,6 +283,117 @@ Dart bridge files in `lib/src/rust/`. Must be re-run any time you
 add, remove, or change a public Rust function or struct that
 crosses the bridge. Generated files should never be edited manually.
 
+### `pub` — visibility modifier
+In Rust everything is **private by default** — functions, structs, and
+fields are invisible outside their module unless explicitly marked `pub`
+(public). This is the opposite of Python, where everything is public by
+default and a leading `_` is only a convention. In Rust, `pub struct`
+makes the type visible, but fields must also be individually marked `pub`
+— the struct being public does not automatically make its fields public.
+
+### `struct`
+A fixed, named collection of typed fields — closer to a Python dataclass
+than a dict. Fields and their types are declared at compile time; the
+compiler rejects any code that creates one with missing fields or wrong
+types. Unlike a Python dict, you cannot add or remove fields at runtime.
+
+### `///` — doc comments
+Two slash styles in Rust: `//` is a regular comment; `///` is a doc
+comment, equivalent to a Python docstring. `cargo doc` reads `///`
+comments and generates HTML documentation for your project. Convention
+is to use `///` on all public-facing items.
+
+### Attributes — `#[...]`
+Metadata attached to a function, struct, or module that changes how it
+is compiled or processed. Examples seen so far:
+- `#[cfg(test)]` — compile this block only in test mode
+- `#[test]` — mark this function as a test for `cargo test`
+- `#[flutter_rust_bridge::frb(sync)]` — instruct the bridge codegen
+  to expose this function as synchronous rather than async
+
+### `#[flutter_rust_bridge::frb(sync)]`
+Tells the bridge code generator to expose a function as synchronous —
+the generated Dart function returns a plain value instead of a `Future`.
+Appropriate for fast in-memory operations like password generation where
+there is no I/O and no reason for Flutter to await the result.
+
+### `fn` and `pub fn`
+`fn` declares a function in Rust, equivalent to `def` in Python.
+`pub fn` makes it visible outside the current module. Key differences
+from Python `def`:
+- Parameter types and return type are mandatory, not optional hints
+- Return type is declared with `->`
+- The last expression in the function body is automatically the return
+  value if written without a semicolon — no `return` keyword needed
+- `return` is used for early exits only (see below)
+
+### Early return vs final expression
+In Rust, `return` is used to exit a function before reaching the end.
+The final return value is written as a bare expression without a
+semicolon — the semicolon discards the value. Pattern for `Result`-
+returning functions: multiple `return Err(...)` early exits for failure
+cases, with `Ok(value)` as the final expression for the happy path.
+A function can have as many `return Err(...)` as needed.
+
+### `let` and `mut`
+`let` declares a variable. Variables are **immutable by default** in
+Rust — you cannot change them after binding. `mut` opts in to
+mutability: `let mut rng = ...`. This is the opposite of most languages.
+The compiler enforces immutability, catching a whole class of bugs at
+compile time.
+
+### `use` — imports
+Rust code can always refer to anything by its full path (`rand::thread_rng()`).
+`use` brings a name into scope so you can use it without the full path,
+equivalent to Python's `from x import y`. `use` can appear at the top
+of a file or inside a function — it scopes to wherever it is declared.
+Sometimes you must `use` a **trait** just to unlock methods on a type,
+even if you never write the trait name directly (e.g. `use rand::Rng`
+to make `.gen_range()` available).
+
+### `::` — path separator
+Rust's path separator for navigating modules, crates, and types.
+Equivalent to Python's `.` in imports. Also used to call type-level
+(static) functions: `String::from("hi")`, `Vec::new()`. Instance
+methods use `.` as in Python: `my_string.len()`.
+
+### Macros — `name!(...)`
+A `!` after a name means it is a macro, not a regular function. Macros
+generate code at compile time. Common ones: `format!`, `println!`,
+`assert!`, `assert_eq!`, `vec!`, `panic!`. The distinction matters
+because macros can do things regular functions cannot, such as accepting
+a variable number of arguments.
+
+### `assert!` and `assert_eq!`
+Test assertion macros. `assert!(condition)` panics if the condition is
+false. `assert_eq!(a, b)` panics if the two values are not equal, and
+prints both values in the error message. Both accept an optional format
+string as extra arguments: `assert!(cond, "message {}", value)`.
+
+### Panicking
+A panic is Rust's "unrecoverable error" mechanism — it stops execution
+immediately. `assert!` panics when its condition is false. Outside tests
+a panic crashes the program. Inside a `#[test]` function the test runner
+catches the panic and records that test as failed, then continues running
+the remaining tests.
+
+### `#[test]` and `#[cfg(test)]` — how they work together
+- `#[test]` marks a function so `cargo test` knows to run it
+- `#[cfg(test)]` gates an entire block so the compiler excludes it
+  from release builds entirely — the code does not exist in the
+  shipped binary
+- They are independent: `#[test]` is about the runner finding tests;
+  `#[cfg(test)]` is about the compiler stripping them from production
+- Convention: wrap all tests in `#[cfg(test)] mod tests { ... }` so
+  they live next to the code they test but cost nothing in production
+
+### `use super::*` in tests
+`super` refers to the parent module. Inside `mod tests`, `use super::*`
+brings everything public from the containing module into scope —
+equivalent to Python's `from .. import *`. This is one of the few
+places in Rust where wildcard imports are considered idiomatic, because
+test modules conventionally want access to everything they are testing.
+
 ### snake_case → camelCase (bridge convention)
 The bridge automatically translates Rust's `snake_case` naming to
 Dart's `camelCase`: `generate_password` → `generatePassword`,
