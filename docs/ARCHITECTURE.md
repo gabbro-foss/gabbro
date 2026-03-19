@@ -63,6 +63,8 @@ gabbro/
 ├── pubspec.yaml                # Flutter dependencies
 ├── pubspec.lock                # Pinned dependency versions
 ├── analysis_options.yaml       # Dart linting rules
+├── .gitignore                  # Git ignore rules (generated + project-specific)
+├── LICENSE                     # GPL-3.0-only licence text
 └── README.md
 ```
 
@@ -129,6 +131,8 @@ Each entry is an instance of a typed class:
 - Screenshot prevention + app switcher blur
 
 ## Password Generator
+- **Status:** classic password mode implemented in Rust (`rust/src/api/password_generator.rs`),
+  bridge generated, 6 unit tests passing, Flutter build clean
 - Two modes: classic password and wordlist-based passphrase
 - Colour coded display with symbol markers — character types are
   distinguished by **both colour and symbol** (never colour alone),
@@ -161,6 +165,8 @@ Each entry is an instance of a typed class:
 - 3-2-1 rule enforced via onboarding and periodic reminders:
   3 copies, 2 different media, 1 offsite
 - Vault wipe after 10 failed attempts makes backup critical
+- Development repo backup: local NAS sync + Synology HyperBackup
+  offsite — project already respects the 3-2-1+1 paradigm
 
 ## Testing Strategy
 - Rust: native test framework, unit + integration tests
@@ -171,6 +177,14 @@ Each entry is an instance of a typed class:
 ## Platforms
 - v1: Linux (Arch + Mint/deb), Android (F-Droid)
 - v2 (future): Windows, macOS, iOS
+
+## Version Control
+
+- Local git repo initialised at project root
+- Remote: private GitHub repository at https://github.com/Zabamund/gabbro
+- SSH key authentication configured for push access
+- Project email: gabbro.app@gmail.com (used in git config user.email)
+- `chat_info/` is git-ignored — development session notes are never versioned
 
 ## Licence
 

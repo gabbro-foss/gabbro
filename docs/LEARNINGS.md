@@ -85,6 +85,10 @@ stronger 2FA anyway.
 3 copies of your data, on 2 different media, with 1 offsite.
 Critical for Gabbro because vault wipe after 10 failed
 attempts means backups are your only recovery option.
+The "+1" variant (3-2-1+1) adds an immutable or air-gapped
+copy for extra resilience. Gabbro's development repo already
+follows this: local machine + NAS sync + Synology HyperBackup
+offsite = 3-2-1+1 in practice.
 
 ### FIDO2/WebAuthn
 Hardware authentication standard. YubiKey compliant. Used for
@@ -206,12 +210,30 @@ A strong copyleft licence for applications. Key properties:
 
 Chosen over LGPL because Gabbro is an application, not a library.
 See ADR-004 for full reasoning.
+
+### .gitignore
 A file at the root of a git repository that tells git which files and
 folders to ignore — i.e. never track or commit. Essential for excluding
 build artefacts, IDE settings, and development-only folders that have
 no place in version control. A trailing slash (e.g. `chat_info/`) tells
 git the entry is a directory. Flutter projects ship with a
 generated `.gitignore`; project-specific exclusions are added manually.
+
+### git remote
+A named reference to a remote repository. `origin` is the conventional
+name for the primary remote. Set with:
+`git remote add origin git@github.com:user/repo.git`
+Verify with: `git remote -v`
+Push with: `git push -u origin master` (the `-u` sets upstream tracking
+so future `git push` commands need no arguments).
+
+### SSH key authentication (GitHub)
+An alternative to password authentication for git remotes. Generate a
+key pair with `ssh-keygen`, add the public key to GitHub under
+Settings → SSH and GPG keys, then use the SSH remote URL
+(`git@github.com:user/repo.git`) instead of HTTPS. The private key
+never leaves your machine. More secure and more convenient than
+passwords for repeated pushes.
 
 ---
 
@@ -230,6 +252,54 @@ Key criteria applied during the naming process: works across target
 languages, no bad phonetic connotations (e.g. French *étron*, French
 *s'évader*), not already registered in the same space, timeless rather
 than trendy, available as `gabbro.app`.
+
+---
+
+## Rust & Bridge Concepts
+
+### `#[cfg(test)]`
+A Rust attribute that marks a block as test-only. Code inside
+`#[cfg(test)]` is compiled only when running `cargo test` — it
+is never included in release builds. The idiomatic place for unit
+tests in Rust is directly in the same file as the code under test,
+inside a `mod tests { ... }` block gated by this attribute.
+
+### `Result<T, E>` in Rust
+Rust's primary error-handling type. A function returning
+`Result<String, String>` either succeeds with `Ok(value)` or
+fails with `Err(message)`. The caller must handle both cases.
+Used in `generate_password()` to signal an empty character pool
+rather than panicking. The bridge maps this to a Dart exception.
+
+### `cargo-expand`
+A Cargo subcommand that macro-expands Rust source code, showing
+what proc-macros (like `flutter_rust_bridge`) generate under the
+hood. `flutter_rust_bridge_codegen` installs it automatically on
+first run if missing. Not needed for day-to-day development.
+
+### `flutter_rust_bridge_codegen generate`
+The command that reads your Rust API surface and regenerates the
+Dart bridge files in `lib/src/rust/`. Must be re-run any time you
+add, remove, or change a public Rust function or struct that
+crosses the bridge. Generated files should never be edited manually.
+
+### snake_case → camelCase (bridge convention)
+The bridge automatically translates Rust's `snake_case` naming to
+Dart's `camelCase`: `generate_password` → `generatePassword`,
+`pool_size` → `poolSize`. Each language gets idiomatic naming
+without any manual mapping.
+
+### Test helper / default fixture pattern
+When writing multiple tests that share a common setup, define a
+helper function (e.g. `default_config()`) that returns a baseline
+value. Each test then only overrides the fields relevant to it.
+Reduces repetition and makes test intent clearer.
+
+### Testing randomness with large samples
+For functions that produce random output, use a large output length
+(e.g. 200 characters) to make it statistically near-certain that
+all parts of the character pool are sampled. This lets you assert
+properties (e.g. "no banned characters appear") without flaky tests.
 
 ---
 
