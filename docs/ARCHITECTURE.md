@@ -49,6 +49,9 @@ gabbro/
 │       │   ├── simple.rs
 │       │   ├── password_generator.rs
 │       │   └── passphrase_generator.rs
+│       ├── vault/              # Internal domain model (not bridge-exposed)
+│       │   ├── mod.rs
+│       │   └── entry.rs        # All 6 entry types and EntryMeta
 │       ├── frb_generated.rs    # Auto-generated bridge code (do not edit)
 │       └── lib.rs
 ├── rust_builder/               # Cargokit build integration (do not edit)
@@ -169,6 +172,25 @@ Each entry is an instance of a typed class:
 - Accessible from main screen and inline within entry editor
 - Remembers user's last settings
 - Clipboard auto-clear after 60 seconds
+
+## Vault Domain Model
+- **Status:** all 6 entry types implemented in Rust
+  (`rust/src/vault/entry.rs`), 11 unit tests passing. 25 Rust tests total.
+- Lives in `rust/src/vault/` — internal module, not exposed to Flutter
+  directly. Flutter will call API functions that construct these types;
+  it never builds them directly.
+- **EntryMeta:** shared metadata struct composed into every entry type —
+  id, timestamps, folder, tags, favourite flag.
+- **Entry types:** Login, Note, Identity, Card, File, Custom.
+- **CustomField:** reusable key/value struct used by LoginEntry (Vec) and
+  CustomEntry (HashMap).
+- **CardEntry::new():** only entry type with a validated constructor —
+  enforces card number digit count (12–19) to reject nonsensical data at
+  construction time. Other types use struct literals; validation for those
+  will live in the API layer when it is built.
+- **Design principle:** invalid state unrepresentable — if a value cannot
+  exist in a valid domain, the type system or constructor prevents it from
+  being created at all.
 
 ## Vault Storage & Sync
 - v1: local path only, chosen during onboarding

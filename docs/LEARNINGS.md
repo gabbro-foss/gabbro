@@ -170,6 +170,26 @@ Zero runtime I/O, zero risk of missing files at runtime. Ideal
 for fixed assets like wordlists. The path is relative to the
 source file containing the macro.
 
+### Module separation: `api/` vs `vault/`
+`rust/src/api/` is the bridge boundary — only what Flutter needs
+to call lives here. `rust/src/vault/` is the internal domain model
+— the core types and logic, invisible to Flutter until explicitly
+exposed via an API function. Keeping these separate follows the
+principle of separating your domain model from your interface layer.
+
+### Composition over inheritance
+Rust has no class inheritance. Shared data is modelled by embedding
+one struct inside another (`pub meta: EntryMeta`). To access a field
+on the inner struct: `entry.meta.id`. This is more explicit and
+flexible than inheritance — the relationship is "has a", not "is a".
+
+### Making invalid state unrepresentable
+A core Rust design principle: if a value cannot exist in a valid
+domain, use the type system or constructor to prevent it from being
+created at all. Example: `CardEntry::new()` rejects card numbers
+outside 12–19 digits — invalid entries simply cannot exist in the
+vault.
+
 ---
 
 ## Tooling
@@ -401,6 +421,11 @@ comment, equivalent to a Python docstring. `cargo doc` reads `///`
 comments and generates HTML documentation for your project. Convention
 is to use `///` on all public-facing items.
 
+### `//!` — module-level doc comments
+Where `///` documents the item that follows it, `//!` documents the
+enclosing item — typically the file/module itself. Written at the top
+of a file, it appears as the module description in `cargo doc` output.
+
 ### Attributes — `#[...]`
 Metadata attached to a function, struct, or module that changes how it
 is compiled or processed. Examples seen so far:
@@ -408,6 +433,7 @@ is compiled or processed. Examples seen so far:
 - `#[test]` — mark this function as a test for `cargo test`
 - `#[flutter_rust_bridge::frb(sync)]` — instruct the bridge codegen
   to expose this function as synchronous rather than async
+- `#[derive(...)]` — auto-generate trait implementations
 
 ### `#[flutter_rust_bridge::frb(sync)]`
 Tells the bridge code generator to expose a function as synchronous —
@@ -497,6 +523,61 @@ The bridge automatically translates Rust's `snake_case` naming to
 Dart's `camelCase`: `generate_password` → `generatePassword`,
 `pool_size` → `poolSize`. Each language gets idiomatic naming
 without any manual mapping.
+
+### `impl` block
+Attaches functions and methods to a type. Defined separately from the
+`struct` or `enum` definition. Functions inside `impl` that don't take
+`self` are **associated functions** (called as `MyType::fn_name(...)`).
+Functions that take `&self` or `&mut self` are **instance methods**
+(called as `value.method()`).
+
+### Associated function / constructor pattern
+Rust has no `__init__`. The convention is a `new()` associated function
+that returns `Result<T, E>` when construction can fail. This is the
+idiomatic way to validate data at creation time — if `new()` returns
+`Ok`, the value is guaranteed valid; if it returns `Err`, nothing was
+created.
+
+### `Option<T>` — nullable values without null
+Rust has no `null` or `None` at the language level. A value that might
+be absent is wrapped in `Option<T>`, which is either `Some(value)` or
+`None`. The compiler forces you to handle both cases before using the
+value. Key methods: `.is_some()`, `.is_none()`, `.unwrap()` (panics on
+None — safe in tests after asserting `is_some()`, avoid in production).
+
+### `Vec<u8>` — raw binary data
+A `Vec` of unsigned 8-bit integers (`u8`). The standard Rust
+representation for binary payloads (file contents, encrypted bytes,
+etc.). Equivalent to Python's `bytes` or `bytearray`. The `u8` suffix
+on a literal (e.g. `255u8`) explicitly types it as an unsigned byte.
+
+### `HashMap<K, V>`
+Rust's dictionary type. `HashMap<String, CustomField>` is a map from
+`String` keys to `CustomField` values. Create with `HashMap::new()`,
+insert with `.insert(key, value)`, access with `map[key]` or
+`.get(key)`. Requires `use std::collections::HashMap`.
+
+### Closures — `|param| expression`
+Anonymous functions, like Python lambdas. Used heavily with iterators:
+`.filter(|c| c.is_ascii_digit())` passes each element to the closure
+and keeps only those where it returns true. The `|param|` syntax is the
+closure's parameter list.
+
+### Iterator chaining
+Rust iterators are lazy and composable. Common pattern:
+`.chars().filter(...).count()` — get an iterator over characters, keep
+only those matching a predicate, count the results. Nothing is computed
+until the chain is consumed (here by `.count()`).
+
+### `#[derive(Debug, Clone, PartialEq)]`
+A derive attribute that auto-generates three trait implementations:
+- `Debug` — enables `{:?}` formatting; needed for readable test failure
+  messages
+- `Clone` — generates a `.clone()` method for deep copies
+- `PartialEq` — generates `==` and `!=`; required for `assert_eq!` in
+  tests. Not added to every type by default — equality semantics should
+  be considered deliberately (e.g. do two entries with the same id but
+  different timestamps count as equal?).
 
 ---
 
