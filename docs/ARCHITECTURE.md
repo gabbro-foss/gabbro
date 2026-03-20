@@ -28,17 +28,27 @@ gabbro/
 │   └── src/
 │       └── rust/               # Auto-generated bridge code (do not edit)
 │           ├── api/
-│           │   └── simple.dart
+│           │   ├── simple.dart
+│           │   ├── password_generator.dart
+│           │   └── passphrase_generator.dart
 │           ├── frb_generated.dart
 │           ├── frb_generated.io.dart
 │           └── frb_generated.web.dart
 ├── rust/                       # Rust crate (all crypto and secrets live here)
 │   ├── Cargo.toml
 │   ├── Cargo.lock
+│   ├── assets/                 # Embedded wordlists (compile-time inclusion)
+│   │   ├── wordlist_en.txt     # EFF large wordlist — 7776 words
+│   │   ├── wordlist_fr.txt     # French Diceware — 7776 words
+│   │   ├── wordlist_de.txt     # German Diceware — 7776 words
+│   │   ├── wordlist_es.txt     # Spanish Diceware — 8192 words
+│   │   └── wordlist_it.txt     # Italian Diceware — 8192 words
 │   └── src/
 │       ├── api/                # Bridge API surface exposed to Flutter
 │       │   ├── mod.rs
-│       │   └── simple.rs
+│       │   ├── simple.rs
+│       │   ├── password_generator.rs
+│       │   └── passphrase_generator.rs
 │       ├── frb_generated.rs    # Auto-generated bridge code (do not edit)
 │       └── lib.rs
 ├── rust_builder/               # Cargokit build integration (do not edit)
@@ -131,9 +141,22 @@ Each entry is an instance of a typed class:
 - Screenshot prevention + app switcher blur
 
 ## Password Generator
-- **Status:** classic password mode implemented in Rust (`rust/src/api/password_generator.rs`),
-  bridge generated, 6 unit tests passing, Flutter build clean
+- **Status:** classic password mode fully implemented in Rust
+  (`rust/src/api/password_generator.rs`), 6 unit tests passing.
+  Passphrase mode fully implemented in Rust
+  (`rust/src/api/passphrase_generator.rs`), 8 unit tests passing.
+  Both bridged to Flutter, Flutter build clean. 14 Rust tests total.
 - Two modes: classic password and wordlist-based passphrase
+- **Passphrase mode:**
+  - 5 languages supported: English, French, German, Spanish, Italian
+  - Wordlists embedded at compile time via `include_str!`
+  - EN, FR, DE: 7776 words (~12.92 bits entropy/word)
+  - ES, IT: 8192 words (exactly 13.00 bits entropy/word)
+  - `PassphraseConfig`: word_count (min 4), separator, capitalise,
+    append_number, language
+  - `Language` enum: English, French, German, Spanish, Italian
+  - Language enum is internal/bridge only — display strings handled in Flutter
+  - Entropy calculated from actual wordlist size per language
 - Colour coded display with symbol markers — character types are
   distinguished by **both colour and symbol** (never colour alone),
   ensuring accessibility for colour-blind users — see ADR-003
@@ -142,7 +165,6 @@ Each entry is an instance of a typed class:
 - Hidden by default, show/hide toggle
 - Entropy display (bits)
 - Exclude ambiguous characters option (0, O, l, 1, I)
-- EFF wordlist for passphrase mode
 - All generation happens in Rust
 - Accessible from main screen and inline within entry editor
 - Remembers user's last settings

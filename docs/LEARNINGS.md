@@ -70,6 +70,22 @@ Excluded from Gabbro deliberately — keeping your password
 manager and 2FA codes separate is more secure. YubiKey provides
 stronger 2FA anyway.
 
+### Diceware / EFF Wordlists
+A method of generating passphrases by selecting words randomly
+from a large wordlist. The EFF large wordlist contains 7776 words
+(6^5 — corresponding to five dice rolls), giving ~12.92 bits of
+entropy per word. Some lists (e.g. ES, IT variants used in Gabbro)
+contain 8192 words (2^13), giving exactly 13.00 bits per word.
+A 4-word passphrase from a 7776-word list gives ~51.7 bits of
+entropy — considered the practical minimum for security.
+A 6-word passphrase gives ~77.5 bits — comfortably strong.
+
+### Passphrase Entropy Minimum
+From a security standpoint, a passphrase must have at least 4 words
+to be considered acceptable. Fewer words (1–3) from any standard
+wordlist produce insufficient entropy regardless of list size.
+Gabbro enforces this as a hard minimum in `PassphraseConfig`.
+
 ---
 
 ## Security Concepts
@@ -139,6 +155,20 @@ name rather than the originally planned `rust_core/`.
 When reality diverges from a design document (e.g. folder names),
 update the doc to match reality. The code is the truth; the doc
 describes it.
+
+### Enum as internal plumbing vs UI concern
+When a Rust enum (e.g. `Language`) is exposed across the bridge,
+its variant names are internal identifiers — not user-facing strings.
+The Flutter/Dart layer is responsible for mapping enum variants to
+display text in whatever language or format the UI requires.
+This keeps Rust free of UI concerns and makes localisation trivial.
+
+### Compile-time asset embedding (`include_str!`)
+`include_str!("path/to/file")` reads a file at compile time and
+embeds its contents as a `&'static str` directly in the binary.
+Zero runtime I/O, zero risk of missing files at runtime. Ideal
+for fixed assets like wordlists. The path is relative to the
+source file containing the macro.
 
 ---
 
@@ -235,6 +265,11 @@ Settings → SSH and GPG keys, then use the SSH remote URL
 never leaves your machine. More secure and more convenient than
 passwords for repeated pushes.
 
+### `wc -l`
+Unix command to count lines in a file. Used to verify wordlist sizes:
+`wc -l wordlist_en.txt` → `7776 wordlist_en.txt`. Essential sanity
+check when processing external files before embedding them.
+
 ---
 
 ## Project History & Naming
@@ -296,6 +331,69 @@ A fixed, named collection of typed fields — closer to a Python dataclass
 than a dict. Fields and their types are declared at compile time; the
 compiler rejects any code that creates one with missing fields or wrong
 types. Unlike a Python dict, you cannot add or remove fields at runtime.
+
+### `enum` in Rust
+A type that can be one of a fixed set of named variants. Unlike Python
+enums, Rust enums are first-class types used throughout the language —
+including in `match` expressions. Each variant can optionally carry
+data. Used in Gabbro for `Language` to represent the five supported
+wordlist languages as a closed set of valid choices.
+
+### `match` in Rust
+Rust's pattern matching expression — like a `switch` statement but
+exhaustive: the compiler forces you to handle every possible variant.
+Used in `wordlist_for()` to select the correct embedded wordlist
+string for each `Language` variant. If you add a new variant to
+the enum and forget to update the `match`, the compiler refuses
+to compile.
+
+### `..default_config()` — struct update syntax
+When constructing a struct in tests, you often want to override just
+one or two fields and keep the rest at their defaults. Rust's struct
+update syntax `..default_config()` fills in all unspecified fields
+from the result of that function call. Reduces repetition and makes
+test intent clearer — only the field under test is mentioned explicitly.
+
+### `for bad_count in [0, 1, 2, 3]`
+In Rust you can iterate directly over a small array literal in a `for`
+loop. Useful in tests to check a function rejects multiple invalid
+inputs without writing a separate test for each value.
+
+### `assert!` with custom message
+`assert!(condition, "message {}", value)` — the second argument is a
+format string printed if the assertion fails. Essential when looping
+in tests: without it, a failure only tells you the assertion failed,
+not which iteration caused it.
+
+### `const` inside a function
+In Rust, `const` can be declared inside a function body, not just at
+module level. It is still a compile-time constant — no runtime cost —
+but its scope is limited to the enclosing function. Used in
+`generate_passphrase` for `MIN_WORD_COUNT` to keep the magic number
+close to where it is used.
+
+### `chars()` and Unicode-safe capitalisation
+`string.chars()` returns an iterator over Unicode scalar values, not
+bytes. To capitalise the first letter of a word safely:
+1. Call `.chars()` to get an iterator
+2. Take the first char with `.next()`
+3. Call `.to_uppercase()` on it (returns a string, not a char, because
+   some Unicode characters uppercase to multiple characters)
+4. Concatenate with `chars.as_str()` for the remainder
+This is more correct than indexing bytes directly, which would panic
+on non-ASCII input.
+
+### Test helper / default fixture pattern
+When writing multiple tests that share a common setup, define a
+helper function (e.g. `default_config()`) that returns a baseline
+value. Each test then only overrides the fields relevant to it.
+Reduces repetition and makes test intent clearer.
+
+### Testing randomness with large samples
+For functions that produce random output, use a large output length
+(e.g. 200 characters) to make it statistically near-certain that
+all parts of the character pool are sampled. This lets you assert
+properties (e.g. "no banned characters appear") without flaky tests.
 
 ### `///` — doc comments
 Two slash styles in Rust: `//` is a regular comment; `///` is a doc
@@ -399,18 +497,6 @@ The bridge automatically translates Rust's `snake_case` naming to
 Dart's `camelCase`: `generate_password` → `generatePassword`,
 `pool_size` → `poolSize`. Each language gets idiomatic naming
 without any manual mapping.
-
-### Test helper / default fixture pattern
-When writing multiple tests that share a common setup, define a
-helper function (e.g. `default_config()`) that returns a baseline
-value. Each test then only overrides the fields relevant to it.
-Reduces repetition and makes test intent clearer.
-
-### Testing randomness with large samples
-For functions that produce random output, use a large output length
-(e.g. 200 characters) to make it statistically near-certain that
-all parts of the character pool are sampled. This lets you assert
-properties (e.g. "no banned characters appear") without flaky tests.
 
 ---
 
