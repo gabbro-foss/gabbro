@@ -1,0 +1,212 @@
+use flutter_rust_bridge::frb;
+use rand::Rng;
+
+// ---------------------------------------------------------------------------
+// Wordlists — embedded at compile time, one word per line
+// ---------------------------------------------------------------------------
+
+const WORDLIST_EN: &str = include_str!("../../assets/wordlist_en.txt");
+const WORDLIST_FR: &str = include_str!("../../assets/wordlist_fr.txt");
+const WORDLIST_DE: &str = include_str!("../../assets/wordlist_de.txt");
+const WORDLIST_ES: &str = include_str!("../../assets/wordlist_es.txt");
+const WORDLIST_IT: &str = include_str!("../../assets/wordlist_it.txt");
+
+// ---------------------------------------------------------------------------
+// Public types
+// ---------------------------------------------------------------------------
+
+#[frb(dart_metadata=("freezed"))]
+pub enum Language {
+    English,
+    French,
+    German,
+    Spanish,
+    Italian,
+}
+
+pub struct PassphraseConfig {
+    pub word_count: u32,
+    pub separator: String,
+    pub capitalise: bool,
+    pub append_number: bool,
+    pub language: Language,
+}
+
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
+
+fn wordlist_for(language: &Language) -> Vec<&'static str> {
+    let raw = match language {
+        Language::English => WORDLIST_EN,
+        Language::French  => WORDLIST_FR,
+        Language::German  => WORDLIST_DE,
+        Language::Spanish => WORDLIST_ES,
+        Language::Italian => WORDLIST_IT,
+    };
+    raw.lines().filter(|l| !l.is_empty()).collect()
+}
+
+// ---------------------------------------------------------------------------
+// Public API (exposed to Flutter via flutter_rust_bridge)
+// ---------------------------------------------------------------------------
+
+/// Generate a passphrase from the given config.
+/// Returns Err if word_count is 0 or the wordlist is empty.
+pub fn generate_passphrase(config: PassphraseConfig) -> Result<String, String> {
+    const MIN_WORD_COUNT: u32 = 4;
+
+    if config.word_count < MIN_WORD_COUNT {
+        return Err(format!("word_count must be at least {}", MIN_WORD_COUNT));
+    }
+
+    let words = wordlist_for(&config.language);
+    if words.is_empty() {
+        return Err("wordlist is empty".into());
+    }
+
+    let mut rng = rand::thread_rng();
+    let mut chosen: Vec<String> = (0..config.word_count)
+        .map(|_| {
+            let word = words[rng.gen_range(0..words.len())];
+            if config.capitalise {
+                let mut chars = word.chars();
+                match chars.next() {
+                    None => String::new(),
+                    Some(first) => {
+                        first.to_uppercase().collect::<String>() + chars.as_str()
+                    }
+                }
+            } else {
+                word.to_string()
+            }
+        })
+        .collect();
+
+    if config.append_number {
+        chosen.push(rng.gen_range(0..=9).to_string());
+    }
+
+    Ok(chosen.join(&config.separator))
+}
+
+/// Calculate entropy in bits for a passphrase.
+/// Uses the actual wordlist size for the given language.
+pub fn passphrase_entropy_bits(word_count: u32, language: Language) -> f64 {
+    let list_size = wordlist_for(&language).len() as f64;
+    (word_count as f64) * list_size.log2()
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn default_config() -> PassphraseConfig {
+        PassphraseConfig {
+            word_count: 4,
+            separator: "-".to_string(),
+            capitalise: false,
+            append_number: false,
+            language: Language::English,
+        }
+    }
+
+    #[test]
+    fn test_correct_word_count() {
+        let result = generate_passphrase(default_config()).unwrap();
+        assert_eq!(result.split('-').count(), 4);
+    }
+
+    #[test]
+    fn test_separator_applied() {
+        let config = PassphraseConfig {
+            separator: ".".to_string(),
+            ..default_config()
+        };
+        let result = generate_passphrase(config).unwrap();
+        assert!(result.contains('.'));
+        assert!(!result.contains('-'));
+    }
+
+    #[test]
+    fn test_capitalise() {
+        let config = PassphraseConfig {
+            capitalise: true,
+            ..default_config()
+        };
+        let result = generate_passphrase(config).unwrap();
+        for word in result.split('-') {
+            let first = word.chars().next().unwrap();
+            assert!(first.is_uppercase(), "Expected uppercase, got: {}", first);
+        }
+    }
+
+    #[test]
+    fn test_append_number() {
+        let config = PassphraseConfig {
+            append_number: true,
+            ..default_config()
+        };
+        let result = generate_passphrase(config).unwrap();
+        let parts: Vec<&str> = result.split('-').collect();
+        // 4 words + 1 digit = 5 parts
+        assert_eq!(parts.len(), 5);
+        let last = parts.last().unwrap();
+        assert!(last.parse::<u8>().is_ok(), "Last part should be a digit");
+    }
+
+    #[test]
+    fn test_zero_word_count_returns_error() {
+        for bad_count in [0, 1, 2, 3] {
+            let config = PassphraseConfig {
+                word_count: bad_count,
+                ..default_config()
+            };
+            assert!(
+                generate_passphrase(config).is_err(),
+                "Expected error for word_count = {}",
+                bad_count
+            );
+        }
+    }
+
+    #[test]
+    fn test_entropy_english() {
+        // 4 words from 7776-word list: 4 * log2(7776) ≈ 51.7 bits
+        let entropy = passphrase_entropy_bits(4, Language::English);
+        assert!((entropy - 51.7).abs() < 0.1, "Got: {}", entropy);
+    }
+
+    #[test]
+    fn test_entropy_spanish() {
+        // 4 words from 8192-word list: 4 * 13.0 = 52.0 bits
+        let entropy = passphrase_entropy_bits(4, Language::Spanish);
+        assert!((entropy - 52.0).abs() < 0.1, "Got: {}", entropy);
+    }
+
+    #[test]
+    fn test_all_languages_generate() {
+        let languages = [
+            ("English", Language::English),
+            ("French", Language::French),
+            ("German", Language::German),
+            ("Spanish", Language::Spanish),
+            ("Italian", Language::Italian),
+        ];
+        for (name, lang) in languages {
+            let config = PassphraseConfig {
+                word_count: 4,
+                separator: "-".to_string(),
+                capitalise: false,
+                append_number: false,
+                language: lang,
+            };
+            let result = generate_passphrase(config);
+            assert!(result.is_ok(), "Failed for language: {}", name);
+        }
+    }
+}
