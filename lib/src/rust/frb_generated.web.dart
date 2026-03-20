@@ -6,6 +6,7 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
+import 'api/passphrase_generator.dart';
 import 'api/password_generator.dart';
 import 'api/simple.dart';
 import 'dart:async';
@@ -28,13 +29,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool dco_decode_bool(dynamic raw);
 
   @protected
+  PassphraseConfig dco_decode_box_autoadd_passphrase_config(dynamic raw);
+
+  @protected
   PasswordConfig dco_decode_box_autoadd_password_config(dynamic raw);
 
   @protected
   double dco_decode_f_64(dynamic raw);
 
   @protected
+  int dco_decode_i_32(dynamic raw);
+
+  @protected
+  Language dco_decode_language(dynamic raw);
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
+
+  @protected
+  PassphraseConfig dco_decode_passphrase_config(dynamic raw);
 
   @protected
   PasswordConfig dco_decode_password_config(dynamic raw);
@@ -55,6 +68,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
+  PassphraseConfig sse_decode_box_autoadd_passphrase_config(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   PasswordConfig sse_decode_box_autoadd_password_config(
     SseDeserializer deserializer,
   );
@@ -63,7 +81,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double sse_decode_f_64(SseDeserializer deserializer);
 
   @protected
+  int sse_decode_i_32(SseDeserializer deserializer);
+
+  @protected
+  Language sse_decode_language(SseDeserializer deserializer);
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
+
+  @protected
+  PassphraseConfig sse_decode_passphrase_config(SseDeserializer deserializer);
 
   @protected
   PasswordConfig sse_decode_password_config(SseDeserializer deserializer);
@@ -78,13 +105,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_decode_unit(SseDeserializer deserializer);
 
   @protected
-  int sse_decode_i_32(SseDeserializer deserializer);
-
-  @protected
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_passphrase_config(
+    PassphraseConfig self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_password_config(
@@ -96,8 +126,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_f_64(double self, SseSerializer serializer);
 
   @protected
+  void sse_encode_i_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_language(Language self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_passphrase_config(
+    PassphraseConfig self,
     SseSerializer serializer,
   );
 
@@ -115,9 +157,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_unit(void self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer);
 }
 
 // Section: wire_class
