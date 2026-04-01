@@ -196,8 +196,8 @@ Each entry is an instance of a typed class:
 - v1: local path only, chosen during onboarding
 - Sync is user's responsibility via export/import
 - Export always encrypted, never plaintext
-- Export produces two files: `<name>.gabbro` (encrypted vault) and
-  `<name>.gabbro.sha256` (detached SHA-256 hash of the whole file)
+- Export produces two files: `<n>.gabbro` (encrypted vault) and
+  `<n>.gabbro.sha256` (detached SHA-256 hash of the whole file)
 - The detached hash allows integrity verification before decryption,
   following the familiar Linux ISO convention users already know
 - Note: AES-256-GCM's auth tag already guarantees tamper-detection
@@ -239,3 +239,63 @@ SPDX identifier: `GPL-3.0-only`
 - Freemium model TBD
 - Yubico partnership target
 - Advanced features (e.g. advanced tags) as premium tier
+
+---
+
+## Bikeshed / Backlog
+
+### Procedure
+
+This section is a lightweight kanban backlog, used across development sessions.
+Follow this procedure exactly:
+
+1. **To-do:** add ideas here as bullet points under the relevant subsection,
+   with enough context to pick them up cold in a future session.
+2. **Doing:** when work begins on an item, mark it `[IN PROGRESS]` here.
+   Remove it from this section once the session is complete.
+3. **Done:** remove the item from this section entirely. Document it properly
+   in the relevant section of ARCHITECTURE.md and/or LEARNINGS.md, exactly
+   as all other completed work is documented.
+
+Both the developer and the AI assistant are expected to follow this procedure.
+New ideas that arise mid-session should be added here immediately rather than
+discussed and forgotten.
+
+---
+
+### Password / Passphrase Generator
+
+- **Non-ASCII wordlist support (v2):** Add CJK and other non-Latin language
+  wordlists (e.g. Japanese, Korean). Architecture already supports it —
+  `include_str!` handles UTF-8 and entropy math is language-agnostic.
+  Key concerns: wordlist sourcing and vetting (EFF-style vetted lists are
+  less available for CJK); separator defaults (CJK may want none, or a
+  middle dot ・, rather than a hyphen); UI warning that a non-ASCII
+  passphrase may be inaccessible on devices lacking the relevant input
+  method — this applies with extra force to the master passphrase.
+
+- **Max length policy:** Decide and document the enforced limits.
+  Classic passwords — no hard cryptographic cap; sensible generator range
+  is 8–64 characters with no upper limit for manual entry. Passphrases —
+  generator max ~20 words (entropy is already astronomical beyond that,
+  and usability degrades). Verify that the Rust `PasswordConfig` struct
+  does not silently truncate values at any boundary.
+
+- **User-typed password/passphrase with entropy feedback:** Allow the user
+  to type their own secret rather than generating one; Gabbro returns an
+  estimated entropy in bits plus a human-readable strength tier
+  (e.g. Terrible / Weak / Fair / Strong / Very Strong / Centuries).
+  Rust API: `estimate_entropy(password: &str) -> EntropyResult` returning
+  bits (f64) and a `StrengthTier` enum; enum-to-display-string mapping
+  handled in Flutter, following the same pattern as the `Language` enum.
+  Important: entropy for a user-typed string is a lower-bound estimate
+  based on detected character classes (lowercase, uppercase, digits,
+  symbols, non-ASCII) — not a true entropy value. Label it clearly as
+  "estimated entropy" in the UI to avoid false precision.
+
+### Monetisation
+
+- **GPL-3.0 monetisation model TBD** — ideas include a Yubico partnership
+  and a Play Store one-time payment. Needs a dedicated design session;
+  must be compatible with GPL-3.0-only licence obligations. See the
+  Monetization section above for current high-level thinking.
