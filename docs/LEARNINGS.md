@@ -220,6 +220,22 @@ Rust's package manager and build tool. `Cargo.toml` declares
 dependencies; `Cargo.lock` pins exact versions. Analogous to
 `pubspec.yaml` / `pubspec.lock` in Flutter.
 
+### Crate
+Rust's unit of compilation and distribution. A crate is Rust's equivalent 
+of a Python package — a reusable unit of code you can add as a dependency.
+The [dependencies] section of `Cargo.toml` is directly analogous to 
+`requirements.txt` or `pyproject.toml` dependencies.
+`cargo add uuid` is equivalent to `pip install uuid`.
+Two types of crate:
+- library crate (`lib`) — provides code for others to use, like a Python
+library. Gabbro's `rust_lib_gabbro` is one.
+- binary crate (`bin`) — produces an executable, like a Python script
+with `if __name__ == "__main__"`.
+
+`crates.io` is the registry, analogous to PyPI. `Cargo.toml` is the
+manifest, analogous to `pyproject.toml`. `Cargo.lock` pins exact 
+versions, analogous to `pip freeze`.
+
 ### AUR (Arch User Repository)
 Community-maintained package repository for Arch Linux. Packages
 are built from source using `makepkg`. When multiple providers
