@@ -585,6 +585,65 @@ Rust iterators are lazy and composable. Common pattern:
 only those matching a predicate, count the results. Nothing is computed
 until the chain is consumed (here by `.count()`).
 
+### Struct composition — embedding one struct inside another
+Rust has no inheritance. Instead, types share data through composition —
+embedding one struct as a named field inside another. In Gabbro, `EntryMeta`
+holds the six fields common to every entry type (id, timestamps, folder, tags,
+favourite). Each entry type then has a field named `meta` of type `EntryMeta`:
+
+```rust
+pub struct NoteEntry {
+    pub meta: EntryMeta,   // EntryMeta composed in as a field
+    pub title: String,
+    pub content: String,
+}
+```
+
+To reach a composed field you chain the dots: `entry.meta.created_at`,
+`entry.meta.id`. This is identical to Python dataclass composition:
+
+```python
+@dataclass
+class NoteEntry:
+    meta: EntryMeta
+    title: str
+
+entry.meta.created_at  # same dot-chaining
+```
+
+The benefit over flattening all fields directly onto each struct is DRY —
+define the shared fields once in `EntryMeta`, compose them into all six entry
+types. Change `EntryMeta` once and every entry type picks up the change.
+
+### DTO — Data Transfer Object
+A DTO is a plain struct whose only job is to carry data across a boundary —
+in Gabbro's case, across the Flutter/Rust bridge. The internal domain types
+(`LoginEntry`, `NoteEntry`, etc.) are rich Rust types that flutter_rust_bridge
+cannot serialize directly. The DTO equivalents (`LoginEntryData`,
+`NoteEntryData`, etc.) in `api/vault.rs` use only bridge-friendly types
+(`String`, `Vec`, `bool`, `Option<String>`) and exist solely to move data
+to Flutter. The pattern is: build the internal type, do any logic on it,
+then convert to the DTO for the return value. Flutter never sees the
+internal type.
+
+### `crate` — Rust's unit of compilation and distribution
+A crate is Rust's equivalent of a Python package — a reusable unit of code
+you can add as a dependency. The `[dependencies]` section of `Cargo.toml`
+is directly analogous to `requirements.txt` or `pyproject.toml` dependencies.
+`cargo add uuid` is equivalent to `pip install uuid`.
+
+Two types of crate:
+- **library crate** (`lib`) — provides code for others to use, like a Python
+  library. Gabbro's `rust_lib_gabbro` is one.
+- **binary crate** (`bin`) — produces an executable, like a Python script
+  with `if __name__ == "__main__"`.
+
+`crates.io` is the registry, analogous to PyPI. `Cargo.toml` is the manifest,
+analogous to `pyproject.toml`. `Cargo.lock` pins exact versions, analogous
+to `pip freeze`. Many crates ship optional functionality behind **feature
+flags** to keep compile times and binary sizes down — enabled with the
+`--features` flag: `cargo add uuid --features v4`.
+
 ### `#[derive(Debug, Clone, PartialEq)]`
 A derive attribute that auto-generates three trait implementations:
 - `Debug` — enables `{:?}` formatting; needed for readable test failure

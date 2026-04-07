@@ -48,7 +48,8 @@ gabbro/
 │       │   ├── mod.rs
 │       │   ├── simple.rs
 │       │   ├── password_generator.rs
-│       │   └── passphrase_generator.rs
+│       │   ├── passphrase_generator.rs
+│       │   └── vault.rs        # Vault entry API — DTOs and create_* functions
 │       ├── vault/              # Internal domain model (not bridge-exposed)
 │       │   ├── mod.rs
 │       │   └── entry.rs        # All 6 entry types and EntryMeta
@@ -148,7 +149,7 @@ Each entry is an instance of a typed class:
   (`rust/src/api/password_generator.rs`), 6 unit tests passing.
   Passphrase mode fully implemented in Rust
   (`rust/src/api/passphrase_generator.rs`), 8 unit tests passing.
-  Both bridged to Flutter, Flutter build clean. 14 Rust tests total.
+  Both bridged to Flutter, Flutter build clean.
 - Two modes: classic password and wordlist-based passphrase
 - **Passphrase mode:**
   - 5 languages supported: English, French, German, Spanish, Italian
@@ -175,7 +176,7 @@ Each entry is an instance of a typed class:
 
 ## Vault Domain Model
 - **Status:** all 6 entry types implemented in Rust
-  (`rust/src/vault/entry.rs`), 11 unit tests passing. 25 Rust tests total.
+  (`rust/src/vault/entry.rs`), 11 unit tests passing.
 - Lives in `rust/src/vault/` — internal module, not exposed to Flutter
   directly. Flutter will call API functions that construct these types;
   it never builds them directly.
@@ -185,12 +186,32 @@ Each entry is an instance of a typed class:
 - **CustomField:** reusable key/value struct used by LoginEntry (Vec) and
   CustomEntry (HashMap).
 - **CardEntry::new():** only entry type with a validated constructor —
-  enforces card number digit count (12–19) to reject nonsensical data at
+  enforces card number digit digit count (12–19) to reject nonsensical data at
   construction time. Other types use struct literals; validation for those
   will live in the API layer when it is built.
 - **Design principle:** invalid state unrepresentable — if a value cannot
   exist in a valid domain, the type system or constructor prevents it from
   being created at all.
+
+## Vault API Layer
+- **Status:** `LoginEntry` and `NoteEntry` implemented in `rust/src/api/vault.rs`,
+  6 unit tests passing. 31 Rust tests total across the project.
+- Lives in `rust/src/api/vault.rs` — the bridge boundary between Flutter and
+  the internal vault domain model.
+- **Pattern:** each entry type gets a bridge-facing DTO (`LoginEntryData`,
+  `NoteEntryData`, etc.) using only bridge-friendly types (`String`, `Vec`,
+  `bool`, `Option<String>`), and a `create_*` function that generates a UUID,
+  timestamps, builds the internal type, then converts to the DTO.
+- **UUID generation:** uses the `uuid` crate (v1.23.0) with the `v4` feature
+  (random UUIDs). Added to `Cargo.toml` this session.
+- **Timestamps:** generated in Rust using `std::time` only — no `chrono`
+  dependency. Format: ISO 8601 UTC (`YYYY-MM-DDTHH:MM:SSZ`).
+- **Remaining entry types to implement:** Identity, Card, File, Custom.
+  Identity and Card are next — Card will reuse the `CardEntry::new()`
+  validated constructor from the domain model.
+- **DTO pattern:** internal domain types never cross the bridge directly.
+  Flutter calls `create_login_entry(...)` and receives a `LoginEntryData` —
+  it never constructs or holds a `LoginEntry`.
 
 ## Vault Storage & Sync
 - v1: local path only, chosen during onboarding
