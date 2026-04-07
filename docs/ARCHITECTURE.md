@@ -293,6 +293,94 @@ discussed and forgotten.
   symbols, non-ASCII) — not a true entropy value. Label it clearly as
   "estimated entropy" in the UI to avoid false precision.
 
+### Features & UX
+
+- **Autofill:** How will autofill work across platforms? On desktop,
+  browser extensions (Chrome/Firefox/etc.) are the standard approach —
+  requires building and maintaining separate extension(s). On mobile there
+  are no extensions; Android exposes an Autofill Framework (AccessibilityService
+  or the dedicated AutofillService API) and iOS has a Password AutoFill
+  extension point. These are fundamentally different integration models per
+  platform. Key questions: which platforms get autofill in v1 vs v2? Is a
+  browser extension in scope at all given the GPL-3.0 and FOSS distribution
+  model? Does autofill change the security model (secrets closer to the
+  browser boundary)?
+
+- **Themes — dark / light / custom:** Dark and light modes are already noted
+  as system-default with user override. Open questions: should Gabbro offer
+  additional high-contrast or accessibility-focused themes beyond dark/light?
+  Any colour theme must be validated against ADR-003 (colour-blind safety) and
+  WCAG 1.4.1. Consider whether custom accent colours (already noted for the
+  password display palette) generalise to a broader theming system, or whether
+  that adds complexity for little gain.
+
+- **Panic button / app hiding on mobile:** A visible "hide app" mechanism —
+  e.g. disguise Gabbro as a calculator or notes app, or a panic button that
+  instantly locks and hides it. Relevant threat model: physical coercion or
+  device inspection. Key questions: how does this interact with the existing
+  auto-lock and wipe logic? Is disguise-as-another-app feasible on Android
+  (custom launcher icon/label, yes; hiding from app drawer is limited) and iOS
+  (more restricted)? Does offering this create a false sense of security?
+
+- **Remote app / vault deletion:** Allow the user to trigger a remote wipe of
+  the vault (and optionally the app) from another device or a web interface.
+  Requires some form of out-of-band communication channel — which conflicts
+  with the current fully-local, no-server v1 model. Key questions: what
+  transport mechanism? (push notification, SMS, email?) Who operates the
+  server? Does this require Gabbro to have a backend service, and if so what
+  are the privacy and cost implications? Likely a v2+ feature; capture the
+  threat it addresses (device lost/stolen) in the meantime.
+
+- **Coercion resistance / duress / decoy vault:** If a user is forced to unlock
+  the vault, a separate decoy passphrase returns a believable but fake set of
+  entries. Known as a "duress password" or "hidden volume" (cf. VeraCrypt).
+  Non-trivial to implement correctly — the decoy vault must be
+  cryptographically indistinguishable from the real one, otherwise it provides
+  no protection. Key questions: does this fit the current single-vault file
+  model? Would it require two encrypted blobs in the same `.gabbro` file?
+  How does it interact with YubiKey auth (does the duress path also require
+  a tap)? High complexity, high value for high-risk users. Needs a dedicated
+  design session before any implementation.
+
+- **Passkey support:** Passkeys (FIDO2 discoverable credentials / WebAuthn
+  resident keys) are increasingly used as a password replacement on websites.
+  Should Gabbro store passkeys alongside passwords? This is a different
+  credential type — not a secret string but a public/private keypair managed
+  by an authenticator. Key questions: is this in scope for Gabbro's vault
+  model (new entry type: `PasskeyEntry`)? How does passkey storage interact
+  with the YubiKey requirement — are we storing credentials for sites that
+  themselves use YubiKeys? What do competing tools (Bitwarden, 1Password) do
+  here? Likely v2+; note that autofill (above) is a prerequisite for passkeys
+  to be useful.
+
+- **Data breach alerts / HaveIBeenPwned integration:** Notify the user if a
+  stored credential appears in a known data breach. HIBP offers a free
+  k-anonymity API for password hash prefix lookups (no full hash sent) and a
+  separate paid API for email breach lookups. Key questions: is the free
+  password API sufficient for v1? What is the cost model for email breach
+  alerts at scale? Does calling an external API conflict with the privacy
+  model (even k-anonymity leaks query timing and frequency)? Should checks
+  be on-demand only, or periodic background checks? FOSS/GPL compatibility
+  of the API terms of service should be verified.
+
+- **Support model:** How will users get help? Options range from a GitHub
+  Issues tracker (FOSS-standard, no cost) to a dedicated support email,
+  community forum (Discourse, Matrix/Element), or paid support tier. Key
+  questions: what is sustainable for a solo developer? Does the monetisation
+  model (see below) create any support obligations? A minimal v1 approach:
+  GitHub Issues + a SUPPORT.md file. Revisit when the user base exists.
+
+### Cryptography
+
+- **PQ authentication layer (ADR needed):** When the FIDO2/YubiKey auth layer
+  is implemented, ensure it does not inadvertently use classical signatures
+  (ECDSA, RSA, etc.). Per Filippo Valsorda's April 2026 analysis of CRQC
+  timelines, hybrid classic+PQ *authentication* is no longer recommended —
+  new deployments should go straight to pure ML-DSA-44. Our current hybrid
+  ML-KEM key exchange is fine (hybrid key exchange remains acceptable). Action:
+  before implementing the auth layer, write an ADR explicitly addressing the
+  signature algorithm choice. See: https://words.filippo.io/crqc-timeline/
+
 ### Monetisation
 
 - **GPL-3.0 monetisation model TBD** — ideas include a Yubico partnership
