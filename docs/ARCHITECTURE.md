@@ -127,6 +127,9 @@ passphrase + random_salt
 ## Vault Contents
 Each entry is an instance of a typed class:
 - **Types:** Login, Note, Identity, Card, File, Custom
+- **Status:** all 6 entry types fully implemented in the domain model
+  (`rust/src/vault/entry.rs`) and bridged via DTOs and API functions
+  (`rust/src/api/vault.rs`). 39 Rust tests passing across the project.
 - **Core fields:** type-specific
 - **Common fields:** UUID, created, modified, folder, tags, favourite
 - **Login entry:** URL, username, password (hidden by default,
@@ -277,12 +280,10 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Next task:** implement `IdentityEntry` and `CardEntry` DTOs and
-  `create_identity_entry` / `create_card_entry` API functions in
-  `rust/src/api/vault.rs`, following the same pattern as `LoginEntry`
-  and `NoteEntry`. `CardEntry` will reuse the validated `CardEntry::new()`
-  constructor from the domain model.
-- **Test count:** 31 Rust tests passing across the project.
+- **Next task:** implement `estimate_entropy(password: &str) -> EntropyResult`
+  in a new `rust/src/api/entropy.rs` — returns estimated entropy in bits (f64)
+  and a `StrengthTier` enum. See backlog for full spec.
+- **Test count:** 39 Rust tests passing across the project.
 
 ---
 

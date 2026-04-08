@@ -672,6 +672,13 @@ A derive attribute that auto-generates three trait implementations:
   be considered deliberately (e.g. do two entries with the same id but
   different timestamps count as equal?).
 
+### `into_values()` on HashMap
+Consumes a `HashMap` and returns an iterator over its values only,
+discarding the keys. Used in `custom_entry_to_data()` to flatten
+a `HashMap<String, CustomField>` into a `Vec<CustomFieldData>` for
+the bridge — the map key is redundant because each `CustomField`
+already carries a `label`.
+
 ---
 
 ## UX & Internationalisation
