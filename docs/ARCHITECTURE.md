@@ -194,8 +194,9 @@ Each entry is an instance of a typed class:
   being created at all.
 
 ## Vault API Layer
-- **Status:** `LoginEntry` and `NoteEntry` implemented in `rust/src/api/vault.rs`,
-  6 unit tests passing. 31 Rust tests total across the project.
+- **Status:** `LoginEntry`, `NoteEntry`, `IdentityEntry`, and `CardEntry`
+  implemented in `rust/src/api/vault.rs`, 10 unit tests passing.
+  35 Rust tests total across the project.
 - Lives in `rust/src/api/vault.rs` — the bridge boundary between Flutter and
   the internal vault domain model.
 - **Pattern:** each entry type gets a bridge-facing DTO (`LoginEntryData`,
@@ -273,12 +274,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Next task:** implement `IdentityEntry` and `CardEntry` DTOs and
-  `create_identity_entry` / `create_card_entry` API functions in
-  `rust/src/api/vault.rs`, following the same pattern as `LoginEntry`
-  and `NoteEntry`. `CardEntry` will reuse the validated `CardEntry::new()`
-  constructor from the domain model.
-- **Test count:** 31 Rust tests passing across the project.
+- **Next task:** implement `FileEntry` and `CustomEntry` DTOs and
+  `create_file_entry` / `create_custom_entry` API functions in
+  `rust/src/api/vault.rs`, following the same pattern as the existing
+  entry types.
+- **Test count:** 35 Rust tests passing across the project.
 
 ---
 

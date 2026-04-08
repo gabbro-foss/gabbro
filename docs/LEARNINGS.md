@@ -561,6 +561,24 @@ be absent is wrapped in `Option<T>`, which is either `Some(value)` or
 value. Key methods: `.is_some()`, `.is_none()`, `.unwrap()` (panics on
 None — safe in tests after asserting `is_some()`, avoid in production).
 
+### Cloning and the move problem
+When you assign a value to a field or variable in Rust, ownership
+transfers — the original is gone. If you need to use the same value
+twice, `.clone()` makes an explicit deep copy first:
+
+```rust
+let now = chrono_now();
+created_at: now.clone(),  // copy goes here
+updated_at: now,          // original moves here — now is gone after this
+```
+
+Convention: move the original into the last use to avoid an unnecessary
+clone. You can clone every use if you prefer clarity over micro-efficiency,
+but idiomatic Rust avoids cloning more than needed.
+
+In Python this is invisible because objects are reference-counted.
+In Rust, ownership makes it explicit.
+
 ### `Vec<u8>` — raw binary data
 A `Vec` of unsigned 8-bit integers (`u8`). The standard Rust
 representation for binary payloads (file contents, encrypted bytes,

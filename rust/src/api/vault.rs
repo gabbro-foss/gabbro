@@ -4,7 +4,7 @@
 //! Internal domain types (LoginEntry, etc.) are never exposed directly.
 
 use crate::vault::entry::{
-    CustomField, EntryMeta, LoginEntry, NoteEntry,
+    CardEntry, CustomField, EntryMeta, IdentityEntry, LoginEntry, NoteEntry,
 };
 use uuid::Uuid;
 
@@ -42,6 +42,36 @@ pub struct NoteEntryData {
     pub favourite: bool,
     pub title: String,
     pub content: String,
+}
+
+/// An identity entry as seen by Flutter.
+pub struct IdentityEntryData {
+    pub id: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub folder: String,
+    pub tags: Vec<String>,
+    pub favourite: bool,
+    pub first_name: String,
+    pub last_name: String,
+    pub email: String,
+    pub phone: Option<String>,
+    pub address: Option<String>,
+}
+
+/// A card entry as seen by Flutter.
+pub struct CardEntryData {
+    pub id: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub folder: String,
+    pub tags: Vec<String>,
+    pub favourite: bool,
+    pub cardholder_name: String,
+    pub card_number: String,
+    pub expiry: String,
+    pub cvv: String,
+    pub notes: Option<String>,
 }
 
 // ── Conversion helpers (internal → DTO) ──────────────────────────────────────
@@ -82,6 +112,39 @@ fn note_entry_to_data(e: NoteEntry) -> NoteEntryData {
         content: e.content,
     }
 }
+
+fn identity_entry_to_data(e: IdentityEntry) -> IdentityEntryData {
+    IdentityEntryData {
+        id: e.meta.id,
+        created_at: e.meta.created_at,
+        updated_at: e.meta.updated_at,
+        folder: e.meta.folder,
+        tags: e.meta.tags,
+        favourite: e.meta.favourite,
+        first_name: e.first_name,
+        last_name: e.last_name,
+        email: e.email,
+        phone: e.phone,
+        address: e.address,
+    }
+}
+
+fn card_entry_to_data(e: CardEntry) -> CardEntryData {
+    CardEntryData {
+        id: e.meta.id,
+        created_at: e.meta.created_at,
+        updated_at: e.meta.updated_at,
+        folder: e.meta.folder,
+        tags: e.meta.tags,
+        favourite: e.meta.favourite,
+        cardholder_name: e.cardholder_name,
+        card_number: e.card_number,
+        expiry: e.expiry,
+        cvv: e.cvv,
+        notes: e.notes,
+    }
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /// Creates a new login entry with a generated UUID and current timestamp.
@@ -146,6 +209,57 @@ pub fn create_note_entry(
     let entry = NoteEntry { meta, title, content };
     note_entry_to_data(entry)
 }
+
+/// Creates a new identity entry with a generated UUID and current timestamp.
+pub fn create_identity_entry(
+    folder: String,
+    tags: Vec<String>,
+    favourite: bool,
+    first_name: String,
+    last_name: String,
+    email: String,
+    phone: Option<String>,
+    address: Option<String>,
+) -> IdentityEntryData {
+    let now = chrono_now();
+    let meta = EntryMeta {
+        id: Uuid::new_v4().to_string(),
+        created_at: now.clone(),
+        updated_at: now,
+        folder,
+        tags,
+        favourite,
+    };
+    let entry = IdentityEntry { meta, first_name, last_name, email, phone, address };
+    identity_entry_to_data(entry)
+}
+
+/// Creates a new card entry with a generated UUID and current timestamp.
+///
+/// Returns an error if the card number does not contain 12-19 digits.
+pub fn create_card_entry(
+    folder: String,
+    tags: Vec<String>,
+    favourite: bool,
+    cardholder_name: String,
+    card_number: String,
+    expiry: String,
+    cvv: String,
+    notes: Option<String>,
+) -> Result<CardEntryData, String> {
+    let now = chrono_now();
+    let meta = EntryMeta {
+        id: Uuid::new_v4().to_string(),
+        created_at: now.clone(),
+        updated_at: now,
+        folder,
+        tags,
+        favourite,
+    };
+    let entry = CardEntry::new(meta, cardholder_name, card_number, expiry, cvv, notes)?;
+    Ok(card_entry_to_data(entry))
+}
+
 
 // ── Timestamp helper ──────────────────────────────────────────────────────────
 
@@ -312,4 +426,80 @@ mod tests {
         );
         assert_ne!(a.id, b.id);
     }
+
+    #[test]
+    fn create_identity_entry_returns_correct_fields() {
+        let entry = create_identity_entry(
+            String::from("Personal"),
+            vec![],
+            false,
+            String::from("Rob"),
+            String::from("Smith"),
+            String::from("rob@example.com"),
+            Some(String::from("+41 79 123 45 67")),
+            Some(String::from("123 Main St")),
+        );
+
+        assert_eq!(entry.first_name, "Rob");
+        assert_eq!(entry.last_name, "Smith");
+        assert_eq!(entry.email, "rob@example.com");
+        assert!(entry.phone.is_some());
+        assert!(entry.address.is_some());
+        assert_eq!(entry.folder, "Personal");
+        assert!(!entry.favourite);
+    }
+
+    #[test]
+    fn create_identity_entry_optional_fields_can_be_absent() {
+        let entry = create_identity_entry(
+            String::from("Personal"),
+            vec![],
+            false,
+            String::from("Rob"),
+            String::from("Smith"),
+            String::from("rob@example.com"),
+            None,
+            None,
+        );
+
+        assert!(entry.phone.is_none());
+        assert!(entry.address.is_none());
+    }
+
+    #[test]
+    fn create_card_entry_valid_number_succeeds() {
+        let result = create_card_entry(
+            String::from("Personal"),
+            vec![],
+            false,
+            String::from("Rob Smith"),
+            String::from("4111111111111111"), // 16 digits
+            String::from("12/28"),
+            String::from("123"),
+            None,
+        );
+
+        assert!(result.is_ok());
+        let entry = result.unwrap();
+        assert_eq!(entry.cardholder_name, "Rob Smith");
+        assert_eq!(entry.expiry, "12/28");
+        assert_eq!(entry.folder, "Personal");
+    }
+
+    #[test]
+    fn create_card_entry_invalid_number_returns_error() {
+        let result = create_card_entry(
+            String::from("Personal"),
+            vec![],
+            false,
+            String::from("Rob Smith"),
+            String::from("1234"), // too short
+            String::from("12/28"),
+            String::from("123"),
+            None,
+        );
+
+        assert!(result.is_err());
+    }
+
 }
