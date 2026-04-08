@@ -250,6 +250,11 @@ Each entry is an instance of a typed class:
 - SSH key authentication configured for push access
 - Project email: gabbro.app@gmail.com (used in git config user.email)
 - `chat_info/` is git-ignored — development session notes are never versioned
+- **AI development partner access:** Claude has no GitHub account and cannot
+  be added as a repository collaborator. The repo being private means Claude
+  has no access to it at all. Session context is restored at the start of each
+  conversation by uploading `ARCHITECTURE.md` and `LEARNINGS.md`, plus any
+  source files under active discussion.
 
 ## Licence
 
@@ -260,6 +265,20 @@ SPDX identifier: `GPL-3.0-only`
 - Freemium model TBD
 - Yubico partnership target
 - Advanced features (e.g. advanced tags) as premium tier
+
+---
+
+## Current Focus
+
+> Update this section at the end of each session. One or two bullets max.
+> It is the first thing to check at the start of the next session.
+
+- **Next task:** implement `IdentityEntry` and `CardEntry` DTOs and
+  `create_identity_entry` / `create_card_entry` API functions in
+  `rust/src/api/vault.rs`, following the same pattern as `LoginEntry`
+  and `NoteEntry`. `CardEntry` will reuse the validated `CardEntry::new()`
+  constructor from the domain model.
+- **Test count:** 31 Rust tests passing across the project.
 
 ---
 
