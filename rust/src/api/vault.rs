@@ -4,7 +4,7 @@
 //! Internal domain types (LoginEntry, etc.) are never exposed directly.
 
 use crate::vault::entry::{
-    CardEntry, CustomField, EntryMeta, IdentityEntry, LoginEntry, NoteEntry,
+    CardEntry, CustomEntry, CustomField, EntryMeta, FileEntry, IdentityEntry, LoginEntry, NoteEntry,
 };
 use uuid::Uuid;
 
@@ -72,6 +72,31 @@ pub struct CardEntryData {
     pub expiry: String,
     pub cvv: String,
     pub notes: Option<String>,
+}
+
+/// A file entry as seen by Flutter.
+pub struct FileEntryData {
+    pub id: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub folder: String,
+    pub tags: Vec<String>,
+    pub favourite: bool,
+    pub filename: String,
+    pub data: Vec<u8>,
+    pub notes: Option<String>,
+}
+
+/// A custom entry as seen by Flutter.
+pub struct CustomEntryData {
+    pub id: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub folder: String,
+    pub tags: Vec<String>,
+    pub favourite: bool,
+    pub title: String,
+    pub fields: Vec<CustomFieldData>,
 }
 
 // ── Conversion helpers (internal → DTO) ──────────────────────────────────────
@@ -142,6 +167,40 @@ fn card_entry_to_data(e: CardEntry) -> CardEntryData {
         expiry: e.expiry,
         cvv: e.cvv,
         notes: e.notes,
+    }
+}
+
+fn file_entry_to_data(e: FileEntry) -> FileEntryData {
+    FileEntryData {
+        id: e.meta.id,
+        created_at: e.meta.created_at,
+        updated_at: e.meta.updated_at,
+        folder: e.meta.folder,
+        tags: e.meta.tags,
+        favourite: e.meta.favourite,
+        filename: e.filename,
+        data: e.data,
+        notes: e.notes,
+    }
+}
+
+fn custom_entry_to_data(e: CustomEntry) -> CustomEntryData {
+    CustomEntryData {
+        id: e.meta.id,
+        created_at: e.meta.created_at,
+        updated_at: e.meta.updated_at,
+        folder: e.meta.folder,
+        tags: e.meta.tags,
+        favourite: e.meta.favourite,
+        title: e.title,
+        fields: e.fields
+            .into_values()
+            .map(|f| CustomFieldData {
+                label: f.label,
+                value: f.value,
+                hidden: f.hidden,
+            })
+            .collect(),
     }
 }
 
@@ -260,6 +319,56 @@ pub fn create_card_entry(
     Ok(card_entry_to_data(entry))
 }
 
+/// Creates a new file entry with a generated UUID and current timestamp.
+pub fn create_file_entry(
+    folder: String,
+    tags: Vec<String>,
+    favourite: bool,
+    filename: String,
+    data: Vec<u8>,
+    notes: Option<String>,
+) -> FileEntryData {
+    let now = chrono_now();
+    let meta = EntryMeta {
+        id: Uuid::new_v4().to_string(),
+        created_at: now.clone(),
+        updated_at: now,
+        folder,
+        tags,
+        favourite,
+    };
+    let entry = FileEntry { meta, filename, data, notes };
+    file_entry_to_data(entry)
+}
+
+/// Creates a new custom entry with a generated UUID and current timestamp.
+pub fn create_custom_entry(
+    folder: String,
+    tags: Vec<String>,
+    favourite: bool,
+    title: String,
+    fields: Vec<CustomFieldData>,
+) -> CustomEntryData {
+    let now = chrono_now();
+    let meta = EntryMeta {
+        id: Uuid::new_v4().to_string(),
+        created_at: now.clone(),
+        updated_at: now,
+        folder,
+        tags,
+        favourite,
+    };
+    let internal_fields = fields
+        .into_iter()
+        .map(|f| (f.label.clone(), CustomField {
+            label: f.label,
+            value: f.value,
+            hidden: f.hidden,
+        }))
+        .collect();
+    let entry = CustomEntry { meta, title, fields: internal_fields };
+    custom_entry_to_data(entry)
+}
 
 // ── Timestamp helper ──────────────────────────────────────────────────────────
 
@@ -500,6 +609,88 @@ mod tests {
         );
 
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn create_file_entry_returns_correct_fields() {
+        let payload = vec![0u8, 1u8, 2u8, 255u8];
+        let entry = create_file_entry(
+            String::from("Personal"),
+            vec![],
+            false,
+            String::from("secret.pdf"),
+            payload,
+            Some(String::from("my secret doc")),
+        );
+
+        assert_eq!(entry.filename, "secret.pdf");
+        assert_eq!(entry.data.len(), 4);
+        assert_eq!(entry.data[3], 255u8);
+        assert!(entry.notes.is_some());
+        assert_eq!(entry.folder, "Personal");
+    }
+
+    #[test]
+    fn create_file_entry_generates_unique_ids() {
+        let a = create_file_entry(
+            String::from("Work"),
+            vec![],
+            false,
+            String::from("a.pdf"),
+            vec![1u8],
+            None,
+        );
+        let b = create_file_entry(
+            String::from("Work"),
+            vec![],
+            false,
+            String::from("b.pdf"),
+            vec![2u8],
+            None,
+        );
+        assert_ne!(a.id, b.id);
+    }
+
+    #[test]
+    fn create_custom_entry_returns_correct_fields() {
+        let fields = vec![
+            CustomFieldData {
+                label: String::from("API Key"),
+                value: String::from("sk-abc123"),
+                hidden: true,
+            },
+            CustomFieldData {
+                label: String::from("Region"),
+                value: String::from("eu-west-1"),
+                hidden: false,
+            },
+        ];
+        let entry = create_custom_entry(
+            String::from("Work"),
+            vec![String::from("aws")],
+            false,
+            String::from("AWS credentials"),
+            fields,
+        );
+
+        assert_eq!(entry.title, "AWS credentials");
+        assert_eq!(entry.fields.len(), 2);
+        assert_eq!(entry.folder, "Work");
+        assert_eq!(entry.tags, vec!["aws"]);
+    }
+
+    #[test]
+    fn create_custom_entry_empty_fields_succeeds() {
+        let entry = create_custom_entry(
+            String::from("Personal"),
+            vec![],
+            false,
+            String::from("Empty custom"),
+            vec![],
+        );
+
+        assert_eq!(entry.title, "Empty custom");
+        assert_eq!(entry.fields.len(), 0);
     }
 
 }
