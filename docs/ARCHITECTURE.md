@@ -286,10 +286,10 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Next task:** implement `estimate_entropy(password: &str) -> EntropyResult`
-  in a new `rust/src/api/entropy.rs` — returns estimated entropy in bits (f64)
-  and a `StrengthTier` enum. See backlog for full spec.
-- **Test count:** 39 Rust tests passing across the project.
+- **Next task:** bridge `estimate_entropy` to Flutter — add
+  `#[flutter_rust_bridge::frb(sync)]` to the public function, run
+  `flutter_rust_bridge_codegen generate`, and verify Flutter build is clean.
+- **Test count:** 49 Rust tests passing across the project.
 
 ---
 
@@ -331,18 +331,6 @@ discussed and forgotten.
   generator max ~20 words (entropy is already astronomical beyond that,
   and usability degrades). Verify that the Rust `PasswordConfig` struct
   does not silently truncate values at any boundary.
-
-- **User-typed password/passphrase with entropy feedback:** Allow the user
-  to type their own secret rather than generating one; Gabbro returns an
-  estimated entropy in bits plus a human-readable strength tier
-  (e.g. Terrible / Weak / Fair / Strong / Very Strong / Centuries).
-  Rust API: `estimate_entropy(password: &str) -> EntropyResult` returning
-  bits (f64) and a `StrengthTier` enum; enum-to-display-string mapping
-  handled in Flutter, following the same pattern as the `Language` enum.
-  Important: entropy for a user-typed string is a lower-bound estimate
-  based on detected character classes (lowercase, uppercase, digits,
-  symbols, non-ASCII) — not a true entropy value. Label it clearly as
-  "estimated entropy" in the UI to avoid false precision.
 
 ### Features & UX
 

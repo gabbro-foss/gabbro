@@ -6,6 +6,9 @@
 use std::collections::HashMap;
 
 /// The six entry types Gabbro support.
+/// Not yet referenced outside this module — will be used for vault
+/// filtering and sorting. Suppressing dead_code until that layer is built.
+#[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
 pub enum EntryType {
     Login,

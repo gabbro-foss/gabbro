@@ -679,6 +679,16 @@ a `HashMap<String, CustomField>` into a `Vec<CustomFieldData>` for
 the bridge — the map key is redundant because each `CustomField`
 already carries a `label`.
 
+### Entropy estimation — lower-bound approach
+When estimating the entropy of a user-typed string, we detect which character
+classes are present (lowercase, uppercase, digits, symbols, non-ASCII) and sum
+their full pool sizes. We never apply the `exclude_ambiguous` reduction because
+the estimator only sees the string, not the generator config. Using the full
+pool size is the conservative choice: it may slightly overestimate entropy for
+generated passwords, but avoids underestimating for manually typed ones.
+Formula: `entropy = length × log₂(pool_size)`. See `rust/src/api/entropy.rs`
+for tier thresholds and references.
+
 ---
 
 ## UX & Internationalisation
