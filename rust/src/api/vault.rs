@@ -70,7 +70,7 @@ fn login_entry_to_data(e: LoginEntry) -> LoginEntryData {
     }
 }
 
-fn note_entry_to_data(e: NoteEntry) -> NoteEntryData{
+fn note_entry_to_data(e: NoteEntry) -> NoteEntryData {
     NoteEntryData {
         id: e.meta.id,
         created_at: e.meta.created_at,
