@@ -253,15 +253,21 @@ Each entry is an instance of a typed class:
 - SSH key authentication configured for push access
 - Project email: gabbro.app@gmail.com (used in git config user.email)
 - `chat_info/` is git-ignored — development session notes are never versioned
+- **GitHub integration (active):** Anthropic's GitHub integration connects
+  the private repository to this Claude Project. Selected files are synced
+  and available in context automatically, eliminating the need to upload
+  `ARCHITECTURE.md`, `LEARNINGS.md`, and source files at the start of each
+  session.
+
+  **Setup procedure (for reference):**
+  1. Open the Claude chat toolbar → Customize → Add from GitHub
+  2. Install the Claude GitHub App on your GitHub profile and grant access
+     to the private repository
+  3. Select which files to include, being mindful of context window usage
+  4. See: https://support.claude.com/en/articles/10167454-using-the-github-integration
 - **AI development partner access:** Claude cannot be added as a GitHub
-  collaborator and has no persistent access to the repo. However, Anthropic
-  provides a GitHub integration (currently in beta) that allows connecting
-  a private repository to a Claude Project — selected files are added to
-  project knowledge and can be synced. This would eliminate the need to
-  upload `ARCHITECTURE.md` and `LEARNINGS.md` at the start of each session.
-  **TODO (next session):** evaluate and set up the GitHub integration for
-  this project. Until then, session context is restored by uploading
-  `ARCHITECTURE.md`, `LEARNINGS.md`, and any source files under discussion.
+  collaborator and has no persistent access to the repo. The GitHub
+  integration (above) is the mechanism for sharing repo context with Claude.
 
 ## Licence
 
