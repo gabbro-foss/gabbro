@@ -194,9 +194,8 @@ Each entry is an instance of a typed class:
   being created at all.
 
 ## Vault API Layer
-- **Status:** `LoginEntry`, `NoteEntry`, `IdentityEntry`, and `CardEntry`
-  implemented in `rust/src/api/vault.rs`, 10 unit tests passing.
-  35 Rust tests total across the project.
+- **Status:** `LoginEntry` and `NoteEntry` implemented in `rust/src/api/vault.rs`,
+  6 unit tests passing. 31 Rust tests total across the project.
 - Lives in `rust/src/api/vault.rs` — the bridge boundary between Flutter and
   the internal vault domain model.
 - **Pattern:** each entry type gets a bridge-facing DTO (`LoginEntryData`,
@@ -251,11 +250,15 @@ Each entry is an instance of a typed class:
 - SSH key authentication configured for push access
 - Project email: gabbro.app@gmail.com (used in git config user.email)
 - `chat_info/` is git-ignored — development session notes are never versioned
-- **AI development partner access:** Claude has no GitHub account and cannot
-  be added as a repository collaborator. The repo being private means Claude
-  has no access to it at all. Session context is restored at the start of each
-  conversation by uploading `ARCHITECTURE.md` and `LEARNINGS.md`, plus any
-  source files under active discussion.
+- **AI development partner access:** Claude cannot be added as a GitHub
+  collaborator and has no persistent access to the repo. However, Anthropic
+  provides a GitHub integration (currently in beta) that allows connecting
+  a private repository to a Claude Project — selected files are added to
+  project knowledge and can be synced. This would eliminate the need to
+  upload `ARCHITECTURE.md` and `LEARNINGS.md` at the start of each session.
+  **TODO (next session):** evaluate and set up the GitHub integration for
+  this project. Until then, session context is restored by uploading
+  `ARCHITECTURE.md`, `LEARNINGS.md`, and any source files under discussion.
 
 ## Licence
 
@@ -274,11 +277,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Next task:** implement `FileEntry` and `CustomEntry` DTOs and
-  `create_file_entry` / `create_custom_entry` API functions in
-  `rust/src/api/vault.rs`, following the same pattern as the existing
-  entry types.
-- **Test count:** 35 Rust tests passing across the project.
+- **Next task:** implement `IdentityEntry` and `CardEntry` DTOs and
+  `create_identity_entry` / `create_card_entry` API functions in
+  `rust/src/api/vault.rs`, following the same pattern as `LoginEntry`
+  and `NoteEntry`. `CardEntry` will reuse the validated `CardEntry::new()`
+  constructor from the domain model.
+- **Test count:** 31 Rust tests passing across the project.
 
 ---
 
