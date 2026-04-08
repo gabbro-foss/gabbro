@@ -55,9 +55,13 @@ fn wordlist_for(language: &Language) -> Vec<&'static str> {
 /// Returns Err if word_count is 0 or the wordlist is empty.
 pub fn generate_passphrase(config: PassphraseConfig) -> Result<String, String> {
     const MIN_WORD_COUNT: u32 = 4;
+    const MAX_WORD_COUNT: u32 = 20;
 
     if config.word_count < MIN_WORD_COUNT {
         return Err(format!("word_count must be at least {}", MIN_WORD_COUNT));
+    }
+    if config.word_count > MAX_WORD_COUNT {
+        return Err(format!("word_count must be at most {}", MAX_WORD_COUNT));
     }
 
     let words = wordlist_for(&config.language);
@@ -209,4 +213,14 @@ mod tests {
             assert!(result.is_ok(), "Failed for language: {}", name);
         }
     }
+
+    #[test]
+    fn test_word_count_above_maximum_returns_error() {
+        let config = PassphraseConfig {
+            word_count: 21,
+            ..default_config()
+        };
+        assert!(generate_passphrase(config).is_err());
+    }
+
 }

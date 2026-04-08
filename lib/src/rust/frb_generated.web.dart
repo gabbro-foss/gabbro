@@ -6,9 +6,11 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
+import 'api/entropy.dart';
 import 'api/passphrase_generator.dart';
 import 'api/password_generator.dart';
 import 'api/simple.dart';
+import 'api/vault.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -35,22 +37,61 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PasswordConfig dco_decode_box_autoadd_password_config(dynamic raw);
 
   @protected
+  CardEntryData dco_decode_card_entry_data(dynamic raw);
+
+  @protected
+  CustomEntryData dco_decode_custom_entry_data(dynamic raw);
+
+  @protected
+  CustomFieldData dco_decode_custom_field_data(dynamic raw);
+
+  @protected
+  EntropyResult dco_decode_entropy_result(dynamic raw);
+
+  @protected
   double dco_decode_f_64(dynamic raw);
+
+  @protected
+  FileEntryData dco_decode_file_entry_data(dynamic raw);
 
   @protected
   int dco_decode_i_32(dynamic raw);
 
   @protected
+  IdentityEntryData dco_decode_identity_entry_data(dynamic raw);
+
+  @protected
   Language dco_decode_language(dynamic raw);
 
   @protected
+  List<String> dco_decode_list_String(dynamic raw);
+
+  @protected
+  List<CustomFieldData> dco_decode_list_custom_field_data(dynamic raw);
+
+  @protected
+  List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
+
+  @protected
+  LoginEntryData dco_decode_login_entry_data(dynamic raw);
+
+  @protected
+  NoteEntryData dco_decode_note_entry_data(dynamic raw);
+
+  @protected
+  String? dco_decode_opt_String(dynamic raw);
 
   @protected
   PassphraseConfig dco_decode_passphrase_config(dynamic raw);
 
   @protected
   PasswordConfig dco_decode_password_config(dynamic raw);
+
+  @protected
+  StrengthTier dco_decode_strength_tier(dynamic raw);
 
   @protected
   int dco_decode_u_32(dynamic raw);
@@ -78,22 +119,65 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  CardEntryData sse_decode_card_entry_data(SseDeserializer deserializer);
+
+  @protected
+  CustomEntryData sse_decode_custom_entry_data(SseDeserializer deserializer);
+
+  @protected
+  CustomFieldData sse_decode_custom_field_data(SseDeserializer deserializer);
+
+  @protected
+  EntropyResult sse_decode_entropy_result(SseDeserializer deserializer);
+
+  @protected
   double sse_decode_f_64(SseDeserializer deserializer);
+
+  @protected
+  FileEntryData sse_decode_file_entry_data(SseDeserializer deserializer);
 
   @protected
   int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
+  IdentityEntryData sse_decode_identity_entry_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   Language sse_decode_language(SseDeserializer deserializer);
 
   @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer);
+
+  @protected
+  List<CustomFieldData> sse_decode_list_custom_field_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
+
+  @protected
+  LoginEntryData sse_decode_login_entry_data(SseDeserializer deserializer);
+
+  @protected
+  NoteEntryData sse_decode_note_entry_data(SseDeserializer deserializer);
+
+  @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer);
 
   @protected
   PassphraseConfig sse_decode_passphrase_config(SseDeserializer deserializer);
 
   @protected
   PasswordConfig sse_decode_password_config(SseDeserializer deserializer);
+
+  @protected
+  StrengthTier sse_decode_strength_tier(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_32(SseDeserializer deserializer);
@@ -123,19 +207,70 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_card_entry_data(CardEntryData self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_custom_entry_data(
+    CustomEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_custom_field_data(
+    CustomFieldData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_entropy_result(EntropyResult self, SseSerializer serializer);
+
+  @protected
   void sse_encode_f_64(double self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_file_entry_data(FileEntryData self, SseSerializer serializer);
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
 
   @protected
+  void sse_encode_identity_entry_data(
+    IdentityEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_language(Language self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_custom_field_data(
+    List<CustomFieldData> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_login_entry_data(
+    LoginEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_note_entry_data(NoteEntryData self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer);
 
   @protected
   void sse_encode_passphrase_config(
@@ -148,6 +283,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     PasswordConfig self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_strength_tier(StrengthTier self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_32(int self, SseSerializer serializer);

@@ -1,3 +1,6 @@
+const MIN_LENGTH: u32 = 32;
+const MAX_LENGTH: u32 = 256;
+
 /// Configuration for classic password generation.
 pub struct PasswordConfig {
     pub length: u32,
@@ -13,6 +16,13 @@ pub struct PasswordConfig {
 #[flutter_rust_bridge::frb(sync)]
 pub fn generate_password(config: PasswordConfig) -> Result<String, String> {
     use rand::Rng;
+
+    if config.length < MIN_LENGTH || config.length > MAX_LENGTH {
+        return Err(format!(
+            "Password length must be between {} and {} characters, got {}",
+            MIN_LENGTH, MAX_LENGTH, config.length
+        ));
+    }
 
     let mut pool = String::new();
 
@@ -77,7 +87,7 @@ mod tests {
 
     fn default_config() -> PasswordConfig {
         PasswordConfig {
-            length: 16,
+            length: 32,
             use_uppercase: true,
             use_lowercase: true,
             use_digits: true,
@@ -89,13 +99,13 @@ mod tests {
     #[test]
     fn test_correct_length() {
         let pwd = generate_password(default_config()).unwrap();
-        assert_eq!(pwd.len(), 16);
+        assert_eq!(pwd.len(), 32);
     }
 
     #[test]
     fn test_empty_pool_returns_error() {
         let config = PasswordConfig {
-            length: 16,
+            length: 32,
             use_uppercase: false,
             use_lowercase: false,
             use_digits: false,
@@ -108,7 +118,7 @@ mod tests {
     #[test]
     fn test_digits_only() {
         let config = PasswordConfig {
-            length: 20,
+            length: 32,
             use_uppercase: false,
             use_lowercase: false,
             use_digits: true,
@@ -148,4 +158,23 @@ mod tests {
         assert_eq!(entropy_bits(0, 16), 0.0);
         assert_eq!(entropy_bits(62, 0), 0.0);
     }
+
+    #[test]
+    fn test_length_below_minimum_returns_error() {
+        let config = PasswordConfig {
+            length: 8,
+            ..default_config()
+        };
+        assert!(generate_password(config).is_err());
+    }
+
+    #[test]
+    fn test_length_above_maximum_returns_error() {
+        let config = PasswordConfig {
+            length: 512,
+            ..default_config()
+        };
+        assert!(generate_password(config).is_err());
+    }
+    
 }

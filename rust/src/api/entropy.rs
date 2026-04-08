@@ -95,6 +95,7 @@ pub struct EntropyResult {
 ///     entropy = length × log₂(pool_size)
 ///
 /// Returns `EntropyResult { bits: 0.0, tier: Terrible }` for an empty string.
+#[flutter_rust_bridge::frb(sync)]
 pub fn estimate_entropy(password: &str) -> EntropyResult {
     if password.is_empty() {
         return EntropyResult {

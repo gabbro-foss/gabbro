@@ -3,9 +3,11 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/entropy.dart';
 import 'api/passphrase_generator.dart';
 import 'api/password_generator.dart';
 import 'api/simple.dart';
+import 'api/vault.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -68,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -1885688122;
+  int get rustContentHash => -1895728757;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -79,9 +81,71 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
+  Future<CardEntryData> crateApiVaultCreateCardEntry({
+    required String folder,
+    required List<String> tags,
+    required bool favourite,
+    required String cardholderName,
+    required String cardNumber,
+    required String expiry,
+    required String cvv,
+    String? notes,
+  });
+
+  Future<CustomEntryData> crateApiVaultCreateCustomEntry({
+    required String folder,
+    required List<String> tags,
+    required bool favourite,
+    required String title,
+    required List<CustomFieldData> fields,
+  });
+
+  Future<FileEntryData> crateApiVaultCreateFileEntry({
+    required String folder,
+    required List<String> tags,
+    required bool favourite,
+    required String filename,
+    required List<int> data,
+    String? notes,
+  });
+
+  Future<IdentityEntryData> crateApiVaultCreateIdentityEntry({
+    required String folder,
+    required List<String> tags,
+    required bool favourite,
+    required String firstName,
+    required String lastName,
+    required String email,
+    String? phone,
+    String? address,
+  });
+
+  Future<LoginEntryData> crateApiVaultCreateLoginEntry({
+    required String folder,
+    required List<String> tags,
+    required bool favourite,
+    required String url,
+    required String username,
+    required String password,
+    String? notes,
+    required List<CustomFieldData> customFields,
+  });
+
+  Future<NoteEntryData> crateApiVaultCreateNoteEntry({
+    required String folder,
+    required List<String> tags,
+    required bool favourite,
+    required String title,
+    required String content,
+  });
+
   double crateApiPasswordGeneratorEntropyBits({
     required int poolSize,
     required int length,
+  });
+
+  Future<EntropyResult> crateApiEntropyEstimateEntropy({
+    required String password,
   });
 
   Future<String> crateApiPassphraseGeneratorGeneratePassphrase({
@@ -111,6 +175,326 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
+  Future<CardEntryData> crateApiVaultCreateCardEntry({
+    required String folder,
+    required List<String> tags,
+    required bool favourite,
+    required String cardholderName,
+    required String cardNumber,
+    required String expiry,
+    required String cvv,
+    String? notes,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(folder, serializer);
+          sse_encode_list_String(tags, serializer);
+          sse_encode_bool(favourite, serializer);
+          sse_encode_String(cardholderName, serializer);
+          sse_encode_String(cardNumber, serializer);
+          sse_encode_String(expiry, serializer);
+          sse_encode_String(cvv, serializer);
+          sse_encode_opt_String(notes, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 1,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_card_entry_data,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiVaultCreateCardEntryConstMeta,
+        argValues: [
+          folder,
+          tags,
+          favourite,
+          cardholderName,
+          cardNumber,
+          expiry,
+          cvv,
+          notes,
+        ],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultCreateCardEntryConstMeta =>
+      const TaskConstMeta(
+        debugName: "create_card_entry",
+        argNames: [
+          "folder",
+          "tags",
+          "favourite",
+          "cardholderName",
+          "cardNumber",
+          "expiry",
+          "cvv",
+          "notes",
+        ],
+      );
+
+  @override
+  Future<CustomEntryData> crateApiVaultCreateCustomEntry({
+    required String folder,
+    required List<String> tags,
+    required bool favourite,
+    required String title,
+    required List<CustomFieldData> fields,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(folder, serializer);
+          sse_encode_list_String(tags, serializer);
+          sse_encode_bool(favourite, serializer);
+          sse_encode_String(title, serializer);
+          sse_encode_list_custom_field_data(fields, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 2,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_custom_entry_data,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiVaultCreateCustomEntryConstMeta,
+        argValues: [folder, tags, favourite, title, fields],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultCreateCustomEntryConstMeta =>
+      const TaskConstMeta(
+        debugName: "create_custom_entry",
+        argNames: ["folder", "tags", "favourite", "title", "fields"],
+      );
+
+  @override
+  Future<FileEntryData> crateApiVaultCreateFileEntry({
+    required String folder,
+    required List<String> tags,
+    required bool favourite,
+    required String filename,
+    required List<int> data,
+    String? notes,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(folder, serializer);
+          sse_encode_list_String(tags, serializer);
+          sse_encode_bool(favourite, serializer);
+          sse_encode_String(filename, serializer);
+          sse_encode_list_prim_u_8_loose(data, serializer);
+          sse_encode_opt_String(notes, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 3,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_file_entry_data,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiVaultCreateFileEntryConstMeta,
+        argValues: [folder, tags, favourite, filename, data, notes],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultCreateFileEntryConstMeta =>
+      const TaskConstMeta(
+        debugName: "create_file_entry",
+        argNames: ["folder", "tags", "favourite", "filename", "data", "notes"],
+      );
+
+  @override
+  Future<IdentityEntryData> crateApiVaultCreateIdentityEntry({
+    required String folder,
+    required List<String> tags,
+    required bool favourite,
+    required String firstName,
+    required String lastName,
+    required String email,
+    String? phone,
+    String? address,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(folder, serializer);
+          sse_encode_list_String(tags, serializer);
+          sse_encode_bool(favourite, serializer);
+          sse_encode_String(firstName, serializer);
+          sse_encode_String(lastName, serializer);
+          sse_encode_String(email, serializer);
+          sse_encode_opt_String(phone, serializer);
+          sse_encode_opt_String(address, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 4,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_identity_entry_data,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiVaultCreateIdentityEntryConstMeta,
+        argValues: [
+          folder,
+          tags,
+          favourite,
+          firstName,
+          lastName,
+          email,
+          phone,
+          address,
+        ],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultCreateIdentityEntryConstMeta =>
+      const TaskConstMeta(
+        debugName: "create_identity_entry",
+        argNames: [
+          "folder",
+          "tags",
+          "favourite",
+          "firstName",
+          "lastName",
+          "email",
+          "phone",
+          "address",
+        ],
+      );
+
+  @override
+  Future<LoginEntryData> crateApiVaultCreateLoginEntry({
+    required String folder,
+    required List<String> tags,
+    required bool favourite,
+    required String url,
+    required String username,
+    required String password,
+    String? notes,
+    required List<CustomFieldData> customFields,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(folder, serializer);
+          sse_encode_list_String(tags, serializer);
+          sse_encode_bool(favourite, serializer);
+          sse_encode_String(url, serializer);
+          sse_encode_String(username, serializer);
+          sse_encode_String(password, serializer);
+          sse_encode_opt_String(notes, serializer);
+          sse_encode_list_custom_field_data(customFields, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 5,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_login_entry_data,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiVaultCreateLoginEntryConstMeta,
+        argValues: [
+          folder,
+          tags,
+          favourite,
+          url,
+          username,
+          password,
+          notes,
+          customFields,
+        ],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultCreateLoginEntryConstMeta =>
+      const TaskConstMeta(
+        debugName: "create_login_entry",
+        argNames: [
+          "folder",
+          "tags",
+          "favourite",
+          "url",
+          "username",
+          "password",
+          "notes",
+          "customFields",
+        ],
+      );
+
+  @override
+  Future<NoteEntryData> crateApiVaultCreateNoteEntry({
+    required String folder,
+    required List<String> tags,
+    required bool favourite,
+    required String title,
+    required String content,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(folder, serializer);
+          sse_encode_list_String(tags, serializer);
+          sse_encode_bool(favourite, serializer);
+          sse_encode_String(title, serializer);
+          sse_encode_String(content, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 6,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_note_entry_data,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiVaultCreateNoteEntryConstMeta,
+        argValues: [folder, tags, favourite, title, content],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultCreateNoteEntryConstMeta =>
+      const TaskConstMeta(
+        debugName: "create_note_entry",
+        argNames: ["folder", "tags", "favourite", "title", "content"],
+      );
+
+  @override
   double crateApiPasswordGeneratorEntropyBits({
     required int poolSize,
     required int length,
@@ -121,7 +505,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(poolSize, serializer);
           sse_encode_u_32(length, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_f_64,
@@ -141,6 +525,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<EntropyResult> crateApiEntropyEstimateEntropy({
+    required String password,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(password, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 8,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_entropy_result,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiEntropyEstimateEntropyConstMeta,
+        argValues: [password],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiEntropyEstimateEntropyConstMeta =>
+      const TaskConstMeta(
+        debugName: "estimate_entropy",
+        argNames: ["password"],
+      );
+
+  @override
   Future<String> crateApiPassphraseGeneratorGeneratePassphrase({
     required PassphraseConfig config,
   }) {
@@ -152,7 +569,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 9,
             port: port_,
           );
         },
@@ -182,7 +599,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_password_config(config, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -205,7 +622,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(name, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_String,
@@ -230,7 +647,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 12,
             port: port_,
           );
         },
@@ -262,7 +679,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 13,
             port: port_,
           );
         },
@@ -309,9 +726,92 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CardEntryData dco_decode_card_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return CardEntryData(
+      id: dco_decode_String(arr[0]),
+      createdAt: dco_decode_String(arr[1]),
+      updatedAt: dco_decode_String(arr[2]),
+      folder: dco_decode_String(arr[3]),
+      tags: dco_decode_list_String(arr[4]),
+      favourite: dco_decode_bool(arr[5]),
+      cardholderName: dco_decode_String(arr[6]),
+      cardNumber: dco_decode_String(arr[7]),
+      expiry: dco_decode_String(arr[8]),
+      cvv: dco_decode_String(arr[9]),
+      notes: dco_decode_opt_String(arr[10]),
+    );
+  }
+
+  @protected
+  CustomEntryData dco_decode_custom_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return CustomEntryData(
+      id: dco_decode_String(arr[0]),
+      createdAt: dco_decode_String(arr[1]),
+      updatedAt: dco_decode_String(arr[2]),
+      folder: dco_decode_String(arr[3]),
+      tags: dco_decode_list_String(arr[4]),
+      favourite: dco_decode_bool(arr[5]),
+      title: dco_decode_String(arr[6]),
+      fields: dco_decode_list_custom_field_data(arr[7]),
+    );
+  }
+
+  @protected
+  CustomFieldData dco_decode_custom_field_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return CustomFieldData(
+      label: dco_decode_String(arr[0]),
+      value: dco_decode_String(arr[1]),
+      hidden: dco_decode_bool(arr[2]),
+    );
+  }
+
+  @protected
+  EntropyResult dco_decode_entropy_result(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return EntropyResult(
+      bits: dco_decode_f_64(arr[0]),
+      tier: dco_decode_strength_tier(arr[1]),
+    );
+  }
+
+  @protected
   double dco_decode_f_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as double;
+  }
+
+  @protected
+  FileEntryData dco_decode_file_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    return FileEntryData(
+      id: dco_decode_String(arr[0]),
+      createdAt: dco_decode_String(arr[1]),
+      updatedAt: dco_decode_String(arr[2]),
+      folder: dco_decode_String(arr[3]),
+      tags: dco_decode_list_String(arr[4]),
+      favourite: dco_decode_bool(arr[5]),
+      filename: dco_decode_String(arr[6]),
+      data: dco_decode_list_prim_u_8_strict(arr[7]),
+      notes: dco_decode_opt_String(arr[8]),
+    );
   }
 
   @protected
@@ -321,15 +821,99 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  IdentityEntryData dco_decode_identity_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return IdentityEntryData(
+      id: dco_decode_String(arr[0]),
+      createdAt: dco_decode_String(arr[1]),
+      updatedAt: dco_decode_String(arr[2]),
+      folder: dco_decode_String(arr[3]),
+      tags: dco_decode_list_String(arr[4]),
+      favourite: dco_decode_bool(arr[5]),
+      firstName: dco_decode_String(arr[6]),
+      lastName: dco_decode_String(arr[7]),
+      email: dco_decode_String(arr[8]),
+      phone: dco_decode_opt_String(arr[9]),
+      address: dco_decode_opt_String(arr[10]),
+    );
+  }
+
+  @protected
   Language dco_decode_language(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return Language.values[raw as int];
   }
 
   @protected
+  List<String> dco_decode_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_String).toList();
+  }
+
+  @protected
+  List<CustomFieldData> dco_decode_list_custom_field_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_custom_field_data).toList();
+  }
+
+  @protected
+  List<int> dco_decode_list_prim_u_8_loose(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as List<int>;
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
+  }
+
+  @protected
+  LoginEntryData dco_decode_login_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return LoginEntryData(
+      id: dco_decode_String(arr[0]),
+      createdAt: dco_decode_String(arr[1]),
+      updatedAt: dco_decode_String(arr[2]),
+      folder: dco_decode_String(arr[3]),
+      tags: dco_decode_list_String(arr[4]),
+      favourite: dco_decode_bool(arr[5]),
+      url: dco_decode_String(arr[6]),
+      username: dco_decode_String(arr[7]),
+      password: dco_decode_String(arr[8]),
+      notes: dco_decode_opt_String(arr[9]),
+      customFields: dco_decode_list_custom_field_data(arr[10]),
+    );
+  }
+
+  @protected
+  NoteEntryData dco_decode_note_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return NoteEntryData(
+      id: dco_decode_String(arr[0]),
+      createdAt: dco_decode_String(arr[1]),
+      updatedAt: dco_decode_String(arr[2]),
+      folder: dco_decode_String(arr[3]),
+      tags: dco_decode_list_String(arr[4]),
+      favourite: dco_decode_bool(arr[5]),
+      title: dco_decode_String(arr[6]),
+      content: dco_decode_String(arr[7]),
+    );
+  }
+
+  @protected
+  String? dco_decode_opt_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_String(raw);
   }
 
   @protected
@@ -361,6 +945,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       useSymbols: dco_decode_bool(arr[4]),
       excludeAmbiguous: dco_decode_bool(arr[5]),
     );
+  }
+
+  @protected
+  StrengthTier dco_decode_strength_tier(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return StrengthTier.values[raw as int];
   }
 
   @protected
@@ -411,15 +1001,144 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CardEntryData sse_decode_card_entry_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    var var_updatedAt = sse_decode_String(deserializer);
+    var var_folder = sse_decode_String(deserializer);
+    var var_tags = sse_decode_list_String(deserializer);
+    var var_favourite = sse_decode_bool(deserializer);
+    var var_cardholderName = sse_decode_String(deserializer);
+    var var_cardNumber = sse_decode_String(deserializer);
+    var var_expiry = sse_decode_String(deserializer);
+    var var_cvv = sse_decode_String(deserializer);
+    var var_notes = sse_decode_opt_String(deserializer);
+    return CardEntryData(
+      id: var_id,
+      createdAt: var_createdAt,
+      updatedAt: var_updatedAt,
+      folder: var_folder,
+      tags: var_tags,
+      favourite: var_favourite,
+      cardholderName: var_cardholderName,
+      cardNumber: var_cardNumber,
+      expiry: var_expiry,
+      cvv: var_cvv,
+      notes: var_notes,
+    );
+  }
+
+  @protected
+  CustomEntryData sse_decode_custom_entry_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    var var_updatedAt = sse_decode_String(deserializer);
+    var var_folder = sse_decode_String(deserializer);
+    var var_tags = sse_decode_list_String(deserializer);
+    var var_favourite = sse_decode_bool(deserializer);
+    var var_title = sse_decode_String(deserializer);
+    var var_fields = sse_decode_list_custom_field_data(deserializer);
+    return CustomEntryData(
+      id: var_id,
+      createdAt: var_createdAt,
+      updatedAt: var_updatedAt,
+      folder: var_folder,
+      tags: var_tags,
+      favourite: var_favourite,
+      title: var_title,
+      fields: var_fields,
+    );
+  }
+
+  @protected
+  CustomFieldData sse_decode_custom_field_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_label = sse_decode_String(deserializer);
+    var var_value = sse_decode_String(deserializer);
+    var var_hidden = sse_decode_bool(deserializer);
+    return CustomFieldData(
+      label: var_label,
+      value: var_value,
+      hidden: var_hidden,
+    );
+  }
+
+  @protected
+  EntropyResult sse_decode_entropy_result(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_bits = sse_decode_f_64(deserializer);
+    var var_tier = sse_decode_strength_tier(deserializer);
+    return EntropyResult(bits: var_bits, tier: var_tier);
+  }
+
+  @protected
   double sse_decode_f_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getFloat64();
   }
 
   @protected
+  FileEntryData sse_decode_file_entry_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    var var_updatedAt = sse_decode_String(deserializer);
+    var var_folder = sse_decode_String(deserializer);
+    var var_tags = sse_decode_list_String(deserializer);
+    var var_favourite = sse_decode_bool(deserializer);
+    var var_filename = sse_decode_String(deserializer);
+    var var_data = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_notes = sse_decode_opt_String(deserializer);
+    return FileEntryData(
+      id: var_id,
+      createdAt: var_createdAt,
+      updatedAt: var_updatedAt,
+      folder: var_folder,
+      tags: var_tags,
+      favourite: var_favourite,
+      filename: var_filename,
+      data: var_data,
+      notes: var_notes,
+    );
+  }
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getInt32();
+  }
+
+  @protected
+  IdentityEntryData sse_decode_identity_entry_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    var var_updatedAt = sse_decode_String(deserializer);
+    var var_folder = sse_decode_String(deserializer);
+    var var_tags = sse_decode_list_String(deserializer);
+    var var_favourite = sse_decode_bool(deserializer);
+    var var_firstName = sse_decode_String(deserializer);
+    var var_lastName = sse_decode_String(deserializer);
+    var var_email = sse_decode_String(deserializer);
+    var var_phone = sse_decode_opt_String(deserializer);
+    var var_address = sse_decode_opt_String(deserializer);
+    return IdentityEntryData(
+      id: var_id,
+      createdAt: var_createdAt,
+      updatedAt: var_updatedAt,
+      folder: var_folder,
+      tags: var_tags,
+      favourite: var_favourite,
+      firstName: var_firstName,
+      lastName: var_lastName,
+      email: var_email,
+      phone: var_phone,
+      address: var_address,
+    );
   }
 
   @protected
@@ -430,10 +1149,106 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <String>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_String(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<CustomFieldData> sse_decode_list_custom_field_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <CustomFieldData>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_custom_field_data(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
     return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  LoginEntryData sse_decode_login_entry_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    var var_updatedAt = sse_decode_String(deserializer);
+    var var_folder = sse_decode_String(deserializer);
+    var var_tags = sse_decode_list_String(deserializer);
+    var var_favourite = sse_decode_bool(deserializer);
+    var var_url = sse_decode_String(deserializer);
+    var var_username = sse_decode_String(deserializer);
+    var var_password = sse_decode_String(deserializer);
+    var var_notes = sse_decode_opt_String(deserializer);
+    var var_customFields = sse_decode_list_custom_field_data(deserializer);
+    return LoginEntryData(
+      id: var_id,
+      createdAt: var_createdAt,
+      updatedAt: var_updatedAt,
+      folder: var_folder,
+      tags: var_tags,
+      favourite: var_favourite,
+      url: var_url,
+      username: var_username,
+      password: var_password,
+      notes: var_notes,
+      customFields: var_customFields,
+    );
+  }
+
+  @protected
+  NoteEntryData sse_decode_note_entry_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    var var_updatedAt = sse_decode_String(deserializer);
+    var var_folder = sse_decode_String(deserializer);
+    var var_tags = sse_decode_list_String(deserializer);
+    var var_favourite = sse_decode_bool(deserializer);
+    var var_title = sse_decode_String(deserializer);
+    var var_content = sse_decode_String(deserializer);
+    return NoteEntryData(
+      id: var_id,
+      createdAt: var_createdAt,
+      updatedAt: var_updatedAt,
+      folder: var_folder,
+      tags: var_tags,
+      favourite: var_favourite,
+      title: var_title,
+      content: var_content,
+    );
+  }
+
+  @protected
+  String? sse_decode_opt_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_String(deserializer));
+    } else {
+      return null;
+    }
   }
 
   @protected
@@ -470,6 +1285,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       useSymbols: var_useSymbols,
       excludeAmbiguous: var_excludeAmbiguous,
     );
+  }
+
+  @protected
+  StrengthTier sse_decode_strength_tier(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return StrengthTier.values[inner];
   }
 
   @protected
@@ -520,9 +1342,79 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_card_entry_data(
+    CardEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.createdAt, serializer);
+    sse_encode_String(self.updatedAt, serializer);
+    sse_encode_String(self.folder, serializer);
+    sse_encode_list_String(self.tags, serializer);
+    sse_encode_bool(self.favourite, serializer);
+    sse_encode_String(self.cardholderName, serializer);
+    sse_encode_String(self.cardNumber, serializer);
+    sse_encode_String(self.expiry, serializer);
+    sse_encode_String(self.cvv, serializer);
+    sse_encode_opt_String(self.notes, serializer);
+  }
+
+  @protected
+  void sse_encode_custom_entry_data(
+    CustomEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.createdAt, serializer);
+    sse_encode_String(self.updatedAt, serializer);
+    sse_encode_String(self.folder, serializer);
+    sse_encode_list_String(self.tags, serializer);
+    sse_encode_bool(self.favourite, serializer);
+    sse_encode_String(self.title, serializer);
+    sse_encode_list_custom_field_data(self.fields, serializer);
+  }
+
+  @protected
+  void sse_encode_custom_field_data(
+    CustomFieldData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.label, serializer);
+    sse_encode_String(self.value, serializer);
+    sse_encode_bool(self.hidden, serializer);
+  }
+
+  @protected
+  void sse_encode_entropy_result(EntropyResult self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_f_64(self.bits, serializer);
+    sse_encode_strength_tier(self.tier, serializer);
+  }
+
+  @protected
   void sse_encode_f_64(double self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putFloat64(self);
+  }
+
+  @protected
+  void sse_encode_file_entry_data(
+    FileEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.createdAt, serializer);
+    sse_encode_String(self.updatedAt, serializer);
+    sse_encode_String(self.folder, serializer);
+    sse_encode_list_String(self.tags, serializer);
+    sse_encode_bool(self.favourite, serializer);
+    sse_encode_String(self.filename, serializer);
+    sse_encode_list_prim_u_8_strict(self.data, serializer);
+    sse_encode_opt_String(self.notes, serializer);
   }
 
   @protected
@@ -532,9 +1424,61 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_identity_entry_data(
+    IdentityEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.createdAt, serializer);
+    sse_encode_String(self.updatedAt, serializer);
+    sse_encode_String(self.folder, serializer);
+    sse_encode_list_String(self.tags, serializer);
+    sse_encode_bool(self.favourite, serializer);
+    sse_encode_String(self.firstName, serializer);
+    sse_encode_String(self.lastName, serializer);
+    sse_encode_String(self.email, serializer);
+    sse_encode_opt_String(self.phone, serializer);
+    sse_encode_opt_String(self.address, serializer);
+  }
+
+  @protected
   void sse_encode_language(Language self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_String(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_custom_field_data(
+    List<CustomFieldData> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_custom_field_data(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_prim_u_8_loose(
+    List<int> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putUint8List(
+      self is Uint8List ? self : Uint8List.fromList(self),
+    );
   }
 
   @protected
@@ -545,6 +1489,51 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint8List(self);
+  }
+
+  @protected
+  void sse_encode_login_entry_data(
+    LoginEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.createdAt, serializer);
+    sse_encode_String(self.updatedAt, serializer);
+    sse_encode_String(self.folder, serializer);
+    sse_encode_list_String(self.tags, serializer);
+    sse_encode_bool(self.favourite, serializer);
+    sse_encode_String(self.url, serializer);
+    sse_encode_String(self.username, serializer);
+    sse_encode_String(self.password, serializer);
+    sse_encode_opt_String(self.notes, serializer);
+    sse_encode_list_custom_field_data(self.customFields, serializer);
+  }
+
+  @protected
+  void sse_encode_note_entry_data(
+    NoteEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.createdAt, serializer);
+    sse_encode_String(self.updatedAt, serializer);
+    sse_encode_String(self.folder, serializer);
+    sse_encode_list_String(self.tags, serializer);
+    sse_encode_bool(self.favourite, serializer);
+    sse_encode_String(self.title, serializer);
+    sse_encode_String(self.content, serializer);
+  }
+
+  @protected
+  void sse_encode_opt_String(String? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_String(self, serializer);
+    }
   }
 
   @protected
@@ -572,6 +1561,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.useDigits, serializer);
     sse_encode_bool(self.useSymbols, serializer);
     sse_encode_bool(self.excludeAmbiguous, serializer);
+  }
+
+  @protected
+  void sse_encode_strength_tier(StrengthTier self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected

@@ -176,6 +176,12 @@ Each entry is an instance of a typed class:
 - Accessible from main screen and inline within entry editor
 - Remembers user's last settings
 - Clipboard auto-clear after 60 seconds
+- **Length policy:** generator minimum 32 characters, maximum 256 characters,
+  default 32. No upper limit enforced for manually typed passwords — user
+  agency is respected; the entropy estimator provides feedback instead of
+  blocking. Passphrase generator: minimum 4 words (enforced), maximum 20
+  words (enforced). Both limits are validated in Rust and return `Err` if
+  exceeded.
 
 ## Vault Domain Model
 - **Status:** all 6 entry types implemented in Rust
@@ -286,10 +292,10 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Next task:** bridge `estimate_entropy` to Flutter — add
-  `#[flutter_rust_bridge::frb(sync)]` to the public function, run
-  `flutter_rust_bridge_codegen generate`, and verify Flutter build is clean.
-- **Test count:** 49 Rust tests passing across the project.
+- **Next task:** tackle the crypto stack — Argon2id KDF, ML-KEM key
+  encapsulation, AES-256-GCM vault encryption. Needs fresh brain —
+  start with an ADR for the PQ authentication layer first.
+- **Test count:** 52 Rust tests passing across the project.
 
 ---
 
@@ -325,12 +331,6 @@ discussed and forgotten.
   passphrase may be inaccessible on devices lacking the relevant input
   method — this applies with extra force to the master passphrase.
 
-- **Max length policy:** Decide and document the enforced limits.
-  Classic passwords — no hard cryptographic cap; sensible generator range
-  is 8–64 characters with no upper limit for manual entry. Passphrases —
-  generator max ~20 words (entropy is already astronomical beyond that,
-  and usability degrades). Verify that the Rust `PasswordConfig` struct
-  does not silently truncate values at any boundary.
 
 ### Features & UX
 
