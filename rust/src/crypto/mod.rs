@@ -7,3 +7,4 @@ pub mod kdf;
 pub mod keypair;
 pub mod ml_kem;
 pub mod hkdf;
+pub mod aes_gcm;

@@ -7,6 +7,7 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
+aes-gcm = "0.10.3"
 argon2 = "0.5.3"
 flutter_rust_bridge = "=2.11.1"
 hkdf = "0.13.0"
