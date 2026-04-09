@@ -112,6 +112,9 @@ passphrase + random_salt
 
 ## Authentication Stack (Layer 2 - App Access)
 - Mandatory FIDO2/WebAuthn hardware key (YubiKey)
+- v1 signature algorithm: Ed25519 (hardware constraint — YubiKey 5
+  series does not yet support ML-DSA). Target: ML-DSA-44 once
+  Yubico ships PQ-capable hardware. See ADR-005.
 - Minimum 2 keys required (primary + backup), maximum 4
 - Biometric unlock available (replaces passphrase entry only,
   never replaces YubiKey tap)
@@ -292,9 +295,10 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Next task:** tackle the crypto stack — Argon2id KDF, ML-KEM key
-  encapsulation, AES-256-GCM vault encryption. Needs fresh brain —
-  start with an ADR for the PQ authentication layer first.
+- **Next task:** implement the crypto stack — Argon2id KDF, ML-KEM key
+  encapsulation, AES-256-GCM vault encryption. Start with a fresh brain;
+  consider whether an ADR for the encryption implementation is needed
+  before writing code.
 - **Test count:** 52 Rust tests passing across the project.
 
 ---
@@ -409,16 +413,6 @@ discussed and forgotten.
   model (see below) create any support obligations? A minimal v1 approach:
   GitHub Issues + a SUPPORT.md file. Revisit when the user base exists.
 
-### Cryptography
-
-- **PQ authentication layer (ADR needed):** When the FIDO2/YubiKey auth layer
-  is implemented, ensure it does not inadvertently use classical signatures
-  (ECDSA, RSA, etc.). Per Filippo Valsorda's April 2026 analysis of CRQC
-  timelines, hybrid classic+PQ *authentication* is no longer recommended —
-  new deployments should go straight to pure ML-DSA-44. Our current hybrid
-  ML-KEM key exchange is fine (hybrid key exchange remains acceptable). Action:
-  before implementing the auth layer, write an ADR explicitly addressing the
-  signature algorithm choice. See: https://words.filippo.io/crqc-timeline/
 
 ### Monetisation
 

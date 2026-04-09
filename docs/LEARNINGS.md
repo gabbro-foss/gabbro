@@ -86,6 +86,99 @@ to be considered acceptable. Fewer words (1–3) from any standard
 wordlist produce insufficient entropy regardless of list size.
 Gabbro enforces this as a hard minimum in `PassphraseConfig`.
 
+### ML-DSA — Post-Quantum Digital Signature Algorithm
+The signature half of NIST's post-quantum standard. DSA = Digital
+Signature Algorithm — used to *prove identity* (authentication). A
+private key signs a challenge; the other party verifies with the
+public key. Analogous to a wax seal: proves the message came from
+you and wasn't tampered with.
+Contrast with ML-KEM, which *establishes a shared secret* (key
+exchange). These solve different problems: ML-DSA proves who you
+are; ML-KEM sets up an encrypted channel.
+
+### ML-DSA parameter sets (ML-DSA-44 / 65 / 87)
+ML-DSA comes in three parameter sets corresponding to NIST security
+levels 2, 3, and 5 respectively. Higher levels = larger signatures
++ more compute, in exchange for a larger security margin.
+- ML-DSA-44: Level 2 (~SHA-256 collision resistance equivalent).
+  Signature size ~2.4 KB.
+- ML-DSA-65: Level 3 (~AES-192 equivalent). ~3.3 KB.
+- ML-DSA-87: Level 5 (~AES-256 equivalent). ~4.6 KB.
+Gabbro targets ML-DSA-44. Level 2 is already beyond conservative
+for authentication; the extra size of Level 3/5 buys protection
+against attacks that don't currently exist. The gap between Level 2
+and Level 3 is not worth the bytes — like rating a safe for a
+storm category that doesn't exist.
+
+### NIST Security Levels
+A 1–5 scale used to compare post-quantum algorithm parameter sets.
+Roughly: Level 1 ≈ AES-128, Level 2 ≈ SHA-256 collision resistance,
+Level 3 ≈ AES-192, Level 5 ≈ AES-256. Not a direct equivalence —
+more a "how hard is the best known attack" comparison. Higher is
+stronger but costs more in key/signature size and compute time.
+
+### Hybrid classical + PQ (signatures)
+A scheme that bundles two signatures — one classical (e.g. ECDSA)
+and one post-quantum (e.g. ML-DSA) — into a single object. Both
+must verify for authentication to succeed. Rationale during the
+transition period: trust ECDSA's 20-year track record while hedging
+on the newer ML-DSA. Now considered the wrong tradeoff for *new*
+deployments: ML-DSA has two years of production use, quantum
+timelines have accelerated, and the complexity cost of hybrid
+signatures outweighs the hedge benefit. Hybrid *key exchange*
+(ML-KEM + classical) remains reasonable because ephemeral keys are
+cheap to compose — but that reasoning does not carry over to
+authentication.
+
+### Composite signatures
+The formal IETF standardisation of hybrid signatures: a defined
+wire format for bundling two signatures (e.g. ECDSA + ML-DSA) into
+a single object, with a standard key type and verification procedure.
+Draft: draft-ietf-lamps-pq-composite-sigs-15 (18 composite key
+type combinations). High complexity cost for Gabbro: no legacy
+compatibility requirement means no benefit from composite signatures.
+Not used in Gabbro.
+
+### WebAuthn / FIDO2 / YubiKey — the stack
+Three layers that work together for hardware authentication:
+- **YubiKey**: the physical device. Does the actual cryptographic
+  signing in tamper-resistant hardware. Private key never leaves
+  the device.
+- **FIDO2**: the protocol between the app and the hardware key.
+  Defines how challenges are issued, how credentials are stored,
+  how signatures are returned.
+- **WebAuthn**: the API your application code calls. Says "ask the
+  user to tap their key and return a signed challenge." The app
+  doesn't talk to the YubiKey directly — it calls WebAuthn, which
+  handles the FIDO2 protocol.
+In Flutter/Dart, the app calls a WebAuthn library; the YubiKey does
+the signing; the app verifies the returned signature. Algorithm
+selection happens via the `pubKeyCredParams` parameter at credential
+creation time.
+
+### YubiKey hardware support gap (PQ)
+Current YubiKey 5 series hardware (as of April 2026) supports
+Ed25519 and ECDSA for FIDO2 — not ML-DSA. Gabbro's target
+algorithm is ML-DSA-44, but this depends on Yubico shipping
+PQ-capable hardware or firmware (likely Series 6 or equivalent).
+Gabbro v1 therefore uses Ed25519 as the FIDO2 signature algorithm
+— the strongest available classical option. The auth layer is
+designed for a clean migration to ML-DSA-44 when hardware supports
+it. This is documented honestly in ADR-005. The PQ claim for Gabbro
+v1 rests on the *encryption* stack (ML-KEM + AES-256-GCM), not the
+authentication layer.
+
+### Authentication vs key exchange — two different problems
+- **Authentication** (ML-DSA): proves identity. "Who are you?" 
+  You sign a challenge with your private key; the other party
+  verifies. Used in Gabbro's Layer 2 (YubiKey unlock).
+- **Key exchange** (ML-KEM): establishes a shared secret. "How do
+  we encrypt our conversation?" Neither party knows the secret in
+  advance — they derive it together. Used in Gabbro's Layer 1
+  (vault encryption).
+Independent operations. Changing the signature algorithm does not
+touch the vault encryption, and vice versa.
+
 ---
 
 ## Security Concepts
