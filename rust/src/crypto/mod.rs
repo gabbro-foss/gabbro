@@ -4,3 +4,4 @@
 //! Flutter calls functions in `api/` which orchestrate these primitives.
 
 pub mod kdf;
+pub mod keypair;

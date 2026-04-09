@@ -11,6 +11,7 @@ argon2 = "0.5.3"
 flutter_rust_bridge = "=2.11.1"
 rand = "0.8"
 uuid = { version = "1.23.0", features = ["v4"] }
+x25519-dalek = { version = "2.0.1", features = ["reusable_secrets"] }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
