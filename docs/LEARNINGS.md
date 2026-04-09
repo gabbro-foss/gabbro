@@ -817,3 +817,76 @@ their master passphrase, without blocking their use.
 A measure of password unpredictability in bits. Higher is
 better. Displaying entropy in real time educates users about
 why length and character variety matter.
+
+---
+
+## Vault Crypto Stack
+
+### The `||` notation in cryptography
+In cryptographic specifications, `A || B` means concatenation —
+A followed by B joined into a single byte sequence. Not a logical OR.
+In Rust: `ikm.extend_from_slice(&a); ikm.extend_from_slice(&b)`.
+In Python: `a + b` on byte arrays.
+
+### Seeded RNG for deterministic keypair derivation
+The `ml-kem` and `x25519-dalek` v2 crates do not accept raw byte
+seeds directly for keypair generation — they require an RNG. To
+derive keypairs deterministically from KDF output, we seed `StdRng`
+(a cryptographically secure deterministic RNG from the `rand` crate)
+with our KDF bytes, then pass it to the keypair generator. Same seed
+→ same RNG stream → same keypair. This is the idiomatic approach;
+the `ml-kem` crate's direct seed API (`hazmat` feature) is explicitly
+marked unsafe for production use.
+
+### Hybrid key exchange — the lock/unlock flow
+
+```
+SETUP: passphrase + salt → Argon2id → 96 bytes
+bytes [0..32]  → seed StdRng → X25519 keypair
+bytes [32..64] → seed StdRng → ML-KEM-1024 keypair
+bytes [64..96] → reserved
+LOCK:
+ML-KEM encapsulate → ml_kem_ciphertext + shared_secret_A
+X25519 ephemeral exchange → ephemeral_public + shared_secret_B
+HKDF(A || B, salt, "gabbro-hybrid-kex-v1") → vault_key
+AES-256-GCM(vault_key, plaintext) → ciphertext + nonce
+UNLOCK:
+Argon2id(passphrase, stored_salt) → same keypairs
+ML-KEM decapsulate(stored_ciphertext) → shared_secret_A
+X25519(stored_ephemeral_public) → shared_secret_B
+HKDF(A || B, stored_salt, info) → vault_key
+AES-256-GCM decrypt → plaintext
+```
+
+### Random session key vs passphrase-derived key
+The vault body is encrypted with a random session key, not the
+passphrase directly. The passphrase derives keypairs that
+*encapsulate* the session key. Consequence: changing the passphrase
+only requires re-running encapsulation — the vault body need not be
+re-encrypted. This is the standard pattern in encrypted storage.
+
+### Argon2id benchmarking
+Parameters should be benchmarked on target hardware, not just
+copied from recommendations. Target range: 0.5–1.0s on the
+development machine. On a 2011 desktop, m=65536/t=3/p=4 produced
+84ms — too fast. t=25 produced 667ms — in the target range.
+The bench_kdf binary in `rust/src/bin/` is the repeatable audit tool.
+OWASP source: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+
+### `*value` — dereferencing in Rust
+The `*` operator dereferences a smart pointer or wrapper type,
+giving access to the underlying data. The ml-kem crate returns
+shared secrets as `hybrid_array::Array<u8, N>` — a fixed-size
+array wrapper. `(*ml_kem_secret).try_into()` dereferences it to
+a plain `[u8]` slice that `.try_into()` can then convert to
+`[u8; 32]`. In Python this indirection is invisible because
+everything is a reference already.
+
+### Dependency version conflicts
+When two crates in the dependency tree require different versions
+of a shared dependency (e.g. `rand_core` v0.6 vs v0.10), traits
+from one version are not compatible with types from the other —
+even if the API looks identical. The fix is usually to reduce
+dependencies rather than add version constraints. In Gabbro:
+`rand_chacha` was removed in favour of `StdRng` from the already-
+present `rand` crate, eliminating the conflict entirely.

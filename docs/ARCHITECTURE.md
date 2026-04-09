@@ -50,9 +50,19 @@ gabbro/
 │       │   ├── password_generator.rs
 │       │   ├── passphrase_generator.rs
 │       │   └── vault.rs        # Vault entry API — DTOs and create_* functions
+│       ├── crypto/             # Internal crypto stack (not bridge-exposed)
+│       │   ├── mod.rs
+│       │   ├── kdf.rs          # Argon2id KDF and Argon2idParams struct
+│       │   ├── keypair.rs      # X25519 keypair derivation
+│       │   ├── ml_kem.rs       # ML-KEM-1024 keypair derivation
+│       │   ├── hkdf.rs         # HKDF-SHA256 combiner
+│       │   ├── aes_gcm.rs      # AES-256-GCM encrypt/decrypt
+│       │   └── vault_crypto.rs # seal_vault() and open_vault()
 │       ├── vault/              # Internal domain model (not bridge-exposed)
 │       │   ├── mod.rs
 │       │   └── entry.rs        # All 6 entry types and EntryMeta
+│       ├── bin/
+│       │   └── bench_kdf.rs    # Argon2id parameter audit tool
 │       ├── frb_generated.rs    # Auto-generated bridge code (do not edit)
 │       └── lib.rs
 ├── rust_builder/               # Cargokit build integration (do not edit)
@@ -72,7 +82,8 @@ gabbro/
 │       ├── ADR-002-export-integrity-hash.md
 │       ├── ADR-003-colourblind-password-display.md
 │       ├── ADR-004-licence.md
-│       └── ADR-005-pq-authentication-signatures.md
+│       ├── ADR-005-pq-authentication-signatures.md
+│       └── ADR-006-encryption-implementation.md
 ├── chat_info/                  # Development session notes and ASCII wireframes
 │   └── ascii_art/              # (git-ignored — not versioned)
 ├── flutter_rust_bridge.yaml    # Bridge configuration
@@ -111,6 +122,16 @@ passphrase + random_salt
 - **AES-256-GCM:** fast symmetric encryption + tamper detection
 - **ML-KEM:** post-quantum key encapsulation (NIST standard)
 - **Hybrid approach:** classical + PQC = belt and suspenders
+
+- **Status:** fully implemented in `rust/src/crypto/`:
+  - `kdf.rs` — Argon2id KDF, `Argon2idParams` struct (m=65536, t=25, p=4)
+  - `keypair.rs` — X25519 keypair derivation from KDF output
+  - `ml_kem.rs` — ML-KEM-1024 keypair derivation from KDF output
+  - `hkdf.rs` — HKDF-SHA256 combiner, domain-separated with "gabbro-hybrid-kex-v1"
+  - `aes_gcm.rs` — AES-256-GCM encrypt/decrypt with random nonce per operation
+  - `vault_crypto.rs` — `seal_vault()` and `open_vault()` orchestrating the full stack
+  - `bench_kdf.rs` — repeatable Argon2id parameter audit tool
+  - All decisions documented in ADR-006.
 
 ## Authentication Stack (Layer 2 - App Access)
 - Mandatory FIDO2/WebAuthn hardware key (YubiKey)
@@ -297,11 +318,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Next task:** implement the crypto stack — Argon2id KDF, ML-KEM key
-  encapsulation, AES-256-GCM vault encryption. Start with a fresh brain;
-  consider whether an ADR for the encryption implementation is needed
-  before writing code.
-- **Test count:** 52 Rust tests passing across the project.
+- **Next task:** wire the crypto stack into the vault file format —
+  implement the `.gabbro` file header (serialization/deserialization
+  of `SealedVault` fields to/from bytes), then write the first
+  end-to-end vault file write and read test.
+- **Test count:** 77 Rust tests passing across the project.
 
 ---
 
