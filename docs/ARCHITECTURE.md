@@ -71,6 +71,8 @@ gabbro/
 │       ├── ADR-001-rust-flutter-stack.md
 │       ├── ADR-002-export-integrity-hash.md
 │       └── ADR-003-colourblind-password-display.md
+│       ├── ADR-004-licence.md
+│       └── ADR-005-pq-authentication-signatures.md
 ├── chat_info/                  # Development session notes and ASCII wireframes
 │   └── ascii_art/              # (git-ignored — not versioned)
 ├── flutter_rust_bridge.yaml    # Bridge configuration
