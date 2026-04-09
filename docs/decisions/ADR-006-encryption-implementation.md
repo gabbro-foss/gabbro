@@ -112,12 +112,20 @@ subtle incompatibilities at boundaries between operations.
 ### 5. Byte-level key derivation flow
 
 Argon2id outputs 96 bytes, split as follows:
-bytes [0..32]  → X25519 private key (32 bytes required)
-bytes [32..96] → ML-KEM-1024 private key seed (64 bytes required)
+bytes [0..32]  → seed for StdRng → X25519 private key
+bytes [32..64] → seed for StdRng → ML-KEM-1024 keypair
+bytes [64..96] → reserved for future use
 
-Public keys are derived deterministically from these. The public keys
-are stored in the vault header; the private keys are re-derived from
-the passphrase on each unlock — they are never stored.
+The `ml-kem` crate (v0.2.3) does not expose the FIPS 203 `(d, z)`
+two-seed keypair generation in its public API — it is available only
+behind a `hazmat` feature flag marked explicitly as unsafe for
+production use. The correct production approach is to seed a
+cryptographically secure deterministic RNG (`StdRng`) from KDF output
+bytes and pass that to the keypair generator. This preserves the
+determinism guarantee: same passphrase + salt → same KDF output →
+same seed → same keypair. Bytes [64..96] are reserved for a future
+use such as a migration to a crate that exposes the two-seed API
+directly.
 
 **Lock (encrypt):**
 1. Generate random 32-byte session key K
