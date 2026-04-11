@@ -443,3 +443,20 @@ discussed and forgotten.
   and a Play Store one-time payment. Needs a dedicated design session;
   must be compatible with GPL-3.0-only licence obligations. See the
   Monetization section above for current high-level thinking.
+- Also see [updated monetisation ideas](#trust--transparency)
+
+### Trust & Transparency
+
+- **Donation / sustainability model**
+  Gabbro should adopt a QGIS-style voluntary donation model: prominent but non-coercive, shown on the download/landing page before the user proceeds. No payment data ever touches the project. Recommended combination: GitHub Sponsors (low friction, familiar to the FOSS audience), Liberapay (FOSS-native non-profit platform, privacy-friendlier than Patreon, no platform fee), and a Monero (XMR) wallet address (genuinely private, no transaction graph, well-trusted by the security-conscious audience Gabbro targets). Bitcoin can be added for reach with a note that it is pseudonymous not anonymous. Patreon explicitly excluded — US company, collects significant user data, wrong values signal. Cash excluded — requires publishing a physical address. This needs a dedicated session when the project is closer to public release: set up the three channels, write the donation page copy, and decide whether to publish donor acknowledgements (opt-in only, given the privacy context).
+
+- **No-telemetry verification guide (README)**
+  Gabbro makes no outbound network connections during normal operation. This should be independently verifiable by users, documented honestly in the README with five sections:
+
+  1. **Static scan** (`rg`) — a documented ripgrep command that scans the repository for known network primitives in both Rust (`TcpStream`, `reqwest`, `hyper`, `ureq`, `tokio::net`) and Dart/Flutter (`http`, `dio`, `HttpClient`, `WebSocket`). Verifies intent in the source code. Limitation: does not cover transitive dependencies. Cross-platform, low barrier.
+  2. **Wireshark** (desktop) — step-by-step guide for Linux (Arch and Debian/Ubuntu), macOS, and Windows. Links to official downloads. Honest about the skill requirement: this is for technically confident users who understand network interfaces and capture filters. The expected result is zero outbound packets during normal vault operations.
+  3. **Android** (NetGuard) — NetGuard is a FOSS (GPL-licensed), no-root Android firewall that shows per-app traffic. Lower barrier than Wireshark, appropriate for non-developer mobile users. Document the setup and what a clean result looks like.
+  4. **iOS** — document honestly: iOS makes independent traffic verification difficult without jailbreaking or developer tooling. Proxyman for iOS (local VPN, no root required) is the most accessible option but is proprietary and paid, which sits awkwardly in a FOSS trust guide. State this plainly. Do not pretend the platform limitation does not exist.
+  5. **Reference screenshots** — include screenshots of clean results on Arch Linux (Wireshark) and Android (NetGuard) as a reference baseline. Note explicitly in the README that these require the reader to trust the project, which partially defeats the purpose — they are included only so users who cannot or will not run the tools themselves can see what a clean result looks like. Zero-risk verification is not possible on all platforms; we document the gap rather than paper over it.
+
+  This guide should be written when Gabbro is approaching public release and the UI is stable enough that the screenshots will not need frequent updating.
