@@ -60,7 +60,8 @@ gabbro/
 │       │   └── vault_crypto.rs # seal_vault() and open_vault()
 │       ├── vault/              # Internal domain model (not bridge-exposed)
 │       │   ├── mod.rs
-│       │   └── entry.rs        # All 6 entry types and EntryMeta
+│       │   ├── entry.rs        # All 6 entry types and EntryMeta
+│       │   └── file_format.rs  # SealedVault — .gabbro binary format
 │       ├── bin/
 │       │   └── bench_kdf.rs    # Argon2id parameter audit tool
 │       ├── frb_generated.rs    # Auto-generated bridge code (do not edit)
@@ -102,9 +103,11 @@ by the scaffold — it will be created manually when cross-layer testing begins.
 - Extension: `.gabbro`
 - Structure:
   - **Header (plaintext):** magic bytes, version, argon2id params,
-    salt, nonce, ML-KEM public key
+    argon2id salt, HKDF salt, nonce, ML-KEM ciphertext, X25519 ephemeral public key
   - **Body (encrypted):** all vault entries, JSON serialized,
     encrypted with AES-256-GCM
+- Serialization: hand-written binary format with fixed-size fields and
+  a length-prefixed body. Implemented in `rust/src/vault/file_format.rs`.
 - Self-contained: all decryption parameters travel with the file
 - Auth tag detects any tampering
 
@@ -318,11 +321,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Next task:** wire the crypto stack into the vault file format —
-  implement the `.gabbro` file header (serialization/deserialization
-  of `SealedVault` fields to/from bytes), then write the first
-  end-to-end vault file write and read test.
-- **Test count:** 77 Rust tests passing across the project.
+- **Completed:** .gabbro file format implemented in `rust/src/vault/file_format.rs` — `SealedVault` struct, `to_bytes()`/`from_bytes()`, 5 tests. `vault_crypto.rs` refactored to use single `SealedVault` definition. 82 Rust tests passing.
+- **Next task:** end-to-end vault file write and read test — call `seal_vault()`, serialize to bytes, deserialize, call `open_vault()`, assert plaintext recovered.
 
 ---
 

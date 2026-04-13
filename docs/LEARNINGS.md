@@ -47,6 +47,10 @@ rainbow table attacks. Not secret — just needs to be unique.
 ### Nonce (Number Used Once)
 A random value used once per encryption operation. Like a salt
 for encryption. Stored alongside encrypted data. Not secret.
+AES-256-GCM requires a 12-byte nonce for every encryption
+operation. It must never repeat for the same key — if it does,
+the encryption is broken. Generated randomly at seal time,
+stored in the vault file header, read back at open time.
 
 ### SHA-256 — Secure Hash Algorithm 256-bit
 A one-way cryptographic hash function that produces a fixed 64-character
@@ -282,6 +286,17 @@ domain, use the type system or constructor to prevent it from being
 created at all. Example: `CardEntry::new()` rejects card numbers
 outside 12–19 digits — invalid entries simply cannot exist in the
 vault.
+
+### Single source of truth for shared types
+When two modules need the same type, define it once in the most
+appropriate module and import it everywhere else. In Gabbro,
+`SealedVault` was initially defined separately in both
+`vault_crypto.rs` and `vault/file_format.rs`. The fix was to
+keep the single definition in `vault/file_format.rs` (where it
+belongs — it describes the file format) and have `vault_crypto.rs`
+import it. Two definitions of the same concept is a maintenance
+hazard: they drift apart, and the compiler cannot catch the
+inconsistency.
 
 ---
 
@@ -592,16 +607,32 @@ methods use `.` as in Python: `my_string.len()`.
 
 ### Macros — `name!(...)`
 A `!` after a name means it is a macro, not a regular function. Macros
-generate code at compile time. Common ones: `format!`, `println!`,
-`assert!`, `assert_eq!`, `vec!`, `panic!`. The distinction matters
-because macros can do things regular functions cannot, such as accepting
-a variable number of arguments.
+generate code at **compile time**, before the compiler processes the
+rest of your code. This lets them do things regular functions cannot:
+- Accept a variable number of arguments — `println!("{} {}", a, b)` or
+  `println!("{}", a)` — a regular function can't do that in Rust
+- Accept different types each call — `assert_eq!` works on integers,
+  strings, structs, anything
+- Inspect the source code itself — `assert_eq!` prints the variable
+  names on failure because the macro sees them before they're evaluated
+
+Common macros in Gabbro: `format!`, `println!`, `assert!`, `assert_eq!`,
+`assert_ne!`, `vec!`, `panic!`. The `!` is purely a signal meaning
+"macro call" — it has nothing to do with negation. This is an
+unfortunate collision with how most languages use `!` to mean "not":
+Rust uses `!` for two unrelated things — negation (`!true == false`)
+and macro invocation (`vec![...]`).
+
+The Python analogy is imperfect, but decorators are the closest thing
+— they wrap and transform code. Macros are more powerful but serve a
+similar "code that operates on code" purpose.
 
 ### `assert!` and `assert_eq!`
 Test assertion macros. `assert!(condition)` panics if the condition is
 false. `assert_eq!(a, b)` panics if the two values are not equal, and
-prints both values in the error message. Both accept an optional format
-string as extra arguments: `assert!(cond, "message {}", value)`.
+prints both values in the error message (`eq` = equal). Its counterpart
+`assert_ne!(a, b)` asserts the values are not equal (`ne` = not equal).
+Both accept an optional format string: `assert!(cond, "message {}", value)`.
 
 ### Panicking
 A panic is Rust's "unrecoverable error" mechanism — it stops execution
@@ -763,7 +794,8 @@ A derive attribute that auto-generates three trait implementations:
 - `PartialEq` — generates `==` and `!=`; required for `assert_eq!` in
   tests. Not added to every type by default — equality semantics should
   be considered deliberately (e.g. do two entries with the same id but
-  different timestamps count as equal?).
+  different timestamps count as equal?). Every field in a struct must
+  also implement `PartialEq` for the containing struct to derive it.
 
 ### `into_values()` on HashMap
 Consumes a `HashMap` and returns an iterator over its values only,
@@ -781,6 +813,62 @@ pool size is the conservative choice: it may slightly overestimate entropy for
 generated passwords, but avoids underestimating for manually typed ones.
 Formula: `entropy = length × log₂(pool_size)`. See `rust/src/api/entropy.rs`
 for tier thresholds and references.
+
+### `to_be_bytes()` / `from_be_bytes()` — big-endian serialization
+`be` stands for **big-endian**, not the verb "to be". Big-endian means the
+most significant byte comes first — the same order humans write numbers
+(thousands before hundreds before units). Its counterpart is `to_le_bytes()`
+for little-endian (least significant byte first).
+
+These are a matched pair: always use `to_be_bytes()` to write and
+`from_be_bytes()` to read back, and you recover the original number.
+Big-endian is the conventional byte order for file formats and network
+protocols (sometimes called "network byte order"). In Gabbro, Argon2id
+parameters and the body length field are all written as big-endian bytes
+in the `.gabbro` file header.
+
+`to_bytes()` does not exist as a standard method on integers in Rust —
+the question "give me the bytes of this number" is ambiguous without
+specifying byte order. The explicit `to_be_bytes()` / `to_le_bytes()`
+naming removes the ambiguity.
+
+### Binary serialization with a cursor
+Hand-written binary serialization reads a flat byte slice by maintaining
+a `pos` (position) index that tracks how far through the data we are.
+The pattern for each field:
+1. Check `data.len() >= pos + field_size` — return `Err` if not enough bytes
+2. Read `data[pos..pos + field_size]` — a range slice of exactly the right size
+3. Convert the slice to the target type (`try_into().unwrap()` for fixed arrays,
+   `u32::from_be_bytes(...)` for integers, `.to_vec()` for owned byte vectors)
+4. Advance `pos += field_size`
+
+The `unwrap()` after `try_into()` is safe here because the length check
+immediately above it guarantees the bytes are present — we are being
+deliberate, not lazy. For variable-length fields (like the body), write
+the length as a fixed-size integer first (a "length prefix"), then the
+bytes themselves. On reading, read the length integer first, then read
+exactly that many bytes.
+
+This is the same pattern used by PNG, ZIP, and most binary file formats.
+
+### Macros vs functions — when the `!` matters
+A **function** is compiled to a fixed piece of code that runs at runtime,
+with a defined number of parameters each of a specific type.
+
+A **macro** runs at **compile time** and generates code before the
+compiler processes it. This enables things functions cannot do:
+- Variable number of arguments: `println!` accepts one argument or ten
+- Works across different types without generics: `assert_eq!` compares
+  integers, strings, or any type that implements `PartialEq`
+- Access to source context: `assert_eq!` can print the variable names
+  in a failure message because the macro sees the source before evaluation
+
+The `!` suffix is purely syntactic — it marks a macro call, not negation.
+Rust uses `!` for two unrelated things: boolean negation (`!true`)
+and macro invocation (`vec![1, 2, 3]`). The distinction matters when
+reading unfamiliar code: `some_function(x)` is a function call;
+`some_macro!(x)` is a macro invocation that may generate arbitrarily
+different code depending on its arguments.
 
 ---
 
