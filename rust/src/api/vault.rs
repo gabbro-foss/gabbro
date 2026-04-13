@@ -439,6 +439,31 @@ pub fn update_entry(
     Ok(())
 }
 
+/// Remove a single entry from the vault by UUID.
+///
+/// Returns `Err` if no entry with that id exists.
+pub fn delete_entry(
+    entries: &mut Vec<VaultEntry>,
+    id: &str,
+) -> Result<(), String> {
+    let pos = entries
+        .iter()
+        .position(|e| entry_id(e) == id)
+        .ok_or_else(|| format!("No entry found with id: {id}"))?;
+    entries.remove(pos);
+    Ok(())
+}
+
+/// Wipe the vault file from disk permanently.
+///
+/// This is a destructive, irreversible operation. The confirmation
+/// logic (two explicit user confirmations) lives in Flutter — Rust
+/// executes the deletion unconditionally when this is called.
+pub fn delete_whole_vault(path: &Path) -> Result<(), String> {
+    std::fs::remove_file(path)
+        .map_err(|e| format!("Failed to delete vault: {e}"))
+}
+
 // ── Vault persistence ─────────────────────────────────────────────────────────
 
 /// Serialize, encrypt, and write a vault to disk in one operation.
@@ -1017,6 +1042,89 @@ mod tests {
         });
 
         assert!(update_entry(&mut entries, ghost).is_err());
+    }
+
+    #[test]
+    fn delete_entry_removes_correct_entry() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let mut entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("First"),
+                content: String::from("first content"),
+            }),
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-002"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("Second"),
+                content: String::from("second content"),
+            }),
+        ];
+
+        delete_entry(&mut entries, "id-001").unwrap();
+        assert_eq!(entries.len(), 1);
+        match &entries[0] {
+            VaultEntry::Note(e) => assert_eq!(e.meta.id, "id-002"),
+            _ => panic!("Expected Note variant"),
+        }
+    }
+
+    #[test]
+    fn delete_entry_missing_id_returns_error() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let mut entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("A note"),
+                content: String::from("some content"),
+            }),
+        ];
+
+        assert!(delete_entry(&mut entries, "does-not-exist").is_err());
+    }
+
+    #[test]
+    fn delete_whole_vault_removes_file() {
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_delete_test.gabbro");
+
+        // Create a real vault file first
+        let entries: Vec<VaultEntry> = vec![];
+        save_vault(&entries, b"passphrase", &path).unwrap();
+        assert!(path.exists());
+
+        delete_whole_vault(&path).unwrap();
+        assert!(!path.exists());
+    }
+
+    #[test]
+    fn delete_whole_vault_missing_file_returns_error() {
+        let path = std::path::Path::new("/tmp/does_not_exist_gabbro_delete.gabbro");
+        assert!(delete_whole_vault(path).is_err());
     }
 
 }
