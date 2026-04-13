@@ -5,6 +5,8 @@
 
 use std::path::Path;
 
+use sha2::{Digest, Sha256};
+
 use crate::crypto::vault_crypto::{open_vault, seal_vault};
 use crate::vault::entry::{
     CardEntry, CustomEntry, CustomField, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
@@ -525,6 +527,49 @@ pub fn change_passphrase(
 ) -> Result<(), String> {
     let entries = load_vault(old_passphrase, path)?;
     save_vault(&entries, new_passphrase, path)
+}
+
+/// Export the vault to a `.gabbro` file and a companion `.gabbro.sha256`
+/// detached hash file.
+///
+/// The hash is computed over the raw bytes of the encrypted vault file,
+/// following the Linux ISO verification convention documented in ADR-002.
+/// This allows integrity verification before decryption using standard
+/// tools (`sha256sum` on Linux, `certutil` on Windows).
+///
+/// `export_path` should point to the desired `.gabbro` output file.
+/// The `.sha256` file is written alongside it automatically.
+pub fn export_vault(
+    entries: &[VaultEntry],
+    passphrase: &[u8],
+    export_path: &Path,
+) -> Result<(), String> {
+    // Serialize and encrypt
+    let plaintext = serialize_entries(entries)?;
+    let sealed = seal_vault(passphrase, &plaintext)?;
+    let vault_bytes = sealed.to_bytes();
+
+    // Write the .gabbro file
+    std::fs::write(export_path, &vault_bytes)
+        .map_err(|e| format!("Failed to write export file: {e}"))?;
+
+    // Compute SHA-256 over the vault bytes
+    let mut hasher = Sha256::new();
+    hasher.update(&vault_bytes);
+    let hash_bytes: [u8; 32] = hasher.finalize().into();
+    let hash_hex = format!("{}  {}\n",
+        hash_bytes.iter().map(|b| format!("{:02x}", b)).collect::<String>(),
+        export_path.file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("vault.gabbro")
+    );
+
+    // Write the .sha256 companion file
+    let hash_path = export_path.with_extension("gabbro.sha256");
+    std::fs::write(&hash_path, hash_hex)
+        .map_err(|e| format!("Failed to write hash file: {e}"))?;
+
+    Ok(())
 }
 
 // ── Vault persistence ─────────────────────────────────────────────────────────
@@ -1409,6 +1454,96 @@ mod tests {
 
         let _ = std::fs::remove_file(&path);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn export_vault_creates_both_files() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_export_test.gabbro");
+        let hash_path = path.with_extension("gabbro.sha256");
+
+        let entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("Export test"),
+                content: String::from("exported content"),
+            }),
+        ];
+
+        export_vault(&entries, b"correct horst battery staple", &path).unwrap();
+
+        assert!(path.exists(), ".gabbro file should exist");
+        assert!(hash_path.exists(), ".gabbro.sha256 file should exist");
+
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(&hash_path);
+    }
+
+    #[test]
+    fn export_vault_hash_file_contains_filename() {
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_export_hash_test.gabbro");
+        let hash_path = path.with_extension("gabbro.sha256");
+
+        let entries: Vec<VaultEntry> = vec![];
+        export_vault(&entries, b"passphrase", &path).unwrap();
+
+        let hash_contents = std::fs::read_to_string(&hash_path).unwrap();
+        assert!(hash_contents.contains("gabbro_export_hash_test.gabbro"));
+        assert!(hash_contents.ends_with('\n'));
+
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(&hash_path);
+    }
+
+    #[test]
+    fn export_vault_can_be_loaded_back() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_export_reload_test.gabbro");
+        let hash_path = path.with_extension("gabbro.sha256");
+
+        let entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("Reload test"),
+                content: String::from("reloaded content"),
+            }),
+        ];
+
+        let passphrase = b"correct horst battery staple";
+        export_vault(&entries, passphrase, &path).unwrap();
+        let recovered = load_vault(passphrase, &path).unwrap();
+
+        assert_eq!(recovered.len(), 1);
+        match &recovered[0] {
+            VaultEntry::Note(e) => assert_eq!(e.content, "reloaded content"),
+            _ => panic!("Expected Note variant"),
+        }
+
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(&hash_path);
     }
 
 }
