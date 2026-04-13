@@ -16,25 +16,7 @@ use crate::crypto::hkdf::derive_vault_key;
 use crate::crypto::kdf::{derive_key, Argon2idParams};
 use crate::crypto::keypair::X25519Keypair;
 use crate::crypto::ml_kem::MlKemKeypair;
-
-/// All data required to decrypt a sealed vault.
-/// These fields are stored in the vault file header.
-pub struct SealedVault {
-    /// Argon2id parameters used to derive the keypairs.
-    pub params: Argon2idParams,
-    /// Random salt used in Argon2id derivation.
-    pub argon2_salt: [u8; 32],
-    /// ML-KEM ciphertext (encapsulated shared secret).
-    pub ml_kem_ciphertext: Vec<u8>,
-    /// X25519 ephemeral public key.
-    pub x25519_ephemeral_public: [u8; 32],
-    /// HKDF salt.
-    pub hkdf_salt: [u8; 32],
-    /// AES-256-GCM nonce.
-    pub nonce: [u8; 12],
-    /// Encrypted vault body (ciphertext + GCM auth tag).
-    pub ciphertext: Vec<u8>,
-}
+use crate::vault::file_format::SealedVault;
 
 /// Encrypts plaintext under the given passphrase.
 pub fn seal_vault(
