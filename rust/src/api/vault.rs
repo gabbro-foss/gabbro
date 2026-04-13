@@ -3,9 +3,15 @@
 //! These functions are the only way Flutter interacts with vault data.
 //! Internal domain types (LoginEntry, etc.) are never exposed directly.
 
+use std::path::Path;
+
+use crate::crypto::vault_crypto::{open_vault, seal_vault};
 use crate::vault::entry::{
-    CardEntry, CustomEntry, CustomField, EntryMeta, FileEntry, IdentityEntry, LoginEntry, NoteEntry,
+    CardEntry, CustomEntry, CustomField, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
+    NoteEntry, VaultEntry,
 };
+use crate::vault::io::{read_vault, write_vault};
+use crate::vault::serialization::{deserialize_entries, serialize_entries};
 use uuid::Uuid;
 
 // ── Bridge-facing DTOs ────────────────────────────────────────────────────────
@@ -370,6 +376,35 @@ pub fn create_custom_entry(
     custom_entry_to_data(entry)
 }
 
+// ── Vault persistence ─────────────────────────────────────────────────────────
+
+/// Serialize, encrypt, and write a vault to disk in one operation.
+///
+/// This is the top-level save operation Flutter will call.
+/// Entries → JSON → AES-256-GCM encrypted → .gabbro file on disk.
+pub fn save_vault(
+    entries: &[VaultEntry],
+    passphrase: &[u8],
+    path: &Path,
+) -> Result<(), String> {
+    let plaintext = serialize_entries(entries)?;
+    let sealed = seal_vault(passphrase, &plaintext)?;
+    write_vault(&sealed, path)
+}
+
+/// Read, decrypt, and deserialize a vault from disk in one operation.
+///
+/// This is the top-level load operation Flutter will call.
+/// .gabbro file → AES-256-GCM decrypt → JSON → Vec<VaultEntry>.
+pub fn load_vault(
+    passphrase: &[u8],
+    path: &Path,
+) -> Result<Vec<VaultEntry>, String> {
+    let sealed = read_vault(path)?;
+    let plaintext = open_vault(passphrase, &sealed)?;
+    deserialize_entries(&plaintext)
+}
+
 // ── Timestamp helper ──────────────────────────────────────────────────────────
 
 /// Returns the current UTC time as an ISO 8601 string.
@@ -691,6 +726,57 @@ mod tests {
 
         assert_eq!(entry.title, "Empty custom");
         assert_eq!(entry.fields.len(), 0);
+    }
+
+    #[test]
+    fn save_and_load_vault_roundtrip() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_api_test.gabbro");
+
+        let entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("Test note"),
+                content: String::from("secret content"),
+            }),
+        ];
+
+        let passphrase = b"correct horst battery staple";
+        save_vault(&entries, passphrase, &path).unwrap();
+        let recovered = load_vault(passphrase, &path).unwrap();
+
+        assert_eq!(recovered.len(), 1);
+        match &recovered[0] {
+            VaultEntry::Note(e) => assert_eq!(e.content, "secret content"),
+            _ => panic!("Expected Note variant"),
+        }
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn load_vault_wrong_passphrase_fails() {
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_api_wrong_pass_test.gabbro");
+
+        let entries: Vec<VaultEntry> = vec![];
+        save_vault(&entries, b"correct passphrase", &path).unwrap();
+        let result = load_vault(b"wrong passphrase", &path);
+
+        let _ = std::fs::remove_file(&path);
+        assert!(result.is_err());
     }
 
 }
