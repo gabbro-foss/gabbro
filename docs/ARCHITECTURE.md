@@ -61,7 +61,8 @@ gabbro/
 │       ├── vault/              # Internal domain model (not bridge-exposed)
 │       │   ├── mod.rs
 │       │   ├── entry.rs        # All 6 entry types and EntryMeta
-│       │   └── file_format.rs  # SealedVault — .gabbro binary format
+│       │   ├── file_format.rs  # SealedVault — .gabbro binary format
+│       │   └── io.rs           # Vault file I/O — write/read .gabbro files
 │       ├── bin/
 │       │   └── bench_kdf.rs    # Argon2id parameter audit tool
 │       ├── frb_generated.rs    # Auto-generated bridge code (do not edit)
@@ -321,11 +322,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** end-to-end vault file write/read test passing —
-  `seal_vault()` → `to_bytes()` → `from_bytes()` → `open_vault()` →
-  plaintext recovered. 83 Rust tests passing.
-- **Next task:** begin Flutter UI scaffolding, or implement vault
-  file I/O (write `.gabbro` to disk and read it back) in Rust.
+- **Completed:** vault filesystem I/O implemented in `rust/src/vault/io.rs` —
+  `write_vault()` and `read_vault()` wrappers around `to_bytes()`/`from_bytes()`.
+  Full storage stack now complete end-to-end. 86 Rust tests passing.
+- **Next task:** define what remains in the Rust backend before touching Flutter.
+  Candidate: a vault API function that serializes vault entries to JSON for
+  encryption — the missing link between the domain model and the crypto stack.
 
 ---
 
