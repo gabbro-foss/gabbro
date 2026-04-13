@@ -464,6 +464,54 @@ pub fn delete_whole_vault(path: &Path) -> Result<(), String> {
         .map_err(|e| format!("Failed to delete vault: {e}"))
 }
 
+/// Return all entries from the vault, optionally masking sensitive values.
+///
+/// When `masked` is true, password and CVV fields are replaced with
+/// `MASKED_VALUE` — a fixed-length placeholder that deliberately reveals
+/// nothing about the actual value's length.
+pub fn list_entries(
+    entries: &[VaultEntry],
+    masked: bool,
+) -> Vec<VaultEntry> {
+    if !masked {
+        return entries.to_vec();
+    }
+    entries.iter().map(|e| mask_entry(e)).collect()
+}
+
+/// Returns a clone of a single entry with sensitive fields replaced
+/// by `MASKED_VALUE`.
+fn mask_entry(entry: &VaultEntry) -> VaultEntry {
+    match entry {
+        VaultEntry::Login(e) => VaultEntry::Login(LoginEntry {
+            meta: e.meta.clone(),
+            url: e.url.clone(),
+            username: e.username.clone(),
+            password: MASKED_VALUE.to_string(),
+            notes: e.notes.clone(),
+            custom_fields: e.custom_fields
+                .iter()
+                .map(|f| CustomField {
+                    label: f.label.clone(),
+                    value: if f.hidden { MASKED_VALUE.to_string() } else { f.value.clone() },
+                    hidden: f.hidden,
+                })
+                .collect(),
+        }),
+        VaultEntry::Card(e) => VaultEntry::Card(CardEntry {
+            meta: e.meta.clone(),
+            cardholder_name: e.cardholder_name.clone(),
+            card_number: e.card_number.clone(),
+            expiry: e.expiry.clone(),
+            cvv: MASKED_VALUE.to_string(),
+            notes: e.notes.clone(),
+        }),
+        // Note, Identity, File, Custom carry no password-class fields —
+        // return a plain clone.
+        other => other.clone(),
+    }
+}
+
 // ── Vault persistence ─────────────────────────────────────────────────────────
 
 /// Serialize, encrypt, and write a vault to disk in one operation.
@@ -1125,6 +1173,168 @@ mod tests {
     fn delete_whole_vault_missing_file_returns_error() {
         let path = std::path::Path::new("/tmp/does_not_exist_gabbro_delete.gabbro");
         assert!(delete_whole_vault(path).is_err());
+    }
+
+    #[test]
+    fn list_entries_unmasked_returns_plaintext() {
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+
+        let entries = vec![
+            VaultEntry::Login(LoginEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                url: String::from("https://example.com"),
+                username: String::from("rob"),
+                password: String::from("s3cr3t"),
+                notes: None,
+                custom_fields: vec![],
+            }),
+        ];
+
+        let result = list_entries(&entries, false);
+        match &result[0] {
+            VaultEntry::Login(e) => assert_eq!(e.password, "s3cr3t"),
+            _ => panic!("Expected Login variant"),
+        }
+    }
+
+    #[test]
+    fn list_entries_masked_hides_password() {
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+
+        let entries = vec![
+            VaultEntry::Login(LoginEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                url: String::from("https://example.com"),
+                username: String::from("rob"),
+                password: String::from("correct horst battery staple"),
+                notes: None,
+                custom_fields: vec![],
+            }),
+        ];
+
+        let result = list_entries(&entries, true);
+        match &result[0] {
+            VaultEntry::Login(e) => {
+                assert_eq!(e.password, MASKED_VALUE);
+                assert_eq!(e.username, "rob"); // non-sensitive field unchanged
+            }
+            _ => panic!("Expected Login variant"),
+        }
+    }
+
+    #[test]
+    fn list_entries_masked_hides_cvv() {
+        use crate::vault::entry::{CardEntry, EntryMeta, VaultEntry};
+
+        let entries = vec![
+            VaultEntry::Card(CardEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                cardholder_name: String::from("Rob Smith"),
+                card_number: String::from("4111111111111111"),
+                expiry: String::from("12/28"),
+                cvv: String::from("123"),
+                notes: None,
+            }),
+        ];
+
+        let result = list_entries(&entries, true);
+        match &result[0] {
+            VaultEntry::Card(e) => {
+                assert_eq!(e.cvv, MASKED_VALUE);
+                assert_eq!(e.expiry, "12/28"); // non-sensitive field unchanged
+            }
+            _ => panic!("Expected Card variant"),
+        }
+    }
+
+    #[test]
+    fn list_entries_masked_hides_hidden_custom_fields() {
+        use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
+
+        let entries = vec![
+            VaultEntry::Login(LoginEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                url: String::from("https://example.com"),
+                username: String::from("rob"),
+                password: String::from("s3cr3t"),
+                notes: None,
+                custom_fields: vec![
+                    CustomField {
+                        label: String::from("API key"),
+                        value: String::from("sk-abc123"),
+                        hidden: true,
+                    },
+                    CustomField {
+                        label: String::from("Region"),
+                        value: String::from("eu-west-1"),
+                        hidden: false,
+                    },
+                ],
+            }),
+        ];
+
+        let result = list_entries(&entries, true);
+        match &result[0] {
+            VaultEntry::Login(e) => {
+                assert_eq!(e.custom_fields[0].value, MASKED_VALUE); // hidden
+                assert_eq!(e.custom_fields[1].value, "eu-west-1");  // not hidden
+            }
+            _ => panic!("Expected Login variant"),
+        }
+    }
+
+    #[test]
+    fn list_entries_masked_does_not_alter_note() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("My note"),
+                content: String::from("sensitive note content"),
+            }),
+        ];
+
+        let result = list_entries(&entries, true);
+        match &result[0] {
+            VaultEntry::Note(e) => assert_eq!(e.content, "sensitive note content"),
+            _ => panic!("Expected Note variant"),
+        }
     }
 
 }
