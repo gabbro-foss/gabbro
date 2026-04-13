@@ -376,6 +376,40 @@ pub fn create_custom_entry(
     custom_entry_to_data(entry)
 }
 
+// ── Entry retrieval ───────────────────────────────────────────────────────────
+
+/// Fixed placeholder used instead of the real value when masked display
+/// is requested. Length is intentionally decoupled from actual value length
+/// to prevent shoulder-surfing attacks based on character count.
+const MASKED_VALUE: &str = "********";
+
+/// Returns a helper that extracts the UUID from any VaultEntry variant.
+fn entry_id(entry: &VaultEntry) -> &str {
+    match entry {
+        VaultEntry::Login(e)    => &e.meta.id,
+        VaultEntry::Note(e)     => &e.meta.id,
+        VaultEntry::Identity(e) => &e.meta.id,
+        VaultEntry::Card(e)     => &e.meta.id,
+        VaultEntry::File(e)     => &e.meta.id,
+        VaultEntry::Custom(e)   => &e.meta.id,
+    }
+}
+
+/// Fetch a single entry by UUID from a loaded vault.
+///
+/// Returns a clone of the matching entry, or `Err` if no entry with
+/// that id exists.
+pub fn get_entry_by_id(
+    entries: &[VaultEntry],
+    id: &str,
+) -> Result<VaultEntry, String> {
+    entries
+        .iter()
+        .find(|e| entry_id(e) == id)
+        .cloned()
+        .ok_or_else(|| format!("No entry found with id: {id}"))
+}
+
 // ── Vault persistence ─────────────────────────────────────────────────────────
 
 /// Serialize, encrypt, and write a vault to disk in one operation.
@@ -777,6 +811,66 @@ mod tests {
 
         let _ = std::fs::remove_file(&path);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn get_entry_by_id_returns_correct_entry() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("First note"),
+                content: String::from("content one"),
+            }),
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-002"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("Second note"),
+                content: String::from("content two"),
+            }),
+        ];
+
+        let found = get_entry_by_id(&entries, "id-001").unwrap();
+        match found {
+            VaultEntry::Note(e) => assert_eq!(e.content, "content one"),
+            _ => panic!("Expected Note variant"),
+        }
+    }
+
+    #[test]
+    fn get_entry_by_id_missing_returns_error() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("A note"),
+                content: String::from("some content"),
+            }),
+        ];
+
+        assert!(get_entry_by_id(&entries, "does-not-exist").is_err());
     }
 
 }
