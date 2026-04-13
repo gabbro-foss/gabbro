@@ -4,12 +4,13 @@
 //! these types directly — it calls API functions that build them.
 
 use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
 
 /// The six entry types Gabbro support.
 /// Not yet referenced outside this module — will be used for vault
 /// filtering and sorting. Suppressing dead_code until that layer is built.
 #[allow(dead_code)]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum EntryType {
     Login,
     Note,
@@ -20,7 +21,7 @@ pub enum EntryType {
 }
 
 /// Common metadata shared by every entry, regardless of type.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EntryMeta {
     /// Stable unique identifier - never reused, even after deletion.
     pub id: String,
@@ -38,7 +39,7 @@ pub struct EntryMeta {
 
 /// A login entry - the most common entry type
 /// Stores credentials for a wehsite or application
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LoginEntry {
     /// Shared metadata (id, timestamp, folder, tags, favourite).
     pub meta: EntryMeta,
@@ -55,7 +56,7 @@ pub struct LoginEntry {
 }
 
 /// A single user-defined key/value field on an entry.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CustomField {
     pub label: String,
     pub value: String,
@@ -64,7 +65,7 @@ pub struct CustomField {
 }
 
 /// A secure note - free-text content with no crendential fields.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NoteEntry {
     pub meta: EntryMeta,
     pub title: String,
@@ -72,7 +73,7 @@ pub struct NoteEntry {
 }
 
 /// A peronal identity entry - name, address, contact details.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IdentityEntry {
     pub meta: EntryMeta,
     pub first_name: String,
@@ -83,7 +84,7 @@ pub struct IdentityEntry {
 }
 
 /// A payment card entry.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CardEntry {
     pub meta: EntryMeta,
     pub cardholder_name: String,
@@ -124,7 +125,7 @@ impl CardEntry {
 }
 
 /// A file attachement entry - stores a binary payload.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FileEntry {
     pub meta: EntryMeta,
     pub filename: String,
@@ -134,11 +135,25 @@ pub struct FileEntry {
 }
 
 /// A fully cutom entry - user-defined fields only.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CustomEntry {
     pub meta: EntryMeta,
     pub title: String,
     pub fields: HashMap<String, CustomField>
+}
+
+/// A single vault entry — wraps all six entry types into one enum.
+///
+/// This is the type that gets serialized to JSON and encrypted into
+/// the vault body. A `Vec<VaultEntry>` represents the full vault contents.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum VaultEntry {
+    Login(LoginEntry),
+    Note(NoteEntry),
+    Identity(IdentityEntry),
+    Card(CardEntry),
+    File(FileEntry),
+    Custom(CustomEntry),
 }
 
 #[cfg(test)]

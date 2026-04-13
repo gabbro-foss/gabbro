@@ -1015,6 +1015,8 @@ dependencies = [
  "hkdf",
  "ml-kem",
  "rand",
+ "serde",
+ "serde_json",
  "sha2",
  "uuid",
  "x25519-dalek",
