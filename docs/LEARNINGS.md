@@ -879,6 +879,25 @@ is serialized or deserialized incorrectly, `open_vault` fails with a
 decryption error — not a deserialization error — because the wrong
 bytes are fed to the crypto layer. Neither half-test would surface this.
 
+### Password masking — fixed-length placeholder
+When displaying vault entries in a list, sensitive fields (passwords, CVVs,
+hidden custom fields) are replaced with a fixed placeholder (`"********"`)
+rather than a string of asterisks matching the actual length. The reason:
+revealing that a password is exactly 14 characters long reduces the attacker's
+search space. A fixed-length placeholder leaks nothing about the actual value.
+The constant `MASKED_VALUE` is defined once in `api/vault.rs` and used
+consistently across all masking logic.
+
+### SHA-256 hex formatting — `hybrid_array` trait conflict
+The `sha2` crate's `finalize()` returns a `GenericArray<u8, N>` type. In
+Gabbro's dependency tree, a version conflict with `hybrid_array` (pulled in
+by `ml-kem`) means `LowerHex` is not implemented for the returned type —
+so `format!("{:x}", hash)` fails to compile. The fix is to convert the
+`GenericArray` to a plain `[u8; 32]` with `.into()`, then format each byte
+individually: `bytes.iter().map(|b| format!("{:02x}", b)).collect::<String>()`.
+This sidesteps the trait conflict entirely and produces standard lowercase
+hex output.
+
 ---
 
 ## UX & Internationalisation

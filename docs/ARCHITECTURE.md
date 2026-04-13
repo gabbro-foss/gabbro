@@ -62,7 +62,8 @@ gabbro/
 │       │   ├── mod.rs
 │       │   ├── entry.rs        # All 6 entry types and EntryMeta
 │       │   ├── file_format.rs  # SealedVault — .gabbro binary format
-│       │   └── io.rs           # Vault file I/O — write/read .gabbro files
+│       │   ├── io.rs           # Vault file I/O — write/read .gabbro files
+│       │   └── serialization.rs# Entry serialization — Vec<VaultEntry> ↔ JSON bytes
 │       ├── bin/
 │       │   └── bench_kdf.rs    # Argon2id parameter audit tool
 │       ├── frb_generated.rs    # Auto-generated bridge code (do not edit)
@@ -233,24 +234,35 @@ Each entry is an instance of a typed class:
   being created at all.
 
 ## Vault API Layer
-- **Status:** `LoginEntry` and `NoteEntry` implemented in `rust/src/api/vault.rs`,
-  6 unit tests passing. 31 Rust tests total across the project.
+- **Status:** all 6 entry types fully implemented in `rust/src/api/vault.rs`.
+  112 Rust tests passing across the project.
 - Lives in `rust/src/api/vault.rs` — the bridge boundary between Flutter and
   the internal vault domain model.
 - **Pattern:** each entry type gets a bridge-facing DTO (`LoginEntryData`,
   `NoteEntryData`, etc.) using only bridge-friendly types (`String`, `Vec`,
   `bool`, `Option<String>`), and a `create_*` function that generates a UUID,
   timestamps, builds the internal type, then converts to the DTO.
-- **UUID generation:** uses the `uuid` crate (v1.23.0) with the `v4` feature
-  (random UUIDs). Added to `Cargo.toml` this session.
+- **UUID generation:** uses the `uuid` crate with the `v4` feature (random UUIDs).
 - **Timestamps:** generated in Rust using `std::time` only — no `chrono`
   dependency. Format: ISO 8601 UTC (`YYYY-MM-DDTHH:MM:SSZ`).
-- **Remaining entry types to implement:** Identity, Card, File, Custom.
-  Identity and Card are next — Card will reuse the `CardEntry::new()`
-  validated constructor from the domain model.
 - **DTO pattern:** internal domain types never cross the bridge directly.
   Flutter calls `create_login_entry(...)` and receives a `LoginEntryData` —
   it never constructs or holds a `LoginEntry`.
+- **Full API surface (all implemented):**
+  - `create_*()` — one per entry type; generates UUID and timestamps
+  - `get_entry_by_id()` — fetch a single entry by UUID
+  - `update_entry()` — replace an entry by UUID; stamps `updated_at`
+  - `delete_entry()` — remove a single entry by UUID
+  - `delete_whole_vault()` — wipe the `.gabbro` file from disk
+  - `list_entries()` — return all entries, optionally masked
+  - `save_vault()` — serialize → encrypt → write to disk
+  - `load_vault()` — read from disk → decrypt → deserialize
+  - `change_passphrase()` — re-seal under a new passphrase
+  - `export_vault()` — write `.gabbro` + `.gabbro.sha256` pair
+- **Password masking:** `list_entries(masked: true)` replaces password, CVV,
+  and hidden custom field values with a fixed 8-character placeholder
+  (`"********"`). Length is deliberately decoupled from the actual value
+  to prevent shoulder-surfing attacks based on character count.
 
 ## Vault Storage & Sync
 - v1: local path only, chosen during onboarding
@@ -322,12 +334,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** vault filesystem I/O implemented in `rust/src/vault/io.rs` —
-  `write_vault()` and `read_vault()` wrappers around `to_bytes()`/`from_bytes()`.
-  Full storage stack now complete end-to-end. 86 Rust tests passing.
-- **Next task:** define what remains in the Rust backend before touching Flutter.
-  Candidate: a vault API function that serializes vault entries to JSON for
-  encryption — the missing link between the domain model and the crypto stack.
+- **Completed:** full Rust backend API complete — all entry CRUD operations,
+  vault persistence, passphrase change, export with detached SHA-256 hash.
+  112 Rust tests passing.
+- **Next task:** bridge exposure — wire `save_vault()`, `load_vault()`, and
+  the entry management functions through `flutter_rust_bridge` so Flutter
+  can call them.
 
 ---
 

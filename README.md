@@ -2,9 +2,9 @@
 
 A post-quantum password manager built with security as core DNA.
 
-> **Status: early development — not yet functional.**
-> Architecture and foundations are being laid. No vault operations
-> are implemented yet.
+> **Status: Rust backend complete — Flutter UI not yet started.**
+> All vault operations are implemented and tested in Rust (112 tests passing).
+> The Flutter UI layer is the next milestone.
 
 ---
 
@@ -69,6 +69,31 @@ passphrase + random_salt
 Vault files use the `.gabbro` extension and are self-contained —
 all parameters needed for decryption travel with the file.
 Exports include a detached SHA-256 hash for integrity verification.
+
+---
+
+## Verifying Export Integrity
+
+Every vault export produces two files:
+
+```
+vault.gabbro         — the encrypted vault
+vault.gabbro.sha256  — detached SHA-256 hash
+```
+
+To verify the export has not been corrupted or tampered with:
+
+```bash
+sha256sum -c vault.gabbro.sha256
+```
+
+A clean result prints `vault.gabbro: OK`. This follows the same
+convention as Linux ISO verification and can be run before decryption
+using any standard tool — no Gabbro installation required.
+
+Note: AES-256-GCM's authentication tag already detects tampering
+during decryption. The detached hash is a UX complement that allows
+verification *before* opening the vault.
 
 ---
 
