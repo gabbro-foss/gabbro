@@ -453,6 +453,25 @@ discussed and forgotten.
   model (see below) create any support obligations? A minimal v1 approach:
   GitHub Issues + a SUPPORT.md file. Revisit when the user base exists.
 
+- **De-Googled Android compatibility:** Gabbro targets F-Droid as its
+  Android distribution channel, which enforces no proprietary dependencies
+  and no anti-features. The Rust backend has zero Google dependencies by
+  design. However, explicit testing on a de-Googled device (GrapheneOS or
+  CalyxOS) is needed before v1 ships to confirm the Flutter layer and
+  YubiKey FIDO2 integration work without Google Play Services or with
+  microG only.
+
+  This matters because Google's ongoing erosion of Android's open
+  platform is pushing privacy-conscious users toward custom ROMs — exactly
+  the users Gabbro is built for. Context:
+  - [Plexus](https://plexus.techlore.tech/) — crowdsourced de-Googled app
+    compatibility ratings, maintained by the community for the community.
+  - [Carl Sagan — Pale Blue Dot](https://www.planetary.org/worlds/pale-blue-dot)
+    — a reminder of what actually matters and why petty exercises of power
+    by present elites are historically self-defeating.
+
+  Plan: find a willing community member with a de-Googled device to test
+  a beta build before v1 release. Do not buy hardware prematurely.
 
 ### Monetisation
 
