@@ -410,6 +410,35 @@ pub fn get_entry_by_id(
         .ok_or_else(|| format!("No entry found with id: {id}"))
 }
 
+/// Replace an existing entry in the vault with an updated version.
+///
+/// Matches by UUID — the updated entry must carry the same id as the
+/// one being replaced. Updates `updated_at` to the current timestamp.
+/// Returns `Err` if no entry with that id exists.
+pub fn update_entry(
+    entries: &mut Vec<VaultEntry>,
+    updated: VaultEntry,
+) -> Result<(), String> {
+    let id = entry_id(&updated).to_string();
+    let pos = entries
+        .iter()
+        .position(|e| entry_id(e) == id)
+        .ok_or_else(|| format!("No entry found with id: {id}"))?;
+
+    // Stamp updated_at on the replacement entry
+    let updated = match updated {
+        VaultEntry::Login(mut e)    => { e.meta.updated_at = chrono_now(); VaultEntry::Login(e) }
+        VaultEntry::Note(mut e)     => { e.meta.updated_at = chrono_now(); VaultEntry::Note(e) }
+        VaultEntry::Identity(mut e) => { e.meta.updated_at = chrono_now(); VaultEntry::Identity(e) }
+        VaultEntry::Card(mut e)     => { e.meta.updated_at = chrono_now(); VaultEntry::Card(e) }
+        VaultEntry::File(mut e)     => { e.meta.updated_at = chrono_now(); VaultEntry::File(e) }
+        VaultEntry::Custom(mut e)   => { e.meta.updated_at = chrono_now(); VaultEntry::Custom(e) }
+    };
+
+    entries[pos] = updated;
+    Ok(())
+}
+
 // ── Vault persistence ─────────────────────────────────────────────────────────
 
 /// Serialize, encrypt, and write a vault to disk in one operation.
@@ -871,6 +900,123 @@ mod tests {
         ];
 
         assert!(get_entry_by_id(&entries, "does-not-exist").is_err());
+    }
+
+    #[test]
+    fn update_entry_replaces_correct_entry() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let mut entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("Original title"),
+                content: String::from("original content"),
+            }),
+        ];
+
+        let updated = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("Updated title"),
+            content: String::from("updated content"),
+        });
+
+        update_entry(&mut entries, updated).unwrap();
+        assert_eq!(entries.len(), 1);
+        match &entries[0] {
+            VaultEntry::Note(e) => {
+                assert_eq!(e.title, "Updated title");
+                assert_eq!(e.content, "updated content");
+            }
+            _ => panic!("Expected Note variant"),
+        }
+    }
+
+    #[test]
+    fn update_entry_stamps_updated_at() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let mut entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("Note"),
+                content: String::from("content"),
+            }),
+        ];
+
+        let updated = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("Note"),
+            content: String::from("new content"),
+        });
+
+        update_entry(&mut entries, updated).unwrap();
+        match &entries[0] {
+            VaultEntry::Note(e) => assert_ne!(e.meta.updated_at, "2025-01-01T00:00:00Z"),
+            _ => panic!("Expected Note variant"),
+        }
+    }
+
+    #[test]
+    fn update_entry_missing_id_returns_error() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let mut entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("Note"),
+                content: String::from("content"),
+            }),
+        ];
+
+        let ghost = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("does-not-exist"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("Ghost"),
+            content: String::from("ghost content"),
+        });
+
+        assert!(update_entry(&mut entries, ghost).is_err());
     }
 
 }
