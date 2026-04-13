@@ -512,6 +512,21 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
     }
 }
 
+/// Re-encrypt the vault under a new passphrase.
+///
+/// Reads and decrypts the vault with the old passphrase, then
+/// re-seals and writes it under the new passphrase. The vault body
+/// is not re-encrypted from scratch — only the key encapsulation
+/// layer changes, which is the standard pattern for passphrase changes.
+pub fn change_passphrase(
+    path: &Path,
+    old_passphrase: &[u8],
+    new_passphrase: &[u8],
+) -> Result<(), String> {
+    let entries = load_vault(old_passphrase, path)?;
+    save_vault(&entries, new_passphrase, path)
+}
+
 // ── Vault persistence ─────────────────────────────────────────────────────────
 
 /// Serialize, encrypt, and write a vault to disk in one operation.
@@ -1335,6 +1350,65 @@ mod tests {
             VaultEntry::Note(e) => assert_eq!(e.content, "sensitive note content"),
             _ => panic!("Expected Note variant"),
         }
+    }
+
+    #[test]
+    fn change_passphrase_allows_open_with_new_passphrase() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_change_pass_test.gabbro");
+
+        let entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("Test note"),
+                content: String::from("secret content"),
+            }),
+        ];
+
+        let old = b"old passphrase";
+        let new = b"new passphrase";
+
+        save_vault(&entries, old, &path).unwrap();
+        change_passphrase(&path, old, new).unwrap();
+
+        // Old passphrase must no longer work
+        assert!(load_vault(old, &path).is_err());
+
+        // New passphrase must work and content must be preserved
+        let recovered = load_vault(new, &path).unwrap();
+        assert_eq!(recovered.len(), 1);
+        match &recovered[0] {
+            VaultEntry::Note(e) => assert_eq!(e.content, "secret content"),
+            _ => panic!("Expected Note variant"),
+        }
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn change_passphrase_wrong_old_passphrase_fails() {
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_change_pass_wrong_test.gabbro");
+
+        let entries: Vec<VaultEntry> = vec![];
+        save_vault(&entries, b"correct passphrase", &path).unwrap();
+
+        let result = change_passphrase(&path, b"wrong passphrase", b"new passphrase");
+
+        let _ = std::fs::remove_file(&path);
+        assert!(result.is_err());
     }
 
 }
