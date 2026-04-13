@@ -870,6 +870,15 @@ reading unfamiliar code: `some_function(x)` is a function call;
 `some_macro!(x)` is a macro invocation that may generate arbitrarily
 different code depending on its arguments.
 
+### End-to-end testing across two subsystems
+A test that exercises only the crypto layer (seal/open) and a test
+that exercises only serialization (to_bytes/from_bytes) can both pass
+while a bug at their boundary goes undetected. The end-to-end test
+catches this: if any header field (e.g. HKDF salt, ML-KEM ciphertext)
+is serialized or deserialized incorrectly, `open_vault` fails with a
+decryption error — not a deserialization error — because the wrong
+bytes are fed to the crypto layer. Neither half-test would surface this.
+
 ---
 
 ## UX & Internationalisation

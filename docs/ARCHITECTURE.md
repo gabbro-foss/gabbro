@@ -321,8 +321,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** .gabbro file format implemented in `rust/src/vault/file_format.rs` — `SealedVault` struct, `to_bytes()`/`from_bytes()`, 5 tests. `vault_crypto.rs` refactored to use single `SealedVault` definition. 82 Rust tests passing.
-- **Next task:** end-to-end vault file write and read test — call `seal_vault()`, serialize to bytes, deserialize, call `open_vault()`, assert plaintext recovered.
+- **Completed:** end-to-end vault file write/read test passing —
+  `seal_vault()` → `to_bytes()` → `from_bytes()` → `open_vault()` →
+  plaintext recovered. 83 Rust tests passing.
+- **Next task:** begin Flutter UI scaffolding, or implement vault
+  file I/O (write `.gabbro` to disk and read it back) in Rust.
 
 ---
 

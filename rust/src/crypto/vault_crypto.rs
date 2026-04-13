@@ -143,4 +143,26 @@ mod tests {
         let b = seal_vault(passphrase, plaintext).unwrap();
         assert_ne!(a.ciphertext, b.ciphertext);
     }
+
+    #[test]
+    fn seal_serialize_deserialize_open_roundtrip() {
+        let passphrase = b"correct horst battery staple";
+        let plaintext = b"end-to-end vault file roundtrip";
+
+        // Seal -> real crypto, real ciphertext
+        let sealed = seal_vault(passphrase, plaintext).unwrap();
+
+        // Serialize -> flat bytes, as written to disk
+        let bytes = sealed.to_bytes();
+
+        // Deserialize -> reconstruct SealedVault from bytes
+        let recovered_sealed = SealedVault::from_bytes(&bytes)
+            .expect("from_bytes should succeed on valid sealed vault");
+
+        // Open -> decrypt with the same passphrase
+        let recovered_plaintext = open_vault(passphrase, &recovered_sealed)
+            .expect("open_vault should succeed after roundtrip through bytes");
+
+        assert_eq!(recovered_plaintext, plaintext);
+    }
 }
