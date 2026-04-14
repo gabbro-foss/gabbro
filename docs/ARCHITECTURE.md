@@ -30,7 +30,11 @@ gabbro/
 │           ├── api/
 │           │   ├── simple.dart
 │           │   ├── password_generator.dart
-│           │   └── passphrase_generator.dart
+│           │   ├── passphrase_generator.dart
+│           │   ├── vault.dart
+│           │   ├── vault_bridge.dart
+│           │   ├── vault_bridge.freezed.dart
+│           │   └── entropy.dart
 │           ├── frb_generated.dart
 │           ├── frb_generated.io.dart
 │           └── frb_generated.web.dart
@@ -49,7 +53,9 @@ gabbro/
 │       │   ├── simple.rs
 │       │   ├── password_generator.rs
 │       │   ├── passphrase_generator.rs
-│       │   └── vault.rs        # Vault entry API — DTOs and create_* functions
+│       │   ├── vault.rs        # Vault entry API — DTOs and create_* functions
+│       │   ├── vault_bridge.rs # Bridge wrappers — save/load vault
+│       │   └── entropy.rs
 │       ├── crypto/             # Internal crypto stack (not bridge-exposed)
 │       │   ├── mod.rs
 │       │   ├── kdf.rs          # Argon2id KDF and Argon2idParams struct
@@ -334,12 +340,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** full Rust backend API complete — all entry CRUD operations,
-  vault persistence, passphrase change, export with detached SHA-256 hash.
-  112 Rust tests passing.
-- **Next task:** bridge exposure — wire `save_vault()`, `load_vault()`, and
-  the entry management functions through `flutter_rust_bridge` so Flutter
-  can call them.
+- **Completed:** bridge exposure — `save_vault` and `load_vault` wired through
+  flutter_rust_bridge as async Dart functions. `VaultEntryData` sealed class
+  generated. Flutter Linux debug build clean. 114 Rust tests passing.
+- **Next task:** wire the remaining vault API functions through the bridge —
+  `create_*` entry functions, `list_entries`, `get_entry_by_id`, `update_entry`,
+  `delete_entry`, and `delete_whole_vault`.
 
 ---
 

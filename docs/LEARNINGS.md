@@ -1006,3 +1006,68 @@ even if the API looks identical. The fix is usually to reduce
 dependencies rather than add version constraints. In Gabbro:
 `rand_chacha` was removed in favour of `StdRng` from the already-
 present `rand` crate, eliminating the conflict entirely.
+
+---
+
+## Flutter/Dart Bridge
+
+### flutter_rust_bridge codegen — what it does
+`flutter_rust_bridge_codegen generate` reads your Rust `api/` surface and
+produces Dart stubs in `lib/src/rust/api/`. These files are auto-generated —
+never edit them manually. Re-run codegen any time you add, remove, or change
+a public Rust function or type that crosses the bridge.
+
+### sync vs async across the bridge
+- `pub fn` + `#[flutter_rust_bridge::frb(sync)]` → Dart calls it as a plain
+  function, returns immediately, blocks the UI thread. Safe only for fast
+  in-memory operations.
+- `pub async fn` (no annotation needed) → Dart calls it with `await`, runs
+  without blocking the UI. Required for anything slow — including Argon2id,
+  which takes ~667ms on target hardware.
+
+### Bridge-friendly types
+Not all Rust types can cross the bridge. The rules:
+- `std::path::Path` → use `String` instead; convert with `Path::new(&s)` inside
+  the wrapper
+- `&[u8]` → use `Vec<u8>` instead
+- Internal domain enums/structs → wrap in bridge-facing DTOs
+
+### `#[flutter_rust_bridge::frb(ignore)]`
+Tells the codegen to skip a function entirely. Use this on internal Rust
+functions that take non-bridge-friendly types and are not meant to be called
+from Flutter. Without it, the codegen attempts to bridge them and fails to
+compile.
+
+### Bridge wrapper pattern
+Keep pure Rust logic in the internal module (`vault.rs`). Create a separate
+`vault_bridge.rs` in `api/` that wraps those functions with bridge-friendly
+signatures. The wrapper converts types in, calls the internal function, and
+converts types back out. This keeps the domain logic clean and the bridge
+boundary explicit.
+
+### Sealed classes in Dart (from Rust enums)
+A Rust `pub enum` with data variants (e.g. `VaultEntryData`) is generated
+as a Dart `sealed class` with factory constructors for each variant. Dart's
+`switch` on a sealed class is exhaustive — the compiler forces you to handle
+every variant, the same guarantee Rust's `match` provides.
+
+### freezed and build_runner
+flutter_rust_bridge uses `freezed` (a Dart code generation package) to
+produce the sealed class hierarchy for Rust enums. `build_runner` is the
+tool that runs the Dart code generation step. Both are dev dependencies.
+Add them with:
+  `flutter pub add --dev freezed`
+  `flutter pub add freezed_annotation`
+  `flutter pub add --dev build_runner`
+
+### Flutter and Cargo commands — where to run them
+- `flutter` commands (build, pub, etc.) → run from the project root (`gabbro/`)
+  where `pubspec.yaml` lives
+- `cargo` commands (test, build, etc.) → run from `gabbro/rust/` where
+  `Cargo.toml` lives
+- `flutter_rust_bridge_codegen generate` → run from the project root
+
+### simple.rs — leave it alone
+The generated `simple.rs` file contains two things: a demo `greet` function
+and the required `init_app` boilerplate that Flutter calls once at startup.
+Never delete or modify it. It serves as the bridge initialisation hook.
