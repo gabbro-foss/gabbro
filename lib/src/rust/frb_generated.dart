@@ -8,6 +8,7 @@ import 'api/passphrase_generator.dart';
 import 'api/password_generator.dart';
 import 'api/simple.dart';
 import 'api/vault.dart';
+import 'api/vault_bridge.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -70,7 +71,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -1895728757;
+  int get rustContentHash => -112163268;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -144,9 +145,7 @@ abstract class RustLibApi extends BaseApi {
     required int length,
   });
 
-  Future<EntropyResult> crateApiEntropyEstimateEntropy({
-    required String password,
-  });
+  EntropyResult crateApiEntropyEstimateEntropy({required String password});
 
   Future<String> crateApiPassphraseGeneratorGeneratePassphrase({
     required PassphraseConfig config,
@@ -160,9 +159,20 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiSimpleInitApp();
 
+  Future<List<VaultEntryData>> crateApiVaultBridgeLoadVaultFromDisk({
+    required List<int> passphrase,
+    required String path,
+  });
+
   Future<double> crateApiPassphraseGeneratorPassphraseEntropyBits({
     required int wordCount,
     required Language language,
+  });
+
+  Future<void> crateApiVaultBridgeSaveVaultToDisk({
+    required List<VaultEntryData> entries,
+    required List<int> passphrase,
+    required String path,
   });
 }
 
@@ -525,20 +535,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<EntropyResult> crateApiEntropyEstimateEntropy({
-    required String password,
-  }) {
-    return handler.executeNormal(
-      NormalTask(
-        callFfi: (port_) {
+  EntropyResult crateApiEntropyEstimateEntropy({required String password}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(password, serializer);
-          pdeCallFfi(
-            generalizedFrbRustBinding,
-            serializer,
-            funcId: 8,
-            port: port_,
-          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_entropy_result,
@@ -666,6 +669,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "init_app", argNames: []);
 
   @override
+  Future<List<VaultEntryData>> crateApiVaultBridgeLoadVaultFromDisk({
+    required List<int> passphrase,
+    required String path,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_8_loose(passphrase, serializer);
+          sse_encode_String(path, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 13,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_vault_entry_data,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiVaultBridgeLoadVaultFromDiskConstMeta,
+        argValues: [passphrase, path],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultBridgeLoadVaultFromDiskConstMeta =>
+      const TaskConstMeta(
+        debugName: "load_vault_from_disk",
+        argNames: ["passphrase", "path"],
+      );
+
+  @override
   Future<double> crateApiPassphraseGeneratorPassphraseEntropyBits({
     required int wordCount,
     required Language language,
@@ -679,7 +717,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 13,
+            funcId: 14,
             port: port_,
           );
         },
@@ -701,6 +739,43 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         argNames: ["wordCount", "language"],
       );
 
+  @override
+  Future<void> crateApiVaultBridgeSaveVaultToDisk({
+    required List<VaultEntryData> entries,
+    required List<int> passphrase,
+    required String path,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_vault_entry_data(entries, serializer);
+          sse_encode_list_prim_u_8_loose(passphrase, serializer);
+          sse_encode_String(path, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 15,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiVaultBridgeSaveVaultToDiskConstMeta,
+        argValues: [entries, passphrase, path],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultBridgeSaveVaultToDiskConstMeta =>
+      const TaskConstMeta(
+        debugName: "save_vault_to_disk",
+        argNames: ["entries", "passphrase", "path"],
+      );
+
   @protected
   String dco_decode_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -711,6 +786,42 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   bool dco_decode_bool(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as bool;
+  }
+
+  @protected
+  CardEntryData dco_decode_box_autoadd_card_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_card_entry_data(raw);
+  }
+
+  @protected
+  CustomEntryData dco_decode_box_autoadd_custom_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_custom_entry_data(raw);
+  }
+
+  @protected
+  FileEntryData dco_decode_box_autoadd_file_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_file_entry_data(raw);
+  }
+
+  @protected
+  IdentityEntryData dco_decode_box_autoadd_identity_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_identity_entry_data(raw);
+  }
+
+  @protected
+  LoginEntryData dco_decode_box_autoadd_login_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_login_entry_data(raw);
+  }
+
+  @protected
+  NoteEntryData dco_decode_box_autoadd_note_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_note_entry_data(raw);
   }
 
   @protected
@@ -872,6 +983,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<VaultEntryData> dco_decode_list_vault_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_vault_entry_data).toList();
+  }
+
+  @protected
   LoginEntryData dco_decode_login_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -972,6 +1089,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  VaultEntryData dco_decode_vault_entry_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    switch (raw[0]) {
+      case 0:
+        return VaultEntryData_Login(
+          dco_decode_box_autoadd_login_entry_data(raw[1]),
+        );
+      case 1:
+        return VaultEntryData_Note(
+          dco_decode_box_autoadd_note_entry_data(raw[1]),
+        );
+      case 2:
+        return VaultEntryData_Identity(
+          dco_decode_box_autoadd_identity_entry_data(raw[1]),
+        );
+      case 3:
+        return VaultEntryData_Card(
+          dco_decode_box_autoadd_card_entry_data(raw[1]),
+        );
+      case 4:
+        return VaultEntryData_File(
+          dco_decode_box_autoadd_file_entry_data(raw[1]),
+        );
+      case 5:
+        return VaultEntryData_Custom(
+          dco_decode_box_autoadd_custom_entry_data(raw[1]),
+        );
+      default:
+        throw Exception("unreachable");
+    }
+  }
+
+  @protected
   String sse_decode_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_prim_u_8_strict(deserializer);
@@ -982,6 +1132,54 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   bool sse_decode_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  CardEntryData sse_decode_box_autoadd_card_entry_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_card_entry_data(deserializer));
+  }
+
+  @protected
+  CustomEntryData sse_decode_box_autoadd_custom_entry_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_custom_entry_data(deserializer));
+  }
+
+  @protected
+  FileEntryData sse_decode_box_autoadd_file_entry_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_file_entry_data(deserializer));
+  }
+
+  @protected
+  IdentityEntryData sse_decode_box_autoadd_identity_entry_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_identity_entry_data(deserializer));
+  }
+
+  @protected
+  LoginEntryData sse_decode_box_autoadd_login_entry_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_login_entry_data(deserializer));
+  }
+
+  @protected
+  NoteEntryData sse_decode_box_autoadd_note_entry_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_note_entry_data(deserializer));
   }
 
   @protected
@@ -1189,6 +1387,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<VaultEntryData> sse_decode_list_vault_entry_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <VaultEntryData>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_vault_entry_data(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   LoginEntryData sse_decode_login_entry_data(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_id = sse_decode_String(deserializer);
@@ -1312,6 +1524,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  VaultEntryData sse_decode_vault_entry_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var tag_ = sse_decode_i_32(deserializer);
+    switch (tag_) {
+      case 0:
+        var var_field0 = sse_decode_box_autoadd_login_entry_data(deserializer);
+        return VaultEntryData_Login(var_field0);
+      case 1:
+        var var_field0 = sse_decode_box_autoadd_note_entry_data(deserializer);
+        return VaultEntryData_Note(var_field0);
+      case 2:
+        var var_field0 = sse_decode_box_autoadd_identity_entry_data(
+          deserializer,
+        );
+        return VaultEntryData_Identity(var_field0);
+      case 3:
+        var var_field0 = sse_decode_box_autoadd_card_entry_data(deserializer);
+        return VaultEntryData_Card(var_field0);
+      case 4:
+        var var_field0 = sse_decode_box_autoadd_file_entry_data(deserializer);
+        return VaultEntryData_File(var_field0);
+      case 5:
+        var var_field0 = sse_decode_box_autoadd_custom_entry_data(deserializer);
+        return VaultEntryData_Custom(var_field0);
+      default:
+        throw UnimplementedError('');
+    }
+  }
+
+  @protected
   void sse_encode_String(String self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
@@ -1321,6 +1564,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_card_entry_data(
+    CardEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_card_entry_data(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_custom_entry_data(
+    CustomEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_custom_entry_data(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_file_entry_data(
+    FileEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_file_entry_data(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_identity_entry_data(
+    IdentityEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_identity_entry_data(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_login_entry_data(
+    LoginEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_login_entry_data(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_note_entry_data(
+    NoteEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_note_entry_data(self, serializer);
   }
 
   @protected
@@ -1492,6 +1789,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_vault_entry_data(
+    List<VaultEntryData> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_vault_entry_data(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_login_entry_data(
     LoginEntryData self,
     SseSerializer serializer,
@@ -1584,5 +1893,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_unit(void self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  void sse_encode_vault_entry_data(
+    VaultEntryData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    switch (self) {
+      case VaultEntryData_Login(field0: final field0):
+        sse_encode_i_32(0, serializer);
+        sse_encode_box_autoadd_login_entry_data(field0, serializer);
+      case VaultEntryData_Note(field0: final field0):
+        sse_encode_i_32(1, serializer);
+        sse_encode_box_autoadd_note_entry_data(field0, serializer);
+      case VaultEntryData_Identity(field0: final field0):
+        sse_encode_i_32(2, serializer);
+        sse_encode_box_autoadd_identity_entry_data(field0, serializer);
+      case VaultEntryData_Card(field0: final field0):
+        sse_encode_i_32(3, serializer);
+        sse_encode_box_autoadd_card_entry_data(field0, serializer);
+      case VaultEntryData_File(field0: final field0):
+        sse_encode_i_32(4, serializer);
+        sse_encode_box_autoadd_file_entry_data(field0, serializer);
+      case VaultEntryData_Custom(field0: final field0):
+        sse_encode_i_32(5, serializer);
+        sse_encode_box_autoadd_custom_entry_data(field0, serializer);
+    }
   }
 }

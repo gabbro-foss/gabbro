@@ -11,6 +11,7 @@ import 'api/passphrase_generator.dart';
 import 'api/password_generator.dart';
 import 'api/simple.dart';
 import 'api/vault.dart';
+import 'api/vault_bridge.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -29,6 +30,24 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   bool dco_decode_bool(dynamic raw);
+
+  @protected
+  CardEntryData dco_decode_box_autoadd_card_entry_data(dynamic raw);
+
+  @protected
+  CustomEntryData dco_decode_box_autoadd_custom_entry_data(dynamic raw);
+
+  @protected
+  FileEntryData dco_decode_box_autoadd_file_entry_data(dynamic raw);
+
+  @protected
+  IdentityEntryData dco_decode_box_autoadd_identity_entry_data(dynamic raw);
+
+  @protected
+  LoginEntryData dco_decode_box_autoadd_login_entry_data(dynamic raw);
+
+  @protected
+  NoteEntryData dco_decode_box_autoadd_note_entry_data(dynamic raw);
 
   @protected
   PassphraseConfig dco_decode_box_autoadd_passphrase_config(dynamic raw);
@@ -76,6 +95,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  List<VaultEntryData> dco_decode_list_vault_entry_data(dynamic raw);
+
+  @protected
   LoginEntryData dco_decode_login_entry_data(dynamic raw);
 
   @protected
@@ -103,10 +125,43 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void dco_decode_unit(dynamic raw);
 
   @protected
+  VaultEntryData dco_decode_vault_entry_data(dynamic raw);
+
+  @protected
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
   bool sse_decode_bool(SseDeserializer deserializer);
+
+  @protected
+  CardEntryData sse_decode_box_autoadd_card_entry_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  CustomEntryData sse_decode_box_autoadd_custom_entry_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  FileEntryData sse_decode_box_autoadd_file_entry_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  IdentityEntryData sse_decode_box_autoadd_identity_entry_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  LoginEntryData sse_decode_box_autoadd_login_entry_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  NoteEntryData sse_decode_box_autoadd_note_entry_data(
+    SseDeserializer deserializer,
+  );
 
   @protected
   PassphraseConfig sse_decode_box_autoadd_passphrase_config(
@@ -162,6 +217,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  List<VaultEntryData> sse_decode_list_vault_entry_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   LoginEntryData sse_decode_login_entry_data(SseDeserializer deserializer);
 
   @protected
@@ -189,10 +249,49 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_decode_unit(SseDeserializer deserializer);
 
   @protected
+  VaultEntryData sse_decode_vault_entry_data(SseDeserializer deserializer);
+
+  @protected
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_card_entry_data(
+    CardEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_custom_entry_data(
+    CustomEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_file_entry_data(
+    FileEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_identity_entry_data(
+    IdentityEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_login_entry_data(
+    LoginEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_note_entry_data(
+    NoteEntryData self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_box_autoadd_passphrase_config(
@@ -261,6 +360,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_vault_entry_data(
+    List<VaultEntryData> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_login_entry_data(
     LoginEntryData self,
     SseSerializer serializer,
@@ -295,6 +400,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_unit(void self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_vault_entry_data(
+    VaultEntryData self,
+    SseSerializer serializer,
+  );
 }
 
 // Section: wire_class

@@ -401,6 +401,7 @@ fn entry_id(entry: &VaultEntry) -> &str {
 ///
 /// Returns a clone of the matching entry, or `Err` if no entry with
 /// that id exists.
+#[flutter_rust_bridge::frb(ignore)]
 pub fn get_entry_by_id(
     entries: &[VaultEntry],
     id: &str,
@@ -417,6 +418,7 @@ pub fn get_entry_by_id(
 /// Matches by UUID — the updated entry must carry the same id as the
 /// one being replaced. Updates `updated_at` to the current timestamp.
 /// Returns `Err` if no entry with that id exists.
+#[flutter_rust_bridge::frb(ignore)]
 pub fn update_entry(
     entries: &mut Vec<VaultEntry>,
     updated: VaultEntry,
@@ -444,6 +446,7 @@ pub fn update_entry(
 /// Remove a single entry from the vault by UUID.
 ///
 /// Returns `Err` if no entry with that id exists.
+#[flutter_rust_bridge::frb(ignore)]
 pub fn delete_entry(
     entries: &mut Vec<VaultEntry>,
     id: &str,
@@ -461,6 +464,7 @@ pub fn delete_entry(
 /// This is a destructive, irreversible operation. The confirmation
 /// logic (two explicit user confirmations) lives in Flutter — Rust
 /// executes the deletion unconditionally when this is called.
+#[flutter_rust_bridge::frb(ignore)]
 pub fn delete_whole_vault(path: &Path) -> Result<(), String> {
     std::fs::remove_file(path)
         .map_err(|e| format!("Failed to delete vault: {e}"))
@@ -471,6 +475,7 @@ pub fn delete_whole_vault(path: &Path) -> Result<(), String> {
 /// When `masked` is true, password and CVV fields are replaced with
 /// `MASKED_VALUE` — a fixed-length placeholder that deliberately reveals
 /// nothing about the actual value's length.
+#[flutter_rust_bridge::frb(ignore)]
 pub fn list_entries(
     entries: &[VaultEntry],
     masked: bool,
@@ -520,6 +525,7 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
 /// re-seals and writes it under the new passphrase. The vault body
 /// is not re-encrypted from scratch — only the key encapsulation
 /// layer changes, which is the standard pattern for passphrase changes.
+#[flutter_rust_bridge::frb(ignore)]
 pub fn change_passphrase(
     path: &Path,
     old_passphrase: &[u8],
@@ -539,6 +545,7 @@ pub fn change_passphrase(
 ///
 /// `export_path` should point to the desired `.gabbro` output file.
 /// The `.sha256` file is written alongside it automatically.
+#[flutter_rust_bridge::frb(ignore)]
 pub fn export_vault(
     entries: &[VaultEntry],
     passphrase: &[u8],
@@ -578,6 +585,7 @@ pub fn export_vault(
 ///
 /// This is the top-level save operation Flutter will call.
 /// Entries → JSON → AES-256-GCM encrypted → .gabbro file on disk.
+#[flutter_rust_bridge::frb(ignore)]
 pub fn save_vault(
     entries: &[VaultEntry],
     passphrase: &[u8],
@@ -592,6 +600,7 @@ pub fn save_vault(
 ///
 /// This is the top-level load operation Flutter will call.
 /// .gabbro file → AES-256-GCM decrypt → JSON → Vec<VaultEntry>.
+#[flutter_rust_bridge::frb(ignore)]
 pub fn load_vault(
     passphrase: &[u8],
     path: &Path,

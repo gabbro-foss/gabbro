@@ -17,7 +17,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 ///     entropy = length × log₂(pool_size)
 ///
 /// Returns `EntropyResult { bits: 0.0, tier: Terrible }` for an empty string.
-Future<EntropyResult> estimateEntropy({required String password}) =>
+EntropyResult estimateEntropy({required String password}) =>
     RustLib.instance.api.crateApiEntropyEstimateEntropy(password: password);
 
 /// The result of an entropy estimate.
