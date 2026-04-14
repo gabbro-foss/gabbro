@@ -397,6 +397,17 @@ discussed and forgotten.
   password display palette) generalise to a broader theming system, or whether
   that adds complexity for little gain.
 
+- **Accessible font sizing:** Gabbro should offer a font size setting with
+  3–5 steps, e.g. Small / Regular / Large / Extra Large (avoid
+  "tiny"/"huge" — these have negative connotations for the people who need
+  them most). Implemented as a slider or segmented control in Settings →
+  Accessibility. Onboarding should default to Regular+1 (one step above
+  the base) and surface the option prominently on first launch — defaulting
+  to the smallest readable size would exclude users with declining vision
+  before they ever reach the settings screen. Pairs with the existing
+  colour-blind safety work (ADR-003) as part of a broader accessibility
+  commitment. Consider testing against WCAG 1.4.4 (Resize Text).
+
 - **Panic button / app hiding on mobile:** A visible "hide app" mechanism —
   e.g. disguise Gabbro as a calculator or notes app, or a panic button that
   instantly locks and hides it. Relevant threat model: physical coercion or
@@ -404,6 +415,20 @@ discussed and forgotten.
   auto-lock and wipe logic? Is disguise-as-another-app feasible on Android
   (custom launcher icon/label, yes; hiding from app drawer is limited) and iOS
   (more restricted)? Does offering this create a false sense of security?
+
+- **Safe entry editing — confirmation and password history:** The edit
+  action should use a recognisable affordance (pencil icon) and require
+  an explicit confirmation step before saving, to prevent accidental
+  overwrites. For password fields specifically, the previous value should
+  be retained for a configurable window — either n days (e.g. 7, 30) or
+  n vault unlocks (e.g. 5, 10) — so a user who saves a typo or a rejected
+  new credential can recover without a support path. The retained value
+  should be stored encrypted in the vault alongside the entry, never
+  plaintext, and automatically purged once the retention window expires.
+  Open questions: how many historical values to keep (probably 1 is enough
+  for v1); whether the retention window is global or per-entry; whether
+  history is shown in the UI or only accessible via an explicit "show
+  previous password" action.
 
 - **Remote app / vault deletion:** Allow the user to trigger a remote wipe of
   the vault (and optionally the app) from another device or a web interface.
@@ -472,6 +497,24 @@ discussed and forgotten.
 
   Plan: find a willing community member with a de-Googled device to test
   a beta build before v1 release. Do not buy hardware prematurely.
+
+- **Responsive layout — mobile and desktop:** Flutter's layout system
+  (flex widgets, `MediaQuery`, `LayoutBuilder`) handles most screen-size
+  variation automatically, but deliberate decisions are still required.
+  Avoid hardcoded pixel values in favour of relative sizing and
+  constraints. The gap between a compact phone (~360dp wide) and a tablet
+  or desktop window (~800dp+) may warrant distinct layouts for some
+  screens — not just scaling, but restructuring (e.g. side panel on
+  desktop, bottom nav on phone). Font size scaling (see Accessible font
+  sizing above) and layout are coupled: a button that fits at Regular may
+  overflow at Extra Large, so both must be tested together.
+
+  Linux desktop requires particular attention: unlike Android, desktop
+  windows are freely resizable. The app must be tested across a range of
+  window sizes — from a narrow tiling WM column to a maximised widescreen
+  window — before v1 ships. No extra dependencies needed; this is a
+  testing discipline, not an architecture change. Reference: WCAG 1.4.4
+  (Resize Text) applies here alongside the font sizing work.
 
 ### Monetisation
 
