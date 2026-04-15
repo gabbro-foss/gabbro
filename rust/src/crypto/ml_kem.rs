@@ -4,7 +4,7 @@
 //! seeds (d, z) used to deterministically generate an ML-KEM-1024
 //! keypair per ADR-006.
 
-use ml_kem::{MlKem1024, MlKem1024Params, KemCore};
+use ml_kem::{MlKem1024, MlKem1024Params, KemCore, EncodedSizeUser};
 use rand::SeedableRng;
 use rand::rngs::StdRng;
 
