@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:gabbro/src/rust/api/simple.dart';
 import 'package:gabbro/src/rust/frb_generated.dart';
+import 'screens/unlock_screen.dart';
 
 Future<void> main() async {
   await RustLib.init();
-  runApp(const MyApp());
+  runApp(const GabbroApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class GabbroApp extends StatelessWidget {
+  const GabbroApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('flutter_rust_bridge quickstart')),
-        body: Center(
-          child: Text(
-            'Action: Call Rust `greet("Tom")`\nResult: `${greet(name: "Tom")}`',
-          ),
+      title: 'Gabbro',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF534AB7),
         ),
+        useMaterial3: true,
       ),
+      home: const UnlockScreen(),
     );
   }
 }
