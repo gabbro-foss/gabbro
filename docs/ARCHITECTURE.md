@@ -443,23 +443,18 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Vault session model fully implemented in Rust.
-  `rust/src/vault/session.rs` added — `VaultSession` struct holds
-  `Vec<VaultEntry>`, `PathBuf`, and `Vec<u8>` passphrase (stored so
-  mutating operations can re-seal without Flutter re-supplying it).
-  `VAULT_SESSION` static is `Lazy<Mutex<Option<VaultSession>>>`.
-  Full session API implemented: `unlock_vault`, `lock_vault`,
-  `list_entry_summaries`, `get_entry`, `session_create_entry`,
-  `session_update_entry`, `session_delete_entry`,
-  `session_delete_whole_vault`, `session_change_passphrase`,
-  `session_export_vault`. `EntrySummaryData` DTO defined in
-  `vault_bridge.rs`. 6 session tests passing with `#[serial]`
-  to prevent global-state races. 120 Rust tests passing total.
-- **Next task:** Rewrite `vault_bridge.rs` — replace the stateless
-  `save_vault_to_disk` / `load_vault_from_disk` pair with bridge-facing
-  wrappers that delegate to the session API in `vault/session.rs`.
-  Then run `flutter_rust_bridge_codegen generate` and verify the Flutter
-  build is clean.
+- **Completed:** `vault_bridge.rs` rewritten with session-based API —
+  `save_vault_to_disk` / `load_vault_from_disk` replaced with ten
+  bridge-facing wrappers (`unlock_vault`, `lock_vault`,
+  `list_entry_summaries`, `get_entry`, `create_entry`, `update_entry`,
+  `delete_entry`, `delete_whole_vault`, `change_passphrase`,
+  `export_vault`) that delegate to `vault/session.rs`. Codegen rerun,
+  Dart bridge files regenerated, Flutter Linux debug build clean.
+  119 Rust tests passing. Unused import in `ml_kem.rs` cleaned up.
+- **Next task:** Begin Flutter UI — implement the vault list screen
+  that calls `unlock_vault`, then `list_entry_summaries` to display
+  entry summaries. This is the first end-to-end path from the UI
+  through the bridge to the session layer.
 
 ---
 

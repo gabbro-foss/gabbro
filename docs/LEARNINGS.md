@@ -1128,6 +1128,25 @@ The generated `simple.rs` file contains two things: a demo `greet` function
 and the required `init_app` boilerplate that Flutter calls once at startup.
 Never delete or modify it. It serves as the bridge initialisation hook.
 
+### Regenerating the bridge after API changes
+Any time a public Rust function or type in `api/` is added, removed,
+or renamed, the generated bridge files must be regenerated. Run from
+the project root (`gabbro/`):
+
+```
+flutter_rust_bridge_codegen generate
+```
+This rewrites four files — `rust/src/frb_generated.rs`,
+`lib/src/rust/api/vault_bridge.dart`, `lib/src/rust/frb_generated.dart`,
+and `lib/src/rust/frb_generated.web.dart`. All four should be included
+in the same commit as the Rust API change that triggered the regeneration.
+Never edit these files manually — the next codegen run will overwrite them.
+
+The symptom of a stale generated file is a `cargo build` error like:
+`cannot find function save_vault_to_disk in module crate::api::vault_bridge`
+— the generated code references a function that no longer exists in the
+source. The fix is always to rerun codegen, not to edit `frb_generated.rs`.
+
 ---
 
 ## Session Model & Memory Security
