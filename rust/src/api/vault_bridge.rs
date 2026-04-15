@@ -361,4 +361,48 @@ mod tests {
 
         let _ = std::fs::remove_file(&path);
     }
+
+#[test]
+#[ignore]
+fn create_test_vault_on_disk() {
+    use crate::vault::entry::{EntryMeta, NoteEntry, LoginEntry, VaultEntry};
+    use crate::api::vault::save_vault;
+    use std::path::PathBuf;
+
+    let path = PathBuf::from("/tmp/gabbro_dev.gabbro");
+    let pass = b"test passphrase";
+
+    let entries = vec![
+        VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("note-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("NAS recovery key"),
+            content: String::from("secret content here"),
+        }),
+        VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("login-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Work"),
+                tags: vec![],
+                favourite: true,
+            },
+            url: String::from("https://github.com"),
+            username: String::from("Zabamund"),
+            password: String::from("hunter2"),
+            notes: None,
+            custom_fields: vec![],
+        }),
+    ];
+
+    save_vault(&entries, pass, &path).unwrap();
+    println!("Test vault written to {:?}", path);
+}
 }

@@ -29,7 +29,7 @@ fn main() {
 
     let mut output = vec![0u8; 96];
 
-    println!("Running Argon2id (m=64MiB, t=3, p=4) ...");
+    println!("Running Argon2id (m=64MiB, t=25, p=4) ...");
     let start = Instant::now();
     argon2.hash_password_into(password, salt, &mut output)
         .expect("hash failed");
