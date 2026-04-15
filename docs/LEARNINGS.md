@@ -979,7 +979,8 @@ The vault body is encrypted with a random session key, not the
 passphrase directly. The passphrase derives keypairs that
 *encapsulate* the session key. Consequence: changing the passphrase
 only requires re-running encapsulation — the vault body need not be
-re-encrypted. This is the standard pattern in encrypted storage.
+re-encrypted from scratch. This is the standard pattern in encrypted
+storage.
 
 ### Argon2id benchmarking
 Parameters should be benchmarked on target hardware, not just
@@ -1071,3 +1072,101 @@ Add them with:
 The generated `simple.rs` file contains two things: a demo `greet` function
 and the required `init_app` boilerplate that Flutter calls once at startup.
 Never delete or modify it. It serves as the bridge initialisation hook.
+
+---
+
+## Session Model & Memory Security
+
+### Rust-owned session state — `Mutex` + `once_cell`
+flutter_rust_bridge functions are stateless by default — each call is an
+independent function call with no persistent `self` or instance on the Rust
+side. To hold state (e.g. a decrypted vault) between calls, the idiomatic
+pattern is a `Mutex<Option<T>>` wrapped in a `once_cell::sync::Lazy` static:
+
+```rust
+use once_cell::sync::Lazy;
+use std::sync::Mutex;
+
+static VAULT_SESSION: Lazy<Mutex<Option<VaultSession>>> =
+    Lazy::new(|| Mutex::new(None));
+```
+
+`Lazy` initialises the value on first access (not at program start).
+`Mutex` ensures only one thread can access the state at a time — required
+because Flutter may call bridge functions from multiple isolates.
+`Option` distinguishes "vault is unlocked" (`Some`) from "vault is locked"
+(`None`). Locking the vault is then simply replacing the `Some` with `None`
+and dropping the contents.
+
+Python analogy: a module-level variable protected by a `threading.Lock()`,
+initialised to `None` and set on first use.
+
+### Stateless bridge vs stateful session — the distinction
+A flutter_rust_bridge function with no side effects (e.g. `generate_password`)
+is truly stateless — call it ten times, get ten independent results. A vault
+operation (e.g. `get_entry`) needs to read from a previously-decrypted
+in-memory vault — it is stateful. The session model bridges this gap: the
+*function* is still a normal Rust function, but it reads from and writes to
+a module-level `Mutex` static that persists for the lifetime of the process.
+The bridge doesn't need to know about this — it just calls the function.
+
+### Why Dart cannot zeroize memory
+Dart is a garbage-collected language running on the Dart VM. The VM controls
+object lifetimes, may intern strings (reuse the same allocation for equal
+values), and makes no guarantee of zeroing memory before reuse. There is no
+`zeroize` equivalent in Dart and no way to force an object to be collected
+at a specific time. Any secret that crosses the Flutter/Rust bridge into Dart
+is, from a strict security standpoint, uncontrolled — it may persist in the
+Dart heap until the process exits. This is a known, accepted limitation shared
+by every password manager built on a managed runtime (Bitwarden with
+Xamarin/MAUI, 1Password with Electron, etc.). The session model limits Dart's
+exposure by design: summaries only for list views, one full entry on demand,
+never the whole vault.
+
+### What `zeroize` actually buys — and what it doesn't
+`zeroize` explicitly overwrites memory with zeros at a defined point (e.g.
+when the vault locks). It uses volatile writes and memory fencing to prevent
+the compiler or CPU from optimising the zeroing away. What it buys: a
+**narrowed time window** — secrets exist in memory from decryption until the
+explicit zero, rather than until the allocator happens to reuse that page.
+For Gabbro's realistic threat (device seizure while unlocked, memory
+forensics on a running device), this meaningfully reduces exposure.
+
+What it does not guarantee:
+- **Swap / hibernation** — the OS may have written the memory page to disk
+  before the zero occurs; `zeroize` cannot reach those bytes
+- **Cold boot attacks** — DRAM retains data for seconds to minutes after
+  power loss; physical attackers with the right tools can recover it
+- **OS memory snapshots** — mobile OSes may snapshot app memory for fast
+  resume before the zero occurs
+
+The conclusion: `zeroize` is one layer in a defence-in-depth stack, not a
+silver bullet. It is worth doing; it is not sufficient alone.
+
+### Full-disk encryption (FDE) as a security prerequisite
+The memory security model — both `zeroize` in Rust and the session model's
+minimal plaintext exposure — rests on a foundation of full-disk encryption.
+Without FDE, an attacker with physical access to a powered-off device can
+read the raw storage directly, bypassing all in-process protections. With FDE:
+- **Android:** enforced by the OS since Android 10 — all user data partitions
+  are encrypted by default. Gabbro can rely on this.
+- **Linux:** dm-crypt/LUKS is the standard; it is the user's responsibility.
+  Gabbro documents this dependency rather than pretending to solve it.
+
+FDE does not protect against a device seized while unlocked (the key is
+in memory). That is precisely the threat that `zeroize` + auto-lock address.
+The two layers are complementary, not redundant.
+
+### Lazy loading — summaries vs full entries
+A vault with hundreds of entries should not be loaded across the bridge in
+full on unlock. The session model enables lazy loading as the natural default:
+- **List view:** Flutter requests `list_entry_summaries()` — lightweight DTOs
+  with id, type, title, folder, tags, favourite. No passwords, no file data.
+- **Detail view:** Flutter requests `get_entry(id)` — one full DTO, only when
+  the user explicitly taps an entry.
+- **Edit / save:** Flutter sends one entry back via `create_entry` or
+  `update_entry` — Rust updates the session and persists the full vault.
+
+This minimises both bridge traffic and Dart-side plaintext exposure. It is
+not an optimisation added later — it is the correct default architecture from
+the start, made natural by Rust owning the session state.
