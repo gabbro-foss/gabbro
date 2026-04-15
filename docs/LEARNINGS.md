@@ -1244,3 +1244,116 @@ full on unlock. The session model enables lazy loading as the natural default:
 This minimises both bridge traffic and Dart-side plaintext exposure. It is
 not an optimisation added later — it is the correct default architecture from
 the start, made natural by Rust owning the session state.
+
+---
+
+## Flutter & Dart Concepts
+
+### `StatelessWidget` vs `StatefulWidget`
+Every visible element in Flutter is a widget. A `StatelessWidget` is a pure
+function of its inputs — it always draws the same thing given the same data.
+A `StatefulWidget` has mutable state that can change over time, causing the
+widget to redraw. The `UnlockScreen` is a `StatefulWidget` because it holds
+changing data: the passphrase text, whether it is obscured, whether unlocking
+is in progress, and any error message.
+
+In Flutter, a `StatefulWidget` is always split into two classes: the widget
+itself (immutable, describes the configuration) and its `State` object
+(mutable, holds the data and builds the UI). The `_` prefix on
+`_UnlockScreenState` marks it as private to the file — the same convention
+as Python's `_private`.
+
+Python analogy: a `StatelessWidget` is like a pure function; a
+`StatefulWidget` is like a class with instance variables that trigger a
+re-render when changed.
+
+### `setState()`
+The method that tells Flutter "something changed, please redraw this widget."
+Without calling `setState()`, changing a variable in a `State` object has
+no visible effect — the UI will not update. With it, Flutter schedules a
+rebuild of just that widget and its children.
+
+```dart
+setState(() {
+  _isUnlocking = true;  // change the variable inside the callback
+});
+```
+
+The callback pattern (passing a function to `setState`) is idiomatic Flutter
+— it makes clear exactly which variables are changing. Python has no direct
+equivalent; the closest analogy is a reactive framework like React where
+setting state triggers a re-render.
+
+### `TextEditingController` and `dispose()`
+A `TextEditingController` owns the contents of a text field. It lets you
+read the current text (`_controller.text`), set it programmatically, or
+listen for changes. Because it allocates resources, it must be explicitly
+released when the widget is destroyed — this is done in the `dispose()`
+method, which Flutter calls automatically when the widget leaves the screen.
+
+Forgetting to call `_controller.dispose()` causes a memory leak. The
+pattern is always: create in the state class, dispose in `dispose()`.
+
+Python analogy: a context manager (`__enter__`/`__exit__`) that must be
+closed when finished — except Flutter calls `dispose()` for you as long as
+you override it correctly.
+
+### `.codeUnits` — String to List\<int\>
+The Rust bridge expects a passphrase as `Vec<u8>` (a list of bytes). Dart
+strings are UTF-16 internally. `.codeUnits` converts a Dart `String` to a
+`List<int>` of UTF-16 code units, which the bridge then maps to `Vec<u8>`.
+
+```dart
+_passphraseController.text.codeUnits  // "hello" → [104, 101, 108, 108, 111]
+```
+
+Python equivalent: `"hello".encode("utf-8")` → `b'hello'`. The concept is
+identical — convert a human-readable string to raw bytes for a system that
+works in bytes.
+
+### `mounted` — safety check after `await`
+After any `await` in Flutter, the widget may have been removed from the
+screen while the async operation was running (e.g. the user navigated away).
+Calling `Navigator` or `setState` on a widget that is no longer mounted
+causes an error. The `mounted` property is `true` if the widget is still
+in the tree, `false` if it has been disposed.
+
+```dart
+await someAsyncOperation();
+if (mounted) {
+  // safe to call setState or Navigator here
+}
+```
+
+This is a Flutter-specific safety idiom with no direct Python equivalent —
+it arises because Flutter's widget lifecycle and async operations run
+concurrently.
+
+### `#[ignore]` — skipping Rust tests by default
+The `#[ignore]` attribute marks a test so it is skipped during a normal
+`cargo test` run. It only executes when explicitly requested with the
+`--ignored` flag:
+
+```bash
+cargo test my_test_name -- --ignored
+```
+
+Used in Gabbro for `create_test_vault_on_disk` — a test that writes a
+real `.gabbro` file to `/tmp/` for development use. Running this on every
+`cargo test` would be wasteful and leave files on disk unnecessarily.
+`#[ignore]` keeps it available without making it part of the standard
+test suite.
+
+### Debug vs release build performance — Rust inside Flutter
+Flutter's debug build compiles Rust in `dev` profile — unoptimised, with
+debug symbols. Rust's optimiser makes a dramatic difference for
+compute-heavy code like Argon2id:
+
+- **Debug build:** ~20s for a single `unlockVault()` call
+- **Release build:** ~667ms for the same call
+
+This is not a bug — it is the expected behaviour of an unoptimised build.
+For development, the slow unlock is an inconvenience we accept in exchange
+for faster compile times and better error messages. For users, the release
+build is always used. Never tune Argon2id parameters based on debug build
+timings — always use `cargo run --bin bench_kdf --release`.

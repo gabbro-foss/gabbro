@@ -25,6 +25,8 @@ default (not `rust_core/` as originally planned).
 gabbro/
 ├── lib/                        # Flutter app entry point and Dart source
 │   ├── main.dart
+│   ├── screens/                # Hand-written UI screens
+│   │   └── unlock_screen.dart  # Passphrase entry screen
 │   └── src/
 │       └── rust/               # Auto-generated bridge code (do not edit)
 │           ├── api/
@@ -171,6 +173,10 @@ Each entry is an instance of a typed class:
 - **Common fields:** UUID, created, modified, folder, tags, favourite
 - **Login entry:** URL, username, password (hidden by default,
   show/hide toggle), custom fields, notes
+- **Display label:** the `Login` entry type is displayed to the user as
+  "Password" in the UI — the internal Rust name is `Login` (accurate domain
+  term), but "Password" is used in Flutter to avoid implying autofill/browser
+  integration that does not yet exist.
 - **Attachments:** files and images supported
 - **No TOTP** — YubiKey covers 2FA; keeping password manager
   and 2FA separate is more secure
@@ -443,18 +449,20 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** `vault_bridge.rs` rewritten with session-based API —
-  `save_vault_to_disk` / `load_vault_from_disk` replaced with ten
-  bridge-facing wrappers (`unlock_vault`, `lock_vault`,
-  `list_entry_summaries`, `get_entry`, `create_entry`, `update_entry`,
-  `delete_entry`, `delete_whole_vault`, `change_passphrase`,
-  `export_vault`) that delegate to `vault/session.rs`. Codegen rerun,
-  Dart bridge files regenerated, Flutter Linux debug build clean.
-  119 Rust tests passing. Unused import in `ml_kem.rs` cleaned up.
-- **Next task:** Begin Flutter UI — implement the vault list screen
-  that calls `unlock_vault`, then `list_entry_summaries` to display
-  entry summaries. This is the first end-to-end path from the UI
-  through the bridge to the session layer.
+- **Completed:** First Flutter UI screens built and wired to the Rust bridge.
+  `main.dart` replaced with real `GabbroApp`. `UnlockScreen` implemented —
+  passphrase field, show/hide toggle, spinner, error handling — and wired to
+  `unlockVault()` bridge call. End-to-end unlock confirmed working: passphrase
+  travels from Flutter through Argon2id + ML-KEM + AES-256-GCM and returns
+  successfully. Dev test vault written to `/tmp/gabbro_dev.gabbro` via
+  `#[ignore]` test in `vault_bridge.rs`. Fixed `EncodedSizeUser` trait import
+  in `ml_kem.rs` (119 Rust tests passing). Fixed stale `t=3` label in
+  `bench_kdf.rs`. Note: unlock takes ~20s in debug builds (unoptimised Rust)
+  and ~667ms in release builds — this is expected behaviour, not a bug.
+- **Next task:** Build `VaultListScreen` — the wireframe designed this session.
+  Call `listEntrySummaries()` after unlock and display results in an
+  alphabetically grouped list with entry type filter chips, scrollbar, and
+  hamburger menu stub. Navigate to it from `UnlockScreen` on successful unlock.
 
 ---
 
