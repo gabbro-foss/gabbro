@@ -11,38 +11,116 @@ part 'vault_bridge.freezed.dart';
 
 // These functions are ignored because they are not marked as `pub`: `vault_entry_from_data`, `vault_entry_to_data`
 
-/// Serialize, encrypt, and write a vault to disk.
+/// Decrypt the vault at `path` and store it in the session.
 ///
-/// Called by Flutter with a list of entries, the user's passphrase,
-/// and the path to write to. The path is a String because `std::path::Path`
-/// is not a bridge-friendly type.
-///
-/// This is an async function — Flutter awaits it without blocking the UI
-/// during the Argon2id KDF (~667ms on target hardware).
-Future<void> saveVaultToDisk({
-  required List<VaultEntryData> entries,
+/// Async — Argon2id takes ~667ms on target hardware.
+Future<void> unlockVault({
   required List<int> passphrase,
   required String path,
-}) => RustLib.instance.api.crateApiVaultBridgeSaveVaultToDisk(
-  entries: entries,
+}) => RustLib.instance.api.crateApiVaultBridgeUnlockVault(
   passphrase: passphrase,
   path: path,
 );
 
-/// Read, decrypt, and deserialize a vault from disk.
+/// Drop the session state, locking the vault.
 ///
-/// Called by Flutter with the user's passphrase and the path to read from.
-/// Returns all entries as bridge-facing DTOs.
+/// Sync — instant, no I/O.
+void lockVault() => RustLib.instance.api.crateApiVaultBridgeLockVault();
+
+/// Return lightweight summaries of all entries — no secrets.
 ///
-/// This is an async function — Flutter awaits it without blocking the UI
-/// during the Argon2id KDF (~667ms on target hardware).
-Future<List<VaultEntryData>> loadVaultFromDisk({
-  required List<int> passphrase,
-  required String path,
-}) => RustLib.instance.api.crateApiVaultBridgeLoadVaultFromDisk(
-  passphrase: passphrase,
-  path: path,
+/// Sync — reads from in-memory session, no I/O.
+List<EntrySummaryData> listEntrySummaries() =>
+    RustLib.instance.api.crateApiVaultBridgeListEntrySummaries();
+
+/// Return one full entry DTO by UUID.
+///
+/// Sync — reads from in-memory session, no I/O.
+VaultEntryData getEntry({required String id}) =>
+    RustLib.instance.api.crateApiVaultBridgeGetEntry(id: id);
+
+/// Add a new entry to the session and persist the vault to disk.
+///
+/// Async — triggers a full vault save (Argon2id + encryption).
+Future<EntrySummaryData> createEntry({required VaultEntryData entry}) =>
+    RustLib.instance.api.crateApiVaultBridgeCreateEntry(entry: entry);
+
+/// Replace an existing entry by UUID and persist.
+///
+/// Async — triggers a full vault save.
+Future<void> updateEntry({required VaultEntryData entry}) =>
+    RustLib.instance.api.crateApiVaultBridgeUpdateEntry(entry: entry);
+
+/// Remove an entry by UUID and persist.
+///
+/// Async — triggers a full vault save.
+Future<void> deleteEntry({required String id}) =>
+    RustLib.instance.api.crateApiVaultBridgeDeleteEntry(id: id);
+
+/// Wipe the vault file from disk and drop the session.
+///
+/// Async — filesystem operation.
+Future<void> deleteWholeVault() =>
+    RustLib.instance.api.crateApiVaultBridgeDeleteWholeVault();
+
+/// Re-seal the vault under a new passphrase. Session remains live.
+///
+/// Async — triggers a full vault save.
+Future<void> changePassphrase({
+  required List<int> oldPassphrase,
+  required List<int> newPassphrase,
+}) => RustLib.instance.api.crateApiVaultBridgeChangePassphrase(
+  oldPassphrase: oldPassphrase,
+  newPassphrase: newPassphrase,
 );
+
+/// Write .gabbro + .gabbro.sha256 from current session state.
+///
+/// Async — filesystem operation.
+Future<void> exportVault({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeExportVault(path: path);
+
+/// Lightweight entry summary returned by `list_entry_summaries()`.
+///
+/// Contains just enough for Flutter to render a list row — no secrets.
+class EntrySummaryData {
+  final String id;
+  final String entryType;
+  final String title;
+  final String folder;
+  final List<String> tags;
+  final bool favourite;
+
+  const EntrySummaryData({
+    required this.id,
+    required this.entryType,
+    required this.title,
+    required this.folder,
+    required this.tags,
+    required this.favourite,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      entryType.hashCode ^
+      title.hashCode ^
+      folder.hashCode ^
+      tags.hashCode ^
+      favourite.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is EntrySummaryData &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          entryType == other.entryType &&
+          title == other.title &&
+          folder == other.folder &&
+          tags == other.tags &&
+          favourite == other.favourite;
+}
 
 @freezed
 sealed class VaultEntryData with _$VaultEntryData {

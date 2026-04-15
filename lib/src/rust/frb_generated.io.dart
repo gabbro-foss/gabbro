@@ -54,6 +54,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PasswordConfig dco_decode_box_autoadd_password_config(dynamic raw);
 
   @protected
+  VaultEntryData dco_decode_box_autoadd_vault_entry_data(dynamic raw);
+
+  @protected
   CardEntryData dco_decode_card_entry_data(dynamic raw);
 
   @protected
@@ -64,6 +67,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   EntropyResult dco_decode_entropy_result(dynamic raw);
+
+  @protected
+  EntrySummaryData dco_decode_entry_summary_data(dynamic raw);
 
   @protected
   double dco_decode_f_64(dynamic raw);
@@ -87,13 +93,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<CustomFieldData> dco_decode_list_custom_field_data(dynamic raw);
 
   @protected
+  List<EntrySummaryData> dco_decode_list_entry_summary_data(dynamic raw);
+
+  @protected
   List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
-
-  @protected
-  List<VaultEntryData> dco_decode_list_vault_entry_data(dynamic raw);
 
   @protected
   LoginEntryData dco_decode_login_entry_data(dynamic raw);
@@ -172,6 +178,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  VaultEntryData sse_decode_box_autoadd_vault_entry_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   CardEntryData sse_decode_card_entry_data(SseDeserializer deserializer);
 
   @protected
@@ -182,6 +193,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   EntropyResult sse_decode_entropy_result(SseDeserializer deserializer);
+
+  @protected
+  EntrySummaryData sse_decode_entry_summary_data(SseDeserializer deserializer);
 
   @protected
   double sse_decode_f_64(SseDeserializer deserializer);
@@ -209,15 +223,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<EntrySummaryData> sse_decode_list_entry_summary_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
-
-  @protected
-  List<VaultEntryData> sse_decode_list_vault_entry_data(
-    SseDeserializer deserializer,
-  );
 
   @protected
   LoginEntryData sse_decode_login_entry_data(SseDeserializer deserializer);
@@ -304,6 +318,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_box_autoadd_vault_entry_data(
+    VaultEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_card_entry_data(CardEntryData self, SseSerializer serializer);
 
   @protected
@@ -320,6 +340,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_entropy_result(EntropyResult self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_entry_summary_data(
+    EntrySummaryData self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_f_64(double self, SseSerializer serializer);
@@ -349,17 +375,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_entry_summary_data(
+    List<EntrySummaryData> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_vault_entry_data(
-    List<VaultEntryData> self,
     SseSerializer serializer,
   );
 

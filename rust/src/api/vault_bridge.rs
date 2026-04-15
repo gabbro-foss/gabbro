@@ -6,17 +6,17 @@
 //!
 //! The internal vault.rs functions are never called directly from Flutter.
 
-use std::path::Path;
+use std::path::PathBuf;
 
 use crate::api::vault::{
     CardEntryData, CustomEntryData, CustomFieldData, FileEntryData, IdentityEntryData,
     LoginEntryData, NoteEntryData,
-    load_vault, save_vault,
 };
 use crate::vault::entry::{
     CardEntry, CustomEntry, CustomField, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
     NoteEntry, VaultEntry,
 };
+use crate::vault::session;
 
 /// Lightweight entry summary returned by `list_entry_summaries()`.
 ///
@@ -230,40 +230,83 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
 
 // ── Bridge-facing API ─────────────────────────────────────────────────────────
 
-/// Serialize, encrypt, and write a vault to disk.
+/// Decrypt the vault at `path` and store it in the session.
 ///
-/// Called by Flutter with a list of entries, the user's passphrase,
-/// and the path to write to. The path is a String because `std::path::Path`
-/// is not a bridge-friendly type.
-///
-/// This is an async function — Flutter awaits it without blocking the UI
-/// during the Argon2id KDF (~667ms on target hardware).
-pub async fn save_vault_to_disk(
-    entries: Vec<VaultEntryData>,
-    passphrase: Vec<u8>,
-    path: String,
-) -> Result<(), String> {
-    let internal: Result<Vec<VaultEntry>, String> = entries
-        .into_iter()
-        .map(vault_entry_from_data)
-        .collect();
-    let internal = internal?;
-    save_vault(&internal, &passphrase, Path::new(&path))
+/// Async — Argon2id takes ~667ms on target hardware.
+pub async fn unlock_vault(passphrase: Vec<u8>, path: String) -> Result<(), String> {
+    session::unlock_vault(&passphrase, PathBuf::from(path))
 }
 
-/// Read, decrypt, and deserialize a vault from disk.
+/// Drop the session state, locking the vault.
 ///
-/// Called by Flutter with the user's passphrase and the path to read from.
-/// Returns all entries as bridge-facing DTOs.
+/// Sync — instant, no I/O.
+#[flutter_rust_bridge::frb(sync)]
+pub fn lock_vault() -> Result<(), String> {
+    session::lock_vault()
+}
+
+/// Return lightweight summaries of all entries — no secrets.
 ///
-/// This is an async function — Flutter awaits it without blocking the UI
-/// during the Argon2id KDF (~667ms on target hardware).
-pub async fn load_vault_from_disk(
-    passphrase: Vec<u8>,
-    path: String,
-) -> Result<Vec<VaultEntryData>, String> {
-    let entries = load_vault(&passphrase, Path::new(&path))?;
-    Ok(entries.into_iter().map(vault_entry_to_data).collect())
+/// Sync — reads from in-memory session, no I/O.
+#[flutter_rust_bridge::frb(sync)]
+pub fn list_entry_summaries() -> Result<Vec<EntrySummaryData>, String> {
+    session::list_entry_summaries()
+}
+
+/// Return one full entry DTO by UUID.
+///
+/// Sync — reads from in-memory session, no I/O.
+#[flutter_rust_bridge::frb(sync)]
+pub fn get_entry(id: String) -> Result<VaultEntryData, String> {
+    let entry = session::get_entry(&id)?;
+    Ok(vault_entry_to_data(entry))
+}
+
+/// Add a new entry to the session and persist the vault to disk.
+///
+/// Async — triggers a full vault save (Argon2id + encryption).
+pub async fn create_entry(entry: VaultEntryData) -> Result<EntrySummaryData, String> {
+    let internal = vault_entry_from_data(entry)?;
+    session::session_create_entry(internal)
+}
+
+/// Replace an existing entry by UUID and persist.
+///
+/// Async — triggers a full vault save.
+pub async fn update_entry(entry: VaultEntryData) -> Result<(), String> {
+    let internal = vault_entry_from_data(entry)?;
+    session::session_update_entry(internal)
+}
+
+/// Remove an entry by UUID and persist.
+///
+/// Async — triggers a full vault save.
+pub async fn delete_entry(id: String) -> Result<(), String> {
+    session::session_delete_entry(&id)
+}
+
+/// Wipe the vault file from disk and drop the session.
+///
+/// Async — filesystem operation.
+pub async fn delete_whole_vault() -> Result<(), String> {
+    session::session_delete_whole_vault()
+}
+
+/// Re-seal the vault under a new passphrase. Session remains live.
+///
+/// Async — triggers a full vault save.
+pub async fn change_passphrase(
+    old_passphrase: Vec<u8>,
+    new_passphrase: Vec<u8>,
+) -> Result<(), String> {
+    session::session_change_passphrase(&old_passphrase, &new_passphrase)
+}
+
+/// Write .gabbro + .gabbro.sha256 from current session state.
+///
+/// Async — filesystem operation.
+pub async fn export_vault(path: String) -> Result<(), String> {
+    session::session_export_vault(PathBuf::from(path))
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -271,61 +314,51 @@ pub async fn load_vault_from_disk(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serial_test::serial;
 
-    // Helper to run async functions in tests
     fn run<F: std::future::Future>(f: F) -> F::Output {
         tokio::runtime::Runtime::new().unwrap().block_on(f)
     }
 
     #[test]
-    fn save_and_load_roundtrip_via_bridge() {
+    #[serial]
+    fn unlock_lock_roundtrip() {
         use std::env::temp_dir;
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        use crate::api::vault::save_vault;
 
         let mut path = temp_dir();
-        path.push("gabbro_bridge_roundtrip_test.gabbro");
-        let path_str = path.to_str().unwrap().to_string();
+        path.push("gabbro_bridge_v2_test.gabbro");
+        let pass = b"bridge test passphrase";
 
-        let entries = vec![
-            VaultEntryData::Note(NoteEntryData {
+        let entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
                 folder: String::from("Personal"),
                 tags: vec![],
                 favourite: false,
-                title: String::from("Bridge test note"),
-                content: String::from("bridge secret content"),
-            }),
-        ];
+            },
+            title: String::from("Bridge v2 test"),
+            content: String::from("bridge v2 content"),
+        })];
+        save_vault(&entries, pass, &path).unwrap();
 
-        let passphrase = b"correct horst battery staple".to_vec();
+        run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
+        let summaries = list_entry_summaries().unwrap();
+        assert_eq!(summaries.len(), 1);
+        assert_eq!(summaries[0].entry_type, "Note");
 
-        run(save_vault_to_disk(entries, passphrase.clone(), path_str.clone())).unwrap();
-        let recovered = run(load_vault_from_disk(passphrase, path_str)).unwrap();
-
-        assert_eq!(recovered.len(), 1);
-        match &recovered[0] {
-            VaultEntryData::Note(e) => assert_eq!(e.content, "bridge secret content"),
+        let entry = get_entry(String::from("id-001")).unwrap();
+        match entry {
+            VaultEntryData::Note(e) => assert_eq!(e.content, "bridge v2 content"),
             _ => panic!("Expected Note variant"),
         }
 
+        lock_vault().unwrap();
+        assert!(list_entry_summaries().is_err());
+
         let _ = std::fs::remove_file(&path);
-    }
-
-    #[test]
-    fn load_wrong_passphrase_returns_error() {
-        use std::env::temp_dir;
-
-        let mut path = temp_dir();
-        path.push("gabbro_bridge_wrong_pass_test.gabbro");
-        let path_str = path.to_str().unwrap().to_string();
-
-        let entries: Vec<VaultEntryData> = vec![];
-        run(save_vault_to_disk(entries, b"correct".to_vec(), path_str.clone())).unwrap();
-
-        let result = run(load_vault_from_disk(b"wrong".to_vec(), path_str));
-        let _ = std::fs::remove_file(&path);
-
-        assert!(result.is_err());
     }
 }
