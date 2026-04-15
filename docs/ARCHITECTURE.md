@@ -244,10 +244,11 @@ Each entry is an instance of a typed class:
   112 Rust tests passing across the project.
 - Lives in `rust/src/api/vault.rs` — the bridge boundary between Flutter and
   the internal vault domain model.
-- **Pattern:** each entry type gets a bridge-facing DTO (`LoginEntryData`,
-  `NoteEntryData`, etc.) using only bridge-friendly types (`String`, `Vec`,
-  `bool`, `Option<String>`), and a `create_*` function that generates a UUID,
-  timestamps, builds the internal type, then converts to the DTO.
+- **Pattern:** each entry type gets a bridge-facing DTO (Data Transfer Object —
+  `LoginEntryData`, `NoteEntryData`, etc.) using only bridge-friendly types
+  (`String`, `Vec`, `bool`, `Option<String>`), and a `create_*` function that
+  generates a UUID, timestamps, builds the internal type, then converts to
+  the DTO.
 - **UUID generation:** uses the `uuid` crate with the `v4` feature (random UUIDs).
 - **Timestamps:** generated in Rust using `std::time` only — no `chrono`
   dependency. Format: ISO 8601 UTC (`YYYY-MM-DDTHH:MM:SSZ`).
@@ -269,6 +270,108 @@ Each entry is an instance of a typed class:
   and hidden custom field values with a fixed 8-character placeholder
   (`"********"`). Length is deliberately decoupled from the actual value
   to prevent shoulder-surfing attacks based on character count.
+
+## Vault Session Model
+The bridge layer uses a **Rust-owned session model**: Rust holds the
+decrypted vault in memory between bridge calls rather than passing the
+whole vault back and forth across the bridge on every operation.
+
+### Rationale
+The alternative — Flutter owning the full decrypted vault in its memory —
+was explicitly considered and rejected for three reasons:
+
+1. **Minimal plaintext exposure.** Dart is a garbage-collected language
+   running on the Dart VM. There is no mechanism to zero memory in Dart:
+   the VM controls object lifetimes, may intern strings, and makes no
+   zeroing guarantee before reuse. Any secret that crosses the bridge into
+   Dart is, from a strict security standpoint, uncontrolled. The session
+   model minimises what crosses the bridge: summaries for list views, one
+   full entry on demand, never the whole vault.
+
+2. **Natural auto-lock.** When the vault locks, Rust drops the session
+   state. Future `zeroize` integration (see Bikeshed) will ensure the
+   memory is actively cleared at that point. Flutter's lock event simply
+   calls `lock_vault()` — it does not need to zero its own copy because
+   it never held one.
+
+3. **Lazy loading.** A vault with hundreds of entries and file attachments
+   should not be loaded across the bridge in full on unlock. The session
+   model makes lazy loading the natural default: Flutter requests summaries
+   to display a list, then fetches one full entry when the user taps it.
+
+### Memory security honesty
+Zeroing memory is not a guarantee of non-recovery. Swap, hibernation, cold
+boot attacks, and OS memory snapshots can all preserve data after an
+in-process zero. `zeroize` narrows the time window during which secrets
+are recoverable in RAM — it does not eliminate the risk. The practical
+threat for Gabbro's users (device seizure while unlocked, memory forensics
+on a running device) is meaningfully reduced by a short window; it is not
+eliminated. Full-disk encryption (FDE) is a stated prerequisite for the
+full security model — on Android this is enforced by the OS; on Linux it
+is the user's responsibility (dm-crypt/LUKS). Gabbro documents this
+dependency rather than papering over it.
+
+Dart cannot zeroize. This is a known, accepted limitation shared by every
+password manager built on a managed runtime. The session model limits
+Dart's exposure by design; it cannot eliminate it.
+
+### Session API (bridge-facing, in `vault_bridge.rs`)
+```
+unlock_vault(passphrase, path)  → Result<(), String>
+  Runs Argon2id + decryption, stores Vec<VaultEntry> in Mutex.
+  Async — Flutter awaits it (~667ms on target hardware).
+
+lock_vault()                    → ()
+  Drops (and eventually zeroizes) the session state.
+  Sync — instant.
+
+list_entry_summaries()          → Result<Vec<EntrySummaryData>, String>
+  Returns lightweight DTOs: id, entry type, title/name, folder, tags,
+  favourite. No passwords, no file data, no CVVs.
+  Sync — reads from in-memory session, no I/O.
+
+get_entry(id)                   → Result<VaultEntryData, String>
+  Returns one full entry DTO by UUID.
+  Sync — reads from in-memory session, no I/O.
+
+create_entry(entry)             → Result<EntrySummaryData, String>
+  Adds a new entry to the session and persists the vault to disk.
+  Async — triggers a full vault save (Argon2id + encryption).
+
+update_entry(entry)             → Result<(), String>
+  Replaces an existing entry by UUID, stamps updated_at, persists.
+  Async — triggers a full vault save.
+
+delete_entry(id)                → Result<(), String>
+  Removes an entry by UUID, persists.
+  Async — triggers a full vault save.
+
+delete_whole_vault()            → Result<(), String>
+  Drops session state, wipes .gabbro file from disk.
+  Async — filesystem operation.
+
+change_passphrase(old, new)     → Result<(), String>
+  Re-seals the vault under a new passphrase. Session remains live.
+  Async — triggers a full vault save under new key.
+
+export_vault(path)              → Result<(), String>
+  Writes .gabbro + .gabbro.sha256 from current session state.
+  Async — filesystem operation.
+```
+
+### Implementation plan
+- Add `rust/src/vault/session.rs` — `VaultSession` struct wrapping
+  `Mutex<Option<(Vec<VaultEntry>, PathBuf)>>` in a `once_cell` static.
+  The path is stored alongside the entries so bridge functions don't
+  require it on every call after unlock.
+- Add `EntrySummaryData` DTO to `vault_bridge.rs` — lightweight struct
+  with id, entry_type (String), title, folder, tags, favourite.
+- Rewrite `vault_bridge.rs` — replace the stateless `save_vault_to_disk`
+  / `load_vault_from_disk` pair with the session API above.
+- All internal `vault.rs` functions remain unchanged — they become the
+  implementation called by the session layer.
+- The existing `vault_bridge.rs` tests are superseded by new session
+  tests in the same file.
 
 ## Vault Storage & Sync
 - v1: local path only, chosen during onboarding
@@ -340,12 +443,15 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** bridge exposure — `save_vault` and `load_vault` wired through
-  flutter_rust_bridge as async Dart functions. `VaultEntryData` sealed class
-  generated. Flutter Linux debug build clean. 114 Rust tests passing.
-- **Next task:** wire the remaining vault API functions through the bridge —
-  `create_*` entry functions, `list_entries`, `get_entry_by_id`, `update_entry`,
-  `delete_entry`, and `delete_whole_vault`.
+- **Completed:** Vault session model designed and documented. Decision:
+  Rust owns the decrypted vault in a `Mutex` static between bridge calls.
+  Flutter receives summaries for list views and one full entry on demand —
+  never the whole vault. Rationale, memory security honesty, and full
+  session API documented in the new **Vault Session Model** section above.
+- **Next task:** Implement the session model in Rust — add
+  `rust/src/vault/session.rs`, add `EntrySummaryData` DTO, rewrite
+  `vault_bridge.rs` with the session API. All internal `vault.rs` functions
+  remain unchanged.
 
 ---
 
@@ -369,6 +475,18 @@ New ideas that arise mid-session should be added here immediately rather than
 discussed and forgotten.
 
 ---
+
+### Security
+
+- **`zeroize` integration:** Add the `zeroize` crate to explicitly clear
+  secret material from Rust heap memory when the vault locks. Specifically:
+  the `Vec<VaultEntry>` inside `VaultSession`, and the plaintext bytes from
+  `seal_vault`/`open_vault`. This narrows the window during which secrets
+  are recoverable in RAM after a lock event. Not a guarantee of
+  non-recovery (swap, cold boot, OS snapshots all remain possible), but a
+  meaningful reduction for the realistic threat of device seizure while
+  unlocked. Prerequisite: session model must be implemented first.
+  See the **Memory Security** discussion in the Vault Session Model section.
 
 ### Password / Passphrase Generator
 
