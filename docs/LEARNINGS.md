@@ -898,6 +898,61 @@ individually: `bytes.iter().map(|b| format!("{:02x}", b)).collect::<String>()`.
 This sidesteps the trait conflict entirely and produces standard lowercase
 hex output.
 
+### `#[serial]` — test isolation for global state
+When tests share a process-wide static (like `VAULT_SESSION`), Cargo's
+default parallel test runner causes logical races: one test unlocks the
+vault while another expects it to be locked, and they corrupt each
+other's assumptions. A `Mutex` prevents data races but not logical ones —
+two threads can each acquire the lock at different moments in a multi-step
+test and still interfere.
+
+The `serial_test` crate solves this with a `#[serial]` attribute that
+forces marked tests to run one at a time, in sequence, even while the
+rest of the suite runs in parallel:
+
+```rust
+use serial_test::serial;
+
+#[test]
+#[serial]
+fn unlock_then_list_summaries_returns_entries() { ... }
+```
+
+Add it as a dev dependency: `serial_test = "3"` under `[dev-dependencies]`
+in `Cargo.toml`.
+
+Python analogy: running pytest with `-n 1` for tests that share
+module-level state, or wrapping setUp/tearDown in a `threading.Lock()`
+to prevent concurrent fixture mutation.
+
+### `VaultSession` storing the passphrase — design decision
+`VaultSession` holds three fields: `Vec<VaultEntry>`, `PathBuf`, and
+`Vec<u8>` passphrase. Storing the passphrase feels surprising at first —
+why keep a secret in memory longer than necessary?
+
+The reason is mechanical: every mutating bridge call (`session_create_entry`,
+`session_update_entry`, `session_delete_entry`, `session_change_passphrase`)
+must persist the vault to disk immediately. Persisting means re-sealing from
+scratch — Argon2id + ML-KEM + AES-256-GCM — and `seal_vault()` requires the
+passphrase. The alternative — asking Flutter to re-supply the passphrase on
+every mutating call — would mean it crossing the bridge on every save, which
+is a worse exposure pattern.
+
+The honest security accounting: the passphrase is already in Rust heap memory
+from the moment `unlock_vault()` runs. Storing it in the session extends the
+window slightly, but that window is already bounded by the auto-lock timer
+and `lock_vault()`, which drops (and eventually `zeroize`s) the whole session.
+This is the same tradeoff made by every desktop password manager that supports
+background auto-save. It is intentional and documented.
+
+`session_change_passphrase` updates the stored passphrase after re-sealing,
+so the session stays consistent with what is on disk:
+
+```rust
+save_vault(&session.entries, new_passphrase, &session.path)?;
+session.passphrase = new_passphrase.to_vec();
+```
+
 ---
 
 ## UX & Internationalisation
