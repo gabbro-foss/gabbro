@@ -18,6 +18,18 @@ use crate::vault::entry::{
     NoteEntry, VaultEntry,
 };
 
+/// Lightweight entry summary returned by `list_entry_summaries()`.
+///
+/// Contains just enough for Flutter to render a list row — no secrets.
+pub struct EntrySummaryData {
+    pub id: String,
+    pub entry_type: String,
+    pub title: String,
+    pub folder: String,
+    pub tags: Vec<String>,
+    pub favourite: bool,
+}
+
 // ── Bridge-facing VaultEntry enum ────────────────────────────────────────────
 
 /// A vault entry as seen by Flutter.
