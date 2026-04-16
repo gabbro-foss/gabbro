@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 
@@ -48,6 +49,28 @@ class EntryDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(_title()),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            tooltip: 'Edit entry',
+            onPressed: () async {
+              final entryType = switch (entry) {
+                VaultEntryData_Login() => 'Login',
+                VaultEntryData_Note() => 'Note',
+                VaultEntryData_Identity() => 'Identity',
+                VaultEntryData_Card() => 'Card',
+                VaultEntryData_File() => 'File',
+                VaultEntryData_Custom() => 'Custom',
+              };
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => CreateEntryScreen(
+                    entryType: entryType,
+                    existing: entry,
+                  ),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
             tooltip: 'Delete entry',

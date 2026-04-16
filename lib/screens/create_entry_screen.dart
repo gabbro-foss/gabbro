@@ -4,8 +4,13 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 class CreateEntryScreen extends StatefulWidget {
   final String entryType;
+  final VaultEntryData? existing;
 
-  const CreateEntryScreen({super.key, required this.entryType});
+  const CreateEntryScreen({
+    super.key,
+    required this.entryType,
+    this.existing,
+  });
 
   @override
   State<CreateEntryScreen> createState() => _CreateEntryScreenState();
@@ -17,14 +22,41 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   String? _error;
 
   // Login fields
-  final _urlController = TextEditingController();
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  late final TextEditingController _urlController;
+  late final TextEditingController _usernameController;
+  late final TextEditingController _passwordController;
   bool _passwordObscured = true;
 
   // Note fields
-  final _titleController = TextEditingController();
-  final _contentController = TextEditingController();
+  late final TextEditingController _titleController;
+  late final TextEditingController _contentController;
+
+  bool get _isEditing => widget.existing != null;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-populate controllers from existing entry if editing
+    if (widget.existing case VaultEntryData_Login(:final field0)) {
+      _urlController = TextEditingController(text: field0.url);
+      _usernameController = TextEditingController(text: field0.username);
+      _passwordController = TextEditingController(text: field0.password);
+      _titleController = TextEditingController();
+      _contentController = TextEditingController();
+    } else if (widget.existing case VaultEntryData_Note(:final field0)) {
+      _urlController = TextEditingController();
+      _usernameController = TextEditingController();
+      _passwordController = TextEditingController();
+      _titleController = TextEditingController(text: field0.title);
+      _contentController = TextEditingController(text: field0.content);
+    } else {
+      _urlController = TextEditingController();
+      _usernameController = TextEditingController();
+      _passwordController = TextEditingController();
+      _titleController = TextEditingController();
+      _contentController = TextEditingController();
+    }
+  }
 
   @override
   void dispose() {
@@ -43,35 +75,10 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _error = null;
     });
     try {
-      switch (widget.entryType) {
-        case 'Login':
-          await createEntry(
-            entry: VaultEntryData.login(LoginEntryData(
-              id: '',
-              createdAt: '',
-              updatedAt: '',
-              folder: 'Personal',
-              tags: [],
-              favourite: false,
-              url: _urlController.text,
-              username: _usernameController.text,
-              password: _passwordController.text,
-              customFields: [],
-            )),
-          );
-        case 'Note':
-          await createEntry(
-            entry: VaultEntryData.note(NoteEntryData(
-              id: '',
-              createdAt: '',
-              updatedAt: '',
-              folder: 'Personal',
-              tags: [],
-              favourite: false,
-              title: _titleController.text,
-              content: _contentController.text,
-            )),
-          );
+      if (_isEditing) {
+        await _saveUpdate();
+      } else {
+        await _saveCreate();
       }
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
@@ -81,9 +88,82 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     }
   }
 
+  Future<void> _saveCreate() async {
+    switch (widget.entryType) {
+      case 'Login':
+        await createEntry(
+          entry: VaultEntryData.login(LoginEntryData(
+            id: '',
+            createdAt: '',
+            updatedAt: '',
+            folder: 'Personal',
+            tags: [],
+            favourite: false,
+            url: _urlController.text,
+            username: _usernameController.text,
+            password: _passwordController.text,
+            customFields: [],
+          )),
+        );
+      case 'Note':
+        await createEntry(
+          entry: VaultEntryData.note(NoteEntryData(
+            id: '',
+            createdAt: '',
+            updatedAt: '',
+            folder: 'Personal',
+            tags: [],
+            favourite: false,
+            title: _titleController.text,
+            content: _contentController.text,
+          )),
+        );
+    }
+  }
+
+  Future<void> _saveUpdate() async {
+    switch (widget.existing) {
+      case VaultEntryData_Login(:final field0):
+        await updateEntry(
+          entry: VaultEntryData.login(LoginEntryData(
+            id: field0.id,
+            createdAt: field0.createdAt,
+            updatedAt: '',
+            folder: field0.folder,
+            tags: field0.tags,
+            favourite: field0.favourite,
+            url: _urlController.text,
+            username: _usernameController.text,
+            password: _passwordController.text,
+            customFields: field0.customFields,
+          )),
+        );
+      case VaultEntryData_Note(:final field0):
+        await updateEntry(
+          entry: VaultEntryData.note(NoteEntryData(
+            id: field0.id,
+            createdAt: field0.createdAt,
+            updatedAt: '',
+            folder: field0.folder,
+            tags: field0.tags,
+            favourite: field0.favourite,
+            title: _titleController.text,
+            content: _contentController.text,
+          )),
+        );
+      default:
+        throw Exception('Edit not yet supported for this entry type.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final title = widget.entryType == 'Login' ? 'New Password' : 'New Note';
+    final String title;
+    if (_isEditing) {
+      title = widget.entryType == 'Login' ? 'Edit Password' : 'Edit Note';
+    } else {
+      title = widget.entryType == 'Login' ? 'New Password' : 'New Note';
+    }
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: SingleChildScrollView(
