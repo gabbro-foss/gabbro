@@ -80,6 +80,15 @@ Future<void> changePassphrase({
 Future<void> exportVault({required String path}) =>
     RustLib.instance.api.crateApiVaultBridgeExportVault(path: path);
 
+/// Create a new empty vault at `path`, sealed with `passphrase`.
+///
+/// Called during onboarding. Async — runs Argon2id + encryption.
+Future<void> initVault({required List<int> passphrase, required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeInitVault(
+      passphrase: passphrase,
+      path: path,
+    );
+
 /// Lightweight entry summary returned by `list_entry_summaries()`.
 ///
 /// Contains just enough for Flutter to render a list row — no secrets.

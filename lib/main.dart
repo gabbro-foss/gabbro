@@ -1,14 +1,28 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gabbro/screens/onboarding_screen.dart';
+import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/src/rust/frb_generated.dart';
-import 'screens/unlock_screen.dart';
+import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
-  runApp(const GabbroApp());
+  final dir = await getApplicationSupportDirectory();
+  final vaultPath = '${dir.path}/gabbro.gabbro';
+  final vaultExists = await File(vaultPath).exists();
+  runApp(GabbroApp(vaultPath: vaultPath, vaultExists: vaultExists));
 }
 
 class GabbroApp extends StatelessWidget {
-  const GabbroApp({super.key});
+  final String vaultPath;
+  final bool vaultExists;
+
+  const GabbroApp({
+    super.key,
+    required this.vaultPath,
+    required this.vaultExists,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +35,9 @@ class GabbroApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const UnlockScreen(),
+      home: vaultExists
+          ? UnlockScreen(vaultPath: vaultPath)
+          : const OnboardingScreen(),
     );
   }
 }

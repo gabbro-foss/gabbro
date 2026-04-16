@@ -3,7 +3,9 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 
 class UnlockScreen extends StatefulWidget {
-  const UnlockScreen({super.key});
+  final String vaultPath;
+
+  const UnlockScreen({super.key, required this.vaultPath});
 
   @override
   State<UnlockScreen> createState() => _UnlockScreenState();
@@ -30,12 +32,12 @@ class _UnlockScreenState extends State<UnlockScreen> {
     try {
       await unlockVault(
         passphrase: _passphraseController.text.codeUnits,
-        path: '/tmp/gabbro_dev.gabbro',
+        path: widget.vaultPath,
       );
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => VaultListScreen(),
+            builder: (context) => const VaultListScreen(),
           ),
         );
       }
@@ -76,7 +78,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
                   controller: _passphraseController,
                   obscureText: _obscured,
                   onSubmitted: (_) => _isUnlocking ? null : _unlock(),
-                decoration: InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Passphrase',
                     border: const OutlineInputBorder(),
                     suffixIcon: IconButton(

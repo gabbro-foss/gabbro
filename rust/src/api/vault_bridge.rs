@@ -309,6 +309,17 @@ pub async fn export_vault(path: String) -> Result<(), String> {
     session::session_export_vault(PathBuf::from(path))
 }
 
+/// Create a new empty vault at `path`, sealed with `passphrase`.
+///
+/// Called during onboarding. Async — runs Argon2id + encryption.
+pub async fn init_vault(passphrase: Vec<u8>, path: String) -> Result<(), String> {
+    use crate::api::vault::save_vault;
+    let vault_path = PathBuf::from(&path);
+    save_vault(&[], &passphrase, &vault_path)?;
+    // Unlock into session immediately so the user lands on the list screen
+    session::unlock_vault(&passphrase, vault_path)
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
