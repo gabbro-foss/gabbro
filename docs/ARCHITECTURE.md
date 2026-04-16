@@ -449,16 +449,15 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Entry detail view. Created `lib/screens/entry_detail_screen.dart`
-  with a `switch` over the `VaultEntryData` sealed class, rendering a
-  type-specific view for all 6 entry types. Sensitive fields (password, card
-  number, CVV) display as `••••••••`. Wired `onTap` in `VaultListScreen` to
-  call `getEntry(id)` (sync bridge call) and push `EntryDetailScreen`.
-  End-to-end confirmed on Linux desktop. 120 Rust tests still passing.
-- **Next task:** Entry creation flow. Add a FAB (Floating Action Button) to
-  `VaultListScreen` that opens an entry-type picker, then navigates to a
-  creation form for the selected type. Start with `Login` and `Note` as the
-  two most common types.
+- **Completed:** Entry creation flow. Added FAB to `VaultListScreen` that opens
+  a bottom sheet type picker, navigates to `CreateEntryScreen`, and refreshes
+  the list on return. `CreateEntryScreen` uses `createEntry(VaultEntryData)`
+  (the session-aware bridge call) for Login and Note types. Entry persisted,
+  encrypted, and visible in list immediately after save. End-to-end confirmed
+  on Linux desktop. 120 Rust tests still passing.
+- **Next task:** Enter key submits passphrase on `UnlockScreen` (one-line
+  change, already in bikeshed). Then consider delete entry flow or moving
+  to Android testing.
 
 ---
 

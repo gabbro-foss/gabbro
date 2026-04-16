@@ -1374,3 +1374,22 @@ cannot call `.isNotEmpty` or pass them to a `String` parameter directly.
 The safe pattern: `if (e.field != null) _doSomething(e.field!)`.
 The `!` asserts non-null after the explicit null check — safe here because
 we just checked.
+
+### `createEntry` vs `createLoginEntry` — session-aware vs standalone
+`createLoginEntry` (in `vault.dart`) creates a standalone DTO with a new UUID
+and timestamps — it does not touch the session or persist anything to disk.
+`createEntry` (in `vault_bridge.dart`) adds the entry to the live session and
+triggers a full vault save (Argon2id + encrypt + write). Always use `createEntry`
+from the UI layer when the intent is to persist a new entry.
+
+### Bottom sheet type picker pattern
+`showModalBottomSheet<String>` returns a `Future<String?>` — null if the user
+dismisses without selecting. The `<String>` type parameter is what each
+`Navigator.of(context).pop(value)` inside the sheet returns. Await it, check
+for null, then navigate.
+
+### `VaultEntryData.login(...)` — factory constructor syntax
+The generated `VaultEntryData` sealed class uses freezed factory constructors.
+`VaultEntryData.login(loginEntryData)` wraps a `LoginEntryData` in the `Login`
+variant. The id, createdAt, and updatedAt fields are passed as empty strings
+from Flutter — Rust generates the real values inside `session_create_entry`.
