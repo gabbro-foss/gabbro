@@ -1404,3 +1404,12 @@ screen awaits the push and calls `_loadEntries()` if it receives `true`.
 ### Long press on desktop
 On Linux desktop, a long press is triggered by holding the left mouse button.
 Right mouse button does not trigger `onLongPress` in Flutter.
+
+### Extending a screen for create/edit — optional `existing` parameter
+Rather than duplicating a form screen, add an optional `existing` parameter
+of the relevant type. `_isEditing` is a simple getter: `widget.existing != null`.
+In `initState`, use a pattern match on `existing` to pre-populate controllers.
+In `_save`, branch on `_isEditing` to call `createEntry` or `updateEntry`.
+`updateEntry` must preserve the original id, createdAt, folder, tags, and
+favourite — only the user-edited fields change. `updatedAt` is passed as an
+empty string and stamped by Rust on the session side.

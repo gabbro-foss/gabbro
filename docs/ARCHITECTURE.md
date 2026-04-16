@@ -449,13 +449,14 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Delete entry flow. Two paths: long press on list tile (confirms
-  via AlertDialog, refreshes list) and trash icon in `EntryDetailScreen` app bar
-  (confirms, pops back to list which refreshes). `onTap` in `VaultListScreen`
-  now awaits navigation and refreshes if detail screen returns `true`.
-  Both paths confirmed on Linux desktop. 120 Rust tests still passing.
-- **Next task:** Edit entry flow — pencil icon in `EntryDetailScreen` app bar,
-  pre-populated form, `updateEntry()` on save. Start with Login and Note.
+- **Completed:** Edit entry flow. Extended `CreateEntryScreen` with an optional
+  `existing` parameter — when present, controllers are pre-populated and save
+  calls `updateEntry()` preserving id, createdAt, folder, tags, and favourite.
+  Pencil icon added to `EntryDetailScreen` app bar alongside the trash icon.
+  Full CRUD cycle (Create, Read, Update, Delete) confirmed on Linux desktop.
+  120 Rust tests still passing.
+- **Next task:** Add bulk delete mode to bikeshed. Then consider onboarding flow
+  — first launch vault creation (choose path, set passphrase, register YubiKey).
 
 ---
 
