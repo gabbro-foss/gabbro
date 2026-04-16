@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
@@ -83,6 +84,43 @@ class _VaultListScreenState extends State<VaultListScreen> {
     return result;
   }
 
+  Future<void> _showTypePicker() async {
+    final types = [
+      ('Login', 'Password'),
+      ('Note', 'Note'),
+      ('Identity', 'Identity'),
+      ('Card', 'Card'),
+      ('File', 'File'),
+      ('Custom', 'Custom'),
+    ];
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text('New entry',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
+          ...types.map((t) => ListTile(
+                title: Text(t.$2),
+                onTap: () => Navigator.of(context).pop(t.$1),
+              )),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+    if (selected == null) return;
+    if (!mounted) return;
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => CreateEntryScreen(entryType: selected),
+      ),
+    );
+    if (created == true) _loadEntries();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_error != null) {
@@ -95,6 +133,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Gabbro')),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showTypePicker,
+        child: const Icon(Icons.add),
+      ),
       body: Column(
         children: [
           SingleChildScrollView(
