@@ -449,14 +449,17 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Edit entry flow. Extended `CreateEntryScreen` with an optional
-  `existing` parameter — when present, controllers are pre-populated and save
-  calls `updateEntry()` preserving id, createdAt, folder, tags, and favourite.
-  Pencil icon added to `EntryDetailScreen` app bar alongside the trash icon.
-  Full CRUD cycle (Create, Read, Update, Delete) confirmed on Linux desktop.
-  120 Rust tests still passing.
-- **Next task:** Add bulk delete mode to bikeshed. Then consider onboarding flow
-  — first launch vault creation (choose path, set passphrase, register YubiKey).
+- **Completed:** Onboarding flow. `main.dart` checks for vault existence at
+  the default path (`getApplicationSupportDirectory()/gabbro.gabbro`) and
+  routes to `OnboardingScreen` or `UnlockScreen` accordingly. `OnboardingScreen`
+  shows a path field (with file picker), master passphrase field with real-time
+  entropy indicator, and confirm passphrase field. `init_vault` added to Rust
+  bridge — creates empty vault and unlocks into session immediately.
+  `UnlockScreen` now takes `vaultPath` as a parameter instead of hardcoding
+  `/tmp/`. End-to-end confirmed on Linux desktop. 119 Rust tests still passing.
+- **Next task:** Fix app ID from `com.example.gabbro` to `app.gabbro.gabbro`
+  in `linux/CMakeLists.txt` and `pubspec.yaml`. Then add bulk delete mode to
+  bikeshed and consider Android build.
 
 ---
 
@@ -657,6 +660,12 @@ discussed and forgotten.
   window — before v1 ships. No extra dependencies needed; this is a
   testing discipline, not an architecture change. Reference: WCAG 1.4.4
   (Resize Text) applies here alongside the font sizing work.
+
+- **Confirm field live revalidation:** The confirm passphrase field on
+  `OnboardingScreen` stays red after the user corrects a mismatch until
+  the form is submitted. Fix: call `_formKey.currentState?.validate()`
+  inside the confirm field's `onChanged` callback. One-line change in
+  `lib/screens/onboarding_screen.dart`.
 
 ### Monetisation
 

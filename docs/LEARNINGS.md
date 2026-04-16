@@ -1413,3 +1413,15 @@ In `_save`, branch on `_isEditing` to call `createEntry` or `updateEntry`.
 `updateEntry` must preserve the original id, createdAt, folder, tags, and
 favourite — only the user-edited fields change. `updatedAt` is passed as an
 empty string and stamped by Rust on the session side.
+
+- **Completed:** Onboarding flow. `main.dart` checks for vault existence at
+  the default path (`getApplicationSupportDirectory()/gabbro.gabbro`) and
+  routes to `OnboardingScreen` or `UnlockScreen` accordingly. `OnboardingScreen`
+  shows a path field (with file picker), master passphrase field with real-time
+  entropy indicator, and confirm passphrase field. `init_vault` added to Rust
+  bridge — creates empty vault and unlocks into session immediately.
+  `UnlockScreen` now takes `vaultPath` as a parameter instead of hardcoding
+  `/tmp/`. End-to-end confirmed on Linux desktop. 119 Rust tests still passing.
+- **Next task:** Fix app ID from `com.example.gabbro` to `app.gabbro.gabbro`
+  in `linux/CMakeLists.txt` and `pubspec.yaml`. Then add bulk delete mode to
+  bikeshed and consider Android build.
