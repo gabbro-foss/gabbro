@@ -449,19 +449,19 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** `VaultListScreen` built and wired. `lib/screens/vault_list_screen.dart`
-  implemented as a `StatefulWidget` — calls `listEntrySummaries()` synchronously
-  in `initState()`, renders a flat `ListView` of entry titles and types.
-  Navigation wired from `UnlockScreen` using `pushReplacement` (back button
-  correctly disabled while vault is open). `_displayType()` helper maps internal
-  Rust entry type strings to UI display strings — `"Login"` → `"Password"`,
-  others unchanged. End-to-end confirmed: unlock → vault list showing real
-  entries from `/tmp/gabbro_dev.gabbro`. Wireframe for `VaultListScreen`
-  saved to `chat_info/ascii_art/vault_list_screen_wireframe.html`.
-- **Next task:** Add alphabetical grouping and entry type filter chips to
-  `VaultListScreen`. Group entries by first letter of title with section
-  headers. Filter chips (All / Password / Note / Card / Identity / File)
-  filter the visible list in Flutter without re-querying the bridge.
+- **Completed:** `VaultListScreen` enhanced with filter chips and alphabetical
+  grouping. Added `_selectedFilter` state, `_filteredEntries` getter (pure Dart,
+  no bridge call), `_groupedEntries` getter building a `List<dynamic>` of
+  interleaved letter headers and entries, and `_displayTitle()` helper.
+  Filter chips (All / Password / Note / Card / Identity / File / Custom) filter
+  the visible list in Flutter without re-querying the bridge. Entries sorted
+  alphabetically and grouped under bold single-letter section headers.
+  End-to-end confirmed on Linux desktop. 119 Rust tests still passing.
+- **Next task:** Entry detail view. Wrap each `ListTile` in `VaultListScreen`
+  with an `onTap` that calls `getEntry(id)` (sync bridge call) and navigates
+  to a new `EntryDetailScreen` showing the full entry fields. Start with
+  `LoginEntryData` / `NoteEntryData` as the two most common types; handle the
+  `VaultEntryData` sealed class with a Dart `switch` expression.
 
 ---
 
