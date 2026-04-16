@@ -1393,3 +1393,14 @@ The generated `VaultEntryData` sealed class uses freezed factory constructors.
 `VaultEntryData.login(loginEntryData)` wraps a `LoginEntryData` in the `Login`
 variant. The id, createdAt, and updatedAt fields are passed as empty strings
 from Flutter — Rust generates the real values inside `session_create_entry`.
+
+### Two-path delete — list and detail screen
+Delete is accessible from two places: long press on a `ListTile` and a trash
+icon in the `EntryDetailScreen` app bar. Both show the same `AlertDialog`.
+The dialog is extracted into a `_confirmDelete()` method to avoid duplication.
+`Navigator.pop(true)` signals to the caller that a delete occurred — the list
+screen awaits the push and calls `_loadEntries()` if it receives `true`.
+
+### Long press on desktop
+On Linux desktop, a long press is triggered by holding the left mouse button.
+Right mouse button does not trigger `onLongPress` in Flutter.

@@ -449,15 +449,13 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Entry creation flow. Added FAB to `VaultListScreen` that opens
-  a bottom sheet type picker, navigates to `CreateEntryScreen`, and refreshes
-  the list on return. `CreateEntryScreen` uses `createEntry(VaultEntryData)`
-  (the session-aware bridge call) for Login and Note types. Entry persisted,
-  encrypted, and visible in list immediately after save. End-to-end confirmed
-  on Linux desktop. 120 Rust tests still passing.
-- **Next task:** Enter key submits passphrase on `UnlockScreen` (one-line
-  change, already in bikeshed). Then consider delete entry flow or moving
-  to Android testing.
+- **Completed:** Delete entry flow. Two paths: long press on list tile (confirms
+  via AlertDialog, refreshes list) and trash icon in `EntryDetailScreen` app bar
+  (confirms, pops back to list which refreshes). `onTap` in `VaultListScreen`
+  now awaits navigation and refreshes if detail screen returns `true`.
+  Both paths confirmed on Linux desktop. 120 Rust tests still passing.
+- **Next task:** Edit entry flow — pencil icon in `EntryDetailScreen` app bar,
+  pre-populated form, `updateEntry()` on save. Start with Login and Note.
 
 ---
 
