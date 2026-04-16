@@ -12,6 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 chat_info/
+docs/teaching_principles.md
 
 # IntelliJ related
 *.iml
