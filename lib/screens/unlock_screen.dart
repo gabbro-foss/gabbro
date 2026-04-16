@@ -75,7 +75,8 @@ class _UnlockScreenState extends State<UnlockScreen> {
                 TextField(
                   controller: _passphraseController,
                   obscureText: _obscured,
-                  decoration: InputDecoration(
+                  onSubmitted: (_) => _isUnlocking ? null : _unlock(),
+                decoration: InputDecoration(
                     labelText: 'Passphrase',
                     border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
