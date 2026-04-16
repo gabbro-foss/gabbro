@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/screens/vault_list_screen.dart';
 
 class UnlockScreen extends StatefulWidget {
   const UnlockScreen({super.key});
@@ -31,9 +32,13 @@ class _UnlockScreenState extends State<UnlockScreen> {
         passphrase: _passphraseController.text.codeUnits,
         path: '/tmp/gabbro_dev.gabbro',
       );
-      setState(() {
-        _errorMessage = 'Vault unlocked successfully!';
-      });
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => VaultListScreen(),
+          ),
+        );
+      }
     } catch (e) {
       setState(() {
         _errorMessage = 'Could not unlock vault. Check your passphrase.';
