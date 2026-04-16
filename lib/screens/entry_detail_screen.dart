@@ -7,10 +7,54 @@ class EntryDetailScreen extends StatelessWidget {
 
   const EntryDetailScreen({super.key, required this.entry});
 
+  String _entryId() => switch (entry) {
+        VaultEntryData_Login(:final field0) => field0.id,
+        VaultEntryData_Note(:final field0) => field0.id,
+        VaultEntryData_Identity(:final field0) => field0.id,
+        VaultEntryData_Card(:final field0) => field0.id,
+        VaultEntryData_File(:final field0) => field0.id,
+        VaultEntryData_Custom(:final field0) => field0.id,
+      };
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete entry?'),
+        content: const Text('This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await deleteEntry(id: _entryId());
+    if (context.mounted) Navigator.of(context).pop(true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_title())),
+      appBar: AppBar(
+        title: Text(_title()),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: 'Delete entry',
+            onPressed: () => _confirmDelete(context),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: _buildBody(),

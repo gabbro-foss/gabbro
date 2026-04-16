@@ -121,6 +121,32 @@ class _VaultListScreenState extends State<VaultListScreen> {
     if (created == true) _loadEntries();
   }
 
+  Future<void> _confirmDelete(BuildContext context, String id) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete entry?'),
+        content: const Text('This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await deleteEntry(id: id);
+    _loadEntries();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_error != null) {
@@ -174,14 +200,16 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 return ListTile(
                   title: Text(_displayTitle(entry)),
                   subtitle: Text(_displayType(entry.entryType)),
-                  onTap: () {
+                  onTap: () async {
                     final full = getEntry(id: entry.id);
-                    Navigator.of(context).push(
+                    final deleted = await Navigator.of(context).push<bool>(
                       MaterialPageRoute(
                         builder: (context) => EntryDetailScreen(entry: full),
                       ),
                     );
+                    if (deleted == true) _loadEntries();
                   },
+                  onLongPress: () => _confirmDelete(context, entry.id),
                 );
               },
             ),
