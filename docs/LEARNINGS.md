@@ -1357,3 +1357,20 @@ For development, the slow unlock is an inconvenience we accept in exchange
 for faster compile times and better error messages. For users, the release
 build is always used. Never tune Argon2id parameters based on debug build
 timings — always use `cargo run --bin bench_kdf --release`.
+
+### Sealed classes in Dart — exhaustive switch over generated types
+When flutter_rust_bridge generates a Dart type from a Rust `pub enum` with
+data variants, it produces a `sealed class` hierarchy. Each variant becomes
+a subclass (e.g. `VaultEntryData_Login`, `VaultEntryData_Note`). Dart's
+`switch` on a sealed class is exhaustive — the compiler forces every variant
+to be handled, the same guarantee Rust's `match` provides.
+
+Destructuring pattern syntax: `VaultEntryData_Login(:final field0)` both
+matches the subclass and unpacks the inner DTO in one step.
+
+### `String?` vs `String` — nullable fields in generated Dart
+Fields declared `Option<String>` in Rust become `String?` in Dart. You
+cannot call `.isNotEmpty` or pass them to a `String` parameter directly.
+The safe pattern: `if (e.field != null) _doSomething(e.field!)`.
+The `!` asserts non-null after the explicit null check — safe here because
+we just checked.

@@ -449,19 +449,16 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** `VaultListScreen` enhanced with filter chips and alphabetical
-  grouping. Added `_selectedFilter` state, `_filteredEntries` getter (pure Dart,
-  no bridge call), `_groupedEntries` getter building a `List<dynamic>` of
-  interleaved letter headers and entries, and `_displayTitle()` helper.
-  Filter chips (All / Password / Note / Card / Identity / File / Custom) filter
-  the visible list in Flutter without re-querying the bridge. Entries sorted
-  alphabetically and grouped under bold single-letter section headers.
-  End-to-end confirmed on Linux desktop. 119 Rust tests still passing.
-- **Next task:** Entry detail view. Wrap each `ListTile` in `VaultListScreen`
-  with an `onTap` that calls `getEntry(id)` (sync bridge call) and navigates
-  to a new `EntryDetailScreen` showing the full entry fields. Start with
-  `LoginEntryData` / `NoteEntryData` as the two most common types; handle the
-  `VaultEntryData` sealed class with a Dart `switch` expression.
+- **Completed:** Entry detail view. Created `lib/screens/entry_detail_screen.dart`
+  with a `switch` over the `VaultEntryData` sealed class, rendering a
+  type-specific view for all 6 entry types. Sensitive fields (password, card
+  number, CVV) display as `••••••••`. Wired `onTap` in `VaultListScreen` to
+  call `getEntry(id)` (sync bridge call) and push `EntryDetailScreen`.
+  End-to-end confirmed on Linux desktop. 120 Rust tests still passing.
+- **Next task:** Entry creation flow. Add a FAB (Floating Action Button) to
+  `VaultListScreen` that opens an entry-type picker, then navigates to a
+  creation form for the selected type. Start with `Login` and `Note` as the
+  two most common types.
 
 ---
 
