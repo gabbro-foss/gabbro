@@ -449,20 +449,19 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** First Flutter UI screens built and wired to the Rust bridge.
-  `main.dart` replaced with real `GabbroApp`. `UnlockScreen` implemented —
-  passphrase field, show/hide toggle, spinner, error handling — and wired to
-  `unlockVault()` bridge call. End-to-end unlock confirmed working: passphrase
-  travels from Flutter through Argon2id + ML-KEM + AES-256-GCM and returns
-  successfully. Dev test vault written to `/tmp/gabbro_dev.gabbro` via
-  `#[ignore]` test in `vault_bridge.rs`. Fixed `EncodedSizeUser` trait import
-  in `ml_kem.rs` (119 Rust tests passing). Fixed stale `t=3` label in
-  `bench_kdf.rs`. Note: unlock takes ~20s in debug builds (unoptimised Rust)
-  and ~667ms in release builds — this is expected behaviour, not a bug.
-- **Next task:** Build `VaultListScreen` — the wireframe designed this session.
-  Call `listEntrySummaries()` after unlock and display results in an
-  alphabetically grouped list with entry type filter chips, scrollbar, and
-  hamburger menu stub. Navigate to it from `UnlockScreen` on successful unlock.
+- **Completed:** `VaultListScreen` built and wired. `lib/screens/vault_list_screen.dart`
+  implemented as a `StatefulWidget` — calls `listEntrySummaries()` synchronously
+  in `initState()`, renders a flat `ListView` of entry titles and types.
+  Navigation wired from `UnlockScreen` using `pushReplacement` (back button
+  correctly disabled while vault is open). `_displayType()` helper maps internal
+  Rust entry type strings to UI display strings — `"Login"` → `"Password"`,
+  others unchanged. End-to-end confirmed: unlock → vault list showing real
+  entries from `/tmp/gabbro_dev.gabbro`. Wireframe for `VaultListScreen`
+  saved to `chat_info/ascii_art/vault_list_screen_wireframe.html`.
+- **Next task:** Add alphabetical grouping and entry type filter chips to
+  `VaultListScreen`. Group entries by first letter of title with section
+  headers. Filter chips (All / Password / Note / Card / Identity / File)
+  filter the visible list in Flutter without re-querying the bridge.
 
 ---
 
@@ -512,6 +511,19 @@ discussed and forgotten.
 
 
 ### Features & UX
+
+- **Enter key submits passphrase on UnlockScreen:** The `TextField` on
+  `UnlockScreen` should submit on Enter/Return keypress — wire `onSubmitted`
+  to call `_unlock()`. Currently requires clicking the Unlock button.
+  One-line change in `lib/screens/unlock_screen.dart`.
+
+- **Display title helper for entry list:** `VaultListScreen` currently uses
+  `entry.title` for all entry types, but `LoginEntry` has no `title` field —
+  it shows the `url` instead (populated by the test vault). A proper
+  `_displayTitle(EntrySummaryData entry)` helper should pick the right field
+  per type: url for Password entries, title for Note/Custom, cardholder name
+  for Card, first+last name for Identity, filename for File. Implement in
+  `vault_list_screen.dart` alongside the existing `_displayType()` helper.
 
 - **Autofill:** How will autofill work across platforms? On desktop,
   browser extensions (Chrome/Firefox/etc.) are the standard approach —
