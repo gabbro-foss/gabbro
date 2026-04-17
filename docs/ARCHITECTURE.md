@@ -483,12 +483,10 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Fixed RenderFlex overflow on `VaultListScreen` (`dense: true`
-  and `VisualDensity.compact` on `Checkbox`). Fixed `setState() after dispose()`
-  error in `lib/screens/create_entry_screen.dart`. Fixed mutex deadlock in
-  `rust/src/vault/session.rs` — `session_create_entry`, `session_update_entry`,
-  and `session_delete_entry` now release the lock before calling `save_vault()`.
-- **Next task:** Android build.
+- **Completed:** Replaced manual Android toolchain approach (individual AUR
+  packages) with Android Studio as self-contained toolchain manager.
+  Reasoning documented in the Android Toolchain Setup section.
+- **Next task:** Install Android Studio from the AUR, read AUR comments first.
 
 ---
 
