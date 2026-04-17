@@ -483,12 +483,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Installed Android Studio from AUR as self-contained toolchain manager.
-  Installed cmdline-tools via SDK Manager, accepted licenses, added three Rust Android
-  cross-compilation targets (`aarch64-linux-android`, `armv7-linux-androideabi`,
-  `x86_64-linux-android`). `flutter doctor` shows Android toolchain clean.
-- **Next task:** Attempt first Android debug build — run `flutter build apk --debug`
-  from `gabbro/` and resolve any build errors.
+- **Completed:** First Android debug build successful. `flutter build apk --debug`
+  produced `build/app/outputs/flutter-apk/app-debug.apk` clean. Cargokit
+  auto-downloaded NDK 28.2 and built Rust for all four Android targets
+  (`aarch64-linux-android`, `armv7-linux-androideabi`, `x86_64-linux-android`,
+  `i686-linux-android`).
+- **Next task:** Test the APK on a physical Android device or emulator.
 
 ---
 
