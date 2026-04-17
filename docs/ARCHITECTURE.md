@@ -449,16 +449,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** App ID renamed to `app.gabbro.gabbro` across all platforms.
-  Copyright string fixed in `AppInfo.xcconfig`. Bulk delete implemented on
-  `VaultListScreen` with always-visible checkboxes, selection count in app bar,
-  delete/cancel actions, and `CircularProgressIndicator` during deletion.
-  Fixed empty entry IDs bug — UUID and timestamps now generated in
-  `create_entry` in `vault_bridge.rs`. Scaffold integration test deleted
-  (referenced renamed `GabbroApp` class). Dart/Flutter Code-OSS extensions
-  installed for auto-formatting.
-- **Next task:** Address RenderFlex overflow on `VaultListScreen` (checkboxes
-  pushing layout), then consider Android build.
+- **Completed:** Fixed RenderFlex overflow on `VaultListScreen` (`dense: true`
+  and `VisualDensity.compact` on `Checkbox`). Fixed `setState() after dispose()`
+  error in `lib/screens/create_entry_screen.dart`. Fixed mutex deadlock in
+  `rust/src/vault/session.rs` — `session_create_entry`, `session_update_entry`,
+  and `session_delete_entry` now release the lock before calling `save_vault()`.
+- **Next task:** Android build.
 
 ---
 

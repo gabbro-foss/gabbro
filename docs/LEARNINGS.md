@@ -1245,6 +1245,30 @@ This minimises both bridge traffic and Dart-side plaintext exposure. It is
 not an optimisation added later — it is the correct default architecture from
 the start, made natural by Rust owning the session state.
 
+### Holding a mutex lock across a slow operation causes deadlock
+
+`std::sync::Mutex::lock()` returns a `MutexGuard` that holds the lock until
+it is dropped. If you call a slow function (e.g. `save_vault()`, which runs
+Argon2id) while still holding the guard, any other thread that tries to
+acquire the same mutex blocks for the entire duration.
+
+The fix is to clone the data you need out of the protected region, let the
+guard drop by closing the block, then call the slow function outside it:
+
+```rust
+let (entries, passphrase, path) = {
+    let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_mut().ok_or("Vault is locked")?;
+    (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+}; // ← MutexGuard dropped here, lock released
+save_vault(&entries, &passphrase, &path)?;
+```
+
+In Gabbro this surfaced as an apparent freeze when navigating back from
+`CreateEntryScreen` while a save was in progress — `list_entry_summaries()`
+was blocked waiting for the mutex that `session_create_entry` held across
+the full Argon2id computation (~20s in debug builds).
+
 ---
 
 ## Flutter & Dart Concepts
