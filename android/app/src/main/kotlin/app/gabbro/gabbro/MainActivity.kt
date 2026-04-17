@@ -1,4 +1,4 @@
-package com.example.gabbro
+package app.gabbro.gabbro
 
 import io.flutter.embedding.android.FlutterActivity
 
