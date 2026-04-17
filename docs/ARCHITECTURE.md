@@ -667,6 +667,13 @@ discussed and forgotten.
   inside the confirm field's `onChanged` callback. One-line change in
   `lib/screens/onboarding_screen.dart`.
 
+- **Clean up legacy vault on first launch:** When the app launches and no
+  vault exists at the current app ID path (`app.gabbro.gabbro`), check for
+  a vault at the old `com.example.gabbro` path and offer to migrate or delete
+  it. Prevents silent accumulation of orphaned vault files on the user's device
+  during development, and will matter for any user who installed a pre-rename
+  build. Implement in `main.dart` during the vault existence check.
+
 ### Monetisation
 
 - **GPL-3.0 monetisation model TBD** — ideas include a Yubico partnership
