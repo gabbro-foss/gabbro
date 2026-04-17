@@ -406,8 +406,52 @@ export_vault(path)              → Result<(), String>
 - TDD from day one — untested code is broken code
 
 ## Platforms
+
 - v1: Linux (Arch + Mint/deb), Android (F-Droid)
 - v2 (future): Windows, macOS, iOS
+
+## Android Toolchain Setup (Arch Linux)
+
+### Prerequisites
+Run your standard Arch pre-install procedure before any of the steps below:
+1. `doas timeshift --create --comments 'pre-android-toolchain'`
+2. Update mirrors
+3. `yay -Sua` — full system update
+4. Reboot if kernel was updated
+
+### Required packages (AUR via yay)
+- `android-sdk` — core Android SDK tools
+- `android-platform` — Android API level headers (API 21+ minimum; covers
+  Flutter's minimum supported Android version)
+- `android-ndk` — Native Development Kit; required by cargokit to compile
+  Rust to Android targets
+- `android-sdk-build-tools` — required by Gradle to produce the APK
+
+Check AUR comments for each package before installing — Android toolchain
+packages occasionally have known issues with specific versions.
+
+### Environment variables
+After install, add to your shell config (`.bashrc` / `.zshrc` / equivalent):
+```bash
+export ANDROID_SDK_ROOT=/opt/android-sdk
+export ANDROID_NDK_ROOT=/opt/android-sdk/ndk/<version>
+export PATH=$PATH:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/platform-tools
+```
+Then reload: `source ~/.bashrc` (or equivalent).
+
+### Rust cross-compilation targets
+Add the Android targets via rustup:
+```bash
+rustup target add aarch64-linux-android   # ARM 64-bit — primary target
+rustup target add armv7-linux-androideabi # ARM 32-bit — older devices
+rustup target add x86_64-linux-android    # x86_64 — emulator
+```
+
+### Verification
+```bash
+flutter doctor -v   # should show Android toolchain ✓
+rustup target list --installed   # should show the three targets above
+```
 
 ## Version Control
 
