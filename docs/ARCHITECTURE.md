@@ -412,35 +412,25 @@ export_vault(path)              → Result<(), String>
 
 ## Android Toolchain Setup (Arch Linux)
 
-### Prerequisites
-Run your standard Arch pre-install procedure before any of the steps below:
-1. `doas timeshift --create --comments 'pre-android-toolchain'`
-2. Update mirrors
-3. `yay -Sua` — full system update
-4. Reboot if kernel was updated
+### Approach
+Android Studio is used as a self-contained toolchain manager. The manual
+approach (individual AUR packages for `android-sdk`, `android-ndk`, etc.)
+was evaluated and rejected: package names on Arch diverge from upstream
+documentation, the correct JDK version conflicts with a modern system JDK,
+and the maintenance burden is high for little reward. Android Studio bundles
+and manages the SDK, NDK, and JDK internally without touching system packages.
 
-### Required packages (AUR via yay)
-- `android-sdk` — core Android SDK tools
-- `android-platform` — Android API level headers (API 21+ minimum; covers
-  Flutter's minimum supported Android version)
-- `android-ndk` — Native Development Kit; required by cargokit to compile
-  Rust to Android targets
-- `android-sdk-build-tools` — required by Gradle to produce the APK
+Android Studio may be removed after a successful build
+(`doas pacman -Rns android-studio`). Note that the SDK it downloads lives
+separately — typically `~/Android/Sdk` — and must be cleaned manually if
+no longer needed. If Gabbro reaches a point of active Android support,
+keep it installed.
 
-Check AUR comments for each package before installing — Android toolchain
-packages occasionally have known issues with specific versions.
-
-### Environment variables
-After install, add to your shell config (`.bashrc` / `.zshrc` / equivalent):
-```bash
-export ANDROID_SDK_ROOT=/opt/android-sdk
-export ANDROID_NDK_ROOT=/opt/android-sdk/ndk/<version>
-export PATH=$PATH:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/platform-tools
-```
-Then reload: `source ~/.bashrc` (or equivalent).
+### Installation
+Install from the AUR. Read AUR comments before installing.
 
 ### Rust cross-compilation targets
-Add the Android targets via rustup:
+Add the Android targets via rustup (run from anywhere — rustup is user-global):
 ```bash
 rustup target add aarch64-linux-android   # ARM 64-bit — primary target
 rustup target add armv7-linux-androideabi # ARM 32-bit — older devices
