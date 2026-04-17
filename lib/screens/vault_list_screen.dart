@@ -14,6 +14,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
   List<EntrySummaryData> _entries = [];
   String? _error;
   String _selectedFilter = 'All';
+  Set<String> _selectedIds = {};
+  bool _isDeleting = false;
+  bool get _isSelecting => _selectedIds.isNotEmpty;
 
   @override
   void initState() {
@@ -36,13 +39,20 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
   String _displayType(String entryType) {
     switch (entryType) {
-      case 'Login': return 'Password';
-      case 'Note': return 'Note';
-      case 'Identity': return 'Identity';
-      case 'Card': return 'Card';
-      case 'File': return 'File';
-      case 'Custom': return 'Custom';
-      default: return entryType;
+      case 'Login':
+        return 'Password';
+      case 'Note':
+        return 'Note';
+      case 'Identity':
+        return 'Identity';
+      case 'Card':
+        return 'Card';
+      case 'File':
+        return 'File';
+      case 'Custom':
+        return 'Custom';
+      default:
+        return entryType;
     }
   }
 
@@ -65,8 +75,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
   List<dynamic> get _groupedEntries {
     final sorted = List<EntrySummaryData>.from(_filteredEntries)
-      ..sort((a, b) => _displayTitle(a).toLowerCase()
-          .compareTo(_displayTitle(b).toLowerCase()));
+      ..sort(
+        (a, b) => _displayTitle(
+          a,
+        ).toLowerCase().compareTo(_displayTitle(b).toLowerCase()),
+      );
 
     final result = <dynamic>[];
     String? currentLetter;
@@ -100,13 +113,17 @@ class _VaultListScreenState extends State<VaultListScreen> {
         children: [
           const Padding(
             padding: EdgeInsets.all(16),
-            child: Text('New entry',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            child: Text(
+              'New entry',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
           ),
-          ...types.map((t) => ListTile(
-                title: Text(t.$2),
-                onTap: () => Navigator.of(context).pop(t.$1),
-              )),
+          ...types.map(
+            (t) => ListTile(
+              title: Text(t.$2),
+              onTap: () => Navigator.of(context).pop(t.$1),
+            ),
+          ),
           const SizedBox(height: 8),
         ],
       ),
@@ -121,11 +138,12 @@ class _VaultListScreenState extends State<VaultListScreen> {
     if (created == true) _loadEntries();
   }
 
-  Future<void> _confirmDelete(BuildContext context, String id) async {
+  Future<void> _confirmDelete(Set<String> ids) async {
+    final count = ids.length;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete entry?'),
+        title: Text('Delete $count ${count == 1 ? 'entry' : 'entries'}?'),
         content: const Text('This cannot be undone.'),
         actions: [
           TextButton(
@@ -143,40 +161,84 @@ class _VaultListScreenState extends State<VaultListScreen> {
       ),
     );
     if (confirmed != true) return;
-    await deleteEntry(id: id);
+    setState(() => _isDeleting = true);
+    for (final id in ids) {
+      await deleteEntry(id: id);
+    }
+    setState(() {
+      _selectedIds.clear();
+      _isDeleting = false;
+    });
     _loadEntries();
   }
 
   @override
   Widget build(BuildContext context) {
     if (_error != null) {
-      return Scaffold(
-        body: Center(child: Text('Error: $_error')),
-      );
+      return Scaffold(body: Center(child: Text('Error: $_error')));
     }
 
-    const filters = ['All', 'Password', 'Note', 'Card', 'Identity', 'File', 'Custom'];
+    const filters = [
+      'All',
+      'Password',
+      'Note',
+      'Card',
+      'Identity',
+      'File',
+      'Custom',
+    ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Gabbro')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showTypePicker,
-        child: const Icon(Icons.add),
+      appBar: AppBar(
+        title: Text(
+          _isSelecting ? '${_selectedIds.length} selected' : 'Gabbro',
+        ),
+        actions: [
+          if (_isDeleting) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          ] else if (_isSelecting) ...[
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () => _confirmDelete(_selectedIds),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => setState(() => _selectedIds.clear()),
+            ),
+          ],
+        ],
       ),
+      floatingActionButton: _isSelecting
+          ? null
+          : FloatingActionButton(
+              onPressed: _showTypePicker,
+              child: const Icon(Icons.add),
+            ),
       body: Column(
         children: [
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: Row(
-              children: filters.map((f) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: FilterChip(
-                  label: Text(f),
-                  selected: _selectedFilter == f,
-                  onSelected: (_) => setState(() => _selectedFilter = f),
-                ),
-              )).toList(),
+              children: filters
+                  .map(
+                    (f) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: FilterChip(
+                        label: Text(f),
+                        selected: _selectedFilter == f,
+                        onSelected: (_) => setState(() => _selectedFilter = f),
+                      ),
+                    ),
+                  )
+                  .toList(),
             ),
           ),
           Expanded(
@@ -198,9 +260,29 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 }
                 final entry = item as EntrySummaryData;
                 return ListTile(
+                  leading: Checkbox(
+                    value: _selectedIds.contains(entry.id),
+                    onChanged: (_) => setState(() {
+                      if (_selectedIds.contains(entry.id)) {
+                        _selectedIds.remove(entry.id);
+                      } else {
+                        _selectedIds.add(entry.id);
+                      }
+                    }),
+                  ),
                   title: Text(_displayTitle(entry)),
                   subtitle: Text(_displayType(entry.entryType)),
                   onTap: () async {
+                    if (_isSelecting) {
+                      setState(() {
+                        if (_selectedIds.contains(entry.id)) {
+                          _selectedIds.remove(entry.id);
+                        } else {
+                          _selectedIds.add(entry.id);
+                        }
+                      });
+                      return;
+                    }
                     final full = getEntry(id: entry.id);
                     final deleted = await Navigator.of(context).push<bool>(
                       MaterialPageRoute(
@@ -209,7 +291,6 @@ class _VaultListScreenState extends State<VaultListScreen> {
                     );
                     if (deleted == true) _loadEntries();
                   },
-                  onLongPress: () => _confirmDelete(context, entry.id),
                 );
               },
             ),

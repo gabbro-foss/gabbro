@@ -266,7 +266,19 @@ pub fn get_entry(id: String) -> Result<VaultEntryData, String> {
 ///
 /// Async — triggers a full vault save (Argon2id + encryption).
 pub async fn create_entry(entry: VaultEntryData) -> Result<EntrySummaryData, String> {
+    use uuid::Uuid;
+    use crate::api::vault::chrono_now;
     let internal = vault_entry_from_data(entry)?;
+    let now = chrono_now();
+    let id = Uuid::new_v4().to_string();
+    let internal = match internal {
+        VaultEntry::Login(mut e)    => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; VaultEntry::Login(e) }
+        VaultEntry::Note(mut e)     => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; VaultEntry::Note(e) }
+        VaultEntry::Identity(mut e) => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; VaultEntry::Identity(e) }
+        VaultEntry::Card(mut e)     => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; VaultEntry::Card(e) }
+        VaultEntry::File(mut e)     => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; VaultEntry::File(e) }
+        VaultEntry::Custom(mut e)   => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; VaultEntry::Custom(e) }
+    };
     session::session_create_entry(internal)
 }
 

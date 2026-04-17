@@ -614,7 +614,7 @@ pub fn load_vault(
 
 /// Returns the current UTC time as an ISO 8601 string.
 /// Uses std only — no chrono dependency needed at this stage.
-fn chrono_now() -> String {
+pub fn chrono_now() -> String {
     // std::time gives us seconds since UNIX epoch; format manually.
     use std::time::{SystemTime, UNIX_EPOCH};
     let secs = SystemTime::now()
