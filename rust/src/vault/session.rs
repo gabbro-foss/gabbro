@@ -139,11 +139,15 @@ pub fn get_entry(id: &str) -> Result<VaultEntry, String> {
 ///
 /// Async — triggers a full vault save (Argon2id + encryption).
 pub fn session_create_entry(entry: VaultEntry) -> Result<EntrySummaryData, String> {
-    let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
-    let session = session.as_mut().ok_or("Vault is locked")?;
-    let summary = entry_to_summary(&entry);
-    session.entries.push(entry);
-    save_vault(&session.entries, &session.passphrase, &session.path)?;
+    let summary;
+    let (entries, passphrase, path) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        summary = entry_to_summary(&entry);
+        session.entries.push(entry);
+        (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+    }; // ← lock released here
+    save_vault(&entries, &passphrase, &path)?;
     Ok(summary)
 }
 
@@ -151,10 +155,13 @@ pub fn session_create_entry(entry: VaultEntry) -> Result<EntrySummaryData, Strin
 ///
 /// Async — triggers a full vault save.
 pub fn session_update_entry(updated: VaultEntry) -> Result<(), String> {
-    let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
-    let session = session.as_mut().ok_or("Vault is locked")?;
-    crate::api::vault::update_entry(&mut session.entries, updated)?;
-    save_vault(&session.entries, &session.passphrase, &session.path)?;
+    let (entries, passphrase, path) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        crate::api::vault::update_entry(&mut session.entries, updated)?;
+        (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+    }; // ← lock released here
+    save_vault(&entries, &passphrase, &path)?;
     Ok(())
 }
 
@@ -162,10 +169,13 @@ pub fn session_update_entry(updated: VaultEntry) -> Result<(), String> {
 ///
 /// Async — triggers a full vault save.
 pub fn session_delete_entry(id: &str) -> Result<(), String> {
-    let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
-    let session = session.as_mut().ok_or("Vault is locked")?;
-    crate::api::vault::delete_entry(&mut session.entries, id)?;
-    save_vault(&session.entries, &session.passphrase, &session.path)?;
+    let (entries, passphrase, path) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        crate::api::vault::delete_entry(&mut session.entries, id)?;
+        (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+    }; // ← lock released here
+    save_vault(&entries, &passphrase, &path)?;
     Ok(())
 }
 

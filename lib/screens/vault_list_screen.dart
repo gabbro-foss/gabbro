@@ -130,12 +130,12 @@ class _VaultListScreenState extends State<VaultListScreen> {
     );
     if (selected == null) return;
     if (!mounted) return;
-    final created = await Navigator.of(context).push<bool>(
+    await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) => CreateEntryScreen(entryType: selected),
       ),
     );
-    if (created == true) _loadEntries();
+    if (mounted) _loadEntries();
   }
 
   Future<void> _confirmDelete(Set<String> ids) async {
@@ -260,7 +260,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 }
                 final entry = item as EntrySummaryData;
                 return ListTile(
+                  dense: true,
                   leading: Checkbox(
+                    visualDensity: VisualDensity.compact,
                     value: _selectedIds.contains(entry.id),
                     onChanged: (_) => setState(() {
                       if (_selectedIds.contains(entry.id)) {
