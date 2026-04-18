@@ -483,12 +483,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** First Android debug build successful. `flutter build apk --debug`
-  produced `build/app/outputs/flutter-apk/app-debug.apk` clean. Cargokit
-  auto-downloaded NDK 28.2 and built Rust for all four Android targets
-  (`aarch64-linux-android`, `armv7-linux-androideabi`, `x86_64-linux-android`,
-  `i686-linux-android`).
-- **Next task:** Test the APK on a physical Android device or emulator.
+- **Completed:** First Android emulator test. Debug APK installed on a Pixel 8
+  AVD (Android 14, AOSP, x86_64) via `adb install`. All implemented flows
+  confirmed working: create Password and Note entries, alphabetical grouping,
+  filter chips, view detail, edit, single delete, bulk delete. Debug build
+  Argon2id latency (~20s) confirmed as expected on emulator.
+- **Next task:** Test on physical Samsung Galaxy S23 device via USB debugging.
 
 ---
 
@@ -695,6 +695,15 @@ discussed and forgotten.
   the form is submitted. Fix: call `_formKey.currentState?.validate()`
   inside the confirm field's `onChanged` callback. One-line change in
   `lib/screens/onboarding_screen.dart`.
+
+- **Stale detail view after edit:** After editing an entry and saving,
+  navigating back to `EntryDetailScreen` still shows the pre-edit content
+  until the user returns to the list and re-taps the entry. Fix: pass the
+  updated entry back to the detail screen after a successful save, or
+  refresh the detail screen's state from the session on return from the
+  edit screen. One approach: use `Navigator.pop(updatedEntry)` from
+  `CreateEntryScreen` and have the detail screen await the push result
+  and reload if non-null.
 
 - **Clean up legacy vault on first launch:** When the app launches and no
   vault exists at the current app ID path (`app.gabbro.gabbro`), check for

@@ -1449,3 +1449,44 @@ empty string and stamped by Rust on the session side.
 - **Next task:** Fix app ID from `com.example.gabbro` to `app.gabbro.gabbro`
   in `linux/CMakeLists.txt` and `pubspec.yaml`. Then add bulk delete mode to
   bikeshed and consider Android build.
+
+## Android Deployment
+
+### `adb` — Android Debug Bridge
+The command-line tool for communicating with Android devices and emulators.
+`adb install <path>.apk` pushes an APK to a connected device or running
+emulator. The emulator registers automatically as an `adb` target when
+launched — no extra configuration needed. Lives in
+`~/Android/Sdk/platform-tools/adb` on a standard Android Studio install.
+
+### Android emulator on Arch Linux — prerequisites
+Two system dependencies are required beyond Android Studio itself:
+- `libbsd` — required by the emulator's QEMU binary; install with
+  `sudo pacman -S libbsd`. Symptom of missing: emulator exits immediately
+  with `error while loading shared libraries: libbsd.so.0`.
+- KVM membership — the x86_64 emulator requires hardware virtualisation;
+  your user must be in the `kvm` group. On Arch, `/dev/kvm` is
+  world-readable by default so this is rarely the blocker, but verify
+  with `groups | grep kvm`.
+
+### AOSP emulator image for FOSS testing
+When creating an AVD, prefer the **Android Open Source Project** system
+image over Google APIs or Google Play variants. Reasons: aligns with
+Gabbro's FOSS principles and de-Googled Android compatibility goal
+(GrapheneOS/CalyxOS), and avoids any Google Play Services dependency
+creeping into the testing baseline. If Gabbro works on AOSP, it will
+work on de-Googled devices.
+
+### Debug vs release APK performance on emulator
+The ~20s Argon2id latency observed in debug builds on the Linux desktop
+is reproduced (and slightly worse) on the Android emulator, which adds
+emulation overhead on top of the unoptimised Rust `dev` profile. This
+is expected and not a bug. Always use `flutter build apk --release` for
+any user-facing test where performance matters.
+
+### Two APK output locations
+`flutter build apk --debug` writes the APK to two locations:
+`build/app/outputs/flutter-apk/app-debug.apk` (Flutter's own output
+path) and `build/app/outputs/apk/debug/app-debug.apk` (Gradle's standard
+output path). Both files are identical — `diff` confirms this. Use either
+for `adb install`; the Flutter path is the more memorable one.
