@@ -571,6 +571,16 @@ discussed and forgotten.
   password display palette) generalise to a broader theming system, or whether
   that adds complexity for little gain.
 
+- **High-contrast mode:** Flutter can read the OS-level high-contrast signal via
+  `MediaQuery.of(context).highContrast` and honour it automatically — worth doing
+  for free. However, an in-app toggle is the more important piece: Linux tiling WM
+  users have no OS-level signal to send, and some users want high contrast only
+  inside their password manager. Implement as a toggle in Settings → Accessibility,
+  alongside the accessible font sizing item. Any high-contrast theme must be
+  validated against ADR-003 (colour-blind safety) and WCAG 1.4.3 (Contrast,
+  minimum) and WCAG 1.4.6 (Contrast, enhanced). Pairs naturally with the
+  Themes — dark / light / custom item above.
+
 - **Accessible font sizing:** Gabbro should offer a font size setting with
   3–5 steps, e.g. Small / Regular / Large / Extra Large (avoid
   "tiny"/"huge" — these have negative connotations for the people who need
@@ -735,3 +745,16 @@ discussed and forgotten.
   5. **Reference screenshots** — include screenshots of clean results on Arch Linux (Wireshark) and Android (NetGuard) as a reference baseline. Note explicitly in the README that these require the reader to trust the project, which partially defeats the purpose — they are included only so users who cannot or will not run the tools themselves can see what a clean result looks like. Zero-risk verification is not possible on all platforms; we document the gap rather than paper over it.
 
   This guide should be written when Gabbro is approaching public release and the UI is stable enough that the screenshots will not need frequent updating.
+
+- **`docs/SECURITY.md` — user-facing security document:** Create a single
+  `docs/SECURITY.md` covering: (1) encryption explained in plain language
+  (ELI5 — what the passphrase does, what Argon2id does, what AES-256-GCM does,
+  what ML-KEM adds); (2) why local-first matters — the server breach argument,
+  with LastPass 2022 as the concrete example; (3) a comparison table of
+  Gabbro's encryption stack vs Bitwarden / LastPass / Enpass / KeePass across
+  KDF, authenticated encryption, post-quantum, storage model, and open-source
+  status; (4) honest caveats — Ed25519 in v1 auth layer (not yet ML-DSA),
+  FDE as a prerequisite, zeroize not yet integrated. The no-telemetry
+  verification guide (see above) should be folded into this document rather
+  than maintained separately. Write when the UI is stable enough that
+  screenshots won't need frequent updating.
