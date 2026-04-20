@@ -544,11 +544,13 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(_screenTitle())),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               ..._buildFields(),
@@ -574,6 +576,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );
@@ -709,7 +712,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             Expanded(
               child: TextFormField(
                 controller: _expiryController,
-                keyboardType: TextInputType.datetime,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(4),
+                  _ExpiryInputFormatter(),
+                ],
                 decoration: const InputDecoration(
                   labelText: 'Expiry (MM/YY)',
                   border: OutlineInputBorder(),
@@ -718,6 +726,10 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   if (v == null || v.isEmpty) return 'Expiry is required';
                   final pattern = RegExp(r'^\d{2}/\d{2}$');
                   if (!pattern.hasMatch(v)) return 'Use MM/YY format';
+                  final month = int.tryParse(v.substring(0, 2));
+                  if (month == null || month < 1 || month > 12) {
+                    return 'Month must be 01–12';
+                  }
                   return null;
                 },
               ),
@@ -728,7 +740,10 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                 controller: _cvvController,
                 obscureText: _cvvObscured,
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(4),
+                ],
                 decoration: InputDecoration(
                   labelText: 'CVV',
                   border: const OutlineInputBorder(),
@@ -1047,4 +1062,29 @@ class _CustomFieldState {
   }
 }
 
+// ── Expiry input formatter ───────────────────────────────────────────────────
 
+/// Auto-inserts '/' after the two month digits so the user only
+/// needs to type 4 digits (MMYY) and gets MM/YY in the field.
+class _ExpiryInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digits = newValue.text.replaceAll('/', '');
+    if (digits.length > 4) return oldValue;
+    final buffer = StringBuffer();
+    for (int i = 0; i < digits.length; i++) {
+      if (i == 2) buffer.write('/');
+      buffer.write(digits[i]);
+    }
+    final text = buffer.toString();
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+  }
+}
+
+// ── Custom field state helper ────────────────────────────────────────────────

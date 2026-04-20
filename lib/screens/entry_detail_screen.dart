@@ -166,9 +166,11 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
         child: _buildBody(),
+        ),
       ),
     );
   }

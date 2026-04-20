@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
+import 'package:gabbro/src/rust/api/entropy.dart';
 
 class UnlockScreen extends StatefulWidget {
   final String vaultPath;
@@ -16,6 +17,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
   bool _obscured = true;
   bool _isUnlocking = false;
   String? _errorMessage;
+  EntropyResult? _entropy;
 
   @override
   void dispose() {
@@ -50,6 +52,24 @@ class _UnlockScreenState extends State<UnlockScreen> {
     }
   }
 
+  Color _tierColor(StrengthTier tier) => switch (tier) {
+    StrengthTier.terrible  => Colors.red,
+    StrengthTier.weak      => Colors.orange,
+    StrengthTier.fair      => Colors.yellow.shade700,
+    StrengthTier.strong    => Colors.lightGreen,
+    StrengthTier.veryStrong => Colors.green,
+    StrengthTier.centuries => Colors.green.shade800,
+  };
+
+  String _tierLabel(StrengthTier tier) => switch (tier) {
+    StrengthTier.terrible  => 'Terrible',
+    StrengthTier.weak      => 'Weak',
+    StrengthTier.fair      => 'Fair',
+    StrengthTier.strong    => 'Strong',
+    StrengthTier.veryStrong => 'Very strong',
+    StrengthTier.centuries => 'Excellent',
+  };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,6 +98,9 @@ class _UnlockScreenState extends State<UnlockScreen> {
                   controller: _passphraseController,
                   obscureText: _obscured,
                   onSubmitted: (_) => _isUnlocking ? null : _unlock(),
+                  onChanged: (v) => setState(
+                    () => _entropy = estimateEntropy(password: v),
+                  ),
                   decoration: InputDecoration(
                     labelText: 'Passphrase',
                     border: const OutlineInputBorder(),
@@ -91,6 +114,29 @@ class _UnlockScreenState extends State<UnlockScreen> {
                     ),
                   ),
                 ),
+                if (_entropy != null) ...[
+                  const SizedBox(height: 8),
+                  LinearProgressIndicator(
+                    value: switch (_entropy!.tier) {
+                      StrengthTier.terrible  => 0.1,
+                      StrengthTier.weak      => 0.25,
+                      StrengthTier.fair      => 0.5,
+                      StrengthTier.strong    => 0.75,
+                      StrengthTier.veryStrong => 0.9,
+                      StrengthTier.centuries => 1.0,
+                    },
+                    color: _tierColor(_entropy!.tier),
+                    backgroundColor: Colors.grey.shade300,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${_tierLabel(_entropy!.tier)} · ${_entropy!.bits.toStringAsFixed(1)} bits of entropy',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: _tierColor(_entropy!.tier),
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 16),
                 if (_errorMessage != null)
                   Text(
