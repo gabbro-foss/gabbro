@@ -483,12 +483,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** All 6 entry types fully implemented in Flutter UI
-  (Identity, Card, File, Custom create/edit/detail screens). CardEntry
-  and IdentityEntry extended with new fields. File export added.
-  CVV validation and show/hide toggles added. file_picker removed.
-- **Next task:** Entropy indicator on UnlockScreen and change passphrase
-  screen, then Android build verification.
+- **Completed:** Entropy indicator on UnlockScreen. Card form fixes
+  (expiry auto-format, month validation, CVV cap). SafeArea applied
+  to all scrollable screens. Android build verified on physical device.
+- **Next task:** zeroize integration (security) or import from other
+  password managers (onboarding UX). Both deferred to fresh session.
 
 ---
 
