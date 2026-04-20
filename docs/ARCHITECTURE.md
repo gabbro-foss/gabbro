@@ -483,10 +483,10 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Physical device test on Samsung Galaxy S23 (Android, USB debugging).
-  All flows confirmed working: onboarding, unlock, create/edit/delete entries,
-  alphabetical grouping, filter chips, portrait and landscape layouts.
-  Unlock time subjectively fast (well under 2s) on release build.
+- **Completed:** Fixed stale detail view and list refresh after entry edit.
+  `EntryDetailScreen` converted to `StatefulWidget`; detail screen updates
+  in place via `setState` after save; list screen unconditionally reloads on
+  return from detail. Also fixed FAB bottom sheet overflow on small windows.
 - **Next task:** Pick next bikeshed item.
 
 ---
