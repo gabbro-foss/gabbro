@@ -108,24 +108,28 @@ class _VaultListScreenState extends State<VaultListScreen> {
     ];
     final selected = await showModalBottomSheet<String>(
       context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'New entry',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
+      builder: (context) => SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  'New entry',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ),
+              ...types.map(
+                (t) => ListTile(
+                  title: Text(t.$2),
+                  onTap: () => Navigator.of(context).pop(t.$1),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
           ),
-          ...types.map(
-            (t) => ListTile(
-              title: Text(t.$2),
-              onTap: () => Navigator.of(context).pop(t.$1),
-            ),
-          ),
-          const SizedBox(height: 8),
-        ],
+        ),
       ),
     );
     if (selected == null) return;
@@ -286,12 +290,12 @@ class _VaultListScreenState extends State<VaultListScreen> {
                       return;
                     }
                     final full = getEntry(id: entry.id);
-                    final deleted = await Navigator.of(context).push<bool>(
+                    await Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => EntryDetailScreen(entry: full),
                       ),
                     );
-                    if (deleted == true) _loadEntries();
+                    if (mounted) _loadEntries();
                   },
                 );
               },

@@ -77,10 +77,20 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     try {
       if (_isEditing) {
         await _saveUpdate();
+        final id = switch (widget.existing!) {
+          VaultEntryData_Login(:final field0) => field0.id,
+          VaultEntryData_Note(:final field0) => field0.id,
+          VaultEntryData_Identity(:final field0) => field0.id,
+          VaultEntryData_Card(:final field0) => field0.id,
+          VaultEntryData_File(:final field0) => field0.id,
+          VaultEntryData_Custom(:final field0) => field0.id,
+        };
+        final updated = getEntry(id: id);
+        if (mounted) Navigator.of(context).pop(updated);
       } else {
         await _saveCreate();
+        if (mounted) Navigator.of(context).pop(true);
       }
-      if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
     } finally {

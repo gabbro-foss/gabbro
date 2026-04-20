@@ -559,14 +559,6 @@ discussed and forgotten.
 
 ### Features & UX
 
-- **Display title helper for entry list:** `VaultListScreen` currently uses
-  `entry.title` for all entry types, but `LoginEntry` has no `title` field —
-  it shows the `url` instead (populated by the test vault). A proper
-  `_displayTitle(EntrySummaryData entry)` helper should pick the right field
-  per type: url for Password entries, title for Note/Custom, cardholder name
-  for Card, first+last name for Identity, filename for File. Implement in
-  `vault_list_screen.dart` alongside the existing `_displayType()` helper.
-
 - **Entropy indicator on all passphrase inputs:** The onboarding screen
   already shows a real-time entropy indicator. Audit all other passphrase
   input fields (unlock screen, change passphrase screen) and add the same

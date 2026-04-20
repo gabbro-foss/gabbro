@@ -3,12 +3,25 @@ import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 
-class EntryDetailScreen extends StatelessWidget {
+class EntryDetailScreen extends StatefulWidget {
   final VaultEntryData entry;
 
   const EntryDetailScreen({super.key, required this.entry});
 
-  String _entryId() => switch (entry) {
+  @override
+  State<EntryDetailScreen> createState() => _EntryDetailScreenState();
+}
+
+class _EntryDetailScreenState extends State<EntryDetailScreen> {
+  late VaultEntryData _entry;
+
+  @override
+  void initState() {
+    super.initState();
+    _entry = widget.entry;
+  }
+
+  String _entryId() => switch (_entry) {
         VaultEntryData_Login(:final field0) => field0.id,
         VaultEntryData_Note(:final field0) => field0.id,
         VaultEntryData_Identity(:final field0) => field0.id,
@@ -53,7 +66,7 @@ class EntryDetailScreen extends StatelessWidget {
             icon: const Icon(Icons.edit_outlined),
             tooltip: 'Edit entry',
             onPressed: () async {
-              final entryType = switch (entry) {
+              final entryType = switch (_entry) {
                 VaultEntryData_Login() => 'Login',
                 VaultEntryData_Note() => 'Note',
                 VaultEntryData_Identity() => 'Identity',
@@ -61,14 +74,17 @@ class EntryDetailScreen extends StatelessWidget {
                 VaultEntryData_File() => 'File',
                 VaultEntryData_Custom() => 'Custom',
               };
-              await Navigator.of(context).push(
+              final updated = await Navigator.of(context).push<VaultEntryData>(
                 MaterialPageRoute(
                   builder: (context) => CreateEntryScreen(
                     entryType: entryType,
-                    existing: entry,
+                    existing: _entry,
                   ),
                 ),
               );
+              if (updated != null && mounted) {
+                setState(() => _entry = updated);
+              }
             },
           ),
           IconButton(
@@ -85,7 +101,7 @@ class EntryDetailScreen extends StatelessWidget {
     );
   }
 
-  String _title() => switch (entry) {
+  String _title() => switch (_entry) {
         VaultEntryData_Login(:final field0) =>
           field0.url.isNotEmpty ? field0.url : '(no URL)',
         VaultEntryData_Note(:final field0) => field0.title,
@@ -96,7 +112,7 @@ class EntryDetailScreen extends StatelessWidget {
         VaultEntryData_Custom(:final field0) => field0.title,
       };
 
-  Widget _buildBody() => switch (entry) {
+  Widget _buildBody() => switch (_entry) {
         VaultEntryData_Login(:final field0) => _loginView(field0),
         VaultEntryData_Note(:final field0) => _noteView(field0),
         VaultEntryData_Identity(:final field0) => _identityView(field0),
