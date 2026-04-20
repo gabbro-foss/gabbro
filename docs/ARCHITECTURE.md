@@ -524,6 +524,27 @@ discussed and forgotten.
   unlocked. Prerequisite: session model must be implemented first.
   See the **Memory Security** discussion in the Vault Session Model section.
 
+- **Pre-release security review — AI pass:** Before v1 public release,
+  run a full AI-assisted security review of `rust/src/crypto/` and
+  `rust/src/vault/` using Claude Opus (the highest-capability model).
+  Share source via the GitHub integration and request a targeted review
+  covering: memory handling, crypto parameter choices, serialization edge
+  cases, untrusted input paths, and any deviation from RustCrypto crate
+  best practices. AI review is a first pass — it complements but does not
+  replace human expert review (see item below).
+
+- **Pre-release security review — human expert:** Seek external
+  cryptography review of `rust/src/crypto/` before any v1 public security
+  claim. Accessible routes for a FOSS project:
+  (1) Academic outreach — cryptography PhD students/postdocs at nearby
+  institutions (ETH Zürich, EPFL) often review interesting open-source
+  PQC work pro-bono; it is relevant to their research.
+  (2) RustCrypto maintainers — reachable on GitHub; a scoped
+  "security review request" issue for usage of their own crates is
+  reasonable.
+  (3) Formal audit (Cure53, Trail of Bits) — money, likely v2 territory.
+  This is a prerequisite for credible v1 security claims given the PQC angle.
+
 ### Password / Passphrase Generator
 
 - **Non-ASCII wordlist support (v2):** Add CJK and other non-Latin language
@@ -545,6 +566,13 @@ discussed and forgotten.
   per type: url for Password entries, title for Note/Custom, cardholder name
   for Card, first+last name for Identity, filename for File. Implement in
   `vault_list_screen.dart` alongside the existing `_displayType()` helper.
+
+- **Entropy indicator on all passphrase inputs:** The onboarding screen
+  already shows a real-time entropy indicator. Audit all other passphrase
+  input fields (unlock screen, change passphrase screen) and add the same
+  indicator consistently. Users choosing their own passphrase deserve the
+  same entropy feedback as the generator provides. Implement using the
+  existing `entropy` bridge function already exposed from Rust.
 
 - **Autofill:** How will autofill work across platforms? On desktop,
   browser extensions (Chrome/Firefox/etc.) are the standard approach —
@@ -712,11 +740,16 @@ discussed and forgotten.
 
 ### Monetisation
 
-- **GPL-3.0 monetisation model TBD** — ideas include a Yubico partnership
-  and a Play Store one-time payment. Needs a dedicated design session;
-  must be compatible with GPL-3.0-only licence obligations. See the
-  Monetization section above for current high-level thinking.
-- Also see [updated monetisation ideas](#trust--transparency)
+- **GPL-3.0 monetisation — confirmed approach:** GPL-3.0-only explicitly
+  permits commercial distribution. Charging on the Play Store while
+  distributing free on Arch/Debian/F-Droid is fully licence-compatible —
+  the buyer receives source and redistribution rights per the GPL bargain,
+  but in practice almost nobody rebuilds from source. F-Droid lists the
+  free build without conflict; it does not object to a paid Play Store
+  version of the same app existing. No licence change required.
+  One-time payment on Play Store is the recommended model to recoup the
+  $25 registration fee; no ongoing subscription complexity.
+  Yubico partnership remains a separate future discussion.
 
 ### Trust & Transparency
 

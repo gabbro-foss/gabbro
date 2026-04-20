@@ -1490,3 +1490,49 @@ any user-facing test where performance matters.
 path) and `build/app/outputs/apk/debug/app-debug.apk` (Gradle's standard
 output path). Both files are identical — `diff` confirms this. Use either
 for `adb install`; the Flutter path is the more memorable one.
+
+---
+
+## Distribution & Licensing
+
+### GPL-3.0 and commercial distribution
+GPL-3.0-only explicitly permits charging money for distribution. The
+copyleft constraint is on the *source* — anyone you distribute to gets
+the code and the right to redistribute it. They could theoretically build
+it themselves, but in practice almost nobody does. This means:
+- Free on Arch/Debian and F-Droid: standard FOSS distribution
+- Paid on the Play Store: fully GPL-3.0 compatible — charge to recoup
+  Google's $25 registration fee (or more)
+- F-Droid's anti-features policy covers things like telemetry and
+  proprietary network services; a paid Play Store version of the same
+  app is not an F-Droid concern
+
+### Android vault file location during development
+Flutter's `getApplicationSupportDirectory()` resolves to
+`/data/data/<app-id>/files/` on Android. For Gabbro with app ID
+`app.gabbro.gabbro`, the vault lives at:
+`/data/data/app.gabbro.gabbro/files/gabbro.gabbro`
+
+Direct filesystem access requires root. During testing, use `adb`:
+```bash
+# Delete just the vault file
+adb shell rm /data/data/app.gabbro.gabbro/files/gabbro.gabbro
+
+# Wipe all app data (vault + SharedPreferences + any other state)
+# Preferred for onboarding testing
+adb shell pm clear app.gabbro.gabbro
+```
+
+### Gabbro vault magic bytes — reading the hexdump
+`hexdump -C ~/.local/share/app.gabbro.gabbro/gabbro.gabbro` on a real
+vault file shows:
+
+```
+00000000  47 41 42 42 52 4f 01 00  01 00 ...
+```
+
+`47 41 42 42 52 4f` is ASCII for `GABBRO` — the magic bytes hardcoded
+in `file_format.rs` to identify valid vault files. `01 00` is the version
+field (v1, big-endian u16). The Argon2id parameters follow immediately.
+Confirming these bytes in a real vault file validates that serialization
+is working correctly end-to-end.
