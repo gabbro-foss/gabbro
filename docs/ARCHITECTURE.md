@@ -483,12 +483,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** First Android emulator test. Debug APK installed on a Pixel 8
-  AVD (Android 14, AOSP, x86_64) via `adb install`. All implemented flows
-  confirmed working: create Password and Note entries, alphabetical grouping,
-  filter chips, view detail, edit, single delete, bulk delete. Debug build
-  Argon2id latency (~20s) confirmed as expected on emulator.
-- **Next task:** Test on physical Samsung Galaxy S23 device via USB debugging.
+- **Completed:** Physical device test on Samsung Galaxy S23 (Android, USB debugging).
+  All flows confirmed working: onboarding, unlock, create/edit/delete entries,
+  alphabetical grouping, filter chips, portrait and landscape layouts.
+  Unlock time subjectively fast (well under 2s) on release build.
+- **Next task:** Pick next bikeshed item.
 
 ---
 
