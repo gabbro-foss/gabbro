@@ -694,12 +694,6 @@ discussed and forgotten.
   testing discipline, not an architecture change. Reference: WCAG 1.4.4
   (Resize Text) applies here alongside the font sizing work.
 
-- **Confirm field live revalidation:** The confirm passphrase field on
-  `OnboardingScreen` stays red after the user corrects a mismatch until
-  the form is submitted. Fix: call `_formKey.currentState?.validate()`
-  inside the confirm field's `onChanged` callback. One-line change in
-  `lib/screens/onboarding_screen.dart`.
-
 - **Stale detail view after edit:** After editing an entry and saving,
   navigating back to `EntryDetailScreen` still shows the pre-edit content
   until the user returns to the list and re-taps the entry. Fix: pass the

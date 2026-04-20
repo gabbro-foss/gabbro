@@ -24,6 +24,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool _isCreating = false;
   String? _error;
   EntropyResult? _entropy;
+  bool? _confirmMatches;
 
   @override
   void initState() {
@@ -90,22 +91,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Color _tierColor(StrengthTier tier) => switch (tier) {
-        StrengthTier.terrible => Colors.red,
-        StrengthTier.weak => Colors.orange,
-        StrengthTier.fair => Colors.yellow.shade700,
-        StrengthTier.strong => Colors.lightGreen,
-        StrengthTier.veryStrong => Colors.green,
-        StrengthTier.centuries => Colors.green.shade800,
-      };
+    StrengthTier.terrible => Colors.red,
+    StrengthTier.weak => Colors.orange,
+    StrengthTier.fair => Colors.yellow.shade700,
+    StrengthTier.strong => Colors.lightGreen,
+    StrengthTier.veryStrong => Colors.green,
+    StrengthTier.centuries => Colors.green.shade800,
+  };
 
   String _tierLabel(StrengthTier tier) => switch (tier) {
-        StrengthTier.terrible => 'Terrible',
-        StrengthTier.weak => 'Weak',
-        StrengthTier.fair => 'Fair',
-        StrengthTier.strong => 'Strong',
-        StrengthTier.veryStrong => 'Very strong',
-        StrengthTier.centuries => 'Excellent',
-      };
+    StrengthTier.terrible => 'Terrible',
+    StrengthTier.weak => 'Weak',
+    StrengthTier.fair => 'Fair',
+    StrengthTier.strong => 'Strong',
+    StrengthTier.veryStrong => 'Very strong',
+    StrengthTier.centuries => 'Excellent',
+  };
 
   bool get _strongEnough =>
       _entropy != null &&
@@ -126,18 +127,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Welcome to Gabbro',
-                      style: Theme.of(context).textTheme.headlineLarge,
-                      textAlign: TextAlign.center),
+                  Text(
+                    'Welcome to Gabbro',
+                    style: Theme.of(context).textTheme.headlineLarge,
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 8),
-                  Text('Create your vault to get started.',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      textAlign: TextAlign.center),
+                  Text(
+                    'Create your vault to get started.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 40),
 
                   // Vault path
-                  const Text('Vault location',
-                      style: TextStyle(fontWeight: FontWeight.w600)),
+                  const Text(
+                    'Vault location',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -172,15 +179,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       labelText: 'Master passphrase',
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
-                        icon: Icon(_passphraseObscured
-                            ? Icons.visibility_off
-                            : Icons.visibility),
+                        icon: Icon(
+                          _passphraseObscured
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
                         onPressed: () => setState(
-                            () => _passphraseObscured = !_passphraseObscured),
+                          () => _passphraseObscured = !_passphraseObscured,
+                        ),
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Passphrase is required';
+                      if (v == null || v.isEmpty)
+                        return 'Passphrase is required';
                       if (!_strongEnough) return 'Passphrase is too weak';
                       return null;
                     },
@@ -205,7 +216,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Text(
                       '${_tierLabel(_entropy!.tier)} · ${_entropy!.bits.toStringAsFixed(1)} bits',
                       style: TextStyle(
-                          fontSize: 12, color: _tierColor(_entropy!.tier)),
+                        fontSize: 12,
+                        color: _tierColor(_entropy!.tier),
+                      ),
                     ),
                   ],
                   const SizedBox(height: 16),
@@ -214,35 +227,64 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   TextFormField(
                     controller: _confirmController,
                     obscureText: _confirmObscured,
+                    onChanged: (v) {
+                      setState(
+                        () => _confirmMatches = v.isEmpty ? null : v == _passphraseController.text,
+                      );
+                    },
                     decoration: InputDecoration(
                       labelText: 'Confirm passphrase',
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
-                        icon: Icon(_confirmObscured
-                            ? Icons.visibility_off
-                            : Icons.visibility),
+                        icon: Icon(
+                          _confirmObscured
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
                         onPressed: () => setState(
-                            () => _confirmObscured = !_confirmObscured),
+                          () => _confirmObscured = !_confirmObscured,
+                        ),
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Please confirm your passphrase';
-                      if (v != _passphraseController.text) return 'Passphrases do not match';
+                      if (v == null || v.isEmpty)
+                        return 'Please confirm your passphrase';
+                      if (v != _passphraseController.text)
+                        return 'Passphrases do not match';
                       return null;
                     },
                   ),
+                  if (_confirmMatches != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      _confirmMatches!
+                          ? '✓ Passphrases match'
+                          : '✗ Passphrases do not match',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: _confirmMatches!
+                            ? Colors.green.shade700
+                            : Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 24),
 
                   if (_error != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(_error!,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.error)),
+                      child: Text(
+                        _error!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
                     ),
 
                   FilledButton(
-                    onPressed: (_isCreating || !_strongEnough) ? null : _createVault,
+                    onPressed: (_isCreating || !_strongEnough)
+                        ? null
+                        : _createVault,
                     child: _isCreating
                         ? const SizedBox(
                             height: 20,
