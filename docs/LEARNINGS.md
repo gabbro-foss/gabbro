@@ -1119,9 +1119,12 @@ Add them with:
 ### Flutter and Cargo commands — where to run them
 - `flutter` commands (build, pub, etc.) → run from the project root (`gabbro/`)
   where `pubspec.yaml` lives
-- `cargo` commands (test, build, etc.) → run from `gabbro/rust/` where
-  `Cargo.toml` lives
-- `flutter_rust_bridge_codegen generate` → run from the project root
+- `cargo` commands (`test`, `build`, `run`, `add`, `check`, etc.) → run from
+  `gabbro/rust/` where `Cargo.toml` lives. This applies to every `cargo`
+  subcommand without exception.
+- `flutter_rust_bridge_codegen generate` → run from the project root (`gabbro/`)
+- When in doubt: if the command starts with `cargo`, you're in `gabbro/rust/`;
+  if it starts with `flutter`, you're in `gabbro/`.
 
 ### simple.rs — leave it alone
 The generated `simple.rs` file contains two things: a demo `greet` function

@@ -577,6 +577,14 @@ discussed and forgotten.
   model? Does autofill change the security model (secrets closer to the
   browser boundary)?
 
+- **Native file picker (desktop):** Both the vault location picker on
+  `OnboardingScreen` and the file entry picker on `CreateEntryScreen`
+  currently use plain text path input on Linux desktop. Replace with a
+  native GTK file dialog when desktop polish work begins. On Android,
+  use the `file_picker` package (re-add as a dependency at that point —
+  it was removed because the Linux backend was not yet set up). The
+  path-based fallback must be retained for headless/CI environments.
+
 - **Themes — dark / light / custom:** Dark and light modes are already noted
   as system-default with user override. Open questions: should Gabbro offer
   additional high-contrast or accessibility-focused themes beyond dark/light?
