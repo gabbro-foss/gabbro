@@ -483,11 +483,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Fixed stale detail view and list refresh after entry edit.
-  `EntryDetailScreen` converted to `StatefulWidget`; detail screen updates
-  in place via `setState` after save; list screen unconditionally reloads on
-  return from detail. Also fixed FAB bottom sheet overflow on small windows.
-- **Next task:** Pick next bikeshed item.
+- **Completed:** All 6 entry types fully implemented in Flutter UI
+  (Identity, Card, File, Custom create/edit/detail screens). CardEntry
+  and IdentityEntry extended with new fields. File export added.
+  CVV validation and show/hide toggles added. file_picker removed.
+- **Next task:** Entropy indicator on UnlockScreen and change passphrase
+  screen, then Android build verification.
 
 ---
 
