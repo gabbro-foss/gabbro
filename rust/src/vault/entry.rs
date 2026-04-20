@@ -72,7 +72,7 @@ pub struct NoteEntry {
     pub content: String,
 }
 
-/// A peronal identity entry - name, address, contact details.
+/// A personal identity entry - name, address, contact details.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IdentityEntry {
     pub meta: EntryMeta,
@@ -81,16 +81,31 @@ pub struct IdentityEntry {
     pub email: String,
     pub phone: Option<String>,
     pub address: Option<String>,
+    /// User-defined extra fields (e.g. "Maiden name", "Mobile", "Landline").
+    pub custom_fields: Vec<CustomField>,
 }
 
 /// A payment card entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CardEntry {
     pub meta: EntryMeta,
+    /// User's own label for this card (e.g. "Visa Platinum"). Optional —
+    /// Flutter falls back to payment network or cardholder name if absent.
+    pub card_name: Option<String>,
+    /// Card status: "active", "lapsed", or "inactive".
+    pub status: String,
     pub cardholder_name: String,
     pub card_number: String,
+    /// Expiry date in MM/YY format.
     pub expiry: String,
     pub cvv: String,
+    /// Credit limit as a string to avoid float precision issues.
+    pub credit_limit: Option<String>,
+    /// Bank account number associated with this card.
+    pub card_account_number: Option<String>,
+    /// Payment network (e.g. "Visa", "Mastercard", "Amex").
+    /// Flutter maps this to a logo asset — no binary data stored here.
+    pub payment_network: Option<String>,
     pub notes: Option<String>,
 }
 
@@ -99,29 +114,39 @@ impl CardEntry {
     /// is within the range of known real-world card formats (12-19 digits).
     pub fn new(
         meta: EntryMeta,
+        card_name: Option<String>,
+        status: String,
         cardholder_name: String,
         card_number: String,
         expiry: String,
         cvv: String,
+        credit_limit: Option<String>,
+        card_account_number: Option<String>,
+        payment_network: Option<String>,
         notes: Option<String>,
-     )-> Result<CardEntry, String> {
-            let digit_count = card_number.chars().filter(|c| c.is_ascii_digit()).count();
-            if digit_count < 12 || digit_count > 19 {
-                return Err(format!(
-                    "Card number must contain 12-19 digits, got {}",
-                    digit_count
-                ));
-            }
-
-            Ok(CardEntry{
-                meta, 
-                cardholder_name,
-                card_number,
-                expiry,
-                cvv,
-                notes,
-            })
+    ) -> Result<CardEntry, String> {
+        let digit_count = card_number.chars().filter(|c| c.is_ascii_digit()).count();
+        if digit_count < 12 || digit_count > 19 {
+            return Err(format!(
+                "Card number must contain 12-19 digits, got {}",
+                digit_count
+            ));
         }
+
+        Ok(CardEntry {
+            meta,
+            card_name,
+            status,
+            cardholder_name,
+            card_number,
+            expiry,
+            cvv,
+            credit_limit,
+            card_account_number,
+            payment_network,
+            notes,
+        })
+    }
 }
 
 /// A file attachement entry - stores a binary payload.
@@ -259,36 +284,50 @@ mod tests {
             email: String::from("rob@example.com"),
             phone: None,
             address: None,
+            custom_fields: vec![],
         };
 
         assert_eq!(entry.first_name, "Rob");
         assert!(entry.phone.is_none());
         assert!(entry.address.is_none());
+        assert!(entry.custom_fields.is_empty());
     }
 
     #[test]
     fn card_entry_valid_number_succeeds() {
         let entry = CardEntry::new(
             default_meta(),
+            Some(String::from("Visa Platinum")),
+            String::from("active"),
             String::from("Rob Smith"),
             String::from("4111111111111111"), // 16 digits
             String::from("12/28"),
             String::from("123"),
             None,
+            None,
+            Some(String::from("Visa")),
+            None,
         ).unwrap();
 
         assert_eq!(entry.cardholder_name, "Rob Smith");
         assert_eq!(entry.expiry, "12/28");
+        assert_eq!(entry.status, "active");
+        assert_eq!(entry.card_name, Some(String::from("Visa Platinum")));
     }
 
     #[test]
     fn card_entry_short_number_fails() {
         let result = CardEntry::new(
             default_meta(),
+            None,
+            String::from("active"),
             String::from("Rob Smith"),
             String::from("1234"),
             String::from("12/28"),
             String::from("123"),
+            None,
+            None,
+            None,
             None,
         );
 
@@ -299,10 +338,15 @@ mod tests {
     fn card_entry_long_number_fails() {
         let result = CardEntry::new(
             default_meta(),
+            None,
+            String::from("active"),
             String::from("Rob Smith"),
             String::from("12345678901234567890"), // 20 digits
             String::from("12/28"),
             String::from("123"),
+            None,
+            None,
+            None,
             None,
         );
 

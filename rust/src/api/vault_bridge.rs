@@ -88,6 +88,10 @@ fn vault_entry_to_data(entry: VaultEntry) -> VaultEntryData {
             email: e.email,
             phone: e.phone,
             address: e.address,
+            custom_fields: e.custom_fields
+                .into_iter()
+                .map(|f| CustomFieldData { label: f.label, value: f.value, hidden: f.hidden })
+                .collect(),
         }),
         VaultEntry::Card(e) => VaultEntryData::Card(CardEntryData {
             id: e.meta.id,
@@ -96,10 +100,15 @@ fn vault_entry_to_data(entry: VaultEntry) -> VaultEntryData {
             folder: e.meta.folder,
             tags: e.meta.tags,
             favourite: e.meta.favourite,
+            card_name: e.card_name,
+            status: e.status,
             cardholder_name: e.cardholder_name,
             card_number: e.card_number,
             expiry: e.expiry,
             cvv: e.cvv,
+            credit_limit: e.credit_limit,
+            card_account_number: e.card_account_number,
+            payment_network: e.payment_network,
             notes: e.notes,
         }),
         VaultEntry::File(e) => VaultEntryData::File(FileEntryData {
@@ -177,6 +186,10 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
             email: d.email,
             phone: d.phone,
             address: d.address,
+            custom_fields: d.custom_fields
+                .into_iter()
+                .map(|f| CustomField { label: f.label, value: f.value, hidden: f.hidden })
+                .collect(),
         })),
         VaultEntryData::Card(d) => {
             let meta = EntryMeta {
@@ -189,10 +202,15 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
             };
             let entry = CardEntry::new(
                 meta,
+                d.card_name,
+                d.status,
                 d.cardholder_name,
                 d.card_number,
                 d.expiry,
                 d.cvv,
+                d.credit_limit,
+                d.card_account_number,
+                d.payment_network,
                 d.notes,
             )?;
             Ok(VaultEntry::Card(entry))

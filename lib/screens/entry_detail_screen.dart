@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -14,6 +16,9 @@ class EntryDetailScreen extends StatefulWidget {
 
 class _EntryDetailScreenState extends State<EntryDetailScreen> {
   late VaultEntryData _entry;
+
+  bool _cardNumberObscured = true;
+  bool _cvvObscured = true;
 
   @override
   void initState() {
@@ -56,12 +61,79 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     if (context.mounted) Navigator.of(context).pop(true);
   }
 
+  /// Export a file entry's bytes to a user-specified path.
+  Future<void> _exportFile(FileEntryData e) async {
+    final pathController = TextEditingController(
+      text: '${Platform.environment['HOME'] ?? '/tmp'}/${e.filename}',
+    );
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Export file'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Save decrypted file to:'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: pathController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Export path',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Export'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final path = pathController.text.trim();
+    if (path.isEmpty) return;
+    try {
+      final file = File(path);
+      await file.parent.create(recursive: true);
+      await file.writeAsBytes(e.data);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Exported to $path')),
+        );
+      }
+    } catch (err) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Export failed: $err'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(_title()),
         actions: [
+          // File export button — only shown for File entries
+          if (_entry case VaultEntryData_File(:final field0))
+            IconButton(
+              icon: const Icon(Icons.download_outlined),
+              tooltip: 'Export file',
+              onPressed: () => _exportFile(field0),
+            ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             tooltip: 'Edit entry',
@@ -107,7 +179,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
         VaultEntryData_Note(:final field0) => field0.title,
         VaultEntryData_Identity(:final field0) =>
           '${field0.firstName} ${field0.lastName}',
-        VaultEntryData_Card(:final field0) => field0.cardholderName,
+        VaultEntryData_Card(:final field0) =>
+          field0.cardName ?? field0.cardholderName,
         VaultEntryData_File(:final field0) => field0.filename,
         VaultEntryData_Custom(:final field0) => field0.title,
       };
@@ -121,6 +194,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
         VaultEntryData_Custom(:final field0) => _customView(field0),
       };
 
+  // ── Entry type views ─────────────────────────────────────────────────────────
+
   Widget _loginView(LoginEntryData e) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,6 +204,13 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
         _field('Username', e.username),
         _field('Password', e.password, obscure: true),
         if (e.notes != null) _field('Notes', e.notes!),
+        if (e.customFields.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          _sectionHeader('Custom fields'),
+          ...e.customFields.map(
+            (f) => _field(f.label, f.value, obscure: f.hidden),
+          ),
+        ],
       ],
     );
   }
@@ -151,6 +233,14 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
         _field('Last name', e.lastName),
         if (e.email.isNotEmpty) _field('Email', e.email),
         if (e.phone != null) _field('Phone', e.phone!),
+        if (e.address != null) _field('Address', e.address!),
+        if (e.customFields.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          _sectionHeader('Custom fields'),
+          ...e.customFields.map(
+            (f) => _field(f.label, f.value, obscure: f.hidden),
+          ),
+        ],
       ],
     );
   }
@@ -159,10 +249,28 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (e.cardName != null) _field('Card label', e.cardName!),
+        _field('Status', e.status),
+        if (e.paymentNetwork != null)
+          _field('Payment network', e.paymentNetwork!),
         _field('Cardholder', e.cardholderName),
-        _field('Number', e.cardNumber, obscure: true),
+        _toggleField(
+          label: 'Number',
+          value: e.cardNumber,
+          obscured: _cardNumberObscured,
+          onToggle: () =>
+              setState(() => _cardNumberObscured = !_cardNumberObscured),
+        ),
         _field('Expiry', e.expiry),
-        _field('CVV', e.cvv, obscure: true),
+        _toggleField(
+          label: 'CVV',
+          value: e.cvv,
+          obscured: _cvvObscured,
+          onToggle: () => setState(() => _cvvObscured = !_cvvObscured),
+        ),
+        if (e.creditLimit != null) _field('Credit limit', e.creditLimit!),
+        if (e.cardAccountNumber != null)
+          _field('Account number', e.cardAccountNumber!),
         if (e.notes != null) _field('Notes', e.notes!),
       ],
     );
@@ -173,8 +281,14 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _field('Filename', e.filename),
-        _field('Size', '${e.data.length} bytes'),
+        _field('Size', _formatBytes(e.data.length)),
         if (e.notes != null) _field('Notes', e.notes!),
+        const SizedBox(height: 16),
+        OutlinedButton.icon(
+          onPressed: () => _exportFile(e),
+          icon: const Icon(Icons.download_outlined),
+          label: const Text('Export file'),
+        ),
       ],
     );
   }
@@ -184,8 +298,24 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _field('Title', e.title),
-        ...e.fields.map((f) => _field(f.label, f.value)),
+        if (e.fields.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          _sectionHeader('Fields'),
+          ...e.fields.map((f) => _field(f.label, f.value, obscure: f.hidden)),
+        ],
       ],
+    );
+  }
+
+  // ── Shared helpers ───────────────────────────────────────────────────────────
+
+  Widget _sectionHeader(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Text(
+        label,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+      ),
     );
   }
 
@@ -208,5 +338,53 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
         ],
       ),
     );
+  }
+
+  Widget _toggleField({
+    required String label,
+    required String value,
+    required bool obscured,
+    required VoidCallback onToggle,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  obscured ? '••••••••' : value,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  obscured ? Icons.visibility_off : Icons.visibility,
+                  size: 18,
+                ),
+                tooltip: obscured ? 'Show' : 'Hide',
+                onPressed: onToggle,
+              ),
+            ],
+          ),
+          const Divider(),
+        ],
+      ),
+    );
+  }
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    }
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 }

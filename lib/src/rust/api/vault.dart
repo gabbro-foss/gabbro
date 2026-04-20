@@ -6,7 +6,7 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `card_entry_to_data`, `chrono_now`, `custom_entry_to_data`, `custom_field_to_data`, `days_to_ymd`, `entry_id`, `file_entry_to_data`, `identity_entry_to_data`, `is_leap`, `login_entry_to_data`, `mask_entry`, `note_entry_to_data`
+// These functions are ignored because they are not marked as `pub`: `card_entry_to_data`, `custom_entry_to_data`, `custom_field_to_data`, `days_to_ymd`, `entry_id`, `file_entry_to_data`, `identity_entry_to_data`, `is_leap`, `login_entry_to_data`, `mask_entry`, `note_entry_to_data`
 // These functions are ignored (category: IgnoreBecauseExplicitAttribute): `change_passphrase`, `delete_entry`, `delete_whole_vault`, `export_vault`, `get_entry_by_id`, `list_entries`, `load_vault`, `save_vault`, `update_entry`
 
 /// Creates a new login entry with a generated UUID and current timestamp.
@@ -76,19 +76,29 @@ Future<CardEntryData> createCardEntry({
   required String folder,
   required List<String> tags,
   required bool favourite,
+  String? cardName,
+  required String status,
   required String cardholderName,
   required String cardNumber,
   required String expiry,
   required String cvv,
+  String? creditLimit,
+  String? cardAccountNumber,
+  String? paymentNetwork,
   String? notes,
 }) => RustLib.instance.api.crateApiVaultCreateCardEntry(
   folder: folder,
   tags: tags,
   favourite: favourite,
+  cardName: cardName,
+  status: status,
   cardholderName: cardholderName,
   cardNumber: cardNumber,
   expiry: expiry,
   cvv: cvv,
+  creditLimit: creditLimit,
+  cardAccountNumber: cardAccountNumber,
+  paymentNetwork: paymentNetwork,
   notes: notes,
 );
 
@@ -124,6 +134,10 @@ Future<CustomEntryData> createCustomEntry({
   fields: fields,
 );
 
+/// Returns the current UTC time as an ISO 8601 string.
+/// Uses std only — no chrono dependency needed at this stage.
+Future<String> chronoNow() => RustLib.instance.api.crateApiVaultChronoNow();
+
 /// A card entry as seen by Flutter.
 class CardEntryData {
   final String id;
@@ -132,10 +146,15 @@ class CardEntryData {
   final String folder;
   final List<String> tags;
   final bool favourite;
+  final String? cardName;
+  final String status;
   final String cardholderName;
   final String cardNumber;
   final String expiry;
   final String cvv;
+  final String? creditLimit;
+  final String? cardAccountNumber;
+  final String? paymentNetwork;
   final String? notes;
 
   const CardEntryData({
@@ -145,10 +164,15 @@ class CardEntryData {
     required this.folder,
     required this.tags,
     required this.favourite,
+    this.cardName,
+    required this.status,
     required this.cardholderName,
     required this.cardNumber,
     required this.expiry,
     required this.cvv,
+    this.creditLimit,
+    this.cardAccountNumber,
+    this.paymentNetwork,
     this.notes,
   });
 
@@ -160,10 +184,15 @@ class CardEntryData {
       folder.hashCode ^
       tags.hashCode ^
       favourite.hashCode ^
+      cardName.hashCode ^
+      status.hashCode ^
       cardholderName.hashCode ^
       cardNumber.hashCode ^
       expiry.hashCode ^
       cvv.hashCode ^
+      creditLimit.hashCode ^
+      cardAccountNumber.hashCode ^
+      paymentNetwork.hashCode ^
       notes.hashCode;
 
   @override
@@ -177,10 +206,15 @@ class CardEntryData {
           folder == other.folder &&
           tags == other.tags &&
           favourite == other.favourite &&
+          cardName == other.cardName &&
+          status == other.status &&
           cardholderName == other.cardholderName &&
           cardNumber == other.cardNumber &&
           expiry == other.expiry &&
           cvv == other.cvv &&
+          creditLimit == other.creditLimit &&
+          cardAccountNumber == other.cardAccountNumber &&
+          paymentNetwork == other.paymentNetwork &&
           notes == other.notes;
 }
 
@@ -322,6 +356,7 @@ class IdentityEntryData {
   final String email;
   final String? phone;
   final String? address;
+  final List<CustomFieldData> customFields;
 
   const IdentityEntryData({
     required this.id,
@@ -335,6 +370,7 @@ class IdentityEntryData {
     required this.email,
     this.phone,
     this.address,
+    required this.customFields,
   });
 
   @override
@@ -349,7 +385,8 @@ class IdentityEntryData {
       lastName.hashCode ^
       email.hashCode ^
       phone.hashCode ^
-      address.hashCode;
+      address.hashCode ^
+      customFields.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -366,7 +403,8 @@ class IdentityEntryData {
           lastName == other.lastName &&
           email == other.email &&
           phone == other.phone &&
-          address == other.address;
+          address == other.address &&
+          customFields == other.customFields;
 }
 
 /// A login entry as seen by Flutter.

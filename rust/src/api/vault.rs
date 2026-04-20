@@ -65,6 +65,7 @@ pub struct IdentityEntryData {
     pub email: String,
     pub phone: Option<String>,
     pub address: Option<String>,
+    pub custom_fields: Vec<CustomFieldData>,
 }
 
 /// A card entry as seen by Flutter.
@@ -75,10 +76,15 @@ pub struct CardEntryData {
     pub folder: String,
     pub tags: Vec<String>,
     pub favourite: bool,
+    pub card_name: Option<String>,
+    pub status: String,
     pub cardholder_name: String,
     pub card_number: String,
     pub expiry: String,
     pub cvv: String,
+    pub credit_limit: Option<String>,
+    pub card_account_number: Option<String>,
+    pub payment_network: Option<String>,
     pub notes: Option<String>,
 }
 
@@ -159,6 +165,7 @@ fn identity_entry_to_data(e: IdentityEntry) -> IdentityEntryData {
         email: e.email,
         phone: e.phone,
         address: e.address,
+        custom_fields: e.custom_fields.into_iter().map(custom_field_to_data).collect(),
     }
 }
 
@@ -170,10 +177,15 @@ fn card_entry_to_data(e: CardEntry) -> CardEntryData {
         folder: e.meta.folder,
         tags: e.meta.tags,
         favourite: e.meta.favourite,
+        card_name: e.card_name,
+        status: e.status,
         cardholder_name: e.cardholder_name,
         card_number: e.card_number,
         expiry: e.expiry,
         cvv: e.cvv,
+        credit_limit: e.credit_limit,
+        card_account_number: e.card_account_number,
+        payment_network: e.payment_network,
         notes: e.notes,
     }
 }
@@ -297,7 +309,7 @@ pub fn create_identity_entry(
         tags,
         favourite,
     };
-    let entry = IdentityEntry { meta, first_name, last_name, email, phone, address };
+    let entry = IdentityEntry { meta, first_name, last_name, email, phone, address, custom_fields: vec![] };
     identity_entry_to_data(entry)
 }
 
@@ -308,10 +320,15 @@ pub fn create_card_entry(
     folder: String,
     tags: Vec<String>,
     favourite: bool,
+    card_name: Option<String>,
+    status: String,
     cardholder_name: String,
     card_number: String,
     expiry: String,
     cvv: String,
+    credit_limit: Option<String>,
+    card_account_number: Option<String>,
+    payment_network: Option<String>,
     notes: Option<String>,
 ) -> Result<CardEntryData, String> {
     let now = chrono_now();
@@ -323,7 +340,19 @@ pub fn create_card_entry(
         tags,
         favourite,
     };
-    let entry = CardEntry::new(meta, cardholder_name, card_number, expiry, cvv, notes)?;
+    let entry = CardEntry::new(
+        meta,
+        card_name,
+        status,
+        cardholder_name,
+        card_number,
+        expiry,
+        cvv,
+        credit_limit,
+        card_account_number,
+        payment_network,
+        notes,
+    )?;
     Ok(card_entry_to_data(entry))
 }
 
@@ -507,10 +536,15 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
         }),
         VaultEntry::Card(e) => VaultEntry::Card(CardEntry {
             meta: e.meta.clone(),
+            card_name: e.card_name.clone(),
+            status: e.status.clone(),
             cardholder_name: e.cardholder_name.clone(),
             card_number: e.card_number.clone(),
             expiry: e.expiry.clone(),
             cvv: MASKED_VALUE.to_string(),
+            credit_limit: e.credit_limit.clone(),
+            card_account_number: e.card_account_number.clone(),
+            payment_network: e.payment_network.clone(),
             notes: e.notes.clone(),
         }),
         // Note, Identity, File, Custom carry no password-class fields —
@@ -821,10 +855,15 @@ mod tests {
             String::from("Personal"),
             vec![],
             false,
+            Some(String::from("Visa Platinum")),
+            String::from("active"),
             String::from("Rob Smith"),
             String::from("4111111111111111"), // 16 digits
             String::from("12/28"),
             String::from("123"),
+            None,
+            None,
+            Some(String::from("Visa")),
             None,
         );
 
@@ -833,6 +872,8 @@ mod tests {
         assert_eq!(entry.cardholder_name, "Rob Smith");
         assert_eq!(entry.expiry, "12/28");
         assert_eq!(entry.folder, "Personal");
+        assert_eq!(entry.status, "active");
+        assert_eq!(entry.card_name, Some(String::from("Visa Platinum")));
     }
 
     #[test]
@@ -841,10 +882,15 @@ mod tests {
             String::from("Personal"),
             vec![],
             false,
+            None,
+            String::from("active"),
             String::from("Rob Smith"),
             String::from("1234"), // too short
             String::from("12/28"),
             String::from("123"),
+            None,
+            None,
+            None,
             None,
         );
 
@@ -1319,10 +1365,15 @@ mod tests {
                     tags: vec![],
                     favourite: false,
                 },
+                card_name: Some(String::from("Visa Platinum")),
+                status: String::from("active"),
                 cardholder_name: String::from("Rob Smith"),
                 card_number: String::from("4111111111111111"),
                 expiry: String::from("12/28"),
                 cvv: String::from("123"),
+                credit_limit: None,
+                card_account_number: None,
+                payment_network: Some(String::from("Visa")),
                 notes: None,
             }),
         ];

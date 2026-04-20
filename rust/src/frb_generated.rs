@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1239605395;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1611058280;
 
 // Section: executor
 
@@ -86,6 +86,38 @@ fn wire__crate__api__vault_bridge__change_passphrase_impl(
         },
     )
 }
+fn wire__crate__api__vault__chrono_now_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "chrono_now",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Result::<_, ()>::Ok(crate::api::vault::chrono_now())?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__api__vault__create_card_entry_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -111,10 +143,15 @@ fn wire__crate__api__vault__create_card_entry_impl(
             let api_folder = <String>::sse_decode(&mut deserializer);
             let api_tags = <Vec<String>>::sse_decode(&mut deserializer);
             let api_favourite = <bool>::sse_decode(&mut deserializer);
+            let api_card_name = <Option<String>>::sse_decode(&mut deserializer);
+            let api_status = <String>::sse_decode(&mut deserializer);
             let api_cardholder_name = <String>::sse_decode(&mut deserializer);
             let api_card_number = <String>::sse_decode(&mut deserializer);
             let api_expiry = <String>::sse_decode(&mut deserializer);
             let api_cvv = <String>::sse_decode(&mut deserializer);
+            let api_credit_limit = <Option<String>>::sse_decode(&mut deserializer);
+            let api_card_account_number = <Option<String>>::sse_decode(&mut deserializer);
+            let api_payment_network = <Option<String>>::sse_decode(&mut deserializer);
             let api_notes = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
@@ -123,10 +160,15 @@ fn wire__crate__api__vault__create_card_entry_impl(
                         api_folder,
                         api_tags,
                         api_favourite,
+                        api_card_name,
+                        api_status,
                         api_cardholder_name,
                         api_card_number,
                         api_expiry,
                         api_cvv,
+                        api_credit_limit,
+                        api_card_account_number,
+                        api_payment_network,
                         api_notes,
                     )?;
                     Ok(output_ok)
@@ -974,10 +1016,15 @@ impl SseDecode for crate::api::vault::CardEntryData {
         let mut var_folder = <String>::sse_decode(deserializer);
         let mut var_tags = <Vec<String>>::sse_decode(deserializer);
         let mut var_favourite = <bool>::sse_decode(deserializer);
+        let mut var_cardName = <Option<String>>::sse_decode(deserializer);
+        let mut var_status = <String>::sse_decode(deserializer);
         let mut var_cardholderName = <String>::sse_decode(deserializer);
         let mut var_cardNumber = <String>::sse_decode(deserializer);
         let mut var_expiry = <String>::sse_decode(deserializer);
         let mut var_cvv = <String>::sse_decode(deserializer);
+        let mut var_creditLimit = <Option<String>>::sse_decode(deserializer);
+        let mut var_cardAccountNumber = <Option<String>>::sse_decode(deserializer);
+        let mut var_paymentNetwork = <Option<String>>::sse_decode(deserializer);
         let mut var_notes = <Option<String>>::sse_decode(deserializer);
         return crate::api::vault::CardEntryData {
             id: var_id,
@@ -986,10 +1033,15 @@ impl SseDecode for crate::api::vault::CardEntryData {
             folder: var_folder,
             tags: var_tags,
             favourite: var_favourite,
+            card_name: var_cardName,
+            status: var_status,
             cardholder_name: var_cardholderName,
             card_number: var_cardNumber,
             expiry: var_expiry,
             cvv: var_cvv,
+            credit_limit: var_creditLimit,
+            card_account_number: var_cardAccountNumber,
+            payment_network: var_paymentNetwork,
             notes: var_notes,
         };
     }
@@ -1119,6 +1171,8 @@ impl SseDecode for crate::api::vault::IdentityEntryData {
         let mut var_email = <String>::sse_decode(deserializer);
         let mut var_phone = <Option<String>>::sse_decode(deserializer);
         let mut var_address = <Option<String>>::sse_decode(deserializer);
+        let mut var_customFields =
+            <Vec<crate::api::vault::CustomFieldData>>::sse_decode(deserializer);
         return crate::api::vault::IdentityEntryData {
             id: var_id,
             created_at: var_createdAt,
@@ -1131,6 +1185,7 @@ impl SseDecode for crate::api::vault::IdentityEntryData {
             email: var_email,
             phone: var_phone,
             address: var_address,
+            custom_fields: var_customFields,
         };
     }
 }
@@ -1394,37 +1449,38 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        2 => wire__crate__api__vault__create_card_entry_impl(port, ptr, rust_vec_len, data_len),
-        3 => wire__crate__api__vault__create_custom_entry_impl(port, ptr, rust_vec_len, data_len),
-        4 => wire__crate__api__vault_bridge__create_entry_impl(port, ptr, rust_vec_len, data_len),
-        5 => wire__crate__api__vault__create_file_entry_impl(port, ptr, rust_vec_len, data_len),
-        6 => wire__crate__api__vault__create_identity_entry_impl(port, ptr, rust_vec_len, data_len),
-        7 => wire__crate__api__vault__create_login_entry_impl(port, ptr, rust_vec_len, data_len),
-        8 => wire__crate__api__vault__create_note_entry_impl(port, ptr, rust_vec_len, data_len),
-        9 => wire__crate__api__vault_bridge__delete_entry_impl(port, ptr, rust_vec_len, data_len),
-        10 => wire__crate__api__vault_bridge__delete_whole_vault_impl(
+        2 => wire__crate__api__vault__chrono_now_impl(port, ptr, rust_vec_len, data_len),
+        3 => wire__crate__api__vault__create_card_entry_impl(port, ptr, rust_vec_len, data_len),
+        4 => wire__crate__api__vault__create_custom_entry_impl(port, ptr, rust_vec_len, data_len),
+        5 => wire__crate__api__vault_bridge__create_entry_impl(port, ptr, rust_vec_len, data_len),
+        6 => wire__crate__api__vault__create_file_entry_impl(port, ptr, rust_vec_len, data_len),
+        7 => wire__crate__api__vault__create_identity_entry_impl(port, ptr, rust_vec_len, data_len),
+        8 => wire__crate__api__vault__create_login_entry_impl(port, ptr, rust_vec_len, data_len),
+        9 => wire__crate__api__vault__create_note_entry_impl(port, ptr, rust_vec_len, data_len),
+        10 => wire__crate__api__vault_bridge__delete_entry_impl(port, ptr, rust_vec_len, data_len),
+        11 => wire__crate__api__vault_bridge__delete_whole_vault_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        13 => wire__crate__api__vault_bridge__export_vault_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__passphrase_generator__generate_passphrase_impl(
+        14 => wire__crate__api__vault_bridge__export_vault_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__api__passphrase_generator__generate_passphrase_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        18 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__api__vault_bridge__init_vault_impl(port, ptr, rust_vec_len, data_len),
-        22 => wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
+        19 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
+        20 => wire__crate__api__vault_bridge__init_vault_impl(port, ptr, rust_vec_len, data_len),
+        23 => wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        23 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
-        24 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
+        24 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
+        25 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -1437,19 +1493,19 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        11 => wire__crate__api__password_generator__entropy_bits_impl(ptr, rust_vec_len, data_len),
-        12 => wire__crate__api__entropy__estimate_entropy_impl(ptr, rust_vec_len, data_len),
-        15 => wire__crate__api__password_generator__generate_password_impl(
+        12 => wire__crate__api__password_generator__entropy_bits_impl(ptr, rust_vec_len, data_len),
+        13 => wire__crate__api__entropy__estimate_entropy_impl(ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__password_generator__generate_password_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        16 => wire__crate__api__vault_bridge__get_entry_impl(ptr, rust_vec_len, data_len),
-        17 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
-        20 => {
+        17 => wire__crate__api__vault_bridge__get_entry_impl(ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
+        21 => {
             wire__crate__api__vault_bridge__list_entry_summaries_impl(ptr, rust_vec_len, data_len)
         }
-        21 => wire__crate__api__vault_bridge__lock_vault_impl(ptr, rust_vec_len, data_len),
+        22 => wire__crate__api__vault_bridge__lock_vault_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -1466,10 +1522,15 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::CardEntryData {
             self.folder.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
             self.favourite.into_into_dart().into_dart(),
+            self.card_name.into_into_dart().into_dart(),
+            self.status.into_into_dart().into_dart(),
             self.cardholder_name.into_into_dart().into_dart(),
             self.card_number.into_into_dart().into_dart(),
             self.expiry.into_into_dart().into_dart(),
             self.cvv.into_into_dart().into_dart(),
+            self.credit_limit.into_into_dart().into_dart(),
+            self.card_account_number.into_into_dart().into_dart(),
+            self.payment_network.into_into_dart().into_dart(),
             self.notes.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -1624,6 +1685,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::IdentityEntryData {
             self.email.into_into_dart().into_dart(),
             self.phone.into_into_dart().into_dart(),
             self.address.into_into_dart().into_dart(),
+            self.custom_fields.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -1857,10 +1919,15 @@ impl SseEncode for crate::api::vault::CardEntryData {
         <String>::sse_encode(self.folder, serializer);
         <Vec<String>>::sse_encode(self.tags, serializer);
         <bool>::sse_encode(self.favourite, serializer);
+        <Option<String>>::sse_encode(self.card_name, serializer);
+        <String>::sse_encode(self.status, serializer);
         <String>::sse_encode(self.cardholder_name, serializer);
         <String>::sse_encode(self.card_number, serializer);
         <String>::sse_encode(self.expiry, serializer);
         <String>::sse_encode(self.cvv, serializer);
+        <Option<String>>::sse_encode(self.credit_limit, serializer);
+        <Option<String>>::sse_encode(self.card_account_number, serializer);
+        <Option<String>>::sse_encode(self.payment_network, serializer);
         <Option<String>>::sse_encode(self.notes, serializer);
     }
 }
@@ -1951,6 +2018,7 @@ impl SseEncode for crate::api::vault::IdentityEntryData {
         <String>::sse_encode(self.email, serializer);
         <Option<String>>::sse_encode(self.phone, serializer);
         <Option<String>>::sse_encode(self.address, serializer);
+        <Vec<crate::api::vault::CustomFieldData>>::sse_encode(self.custom_fields, serializer);
     }
 }
 

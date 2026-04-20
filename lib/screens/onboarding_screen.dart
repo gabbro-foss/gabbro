@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
@@ -49,18 +48,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _onPassphraseChanged(String value) {
     final result = estimateEntropy(password: value);
     setState(() => _entropy = result);
-  }
-
-  Future<void> _pickPath() async {
-    final result = await FilePicker.saveFile(
-      dialogTitle: 'Choose vault location',
-      fileName: 'gabbro.gabbro',
-    );
-    if (result != null) {
-      String path = result;
-      if (!path.endsWith('.gabbro')) path = '$path.gabbro';
-      setState(() => _pathController.text = path);
-    }
   }
 
   Future<void> _createVault() async {
@@ -159,12 +146,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ? 'Path is required'
                               : null,
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton.filled(
-                        icon: const Icon(Icons.folder_open),
-                        tooltip: 'Choose location',
-                        onPressed: _pickPath,
                       ),
                     ],
                   ),
