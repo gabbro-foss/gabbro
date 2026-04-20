@@ -538,11 +538,6 @@ discussed and forgotten.
 
 ### Features & UX
 
-- **Enter key submits passphrase on UnlockScreen:** The `TextField` on
-  `UnlockScreen` should submit on Enter/Return keypress — wire `onSubmitted`
-  to call `_unlock()`. Currently requires clicking the Unlock button.
-  One-line change in `lib/screens/unlock_screen.dart`.
-
 - **Display title helper for entry list:** `VaultListScreen` currently uses
   `entry.title` for all entry types, but `LoginEntry` has no `title` field —
   it shows the `url` instead (populated by the test vault). A proper
