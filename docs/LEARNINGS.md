@@ -1379,6 +1379,11 @@ compute-heavy code like Argon2id:
 - **Debug build:** ~20s for a single `unlockVault()` call
 - **Release build:** ~667ms for the same call
 
+This applies to Android too — `flutter build apk --debug` will be slow
+for any vault operation. Always use `flutter build apk --release` for
+any user-facing performance assessment on Android. Never tune Argon2id
+parameters based on debug build timings on any platform.
+
 This is not a bug — it is the expected behaviour of an unoptimised build.
 For development, the slow unlock is an inconvenience we accept in exchange
 for faster compile times and better error messages. For users, the release
@@ -1539,3 +1544,32 @@ in `file_format.rs` to identify valid vault files. `01 00` is the version
 field (v1, big-endian u16). The Argon2id parameters follow immediately.
 Confirming these bytes in a real vault file validates that serialization
 is working correctly end-to-end.
+
+### `SafeArea` — avoiding system UI intrusions on mobile
+On Android (and iOS), system UI elements — the navigation bar, notches,
+status bar — can overlap app content if not accounted for. The idiomatic
+Flutter solution is to wrap scrollable screen bodies in `SafeArea`:
+
+```dart
+body: SafeArea(
+  child: SingleChildScrollView(
+    padding: const EdgeInsets.all(16),
+    ...
+  ),
+),
+```
+
+`SafeArea` automatically insets its child to avoid all system UI
+intrusions at runtime — it adapts to any device, launcher, or form
+factor without hardcoded pixel values. Apply it to any screen with
+scrollable content. `MediaQuery.of(context).padding.bottom` is the
+manual alternative but `SafeArea` is cleaner and handles all four
+sides.
+
+### `mainAxisSize: MainAxisSize.min` — enabling scroll in forms
+A `Column` inside a `SingleChildScrollView` only triggers scrolling if
+its natural height exceeds the viewport. Without `mainAxisSize: MainAxisSize.min`,
+a `Column` expands to fill available space — it never overflows and
+scroll never activates. Adding `mainAxisSize: MainAxisSize.min` tells
+the column to size itself to its children, enabling scroll when the
+content is taller than the screen.
