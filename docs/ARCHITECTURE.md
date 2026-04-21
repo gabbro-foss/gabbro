@@ -238,16 +238,18 @@ Each entry is an instance of a typed class:
 - **CustomField:** reusable key/value struct used by LoginEntry (Vec) and
   CustomEntry (HashMap).
 - **CardEntry::new():** only entry type with a validated constructor —
-  enforces card number digit digit count (12–19) to reject nonsensical data at
-  construction time. Other types use struct literals; validation for those
-  will live in the API layer when it is built.
+  enforces card number digit count (12–19) to reject nonsensical data at
+  construction time. Fields added for Enpass import gap closure: `pin`,
+  `bank_name`, `transaction_password` (all `Option<String>`). Other types
+  use struct literals; validation for those will live in the API layer when
+  it is built.
 - **Design principle:** invalid state unrepresentable — if a value cannot
   exist in a valid domain, the type system or constructor prevents it from
   being created at all.
 
 ## Vault API Layer
 - **Status:** all 6 entry types fully implemented in `rust/src/api/vault.rs`.
-  112 Rust tests passing across the project.
+  120 Rust tests passing across the project.
 - Lives in `rust/src/api/vault.rs` — the bridge boundary between Flutter and
   the internal vault domain model.
 - **Pattern:** each entry type gets a bridge-facing DTO (Data Transfer Object —
@@ -483,12 +485,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Full `zeroize` coverage — `Zeroize` + `ZeroizeOnDrop`
-  derived on all entry structs in `entry.rs`; `CustomEntry` has a manual
-  impl due to `HashMap`. Conversion helpers updated to take references
-  to satisfy Rust's Drop move restriction. 120 Rust tests passing.
-- **Next task:** Import / Migration — begin with mock vault construction
-  and field gap analysis (see Import / Migration section above).
+- **Completed:** Enpass field gap analysis complete. `CardEntry` domain
+  model updated with `pin`, `bank_name`, `transaction_password`. Flaky
+  `test_capitalise` test fixed. 120 Rust tests passing.
+- **Next task:** Import / Migration — Enpass importer implementation.
+  Begin with `rust/src/import/enpass.rs` parsing the JSON export format
+  and mapping to `VaultEntry` types (see Import / Migration section).
 
 ---
 
