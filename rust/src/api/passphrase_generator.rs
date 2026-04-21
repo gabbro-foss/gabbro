@@ -145,7 +145,12 @@ mod tests {
         let result = generate_passphrase(config).unwrap();
         for word in result.split('-') {
             let first = word.chars().next().unwrap();
-            assert!(first.is_uppercase(), "Expected uppercase, got: {}", first);
+            // Skip tokens that start with a digit — EFF wordlists contain
+            // entries like "2000s", and append_number adds a bare digit token.
+            // Capitalisation is a no-op on digits, so they are not a test failure.
+            if first.is_alphabetic() {
+                assert!(first.is_uppercase(), "Expected uppercase, got: {}", first);
+            }
         }
     }
 
