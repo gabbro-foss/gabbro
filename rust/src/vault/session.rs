@@ -5,6 +5,7 @@
 //! and write them.
 
 use std::path::PathBuf;
+use zeroize::Zeroize;
 
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
@@ -42,6 +43,13 @@ pub fn unlock_vault(passphrase: &[u8], path: PathBuf) -> Result<(), String> {
 /// called again.
 pub fn lock_vault() -> Result<(), String> {
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    if let Some(ref mut s) = *session {
+        // Cryptographic-grade zero: volatile writes the compiler cannot optimise away.
+        // Covers the passphrase bytes fully. The entries vec is cleared (drops all
+        // heap-allocated String fields promptly); full per-field zeroize is a backlog item.
+        s.passphrase.zeroize();
+        s.entries.clear();
+    }
     *session = None;
     Ok(())
 }
@@ -333,6 +341,24 @@ mod tests {
         let summaries = list_entry_summaries().unwrap();
 
         assert_eq!(summaries.len(), 2);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn lock_vault_clears_session() {
+        let pass = b"test passphrase";
+        let path = setup_vault(pass);
+
+        unlock_vault(pass, path.clone()).unwrap();
+        // Vault is unlocked — summaries should be accessible
+        assert!(list_entry_summaries().is_ok());
+
+        lock_vault().unwrap();
+        // After lock, session must be cleared — all access must fail
+        assert!(list_entry_summaries().is_err());
+        assert!(get_entry("id-001").is_err());
 
         teardown(&path);
     }
