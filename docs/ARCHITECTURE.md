@@ -487,7 +487,8 @@ SPDX identifier: `GPL-3.0-only`
   derived on all entry structs in `entry.rs`; `CustomEntry` has a manual
   impl due to `HashMap`. Conversion helpers updated to take references
   to satisfy Rust's Drop move restriction. 120 Rust tests passing.
-- **Next task:** import from other password managers (onboarding UX).
+- **Next task:** Import / Migration — begin with mock vault construction
+  and field gap analysis (see Import / Migration section above).
 
 ---
 
@@ -513,13 +514,6 @@ discussed and forgotten.
 ---
 
 ### Security
-
-- **Pre-release security review — AI pass:** Before v1 public release,
-  run a full AI-assisted security review of `rust/src/crypto/` and
-  `rust/src/vault/` using Claude Opus. Share source via the GitHub
-  integration and request a targeted review covering: memory handling,
-  crypto parameter choices, serialization edge cases, untrusted input
-  paths, and any deviation from RustCrypto crate best practices.
 
 - **Pre-release security review — AI pass:** Before v1 public release,
   run a full AI-assisted security review of `rust/src/crypto/` and
@@ -735,7 +729,105 @@ discussed and forgotten.
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
 
-### Monetisation
+## Import / Migration
+
+### Rationale — why not write N importers?
+
+Before writing any import code, we thought carefully about who actually
+migrates password managers and why. The analysis shaped the scope
+significantly.
+
+**The user archetypes considered:**
+
+1. **Free-tier user** — uses a password manager for convenience. Low
+   switching cost, but also low motivation: the free tier is working fine.
+   Unlikely to migrate.
+2. **Paid-tier user** — already invested, likely has autofill and browser
+   integration set up. Switching has a real cost. Unlikely to migrate.
+3. **Browser built-in user** — convenience and laziness driven. No
+   subscription to escape from, but also no urgency to change. Unlikely
+   to migrate.
+4. **The post-event migrant** — the user whose subscription lapsed, who
+   got burned by a breach (LastPass 2022 is the concrete example), or who
+   has already decided to leave and is sitting on an exported file wondering
+   what to do next. This user is *actively looking* for a migration path.
+   Migration is triggered by a specific event, not gradual dissatisfaction.
+   This is Gabbro's target demographic for importers.
+
+**The conclusion:** importers are not about pulling users away from active
+subscriptions — they are about catching people at the moment they decide
+to leave. That reframe changes the priority order completely. We do not
+need to cover every password manager speculatively. We need to cover the
+ones most likely to be the prior home of a privacy-conscious user who has
+just decided to move on.
+
+**Maintenance honesty:** every importer is a maintenance liability. Any
+time an upstream app changes its export format, the importer breaks silently
+or noisily. Keeping the importer surface small is not laziness — it is
+sustainable engineering.
+
+### Agreed scope
+
+Three importers, in implementation order:
+
+1. **Enpass** — required by the project author; also a natural fit for
+   Gabbro's audience (privacy-conscious, FOSS-adjacent users). Enpass
+   exports to JSON with a documented schema. Implement first.
+
+2. **Bitwarden** — the most likely prior home for someone who discovers
+   Gabbro. The values overlap is high: FOSS, self-hostable, privacy-focused.
+   If someone is leaving Bitwarden for Gabbro, that path should be
+   frictionless. Bitwarden's JSON export format is well-documented and
+   stable. Implement second.
+
+3. **Generic CSV / JSON importer** — covers the long tail: browser built-in
+   exports, lesser-known managers, and any manager not explicitly supported.
+   Most password managers export to CSV. The main design challenge is field
+   mapping: a simple UI step asking the user to map their columns to Gabbro
+   fields is more honest than silent guessing. Implement third.
+
+Everything else (1Password, LastPass, Dashlane, Keeper, etc.) — defer to
+the generic importer and document it clearly.
+
+### Implementation order
+
+The correct sequence, regardless of which importers we build:
+
+1. **Build a mock vault** — create a representative set of test entries
+   covering all six Gabbro entry types (Login, Note, Identity, Card, File,
+   Custom), with realistic field values. Load this into each target password
+   manager via their free tier and export it back out.
+
+2. **Field gap analysis** — compare what each manager exports against
+   Gabbro's current domain model. Identify any fields present in the export
+   that have no home in Gabbro's entry types. Document the gaps explicitly
+   before writing a single line of import code.
+
+3. **Domain model updates** — add any missing fields to the relevant entry
+   types in `rust/src/vault/entry.rs`. Do this before writing importers, not
+   after — retrofitting import code around a domain model change is messy.
+
+4. **Enpass importer** — implement once the domain model is complete.
+
+5. **Bitwarden importer** — implement second.
+
+6. **Generic CSV / JSON importer** — implement last, once the field surface
+   is stable.
+
+### Open questions for the implementation session
+
+- What does Enpass's current JSON export schema look like? Verify the
+  current format before assuming anything from documentation.
+- What fields does Enpass export that Gabbro's domain model does not
+  currently have? The mock vault exercise answers this empirically.
+- **Architecture question:** should import parsing live in Rust or Dart?
+  The instinct is Rust — parsing untrusted external data and mapping it
+  into the domain model is exactly the kind of work that belongs where the
+  domain model lives. A Dart-side parser that passes structured data across
+  the bridge is also possible but introduces a second parsing boundary.
+  Settle this explicitly before starting implementation.
+
+## Monetisation
 
 - **GPL-3.0 monetisation — confirmed approach:** GPL-3.0-only explicitly
   permits commercial distribution. Charging on the Play Store while
@@ -748,7 +840,7 @@ discussed and forgotten.
   $25 registration fee; no ongoing subscription complexity.
   Yubico partnership remains a separate future discussion.
 
-### Trust & Transparency
+## Trust & Transparency
 
 - **Donation / sustainability model**
   Gabbro should adopt a QGIS-style voluntary donation model: prominent but non-coercive, shown on the download/landing page before the user proceeds. No payment data ever touches the project. Recommended combination: GitHub Sponsors (low friction, familiar to the FOSS audience), Liberapay (FOSS-native non-profit platform, privacy-friendlier than Patreon, no platform fee), and a Monero (XMR) wallet address (genuinely private, no transaction graph, well-trusted by the security-conscious audience Gabbro targets). Bitcoin can be added for reach with a note that it is pseudonymous not anonymous. Patreon explicitly excluded — US company, collects significant user data, wrong values signal. Cash excluded — requires publishing a physical address. This needs a dedicated session when the project is closer to public release: set up the three channels, write the donation page copy, and decide whether to publish donor acknowledgements (opt-in only, given the privacy context).
