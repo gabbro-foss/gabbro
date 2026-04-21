@@ -102,6 +102,9 @@ abstract class RustLibApi extends BaseApi {
     String? creditLimit,
     String? cardAccountNumber,
     String? paymentNetwork,
+    String? pin,
+    String? bankName,
+    String? transactionPassword,
     String? notes,
   });
 
@@ -289,6 +292,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     String? creditLimit,
     String? cardAccountNumber,
     String? paymentNetwork,
+    String? pin,
+    String? bankName,
+    String? transactionPassword,
     String? notes,
   }) {
     return handler.executeNormal(
@@ -307,6 +313,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_opt_String(creditLimit, serializer);
           sse_encode_opt_String(cardAccountNumber, serializer);
           sse_encode_opt_String(paymentNetwork, serializer);
+          sse_encode_opt_String(pin, serializer);
+          sse_encode_opt_String(bankName, serializer);
+          sse_encode_opt_String(transactionPassword, serializer);
           sse_encode_opt_String(notes, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
@@ -333,6 +342,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           creditLimit,
           cardAccountNumber,
           paymentNetwork,
+          pin,
+          bankName,
+          transactionPassword,
           notes,
         ],
         apiImpl: this,
@@ -356,6 +368,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "creditLimit",
           "cardAccountNumber",
           "paymentNetwork",
+          "pin",
+          "bankName",
+          "transactionPassword",
           "notes",
         ],
       );
@@ -1163,8 +1178,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   CardEntryData dco_decode_card_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 16)
-      throw Exception('unexpected arr length: expect 16 but see ${arr.length}');
+    if (arr.length != 19)
+      throw Exception('unexpected arr length: expect 19 but see ${arr.length}');
     return CardEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -1181,7 +1196,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       creditLimit: dco_decode_opt_String(arr[12]),
       cardAccountNumber: dco_decode_opt_String(arr[13]),
       paymentNetwork: dco_decode_opt_String(arr[14]),
-      notes: dco_decode_opt_String(arr[15]),
+      pin: dco_decode_opt_String(arr[15]),
+      bankName: dco_decode_opt_String(arr[16]),
+      transactionPassword: dco_decode_opt_String(arr[17]),
+      notes: dco_decode_opt_String(arr[18]),
     );
   }
 
@@ -1569,6 +1587,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_creditLimit = sse_decode_opt_String(deserializer);
     var var_cardAccountNumber = sse_decode_opt_String(deserializer);
     var var_paymentNetwork = sse_decode_opt_String(deserializer);
+    var var_pin = sse_decode_opt_String(deserializer);
+    var var_bankName = sse_decode_opt_String(deserializer);
+    var var_transactionPassword = sse_decode_opt_String(deserializer);
     var var_notes = sse_decode_opt_String(deserializer);
     return CardEntryData(
       id: var_id,
@@ -1586,6 +1607,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       creditLimit: var_creditLimit,
       cardAccountNumber: var_cardAccountNumber,
       paymentNetwork: var_paymentNetwork,
+      pin: var_pin,
+      bankName: var_bankName,
+      transactionPassword: var_transactionPassword,
       notes: var_notes,
     );
   }
@@ -2052,6 +2076,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.creditLimit, serializer);
     sse_encode_opt_String(self.cardAccountNumber, serializer);
     sse_encode_opt_String(self.paymentNetwork, serializer);
+    sse_encode_opt_String(self.pin, serializer);
+    sse_encode_opt_String(self.bankName, serializer);
+    sse_encode_opt_String(self.transactionPassword, serializer);
     sse_encode_opt_String(self.notes, serializer);
   }
 

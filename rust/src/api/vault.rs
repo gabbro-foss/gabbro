@@ -85,6 +85,9 @@ pub struct CardEntryData {
     pub credit_limit: Option<String>,
     pub card_account_number: Option<String>,
     pub payment_network: Option<String>,
+    pub pin: Option<String>,
+    pub bank_name: Option<String>,
+    pub transaction_password: Option<String>,
     pub notes: Option<String>,
 }
 
@@ -189,6 +192,9 @@ fn card_entry_to_data(e: &CardEntry) -> CardEntryData {
         credit_limit: e.credit_limit.clone(),
         card_account_number: e.card_account_number.clone(),
         payment_network: e.payment_network.clone(),
+        pin: e.pin.clone(),
+        bank_name: e.bank_name.clone(),
+        transaction_password: e.transaction_password.clone(),
         notes: e.notes.clone(),
     }
 }
@@ -328,6 +334,9 @@ pub fn create_card_entry(
     credit_limit: Option<String>,
     card_account_number: Option<String>,
     payment_network: Option<String>,
+    pin: Option<String>,
+    bank_name: Option<String>,
+    transaction_password: Option<String>,
     notes: Option<String>,
 ) -> Result<CardEntryData, String> {
     let now = chrono_now();
@@ -350,6 +359,9 @@ pub fn create_card_entry(
         credit_limit,
         card_account_number,
         payment_network,
+        pin,
+        bank_name,
+        transaction_password,
         notes,
     )?;
     Ok(card_entry_to_data(&entry))
@@ -546,6 +558,9 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
             credit_limit: e.credit_limit.clone(),
             card_account_number: e.card_account_number.clone(),
             payment_network: e.payment_network.clone(),
+            pin: e.pin.clone(),
+            bank_name: e.bank_name.clone(),
+            transaction_password: e.transaction_password.clone(),
             notes: e.notes.clone(),
         }),
         // Note, Identity, File, Custom carry no password-class fields —
@@ -866,6 +881,9 @@ mod tests {
             None,
             Some(String::from("Visa")),
             None,
+            None,
+            None,
+            None,
         );
 
         assert!(result.is_ok());
@@ -889,6 +907,9 @@ mod tests {
             String::from("1234"), // too short
             String::from("12/28"),
             String::from("123"),
+            None,
+            None,
+            None,
             None,
             None,
             None,
@@ -1375,6 +1396,9 @@ mod tests {
                 credit_limit: None,
                 card_account_number: None,
                 payment_network: Some(String::from("Visa")),
+                pin: None,
+                bank_name: None,
+                transaction_password: None,
                 notes: None,
             }),
         ];

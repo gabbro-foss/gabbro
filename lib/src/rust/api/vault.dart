@@ -85,6 +85,9 @@ Future<CardEntryData> createCardEntry({
   String? creditLimit,
   String? cardAccountNumber,
   String? paymentNetwork,
+  String? pin,
+  String? bankName,
+  String? transactionPassword,
   String? notes,
 }) => RustLib.instance.api.crateApiVaultCreateCardEntry(
   folder: folder,
@@ -99,6 +102,9 @@ Future<CardEntryData> createCardEntry({
   creditLimit: creditLimit,
   cardAccountNumber: cardAccountNumber,
   paymentNetwork: paymentNetwork,
+  pin: pin,
+  bankName: bankName,
+  transactionPassword: transactionPassword,
   notes: notes,
 );
 
@@ -155,6 +161,9 @@ class CardEntryData {
   final String? creditLimit;
   final String? cardAccountNumber;
   final String? paymentNetwork;
+  final String? pin;
+  final String? bankName;
+  final String? transactionPassword;
   final String? notes;
 
   const CardEntryData({
@@ -173,6 +182,9 @@ class CardEntryData {
     this.creditLimit,
     this.cardAccountNumber,
     this.paymentNetwork,
+    this.pin,
+    this.bankName,
+    this.transactionPassword,
     this.notes,
   });
 
@@ -193,6 +205,9 @@ class CardEntryData {
       creditLimit.hashCode ^
       cardAccountNumber.hashCode ^
       paymentNetwork.hashCode ^
+      pin.hashCode ^
+      bankName.hashCode ^
+      transactionPassword.hashCode ^
       notes.hashCode;
 
   @override
@@ -215,6 +230,9 @@ class CardEntryData {
           creditLimit == other.creditLimit &&
           cardAccountNumber == other.cardAccountNumber &&
           paymentNetwork == other.paymentNetwork &&
+          pin == other.pin &&
+          bankName == other.bankName &&
+          transactionPassword == other.transactionPassword &&
           notes == other.notes;
 }
 

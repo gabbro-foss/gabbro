@@ -152,6 +152,9 @@ fn wire__crate__api__vault__create_card_entry_impl(
             let api_credit_limit = <Option<String>>::sse_decode(&mut deserializer);
             let api_card_account_number = <Option<String>>::sse_decode(&mut deserializer);
             let api_payment_network = <Option<String>>::sse_decode(&mut deserializer);
+            let api_pin = <Option<String>>::sse_decode(&mut deserializer);
+            let api_bank_name = <Option<String>>::sse_decode(&mut deserializer);
+            let api_transaction_password = <Option<String>>::sse_decode(&mut deserializer);
             let api_notes = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
@@ -169,6 +172,9 @@ fn wire__crate__api__vault__create_card_entry_impl(
                         api_credit_limit,
                         api_card_account_number,
                         api_payment_network,
+                        api_pin,
+                        api_bank_name,
+                        api_transaction_password,
                         api_notes,
                     )?;
                     Ok(output_ok)
@@ -1025,6 +1031,9 @@ impl SseDecode for crate::api::vault::CardEntryData {
         let mut var_creditLimit = <Option<String>>::sse_decode(deserializer);
         let mut var_cardAccountNumber = <Option<String>>::sse_decode(deserializer);
         let mut var_paymentNetwork = <Option<String>>::sse_decode(deserializer);
+        let mut var_pin = <Option<String>>::sse_decode(deserializer);
+        let mut var_bankName = <Option<String>>::sse_decode(deserializer);
+        let mut var_transactionPassword = <Option<String>>::sse_decode(deserializer);
         let mut var_notes = <Option<String>>::sse_decode(deserializer);
         return crate::api::vault::CardEntryData {
             id: var_id,
@@ -1042,6 +1051,9 @@ impl SseDecode for crate::api::vault::CardEntryData {
             credit_limit: var_creditLimit,
             card_account_number: var_cardAccountNumber,
             payment_network: var_paymentNetwork,
+            pin: var_pin,
+            bank_name: var_bankName,
+            transaction_password: var_transactionPassword,
             notes: var_notes,
         };
     }
@@ -1531,6 +1543,9 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::CardEntryData {
             self.credit_limit.into_into_dart().into_dart(),
             self.card_account_number.into_into_dart().into_dart(),
             self.payment_network.into_into_dart().into_dart(),
+            self.pin.into_into_dart().into_dart(),
+            self.bank_name.into_into_dart().into_dart(),
+            self.transaction_password.into_into_dart().into_dart(),
             self.notes.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -1928,6 +1943,9 @@ impl SseEncode for crate::api::vault::CardEntryData {
         <Option<String>>::sse_encode(self.credit_limit, serializer);
         <Option<String>>::sse_encode(self.card_account_number, serializer);
         <Option<String>>::sse_encode(self.payment_network, serializer);
+        <Option<String>>::sse_encode(self.pin, serializer);
+        <Option<String>>::sse_encode(self.bank_name, serializer);
+        <Option<String>>::sse_encode(self.transaction_password, serializer);
         <Option<String>>::sse_encode(self.notes, serializer);
     }
 }

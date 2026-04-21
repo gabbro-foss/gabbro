@@ -107,6 +107,12 @@ pub struct CardEntry {
     /// Payment network (e.g. "Visa", "Mastercard", "Amex").
     /// Flutter maps this to a logo asset — no binary data stored here.
     pub payment_network: Option<String>,
+    /// Card PIN.
+    pub pin: Option<String>,
+    /// Issuing bank name (e.g. "UBS", "Credit Suisse").
+    pub bank_name: Option<String>,
+    /// Transaction password (used by some banks for online payments).
+    pub transaction_password: Option<String>,
     pub notes: Option<String>,
 }
 
@@ -124,6 +130,9 @@ impl CardEntry {
         credit_limit: Option<String>,
         card_account_number: Option<String>,
         payment_network: Option<String>,
+        pin: Option<String>,
+        bank_name: Option<String>,
+        transaction_password: Option<String>,
         notes: Option<String>,
     ) -> Result<CardEntry, String> {
         let digit_count = card_number.chars().filter(|c| c.is_ascii_digit()).count();
@@ -135,18 +144,21 @@ impl CardEntry {
         }
 
         Ok(CardEntry {
-            meta,
-            card_name,
-            status,
-            cardholder_name,
-            card_number,
-            expiry,
-            cvv,
-            credit_limit,
-            card_account_number,
-            payment_network,
-            notes,
-        })
+                meta,
+                card_name,
+                status,
+                cardholder_name,
+                card_number,
+                expiry,
+                cvv,
+                credit_limit,
+                card_account_number,
+                payment_network,
+                pin,
+                bank_name,
+                transaction_password,
+                notes,
+            })
     }
 }
 
@@ -320,6 +332,9 @@ mod tests {
             None,
             Some(String::from("Visa")),
             None,
+            None,
+            None,
+            None,
         ).unwrap();
 
         assert_eq!(entry.cardholder_name, "Rob Smith");
@@ -342,6 +357,9 @@ mod tests {
             None,
             None,
             None,
+            None,
+            None,
+            None,
         );
 
         assert!(result.is_err());
@@ -357,6 +375,9 @@ mod tests {
             String::from("12345678901234567890"), // 20 digits
             String::from("12/28"),
             String::from("123"),
+            None,
+            None,
+            None,
             None,
             None,
             None,

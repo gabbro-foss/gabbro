@@ -111,6 +111,9 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
             credit_limit: e.credit_limit.clone(),
             card_account_number: e.card_account_number.clone(),
             payment_network: e.payment_network.clone(),
+            pin: e.pin.clone(),
+            bank_name: e.bank_name.clone(),
+            transaction_password: e.transaction_password.clone(),
             notes: e.notes.clone(),
         }),
         VaultEntry::File(e) => VaultEntryData::File(FileEntryData {
@@ -213,6 +216,9 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 d.credit_limit,
                 d.card_account_number,
                 d.payment_network,
+                d.pin,
+                d.bank_name,
+                d.transaction_password,
                 d.notes,
             )?;
             Ok(VaultEntry::Card(entry))
