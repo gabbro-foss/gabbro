@@ -293,7 +293,7 @@ mod tests {
         let entry = get_entry("id-001").unwrap();
 
         match entry {
-            VaultEntry::Note(e) => assert_eq!(e.content, "session secret content"),
+            VaultEntry::Note(ref e) => assert_eq!(e.content, "session secret content"),
             _ => panic!("Expected Note variant"),
         }
 
