@@ -483,11 +483,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Entropy indicator on UnlockScreen. Card form fixes
-  (expiry auto-format, month validation, CVV cap). SafeArea applied
-  to all scrollable screens. Android build verified on physical device.
-- **Next task:** zeroize integration (security) or import from other
-  password managers (onboarding UX). Both deferred to fresh session.
+- **Completed:** `zeroize` integration — passphrase `Vec<u8>` is
+  cryptographically zeroed on `lock_vault()`; entries vec is cleared.
+  121 Rust tests passing.
+- **Next task:** import from other password managers (onboarding UX),
+  or full `zeroize` coverage on `VaultEntry` structs (see Bikeshed).
 
 ---
 
@@ -514,15 +514,13 @@ discussed and forgotten.
 
 ### Security
 
-- **`zeroize` integration:** Add the `zeroize` crate to explicitly clear
-  secret material from Rust heap memory when the vault locks. Specifically:
-  the `Vec<VaultEntry>` inside `VaultSession`, and the plaintext bytes from
-  `seal_vault`/`open_vault`. This narrows the window during which secrets
-  are recoverable in RAM after a lock event. Not a guarantee of
-  non-recovery (swap, cold boot, OS snapshots all remain possible), but a
-  meaningful reduction for the realistic threat of device seizure while
-  unlocked. Prerequisite: session model must be implemented first.
-  See the **Memory Security** discussion in the Vault Session Model section.
+- **Full `zeroize` coverage on `VaultEntry`:** The passphrase `Vec<u8>` is
+  now cryptographically zeroed on lock (volatile writes, compiler-barrier
+  guaranteed). The `Vec<VaultEntry>` is cleared via `.clear()` which drops
+  all heap-allocated `String` fields promptly but does not guarantee
+  byte-level overwrite. Full coverage requires deriving `Zeroize` on every
+  struct in `entry.rs` (`VaultEntry`, `LoginEntry`, `NoteEntry`,
+  `EntryMeta`, `CustomField`, etc.). Worth doing before v1 public release.
 
 - **Pre-release security review — AI pass:** Before v1 public release,
   run a full AI-assisted security review of `rust/src/crypto/` and

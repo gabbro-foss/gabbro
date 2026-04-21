@@ -1248,6 +1248,36 @@ This minimises both bridge traffic and Dart-side plaintext exposure. It is
 not an optimisation added later — it is the correct default architecture from
 the start, made natural by Rust owning the session state.
 
+### `zeroize` — cryptographic memory clearing on lock
+When `lock_vault()` runs, two things happen before the session is dropped:
+
+```rust
+s.passphrase.zeroize();  // cryptographic-grade zero — volatile writes
+s.entries.clear();       // drops all heap-allocated String fields promptly
+```
+
+`Vec<u8>` implements `Zeroize` directly — the `zeroize` crate writes zeros
+over the bytes using volatile writes and a compiler memory fence, preventing
+the compiler or CPU from optimising the operation away. This is the correct
+approach; overwriting with random bytes is not meaningfully more secure and
+is slower.
+
+`.clear()` on `Vec<VaultEntry>` drops all the nested `String` allocations
+(passwords, notes, CVVs etc.) promptly, but does not guarantee byte-level
+overwrite — the allocator may reuse those pages without zeroing them. Full
+coverage requires deriving `Zeroize` on every struct in `entry.rs`, which
+is a backlog item.
+
+The window during which secrets are recoverable in RAM is bounded by the
+auto-lock timer plus the time between lock and the next allocator reuse.
+`zeroize` narrows this window — it does not eliminate it. Swap, cold boot
+attacks, and OS memory snapshots remain outside its reach.
+
+Python analogy: `del my_secret` removes the reference but doesn't touch
+the bytes. `zeroize` is the equivalent of explicitly overwriting the
+underlying buffer before releasing it — something Python gives you no
+mechanism to do.
+
 ### Holding a mutex lock across a slow operation causes deadlock
 
 `std::sync::Mutex::lock()` returns a `MutexGuard` that holds the lock until
