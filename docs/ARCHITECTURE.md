@@ -483,11 +483,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** `zeroize` integration — passphrase `Vec<u8>` is
-  cryptographically zeroed on `lock_vault()`; entries vec is cleared.
-  121 Rust tests passing.
-- **Next task:** import from other password managers (onboarding UX),
-  or full `zeroize` coverage on `VaultEntry` structs (see Bikeshed).
+- **Completed:** Full `zeroize` coverage — `Zeroize` + `ZeroizeOnDrop`
+  derived on all entry structs in `entry.rs`; `CustomEntry` has a manual
+  impl due to `HashMap`. Conversion helpers updated to take references
+  to satisfy Rust's Drop move restriction. 120 Rust tests passing.
+- **Next task:** import from other password managers (onboarding UX).
 
 ---
 
@@ -514,13 +514,12 @@ discussed and forgotten.
 
 ### Security
 
-- **Full `zeroize` coverage on `VaultEntry`:** The passphrase `Vec<u8>` is
-  now cryptographically zeroed on lock (volatile writes, compiler-barrier
-  guaranteed). The `Vec<VaultEntry>` is cleared via `.clear()` which drops
-  all heap-allocated `String` fields promptly but does not guarantee
-  byte-level overwrite. Full coverage requires deriving `Zeroize` on every
-  struct in `entry.rs` (`VaultEntry`, `LoginEntry`, `NoteEntry`,
-  `EntryMeta`, `CustomField`, etc.). Worth doing before v1 public release.
+- **Pre-release security review — AI pass:** Before v1 public release,
+  run a full AI-assisted security review of `rust/src/crypto/` and
+  `rust/src/vault/` using Claude Opus. Share source via the GitHub
+  integration and request a targeted review covering: memory handling,
+  crypto parameter choices, serialization edge cases, untrusted input
+  paths, and any deviation from RustCrypto crate best practices.
 
 - **Pre-release security review — AI pass:** Before v1 public release,
   run a full AI-assisted security review of `rust/src/crypto/` and

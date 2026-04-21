@@ -1278,6 +1278,38 @@ the bytes. `zeroize` is the equivalent of explicitly overwriting the
 underlying buffer before releasing it — something Python gives you no
 mechanism to do.
 
+### `ZeroizeOnDrop` and the move-out-of-Drop restriction
+Deriving `ZeroizeOnDrop` on a type causes Rust to implement the `Drop`
+trait for it. Rust enforces a rule: **you cannot move a field out of a
+type that implements `Drop`**. This is because the compiler must be able
+to run `drop()` on the original value, which requires the fields to still
+be present.
+
+Before `ZeroizeOnDrop`, code like this compiled fine:
+
+```rust
+fn entry_to_data(e: LoginEntry) -> LoginEntryData {
+    LoginEntryData { password: e.password, ... }  // moves e.password out
+}
+```
+
+After `ZeroizeOnDrop`, the same code fails with `E0509: cannot move out
+of type LoginEntry which implements the Drop trait`.
+
+Two fixes depending on context:
+- **Conversion functions** — change signature to take `&LoginEntry`
+  (a reference) and `.clone()` each field. The original value is never
+  consumed, so `Drop` runs normally when it goes out of scope.
+- **Match arms that mutate then return** — use `ref mut e` to borrow
+  the inner value rather than move it, mutate through the reference,
+  then return the outer enum value intact.
+
+Python analogy: there is no direct equivalent, because Python has no
+ownership model. The closest mental model is: if an object has a
+`__del__` method, Python needs the object to remain whole so `__del__`
+can access all its attributes at cleanup time. Rust enforces this
+statically at compile time rather than at runtime.
+
 ### Holding a mutex lock across a slow operation causes deadlock
 
 `std::sync::Mutex::lock()` returns a `MutexGuard` that holds the lock until
