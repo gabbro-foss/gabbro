@@ -5,6 +5,7 @@
 
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// The six entry types Gabbro support.
 /// Not yet referenced outside this module — will be used for vault
@@ -21,7 +22,7 @@ pub enum EntryType {
 }
 
 /// Common metadata shared by every entry, regardless of type.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct EntryMeta {
     /// Stable unique identifier - never reused, even after deletion.
     pub id: String,
@@ -39,7 +40,7 @@ pub struct EntryMeta {
 
 /// A login entry - the most common entry type
 /// Stores credentials for a wehsite or application
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct LoginEntry {
     /// Shared metadata (id, timestamp, folder, tags, favourite).
     pub meta: EntryMeta,
@@ -56,7 +57,7 @@ pub struct LoginEntry {
 }
 
 /// A single user-defined key/value field on an entry.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct CustomField {
     pub label: String,
     pub value: String,
@@ -65,7 +66,7 @@ pub struct CustomField {
 }
 
 /// A secure note - free-text content with no crendential fields.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct NoteEntry {
     pub meta: EntryMeta,
     pub title: String,
@@ -73,7 +74,7 @@ pub struct NoteEntry {
 }
 
 /// A personal identity entry - name, address, contact details.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct IdentityEntry {
     pub meta: EntryMeta,
     pub first_name: String,
@@ -86,7 +87,7 @@ pub struct IdentityEntry {
 }
 
 /// A payment card entry.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct CardEntry {
     pub meta: EntryMeta,
     /// User's own label for this card (e.g. "Visa Platinum"). Optional —
@@ -150,7 +151,7 @@ impl CardEntry {
 }
 
 /// A file attachement entry - stores a binary payload.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct FileEntry {
     pub meta: EntryMeta,
     pub filename: String,
@@ -159,19 +160,31 @@ pub struct FileEntry {
     pub notes: Option<String>,
 }
 
-/// A fully cutom entry - user-defined fields only.
+/// A fully custom entry - user-defined fields only.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CustomEntry {
     pub meta: EntryMeta,
     pub title: String,
-    pub fields: HashMap<String, CustomField>
+    pub fields: HashMap<String, CustomField>,
 }
+
+impl Zeroize for CustomEntry {
+    fn zeroize(&mut self) {
+        self.meta.zeroize();
+        self.title.zeroize();
+        // HashMap has no zeroize impl — clear() drops all keys and values promptly.
+        // Each CustomField value is ZeroizeOnDrop so memory is cleared on drop.
+        self.fields.clear();
+    }
+}
+
+impl ZeroizeOnDrop for CustomEntry {}
 
 /// A single vault entry — wraps all six entry types into one enum.
 ///
 /// This is the type that gets serialized to JSON and encrypted into
 /// the vault body. A `Vec<VaultEntry>` represents the full vault contents.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub enum VaultEntry {
     Login(LoginEntry),
     Note(NoteEntry),
@@ -239,7 +252,7 @@ mod tests {
         };
 
         assert!(entry.notes.is_some());
-        assert_eq!(entry.notes.unwrap(), "my github account");
+        assert_eq!(entry.notes.clone().unwrap(), "my github account");
     }
 
     #[test]

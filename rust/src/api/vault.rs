@@ -115,111 +115,110 @@ pub struct CustomEntryData {
 
 // ── Conversion helpers (internal → DTO) ──────────────────────────────────────
 
-fn custom_field_to_data(f: CustomField) -> CustomFieldData {
+// All conversion helpers take references to avoid moving out of types that
+// implement Drop (via ZeroizeOnDrop). Fields are cloned explicitly.
+
+fn custom_field_to_data(f: &CustomField) -> CustomFieldData {
     CustomFieldData {
-        label: f.label,
-        value: f.value,
+        label: f.label.clone(),
+        value: f.value.clone(),
         hidden: f.hidden,
     }
 }
 
-fn login_entry_to_data(e: LoginEntry) -> LoginEntryData {
+fn login_entry_to_data(e: &LoginEntry) -> LoginEntryData {
     LoginEntryData {
-        id: e.meta.id,
-        created_at: e.meta.created_at,
-        updated_at: e.meta.updated_at,
-        folder: e.meta.folder,
-        tags: e.meta.tags,
+        id: e.meta.id.clone(),
+        created_at: e.meta.created_at.clone(),
+        updated_at: e.meta.updated_at.clone(),
+        folder: e.meta.folder.clone(),
+        tags: e.meta.tags.clone(),
         favourite: e.meta.favourite,
-        url: e.url,
-        username: e.username,
-        password: e.password,
-        notes: e.notes,
-        custom_fields: e.custom_fields.into_iter().map(custom_field_to_data).collect(),
+        url: e.url.clone(),
+        username: e.username.clone(),
+        password: e.password.clone(),
+        notes: e.notes.clone(),
+        custom_fields: e.custom_fields.iter().map(custom_field_to_data).collect(),
     }
 }
 
-fn note_entry_to_data(e: NoteEntry) -> NoteEntryData {
+fn note_entry_to_data(e: &NoteEntry) -> NoteEntryData {
     NoteEntryData {
-        id: e.meta.id,
-        created_at: e.meta.created_at,
-        updated_at: e.meta.updated_at,
-        folder: e.meta.folder,
-        tags: e.meta.tags,
+        id: e.meta.id.clone(),
+        created_at: e.meta.created_at.clone(),
+        updated_at: e.meta.updated_at.clone(),
+        folder: e.meta.folder.clone(),
+        tags: e.meta.tags.clone(),
         favourite: e.meta.favourite,
-        title: e.title,
-        content: e.content,
+        title: e.title.clone(),
+        content: e.content.clone(),
     }
 }
 
-fn identity_entry_to_data(e: IdentityEntry) -> IdentityEntryData {
+fn identity_entry_to_data(e: &IdentityEntry) -> IdentityEntryData {
     IdentityEntryData {
-        id: e.meta.id,
-        created_at: e.meta.created_at,
-        updated_at: e.meta.updated_at,
-        folder: e.meta.folder,
-        tags: e.meta.tags,
+        id: e.meta.id.clone(),
+        created_at: e.meta.created_at.clone(),
+        updated_at: e.meta.updated_at.clone(),
+        folder: e.meta.folder.clone(),
+        tags: e.meta.tags.clone(),
         favourite: e.meta.favourite,
-        first_name: e.first_name,
-        last_name: e.last_name,
-        email: e.email,
-        phone: e.phone,
-        address: e.address,
-        custom_fields: e.custom_fields.into_iter().map(custom_field_to_data).collect(),
+        first_name: e.first_name.clone(),
+        last_name: e.last_name.clone(),
+        email: e.email.clone(),
+        phone: e.phone.clone(),
+        address: e.address.clone(),
+        custom_fields: e.custom_fields.iter().map(custom_field_to_data).collect(),
     }
 }
 
-fn card_entry_to_data(e: CardEntry) -> CardEntryData {
+fn card_entry_to_data(e: &CardEntry) -> CardEntryData {
     CardEntryData {
-        id: e.meta.id,
-        created_at: e.meta.created_at,
-        updated_at: e.meta.updated_at,
-        folder: e.meta.folder,
-        tags: e.meta.tags,
+        id: e.meta.id.clone(),
+        created_at: e.meta.created_at.clone(),
+        updated_at: e.meta.updated_at.clone(),
+        folder: e.meta.folder.clone(),
+        tags: e.meta.tags.clone(),
         favourite: e.meta.favourite,
-        card_name: e.card_name,
-        status: e.status,
-        cardholder_name: e.cardholder_name,
-        card_number: e.card_number,
-        expiry: e.expiry,
-        cvv: e.cvv,
-        credit_limit: e.credit_limit,
-        card_account_number: e.card_account_number,
-        payment_network: e.payment_network,
-        notes: e.notes,
+        card_name: e.card_name.clone(),
+        status: e.status.clone(),
+        cardholder_name: e.cardholder_name.clone(),
+        card_number: e.card_number.clone(),
+        expiry: e.expiry.clone(),
+        cvv: e.cvv.clone(),
+        credit_limit: e.credit_limit.clone(),
+        card_account_number: e.card_account_number.clone(),
+        payment_network: e.payment_network.clone(),
+        notes: e.notes.clone(),
     }
 }
 
-fn file_entry_to_data(e: FileEntry) -> FileEntryData {
+fn file_entry_to_data(e: &FileEntry) -> FileEntryData {
     FileEntryData {
-        id: e.meta.id,
-        created_at: e.meta.created_at,
-        updated_at: e.meta.updated_at,
-        folder: e.meta.folder,
-        tags: e.meta.tags,
+        id: e.meta.id.clone(),
+        created_at: e.meta.created_at.clone(),
+        updated_at: e.meta.updated_at.clone(),
+        folder: e.meta.folder.clone(),
+        tags: e.meta.tags.clone(),
         favourite: e.meta.favourite,
-        filename: e.filename,
-        data: e.data,
-        notes: e.notes,
+        filename: e.filename.clone(),
+        data: e.data.clone(),
+        notes: e.notes.clone(),
     }
 }
 
-fn custom_entry_to_data(e: CustomEntry) -> CustomEntryData {
+fn custom_entry_to_data(e: &CustomEntry) -> CustomEntryData {
     CustomEntryData {
-        id: e.meta.id,
-        created_at: e.meta.created_at,
-        updated_at: e.meta.updated_at,
-        folder: e.meta.folder,
-        tags: e.meta.tags,
+        id: e.meta.id.clone(),
+        created_at: e.meta.created_at.clone(),
+        updated_at: e.meta.updated_at.clone(),
+        folder: e.meta.folder.clone(),
+        tags: e.meta.tags.clone(),
         favourite: e.meta.favourite,
-        title: e.title,
+        title: e.title.clone(),
         fields: e.fields
-            .into_values()
-            .map(|f| CustomFieldData {
-                label: f.label,
-                value: f.value,
-                hidden: f.hidden,
-            })
+            .values()
+            .map(custom_field_to_data)
             .collect(),
     }
 }
@@ -265,7 +264,7 @@ pub fn create_login_entry(
         notes,
         custom_fields: internal_fields,
     };
-    login_entry_to_data(entry)
+    login_entry_to_data(&entry)
 }
 
 /// Creates a new note entry with a generated UUID and current timestamp.
@@ -286,7 +285,7 @@ pub fn create_note_entry(
         favourite,
     };
     let entry = NoteEntry { meta, title, content };
-    note_entry_to_data(entry)
+    note_entry_to_data(&entry)
 }
 
 /// Creates a new identity entry with a generated UUID and current timestamp.
@@ -310,7 +309,7 @@ pub fn create_identity_entry(
         favourite,
     };
     let entry = IdentityEntry { meta, first_name, last_name, email, phone, address, custom_fields: vec![] };
-    identity_entry_to_data(entry)
+    identity_entry_to_data(&entry)
 }
 
 /// Creates a new card entry with a generated UUID and current timestamp.
@@ -353,7 +352,7 @@ pub fn create_card_entry(
         payment_network,
         notes,
     )?;
-    Ok(card_entry_to_data(entry))
+    Ok(card_entry_to_data(&entry))
 }
 
 /// Creates a new file entry with a generated UUID and current timestamp.
@@ -375,7 +374,7 @@ pub fn create_file_entry(
         favourite,
     };
     let entry = FileEntry { meta, filename, data, notes };
-    file_entry_to_data(entry)
+    file_entry_to_data(&entry)
 }
 
 /// Creates a new custom entry with a generated UUID and current timestamp.
@@ -404,7 +403,7 @@ pub fn create_custom_entry(
         }))
         .collect();
     let entry = CustomEntry { meta, title, fields: internal_fields };
-    custom_entry_to_data(entry)
+    custom_entry_to_data(&entry)
 }
 
 // ── Entry retrieval ───────────────────────────────────────────────────────────
@@ -450,7 +449,7 @@ pub fn get_entry_by_id(
 #[flutter_rust_bridge::frb(ignore)]
 pub fn update_entry(
     entries: &mut Vec<VaultEntry>,
-    updated: VaultEntry,
+    mut updated: VaultEntry,
 ) -> Result<(), String> {
     let id = entry_id(&updated).to_string();
     let pos = entries
@@ -458,14 +457,16 @@ pub fn update_entry(
         .position(|e| entry_id(e) == id)
         .ok_or_else(|| format!("No entry found with id: {id}"))?;
 
-    // Stamp updated_at on the replacement entry
+    // Stamp updated_at on the replacement entry.
+    // `ref mut e` borrows the inner value rather than moving it out of the
+    // enum — required because VaultEntry now implements Drop via ZeroizeOnDrop.
     let updated = match updated {
-        VaultEntry::Login(mut e)    => { e.meta.updated_at = chrono_now(); VaultEntry::Login(e) }
-        VaultEntry::Note(mut e)     => { e.meta.updated_at = chrono_now(); VaultEntry::Note(e) }
-        VaultEntry::Identity(mut e) => { e.meta.updated_at = chrono_now(); VaultEntry::Identity(e) }
-        VaultEntry::Card(mut e)     => { e.meta.updated_at = chrono_now(); VaultEntry::Card(e) }
-        VaultEntry::File(mut e)     => { e.meta.updated_at = chrono_now(); VaultEntry::File(e) }
-        VaultEntry::Custom(mut e)   => { e.meta.updated_at = chrono_now(); VaultEntry::Custom(e) }
+        VaultEntry::Login(ref mut e)    => { e.meta.updated_at = chrono_now(); updated }
+        VaultEntry::Note(ref mut e)     => { e.meta.updated_at = chrono_now(); updated }
+        VaultEntry::Identity(ref mut e) => { e.meta.updated_at = chrono_now(); updated }
+        VaultEntry::Card(ref mut e)     => { e.meta.updated_at = chrono_now(); updated }
+        VaultEntry::File(ref mut e)     => { e.meta.updated_at = chrono_now(); updated }
+        VaultEntry::Custom(ref mut e)   => { e.meta.updated_at = chrono_now(); updated }
     };
 
     entries[pos] = updated;
@@ -1063,7 +1064,7 @@ mod tests {
 
         let found = get_entry_by_id(&entries, "id-001").unwrap();
         match found {
-            VaultEntry::Note(e) => assert_eq!(e.content, "content one"),
+            VaultEntry::Note(ref e) => assert_eq!(e.content, "content one"),
             _ => panic!("Expected Note variant"),
         }
     }

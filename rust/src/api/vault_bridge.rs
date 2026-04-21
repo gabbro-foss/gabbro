@@ -48,91 +48,93 @@ pub enum VaultEntryData {
 
 // ── Conversion: internal VaultEntry → VaultEntryData DTO ─────────────────────
 
-fn vault_entry_to_data(entry: VaultEntry) -> VaultEntryData {
+// Takes a reference to avoid moving out of a type that implements Drop
+// (via ZeroizeOnDrop). All fields are cloned explicitly.
+fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
     match entry {
         VaultEntry::Login(e) => VaultEntryData::Login(LoginEntryData {
-            id: e.meta.id,
-            created_at: e.meta.created_at,
-            updated_at: e.meta.updated_at,
-            folder: e.meta.folder,
-            tags: e.meta.tags,
+            id: e.meta.id.clone(),
+            created_at: e.meta.created_at.clone(),
+            updated_at: e.meta.updated_at.clone(),
+            folder: e.meta.folder.clone(),
+            tags: e.meta.tags.clone(),
             favourite: e.meta.favourite,
-            url: e.url,
-            username: e.username,
-            password: e.password,
-            notes: e.notes,
+            url: e.url.clone(),
+            username: e.username.clone(),
+            password: e.password.clone(),
+            notes: e.notes.clone(),
             custom_fields: e.custom_fields
-                .into_iter()
-                .map(|f| CustomFieldData { label: f.label, value: f.value, hidden: f.hidden })
+                .iter()
+                .map(|f| CustomFieldData { label: f.label.clone(), value: f.value.clone(), hidden: f.hidden })
                 .collect(),
         }),
         VaultEntry::Note(e) => VaultEntryData::Note(NoteEntryData {
-            id: e.meta.id,
-            created_at: e.meta.created_at,
-            updated_at: e.meta.updated_at,
-            folder: e.meta.folder,
-            tags: e.meta.tags,
+            id: e.meta.id.clone(),
+            created_at: e.meta.created_at.clone(),
+            updated_at: e.meta.updated_at.clone(),
+            folder: e.meta.folder.clone(),
+            tags: e.meta.tags.clone(),
             favourite: e.meta.favourite,
-            title: e.title,
-            content: e.content,
+            title: e.title.clone(),
+            content: e.content.clone(),
         }),
         VaultEntry::Identity(e) => VaultEntryData::Identity(IdentityEntryData {
-            id: e.meta.id,
-            created_at: e.meta.created_at,
-            updated_at: e.meta.updated_at,
-            folder: e.meta.folder,
-            tags: e.meta.tags,
+            id: e.meta.id.clone(),
+            created_at: e.meta.created_at.clone(),
+            updated_at: e.meta.updated_at.clone(),
+            folder: e.meta.folder.clone(),
+            tags: e.meta.tags.clone(),
             favourite: e.meta.favourite,
-            first_name: e.first_name,
-            last_name: e.last_name,
-            email: e.email,
-            phone: e.phone,
-            address: e.address,
+            first_name: e.first_name.clone(),
+            last_name: e.last_name.clone(),
+            email: e.email.clone(),
+            phone: e.phone.clone(),
+            address: e.address.clone(),
             custom_fields: e.custom_fields
-                .into_iter()
-                .map(|f| CustomFieldData { label: f.label, value: f.value, hidden: f.hidden })
+                .iter()
+                .map(|f| CustomFieldData { label: f.label.clone(), value: f.value.clone(), hidden: f.hidden })
                 .collect(),
         }),
         VaultEntry::Card(e) => VaultEntryData::Card(CardEntryData {
-            id: e.meta.id,
-            created_at: e.meta.created_at,
-            updated_at: e.meta.updated_at,
-            folder: e.meta.folder,
-            tags: e.meta.tags,
+            id: e.meta.id.clone(),
+            created_at: e.meta.created_at.clone(),
+            updated_at: e.meta.updated_at.clone(),
+            folder: e.meta.folder.clone(),
+            tags: e.meta.tags.clone(),
             favourite: e.meta.favourite,
-            card_name: e.card_name,
-            status: e.status,
-            cardholder_name: e.cardholder_name,
-            card_number: e.card_number,
-            expiry: e.expiry,
-            cvv: e.cvv,
-            credit_limit: e.credit_limit,
-            card_account_number: e.card_account_number,
-            payment_network: e.payment_network,
-            notes: e.notes,
+            card_name: e.card_name.clone(),
+            status: e.status.clone(),
+            cardholder_name: e.cardholder_name.clone(),
+            card_number: e.card_number.clone(),
+            expiry: e.expiry.clone(),
+            cvv: e.cvv.clone(),
+            credit_limit: e.credit_limit.clone(),
+            card_account_number: e.card_account_number.clone(),
+            payment_network: e.payment_network.clone(),
+            notes: e.notes.clone(),
         }),
         VaultEntry::File(e) => VaultEntryData::File(FileEntryData {
-            id: e.meta.id,
-            created_at: e.meta.created_at,
-            updated_at: e.meta.updated_at,
-            folder: e.meta.folder,
-            tags: e.meta.tags,
+            id: e.meta.id.clone(),
+            created_at: e.meta.created_at.clone(),
+            updated_at: e.meta.updated_at.clone(),
+            folder: e.meta.folder.clone(),
+            tags: e.meta.tags.clone(),
             favourite: e.meta.favourite,
-            filename: e.filename,
-            data: e.data,
-            notes: e.notes,
+            filename: e.filename.clone(),
+            data: e.data.clone(),
+            notes: e.notes.clone(),
         }),
         VaultEntry::Custom(e) => VaultEntryData::Custom(CustomEntryData {
-            id: e.meta.id,
-            created_at: e.meta.created_at,
-            updated_at: e.meta.updated_at,
-            folder: e.meta.folder,
-            tags: e.meta.tags,
+            id: e.meta.id.clone(),
+            created_at: e.meta.created_at.clone(),
+            updated_at: e.meta.updated_at.clone(),
+            folder: e.meta.folder.clone(),
+            tags: e.meta.tags.clone(),
             favourite: e.meta.favourite,
-            title: e.title,
+            title: e.title.clone(),
             fields: e.fields
-                .into_values()
-                .map(|f| CustomFieldData { label: f.label, value: f.value, hidden: f.hidden })
+                .values()
+                .map(|f| CustomFieldData { label: f.label.clone(), value: f.value.clone(), hidden: f.hidden })
                 .collect(),
         }),
     }
@@ -277,7 +279,7 @@ pub fn list_entry_summaries() -> Result<Vec<EntrySummaryData>, String> {
 #[flutter_rust_bridge::frb(sync)]
 pub fn get_entry(id: String) -> Result<VaultEntryData, String> {
     let entry = session::get_entry(&id)?;
-    Ok(vault_entry_to_data(entry))
+    Ok(vault_entry_to_data(&entry))
 }
 
 /// Add a new entry to the session and persist the vault to disk.
@@ -286,17 +288,19 @@ pub fn get_entry(id: String) -> Result<VaultEntryData, String> {
 pub async fn create_entry(entry: VaultEntryData) -> Result<EntrySummaryData, String> {
     use uuid::Uuid;
     use crate::api::vault::chrono_now;
-    let internal = vault_entry_from_data(entry)?;
+    let mut internal = vault_entry_from_data(entry)?;
     let now = chrono_now();
     let id = Uuid::new_v4().to_string();
-    let internal = match internal {
-        VaultEntry::Login(mut e)    => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; VaultEntry::Login(e) }
-        VaultEntry::Note(mut e)     => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; VaultEntry::Note(e) }
-        VaultEntry::Identity(mut e) => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; VaultEntry::Identity(e) }
-        VaultEntry::Card(mut e)     => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; VaultEntry::Card(e) }
-        VaultEntry::File(mut e)     => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; VaultEntry::File(e) }
-        VaultEntry::Custom(mut e)   => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; VaultEntry::Custom(e) }
-    };
+    // `ref mut e` borrows the inner value rather than moving it — required
+    // because VaultEntry now implements Drop via ZeroizeOnDrop.
+    match &mut internal {
+        VaultEntry::Login(ref mut e)    => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; }
+        VaultEntry::Note(ref mut e)     => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; }
+        VaultEntry::Identity(ref mut e) => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; }
+        VaultEntry::Card(ref mut e)     => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; }
+        VaultEntry::File(ref mut e)     => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; }
+        VaultEntry::Custom(ref mut e)   => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; }
+    }
     session::session_create_entry(internal)
 }
 
