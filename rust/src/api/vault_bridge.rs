@@ -16,6 +16,7 @@ use crate::vault::entry::{
     CardEntry, CustomEntry, CustomField, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
     NoteEntry, VaultEntry,
 };
+use crate::import::enpass;
 use crate::vault::session;
 
 /// Lightweight entry summary returned by `list_entry_summaries()`.
@@ -358,6 +359,22 @@ pub async fn init_vault(passphrase: Vec<u8>, path: String) -> Result<(), String>
     save_vault(&[], &passphrase, &vault_path)?;
     // Unlock into session immediately so the user lands on the list screen
     session::unlock_vault(&passphrase, vault_path)
+}
+
+/// Parse an Enpass JSON export and merge all entries into the live session,
+/// then persist the vault to disk.
+///
+/// `data` is the raw bytes of the Enpass `.json` export file.
+/// The vault must already be unlocked — returns `Err` if no session is active.
+///
+/// Async — triggers a full vault save after import (Argon2id + encryption).
+pub async fn import_from_enpass(data: Vec<u8>) -> Result<usize, String> {
+    let entries = enpass::parse(&data)?;
+    let count = entries.len();
+    for entry in entries {
+        session::session_create_entry(entry)?;
+    }
+    Ok(count)
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
