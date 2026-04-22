@@ -19,6 +19,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
 
   bool _cardNumberObscured = true;
   bool _cvvObscured = true;
+  final Set<String> _revealedFields = {};
 
   @override
   void initState() {
@@ -210,7 +211,20 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           const SizedBox(height: 8),
           _sectionHeader('Custom fields'),
           ...e.customFields.map(
-            (f) => _field(f.label, f.value, obscure: f.hidden),
+            (f) => f.hidden
+                ? _toggleField(
+                    label: f.label,
+                    value: f.value,
+                    obscured: !_revealedFields.contains(f.label),
+                    onToggle: () => setState(() {
+                      if (_revealedFields.contains(f.label)) {
+                        _revealedFields.remove(f.label);
+                      } else {
+                        _revealedFields.add(f.label);
+                      }
+                    }),
+                  )
+                : _field(f.label, f.value),
           ),
         ],
       ],
@@ -303,7 +317,22 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
         if (e.fields.isNotEmpty) ...[
           const SizedBox(height: 8),
           _sectionHeader('Fields'),
-          ...e.fields.map((f) => _field(f.label, f.value, obscure: f.hidden)),
+          ...e.fields.map(
+            (f) => f.hidden
+                ? _toggleField(
+                    label: f.label,
+                    value: f.value,
+                    obscured: !_revealedFields.contains(f.label),
+                    onToggle: () => setState(() {
+                      if (_revealedFields.contains(f.label)) {
+                        _revealedFields.remove(f.label);
+                      } else {
+                        _revealedFields.add(f.label);
+                      }
+                    }),
+                  )
+                : _field(f.label, f.value),
+          ),
         ],
       ],
     );
@@ -322,6 +351,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   }
 
   Widget _field(String label, String value, {bool obscure = false}) {
+    if (value.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -348,6 +378,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     required bool obscured,
     required VoidCallback onToggle,
   }) {
+    if (value.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(

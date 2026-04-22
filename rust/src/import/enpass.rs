@@ -125,16 +125,23 @@ fn convert_item(item: EnpassItem) -> Result<VaultEntry, String> {
 
 fn convert_login(
     meta: EntryMeta,
-    _title: &str,
+    title: &str,
     note: &str,
     fields: &[&EnpassField],
 ) -> LoginEntry {
-    let url      = find_field_value(fields, &["url"]);
-    let username = find_field_value(fields, &["username", "email"]);
+    let url      = find_field_value(fields, &["url", "webAddress", "Web Address"]);
+    let username = find_field_value(fields, &["username", "email", "name", "login"]);
     let password = find_field_value(fields, &["password"]);
+    // If both url and username are empty, fall back to the item title as the url
+    // so the entry is at least identifiable in the list view.
+    let url = if url.is_empty() && username.is_empty() {
+        title.to_string()
+    } else {
+        url
+    };
 
     // Everything that isn't a canonical login field becomes a custom field.
-    let skip = ["url", "username", "email", "password"];
+    let skip = ["url", "webAddress", "Web Address", "username", "email", "name", "login", "password"];
     let custom_fields = fields
         .iter()
         .filter(|f| !skip.contains(&f.field_type.as_str()))
@@ -212,12 +219,15 @@ fn should_drop_field(field_type: &str) -> bool {
     ) || field_type.starts_with(".Android")
 }
 
-/// Find the first matching field value by type; return empty string if absent.
+/// Find the first non-empty matching field value by type.
+/// If all matching fields are empty, returns empty string.
 fn find_field_value(fields: &[&EnpassField], types: &[&str]) -> String {
+    // Prefer first non-empty match across all specified types.
     fields
         .iter()
-        .find(|f| types.contains(&f.field_type.as_str()))
+        .filter(|f| types.contains(&f.field_type.as_str()))
         .map(|f| f.value.clone())
+        .find(|v| !v.is_empty())
         .unwrap_or_default()
 }
 

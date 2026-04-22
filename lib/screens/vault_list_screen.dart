@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
@@ -16,6 +18,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
   String _selectedFilter = 'All';
   Set<String> _selectedIds = {};
   bool _isDeleting = false;
+  bool _isImporting = false;
   bool get _isSelecting => _selectedIds.isNotEmpty;
 
   @override
@@ -142,6 +145,83 @@ class _VaultListScreenState extends State<VaultListScreen> {
     if (mounted) _loadEntries();
   }
 
+  Future<void> _importEnpass() async {
+    final pathController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Import from Enpass'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Enter the path to your Enpass .json export file:'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: pathController,
+              autofocus: true,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'File path',
+                hintText: '/home/user/enpass_export.json',
+              ),
+              onSubmitted: (_) => Navigator.of(context).pop(true),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Import'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final path = pathController.text.trim();
+    if (path.isEmpty) return;
+
+    final file = File(path);
+    if (!file.existsSync()) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('File not found: $path'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    try {
+      setState(() => _isImporting = true);
+      final bytes = await file.readAsBytes();
+      final count = await importFromEnpass(data: bytes);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Imported $count entries from Enpass.')),
+        );
+        _loadEntries();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Import failed: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isImporting = false);
+    }
+  }
+
   Future<void> _confirmDelete(Set<String> ids) async {
     final count = ids.length;
     final confirmed = await showDialog<bool>(
@@ -198,6 +278,21 @@ class _VaultListScreenState extends State<VaultListScreen> {
           _isSelecting ? '${_selectedIds.length} selected' : 'Gabbro',
         ),
         actions: [
+          if (_isImporting)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
+          else if (!_isSelecting)
+            IconButton(
+              icon: const Icon(Icons.upload_file),
+              tooltip: 'Import from Enpass',
+              onPressed: _importEnpass,
+            ),
           if (_isDeleting) ...[
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),

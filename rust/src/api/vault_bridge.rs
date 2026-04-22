@@ -372,8 +372,9 @@ pub async fn import_from_enpass(data: Vec<u8>) -> Result<usize, String> {
     let entries = enpass::parse(&data)?;
     let count = entries.len();
     for entry in entries {
-        session::session_create_entry(entry)?;
+        session::session_add_entry_no_save(entry)?;
     }
+    session::session_save()?;
     Ok(count)
 }
 

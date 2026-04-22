@@ -72,7 +72,13 @@ fn entry_to_summary(entry: &VaultEntry) -> EntrySummaryData {
         VaultEntry::Login(e) => EntrySummaryData {
             id: e.meta.id.clone(),
             entry_type: String::from("Login"),
-            title: e.url.clone(),
+            title: if !e.username.is_empty() {
+                e.username.clone()
+            } else if !e.url.is_empty() {
+                e.url.clone()
+            } else {
+                e.meta.id.clone()
+            },
             folder: e.meta.folder.clone(),
             tags: e.meta.tags.clone(),
             favourite: e.meta.favourite,
@@ -141,6 +147,31 @@ pub fn get_entry(id: &str) -> Result<VaultEntry, String> {
         .find(|e| entry_id(e) == id)
         .cloned()
         .ok_or_else(|| format!("No entry found with id: {id}"))
+}
+
+/// Add a new entry to the in-memory session only — no disk write.
+///
+/// Used by bulk operations (e.g. import) that add many entries and
+/// want to save once at the end rather than once per entry.
+pub fn session_add_entry_no_save(entry: VaultEntry) -> Result<(), String> {
+    let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_mut().ok_or("Vault is locked")?;
+    session.entries.push(entry);
+    Ok(())
+}
+
+/// Persist the current session state to disk.
+///
+/// Used after bulk operations that called `session_add_entry_no_save`
+/// for each entry and now want a single save.
+pub fn session_save() -> Result<(), String> {
+    let (entries, passphrase, path) = {
+        let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_ref().ok_or("Vault is locked")?;
+        (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+    };
+    save_vault(&entries, &passphrase, &path)?;
+    Ok(())
 }
 
 /// Add a new entry to the session and persist the vault to disk.
