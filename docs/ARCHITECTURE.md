@@ -493,13 +493,14 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** `EntryAttachment` struct added to `entry.rs` and wired into
-  `LoginEntry`, `NoteEntry`, `IdentityEntry`, `CardEntry`, `CustomEntry`.
-  Enpass importer updated with `EnpassAttachment` parsing, base64 decoding,
-  and 13 TDD tests — all passing. 138 Rust tests passing.
-- **Next task:** Enpass importer TDD rewrite — step 3: rewrite `convert_login`,
-  `convert_card`, `convert_custom` until all tests pass against the anonymised
-  export. Build release for all UI/UX testing — never debug builds for UX assessment.
+- **Completed:** `custom_fields: Vec<CustomField>` added to `CardEntry` and
+  `CardEntry::new()`; `CardEntryData` DTO and bridge updated; `convert_card`
+  in Enpass importer fixed to preserve overflow fields (username, password,
+  url, numeric, date, phone) as custom fields rather than silently dropping
+  them; weak placeholder test strengthened to real assertions. Bridge
+  regenerated. 138 Rust tests passing.
+- **Next task:** Verify full 247-item Enpass import end-to-end via a release
+  build. Then begin Bitwarden importer planning.
 
 ---
 

@@ -1278,6 +1278,23 @@ the bytes. `zeroize` is the equivalent of explicitly overwriting the
 underlying buffer before releasing it — something Python gives you no
 mechanism to do.
 
+### Propagating a domain model change — the full blast radius
+When you add a field to a core domain type like `CardEntry`, the compiler
+finds every place that constructs or pattern-matches it. In Gabbro this
+means touching: the struct definition, the validated constructor
+(`CardEntry::new()`), all call sites of that constructor, any struct
+literals (in tests and in `mask_entry`), the bridge-facing DTO
+(`CardEntryData`), the DTO conversion function (`card_entry_to_data`),
+the bridge conversion in `vault_bridge.rs`, and the auto-generated
+`frb_generated.rs` (fixed by rerunning `flutter_rust_bridge_codegen generate`
+from the project root).
+
+The compiler guides you through every call site — treat the error list as
+a checklist, not a problem. The correct order is: domain model first,
+then callers, then bridge, then codegen. Running `cargo test --lib
+vault::entry` after the domain model change confirms that layer is clean
+before touching anything else.
+
 ### `ZeroizeOnDrop` and the move-out-of-Drop restriction
 Deriving `ZeroizeOnDrop` on a type causes Rust to implement the `Drop`
 trait for it. Rust enforces a rule: **you cannot move a field out of a
