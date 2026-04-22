@@ -183,6 +183,16 @@ fn convert_card(
 ) -> Result<CardEntry, String> {
     let card_number = find_field_value(fields, &["ccNumber"]);
 
+    // Fields that map to dedicated CardEntry slots — everything else overflows
+    // to custom_fields so no data is silently dropped on import.
+    let cc_skip = ["ccName", "ccNumber", "ccExpiry", "ccCvc", "ccPin",
+                   "ccBankname", "ccTxnpassword", "ccType"];
+    let custom_fields = fields
+        .iter()
+        .filter(|f| !cc_skip.contains(&f.field_type.as_str()))
+        .map(|f| enpass_field_to_custom(*f))
+        .collect();
+
     CardEntry::new(
         meta,
         None,                                                          // card_name
@@ -198,6 +208,7 @@ fn convert_card(
         opt_field_value(fields, &["ccBankname"]),                     // bank_name
         opt_field_value(fields, &["ccTxnpassword"]),                  // transaction_password
         non_empty(note),                                               // notes
+        custom_fields,
         attachments,
     )
 }
@@ -571,13 +582,17 @@ mod tests {
         let entries = parse(json.as_bytes()).unwrap();
         let VaultEntry::Card(ref e) = entries[0] else { panic!("expected Card") };
         assert_eq!(e.cardholder_name, "Rob Smith");
-        // username and password fields on a card should not be silently dropped
-        // — the card importer does not call convert_login so they land nowhere
-        // currently. This test will fail until convert_card maps unmapped
-        // fields to custom_fields (or until we decide to drop them deliberately
-        // and update this test accordingly).
-        assert!(!e.attachments.is_empty() || e.cardholder_name == "Rob Smith",
-            "card entry parsed — username/password field handling TBD");
+        assert_eq!(e.card_number, "4111111111111111");
+        // username and password fields on a card have no dedicated slot —
+        // they must land in custom_fields rather than being silently dropped.
+        assert!(
+            e.custom_fields.iter().any(|f| f.label == "Portal user"),
+            "username field on a card should become a custom field"
+        );
+        assert!(
+            e.custom_fields.iter().any(|f| f.label == "Portal pass" && f.hidden),
+            "password field on a card should become a hidden custom field"
+        );
     }
 
     #[test]

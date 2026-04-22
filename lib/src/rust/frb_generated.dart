@@ -1210,8 +1210,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   CardEntryData dco_decode_card_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 19)
-      throw Exception('unexpected arr length: expect 19 but see ${arr.length}');
+    if (arr.length != 20)
+      throw Exception('unexpected arr length: expect 20 but see ${arr.length}');
     return CardEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -1232,6 +1232,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       bankName: dco_decode_opt_String(arr[16]),
       transactionPassword: dco_decode_opt_String(arr[17]),
       notes: dco_decode_opt_String(arr[18]),
+      customFields: dco_decode_list_custom_field_data(arr[19]),
     );
   }
 
@@ -1629,6 +1630,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_bankName = sse_decode_opt_String(deserializer);
     var var_transactionPassword = sse_decode_opt_String(deserializer);
     var var_notes = sse_decode_opt_String(deserializer);
+    var var_customFields = sse_decode_list_custom_field_data(deserializer);
     return CardEntryData(
       id: var_id,
       createdAt: var_createdAt,
@@ -1649,6 +1651,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       bankName: var_bankName,
       transactionPassword: var_transactionPassword,
       notes: var_notes,
+      customFields: var_customFields,
     );
   }
 
@@ -2124,6 +2127,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.bankName, serializer);
     sse_encode_opt_String(self.transactionPassword, serializer);
     sse_encode_opt_String(self.notes, serializer);
+    sse_encode_list_custom_field_data(self.customFields, serializer);
   }
 
   @protected

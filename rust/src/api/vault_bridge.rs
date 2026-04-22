@@ -116,6 +116,11 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
             bank_name: e.bank_name.clone(),
             transaction_password: e.transaction_password.clone(),
             notes: e.notes.clone(),
+            custom_fields: e.custom_fields.iter().map(|f| CustomFieldData {
+                label: f.label.clone(),
+                value: f.value.clone(),
+                hidden: f.hidden,
+            }).collect(),
         }),
         VaultEntry::File(e) => VaultEntryData::File(FileEntryData {
             id: e.meta.id.clone(),
@@ -224,6 +229,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 d.bank_name,
                 d.transaction_password,
                 d.notes,
+                vec![],
                 vec![],
             )?;
             Ok(VaultEntry::Card(entry))

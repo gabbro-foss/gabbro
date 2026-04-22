@@ -89,6 +89,7 @@ pub struct CardEntryData {
     pub bank_name: Option<String>,
     pub transaction_password: Option<String>,
     pub notes: Option<String>,
+    pub custom_fields: Vec<CustomFieldData>,
 }
 
 /// A file entry as seen by Flutter.
@@ -196,6 +197,7 @@ fn card_entry_to_data(e: &CardEntry) -> CardEntryData {
         bank_name: e.bank_name.clone(),
         transaction_password: e.transaction_password.clone(),
         notes: e.notes.clone(),
+        custom_fields: e.custom_fields.iter().map(custom_field_to_data).collect(),
     }
 }
 
@@ -364,6 +366,7 @@ pub fn create_card_entry(
         bank_name,
         transaction_password,
         notes,
+        vec![],
         vec![],
     )?;
     Ok(card_entry_to_data(&entry))
@@ -565,6 +568,7 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
             bank_name: e.bank_name.clone(),
             transaction_password: e.transaction_password.clone(),
             notes: e.notes.clone(),
+            custom_fields: e.custom_fields.clone(),
             attachments: e.attachments.clone(),
         }),
         // Note, Identity, File, Custom carry no password-class fields —
@@ -1419,6 +1423,7 @@ mod tests {
                 bank_name: None,
                 transaction_password: None,
                 notes: None,
+                custom_fields: vec![],
                 attachments: vec![],
             }),
         ];

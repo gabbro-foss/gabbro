@@ -165,6 +165,7 @@ class CardEntryData {
   final String? bankName;
   final String? transactionPassword;
   final String? notes;
+  final List<CustomFieldData> customFields;
 
   const CardEntryData({
     required this.id,
@@ -186,6 +187,7 @@ class CardEntryData {
     this.bankName,
     this.transactionPassword,
     this.notes,
+    required this.customFields,
   });
 
   @override
@@ -208,7 +210,8 @@ class CardEntryData {
       pin.hashCode ^
       bankName.hashCode ^
       transactionPassword.hashCode ^
-      notes.hashCode;
+      notes.hashCode ^
+      customFields.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -233,7 +236,8 @@ class CardEntryData {
           pin == other.pin &&
           bankName == other.bankName &&
           transactionPassword == other.transactionPassword &&
-          notes == other.notes;
+          notes == other.notes &&
+          customFields == other.customFields;
 }
 
 /// A custom entry as seen by Flutter.

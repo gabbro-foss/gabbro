@@ -130,6 +130,8 @@ pub struct CardEntry {
     /// Transaction password (used by some banks for online payments).
     pub transaction_password: Option<String>,
     pub notes: Option<String>,
+    /// User-defined extra fields — overflow from import (e.g. portal username/password).
+    pub custom_fields: Vec<CustomField>,
     pub attachments: Vec<EntryAttachment>,
 }
 
@@ -151,6 +153,7 @@ impl CardEntry {
         bank_name: Option<String>,
         transaction_password: Option<String>,
         notes: Option<String>,
+        custom_fields: Vec<CustomField>,
         attachments: Vec<EntryAttachment>,
     ) -> Result<CardEntry, String> {
         let digit_count = card_number.chars().filter(|c| c.is_ascii_digit()).count();
@@ -176,6 +179,7 @@ impl CardEntry {
                 bank_name,
                 transaction_password,
                 notes,
+                custom_fields,
                 attachments,
             })
     }
@@ -362,6 +366,7 @@ mod tests {
             None,
             None,
             vec![],
+            vec![],
         ).unwrap();
 
         assert_eq!(entry.cardholder_name, "Rob Smith");
@@ -388,6 +393,7 @@ mod tests {
             None,
             None,
             vec![],
+            vec![],
         );
 
         assert!(result.is_err());
@@ -410,6 +416,7 @@ mod tests {
             None,
             None,
             None,
+            vec![],
             vec![],
         );
 

@@ -1072,6 +1072,8 @@ impl SseDecode for crate::api::vault::CardEntryData {
         let mut var_bankName = <Option<String>>::sse_decode(deserializer);
         let mut var_transactionPassword = <Option<String>>::sse_decode(deserializer);
         let mut var_notes = <Option<String>>::sse_decode(deserializer);
+        let mut var_customFields =
+            <Vec<crate::api::vault::CustomFieldData>>::sse_decode(deserializer);
         return crate::api::vault::CardEntryData {
             id: var_id,
             created_at: var_createdAt,
@@ -1092,6 +1094,7 @@ impl SseDecode for crate::api::vault::CardEntryData {
             bank_name: var_bankName,
             transaction_password: var_transactionPassword,
             notes: var_notes,
+            custom_fields: var_customFields,
         };
     }
 }
@@ -1597,6 +1600,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::CardEntryData {
             self.bank_name.into_into_dart().into_dart(),
             self.transaction_password.into_into_dart().into_dart(),
             self.notes.into_into_dart().into_dart(),
+            self.custom_fields.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -1997,6 +2001,7 @@ impl SseEncode for crate::api::vault::CardEntryData {
         <Option<String>>::sse_encode(self.bank_name, serializer);
         <Option<String>>::sse_encode(self.transaction_password, serializer);
         <Option<String>>::sse_encode(self.notes, serializer);
+        <Vec<crate::api::vault::CustomFieldData>>::sse_encode(self.custom_fields, serializer);
     }
 }
 
