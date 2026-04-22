@@ -12,8 +12,7 @@
 .swiftpm/
 migrate_working_dir/
 chat_info/
-docs/teaching_principles.md
-docs/standard_session_principles.md
+docs/standard_session_guidelines_for_Claude.md
 
 # IntelliJ related
 *.iml
