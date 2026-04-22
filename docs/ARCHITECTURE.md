@@ -243,6 +243,14 @@ Each entry is an instance of a typed class:
   `bank_name`, `transaction_password` (all `Option<String>`). Other types
   use struct literals; validation for those will live in the API layer when
   it is built.
+- **EntryAttachment** — planned struct, not yet implemented. To be added to
+  `rust/src/vault/entry.rs` before the Enpass importer TDD rewrite.
+  Must derive `Zeroize` and `ZeroizeOnDrop` — attachment data may be sensitive
+  (passport scans, etc.). Add `attachments: Vec<EntryAttachment>` to `LoginEntry`,
+  `NoteEntry`, `IdentityEntry`, `CardEntry`, and `CustomEntry`. Not `FileEntry` —
+  a file entry IS an attachment; adding attachments to it would be recursive.
+  Bridge DTO (`EntryAttachmentData`) and Flutter UI deferred to a separate session
+  after the importer TDD rewrite is complete.
 - **Design principle:** invalid state unrepresentable — if a value cannot
   exist in a valid domain, the type system or constructor prevents it from
   being created at all.
@@ -485,10 +493,16 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Enpass JSON importer implemented in `rust/src/import/enpass.rs`.
-  Parses items, filters archived/trashed, maps all six categories, 127 Rust tests passing.
-- **Next task:** Bridge wiring — add `import_from_enpass()` to `rust/src/api/vault_bridge.rs`,
-  regenerate bridge, add Flutter import UI, then release build smoke test on Linux and Android.
+- **Completed:** Enpass importer bridge wiring, Flutter import UI (upload icon, spinner,
+  snackbar), batch import (single vault save), partial field mapping fixes. WIP committed.
+  126 Rust tests passing.
+- **Next task:** Enpass importer TDD rewrite. Mandatory sequence:
+  (1) add `EntryAttachment` struct to `rust/src/vault/entry.rs` and wire into `LoginEntry`,
+  `NoteEntry`, `IdentityEntry`, `CardEntry`, `CustomEntry` (not `FileEntry`);
+  (2) write failing Rust tests in `rust/src/import/enpass.rs` against the anonymised
+  export (13 tests covering all category/field mappings + attachments);
+  (3) rewrite `convert_login`, `convert_card`, `convert_custom` until all tests pass;
+  (4) build release for all UI/UX testing — never debug builds for UX assessment.
 
 ---
 
@@ -729,6 +743,32 @@ discussed and forgotten.
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
 
+- **Select-all for bulk delete:** The vault list screen has per-entry checkboxes
+  and a bulk delete action, but no select-all button. With 200+ entries this is
+  unusable. Add a select-all toggle to the app bar when in selection mode.
+
+- **Copy to clipboard from detail screen:** Fields in `EntryDetailScreen` are
+  plain `Text` widgets — not selectable, not copyable. Add a copy icon button
+  alongside each field value, or make the text selectable via `SelectableText`.
+  Both URL and username fields are high-priority for copy support.
+
+- **Enter key submits dialogs:** The import dialog (and any other path-input
+  dialogs) should submit on Enter key press. Use `onSubmitted` on the
+  `TextField` with `Navigator.of(context).pop(true)`. Also add `autofocus: true`
+  so the field is focused immediately on dialog open.
+
+- **Release builds for UI/UX testing:** Debug builds run Argon2id unoptimised
+  (~20s per vault operation on Linux, worse on Android emulator). Always use
+  `flutter build linux --release` and `flutter build apk --release` for any
+  user-facing performance assessment or UI/UX testing. Never tune Argon2id
+  parameters or assess UX based on debug build timings.
+
+- **Investigate blank Login fields after Enpass import:** Some imported Login
+  entries show blank URL and username in the detail view. Unclear whether this
+  is a field mapping bug or genuinely empty data in the source vault. The TDD
+  rewrite of the importer (see Import / Migration section) will surface this
+  if it is a mapping issue.
+
 ## Import / Migration
 
 ### Rationale — why not write N importers?
@@ -814,18 +854,58 @@ The correct sequence, regardless of which importers we build:
 6. **Generic CSV / JSON importer** — implement last, once the field surface
    is stable.
 
-### Open questions for the implementation session
+### Enpass — what we know from analysis of a real export (247 items)
 
-- What does Enpass's current JSON export schema look like? Verify the
-  current format before assuming anything from documentation.
-- What fields does Enpass export that Gabbro's domain model does not
-  currently have? The mock vault exercise answers this empirically.
-- **Architecture question:** should import parsing live in Rust or Dart?
-  The instinct is Rust — parsing untrusted external data and mapping it
-  into the domain model is exactly the kind of work that belongs where the
-  domain model lives. A Dart-side parser that passes structured data across
-  the bridge is also possible but introduces a second parsing boundary.
-  Settle this explicitly before starting implementation.
+**Settled decisions:**
+- Parsing lives in Rust — untrusted external data mapping into the domain
+  model belongs where the domain model lives. Decided and implemented.
+- Attachments are preserved — imported as `Vec<EntryAttachment>` on the
+  entry they belong to. Not dropped, not split into separate FileEntries.
+  Attachment `data` is base64-encoded in the export; decode to `Vec<u8>` on import.
+- Archived and trashed items are silently skipped.
+- Deleted fields within an item are silently skipped.
+- `totp`, `section`, `.Android#`, `ccType` fields are dropped.
+- `numeric`, `date`, `phone`, `pin`, `text` fields not mapped to a canonical
+  field become `CustomField` entries on the parent entry.
+
+**Category → Gabbro type mapping:**
+- `login`, `computer`, `finance` → `LoginEntry`
+- `creditcard` → `CardEntry`
+- `note` → `NoteEntry`
+- `travel`, `misc`, and any unknown category → `CustomEntry`
+- `identity` → `CustomEntry` (no dedicated identity template in Enpass)
+
+**Field type → LoginEntry field mapping:**
+- `username`, `email` → `username` (prefer first non-empty value)
+- `url` → `url`
+- `password` → `password`
+- Everything else → `custom_fields`
+
+**Enpass export structure (confirmed from real data):**
+- Top-level: `{ "items": [...] }`
+- Each item has: `uuid`, `title`, `category`, `note`, `favorite`, `archived`,
+  `trashed`, `fields`, `attachments`, `template_type`
+- Each field has: `label`, `type`, `value`, `sensitive`, `deleted`, `order`, `uid`
+- Each attachment has: `uuid`, `name`, `kind` (mime type), `data` (base64)
+
+**TDD strategy — mandatory, do not skip:**
+1. Add `EntryAttachment` to `entry.rs` first (see Vault Domain Model section)
+2. Write 13 failing tests in `rust/src/import/enpass.rs` covering:
+   - Login with `username` populated
+   - Login with `username` empty, `email` populated → email used
+   - Login with both `username` and `email` → username preferred (first non-empty)
+   - Login title comes from `item.title`, not URL
+   - `computer` category → `LoginEntry`
+   - `finance` category → `LoginEntry`
+   - `creditcard` with `username`/`password` fields → become custom fields
+   - `travel` → `CustomEntry`
+   - `numeric` field type → becomes custom field
+   - `section` fields → dropped
+   - `totp` fields → dropped
+   - Items with attachments → attachment imported, not dropped
+   - Archived item → skipped
+3. Fix parser until all tests pass
+4. Build release for UI/UX testing
 
 ## Monetisation
 
