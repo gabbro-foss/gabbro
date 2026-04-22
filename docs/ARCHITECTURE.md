@@ -243,14 +243,14 @@ Each entry is an instance of a typed class:
   `bank_name`, `transaction_password` (all `Option<String>`). Other types
   use struct literals; validation for those will live in the API layer when
   it is built.
-- **EntryAttachment** — planned struct, not yet implemented. To be added to
-  `rust/src/vault/entry.rs` before the Enpass importer TDD rewrite.
-  Must derive `Zeroize` and `ZeroizeOnDrop` — attachment data may be sensitive
-  (passport scans, etc.). Add `attachments: Vec<EntryAttachment>` to `LoginEntry`,
-  `NoteEntry`, `IdentityEntry`, `CardEntry`, and `CustomEntry`. Not `FileEntry` —
-  a file entry IS an attachment; adding attachments to it would be recursive.
-  Bridge DTO (`EntryAttachmentData`) and Flutter UI deferred to a separate session
-  after the importer TDD rewrite is complete.
+- **EntryAttachment** — implemented in `rust/src/vault/entry.rs`.
+  Derives `Zeroize` and `ZeroizeOnDrop` — attachment data may be sensitive
+  (passport scans, etc.). Fields: `uuid`, `name`, `kind` (MIME type), `data`
+  (`Vec<u8>`, decoded from base64 on import). `Vec<EntryAttachment>` is present
+  on `LoginEntry`, `NoteEntry`, `IdentityEntry`, `CardEntry`, and `CustomEntry`.
+  Not on `FileEntry` — a file entry IS an attachment; adding attachments to it
+  would be recursive. Bridge DTO (`EntryAttachmentData`) and Flutter UI deferred
+  to a separate session after the importer TDD rewrite is complete.
 - **Design principle:** invalid state unrepresentable — if a value cannot
   exist in a valid domain, the type system or constructor prevents it from
   being created at all.
@@ -493,16 +493,13 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Enpass importer bridge wiring, Flutter import UI (upload icon, spinner,
-  snackbar), batch import (single vault save), partial field mapping fixes. WIP committed.
-  126 Rust tests passing.
-- **Next task:** Enpass importer TDD rewrite. Mandatory sequence:
-  (1) add `EntryAttachment` struct to `rust/src/vault/entry.rs` and wire into `LoginEntry`,
-  `NoteEntry`, `IdentityEntry`, `CardEntry`, `CustomEntry` (not `FileEntry`);
-  (2) write failing Rust tests in `rust/src/import/enpass.rs` against the anonymised
-  export (13 tests covering all category/field mappings + attachments);
-  (3) rewrite `convert_login`, `convert_card`, `convert_custom` until all tests pass;
-  (4) build release for all UI/UX testing — never debug builds for UX assessment.
+- **Completed:** `EntryAttachment` struct added to `entry.rs` and wired into
+  `LoginEntry`, `NoteEntry`, `IdentityEntry`, `CardEntry`, `CustomEntry`.
+  Enpass importer updated with `EnpassAttachment` parsing, base64 decoding,
+  and 13 TDD tests — all passing. 138 Rust tests passing.
+- **Next task:** Enpass importer TDD rewrite — step 3: rewrite `convert_login`,
+  `convert_card`, `convert_custom` until all tests pass against the anonymised
+  export. Build release for all UI/UX testing — never debug builds for UX assessment.
 
 ---
 
@@ -526,6 +523,13 @@ New ideas that arise mid-session should be added here immediately rather than
 discussed and forgotten.
 
 ---
+
+### Testing
+
+- **Pre-existing test failure:** `api::passphrase_generator::tests::test_append_number`
+  fails with `left: 6, right: 5` — word count assertion off by one when
+  `append_number` is enabled. Last touched in commit `2c0dfed`. Investigate
+  and fix before v1 release.
 
 ### Security
 
