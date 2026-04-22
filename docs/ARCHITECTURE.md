@@ -768,6 +768,14 @@ discussed and forgotten.
   user-facing performance assessment or UI/UX testing. Never tune Argon2id
   parameters or assess UX based on debug build timings.
 
+- **Clean up dead entries in `convert_login` skip list:** The `skip` array in
+  `convert_login` in `rust/src/import/enpass.rs` contains field type strings
+  that do not exist in the real Enpass export (`webAddress`, `Web Address`,
+  `name`, `login`). They are harmless but misleading — a reader might think
+  these are real field types to watch for. Remove them, leaving only the four
+  types that actually appear in the data: `url`, `username`, `email`,
+  `password`.
+
 - **Investigate blank Login fields after Enpass import:** Some imported Login
   entries show blank URL and username in the detail view. Unclear whether this
   is a field mapping bug or genuinely empty data in the source vault. The TDD
