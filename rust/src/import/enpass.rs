@@ -113,6 +113,7 @@ fn convert_item(item: EnpassItem) -> Result<VaultEntry, String> {
                 meta,
                 title: item.title,
                 content: item.note,
+                attachments: vec![],
             }))
         }
         "identity" | "travel" | "misc" | _ => {
@@ -155,6 +156,7 @@ fn convert_login(
         password,
         notes: non_empty(note),
         custom_fields,
+        attachments: vec![],
     }
 }
 
@@ -180,6 +182,7 @@ fn convert_card(
         opt_field_value(fields, &["ccBankname"]),                     // bank_name
         opt_field_value(fields, &["ccTxnpassword"]),                  // transaction_password
         non_empty(note),                                               // notes
+        vec![],                                                        // attachments
     )
 }
 
@@ -207,6 +210,7 @@ fn convert_custom(
         meta,
         title: title.to_string(),
         fields: field_map,
+        attachments: vec![],
     }
 }
 

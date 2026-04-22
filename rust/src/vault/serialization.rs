@@ -53,6 +53,7 @@ mod tests {
             password: String::from("correct horst battery staple"),
             notes: None,
             custom_fields: vec![],
+            attachments: vec![],
         });
         let bytes = serialize_entries(&[entry]).unwrap();
         let recovered = deserialize_entries(&bytes).unwrap();
@@ -80,11 +81,13 @@ mod tests {
                     value: String::from("abc123"),
                     hidden: true,
                 }],
+                attachments: vec![],
             }),
             VaultEntry::Note(NoteEntry {
                 meta: default_meta("id-002"),
                 title: String::from("Recovery codes"),
                 content: String::from("code1\ncode2\ncode3"),
+                attachments: vec![],
             }),
         ];
         let bytes = serialize_entries(&entries).unwrap();
@@ -104,6 +107,7 @@ mod tests {
             meta: default_meta("id-001"),
             title: String::from("Test"),
             content: String::from("Hello"),
+            attachments: vec![],
         });
         let bytes = serialize_entries(&[entry]).unwrap();
         let json_str = std::str::from_utf8(&bytes).expect("bytes should be valid UTF-8");

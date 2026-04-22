@@ -269,6 +269,7 @@ pub fn create_login_entry(
         password,
         notes,
         custom_fields: internal_fields,
+        attachments: vec![],
     };
     login_entry_to_data(&entry)
 }
@@ -290,7 +291,7 @@ pub fn create_note_entry(
         tags,
         favourite,
     };
-    let entry = NoteEntry { meta, title, content };
+    let entry = NoteEntry { meta, title, content, attachments: vec![] };
     note_entry_to_data(&entry)
 }
 
@@ -314,7 +315,7 @@ pub fn create_identity_entry(
         tags,
         favourite,
     };
-    let entry = IdentityEntry { meta, first_name, last_name, email, phone, address, custom_fields: vec![] };
+    let entry = IdentityEntry { meta, first_name, last_name, email, phone, address, custom_fields: vec![], attachments: vec![] };
     identity_entry_to_data(&entry)
 }
 
@@ -363,6 +364,7 @@ pub fn create_card_entry(
         bank_name,
         transaction_password,
         notes,
+        vec![],
     )?;
     Ok(card_entry_to_data(&entry))
 }
@@ -414,7 +416,7 @@ pub fn create_custom_entry(
             hidden: f.hidden,
         }))
         .collect();
-    let entry = CustomEntry { meta, title, fields: internal_fields };
+    let entry = CustomEntry { meta, title, fields: internal_fields, attachments: vec![] };
     custom_entry_to_data(&entry)
 }
 
@@ -546,6 +548,7 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
                     hidden: f.hidden,
                 })
                 .collect(),
+            attachments: e.attachments.clone(),
         }),
         VaultEntry::Card(e) => VaultEntry::Card(CardEntry {
             meta: e.meta.clone(),
@@ -562,6 +565,7 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
             bank_name: e.bank_name.clone(),
             transaction_password: e.transaction_password.clone(),
             notes: e.notes.clone(),
+            attachments: e.attachments.clone(),
         }),
         // Note, Identity, File, Custom carry no password-class fields —
         // return a plain clone.
@@ -1021,6 +1025,7 @@ mod tests {
                 },
                 title: String::from("Test note"),
                 content: String::from("secret content"),
+                attachments: vec![],
             }),
         ];
 
@@ -1068,6 +1073,7 @@ mod tests {
                 },
                 title: String::from("First note"),
                 content: String::from("content one"),
+                attachments: vec![],
             }),
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
@@ -1080,6 +1086,7 @@ mod tests {
                 },
                 title: String::from("Second note"),
                 content: String::from("content two"),
+                attachments: vec![],
             }),
         ];
 
@@ -1106,6 +1113,7 @@ mod tests {
                 },
                 title: String::from("A note"),
                 content: String::from("some content"),
+                attachments: vec![],
             }),
         ];
 
@@ -1128,6 +1136,7 @@ mod tests {
                 },
                 title: String::from("Original title"),
                 content: String::from("original content"),
+                attachments: vec![],
             }),
         ];
 
@@ -1142,6 +1151,7 @@ mod tests {
             },
             title: String::from("Updated title"),
             content: String::from("updated content"),
+            attachments: vec![],
         });
 
         update_entry(&mut entries, updated).unwrap();
@@ -1171,6 +1181,7 @@ mod tests {
                 },
                 title: String::from("Note"),
                 content: String::from("content"),
+                attachments: vec![],
             }),
         ];
 
@@ -1185,6 +1196,7 @@ mod tests {
             },
             title: String::from("Note"),
             content: String::from("new content"),
+            attachments: vec![],
         });
 
         update_entry(&mut entries, updated).unwrap();
@@ -1210,6 +1222,7 @@ mod tests {
                 },
                 title: String::from("Note"),
                 content: String::from("content"),
+                attachments: vec![],
             }),
         ];
 
@@ -1224,6 +1237,7 @@ mod tests {
             },
             title: String::from("Ghost"),
             content: String::from("ghost content"),
+            attachments: vec![],
         });
 
         assert!(update_entry(&mut entries, ghost).is_err());
@@ -1245,6 +1259,7 @@ mod tests {
                 },
                 title: String::from("First"),
                 content: String::from("first content"),
+                attachments: vec![],
             }),
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
@@ -1257,6 +1272,7 @@ mod tests {
                 },
                 title: String::from("Second"),
                 content: String::from("second content"),
+                attachments: vec![],
             }),
         ];
 
@@ -1284,6 +1300,7 @@ mod tests {
                 },
                 title: String::from("A note"),
                 content: String::from("some content"),
+                attachments: vec![],
             }),
         ];
 
@@ -1331,6 +1348,7 @@ mod tests {
                 password: String::from("s3cr3t"),
                 notes: None,
                 custom_fields: vec![],
+                attachments: vec![],
             }),
         ];
 
@@ -1360,6 +1378,7 @@ mod tests {
                 password: String::from("correct horst battery staple"),
                 notes: None,
                 custom_fields: vec![],
+                attachments: vec![],
             }),
         ];
 
@@ -1400,6 +1419,7 @@ mod tests {
                 bank_name: None,
                 transaction_password: None,
                 notes: None,
+                attachments: vec![],
             }),
         ];
 
@@ -1443,6 +1463,7 @@ mod tests {
                         hidden: false,
                     },
                 ],
+                attachments: vec![],
             }),
         ];
 
@@ -1472,6 +1493,7 @@ mod tests {
                 },
                 title: String::from("My note"),
                 content: String::from("sensitive note content"),
+                attachments: vec![],
             }),
         ];
 
@@ -1502,6 +1524,7 @@ mod tests {
                 },
                 title: String::from("Test note"),
                 content: String::from("secret content"),
+                attachments: vec![],
             }),
         ];
 
@@ -1562,6 +1585,7 @@ mod tests {
                 },
                 title: String::from("Export test"),
                 content: String::from("exported content"),
+                attachments: vec![],
             }),
         ];
 
@@ -1614,6 +1638,7 @@ mod tests {
                 },
                 title: String::from("Reload test"),
                 content: String::from("reloaded content"),
+                attachments: vec![],
             }),
         ];
 

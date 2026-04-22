@@ -38,6 +38,19 @@ pub struct EntryMeta {
     pub favourite: bool,
 }
 
+/// A binary attachment belonging to a vault entry.
+///
+/// Imported from Enpass exports; data is base64-decoded on import.
+#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+pub struct EntryAttachment {
+    pub uuid: String,
+    pub name: String,
+    /// MIME type (e.g. "image/png", "application/pdf").
+    pub kind: String,
+    /// Raw binary data — decoded from base64 on import.
+    pub data: Vec<u8>,
+}
+
 /// A login entry - the most common entry type
 /// Stores credentials for a wehsite or application
 #[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
@@ -54,6 +67,7 @@ pub struct LoginEntry {
     pub notes: Option<String>,
     /// User-defined extra fields (e.g. "Security question").
     pub custom_fields: Vec<CustomField>,
+    pub attachments: Vec<EntryAttachment>,
 }
 
 /// A single user-defined key/value field on an entry.
@@ -71,6 +85,7 @@ pub struct NoteEntry {
     pub meta: EntryMeta,
     pub title: String,
     pub content: String,
+    pub attachments: Vec<EntryAttachment>,
 }
 
 /// A personal identity entry - name, address, contact details.
@@ -84,6 +99,7 @@ pub struct IdentityEntry {
     pub address: Option<String>,
     /// User-defined extra fields (e.g. "Maiden name", "Mobile", "Landline").
     pub custom_fields: Vec<CustomField>,
+    pub attachments: Vec<EntryAttachment>,
 }
 
 /// A payment card entry.
@@ -114,6 +130,7 @@ pub struct CardEntry {
     /// Transaction password (used by some banks for online payments).
     pub transaction_password: Option<String>,
     pub notes: Option<String>,
+    pub attachments: Vec<EntryAttachment>,
 }
 
 impl CardEntry {
@@ -134,6 +151,7 @@ impl CardEntry {
         bank_name: Option<String>,
         transaction_password: Option<String>,
         notes: Option<String>,
+        attachments: Vec<EntryAttachment>,
     ) -> Result<CardEntry, String> {
         let digit_count = card_number.chars().filter(|c| c.is_ascii_digit()).count();
         if digit_count < 12 || digit_count > 19 {
@@ -158,6 +176,7 @@ impl CardEntry {
                 bank_name,
                 transaction_password,
                 notes,
+                attachments,
             })
     }
 }
@@ -178,6 +197,7 @@ pub struct CustomEntry {
     pub meta: EntryMeta,
     pub title: String,
     pub fields: HashMap<String, CustomField>,
+    pub attachments: Vec<EntryAttachment>,
 }
 
 impl Zeroize for CustomEntry {
@@ -230,6 +250,7 @@ mod tests {
             password: String::from("hunter2"),
             notes: None,
             custom_fields: vec![],
+            attachments: vec![],
         };
 
         assert_eq!(entry.url, "https://github.com");
@@ -247,6 +268,7 @@ mod tests {
             password: String::from("s3cr3t"),
             notes: None,
             custom_fields: vec![],
+            attachments: vec![],
         };
 
         assert!(entry.notes.is_none());
@@ -261,6 +283,7 @@ mod tests {
             password: String::from("s3cr3t"),
             notes: Some(String::from("my github account")),
             custom_fields: vec![],
+            attachments: vec![],
         };
 
         assert!(entry.notes.is_some());
@@ -281,6 +304,7 @@ mod tests {
             password: String::from("s3cr3t"),
             notes: None,
             custom_fields: vec![field],
+            attachments: vec![],
         };
 
         assert_eq!(entry.custom_fields.len(), 1);
@@ -294,6 +318,7 @@ mod tests {
             meta: default_meta(),
             title: String::from("Shopping list"),
             content: String::from("Milk, eggs, bread"),
+            attachments: vec![],
         };
 
         assert_eq!(entry.title, "Shopping list");
@@ -310,6 +335,7 @@ mod tests {
             phone: None,
             address: None,
             custom_fields: vec![],
+            attachments: vec![],
         };
 
         assert_eq!(entry.first_name, "Rob");
@@ -335,6 +361,7 @@ mod tests {
             None,
             None,
             None,
+            vec![],
         ).unwrap();
 
         assert_eq!(entry.cardholder_name, "Rob Smith");
@@ -360,6 +387,7 @@ mod tests {
             None,
             None,
             None,
+            vec![],
         );
 
         assert!(result.is_err());
@@ -382,6 +410,7 @@ mod tests {
             None,
             None,
             None,
+            vec![],
         );
 
         assert!(result.is_err());
@@ -417,11 +446,11 @@ mod tests {
             meta: default_meta(),
             title: String::from("My API credentials"),
             fields,
+            attachments: vec![],
         };
 
         assert_eq!(entry.title, "My API credentials");
         assert_eq!(entry.fields.len(), 1);
         assert!(entry.fields["api_key"].hidden);
     }
-
 }

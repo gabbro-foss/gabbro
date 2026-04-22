@@ -165,6 +165,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 .into_iter()
                 .map(|f| CustomField { label: f.label, value: f.value, hidden: f.hidden })
                 .collect(),
+            attachments: vec![],
         })),
         VaultEntryData::Note(d) => Ok(VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -177,6 +178,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
             },
             title: d.title,
             content: d.content,
+            attachments: vec![],
         })),
         VaultEntryData::Identity(d) => Ok(VaultEntry::Identity(IdentityEntry {
             meta: EntryMeta {
@@ -196,6 +198,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 .into_iter()
                 .map(|f| CustomField { label: f.label, value: f.value, hidden: f.hidden })
                 .collect(),
+            attachments: vec![],
         })),
         VaultEntryData::Card(d) => {
             let meta = EntryMeta {
@@ -221,6 +224,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 d.bank_name,
                 d.transaction_password,
                 d.notes,
+                vec![],
             )?;
             Ok(VaultEntry::Card(entry))
         }
@@ -251,6 +255,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 .into_iter()
                 .map(|f| (f.label.clone(), CustomField { label: f.label, value: f.value, hidden: f.hidden }))
                 .collect(),
+            attachments: vec![],
         })),
     }
 }
@@ -411,6 +416,7 @@ mod tests {
             },
             title: String::from("Bridge v2 test"),
             content: String::from("bridge v2 content"),
+            attachments: vec![],
         })];
         save_vault(&entries, pass, &path).unwrap();
 
@@ -453,6 +459,7 @@ fn create_test_vault_on_disk() {
             },
             title: String::from("NAS recovery key"),
             content: String::from("secret content here"),
+            attachments: vec![],
         }),
         VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
@@ -468,6 +475,7 @@ fn create_test_vault_on_disk() {
             password: String::from("hunter2"),
             notes: None,
             custom_fields: vec![],
+            attachments: vec![],
         }),
     ];
 

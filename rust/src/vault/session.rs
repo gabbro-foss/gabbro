@@ -272,6 +272,7 @@ mod tests {
                 },
                 title: String::from("Session test note"),
                 content: String::from("session secret content"),
+                attachments: vec![],
             }),
         ];
         save_vault(&entries, passphrase, &path).unwrap();
@@ -362,6 +363,7 @@ mod tests {
             },
             title: String::from("New note"),
             content: String::from("new content"),
+            attachments: vec![],
         });
 
         session_create_entry(new_entry).unwrap();
