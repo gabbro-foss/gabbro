@@ -485,12 +485,10 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Enpass field gap analysis complete. `CardEntry` domain
-  model updated with `pin`, `bank_name`, `transaction_password`. Flaky
-  `test_capitalise` test fixed. 120 Rust tests passing.
-- **Next task:** Import / Migration — Enpass importer implementation.
-  Begin with `rust/src/import/enpass.rs` parsing the JSON export format
-  and mapping to `VaultEntry` types (see Import / Migration section).
+- **Completed:** Enpass JSON importer implemented in `rust/src/import/enpass.rs`.
+  Parses items, filters archived/trashed, maps all six categories, 127 Rust tests passing.
+- **Next task:** Bridge wiring — add `import_from_enpass()` to `rust/src/api/vault_bridge.rs`,
+  regenerate bridge, add Flutter import UI, then release build smoke test on Linux and Android.
 
 ---
 
