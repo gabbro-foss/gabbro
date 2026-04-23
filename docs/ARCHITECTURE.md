@@ -493,14 +493,13 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** `custom_fields: Vec<CustomField>` added to `CardEntry` and
-  `CardEntry::new()`; `CardEntryData` DTO and bridge updated; `convert_card`
-  in Enpass importer fixed to preserve overflow fields (username, password,
-  url, numeric, date, phone) as custom fields rather than silently dropping
-  them; weak placeholder test strengthened to real assertions. Bridge
-  regenerated. 138 Rust tests passing.
-- **Next task:** Verify full 247-item Enpass import end-to-end via a release
-  build. Then begin Bitwarden importer planning.
+- **Completed:** Full Enpass import verified end-to-end via release build.
+  245 entries imported (2 skipped — archived/trashed, expected). Release
+  build import is near-instantaneous. `create_entry_screen.dart` fixed to
+  supply `customFields` on `CardEntryData`. 138 Rust tests passing.
+- **Next task:** Add `title: String` to `LoginEntry` and audit all other
+  entry types for the same gap. Propagate through DTO, bridge, codegen, and
+  `entry_to_summary`. Then rebuild and re-verify Enpass import list view.
 
 ---
 
@@ -783,6 +782,19 @@ discussed and forgotten.
   if it is a mapping issue.
 
 ## Import / Migration
+
+### Bikeshed
+
+- **`LoginEntry` missing `title` field — list view shows URL instead of name:**
+  Enpass (and all importers) provide a human-readable item title (e.g.
+  "GitHub", "Netflix") distinct from the URL and username. `LoginEntry` has
+  no `title` field, so `entry_to_summary` cannot use it — the list view falls
+  back to URL or username, producing poor results (e.g. identical-looking
+  entries for services sharing an email login). Fix: add `title: String` to
+  `LoginEntry`, propagate through `LoginEntryData` DTO, `vault_entry_to_data`,
+  `vault_entry_from_data`, `entry_to_summary`, `create_entry_screen.dart`,
+  and regenerate the bridge. Audit `CardEntry` and other entry types for the
+  same gap while doing this.
 
 ### Rationale — why not write N importers?
 
