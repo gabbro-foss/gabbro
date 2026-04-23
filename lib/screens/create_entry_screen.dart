@@ -359,6 +359,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             notes: _cardNotesController.text.isEmpty
                 ? null
                 : _cardNotesController.text,
+            customFields: const [],
           )),
         );
 
@@ -492,6 +493,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             notes: _cardNotesController.text.isEmpty
                 ? null
                 : _cardNotesController.text,
+            customFields: field0.customFields,
           )),
         );
 
