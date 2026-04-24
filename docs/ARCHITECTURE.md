@@ -493,11 +493,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Added `title: String` to `LoginEntry`; propagated through DTO,
-  bridge, codegen, session summary, Enpass importer, and Flutter UI. Card detail
-  view now shows PIN, bank name, transaction password, and custom fields.
-  Login detail view shows title. 143 Rust tests passing.
-- **Next task:** Implement vault list screen search function (see Features & UX — "Fast fuzzy search").
+- **Completed:** Vault list screen search — persistent search bar with
+  case-insensitive substring filtering, clear button, and empty-results message.
+  5 Flutter widget tests passing. Dependency injection pattern introduced for
+  testable Flutter screens.
+- **Next task:** Alphabetical scroll index bar (see Bikeshed — "Alphabetical scroll index bar").
 
 ---
 

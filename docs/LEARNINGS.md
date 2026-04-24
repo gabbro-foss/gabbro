@@ -1537,6 +1537,40 @@ empty string and stamped by Rust on the session side.
   in `linux/CMakeLists.txt` and `pubspec.yaml`. Then add bulk delete mode to
   bikeshed and consider Android build.
 
+### Dependency injection for testable Flutter widgets
+Flutter widget tests run on the host machine with no Rust binary available.
+A widget that calls a bridge function directly (e.g. `listEntrySummaries()`)
+cannot be tested in isolation — the call crashes with no native library loaded.
+
+The fix is dependency injection: give the widget an optional function parameter
+with the real bridge call as its default value:
+
+```dart
+class VaultListScreen extends StatefulWidget {
+  final List<EntrySummaryData> Function() listEntries;
+  const VaultListScreen({
+    super.key,
+    this.listEntries = listEntrySummaries,
+  });
+}
+```
+
+Production code passes nothing — the default applies. Tests pass a function
+that returns fake data. The widget is identical in both cases; only the
+data source changes. Python analogy: a function that takes an `http_client`
+parameter defaulting to `requests` — tests substitute a mock, production
+uses the real thing.
+
+### `find.descendant` — scoping widget finders in tests
+`find.text('X')` matches every widget in the tree that displays the text X.
+When a search field contains typed text X and a list tile also displays X,
+`findsOneWidget` fails because two matches are found.
+
+`find.descendant(of: find.byType(ListTile), matching: find.text('X'))` scopes
+the search to only widgets that are descendants of a `ListTile`. Use this
+pattern any time a text value could appear in both an input field and
+elsewhere in the widget tree.
+
 ## Android Deployment
 
 ### `adb` — Android Debug Bridge
