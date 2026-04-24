@@ -789,8 +789,6 @@ discussed and forgotten.
 
 ## Import / Migration
 
-### Bikeshed
-
 ### Rationale — why not write N importers?
 
 Before writing any import code, we thought carefully about who actually
