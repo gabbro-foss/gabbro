@@ -6,7 +6,9 @@ import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 class VaultListScreen extends StatefulWidget {
-  const VaultListScreen({super.key});
+  final List<EntrySummaryData> Function() listEntries;
+
+  const VaultListScreen({super.key, this.listEntries = listEntrySummaries});
 
   @override
   State<VaultListScreen> createState() => _VaultListScreenState();
@@ -21,15 +23,24 @@ class _VaultListScreenState extends State<VaultListScreen> {
   bool _isImporting = false;
   bool get _isSelecting => _selectedIds.isNotEmpty;
 
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     _loadEntries();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   void _loadEntries() {
     try {
-      final entries = listEntrySummaries();
+      final entries = widget.listEntries();
       setState(() {
         _entries = entries;
       });
@@ -71,9 +82,20 @@ class _VaultListScreenState extends State<VaultListScreen> {
   }
 
   List<EntrySummaryData> get _filteredEntries {
-    if (_selectedFilter == 'All') return _entries;
-    final rustType = _selectedFilter == 'Password' ? 'Login' : _selectedFilter;
-    return _entries.where((e) => e.entryType == rustType).toList();
+    final typeFiltered = _selectedFilter == 'All'
+        ? _entries
+        : _entries.where((e) {
+            final rustType = _selectedFilter == 'Password'
+                ? 'Login'
+                : _selectedFilter;
+            return e.entryType == rustType;
+          }).toList();
+
+    if (_searchQuery.isEmpty) return typeFiltered;
+    final query = _searchQuery.toLowerCase();
+    return typeFiltered
+        .where((e) => _displayTitle(e).toLowerCase().contains(query))
+        .toList();
   }
 
   List<dynamic> get _groupedEntries {
@@ -322,6 +344,29 @@ class _VaultListScreenState extends State<VaultListScreen> {
             ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search entries…',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () => setState(() {
+                          _searchQuery = '';
+                          _searchController.clear();
+                        }),
+                      )
+                    : null,
+                border: const OutlineInputBorder(),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+              ),
+              onChanged: (value) => setState(() => _searchQuery = value),
+            ),
+          ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -341,60 +386,63 @@ class _VaultListScreenState extends State<VaultListScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: _groupedEntries.length,
-              itemBuilder: (context, index) {
-                final item = _groupedEntries[index];
-                if (item is String) {
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                    child: Text(
-                      item,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  );
-                }
-                final entry = item as EntrySummaryData;
-                return ListTile(
-                  dense: true,
-                  leading: Checkbox(
-                    visualDensity: VisualDensity.compact,
-                    value: _selectedIds.contains(entry.id),
-                    onChanged: (_) => setState(() {
-                      if (_selectedIds.contains(entry.id)) {
-                        _selectedIds.remove(entry.id);
-                      } else {
-                        _selectedIds.add(entry.id);
+            child: _groupedEntries.isEmpty
+                ? const Center(child: Text('No entries match your search.'))
+                : ListView.builder(
+                    itemCount: _groupedEntries.length,
+                    itemBuilder: (context, index) {
+                      final item = _groupedEntries[index];
+                      if (item is String) {
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                          child: Text(
+                            item,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        );
                       }
-                    }),
+                      final entry = item as EntrySummaryData;
+                      return ListTile(
+                        dense: true,
+                        leading: Checkbox(
+                          visualDensity: VisualDensity.compact,
+                          value: _selectedIds.contains(entry.id),
+                          onChanged: (_) => setState(() {
+                            if (_selectedIds.contains(entry.id)) {
+                              _selectedIds.remove(entry.id);
+                            } else {
+                              _selectedIds.add(entry.id);
+                            }
+                          }),
+                        ),
+                        title: Text(_displayTitle(entry)),
+                        subtitle: Text(_displayType(entry.entryType)),
+                        onTap: () async {
+                          if (_isSelecting) {
+                            setState(() {
+                              if (_selectedIds.contains(entry.id)) {
+                                _selectedIds.remove(entry.id);
+                              } else {
+                                _selectedIds.add(entry.id);
+                              }
+                            });
+                            return;
+                          }
+                          final full = getEntry(id: entry.id);
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  EntryDetailScreen(entry: full),
+                            ),
+                          );
+                          if (mounted) _loadEntries();
+                        },
+                      );
+                    },
                   ),
-                  title: Text(_displayTitle(entry)),
-                  subtitle: Text(_displayType(entry.entryType)),
-                  onTap: () async {
-                    if (_isSelecting) {
-                      setState(() {
-                        if (_selectedIds.contains(entry.id)) {
-                          _selectedIds.remove(entry.id);
-                        } else {
-                          _selectedIds.add(entry.id);
-                        }
-                      });
-                      return;
-                    }
-                    final full = getEntry(id: entry.id);
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => EntryDetailScreen(entry: full),
-                      ),
-                    );
-                    if (mounted) _loadEntries();
-                  },
-                );
-              },
-            ),
           ),
         ],
       ),
