@@ -493,13 +493,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Full Enpass import verified end-to-end via release build.
-  245 entries imported (2 skipped — archived/trashed, expected). Release
-  build import is near-instantaneous. `create_entry_screen.dart` fixed to
-  supply `customFields` on `CardEntryData`. 138 Rust tests passing.
-- **Next task:** Add `title: String` to `LoginEntry` and audit all other
-  entry types for the same gap. Propagate through DTO, bridge, codegen, and
-  `entry_to_summary`. Then rebuild and re-verify Enpass import list view.
+- **Completed:** Added `title: String` to `LoginEntry`; propagated through DTO,
+  bridge, codegen, session summary, Enpass importer, and Flutter UI. Card detail
+  view now shows PIN, bank name, transaction password, and custom fields.
+  Login detail view shows title. 143 Rust tests passing.
+- **Next task:** Update `ARCHITECTURE.md` bikeshed with alphabetical scroll index
+  bar item, then begin work on vault list screen search function.
 
 ---
 
@@ -746,6 +745,14 @@ discussed and forgotten.
   it. Prevents silent accumulation of orphaned vault files on the user's device
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
+
+- **Alphabetical scroll index bar (list view):** The vault list screen groups
+  entries by first letter but has no fast-scroll index bar on the right edge
+  to jump directly to a letter. On a vault with 200+ entries this makes
+  navigation slow. Implement a letter index widget (Flutter has no built-in;
+  options include `scrollable_positioned_list` + a custom overlay, or the
+  `azlistview` package — evaluate licence compatibility with GPL-3.0 before
+  adopting). Pairs with the existing alphabetical grouping work.
 
 - **Select-all for bulk delete:** The vault list screen has per-entry checkboxes
   and a bulk delete action, but no select-all button. With 200+ entries this is
