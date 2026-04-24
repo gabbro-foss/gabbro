@@ -33,6 +33,9 @@ pub struct LoginEntryData {
     pub folder: String,
     pub tags: Vec<String>,
     pub favourite: bool,
+    /// Human-readable item title (e.g. "GitHub", "Netflix").
+    /// Distinct from the URL — used as the primary display label in list views.
+    pub title: String,
     pub url: String,
     pub username: String,
     pub password: String,
@@ -138,6 +141,7 @@ fn login_entry_to_data(e: &LoginEntry) -> LoginEntryData {
         folder: e.meta.folder.clone(),
         tags: e.meta.tags.clone(),
         favourite: e.meta.favourite,
+        title: e.title.clone(),
         url: e.url.clone(),
         username: e.username.clone(),
         password: e.password.clone(),
@@ -241,6 +245,7 @@ pub fn create_login_entry(
     folder: String,
     tags: Vec<String>,
     favourite: bool,
+    title: String,
     url: String,
     username: String,
     password: String,
@@ -266,6 +271,7 @@ pub fn create_login_entry(
         .collect();
     let entry = LoginEntry {
         meta,
+        title,
         url,
         username,
         password,
@@ -539,6 +545,7 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
     match entry {
         VaultEntry::Login(e) => VaultEntry::Login(LoginEntry {
             meta: e.meta.clone(),
+            title: e.title.clone(),
             url: e.url.clone(),
             username: e.username.clone(),
             password: MASKED_VALUE.to_string(),
@@ -723,6 +730,7 @@ mod tests {
             String::from("Personal"),
             vec![String::from("web")],
             false,
+            String::from("GitHub"),
             String::from("https://github.com"),
             String::from("rob"),
             String::from("hunter2"),
@@ -730,6 +738,7 @@ mod tests {
             vec![],
         );
 
+        assert_eq!(entry.title, "GitHub");
         assert_eq!(entry.folder, "Personal");
         assert_eq!(entry.url, "https://github.com");
         assert_eq!(entry.username, "rob");
@@ -745,6 +754,7 @@ mod tests {
             String::from("Work"),
             vec![],
             false,
+            String::from("Site A"),
             String::from("https://a.com"),
             String::from("user"),
             String::from("pass"),
@@ -755,6 +765,7 @@ mod tests {
             String::from("Work"),
             vec![],
             false,
+            String::from("Site B"),
             String::from("https://b.com"),
             String::from("user"),
             String::from("pass"),
@@ -775,6 +786,7 @@ mod tests {
             String::from("Personal"),
             vec![],
             true,
+            String::from("Example"),
             String::from("https://example.com"),
             String::from("rob"),
             String::from("s3cr3t"),
@@ -1347,6 +1359,7 @@ mod tests {
                     tags: vec![],
                     favourite: false,
                 },
+                title: String::from("Example"),
                 url: String::from("https://example.com"),
                 username: String::from("rob"),
                 password: String::from("s3cr3t"),
@@ -1377,6 +1390,7 @@ mod tests {
                     tags: vec![],
                     favourite: false,
                 },
+                title: String::from("Example"),
                 url: String::from("https://example.com"),
                 username: String::from("rob"),
                 password: String::from("correct horst battery staple"),
@@ -1452,6 +1466,7 @@ mod tests {
                     tags: vec![],
                     favourite: false,
                 },
+                title: String::from("Example"),
                 url: String::from("https://example.com"),
                 username: String::from("rob"),
                 password: String::from("s3cr3t"),
@@ -1660,5 +1675,4 @@ mod tests {
         let _ = std::fs::remove_file(&path);
         let _ = std::fs::remove_file(&hash_path);
     }
-
 }

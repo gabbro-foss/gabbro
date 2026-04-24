@@ -52,11 +52,14 @@ pub struct EntryAttachment {
 }
 
 /// A login entry - the most common entry type
-/// Stores credentials for a wehsite or application
+/// Stores credentials for a website or application
 #[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct LoginEntry {
     /// Shared metadata (id, timestamp, folder, tags, favourite).
     pub meta: EntryMeta,
+    /// Human-readable item title (e.g. "GitHub", "Netflix").
+    /// Distinct from the URL — used as the primary display label in list views.
+    pub title: String,
     /// The URL this login belongs to (e.g. "https://github.com").
     pub url: String,
     /// The username or email address.
@@ -79,7 +82,7 @@ pub struct CustomField {
     pub hidden: bool,
 }
 
-/// A secure note - free-text content with no crendential fields.
+/// A secure note - free-text content with no credential fields.
 #[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct NoteEntry {
     pub meta: EntryMeta,
@@ -165,27 +168,27 @@ impl CardEntry {
         }
 
         Ok(CardEntry {
-                meta,
-                card_name,
-                status,
-                cardholder_name,
-                card_number,
-                expiry,
-                cvv,
-                credit_limit,
-                card_account_number,
-                payment_network,
-                pin,
-                bank_name,
-                transaction_password,
-                notes,
-                custom_fields,
-                attachments,
-            })
+            meta,
+            card_name,
+            status,
+            cardholder_name,
+            card_number,
+            expiry,
+            cvv,
+            credit_limit,
+            card_account_number,
+            payment_network,
+            pin,
+            bank_name,
+            transaction_password,
+            notes,
+            custom_fields,
+            attachments,
+        })
     }
 }
 
-/// A file attachement entry - stores a binary payload.
+/// A file attachment entry - stores a binary payload.
 #[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct FileEntry {
     pub meta: EntryMeta,
@@ -249,6 +252,7 @@ mod tests {
     fn login_entry_stores_basic_fields() {
         let entry = LoginEntry {
             meta: default_meta(),
+            title: String::from("GitHub"),
             url: String::from("https://github.com"),
             username: String::from("rob"),
             password: String::from("hunter2"),
@@ -257,6 +261,7 @@ mod tests {
             attachments: vec![],
         };
 
+        assert_eq!(entry.title, "GitHub");
         assert_eq!(entry.url, "https://github.com");
         assert_eq!(entry.username, "rob");
         assert_eq!(entry.meta.id, "test-id-001");
@@ -267,6 +272,7 @@ mod tests {
     fn login_entry_notes_can_be_absent() {
         let entry = LoginEntry {
             meta: default_meta(),
+            title: String::from("Example"),
             url: String::from("https://example.com"),
             username: String::from("rob"),
             password: String::from("s3cr3t"),
@@ -282,6 +288,7 @@ mod tests {
     fn login_entry_notes_can_be_present() {
         let entry = LoginEntry {
             meta: default_meta(),
+            title: String::from("Example"),
             url: String::from("https://example.com"),
             username: String::from("rob"),
             password: String::from("s3cr3t"),
@@ -303,6 +310,7 @@ mod tests {
         };
         let entry = LoginEntry {
             meta: default_meta(),
+            title: String::from("Example"),
             url: String::from("https://example.com"),
             username: String::from("rob"),
             password: String::from("s3cr3t"),

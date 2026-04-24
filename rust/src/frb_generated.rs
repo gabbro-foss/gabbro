@@ -383,6 +383,7 @@ fn wire__crate__api__vault__create_login_entry_impl(
             let api_folder = <String>::sse_decode(&mut deserializer);
             let api_tags = <Vec<String>>::sse_decode(&mut deserializer);
             let api_favourite = <bool>::sse_decode(&mut deserializer);
+            let api_title = <String>::sse_decode(&mut deserializer);
             let api_url = <String>::sse_decode(&mut deserializer);
             let api_username = <String>::sse_decode(&mut deserializer);
             let api_password = <String>::sse_decode(&mut deserializer);
@@ -396,6 +397,7 @@ fn wire__crate__api__vault__create_login_entry_impl(
                         api_folder,
                         api_tags,
                         api_favourite,
+                        api_title,
                         api_url,
                         api_username,
                         api_password,
@@ -1318,6 +1320,7 @@ impl SseDecode for crate::api::vault::LoginEntryData {
         let mut var_folder = <String>::sse_decode(deserializer);
         let mut var_tags = <Vec<String>>::sse_decode(deserializer);
         let mut var_favourite = <bool>::sse_decode(deserializer);
+        let mut var_title = <String>::sse_decode(deserializer);
         let mut var_url = <String>::sse_decode(deserializer);
         let mut var_username = <String>::sse_decode(deserializer);
         let mut var_password = <String>::sse_decode(deserializer);
@@ -1331,6 +1334,7 @@ impl SseDecode for crate::api::vault::LoginEntryData {
             folder: var_folder,
             tags: var_tags,
             favourite: var_favourite,
+            title: var_title,
             url: var_url,
             username: var_username,
             password: var_password,
@@ -1804,6 +1808,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::LoginEntryData {
             self.folder.into_into_dart().into_dart(),
             self.tags.into_into_dart().into_dart(),
             self.favourite.into_into_dart().into_dart(),
+            self.title.into_into_dart().into_dart(),
             self.url.into_into_dart().into_dart(),
             self.username.into_into_dart().into_dart(),
             self.password.into_into_dart().into_dart(),
@@ -2163,6 +2168,7 @@ impl SseEncode for crate::api::vault::LoginEntryData {
         <String>::sse_encode(self.folder, serializer);
         <Vec<String>>::sse_encode(self.tags, serializer);
         <bool>::sse_encode(self.favourite, serializer);
+        <String>::sse_encode(self.title, serializer);
         <String>::sse_encode(self.url, serializer);
         <String>::sse_encode(self.username, serializer);
         <String>::sse_encode(self.password, serializer);

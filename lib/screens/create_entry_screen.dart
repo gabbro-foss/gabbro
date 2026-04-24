@@ -25,6 +25,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   String? _error;
 
   // ── Login fields ────────────────────────────────────────────────────────────
+  late final TextEditingController _loginTitleController;
   late final TextEditingController _urlController;
   late final TextEditingController _usernameController;
   late final TextEditingController _passwordController;
@@ -91,15 +92,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     final e = widget.existing;
 
     // ── Login ──────────────────────────────────────────────────────────────
-    if (e case VaultEntryData_Login(:final field0)) {
-      _urlController = TextEditingController(text: field0.url);
-      _usernameController = TextEditingController(text: field0.username);
-      _passwordController = TextEditingController(text: field0.password);
-    } else {
-      _urlController = TextEditingController();
-      _usernameController = TextEditingController();
-      _passwordController = TextEditingController();
-    }
+    // ── Login fields ────────────────────────────────────────────────────────────
+  late final TextEditingController _loginTitleController;
+  late final TextEditingController _urlController;
+  late final TextEditingController _usernameController;
+  late final TextEditingController _passwordController;
+  bool _passwordObscured = true;
 
     // ── Note ───────────────────────────────────────────────────────────────
     if (e case VaultEntryData_Note(:final field0)) {
@@ -194,6 +192,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   @override
   void dispose() {
     // Login
+    _loginTitleController.dispose();
     _urlController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
@@ -279,6 +278,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             folder: 'Personal',
             tags: [],
             favourite: false,
+            title: _loginTitleController.text,
             url: _urlController.text,
             username: _usernameController.text,
             password: _passwordController.text,
@@ -413,6 +413,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             folder: field0.folder,
             tags: field0.tags,
             favourite: field0.favourite,
+            title: _loginTitleController.text,
             url: _urlController.text,
             username: _usernameController.text,
             password: _passwordController.text,
@@ -613,6 +614,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   // ── Login fields ─────────────────────────────────────────────────────────────
 
   List<Widget> _loginFields() => [
+        _textField(_loginTitleController, 'Title'),
+        const SizedBox(height: 12),
         _textField(_urlController, 'URL'),
         const SizedBox(height: 12),
         _textField(_usernameController, 'Username'),

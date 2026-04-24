@@ -48,6 +48,7 @@ mod tests {
     fn single_login_entry_roundtrips() {
         let entry = VaultEntry::Login(LoginEntry {
             meta: default_meta("id-001"),
+            title: String::from("GitHub"),
             url: String::from("https://github.com"),
             username: String::from("rob"),
             password: String::from("correct horst battery staple"),
@@ -72,6 +73,7 @@ mod tests {
         let entries = vec![
             VaultEntry::Login(LoginEntry {
                 meta: default_meta("id-001"),
+                title: String::from("Example"),
                 url: String::from("https://example.com"),
                 username: String::from("rob"),
                 password: String::from("s3cr3t"),

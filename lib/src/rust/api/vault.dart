@@ -17,6 +17,7 @@ Future<LoginEntryData> createLoginEntry({
   required String folder,
   required List<String> tags,
   required bool favourite,
+  required String title,
   required String url,
   required String username,
   required String password,
@@ -26,6 +27,7 @@ Future<LoginEntryData> createLoginEntry({
   folder: folder,
   tags: tags,
   favourite: favourite,
+  title: title,
   url: url,
   username: username,
   password: password,
@@ -437,6 +439,10 @@ class LoginEntryData {
   final String folder;
   final List<String> tags;
   final bool favourite;
+
+  /// Human-readable item title (e.g. "GitHub", "Netflix").
+  /// Distinct from the URL — used as the primary display label in list views.
+  final String title;
   final String url;
   final String username;
   final String password;
@@ -450,6 +456,7 @@ class LoginEntryData {
     required this.folder,
     required this.tags,
     required this.favourite,
+    required this.title,
     required this.url,
     required this.username,
     required this.password,
@@ -465,6 +472,7 @@ class LoginEntryData {
       folder.hashCode ^
       tags.hashCode ^
       favourite.hashCode ^
+      title.hashCode ^
       url.hashCode ^
       username.hashCode ^
       password.hashCode ^
@@ -482,6 +490,7 @@ class LoginEntryData {
           folder == other.folder &&
           tags == other.tags &&
           favourite == other.favourite &&
+          title == other.title &&
           url == other.url &&
           username == other.username &&
           password == other.password &&

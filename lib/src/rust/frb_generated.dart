@@ -144,6 +144,7 @@ abstract class RustLibApi extends BaseApi {
     required String folder,
     required List<String> tags,
     required bool favourite,
+    required String title,
     required String url,
     required String username,
     required String password,
@@ -561,6 +562,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required String folder,
     required List<String> tags,
     required bool favourite,
+    required String title,
     required String url,
     required String username,
     required String password,
@@ -574,6 +576,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(folder, serializer);
           sse_encode_list_String(tags, serializer);
           sse_encode_bool(favourite, serializer);
+          sse_encode_String(title, serializer);
           sse_encode_String(url, serializer);
           sse_encode_String(username, serializer);
           sse_encode_String(password, serializer);
@@ -595,6 +598,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           folder,
           tags,
           favourite,
+          title,
           url,
           username,
           password,
@@ -613,6 +617,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "folder",
           "tags",
           "favourite",
+          "title",
           "url",
           "username",
           "password",
@@ -1388,8 +1393,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LoginEntryData dco_decode_login_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 11)
-      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    if (arr.length != 12)
+      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
     return LoginEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -1397,11 +1402,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       folder: dco_decode_String(arr[3]),
       tags: dco_decode_list_String(arr[4]),
       favourite: dco_decode_bool(arr[5]),
-      url: dco_decode_String(arr[6]),
-      username: dco_decode_String(arr[7]),
-      password: dco_decode_String(arr[8]),
-      notes: dco_decode_opt_String(arr[9]),
-      customFields: dco_decode_list_custom_field_data(arr[10]),
+      title: dco_decode_String(arr[6]),
+      url: dco_decode_String(arr[7]),
+      username: dco_decode_String(arr[8]),
+      password: dco_decode_String(arr[9]),
+      notes: dco_decode_opt_String(arr[10]),
+      customFields: dco_decode_list_custom_field_data(arr[11]),
     );
   }
 
@@ -1858,6 +1864,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_folder = sse_decode_String(deserializer);
     var var_tags = sse_decode_list_String(deserializer);
     var var_favourite = sse_decode_bool(deserializer);
+    var var_title = sse_decode_String(deserializer);
     var var_url = sse_decode_String(deserializer);
     var var_username = sse_decode_String(deserializer);
     var var_password = sse_decode_String(deserializer);
@@ -1870,6 +1877,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       folder: var_folder,
       tags: var_tags,
       favourite: var_favourite,
+      title: var_title,
       url: var_url,
       username: var_username,
       password: var_password,
@@ -2300,6 +2308,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.folder, serializer);
     sse_encode_list_String(self.tags, serializer);
     sse_encode_bool(self.favourite, serializer);
+    sse_encode_String(self.title, serializer);
     sse_encode_String(self.url, serializer);
     sse_encode_String(self.username, serializer);
     sse_encode_String(self.password, serializer);

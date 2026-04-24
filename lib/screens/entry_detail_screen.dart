@@ -170,7 +170,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-        child: _buildBody(),
+          child: _buildBody(),
         ),
       ),
     );
@@ -178,7 +178,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
 
   String _title() => switch (_entry) {
         VaultEntryData_Login(:final field0) =>
-          field0.url.isNotEmpty ? field0.url : '(no URL)',
+          field0.title.isNotEmpty ? field0.title : field0.url.isNotEmpty ? field0.url : '(no title)',
         VaultEntryData_Note(:final field0) => field0.title,
         VaultEntryData_Identity(:final field0) =>
           '${field0.firstName} ${field0.lastName}',
@@ -203,6 +203,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _field('Title', e.title),
         _field('URL', e.url),
         _field('Username', e.username),
         _field('Password', e.password, obscure: true),
@@ -284,10 +285,57 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           obscured: _cvvObscured,
           onToggle: () => setState(() => _cvvObscured = !_cvvObscured),
         ),
+        if (e.pin != null)
+          _toggleField(
+            label: 'PIN',
+            value: e.pin!,
+            obscured: !_revealedFields.contains('pin'),
+            onToggle: () => setState(() {
+              if (_revealedFields.contains('pin')) {
+                _revealedFields.remove('pin');
+              } else {
+                _revealedFields.add('pin');
+              }
+            }),
+          ),
         if (e.creditLimit != null) _field('Credit limit', e.creditLimit!),
         if (e.cardAccountNumber != null)
           _field('Account number', e.cardAccountNumber!),
+        if (e.bankName != null) _field('Bank', e.bankName!),
+        if (e.transactionPassword != null)
+          _toggleField(
+            label: 'Transaction password',
+            value: e.transactionPassword!,
+            obscured: !_revealedFields.contains('transaction_password'),
+            onToggle: () => setState(() {
+              if (_revealedFields.contains('transaction_password')) {
+                _revealedFields.remove('transaction_password');
+              } else {
+                _revealedFields.add('transaction_password');
+              }
+            }),
+          ),
         if (e.notes != null) _field('Notes', e.notes!),
+        if (e.customFields.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          _sectionHeader('Custom fields'),
+          ...e.customFields.map(
+            (f) => f.hidden
+                ? _toggleField(
+                    label: f.label,
+                    value: f.value,
+                    obscured: !_revealedFields.contains(f.label),
+                    onToggle: () => setState(() {
+                      if (_revealedFields.contains(f.label)) {
+                        _revealedFields.remove(f.label);
+                      } else {
+                        _revealedFields.add(f.label);
+                      }
+                    }),
+                  )
+                : _field(f.label, f.value),
+          ),
+        ],
       ],
     );
   }

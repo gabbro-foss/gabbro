@@ -22,7 +22,7 @@ pub struct VaultSession {
     pub passphrase: Vec<u8>,
 }
 
-static VAULT_SESSION: Lazy<Mutex<Option<VaultSession>>> = 
+static VAULT_SESSION: Lazy<Mutex<Option<VaultSession>>> =
     Lazy::new(|| Mutex::new(None));
 
 // ── Session API ───────────────────────────────────────────────────────────────
@@ -67,13 +67,21 @@ fn entry_id(entry: &VaultEntry) -> &str {
 }
 
 /// Builds a lightweight summary DTO from any entry variant.
+///
+/// Display title selection per type:
+/// - Login:    `title` field; falls back to `url` if empty, then UUID
+/// - Note:     `title` field
+/// - Identity: `first_name + " " + last_name`
+/// - Card:     `card_name` if present; falls back to `cardholder_name`
+/// - File:     `filename`
+/// - Custom:   `title` field
 fn entry_to_summary(entry: &VaultEntry) -> EntrySummaryData {
     match entry {
         VaultEntry::Login(e) => EntrySummaryData {
             id: e.meta.id.clone(),
             entry_type: String::from("Login"),
-            title: if !e.username.is_empty() {
-                e.username.clone()
+            title: if !e.title.is_empty() {
+                e.title.clone()
             } else if !e.url.is_empty() {
                 e.url.clone()
             } else {
@@ -102,7 +110,11 @@ fn entry_to_summary(entry: &VaultEntry) -> EntrySummaryData {
         VaultEntry::Card(e) => EntrySummaryData {
             id: e.meta.id.clone(),
             entry_type: String::from("Card"),
-            title: e.cardholder_name.clone(),
+            title: e.card_name
+                .as_deref()
+                .filter(|s| !s.is_empty())
+                .unwrap_or(&e.cardholder_name)
+                .to_string(),
             folder: e.meta.folder.clone(),
             tags: e.meta.tags.clone(),
             favourite: e.meta.favourite,
@@ -411,5 +423,133 @@ mod tests {
         assert!(unlock_vault(new, path.clone()).is_ok());
 
         teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn login_entry_to_summary_uses_title() {
+        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry};
+
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("id-login-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("hunter2"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+
+        let summary = entry_to_summary(&entry);
+        assert_eq!(summary.title, "GitHub",
+            "summary title should use LoginEntry.title, not url or username");
+    }
+
+    #[test]
+    #[serial]
+    fn login_entry_to_summary_falls_back_to_url_when_title_empty() {
+        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry};
+
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("id-login-002"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from(""),
+            url: String::from("https://example.com"),
+            username: String::from("rob"),
+            password: String::from("s3cr3t"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+
+        let summary = entry_to_summary(&entry);
+        assert_eq!(summary.title, "https://example.com",
+            "summary should fall back to url when title is empty");
+    }
+
+    #[test]
+    #[serial]
+    fn card_entry_to_summary_uses_card_name_when_present() {
+        use crate::vault::entry::{CardEntry, EntryMeta, VaultEntry};
+
+        let entry = VaultEntry::Card(CardEntry {
+            meta: EntryMeta {
+                id: String::from("id-card-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            card_name: Some(String::from("Visa Platinum")),
+            status: String::from("active"),
+            cardholder_name: String::from("Rob Smith"),
+            card_number: String::from("4111111111111111"),
+            expiry: String::from("12/28"),
+            cvv: String::from("123"),
+            credit_limit: None,
+            card_account_number: None,
+            payment_network: None,
+            pin: None,
+            bank_name: None,
+            transaction_password: None,
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+
+        let summary = entry_to_summary(&entry);
+        assert_eq!(summary.title, "Visa Platinum",
+            "summary should use card_name when present");
+    }
+
+    #[test]
+    #[serial]
+    fn card_entry_to_summary_falls_back_to_cardholder_name() {
+        use crate::vault::entry::{CardEntry, EntryMeta, VaultEntry};
+
+        let entry = VaultEntry::Card(CardEntry {
+            meta: EntryMeta {
+                id: String::from("id-card-002"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            card_name: None,
+            status: String::from("active"),
+            cardholder_name: String::from("Rob Smith"),
+            card_number: String::from("4111111111111111"),
+            expiry: String::from("12/28"),
+            cvv: String::from("123"),
+            credit_limit: None,
+            card_account_number: None,
+            payment_network: None,
+            pin: None,
+            bank_name: None,
+            transaction_password: None,
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+
+        let summary = entry_to_summary(&entry);
+        assert_eq!(summary.title, "Rob Smith",
+            "summary should fall back to cardholder_name when card_name is absent");
     }
 }

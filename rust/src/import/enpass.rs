@@ -119,7 +119,7 @@ fn convert_item(item: EnpassItem) -> Result<VaultEntry, String> {
             Ok(VaultEntry::Login(convert_login(meta, &item.title, &item.note, &fields, attachments)))
         }
         "creditcard" => {
-            convert_card(meta, &item.note, &fields, attachments)
+            convert_card(meta, &item.title, &item.note, &fields, attachments)
                 .map(VaultEntry::Card)
         }
         "note" => {
@@ -145,19 +145,14 @@ fn convert_login(
     fields: &[&EnpassField],
     attachments: Vec<EntryAttachment>,
 ) -> LoginEntry {
-    let url      = find_field_value(fields, &["url", "webAddress", "Web Address"]);
-    let username = find_field_value(fields, &["username", "email", "name", "login"]);
+    let url      = find_field_value(fields, &["url"]);
+    let username = find_field_value(fields, &["username", "email"]);
     let password = find_field_value(fields, &["password"]);
-    // If both url and username are empty, fall back to the item title as the url
-    // so the entry is at least identifiable in the list view.
-    let url = if url.is_empty() && username.is_empty() {
-        title.to_string()
-    } else {
-        url
-    };
 
     // Everything that isn't a canonical login field becomes a custom field.
-    let skip = ["url", "webAddress", "Web Address", "username", "email", "name", "login", "password"];
+    // The skip list contains only field types that actually appear in real
+    // Enpass exports and map to dedicated LoginEntry slots.
+    let skip = ["url", "username", "email", "password"];
     let custom_fields = fields
         .iter()
         .filter(|f| !skip.contains(&f.field_type.as_str()))
@@ -166,6 +161,7 @@ fn convert_login(
 
     LoginEntry {
         meta,
+        title: title.to_string(),
         url,
         username,
         password,
@@ -177,6 +173,7 @@ fn convert_login(
 
 fn convert_card(
     meta: EntryMeta,
+    title: &str,
     note: &str,
     fields: &[&EnpassField],
     attachments: Vec<EntryAttachment>,
@@ -195,7 +192,7 @@ fn convert_card(
 
     CardEntry::new(
         meta,
-        None,                                                          // card_name
+        Some(title.to_string()),                                       // card_name from item title
         String::from("active"),                                        // status
         find_field_value(fields, &["ccName"]),                        // cardholder_name
         card_number,
@@ -382,6 +379,7 @@ mod tests {
         assert_eq!(entries.len(), 1);
         let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
         assert_eq!(e.meta.id, "aaa-111");
+        assert_eq!(e.title, "GitHub");
         assert_eq!(e.username, "rob");
         assert_eq!(e.password, "h4x0r");
         assert_eq!(e.url, "https://github.com");
@@ -394,6 +392,7 @@ mod tests {
         assert_eq!(entries.len(), 1);
         let VaultEntry::Card(ref e) = entries[0] else { panic!("expected Card") };
         assert_eq!(e.meta.id, "bbb-222");
+        assert_eq!(e.card_name, Some(String::from("Visa Platinum")));
         assert_eq!(e.cardholder_name, "Rob Smith");
         assert_eq!(e.card_number, "4111111111111111");
         assert_eq!(e.meta.favourite, true);
@@ -505,9 +504,6 @@ mod tests {
 
     #[test]
     fn login_title_comes_from_item_title_not_url() {
-        // Titles are not stored on LoginEntry directly — they surface via
-        // the summary layer. Verify the entry's meta.id is correct and the
-        // url field comes from the url field, not the item title.
         let json = r#"{
           "items": [{
             "uuid": "f01-004", "title": "My Bank", "category": "login",
@@ -521,6 +517,8 @@ mod tests {
         }"#;
         let entries = parse(json.as_bytes()).unwrap();
         let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
+        assert_eq!(e.title, "My Bank",
+            "title field should come from item.title");
         assert_eq!(e.url, "https://mybank.example",
             "url should come from the url field, not the item title");
         assert_eq!(e.meta.id, "f01-004");
@@ -562,9 +560,6 @@ mod tests {
 
     #[test]
     fn creditcard_username_and_password_fields_become_custom_fields() {
-        // A creditcard item may contain username/password fields (e.g. for
-        // online banking portal access). These have no home in CardEntry and
-        // must not be silently dropped — they become custom fields.
         let json = r#"{
           "items": [{
             "uuid": "f02-001", "title": "Visa", "category": "creditcard",
@@ -583,8 +578,6 @@ mod tests {
         let VaultEntry::Card(ref e) = entries[0] else { panic!("expected Card") };
         assert_eq!(e.cardholder_name, "Rob Smith");
         assert_eq!(e.card_number, "4111111111111111");
-        // username and password fields on a card have no dedicated slot —
-        // they must land in custom_fields rather than being silently dropped.
         assert!(
             e.custom_fields.iter().any(|f| f.label == "Portal user"),
             "username field on a card should become a custom field"
