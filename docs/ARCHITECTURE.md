@@ -493,11 +493,14 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Vault list screen search — persistent search bar with
-  case-insensitive substring filtering, clear button, and empty-results message.
-  5 Flutter widget tests passing. Dependency injection pattern introduced for
-  testable Flutter screens.
-- **Next task:** Alphabetical scroll index bar (see Bikeshed — "Alphabetical scroll index bar").
+- **Completed:** Alphabet index bar scaffold — `AlphabetIndexBar` widget
+  built in `lib/screens/alphabet_index_bar.dart`. All 27 letters (A–Z + #)
+  shown, windowed when screen height is insufficient, dimmed for unpopulated
+  letters, present letters interactive. Grouping fixed: non-alphabetic titles
+  now sort under `#` after Z. Layout uses `Row` to give list and bar
+  unambiguous separate columns.
+- **Next task:** Fix alphabet index bar scroll jump (see Bikeshed —
+  "Alphabetical scroll index bar — scroll jump fix").
 
 ---
 
@@ -745,13 +748,24 @@ discussed and forgotten.
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
 
-- **Alphabetical scroll index bar (list view):** The vault list screen groups
-  entries by first letter but has no fast-scroll index bar on the right edge
-  to jump directly to a letter. On a vault with 200+ entries this makes
-  navigation slow. Implement a letter index widget (Flutter has no built-in;
-  options include `scrollable_positioned_list` + a custom overlay, or the
-  `azlistview` package — evaluate licence compatibility with GPL-3.0 before
-  adopting). Pairs with the existing alphabetical grouping work.
+- **Alphabetical scroll index bar — scroll jump fix:** The `AlphabetIndexBar`
+  widget is built and wired. Visual behaviour (windowing, dimming, drag
+  highlight) works correctly. The scroll jump does not work because
+  `GlobalKey`-based position lookup fails for off-screen section headers:
+  `ListView.builder` is lazy — headers that have never scrolled into view
+  have never been built, so `_sectionKeys[letter]` is null for any letter
+  whose section is not currently visible.
+
+  **Root cause confirmed:** `_scrollToLetter` receives the correct letter
+  (verified via `debugPrint`), but `sectionKey` is null because the header
+  widget for that letter was never rendered.
+
+  **Correct fix:** abandon `GlobalKey` lookup entirely. Use
+  `scrollable_positioned_list` (pub.dev, BSD-3 licence, GPL-3.0 compatible)
+  which provides `ItemScrollController.scrollTo(index:)` — scroll directly
+  to a flat list index with no offset arithmetic and no lazy-render problem.
+  Evaluate the licence and API at the start of the next session before
+  writing any code.
 
 - **Select-all for bulk delete:** The vault list screen has per-entry checkboxes
   and a bulk delete action, but no select-all button. With 200+ entries this is

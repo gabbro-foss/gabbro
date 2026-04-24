@@ -1686,3 +1686,51 @@ a `Column` expands to fill available space — it never overflows and
 scroll never activates. Adding `mainAxisSize: MainAxisSize.min` tells
 the column to size itself to its children, enabling scroll when the
 content is taller than the screen.
+### `ListView.builder` is lazy — `GlobalKey` fails for off-screen items
+`ListView.builder` only builds widgets that are currently visible (or near
+the viewport). A `GlobalKey` attached to a section header that has never
+scrolled into view will have `currentContext == null` — the widget simply
+does not exist in the render tree yet.
+
+Consequence: using `GlobalKey` to look up the position of an arbitrary
+section header and scroll to it fails silently for any header that is
+off-screen. `_sectionKeys[letter]` returns null for letters whose sections
+are below the current scroll position and have never been rendered.
+
+The correct solution for "scroll to index N in a lazy list" is
+`scrollable_positioned_list`, a BSD-3-licensed package that wraps
+`ListView.builder` and provides `ItemScrollController.scrollTo(index:)`.
+This sidesteps the lazy-render problem entirely because the scroll is
+driven by index, not by pixel position derived from a rendered widget.
+
+### `Row` vs `Stack` for side-by-side list + index bar
+A `Stack` overlays children — the index bar sits on top of the list and
+competes for tap events at the same screen coordinates. This makes it
+impossible to reliably distinguish a tap on the index bar from a tap on
+a list item, especially on desktop where click targets are small.
+
+A `Row` places children side by side — the list takes `Expanded` (all
+remaining width) and the index bar takes a fixed `SizedBox` width. No
+overlap, no ambiguity, no competing tap targets.
+
+### FAB clearance — padding not layout tricks
+The `FloatingActionButton` floats above the body at the bottom-right by
+default. Content behind it is obscured. The correct fix is to add
+`padding: EdgeInsets.only(bottom: 80)` to the widget that would otherwise
+extend behind the FAB. No layout restructuring needed — the FAB's default
+position is ~56px tall with ~16px margin, so 80px bottom padding is
+sufficient clearance.
+
+### `LayoutBuilder` for responsive letter bar
+`LayoutBuilder` gives a widget access to its own constraints at build time.
+Used in `AlphabetIndexBar` to compute how many letters fit at the minimum
+readable height, then window the full 27-letter list to that count centred
+on the active letter. This avoids overflow on small screens without
+shrinking font size below readable limits.
+
+### `HitTestBehavior.opaque` on `GestureDetector`
+By default a `GestureDetector` only receives hit tests where its child has
+painted pixels. `HitTestBehavior.opaque` makes the entire bounding box
+receive hits regardless of whether the child painted there. Required for
+the index bar so that taps in the gaps between letters are still captured
+by the bar rather than falling through to the list behind it.
