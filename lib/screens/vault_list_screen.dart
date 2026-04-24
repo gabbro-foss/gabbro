@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -25,6 +26,12 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final Map<String, GlobalKey> _sectionKeys = {};
+
+  // Key on the ListView itself — used to get the list's screen position
+  // so _scrollToLetter can compute accurate offsets.
+  final GlobalKey _listKey = GlobalKey();
 
   @override
   void initState() {
@@ -35,6 +42,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -85,9 +93,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
     final typeFiltered = _selectedFilter == 'All'
         ? _entries
         : _entries.where((e) {
-            final rustType = _selectedFilter == 'Password'
-                ? 'Login'
-                : _selectedFilter;
+            final rustType =
+                _selectedFilter == 'Password' ? 'Login' : _selectedFilter;
             return e.entryType == rustType;
           }).toList();
 
@@ -98,21 +105,45 @@ class _VaultListScreenState extends State<VaultListScreen> {
         .toList();
   }
 
+  Map<String, int> get _letterIndex {
+    final map = <String, int>{};
+    final items = _groupedEntries;
+    for (var i = 0; i < items.length; i++) {
+      final item = items[i];
+      if (item is String) map[item] = i;
+    }
+    return map;
+  }
+
+  String _sectionLetter(EntrySummaryData entry) {
+    final title = _displayTitle(entry);
+    if (title.isEmpty) return '#';
+    final first = title[0];
+    return RegExp(r'[A-Za-z]').hasMatch(first) ? first.toUpperCase() : '#';
+  }
+
+  int _sortKey(EntrySummaryData entry) {
+    final title = _displayTitle(entry);
+    if (title.isEmpty) return 1;
+    final first = title[0];
+    return RegExp(r'[A-Za-z]').hasMatch(first) ? 0 : 1;
+  }
+
   List<dynamic> get _groupedEntries {
     final sorted = List<EntrySummaryData>.from(_filteredEntries)
-      ..sort(
-        (a, b) => _displayTitle(
-          a,
-        ).toLowerCase().compareTo(_displayTitle(b).toLowerCase()),
-      );
+      ..sort((a, b) {
+        final keyDiff = _sortKey(a) - _sortKey(b);
+        if (keyDiff != 0) return keyDiff;
+        return _displayTitle(a)
+            .toLowerCase()
+            .compareTo(_displayTitle(b).toLowerCase());
+      });
 
     final result = <dynamic>[];
     String? currentLetter;
 
     for (final entry in sorted) {
-      final letter = _displayTitle(entry).isNotEmpty
-          ? _displayTitle(entry)[0].toUpperCase()
-          : '#';
+      final letter = _sectionLetter(entry);
       if (letter != currentLetter) {
         result.add(letter);
         currentLetter = letter;
@@ -120,6 +151,34 @@ class _VaultListScreenState extends State<VaultListScreen> {
       result.add(entry);
     }
     return result;
+  }
+
+  // Scrolls so the section header for [letter] is at the top of the list.
+  // Uses GlobalKey positions measured after render, so no hardcoded heights.
+  void _scrollToLetter(String letter) {
+    debugPrint('_scrollToLetter called: $letter');
+    if (!_scrollController.hasClients) return;
+    final sectionKey = _sectionKeys[letter];
+    debugPrint('sectionKey: $sectionKey');
+    if (sectionKey == null) return;
+    final sectionContext = sectionKey.currentContext;
+    debugPrint('sectionContext: $sectionContext');
+    if (sectionContext == null) return;
+    final listContext = _listKey.currentContext;
+    debugPrint('listContext: $listContext');
+    if (listContext == null) return;
+
+    final sectionBox = sectionContext.findRenderObject() as RenderBox;
+    final listBox = listContext.findRenderObject() as RenderBox;
+
+    // Position of the section header relative to the list widget's top-left.
+    final sectionOffset =
+        sectionBox.localToGlobal(Offset.zero, ancestor: listBox);
+
+    final target = _scrollController.offset + sectionOffset.dy;
+    _scrollController.jumpTo(
+      target.clamp(0.0, _scrollController.position.maxScrollExtent),
+    );
   }
 
   Future<void> _showTypePicker() async {
@@ -336,6 +395,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
           ],
         ],
       ),
+      // FAB stays at default bottom-right but the index bar column ends
+      // above it via padding, so they never overlap.
       floatingActionButton: _isSelecting
           ? null
           : FloatingActionButton(
@@ -378,7 +439,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
                       child: FilterChip(
                         label: Text(f),
                         selected: _selectedFilter == f,
-                        onSelected: (_) => setState(() => _selectedFilter = f),
+                        onSelected: (_) =>
+                            setState(() => _selectedFilter = f),
                       ),
                     ),
                   )
@@ -388,60 +450,86 @@ class _VaultListScreenState extends State<VaultListScreen> {
           Expanded(
             child: _groupedEntries.isEmpty
                 ? const Center(child: Text('No entries match your search.'))
-                : ListView.builder(
-                    itemCount: _groupedEntries.length,
-                    itemBuilder: (context, index) {
-                      final item = _groupedEntries[index];
-                      if (item is String) {
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-                          child: Text(
-                            item,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // List takes all available width minus the index bar.
+                      Expanded(
+                        child: ListView.builder(
+                          key: _listKey,
+                          controller: _scrollController,
+                          itemCount: _groupedEntries.length,
+                          itemBuilder: (context, index) {
+                            final item = _groupedEntries[index];
+                            if (item is String) {
+                              _sectionKeys[item] ??= GlobalKey();
+                              return Padding(
+                                key: _sectionKeys[item],
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                                child: Text(
+                                  item,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              );
+                            }
+                            final entry = item as EntrySummaryData;
+                            return ListTile(
+                              dense: true,
+                              leading: Checkbox(
+                                visualDensity: VisualDensity.compact,
+                                value: _selectedIds.contains(entry.id),
+                                onChanged: (_) => setState(() {
+                                  if (_selectedIds.contains(entry.id)) {
+                                    _selectedIds.remove(entry.id);
+                                  } else {
+                                    _selectedIds.add(entry.id);
+                                  }
+                                }),
+                              ),
+                              title: Text(_displayTitle(entry)),
+                              subtitle: Text(_displayType(entry.entryType)),
+                              onTap: () async {
+                                if (_isSelecting) {
+                                  setState(() {
+                                    if (_selectedIds.contains(entry.id)) {
+                                      _selectedIds.remove(entry.id);
+                                    } else {
+                                      _selectedIds.add(entry.id);
+                                    }
+                                  });
+                                  return;
+                                }
+                                final full = getEntry(id: entry.id);
+                                await Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EntryDetailScreen(entry: full),
+                                  ),
+                                );
+                                if (mounted) _loadEntries();
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      // Index bar — fixed width column, clear of the FAB
+                      // at the bottom via padding.
+                      if (_searchQuery.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 80),
+                          child: SizedBox(
+                            width: 36,
+                            child: AlphabetIndexBar(
+                              presentLetters: _letterIndex.keys.toSet(),
+                              onLetterSelected: _scrollToLetter,
                             ),
                           ),
-                        );
-                      }
-                      final entry = item as EntrySummaryData;
-                      return ListTile(
-                        dense: true,
-                        leading: Checkbox(
-                          visualDensity: VisualDensity.compact,
-                          value: _selectedIds.contains(entry.id),
-                          onChanged: (_) => setState(() {
-                            if (_selectedIds.contains(entry.id)) {
-                              _selectedIds.remove(entry.id);
-                            } else {
-                              _selectedIds.add(entry.id);
-                            }
-                          }),
                         ),
-                        title: Text(_displayTitle(entry)),
-                        subtitle: Text(_displayType(entry.entryType)),
-                        onTap: () async {
-                          if (_isSelecting) {
-                            setState(() {
-                              if (_selectedIds.contains(entry.id)) {
-                                _selectedIds.remove(entry.id);
-                              } else {
-                                _selectedIds.add(entry.id);
-                              }
-                            });
-                            return;
-                          }
-                          final full = getEntry(id: entry.id);
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  EntryDetailScreen(entry: full),
-                            ),
-                          );
-                          if (mounted) _loadEntries();
-                        },
-                      );
-                    },
+                    ],
                   ),
           ),
         ],
