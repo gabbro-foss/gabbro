@@ -339,6 +339,15 @@ pub async fn delete_entry(id: String) -> Result<(), String> {
     session::session_delete_entry(&id)
 }
 
+/// Remove multiple entries by UUID in one pass and persist once.
+///
+/// Async — triggers a single vault save regardless of how many entries
+/// are deleted. Use this instead of calling delete_entry in a loop.
+pub async fn delete_entries(ids: Vec<String>) -> Result<(), String> {
+    session::session_delete_entries_no_save(&ids)?;
+    session::session_save()
+}
+
 /// Wipe the vault file from disk and drop the session.
 ///
 /// Async — filesystem operation.

@@ -301,9 +301,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
     );
     if (confirmed != true) return;
     setState(() => _isDeleting = true);
-    for (final id in ids) {
-      await deleteEntry(id: id);
-    }
+    await deleteEntries(ids: ids.toList());
     setState(() {
       _selectedIds.clear();
       _isDeleting = false;
@@ -358,6 +356,23 @@ class _VaultListScreenState extends State<VaultListScreen> {
               ),
             ),
           ] else if (_isSelecting) ...[
+            IconButton(
+              icon: Icon(
+                _selectedIds.length == _filteredEntries.length
+                    ? Icons.deselect
+                    : Icons.select_all,
+              ),
+              tooltip: _selectedIds.length == _filteredEntries.length
+                  ? 'Deselect all'
+                  : 'Select all',
+              onPressed: () => setState(() {
+                if (_selectedIds.length == _filteredEntries.length) {
+                  _selectedIds.clear();
+                } else {
+                  _selectedIds = _filteredEntries.map((e) => e.id).toSet();
+                }
+              }),
+            ),
             IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () => _confirmDelete(_selectedIds),

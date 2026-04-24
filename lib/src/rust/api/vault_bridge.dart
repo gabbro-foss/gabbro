@@ -57,6 +57,13 @@ Future<void> updateEntry({required VaultEntryData entry}) =>
 Future<void> deleteEntry({required String id}) =>
     RustLib.instance.api.crateApiVaultBridgeDeleteEntry(id: id);
 
+/// Remove multiple entries by UUID in one pass and persist once.
+///
+/// Async — triggers a single vault save regardless of how many entries
+/// are deleted. Use this instead of calling delete_entry in a loop.
+Future<void> deleteEntries({required List<String> ids}) =>
+    RustLib.instance.api.crateApiVaultBridgeDeleteEntries(ids: ids);
+
 /// Wipe the vault file from disk and drop the session.
 ///
 /// Async — filesystem operation.

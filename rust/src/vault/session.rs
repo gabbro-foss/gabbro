@@ -161,6 +161,17 @@ pub fn get_entry(id: &str) -> Result<VaultEntry, String> {
         .ok_or_else(|| format!("No entry found with id: {id}"))
 }
 
+/// Remove multiple entries by UUID from the in-memory session only — no disk write.
+///
+/// Used by bulk delete: remove all entries in one pass, then call
+/// `session_save()` once rather than once per entry.
+pub fn session_delete_entries_no_save(ids: &[String]) -> Result<(), String> {
+    let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_mut().ok_or("Vault is locked")?;
+    session.entries.retain(|e| !ids.contains(&entry_id(e).to_string()));
+    Ok(())
+}
+
 /// Add a new entry to the in-memory session only — no disk write.
 ///
 /// Used by bulk operations (e.g. import) that add many entries and
