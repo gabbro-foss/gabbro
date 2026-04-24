@@ -17,6 +17,7 @@ class EntryDetailScreen extends StatefulWidget {
 class _EntryDetailScreenState extends State<EntryDetailScreen> {
   late VaultEntryData _entry;
 
+  bool _passwordObscured = true;
   bool _cardNumberObscured = true;
   bool _cvvObscured = true;
   final Set<String> _revealedFields = {};
@@ -206,7 +207,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
         _field('Title', e.title),
         _field('URL', e.url),
         _field('Username', e.username),
-        _field('Password', e.password, obscure: true),
+        _toggleField(
+          label: 'Password',
+          value: e.password,
+          obscured: _passwordObscured,
+          onToggle: () => setState(() => _passwordObscured = !_passwordObscured),
+        ),
         if (e.notes != null) _field('Notes', e.notes!),
         if (e.customFields.isNotEmpty) ...[
           const SizedBox(height: 8),
