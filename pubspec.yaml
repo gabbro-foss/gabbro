@@ -39,6 +39,7 @@ dependencies:
   flutter_rust_bridge: 2.11.1
   freezed_annotation: ^3.1.0
   path_provider: ^2.1.5
+  scrollable_positioned_list: ^0.3.8
 
 dev_dependencies:
   flutter_test:
