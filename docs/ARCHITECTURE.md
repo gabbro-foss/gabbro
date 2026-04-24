@@ -497,8 +497,7 @@ SPDX identifier: `GPL-3.0-only`
   bridge, codegen, session summary, Enpass importer, and Flutter UI. Card detail
   view now shows PIN, bank name, transaction password, and custom fields.
   Login detail view shows title. 143 Rust tests passing.
-- **Next task:** Update `ARCHITECTURE.md` bikeshed with alphabetical scroll index
-  bar item, then begin work on vault list screen search function.
+- **Next task:** Implement vault list screen search function (see Features & UX — "Fast fuzzy search").
 
 ---
 
