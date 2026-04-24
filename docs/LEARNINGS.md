@@ -1734,3 +1734,27 @@ painted pixels. `HitTestBehavior.opaque` makes the entire bounding box
 receive hits regardless of whether the child painted there. Required for
 the index bar so that taps in the gaps between letters are still captured
 by the bar rather than falling through to the list behind it.
+
+### `ScrollConfiguration` — suppressing the platform scrollbar
+`ScrollConfiguration.of(context).copyWith(scrollbars: false)` removes the
+platform scrollbar from any scroll view wrapped in a `ScrollConfiguration`
+widget with that behaviour. Used in `VaultListScreen` to suppress the
+default scrollbar on `ScrollablePositionedList` — the alphabet index bar
+is the navigation mechanism and a separate scrollbar is redundant.
+
+### `retain` — in-place filtering of a `Vec` in Rust
+`vec.retain(|item| condition)` removes all elements for which the condition
+returns false, in a single pass, without allocating a new `Vec`. Used in
+`session_delete_entries_no_save` to remove multiple entries by UUID in one
+operation: `session.entries.retain(|e| !ids.contains(&entry_id(e).to_string()))`.
+The mirror image of `.filter()` on an iterator — `retain` mutates in place
+while `filter` produces a new collection.
+
+### Bulk operations — no-save + single save pattern
+When multiple entries need to be added or removed, calling a save function
+per entry is expensive: each save runs Argon2id + encryption + disk write
+(~667ms in release). The correct pattern is to mutate the in-memory session
+N times without saving, then call save once at the end. In Gabbro this is
+implemented as paired functions: `session_add_entry_no_save` /
+`session_delete_entries_no_save` for the mutations, and `session_save` for
+the single persist. Both import and bulk delete use this pattern.

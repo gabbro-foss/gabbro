@@ -493,13 +493,14 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Alphabet index bar scroll jump fixed. Replaced `GlobalKey`
-  position lookup (fails for off-screen items in lazy `ListView.builder`) with
-  `scrollable_positioned_list` 0.3.8 (BSD-3, GPL-3.0 compatible) and
-  `ItemScrollController.jumpTo(index:)`. Index bar moved to left of list,
-  platform scrollbar suppressed via `ScrollConfiguration`, FAB clearance
-  restored via `padding` on `ScrollablePositionedList`.
-- **Next task:** Select-all for bulk delete (see Bikeshed — "Select-all for bulk delete").
+- **Completed:** Select-all for bulk delete implemented. Toggle in app bar
+  when in selection mode: selects all filtered entries, or deselects all if
+  already fully selected. Bulk delete fixed to use a single vault save
+  (`delete_entries` bridge function) rather than one save per entry —
+  `session_delete_entries_no_save` removes all entries in one pass then
+  `session_save` persists once.
+- **Next task:** Copy to clipboard from detail screen (see Bikeshed —
+  "Copy to clipboard from detail screen").
 
 ---
 
@@ -747,9 +748,9 @@ discussed and forgotten.
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
 
-- **Select-all for bulk delete:** The vault list screen has per-entry checkboxes
-  and a bulk delete action, but no select-all button. With 200+ entries this is
-  unusable. Add a select-all toggle to the app bar when in selection mode.
+- **Vault deletion from UI:** Allow the user to delete their vault file from
+  within the app — currently only possible at the OS level. Should require
+  confirmation and lock the session, then route back to onboarding.
 
 - **Copy to clipboard from detail screen:** Fields in `EntryDetailScreen` are
   plain `Text` widgets — not selectable, not copyable. Add a copy icon button
