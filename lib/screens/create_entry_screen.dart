@@ -92,12 +92,17 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     final e = widget.existing;
 
     // ── Login ──────────────────────────────────────────────────────────────
-    // ── Login fields ────────────────────────────────────────────────────────────
-  late final TextEditingController _loginTitleController;
-  late final TextEditingController _urlController;
-  late final TextEditingController _usernameController;
-  late final TextEditingController _passwordController;
-  bool _passwordObscured = true;
+    if (e case VaultEntryData_Login(:final field0)) {
+      _loginTitleController = TextEditingController(text: field0.title);
+      _urlController = TextEditingController(text: field0.url);
+      _usernameController = TextEditingController(text: field0.username);
+      _passwordController = TextEditingController(text: field0.password);
+    } else {
+      _loginTitleController = TextEditingController();
+      _urlController = TextEditingController();
+      _usernameController = TextEditingController();
+      _passwordController = TextEditingController();
+    }
 
     // ── Note ───────────────────────────────────────────────────────────────
     if (e case VaultEntryData_Note(:final field0)) {
