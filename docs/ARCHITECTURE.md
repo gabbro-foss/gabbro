@@ -791,17 +791,6 @@ discussed and forgotten.
 
 ### Bikeshed
 
-- **`LoginEntry` missing `title` field — list view shows URL instead of name:**
-  Enpass (and all importers) provide a human-readable item title (e.g.
-  "GitHub", "Netflix") distinct from the URL and username. `LoginEntry` has
-  no `title` field, so `entry_to_summary` cannot use it — the list view falls
-  back to URL or username, producing poor results (e.g. identical-looking
-  entries for services sharing an email login). Fix: add `title: String` to
-  `LoginEntry`, propagate through `LoginEntryData` DTO, `vault_entry_to_data`,
-  `vault_entry_from_data`, `entry_to_summary`, `create_entry_screen.dart`,
-  and regenerate the bridge. Audit `CardEntry` and other entry types for the
-  same gap while doing this.
-
 ### Rationale — why not write N importers?
 
 Before writing any import code, we thought carefully about who actually
