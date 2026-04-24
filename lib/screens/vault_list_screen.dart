@@ -156,16 +156,12 @@ class _VaultListScreenState extends State<VaultListScreen> {
   // Scrolls so the section header for [letter] is at the top of the list.
   // Uses GlobalKey positions measured after render, so no hardcoded heights.
   void _scrollToLetter(String letter) {
-    debugPrint('_scrollToLetter called: $letter');
     if (!_scrollController.hasClients) return;
     final sectionKey = _sectionKeys[letter];
-    debugPrint('sectionKey: $sectionKey');
     if (sectionKey == null) return;
     final sectionContext = sectionKey.currentContext;
-    debugPrint('sectionContext: $sectionContext');
     if (sectionContext == null) return;
     final listContext = _listKey.currentContext;
-    debugPrint('listContext: $listContext');
     if (listContext == null) return;
 
     final sectionBox = sectionContext.findRenderObject() as RenderBox;
