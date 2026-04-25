@@ -819,6 +819,13 @@ discussed and forgotten.
   rewrite of the importer (see Import / Migration section) will surface this
   if it is a mapping issue.
 
+- **Enpass expiry format mismatch:** Enpass stores card expiry as `MM/YYYY`
+  (4-digit year). Gabbro's `CardEntry` expects `MM/YY` (2-digit year).
+  The importer currently passes the raw value through, causing the
+  `CreateEntryScreen` validator to reject it on edit. Fix in the importer:
+  detect the `MM/YYYY` pattern and truncate to `MM/YY` on import.
+  Add a test case to the Enpass TDD suite covering this conversion.
+
 ## Import / Migration
 
 ### Rationale — why not write N importers?
