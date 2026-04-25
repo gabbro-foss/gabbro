@@ -30,13 +30,13 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   }
 
   String _entryId() => switch (_entry) {
-        VaultEntryData_Login(:final field0) => field0.id,
-        VaultEntryData_Note(:final field0) => field0.id,
-        VaultEntryData_Identity(:final field0) => field0.id,
-        VaultEntryData_Card(:final field0) => field0.id,
-        VaultEntryData_File(:final field0) => field0.id,
-        VaultEntryData_Custom(:final field0) => field0.id,
-      };
+    VaultEntryData_Login(:final field0) => field0.id,
+    VaultEntryData_Note(:final field0) => field0.id,
+    VaultEntryData_Identity(:final field0) => field0.id,
+    VaultEntryData_Card(:final field0) => field0.id,
+    VaultEntryData_File(:final field0) => field0.id,
+    VaultEntryData_Custom(:final field0) => field0.id,
+  };
 
   Future<void> _confirmDelete(BuildContext context) async {
     final confirmed = await showDialog<bool>(
@@ -81,10 +81,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             const SizedBox(height: 12),
             TextField(
               controller: pathController,
+              autofocus: true,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Export path',
               ),
+              onSubmitted: (_) => Navigator.of(context).pop(true),
             ),
           ],
         ),
@@ -108,9 +110,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       await file.parent.create(recursive: true);
       await file.writeAsBytes(e.data);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Exported to $path')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Exported to $path')));
       }
     } catch (err) {
       if (mounted) {
@@ -151,10 +153,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
               };
               final updated = await Navigator.of(context).push<VaultEntryData>(
                 MaterialPageRoute(
-                  builder: (context) => CreateEntryScreen(
-                    entryType: entryType,
-                    existing: _entry,
-                  ),
+                  builder: (context) =>
+                      CreateEntryScreen(entryType: entryType, existing: _entry),
                 ),
               );
               if (updated != null && mounted) {
@@ -179,25 +179,29 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   }
 
   String _title() => switch (_entry) {
-        VaultEntryData_Login(:final field0) =>
-          field0.title.isNotEmpty ? field0.title : field0.url.isNotEmpty ? field0.url : '(no title)',
-        VaultEntryData_Note(:final field0) => field0.title,
-        VaultEntryData_Identity(:final field0) =>
-          '${field0.firstName} ${field0.lastName}',
-        VaultEntryData_Card(:final field0) =>
-          field0.cardName ?? field0.cardholderName,
-        VaultEntryData_File(:final field0) => field0.filename,
-        VaultEntryData_Custom(:final field0) => field0.title,
-      };
+    VaultEntryData_Login(:final field0) =>
+      field0.title.isNotEmpty
+          ? field0.title
+          : field0.url.isNotEmpty
+          ? field0.url
+          : '(no title)',
+    VaultEntryData_Note(:final field0) => field0.title,
+    VaultEntryData_Identity(:final field0) =>
+      '${field0.firstName} ${field0.lastName}',
+    VaultEntryData_Card(:final field0) =>
+      field0.cardName ?? field0.cardholderName,
+    VaultEntryData_File(:final field0) => field0.filename,
+    VaultEntryData_Custom(:final field0) => field0.title,
+  };
 
   Widget _buildBody() => switch (_entry) {
-        VaultEntryData_Login(:final field0) => _loginView(field0),
-        VaultEntryData_Note(:final field0) => _noteView(field0),
-        VaultEntryData_Identity(:final field0) => _identityView(field0),
-        VaultEntryData_Card(:final field0) => _cardView(field0),
-        VaultEntryData_File(:final field0) => _fileView(field0),
-        VaultEntryData_Custom(:final field0) => _customView(field0),
-      };
+    VaultEntryData_Login(:final field0) => _loginView(field0),
+    VaultEntryData_Note(:final field0) => _noteView(field0),
+    VaultEntryData_Identity(:final field0) => _identityView(field0),
+    VaultEntryData_Card(:final field0) => _cardView(field0),
+    VaultEntryData_File(:final field0) => _fileView(field0),
+    VaultEntryData_Custom(:final field0) => _customView(field0),
+  };
 
   // ── Entry type views ─────────────────────────────────────────────────────────
 
@@ -212,7 +216,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           label: 'Password',
           value: e.password,
           obscured: _passwordObscured,
-          onToggle: () => setState(() => _passwordObscured = !_passwordObscured),
+          onToggle: () =>
+              setState(() => _passwordObscured = !_passwordObscured),
         ),
         if (e.notes != null) _field('Notes', e.notes!),
         if (e.customFields.isNotEmpty) ...[
@@ -242,10 +247,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   Widget _noteView(NoteEntryData e) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _field('Title', e.title),
-        _field('Content', e.content),
-      ],
+      children: [_field('Title', e.title), _field('Content', e.content)],
     );
   }
 
