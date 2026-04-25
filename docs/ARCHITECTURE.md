@@ -71,7 +71,10 @@ gabbro/
 │       │   ├── entry.rs        # All 6 entry types and EntryMeta
 │       │   ├── file_format.rs  # SealedVault — .gabbro binary format
 │       │   ├── io.rs           # Vault file I/O — write/read .gabbro files
-│       │   └── serialization.rs# Entry serialization — Vec<VaultEntry> ↔ JSON bytes
+│       └── serialization.rs# Entry serialization — Vec<VaultEntry> ↔ JSON bytes
+│       ├── import/             # Importers for third-party password managers
+│       │   ├── mod.rs
+│       │   └── enpass.rs       # Enpass JSON importer — 18 tests passing
 │       ├── bin/
 │       │   └── bench_kdf.rs    # Argon2id parameter audit tool
 │       ├── frb_generated.rs    # Auto-generated bridge code (do not edit)
@@ -168,7 +171,7 @@ Each entry is an instance of a typed class:
 - **Types:** Login, Note, Identity, Card, File, Custom
 - **Status:** all 6 entry types fully implemented in the domain model
   (`rust/src/vault/entry.rs`) and bridged via DTOs and API functions
-  (`rust/src/api/vault.rs`). 39 Rust tests passing across the project.
+  (`rust/src/api/vault.rs`). 142 Rust tests passing, 1 ignored across the project.
 - **Core fields:** type-specific
 - **Common fields:** UUID, created, modified, folder, tags, favourite
 - **Login entry:** URL, username, password (hidden by default,
@@ -257,7 +260,7 @@ Each entry is an instance of a typed class:
 
 ## Vault API Layer
 - **Status:** all 6 entry types fully implemented in `rust/src/api/vault.rs`.
-  120 Rust tests passing across the project.
+  142 Rust tests passing, 1 ignored across the project.
 - Lives in `rust/src/api/vault.rs` — the bridge boundary between Flutter and
   the internal vault domain model.
 - **Pattern:** each entry type gets a bridge-facing DTO (Data Transfer Object —
@@ -493,14 +496,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Focus and Tab navigation on `CreateEntryScreen`. All six
-  entry types have `autofocus: true` on the first field and `FocusNode`
-  chains wiring Enter through fields in visual order. Last field calls
-  `_save()` directly (or `_loadFileFromPath()` for File). Multiline fields
-  (Note content, Card notes, File notes) get newlines on Enter — no
-  `onFieldSubmitted`. Custom fields rely on Tab naturally. Obscured fields
-  need `textInputAction: TextInputAction.next` to fire `onFieldSubmitted`.
-- **Next task:** to be decided.
+- **Completed:** Doc cleanup — removed stale bikeshed items (fixed test,
+  three resolved Enpass bullets), updated Rust test counts to 142 passing /
+  1 ignored, added `import/` to project structure tree.
+- **Next task:** Flutter widget tests — `VaultListScreen`, `EntryDetailScreen`,
+  `CreateEntryScreen`.
 
 ---
 
@@ -545,10 +545,6 @@ discussed and forgotten.
   dependency injection — same pattern as `VaultListScreen`. No Rust binary
   needed for any of these.
 
-- **Pre-existing test failure:** `api::passphrase_generator::tests::test_append_number`
-  fails with `left: 6, right: 5` — word count assertion off by one when
-  `append_number` is enabled. Last touched in commit `2c0dfed`. Investigate
-  and fix before v1 release.
 
 ### Security
 
@@ -799,20 +795,6 @@ discussed and forgotten.
   user-facing performance assessment or UI/UX testing. Never tune Argon2id
   parameters or assess UX based on debug build timings.
 
-- **Clean up dead entries in `convert_login` skip list:** The `skip` array in
-  `convert_login` in `rust/src/import/enpass.rs` contains field type strings
-  that do not exist in the real Enpass export (`webAddress`, `Web Address`,
-  `name`, `login`). They are harmless but misleading — a reader might think
-  these are real field types to watch for. Remove them, leaving only the four
-  types that actually appear in the data: `url`, `username`, `email`,
-  `password`.
-
-- **Investigate blank Login fields after Enpass import:** Some imported Login
-  entries show blank URL and username in the detail view. Unclear whether this
-  is a field mapping bug or genuinely empty data in the source vault. The TDD
-  rewrite of the importer (see Import / Migration section) will surface this
-  if it is a mapping issue.
-
 - **Enpass expiry format mismatch:** Enpass stores card expiry as `MM/YYYY`
   (4-digit year). Gabbro's `CardEntry` expects `MM/YY` (2-digit year).
   The importer currently passes the raw value through, causing the
@@ -964,24 +946,9 @@ constructor parameter carrying raw field values distinct from `existing`
 - Each field has: `label`, `type`, `value`, `sensitive`, `deleted`, `order`, `uid`
 - Each attachment has: `uuid`, `name`, `kind` (mime type), `data` (base64)
 
-**TDD strategy — mandatory, do not skip:**
-1. Add `EntryAttachment` to `entry.rs` first (see Vault Domain Model section)
-2. Write 13 failing tests in `rust/src/import/enpass.rs` covering:
-   - Login with `username` populated
-   - Login with `username` empty, `email` populated → email used
-   - Login with both `username` and `email` → username preferred (first non-empty)
-   - Login title comes from `item.title`, not URL
-   - `computer` category → `LoginEntry`
-   - `finance` category → `LoginEntry`
-   - `creditcard` with `username`/`password` fields → become custom fields
-   - `travel` → `CustomEntry`
-   - `numeric` field type → becomes custom field
-   - `section` fields → dropped
-   - `totp` fields → dropped
-   - Items with attachments → attachment imported, not dropped
-   - Archived item → skipped
-3. Fix parser until all tests pass
-4. Build release for UI/UX testing
+**Status: complete — 18 tests passing.** The TDD strategy was followed:
+anonymised test data, failing tests first, parser fixed until all passed.
+See `rust/src/import/enpass.rs` for the full test suite.
 
 ## Monetisation
 
