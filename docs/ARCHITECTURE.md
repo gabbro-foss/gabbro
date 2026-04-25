@@ -883,6 +883,31 @@ The correct sequence, regardless of which importers we build:
 
 5. **Bitwarden importer** — implement second.
 
+### Import validation failures — user review flow
+
+Currently, items that fail domain validation during import (e.g. a card
+number outside the 12–19 digit range) are silently skipped with a log
+message. The user sees a count of imported entries but has no way to
+identify which items were dropped or why.
+
+Proposed fix: collect all validation failures during import into a list of
+`ImportFailure` structs (item title, category, reason). After the import
+completes, if any failures exist, show a review dialog listing each failed
+item with its title and the rejection reason. For each item, offer two
+actions: "Edit" (open a pre-populated `CreateEntryScreen` with the raw
+field values so the user can correct the offending field and save manually)
+and "Skip" (discard the item). "Edit" is the high-value path — it lets the
+user recover data that Gabbro's validator correctly rejected but that the
+user knows is valid enough to keep in some corrected form.
+
+Key questions: should the review dialog be blocking (must resolve all
+failures before returning to the list) or non-blocking (failures queued
+for later review)? Blocking is simpler and less likely to be forgotten.
+How does `CreateEntryScreen` receive pre-populated data for a partially
+valid entry that never made it into the vault? Likely a new optional
+constructor parameter carrying raw field values distinct from `existing`
+(which requires a valid `VaultEntryData`).
+
 6. **Generic CSV / JSON importer** — implement last, once the field surface
    is stable.
 
