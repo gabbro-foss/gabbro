@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/services.dart';
 
 import 'package:flutter/material.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
@@ -394,6 +395,18 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
 
   // ── Shared helpers ───────────────────────────────────────────────────────────
 
+  Future<void> _copyToClipboard(String value) async {
+    await Clipboard.setData(ClipboardData(text: value));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Copied to clipboard'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   Widget _sectionHeader(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
@@ -416,9 +429,20 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 4),
-          Text(
-            obscure ? '••••••••' : value,
-            style: const TextStyle(fontSize: 16),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  obscure ? '••••••••' : value,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.copy_outlined, size: 18),
+                tooltip: 'Copy',
+                onPressed: () => _copyToClipboard(value),
+              ),
+            ],
           ),
           const Divider(),
         ],
@@ -450,6 +474,11 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                   obscured ? '••••••••' : value,
                   style: const TextStyle(fontSize: 16),
                 ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.copy_outlined, size: 18),
+                tooltip: 'Copy',
+                onPressed: () => _copyToClipboard(value),
               ),
               IconButton(
                 icon: Icon(
