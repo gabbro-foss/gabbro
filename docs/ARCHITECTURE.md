@@ -526,6 +526,24 @@ discussed and forgotten.
 
 ### Testing
 
+- **Flutter widget tests — known gaps:** The Flutter side has significantly
+  fewer tests than the Rust backend. Three specific gaps to address before
+  v1:
+  (1) `VaultListScreen` — dependency injection scaffolding already exists
+  (`listEntries` parameter with real bridge call as default). Write tests
+  covering: entries render correctly, filter chips filter by type, search
+  filters by title, empty state shows correct message, long press enters
+  selection mode.
+  (2) `EntryDetailScreen` — no tests exist. Write tests covering: each
+  entry type renders its fields, copy button calls clipboard, toggle
+  button toggles obscured state, delete confirmation dialog appears.
+  (3) `CreateEntryScreen` — no tests exist. Write tests covering: required
+  field validation fires on empty save, edit mode pre-populates fields,
+  save calls the correct bridge function.
+  Implement using `flutter_test` with fake bridge functions passed via
+  dependency injection — same pattern as `VaultListScreen`. No Rust binary
+  needed for any of these.
+
 - **Pre-existing test failure:** `api::passphrase_generator::tests::test_append_number`
   fails with `left: 6, right: 5` — word count assertion off by one when
   `append_number` is enabled. Last touched in commit `2c0dfed`. Investigate
