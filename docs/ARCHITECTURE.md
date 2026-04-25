@@ -493,13 +493,14 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Enter key submits dialogs. `_importEnpass` dialog already
-  had `onSubmitted` and `autofocus` — confirmed working. Export dialog
-  (`_exportFile`) updated with same pattern. "Enter key submits dialogs"
-  bikeshed item removed.
-- **Next task:** Fix focus/Tab navigation on `CreateEntryScreen` — first
-  field should be focused on open; Tab should move between fields in order
-  (see Bikeshed — "Focus and Tab navigation on CreateEntryScreen").
+- **Completed:** Focus and Tab navigation on `CreateEntryScreen`. All six
+  entry types have `autofocus: true` on the first field and `FocusNode`
+  chains wiring Enter through fields in visual order. Last field calls
+  `_save()` directly (or `_loadFileFromPath()` for File). Multiline fields
+  (Note content, Card notes, File notes) get newlines on Enter — no
+  `onFieldSubmitted`. Custom fields rely on Tab naturally. Obscured fields
+  need `textInputAction: TextInputAction.next` to fire `onFieldSubmitted`.
+- **Next task:** to be decided.
 
 ---
 
@@ -764,13 +765,6 @@ discussed and forgotten.
   it. Prevents silent accumulation of orphaned vault files on the user's device
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
-
-- **Focus and Tab navigation on `CreateEntryScreen`:** On open, the first
-  editable field is not focused — the user must Tab twice to reach it.
-  Tab order between fields is not natural. Fix: add `autofocus: true` to
-  the first field, and wire `FocusNode` + `onSubmitted` chains so Tab moves
-  focus through fields in logical order, with the final field submitting
-  the form.
 
 - **Export vault:** Users need a way to export the full vault from within
   the app — currently only possible at the OS level (copy the `.gabbro`
