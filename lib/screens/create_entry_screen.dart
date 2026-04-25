@@ -803,8 +803,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       ),
       validator: (v) =>
           (v == null || v.isEmpty) ? 'Last name is required' : null,
-      onFieldSubmitted: (_) =>
-          FocusScope.of(context).requestFocus(_emailFocus),
+      onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
     ),
     const SizedBox(height: 12),
     TextFormField(
@@ -815,10 +814,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: 'Email',
         border: OutlineInputBorder(),
       ),
-      validator: (v) =>
-          (v == null || v.isEmpty) ? 'Email is required' : null,
-      onFieldSubmitted: (_) =>
-          FocusScope.of(context).requestFocus(_phoneFocus),
+      validator: (v) => (v == null || v.isEmpty) ? 'Email is required' : null,
+      onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_phoneFocus),
     ),
     const SizedBox(height: 12),
     TextFormField(
@@ -875,7 +872,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     const SizedBox(height: 12),
     _dropdownField(
       label: 'Status',
-      value: _cardStatuses.contains(_cardStatusController.text)
+      initialValue: _cardStatuses.contains(_cardStatusController.text)
           ? _cardStatusController.text
           : 'active',
       items: _cardStatuses,
@@ -898,7 +895,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     const SizedBox(height: 12),
     _dropdownField(
       label: 'Payment network',
-      value: _paymentNetworks.contains(_paymentNetworkController.text)
+      initialValue: _paymentNetworks.contains(_paymentNetworkController.text)
           ? _paymentNetworkController.text
           : null,
       items: _paymentNetworks,
@@ -1117,8 +1114,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: 'Title',
         border: OutlineInputBorder(),
       ),
-      validator: (v) =>
-          (v == null || v.isEmpty) ? 'Title is required' : null,
+      validator: (v) => (v == null || v.isEmpty) ? 'Title is required' : null,
       onFieldSubmitted: (_) => _save(),
     ),
     const SizedBox(height: 16),
@@ -1207,24 +1203,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   // ── Field helpers ────────────────────────────────────────────────────────────
 
-  Widget _textField(
-    TextEditingController controller,
-    String label, {
-    int maxLines = 1,
-    TextInputType? keyboardType,
-  }) {
-    return TextFormField(
-      controller: controller,
-      maxLines: maxLines,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-      ),
-      validator: (v) => (v == null || v.isEmpty) ? '$label is required' : null,
-    );
-  }
-
   /// Optional field — no validator, empty text is fine.
   Widget _optionalTextField(
     TextEditingController controller,
@@ -1243,39 +1221,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     );
   }
 
-  Widget _obscuredField({
-    required TextEditingController controller,
-    required String label,
-    required bool obscured,
-    required VoidCallback onToggle,
-    bool required = false,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscured,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(),
-        suffixIcon: IconButton(
-          icon: Icon(obscured ? Icons.visibility_off : Icons.visibility),
-          onPressed: onToggle,
-        ),
-      ),
-      validator: required
-          ? (v) => (v == null || v.isEmpty) ? '$label is required' : null
-          : null,
-    );
-  }
-
   Widget _dropdownField({
     required String label,
-    required String? value,
+    required String? initialValue,
     required List<String> items,
     required void Function(String?) onChanged,
     bool required = true,
   }) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: initialValue,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
