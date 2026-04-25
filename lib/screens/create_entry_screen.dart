@@ -9,11 +9,7 @@ class CreateEntryScreen extends StatefulWidget {
   final String entryType;
   final VaultEntryData? existing;
 
-  const CreateEntryScreen({
-    super.key,
-    required this.entryType,
-    this.existing,
-  });
+  const CreateEntryScreen({super.key, required this.entryType, this.existing});
 
   @override
   State<CreateEntryScreen> createState() => _CreateEntryScreenState();
@@ -30,10 +26,16 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   late final TextEditingController _usernameController;
   late final TextEditingController _passwordController;
   bool _passwordObscured = true;
+  final FocusNode _loginTitleFocus = FocusNode();
+  final FocusNode _urlFocus = FocusNode();
+  final FocusNode _usernameFocus = FocusNode();
+  final FocusNode _passwordFocus = FocusNode();
 
   // ── Note fields ─────────────────────────────────────────────────────────────
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
+  final FocusNode _noteTitleFocus = FocusNode();
+  final FocusNode _noteContentFocus = FocusNode();
 
   // ── Identity fields ─────────────────────────────────────────────────────────
   late final TextEditingController _firstNameController;
@@ -43,6 +45,11 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   late final TextEditingController _addressController;
   // Dynamic custom fields for Identity
   final List<_CustomFieldState> _identityCustomFields = [];
+  final FocusNode _firstNameFocus = FocusNode();
+  final FocusNode _lastNameFocus = FocusNode();
+  final FocusNode _emailFocus = FocusNode();
+  final FocusNode _phoneFocus = FocusNode();
+  final FocusNode _addressFocus = FocusNode();
 
   // ── Card fields ─────────────────────────────────────────────────────────────
   late final TextEditingController _cardNameController;
@@ -56,15 +63,24 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   late final TextEditingController _cardAccountNumberController;
   late final TextEditingController _paymentNetworkController;
   late final TextEditingController _cardNotesController;
+  final FocusNode _cardNameFocus = FocusNode();
+  final FocusNode _cardholderNameFocus = FocusNode();
+  final FocusNode _cardNumberFocus = FocusNode();
+  final FocusNode _expiryFocus = FocusNode();
+  final FocusNode _cvvFocus = FocusNode();
+  final FocusNode _creditLimitFocus = FocusNode();
+  final FocusNode _cardAccountNumberFocus = FocusNode();
 
   // ── File fields ─────────────────────────────────────────────────────────────
   String? _pickedFilename;
   Uint8List? _pickedFileBytes;
   late final TextEditingController _fileNotesController;
+  final FocusNode _filePathFocus = FocusNode();
 
   // ── Custom entry fields ─────────────────────────────────────────────────────
   late final TextEditingController _customTitleController;
   final List<_CustomFieldState> _customFields = [];
+  final FocusNode _customTitleFocus = FocusNode();
 
   bool get _isEditing => widget.existing != null;
 
@@ -121,11 +137,13 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _phoneController = TextEditingController(text: field0.phone ?? '');
       _addressController = TextEditingController(text: field0.address ?? '');
       for (final f in field0.customFields) {
-        _identityCustomFields.add(_CustomFieldState(
-          labelController: TextEditingController(text: f.label),
-          valueController: TextEditingController(text: f.value),
-          hidden: f.hidden,
-        ));
+        _identityCustomFields.add(
+          _CustomFieldState(
+            labelController: TextEditingController(text: f.label),
+            valueController: TextEditingController(text: f.value),
+            hidden: f.hidden,
+          ),
+        );
       }
     } else {
       _firstNameController = TextEditingController();
@@ -137,24 +155,24 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
     // ── Card ───────────────────────────────────────────────────────────────
     if (e case VaultEntryData_Card(:final field0)) {
-      _cardNameController =
-          TextEditingController(text: field0.cardName ?? '');
-      _cardStatusController =
-          TextEditingController(text: field0.status);
-      _cardholderNameController =
-          TextEditingController(text: field0.cardholderName);
-      _cardNumberController =
-          TextEditingController(text: field0.cardNumber);
+      _cardNameController = TextEditingController(text: field0.cardName ?? '');
+      _cardStatusController = TextEditingController(text: field0.status);
+      _cardholderNameController = TextEditingController(
+        text: field0.cardholderName,
+      );
+      _cardNumberController = TextEditingController(text: field0.cardNumber);
       _expiryController = TextEditingController(text: field0.expiry);
       _cvvController = TextEditingController(text: field0.cvv);
-      _creditLimitController =
-          TextEditingController(text: field0.creditLimit ?? '');
-      _cardAccountNumberController =
-          TextEditingController(text: field0.cardAccountNumber ?? '');
-      _paymentNetworkController =
-          TextEditingController(text: field0.paymentNetwork ?? '');
-      _cardNotesController =
-          TextEditingController(text: field0.notes ?? '');
+      _creditLimitController = TextEditingController(
+        text: field0.creditLimit ?? '',
+      );
+      _cardAccountNumberController = TextEditingController(
+        text: field0.cardAccountNumber ?? '',
+      );
+      _paymentNetworkController = TextEditingController(
+        text: field0.paymentNetwork ?? '',
+      );
+      _cardNotesController = TextEditingController(text: field0.notes ?? '');
     } else {
       _cardNameController = TextEditingController();
       _cardStatusController = TextEditingController(text: 'active');
@@ -172,22 +190,22 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     if (e case VaultEntryData_File(:final field0)) {
       _pickedFilename = field0.filename;
       _pickedFileBytes = Uint8List.fromList(field0.data);
-      _fileNotesController =
-          TextEditingController(text: field0.notes ?? '');
+      _fileNotesController = TextEditingController(text: field0.notes ?? '');
     } else {
       _fileNotesController = TextEditingController();
     }
 
     // ── Custom ─────────────────────────────────────────────────────────────
     if (e case VaultEntryData_Custom(:final field0)) {
-      _customTitleController =
-          TextEditingController(text: field0.title);
+      _customTitleController = TextEditingController(text: field0.title);
       for (final f in field0.fields) {
-        _customFields.add(_CustomFieldState(
-          labelController: TextEditingController(text: f.label),
-          valueController: TextEditingController(text: f.value),
-          hidden: f.hidden,
-        ));
+        _customFields.add(
+          _CustomFieldState(
+            labelController: TextEditingController(text: f.label),
+            valueController: TextEditingController(text: f.value),
+            hidden: f.hidden,
+          ),
+        );
       }
     } else {
       _customTitleController = TextEditingController();
@@ -201,15 +219,26 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _urlController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
+    _loginTitleFocus.dispose();
+    _urlFocus.dispose();
+    _usernameFocus.dispose();
+    _passwordFocus.dispose();
     // Note
     _titleController.dispose();
     _contentController.dispose();
+    _noteTitleFocus.dispose();
+    _noteContentFocus.dispose();
     // Identity
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
+    _firstNameFocus.dispose();
+    _lastNameFocus.dispose();
+    _emailFocus.dispose();
+    _phoneFocus.dispose();
+    _addressFocus.dispose();
     for (final f in _identityCustomFields) {
       f.dispose();
     }
@@ -224,11 +253,20 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _cardAccountNumberController.dispose();
     _paymentNetworkController.dispose();
     _cardNotesController.dispose();
+    _cardNameFocus.dispose();
+    _cardholderNameFocus.dispose();
+    _cardNumberFocus.dispose();
+    _expiryFocus.dispose();
+    _cvvFocus.dispose();
+    _creditLimitFocus.dispose();
+    _cardAccountNumberFocus.dispose();
     // File
     _fileNotesController.dispose();
     _filePathController.dispose();
+    _filePathFocus.dispose();
     // Custom
     _customTitleController.dispose();
+    _customTitleFocus.dispose();
     for (final f in _customFields) {
       f.dispose();
     }
@@ -276,133 +314,149 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     switch (widget.entryType) {
       case 'Login':
         await createEntry(
-          entry: VaultEntryData.login(LoginEntryData(
-            id: '',
-            createdAt: '',
-            updatedAt: '',
-            folder: 'Personal',
-            tags: [],
-            favourite: false,
-            title: _loginTitleController.text,
-            url: _urlController.text,
-            username: _usernameController.text,
-            password: _passwordController.text,
-            customFields: [],
-          )),
+          entry: VaultEntryData.login(
+            LoginEntryData(
+              id: '',
+              createdAt: '',
+              updatedAt: '',
+              folder: 'Personal',
+              tags: [],
+              favourite: false,
+              title: _loginTitleController.text,
+              url: _urlController.text,
+              username: _usernameController.text,
+              password: _passwordController.text,
+              customFields: [],
+            ),
+          ),
         );
 
       case 'Note':
         await createEntry(
-          entry: VaultEntryData.note(NoteEntryData(
-            id: '',
-            createdAt: '',
-            updatedAt: '',
-            folder: 'Personal',
-            tags: [],
-            favourite: false,
-            title: _titleController.text,
-            content: _contentController.text,
-          )),
+          entry: VaultEntryData.note(
+            NoteEntryData(
+              id: '',
+              createdAt: '',
+              updatedAt: '',
+              folder: 'Personal',
+              tags: [],
+              favourite: false,
+              title: _titleController.text,
+              content: _contentController.text,
+            ),
+          ),
         );
 
       case 'Identity':
         await createEntry(
-          entry: VaultEntryData.identity(IdentityEntryData(
-            id: '',
-            createdAt: '',
-            updatedAt: '',
-            folder: 'Personal',
-            tags: [],
-            favourite: false,
-            firstName: _firstNameController.text,
-            lastName: _lastNameController.text,
-            email: _emailController.text,
-            phone: _phoneController.text.isEmpty
-                ? null
-                : _phoneController.text,
-            address: _addressController.text.isEmpty
-                ? null
-                : _addressController.text,
-            customFields: _identityCustomFields
-                .map((f) => CustomFieldData(
+          entry: VaultEntryData.identity(
+            IdentityEntryData(
+              id: '',
+              createdAt: '',
+              updatedAt: '',
+              folder: 'Personal',
+              tags: [],
+              favourite: false,
+              firstName: _firstNameController.text,
+              lastName: _lastNameController.text,
+              email: _emailController.text,
+              phone: _phoneController.text.isEmpty
+                  ? null
+                  : _phoneController.text,
+              address: _addressController.text.isEmpty
+                  ? null
+                  : _addressController.text,
+              customFields: _identityCustomFields
+                  .map(
+                    (f) => CustomFieldData(
                       label: f.labelController.text,
                       value: f.valueController.text,
                       hidden: f.hidden,
-                    ))
-                .toList(),
-          )),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
         );
 
       case 'Card':
         await createEntry(
-          entry: VaultEntryData.card(CardEntryData(
-            id: '',
-            createdAt: '',
-            updatedAt: '',
-            folder: 'Personal',
-            tags: [],
-            favourite: false,
-            cardName: _cardNameController.text.isEmpty
-                ? null
-                : _cardNameController.text,
-            status: _cardStatusController.text.isEmpty
-                ? 'active'
-                : _cardStatusController.text,
-            cardholderName: _cardholderNameController.text,
-            cardNumber: _cardNumberController.text,
-            expiry: _expiryController.text,
-            cvv: _cvvController.text,
-            creditLimit: _creditLimitController.text.isEmpty
-                ? null
-                : _creditLimitController.text,
-            cardAccountNumber: _cardAccountNumberController.text.isEmpty
-                ? null
-                : _cardAccountNumberController.text,
-            paymentNetwork: _paymentNetworkController.text.isEmpty
-                ? null
-                : _paymentNetworkController.text,
-            notes: _cardNotesController.text.isEmpty
-                ? null
-                : _cardNotesController.text,
-            customFields: const [],
-          )),
+          entry: VaultEntryData.card(
+            CardEntryData(
+              id: '',
+              createdAt: '',
+              updatedAt: '',
+              folder: 'Personal',
+              tags: [],
+              favourite: false,
+              cardName: _cardNameController.text.isEmpty
+                  ? null
+                  : _cardNameController.text,
+              status: _cardStatusController.text.isEmpty
+                  ? 'active'
+                  : _cardStatusController.text,
+              cardholderName: _cardholderNameController.text,
+              cardNumber: _cardNumberController.text,
+              expiry: _expiryController.text,
+              cvv: _cvvController.text,
+              creditLimit: _creditLimitController.text.isEmpty
+                  ? null
+                  : _creditLimitController.text,
+              cardAccountNumber: _cardAccountNumberController.text.isEmpty
+                  ? null
+                  : _cardAccountNumberController.text,
+              paymentNetwork: _paymentNetworkController.text.isEmpty
+                  ? null
+                  : _paymentNetworkController.text,
+              notes: _cardNotesController.text.isEmpty
+                  ? null
+                  : _cardNotesController.text,
+              customFields: const [],
+            ),
+          ),
         );
 
       case 'File':
         await createEntry(
-          entry: VaultEntryData.file(FileEntryData(
-            id: '',
-            createdAt: '',
-            updatedAt: '',
-            folder: 'Personal',
-            tags: [],
-            favourite: false,
-            filename: _pickedFilename!,
-            data: _pickedFileBytes!,
-            notes: _fileNotesController.text.isEmpty
-                ? null
-                : _fileNotesController.text,
-          )),
+          entry: VaultEntryData.file(
+            FileEntryData(
+              id: '',
+              createdAt: '',
+              updatedAt: '',
+              folder: 'Personal',
+              tags: [],
+              favourite: false,
+              filename: _pickedFilename!,
+              data: _pickedFileBytes!,
+              notes: _fileNotesController.text.isEmpty
+                  ? null
+                  : _fileNotesController.text,
+            ),
+          ),
         );
 
       case 'Custom':
         await createEntry(
-          entry: VaultEntryData.custom(CustomEntryData(
-            id: '',
-            createdAt: '',
-            updatedAt: '',
-            folder: 'Personal',
-            tags: [],
-            favourite: false,
-            title: _customTitleController.text,
-            fields: _customFields
-                .map((f) => CustomFieldData(
+          entry: VaultEntryData.custom(
+            CustomEntryData(
+              id: '',
+              createdAt: '',
+              updatedAt: '',
+              folder: 'Personal',
+              tags: [],
+              favourite: false,
+              title: _customTitleController.text,
+              fields: _customFields
+                  .map(
+                    (f) => CustomFieldData(
                       label: f.labelController.text,
                       value: f.valueController.text,
                       hidden: f.hidden,
-                    ))
-                .toList(),
-          )),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
         );
     }
   }
@@ -411,134 +465,150 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     switch (widget.existing) {
       case VaultEntryData_Login(:final field0):
         await updateEntry(
-          entry: VaultEntryData.login(LoginEntryData(
-            id: field0.id,
-            createdAt: field0.createdAt,
-            updatedAt: '',
-            folder: field0.folder,
-            tags: field0.tags,
-            favourite: field0.favourite,
-            title: _loginTitleController.text,
-            url: _urlController.text,
-            username: _usernameController.text,
-            password: _passwordController.text,
-            customFields: field0.customFields,
-          )),
+          entry: VaultEntryData.login(
+            LoginEntryData(
+              id: field0.id,
+              createdAt: field0.createdAt,
+              updatedAt: '',
+              folder: field0.folder,
+              tags: field0.tags,
+              favourite: field0.favourite,
+              title: _loginTitleController.text,
+              url: _urlController.text,
+              username: _usernameController.text,
+              password: _passwordController.text,
+              customFields: field0.customFields,
+            ),
+          ),
         );
 
       case VaultEntryData_Note(:final field0):
         await updateEntry(
-          entry: VaultEntryData.note(NoteEntryData(
-            id: field0.id,
-            createdAt: field0.createdAt,
-            updatedAt: '',
-            folder: field0.folder,
-            tags: field0.tags,
-            favourite: field0.favourite,
-            title: _titleController.text,
-            content: _contentController.text,
-          )),
+          entry: VaultEntryData.note(
+            NoteEntryData(
+              id: field0.id,
+              createdAt: field0.createdAt,
+              updatedAt: '',
+              folder: field0.folder,
+              tags: field0.tags,
+              favourite: field0.favourite,
+              title: _titleController.text,
+              content: _contentController.text,
+            ),
+          ),
         );
 
       case VaultEntryData_Identity(:final field0):
         await updateEntry(
-          entry: VaultEntryData.identity(IdentityEntryData(
-            id: field0.id,
-            createdAt: field0.createdAt,
-            updatedAt: '',
-            folder: field0.folder,
-            tags: field0.tags,
-            favourite: field0.favourite,
-            firstName: _firstNameController.text,
-            lastName: _lastNameController.text,
-            email: _emailController.text,
-            phone: _phoneController.text.isEmpty
-                ? null
-                : _phoneController.text,
-            address: _addressController.text.isEmpty
-                ? null
-                : _addressController.text,
-            customFields: _identityCustomFields
-                .map((f) => CustomFieldData(
+          entry: VaultEntryData.identity(
+            IdentityEntryData(
+              id: field0.id,
+              createdAt: field0.createdAt,
+              updatedAt: '',
+              folder: field0.folder,
+              tags: field0.tags,
+              favourite: field0.favourite,
+              firstName: _firstNameController.text,
+              lastName: _lastNameController.text,
+              email: _emailController.text,
+              phone: _phoneController.text.isEmpty
+                  ? null
+                  : _phoneController.text,
+              address: _addressController.text.isEmpty
+                  ? null
+                  : _addressController.text,
+              customFields: _identityCustomFields
+                  .map(
+                    (f) => CustomFieldData(
                       label: f.labelController.text,
                       value: f.valueController.text,
                       hidden: f.hidden,
-                    ))
-                .toList(),
-          )),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
         );
 
       case VaultEntryData_Card(:final field0):
         await updateEntry(
-          entry: VaultEntryData.card(CardEntryData(
-            id: field0.id,
-            createdAt: field0.createdAt,
-            updatedAt: '',
-            folder: field0.folder,
-            tags: field0.tags,
-            favourite: field0.favourite,
-            cardName: _cardNameController.text.isEmpty
-                ? null
-                : _cardNameController.text,
-            status: _cardStatusController.text.isEmpty
-                ? 'active'
-                : _cardStatusController.text,
-            cardholderName: _cardholderNameController.text,
-            cardNumber: _cardNumberController.text,
-            expiry: _expiryController.text,
-            cvv: _cvvController.text,
-            creditLimit: _creditLimitController.text.isEmpty
-                ? null
-                : _creditLimitController.text,
-            cardAccountNumber: _cardAccountNumberController.text.isEmpty
-                ? null
-                : _cardAccountNumberController.text,
-            paymentNetwork: _paymentNetworkController.text.isEmpty
-                ? null
-                : _paymentNetworkController.text,
-            notes: _cardNotesController.text.isEmpty
-                ? null
-                : _cardNotesController.text,
-            customFields: field0.customFields,
-          )),
+          entry: VaultEntryData.card(
+            CardEntryData(
+              id: field0.id,
+              createdAt: field0.createdAt,
+              updatedAt: '',
+              folder: field0.folder,
+              tags: field0.tags,
+              favourite: field0.favourite,
+              cardName: _cardNameController.text.isEmpty
+                  ? null
+                  : _cardNameController.text,
+              status: _cardStatusController.text.isEmpty
+                  ? 'active'
+                  : _cardStatusController.text,
+              cardholderName: _cardholderNameController.text,
+              cardNumber: _cardNumberController.text,
+              expiry: _expiryController.text,
+              cvv: _cvvController.text,
+              creditLimit: _creditLimitController.text.isEmpty
+                  ? null
+                  : _creditLimitController.text,
+              cardAccountNumber: _cardAccountNumberController.text.isEmpty
+                  ? null
+                  : _cardAccountNumberController.text,
+              paymentNetwork: _paymentNetworkController.text.isEmpty
+                  ? null
+                  : _paymentNetworkController.text,
+              notes: _cardNotesController.text.isEmpty
+                  ? null
+                  : _cardNotesController.text,
+              customFields: field0.customFields,
+            ),
+          ),
         );
 
       case VaultEntryData_File(:final field0):
         await updateEntry(
-          entry: VaultEntryData.file(FileEntryData(
-            id: field0.id,
-            createdAt: field0.createdAt,
-            updatedAt: '',
-            folder: field0.folder,
-            tags: field0.tags,
-            favourite: field0.favourite,
-            // Keep original file data if no new file was picked
-            filename: _pickedFilename ?? field0.filename,
-            data: _pickedFileBytes ?? Uint8List.fromList(field0.data),
-            notes: _fileNotesController.text.isEmpty
-                ? null
-                : _fileNotesController.text,
-          )),
+          entry: VaultEntryData.file(
+            FileEntryData(
+              id: field0.id,
+              createdAt: field0.createdAt,
+              updatedAt: '',
+              folder: field0.folder,
+              tags: field0.tags,
+              favourite: field0.favourite,
+              // Keep original file data if no new file was picked
+              filename: _pickedFilename ?? field0.filename,
+              data: _pickedFileBytes ?? Uint8List.fromList(field0.data),
+              notes: _fileNotesController.text.isEmpty
+                  ? null
+                  : _fileNotesController.text,
+            ),
+          ),
         );
 
       case VaultEntryData_Custom(:final field0):
         await updateEntry(
-          entry: VaultEntryData.custom(CustomEntryData(
-            id: field0.id,
-            createdAt: field0.createdAt,
-            updatedAt: '',
-            folder: field0.folder,
-            tags: field0.tags,
-            favourite: field0.favourite,
-            title: _customTitleController.text,
-            fields: _customFields
-                .map((f) => CustomFieldData(
+          entry: VaultEntryData.custom(
+            CustomEntryData(
+              id: field0.id,
+              createdAt: field0.createdAt,
+              updatedAt: '',
+              folder: field0.folder,
+              tags: field0.tags,
+              favourite: field0.favourite,
+              title: _customTitleController.text,
+              fields: _customFields
+                  .map(
+                    (f) => CustomFieldData(
                       label: f.labelController.text,
                       value: f.valueController.text,
                       hidden: f.hidden,
-                    ))
-                .toList(),
-          )),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
         );
 
       default:
@@ -555,36 +625,37 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              ..._buildFields(),
-              const SizedBox(height: 16),
-              if (_error != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(
-                    _error!,
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.error),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ..._buildFields(),
+                const SizedBox(height: 16),
+                if (_error != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      _error!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
                   ),
+                FilledButton(
+                  onPressed: _isSaving ? null : _save,
+                  child: _isSaving
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Save'),
                 ),
-              FilledButton(
-                onPressed: _isSaving ? null : _save,
-                child: _isSaving
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Save'),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
         ),
       ),
     );
@@ -619,172 +690,340 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   // ── Login fields ─────────────────────────────────────────────────────────────
 
   List<Widget> _loginFields() => [
-        _textField(_loginTitleController, 'Title'),
-        const SizedBox(height: 12),
-        _textField(_urlController, 'URL'),
-        const SizedBox(height: 12),
-        _textField(_usernameController, 'Username'),
-        const SizedBox(height: 12),
-        _obscuredField(
-          controller: _passwordController,
-          label: 'Password',
-          obscured: _passwordObscured,
-          onToggle: () =>
+    TextFormField(
+      controller: _loginTitleController,
+      focusNode: _loginTitleFocus,
+      autofocus: true,
+      decoration: const InputDecoration(
+        labelText: 'Title',
+        border: OutlineInputBorder(),
+      ),
+      validator: (v) => (v == null || v.isEmpty) ? 'Title is required' : null,
+      onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_urlFocus),
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _urlController,
+      focusNode: _urlFocus,
+      decoration: const InputDecoration(
+        labelText: 'URL',
+        border: OutlineInputBorder(),
+      ),
+      validator: (v) => (v == null || v.isEmpty) ? 'URL is required' : null,
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_usernameFocus),
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _usernameController,
+      focusNode: _usernameFocus,
+      decoration: const InputDecoration(
+        labelText: 'Username',
+        border: OutlineInputBorder(),
+      ),
+      validator: (v) =>
+          (v == null || v.isEmpty) ? 'Username is required' : null,
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_passwordFocus),
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _passwordController,
+      focusNode: _passwordFocus,
+      obscureText: _passwordObscured,
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(
+        labelText: 'Password',
+        border: const OutlineInputBorder(),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _passwordObscured ? Icons.visibility_off : Icons.visibility,
+          ),
+          onPressed: () =>
               setState(() => _passwordObscured = !_passwordObscured),
-          required: true,
         ),
-      ];
+      ),
+      validator: (v) =>
+          (v == null || v.isEmpty) ? 'Password is required' : null,
+      onFieldSubmitted: (_) => _save(),
+    ),
+  ];
 
   // ── Note fields ──────────────────────────────────────────────────────────────
 
   List<Widget> _noteFields() => [
-        _textField(_titleController, 'Title'),
-        const SizedBox(height: 12),
-        _textField(_contentController, 'Content', maxLines: 6),
-      ];
+    TextFormField(
+      controller: _titleController,
+      focusNode: _noteTitleFocus,
+      autofocus: true,
+      decoration: const InputDecoration(
+        labelText: 'Title',
+        border: OutlineInputBorder(),
+      ),
+      validator: (v) => (v == null || v.isEmpty) ? 'Title is required' : null,
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_noteContentFocus),
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _contentController,
+      focusNode: _noteContentFocus,
+      maxLines: 6,
+      decoration: const InputDecoration(
+        labelText: 'Content',
+        border: OutlineInputBorder(),
+      ),
+      validator: (v) => (v == null || v.isEmpty) ? 'Content is required' : null,
+    ),
+  ];
 
   // ── Identity fields ──────────────────────────────────────────────────────────
 
   List<Widget> _identityFields() => [
-        _textField(_firstNameController, 'First name'),
-        const SizedBox(height: 12),
-        _textField(_lastNameController, 'Last name'),
-        const SizedBox(height: 12),
-        _textField(_emailController, 'Email',
-            keyboardType: TextInputType.emailAddress),
-        const SizedBox(height: 12),
-        _optionalTextField(_phoneController, 'Phone',
-            keyboardType: TextInputType.phone),
-        const SizedBox(height: 12),
-        _optionalTextField(_addressController, 'Address', maxLines: 3),
-        const SizedBox(height: 16),
-        _customFieldsSection(
-          fields: _identityCustomFields,
-          onAdd: () => setState(() => _identityCustomFields
-              .add(_CustomFieldState.empty())),
-          onRemove: (i) => setState(() {
-            _identityCustomFields[i].dispose();
-            _identityCustomFields.removeAt(i);
-          }),
-          onToggleHidden: (i) => setState(
-              () => _identityCustomFields[i].hidden =
-                  !_identityCustomFields[i].hidden),
-        ),
-      ];
+    TextFormField(
+      controller: _firstNameController,
+      focusNode: _firstNameFocus,
+      autofocus: true,
+      decoration: const InputDecoration(
+        labelText: 'First name',
+        border: OutlineInputBorder(),
+      ),
+      validator: (v) =>
+          (v == null || v.isEmpty) ? 'First name is required' : null,
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_lastNameFocus),
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _lastNameController,
+      focusNode: _lastNameFocus,
+      decoration: const InputDecoration(
+        labelText: 'Last name',
+        border: OutlineInputBorder(),
+      ),
+      validator: (v) =>
+          (v == null || v.isEmpty) ? 'Last name is required' : null,
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_emailFocus),
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _emailController,
+      focusNode: _emailFocus,
+      keyboardType: TextInputType.emailAddress,
+      decoration: const InputDecoration(
+        labelText: 'Email',
+        border: OutlineInputBorder(),
+      ),
+      validator: (v) =>
+          (v == null || v.isEmpty) ? 'Email is required' : null,
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_phoneFocus),
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _phoneController,
+      focusNode: _phoneFocus,
+      keyboardType: TextInputType.phone,
+      decoration: const InputDecoration(
+        labelText: 'Phone (optional)',
+        border: OutlineInputBorder(),
+      ),
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_addressFocus),
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _addressController,
+      focusNode: _addressFocus,
+      maxLines: 3,
+      decoration: const InputDecoration(
+        labelText: 'Address (optional)',
+        border: OutlineInputBorder(),
+      ),
+    ),
+    const SizedBox(height: 16),
+    _customFieldsSection(
+      fields: _identityCustomFields,
+      onAdd: () =>
+          setState(() => _identityCustomFields.add(_CustomFieldState.empty())),
+      onRemove: (i) => setState(() {
+        _identityCustomFields[i].dispose();
+        _identityCustomFields.removeAt(i);
+      }),
+      onToggleHidden: (i) => setState(
+        () =>
+            _identityCustomFields[i].hidden = !_identityCustomFields[i].hidden,
+      ),
+    ),
+  ];
 
   // ── Card fields ──────────────────────────────────────────────────────────────
 
   List<Widget> _cardFields() => [
-        _optionalTextField(_cardNameController, 'Card label (e.g. "Visa Platinum")'),
-        const SizedBox(height: 12),
-        _dropdownField(
-          label: 'Status',
-          value: _cardStatuses.contains(_cardStatusController.text)
-              ? _cardStatusController.text
-              : 'active',
-          items: _cardStatuses,
-          onChanged: (v) =>
-              setState(() => _cardStatusController.text = v ?? 'active'),
-        ),
-        const SizedBox(height: 12),
-        _textField(_cardholderNameController, 'Cardholder name'),
-        const SizedBox(height: 12),
-        _dropdownField(
-          label: 'Payment network',
-          value: _paymentNetworks.contains(_paymentNetworkController.text)
-              ? _paymentNetworkController.text
-              : null,
-          items: _paymentNetworks,
-          onChanged: (v) =>
-              setState(() => _paymentNetworkController.text = v ?? ''),
-          required: false,
-        ),
-        const SizedBox(height: 12),
-        TextFormField(
-          controller: _cardNumberController,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          decoration: const InputDecoration(
-            labelText: 'Card number',
-            border: OutlineInputBorder(),
+    TextFormField(
+      controller: _cardNameController,
+      focusNode: _cardNameFocus,
+      autofocus: true,
+      decoration: const InputDecoration(
+        labelText: 'Card label (e.g. "Visa Platinum") (optional)',
+        border: OutlineInputBorder(),
+      ),
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_cardholderNameFocus),
+    ),
+    const SizedBox(height: 12),
+    _dropdownField(
+      label: 'Status',
+      value: _cardStatuses.contains(_cardStatusController.text)
+          ? _cardStatusController.text
+          : 'active',
+      items: _cardStatuses,
+      onChanged: (v) =>
+          setState(() => _cardStatusController.text = v ?? 'active'),
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _cardholderNameController,
+      focusNode: _cardholderNameFocus,
+      decoration: const InputDecoration(
+        labelText: 'Cardholder name',
+        border: OutlineInputBorder(),
+      ),
+      validator: (v) =>
+          (v == null || v.isEmpty) ? 'Cardholder name is required' : null,
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_cardNumberFocus),
+    ),
+    const SizedBox(height: 12),
+    _dropdownField(
+      label: 'Payment network',
+      value: _paymentNetworks.contains(_paymentNetworkController.text)
+          ? _paymentNetworkController.text
+          : null,
+      items: _paymentNetworks,
+      onChanged: (v) =>
+          setState(() => _paymentNetworkController.text = v ?? ''),
+      required: false,
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _cardNumberController,
+      focusNode: _cardNumberFocus,
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      decoration: const InputDecoration(
+        labelText: 'Card number',
+        border: OutlineInputBorder(),
+      ),
+      validator: (v) {
+        if (v == null || v.isEmpty) return 'Card number is required';
+        if (v.length < 12 || v.length > 19) {
+          return 'Card number must be 12–19 digits';
+        }
+        return null;
+      },
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_expiryFocus),
+    ),
+    const SizedBox(height: 12),
+    Row(
+      children: [
+        Expanded(
+          child: TextFormField(
+            controller: _expiryController,
+            focusNode: _expiryFocus,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(4),
+              _ExpiryInputFormatter(),
+            ],
+            decoration: const InputDecoration(
+              labelText: 'Expiry (MM/YY)',
+              border: OutlineInputBorder(),
+            ),
+            validator: (v) {
+              if (v == null || v.isEmpty) return 'Expiry is required';
+              final pattern = RegExp(r'^\d{2}/\d{2}$');
+              if (!pattern.hasMatch(v)) return 'Use MM/YY format';
+              final month = int.tryParse(v.substring(0, 2));
+              if (month == null || month < 1 || month > 12) {
+                return 'Month must be 01–12';
+              }
+              return null;
+            },
+            onFieldSubmitted: (_) =>
+                FocusScope.of(context).requestFocus(_cvvFocus),
           ),
-          validator: (v) {
-            if (v == null || v.isEmpty) return 'Card number is required';
-            if (v.length < 12 || v.length > 19) {
-              return 'Card number must be 12–19 digits';
-            }
-            return null;
-          },
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                controller: _expiryController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(4),
-                  _ExpiryInputFormatter(),
-                ],
-                decoration: const InputDecoration(
-                  labelText: 'Expiry (MM/YY)',
-                  border: OutlineInputBorder(),
+        const SizedBox(width: 12),
+        Expanded(
+          child: TextFormField(
+            controller: _cvvController,
+            focusNode: _cvvFocus,
+            obscureText: _cvvObscured,
+            textInputAction: TextInputAction.next,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(4),
+            ],
+            decoration: InputDecoration(
+              labelText: 'CVV',
+              border: const OutlineInputBorder(),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _cvvObscured ? Icons.visibility_off : Icons.visibility,
                 ),
-                validator: (v) {
-                  if (v == null || v.isEmpty) return 'Expiry is required';
-                  final pattern = RegExp(r'^\d{2}/\d{2}$');
-                  if (!pattern.hasMatch(v)) return 'Use MM/YY format';
-                  final month = int.tryParse(v.substring(0, 2));
-                  if (month == null || month < 1 || month > 12) {
-                    return 'Month must be 01–12';
-                  }
-                  return null;
-                },
+                onPressed: () => setState(() => _cvvObscured = !_cvvObscured),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: TextFormField(
-                controller: _cvvController,
-                obscureText: _cvvObscured,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(4),
-                ],
-                decoration: InputDecoration(
-                  labelText: 'CVV',
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(_cvvObscured
-                        ? Icons.visibility_off
-                        : Icons.visibility),
-                    onPressed: () =>
-                        setState(() => _cvvObscured = !_cvvObscured),
-                  ),
-                ),
-                validator: (v) {
-                  if (v == null || v.isEmpty) return 'CVV is required';
-                  if (v.length < 3 || v.length > 4) {
-                    return 'CVV must be 3 or 4 digits';
-                  }
-                  return null;
-                },
-              ),
-            ),
-          ],
+            validator: (v) {
+              if (v == null || v.isEmpty) return 'CVV is required';
+              if (v.length < 3 || v.length > 4) {
+                return 'CVV must be 3 or 4 digits';
+              }
+              return null;
+            },
+            onFieldSubmitted: (_) =>
+                FocusScope.of(context).requestFocus(_creditLimitFocus),
+          ),
         ),
-        const SizedBox(height: 12),
-        _optionalTextField(_creditLimitController, 'Credit limit',
-            keyboardType: TextInputType.number),
-        const SizedBox(height: 12),
-        _optionalTextField(
-            _cardAccountNumberController, 'Account number'),
-        const SizedBox(height: 12),
-        _optionalTextField(_cardNotesController, 'Notes', maxLines: 3),
-      ];
+      ],
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _creditLimitController,
+      focusNode: _creditLimitFocus,
+      keyboardType: TextInputType.number,
+      decoration: const InputDecoration(
+        labelText: 'Credit limit (optional)',
+        border: OutlineInputBorder(),
+      ),
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_cardAccountNumberFocus),
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _cardAccountNumberController,
+      focusNode: _cardAccountNumberFocus,
+      decoration: const InputDecoration(
+        labelText: 'Account number (optional)',
+        border: OutlineInputBorder(),
+      ),
+      onFieldSubmitted: (_) => _save(),
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _cardNotesController,
+      maxLines: 3,
+      decoration: const InputDecoration(
+        labelText: 'Notes (optional)',
+        border: OutlineInputBorder(),
+      ),
+    ),
+  ];
 
   // ── File fields ──────────────────────────────────────────────────────────────
   // Desktop approach: user types a file path and presses Load.
@@ -794,55 +1033,55 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   String? _fileLoadError;
 
   List<Widget> _fileFields() => [
-        if (_pickedFilename != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Row(
-              children: [
-                const Icon(Icons.insert_drive_file_outlined),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _pickedFilename!,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (_pickedFileBytes != null)
-                  Text(
-                    '${(_pickedFileBytes!.length / 1024).toStringAsFixed(1)} KB',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-              ],
-            ),
-          ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    if (_pickedFilename != null)
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(
           children: [
-            Expanded(
-              child: TextFormField(
-                controller: _filePathController,
-                decoration: InputDecoration(
-                  labelText: 'File path',
-                  border: const OutlineInputBorder(),
-                  errorText: _fileLoadError,
-                ),
-                validator: (_) =>
-                    _pickedFileBytes == null ? 'Please load a file' : null,
-              ),
-            ),
+            const Icon(Icons.insert_drive_file_outlined),
             const SizedBox(width: 8),
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: OutlinedButton(
-                onPressed: _loadFileFromPath,
-                child: const Text('Load'),
-              ),
+            Expanded(
+              child: Text(_pickedFilename!, overflow: TextOverflow.ellipsis),
             ),
+            if (_pickedFileBytes != null)
+              Text(
+                '${(_pickedFileBytes!.length / 1024).toStringAsFixed(1)} KB',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
           ],
         ),
-        const SizedBox(height: 12),
-        _optionalTextField(_fileNotesController, 'Notes', maxLines: 3),
-      ];
+      ),
+    Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: TextFormField(
+            controller: _filePathController,
+            focusNode: _filePathFocus,
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: 'File path',
+              border: const OutlineInputBorder(),
+              errorText: _fileLoadError,
+            ),
+            validator: (_) =>
+                _pickedFileBytes == null ? 'Please load a file' : null,
+            onFieldSubmitted: (_) => _loadFileFromPath(),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: OutlinedButton(
+            onPressed: _loadFileFromPath,
+            child: const Text('Load'),
+          ),
+        ),
+      ],
+    ),
+    const SizedBox(height: 12),
+    _optionalTextField(_fileNotesController, 'Notes', maxLines: 3),
+  ];
 
   Future<void> _loadFileFromPath() async {
     final path = _filePathController.text.trim();
@@ -870,20 +1109,30 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   // ── Custom entry fields ──────────────────────────────────────────────────────
 
   List<Widget> _customEntryFields() => [
-        _textField(_customTitleController, 'Title'),
-        const SizedBox(height: 16),
-        _customFieldsSection(
-          fields: _customFields,
-          onAdd: () => setState(
-              () => _customFields.add(_CustomFieldState.empty())),
-          onRemove: (i) => setState(() {
-            _customFields[i].dispose();
-            _customFields.removeAt(i);
-          }),
-          onToggleHidden: (i) => setState(
-              () => _customFields[i].hidden = !_customFields[i].hidden),
-        ),
-      ];
+    TextFormField(
+      controller: _customTitleController,
+      focusNode: _customTitleFocus,
+      autofocus: true,
+      decoration: const InputDecoration(
+        labelText: 'Title',
+        border: OutlineInputBorder(),
+      ),
+      validator: (v) =>
+          (v == null || v.isEmpty) ? 'Title is required' : null,
+      onFieldSubmitted: (_) => _save(),
+    ),
+    const SizedBox(height: 16),
+    _customFieldsSection(
+      fields: _customFields,
+      onAdd: () => setState(() => _customFields.add(_CustomFieldState.empty())),
+      onRemove: (i) => setState(() {
+        _customFields[i].dispose();
+        _customFields.removeAt(i);
+      }),
+      onToggleHidden: (i) =>
+          setState(() => _customFields[i].hidden = !_customFields[i].hidden),
+    ),
+  ];
 
   // ── Shared custom fields section ─────────────────────────────────────────────
 
@@ -897,10 +1146,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (fields.isNotEmpty)
-          Text(
-            'Custom fields',
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
+          Text('Custom fields', style: Theme.of(context).textTheme.titleSmall),
         if (fields.isNotEmpty) const SizedBox(height: 8),
         ...List.generate(fields.length, (i) {
           final f = fields[i];
@@ -917,9 +1163,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                       labelText: 'Label',
                       border: OutlineInputBorder(),
                     ),
-                    validator: (v) => (v == null || v.isEmpty)
-                        ? 'Label required'
-                        : null,
+                    validator: (v) =>
+                        (v == null || v.isEmpty) ? 'Label required' : null,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -932,9 +1177,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                       labelText: 'Value',
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
-                        icon: Icon(f.hidden
-                            ? Icons.visibility_off
-                            : Icons.visibility),
+                        icon: Icon(
+                          f.hidden ? Icons.visibility_off : Icons.visibility,
+                        ),
                         tooltip: f.hidden ? 'Show value' : 'Hide value',
                         onPressed: () => onToggleHidden(i),
                       ),
@@ -976,8 +1221,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: label,
         border: const OutlineInputBorder(),
       ),
-      validator: (v) =>
-          (v == null || v.isEmpty) ? '$label is required' : null,
+      validator: (v) => (v == null || v.isEmpty) ? '$label is required' : null,
     );
   }
 
@@ -1062,9 +1306,9 @@ class _CustomFieldState {
   });
 
   factory _CustomFieldState.empty() => _CustomFieldState(
-        labelController: TextEditingController(),
-        valueController: TextEditingController(),
-      );
+    labelController: TextEditingController(),
+    valueController: TextEditingController(),
+  );
 
   void dispose() {
     labelController.dispose();
