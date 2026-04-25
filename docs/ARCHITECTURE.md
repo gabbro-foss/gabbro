@@ -493,13 +493,13 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Copy to clipboard from detail screen. Every field in
-  `EntryDetailScreen` now has a copy icon button. Plain fields use `_field`
-  with an added `Row` + `IconButton`. Toggle fields (`_toggleField`) have
-  a second icon button alongside the visibility toggle. Copy always uses
-  the real value regardless of obscure state. Confirmed working on all
-  entry types in release build.
-- **Next task:** Enter key submits dialogs (see Bikeshed — "Enter key submits dialogs").
+- **Completed:** Enter key submits dialogs. `_importEnpass` dialog already
+  had `onSubmitted` and `autofocus` — confirmed working. Export dialog
+  (`_exportFile`) updated with same pattern. "Enter key submits dialogs"
+  bikeshed item removed.
+- **Next task:** Fix focus/Tab navigation on `CreateEntryScreen` — first
+  field should be focused on open; Tab should move between fields in order
+  (see Bikeshed — "Focus and Tab navigation on CreateEntryScreen").
 
 ---
 
@@ -747,14 +747,39 @@ discussed and forgotten.
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
 
-- **Vault deletion from UI:** Allow the user to delete their vault file from
-  within the app — currently only possible at the OS level. Should require
-  confirmation and lock the session, then route back to onboarding.
+- **Focus and Tab navigation on `CreateEntryScreen`:** On open, the first
+  editable field is not focused — the user must Tab twice to reach it.
+  Tab order between fields is not natural. Fix: add `autofocus: true` to
+  the first field, and wire `FocusNode` + `onSubmitted` chains so Tab moves
+  focus through fields in logical order, with the final field submitting
+  the form.
 
-- **Enter key submits dialogs:** The import dialog (and any other path-input
-  dialogs) should submit on Enter key press. Use `onSubmitted` on the
-  `TextField` with `Navigator.of(context).pop(true)`. Also add `autofocus: true`
-  so the field is focused immediately on dialog open.
+- **Export vault:** Users need a way to export the full vault from within
+  the app — currently only possible at the OS level (copy the `.gabbro`
+  file manually). Should produce a `.gabbro` + `.gabbro.sha256` pair at a
+  user-chosen path, matching the existing `export_vault` Rust bridge function.
+  Add an Export option to a future Settings screen or vault action menu.
+
+- **Custom filter chips:** Allow users to add new filter chips based on
+  folders or custom tags, beyond the fixed entry-type chips. YAGNI risk is
+  real — the fixed chips cover the common case and custom ones add UI
+  complexity. Revisit after v1 ships and user feedback exists.
+
+- **Hide filter chips:** Allow users to hide individual filter chips they
+  never use (e.g. a user who has no Card entries). YAGNI risk same as
+  above — defer until there is evidence users want this.
+
+- **Multiple vaults:** Allow users to create and switch between more than
+  one vault. Key questions: how does the session model handle multiple
+  open vaults? Does the UI need a vault switcher, or is open/close
+  sufficient? Does each vault get its own passphrase and KDF parameters?
+  Significant architecture change — v2 at earliest.
+
+- **Vault deletion from UI (full vault):** Distinct from the existing
+  "delete all entries" path — this should delete the `.gabbro` file from
+  disk entirely, lock the session, and route back to onboarding. The
+  existing `delete_whole_vault` bridge function already does the Rust side;
+  this is a UI and navigation task.
 
 - **Release builds for UI/UX testing:** Debug builds run Argon2id unoptimised
   (~20s per vault operation on Linux, worse on Android emulator). Always use
