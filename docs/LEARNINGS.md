@@ -1742,6 +1742,19 @@ widget with that behaviour. Used in `VaultListScreen` to suppress the
 default scrollbar on `ScrollablePositionedList` — the alphabet index bar
 is the navigation mechanism and a separate scrollbar is redundant.
 
+### `Clipboard` — writing to the system clipboard in Flutter
+`Clipboard.setData(ClipboardData(text: value))` writes a string to the
+system clipboard. Lives in `package:flutter/services.dart`. The call is
+async — `await` it before showing any confirmation UI. Always check
+`mounted` after the await before calling `ScaffoldMessenger`, because the
+widget may have been disposed while the clipboard write was in progress.
+The `SnackBar` is the standard Flutter confirmation pattern: brief
+(2 seconds), non-blocking, dismissible.
+
+For sensitive fields that have a show/hide toggle (passwords, CVV, PIN),
+copy always uses the real underlying value — never the bullet placeholder.
+The user's intent when tapping copy is unambiguous.
+
 ### `retain` — in-place filtering of a `Vec` in Rust
 `vec.retain(|item| condition)` removes all elements for which the condition
 returns false, in a single pass, without allocating a new `Vec`. Used in

@@ -493,14 +493,13 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Select-all for bulk delete implemented. Toggle in app bar
-  when in selection mode: selects all filtered entries, or deselects all if
-  already fully selected. Bulk delete fixed to use a single vault save
-  (`delete_entries` bridge function) rather than one save per entry —
-  `session_delete_entries_no_save` removes all entries in one pass then
-  `session_save` persists once.
-- **Next task:** Copy to clipboard from detail screen (see Bikeshed —
-  "Copy to clipboard from detail screen").
+- **Completed:** Copy to clipboard from detail screen. Every field in
+  `EntryDetailScreen` now has a copy icon button. Plain fields use `_field`
+  with an added `Row` + `IconButton`. Toggle fields (`_toggleField`) have
+  a second icon button alongside the visibility toggle. Copy always uses
+  the real value regardless of obscure state. Confirmed working on all
+  entry types in release build.
+- **Next task:** Enter key submits dialogs (see Bikeshed — "Enter key submits dialogs").
 
 ---
 
@@ -751,11 +750,6 @@ discussed and forgotten.
 - **Vault deletion from UI:** Allow the user to delete their vault file from
   within the app — currently only possible at the OS level. Should require
   confirmation and lock the session, then route back to onboarding.
-
-- **Copy to clipboard from detail screen:** Fields in `EntryDetailScreen` are
-  plain `Text` widgets — not selectable, not copyable. Add a copy icon button
-  alongside each field value, or make the text selectable via `SelectableText`.
-  Both URL and username fields are high-priority for copy support.
 
 - **Enter key submits dialogs:** The import dialog (and any other path-input
   dialogs) should submit on Enter key press. Use `onSubmitted` on the
