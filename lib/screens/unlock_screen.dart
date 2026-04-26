@@ -3,10 +3,22 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 
+Future<void> _defaultUnlock(List<int> passphrase, String path) =>
+    unlockVault(passphrase: passphrase, path: path);
+EntropyResult _defaultEstimateEntropy(String password) =>
+    estimateEntropy(password: password);
+
 class UnlockScreen extends StatefulWidget {
   final String vaultPath;
+  final Future<void> Function(List<int> passphrase, String path) onUnlock;
+  final EntropyResult Function(String password) onEstimateEntropy;
 
-  const UnlockScreen({super.key, required this.vaultPath});
+  const UnlockScreen({
+    super.key,
+    required this.vaultPath,
+    this.onUnlock = _defaultUnlock,
+    this.onEstimateEntropy = _defaultEstimateEntropy,
+  });
 
   @override
   State<UnlockScreen> createState() => _UnlockScreenState();
@@ -32,9 +44,9 @@ class _UnlockScreenState extends State<UnlockScreen> {
     });
 
     try {
-      await unlockVault(
-        passphrase: _passphraseController.text.codeUnits,
-        path: widget.vaultPath,
+      await widget.onUnlock(
+        _passphraseController.text.codeUnits,
+        widget.vaultPath,
       );
       if (mounted) {
         Navigator.of(context).pushReplacement(
@@ -53,19 +65,19 @@ class _UnlockScreenState extends State<UnlockScreen> {
   }
 
   Color _tierColor(StrengthTier tier) => switch (tier) {
-    StrengthTier.terrible  => Colors.red,
-    StrengthTier.weak      => Colors.orange,
-    StrengthTier.fair      => Colors.yellow.shade700,
-    StrengthTier.strong    => Colors.lightGreen,
+    StrengthTier.terrible => Colors.red,
+    StrengthTier.weak => Colors.orange,
+    StrengthTier.fair => Colors.yellow.shade700,
+    StrengthTier.strong => Colors.lightGreen,
     StrengthTier.veryStrong => Colors.green,
     StrengthTier.centuries => Colors.green.shade800,
   };
 
   String _tierLabel(StrengthTier tier) => switch (tier) {
-    StrengthTier.terrible  => 'Terrible',
-    StrengthTier.weak      => 'Weak',
-    StrengthTier.fair      => 'Fair',
-    StrengthTier.strong    => 'Strong',
+    StrengthTier.terrible => 'Terrible',
+    StrengthTier.weak => 'Weak',
+    StrengthTier.fair => 'Fair',
+    StrengthTier.strong => 'Strong',
     StrengthTier.veryStrong => 'Very strong',
     StrengthTier.centuries => 'Excellent',
   };
@@ -99,7 +111,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
                   obscureText: _obscured,
                   onSubmitted: (_) => _isUnlocking ? null : _unlock(),
                   onChanged: (v) => setState(
-                    () => _entropy = estimateEntropy(password: v),
+                    () => _entropy = widget.onEstimateEntropy(v),
                   ),
                   decoration: InputDecoration(
                     labelText: 'Passphrase',
@@ -118,10 +130,10 @@ class _UnlockScreenState extends State<UnlockScreen> {
                   const SizedBox(height: 8),
                   LinearProgressIndicator(
                     value: switch (_entropy!.tier) {
-                      StrengthTier.terrible  => 0.1,
-                      StrengthTier.weak      => 0.25,
-                      StrengthTier.fair      => 0.5,
-                      StrengthTier.strong    => 0.75,
+                      StrengthTier.terrible => 0.1,
+                      StrengthTier.weak => 0.25,
+                      StrengthTier.fair => 0.5,
+                      StrengthTier.strong => 0.75,
                       StrengthTier.veryStrong => 0.9,
                       StrengthTier.centuries => 1.0,
                     },

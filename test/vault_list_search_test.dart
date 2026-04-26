@@ -82,6 +82,37 @@ void main() {
     expect(find.text('Olivine'), findsOneWidget);
   });
 
+  testWidgets('filter chip filters by entry type', (tester) async {
+    await tester.pumpWidget(_buildScreen(_threeEntries));
+
+    await tester.tap(find.widgetWithText(FilterChip, 'Note'));
+    await tester.pump();
+
+    expect(
+      find.descendant(of: find.byType(ListTile), matching: find.text('Muscovite')),
+      findsOneWidget,
+    );
+    expect(find.text('Quartz'), findsNothing);
+    expect(find.text('Olivine'), findsNothing);
+  });
+
+  testWidgets('tapping checkbox enters selection mode', (tester) async {
+    await tester.pumpWidget(_buildScreen(_threeEntries));
+
+    final quartzTile = find.ancestor(
+      of: find.text('Quartz'),
+      matching: find.byType(ListTile),
+    );
+    final checkbox = find.descendant(
+      of: quartzTile,
+      matching: find.byType(Checkbox),
+    );
+    await tester.tap(checkbox);
+    await tester.pump();
+
+    expect(find.text('1 selected'), findsOneWidget);
+  });
+
   testWidgets('empty query shows no results message', (tester) async {
     await tester.pumpWidget(_buildScreen(_threeEntries));
 

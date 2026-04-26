@@ -5,11 +5,27 @@ import 'package:flutter/services.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
+Future<void> _defaultCreate(VaultEntryData entry) =>
+    createEntry(entry: entry);
+Future<void> _defaultUpdate(VaultEntryData entry) =>
+    updateEntry(entry: entry);
+VaultEntryData _defaultGetEntry(String id) => getEntry(id: id);
+
 class CreateEntryScreen extends StatefulWidget {
   final String entryType;
   final VaultEntryData? existing;
+  final Future<void> Function(VaultEntryData entry) onCreateEntry;
+  final Future<void> Function(VaultEntryData entry) onUpdateEntry;
+  final VaultEntryData Function(String id) onGetEntry;
 
-  const CreateEntryScreen({super.key, required this.entryType, this.existing});
+  const CreateEntryScreen({
+    super.key,
+    required this.entryType,
+    this.existing,
+    this.onCreateEntry = _defaultCreate,
+    this.onUpdateEntry = _defaultUpdate,
+    this.onGetEntry = _defaultGetEntry,
+  });
 
   @override
   State<CreateEntryScreen> createState() => _CreateEntryScreenState();
@@ -43,7 +59,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
   late final TextEditingController _addressController;
-  // Dynamic custom fields for Identity
   final List<_CustomFieldState> _identityCustomFields = [];
   final FocusNode _firstNameFocus = FocusNode();
   final FocusNode _lastNameFocus = FocusNode();
@@ -84,10 +99,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   bool get _isEditing => widget.existing != null;
 
-  // ── Card status options ─────────────────────────────────────────────────────
   static const _cardStatuses = ['active', 'lapsed', 'inactive'];
-
-  // ── Payment network options ─────────────────────────────────────────────────
   static const _paymentNetworks = [
     'Visa',
     'Mastercard',
@@ -157,22 +169,19 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     if (e case VaultEntryData_Card(:final field0)) {
       _cardNameController = TextEditingController(text: field0.cardName ?? '');
       _cardStatusController = TextEditingController(text: field0.status);
-      _cardholderNameController = TextEditingController(
-        text: field0.cardholderName,
-      );
+      _cardholderNameController =
+          TextEditingController(text: field0.cardholderName);
       _cardNumberController = TextEditingController(text: field0.cardNumber);
       _expiryController = TextEditingController(text: field0.expiry);
       _cvvController = TextEditingController(text: field0.cvv);
-      _creditLimitController = TextEditingController(
-        text: field0.creditLimit ?? '',
-      );
-      _cardAccountNumberController = TextEditingController(
-        text: field0.cardAccountNumber ?? '',
-      );
-      _paymentNetworkController = TextEditingController(
-        text: field0.paymentNetwork ?? '',
-      );
-      _cardNotesController = TextEditingController(text: field0.notes ?? '');
+      _creditLimitController =
+          TextEditingController(text: field0.creditLimit ?? '');
+      _cardAccountNumberController =
+          TextEditingController(text: field0.cardAccountNumber ?? '');
+      _paymentNetworkController =
+          TextEditingController(text: field0.paymentNetwork ?? '');
+      _cardNotesController =
+          TextEditingController(text: field0.notes ?? '');
     } else {
       _cardNameController = TextEditingController();
       _cardStatusController = TextEditingController(text: 'active');
@@ -190,7 +199,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     if (e case VaultEntryData_File(:final field0)) {
       _pickedFilename = field0.filename;
       _pickedFileBytes = Uint8List.fromList(field0.data);
-      _fileNotesController = TextEditingController(text: field0.notes ?? '');
+      _fileNotesController =
+          TextEditingController(text: field0.notes ?? '');
     } else {
       _fileNotesController = TextEditingController();
     }
@@ -214,7 +224,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   @override
   void dispose() {
-    // Login
     _loginTitleController.dispose();
     _urlController.dispose();
     _usernameController.dispose();
@@ -223,12 +232,10 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _urlFocus.dispose();
     _usernameFocus.dispose();
     _passwordFocus.dispose();
-    // Note
     _titleController.dispose();
     _contentController.dispose();
     _noteTitleFocus.dispose();
     _noteContentFocus.dispose();
-    // Identity
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
@@ -242,7 +249,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     for (final f in _identityCustomFields) {
       f.dispose();
     }
-    // Card
     _cardNameController.dispose();
     _cardStatusController.dispose();
     _cardholderNameController.dispose();
@@ -260,11 +266,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _cvvFocus.dispose();
     _creditLimitFocus.dispose();
     _cardAccountNumberFocus.dispose();
-    // File
     _fileNotesController.dispose();
     _filePathController.dispose();
     _filePathFocus.dispose();
-    // Custom
     _customTitleController.dispose();
     _customTitleFocus.dispose();
     for (final f in _customFields) {
@@ -277,7 +281,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    // File entry needs a file picked
     if (widget.entryType == 'File' && _pickedFileBytes == null) {
       setState(() => _error = 'Please pick a file.');
       return;
@@ -297,7 +300,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
           VaultEntryData_File(:final field0) => field0.id,
           VaultEntryData_Custom(:final field0) => field0.id,
         };
-        final updated = getEntry(id: id);
+        final updated = widget.onGetEntry(id);
         if (mounted) Navigator.of(context).pop(updated);
       } else {
         await _saveCreate();
@@ -313,8 +316,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   Future<void> _saveCreate() async {
     switch (widget.entryType) {
       case 'Login':
-        await createEntry(
-          entry: VaultEntryData.login(
+        await widget.onCreateEntry(
+          VaultEntryData.login(
             LoginEntryData(
               id: '',
               createdAt: '',
@@ -332,8 +335,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         );
 
       case 'Note':
-        await createEntry(
-          entry: VaultEntryData.note(
+        await widget.onCreateEntry(
+          VaultEntryData.note(
             NoteEntryData(
               id: '',
               createdAt: '',
@@ -348,8 +351,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         );
 
       case 'Identity':
-        await createEntry(
-          entry: VaultEntryData.identity(
+        await widget.onCreateEntry(
+          VaultEntryData.identity(
             IdentityEntryData(
               id: '',
               createdAt: '',
@@ -380,8 +383,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         );
 
       case 'Card':
-        await createEntry(
-          entry: VaultEntryData.card(
+        await widget.onCreateEntry(
+          VaultEntryData.card(
             CardEntryData(
               id: '',
               createdAt: '',
@@ -417,8 +420,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         );
 
       case 'File':
-        await createEntry(
-          entry: VaultEntryData.file(
+        await widget.onCreateEntry(
+          VaultEntryData.file(
             FileEntryData(
               id: '',
               createdAt: '',
@@ -436,8 +439,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         );
 
       case 'Custom':
-        await createEntry(
-          entry: VaultEntryData.custom(
+        await widget.onCreateEntry(
+          VaultEntryData.custom(
             CustomEntryData(
               id: '',
               createdAt: '',
@@ -464,8 +467,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   Future<void> _saveUpdate() async {
     switch (widget.existing) {
       case VaultEntryData_Login(:final field0):
-        await updateEntry(
-          entry: VaultEntryData.login(
+        await widget.onUpdateEntry(
+          VaultEntryData.login(
             LoginEntryData(
               id: field0.id,
               createdAt: field0.createdAt,
@@ -483,8 +486,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         );
 
       case VaultEntryData_Note(:final field0):
-        await updateEntry(
-          entry: VaultEntryData.note(
+        await widget.onUpdateEntry(
+          VaultEntryData.note(
             NoteEntryData(
               id: field0.id,
               createdAt: field0.createdAt,
@@ -499,8 +502,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         );
 
       case VaultEntryData_Identity(:final field0):
-        await updateEntry(
-          entry: VaultEntryData.identity(
+        await widget.onUpdateEntry(
+          VaultEntryData.identity(
             IdentityEntryData(
               id: field0.id,
               createdAt: field0.createdAt,
@@ -531,8 +534,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         );
 
       case VaultEntryData_Card(:final field0):
-        await updateEntry(
-          entry: VaultEntryData.card(
+        await widget.onUpdateEntry(
+          VaultEntryData.card(
             CardEntryData(
               id: field0.id,
               createdAt: field0.createdAt,
@@ -568,8 +571,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         );
 
       case VaultEntryData_File(:final field0):
-        await updateEntry(
-          entry: VaultEntryData.file(
+        await widget.onUpdateEntry(
+          VaultEntryData.file(
             FileEntryData(
               id: field0.id,
               createdAt: field0.createdAt,
@@ -577,7 +580,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               folder: field0.folder,
               tags: field0.tags,
               favourite: field0.favourite,
-              // Keep original file data if no new file was picked
               filename: _pickedFilename ?? field0.filename,
               data: _pickedFileBytes ?? Uint8List.fromList(field0.data),
               notes: _fileNotesController.text.isEmpty
@@ -588,8 +590,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         );
 
       case VaultEntryData_Custom(:final field0):
-        await updateEntry(
-          entry: VaultEntryData.custom(
+        await widget.onUpdateEntry(
+          VaultEntryData.custom(
             CustomEntryData(
               id: field0.id,
               createdAt: field0.createdAt,
@@ -773,7 +775,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: 'Content',
         border: OutlineInputBorder(),
       ),
-      validator: (v) => (v == null || v.isEmpty) ? 'Content is required' : null,
+      validator: (v) =>
+          (v == null || v.isEmpty) ? 'Content is required' : null,
     ),
   ];
 
@@ -803,7 +806,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       ),
       validator: (v) =>
           (v == null || v.isEmpty) ? 'Last name is required' : null,
-      onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_emailFocus),
     ),
     const SizedBox(height: 12),
     TextFormField(
@@ -814,8 +818,10 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: 'Email',
         border: OutlineInputBorder(),
       ),
-      validator: (v) => (v == null || v.isEmpty) ? 'Email is required' : null,
-      onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_phoneFocus),
+      validator: (v) =>
+          (v == null || v.isEmpty) ? 'Email is required' : null,
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_phoneFocus),
     ),
     const SizedBox(height: 12),
     TextFormField(
@@ -842,15 +848,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     const SizedBox(height: 16),
     _customFieldsSection(
       fields: _identityCustomFields,
-      onAdd: () =>
-          setState(() => _identityCustomFields.add(_CustomFieldState.empty())),
+      onAdd: () => setState(
+          () => _identityCustomFields.add(_CustomFieldState.empty())),
       onRemove: (i) => setState(() {
         _identityCustomFields[i].dispose();
         _identityCustomFields.removeAt(i);
       }),
       onToggleHidden: (i) => setState(
-        () =>
-            _identityCustomFields[i].hidden = !_identityCustomFields[i].hidden,
+        () => _identityCustomFields[i].hidden =
+            !_identityCustomFields[i].hidden,
       ),
     ),
   ];
@@ -973,7 +979,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                 icon: Icon(
                   _cvvObscured ? Icons.visibility_off : Icons.visibility,
                 ),
-                onPressed: () => setState(() => _cvvObscured = !_cvvObscured),
+                onPressed: () =>
+                    setState(() => _cvvObscured = !_cvvObscured),
               ),
             ),
             validator: (v) {
@@ -1023,8 +1030,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   ];
 
   // ── File fields ──────────────────────────────────────────────────────────────
-  // Desktop approach: user types a file path and presses Load.
-  // A native file picker will be added when Android support is built.
 
   final TextEditingController _filePathController = TextEditingController();
   String? _fileLoadError;
@@ -1038,7 +1043,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             const Icon(Icons.insert_drive_file_outlined),
             const SizedBox(width: 8),
             Expanded(
-              child: Text(_pickedFilename!, overflow: TextOverflow.ellipsis),
+              child:
+                  Text(_pickedFilename!, overflow: TextOverflow.ellipsis),
             ),
             if (_pickedFileBytes != null)
               Text(
@@ -1114,19 +1120,21 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: 'Title',
         border: OutlineInputBorder(),
       ),
-      validator: (v) => (v == null || v.isEmpty) ? 'Title is required' : null,
+      validator: (v) =>
+          (v == null || v.isEmpty) ? 'Title is required' : null,
       onFieldSubmitted: (_) => _save(),
     ),
     const SizedBox(height: 16),
     _customFieldsSection(
       fields: _customFields,
-      onAdd: () => setState(() => _customFields.add(_CustomFieldState.empty())),
+      onAdd: () =>
+          setState(() => _customFields.add(_CustomFieldState.empty())),
       onRemove: (i) => setState(() {
         _customFields[i].dispose();
         _customFields.removeAt(i);
       }),
-      onToggleHidden: (i) =>
-          setState(() => _customFields[i].hidden = !_customFields[i].hidden),
+      onToggleHidden: (i) => setState(
+          () => _customFields[i].hidden = !_customFields[i].hidden),
     ),
   ];
 
@@ -1142,7 +1150,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (fields.isNotEmpty)
-          Text('Custom fields', style: Theme.of(context).textTheme.titleSmall),
+          Text('Custom fields',
+              style: Theme.of(context).textTheme.titleSmall),
         if (fields.isNotEmpty) const SizedBox(height: 8),
         ...List.generate(fields.length, (i) {
           final f = fields[i];
@@ -1174,7 +1183,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          f.hidden ? Icons.visibility_off : Icons.visibility,
+                          f.hidden
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
                         tooltip: f.hidden ? 'Show value' : 'Hide value',
                         onPressed: () => onToggleHidden(i),
@@ -1203,7 +1214,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   // ── Field helpers ────────────────────────────────────────────────────────────
 
-  /// Optional field — no validator, empty text is fine.
   Widget _optionalTextField(
     TextEditingController controller,
     String label, {
@@ -1247,7 +1257,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
 // ── Custom field state helper ────────────────────────────────────────────────
 
-/// Holds the mutable state for a single user-defined key/value field.
 class _CustomFieldState {
   final TextEditingController labelController;
   final TextEditingController valueController;
@@ -1260,9 +1269,9 @@ class _CustomFieldState {
   });
 
   factory _CustomFieldState.empty() => _CustomFieldState(
-    labelController: TextEditingController(),
-    valueController: TextEditingController(),
-  );
+        labelController: TextEditingController(),
+        valueController: TextEditingController(),
+      );
 
   void dispose() {
     labelController.dispose();
@@ -1272,8 +1281,6 @@ class _CustomFieldState {
 
 // ── Expiry input formatter ───────────────────────────────────────────────────
 
-/// Auto-inserts '/' after the two month digits so the user only
-/// needs to type 4 digits (MMYY) and gets MM/YY in the field.
 class _ExpiryInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -1294,5 +1301,3 @@ class _ExpiryInputFormatter extends TextInputFormatter {
     );
   }
 }
-
-// ── Custom field state helper ────────────────────────────────────────────────

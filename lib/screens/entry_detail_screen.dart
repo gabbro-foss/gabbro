@@ -1,15 +1,26 @@
 import 'dart:io';
-import 'package:flutter/services.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 
+Future<void> _defaultDelete(String id) => deleteEntry(id: id);
+Future<void> _defaultCopy(String value) =>
+    Clipboard.setData(ClipboardData(text: value));
+
 class EntryDetailScreen extends StatefulWidget {
   final VaultEntryData entry;
+  final Future<void> Function(String id) onDeleteEntry;
+  final Future<void> Function(String value) onCopyToClipboard;
 
-  const EntryDetailScreen({super.key, required this.entry});
+  const EntryDetailScreen({
+    super.key,
+    required this.entry,
+    this.onDeleteEntry = _defaultDelete,
+    this.onCopyToClipboard = _defaultCopy,
+  });
 
   @override
   State<EntryDetailScreen> createState() => _EntryDetailScreenState();
@@ -60,7 +71,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       ),
     );
     if (confirmed != true) return;
-    await deleteEntry(id: _entryId());
+    await widget.onDeleteEntry(_entryId());
     if (context.mounted) Navigator.of(context).pop(true);
   }
 
@@ -398,7 +409,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   // ── Shared helpers ───────────────────────────────────────────────────────────
 
   Future<void> _copyToClipboard(String value) async {
-    await Clipboard.setData(ClipboardData(text: value));
+    await widget.onCopyToClipboard(value);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

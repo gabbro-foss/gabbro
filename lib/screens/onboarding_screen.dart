@@ -5,8 +5,22 @@ import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:path_provider/path_provider.dart';
 
+Future<void> _defaultInitVault(List<int> passphrase, String path) =>
+    initVault(passphrase: passphrase, path: path);
+EntropyResult _defaultEstimateEntropy(String password) =>
+    estimateEntropy(password: password);
+
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({super.key});
+  final String? initialPath;
+  final Future<void> Function(List<int> passphrase, String path) onInitVault;
+  final EntropyResult Function(String password) onEstimateEntropy;
+
+  const OnboardingScreen({
+    super.key,
+    this.initialPath,
+    this.onInitVault = _defaultInitVault,
+    this.onEstimateEntropy = _defaultEstimateEntropy,
+  });
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -28,7 +42,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   void initState() {
     super.initState();
-    _initDefaultPath();
+    if (widget.initialPath != null) {
+      _pathController.text = widget.initialPath!;
+    } else {
+      _initDefaultPath();
+    }
   }
 
   Future<void> _initDefaultPath() async {
@@ -46,7 +64,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _onPassphraseChanged(String value) {
-    final result = estimateEntropy(password: value);
+    final result = widget.onEstimateEntropy(value);
     setState(() => _entropy = result);
   }
 
@@ -57,13 +75,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       _error = null;
     });
     try {
-      // Ensure the directory exists
       final file = File(_pathController.text);
       await file.parent.create(recursive: true);
 
-      await initVault(
-        passphrase: _passphraseController.text.codeUnits,
-        path: _pathController.text,
+      await widget.onInitVault(
+        _passphraseController.text.codeUnits,
+        _pathController.text,
       );
       if (mounted) {
         Navigator.of(context).pushReplacement(
@@ -127,7 +144,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   const SizedBox(height: 40),
 
-                  // Vault path
                   const Text(
                     'Vault location',
                     style: TextStyle(fontWeight: FontWeight.w600),
@@ -151,7 +167,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Passphrase
                   TextFormField(
                     controller: _passphraseController,
                     obscureText: _passphraseObscured,
@@ -178,7 +193,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     },
                   ),
 
-                  // Entropy indicator
                   if (_entropy != null) ...[
                     const SizedBox(height: 8),
                     LinearProgressIndicator(
@@ -204,13 +218,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ],
                   const SizedBox(height: 16),
 
-                  // Confirm passphrase
                   TextFormField(
                     controller: _confirmController,
                     obscureText: _confirmObscured,
                     onChanged: (v) {
                       setState(
-                        () => _confirmMatches = v.isEmpty ? null : v == _passphraseController.text,
+                        () => _confirmMatches =
+                            v.isEmpty ? null : v == _passphraseController.text,
                       );
                     },
                     decoration: InputDecoration(
