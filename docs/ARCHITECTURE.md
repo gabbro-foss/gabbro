@@ -496,11 +496,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Doc cleanup — removed stale bikeshed items (fixed test,
-  three resolved Enpass bullets), updated Rust test counts to 142 passing /
-  1 ignored, added `import/` to project structure tree.
-- **Next task:** Flutter widget tests — `VaultListScreen`, `EntryDetailScreen`,
-  `CreateEntryScreen`.
+- **Completed:** Flutter widget tests — 26 tests passing across all screens:
+  `VaultListScreen` (7), `EntryDetailScreen` (5), `CreateEntryScreen` (3),
+  `UnlockScreen` (3), `OnboardingScreen` (5), `AlphabetIndexBar` (3).
+  Dependency injection pattern applied to all screens with bridge calls.
+- **Next task:** Bitwarden importer (see Bikeshed — Import / Migration).
 
 ---
 
@@ -526,6 +526,15 @@ discussed and forgotten.
 ---
 
 ### Testing
+
+- **Cross-layer integration tests:** Widget tests cover UI behaviour; Rust
+  tests cover domain logic. The bridge boundary is not yet tested end-to-end.
+  Add a `tests/` folder with integration tests that run the full app against
+  a real Rust binary before v1. See LEARNINGS.md testing pyramid for context.
+
+- **Android long press — selection mode:** On Android, long pressing a list
+  tile should enter selection mode as an alternative to tapping the checkbox.
+  Not implemented yet; defer to Android polish pass.
 
 - **Flutter widget tests — known gaps:** The Flutter side has significantly
   fewer tests than the Rust backend. Three specific gaps to address before

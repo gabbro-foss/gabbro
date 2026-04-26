@@ -1571,6 +1571,32 @@ the search to only widgets that are descendants of a `ListTile`. Use this
 pattern any time a text value could appear in both an input field and
 elsewhere in the widget tree.
 
+### The testing pyramid
+Unit tests form the broad base — many, fast, isolated. Widget tests sit in
+the middle — fewer, test UI behaviour only. Integration tests are the thin
+top — few, slow, exercise the full stack including the bridge. Write them
+bottom-up: unit tests first, then widget tests once unit tests are solid,
+then integration tests once the lower layers are clean.
+
+        /\
+       /  \  integration tests — few, slow, full stack
+      /----\
+     /      \  widget tests — medium, UI behaviour
+    /--------\
+   /          \  unit tests — many, fast, isolated
+  /____________\
+
+### Dependency injection for testable screens — the full pattern
+All Gabbro screens follow the same DI pattern. Bridge functions that would
+crash in a test environment are extracted as optional parameters with the
+real bridge call as the default value. Top-level private functions
+(e.g. `_defaultDelete`, `_defaultEstimateEntropy`) hold the defaults —
+Dart requires default parameter values to be top-level references, not
+instance methods. Production code passes nothing; tests pass fakes.
+This applies to all bridge calls including `estimateEntropy`, which fires
+on every `onChanged` keystroke and must be injected even when entropy
+display is not under test.
+
 ## Android Deployment
 
 ### `adb` — Android Debug Bridge
