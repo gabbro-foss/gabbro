@@ -4,6 +4,7 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/entropy.dart';
+import 'api/import.dart';
 import 'api/passphrase_generator.dart';
 import 'api/password_generator.dart';
 import 'api/simple.dart';
@@ -33,6 +34,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   CardEntryData dco_decode_box_autoadd_card_entry_data(dynamic raw);
 
   @protected
+  CsvImportConfigData dco_decode_box_autoadd_csv_import_config_data(
+    dynamic raw,
+  );
+
+  @protected
   CustomEntryData dco_decode_box_autoadd_custom_entry_data(dynamic raw);
 
   @protected
@@ -58,6 +64,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   CardEntryData dco_decode_card_entry_data(dynamic raw);
+
+  @protected
+  CsvImportConfigData dco_decode_csv_import_config_data(dynamic raw);
+
+  @protected
+  CsvPreviewData dco_decode_csv_preview_data(dynamic raw);
 
   @protected
   CustomEntryData dco_decode_custom_entry_data(dynamic raw);
@@ -94,6 +106,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<EntrySummaryData> dco_decode_list_entry_summary_data(dynamic raw);
+
+  @protected
+  List<List<String>> dco_decode_list_list_String(dynamic raw);
 
   @protected
   List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
@@ -146,6 +161,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  CsvImportConfigData sse_decode_box_autoadd_csv_import_config_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   CustomEntryData sse_decode_box_autoadd_custom_entry_data(
     SseDeserializer deserializer,
   );
@@ -189,6 +209,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   CardEntryData sse_decode_card_entry_data(SseDeserializer deserializer);
 
   @protected
+  CsvImportConfigData sse_decode_csv_import_config_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  CsvPreviewData sse_decode_csv_preview_data(SseDeserializer deserializer);
+
+  @protected
   CustomEntryData sse_decode_custom_entry_data(SseDeserializer deserializer);
 
   @protected
@@ -229,6 +257,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<EntrySummaryData> sse_decode_list_entry_summary_data(
     SseDeserializer deserializer,
   );
+
+  @protected
+  List<List<String>> sse_decode_list_list_String(SseDeserializer deserializer);
 
   @protected
   List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
@@ -278,6 +309,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_card_entry_data(
     CardEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_csv_import_config_data(
+    CsvImportConfigData self,
     SseSerializer serializer,
   );
 
@@ -333,6 +370,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_card_entry_data(CardEntryData self, SseSerializer serializer);
 
   @protected
+  void sse_encode_csv_import_config_data(
+    CsvImportConfigData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_csv_preview_data(
+    CsvPreviewData self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_custom_entry_data(
     CustomEntryData self,
     SseSerializer serializer,
@@ -383,6 +432,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_entry_summary_data(
     List<EntrySummaryData> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_list_String(
+    List<List<String>> self,
     SseSerializer serializer,
   );
 

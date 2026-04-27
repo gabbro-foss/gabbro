@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1452471185;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1628873633;
 
 // Section: executor
 
@@ -787,6 +787,45 @@ fn wire__crate__api__simple__greet_impl(
         },
     )
 }
+fn wire__crate__api__import__import_from_csv_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "import_from_csv",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_input = <String>::sse_decode(&mut deserializer);
+            let api_config =
+                <crate::api::import::CsvImportConfigData>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::import::import_from_csv(api_input, api_config).await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__vault_bridge__import_from_enpass_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -994,6 +1033,36 @@ fn wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
         },
     )
 }
+fn wire__crate__api__import__sniff_csv_file_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "sniff_csv_file",
+            port: None,
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_input = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            transform_result_sse::<_, String>((move || {
+                let output_ok = crate::api::import::sniff_csv_file(api_input)?;
+                Ok(output_ok)
+            })())
+        },
+    )
+}
 fn wire__crate__api__vault_bridge__unlock_vault_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1133,6 +1202,38 @@ impl SseDecode for crate::api::vault::CardEntryData {
             transaction_password: var_transactionPassword,
             notes: var_notes,
             custom_fields: var_customFields,
+        };
+    }
+}
+
+impl SseDecode for crate::api::import::CsvImportConfigData {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_titleCol = <Option<String>>::sse_decode(deserializer);
+        let mut var_urlCol = <Option<String>>::sse_decode(deserializer);
+        let mut var_usernameCol = <Option<String>>::sse_decode(deserializer);
+        let mut var_passwordCol = <Option<String>>::sse_decode(deserializer);
+        let mut var_notesCol = <Option<String>>::sse_decode(deserializer);
+        let mut var_favouriteCol = <Option<String>>::sse_decode(deserializer);
+        return crate::api::import::CsvImportConfigData {
+            title_col: var_titleCol,
+            url_col: var_urlCol,
+            username_col: var_usernameCol,
+            password_col: var_passwordCol,
+            notes_col: var_notesCol,
+            favourite_col: var_favouriteCol,
+        };
+    }
+}
+
+impl SseDecode for crate::api::import::CsvPreviewData {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_headers = <Vec<String>>::sse_decode(deserializer);
+        let mut var_rows = <Vec<Vec<String>>>::sse_decode(deserializer);
+        return crate::api::import::CsvPreviewData {
+            headers: var_headers,
+            rows: var_rows,
         };
     }
 }
@@ -1330,6 +1431,18 @@ impl SseDecode for Vec<crate::api::vault_bridge::EntrySummaryData> {
             ans_.push(<crate::api::vault_bridge::EntrySummaryData>::sse_decode(
                 deserializer,
             ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<Vec<String>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<Vec<String>>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -1573,22 +1686,23 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        20 => wire__crate__api__vault_bridge__import_from_enpass_impl(
+        20 => wire__crate__api__import__import_from_csv_impl(port, ptr, rust_vec_len, data_len),
+        21 => wire__crate__api__vault_bridge__import_from_enpass_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        21 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
-        22 => wire__crate__api__vault_bridge__init_vault_impl(port, ptr, rust_vec_len, data_len),
-        25 => wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
+        22 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
+        23 => wire__crate__api__vault_bridge__init_vault_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        26 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
-        27 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
+        28 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
+        29 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -1610,10 +1724,11 @@ fn pde_ffi_dispatcher_sync_impl(
         ),
         18 => wire__crate__api__vault_bridge__get_entry_impl(ptr, rust_vec_len, data_len),
         19 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
-        23 => {
+        24 => {
             wire__crate__api__vault_bridge__list_entry_summaries_impl(ptr, rust_vec_len, data_len)
         }
-        24 => wire__crate__api__vault_bridge__lock_vault_impl(ptr, rust_vec_len, data_len),
+        25 => wire__crate__api__vault_bridge__lock_vault_impl(ptr, rust_vec_len, data_len),
+        27 => wire__crate__api__import__sniff_csv_file_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -1656,6 +1771,52 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::CardEntryData>
     for crate::api::vault::CardEntryData
 {
     fn into_into_dart(self) -> crate::api::vault::CardEntryData {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::import::CsvImportConfigData {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.title_col.into_into_dart().into_dart(),
+            self.url_col.into_into_dart().into_dart(),
+            self.username_col.into_into_dart().into_dart(),
+            self.password_col.into_into_dart().into_dart(),
+            self.notes_col.into_into_dart().into_dart(),
+            self.favourite_col.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::import::CsvImportConfigData
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::import::CsvImportConfigData>
+    for crate::api::import::CsvImportConfigData
+{
+    fn into_into_dart(self) -> crate::api::import::CsvImportConfigData {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::import::CsvPreviewData {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.headers.into_into_dart().into_dart(),
+            self.rows.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::import::CsvPreviewData
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::import::CsvPreviewData>
+    for crate::api::import::CsvPreviewData
+{
+    fn into_into_dart(self) -> crate::api::import::CsvPreviewData {
         self
     }
 }
@@ -2049,6 +2210,26 @@ impl SseEncode for crate::api::vault::CardEntryData {
     }
 }
 
+impl SseEncode for crate::api::import::CsvImportConfigData {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Option<String>>::sse_encode(self.title_col, serializer);
+        <Option<String>>::sse_encode(self.url_col, serializer);
+        <Option<String>>::sse_encode(self.username_col, serializer);
+        <Option<String>>::sse_encode(self.password_col, serializer);
+        <Option<String>>::sse_encode(self.notes_col, serializer);
+        <Option<String>>::sse_encode(self.favourite_col, serializer);
+    }
+}
+
+impl SseEncode for crate::api::import::CsvPreviewData {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<String>>::sse_encode(self.headers, serializer);
+        <Vec<Vec<String>>>::sse_encode(self.rows, serializer);
+    }
+}
+
 impl SseEncode for crate::api::vault::CustomEntryData {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2184,6 +2365,16 @@ impl SseEncode for Vec<crate::api::vault_bridge::EntrySummaryData> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::api::vault_bridge::EntrySummaryData>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<Vec<String>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <Vec<String>>::sse_encode(item, serializer);
         }
     }
 }

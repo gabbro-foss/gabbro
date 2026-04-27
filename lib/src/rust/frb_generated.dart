@@ -4,6 +4,7 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/entropy.dart';
+import 'api/import.dart';
 import 'api/passphrase_generator.dart';
 import 'api/password_generator.dart';
 import 'api/simple.dart';
@@ -71,7 +72,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 1452471185;
+  int get rustContentHash => -1628873633;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -187,6 +188,11 @@ abstract class RustLibApi extends BaseApi {
 
   String crateApiSimpleGreet({required String name});
 
+  Future<BigInt> crateApiImportImportFromCsv({
+    required String input,
+    required CsvImportConfigData config,
+  });
+
   Future<BigInt> crateApiVaultBridgeImportFromEnpass({required List<int> data});
 
   Future<void> crateApiSimpleInitApp();
@@ -204,6 +210,8 @@ abstract class RustLibApi extends BaseApi {
     required int wordCount,
     required Language language,
   });
+
+  CsvPreviewData crateApiImportSniffCsvFile({required String input});
 
   Future<void> crateApiVaultBridgeUnlockVault({
     required List<int> passphrase,
@@ -941,6 +949,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "greet", argNames: ["name"]);
 
   @override
+  Future<BigInt> crateApiImportImportFromCsv({
+    required String input,
+    required CsvImportConfigData config,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(input, serializer);
+          sse_encode_box_autoadd_csv_import_config_data(config, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 20,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_usize,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiImportImportFromCsvConstMeta,
+        argValues: [input, config],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiImportImportFromCsvConstMeta =>
+      const TaskConstMeta(
+        debugName: "import_from_csv",
+        argNames: ["input", "config"],
+      );
+
+  @override
   Future<BigInt> crateApiVaultBridgeImportFromEnpass({
     required List<int> data,
   }) {
@@ -952,7 +995,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 20,
+            funcId: 21,
             port: port_,
           );
         },
@@ -979,7 +1022,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 21,
+            funcId: 22,
             port: port_,
           );
         },
@@ -1011,7 +1054,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 22,
+            funcId: 23,
             port: port_,
           );
         },
@@ -1038,7 +1081,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_entry_summary_data,
@@ -1060,7 +1103,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 24)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 25)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1090,7 +1133,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 25,
+            funcId: 26,
             port: port_,
           );
         },
@@ -1113,6 +1156,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  CsvPreviewData crateApiImportSniffCsvFile({required String input}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(input, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 27)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_csv_preview_data,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiImportSniffCsvFileConstMeta,
+        argValues: [input],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiImportSniffCsvFileConstMeta =>
+      const TaskConstMeta(debugName: "sniff_csv_file", argNames: ["input"]);
+
+  @override
   Future<void> crateApiVaultBridgeUnlockVault({
     required List<int> passphrase,
     required String path,
@@ -1126,7 +1192,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 26,
+            funcId: 28,
             port: port_,
           );
         },
@@ -1157,7 +1223,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 27,
+            funcId: 29,
             port: port_,
           );
         },
@@ -1191,6 +1257,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   CardEntryData dco_decode_box_autoadd_card_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_card_entry_data(raw);
+  }
+
+  @protected
+  CsvImportConfigData dco_decode_box_autoadd_csv_import_config_data(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_csv_import_config_data(raw);
   }
 
   @protected
@@ -1268,6 +1342,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       transactionPassword: dco_decode_opt_String(arr[17]),
       notes: dco_decode_opt_String(arr[18]),
       customFields: dco_decode_list_custom_field_data(arr[19]),
+    );
+  }
+
+  @protected
+  CsvImportConfigData dco_decode_csv_import_config_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return CsvImportConfigData(
+      titleCol: dco_decode_opt_String(arr[0]),
+      urlCol: dco_decode_opt_String(arr[1]),
+      usernameCol: dco_decode_opt_String(arr[2]),
+      passwordCol: dco_decode_opt_String(arr[3]),
+      notesCol: dco_decode_opt_String(arr[4]),
+      favouriteCol: dco_decode_opt_String(arr[5]),
+    );
+  }
+
+  @protected
+  CsvPreviewData dco_decode_csv_preview_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return CsvPreviewData(
+      headers: dco_decode_list_String(arr[0]),
+      rows: dco_decode_list_list_String(arr[1]),
     );
   }
 
@@ -1405,6 +1507,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<EntrySummaryData> dco_decode_list_entry_summary_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_entry_summary_data).toList();
+  }
+
+  @protected
+  List<List<String>> dco_decode_list_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_list_String).toList();
   }
 
   @protected
@@ -1581,6 +1689,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CsvImportConfigData sse_decode_box_autoadd_csv_import_config_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_csv_import_config_data(deserializer));
+  }
+
+  @protected
   CustomEntryData sse_decode_box_autoadd_custom_entry_data(
     SseDeserializer deserializer,
   ) {
@@ -1689,6 +1805,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       notes: var_notes,
       customFields: var_customFields,
     );
+  }
+
+  @protected
+  CsvImportConfigData sse_decode_csv_import_config_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_titleCol = sse_decode_opt_String(deserializer);
+    var var_urlCol = sse_decode_opt_String(deserializer);
+    var var_usernameCol = sse_decode_opt_String(deserializer);
+    var var_passwordCol = sse_decode_opt_String(deserializer);
+    var var_notesCol = sse_decode_opt_String(deserializer);
+    var var_favouriteCol = sse_decode_opt_String(deserializer);
+    return CsvImportConfigData(
+      titleCol: var_titleCol,
+      urlCol: var_urlCol,
+      usernameCol: var_usernameCol,
+      passwordCol: var_passwordCol,
+      notesCol: var_notesCol,
+      favouriteCol: var_favouriteCol,
+    );
+  }
+
+  @protected
+  CsvPreviewData sse_decode_csv_preview_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_headers = sse_decode_list_String(deserializer);
+    var var_rows = sse_decode_list_list_String(deserializer);
+    return CsvPreviewData(headers: var_headers, rows: var_rows);
   }
 
   @protected
@@ -1867,6 +2012,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <EntrySummaryData>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_entry_summary_data(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<List<String>> sse_decode_list_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <List<String>>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_list_String(deserializer));
     }
     return ans_;
   }
@@ -2069,6 +2226,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_csv_import_config_data(
+    CsvImportConfigData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_csv_import_config_data(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_custom_entry_data(
     CustomEntryData self,
     SseSerializer serializer,
@@ -2166,6 +2332,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.transactionPassword, serializer);
     sse_encode_opt_String(self.notes, serializer);
     sse_encode_list_custom_field_data(self.customFields, serializer);
+  }
+
+  @protected
+  void sse_encode_csv_import_config_data(
+    CsvImportConfigData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_String(self.titleCol, serializer);
+    sse_encode_opt_String(self.urlCol, serializer);
+    sse_encode_opt_String(self.usernameCol, serializer);
+    sse_encode_opt_String(self.passwordCol, serializer);
+    sse_encode_opt_String(self.notesCol, serializer);
+    sse_encode_opt_String(self.favouriteCol, serializer);
+  }
+
+  @protected
+  void sse_encode_csv_preview_data(
+    CsvPreviewData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_String(self.headers, serializer);
+    sse_encode_list_list_String(self.rows, serializer);
   }
 
   @protected
@@ -2301,6 +2491,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_entry_summary_data(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_list_String(
+    List<List<String>> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_list_String(item, serializer);
     }
   }
 
