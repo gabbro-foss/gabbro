@@ -26,7 +26,9 @@ gabbro/
 ├── lib/                        # Flutter app entry point and Dart source
 │   ├── main.dart
 │   ├── screens/                # Hand-written UI screens
-│   │   └── unlock_screen.dart  # Passphrase entry screen
+│   │   ├── unlock_screen.dart        # Passphrase entry screen
+│   │   ├── import_screen.dart        # Import from Enpass / Bitwarden / CSV
+│   │   └── csv_mapping_screen.dart   # CSV column-mapping UI
 │   └── src/
 │       └── rust/               # Auto-generated bridge code (do not edit)
 │           ├── api/
@@ -498,8 +500,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** CSV importer bridged to Flutter. `rust/src/api/import.rs` added with `sniff_csv_file` (sync) and `import_from_csv` (async). Bridge uses bulk no-save + single-save pattern. Dart stubs regenerated. 169 Rust tests passing, 1 ignored.
-- **Next task:** Flutter import screen — source picker (CSV / Enpass / Bitwarden), then CSV column-mapping UI calling `sniffCsvFile` and `importFromCsv`.
+- **Completed:** Full import UI built. All three importers (Enpass, Bitwarden, CSV) consolidated in `rust/src/api/import.rs` and surfaced via `lib/screens/import_screen.dart` + `lib/screens/csv_mapping_screen.dart`. CSV flow: sniff → column-mapping screen with preview table and auto-guess. 171 Rust tests passing, 1 ignored.
+- **Next task:** Move import button from VaultListScreen app bar into a hamburger menu (Settings/options). Design the hamburger menu structure first.
 
 ---
 

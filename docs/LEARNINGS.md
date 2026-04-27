@@ -1150,6 +1150,13 @@ The symptom of a stale generated file is a `cargo build` error like:
 — the generated code references a function that no longer exists in the
 source. The fix is always to rerun codegen, not to edit `frb_generated.rs`.
 
+### `usize` → `BigInt` in generated Dart
+Rust's `usize` (used as a return type for counts like `import_from_csv`) is
+mapped to Dart's `BigInt` by flutter_rust_bridge — not `int`. When a bridge
+function returns `usize`, the generated Dart signature returns `Future<BigInt>`.
+Convert to a plain Dart `int` with `.toInt()` at the call site when passing
+to Flutter APIs that expect `int` (e.g. `Navigator.pop`, snackbar counts).
+
 ---
 
 ## Session Model & Memory Security
