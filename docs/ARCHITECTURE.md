@@ -496,11 +496,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Flutter widget tests — 26 tests passing across all screens:
-  `VaultListScreen` (7), `EntryDetailScreen` (5), `CreateEntryScreen` (3),
-  `UnlockScreen` (3), `OnboardingScreen` (5), `AlphabetIndexBar` (3).
-  Dependency injection pattern applied to all screens with bridge calls.
-- **Next task:** Bitwarden importer (see Bikeshed — Import / Migration).
+- **Completed:** Bitwarden JSON importer implemented in `rust/src/import/bitwarden.rs`. Parses all four item types, resolves folder names, 150 Rust tests passing, 1 ignored.
+- **Next task:** Generic CSV/JSON importer — covers the long tail of password managers not explicitly supported. See Import / Migration backlog for design notes.
 
 ---
 
@@ -871,9 +868,8 @@ The correct sequence, regardless of which importers we build:
    types in `rust/src/vault/entry.rs`. Do this before writing importers, not
    after — retrofitting import code around a domain model change is messy.
 
-4. **Enpass importer** — implement once the domain model is complete.
-
-5. **Bitwarden importer** — implement second.
+4. **Generic CSV / JSON importer** — implement last, once the field surface
+   is stable.
 
 ### Import validation failures — user review flow
 
@@ -899,9 +895,6 @@ How does `CreateEntryScreen` receive pre-populated data for a partially
 valid entry that never made it into the vault? Likely a new optional
 constructor parameter carrying raw field values distinct from `existing`
 (which requires a valid `VaultEntryData`).
-
-6. **Generic CSV / JSON importer** — implement last, once the field surface
-   is stable.
 
 ### Enpass — what we know from analysis of a real export (247 items)
 
