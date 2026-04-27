@@ -4,6 +4,8 @@
 //! seeds (d, z) used to deterministically generate an ML-KEM-1024
 //! keypair per ADR-006.
 
+// EncodedSizeUser provides `as_bytes()` on EncapsulationKey — must stay in scope
+#[allow(unused_imports)]
 use ml_kem::{MlKem1024, MlKem1024Params, KemCore, EncodedSizeUser};
 use rand::SeedableRng;
 use rand::rngs::StdRng;
