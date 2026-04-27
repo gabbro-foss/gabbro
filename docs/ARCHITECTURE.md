@@ -57,6 +57,7 @@ gabbro/
 │       │   ├── passphrase_generator.rs
 │       │   ├── vault.rs        # Vault entry API — DTOs and create_* functions
 │       │   ├── vault_bridge.rs # Bridge wrappers — save/load vault
+│       │   ├── import.rs       # Import bridge — CSV, Enpass, Bitwarden
 │       │   └── entropy.rs
 │       ├── crypto/             # Internal crypto stack (not bridge-exposed)
 │       │   ├── mod.rs
@@ -497,8 +498,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Generic CSV importer implemented in `rust/src/import/csv.rs`. Hand-rolled parser, no new dependencies, 14 tests passing. 164 Rust tests passing, 1 ignored.
-- **Next task:** Bridge the CSV importer to Flutter — `sniff_csv` and `import_csv` need bridge-facing wrappers in `rust/src/api/`, then a Flutter import screen with column mapping UI.
+- **Completed:** CSV importer bridged to Flutter. `rust/src/api/import.rs` added with `sniff_csv_file` (sync) and `import_from_csv` (async). Bridge uses bulk no-save + single-save pattern. Dart stubs regenerated. 169 Rust tests passing, 1 ignored.
+- **Next task:** Flutter import screen — source picker (CSV / Enpass / Bitwarden), then CSV column-mapping UI calling `sniffCsvFile` and `importFromCsv`.
 
 ---
 
