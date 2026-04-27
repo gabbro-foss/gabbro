@@ -557,6 +557,17 @@ discussed and forgotten.
   (3) Formal audit (Cure53, Trail of Bits) — money, likely v2 territory.
   This is a prerequisite for credible v1 security claims given the PQC angle.
 
+### Code Quality
+
+- **Dependency audit:** Keep the dependency surface minimal — only add a
+  crate when it solves a problem that cannot be reasonably solved with `std`.
+  Before v1, audit `Cargo.toml` and remove or replace any crate that has
+  outlived its purpose or could be substituted with a small `std`-only
+  implementation. Pay particular attention to transitive dependencies
+  (`cargo tree`). A smaller dependency surface means less attack surface,
+  faster compile times, and fewer supply-chain risks. Reference: the same
+  philosophy applied successfully in `wellpathpy` (numpy-only).
+
 ### Password / Passphrase Generator
 
 - **Non-ASCII wordlist support (v2):** Add CJK and other non-Latin language
