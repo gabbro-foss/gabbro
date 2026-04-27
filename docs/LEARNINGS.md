@@ -1789,6 +1789,41 @@ operation: `session.entries.retain(|e| !ids.contains(&entry_id(e).to_string()))`
 The mirror image of `.filter()` on an iterator — `retain` mutates in place
 while `filter` produces a new collection.
 
+### BOM — Byte Order Mark
+A BOM is a Unicode character (`\u{FEFF}`) that some tools prepend to
+UTF-8 files to signal the encoding. Microsoft Excel on Windows prepends
+a BOM to every CSV it exports. It is invisible in most text editors but
+causes the first column header to read as `"\u{FEFF}name"` instead of
+`"name"`, silently breaking any field mapping that references it by name.
+
+The fix is to strip the BOM as the first operation on any untrusted
+text input: `input.strip_prefix('\u{FEFF}').unwrap_or(input)`. This
+is a no-op if no BOM is present, and costs nothing. Applied in both
+`sniff_csv()` and `import_csv()` in `rust/src/import/csv.rs`.
+
+### Trait imports required for method dispatch
+In Rust, a method defined by a trait is only callable if that trait is
+in scope — even if you never write the trait name directly in your code.
+Example: `EncodedSizeUser` provides `as_bytes()` on `EncapsulationKey`
+from the `ml-kem` crate. Removing the `use ml_kem::EncodedSizeUser`
+import silences a spurious "unused import" warning but immediately
+breaks every call site that uses `.as_bytes()` on that type.
+
+The correct fix when a trait import appears unused but removing it
+breaks compilation: add `#[allow(unused_imports)]` with an explanatory
+comment rather than removing the import. This documents the intent
+explicitly for the next reader.
+
+```rust
+// EncodedSizeUser provides `as_bytes()` on EncapsulationKey — must stay in scope
+#[allow(unused_imports)]
+use ml_kem::{MlKem1024, MlKem1024Params, KemCore, EncodedSizeUser};
+```
+
+Python has no equivalent — method availability is checked at runtime,
+not compile time, so a missing import only fails when the method is
+actually called.
+
 ### Bulk operations — no-save + single save pattern
 When multiple entries need to be added or removed, calling a save function
 per entry is expensive: each save runs Argon2id + encryption + disk write

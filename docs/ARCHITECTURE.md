@@ -74,7 +74,8 @@ gabbro/
 │       └── serialization.rs# Entry serialization — Vec<VaultEntry> ↔ JSON bytes
 │       ├── import/             # Importers for third-party password managers
 │       │   ├── mod.rs
-│       │   └── enpass.rs       # Enpass JSON importer — 18 tests passing
+│       │   ├── enpass.rs       # Enpass JSON importer — 18 tests passing
+│       │   └── csv.rs          # Generic CSV importer — 14 tests passing
 │       ├── bin/
 │       │   └── bench_kdf.rs    # Argon2id parameter audit tool
 │       ├── frb_generated.rs    # Auto-generated bridge code (do not edit)
@@ -496,8 +497,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Bitwarden JSON importer implemented in `rust/src/import/bitwarden.rs`. Parses all four item types, resolves folder names, 150 Rust tests passing, 1 ignored.
-- **Next task:** Generic CSV/JSON importer — covers the long tail of password managers not explicitly supported. See Import / Migration backlog for design notes.
+- **Completed:** Generic CSV importer implemented in `rust/src/import/csv.rs`. Hand-rolled parser, no new dependencies, 14 tests passing. 164 Rust tests passing, 1 ignored.
+- **Next task:** Bridge the CSV importer to Flutter — `sniff_csv` and `import_csv` need bridge-facing wrappers in `rust/src/api/`, then a Flutter import screen with column mapping UI.
 
 ---
 
@@ -860,6 +861,41 @@ Three importers, in implementation order:
 
 Everything else (1Password, LastPass, Dashlane, Keeper, etc.) — defer to
 the generic importer and document it clearly.
+
+### Generic CSV importer — design and status
+
+**Status: complete — 14 tests passing.** Implemented in
+`rust/src/import/csv.rs`. No new dependencies — hand-rolled parser,
+consistent with the project's minimal dependency philosophy.
+
+**Design decisions:**
+- All CSV input is treated as untrusted: 10 MB size limit enforced
+  before parsing; BOM (`\u{FEFF}`) stripped silently (Excel on Windows
+  prepends this to every CSV export); `"None"` values normalised to
+  empty string.
+- `sniff_csv()` returns headers and up to 3 preview rows as a
+  `CsvPreview` struct — for Flutter's mapping UI to display before
+  import begins.
+- `import_csv()` takes a `CsvImportConfig` struct with six optional
+  column mappings (`title_col`, `url_col`, `username_col`,
+  `password_col`, `notes_col`, `favourite_col`). Any column not
+  explicitly mapped becomes a `CustomField` on the resulting entry.
+- All rows produce `LoginEntry` — generic CSV has no type system.
+  Type information from the source manager (if any) lands in a
+  custom field.
+- Title fallback chain: mapped title column → mapped URL column →
+  `"MISSING TITLE"`. Title is the only required field; all others
+  are optional.
+- Favourite normalisation: `"1"`, `"yes"`, `"true"` (case-insensitive)
+  → `true`; everything else → `false`.
+- Quoted fields containing commas handled correctly by the hand-rolled
+  parser.
+- Rows with fewer columns than headers: missing fields default to
+  empty string. Rows with more columns than headers: extra fields
+  silently ignored.
+- A one-sentence warning is shown on the Flutter import screen:
+  "Only import CSV files you exported yourself from a trusted
+  password manager." Non-blocking, inline.
 
 ### Implementation order
 
