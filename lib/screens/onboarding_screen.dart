@@ -84,7 +84,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       );
       if (mounted) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const VaultListScreen()),
+          MaterialPageRoute(
+            builder: (context) => VaultListScreen(vaultPath: _pathController.text),
+          ),
         );
       }
     } catch (e) {

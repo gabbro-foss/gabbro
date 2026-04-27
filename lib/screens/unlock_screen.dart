@@ -51,7 +51,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const VaultListScreen(),
+            builder: (context) => VaultListScreen(vaultPath: widget.vaultPath),
           ),
         );
       }

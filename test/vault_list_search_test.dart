@@ -24,7 +24,7 @@ List<EntrySummaryData> _threeEntries() => [
 // ── Widget helper ─────────────────────────────────────────────────────────────
 
 Widget _buildScreen(List<EntrySummaryData> Function() listEntries) =>
-    MaterialApp(home: VaultListScreen(listEntries: listEntries));
+    MaterialApp(home: VaultListScreen(vaultPath: '/tmp/test.gabbro', listEntries: listEntries));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 void main() {

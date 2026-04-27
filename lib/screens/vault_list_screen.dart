@@ -4,12 +4,18 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
+import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 class VaultListScreen extends StatefulWidget {
+  final String vaultPath;
   final List<EntrySummaryData> Function() listEntries;
 
-  const VaultListScreen({super.key, this.listEntries = listEntrySummaries});
+  const VaultListScreen({
+    super.key,
+    required this.vaultPath,
+    this.listEntries = listEntrySummaries,
+  });
 
   @override
   State<VaultListScreen> createState() => _VaultListScreenState();
@@ -201,15 +207,15 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
   Future<void> _openImportScreen() async {
     setState(() => _isImporting = true);
-    final count = await Navigator.of(context).push<int>(
-      MaterialPageRoute(builder: (context) => const ImportScreen()),
-    );
+    final count = await Navigator.of(
+      context,
+    ).push<int>(MaterialPageRoute(builder: (context) => const ImportScreen()));
     if (mounted) {
       setState(() => _isImporting = false);
       if (count != null && count > 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Imported $count entries.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Imported $count entries.')));
         _loadEntries();
       }
     }
@@ -247,6 +253,34 @@ class _VaultListScreenState extends State<VaultListScreen> {
     _loadEntries();
   }
 
+  void _onMenuSelected(String value) {
+    switch (value) {
+      case 'import':
+        _openImportScreen();
+      case 'change_passphrase':
+        _showComingSoon('Change passphrase');
+      case 'appearance':
+        _showComingSoon('Appearance');
+      case 'about':
+        _showComingSoon('About');
+    }
+  }
+
+  void _lockAndExit() {
+    lockVault();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => UnlockScreen(vaultPath: widget.vaultPath),
+      ),
+    );
+  }
+
+  void _showComingSoon(String feature) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('$feature — coming soon')));
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_error != null) {
@@ -277,13 +311,53 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 height: 24,
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
-            )
-          else if (!_isSelecting)
-            IconButton(
-              icon: const Icon(Icons.upload_file),
-              tooltip: 'Import entries',
-              onPressed: _openImportScreen,
             ),
+          if (!_isSelecting) ...[
+            IconButton(
+              icon: const Icon(Icons.lock_outline),
+              tooltip: 'Lock vault',
+              onPressed: _lockAndExit,
+            ),
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              tooltip: 'Menu',
+              onSelected: _onMenuSelected,
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'import',
+                  child: Text('Import entries'),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem(
+                  enabled: false,
+                  value: 'vault_add',
+                  child: Text('Add vault'),
+                ),
+                const PopupMenuItem(
+                  enabled: false,
+                  value: 'vault_delete',
+                  child: Text('Delete vault'),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem(
+                  value: 'change_passphrase',
+                  child: Text('Change passphrase'),
+                ),
+                const PopupMenuItem(
+                  enabled: false,
+                  value: 'yubikeys',
+                  child: Text('Manage YubiKeys'),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem(
+                  value: 'appearance',
+                  child: Text('Appearance'),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem(value: 'about', child: Text('About')),
+              ],
+            ),
+          ],
           if (_isDeleting) ...[
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),

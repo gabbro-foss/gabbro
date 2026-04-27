@@ -500,8 +500,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Full import UI built. All three importers (Enpass, Bitwarden, CSV) consolidated in `rust/src/api/import.rs` and surfaced via `lib/screens/import_screen.dart` + `lib/screens/csv_mapping_screen.dart`. CSV flow: sniff → column-mapping screen with preview table and auto-guess. 171 Rust tests passing, 1 ignored.
-- **Next task:** Move import button from VaultListScreen app bar into a hamburger menu (Settings/options). Design the hamburger menu structure first.
+- **Completed:** Hamburger menu added to `VaultListScreen`. Import moved from app bar into menu. Lock button (`Icons.lock_outline`) added to app bar — calls `lockVault()` and navigates to `UnlockScreen`. `vaultPath` threaded through from `UnlockScreen` and `OnboardingScreen` into `VaultListScreen`. Menu groups: Security, Vault, Import, Appearance, About. Vault/YubiKey items greyed out (not yet implemented). Change passphrase, Appearance, About stub to "coming soon" snackbar.
+- **Next task:** Implement stubbed menu items — Change passphrase UI first.
 
 ---
 
@@ -764,6 +764,10 @@ discussed and forgotten.
   it. Prevents silent accumulation of orphaned vault files on the user's device
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
+
+- **About screen:** Show app version, link to GitHub repo, link to issue tracker, open source licence list, and "Support Gabbro" donation link. Triggered from the hamburger menu About item (currently stubs to a snackbar).
+
+- **Appearance screen:** Theme (dark/light/system), text size, colour palette for password display. Triggered from the hamburger menu Appearance item (currently stubs to a snackbar).
 
 - **Export vault:** Users need a way to export the full vault from within
   the app — currently only possible at the OS level (copy the `.gabbro`
