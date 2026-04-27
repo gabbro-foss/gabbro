@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
