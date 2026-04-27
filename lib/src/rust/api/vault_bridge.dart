@@ -96,16 +96,6 @@ Future<void> initVault({required List<int> passphrase, required String path}) =>
       path: path,
     );
 
-/// Parse an Enpass JSON export and merge all entries into the live session,
-/// then persist the vault to disk.
-///
-/// `data` is the raw bytes of the Enpass `.json` export file.
-/// The vault must already be unlocked — returns `Err` if no session is active.
-///
-/// Async — triggers a full vault save after import (Argon2id + encryption).
-Future<BigInt> importFromEnpass({required List<int> data}) =>
-    RustLib.instance.api.crateApiVaultBridgeImportFromEnpass(data: data);
-
 /// Lightweight entry summary returned by `list_entry_summaries()`.
 ///
 /// Contains just enough for Flutter to render a list row — no secrets.

@@ -24,6 +24,26 @@ Future<BigInt> importFromCsv({
   config: config,
 );
 
+/// Import all entries from a Bitwarden unencrypted JSON export into the
+/// live session, then persist once.
+///
+/// `data` is the raw bytes of the Bitwarden `.json` export file.
+/// The vault must already be unlocked — returns `Err` if no session is active.
+///
+/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+Future<BigInt> importFromBitwarden({required List<int> data}) =>
+    RustLib.instance.api.crateApiImportImportFromBitwarden(data: data);
+
+/// Import all entries from an Enpass JSON export into the live session,
+/// then persist once.
+///
+/// `data` is the raw bytes of the Enpass `.json` export file.
+/// The vault must already be unlocked — returns `Err` if no session is active.
+///
+/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+Future<BigInt> importFromEnpass({required List<int> data}) =>
+    RustLib.instance.api.crateApiImportImportFromEnpass(data: data);
+
 /// Column mapping config passed in by Flutter after the user maps columns.
 class CsvImportConfigData {
   final String? titleCol;

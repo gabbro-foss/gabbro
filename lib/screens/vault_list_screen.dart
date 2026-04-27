@@ -5,6 +5,7 @@ import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
+import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 class VaultListScreen extends StatefulWidget {

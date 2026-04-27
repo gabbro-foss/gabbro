@@ -5,7 +5,9 @@
 //! no-save + single-save pattern to avoid running Argon2id once per entry.
 
 use crate::api::vault::chrono_now;
+use crate::import::bitwarden;
 use crate::import::csv::{import_csv, sniff_csv as csv_sniff, CsvImportConfig};
+use crate::import::enpass;
 use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
 use crate::vault::session;
 use uuid::Uuid;
@@ -94,6 +96,40 @@ pub async fn import_from_csv(input: String, config: CsvImportConfigData) -> Resu
     Ok(count)
 }
 
+/// Import all entries from a Bitwarden unencrypted JSON export into the
+/// live session, then persist once.
+///
+/// `data` is the raw bytes of the Bitwarden `.json` export file.
+/// The vault must already be unlocked — returns `Err` if no session is active.
+///
+/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<usize, String> {
+    let entries = bitwarden::parse(&data)?;
+    let count = entries.len();
+    for entry in entries {
+        session::session_add_entry_no_save(entry)?;
+    }
+    session::session_save()?;
+    Ok(count)
+}
+
+/// Import all entries from an Enpass JSON export into the live session,
+/// then persist once.
+///
+/// `data` is the raw bytes of the Enpass `.json` export file.
+/// The vault must already be unlocked — returns `Err` if no session is active.
+///
+/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+pub async fn import_from_enpass(data: Vec<u8>) -> Result<usize, String> {
+    let entries = enpass::parse(&data)?;
+    let count = entries.len();
+    for entry in entries {
+        session::session_add_entry_no_save(entry)?;
+    }
+    session::session_save()?;
+    Ok(count)
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -137,6 +173,36 @@ mod tests {
 name,url,login,password,comments,favourite
 GitHub,https://github.com,rob,hunter2,my github,yes
 Google,https://google.com,rob@gmail.com,s3cr3t,,no";
+
+    const BITWARDEN_JSON: &str = r#"{
+        "encrypted": false,
+        "folders": [],
+        "items": [
+            {"id":"bw-001","folderId":null,"type":1,"name":"GitHub","notes":null,"favorite":false,"fields":[],"login":{"uris":[{"uri":"https://github.com"}],"username":"rob","password":"hunter2"}},
+            {"id":"bw-002","folderId":null,"type":2,"name":"SSH Key","notes":"my key passphrase","favorite":false,"fields":[],"secureNote":{}},
+            {"id":"bw-003","folderId":null,"type":3,"name":"Visa","notes":null,"favorite":false,"fields":[],"card":{"cardholderName":"Rob","brand":"Visa","number":"4111111111111111","expMonth":"12","expYear":"2028","code":"123"}},
+            {"id":"bw-004","folderId":null,"type":4,"name":"Rob Example","notes":null,"favorite":false,"fields":[],"identity":{"firstName":"Rob","lastName":"Example","email":"rob@example.com","phone":null,"company":null}},
+            {"id":"bw-005","folderId":null,"type":99,"name":"Unknown","notes":null,"favorite":false,"fields":[]}
+        ]
+    }"#;
+
+    const ENPASS_JSON: &str = r#"{
+        "items": [{
+            "uuid": "enp-001",
+            "title": "GitHub",
+            "category": "login",
+            "note": "",
+            "favorite": 0,
+            "archived": 0,
+            "trashed": 0,
+            "fields": [
+                {"label":"Username","type":"username","value":"rob","sensitive":0,"deleted":0},
+                {"label":"Password","type":"password","value":"hunter2","sensitive":1,"deleted":0},
+                {"label":"Website","type":"url","value":"https://github.com","sensitive":0,"deleted":0}
+            ],
+            "attachments": []
+        }]
+    }"#;
 
     #[test]
     fn sniff_csv_file_returns_headers() {
@@ -202,6 +268,43 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
         session::unlock_vault(pass, path.clone()).unwrap();
         let summaries = session::list_entry_summaries().unwrap();
         assert_eq!(summaries.len(), 3);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn import_from_bitwarden_adds_entries_to_session() {
+        let pass = b"bitwarden test passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let count = run(import_from_bitwarden(
+            BITWARDEN_JSON.as_bytes().to_vec(),
+        ))
+        .unwrap();
+        assert_eq!(count, 4); // login, note, card, identity — unknown type skipped
+
+        let summaries = session::list_entry_summaries().unwrap();
+        // 1 existing note + 4 imported entries
+        assert_eq!(summaries.len(), 5);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn import_from_enpass_adds_entries_to_session() {
+        let pass = b"enpass test passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let count = run(import_from_enpass(ENPASS_JSON.as_bytes().to_vec())).unwrap();
+        assert_eq!(count, 1);
+
+        let summaries = session::list_entry_summaries().unwrap();
+        // 1 existing note + 1 imported login
+        assert_eq!(summaries.len(), 2);
 
         teardown(&path);
     }
