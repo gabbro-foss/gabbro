@@ -527,6 +527,44 @@ discussed and forgotten.
 
 ---
 
+### Versioning scheme
+
+Both Gabbro and wellpathpy use **SemVer** (Semantic Versioning):
+`MAJOR.MINOR.PATCH`
+
+**Why SemVer over CalVer or sequential numbering:**
+CalVer (e.g. `2025.04.1`) communicates release date, not stability — unhelpful
+for a security tool where the question users ask is "is this ready to trust?"
+Sequential numbering gives no information about compatibility. SemVer is also
+what F-Droid, the Arch AUR, Debian, and PyPI all expect — fighting it adds
+friction for packagers.
+
+**What the numbers mean:**
+
+| Part | Gabbro (app) | wellpathpy (library) |
+|------|-------------|---------------------|
+| **Major 0→1** | "We stand behind this" — public trust milestone | API is now stable |
+| **Major 1→2** | Breaking change (vault format, auth model) | Breaking API change |
+| **Minor x→x+1** | New user-facing feature shipped | New function / method added |
+| **Patch x.y→x.y+1** | Bug or security fix | Bug or docs fix |
+
+**Key difference between the two projects:**
+The Major bump carries heavier weight for Gabbro than for wellpathpy. For a
+password manager, `0.x` signals "not yet stable — use with caution" and `1.0`
+is a public commitment. For a Python library the same signal exists, but users
+expect `0.x` libraries in their toolchains — the stakes are lower.
+
+**Current state:** Gabbro is at `1.0.0` in `pubspec.yaml` but has not had a
+public release. The version should remain `0.x` until the v1 feature set
+(Linux + Android, YubiKey auth, full vault encryption) is complete and
+the pre-release security review has been passed. Reset to `0.1.0` before
+the first public tag.
+
+**Action items:**
+- Reset `pubspec.yaml` version to `0.1.0` before first public release
+- Add a `CHANGELOG.md` at the project root (keep it; do not auto-generate)
+- Apply the same scheme and table to `wellpathpy` docs when next updated
+
 ### Dependencies
 
 - **Audit direct Flutter dependencies before v1:** Current direct deps in
