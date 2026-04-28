@@ -1,0 +1,121 @@
+<svg width="100%" viewBox="0 0 680 440" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>SemVer versioning scheme for Gabbro and wellpathpy</title>
+  <desc>Semantic Versioning MAJOR.MINOR.PATCH explained with examples for Gabbro password manager and wellpathpy Python library</desc>
+
+  <style>
+    text { font-family: sans-serif; fill: #1a1a1a; }
+    .th  { font-size: 14px; font-weight: 500; }
+    .ts  { font-size: 12px; font-weight: 400; fill: #555; }
+    .major rect { fill: #EEEDFE; stroke: #534AB7; }
+    .major .th  { fill: #3C3489; }
+    .major .ts  { fill: #534AB7; }
+    .minor rect { fill: #E1F5EE; stroke: #0F6E56; }
+    .minor .th  { fill: #085041; }
+    .minor .ts  { fill: #0F6E56; }
+    .patch rect { fill: #F1EFE8; stroke: #5F5E5A; }
+    .patch .th  { fill: #444441; }
+    .patch .ts  { fill: #5F5E5A; }
+    .arr  { stroke: #888780; stroke-width: 0.5; fill: none; }
+    .divider { stroke: #D3D1C7; stroke-width: 0.5; }
+  </style>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Large version number -->
+  <text class="th" x="340" y="48" text-anchor="middle" style="font-size:40px;letter-spacing:6px">1 . 4 . 2</text>
+
+  <!-- Bracket: MAJOR -->
+  <line class="arr" x1="248" y1="60" x2="298" y2="60"/>
+  <line class="arr" x1="248" y1="56" x2="248" y2="60"/>
+  <line class="arr" x1="298" y1="56" x2="298" y2="60"/>
+  <line class="arr" x1="273" y1="60" x2="176" y2="80" marker-end="url(#arrow)"/>
+
+  <!-- Bracket: MINOR -->
+  <line class="arr" x1="316" y1="60" x2="366" y2="60"/>
+  <line class="arr" x1="316" y1="56" x2="316" y2="60"/>
+  <line class="arr" x1="366" y1="56" x2="366" y2="60"/>
+  <line class="arr" x1="341" y1="60" x2="341" y2="80" marker-end="url(#arrow)"/>
+
+  <!-- Bracket: PATCH -->
+  <line class="arr" x1="382" y1="60" x2="432" y2="60"/>
+  <line class="arr" x1="382" y1="56" x2="382" y2="60"/>
+  <line class="arr" x1="432" y1="56" x2="432" y2="60"/>
+  <line class="arr" x1="407" y1="60" x2="506" y2="80" marker-end="url(#arrow)"/>
+
+  <!-- Three label boxes -->
+  <g class="major">
+    <rect x="40" y="84" width="180" height="52" rx="8" stroke-width="0.5"/>
+    <text class="th" x="130" y="106" text-anchor="middle" dominant-baseline="central">Major</text>
+    <text class="ts" x="130" y="124" text-anchor="middle" dominant-baseline="central">Trust milestone</text>
+  </g>
+  <g class="minor">
+    <rect x="250" y="84" width="180" height="52" rx="8" stroke-width="0.5"/>
+    <text class="th" x="340" y="106" text-anchor="middle" dominant-baseline="central">Minor</text>
+    <text class="ts" x="340" y="124" text-anchor="middle" dominant-baseline="central">New feature</text>
+  </g>
+  <g class="patch">
+    <rect x="460" y="84" width="180" height="52" rx="8" stroke-width="0.5"/>
+    <text class="th" x="550" y="106" text-anchor="middle" dominant-baseline="central">Patch</text>
+    <text class="ts" x="550" y="124" text-anchor="middle" dominant-baseline="central">Bug / security fix</text>
+  </g>
+
+  <!-- Horizontal divider -->
+  <line class="divider" x1="40" y1="158" x2="640" y2="158"/>
+
+  <!-- Column headers -->
+  <text class="th" x="190" y="180" text-anchor="middle">Gabbro</text>
+  <text class="ts" x="190" y="196" text-anchor="middle">password manager</text>
+  <text class="th" x="490" y="180" text-anchor="middle">wellpathpy</text>
+  <text class="ts" x="490" y="196" text-anchor="middle">Python library</text>
+
+  <!-- Vertical divider -->
+  <line class="divider" x1="340" y1="158" x2="340" y2="420"/>
+
+  <!-- Gabbro rows -->
+  <g class="major">
+    <rect x="40" y="208" width="280" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th" x="96" y="230" text-anchor="middle" dominant-baseline="central">0 →</text>
+    <text class="ts" x="224" y="230" text-anchor="middle" dominant-baseline="central">Not yet stable, use with caution</text>
+  </g>
+  <g class="major">
+    <rect x="40" y="260" width="280" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th" x="96" y="282" text-anchor="middle" dominant-baseline="central">1 →</text>
+    <text class="ts" x="224" y="282" text-anchor="middle" dominant-baseline="central">We stand behind this</text>
+  </g>
+  <g class="minor">
+    <rect x="40" y="312" width="280" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th" x="96" y="334" text-anchor="middle" dominant-baseline="central">1.x →</text>
+    <text class="ts" x="224" y="334" text-anchor="middle" dominant-baseline="central">New feature shipped</text>
+  </g>
+  <g class="patch">
+    <rect x="40" y="364" width="280" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th" x="96" y="386" text-anchor="middle" dominant-baseline="central">1.x.y →</text>
+    <text class="ts" x="224" y="386" text-anchor="middle" dominant-baseline="central">Bug or security fix</text>
+  </g>
+
+  <!-- wellpathpy rows -->
+  <g class="major">
+    <rect x="360" y="208" width="280" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th" x="416" y="230" text-anchor="middle" dominant-baseline="central">0 →</text>
+    <text class="ts" x="544" y="230" text-anchor="middle" dominant-baseline="central">API may still change</text>
+  </g>
+  <g class="major">
+    <rect x="360" y="260" width="280" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th" x="416" y="282" text-anchor="middle" dominant-baseline="central">1 →</text>
+    <text class="ts" x="544" y="282" text-anchor="middle" dominant-baseline="central">API is stable</text>
+  </g>
+  <g class="minor">
+    <rect x="360" y="312" width="280" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th" x="416" y="334" text-anchor="middle" dominant-baseline="central">1.x →</text>
+    <text class="ts" x="544" y="334" text-anchor="middle" dominant-baseline="central">New function or method</text>
+  </g>
+  <g class="patch">
+    <rect x="360" y="364" width="280" height="44" rx="8" stroke-width="0.5"/>
+    <text class="th" x="416" y="386" text-anchor="middle" dominant-baseline="central">1.x.y →</text>
+    <text class="ts" x="544" y="386" text-anchor="middle" dominant-baseline="central">Bug or docs fix</text>
+  </g>
+</svg>
