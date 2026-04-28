@@ -267,7 +267,13 @@ Each entry is an instance of a typed class:
   `MaterialApp` so all text in the app scales uniformly.
 - **Appearance screen:** two segmented button rows (theme, text size) plus
   a live preview box showing the current text scale. High-contrast toggle
-  present but disabled — labelled "Not yet implemented".
+  enabled — works in both light and dark mode.
+- **Accessibility shortcut:** `OutlinedButton.icon` (icon: `Icons.accessibility_new`,
+  label: "Accessibility") positioned top-right on `OnboardingScreen` and
+  `UnlockScreen`. Toggles `highContrast: true` + `textSize: extra_large`
+  together in one tap — ensures vision-impaired users can access accessibility
+  settings before reaching the main UI. Icon is highlighted in primary colour
+  when active.
 - **`UnlockScreen` autofocus:** `autofocus: true` added to the passphrase
   `TextField` so the keyboard/cursor is ready immediately on launch.
 
@@ -538,8 +544,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Appearance screen implemented (`lib/screens/appearance_screen.dart`). Theme (dark/light/system), text size (small/regular/large/XL) with live preview, high-contrast placeholder. Settings persisted to `~/.config/gabbro/settings.jsonc` (JSONC format, human-editable). `AppSettings` class in `lib/settings.dart` with 13 Flutter tests passing. Autofocus fix applied to `UnlockScreen`.
-- **Next task:** Write Appearance section in ARCHITECTURE.md; then tackle next bikeshed item.
+- **Completed:** High contrast mode implemented for both light and dark themes. Accessibility shortcut button (`OutlinedButton.icon`, `Icons.accessibility_new`) added to `OnboardingScreen` and `UnlockScreen` — toggles XL text + high contrast in one tap. 15 Flutter tests passing.
+- **Next task:** Review bikeshed and pick next item.
 
 ---
 
