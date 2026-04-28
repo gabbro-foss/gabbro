@@ -108,6 +108,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
                 const SizedBox(height: 48),
                 TextField(
                   controller: _passphraseController,
+                  autofocus: true,
                   obscureText: _obscured,
                   onSubmitted: (_) => _isUnlocking ? null : _unlock(),
                   onChanged: (v) => setState(
