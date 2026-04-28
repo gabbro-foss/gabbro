@@ -4,6 +4,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
+import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
@@ -258,7 +259,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
       case 'import':
         _openImportScreen();
       case 'change_passphrase':
-        _showComingSoon('Change passphrase');
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const ChangePassphraseScreen(),
+          ),
+        );
       case 'appearance':
         _showComingSoon('Appearance');
       case 'about':
