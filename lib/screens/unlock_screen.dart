@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/main.dart';
+import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
@@ -42,7 +44,6 @@ class _UnlockScreenState extends State<UnlockScreen> {
       _isUnlocking = true;
       _errorMessage = null;
     });
-
     try {
       await widget.onUnlock(
         _passphraseController.text.codeUnits,
@@ -82,98 +83,139 @@ class _UnlockScreenState extends State<UnlockScreen> {
     StrengthTier.centuries => 'Excellent',
   };
 
+  Future<void> _toggleAccessibility() async {
+    final current = GabbroApp.of(context).settings;
+    final isOn =
+        current.highContrast && current.textSize == TextSizeChoice.extra_large;
+    await GabbroApp.of(context).updateSettings(
+      current.copyWith(
+        highContrast: !isOn,
+        textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.extra_large,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isAccessibilityOn =
+        GabbroApp.of(context).settings.highContrast &&
+        GabbroApp.of(context).settings.textSize == TextSizeChoice.extra_large;
+
     return Scaffold(
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Gabbro',
-                  style: Theme.of(context).textTheme.headlineLarge,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Enter your passphrase to unlock',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 48),
-                TextField(
-                  controller: _passphraseController,
-                  autofocus: true,
-                  obscureText: _obscured,
-                  onSubmitted: (_) => _isUnlocking ? null : _unlock(),
-                  onChanged: (v) => setState(
-                    () => _entropy = widget.onEstimateEntropy(v),
-                  ),
-                  decoration: InputDecoration(
-                    labelText: 'Passphrase',
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscured ? Icons.visibility_off : Icons.visibility,
+      body: Stack(
+        children: [
+          // ── Main content ───────────────────────────────────────────────
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Gabbro',
+                      style: Theme.of(context).textTheme.headlineLarge,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Enter your passphrase to unlock',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 48),
+                    TextField(
+                      controller: _passphraseController,
+                      autofocus: true,
+                      obscureText: _obscured,
+                      onSubmitted: (_) => _isUnlocking ? null : _unlock(),
+                      onChanged: (v) => setState(
+                        () => _entropy = widget.onEstimateEntropy(v),
                       ),
-                      onPressed: () {
-                        setState(() => _obscured = !_obscured);
-                      },
+                      decoration: InputDecoration(
+                        labelText: 'Passphrase',
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscured ? Icons.visibility_off : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() => _obscured = !_obscured);
+                          },
+                        ),
+                      ),
                     ),
-                  ),
+                    if (_entropy != null) ...[
+                      const SizedBox(height: 8),
+                      LinearProgressIndicator(
+                        value: switch (_entropy!.tier) {
+                          StrengthTier.terrible => 0.1,
+                          StrengthTier.weak => 0.25,
+                          StrengthTier.fair => 0.5,
+                          StrengthTier.strong => 0.75,
+                          StrengthTier.veryStrong => 0.9,
+                          StrengthTier.centuries => 1.0,
+                        },
+                        color: _tierColor(_entropy!.tier),
+                        backgroundColor: Colors.grey.shade300,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${_tierLabel(_entropy!.tier)} · ${_entropy!.bits.toStringAsFixed(1)} bits of entropy',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: _tierColor(_entropy!.tier),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    if (_errorMessage != null)
+                      Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: _isUnlocking ? null : _unlock,
+                      child: _isUnlocking
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Unlock'),
+                    ),
+                  ],
                 ),
-                if (_entropy != null) ...[
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: switch (_entropy!.tier) {
-                      StrengthTier.terrible => 0.1,
-                      StrengthTier.weak => 0.25,
-                      StrengthTier.fair => 0.5,
-                      StrengthTier.strong => 0.75,
-                      StrengthTier.veryStrong => 0.9,
-                      StrengthTier.centuries => 1.0,
-                    },
-                    color: _tierColor(_entropy!.tier),
-                    backgroundColor: Colors.grey.shade300,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${_tierLabel(_entropy!.tier)} · ${_entropy!.bits.toStringAsFixed(1)} bits of entropy',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: _tierColor(_entropy!.tier),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 16),
-                if (_errorMessage != null)
-                  Text(
-                    _errorMessage!,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: _isUnlocking ? null : _unlock,
-                  child: _isUnlocking
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Unlock'),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+          // ── Accessibility shortcut — top-right corner ──────────────────
+          Positioned(
+            top: 8,
+            right: 8,
+            child: SafeArea(
+              child: OutlinedButton.icon(
+                icon: Icon(
+                  Icons.accessibility_new,
+                  color: isAccessibilityOn
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
+                ),
+                label: const Text('Accessibility'),
+                onPressed: _toggleAccessibility,
+                style: OutlinedButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

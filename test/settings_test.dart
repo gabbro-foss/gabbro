@@ -115,6 +115,26 @@ void main() {
       expect(copy.theme, original.theme);
       expect(copy.textSize, original.textSize);
     });
+
+    test('overrides highContrast only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(highContrast: true);
+      expect(updated.highContrast, isTrue);
+      expect(updated.theme, original.theme);
+      expect(updated.textSize, original.textSize);
+    });
+
+    test('round-trips highContrast true through fromJson', () {
+      const original = AppSettings(
+        theme: ThemeChoice.dark,
+        textSize: TextSizeChoice.extra_large,
+        highContrast: true,
+      );
+      final restored = AppSettings.fromJson(original.toJson());
+      expect(restored.highContrast, isTrue);
+      expect(restored.theme, original.theme);
+      expect(restored.textSize, original.textSize);
+    });
   });
 
   // ── defaults ─────────────────────────────────────────────────────────────

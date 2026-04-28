@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
+import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:path_provider/path_provider.dart';
@@ -77,7 +79,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     try {
       final file = File(_pathController.text);
       await file.parent.create(recursive: true);
-
       await widget.onInitVault(
         _passphraseController.text.codeUnits,
         _pathController.text,
@@ -85,7 +86,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => VaultListScreen(vaultPath: _pathController.text),
+            builder: (context) =>
+                VaultListScreen(vaultPath: _pathController.text),
           ),
         );
       }
@@ -120,181 +122,219 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _entropy!.tier == StrengthTier.veryStrong ||
           _entropy!.tier == StrengthTier.centuries);
 
+  Future<void> _toggleAccessibility() async {
+    final current = GabbroApp.of(context).settings;
+    final isOn =
+        current.highContrast && current.textSize == TextSizeChoice.extra_large;
+    await GabbroApp.of(context).updateSettings(
+      current.copyWith(
+        highContrast: !isOn,
+        textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.extra_large,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Welcome to Gabbro',
-                    style: Theme.of(context).textTheme.headlineLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Create your vault to get started.',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 40),
+    final isAccessibilityOn =
+        GabbroApp.of(context).settings.highContrast &&
+        GabbroApp.of(context).settings.textSize == TextSizeChoice.extra_large;
 
-                  const Text(
-                    'Vault location',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
+    return Scaffold(
+      body: Stack(
+        children: [
+          // ── Main content ───────────────────────────────────────────────
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(32),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _pathController,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: 'Path to vault file',
+                      Text(
+                        'Welcome to Gabbro',
+                        style: Theme.of(context).textTheme.headlineLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Create your vault to get started.',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 40),
+                      const Text(
+                        'Vault location',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _pathController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(),
+                                hintText: 'Path to vault file',
+                              ),
+                              validator: (v) => (v == null || v.isEmpty)
+                                  ? 'Path is required'
+                                  : null,
+                            ),
                           ),
-                          validator: (v) => (v == null || v.isEmpty)
-                              ? 'Path is required'
-                              : null,
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      TextFormField(
+                        controller: _passphraseController,
+                        obscureText: _passphraseObscured,
+                        onChanged: _onPassphraseChanged,
+                        decoration: InputDecoration(
+                          labelText: 'Master passphrase',
+                          border: const OutlineInputBorder(),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _passphraseObscured
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () => setState(
+                              () => _passphraseObscured = !_passphraseObscured,
+                            ),
+                          ),
                         ),
+                        validator: (v) {
+                          if (v == null || v.isEmpty)
+                            return 'Passphrase is required';
+                          if (!_strongEnough) return 'Passphrase is too weak';
+                          return null;
+                        },
+                      ),
+                      if (_entropy != null) ...[
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          value: switch (_entropy!.tier) {
+                            StrengthTier.terrible => 0.1,
+                            StrengthTier.weak => 0.25,
+                            StrengthTier.fair => 0.5,
+                            StrengthTier.strong => 0.75,
+                            StrengthTier.veryStrong => 0.9,
+                            StrengthTier.centuries => 1.0,
+                          },
+                          color: _tierColor(_entropy!.tier),
+                          backgroundColor: Colors.grey.shade300,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${_tierLabel(_entropy!.tier)} · ${_entropy!.bits.toStringAsFixed(1)} bits of entropy',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _tierColor(_entropy!.tier),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _confirmController,
+                        obscureText: _confirmObscured,
+                        onChanged: (v) {
+                          setState(
+                            () => _confirmMatches = v.isEmpty
+                                ? null
+                                : v == _passphraseController.text,
+                          );
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Confirm passphrase',
+                          border: const OutlineInputBorder(),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _confirmObscured
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () => setState(
+                              () => _confirmObscured = !_confirmObscured,
+                            ),
+                          ),
+                        ),
+                        validator: (v) {
+                          if (v == null || v.isEmpty)
+                            return 'Please confirm your passphrase';
+                          if (v != _passphraseController.text)
+                            return 'Passphrases do not match';
+                          return null;
+                        },
+                      ),
+                      if (_confirmMatches != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          _confirmMatches!
+                              ? '✓ Passphrases match'
+                              : '✗ Passphrases do not match',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _confirmMatches!
+                                ? Colors.green.shade700
+                                : Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 24),
+                      if (_error != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Text(
+                            _error!,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                        ),
+                      FilledButton(
+                        onPressed: (_isCreating || !_strongEnough)
+                            ? null
+                            : _createVault,
+                        child: _isCreating
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text('Create vault'),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
-
-                  TextFormField(
-                    controller: _passphraseController,
-                    obscureText: _passphraseObscured,
-                    onChanged: _onPassphraseChanged,
-                    decoration: InputDecoration(
-                      labelText: 'Master passphrase',
-                      border: const OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _passphraseObscured
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: () => setState(
-                          () => _passphraseObscured = !_passphraseObscured,
-                        ),
-                      ),
-                    ),
-                    validator: (v) {
-                      if (v == null || v.isEmpty)
-                        return 'Passphrase is required';
-                      if (!_strongEnough) return 'Passphrase is too weak';
-                      return null;
-                    },
-                  ),
-
-                  if (_entropy != null) ...[
-                    const SizedBox(height: 8),
-                    LinearProgressIndicator(
-                      value: switch (_entropy!.tier) {
-                        StrengthTier.terrible => 0.1,
-                        StrengthTier.weak => 0.25,
-                        StrengthTier.fair => 0.5,
-                        StrengthTier.strong => 0.75,
-                        StrengthTier.veryStrong => 0.9,
-                        StrengthTier.centuries => 1.0,
-                      },
-                      color: _tierColor(_entropy!.tier),
-                      backgroundColor: Colors.grey.shade300,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${_tierLabel(_entropy!.tier)} · ${_entropy!.bits.toStringAsFixed(1)} bits of entropy',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: _tierColor(_entropy!.tier),
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 16),
-
-                  TextFormField(
-                    controller: _confirmController,
-                    obscureText: _confirmObscured,
-                    onChanged: (v) {
-                      setState(
-                        () => _confirmMatches =
-                            v.isEmpty ? null : v == _passphraseController.text,
-                      );
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Confirm passphrase',
-                      border: const OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _confirmObscured
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: () => setState(
-                          () => _confirmObscured = !_confirmObscured,
-                        ),
-                      ),
-                    ),
-                    validator: (v) {
-                      if (v == null || v.isEmpty)
-                        return 'Please confirm your passphrase';
-                      if (v != _passphraseController.text)
-                        return 'Passphrases do not match';
-                      return null;
-                    },
-                  ),
-                  if (_confirmMatches != null) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      _confirmMatches!
-                          ? '✓ Passphrases match'
-                          : '✗ Passphrases do not match',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: _confirmMatches!
-                            ? Colors.green.shade700
-                            : Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 24),
-
-                  if (_error != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(
-                        _error!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
-                    ),
-
-                  FilledButton(
-                    onPressed: (_isCreating || !_strongEnough)
-                        ? null
-                        : _createVault,
-                    child: _isCreating
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Create vault'),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+          // ── Accessibility shortcut — top-right corner ──────────────────
+          Positioned(
+            top: 8,
+            right: 8,
+            child: SafeArea(
+              child: OutlinedButton.icon(
+                icon: Icon(
+                  Icons.accessibility_new,
+                  color: isAccessibilityOn
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
+                ),
+                label: const Text('Accessibility'),
+                onPressed: _toggleAccessibility,
+                style: OutlinedButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

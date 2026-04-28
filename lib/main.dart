@@ -71,25 +71,64 @@ class _GabbroAppState extends State<GabbroApp> {
     TextSizeChoice.extra_large => 1.3,
   };
 
+  static ThemeData _lightTheme({required bool highContrast}) {
+    if (highContrast) {
+      return ThemeData(
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF000000),
+          onPrimary: Color(0xFFFFFFFF),
+          secondary: Color(0xFF000000),
+          onSecondary: Color(0xFFFFFFFF),
+          surface: Color(0xFFFFFFFF),
+          onSurface: Color(0xFF000000),
+          error: Color(0xFF990000),
+          onError: Color(0xFFFFFFFF),
+        ),
+        useMaterial3: true,
+      );
+    }
+    return ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF534AB7)),
+      useMaterial3: true,
+    );
+  }
+
+  static ThemeData _darkTheme({required bool highContrast}) {
+    if (highContrast) {
+      return ThemeData(
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFFFFFFFF),
+          onPrimary: Color(0xFF000000),
+          secondary: Color(0xFFFFFFFF),
+          onSecondary: Color(0xFF000000),
+          surface: Color(0xFF000000),
+          onSurface: Color(0xFFFFFFFF),
+          error: Color(0xFFFF6666),
+          onError: Color(0xFF000000),
+        ),
+        useMaterial3: true,
+      );
+    }
+    return ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF534AB7),
+        brightness: Brightness.dark,
+      ),
+      useMaterial3: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final hc = _settings.highContrast;
     return MediaQuery(
       data: MediaQueryData(textScaler: TextScaler.linear(_textScale)),
       child: MaterialApp(
         title: 'Gabbro',
         debugShowCheckedModeBanner: false,
         themeMode: _themeMode,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF534AB7)),
-          useMaterial3: true,
-        ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF534AB7),
-            brightness: Brightness.dark,
-          ),
-          useMaterial3: true,
-        ),
+        theme: _lightTheme(highContrast: hc),
+        darkTheme: _darkTheme(highContrast: hc),
         home: widget.vaultExists
             ? UnlockScreen(vaultPath: widget.vaultPath)
             : const OnboardingScreen(),

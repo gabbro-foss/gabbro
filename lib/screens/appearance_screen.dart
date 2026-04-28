@@ -87,10 +87,13 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 title: const Text('High contrast'),
-                subtitle: const Text('Not yet implemented'),
+                subtitle: const Text(
+                  'Increases contrast for better readability',
+                ),
                 trailing: Switch(
-                  value: false,
-                  onChanged: null, // disabled until implemented
+                  value: _settings.highContrast,
+                  onChanged: (v) =>
+                      _update(_settings.copyWith(highContrast: v)),
                 ),
               ),
             ],
