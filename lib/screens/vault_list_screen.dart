@@ -4,6 +4,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
+import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -267,7 +268,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
       case 'appearance':
         _showComingSoon('Appearance');
       case 'about':
-        _showComingSoon('About');
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const AboutScreen()),
+        );
     }
   }
 
