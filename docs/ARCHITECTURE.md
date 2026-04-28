@@ -29,7 +29,9 @@ gabbro/
 │   │   ├── unlock_screen.dart        # Passphrase entry screen
 │   │   ├── import_screen.dart        # Import from Enpass / Bitwarden / CSV
 │   │   ├── csv_mapping_screen.dart   # CSV column-mapping UI
-│   │   └── change_passphrase_screen.dart  # Change master passphrase
+│   │   ├── change_passphrase_screen.dart  # Change master passphrase
+│   │   ├── about_screen.dart              # About screen — version, links, licences
+│   │   └── appearance_screen.dart         # Appearance — theme, text size
 │   └── src/
 │       └── rust/               # Auto-generated bridge code (do not edit)
 │           ├── api/
@@ -105,6 +107,8 @@ gabbro/
 │       └── ADR-006-encryption-implementation.md
 ├── chat_info/                  # Development session notes and ASCII wireframes
 │   └── ascii_art/              # (git-ignored — not versioned)
+├── lib/
+│   └── settings.dart           # AppSettings — JSONC load/save, theme/text-size enums
 ├── flutter_rust_bridge.yaml    # Bridge configuration
 ├── pubspec.yaml                # Flutter dependencies
 ├── pubspec.lock                # Pinned dependency versions
@@ -233,6 +237,39 @@ Each entry is an instance of a typed class:
   blocking. Passphrase generator: minimum 4 words (enforced), maximum 20
   words (enforced). Both limits are validated in Rust and return `Err` if
   exceeded.
+
+## Appearance & Settings
+
+- **Status:** implemented. `lib/settings.dart` + `lib/screens/appearance_screen.dart`.
+  13 Flutter unit tests passing.
+- **Settings file:** `~/.config/gabbro/settings.jsonc` on Linux,
+  `~/Library/Application Support/gabbro/settings.jsonc` on macOS,
+  `<app support dir>/settings.jsonc` on Android.
+- **Format:** JSONC — standard JSON with `//` and `#` comment lines stripped
+  before parsing. All options documented inline. Invalid values fall back to
+  defaults silently. Human-editable by design — follows the Arch/qtile
+  convention of a config file the user can read and modify directly.
+- **`AppSettings` class:** immutable, `const`-constructible. Fields:
+  `theme` (`ThemeChoice`: system/light/dark), `textSize` (`TextSizeChoice`:
+  small/regular/large/extra_large), `highContrast` (bool, placeholder).
+  `load()` is async (file I/O); `save()` writes the full JSONC with comments.
+  `copyWith()` for immutable updates. `fromJson()`/`toJson()` for
+  serialisation. Comment stripping exposed via `stripCommentsForTest()` for
+  unit testing.
+- **Theme:** `GabbroApp` (in `main.dart`) was promoted from `StatelessWidget`
+  to `StatefulWidget` to hold `AppSettings` at the app root. `ThemeMode` and
+  `TextScaler` are derived from settings and passed down via `MediaQuery` and
+  `MaterialApp`. Descendant screens update settings via
+  `GabbroApp.of(context).updateSettings(...)` — changes take effect
+  immediately app-wide without restart.
+- **Text scaling:** `TextScaler.linear()` factors: small=0.85, regular=1.0,
+  large=1.15, extra_large=1.3. Applied via a `MediaQuery` wrapper above
+  `MaterialApp` so all text in the app scales uniformly.
+- **Appearance screen:** two segmented button rows (theme, text size) plus
+  a live preview box showing the current text scale. High-contrast toggle
+  present but disabled — labelled "Not yet implemented".
+- **`UnlockScreen` autofocus:** `autofocus: true` added to the passphrase
+  `TextField` so the keyboard/cursor is ready immediately on launch.
 
 ## Vault Domain Model
 - **Status:** all 6 entry types implemented in Rust
@@ -501,8 +538,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Change passphrase screen implemented (`lib/screens/change_passphrase_screen.dart`). Verifies old passphrase, enforces entropy on new passphrase, confirm field with match indicator. On success: snackbar + `Navigator.pop()` back to vault list. Wired into hamburger menu — replaces the "coming soon" stub.
-- **Next task:** Implement remaining stubbed menu items — About screen next.
+- **Completed:** Appearance screen implemented (`lib/screens/appearance_screen.dart`). Theme (dark/light/system), text size (small/regular/large/XL) with live preview, high-contrast placeholder. Settings persisted to `~/.config/gabbro/settings.jsonc` (JSONC format, human-editable). `AppSettings` class in `lib/settings.dart` with 13 Flutter tests passing. Autofocus fix applied to `UnlockScreen`.
+- **Next task:** Write Appearance section in ARCHITECTURE.md; then tackle next bikeshed item.
 
 ---
 
@@ -824,10 +861,6 @@ the first public tag.
   `TextFormField` does not do this automatically — requires `onFieldSubmitted`
   or a `RawKeyboardListener` wired to the submit action. Low effort, high
   polish. Apply consistently across all form screens.
-
-- **About screen:** Show app version, link to GitHub repo, link to issue tracker, open source licence list, and "Support Gabbro" donation link. Triggered from the hamburger menu About item (currently stubs to a snackbar).
-
-- **Appearance screen:** Theme (dark/light/system), text size, colour palette for password display. Triggered from the hamburger menu Appearance item (currently stubs to a snackbar).
 
 - **Export vault:** Users need a way to export the full vault from within
   the app — currently only possible at the OS level (copy the `.gabbro`
