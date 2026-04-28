@@ -268,14 +268,12 @@ class _VaultListScreenState extends State<VaultListScreen> {
         );
       case 'appearance':
         Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => const AppearanceScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const AppearanceScreen()),
         );
       case 'about':
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const AboutScreen()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => const AboutScreen()));
     }
   }
 
@@ -286,12 +284,6 @@ class _VaultListScreenState extends State<VaultListScreen> {
         builder: (context) => UnlockScreen(vaultPath: widget.vaultPath),
       ),
     );
-  }
-
-  void _showComingSoon(String feature) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('$feature — coming soon')));
   }
 
   @override
