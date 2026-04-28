@@ -527,6 +527,20 @@ discussed and forgotten.
 
 ---
 
+### Dependencies
+
+- **Audit direct Flutter dependencies before v1:** Current direct deps in
+  `pubspec.yaml`: `flutter`, `flutter_rust_bridge`, `rust_lib_gabbro`,
+  `freezed_annotation`, `path_provider`, `scrollable_positioned_list`,
+  `cupertino_icons`. The first five are load-bearing and cannot be removed
+  without architectural change. `scrollable_positioned_list` was chosen
+  deliberately for the alphabet index bar (lazy-list scroll-to-index problem
+  — no Flutter std solution). `cupertino_icons` is an iOS icon font with no
+  usage in the current Linux/Android codebase — **remove it**. Before adding
+  any new dependency, apply the same standard: can this be solved with what
+  we already have? Dev deps (`flutter_lints`, `freezed`, `build_runner`) have
+  no attack surface and are fine.
+
 ### Testing
 
 - **Cross-layer integration tests:** Widget tests cover UI behaviour; Rust
