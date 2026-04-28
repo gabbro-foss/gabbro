@@ -28,7 +28,8 @@ gabbro/
 │   ├── screens/                # Hand-written UI screens
 │   │   ├── unlock_screen.dart        # Passphrase entry screen
 │   │   ├── import_screen.dart        # Import from Enpass / Bitwarden / CSV
-│   │   └── csv_mapping_screen.dart   # CSV column-mapping UI
+│   │   ├── csv_mapping_screen.dart   # CSV column-mapping UI
+│   │   └── change_passphrase_screen.dart  # Change master passphrase
 │   └── src/
 │       └── rust/               # Auto-generated bridge code (do not edit)
 │           ├── api/
@@ -500,8 +501,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Hamburger menu added to `VaultListScreen`. Import moved from app bar into menu. Lock button (`Icons.lock_outline`) added to app bar — calls `lockVault()` and navigates to `UnlockScreen`. `vaultPath` threaded through from `UnlockScreen` and `OnboardingScreen` into `VaultListScreen`. Menu groups: Security, Vault, Import, Appearance, About. Vault/YubiKey items greyed out (not yet implemented). Change passphrase, Appearance, About stub to "coming soon" snackbar.
-- **Next task:** Implement stubbed menu items — Change passphrase UI first.
+- **Completed:** Change passphrase screen implemented (`lib/screens/change_passphrase_screen.dart`). Verifies old passphrase, enforces entropy on new passphrase, confirm field with match indicator. On success: snackbar + `Navigator.pop()` back to vault list. Wired into hamburger menu — replaces the "coming soon" stub.
+- **Next task:** Implement remaining stubbed menu items — About screen next.
 
 ---
 
@@ -586,12 +587,13 @@ discussed and forgotten.
 
 ### Features & UX
 
-- **Entropy indicator on all passphrase inputs:** The onboarding screen
-  already shows a real-time entropy indicator. Audit all other passphrase
-  input fields (unlock screen, change passphrase screen) and add the same
-  indicator consistently. Users choosing their own passphrase deserve the
-  same entropy feedback as the generator provides. Implement using the
-  existing `entropy` bridge function already exposed from Rust.
+- **Entropy indicator on all passphrase inputs:** Onboarding and Change
+  Passphrase screens both show a real-time entropy indicator. Remaining:
+  audit the Unlock Screen — users re-entering their passphrase after a
+  cold boot may benefit from feedback too, though the case is weaker there
+  (they are entering an existing passphrase, not choosing a new one).
+  Implement using the existing `entropy` bridge function already exposed
+  from Rust.
 
 - **Autofill:** How will autofill work across platforms? On desktop,
   browser extensions (Chrome/Firefox/etc.) are the standard approach —
@@ -764,6 +766,12 @@ discussed and forgotten.
   it. Prevents silent accumulation of orphaned vault files on the user's device
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
+
+- **Enter key submits forms:** On desktop, pressing Enter in the last field
+  of a form (e.g. Change Passphrase, Unlock) should submit it. Flutter's
+  `TextFormField` does not do this automatically — requires `onFieldSubmitted`
+  or a `RawKeyboardListener` wired to the submit action. Low effort, high
+  polish. Apply consistently across all form screens.
 
 - **About screen:** Show app version, link to GitHub repo, link to issue tracker, open source licence list, and "Support Gabbro" donation link. Triggered from the hamburger menu About item (currently stubs to a snackbar).
 
