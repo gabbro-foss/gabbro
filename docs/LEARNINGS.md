@@ -1848,6 +1848,29 @@ Python has no equivalent — method availability is checked at runtime,
 not compile time, so a missing import only fails when the method is
 actually called.
 
+### Android 16 edge-to-edge enforcement
+Android 16 makes edge-to-edge rendering mandatory — apps draw behind the
+status bar and bottom navigation bar with no opt-out. The `windowOptOutEdgeToEdgeEnforcement`
+flag and `SystemChrome` mode overrides are both ignored. The correct Flutter
+fix is to preserve system insets in `MediaQuery`: use `MediaQuery.of(context).copyWith(...)`
+rather than `MediaQueryData(...)` when overriding only one field (e.g. `textScaler`).
+`MediaQueryData()` constructs a fresh object with all inset fields zeroed,
+silently discarding the status bar and navigation bar padding that `Scaffold`
+needs to position `AppBar` and `FloatingActionButton` correctly.
+
+### `FilePicker.saveFile()` not supported on Android
+`FilePicker.saveFile()` silently returns `null` on Android — it is a
+desktop-only API. On Android, vault path should be fixed to
+`getApplicationSupportDirectory()` and shown as read-only text. Use
+`Platform.isAndroid` to branch between the two behaviours.
+
+### Closure capture in Flutter list builders
+In a `ListView` or `ScrollablePositionedList` builder, any value computed
+outside the `builder` callback is captured once at build time, not per tap.
+The fix: move the computation inside the callback. Classic example: calling
+`getEntry(id: entry.id)` outside `MaterialPageRoute builder` captures the
+last computed value for all tiles — move it inside so it runs on tap.
+
 ### Bulk operations — no-save + single save pattern
 When multiple entries need to be added or removed, calling a save function
 per entry is expensive: each save runs Argon2id + encryption + disk write

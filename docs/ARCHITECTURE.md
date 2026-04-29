@@ -547,8 +547,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** `PathField` wired into `OnboardingScreen` (native save dialog replaces plain text input). `pubspec.yaml` version reset to `0.1.0+1`. `cupertino_icons` removed. Enpass `MM/YYYY` expiry normalised to `MM/YY` in importer with TDD. 48 Flutter tests, 20 Enpass tests passing.
-- **Next task:** Add `CHANGELOG.md` at project root; consider Android build polish pass.
+- **Completed:** Android build polish pass on Samsung S23 (Android 16). Fixed `MediaQueryData` stripping system insets (root cause of all status bar/FAB overlap bugs), `PathField` save mode silent failure on Android, detail view showing wrong entry, delete wiping all entries (nil UUID in anonymised test data), list content extending behind bottom nav bar.
+- **Next task:** CHANGELOG.md deferred until post-stable release. Remaining Android polish: button text wrapping in accessibility screen, swipe-left affordance, auto-lock on background/sleep. UX items from bikeshed.
 
 ---
 
@@ -865,6 +865,10 @@ the first public tag.
   it. Prevents silent accumulation of orphaned vault files on the user's device
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
+
+- **Auto-lock on background/sleep (Android):** Gabbro does not currently lock when the app is backgrounded or the phone screen turns off on Android. Confirmed on Samsung S23 (Android 16). Requires `AppLifecycleListener` or `WidgetsBindingObserver` in `main.dart` to detect `AppLifecycleState.paused` / `inactive` and call `lockVault()`. Pairs with the existing auto-lock timer.
+
+- **Icons on entry type cards:** Add a distinct icon per entry type (Login, Note, Card, Identity, File, Custom) to the list tiles and detail screens. Improves scannability. Use Material icons — no new dependency needed.
 
 - **Enter key submits forms:** On desktop, pressing Enter in the last field
   of a form (e.g. Change Passphrase, Unlock) should submit it. Flutter's
