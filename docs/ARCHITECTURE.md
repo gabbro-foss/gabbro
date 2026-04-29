@@ -544,8 +544,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** High contrast mode implemented for both light and dark themes. Accessibility shortcut button (`OutlinedButton.icon`, `Icons.accessibility_new`) added to `OnboardingScreen` and `UnlockScreen` — toggles XL text + high contrast in one tap. 15 Flutter tests passing.
-- **Next task:** Review bikeshed and pick next item.
+- **Completed:** Fixed widget test crashes caused by `GabbroApp.of(context)!` blowing up in bare `MaterialApp` test harnesses. Added `GabbroApp.maybeOf()` (nullable); `OnboardingScreen` and `UnlockScreen` now use it, gracefully no-oping when no `GabbroApp` ancestor is present. 41 Flutter tests passing.
+- **Next task:** Export vault UI — Flutter screen + TDD. Rust bridge function `export_vault` already exists.
 
 ---
 
@@ -855,6 +855,27 @@ the first public tag.
   `CreateEntryScreen` and have the detail screen await the push result
   and reload if non-null.
 
+- **Colour scheme — olivine green:** The current seed colour is purple
+  (`0xFF534AB7`). Consider changing to an olivine green to better match
+  the gabbro rock aesthetic. Prerequisite before making the change:
+  validate the new palette against WCAG 1.4.3 (Contrast, minimum) and
+  ADR-003 (colour-blind safety) — run the candidate colour through a CVD
+  simulator and contrast checker first. Low risk if the prerequisite is
+  met; purely cosmetic otherwise.
+
+- **Block copy/paste on master passphrase fields:** On `OnboardingScreen`
+  and `UnlockScreen`, the master passphrase fields should block clipboard
+  paste to prevent accidental exposure via clipboard history tools.
+  Implement with a custom `TextInputFormatter` or by intercepting
+  `onChanged` to detect paste events. Defer until pre-release — current
+  behaviour is acceptable for development and testing.
+
+- **URL opening in About screen:** Links in the About screen do not open
+  in the browser. This is addressable within Gabbro using the
+  `url_launcher` package (`launchUrl` with `LaunchMode.externalApplication`).
+  Not an OS-level limitation. Low effort; add to the About screen polish
+  pass.
+
 - **Clean up legacy vault on first launch:** When the app launches and no
   vault exists at the current app ID path (`app.gabbro.gabbro`), check for
   a vault at the old `com.example.gabbro` path and offer to migrate or delete
@@ -867,12 +888,6 @@ the first public tag.
   `TextFormField` does not do this automatically — requires `onFieldSubmitted`
   or a `RawKeyboardListener` wired to the submit action. Low effort, high
   polish. Apply consistently across all form screens.
-
-- **Export vault:** Users need a way to export the full vault from within
-  the app — currently only possible at the OS level (copy the `.gabbro`
-  file manually). Should produce a `.gabbro` + `.gabbro.sha256` pair at a
-  user-chosen path, matching the existing `export_vault` Rust bridge function.
-  Add an Export option to a future Settings screen or vault action menu.
 
 - **Custom filter chips:** Allow users to add new filter chips based on
   folders or custom tags, beyond the fixed entry-type chips. YAGNI risk is
