@@ -10,6 +10,7 @@ class PathField extends StatefulWidget {
   final List<String>? allowedExtensions;
   final String? saveFileName;
   final void Function(String path) onPathSelected;
+  final String? Function(String?)? validator;
 
   const PathField({
     super.key,
@@ -19,6 +20,7 @@ class PathField extends StatefulWidget {
     this.initialPath,
     this.allowedExtensions,
     this.saveFileName,
+    this.validator,
   });
 
   @override
@@ -66,6 +68,7 @@ class _PathFieldState extends State<PathField> {
     return TextFormField(
       controller: _controller,
       readOnly: true,
+      validator: widget.validator,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
         hintText: widget.hint,

@@ -196,7 +196,7 @@ fn convert_card(
         String::from("active"),                                        // status
         find_field_value(fields, &["ccName"]),                        // cardholder_name
         card_number,
-        find_field_value(fields, &["ccExpiry"]),                      // expiry
+        normalise_expiry(&find_field_value(fields, &["ccExpiry"])),   // expiry
         find_field_value(fields, &["ccCvc"]),                         // cvv
         None,                                                          // credit_limit
         None,                                                          // card_account_number
@@ -325,6 +325,17 @@ fn make_meta(uuid: &str, folder: &str, favorite: u8) -> EntryMeta {
         folder: folder.to_string(),
         tags: vec![],
         favourite: favorite == 1,
+    }
+}
+
+/// Normalise an Enpass expiry string from `MM/YYYY` to `MM/YY`.
+/// If the format is already `MM/YY` or unrecognised, returns it unchanged.
+fn normalise_expiry(expiry: &str) -> String {
+    let parts: Vec<&str> = expiry.splitn(2, '/').collect();
+    if parts.len() == 2 && parts[1].len() == 4 {
+        format!("{}/{}", parts[0], &parts[1][2..])
+    } else {
+        expiry.to_string()
     }
 }
 
@@ -666,6 +677,26 @@ mod tests {
             !e.custom_fields.iter().any(|f| f.label == "TOTP"),
             "totp fields should be dropped and never appear as custom fields"
         );
+    }
+
+    #[test]
+    fn card_expiry_mm_yyyy_is_normalised_to_mm_yy() {
+        let json = r#"{
+          "items": [{
+            "uuid": "f08-001", "title": "Visa", "category": "creditcard",
+            "note": "", "favorite": 0, "archived": 0, "trashed": 0,
+            "fields": [
+              {"label": "Name on card", "type": "ccName",   "value": "Rob Smith",        "sensitive": 0, "deleted": 0},
+              {"label": "Card number",  "type": "ccNumber", "value": "4111111111111111", "sensitive": 1, "deleted": 0},
+              {"label": "Expiry",       "type": "ccExpiry", "value": "12/2028",          "sensitive": 0, "deleted": 0},
+              {"label": "CVV",          "type": "ccCvc",    "value": "123",              "sensitive": 1, "deleted": 0}
+            ]
+          }]
+        }"#;
+        let entries = parse(json.as_bytes()).unwrap();
+        let VaultEntry::Card(ref e) = entries[0] else { panic!("expected Card") };
+        assert_eq!(e.expiry, "12/28",
+            "MM/YYYY expiry from Enpass should be normalised to MM/YY");
     }
 
     #[test]

@@ -5,6 +5,7 @@ import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/widgets/path_field.dart';
 import 'package:path_provider/path_provider.dart';
 
 Future<void> _defaultInitVault(List<int> passphrase, String path) =>
@@ -32,7 +33,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passphraseController = TextEditingController();
   final _confirmController = TextEditingController();
-  final _pathController = TextEditingController();
+  String _vaultPath = '';
 
   bool _passphraseObscured = true;
   bool _confirmObscured = true;
@@ -45,7 +46,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void initState() {
     super.initState();
     if (widget.initialPath != null) {
-      _pathController.text = widget.initialPath!;
+      _vaultPath = widget.initialPath!;
     } else {
       _initDefaultPath();
     }
@@ -53,15 +54,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Future<void> _initDefaultPath() async {
     final dir = await getApplicationSupportDirectory();
-    final path = '${dir.path}/gabbro.gabbro';
-    setState(() => _pathController.text = path);
+    setState(() => _vaultPath = '${dir.path}/gabbro.gabbro');
   }
 
   @override
   void dispose() {
     _passphraseController.dispose();
     _confirmController.dispose();
-    _pathController.dispose();
     super.dispose();
   }
 
@@ -77,17 +76,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       _error = null;
     });
     try {
-      final file = File(_pathController.text);
+      final file = File(_vaultPath);
       await file.parent.create(recursive: true);
       await widget.onInitVault(
         _passphraseController.text.codeUnits,
-        _pathController.text,
+        _vaultPath,
       );
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) =>
-                VaultListScreen(vaultPath: _pathController.text),
+                VaultListScreen(vaultPath: _vaultPath),
           ),
         );
       }
@@ -175,21 +174,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: _pathController,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: 'Path to vault file',
-                              ),
-                              validator: (v) => (v == null || v.isEmpty)
-                                  ? 'Path is required'
-                                  : null,
-                            ),
-                          ),
-                        ],
+                      PathField(
+                        mode: PathFieldMode.save,
+                        hint: 'Path to vault file',
+                        initialPath: _vaultPath.isEmpty ? null : _vaultPath,
+                        allowedExtensions: const ['gabbro'],
+                        saveFileName: 'gabbro.gabbro',
+                        onPathSelected: (path) => setState(() => _vaultPath = path),
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? 'Path is required'
+                            : null,
                       ),
                       const SizedBox(height: 24),
                       TextFormField(
