@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
 import 'package:gabbro/src/rust/api/import.dart';
+import 'package:gabbro/widgets/path_field.dart';
 
 Future<BigInt> _defaultImportEnpass(List<int> data) =>
     importFromEnpass(data: data);
@@ -27,9 +28,9 @@ class ImportScreen extends StatefulWidget {
 }
 
 class _ImportScreenState extends State<ImportScreen> {
-  final _enpassPathController = TextEditingController();
-  final _bitwardenPathController = TextEditingController();
-  final _csvPathController = TextEditingController();
+  String? _enpassPath;
+  String? _bitwardenPath;
+  String? _csvPath;
 
   bool _isImportingEnpass = false;
   bool _isImportingBitwarden = false;
@@ -39,20 +40,12 @@ class _ImportScreenState extends State<ImportScreen> {
   String? _bitwardenError;
   String? _csvError;
 
-  @override
-  void dispose() {
-    _enpassPathController.dispose();
-    _bitwardenPathController.dispose();
-    _csvPathController.dispose();
-    super.dispose();
-  }
-
   // ── Enpass ───────────────────────────────────────────────────────────────
 
   Future<void> _importEnpass() async {
-    final path = _enpassPathController.text.trim();
-    if (path.isEmpty) {
-      setState(() => _enpassError = 'Enter a file path.');
+    final path = _enpassPath;
+    if (path == null || path.isEmpty) {
+      setState(() => _enpassError = 'Select a file.');
       return;
     }
     final file = File(path);
@@ -78,9 +71,9 @@ class _ImportScreenState extends State<ImportScreen> {
   // ── Bitwarden ────────────────────────────────────────────────────────────
 
   Future<void> _importBitwarden() async {
-    final path = _bitwardenPathController.text.trim();
-    if (path.isEmpty) {
-      setState(() => _bitwardenError = 'Enter a file path.');
+    final path = _bitwardenPath;
+    if (path == null || path.isEmpty) {
+      setState(() => _bitwardenError = 'Select a file.');
       return;
     }
     final file = File(path);
@@ -106,9 +99,9 @@ class _ImportScreenState extends State<ImportScreen> {
   // ── CSV ──────────────────────────────────────────────────────────────────
 
   Future<void> _sniffAndPushCsvMapping() async {
-    final path = _csvPathController.text.trim();
-    if (path.isEmpty) {
-      setState(() => _csvError = 'Enter a file path.');
+    final path = _csvPath;
+    if (path == null || path.isEmpty) {
+      setState(() => _csvError = 'Select a file.');
       return;
     }
     final file = File(path);
@@ -154,8 +147,9 @@ class _ImportScreenState extends State<ImportScreen> {
               _importSection(
                 title: 'Enpass',
                 subtitle: 'JSON export from Enpass (Tools → Export)',
-                controller: _enpassPathController,
                 hint: '/home/user/enpass_export.json',
+                allowedExtensions: ['json'],
+                onPathSelected: (p) => setState(() => _enpassPath = p),
                 isLoading: _isImportingEnpass,
                 error: _enpassError,
                 onImport: _importEnpass,
@@ -167,8 +161,9 @@ class _ImportScreenState extends State<ImportScreen> {
                 title: 'Bitwarden',
                 subtitle:
                     'Unencrypted JSON export from Bitwarden (Tools → Export Vault)',
-                controller: _bitwardenPathController,
                 hint: '/home/user/bitwarden_export.json',
+                allowedExtensions: ['json'],
+                onPathSelected: (p) => setState(() => _bitwardenPath = p),
                 isLoading: _isImportingBitwarden,
                 error: _bitwardenError,
                 onImport: _importBitwarden,
@@ -187,8 +182,9 @@ class _ImportScreenState extends State<ImportScreen> {
   Widget _importSection({
     required String title,
     required String subtitle,
-    required TextEditingController controller,
     required String hint,
+    required List<String> allowedExtensions,
+    required void Function(String) onPathSelected,
     required bool isLoading,
     required String? error,
     required VoidCallback onImport,
@@ -200,16 +196,22 @@ class _ImportScreenState extends State<ImportScreen> {
         const SizedBox(height: 4),
         Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
         const SizedBox(height: 12),
-        TextFormField(
-          controller: controller,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            labelText: 'File path',
-            hintText: hint,
-            errorText: error,
-          ),
-          onFieldSubmitted: (_) => isLoading ? null : onImport(),
+        PathField(
+          mode: PathFieldMode.open,
+          hint: hint,
+          allowedExtensions: allowedExtensions,
+          onPathSelected: onPathSelected,
         ),
+        if (error != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            error,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+              fontSize: 12,
+            ),
+          ),
+        ],
         const SizedBox(height: 12),
         FilledButton(
           onPressed: isLoading ? null : onImport,
@@ -236,17 +238,22 @@ class _ImportScreenState extends State<ImportScreen> {
           style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 12),
-        TextFormField(
-          controller: _csvPathController,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            labelText: 'File path',
-            hintText: '/home/user/passwords.csv',
-            errorText: _csvError,
-          ),
-          onFieldSubmitted: (_) =>
-              _isSniffingCsv ? null : _sniffAndPushCsvMapping(),
+        PathField(
+          mode: PathFieldMode.open,
+          hint: '/home/user/passwords.csv',
+          allowedExtensions: ['csv'],
+          onPathSelected: (p) => setState(() => _csvPath = p),
         ),
+        if (_csvError != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            _csvError!,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+              fontSize: 12,
+            ),
+          ),
+        ],
         const SizedBox(height: 12),
         FilledButton(
           onPressed: _isSniffingCsv ? null : _sniffAndPushCsvMapping,

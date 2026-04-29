@@ -5,6 +5,7 @@ import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/screens/about_screen.dart';
+import 'package:gabbro/screens/export_screen.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
@@ -208,6 +209,12 @@ class _VaultListScreenState extends State<VaultListScreen> {
     if (mounted) _loadEntries();
   }
 
+  Future<void> _openExportScreen() async {
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (context) => const ExportScreen()),
+    );
+  }
+
   Future<void> _openImportScreen() async {
     setState(() => _isImporting = true);
     final count = await Navigator.of(
@@ -258,6 +265,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
   void _onMenuSelected(String value) {
     switch (value) {
+      case 'export':
+        _openExportScreen();
       case 'import':
         _openImportScreen();
       case 'change_passphrase':
@@ -328,6 +337,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
               tooltip: 'Menu',
               onSelected: _onMenuSelected,
               itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'export',
+                  child: Text('Export vault'),
+                ),
                 const PopupMenuItem(
                   value: 'import',
                   child: Text('Import entries'),
