@@ -547,8 +547,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Export vault UI — `lib/screens/export_screen.dart` + `lib/widgets/path_field.dart`. Native file picker (`file_picker: ^11.0.2`) added. `ImportScreen` refactored to use `PathField`. Export accessible from vault list menu. 48 Flutter tests passing.
-- **Next task:** Wire `PathField` into `OnboardingScreen` vault path picker (currently plain text input).
+- **Completed:** `PathField` wired into `OnboardingScreen` (native save dialog replaces plain text input). `pubspec.yaml` version reset to `0.1.0+1`. `cupertino_icons` removed. Enpass `MM/YYYY` expiry normalised to `MM/YY` in importer with TDD. 48 Flutter tests, 20 Enpass tests passing.
+- **Next task:** Add `CHANGELOG.md` at project root; consider Android build polish pass.
 
 ---
 
@@ -607,7 +607,6 @@ the pre-release security review has been passed. Reset to `0.1.0` before
 the first public tag.
 
 **Action items:**
-- Reset `pubspec.yaml` version to `0.1.0` before first public release
 - Add a `CHANGELOG.md` at the project root (keep it; do not auto-generate)
 - Apply the same scheme and table to `wellpathpy` docs when next updated
 
@@ -616,14 +615,12 @@ the first public tag.
 - **Audit direct Flutter dependencies before v1:** Current direct deps in
   `pubspec.yaml`: `flutter`, `flutter_rust_bridge`, `rust_lib_gabbro`,
   `freezed_annotation`, `path_provider`, `scrollable_positioned_list`,
-  `cupertino_icons`. The first five are load-bearing and cannot be removed
-  without architectural change. `scrollable_positioned_list` was chosen
-  deliberately for the alphabet index bar (lazy-list scroll-to-index problem
-  — no Flutter std solution). `cupertino_icons` is an iOS icon font with no
-  usage in the current Linux/Android codebase — **remove it**. Before adding
-  any new dependency, apply the same standard: can this be solved with what
-  we already have? Dev deps (`flutter_lints`, `freezed`, `build_runner`) have
-  no attack surface and are fine.
+  `file_picker`. All are load-bearing and cannot be removed without
+  architectural change. `scrollable_positioned_list` was chosen deliberately
+  for the alphabet index bar (lazy-list scroll-to-index problem — no Flutter
+  std solution). Before adding any new dependency, apply the same standard:
+  can this be solved with what we already have? Dev deps (`flutter_lints`,
+  `freezed`, `build_runner`) have no attack surface and are fine.
 
 ### Testing
 
@@ -841,15 +838,6 @@ the first public tag.
   testing discipline, not an architecture change. Reference: WCAG 1.4.4
   (Resize Text) applies here alongside the font sizing work.
 
-- **Stale detail view after edit:** After editing an entry and saving,
-  navigating back to `EntryDetailScreen` still shows the pre-edit content
-  until the user returns to the list and re-taps the entry. Fix: pass the
-  updated entry back to the detail screen after a successful save, or
-  refresh the detail screen's state from the session on return from the
-  edit screen. One approach: use `Navigator.pop(updatedEntry)` from
-  `CreateEntryScreen` and have the detail screen await the push result
-  and reload if non-null.
-
 - **Colour scheme — olivine green:** The current seed colour is purple
   (`0xFF534AB7`). Consider changing to an olivine green to better match
   the gabbro rock aesthetic. Prerequisite before making the change:
@@ -910,13 +898,6 @@ the first public tag.
   `flutter build linux --release` and `flutter build apk --release` for any
   user-facing performance assessment or UI/UX testing. Never tune Argon2id
   parameters or assess UX based on debug build timings.
-
-- **Enpass expiry format mismatch:** Enpass stores card expiry as `MM/YYYY`
-  (4-digit year). Gabbro's `CardEntry` expects `MM/YY` (2-digit year).
-  The importer currently passes the raw value through, causing the
-  `CreateEntryScreen` validator to reject it on edit. Fix in the importer:
-  detect the `MM/YYYY` pattern and truncate to `MM/YY` on import.
-  Add a test case to the Enpass TDD suite covering this conversion.
 
 ## Import / Migration
 
