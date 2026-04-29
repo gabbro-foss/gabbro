@@ -38,6 +38,10 @@ class GabbroApp extends StatefulWidget {
   State<GabbroApp> createState() => _GabbroAppState();
 
   /// Allow descendant widgets to update settings app-wide.
+  static _GabbroAppState? maybeOf(BuildContext context) {
+    return context.findAncestorStateOfType<_GabbroAppState>();
+  }
+
   static _GabbroAppState of(BuildContext context) {
     return context.findAncestorStateOfType<_GabbroAppState>()!;
   }

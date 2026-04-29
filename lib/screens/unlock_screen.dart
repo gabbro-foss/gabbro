@@ -84,10 +84,12 @@ class _UnlockScreenState extends State<UnlockScreen> {
   };
 
   Future<void> _toggleAccessibility() async {
-    final current = GabbroApp.of(context).settings;
+    final app = GabbroApp.maybeOf(context);
+    if (app == null) return;
+    final current = app.settings;
     final isOn =
         current.highContrast && current.textSize == TextSizeChoice.extra_large;
-    await GabbroApp.of(context).updateSettings(
+    await app.updateSettings(
       current.copyWith(
         highContrast: !isOn,
         textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.extra_large,
@@ -97,9 +99,11 @@ class _UnlockScreenState extends State<UnlockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final app = GabbroApp.maybeOf(context);
     final isAccessibilityOn =
-        GabbroApp.of(context).settings.highContrast &&
-        GabbroApp.of(context).settings.textSize == TextSizeChoice.extra_large;
+        app != null &&
+        app.settings.highContrast &&
+        app.settings.textSize == TextSizeChoice.extra_large;
 
     return Scaffold(
       body: Stack(
