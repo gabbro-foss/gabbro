@@ -201,7 +201,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
           ),
           // ── Accessibility shortcut — top-right corner ──────────────────
           Positioned(
-            top: 8,
+            top: MediaQuery.of(context).padding.top + 8,
             right: 8,
             child: SafeArea(
               child: OutlinedButton.icon(

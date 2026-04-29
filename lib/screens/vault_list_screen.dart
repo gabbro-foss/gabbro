@@ -422,7 +422,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
               onPressed: _showTypePicker,
               child: const Icon(Icons.add),
             ),
-      body: Column(
+      body: SafeArea(
+        child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
@@ -541,11 +542,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                     });
                                     return;
                                   }
-                                  final full = getEntry(id: entry.id);
                                   await Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          EntryDetailScreen(entry: full),
+                                          EntryDetailScreen(entry: getEntry(id: entry.id)),
                                     ),
                                   );
                                   if (mounted) _loadEntries();
@@ -559,6 +559,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
                   ),
           ),
         ],
+        ),
       ),
     );
   }

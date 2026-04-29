@@ -174,17 +174,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 8),
-                      PathField(
-                        mode: PathFieldMode.save,
-                        hint: 'Path to vault file',
-                        initialPath: _vaultPath.isEmpty ? null : _vaultPath,
-                        allowedExtensions: const ['gabbro'],
-                        saveFileName: 'gabbro.gabbro',
-                        onPathSelected: (path) => setState(() => _vaultPath = path),
-                        validator: (v) => (v == null || v.isEmpty)
-                            ? 'Path is required'
-                            : null,
-                      ),
+                      if (Platform.isAndroid)
+                        Text(
+                          _vaultPath.isEmpty ? 'Loading…' : _vaultPath,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        )
+                      else
+                        PathField(
+                          mode: PathFieldMode.save,
+                          hint: 'Path to vault file',
+                          initialPath: _vaultPath.isEmpty ? null : _vaultPath,
+                          allowedExtensions: const ['gabbro'],
+                          saveFileName: 'gabbro.gabbro',
+                          onPathSelected: (path) => setState(() => _vaultPath = path),
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? 'Path is required'
+                              : null,
+                        ),
                       const SizedBox(height: 24),
                       TextFormField(
                         controller: _passphraseController,
@@ -314,7 +320,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           // ── Accessibility shortcut — top-right corner ──────────────────
           Positioned(
-            top: 8,
+            top: MediaQuery.of(context).padding.top + 8,
             right: 8,
             child: SafeArea(
               child: OutlinedButton.icon(

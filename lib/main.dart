@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/settings.dart';
@@ -8,6 +9,12 @@ import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+    ));
+  }
   await RustLib.init();
   final dir = await getApplicationSupportDirectory();
   final vaultPath = '${dir.path}/gabbro.gabbro';
@@ -126,7 +133,7 @@ class _GabbroAppState extends State<GabbroApp> {
   Widget build(BuildContext context) {
     final hc = _settings.highContrast;
     return MediaQuery(
-      data: MediaQueryData(textScaler: TextScaler.linear(_textScale)),
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(_textScale)),
       child: MaterialApp(
         title: 'Gabbro',
         debugShowCheckedModeBanner: false,
