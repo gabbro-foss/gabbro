@@ -27,11 +27,14 @@ gabbro/
 │   ├── main.dart
 │   ├── screens/                # Hand-written UI screens
 │   │   ├── unlock_screen.dart        # Passphrase entry screen
+│   │   ├── export_screen.dart        # Export vault — writes .gabbro + .gabbro.sha256
 │   │   ├── import_screen.dart        # Import from Enpass / Bitwarden / CSV
 │   │   ├── csv_mapping_screen.dart   # CSV column-mapping UI
 │   │   ├── change_passphrase_screen.dart  # Change master passphrase
 │   │   ├── about_screen.dart              # About screen — version, links, licences
 │   │   └── appearance_screen.dart         # Appearance — theme, text size
+│   ├── widgets/                      # Reusable UI components
+│   │   └── path_field.dart           # Native file picker field (open + save modes)
 │   └── src/
 │       └── rust/               # Auto-generated bridge code (do not edit)
 │           ├── api/
@@ -544,8 +547,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Fixed widget test crashes caused by `GabbroApp.of(context)!` blowing up in bare `MaterialApp` test harnesses. Added `GabbroApp.maybeOf()` (nullable); `OnboardingScreen` and `UnlockScreen` now use it, gracefully no-oping when no `GabbroApp` ancestor is present. 41 Flutter tests passing.
-- **Next task:** Export vault UI — Flutter screen + TDD. Rust bridge function `export_vault` already exists.
+- **Completed:** Export vault UI — `lib/screens/export_screen.dart` + `lib/widgets/path_field.dart`. Native file picker (`file_picker: ^11.0.2`) added. `ImportScreen` refactored to use `PathField`. Export accessible from vault list menu. 48 Flutter tests passing.
+- **Next task:** Wire `PathField` into `OnboardingScreen` vault path picker (currently plain text input).
 
 ---
 
@@ -700,14 +703,6 @@ the first public tag.
   browser extension in scope at all given the GPL-3.0 and FOSS distribution
   model? Does autofill change the security model (secrets closer to the
   browser boundary)?
-
-- **Native file picker (desktop):** Both the vault location picker on
-  `OnboardingScreen` and the file entry picker on `CreateEntryScreen`
-  currently use plain text path input on Linux desktop. Replace with a
-  native GTK file dialog when desktop polish work begins. On Android,
-  use the `file_picker` package (re-add as a dependency at that point —
-  it was removed because the Linux backend was not yet set up). The
-  path-based fallback must be retained for headless/CI environments.
 
 - **Themes — dark / light / custom:** Dark and light modes are already noted
   as system-default with user override. Open questions: should Gabbro offer

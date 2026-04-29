@@ -1788,6 +1788,23 @@ For sensitive fields that have a show/hide toggle (passwords, CVV, PIN),
 copy always uses the real underlying value — never the bullet placeholder.
 The user's intent when tapping copy is unambiguous.
 
+### `file_picker` v11 — static API, no `.platform`
+`file_picker` v11 introduced a breaking change: the instance-based
+`FilePicker.platform.pickFiles()` pattern was replaced with direct
+static calls. The correct v11 API is:
+- `FilePicker.pickFiles(...)` — open a file picker dialog
+- `FilePicker.saveFile(...)` — open a save dialog (desktop only)
+- `FilePicker.getDirectoryPath()` — open a directory picker
+
+`PathField` (`lib/widgets/path_field.dart`) wraps these into a
+reusable widget with two modes (`PathFieldMode.open` / `.save`),
+a read-only `TextFormField` displaying the selected path, and a
+folder icon button that opens the native dialog. Used by
+`ImportScreen` (open mode) and `ExportScreen` (save mode).
+The widget's `onPathSelected` callback is the DI hook for tests —
+production code uses the real picker; tests inject a pre-set path
+via `initialPath`.
+
 ### `retain` — in-place filtering of a `Vec` in Rust
 `vec.retain(|item| condition)` removes all elements for which the condition
 returns false, in a single pass, without allocating a new `Vec`. Used in
