@@ -96,6 +96,15 @@ class _VaultListScreenState extends State<VaultListScreen> {
     }
   }
 
+  IconData _entryTypeIcon(String entryType) => switch (entryType) {
+    'Login' => Icons.lock_outline,
+    'Note' => Icons.note_outlined,
+    'Identity' => Icons.person_outline,
+    'Card' => Icons.credit_card_outlined,
+    'File' => Icons.insert_drive_file_outlined,
+    _ => Icons.tune,
+  };
+
   String _displayType(String entryType) {
     switch (entryType) {
       case 'Login':
@@ -222,6 +231,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
               ),
               ...types.map(
                 (t) => ListTile(
+                  leading: Icon(
+                    _entryTypeIcon(t.$1),
+                    color: Theme.of(context).colorScheme.primary,
+                    semanticLabel: t.$2,
+                  ),
                   title: Text(t.$2),
                   onTap: () => Navigator.of(context).pop(t.$1),
                 ),
@@ -586,19 +600,65 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                   );
                                 }
                                 final entry = item as EntrySummaryData;
+                                final isWide =
+                                    MediaQuery.of(context).size.width >= 600;
                                 return ListTile(
                                   dense: true,
-                                  leading: Checkbox(
-                                    visualDensity: VisualDensity.compact,
-                                    value: _selectedIds.contains(entry.id),
-                                    onChanged: (_) => setState(() {
-                                      if (_selectedIds.contains(entry.id)) {
-                                        _selectedIds.remove(entry.id);
-                                      } else {
-                                        _selectedIds.add(entry.id);
-                                      }
-                                    }),
-                                  ),
+                                  leading: isWide
+                                      ? Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              _entryTypeIcon(entry.entryType),
+                                              size: 20,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                              semanticLabel: _displayType(
+                                                entry.entryType,
+                                              ),
+                                            ),
+                                            Checkbox(
+                                              visualDensity:
+                                                  VisualDensity.compact,
+                                              value: _selectedIds
+                                                  .contains(entry.id),
+                                              onChanged: (_) => setState(() {
+                                                if (_selectedIds
+                                                    .contains(entry.id)) {
+                                                  _selectedIds.remove(entry.id);
+                                                } else {
+                                                  _selectedIds.add(entry.id);
+                                                }
+                                              }),
+                                            ),
+                                          ],
+                                        )
+                                      : _isSelecting
+                                          ? Checkbox(
+                                              visualDensity:
+                                                  VisualDensity.compact,
+                                              value: _selectedIds
+                                                  .contains(entry.id),
+                                              onChanged: (_) => setState(() {
+                                                if (_selectedIds
+                                                    .contains(entry.id)) {
+                                                  _selectedIds.remove(entry.id);
+                                                } else {
+                                                  _selectedIds.add(entry.id);
+                                                }
+                                              }),
+                                            )
+                                          : Icon(
+                                              _entryTypeIcon(entry.entryType),
+                                              size: 20,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                              semanticLabel: _displayType(
+                                                entry.entryType,
+                                              ),
+                                            ),
                                   title: Text(_displayTitle(entry)),
                                   subtitle: Text(_displayType(entry.entryType)),
                                   onTap: () async {

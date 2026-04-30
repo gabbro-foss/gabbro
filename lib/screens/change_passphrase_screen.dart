@@ -190,6 +190,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                   TextFormField(
                     controller: _confirmController,
                     obscureText: _confirmObscured,
+                    onFieldSubmitted: (_) => _changePassphrase(),
                     onChanged: (v) {
                       setState(
                         () => _confirmMatches = v.isEmpty

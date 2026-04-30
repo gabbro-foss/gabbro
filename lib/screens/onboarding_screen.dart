@@ -244,6 +244,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       TextFormField(
                         controller: _confirmController,
                         obscureText: _confirmObscured,
+                        onFieldSubmitted: (_) => _createVault(),
                         onChanged: (v) {
                           setState(
                             () => _confirmMatches = v.isEmpty
