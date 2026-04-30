@@ -1842,6 +1842,16 @@ The widget's `onPathSelected` callback is the DI hook for tests —
 production code uses the real picker; tests inject a pre-set path
 via `initialPath`.
 
+### `Wrap` vs `Row` for accessible button groups
+`Row` with `Expanded` children is a common pattern for segmented button groups, but it breaks at large text sizes — labels wrap mid-word inside fixed-width buttons. `Wrap` is the accessible alternative: it lays out children horizontally and reflows to a new line when space runs out, so each button stays legible at any text scale. No `Expanded` needed — children take their natural size. The tradeoff is that buttons are no longer equal-width, but for a settings control this is acceptable and preferable to illegible labels.
+
+### `ScrollController` for dynamic scroll affordances
+A `ScrollController` attached to a `SingleChildScrollView` exposes `position.pixels` (current scroll offset), `position.maxScrollExtent` (total scrollable distance), and `position.viewportDimension` (visible width). Adding a listener via `addListener` lets a parent widget react to scroll changes — e.g. showing/hiding chevron affordances. Key patterns:
+- Add listener in `initState`, remove in `dispose`.
+- Use `WidgetsBinding.instance.addPostFrameCallback` to read scroll extents after the first frame — they are not available during `build`.
+- Use a meaningful threshold (e.g. `> 80.0`) to avoid showing affordances when content is only marginally wider than the viewport (padding rounding artifacts).
+- `animateTo()` with a `curve` and `duration` gives smooth programmatic scrolling on tap.
+
 ### `retain` — in-place filtering of a `Vec` in Rust
 `vec.retain(|item| condition)` removes all elements for which the condition
 returns false, in a single pass, without allocating a new `Vec`. Used in

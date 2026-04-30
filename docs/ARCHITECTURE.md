@@ -35,7 +35,8 @@ gabbro/
 │   │   ├── appearance_screen.dart         # Appearance — theme, text size
 │   │   └── security_screen.dart           # Security — foreground and background lock timeouts
 │   ├── widgets/                      # Reusable UI components
-│   │   └── path_field.dart           # Native file picker field (open + save modes)
+│   │   ├── path_field.dart           # Native file picker field (open + save modes)
+│   │   └── segmented_row.dart        # Shared SegmentedRow<T> and SectionHeader widgets
 │   └── src/
 │       └── rust/               # Auto-generated bridge code (do not edit)
 │           ├── api/
@@ -571,8 +572,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Auto-lock — foreground inactivity timer and background timeout, both configurable via new Security screen in app menu. Hamburger menu icon (was three dots). Verified on Samsung S23 (Android 16).
-- **Next task:** Remaining Android polish: button text wrapping in segmented rows (accessibility + security screens), swipe-left affordance. UX items from bikeshed.
+- **Completed:** Android polish — `SegmentedRow<T>` and `SectionHeader` extracted to shared `segmented_row.dart` (deduplication); `Wrap`-based layout replaces `Row` to prevent button text overflow at large text sizes. Filter chip row scroll affordance: bidirectional fade + chevron overlay with tap-to-scroll, driven by `ScrollController`. Verified on Samsung S23 (Android 16).
+- **Next task:** UX items from bikeshed — icons on entry type cards, Enter key submits forms, URL opening in About screen.
 
 ---
 
@@ -890,9 +891,7 @@ the first public tag.
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
 
-- **Button text wrapping in segmented rows:** At larger text sizes, button labels in `_SegmentedRow` wrap awkwardly (e.g. "1\nmi\nn"). Affects `AppearanceScreen` and `SecurityScreen`. Fix: constrain label text size or use `FittedBox`. Low effort, high polish.
-
-- **Icons on entry type cards:** Add a distinct icon per entry type (Login, Note, Card, Identity, File, Custom) to the list tiles and detail screens. Improves scannability. Use Material icons — no new dependency needed.
+- **Icons on entry type cards:** Add a distinct icon per entry type (Login, Note, Card, Identity, File, Custom) to the list tiles and detail screens. Improves scannability. Use Material icons — no new dependency needed. Good first candidate for next session.
 
 - **Enter key submits forms:** On desktop, pressing Enter in the last field
   of a form (e.g. Change Passphrase, Unlock) should submit it. Flutter's
