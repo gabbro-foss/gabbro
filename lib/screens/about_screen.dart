@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Hard-coded version string — updated manually when pubspec.yaml version
 /// changes. Avoids the package_info_plus dependency for a value that changes
@@ -160,9 +161,10 @@ class _SectionHeader extends StatelessWidget {
 }
 
 // ── Link tile — displays a URL as a tappable row ─────────────────────────────
-// We do not open URLs automatically (would require url_launcher dependency).
-// Instead we show the URL in a dialog so the user can copy it manually.
-// This keeps the zero-dependency principle intact.
+// Tapping shows a dialog with the URL as SelectableText (copy-friendly) and
+// an explicit "Open in browser" button. Two-step confirmation: the user sees
+// the URL before the browser opens. Uses url_launcher with externalApplication
+// mode — opens the system browser, no in-app webview.
 
 class _LinkTile extends StatelessWidget {
   final IconData icon;
@@ -175,8 +177,8 @@ class _LinkTile extends StatelessWidget {
     required this.url,
   });
 
-  void _showUrl(BuildContext context) {
-    showDialog<void>(
+  Future<void> _showUrl(BuildContext context) async {
+    await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(label),
@@ -185,6 +187,17 @@ class _LinkTile extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Close'),
+          ),
+          FilledButton.icon(
+            icon: const Icon(Icons.open_in_new, size: 16),
+            label: const Text('Open in browser'),
+            onPressed: () async {
+              final uri = Uri.parse(url);
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+              if (context.mounted) Navigator.of(context).pop();
+            },
           ),
         ],
       ),
@@ -241,6 +254,17 @@ class _ComponentTile extends StatelessWidget {
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('Close'),
+            ),
+            FilledButton.icon(
+              icon: const Icon(Icons.open_in_new, size: 16),
+              label: const Text('Open in browser'),
+              onPressed: () async {
+                final uri = Uri.parse(url);
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
+                if (context.mounted) Navigator.of(context).pop();
+              },
             ),
           ],
         ),
