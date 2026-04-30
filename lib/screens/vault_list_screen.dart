@@ -39,17 +39,48 @@ class _VaultListScreenState extends State<VaultListScreen> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
   final ItemScrollController _itemScrollController = ItemScrollController();
+  final ScrollController _chipScrollController = ScrollController();
+  bool _showLeftChevron = false;
+  bool _showRightChevron = false;
 
   @override
   void initState() {
     super.initState();
     _loadEntries();
+    _chipScrollController.addListener(_updateChevrons);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateChevrons());
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _chipScrollController.removeListener(_updateChevrons);
+    _chipScrollController.dispose();
     super.dispose();
+  }
+
+  void _updateChevrons() {
+    if (!_chipScrollController.hasClients) return;
+    final pos = _chipScrollController.position;
+    setState(() {
+      _showLeftChevron = pos.pixels > 1.0 && pos.maxScrollExtent > 80.0;
+      _showRightChevron =
+          pos.pixels < pos.maxScrollExtent - 1.0 && pos.maxScrollExtent > 80.0;
+    });
+  }
+
+  void _scrollChips(bool toRight) {
+    if (!_chipScrollController.hasClients) return;
+    final pos = _chipScrollController.position;
+    final target = (pos.pixels + (toRight ? 120.0 : -120.0)).clamp(
+      0.0,
+      pos.maxScrollExtent,
+    );
+    _chipScrollController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _loadEntries() {
@@ -212,9 +243,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
   }
 
   Future<void> _openExportScreen() async {
-    await Navigator.of(context).push<bool>(
-      MaterialPageRoute(builder: (context) => const ExportScreen()),
-    );
+    await Navigator.of(
+      context,
+    ).push<bool>(MaterialPageRoute(builder: (context) => const ExportScreen()));
   }
 
   Future<void> _openImportScreen() async {
@@ -383,10 +414,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
                   value: 'appearance',
                   child: Text('Appearance'),
                 ),
-                const PopupMenuItem(
-                  value: 'security',
-                  child: Text('Security'),
-                ),
+                const PopupMenuItem(value: 'security', child: Text('Security')),
                 const PopupMenuDivider(),
                 const PopupMenuItem(value: 'about', child: Text('About')),
               ],
@@ -440,141 +468,209 @@ class _VaultListScreenState extends State<VaultListScreen> {
             ),
       body: SafeArea(
         child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search entries…',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () => setState(() {
-                          _searchQuery = '';
-                          _searchController.clear();
-                        }),
-                      )
-                    : null,
-                border: const OutlineInputBorder(),
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(vertical: 10),
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search entries…',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () => setState(() {
+                            _searchQuery = '';
+                            _searchController.clear();
+                          }),
+                        )
+                      : null,
+                  border: const OutlineInputBorder(),
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                ),
+                onChanged: (value) => setState(() => _searchQuery = value),
               ),
-              onChanged: (value) => setState(() => _searchQuery = value),
             ),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(
-              children: filters
-                  .map(
-                    (f) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: FilterChip(
-                        label: Text(f),
-                        selected: _selectedFilter == f,
-                        onSelected: (_) => setState(() => _selectedFilter = f),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-          Expanded(
-            child: _groupedEntries.isEmpty
-                ? const Center(child: Text('No entries match your search.'))
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Index bar — fixed width column, clear of the FAB
-                      // at the bottom via padding. Left of the list so it
-                      // does not sit on top of the platform scrollbar.
-                      if (_searchQuery.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 80),
-                          child: SizedBox(
-                            width: 36,
-                            child: AlphabetIndexBar(
-                              presentLetters: _letterIndex.keys.toSet(),
-                              onLetterSelected: _scrollToLetter,
+            Stack(
+              alignment: Alignment.centerRight,
+              children: [
+                SingleChildScrollView(
+                  controller: _chipScrollController,
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  child: Row(
+                    children: filters
+                        .map(
+                          (f) => Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: FilterChip(
+                              label: Text(f),
+                              selected: _selectedFilter == f,
+                              onSelected: (_) =>
+                                  setState(() => _selectedFilter = f),
                             ),
                           ),
-                        ),
-                      // List takes all remaining width.
-                      Expanded(
-                        child: ScrollConfiguration(
-                          behavior: ScrollConfiguration.of(
-                            context,
-                          ).copyWith(scrollbars: false),
-                          child: ScrollablePositionedList.builder(
-                            itemScrollController: _itemScrollController,
+                        )
+                        .toList(),
+                  ),
+                ),
+                if (_showRightChevron)
+                  Positioned(
+                    right: 0,
+                    child: _ChipRowFadeEdge(
+                      alignment: Alignment.centerRight,
+                      onTap: () => _scrollChips(true),
+                    ),
+                  ),
+                if (_showLeftChevron)
+                  Positioned(
+                    left: 0,
+                    child: _ChipRowFadeEdge(
+                      alignment: Alignment.centerLeft,
+                      onTap: () => _scrollChips(false),
+                    ),
+                  ),
+              ],
+            ),
+            Expanded(
+              child: _groupedEntries.isEmpty
+                  ? const Center(child: Text('No entries match your search.'))
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Index bar — fixed width column, clear of the FAB
+                        // at the bottom via padding. Left of the list so it
+                        // does not sit on top of the platform scrollbar.
+                        if (_searchQuery.isEmpty)
+                          Padding(
                             padding: const EdgeInsets.only(bottom: 80),
-                            itemCount: _groupedEntries.length,
-                            itemBuilder: (context, index) {
-                              final item = _groupedEntries[index];
-                              if (item is String) {
-                                return Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                    16,
-                                    8,
-                                    16,
-                                    4,
-                                  ),
-                                  child: Text(
-                                    item,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
+                            child: SizedBox(
+                              width: 36,
+                              child: AlphabetIndexBar(
+                                presentLetters: _letterIndex.keys.toSet(),
+                                onLetterSelected: _scrollToLetter,
+                              ),
+                            ),
+                          ),
+                        // List takes all remaining width.
+                        Expanded(
+                          child: ScrollConfiguration(
+                            behavior: ScrollConfiguration.of(
+                              context,
+                            ).copyWith(scrollbars: false),
+                            child: ScrollablePositionedList.builder(
+                              itemScrollController: _itemScrollController,
+                              padding: const EdgeInsets.only(bottom: 80),
+                              itemCount: _groupedEntries.length,
+                              itemBuilder: (context, index) {
+                                final item = _groupedEntries[index];
+                                if (item is String) {
+                                  return Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                      16,
+                                      8,
+                                      16,
+                                      4,
                                     ),
-                                  ),
-                                );
-                              }
-                              final entry = item as EntrySummaryData;
-                              return ListTile(
-                                dense: true,
-                                leading: Checkbox(
-                                  visualDensity: VisualDensity.compact,
-                                  value: _selectedIds.contains(entry.id),
-                                  onChanged: (_) => setState(() {
-                                    if (_selectedIds.contains(entry.id)) {
-                                      _selectedIds.remove(entry.id);
-                                    } else {
-                                      _selectedIds.add(entry.id);
-                                    }
-                                  }),
-                                ),
-                                title: Text(_displayTitle(entry)),
-                                subtitle: Text(_displayType(entry.entryType)),
-                                onTap: () async {
-                                  if (_isSelecting) {
-                                    setState(() {
+                                    child: Text(
+                                      item,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                final entry = item as EntrySummaryData;
+                                return ListTile(
+                                  dense: true,
+                                  leading: Checkbox(
+                                    visualDensity: VisualDensity.compact,
+                                    value: _selectedIds.contains(entry.id),
+                                    onChanged: (_) => setState(() {
                                       if (_selectedIds.contains(entry.id)) {
                                         _selectedIds.remove(entry.id);
                                       } else {
                                         _selectedIds.add(entry.id);
                                       }
-                                    });
-                                    return;
-                                  }
-                                  await Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          EntryDetailScreen(entry: getEntry(id: entry.id)),
-                                    ),
-                                  );
-                                  if (mounted) _loadEntries();
-                                },
-                              );
-                            },
+                                    }),
+                                  ),
+                                  title: Text(_displayTitle(entry)),
+                                  subtitle: Text(_displayType(entry.entryType)),
+                                  onTap: () async {
+                                    if (_isSelecting) {
+                                      setState(() {
+                                        if (_selectedIds.contains(entry.id)) {
+                                          _selectedIds.remove(entry.id);
+                                        } else {
+                                          _selectedIds.add(entry.id);
+                                        }
+                                      });
+                                      return;
+                                    }
+                                    await Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => EntryDetailScreen(
+                                          entry: getEntry(id: entry.id),
+                                        ),
+                                      ),
+                                    );
+                                    if (mounted) _loadEntries();
+                                  },
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ChipRowFadeEdge extends StatelessWidget {
+  final Alignment alignment;
+  final VoidCallback onTap;
+  const _ChipRowFadeEdge({required this.alignment, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final isRight = alignment == Alignment.centerRight;
+    final color = Theme.of(context).scaffoldBackgroundColor;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: isRight ? Alignment.centerLeft : Alignment.centerRight,
+            end: isRight ? Alignment.centerRight : Alignment.centerLeft,
+            colors: [color.withValues(alpha: 0), color],
           ),
-        ],
+        ),
+        child: Center(
+          child: Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isRight ? Icons.chevron_right : Icons.chevron_left,
+              color: Theme.of(context).colorScheme.onPrimary,
+              size: 20,
+            ),
+          ),
         ),
       ),
     );

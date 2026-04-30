@@ -36,11 +36,14 @@ class GabbroApp extends StatefulWidget {
   final bool vaultExists;
   final AppSettings settings;
 
+  final Widget? initialScreen;
+
   const GabbroApp({
     super.key,
     required this.vaultPath,
     required this.vaultExists,
     required this.settings,
+    this.initialScreen,
   });
 
   @override
@@ -223,9 +226,10 @@ class _GabbroAppState extends State<GabbroApp> with WidgetsBindingObserver {
           themeMode: _themeMode,
           theme: _lightTheme(highContrast: hc),
           darkTheme: _darkTheme(highContrast: hc),
-          home: widget.vaultExists
-              ? UnlockScreen(vaultPath: widget.vaultPath)
-              : const OnboardingScreen(),
+          home: widget.initialScreen ??
+              (widget.vaultExists
+                  ? UnlockScreen(vaultPath: widget.vaultPath)
+                  : const OnboardingScreen()),
         ),
       ),
     );

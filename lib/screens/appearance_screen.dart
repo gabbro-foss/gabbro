@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
+import 'package:gabbro/widgets/segmented_row.dart';
 
 class AppearanceScreen extends StatefulWidget {
   const AppearanceScreen({super.key});
@@ -38,9 +39,9 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ── Theme ──────────────────────────────────────────────────
-              _SectionHeader(label: 'Theme'),
+              SectionHeader(label: 'Theme'),
               const SizedBox(height: 8),
-              _SegmentedRow<ThemeChoice>(
+              SegmentedRow<ThemeChoice>(
                 values: ThemeChoice.values,
                 selected: _settings.theme,
                 label: (v) => switch (v) {
@@ -53,9 +54,9 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               const SizedBox(height: 32),
 
               // ── Text size ──────────────────────────────────────────────
-              _SectionHeader(label: 'Text size'),
+              SectionHeader(label: 'Text size'),
               const SizedBox(height: 8),
-              _SegmentedRow<TextSizeChoice>(
+              SegmentedRow<TextSizeChoice>(
                 values: TextSizeChoice.values,
                 selected: _settings.textSize,
                 label: (v) => switch (v) {
@@ -82,7 +83,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               const SizedBox(height: 32),
 
               // ── High contrast ──────────────────────────────────────────
-              _SectionHeader(label: 'Accessibility'),
+              SectionHeader(label: 'Accessibility'),
               const SizedBox(height: 8),
               ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -100,67 +101,6 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-// ── Section header ────────────────────────────────────────────────────────────
-
-class _SectionHeader extends StatelessWidget {
-  final String label;
-  const _SectionHeader({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-        color: Theme.of(context).colorScheme.primary,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
-}
-
-// ── Generic segmented row ─────────────────────────────────────────────────────
-
-class _SegmentedRow<T> extends StatelessWidget {
-  final List<T> values;
-  final T selected;
-  final String Function(T) label;
-  final void Function(T) onSelected;
-
-  const _SegmentedRow({
-    required this.values,
-    required this.selected,
-    required this.label,
-    required this.onSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Row(
-      children: values.map((v) {
-        final isSelected = v == selected;
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: FilledButton.tonal(
-              style: FilledButton.styleFrom(
-                backgroundColor: isSelected
-                    ? colorScheme.primary
-                    : colorScheme.surfaceContainerHighest,
-                foregroundColor: isSelected
-                    ? colorScheme.onPrimary
-                    : colorScheme.onSurface,
-              ),
-              onPressed: () => onSelected(v),
-              child: Text(label(v)),
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 }

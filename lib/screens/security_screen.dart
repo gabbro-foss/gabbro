@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gabbro/settings.dart';
+import 'package:gabbro/widgets/segmented_row.dart';
 
 class SecurityScreen extends StatefulWidget {
   final AppSettings settings;
@@ -41,14 +42,14 @@ class _SecurityScreenState extends State<SecurityScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ── Foreground lock ────────────────────────────────────────
-              _SectionHeader(label: 'Foreground lock'),
+              SectionHeader(label: 'Foreground lock'),
               const SizedBox(height: 4),
               const Text(
                 'Lock after this much inactivity while the app is open.',
                 style: TextStyle(fontSize: 12),
               ),
               const SizedBox(height: 8),
-              _SegmentedRow<ForegroundLockTimeout>(
+              SegmentedRow<ForegroundLockTimeout>(
                 values: ForegroundLockTimeout.values,
                 selected: _settings.foregroundLockTimeout,
                 label: (v) => switch (v) {
@@ -63,14 +64,14 @@ class _SecurityScreenState extends State<SecurityScreen> {
               const SizedBox(height: 32),
 
               // ── Background lock ────────────────────────────────────────
-              _SectionHeader(label: 'Background lock'),
+              SectionHeader(label: 'Background lock'),
               const SizedBox(height: 4),
               const Text(
                 'Lock after the app has been in the background for this long.',
                 style: TextStyle(fontSize: 12),
               ),
               const SizedBox(height: 8),
-              _SegmentedRow<BackgroundLockTimeout>(
+              SegmentedRow<BackgroundLockTimeout>(
                 values: BackgroundLockTimeout.values,
                 selected: _settings.backgroundLockTimeout,
                 label: (v) => switch (v) {
@@ -86,67 +87,6 @@ class _SecurityScreenState extends State<SecurityScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-// ── Section header ────────────────────────────────────────────────────────────
-
-class _SectionHeader extends StatelessWidget {
-  final String label;
-  const _SectionHeader({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-        color: Theme.of(context).colorScheme.primary,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
-}
-
-// ── Generic segmented row ─────────────────────────────────────────────────────
-
-class _SegmentedRow<T> extends StatelessWidget {
-  final List<T> values;
-  final T selected;
-  final String Function(T) label;
-  final void Function(T) onSelected;
-
-  const _SegmentedRow({
-    required this.values,
-    required this.selected,
-    required this.label,
-    required this.onSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Row(
-      children: values.map((v) {
-        final isSelected = v == selected;
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: FilledButton.tonal(
-              style: FilledButton.styleFrom(
-                backgroundColor: isSelected
-                    ? colorScheme.primary
-                    : colorScheme.surfaceContainerHighest,
-                foregroundColor: isSelected
-                    ? colorScheme.onPrimary
-                    : colorScheme.onSurface,
-              ),
-              onPressed: () => onSelected(v),
-              child: Text(label(v)),
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 }
