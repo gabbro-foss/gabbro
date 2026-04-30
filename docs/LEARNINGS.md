@@ -4,6 +4,43 @@ A running journal of concepts covered during development.
 
 ---
 
+## Flutter — App Lifecycle & Auto-lock
+
+### WidgetsBindingObserver
+A mixin that lets a `State` class listen to app lifecycle events.
+Register with `WidgetsBinding.instance.addObserver(this)` in `initState`,
+deregister in `dispose`. Override `didChangeAppLifecycleState` to react
+to state changes.
+
+### AppLifecycleState
+Key states for auto-lock:
+- `paused` — app fully backgrounded or screen off. Start the background timer here.
+- `resumed` — app returned to foreground. Cancel the background timer, restart the foreground timer.
+- `detached` — app process being torn down. Lock immediately, no timer needed.
+- `inactive` — brief focus loss (notification shade, etc.). Ignored for locking — too aggressive.
+
+### GlobalKey<NavigatorState>
+When navigation must happen from outside the widget tree (e.g. a timer
+callback in `_GabbroAppState`), pass a `GlobalKey<NavigatorState>` to
+`MaterialApp` via `navigatorKey`. Then call
+`_navigatorKey.currentState?.pushAndRemoveUntil(...)` to navigate and
+clear the stack. The `pushAndRemoveUntil` with `(_) => false` predicate
+removes all routes — correct for a lock event where returning to the
+previous screen would bypass security.
+
+### Foreground inactivity detection
+Wrap the entire `MaterialApp` in a `GestureDetector` with
+`HitTestBehavior.translucent` so it receives events without blocking
+child widgets. Reset the foreground timer on `onTap` and `onPanDown`.
+This catches taps and scrolls without needing to instrument individual
+screens.
+
+### Timer in Dart
+`dart:async` `Timer` fires a callback once after a duration.
+Cancel with `timer.cancel()` before it fires to abort.
+Python analogy: `threading.Timer` — same concept, same cancel pattern.
+Always cancel in `dispose` to avoid callbacks firing on a dead widget.
+
 ## Cryptography
 
 ### PQC — Post-Quantum Cryptography

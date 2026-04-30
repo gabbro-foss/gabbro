@@ -32,7 +32,8 @@ gabbro/
 │   │   ├── csv_mapping_screen.dart   # CSV column-mapping UI
 │   │   ├── change_passphrase_screen.dart  # Change master passphrase
 │   │   ├── about_screen.dart              # About screen — version, links, licences
-│   │   └── appearance_screen.dart         # Appearance — theme, text size
+│   │   ├── appearance_screen.dart         # Appearance — theme, text size
+│   │   └── security_screen.dart           # Security — foreground and background lock timeouts
 │   ├── widgets/                      # Reusable UI components
 │   │   └── path_field.dart           # Native file picker field (open + save modes)
 │   └── src/
@@ -279,6 +280,29 @@ Each entry is an instance of a typed class:
   when active.
 - **`UnlockScreen` autofocus:** `autofocus: true` added to the passphrase
   `TextField` so the keyboard/cursor is ready immediately on launch.
+
+## Auto-lock
+
+- **Foreground inactivity timer:** resets on any user interaction via a
+  `GestureDetector` wrapping the entire `MaterialApp`. Fires after the
+  configured duration and calls `_lock()`. Managed in `_GabbroAppState`.
+- **Background timer:** starts when `AppLifecycleState.paused` is received,
+  cancelled if the app resumes before it fires. Lock fires immediately on
+  `AppLifecycleState.detached` (app killed).
+- **Lock action:** calls `lockVault()` (Rust bridge), then
+  `pushAndRemoveUntil` to `UnlockScreen`, clearing the navigation stack.
+- **Never option:** setting either timeout to `never` cancels the
+  corresponding timer entirely — no lock fires.
+- **Settings:** both timeouts are fields on `AppSettings`, persisted to
+  `settings.jsonc`. Configurable via Settings → Security in the app menu.
+  - `ForegroundLockTimeout`: `thirtySeconds` (default) / `oneMinute` / `fiveMinutes` / `never`
+  - `BackgroundLockTimeout`: `fiveMinutes` (default) / `oneMinute` / `fifteenMinutes` / `never`
+- **Navigation:** `_GabbroAppState` holds a `GlobalKey<NavigatorState>`
+  passed to `MaterialApp` so the lock action can navigate from outside
+  the widget tree.
+- **Verified on hardware:** Samsung S23 (Android 16) — foreground inactivity,
+  background timeout, app kill, resume within timeout, settings persistence,
+  interaction reset, and Never option all confirmed.
 
 ## Vault Domain Model
 - **Status:** all 6 entry types implemented in Rust
@@ -547,8 +571,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Android build polish pass on Samsung S23 (Android 16). Fixed `MediaQueryData` stripping system insets (root cause of all status bar/FAB overlap bugs), `PathField` save mode silent failure on Android, detail view showing wrong entry, delete wiping all entries (nil UUID in anonymised test data), list content extending behind bottom nav bar.
-- **Next task:** CHANGELOG.md deferred until post-stable release. Remaining Android polish: button text wrapping in accessibility screen, swipe-left affordance, auto-lock on background/sleep. UX items from bikeshed.
+- **Completed:** Auto-lock — foreground inactivity timer and background timeout, both configurable via new Security screen in app menu. Hamburger menu icon (was three dots). Verified on Samsung S23 (Android 16).
+- **Next task:** Remaining Android polish: button text wrapping in segmented rows (accessibility + security screens), swipe-left affordance. UX items from bikeshed.
 
 ---
 
@@ -866,7 +890,7 @@ the first public tag.
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
 
-- **Auto-lock on background/sleep (Android):** Gabbro does not currently lock when the app is backgrounded or the phone screen turns off on Android. Confirmed on Samsung S23 (Android 16). Requires `AppLifecycleListener` or `WidgetsBindingObserver` in `main.dart` to detect `AppLifecycleState.paused` / `inactive` and call `lockVault()`. Pairs with the existing auto-lock timer.
+- **Button text wrapping in segmented rows:** At larger text sizes, button labels in `_SegmentedRow` wrap awkwardly (e.g. "1\nmi\nn"). Affects `AppearanceScreen` and `SecurityScreen`. Fix: constrain label text size or use `FittedBox`. Low effort, high polish.
 
 - **Icons on entry type cards:** Add a distinct icon per entry type (Login, Note, Card, Identity, File, Custom) to the list tiles and detail screens. Improves scannability. Use Material icons — no new dependency needed.
 
