@@ -12,11 +12,15 @@ class AppSettings {
   final ThemeChoice theme;
   final TextSizeChoice textSize;
   final bool highContrast; // placeholder — not yet implemented
+  final ForegroundLockTimeout foregroundLockTimeout;
+  final BackgroundLockTimeout backgroundLockTimeout;
 
   const AppSettings({
     this.theme = ThemeChoice.system,
     this.textSize = TextSizeChoice.regular,
     this.highContrast = false,
+    this.foregroundLockTimeout = ForegroundLockTimeout.thirtySeconds,
+    this.backgroundLockTimeout = BackgroundLockTimeout.fiveMinutes,
   });
 
   static AppSettings get defaults => const AppSettings();
@@ -27,6 +31,8 @@ class AppSettings {
     'theme': theme.name,
     'text_size': textSize.name,
     'high_contrast': highContrast,
+    'foreground_lock_timeout': foregroundLockTimeout.name,
+    'background_lock_timeout': backgroundLockTimeout.name,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -36,6 +42,12 @@ class AppSettings {
         (json['text_size'] as String? ?? 'regular'),
       ),
       highContrast: json['high_contrast'] as bool? ?? false,
+      foregroundLockTimeout: ForegroundLockTimeout.values.byName(
+        json['foreground_lock_timeout'] as String? ?? 'thirtySeconds',
+      ),
+      backgroundLockTimeout: BackgroundLockTimeout.values.byName(
+        json['background_lock_timeout'] as String? ?? 'fiveMinutes',
+      ),
     );
   }
 
@@ -43,10 +55,14 @@ class AppSettings {
     ThemeChoice? theme,
     TextSizeChoice? textSize,
     bool? highContrast,
+    ForegroundLockTimeout? foregroundLockTimeout,
+    BackgroundLockTimeout? backgroundLockTimeout,
   }) => AppSettings(
     theme: theme ?? this.theme,
     textSize: textSize ?? this.textSize,
     highContrast: highContrast ?? this.highContrast,
+    foregroundLockTimeout: foregroundLockTimeout ?? this.foregroundLockTimeout,
+    backgroundLockTimeout: backgroundLockTimeout ?? this.backgroundLockTimeout,
   );
 
   // ── File I/O ───────────────────────────────────────────────────────────
@@ -105,7 +121,15 @@ class AppSettings {
 
   // High-contrast mode (not yet implemented — reserved for future use).
   // Options: true | false
-  "high_contrast": $highContrast
+  "high_contrast": $highContrast,
+
+  // How long before the vault locks due to foreground inactivity.
+  // Options: "thirtySeconds" | "oneMinute" | "fiveMinutes" | "never"
+  "foreground_lock_timeout": "${foregroundLockTimeout.name}",
+
+  // How long the app can stay backgrounded before the vault locks.
+  // Options: "oneMinute" | "fiveMinutes" | "fifteenMinutes" | "never"
+  "background_lock_timeout": "${backgroundLockTimeout.name}"
 }
 ''';
 
@@ -130,3 +154,7 @@ class AppSettings {
 enum ThemeChoice { system, light, dark }
 
 enum TextSizeChoice { small, regular, large, extra_large }
+
+enum ForegroundLockTimeout { thirtySeconds, oneMinute, fiveMinutes, never }
+
+enum BackgroundLockTimeout { oneMinute, fiveMinutes, fifteenMinutes, never }

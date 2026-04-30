@@ -145,4 +145,70 @@ void main() {
     expect(d.textSize, TextSizeChoice.regular);
     expect(d.highContrast, isFalse);
   });
+
+  // ── ForegroundLockTimeout ─────────────────────────────────────────────────
+
+  group('ForegroundLockTimeout', () {
+    test('all values round-trip through fromJson', () {
+      for (final choice in ForegroundLockTimeout.values) {
+        final s = AppSettings.fromJson({'foreground_lock_timeout': choice.name});
+        expect(s.foregroundLockTimeout, choice);
+      }
+    });
+
+    test('defaults to thirtySeconds', () {
+      final s = AppSettings.fromJson({});
+      expect(s.foregroundLockTimeout, ForegroundLockTimeout.thirtySeconds);
+    });
+
+    test('copyWith overrides foregroundLockTimeout only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(
+        foregroundLockTimeout: ForegroundLockTimeout.never,
+      );
+      expect(updated.foregroundLockTimeout, ForegroundLockTimeout.never);
+      expect(updated.theme, original.theme);
+      expect(updated.backgroundLockTimeout, original.backgroundLockTimeout);
+    });
+
+    test('serialises to toJson', () {
+      const s = AppSettings(
+        foregroundLockTimeout: ForegroundLockTimeout.oneMinute,
+      );
+      expect(s.toJson()['foreground_lock_timeout'], 'oneMinute');
+    });
+  });
+
+  // ── BackgroundLockTimeout ─────────────────────────────────────────────────
+
+  group('BackgroundLockTimeout', () {
+    test('all values round-trip through fromJson', () {
+      for (final choice in BackgroundLockTimeout.values) {
+        final s = AppSettings.fromJson({'background_lock_timeout': choice.name});
+        expect(s.backgroundLockTimeout, choice);
+      }
+    });
+
+    test('defaults to fiveMinutes', () {
+      final s = AppSettings.fromJson({});
+      expect(s.backgroundLockTimeout, BackgroundLockTimeout.fiveMinutes);
+    });
+
+    test('copyWith overrides backgroundLockTimeout only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(
+        backgroundLockTimeout: BackgroundLockTimeout.never,
+      );
+      expect(updated.backgroundLockTimeout, BackgroundLockTimeout.never);
+      expect(updated.theme, original.theme);
+      expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
+    });
+
+    test('serialises to toJson', () {
+      const s = AppSettings(
+        backgroundLockTimeout: BackgroundLockTimeout.fifteenMinutes,
+      );
+      expect(s.toJson()['background_lock_timeout'], 'fifteenMinutes');
+    });
+  });
 }

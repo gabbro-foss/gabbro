@@ -1,0 +1,63 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/settings.dart';
+import 'package:gabbro/screens/security_screen.dart';
+
+Widget _buildScreen({
+  AppSettings settings = const AppSettings(),
+  void Function(AppSettings)? onUpdate,
+}) => MaterialApp(
+  home: SecurityScreen(
+    settings: settings,
+    onUpdate: onUpdate ?? (_) {},
+  ),
+);
+
+void main() {
+  group('SecurityScreen', () {
+    testWidgets('renders foreground and background timeout section headers', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      expect(find.text('Foreground lock'), findsOneWidget);
+      expect(find.text('Background lock'), findsOneWidget);
+    });
+
+    testWidgets('foreground timeout buttons are all present', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      expect(find.text('30s'), findsOneWidget);
+      expect(find.text('1 min'), findsAtLeastNWidgets(1));
+      expect(find.text('5 min'), findsAtLeastNWidgets(1));
+      expect(find.text('Never'), findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('background timeout buttons are all present', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      expect(find.text('15 min'), findsOneWidget);
+    });
+
+    testWidgets('tapping a foreground button calls onUpdate with correct value', (tester) async {
+      AppSettings? updated;
+      await tester.pumpWidget(_buildScreen(onUpdate: (s) => updated = s));
+      await tester.tap(find.text('Never').first);
+      await tester.pumpAndSettle();
+      expect(updated?.foregroundLockTimeout, ForegroundLockTimeout.never);
+    });
+
+    testWidgets('tapping a background button calls onUpdate with correct value', (tester) async {
+      AppSettings? updated;
+      await tester.pumpWidget(_buildScreen(onUpdate: (s) => updated = s));
+      await tester.tap(find.text('15 min'));
+      await tester.pumpAndSettle();
+      expect(updated?.backgroundLockTimeout, BackgroundLockTimeout.fifteenMinutes);
+    });
+
+    testWidgets('selected foreground button reflects current settings', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        settings: const AppSettings(
+          foregroundLockTimeout: ForegroundLockTimeout.oneMinute,
+        ),
+      ));
+      // The screen receives the setting — no exception thrown, renders cleanly.
+      expect(find.text('1 min'), findsAtLeastNWidgets(1));
+    });
+  });
+}

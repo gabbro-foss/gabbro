@@ -7,6 +7,8 @@ import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/screens/export_screen.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
+import 'package:gabbro/screens/security_screen.dart';
+import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -279,6 +281,16 @@ class _VaultListScreenState extends State<VaultListScreen> {
         Navigator.of(context).push(
           MaterialPageRoute(builder: (context) => const AppearanceScreen()),
         );
+      case 'security':
+        final appState = GabbroApp.of(context);
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => SecurityScreen(
+              settings: appState.settings,
+              onUpdate: (updated) => appState.updateSettings(updated),
+            ),
+          ),
+        );
       case 'about':
         Navigator.of(
           context,
@@ -333,7 +345,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
               onPressed: _lockAndExit,
             ),
             PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert),
+              icon: const Icon(Icons.menu),
               tooltip: 'Menu',
               onSelected: _onMenuSelected,
               itemBuilder: (context) => [
@@ -370,6 +382,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 const PopupMenuItem(
                   value: 'appearance',
                   child: Text('Appearance'),
+                ),
+                const PopupMenuItem(
+                  value: 'security',
+                  child: Text('Security'),
                 ),
                 const PopupMenuDivider(),
                 const PopupMenuItem(value: 'about', child: Text('About')),

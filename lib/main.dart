@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/frb_generated.dart';
 import 'package:path_provider/path_provider.dart';
@@ -54,19 +56,95 @@ class GabbroApp extends StatefulWidget {
   }
 }
 
-class _GabbroAppState extends State<GabbroApp> {
+class _GabbroAppState extends State<GabbroApp> with WidgetsBindingObserver {
   late AppSettings _settings;
   AppSettings get settings => _settings;
+
+  final _navigatorKey = GlobalKey<NavigatorState>();
+
+  Timer? _backgroundTimer;
+  Timer? _foregroundTimer;
 
   @override
   void initState() {
     super.initState();
     _settings = widget.settings;
+    WidgetsBinding.instance.addObserver(this);
+    _resetForegroundTimer();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _backgroundTimer?.cancel();
+    _foregroundTimer?.cancel();
+    super.dispose();
+  }
+
+  // ── Foreground inactivity timer ───────────────────────────────────────────
+
+  Duration? get _foregroundDuration => switch (_settings.foregroundLockTimeout) {
+    ForegroundLockTimeout.thirtySeconds => const Duration(seconds: 30),
+    ForegroundLockTimeout.oneMinute    => const Duration(minutes: 1),
+    ForegroundLockTimeout.fiveMinutes  => const Duration(minutes: 5),
+    ForegroundLockTimeout.never        => null,
+  };
+
+  void _resetForegroundTimer() {
+    _foregroundTimer?.cancel();
+    final duration = _foregroundDuration;
+    if (duration == null) return;
+    _foregroundTimer = Timer(duration, _lock);
+  }
+
+  // ── Background timer ──────────────────────────────────────────────────────
+
+  Duration? get _backgroundDuration => switch (_settings.backgroundLockTimeout) {
+    BackgroundLockTimeout.oneMinute      => const Duration(minutes: 1),
+    BackgroundLockTimeout.fiveMinutes    => const Duration(minutes: 5),
+    BackgroundLockTimeout.fifteenMinutes => const Duration(minutes: 15),
+    BackgroundLockTimeout.never          => null,
+  };
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.paused:
+        _foregroundTimer?.cancel();
+        final duration = _backgroundDuration;
+        if (duration != null) {
+          _backgroundTimer = Timer(duration, _lock);
+        }
+      case AppLifecycleState.detached:
+        _lock();
+      case AppLifecycleState.resumed:
+        _backgroundTimer?.cancel();
+        _resetForegroundTimer();
+      default:
+        break;
+    }
+  }
+
+  // ── Lock ──────────────────────────────────────────────────────────────────
+
+  void _lock() {
+    _backgroundTimer?.cancel();
+    _foregroundTimer?.cancel();
+    try {
+      lockVault();
+    } catch (_) {}
+    _navigatorKey.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => UnlockScreen(vaultPath: widget.vaultPath),
+      ),
+      (_) => false,
+    );
   }
 
   Future<void> updateSettings(AppSettings updated) async {
     await updated.save();
     setState(() => _settings = updated);
+    _resetForegroundTimer();
   }
 
   ThemeMode get _themeMode => switch (_settings.theme) {
@@ -134,15 +212,21 @@ class _GabbroAppState extends State<GabbroApp> {
     final hc = _settings.highContrast;
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(_textScale)),
-      child: MaterialApp(
-        title: 'Gabbro',
-        debugShowCheckedModeBanner: false,
-        themeMode: _themeMode,
-        theme: _lightTheme(highContrast: hc),
-        darkTheme: _darkTheme(highContrast: hc),
-        home: widget.vaultExists
-            ? UnlockScreen(vaultPath: widget.vaultPath)
-            : const OnboardingScreen(),
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: _resetForegroundTimer,
+        onPanDown: (_) => _resetForegroundTimer(),
+        child: MaterialApp(
+          navigatorKey: _navigatorKey,
+          title: 'Gabbro',
+          debugShowCheckedModeBanner: false,
+          themeMode: _themeMode,
+          theme: _lightTheme(highContrast: hc),
+          darkTheme: _darkTheme(highContrast: hc),
+          home: widget.vaultExists
+              ? UnlockScreen(vaultPath: widget.vaultPath)
+              : const OnboardingScreen(),
+        ),
       ),
     );
   }
