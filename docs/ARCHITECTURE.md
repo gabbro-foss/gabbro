@@ -572,8 +572,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Android polish — `SegmentedRow<T>` and `SectionHeader` extracted to shared `segmented_row.dart` (deduplication); `Wrap`-based layout replaces `Row` to prevent button text overflow at large text sizes. Filter chip row scroll affordance: bidirectional fade + chevron overlay with tap-to-scroll, driven by `ScrollController`. Verified on Samsung S23 (Android 16).
-- **Next task:** UX items from bikeshed — icons on entry type cards, Enter key submits forms, URL opening in About screen.
+- **Completed:** UX polish — entry type icons on list tiles and type-picker bottom sheet (icon+checkbox on wide screens, icon/checkbox swap on narrow); Enter key submits all forms (`ChangePassphraseScreen`, `OnboardingScreen`); URL opening in About screen via `url_launcher` (two-step: dialog shows URL first, explicit "Open in browser" button launches system browser).
+- **Next task:** Bikeshed bugs — identity email optional, file entry use file picker. Then: copy to clipboard auto-clear (60s), vault deletion from UI.
 
 ---
 
@@ -640,12 +640,15 @@ the first public tag.
 - **Audit direct Flutter dependencies before v1:** Current direct deps in
   `pubspec.yaml`: `flutter`, `flutter_rust_bridge`, `rust_lib_gabbro`,
   `freezed_annotation`, `path_provider`, `scrollable_positioned_list`,
-  `file_picker`. All are load-bearing and cannot be removed without
-  architectural change. `scrollable_positioned_list` was chosen deliberately
-  for the alphabet index bar (lazy-list scroll-to-index problem — no Flutter
-  std solution). Before adding any new dependency, apply the same standard:
-  can this be solved with what we already have? Dev deps (`flutter_lints`,
-  `freezed`, `build_runner`) have no attack surface and are fine.
+  `file_picker`, `url_launcher`. All are load-bearing and cannot be removed
+  without architectural change. `scrollable_positioned_list` was chosen
+  deliberately for the alphabet index bar (lazy-list scroll-to-index problem —
+  no Flutter std solution). `url_launcher` added for About screen links —
+  opens system browser via `LaunchMode.externalApplication`, no in-app webview,
+  no outbound connections from Gabbro itself. Before adding any new dependency,
+  apply the same standard: can this be solved with what we already have? Dev
+  deps (`flutter_lints`, `freezed`, `build_runner`) have no attack surface and
+  are fine.
 
 ### Testing
 
