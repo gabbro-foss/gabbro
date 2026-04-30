@@ -891,13 +891,13 @@ the first public tag.
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
 
-- **Icons on entry type cards:** Add a distinct icon per entry type (Login, Note, Card, Identity, File, Custom) to the list tiles and detail screens. Improves scannability. Use Material icons — no new dependency needed. Good first candidate for next session.
+- **Icons on entry type cards:** ✅ Done. Distinct icon per entry type in list tiles and type-picker bottom sheet. Icon+checkbox side by side on wide screens (≥600dp), icon-only at rest / checkbox-only when selecting on narrow screens. `semanticLabel` set on all icons for screen reader accessibility.
 
-- **Enter key submits forms:** On desktop, pressing Enter in the last field
-  of a form (e.g. Change Passphrase, Unlock) should submit it. Flutter's
-  `TextFormField` does not do this automatically — requires `onFieldSubmitted`
-  or a `RawKeyboardListener` wired to the submit action. Low effort, high
-  polish. Apply consistently across all form screens.
+- **Enter key submits forms:** ✅ Done. All form screens now submit on Enter from the last field: `UnlockScreen` (`onSubmitted`), `CreateEntryScreen` (all entry types chain fields, last calls `_save()`), `ChangePassphraseScreen` (confirm field calls `_changePassphrase()`), `OnboardingScreen` (confirm field calls `_createVault()`).
+
+- **Identity entry — email optional:** `create_entry_screen.dart` `_identityFields()` — email `validator` currently rejects empty input; email should be optional like phone and address. One-line fix: remove the validator or change it to allow empty.
+
+- **File entry — use file picker:** `_fileFields()` currently uses a manual text path + Load button. Should use `file_picker` (already a direct dependency) via `FilePicker.pickFiles()`, populating `_pickedFilename` and `_pickedFileBytes` directly. Same pattern used internally by `PathField`. Drop the `_filePathController` and `_loadFileFromPath()` in the process.
 
 - **Custom filter chips:** Allow users to add new filter chips based on
   folders or custom tags, beyond the fixed entry-type chips. YAGNI risk is
