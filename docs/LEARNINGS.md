@@ -4,6 +4,58 @@ A running journal of concepts covered during development.
 
 ---
 
+## Flutter — `ScrollMetricsNotification` for geometry-driven UI
+
+A `ScrollController` listener only fires when the user scrolls. It does
+not fire when the scroll geometry changes due to a layout event such as
+an orientation change. This means chevron/affordance visibility logic
+driven only by a controller listener will not update on rotation.
+
+`ScrollMetricsNotification` fires whenever the scroll metrics change —
+including on viewport resize. Wrap the scrollable in a
+`NotificationListener<ScrollMetricsNotification>` and call the update
+function from `onNotification`. Return `false` to let the notification
+bubble up.
+
+```dart
+NotificationListener<ScrollMetricsNotification>(
+  onNotification: (notification) {
+    _updateChevrons();
+    return false;
+  },
+  child: SingleChildScrollView(...),
+)
+```
+
+Python analogy: like attaching a callback to a `resize` event on a
+widget rather than only listening to scroll events — the geometry changed
+even though nothing was scrolled.
+
+---
+
+## Flutter — `library_private_types_in_public_api` lint
+
+Dart's `library_private_types_in_public_api` lint fires when a public
+method returns or exposes a private type (one starting with `_`). The fix
+is to introduce a public abstract class that exposes only the API surface
+descendants need, and have the private state class implement it.
+
+```dart
+abstract class GabbroAppState {
+  AppSettings get settings;
+  Future<void> updateSettings(AppSettings updated);
+}
+
+class _GabbroAppState extends State<GabbroApp>
+    implements GabbroAppState { ... }
+```
+
+The static `of()`/`maybeOf()` methods then return `GabbroAppState`
+instead of `_GabbroAppState` — no private type crosses the public
+boundary.
+
+---
+
 ## Android — `<queries>` and package visibility (Android 11+)
 
 Android 11 introduced package visibility restrictions. Apps must declare

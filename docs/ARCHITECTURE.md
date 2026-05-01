@@ -585,15 +585,16 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Portrait mode selection — `_selectionMode` bool added to
-  `VaultListScreen`; narrow screens (< 600 dp) show a checklist icon in
-  the app bar to enter selection mode explicitly; long-press on any tile
-  enters selection mode and selects that tile. 90 Flutter tests passing.
-  Identity email field confirmed optional — first and last name are the
-  only mandatory fields on identity entries.
-- **Next task:** Landscape chevron — hide scroll affordance when all filter
-  chips fit without scrolling. Then: detail view timestamps — show
-  `created_at` and `updated_at` on the entry detail screen.
+- **Completed:** Landscape chevron — `ScrollMetricsNotification` wrapping
+  the filter chip `SingleChildScrollView` triggers `_updateChevrons()`
+  on orientation change; threshold corrected from `> 80.0` to `> 0`;
+  `didChangeDependencies` hook added for belt-and-suspenders re-check.
+  Also: full IDE lint cleanup across `lib/` and `test/` —
+  `GabbroAppState` public interface introduced, `extraLarge` rename,
+  `withValues()` migration, curly braces, unnecessary underscores.
+  90 Flutter tests passing.
+- **Next task:** Detail view timestamps — show `created_at` and
+  `updated_at` on the entry detail screen.
 
 ---
 
@@ -935,11 +936,6 @@ the first public tag.
   app-private storage without SAF, `MANAGE_EXTERNAL_STORAGE` would be
   required — a heavily restricted permission that draws Play Store
   scrutiny.
-
-- **Landscape mode — hide chevron when chips fit:** When all filter chips
-  are visible without scrolling (landscape or wide screen), the chevron
-  scroll affordance should be hidden. Currently it shows regardless.
-  Already tracked partially under the chevron logic in `_updateChevrons()`.
 
 - **About screen — "Open in browser" button does nothing:** The two-step
   URL dialog shows the URL correctly but the "Open in browser" button does
