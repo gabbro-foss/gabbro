@@ -587,7 +587,11 @@ SPDX identifier: `GPL-3.0-only`
   `VaultListScreen`; narrow screens (< 600 dp) show a checklist icon in
   the app bar to enter selection mode explicitly; long-press on any tile
   enters selection mode and selects that tile. 90 Flutter tests passing.
-- **Next task:** TBD — pick from Bikeshed.
+  Identity email field confirmed optional — first and last name are the
+  only mandatory fields on identity entries.
+- **Next task:** Landscape chevron — hide scroll affordance when all filter
+  chips fit without scrolling. Then: detail view timestamps — show
+  `created_at` and `updated_at` on the entry detail screen.
 
 ---
 
@@ -670,10 +674,6 @@ the first public tag.
   tests cover domain logic. The bridge boundary is not yet tested end-to-end.
   Add a `tests/` folder with integration tests that run the full app against
   a real Rust binary before v1. See LEARNINGS.md testing pyramid for context.
-
-- **Android long press — selection mode:** On Android, long pressing a list
-  tile should enter selection mode as an alternative to tapping the checkbox.
-  Not implemented yet; defer to Android polish pass.
 
 
 ### Security
