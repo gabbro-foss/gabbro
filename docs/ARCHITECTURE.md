@@ -572,8 +572,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** UX polish — entry type icons on list tiles and type-picker bottom sheet (icon+checkbox on wide screens, icon/checkbox swap on narrow); Enter key submits all forms (`ChangePassphraseScreen`, `OnboardingScreen`); URL opening in About screen via `url_launcher` (two-step: dialog shows URL first, explicit "Open in browser" button launches system browser).
-- **Next task:** Bikeshed bugs — identity email optional, file entry use file picker. Then: copy to clipboard auto-clear (60s), vault deletion from UI.
+- **Completed:** Bikeshed bugs — identity email now optional; file entry uses `file_picker` (drops manual path + Load button); clipboard auto-clear with configurable timeout (30s/60s/2min/never) in Settings → Security, timer wired in `EntryDetailScreen`, snackbar warns about clipboard managers. 77 Flutter tests passing.
+- **Next task:** Vault deletion from UI — call existing `delete_whole_vault`, lock session, route to onboarding.
 
 ---
 
@@ -898,10 +898,6 @@ the first public tag.
 
 - **Enter key submits forms:** ✅ Done. All form screens now submit on Enter from the last field: `UnlockScreen` (`onSubmitted`), `CreateEntryScreen` (all entry types chain fields, last calls `_save()`), `ChangePassphraseScreen` (confirm field calls `_changePassphrase()`), `OnboardingScreen` (confirm field calls `_createVault()`).
 
-- **Identity entry — email optional:** `create_entry_screen.dart` `_identityFields()` — email `validator` currently rejects empty input; email should be optional like phone and address. One-line fix: remove the validator or change it to allow empty.
-
-- **File entry — use file picker:** `_fileFields()` currently uses a manual text path + Load button. Should use `file_picker` (already a direct dependency) via `FilePicker.pickFiles()`, populating `_pickedFilename` and `_pickedFileBytes` directly. Same pattern used internally by `PathField`. Drop the `_filePathController` and `_loadFileFromPath()` in the process.
-
 - **Custom filter chips:** Allow users to add new filter chips based on
   folders or custom tags, beyond the fixed entry-type chips. YAGNI risk is
   real — the fixed chips cover the common case and custom ones add UI
@@ -922,6 +918,36 @@ the first public tag.
   disk entirely, lock the session, and route back to onboarding. The
   existing `delete_whole_vault` bridge function already does the Rust side;
   this is a UI and navigation task.
+
+- **Portrait mode — selection not accessible:** On Android in portrait view,
+  checkboxes in the vault list are not visible. Long press and short press
+  both open the detail view — there is no way to enter selection mode on
+  narrow screens without already being in selection mode. Fix: add a
+  dedicated select affordance (e.g. long press enters selection mode, or
+  a select icon in the app bar).
+
+- **Landscape mode — hide chevron when chips fit:** When all filter chips
+  are visible without scrolling (landscape or wide screen), the chevron
+  scroll affordance should be hidden. Currently it shows regardless.
+  Already tracked partially under the chevron logic in `_updateChevrons()`.
+
+- **About screen — "Open in browser" button does nothing:** The two-step
+  URL dialog shows the URL correctly but the "Open in browser" button does
+  not launch the system browser. `url_launcher` is wired elsewhere —
+  investigate why this path is broken.
+
+- **Detail view — created/modified timestamps:** Show `created_at` and
+  `updated_at` on the detail screen so users can audit when an entry was
+  created or last changed. Data is already present in all entry DTOs.
+  Low effort, high audit value.
+
+- **Autofill:** Autofill does not use the OS clipboard — credentials go
+  directly from the autofill service into the target field via the OS
+  autofill framework, bypassing clipboard history managers entirely. This
+  is a meaningful security advantage over copy-paste and worth building
+  in v2. On Android: AutofillService API. On desktop: browser extension
+  (separate distribution). Prerequisite for passkey support.
+  Document the clipboard-vs-autofill security distinction in `docs/SECURITY.md`.
 
 - **Release builds for UI/UX testing:** Debug builds run Argon2id unoptimised
   (~20s per vault operation on Linux, worse on Android emulator). Always use
