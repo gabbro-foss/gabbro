@@ -54,6 +54,28 @@ Widget _buildScreen(
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
+  group('formatTimestamp', () {
+    test('formats valid ISO 8601 UTC string', () {
+      final dt = DateTime.parse('2025-04-21T14:32:07Z').toLocal();
+      const months = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      ];
+      final expected =
+          '21 ${months[dt.month - 1]} ${dt.year}, '
+          '${dt.hour.toString().padLeft(2, '0')}:'
+          '${dt.minute.toString().padLeft(2, '0')}';
+      expect(formatTimestamp('2025-04-21T14:32:07Z'), expected);
+    });
+
+    test('returns Unknown for empty string', () {
+      expect(formatTimestamp(''), 'Unknown');
+    });
+
+    test('returns Unknown for invalid string', () {
+      expect(formatTimestamp('not-a-date'), 'Unknown');
+    });
+  });
   testWidgets('login entry renders fields correctly', (tester) async {
     await tester.pumpWidget(
       _buildScreen(VaultEntryData.login(_loginEntry())),
@@ -129,6 +151,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('never'), findsOneWidget);
+  });
+
+  testWidgets('timestamps section shows Created and Updated labels',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.login(_loginEntry())),
+    );
+
+    expect(find.text('Created'), findsOneWidget);
+    expect(find.text('Updated'), findsOneWidget);
   });
 
   testWidgets('note entry renders title and content', (tester) async {

@@ -8,6 +8,26 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 
+/// Formats an ISO 8601 UTC timestamp string into a human-readable form.
+/// Returns 'Unknown' for empty or unparseable input.
+String formatTimestamp(String iso) {
+  if (iso.isEmpty) return 'Unknown';
+  try {
+    final dt = DateTime.parse(iso).toLocal();
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    final day = dt.day.toString().padLeft(2, '0');
+    final month = months[dt.month - 1];
+    final hour = dt.hour.toString().padLeft(2, '0');
+    final minute = dt.minute.toString().padLeft(2, '0');
+    return '$day $month ${dt.year}, $hour:$minute';
+  } catch (_) {
+    return 'Unknown';
+  }
+}
+
 Future<void> _defaultDelete(String id) => deleteEntry(id: id);
 Future<void> _defaultCopy(String value) =>
     Clipboard.setData(ClipboardData(text: value));
@@ -262,6 +282,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 : _field(f.label, f.value),
           ),
         ],
+        _timestampsRow(e.createdAt, e.updatedAt),
       ],
     );
   }
@@ -269,7 +290,11 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   Widget _noteView(NoteEntryData e) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [_field('Title', e.title), _field('Content', e.content)],
+      children: [
+        _field('Title', e.title),
+        _field('Content', e.content),
+        _timestampsRow(e.createdAt, e.updatedAt),
+      ],
     );
   }
 
@@ -289,6 +314,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             (f) => _field(f.label, f.value, obscure: f.hidden),
           ),
         ],
+        _timestampsRow(e.createdAt, e.updatedAt),
       ],
     );
   }
@@ -367,6 +393,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 : _field(f.label, f.value),
           ),
         ],
+        _timestampsRow(e.createdAt, e.updatedAt),
       ],
     );
   }
@@ -384,6 +411,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           icon: const Icon(Icons.download_outlined),
           label: const Text('Export file'),
         ),
+        _timestampsRow(e.createdAt, e.updatedAt),
       ],
     );
   }
@@ -413,6 +441,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 : _field(f.label, f.value),
           ),
         ],
+        _timestampsRow(e.createdAt, e.updatedAt),
       ],
     );
   }
@@ -537,6 +566,46 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             ],
           ),
           const Divider(),
+        ],
+      ),
+    );
+  }
+
+  Widget _timestampsRow(String createdAt, String updatedAt) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Created',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  formatTimestamp(createdAt),
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Updated',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  formatTimestamp(updatedAt),
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
