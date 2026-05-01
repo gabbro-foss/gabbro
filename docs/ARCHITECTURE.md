@@ -283,6 +283,16 @@ Each entry is an instance of a typed class:
   when active.
 - **`UnlockScreen` autofocus:** `autofocus: true` added to the passphrase
   `TextField` so the keyboard/cursor is ready immediately on launch.
+- **Entry detail timestamps:** `created_at` and `updated_at` are shown
+  at the bottom of all six entry type detail views. Rendered by
+  `_timestampsRow()` in `entry_detail_screen.dart`. Timestamps are
+  display-only — no copy button (metadata, not a secret). Formatting
+  handled by `formatTimestamp()` (package-private top-level function):
+  parses ISO 8601 UTC, converts to local time, renders as
+  `"DD Mon YYYY, HH:MM"`. Falls back to `"Unknown"` for empty or
+  unparseable input. Month abbreviations are currently hard-coded in
+  English — see i18n backlog item for the migration path.
+
 - **Vault deletion from UI:** Menu → Delete vault (previously greyed out)
   triggers a two-step confirmation: (1) warning dialog — Cancel / Continue;
   (2) user must type `DELETE` exactly — Confirm button disabled until matched.
@@ -585,16 +595,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Landscape chevron — `ScrollMetricsNotification` wrapping
-  the filter chip `SingleChildScrollView` triggers `_updateChevrons()`
-  on orientation change; threshold corrected from `> 80.0` to `> 0`;
-  `didChangeDependencies` hook added for belt-and-suspenders re-check.
-  Also: full IDE lint cleanup across `lib/` and `test/` —
-  `GabbroAppState` public interface introduced, `extraLarge` rename,
-  `withValues()` migration, curly braces, unnecessary underscores.
-  90 Flutter tests passing.
-- **Next task:** Detail view timestamps — show `created_at` and
-  `updated_at` on the entry detail screen.
+- **Completed:** Detail view timestamps — `created_at` and `updated_at`
+  shown on all six entry type detail views. `formatTimestamp()` helper
+  parses ISO 8601 UTC and renders local time as `"DD Mon YYYY, HH:MM"`;
+  falls back to `"Unknown"` for empty or invalid input. 94 Flutter tests
+  passing.
+- **Next task:** TBD.
 
 ---
 
@@ -726,6 +732,12 @@ the first public tag.
 
 
 ### Features & UX
+
+- **Timestamp localisation (i18n):** `formatTimestamp()` in
+  `entry_detail_screen.dart` uses a hand-rolled English month
+  abbreviations array. When internationalisation (i18n) is added,
+  replace with `DateFormat('dd MMM yyyy, HH:mm').format(dt)` from
+  `package:intl` — one-line change, picks up device locale automatically.
 
 - **Entropy indicator on all passphrase inputs:** Onboarding and Change
   Passphrase screens both show a real-time entropy indicator. Remaining:
