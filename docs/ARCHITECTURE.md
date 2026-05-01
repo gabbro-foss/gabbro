@@ -583,8 +583,14 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Vault deletion from UI — two-step confirmation (warning dialog + type `DELETE`), calls `delete_whole_vault`, navigates to `OnboardingScreen` with post-deletion message, reuses existing vault path, passphrase guidance shown. 85 Flutter tests passing.
-- **Next task:** TBD — review Bikeshed backlog.
+- **Completed:** Bikeshed doc update — removed done items (accessible font
+  sizing, icons on entry type cards, Enter key submits forms), updated
+  high-contrast mode status, About screen bug root cause documented,
+  block copy/paste spec refined, tablet testing and Destination Linux
+  outreach added.
+- **Next task:** Fix About screen "Open in browser" bug — add `<queries>`
+  block to `android/app/src/main/AndroidManifest.xml`, harden
+  `canLaunchUrl` guard with snackbar fallback.
 
 ---
 
@@ -752,22 +758,13 @@ the first public tag.
   `MediaQuery.of(context).highContrast` and honour it automatically — worth doing
   for free. However, an in-app toggle is the more important piece: Linux tiling WM
   users have no OS-level signal to send, and some users want high contrast only
-  inside their password manager. Implement as a toggle in Settings → Accessibility,
-  alongside the accessible font sizing item. Any high-contrast theme must be
-  validated against ADR-003 (colour-blind safety) and WCAG 1.4.3 (Contrast,
-  minimum) and WCAG 1.4.6 (Contrast, enhanced). Pairs naturally with the
-  Themes — dark / light / custom item above.
-
-- **Accessible font sizing:** Gabbro should offer a font size setting with
-  3–5 steps, e.g. Small / Regular / Large / Extra Large (avoid
-  "tiny"/"huge" — these have negative connotations for the people who need
-  them most). Implemented as a slider or segmented control in Settings →
-  Accessibility. Onboarding should default to Regular+1 (one step above
-  the base) and surface the option prominently on first launch — defaulting
-  to the smallest readable size would exclude users with declining vision
-  before they ever reach the settings screen. Pairs with the existing
-  colour-blind safety work (ADR-003) as part of a broader accessibility
-  commitment. Consider testing against WCAG 1.4.4 (Resize Text).
+  inside their password manager. **Plumbing done:** toggle exists in Appearance
+  screen, `highContrast` bool persisted in `AppSettings`, accessibility shortcut
+  on `UnlockScreen` and `OnboardingScreen` activates it. **Remaining:** implement
+  the actual high-contrast theme — colour overrides validated against ADR-003
+  (colour-blind safety), WCAG 1.4.3 (Contrast, minimum), and WCAG 1.4.6
+  (Contrast, enhanced). Pairs naturally with the Themes — dark / light / custom
+  item above.
 
 - **Panic button / app hiding on mobile:** A visible "hide app" mechanism —
   e.g. disguise Gabbro as a calculator or notes app, or a panic button that
@@ -889,8 +886,10 @@ the first public tag.
   and `UnlockScreen`, the master passphrase fields should block clipboard
   paste to prevent accidental exposure via clipboard history tools.
   Implement with a custom `TextInputFormatter` or by intercepting
-  `onChanged` to detect paste events. Defer until pre-release — current
-  behaviour is acceptable for development and testing.
+  `onChanged` to detect paste events. Default behaviour: block paste.
+  User-configurable via a toggle in Settings → Security (default: block).
+  Defer until pre-release — current behaviour is acceptable for development
+  and testing.
 
 - **URL opening in About screen:** Links in the About screen do not open
   in the browser. This is addressable within Gabbro using the
@@ -904,10 +903,6 @@ the first public tag.
   it. Prevents silent accumulation of orphaned vault files on the user's device
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
-
-- **Icons on entry type cards:** ✅ Done. Distinct icon per entry type in list tiles and type-picker bottom sheet. Icon+checkbox side by side on wide screens (≥600dp), icon-only at rest / checkbox-only when selecting on narrow screens. `semanticLabel` set on all icons for screen reader accessibility.
-
-- **Enter key submits forms:** ✅ Done. All form screens now submit on Enter from the last field: `UnlockScreen` (`onSubmitted`), `CreateEntryScreen` (all entry types chain fields, last calls `_save()`), `ChangePassphraseScreen` (confirm field calls `_changePassphrase()`), `OnboardingScreen` (confirm field calls `_createVault()`).
 
 - **Custom filter chips:** Allow users to add new filter chips based on
   folders or custom tags, beyond the fixed entry-type chips. YAGNI risk is
@@ -931,6 +926,12 @@ the first public tag.
   dedicated select affordance (e.g. long press enters selection mode, or
   a select icon in the app bar).
 
+- **Test on Android tablet:** Test a release APK on the Lenovo tablet.
+  Focus areas: layout at larger screen sizes, filter chip visibility,
+  vault list tile sizing, entry detail screen proportions, and selection
+  mode affordances. Document any layout breakage in this section as new
+  bikeshed items.
+
 - **Landscape mode — hide chevron when chips fit:** When all filter chips
   are visible without scrolling (landscape or wide screen), the chevron
   scroll affordance should be hidden. Currently it shows regardless.
@@ -938,8 +939,14 @@ the first public tag.
 
 - **About screen — "Open in browser" button does nothing:** The two-step
   URL dialog shows the URL correctly but the "Open in browser" button does
-  not launch the system browser. `url_launcher` is wired elsewhere —
-  investigate why this path is broken.
+  not launch the system browser. Root cause: on Android 11+, apps must
+  declare which URL schemes they intend to query in `AndroidManifest.xml`
+  via a `<queries>` block. Without it, `canLaunchUrl` returns `false` for
+  `https://` URLs even when a browser is installed, and the launch is
+  silently skipped. Fix: add the `<queries>` block to
+  `android/app/src/main/AndroidManifest.xml` and remove or harden the
+  `canLaunchUrl` guard to show a snackbar on failure rather than silently
+  doing nothing.
 
 - **Detail view — created/modified timestamps:** Show `created_at` and
   `updated_at` on the detail screen so users can audit when an entry was
@@ -1151,6 +1158,14 @@ See `rust/src/import/enpass.rs` for the full test suite.
   One-time payment on Play Store is the recommended model to recoup the
   $25 registration fee; no ongoing subscription complexity.
   Yubico partnership remains a separate future discussion.
+
+- **Monetisation outreach — Destination Linux podcast:** Contact the
+  Destination Linux podcast (https://destinationlinux.org/) when Gabbro
+  is approaching a public release. Their audience is exactly Gabbro's
+  target demographic: privacy-conscious, FOSS-native Linux users. A
+  guest appearance or mention would provide credible organic reach at
+  zero cost. Prepare a short project summary and a working demo build
+  before reaching out.
 
 ## Trust & Transparency
 
