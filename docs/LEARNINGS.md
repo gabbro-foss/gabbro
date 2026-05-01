@@ -4,6 +4,58 @@ A running journal of concepts covered during development.
 
 ---
 
+## Android — `<queries>` and package visibility (Android 11+)
+
+Android 11 introduced package visibility restrictions. Apps must declare
+which URL schemes they intend to query in `AndroidManifest.xml` via a
+`<queries>` block. Without it, `canLaunchUrl()` from `url_launcher`
+returns `false` for `https://` URLs even when a browser is installed —
+the launch is silently skipped.
+
+Fix: add `ACTION_VIEW` intents for `https` and `http` schemes inside
+`<queries>`:
+
+```xml
+<intent>
+    <action android:name="android.intent.action.VIEW"/>
+    <data android:scheme="https"/>
+</intent>
+<intent>
+    <action android:name="android.intent.action.VIEW"/>
+    <data android:scheme="http"/>
+</intent>
+```
+
+Also: drop the `canLaunchUrl` guard and call `launchUrl` directly,
+checking the returned `bool` to show a snackbar on failure. The guard
+pattern is the silent failure point — if `canLaunchUrl` returns `false`,
+nothing happens and the user has no feedback.
+
+Python analogy: like checking `os.path.exists()` before `open()` — if
+the check itself is broken, the failure is invisible. Better to attempt
+the operation and handle the exception explicitly.
+
+## Android — storage permissions and scoped storage
+
+Gabbro declares no storage permissions in `AndroidManifest.xml`. This
+is correct because:
+
+- **App-private storage** (`getApplicationDocumentsDirectory()` via
+  `path_provider`) requires no permission on any Android version — the
+  OS grants access automatically to the app's own directory.
+- **User-chosen paths** (export/import via `file_picker`) use the
+  Storage Access Framework (SAF) — the OS file picker grants URI-scoped
+  access for the specific file chosen, without a blanket storage
+  permission.
+
+The dangerous permission to avoid is `MANAGE_EXTERNAL_STORAGE` — it
+grants broad access to shared storage and draws heavy Play Store
+scrutiny. Only needed if writing outside app-private storage without SAF.
+
+This assumption must be verified before v1 — see bikeshed.
+
+---
+
 ## Flutter — file_picker v11 API
 
 The correct call is `FilePicker.pickFiles()` directly — no `.platform`
