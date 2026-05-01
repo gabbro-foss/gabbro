@@ -185,7 +185,7 @@ Each entry is an instance of a typed class:
 - **Types:** Login, Note, Identity, Card, File, Custom
 - **Status:** all 6 entry types fully implemented in the domain model
   (`rust/src/vault/entry.rs`) and bridged via DTOs and API functions
-  (`rust/src/api/vault.rs`). 142 Rust tests passing, 1 ignored across the project.
+  (`rust/src/api/vault.rs`). 172 Rust tests passing, 1 ignored across the project.
 - **Core fields:** type-specific
 - **Common fields:** UUID, created, modified, folder, tags, favourite
 - **Login entry:** URL, username, password (hidden by default,
@@ -583,12 +583,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** About screen "Open in browser" bug fixed — added `https`/
-  `http` `<queries>` intents to `AndroidManifest.xml`, replaced silent
-  `canLaunchUrl` guard with direct `launchUrl` + snackbar fallback.
-  Verified on Samsung S23 (Android 16). 85 Flutter tests passing.
-- **Next task:** Portrait mode selection — add long-press to enter
-  selection mode on narrow screens.
+- **Completed:** Portrait mode selection — `_selectionMode` bool added to
+  `VaultListScreen`; narrow screens (< 600 dp) show a checklist icon in
+  the app bar to enter selection mode explicitly; long-press on any tile
+  enters selection mode and selects that tile. 90 Flutter tests passing.
+- **Next task:** TBD — pick from Bikeshed.
 
 ---
 
@@ -916,13 +915,6 @@ the first public tag.
   open vaults? Does the UI need a vault switcher, or is open/close
   sufficient? Does each vault get its own passphrase and KDF parameters?
   Significant architecture change — v2 at earliest.
-
-- **Portrait mode — selection not accessible:** On Android in portrait view,
-  checkboxes in the vault list are not visible. Long press and short press
-  both open the detail view — there is no way to enter selection mode on
-  narrow screens without already being in selection mode. Fix: add a
-  dedicated select affordance (e.g. long press enters selection mode, or
-  a select icon in the app bar).
 
 - **Test on Android tablet:** Test a release APK on the Lenovo tablet.
   Focus areas: layout at larger screen sizes, filter chip visibility,
