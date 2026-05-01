@@ -63,7 +63,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                   TextSizeChoice.small => 'Small',
                   TextSizeChoice.regular => 'Regular',
                   TextSizeChoice.large => 'Large',
-                  TextSizeChoice.extra_large => 'XL',
+                  TextSizeChoice.extraLarge => 'XL',
                 },
                 onSelected: (v) => _update(_settings.copyWith(textSize: v)),
               ),

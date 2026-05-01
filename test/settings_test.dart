@@ -85,7 +85,7 @@ void main() {
     test('round-trips through fromJson', () {
       const original = AppSettings(
         theme: ThemeChoice.dark,
-        textSize: TextSizeChoice.extra_large,
+        textSize: TextSizeChoice.extraLarge,
         highContrast: false,
       );
       final restored = AppSettings.fromJson(original.toJson());
@@ -127,7 +127,7 @@ void main() {
     test('round-trips highContrast true through fromJson', () {
       const original = AppSettings(
         theme: ThemeChoice.dark,
-        textSize: TextSizeChoice.extra_large,
+        textSize: TextSizeChoice.extraLarge,
         highContrast: true,
       );
       final restored = AppSettings.fromJson(original.toJson());

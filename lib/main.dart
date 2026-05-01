@@ -31,6 +31,12 @@ Future<void> main() async {
   );
 }
 
+/// Public interface for descendant widgets to read settings and push updates.
+abstract class GabbroAppState {
+  AppSettings get settings;
+  Future<void> updateSettings(AppSettings updated);
+}
+
 class GabbroApp extends StatefulWidget {
   final String vaultPath;
   final bool vaultExists;
@@ -50,17 +56,20 @@ class GabbroApp extends StatefulWidget {
   State<GabbroApp> createState() => _GabbroAppState();
 
   /// Allow descendant widgets to update settings app-wide.
-  static _GabbroAppState? maybeOf(BuildContext context) {
+  static GabbroAppState? maybeOf(BuildContext context) {
     return context.findAncestorStateOfType<_GabbroAppState>();
   }
 
-  static _GabbroAppState of(BuildContext context) {
+  static GabbroAppState of(BuildContext context) {
     return context.findAncestorStateOfType<_GabbroAppState>()!;
   }
 }
 
-class _GabbroAppState extends State<GabbroApp> with WidgetsBindingObserver {
+class _GabbroAppState extends State<GabbroApp>
+    with WidgetsBindingObserver
+    implements GabbroAppState {
   late AppSettings _settings;
+  @override
   AppSettings get settings => _settings;
 
   final _navigatorKey = GlobalKey<NavigatorState>();
@@ -144,6 +153,7 @@ class _GabbroAppState extends State<GabbroApp> with WidgetsBindingObserver {
     );
   }
 
+  @override
   Future<void> updateSettings(AppSettings updated) async {
     await updated.save();
     setState(() => _settings = updated);
@@ -160,7 +170,7 @@ class _GabbroAppState extends State<GabbroApp> with WidgetsBindingObserver {
     TextSizeChoice.small => 0.85,
     TextSizeChoice.regular => 1.0,
     TextSizeChoice.large => 1.15,
-    TextSizeChoice.extra_large => 1.3,
+    TextSizeChoice.extraLarge => 1.3,
   };
 
   static ThemeData _lightTheme({required bool highContrast}) {

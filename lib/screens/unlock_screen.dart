@@ -88,11 +88,11 @@ class _UnlockScreenState extends State<UnlockScreen> {
     if (app == null) return;
     final current = app.settings;
     final isOn =
-        current.highContrast && current.textSize == TextSizeChoice.extra_large;
+        current.highContrast && current.textSize == TextSizeChoice.extraLarge;
     await app.updateSettings(
       current.copyWith(
         highContrast: !isOn,
-        textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.extra_large,
+        textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.extraLarge,
       ),
     );
   }
@@ -103,7 +103,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
     final isAccessibilityOn =
         app != null &&
         app.settings.highContrast &&
-        app.settings.textSize == TextSizeChoice.extra_large;
+        app.settings.textSize == TextSizeChoice.extraLarge;
 
     return Scaffold(
       body: Stack(

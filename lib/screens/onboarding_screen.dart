@@ -128,11 +128,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (app == null) return;
     final current = app.settings;
     final isOn =
-        current.highContrast && current.textSize == TextSizeChoice.extra_large;
+        current.highContrast && current.textSize == TextSizeChoice.extraLarge;
     await app.updateSettings(
       current.copyWith(
         highContrast: !isOn,
-        textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.extra_large,
+        textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.extraLarge,
       ),
     );
   }
@@ -143,7 +143,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isAccessibilityOn =
         app != null &&
         app.settings.highContrast &&
-        app.settings.textSize == TextSizeChoice.extra_large;
+        app.settings.textSize == TextSizeChoice.extraLarge;
 
     return Scaffold(
       body: Stack(
@@ -251,8 +251,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                         validator: (v) {
-                          if (v == null || v.isEmpty)
+                          if (v == null || v.isEmpty) {
                             return 'Passphrase is required';
+                          }
                           if (!_strongEnough) return 'Passphrase is too weak';
                           return null;
                         },
@@ -307,10 +308,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                         validator: (v) {
-                          if (v == null || v.isEmpty)
+                          if (v == null || v.isEmpty) {
                             return 'Please confirm your passphrase';
-                          if (v != _passphraseController.text)
+                          }
+                          if (v != _passphraseController.text) {
                             return 'Passphrases do not match';
+                          }
                           return null;
                         },
                       ),

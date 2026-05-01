@@ -115,7 +115,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
                               ? Theme.of(context).colorScheme.onPrimary
                               : isPresent
                                   ? primary
-                                  : primary.withOpacity(0.25),
+                                  : primary.withValues(alpha: 0.25),
                         ),
                       ),
                     ),

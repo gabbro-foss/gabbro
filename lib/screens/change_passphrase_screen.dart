@@ -157,8 +157,9 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty)
+                      if (v == null || v.isEmpty) {
                         return 'New passphrase is required';
+                      }
                       if (!_strongEnough) return 'Passphrase is too weak';
                       return null;
                     },
@@ -213,10 +214,12 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty)
+                      if (v == null || v.isEmpty) {
                         return 'Please confirm your new passphrase';
-                      if (v != _newController.text)
+                      }
+                      if (v != _newController.text) {
                         return 'Passphrases do not match';
+                      }
                       return null;
                     },
                   ),

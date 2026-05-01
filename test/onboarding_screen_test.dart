@@ -7,7 +7,7 @@ import 'package:gabbro/src/rust/api/entropy.dart';
 
 // Returns a fixed strong result so passphrase-dependent UI
 // (match indicator) works without the Rust bridge.
-EntropyResult _fakeStrongEntropy(String _) => EntropyResult(
+EntropyResult _fakeStrongEntropy(String ignored) => EntropyResult(
       bits: 100,
       tier: StrengthTier.veryStrong,
     );
@@ -20,7 +20,7 @@ Widget _buildScreen({
     MaterialApp(
       home: OnboardingScreen(
         initialPath: '/tmp/test.gabbro',
-        onInitVault: onInitVault ?? (_, __) async {},
+        onInitVault: onInitVault ?? (a, b) async {},
         onEstimateEntropy: _fakeStrongEntropy,
       ),
     );

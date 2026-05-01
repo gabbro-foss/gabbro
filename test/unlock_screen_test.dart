@@ -5,7 +5,7 @@ import 'package:gabbro/src/rust/api/entropy.dart';
 
 // ── Fake entropy ──────────────────────────────────────────────────────────────
 
-EntropyResult _fakeEntropy(String _) => EntropyResult(
+EntropyResult _fakeEntropy(String ignored) => EntropyResult(
       bits: 0,
       tier: StrengthTier.terrible,
     );
@@ -18,7 +18,7 @@ Widget _buildScreen({
     MaterialApp(
       home: UnlockScreen(
         vaultPath: '/tmp/test.gabbro',
-        onUnlock: onUnlock ?? (_, __) async {},
+        onUnlock: onUnlock ?? (a, b) async {},
         onEstimateEntropy: _fakeEntropy,
       ),
     );
@@ -37,7 +37,7 @@ void main() {
   testWidgets('error message shown when unlock throws', (tester) async {
     await tester.pumpWidget(
       _buildScreen(
-        onUnlock: (_, __) async => throw Exception('wrong passphrase'),
+        onUnlock: (a, b) async => throw Exception('wrong passphrase'),
       ),
     );
 
@@ -54,7 +54,7 @@ void main() {
   testWidgets('unlock button is present and tappable', (tester) async {
     bool called = false;
     await tester.pumpWidget(
-      _buildScreen(onUnlock: (_, __) async => called = true),
+      _buildScreen(onUnlock: (a, b) async => called = true),
     );
 
     await tester.enterText(find.byType(TextField), 'anypassphrase');

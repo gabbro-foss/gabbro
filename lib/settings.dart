@@ -6,8 +6,8 @@ import 'package:path_provider/path_provider.dart';
 // Lines beginning with // or # are stripped before parsing.
 
 /// User-editable application settings.
-/// On Linux: ~/.config/gabbro/settings.jsonc
-/// On Android: <app support dir>/settings.jsonc
+/// On Linux: `~/.config/gabbro/settings.jsonc`
+/// On Android: `<app support dir>/settings.jsonc`
 class AppSettings {
   final ThemeChoice theme;
   final TextSizeChoice textSize;
@@ -42,7 +42,7 @@ class AppSettings {
     return AppSettings(
       theme: ThemeChoice.values.byName((json['theme'] as String? ?? 'system')),
       textSize: TextSizeChoice.values.byName(
-        (json['text_size'] as String? ?? 'regular'),
+        (json['text_size'] as String? ?? 'regular').replaceAll('extra_large', 'extraLarge'),
       ),
       highContrast: json['high_contrast'] as bool? ?? false,
       foregroundLockTimeout: ForegroundLockTimeout.values.byName(
@@ -124,7 +124,7 @@ class AppSettings {
   "theme": "${theme.name}",
 
   // Interface text size.
-  // Options: "small" | "regular" | "large" | "extra_large"
+  // Options: "small" | "regular" | "large" | "extraLarge"
   "text_size": "${textSize.name}",
 
   // High-contrast mode (not yet implemented — reserved for future use).
@@ -165,7 +165,7 @@ class AppSettings {
 
 enum ThemeChoice { system, light, dark }
 
-enum TextSizeChoice { small, regular, large, extra_large }
+enum TextSizeChoice { small, regular, large, extraLarge }
 
 enum ForegroundLockTimeout { thirtySeconds, oneMinute, fiveMinutes, never }
 
