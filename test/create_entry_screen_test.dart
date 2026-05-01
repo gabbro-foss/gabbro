@@ -77,6 +77,27 @@ void main() {
     );
   });
 
+  testWidgets('file entry shows pick file button not load button',
+      (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('File'));
+    expect(find.text('Pick file'), findsOneWidget);
+    expect(find.text('Load'), findsNothing);
+  });
+
+  testWidgets('identity entry saves without email', (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Identity'));
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'First name'),
+      'Ada',
+    );
+    // intentionally leave email empty
+    await tester.tap(find.text('Save'));
+    await tester.pump();
+
+    expect(find.text('Email is required'), findsNothing);
+  });
+
   testWidgets('save button calls onCreateEntry with correct type',
       (tester) async {
     VaultEntryData? captured;
