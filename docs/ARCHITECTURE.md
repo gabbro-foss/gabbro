@@ -256,7 +256,7 @@ Each entry is an instance of a typed class:
   convention of a config file the user can read and modify directly.
 - **`AppSettings` class:** immutable, `const`-constructible. Fields:
   `theme` (`ThemeChoice`: system/light/dark), `textSize` (`TextSizeChoice`:
-  small/regular/large/extra_large), `highContrast` (bool, placeholder).
+  small/regular/large/extraLarge), `highContrast` (bool, placeholder).
   `load()` is async (file I/O); `save()` writes the full JSONC with comments.
   `copyWith()` for immutable updates. `fromJson()`/`toJson()` for
   serialisation. Comment stripping exposed via `stripCommentsForTest()` for
@@ -266,16 +266,18 @@ Each entry is an instance of a typed class:
   `TextScaler` are derived from settings and passed down via `MediaQuery` and
   `MaterialApp`. Descendant screens update settings via
   `GabbroApp.of(context).updateSettings(...)` — changes take effect
-  immediately app-wide without restart.
+  immediately app-wide without restart. `GabbroAppState` is a public abstract
+  class exposing `settings` and `updateSettings()` — `_GabbroAppState`
+  implements it, resolving the `library_private_types_in_public_api` lint.
 - **Text scaling:** `TextScaler.linear()` factors: small=0.85, regular=1.0,
-  large=1.15, extra_large=1.3. Applied via a `MediaQuery` wrapper above
+  large=1.15, extraLarge=1.3. Applied via a `MediaQuery` wrapper above
   `MaterialApp` so all text in the app scales uniformly.
 - **Appearance screen:** two segmented button rows (theme, text size) plus
   a live preview box showing the current text scale. High-contrast toggle
   enabled — works in both light and dark mode.
 - **Accessibility shortcut:** `OutlinedButton.icon` (icon: `Icons.accessibility_new`,
   label: "Accessibility") positioned top-right on `OnboardingScreen` and
-  `UnlockScreen`. Toggles `highContrast: true` + `textSize: extra_large`
+  `UnlockScreen`. Toggles `highContrast: true` + `textSize: extraLarge`
   together in one tap — ensures vision-impaired users can access accessibility
   settings before reaching the main UI. Icon is highlighted in primary colour
   when active.
