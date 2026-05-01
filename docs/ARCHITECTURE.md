@@ -281,6 +281,17 @@ Each entry is an instance of a typed class:
   when active.
 - **`UnlockScreen` autofocus:** `autofocus: true` added to the passphrase
   `TextField` so the keyboard/cursor is ready immediately on launch.
+- **Vault deletion from UI:** Menu → Delete vault (previously greyed out)
+  triggers a two-step confirmation: (1) warning dialog — Cancel / Continue;
+  (2) user must type `DELETE` exactly — Confirm button disabled until matched.
+  On confirm: calls `delete_whole_vault` bridge (drops session, wipes `.gabbro`
+  file), then `pushAndRemoveUntil` to `OnboardingScreen` clearing the stack.
+  `OnboardingScreen` accepts an optional `postDeletionMessage` — rendered as
+  an accent-coloured info banner with `Icons.info_outline`. Vault path reused
+  as default for the new vault; passphrase guidance shown below the location
+  label. `deleteVault` is injectable on `VaultListScreen` for testability.
+  8 tests in `test/vault_list_delete_vault_test.dart`. Verified on Samsung S23
+  (Android 16).
 
 ## Auto-lock
 
@@ -572,8 +583,8 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Bikeshed bugs — identity email now optional; file entry uses `file_picker` (drops manual path + Load button); clipboard auto-clear with configurable timeout (30s/60s/2min/never) in Settings → Security, timer wired in `EntryDetailScreen`, snackbar warns about clipboard managers. 77 Flutter tests passing.
-- **Next task:** Vault deletion from UI — call existing `delete_whole_vault`, lock session, route to onboarding.
+- **Completed:** Vault deletion from UI — two-step confirmation (warning dialog + type `DELETE`), calls `delete_whole_vault`, navigates to `OnboardingScreen` with post-deletion message, reuses existing vault path, passphrase guidance shown. 85 Flutter tests passing.
+- **Next task:** TBD — review Bikeshed backlog.
 
 ---
 
@@ -912,12 +923,6 @@ the first public tag.
   open vaults? Does the UI need a vault switcher, or is open/close
   sufficient? Does each vault get its own passphrase and KDF parameters?
   Significant architecture change — v2 at earliest.
-
-- **Vault deletion from UI (full vault):** Distinct from the existing
-  "delete all entries" path — this should delete the `.gabbro` file from
-  disk entirely, lock the session, and route back to onboarding. The
-  existing `delete_whole_vault` bridge function already does the Rust side;
-  this is a UI and navigation task.
 
 - **Portrait mode — selection not accessible:** On Android in portrait view,
   checkboxes in the vault list are not visible. Long press and short press
