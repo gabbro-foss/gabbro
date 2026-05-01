@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
+import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
@@ -38,12 +39,15 @@ Widget _buildScreen(
   VaultEntryData entry, {
   Future<void> Function(String id)? onDeleteEntry,
   Future<void> Function(String value)? onCopyToClipboard,
+  ClipboardClearTimeout clipboardClearTimeout =
+      ClipboardClearTimeout.sixtySeconds,
 }) =>
     MaterialApp(
       home: EntryDetailScreen(
         entry: entry,
         onDeleteEntry: onDeleteEntry ?? (_) async {},
         onCopyToClipboard: onCopyToClipboard ?? (_) async {},
+        clipboardClearTimeout: clipboardClearTimeout,
       ),
     );
 
@@ -83,7 +87,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.copy_outlined).first);
     await tester.pumpAndSettle();
 
-    expect(find.text('Copied to clipboard'), findsOneWidget);
+    expect(find.textContaining('Copied'), findsOneWidget);
   });
 
   testWidgets('delete icon shows confirmation dialog', (tester) async {
@@ -96,6 +100,35 @@ void main() {
 
     expect(find.text('Delete entry?'), findsOneWidget);
     expect(find.text('This cannot be undone.'), findsOneWidget);
+  });
+
+  testWidgets('copy button snackbar mentions clear timeout', (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(
+        VaultEntryData.login(_loginEntry()),
+        clipboardClearTimeout: ClipboardClearTimeout.thirtySeconds,
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.copy_outlined).first);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('30s'), findsOneWidget);
+  });
+
+  testWidgets('copy snackbar says "never clears" when timeout is never',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(
+        VaultEntryData.login(_loginEntry()),
+        clipboardClearTimeout: ClipboardClearTimeout.never,
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.copy_outlined).first);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('never'), findsOneWidget);
   });
 
   testWidgets('note entry renders title and content', (tester) async {

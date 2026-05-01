@@ -24,7 +24,7 @@ void main() {
 
     testWidgets('foreground timeout buttons are all present', (tester) async {
       await tester.pumpWidget(_buildScreen());
-      expect(find.text('30s'), findsOneWidget);
+      expect(find.text('30s'), findsAtLeastNWidgets(1));
       expect(find.text('1 min'), findsAtLeastNWidgets(1));
       expect(find.text('5 min'), findsAtLeastNWidgets(1));
       expect(find.text('Never'), findsAtLeastNWidgets(1));
@@ -66,6 +66,26 @@ void main() {
       );
       expect(find.byType(Wrap), findsOneWidget);
       expect(find.byType(Row), findsNothing);
+    });
+
+    testWidgets('clipboard clear timeout section header is present', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      expect(find.text('Clipboard clear'), findsOneWidget);
+    });
+
+    testWidgets('clipboard clear timeout buttons are all present', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      expect(find.text('30s'), findsAtLeastNWidgets(1));
+      expect(find.text('60s'), findsOneWidget);
+      expect(find.text('2 min'), findsOneWidget);
+    });
+
+    testWidgets('tapping a clipboard clear button calls onUpdate with correct value', (tester) async {
+      AppSettings? updated;
+      await tester.pumpWidget(_buildScreen(onUpdate: (s) => updated = s));
+      await tester.tap(find.text('2 min'));
+      await tester.pumpAndSettle();
+      expect(updated?.clipboardClearTimeout, ClipboardClearTimeout.twoMinutes);
     });
 
     testWidgets('selected foreground button reflects current settings', (tester) async {

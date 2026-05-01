@@ -179,6 +179,39 @@ void main() {
     });
   });
 
+  // ── ClipboardClearTimeout ─────────────────────────────────────────────────
+
+  group('ClipboardClearTimeout', () {
+    test('all values round-trip through fromJson', () {
+      for (final choice in ClipboardClearTimeout.values) {
+        final s = AppSettings.fromJson({'clipboard_clear_timeout': choice.name});
+        expect(s.clipboardClearTimeout, choice);
+      }
+    });
+
+    test('defaults to sixtySeconds', () {
+      final s = AppSettings.fromJson({});
+      expect(s.clipboardClearTimeout, ClipboardClearTimeout.sixtySeconds);
+    });
+
+    test('copyWith overrides clipboardClearTimeout only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(
+        clipboardClearTimeout: ClipboardClearTimeout.never,
+      );
+      expect(updated.clipboardClearTimeout, ClipboardClearTimeout.never);
+      expect(updated.theme, original.theme);
+      expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
+    });
+
+    test('serialises to toJson', () {
+      const s = AppSettings(
+        clipboardClearTimeout: ClipboardClearTimeout.thirtySeconds,
+      );
+      expect(s.toJson()['clipboard_clear_timeout'], 'thirtySeconds');
+    });
+  });
+
   // ── BackgroundLockTimeout ─────────────────────────────────────────────────
 
   group('BackgroundLockTimeout', () {
