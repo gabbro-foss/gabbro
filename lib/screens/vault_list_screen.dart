@@ -10,17 +10,22 @@ import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
+import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+
+Future<void> _defaultDeleteVault() => deleteWholeVault();
 
 class VaultListScreen extends StatefulWidget {
   final String vaultPath;
   final List<EntrySummaryData> Function() listEntries;
+  final Future<void> Function() deleteVault;
 
   const VaultListScreen({
     super.key,
     required this.vaultPath,
     this.listEntries = listEntrySummaries,
+    this.deleteVault = _defaultDeleteVault,
   });
 
   @override
@@ -336,11 +341,100 @@ class _VaultListScreenState extends State<VaultListScreen> {
             ),
           ),
         );
+      case 'vault_delete':
+        _deleteWholeVault();
       case 'about':
         Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (context) => const AboutScreen()));
     }
+  }
+
+  Future<void> _deleteWholeVault() async {
+    // Step 1 — warning confirmation
+    final step1 = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete vault?'),
+        content: const Text(
+          'This will permanently delete all entries. This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
+    if (step1 != true) return;
+    if (!mounted) return;
+
+    // Step 2 — type DELETE to confirm
+    final confirmController = TextEditingController();
+    final step2 = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: const Text('Are you sure?'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Type DELETE to confirm'),
+              const SizedBox(height: 12),
+              TextField(
+                key: const Key('delete_vault_confirm_field'),
+                controller: confirmController,
+                autofocus: true,
+                decoration: const InputDecoration(border: OutlineInputBorder()),
+                onChanged: (_) => setState(() {}),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: confirmController.text == 'DELETE'
+                  ? () => Navigator.of(ctx).pop(true)
+                  : null,
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(ctx).colorScheme.error,
+              ),
+              child: const Text('Confirm'),
+            ),
+          ],
+        ),
+      ),
+    );
+    // Dispose after dialog is fully closed and removed from the tree.
+    WidgetsBinding.instance.addPostFrameCallback((_) => confirmController.dispose());
+    if (step2 != true) return;
+    if (!mounted) return;
+
+    await widget.deleteVault();
+    if (!mounted) return;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => OnboardingScreen(
+          initialPath: widget.vaultPath,
+          postDeletionMessage:
+              'Your vault has been deleted. Create a new one to continue.',
+        ),
+      ),
+      (_) => false,
+    );
   }
 
   void _lockAndExit() {
@@ -409,7 +503,6 @@ class _VaultListScreenState extends State<VaultListScreen> {
                   child: Text('Add vault'),
                 ),
                 const PopupMenuItem(
-                  enabled: false,
                   value: 'vault_delete',
                   child: Text('Delete vault'),
                 ),

@@ -15,12 +15,14 @@ EntropyResult _defaultEstimateEntropy(String password) =>
 
 class OnboardingScreen extends StatefulWidget {
   final String? initialPath;
+  final String? postDeletionMessage;
   final Future<void> Function(List<int> passphrase, String path) onInitVault;
   final EntropyResult Function(String password) onEstimateEntropy;
 
   const OnboardingScreen({
     super.key,
     this.initialPath,
+    this.postDeletionMessage,
     this.onInitVault = _defaultInitVault,
     this.onEstimateEntropy = _defaultEstimateEntropy,
   });
@@ -163,15 +165,46 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        'Create your vault to get started.',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        textAlign: TextAlign.center,
-                      ),
+                      if (widget.postDeletionMessage != null) ...[
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                color: Theme.of(context).colorScheme.primary,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  widget.postDeletionMessage!,
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ] else ...[
+                        Text(
+                          'Create your vault to get started.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                       const SizedBox(height: 40),
-                      const Text(
-                        'Vault location',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                      Text(
+                        widget.postDeletionMessage != null
+                            ? 'New vault location (same as before)'
+                            : 'Vault location',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 8),
                       if (Platform.isAndroid)
@@ -191,6 +224,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ? 'Path is required'
                               : null,
                         ),
+                      if (widget.postDeletionMessage != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          'Choose a new master passphrase, or re-use your previous one if you prefer.',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
                       const SizedBox(height: 24),
                       TextFormField(
                         controller: _passphraseController,
