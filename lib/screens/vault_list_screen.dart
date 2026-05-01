@@ -58,6 +58,12 @@ class _VaultListScreenState extends State<VaultListScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateChevrons());
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     _chipScrollController.removeListener(_updateChevrons);
@@ -68,10 +74,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
   void _updateChevrons() {
     if (!_chipScrollController.hasClients) return;
     final pos = _chipScrollController.position;
+    final overflows = pos.maxScrollExtent > 0;
     setState(() {
-      _showLeftChevron = pos.pixels > 1.0 && pos.maxScrollExtent > 80.0;
-      _showRightChevron =
-          pos.pixels < pos.maxScrollExtent - 1.0 && pos.maxScrollExtent > 80.0;
+      _showLeftChevron = overflows && pos.pixels > 1.0;
+      _showRightChevron = overflows && pos.pixels < pos.maxScrollExtent - 1.0;
     });
   }
 
@@ -620,27 +626,35 @@ class _VaultListScreenState extends State<VaultListScreen> {
             Stack(
               alignment: Alignment.centerRight,
               children: [
-                SingleChildScrollView(
-                  controller: _chipScrollController,
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  child: Row(
-                    children: filters
-                        .map(
-                          (f) => Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: FilterChip(
-                              label: Text(f),
-                              selected: _selectedFilter == f,
-                              onSelected: (_) =>
-                                  setState(() => _selectedFilter = f),
+                NotificationListener<ScrollMetricsNotification>(
+                  onNotification: (notification) {
+                    _updateChevrons();
+                    return false;
+                  },
+                  child: SingleChildScrollView(
+                    controller: _chipScrollController,
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    child: Row(
+                      children: filters
+                          .map(
+                            (f) => Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              child: FilterChip(
+                                label: Text(f),
+                                selected: _selectedFilter == f,
+                                onSelected: (_) =>
+                                    setState(() => _selectedFilter = f),
+                              ),
                             ),
-                          ),
-                        )
-                        .toList(),
+                          )
+                          .toList(),
+                    ),
                   ),
                 ),
                 if (_showRightChevron)
