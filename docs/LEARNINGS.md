@@ -4,6 +4,43 @@ A running journal of concepts covered during development.
 
 ---
 
+## Flutter — file_picker v11 API
+
+The correct call is `FilePicker.pickFiles()` directly — no `.platform`
+intermediary. Pass `withData: true` to get file bytes in memory (required
+on Android where file paths are not directly accessible). The result is a
+`FilePickerResult?`; access bytes via `result.files.first.bytes`.
+
+```dart
+final result = await FilePicker.pickFiles(withData: true);
+if (result == null || result.files.isEmpty) return;
+final bytes = result.files.first.bytes; // Uint8List?
+```
+
+## Clipboard security — auto-clear limitations
+
+`Clipboard.setData(ClipboardData(text: ''))` clears the *system* clipboard —
+the next paste from any app will be empty. However, clipboard manager apps
+(Samsung Keyboard history, KDE Klipper, Gboard history) maintain their own
+ring buffer of recent clips stored separately from the system clipboard.
+Gabbro has no API access to these — they survive our clear.
+
+Auto-clear is therefore best-effort: it closes the accidental-paste window
+but cannot reach clipboard history managers. Always inform the user of this
+limitation (Gabbro does so via the copy snackbar). Document honestly in
+`docs/SECURITY.md` when written.
+
+Python analogy: like `del my_dict['key']` — removes the reference, but if
+another dict also holds the value, it persists.
+
+## Autofill vs clipboard — security distinction
+
+Autofill does not use the OS clipboard. Credentials go directly from the
+autofill service into the target field via the OS autofill framework —
+clipboard history managers never see them. This is a meaningful security
+advantage over copy-paste. See ARCHITECTURE.md Bikeshed for implementation
+notes.
+
 ## Flutter — App Lifecycle & Auto-lock
 
 ### WidgetsBindingObserver
