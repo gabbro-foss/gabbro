@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
@@ -90,7 +89,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   String? _pickedFilename;
   Uint8List? _pickedFileBytes;
   late final TextEditingController _fileNotesController;
-  final FocusNode _filePathFocus = FocusNode();
 
   // ── Custom entry fields ─────────────────────────────────────────────────────
   late final TextEditingController _customTitleController;
@@ -267,8 +265,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _creditLimitFocus.dispose();
     _cardAccountNumberFocus.dispose();
     _fileNotesController.dispose();
-    _filePathController.dispose();
-    _filePathFocus.dispose();
     _customTitleController.dispose();
     _customTitleFocus.dispose();
     for (final f in _customFields) {
@@ -815,11 +811,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       focusNode: _emailFocus,
       keyboardType: TextInputType.emailAddress,
       decoration: const InputDecoration(
-        labelText: 'Email',
+        labelText: 'Email (optional)',
         border: OutlineInputBorder(),
       ),
-      validator: (v) =>
-          (v == null || v.isEmpty) ? 'Email is required' : null,
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_phoneFocus),
     ),
@@ -1031,9 +1025,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   // ── File fields ──────────────────────────────────────────────────────────────
 
-  final TextEditingController _filePathController = TextEditingController();
-  String? _fileLoadError;
-
   List<Widget> _fileFields() => [
     if (_pickedFilename != null)
       Padding(
@@ -1043,8 +1034,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             const Icon(Icons.insert_drive_file_outlined),
             const SizedBox(width: 8),
             Expanded(
-              child:
-                  Text(_pickedFilename!, overflow: TextOverflow.ellipsis),
+              child: Text(_pickedFilename!, overflow: TextOverflow.ellipsis),
             ),
             if (_pickedFileBytes != null)
               Text(
@@ -1054,59 +1044,32 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
           ],
         ),
       ),
-    Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: TextFormField(
-            controller: _filePathController,
-            focusNode: _filePathFocus,
-            autofocus: true,
-            decoration: InputDecoration(
-              labelText: 'File path',
-              border: const OutlineInputBorder(),
-              errorText: _fileLoadError,
-            ),
-            validator: (_) =>
-                _pickedFileBytes == null ? 'Please load a file' : null,
-            onFieldSubmitted: (_) => _loadFileFromPath(),
-          ),
+    if (_pickedFileBytes == null)
+      const Padding(
+        padding: EdgeInsets.only(bottom: 12),
+        child: Text(
+          'No file selected',
+          style: TextStyle(fontStyle: FontStyle.italic),
         ),
-        const SizedBox(width: 8),
-        Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: OutlinedButton(
-            onPressed: _loadFileFromPath,
-            child: const Text('Load'),
-          ),
-        ),
-      ],
+      ),
+    OutlinedButton.icon(
+      onPressed: _pickFile,
+      icon: const Icon(Icons.folder_open_outlined),
+      label: const Text('Pick file'),
     ),
     const SizedBox(height: 12),
     _optionalTextField(_fileNotesController, 'Notes', maxLines: 3),
   ];
 
-  Future<void> _loadFileFromPath() async {
-    final path = _filePathController.text.trim();
-    if (path.isEmpty) {
-      setState(() => _fileLoadError = 'Enter a file path');
-      return;
-    }
-    final file = File(path);
-    if (!file.existsSync()) {
-      setState(() => _fileLoadError = 'File not found');
-      return;
-    }
-    try {
-      final bytes = await file.readAsBytes();
-      setState(() {
-        _pickedFilename = path.split(Platform.pathSeparator).last;
-        _pickedFileBytes = bytes;
-        _fileLoadError = null;
-      });
-    } catch (e) {
-      setState(() => _fileLoadError = 'Could not read file: $e');
-    }
+  Future<void> _pickFile() async {
+    final result = await FilePicker.pickFiles(withData: true);
+    if (result == null || result.files.isEmpty) return;
+    final f = result.files.first;
+    if (f.bytes == null) return;
+    setState(() {
+      _pickedFilename = f.name;
+      _pickedFileBytes = f.bytes;
+    });
   }
 
   // ── Custom entry fields ──────────────────────────────────────────────────────
