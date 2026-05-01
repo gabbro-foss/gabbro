@@ -37,9 +37,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
   String? _error;
   String _selectedFilter = 'All';
   Set<String> _selectedIds = {};
+  bool _selectionMode = false;
   bool _isDeleting = false;
   bool _isImporting = false;
-  bool get _isSelecting => _selectedIds.isNotEmpty;
+  bool get _isSelecting => _selectionMode || _selectedIds.isNotEmpty;
 
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
@@ -418,7 +419,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
       ),
     );
     // Dispose after dialog is fully closed and removed from the tree.
-    WidgetsBinding.instance.addPostFrameCallback((_) => confirmController.dispose());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => confirmController.dispose(),
+    );
     if (step2 != true) return;
     if (!mounted) return;
 
@@ -478,6 +481,18 @@ class _VaultListScreenState extends State<VaultListScreen> {
               ),
             ),
           if (!_isSelecting) ...[
+            Builder(
+              builder: (context) {
+                final isNarrow = MediaQuery.of(context).size.width < 600;
+                return isNarrow
+                    ? IconButton(
+                        icon: const Icon(Icons.checklist),
+                        tooltip: 'Select entries',
+                        onPressed: () => setState(() => _selectionMode = true),
+                      )
+                    : const SizedBox.shrink();
+              },
+            ),
             IconButton(
               icon: const Icon(Icons.lock_outline),
               tooltip: 'Lock vault',
@@ -560,7 +575,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.close),
-              onPressed: () => setState(() => _selectedIds.clear()),
+              onPressed: () => setState(() {
+                _selectedIds.clear();
+                _selectionMode = false;
+              }),
             ),
           ],
         ],
@@ -704,9 +722,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                             Icon(
                                               _entryTypeIcon(entry.entryType),
                                               size: 20,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
                                               semanticLabel: _displayType(
                                                 entry.entryType,
                                               ),
@@ -714,11 +732,13 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                             Checkbox(
                                               visualDensity:
                                                   VisualDensity.compact,
-                                              value: _selectedIds
-                                                  .contains(entry.id),
+                                              value: _selectedIds.contains(
+                                                entry.id,
+                                              ),
                                               onChanged: (_) => setState(() {
-                                                if (_selectedIds
-                                                    .contains(entry.id)) {
+                                                if (_selectedIds.contains(
+                                                  entry.id,
+                                                )) {
                                                   _selectedIds.remove(entry.id);
                                                 } else {
                                                   _selectedIds.add(entry.id);
@@ -728,32 +748,37 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                           ],
                                         )
                                       : _isSelecting
-                                          ? Checkbox(
-                                              visualDensity:
-                                                  VisualDensity.compact,
-                                              value: _selectedIds
-                                                  .contains(entry.id),
-                                              onChanged: (_) => setState(() {
-                                                if (_selectedIds
-                                                    .contains(entry.id)) {
-                                                  _selectedIds.remove(entry.id);
-                                                } else {
-                                                  _selectedIds.add(entry.id);
-                                                }
-                                              }),
-                                            )
-                                          : Icon(
-                                              _entryTypeIcon(entry.entryType),
-                                              size: 20,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                              semanticLabel: _displayType(
-                                                entry.entryType,
-                                              ),
-                                            ),
+                                      ? Checkbox(
+                                          visualDensity: VisualDensity.compact,
+                                          value: _selectedIds.contains(
+                                            entry.id,
+                                          ),
+                                          onChanged: (_) => setState(() {
+                                            if (_selectedIds.contains(
+                                              entry.id,
+                                            )) {
+                                              _selectedIds.remove(entry.id);
+                                            } else {
+                                              _selectedIds.add(entry.id);
+                                            }
+                                          }),
+                                        )
+                                      : Icon(
+                                          _entryTypeIcon(entry.entryType),
+                                          size: 20,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
+                                          semanticLabel: _displayType(
+                                            entry.entryType,
+                                          ),
+                                        ),
                                   title: Text(_displayTitle(entry)),
                                   subtitle: Text(_displayType(entry.entryType)),
+                                  onLongPress: () => setState(() {
+                                    _selectionMode = true;
+                                    _selectedIds.add(entry.id);
+                                  }),
                                   onTap: () async {
                                     if (_isSelecting) {
                                       setState(() {
