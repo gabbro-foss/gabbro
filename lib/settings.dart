@@ -14,6 +14,7 @@ class AppSettings {
   final bool highContrast; // placeholder — not yet implemented
   final ForegroundLockTimeout foregroundLockTimeout;
   final BackgroundLockTimeout backgroundLockTimeout;
+  final ClipboardClearTimeout clipboardClearTimeout;
 
   const AppSettings({
     this.theme = ThemeChoice.system,
@@ -21,6 +22,7 @@ class AppSettings {
     this.highContrast = false,
     this.foregroundLockTimeout = ForegroundLockTimeout.thirtySeconds,
     this.backgroundLockTimeout = BackgroundLockTimeout.fiveMinutes,
+    this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
   });
 
   static AppSettings get defaults => const AppSettings();
@@ -33,6 +35,7 @@ class AppSettings {
     'high_contrast': highContrast,
     'foreground_lock_timeout': foregroundLockTimeout.name,
     'background_lock_timeout': backgroundLockTimeout.name,
+    'clipboard_clear_timeout': clipboardClearTimeout.name,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -48,6 +51,9 @@ class AppSettings {
       backgroundLockTimeout: BackgroundLockTimeout.values.byName(
         json['background_lock_timeout'] as String? ?? 'fiveMinutes',
       ),
+      clipboardClearTimeout: ClipboardClearTimeout.values.byName(
+        json['clipboard_clear_timeout'] as String? ?? 'sixtySeconds',
+      ),
     );
   }
 
@@ -57,12 +63,14 @@ class AppSettings {
     bool? highContrast,
     ForegroundLockTimeout? foregroundLockTimeout,
     BackgroundLockTimeout? backgroundLockTimeout,
+    ClipboardClearTimeout? clipboardClearTimeout,
   }) => AppSettings(
     theme: theme ?? this.theme,
     textSize: textSize ?? this.textSize,
     highContrast: highContrast ?? this.highContrast,
     foregroundLockTimeout: foregroundLockTimeout ?? this.foregroundLockTimeout,
     backgroundLockTimeout: backgroundLockTimeout ?? this.backgroundLockTimeout,
+    clipboardClearTimeout: clipboardClearTimeout ?? this.clipboardClearTimeout,
   );
 
   // ── File I/O ───────────────────────────────────────────────────────────
@@ -129,7 +137,11 @@ class AppSettings {
 
   // How long the app can stay backgrounded before the vault locks.
   // Options: "oneMinute" | "fiveMinutes" | "fifteenMinutes" | "never"
-  "background_lock_timeout": "${backgroundLockTimeout.name}"
+  "background_lock_timeout": "${backgroundLockTimeout.name}",
+
+  // How long before the clipboard is cleared after copying a secret.
+  // Options: "never" | "thirtySeconds" | "sixtySeconds" | "twoMinutes"
+  "clipboard_clear_timeout": "${clipboardClearTimeout.name}"
 }
 ''';
 
@@ -158,3 +170,5 @@ enum TextSizeChoice { small, regular, large, extra_large }
 enum ForegroundLockTimeout { thirtySeconds, oneMinute, fiveMinutes, never }
 
 enum BackgroundLockTimeout { oneMinute, fiveMinutes, fifteenMinutes, never }
+
+enum ClipboardClearTimeout { never, thirtySeconds, sixtySeconds, twoMinutes }

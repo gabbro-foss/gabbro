@@ -676,6 +676,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                       MaterialPageRoute(
                                         builder: (context) => EntryDetailScreen(
                                           entry: getEntry(id: entry.id),
+                                          clipboardClearTimeout: GabbroApp.of(
+                                            context,
+                                          ).settings.clipboardClearTimeout,
                                         ),
                                       ),
                                     );

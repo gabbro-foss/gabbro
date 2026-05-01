@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
+import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 
@@ -14,12 +16,14 @@ class EntryDetailScreen extends StatefulWidget {
   final VaultEntryData entry;
   final Future<void> Function(String id) onDeleteEntry;
   final Future<void> Function(String value) onCopyToClipboard;
+  final ClipboardClearTimeout clipboardClearTimeout;
 
   const EntryDetailScreen({
     super.key,
     required this.entry,
     this.onDeleteEntry = _defaultDelete,
     this.onCopyToClipboard = _defaultCopy,
+    this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
   });
 
   @override
@@ -28,6 +32,7 @@ class EntryDetailScreen extends StatefulWidget {
 
 class _EntryDetailScreenState extends State<EntryDetailScreen> {
   late VaultEntryData _entry;
+  Timer? _clipboardClearTimer;
 
   bool _passwordObscured = true;
   bool _cardNumberObscured = true;
@@ -38,6 +43,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   void initState() {
     super.initState();
     _entry = widget.entry;
+  }
+
+  @override
+  void dispose() {
+    _clipboardClearTimer?.cancel();
+    super.dispose();
   }
 
   String _entryId() => switch (_entry) {
@@ -410,11 +421,33 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
 
   Future<void> _copyToClipboard(String value) async {
     await widget.onCopyToClipboard(value);
+    _clipboardClearTimer?.cancel();
+
+    final timeout = widget.clipboardClearTimeout;
+    final duration = switch (timeout) {
+      ClipboardClearTimeout.never => null,
+      ClipboardClearTimeout.thirtySeconds => const Duration(seconds: 30),
+      ClipboardClearTimeout.sixtySeconds => const Duration(seconds: 60),
+      ClipboardClearTimeout.twoMinutes => const Duration(minutes: 2),
+    };
+
+    if (duration != null) {
+      _clipboardClearTimer = Timer(duration, () {
+        Clipboard.setData(const ClipboardData(text: ''));
+      });
+    }
+
     if (mounted) {
+      final label = switch (timeout) {
+        ClipboardClearTimeout.never => 'Copied — clipboard never clears automatically',
+        ClipboardClearTimeout.thirtySeconds => 'Copied — clipboard clears in 30s',
+        ClipboardClearTimeout.sixtySeconds => 'Copied — clipboard clears in 60s',
+        ClipboardClearTimeout.twoMinutes => 'Copied — clipboard clears in 2 min',
+      };
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Copied to clipboard'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text(label),
+          duration: const Duration(seconds: 3),
         ),
       );
     }

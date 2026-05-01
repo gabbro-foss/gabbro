@@ -83,6 +83,29 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 onSelected: (v) =>
                     _update(_settings.copyWith(backgroundLockTimeout: v)),
               ),
+              const SizedBox(height: 32),
+
+              // ── Clipboard clear ────────────────────────────────────────
+              SectionHeader(label: 'Clipboard clear'),
+              const SizedBox(height: 4),
+              const Text(
+                'Clear the clipboard this long after copying a secret. '
+                'Note: clipboard managers may retain a copy.',
+                style: TextStyle(fontSize: 12),
+              ),
+              const SizedBox(height: 8),
+              SegmentedRow<ClipboardClearTimeout>(
+                values: ClipboardClearTimeout.values,
+                selected: _settings.clipboardClearTimeout,
+                label: (v) => switch (v) {
+                  ClipboardClearTimeout.never => 'Never',
+                  ClipboardClearTimeout.thirtySeconds => '30s',
+                  ClipboardClearTimeout.sixtySeconds => '60s',
+                  ClipboardClearTimeout.twoMinutes => '2 min',
+                },
+                onSelected: (v) =>
+                    _update(_settings.copyWith(clipboardClearTimeout: v)),
+              ),
             ],
           ),
         ),
