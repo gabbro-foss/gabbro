@@ -193,8 +193,14 @@ class _LinkTile extends StatelessWidget {
             label: const Text('Open in browser'),
             onPressed: () async {
               final uri = Uri.parse(url);
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              final launched = await launchUrl(
+                uri,
+                mode: LaunchMode.externalApplication,
+              );
+              if (!launched && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Could not open $url')),
+                );
               }
               if (context.mounted) Navigator.of(context).pop();
             },
@@ -260,8 +266,14 @@ class _ComponentTile extends StatelessWidget {
               label: const Text('Open in browser'),
               onPressed: () async {
                 final uri = Uri.parse(url);
-                if (await canLaunchUrl(uri)) {
-                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                final launched = await launchUrl(
+                  uri,
+                  mode: LaunchMode.externalApplication,
+                );
+                if (!launched && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Could not open $url')),
+                  );
                 }
                 if (context.mounted) Navigator.of(context).pop();
               },

@@ -583,14 +583,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Bikeshed doc update — removed done items (accessible font
-  sizing, icons on entry type cards, Enter key submits forms), updated
-  high-contrast mode status, About screen bug root cause documented,
-  block copy/paste spec refined, tablet testing and Destination Linux
-  outreach added.
-- **Next task:** Fix About screen "Open in browser" bug — add `<queries>`
-  block to `android/app/src/main/AndroidManifest.xml`, harden
-  `canLaunchUrl` guard with snackbar fallback.
+- **Completed:** About screen "Open in browser" bug fixed — added `https`/
+  `http` `<queries>` intents to `AndroidManifest.xml`, replaced silent
+  `canLaunchUrl` guard with direct `launchUrl` + snackbar fallback.
+  Verified on Samsung S23 (Android 16). 85 Flutter tests passing.
+- **Next task:** Portrait mode selection — add long-press to enter
+  selection mode on narrow screens.
 
 ---
 
@@ -931,6 +929,18 @@ the first public tag.
   vault list tile sizing, entry detail screen proportions, and selection
   mode affordances. Document any layout breakage in this section as new
   bikeshed items.
+
+- **Verify Android storage permissions:** Gabbro currently declares no
+  storage permissions in `AndroidManifest.xml`. This is correct as long
+  as: (1) the vault file lives in app-private storage via
+  `getApplicationDocumentsDirectory()` (no permission needed on any
+  Android version); and (2) export/import uses `file_picker` which
+  operates via the Storage Access Framework (SAF), granting URI-scoped
+  access without a blanket storage permission. Verify both assumptions
+  hold on Android 11+ before v1. If any code path writes outside
+  app-private storage without SAF, `MANAGE_EXTERNAL_STORAGE` would be
+  required — a heavily restricted permission that draws Play Store
+  scrutiny.
 
 - **Landscape mode — hide chevron when chips fit:** When all filter chips
   are visible without scrolling (landscape or wide screen), the chevron
