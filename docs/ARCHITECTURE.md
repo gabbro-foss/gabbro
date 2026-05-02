@@ -928,14 +928,6 @@ the first public tag.
   testing discipline, not an architecture change. Reference: WCAG 1.4.4
   (Resize Text) applies here alongside the font sizing work.
 
-- **Colour scheme — olivine green:** The current seed colour is purple
-  (`0xFF534AB7`). Consider changing to an olivine green to better match
-  the gabbro rock aesthetic. Prerequisite before making the change:
-  validate the new palette against WCAG 1.4.3 (Contrast, minimum) and
-  ADR-003 (colour-blind safety) — run the candidate colour through a CVD
-  simulator and contrast checker first. Low risk if the prerequisite is
-  met; purely cosmetic otherwise.
-
 - **Block copy/paste on master passphrase fields:** On `OnboardingScreen`
   and `UnlockScreen`, the master passphrase fields should block clipboard
   paste to prevent accidental exposure via clipboard history tools.
@@ -957,6 +949,13 @@ the first public tag.
   it. Prevents silent accumulation of orphaned vault files on the user's device
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
+
+- **Alphabet index bar — usability fixes:** Two known issues: (a) the
+  index letters are too small to tap reliably; (b) scrolling the index
+  bar does not reliably reach the letter `A` (first item) when scrolling
+  up from the middle. Investigate both before fixing — (a) may be a
+  simple font size / padding increase; (b) may be an off-by-one in the
+  `ItemScrollController.scrollTo` call or the index construction.
 
 - **Custom filter chips:** Allow users to add new filter chips based on
   folders or custom tags, beyond the fixed entry-type chips. YAGNI risk is
