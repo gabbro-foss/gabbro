@@ -789,14 +789,6 @@ the first public tag.
   replace with `DateFormat('dd MMM yyyy, HH:mm').format(dt)` from
   `package:intl` — one-line change, picks up device locale automatically.
 
-- **Entropy indicator on all passphrase inputs:** Onboarding and Change
-  Passphrase screens both show a real-time entropy indicator. Remaining:
-  audit the Unlock Screen — users re-entering their passphrase after a
-  cold boot may benefit from feedback too, though the case is weaker there
-  (they are entering an existing passphrase, not choosing a new one).
-  Implement using the existing `entropy` bridge function already exposed
-  from Rust.
-
 - **Autofill:** How will autofill work across platforms? On desktop,
   browser extensions (Chrome/Firefox/etc.) are the standard approach —
   requires building and maintaining separate extension(s). On mobile there
