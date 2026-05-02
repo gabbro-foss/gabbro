@@ -128,11 +128,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (app == null) return;
     final current = app.settings;
     final isOn =
-        current.highContrast && current.textSize == TextSizeChoice.extraLarge;
+        current.highContrast && current.textSize == TextSizeChoice.xxLarge;
     await app.updateSettings(
       current.copyWith(
         highContrast: !isOn,
-        textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.extraLarge,
+        textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.xxLarge,
       ),
     );
   }
@@ -143,7 +143,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final isAccessibilityOn =
         app != null &&
         app.settings.highContrast &&
-        app.settings.textSize == TextSizeChoice.extraLarge;
+        app.settings.textSize == TextSizeChoice.xxLarge;
 
     return Scaffold(
       body: Stack(
@@ -367,17 +367,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             top: MediaQuery.of(context).padding.top + 8,
             right: 8,
             child: SafeArea(
-              child: OutlinedButton.icon(
-                icon: Icon(
-                  Icons.accessibility_new,
-                  color: isAccessibilityOn
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-                ),
-                label: const Text('Accessibility'),
-                onPressed: _toggleAccessibility,
-                style: OutlinedButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
+              child: AnimatedOpacity(
+                opacity: MediaQuery.of(context).viewInsets.bottom > 0 ? 0.0 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                child: OutlinedButton.icon(
+                  icon: Icon(
+                    Icons.accessibility_new,
+                    color: isAccessibilityOn
+                        ? Theme.of(context).colorScheme.primary
+                        : null,
+                  ),
+                  label: const Text('Accessibility'),
+                  onPressed: _toggleAccessibility,
+                  style: OutlinedButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                  ),
                 ),
               ),
             ),

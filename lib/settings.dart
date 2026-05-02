@@ -124,7 +124,7 @@ class AppSettings {
   "theme": "${theme.name}",
 
   // Interface text size.
-  // Options: "small" | "regular" | "large" | "extraLarge"
+  // Options: "small" | "regular" | "large" | "extraLarge" | "xxLarge"
   "text_size": "${textSize.name}",
 
   // High-contrast mode (not yet implemented — reserved for future use).
@@ -165,7 +165,7 @@ class AppSettings {
 
 enum ThemeChoice { system, light, dark }
 
-enum TextSizeChoice { small, regular, large, extraLarge }
+enum TextSizeChoice { small, regular, large, extraLarge, xxLarge }
 
 enum ForegroundLockTimeout { thirtySeconds, oneMinute, fiveMinutes, never }
 

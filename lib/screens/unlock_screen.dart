@@ -83,28 +83,9 @@ class _UnlockScreenState extends State<UnlockScreen> {
     StrengthTier.centuries => 'Excellent',
   };
 
-  Future<void> _toggleAccessibility() async {
-    final app = GabbroApp.maybeOf(context);
-    if (app == null) return;
-    final current = app.settings;
-    final isOn =
-        current.highContrast && current.textSize == TextSizeChoice.extraLarge;
-    await app.updateSettings(
-      current.copyWith(
-        highContrast: !isOn,
-        textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.extraLarge,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final app = GabbroApp.maybeOf(context);
-    final isAccessibilityOn =
-        app != null &&
-        app.settings.highContrast &&
-        app.settings.textSize == TextSizeChoice.extraLarge;
-
     return Scaffold(
       body: Stack(
         children: [
@@ -195,26 +176,6 @@ class _UnlockScreenState extends State<UnlockScreen> {
                           : const Text('Unlock'),
                     ),
                   ],
-                ),
-              ),
-            ),
-          ),
-          // ── Accessibility shortcut — top-right corner ──────────────────
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
-            right: 8,
-            child: SafeArea(
-              child: OutlinedButton.icon(
-                icon: Icon(
-                  Icons.accessibility_new,
-                  color: isAccessibilityOn
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
-                ),
-                label: const Text('Accessibility'),
-                onPressed: _toggleAccessibility,
-                style: OutlinedButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
                 ),
               ),
             ),

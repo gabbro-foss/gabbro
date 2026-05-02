@@ -171,6 +171,7 @@ class _GabbroAppState extends State<GabbroApp>
     TextSizeChoice.regular => 1.0,
     TextSizeChoice.large => 1.15,
     TextSizeChoice.extraLarge => 1.3,
+    TextSizeChoice.xxLarge => 1.5,
   };
 
   static ThemeData _lightTheme({required bool highContrast}) {
