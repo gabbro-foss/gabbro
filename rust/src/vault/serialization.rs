@@ -55,6 +55,7 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
+            previous_password: None,
         });
         let bytes = serialize_entries(&[entry]).unwrap();
         let recovered = deserialize_entries(&bytes).unwrap();
@@ -84,6 +85,7 @@ mod tests {
                     hidden: true,
                 }],
                 attachments: vec![],
+                previous_password: None,
             }),
             VaultEntry::Note(NoteEntry {
                 meta: default_meta("id-002"),

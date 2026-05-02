@@ -71,6 +71,17 @@ pub struct LoginEntry {
     /// User-defined extra fields (e.g. "Security question").
     pub custom_fields: Vec<CustomField>,
     pub attachments: Vec<EntryAttachment>,
+    /// Previous password value, retained for typo recovery.
+    pub previous_password: Option<PreviousSecret>,
+}
+
+/// Holds one previous value of a sensitive field, for typo recovery.
+#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+pub struct PreviousSecret {
+    /// The previous secret value.
+    pub value: String,
+    /// ISO 8601 timestamp: when the current value replaced this one.
+    pub saved_at: String,
 }
 
 /// A single user-defined key/value field on an entry.
@@ -136,6 +147,10 @@ pub struct CardEntry {
     /// User-defined extra fields — overflow from import (e.g. portal username/password).
     pub custom_fields: Vec<CustomField>,
     pub attachments: Vec<EntryAttachment>,
+    /// Previous CVV value, retained for typo recovery.
+    pub previous_cvv: Option<PreviousSecret>,
+    /// Previous PIN value, retained for typo recovery.
+    pub previous_pin: Option<PreviousSecret>,
 }
 
 impl CardEntry {
@@ -158,6 +173,8 @@ impl CardEntry {
         notes: Option<String>,
         custom_fields: Vec<CustomField>,
         attachments: Vec<EntryAttachment>,
+        previous_cvv: Option<PreviousSecret>,
+        previous_pin: Option<PreviousSecret>,
     ) -> Result<CardEntry, String> {
         let digit_count = card_number.chars().filter(|c| c.is_ascii_digit()).count();
         if digit_count < 12 || digit_count > 19 {
@@ -184,6 +201,8 @@ impl CardEntry {
             notes,
             custom_fields,
             attachments,
+            previous_cvv,
+            previous_pin,
         })
     }
 }
@@ -259,6 +278,7 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
+            previous_password: None,
         };
 
         assert_eq!(entry.title, "GitHub");
@@ -279,6 +299,7 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
+            previous_password: None,
         };
 
         assert!(entry.notes.is_none());
@@ -295,6 +316,7 @@ mod tests {
             notes: Some(String::from("my github account")),
             custom_fields: vec![],
             attachments: vec![],
+            previous_password: None,
         };
 
         assert!(entry.notes.is_some());
@@ -317,6 +339,7 @@ mod tests {
             notes: None,
             custom_fields: vec![field],
             attachments: vec![],
+            previous_password: None,
         };
 
         assert_eq!(entry.custom_fields.len(), 1);
@@ -375,6 +398,8 @@ mod tests {
             None,
             vec![],
             vec![],
+            None,
+            None,
         ).unwrap();
 
         assert_eq!(entry.cardholder_name, "Rob Smith");
@@ -402,6 +427,8 @@ mod tests {
             None,
             vec![],
             vec![],
+            None,
+            None,
         );
 
         assert!(result.is_err());
@@ -426,6 +453,8 @@ mod tests {
             None,
             vec![],
             vec![],
+            None,
+            None,
         );
 
         assert!(result.is_err());
@@ -444,6 +473,91 @@ mod tests {
         assert_eq!(entry.filename, "secret.pdf");
         assert_eq!(entry.data.len(), 4);
         assert_eq!(entry.data[3], 255u8);
+    }
+
+    #[test]
+    fn previous_secret_is_none_by_default_on_login() {
+        let entry = LoginEntry {
+            meta: default_meta(),
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("hunter2"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        };
+        assert!(entry.previous_password.is_none());
+    }
+
+    #[test]
+    fn login_entry_can_store_previous_password() {
+        let prev = PreviousSecret {
+            value: String::from("old_hunter2"),
+            saved_at: String::from("2025-01-01T00:00:00Z"),
+        };
+        let entry = LoginEntry {
+            meta: default_meta(),
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("new_hunter2"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: Some(prev),
+        };
+        assert!(entry.previous_password.is_some());
+        assert_eq!(entry.previous_password.clone().unwrap().value, "old_hunter2");
+    }
+
+    #[test]
+    fn card_entry_can_store_previous_cvv() {
+        let entry = CardEntry::new(
+            default_meta(),
+            None,
+            String::from("active"),
+            String::from("Rob Smith"),
+            String::from("4111111111111111"),
+            String::from("12/28"),
+            String::from("999"),
+            None, None,
+            Some(String::from("Visa")),
+            None, None, None, None,
+            vec![], vec![],
+            Some(PreviousSecret {
+                value: String::from("123"),
+                saved_at: String::from("2025-01-01T00:00:00Z"),
+            }),
+            None,
+        ).unwrap();
+        assert!(entry.previous_cvv.is_some());
+        assert_eq!(entry.previous_cvv.clone().unwrap().value, "123");
+    }
+
+    #[test]
+    fn card_entry_can_store_previous_pin() {
+        let entry = CardEntry::new(
+            default_meta(),
+            None,
+            String::from("active"),
+            String::from("Rob Smith"),
+            String::from("4111111111111111"),
+            String::from("12/28"),
+            String::from("123"),
+            None, None,
+            Some(String::from("Visa")),
+            None, None, None, None,
+            vec![], vec![],
+            None,
+            Some(PreviousSecret {
+                value: String::from("4321"),
+                saved_at: String::from("2025-01-01T00:00:00Z"),
+            }),
+        ).unwrap();
+        assert!(entry.previous_pin.is_some());
+        assert_eq!(entry.previous_pin.clone().unwrap().value, "4321");
     }
 
     #[test]

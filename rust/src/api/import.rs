@@ -88,6 +88,7 @@ pub async fn import_from_csv(input: String, config: CsvImportConfigData) -> Resu
                 })
                 .collect(),
             attachments: vec![],
+            previous_password: None,
         });
         session::session_add_entry_no_save(entry)?;
     }

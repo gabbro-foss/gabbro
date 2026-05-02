@@ -168,6 +168,7 @@ fn convert_login(
         notes: non_empty(note),
         custom_fields,
         attachments,
+        previous_password: None,
     }
 }
 
@@ -207,6 +208,8 @@ fn convert_card(
         non_empty(note),                                               // notes
         custom_fields,
         attachments,
+        None,
+        None,
     )
 }
 

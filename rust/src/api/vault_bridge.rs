@@ -172,6 +172,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 .map(|f| CustomField { label: f.label, value: f.value, hidden: f.hidden })
                 .collect(),
             attachments: vec![],
+            previous_password: None,
         })),
         VaultEntryData::Note(d) => Ok(VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -232,6 +233,8 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 d.notes,
                 vec![],
                 vec![],
+                None,
+                None,
             )?;
             Ok(VaultEntry::Card(entry))
         }
@@ -476,6 +479,7 @@ mod tests {
                 notes: None,
                 custom_fields: vec![],
                 attachments: vec![],
+                previous_password: None,
             }),
         ];
 

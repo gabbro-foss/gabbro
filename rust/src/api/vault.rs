@@ -278,6 +278,7 @@ pub fn create_login_entry(
         notes,
         custom_fields: internal_fields,
         attachments: vec![],
+        previous_password: None,
     };
     login_entry_to_data(&entry)
 }
@@ -374,6 +375,8 @@ pub fn create_card_entry(
         notes,
         vec![],
         vec![],
+        None,
+        None,
     )?;
     Ok(card_entry_to_data(&entry))
 }
@@ -559,6 +562,7 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
                 })
                 .collect(),
             attachments: e.attachments.clone(),
+            previous_password: e.previous_password.clone(),
         }),
         VaultEntry::Card(e) => VaultEntry::Card(CardEntry {
             meta: e.meta.clone(),
@@ -577,6 +581,8 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
             notes: e.notes.clone(),
             custom_fields: e.custom_fields.clone(),
             attachments: e.attachments.clone(),
+            previous_cvv: e.previous_cvv.clone(),
+            previous_pin: e.previous_pin.clone(),
         }),
         // Note, Identity, File, Custom carry no password-class fields —
         // return a plain clone.
@@ -1366,6 +1372,7 @@ mod tests {
                 notes: None,
                 custom_fields: vec![],
                 attachments: vec![],
+                previous_password: None,
             }),
         ];
 
@@ -1397,6 +1404,7 @@ mod tests {
                 notes: None,
                 custom_fields: vec![],
                 attachments: vec![],
+                previous_password: None,
             }),
         ];
 
@@ -1439,6 +1447,8 @@ mod tests {
                 notes: None,
                 custom_fields: vec![],
                 attachments: vec![],
+                previous_cvv: None,
+                previous_pin: None,
             }),
         ];
 
@@ -1484,6 +1494,7 @@ mod tests {
                     },
                 ],
                 attachments: vec![],
+                previous_password: None,
             }),
         ];
 

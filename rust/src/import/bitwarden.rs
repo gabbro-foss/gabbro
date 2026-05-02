@@ -195,6 +195,7 @@ fn convert_login(
         notes,
         custom_fields,
         attachments: vec![],
+        previous_password: None,
     })
 }
 
@@ -242,6 +243,8 @@ fn convert_card(
         notes,
         custom_fields,
         vec![],
+        None,
+        None,
     )
     .ok()
 }
