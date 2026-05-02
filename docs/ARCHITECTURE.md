@@ -664,6 +664,16 @@ the first public tag.
 
 ### Dependencies
 
+- **Dependency licence audit for About screen:** Before v1, verify that
+  every entry in `_kComponents` in `about_screen.dart` is accurate and
+  complete against the actual `Cargo.toml` and `pubspec.yaml` at that
+  time. Dependencies added or removed during development will not
+  automatically update the About screen. Also verify licence strings
+  against each project's own `LICENSE` file — dual-licence projects
+  (Apache-2.0 / MIT) should be listed as such. The three language/runtime
+  entries (Rust, Dart, Flutter) are stable and unlikely to change.
+  Low effort; do as a pre-release gate, not before.
+
 - **Audit direct Flutter dependencies before v1:** Current direct deps in
   `pubspec.yaml`: `flutter`, `flutter_rust_bridge`, `rust_lib_gabbro`,
   `freezed_annotation`, `path_provider`, `scrollable_positioned_list`,
@@ -733,11 +743,62 @@ the first public tag.
 
 ### Features & UX
 
+- **Vault sync across devices:** Moving or merging a `.gabbro` vault file
+  between devices. Distinct from both "Import entries" (from other password
+  managers) and "Add vault" (multiple vaults on one device). Three
+  sub-cases to design for:
+
+  (i) **Export → import (one-shot overwrite):** User exports `.gabbro`
+  from device A, imports to device B. Simple: decrypt both, discard B's
+  entries, replace with A's, re-encrypt. No conflict resolution needed.
+  Requires passphrase available on B (same passphrase — the common case
+  for personal sync).
+
+  (ii) **File-level sync via NAS / cloud (automated):** User syncs the
+  `.gabbro` file itself using rsync, Syncthing, etc. Gabbro does not need
+  to do anything here — the file is the unit of sync. The risk: concurrent
+  edits on two devices produce two diverged files. Gabbro should detect
+  this (file modified-time newer than last-loaded timestamp) and warn the
+  user rather than silently overwriting. A "last writer wins" policy is
+  acceptable for v1 with an explicit warning.
+
+  (iii) **Entry-level merge (full sync):** Decrypt both vaults, diff entry
+  sets by UUID, apply a merge strategy. Analogous to a database
+  `MERGE`/`UPSERT` keyed on UUID. Conflict resolution options (to expose
+  as user-configurable sync settings):
+  - Last-write-wins per entry (compare `updated_at`)
+  - Union (keep all entries from both — no deletions propagated)
+  - rsync `--delete` style (source is authoritative; deletions propagate)
+  - Interactive (prompt user per conflict)
+
+  Key questions: which sub-cases are in scope for v1? Sub-case (i) is low
+  effort and high value — a good v1 target. Sub-case (ii) requires only
+  a staleness check. Sub-case (iii) is a full session (or several) on its
+  own. Does merge require a new bridge function `merge_vaults(path_a,
+  path_b, strategy)`? How does the UI surface sync settings so they persist
+  and are reusable (sync is a regular operation, not a one-off)?
+
+  This is at minimum one full session; sub-case (iii) likely several.
+  Do not start without a design doc agreed first.
+
 - **Timestamp localisation (i18n):** `formatTimestamp()` in
   `entry_detail_screen.dart` uses a hand-rolled English month
   abbreviations array. When internationalisation (i18n) is added,
   replace with `DateFormat('dd MMM yyyy, HH:mm').format(dt)` from
   `package:intl` — one-line change, picks up device locale automatically.
+
+- **XXL font size step:** Add a fifth `TextSizeChoice` value (`xxLarge`)
+  above the current `extraLarge` (1.3×). Suggested scale factor: 1.5×.
+  Changes required:
+  - Add `xxLarge` to the `TextSizeChoice` enum in `lib/settings.dart`
+  - Add the 1.5× case to the `TextScaler.linear()` switch
+  - Add the option to the segmented button row in `appearance_screen.dart`
+  - Update the accessibility shortcut (currently hardcodes `extraLarge`)
+    to jump to `xxLarge` instead — if a user hits the accessibility button
+    they want maximum legibility
+  - Update `AppSettings.fromJson()` / `toJson()` for the new enum value
+  - Update affected tests in `test/appearance_settings_test.dart`
+  Low effort, self-contained. Good candidate for a short session.
 
 - **Entropy indicator on all passphrase inputs:** Onboarding and Change
   Passphrase screens both show a real-time entropy indicator. Remaining:
@@ -931,11 +992,14 @@ the first public tag.
   sufficient? Does each vault get its own passphrase and KDF parameters?
   Significant architecture change — v2 at earliest.
 
-- **Test on Android tablet:** Test a release APK on the Lenovo tablet.
-  Focus areas: layout at larger screen sizes, filter chip visibility,
-  vault list tile sizing, entry detail screen proportions, and selection
-  mode affordances. Document any layout breakage in this section as new
-  bikeshed items.
+- **Test on Android tablet:** ✓ Tested on Lenovo tablet (Android). All
+  functionality works correctly. However, the UI has significant wasted
+  space at larger screen sizes — the layout scales but does not restructure.
+  A dedicated design session is needed before implementing: consider a
+  two-pane master/detail layout at ≥600dp (vault list left, entry detail
+  right), wider cards/tiles, and revisiting the filter chip row. Pairs with
+  the "Responsive layout — mobile and desktop" item above. Non-trivial —
+  do not start without a wireframe agreed first.
 
 - **Verify Android storage permissions:** Gabbro currently declares no
   storage permissions in `AndroidManifest.xml`. This is correct as long
