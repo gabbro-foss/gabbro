@@ -1002,17 +1002,6 @@ the first public tag.
   required — a heavily restricted permission that draws Play Store
   scrutiny.
 
-- **About screen — "Open in browser" button does nothing:** The two-step
-  URL dialog shows the URL correctly but the "Open in browser" button does
-  not launch the system browser. Root cause: on Android 11+, apps must
-  declare which URL schemes they intend to query in `AndroidManifest.xml`
-  via a `<queries>` block. Without it, `canLaunchUrl` returns `false` for
-  `https://` URLs even when a browser is installed, and the launch is
-  silently skipped. Fix: add the `<queries>` block to
-  `android/app/src/main/AndroidManifest.xml` and remove or harden the
-  `canLaunchUrl` guard to show a snackbar on failure rather than silently
-  doing nothing.
-
 - **Detail view — created/modified timestamps:** Show `created_at` and
   `updated_at` on the detail screen so users can audit when an entry was
   created or last changed. Data is already present in all entry DTOs.
