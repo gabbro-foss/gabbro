@@ -261,6 +261,12 @@ Each entry is an instance of a typed class:
   `copyWith()` for immutable updates. `fromJson()`/`toJson()` for
   serialisation. Comment stripping exposed via `stripCommentsForTest()` for
   unit testing.
+- **Seed colour:** olivine green `#5C7A3E` (`0xFF5C7A3E`). Validated
+  against WCAG 1.4.3 (contrast ratio 4.59:1 against white — passes AA)
+  and ADR-003 (CVD simulation: shifts to muted gold under deuteranomaly,
+  acceptable because colour is never used as the sole information carrier).
+  Applied via `ColorScheme.fromSeed` in both `_lightTheme` and `_darkTheme`
+  in `main.dart`.
 - **Theme:** `GabbroApp` (in `main.dart`) was promoted from `StatelessWidget`
   to `StatefulWidget` to hold `AppSettings` at the app root. `ThemeMode` and
   `TextScaler` are derived from settings and passed down via `MediaQuery` and
@@ -597,12 +603,13 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Detail view timestamps — `created_at` and `updated_at`
-  shown on all six entry type detail views. `formatTimestamp()` helper
-  parses ISO 8601 UTC and renders local time as `"DD Mon YYYY, HH:MM"`;
-  falls back to `"Unknown"` for empty or invalid input. 94 Flutter tests
-  passing.
-- **Next task:** TBD.
+- **Completed:** Olivine green colour scheme (`#5C7A3E` seed, validated
+  against WCAG 1.4.3 and ADR-003); Claude URL added to About screen
+  attribution; entropy indicator audit confirmed complete on all three
+  passphrase screens. 94 Flutter tests passing.
+- **Next task:** Safe entry editing — confirmation step and password
+  history retention. Design discussion first (see bikeshed entry),
+  then TDD. Start with a wireframe/design agreed before any code.
 
 ---
 
