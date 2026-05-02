@@ -1,0 +1,134 @@
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.frame { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 12px; margin-bottom: 20px; }
+.label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.phone { background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-secondary); overflow: hidden; }
+.bar { background: var(--color-background-secondary); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.bar-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+.bar-action { font-size: 13px; color: var(--color-text-info); }
+.body { padding: 14px; }
+.section-head { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; margin-top: 12px; }
+.field { margin-bottom: 10px; }
+.field-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 3px; }
+.field-value { font-size: 14px; color: var(--color-text-primary); background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 7px 10px; display: flex; align-items: center; justify-content: space-between; }
+.mono { font-family: var(--font-mono); letter-spacing: 0.1em; color: var(--color-text-secondary); }
+.eye { font-size: 14px; color: var(--color-text-secondary); cursor: pointer; padding-left: 8px; flex-shrink: 0; }
+.tag { font-size: 11px; background: var(--color-background-info); color: var(--color-text-info); border-radius: 4px; padding: 2px 7px; display: inline-block; }
+.hint { font-size: 11px; color: var(--color-text-secondary); margin-top: -6px; margin-bottom: 8px; }
+.btn-row { display: flex; gap: 8px; margin-top: 14px; }
+.btn { flex: 1; padding: 9px 0; border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; border: 0.5px solid var(--color-border-secondary); background: none; color: var(--color-text-primary); text-align: center; }
+.btn.primary { background: var(--color-background-info); color: var(--color-text-info); border-color: transparent; }
+.btn.danger { background: var(--color-background-danger); color: var(--color-text-danger); border-color: transparent; }
+.sensitive-row { background: var(--color-background-warning); border-radius: var(--border-radius-md); padding: 8px 10px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+.sensitive-left { display: flex; align-items: center; gap: 8px; }
+.sensitive-label { font-size: 13px; color: var(--color-text-warning); }
+.diff-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+.diff-cell { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 7px 9px; }
+.diff-key { font-size: 10px; color: var(--color-text-secondary); margin-bottom: 2px; }
+.diff-old { font-size: 12px; color: var(--color-text-secondary); text-decoration: line-through; }
+.diff-new { font-size: 12px; color: var(--color-text-success); }
+.warning-box { background: var(--color-background-warning); border-radius: var(--border-radius-md); padding: 8px 10px; font-size: 12px; color: var(--color-text-warning); margin-bottom: 12px; }
+.history-row { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 8px 10px; margin-bottom: 6px; border: 0.5px solid var(--color-border-tertiary); }
+.history-meta { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.history-val { font-size: 13px; font-family: var(--font-mono); color: var(--color-text-primary); letter-spacing: 0.1em; display: flex; align-items: center; justify-content: space-between; }
+.history-actions { display: flex; align-items: center; gap: 10px; }
+.revert-btn { font-size: 11px; color: var(--color-text-info); }
+.pencil-btn { font-size: 13px; color: var(--color-text-info); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 5px 10px; background: none; }
+</style>
+
+<p class="label">Screen 1 — Detail view (read-only)</p>
+<div class="frame"><div class="phone">
+  <div class="bar">
+    <span class="bar-action">← Back</span>
+    <span class="bar-title">GitHub</span>
+    <button class="pencil-btn">✎ Edit</button>
+  </div>
+  <div class="body">
+    <div class="field"><div class="field-label">Username</div><div class="field-value">rob@example.com</div></div>
+    <div class="field"><div class="field-label">Password</div><div class="field-value"><span class="mono">••••••••••••</span><span class="eye">👁</span></div></div>
+    <div class="field"><div class="field-label">URL</div><div class="field-value">github.com</div></div>
+    <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">
+      <span class="field-label" style="margin:0">Tags</span>
+      <span class="tag">dev</span><span class="tag">work</span>
+    </div>
+  </div>
+</div></div>
+
+<p class="label">Screen 2 — Edit mode</p>
+<div class="frame"><div class="phone">
+  <div class="bar">
+    <span class="bar-action">Cancel</span>
+    <span class="bar-title">Edit entry</span>
+    <span class="bar-action" style="color:var(--color-text-secondary)">Review →</span>
+  </div>
+  <div class="body">
+    <div class="field"><div class="field-label">Title</div><div class="field-value">GitHub</div></div>
+    <div class="field"><div class="field-label">Username</div><div class="field-value">rob@example.com</div></div>
+    <div class="field">
+      <div class="field-label">Password <span style="font-size:10px; color:var(--color-text-warning)">● sensitive</span></div>
+      <div class="field-value"><span class="mono">s3cr3t!NEW••••</span><span class="eye">👁</span></div>
+    </div>
+    <p class="hint">Previous value will be retained for 30 days.</p>
+    <div class="field"><div class="field-label">URL</div><div class="field-value">github.com/login</div></div>
+  </div>
+</div></div>
+
+<p class="label">Screen 3 — Review changes</p>
+<div class="frame"><div class="phone">
+  <div class="bar">
+    <span class="bar-action">← Edit</span>
+    <span class="bar-title">Review changes</span>
+    <span></span>
+  </div>
+  <div class="body">
+    <div class="section-head">Sensitive fields</div>
+    <div class="sensitive-row">
+      <div class="sensitive-left"><span style="font-size:13px">⚠</span><span class="sensitive-label">Password changed</span></div>
+      <span class="eye">👁</span>
+    </div>
+
+    <div class="section-head">Other fields</div>
+    <div class="diff-row">
+      <div class="diff-cell"><div class="diff-key">URL — before</div><div class="diff-old">github.com</div></div>
+      <div class="diff-cell"><div class="diff-key">URL — after</div><div class="diff-new">github.com/login</div></div>
+    </div>
+    <div class="btn-row">
+      <div class="btn">Cancel</div>
+      <div class="btn primary">Save</div>
+    </div>
+  </div>
+</div></div>
+
+<p class="label">Screen 4 — Password history</p>
+<div class="frame"><div class="phone">
+  <div class="bar">
+    <span class="bar-action">← Back</span>
+    <span class="bar-title">Password history</span>
+    <span></span>
+  </div>
+  <div class="body">
+    <div class="warning-box">Only 1 previous value is kept. History auto-purges after 30 days.</div>
+
+    <div class="section-head">Current</div>
+    <div class="history-row">
+      <div class="history-meta">Saved 2 May 2026</div>
+      <div class="history-val">
+        <span class="mono">••••••••••</span>
+        <div class="history-actions"><span class="eye">👁</span><span style="font-size:11px; color:var(--color-text-secondary)">current</span></div>
+      </div>
+    </div>
+
+    <div class="section-head">Previous</div>
+    <div class="history-row">
+      <div class="history-meta">Saved 1 Apr 2026 · expires 1 May 2026</div>
+      <div class="history-val">
+        <span class="mono">••••••••••</span>
+        <div class="history-actions"><span class="eye">👁</span><span class="revert-btn">↩ Revert</span></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <div class="btn danger">Delete previous entry</div>
+    </div>
+  </div>
+</div></div>

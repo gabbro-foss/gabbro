@@ -603,13 +603,14 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Olivine green colour scheme (`#5C7A3E` seed, validated
-  against WCAG 1.4.3 and ADR-003); Claude URL added to About screen
-  attribution; entropy indicator audit confirmed complete on all three
-  passphrase screens. 94 Flutter tests passing.
-- **Next task:** Safe entry editing — confirmation step and password
-  history retention. Design discussion first (see bikeshed entry),
-  then TDD. Start with a wireframe/design agreed before any code.
+- **Completed:** Safe entry editing — Rust domain model phase complete.
+  `PreviousSecret` struct added; `LoginEntry` gains `previous_password`,
+  `CardEntry` gains `previous_cvv` and `previous_pin`. All fields
+  `Zeroize` + `ZeroizeOnDrop`. 176 Rust tests passing.
+- **Next task:** Safe entry editing — Flutter phase. Screens 2 (Review
+  changes confirmation) and 4 (Password history) per agreed wireframes.
+  Then wire `update_entry` in Rust API layer to capture previous value
+  before overwriting.
 
 ---
 
@@ -835,19 +836,24 @@ the first public tag.
   (custom launcher icon/label, yes; hiding from app drawer is limited) and iOS
   (more restricted)? Does offering this create a false sense of security?
 
-- **Safe entry editing — confirmation and password history:** The edit
-  action should use a recognisable affordance (pencil icon) and require
-  an explicit confirmation step before saving, to prevent accidental
-  overwrites. For password fields specifically, the previous value should
-  be retained for a configurable window — either n days (e.g. 7, 30) or
-  n vault unlocks (e.g. 5, 10) — so a user who saves a typo or a rejected
-  new credential can recover without a support path. The retained value
-  should be stored encrypted in the vault alongside the entry, never
-  plaintext, and automatically purged once the retention window expires.
-  Open questions: how many historical values to keep (probably 1 is enough
-  for v1); whether the retention window is global or per-entry; whether
-  history is shown in the UI or only accessible via an explicit "show
-  previous password" action.
+- **Safe entry editing — Flutter phase:** Rust domain model complete —
+  `PreviousSecret` on `LoginEntry.previous_password`, `CardEntry.previous_cvv`,
+  `CardEntry.previous_pin`. Wireframes agreed (4 screens). Remaining work:
+  (1) wire `update_entry` in Rust to capture previous value before overwriting,
+  with configurable auto-expiry (default 30 days, options 7/30/90/never);
+  (2) Flutter screen 2 — "Review →" replaces "Save", shows diff of changed
+  fields; (3) Flutter screen 4 — password history with show/hide toggle,
+  ↩ Revert, "Delete previous entry"; (4) Settings → Security: expiry picker.
+  Retention: 1 previous value only, global window, time-based, user can
+  purge early. Applies to: `password` (Login), `cvv` + `pin` (Card),
+  hidden `CustomField`s (Login, Custom). Identity hidden custom fields
+  excluded (YAGNI).
+
+- **Card entry — `pin` field in Flutter UI:** `pin` exists on `CardEntry`
+  in the Rust domain model (added for Enpass import) but is not rendered
+  in `create_entry_screen.dart`. Needs a `obscureText` field with
+  show/hide toggle, same pattern as `cvv`. Do alongside safe entry editing
+  Flutter phase.
 
 - **Remote app / vault deletion:** Allow the user to trigger a remote wipe of
   the vault (and optionally the app) from another device or a web interface.
