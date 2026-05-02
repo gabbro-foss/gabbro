@@ -96,9 +96,20 @@ class AboutScreen extends StatelessWidget {
               // ── Attribution ──────────────────────────────────────────────
               _SectionHeader(label: 'Attribution'),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Text(
-                  'Project owner, architect, and lead developer: Robert Leckenby.\n'
+                  'Project owner, architect, and lead developer:',
+                  style: textTheme.bodyMedium,
+                ),
+              ),
+              _LinkTile(
+                icon: Icons.person_outline,
+                label: 'Zabamund',
+                url: 'https://github.com/Zabamund',
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(
                   'AI development partner: Claude (Anthropic).',
                   style: textTheme.bodyMedium,
                 ),
@@ -355,5 +366,46 @@ const _kComponents = [
     name: 'path_provider',
     licence: 'BSD-3-Clause',
     url: 'https://github.com/flutter/packages',
+  ),
+  _Component(
+    name: 'file_picker',
+    licence: 'MIT',
+    url: 'https://github.com/miguelpruivo/flutter_file_picker',
+  ),
+  _Component(
+    name: 'url_launcher',
+    licence: 'BSD-3-Clause',
+    url: 'https://github.com/flutter/packages',
+  ),
+  _Component(
+    name: 'freezed_annotation',
+    licence: 'MIT',
+    url: 'https://github.com/rrousselGit/freezed',
+  ),
+  _Component(
+    name: 'sha2',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/RustCrypto/hashes',
+  ),
+  _Component(
+    name: 'rand',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/rust-random/rand',
+  ),
+  // Languages & runtimes
+  _Component(
+    name: 'Rust',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/rust-lang/rust',
+  ),
+  _Component(
+    name: 'Dart',
+    licence: 'BSD-3-Clause',
+    url: 'https://github.com/dart-lang/sdk',
+  ),
+  _Component(
+    name: 'Flutter',
+    licence: 'BSD-3-Clause',
+    url: 'https://github.com/flutter/flutter',
   ),
 ];
