@@ -270,17 +270,19 @@ Each entry is an instance of a typed class:
   class exposing `settings` and `updateSettings()` — `_GabbroAppState`
   implements it, resolving the `library_private_types_in_public_api` lint.
 - **Text scaling:** `TextScaler.linear()` factors: small=0.85, regular=1.0,
-  large=1.15, extraLarge=1.3. Applied via a `MediaQuery` wrapper above
-  `MaterialApp` so all text in the app scales uniformly.
+  large=1.15, extraLarge=1.3, xxLarge=1.5. Applied via a `MediaQuery` wrapper
+  above `MaterialApp` so all text in the app scales uniformly.
 - **Appearance screen:** two segmented button rows (theme, text size) plus
   a live preview box showing the current text scale. High-contrast toggle
   enabled — works in both light and dark mode.
 - **Accessibility shortcut:** `OutlinedButton.icon` (icon: `Icons.accessibility_new`,
-  label: "Accessibility") positioned top-right on `OnboardingScreen` and
-  `UnlockScreen`. Toggles `highContrast: true` + `textSize: extraLarge`
-  together in one tap — ensures vision-impaired users can access accessibility
-  settings before reaching the main UI. Icon is highlighted in primary colour
-  when active.
+  label: "Accessibility") positioned top-right on `OnboardingScreen` only
+  (removed from `UnlockScreen` — settings persist after onboarding so the
+  shortcut is not needed there). Toggles `highContrast: true` +
+  `textSize: xxLarge` together in one tap — ensures vision-impaired users
+  can access accessibility settings before reaching the main UI. Icon is
+  highlighted in primary colour when active. Button fades out via
+  `AnimatedOpacity` when the keyboard is open to avoid overlapping content.
 - **`UnlockScreen` autofocus:** `autofocus: true` added to the passphrase
   `TextField` so the keyboard/cursor is ready immediately on launch.
 - **Entry detail timestamps:** `created_at` and `updated_at` are shown
@@ -786,19 +788,6 @@ the first public tag.
   abbreviations array. When internationalisation (i18n) is added,
   replace with `DateFormat('dd MMM yyyy, HH:mm').format(dt)` from
   `package:intl` — one-line change, picks up device locale automatically.
-
-- **XXL font size step:** Add a fifth `TextSizeChoice` value (`xxLarge`)
-  above the current `extraLarge` (1.3×). Suggested scale factor: 1.5×.
-  Changes required:
-  - Add `xxLarge` to the `TextSizeChoice` enum in `lib/settings.dart`
-  - Add the 1.5× case to the `TextScaler.linear()` switch
-  - Add the option to the segmented button row in `appearance_screen.dart`
-  - Update the accessibility shortcut (currently hardcodes `extraLarge`)
-    to jump to `xxLarge` instead — if a user hits the accessibility button
-    they want maximum legibility
-  - Update `AppSettings.fromJson()` / `toJson()` for the new enum value
-  - Update affected tests in `test/appearance_settings_test.dart`
-  Low effort, self-contained. Good candidate for a short session.
 
 - **Entropy indicator on all passphrase inputs:** Onboarding and Change
   Passphrase screens both show a real-time entropy indicator. Remaining:
