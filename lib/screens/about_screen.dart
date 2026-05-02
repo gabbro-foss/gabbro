@@ -9,6 +9,7 @@ const _kAppVersion = '1.0.0';
 const _kGitHubUrl = 'https://github.com/Zabamund/gabbro';
 const _kIssuesUrl = 'https://github.com/Zabamund/gabbro/issues';
 const _kDonateUrl = 'https://github.com/sponsors/Zabamund';
+const _kClaudeUrl = 'https://claude.ai';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -110,9 +111,14 @@ class AboutScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Text(
-                  'AI development partner: Claude (Anthropic).',
+                  'AI development partner:',
                   style: textTheme.bodyMedium,
                 ),
+              ),
+              _LinkTile(
+                icon: Icons.smart_toy_outlined,
+                label: 'Claude (Anthropic)',
+                url: _kClaudeUrl,
               ),
               const SizedBox(height: 32),
 
