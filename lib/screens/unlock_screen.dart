@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gabbro/main.dart';
-import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
@@ -85,7 +83,6 @@ class _UnlockScreenState extends State<UnlockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final app = GabbroApp.maybeOf(context);
     return Scaffold(
       body: Stack(
         children: [
