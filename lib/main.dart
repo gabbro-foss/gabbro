@@ -191,7 +191,7 @@ class _GabbroAppState extends State<GabbroApp>
       );
     }
     return ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF534AB7)),
+      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF5C7A3E)),
       useMaterial3: true,
     );
   }
@@ -214,7 +214,7 @@ class _GabbroAppState extends State<GabbroApp>
     }
     return ThemeData(
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF534AB7),
+        seedColor: const Color(0xFF5C7A3E),
         brightness: Brightness.dark,
       ),
       useMaterial3: true,
