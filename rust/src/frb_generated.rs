@@ -1161,11 +1161,14 @@ fn wire__crate__api__vault_bridge__update_entry_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_entry =
                 <crate::api::vault_bridge::VaultEntryData>::sse_decode(&mut deserializer);
+            let api_expiry_days = <Option<u32>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::vault_bridge::update_entry(api_entry, None).await?;
+                        let output_ok =
+                            crate::api::vault_bridge::update_entry(api_entry, api_expiry_days)
+                                .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1216,6 +1219,10 @@ impl SseDecode for crate::api::vault::CardEntryData {
         let mut var_notes = <Option<String>>::sse_decode(deserializer);
         let mut var_customFields =
             <Vec<crate::api::vault::CustomFieldData>>::sse_decode(deserializer);
+        let mut var_previousCvv =
+            <Option<crate::api::vault::PreviousSecretData>>::sse_decode(deserializer);
+        let mut var_previousPin =
+            <Option<crate::api::vault::PreviousSecretData>>::sse_decode(deserializer);
         return crate::api::vault::CardEntryData {
             id: var_id,
             created_at: var_createdAt,
@@ -1237,6 +1244,8 @@ impl SseDecode for crate::api::vault::CardEntryData {
             transaction_password: var_transactionPassword,
             notes: var_notes,
             custom_fields: var_customFields,
+            previous_cvv: var_previousCvv,
+            previous_pin: var_previousPin,
         };
     }
 }
@@ -1511,6 +1520,8 @@ impl SseDecode for crate::api::vault::LoginEntryData {
         let mut var_notes = <Option<String>>::sse_decode(deserializer);
         let mut var_customFields =
             <Vec<crate::api::vault::CustomFieldData>>::sse_decode(deserializer);
+        let mut var_previousPassword =
+            <Option<crate::api::vault::PreviousSecretData>>::sse_decode(deserializer);
         return crate::api::vault::LoginEntryData {
             id: var_id,
             created_at: var_createdAt,
@@ -1524,6 +1535,7 @@ impl SseDecode for crate::api::vault::LoginEntryData {
             password: var_password,
             notes: var_notes,
             custom_fields: var_customFields,
+            previous_password: var_previousPassword,
         };
     }
 }
@@ -1557,6 +1569,30 @@ impl SseDecode for Option<String> {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
             return Some(<String>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::api::vault::PreviousSecretData> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::api::vault::PreviousSecretData>::sse_decode(
+                deserializer,
+            ));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<u32> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<u32>::sse_decode(deserializer));
         } else {
             return None;
         }
@@ -1598,6 +1634,20 @@ impl SseDecode for crate::api::password_generator::PasswordConfig {
             use_digits: var_useDigits,
             use_symbols: var_useSymbols,
             exclude_ambiguous: var_excludeAmbiguous,
+        };
+    }
+}
+
+impl SseDecode for crate::api::vault::PreviousSecretData {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_value = <String>::sse_decode(deserializer);
+        let mut var_savedAt = <String>::sse_decode(deserializer);
+        let mut var_expiresAt = <Option<String>>::sse_decode(deserializer);
+        return crate::api::vault::PreviousSecretData {
+            value: var_value,
+            saved_at: var_savedAt,
+            expires_at: var_expiresAt,
         };
     }
 }
@@ -1792,6 +1842,8 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::CardEntryData {
             self.transaction_password.into_into_dart().into_dart(),
             self.notes.into_into_dart().into_dart(),
             self.custom_fields.into_into_dart().into_dart(),
+            self.previous_cvv.into_into_dart().into_dart(),
+            self.previous_pin.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -2047,6 +2099,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::LoginEntryData {
             self.password.into_into_dart().into_dart(),
             self.notes.into_into_dart().into_dart(),
             self.custom_fields.into_into_dart().into_dart(),
+            self.previous_password.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -2135,6 +2188,28 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::password_generator::PasswordC
     for crate::api::password_generator::PasswordConfig
 {
     fn into_into_dart(self) -> crate::api::password_generator::PasswordConfig {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::vault::PreviousSecretData {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.value.into_into_dart().into_dart(),
+            self.saved_at.into_into_dart().into_dart(),
+            self.expires_at.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::vault::PreviousSecretData
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::PreviousSecretData>
+    for crate::api::vault::PreviousSecretData
+{
+    fn into_into_dart(self) -> crate::api::vault::PreviousSecretData {
         self
     }
 }
@@ -2240,6 +2315,8 @@ impl SseEncode for crate::api::vault::CardEntryData {
         <Option<String>>::sse_encode(self.transaction_password, serializer);
         <Option<String>>::sse_encode(self.notes, serializer);
         <Vec<crate::api::vault::CustomFieldData>>::sse_encode(self.custom_fields, serializer);
+        <Option<crate::api::vault::PreviousSecretData>>::sse_encode(self.previous_cvv, serializer);
+        <Option<crate::api::vault::PreviousSecretData>>::sse_encode(self.previous_pin, serializer);
     }
 }
 
@@ -2437,6 +2514,10 @@ impl SseEncode for crate::api::vault::LoginEntryData {
         <String>::sse_encode(self.password, serializer);
         <Option<String>>::sse_encode(self.notes, serializer);
         <Vec<crate::api::vault::CustomFieldData>>::sse_encode(self.custom_fields, serializer);
+        <Option<crate::api::vault::PreviousSecretData>>::sse_encode(
+            self.previous_password,
+            serializer,
+        );
     }
 }
 
@@ -2464,6 +2545,26 @@ impl SseEncode for Option<String> {
     }
 }
 
+impl SseEncode for Option<crate::api::vault::PreviousSecretData> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::api::vault::PreviousSecretData>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<u32> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <u32>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for crate::api::passphrase_generator::PassphraseConfig {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2484,6 +2585,15 @@ impl SseEncode for crate::api::password_generator::PasswordConfig {
         <bool>::sse_encode(self.use_digits, serializer);
         <bool>::sse_encode(self.use_symbols, serializer);
         <bool>::sse_encode(self.exclude_ambiguous, serializer);
+    }
+}
+
+impl SseEncode for crate::api::vault::PreviousSecretData {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.value, serializer);
+        <String>::sse_encode(self.saved_at, serializer);
+        <Option<String>>::sse_encode(self.expires_at, serializer);
     }
 }
 

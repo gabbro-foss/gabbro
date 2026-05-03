@@ -6,7 +6,7 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `card_entry_to_data`, `custom_entry_to_data`, `custom_field_to_data`, `days_to_ymd`, `entry_id`, `file_entry_to_data`, `identity_entry_to_data`, `is_leap`, `login_entry_to_data`, `mask_entry`, `note_entry_to_data`
+// These functions are ignored because they are not marked as `pub`: `add_days_to_timestamp`, `card_entry_to_data`, `custom_entry_to_data`, `custom_field_to_data`, `days_from_ymd`, `days_to_ymd`, `entry_id`, `file_entry_to_data`, `identity_entry_to_data`, `is_leap`, `login_entry_to_data`, `mask_entry`, `note_entry_to_data`, `previous_secret_to_data`
 // These functions are ignored (category: IgnoreBecauseExplicitAttribute): `change_passphrase`, `delete_entry`, `delete_whole_vault`, `export_vault`, `get_entry_by_id`, `list_entries`, `load_vault`, `save_vault`, `update_entry`
 
 /// Creates a new login entry with a generated UUID and current timestamp.
@@ -169,6 +169,12 @@ class CardEntryData {
   final String? notes;
   final List<CustomFieldData> customFields;
 
+  /// Previous CVV, masked by default. `None` if no history exists.
+  final PreviousSecretData? previousCvv;
+
+  /// Previous PIN, masked by default. `None` if no history exists.
+  final PreviousSecretData? previousPin;
+
   const CardEntryData({
     required this.id,
     required this.createdAt,
@@ -190,6 +196,8 @@ class CardEntryData {
     this.transactionPassword,
     this.notes,
     required this.customFields,
+    this.previousCvv,
+    this.previousPin,
   });
 
   @override
@@ -213,7 +221,9 @@ class CardEntryData {
       bankName.hashCode ^
       transactionPassword.hashCode ^
       notes.hashCode ^
-      customFields.hashCode;
+      customFields.hashCode ^
+      previousCvv.hashCode ^
+      previousPin.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -239,7 +249,9 @@ class CardEntryData {
           bankName == other.bankName &&
           transactionPassword == other.transactionPassword &&
           notes == other.notes &&
-          customFields == other.customFields;
+          customFields == other.customFields &&
+          previousCvv == other.previousCvv &&
+          previousPin == other.previousPin;
 }
 
 /// A custom entry as seen by Flutter.
@@ -449,6 +461,9 @@ class LoginEntryData {
   final String? notes;
   final List<CustomFieldData> customFields;
 
+  /// Previous password, masked by default. `None` if no history exists.
+  final PreviousSecretData? previousPassword;
+
   const LoginEntryData({
     required this.id,
     required this.createdAt,
@@ -462,6 +477,7 @@ class LoginEntryData {
     required this.password,
     this.notes,
     required this.customFields,
+    this.previousPassword,
   });
 
   @override
@@ -477,7 +493,8 @@ class LoginEntryData {
       username.hashCode ^
       password.hashCode ^
       notes.hashCode ^
-      customFields.hashCode;
+      customFields.hashCode ^
+      previousPassword.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -495,7 +512,8 @@ class LoginEntryData {
           username == other.username &&
           password == other.password &&
           notes == other.notes &&
-          customFields == other.customFields;
+          customFields == other.customFields &&
+          previousPassword == other.previousPassword;
 }
 
 /// A note entry as seen by Flutter.
@@ -544,4 +562,30 @@ class NoteEntryData {
           favourite == other.favourite &&
           title == other.title &&
           content == other.content;
+}
+
+/// A previous sensitive value as seen by Flutter.
+/// `value` is always masked at the bridge boundary — Flutter unmasks on toggle.
+class PreviousSecretData {
+  final String value;
+  final String savedAt;
+  final String? expiresAt;
+
+  const PreviousSecretData({
+    required this.value,
+    required this.savedAt,
+    this.expiresAt,
+  });
+
+  @override
+  int get hashCode => value.hashCode ^ savedAt.hashCode ^ expiresAt.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PreviousSecretData &&
+          runtimeType == other.runtimeType &&
+          value == other.value &&
+          savedAt == other.savedAt &&
+          expiresAt == other.expiresAt;
 }

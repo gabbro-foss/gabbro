@@ -220,7 +220,10 @@ abstract class RustLibApi extends BaseApi {
     required String path,
   });
 
-  Future<void> crateApiVaultBridgeUpdateEntry({required VaultEntryData entry});
+  Future<void> crateApiVaultBridgeUpdateEntry({
+    required VaultEntryData entry,
+    int? expiryDays,
+  });
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -1245,12 +1248,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiVaultBridgeUpdateEntry({required VaultEntryData entry}) {
+  Future<void> crateApiVaultBridgeUpdateEntry({
+    required VaultEntryData entry,
+    int? expiryDays,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_box_autoadd_vault_entry_data(entry, serializer);
+          sse_encode_opt_box_autoadd_u_32(expiryDays, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -1263,14 +1270,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_String,
         ),
         constMeta: kCrateApiVaultBridgeUpdateEntryConstMeta,
-        argValues: [entry],
+        argValues: [entry, expiryDays],
         apiImpl: this,
       ),
     );
   }
 
   TaskConstMeta get kCrateApiVaultBridgeUpdateEntryConstMeta =>
-      const TaskConstMeta(debugName: "update_entry", argNames: ["entry"]);
+      const TaskConstMeta(
+        debugName: "update_entry",
+        argNames: ["entry", "expiryDays"],
+      );
 
   @protected
   String dco_decode_String(dynamic raw) {
@@ -1341,6 +1351,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PreviousSecretData dco_decode_box_autoadd_previous_secret_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_previous_secret_data(raw);
+  }
+
+  @protected
+  int dco_decode_box_autoadd_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as int;
+  }
+
+  @protected
   VaultEntryData dco_decode_box_autoadd_vault_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_vault_entry_data(raw);
@@ -1350,8 +1372,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   CardEntryData dco_decode_card_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 20)
-      throw Exception('unexpected arr length: expect 20 but see ${arr.length}');
+    if (arr.length != 22)
+      throw Exception('unexpected arr length: expect 22 but see ${arr.length}');
     return CardEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -1373,6 +1395,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       transactionPassword: dco_decode_opt_String(arr[17]),
       notes: dco_decode_opt_String(arr[18]),
       customFields: dco_decode_list_custom_field_data(arr[19]),
+      previousCvv: dco_decode_opt_box_autoadd_previous_secret_data(arr[20]),
+      previousPin: dco_decode_opt_box_autoadd_previous_secret_data(arr[21]),
     );
   }
 
@@ -1562,8 +1586,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LoginEntryData dco_decode_login_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 12)
-      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
+    if (arr.length != 13)
+      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
     return LoginEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -1577,6 +1601,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       password: dco_decode_String(arr[9]),
       notes: dco_decode_opt_String(arr[10]),
       customFields: dco_decode_list_custom_field_data(arr[11]),
+      previousPassword: dco_decode_opt_box_autoadd_previous_secret_data(
+        arr[12],
+      ),
     );
   }
 
@@ -1602,6 +1629,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   String? dco_decode_opt_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_String(raw);
+  }
+
+  @protected
+  PreviousSecretData? dco_decode_opt_box_autoadd_previous_secret_data(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_previous_secret_data(raw);
+  }
+
+  @protected
+  int? dco_decode_opt_box_autoadd_u_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_u_32(raw);
   }
 
   @protected
@@ -1632,6 +1675,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       useDigits: dco_decode_bool(arr[3]),
       useSymbols: dco_decode_bool(arr[4]),
       excludeAmbiguous: dco_decode_bool(arr[5]),
+    );
+  }
+
+  @protected
+  PreviousSecretData dco_decode_previous_secret_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return PreviousSecretData(
+      value: dco_decode_String(arr[0]),
+      savedAt: dco_decode_String(arr[1]),
+      expiresAt: dco_decode_opt_String(arr[2]),
     );
   }
 
@@ -1784,6 +1840,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PreviousSecretData sse_decode_box_autoadd_previous_secret_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_previous_secret_data(deserializer));
+  }
+
+  @protected
+  int sse_decode_box_autoadd_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_u_32(deserializer));
+  }
+
+  @protected
   VaultEntryData sse_decode_box_autoadd_vault_entry_data(
     SseDeserializer deserializer,
   ) {
@@ -1814,6 +1884,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_transactionPassword = sse_decode_opt_String(deserializer);
     var var_notes = sse_decode_opt_String(deserializer);
     var var_customFields = sse_decode_list_custom_field_data(deserializer);
+    var var_previousCvv = sse_decode_opt_box_autoadd_previous_secret_data(
+      deserializer,
+    );
+    var var_previousPin = sse_decode_opt_box_autoadd_previous_secret_data(
+      deserializer,
+    );
     return CardEntryData(
       id: var_id,
       createdAt: var_createdAt,
@@ -1835,6 +1911,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       transactionPassword: var_transactionPassword,
       notes: var_notes,
       customFields: var_customFields,
+      previousCvv: var_previousCvv,
+      previousPin: var_previousPin,
     );
   }
 
@@ -2088,6 +2166,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_password = sse_decode_String(deserializer);
     var var_notes = sse_decode_opt_String(deserializer);
     var var_customFields = sse_decode_list_custom_field_data(deserializer);
+    var var_previousPassword = sse_decode_opt_box_autoadd_previous_secret_data(
+      deserializer,
+    );
     return LoginEntryData(
       id: var_id,
       createdAt: var_createdAt,
@@ -2101,6 +2182,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       password: var_password,
       notes: var_notes,
       customFields: var_customFields,
+      previousPassword: var_previousPassword,
     );
   }
 
@@ -2139,6 +2221,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  PreviousSecretData? sse_decode_opt_box_autoadd_previous_secret_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_previous_secret_data(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_u_32(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   PassphraseConfig sse_decode_passphrase_config(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_wordCount = sse_decode_u_32(deserializer);
@@ -2171,6 +2277,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       useDigits: var_useDigits,
       useSymbols: var_useSymbols,
       excludeAmbiguous: var_excludeAmbiguous,
+    );
+  }
+
+  @protected
+  PreviousSecretData sse_decode_previous_secret_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_value = sse_decode_String(deserializer);
+    var var_savedAt = sse_decode_String(deserializer);
+    var var_expiresAt = sse_decode_opt_String(deserializer);
+    return PreviousSecretData(
+      value: var_value,
+      savedAt: var_savedAt,
+      expiresAt: var_expiresAt,
     );
   }
 
@@ -2329,6 +2450,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_previous_secret_data(
+    PreviousSecretData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_previous_secret_data(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_vault_entry_data(
     VaultEntryData self,
     SseSerializer serializer,
@@ -2363,6 +2499,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.transactionPassword, serializer);
     sse_encode_opt_String(self.notes, serializer);
     sse_encode_list_custom_field_data(self.customFields, serializer);
+    sse_encode_opt_box_autoadd_previous_secret_data(
+      self.previousCvv,
+      serializer,
+    );
+    sse_encode_opt_box_autoadd_previous_secret_data(
+      self.previousPin,
+      serializer,
+    );
   }
 
   @protected
@@ -2577,6 +2721,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.password, serializer);
     sse_encode_opt_String(self.notes, serializer);
     sse_encode_list_custom_field_data(self.customFields, serializer);
+    sse_encode_opt_box_autoadd_previous_secret_data(
+      self.previousPassword,
+      serializer,
+    );
   }
 
   @protected
@@ -2606,6 +2754,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_previous_secret_data(
+    PreviousSecretData? self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_previous_secret_data(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_u_32(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_passphrase_config(
     PassphraseConfig self,
     SseSerializer serializer,
@@ -2630,6 +2801,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.useDigits, serializer);
     sse_encode_bool(self.useSymbols, serializer);
     sse_encode_bool(self.excludeAmbiguous, serializer);
+  }
+
+  @protected
+  void sse_encode_previous_secret_data(
+    PreviousSecretData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.value, serializer);
+    sse_encode_String(self.savedAt, serializer);
+    sse_encode_opt_String(self.expiresAt, serializer);
   }
 
   @protected

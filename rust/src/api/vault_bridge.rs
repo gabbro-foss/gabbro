@@ -10,7 +10,7 @@ use std::path::PathBuf;
 
 use crate::api::vault::{
     CardEntryData, CustomEntryData, CustomFieldData, FileEntryData, IdentityEntryData,
-    LoginEntryData, NoteEntryData,
+    LoginEntryData, NoteEntryData, PreviousSecretData,
 };
 use crate::vault::entry::{
     CardEntry, CustomEntry, CustomField, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
@@ -68,6 +68,11 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                 .iter()
                 .map(|f| CustomFieldData { label: f.label.clone(), value: f.value.clone(), hidden: f.hidden })
                 .collect(),
+            previous_password: e.previous_password.as_ref().map(|p| PreviousSecretData {
+                value: crate::api::vault::MASKED_VALUE.to_string(),
+                saved_at: p.saved_at.clone(),
+                expires_at: p.expires_at.clone(),
+            }),
         }),
         VaultEntry::Note(e) => VaultEntryData::Note(NoteEntryData {
             id: e.meta.id.clone(),
@@ -121,6 +126,16 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                 value: f.value.clone(),
                 hidden: f.hidden,
             }).collect(),
+            previous_cvv: e.previous_cvv.as_ref().map(|p| PreviousSecretData {
+                value: crate::api::vault::MASKED_VALUE.to_string(),
+                saved_at: p.saved_at.clone(),
+                expires_at: p.expires_at.clone(),
+            }),
+            previous_pin: e.previous_pin.as_ref().map(|p| PreviousSecretData {
+                value: crate::api::vault::MASKED_VALUE.to_string(),
+                saved_at: p.saved_at.clone(),
+                expires_at: p.expires_at.clone(),
+            }),
         }),
         VaultEntry::File(e) => VaultEntryData::File(FileEntryData {
             id: e.meta.id.clone(),
@@ -172,7 +187,11 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 .map(|f| CustomField { label: f.label, value: f.value, hidden: f.hidden })
                 .collect(),
             attachments: vec![],
-            previous_password: None,
+            previous_password: d.previous_password.map(|p| crate::vault::entry::PreviousSecret {
+                value: p.value,
+                saved_at: p.saved_at,
+                expires_at: p.expires_at,
+            }),
         })),
         VaultEntryData::Note(d) => Ok(VaultEntry::Note(NoteEntry {
             meta: EntryMeta {

@@ -47,9 +47,14 @@ Future<EntrySummaryData> createEntry({required VaultEntryData entry}) =>
 
 /// Replace an existing entry by UUID and persist.
 ///
+/// `expiry_days`: how long to retain the previous sensitive value.
+/// `None` = keep until manually deleted. `Some(n)` = purge after n days.
 /// Async — triggers a full vault save.
-Future<void> updateEntry({required VaultEntryData entry}) =>
-    RustLib.instance.api.crateApiVaultBridgeUpdateEntry(entry: entry);
+Future<void> updateEntry({required VaultEntryData entry, int? expiryDays}) =>
+    RustLib.instance.api.crateApiVaultBridgeUpdateEntry(
+      entry: entry,
+      expiryDays: expiryDays,
+    );
 
 /// Remove an entry by UUID and persist.
 ///

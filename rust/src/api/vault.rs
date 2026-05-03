@@ -25,6 +25,14 @@ pub struct CustomFieldData {
     pub hidden: bool,
 }
 
+/// A previous sensitive value as seen by Flutter.
+/// `value` is always masked at the bridge boundary — Flutter unmasks on toggle.
+pub struct PreviousSecretData {
+    pub value: String,
+    pub saved_at: String,
+    pub expires_at: Option<String>,
+}
+
 /// A login entry as seen by Flutter.
 pub struct LoginEntryData {
     pub id: String,
@@ -41,6 +49,8 @@ pub struct LoginEntryData {
     pub password: String,
     pub notes: Option<String>,
     pub custom_fields: Vec<CustomFieldData>,
+    /// Previous password, masked by default. `None` if no history exists.
+    pub previous_password: Option<PreviousSecretData>,
 }
 
 /// A note entry as seen by Flutter.
@@ -93,6 +103,10 @@ pub struct CardEntryData {
     pub transaction_password: Option<String>,
     pub notes: Option<String>,
     pub custom_fields: Vec<CustomFieldData>,
+    /// Previous CVV, masked by default. `None` if no history exists.
+    pub previous_cvv: Option<PreviousSecretData>,
+    /// Previous PIN, masked by default. `None` if no history exists.
+    pub previous_pin: Option<PreviousSecretData>,
 }
 
 /// A file entry as seen by Flutter.
@@ -133,6 +147,14 @@ fn custom_field_to_data(f: &CustomField) -> CustomFieldData {
     }
 }
 
+fn previous_secret_to_data(p: &crate::vault::entry::PreviousSecret) -> PreviousSecretData {
+    PreviousSecretData {
+        value: MASKED_VALUE.to_string(),
+        saved_at: p.saved_at.clone(),
+        expires_at: p.expires_at.clone(),
+    }
+}
+
 fn login_entry_to_data(e: &LoginEntry) -> LoginEntryData {
     LoginEntryData {
         id: e.meta.id.clone(),
@@ -147,6 +169,7 @@ fn login_entry_to_data(e: &LoginEntry) -> LoginEntryData {
         password: e.password.clone(),
         notes: e.notes.clone(),
         custom_fields: e.custom_fields.iter().map(custom_field_to_data).collect(),
+        previous_password: e.previous_password.as_ref().map(previous_secret_to_data),
     }
 }
 
@@ -202,6 +225,8 @@ fn card_entry_to_data(e: &CardEntry) -> CardEntryData {
         transaction_password: e.transaction_password.clone(),
         notes: e.notes.clone(),
         custom_fields: e.custom_fields.iter().map(custom_field_to_data).collect(),
+        previous_cvv: e.previous_cvv.as_ref().map(previous_secret_to_data),
+        previous_pin: e.previous_pin.as_ref().map(previous_secret_to_data),
     }
 }
 
@@ -437,7 +462,7 @@ pub fn create_custom_entry(
 /// Fixed placeholder used instead of the real value when masked display
 /// is requested. Length is intentionally decoupled from actual value length
 /// to prevent shoulder-surfing attacks based on character count.
-const MASKED_VALUE: &str = "********";
+pub const MASKED_VALUE: &str = "********";
 
 /// Returns a helper that extracts the UUID from any VaultEntry variant.
 fn entry_id(entry: &VaultEntry) -> &str {

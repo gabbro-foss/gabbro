@@ -62,6 +62,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PasswordConfig dco_decode_box_autoadd_password_config(dynamic raw);
 
   @protected
+  PreviousSecretData dco_decode_box_autoadd_previous_secret_data(dynamic raw);
+
+  @protected
+  int dco_decode_box_autoadd_u_32(dynamic raw);
+
+  @protected
   VaultEntryData dco_decode_box_autoadd_vault_entry_data(dynamic raw);
 
   @protected
@@ -128,10 +134,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String? dco_decode_opt_String(dynamic raw);
 
   @protected
+  PreviousSecretData? dco_decode_opt_box_autoadd_previous_secret_data(
+    dynamic raw,
+  );
+
+  @protected
+  int? dco_decode_opt_box_autoadd_u_32(dynamic raw);
+
+  @protected
   PassphraseConfig dco_decode_passphrase_config(dynamic raw);
 
   @protected
   PasswordConfig dco_decode_password_config(dynamic raw);
+
+  @protected
+  PreviousSecretData dco_decode_previous_secret_data(dynamic raw);
 
   @protected
   StrengthTier dco_decode_strength_tier(dynamic raw);
@@ -201,6 +218,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PasswordConfig sse_decode_box_autoadd_password_config(
     SseDeserializer deserializer,
   );
+
+  @protected
+  PreviousSecretData sse_decode_box_autoadd_previous_secret_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  int sse_decode_box_autoadd_u_32(SseDeserializer deserializer);
 
   @protected
   VaultEntryData sse_decode_box_autoadd_vault_entry_data(
@@ -279,10 +304,23 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String? sse_decode_opt_String(SseDeserializer deserializer);
 
   @protected
+  PreviousSecretData? sse_decode_opt_box_autoadd_previous_secret_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
+
+  @protected
   PassphraseConfig sse_decode_passphrase_config(SseDeserializer deserializer);
 
   @protected
   PasswordConfig sse_decode_password_config(SseDeserializer deserializer);
+
+  @protected
+  PreviousSecretData sse_decode_previous_secret_data(
+    SseDeserializer deserializer,
+  );
 
   @protected
   StrengthTier sse_decode_strength_tier(SseDeserializer deserializer);
@@ -361,6 +399,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     PasswordConfig self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_box_autoadd_previous_secret_data(
+    PreviousSecretData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_vault_entry_data(
@@ -465,6 +512,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_opt_String(String? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_box_autoadd_previous_secret_data(
+    PreviousSecretData? self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
+
+  @protected
   void sse_encode_passphrase_config(
     PassphraseConfig self,
     SseSerializer serializer,
@@ -473,6 +529,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_password_config(
     PasswordConfig self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_previous_secret_data(
+    PreviousSecretData self,
     SseSerializer serializer,
   );
 
