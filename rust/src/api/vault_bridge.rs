@@ -328,10 +328,12 @@ pub async fn create_entry(entry: VaultEntryData) -> Result<EntrySummaryData, Str
 
 /// Replace an existing entry by UUID and persist.
 ///
+/// `expiry_days`: how long to retain the previous sensitive value.
+/// `None` = keep until manually deleted. `Some(n)` = purge after n days.
 /// Async — triggers a full vault save.
-pub async fn update_entry(entry: VaultEntryData) -> Result<(), String> {
+pub async fn update_entry(entry: VaultEntryData, expiry_days: Option<u32>) -> Result<(), String> {
     let internal = vault_entry_from_data(entry)?;
-    session::session_update_entry(internal)
+    session::session_update_entry(internal, expiry_days)
 }
 
 /// Remove an entry by UUID and persist.

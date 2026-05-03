@@ -216,11 +216,11 @@ pub fn session_create_entry(entry: VaultEntry) -> Result<EntrySummaryData, Strin
 /// Replace an existing entry by UUID and persist.
 ///
 /// Async — triggers a full vault save.
-pub fn session_update_entry(updated: VaultEntry) -> Result<(), String> {
+pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Result<(), String> {
     let (entries, passphrase, path) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
-        crate::api::vault::update_entry(&mut session.entries, updated)?;
+        crate::api::vault::update_entry(&mut session.entries, updated, expiry_days)?;
         (session.entries.clone(), session.passphrase.clone(), session.path.clone())
     }; // ← lock released here
     save_vault(&entries, &passphrase, &path)?;

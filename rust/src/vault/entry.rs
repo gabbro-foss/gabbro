@@ -82,6 +82,9 @@ pub struct PreviousSecret {
     pub value: String,
     /// ISO 8601 timestamp: when the current value replaced this one.
     pub saved_at: String,
+    /// ISO 8601 timestamp: when this record auto-purges.
+    /// `None` means keep until manually deleted.
+    pub expires_at: Option<String>,
 }
 
 /// A single user-defined key/value field on an entry.
@@ -492,10 +495,28 @@ mod tests {
     }
 
     #[test]
+    fn previous_secret_stores_expires_at() {
+        let prev = PreviousSecret {
+            value: String::from("old_hunter2"),
+            saved_at: String::from("2025-01-01T00:00:00Z"),
+            expires_at: Some(String::from("2025-01-31T00:00:00Z")),
+        };
+        assert_eq!(prev.expires_at, Some(String::from("2025-01-31T00:00:00Z")));
+
+        let prev_forever = PreviousSecret {
+            value: String::from("old_hunter2"),
+            saved_at: String::from("2025-01-01T00:00:00Z"),
+            expires_at: None,
+        };
+        assert!(prev_forever.expires_at.is_none());
+    }
+
+    #[test]
     fn login_entry_can_store_previous_password() {
         let prev = PreviousSecret {
             value: String::from("old_hunter2"),
             saved_at: String::from("2025-01-01T00:00:00Z"),
+            expires_at: Some(String::from("2025-01-31T00:00:00Z")),
         };
         let entry = LoginEntry {
             meta: default_meta(),
@@ -529,6 +550,7 @@ mod tests {
             Some(PreviousSecret {
                 value: String::from("123"),
                 saved_at: String::from("2025-01-01T00:00:00Z"),
+                expires_at: Some(String::from("2025-01-31T00:00:00Z")),
             }),
             None,
         ).unwrap();
@@ -554,6 +576,7 @@ mod tests {
             Some(PreviousSecret {
                 value: String::from("4321"),
                 saved_at: String::from("2025-01-01T00:00:00Z"),
+                expires_at: Some(String::from("2025-01-31T00:00:00Z")),
             }),
         ).unwrap();
         assert!(entry.previous_pin.is_some());

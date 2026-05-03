@@ -1165,7 +1165,7 @@ fn wire__crate__api__vault_bridge__update_entry_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::vault_bridge::update_entry(api_entry).await?;
+                        let output_ok = crate::api::vault_bridge::update_entry(api_entry, None).await?;
                         Ok(output_ok)
                     })()
                     .await,

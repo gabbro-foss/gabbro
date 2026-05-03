@@ -471,11 +471,16 @@ pub fn get_entry_by_id(
 ///
 /// Matches by UUID — the updated entry must carry the same id as the
 /// one being replaced. Updates `updated_at` to the current timestamp.
+/// For Login and Card entries, snapshots any changed sensitive field
+/// (password, CVV, PIN) into the corresponding `previous_*` field.
+/// `expiry_days`: `Some(n)` sets `expires_at` to now + n days;
+/// `None` means keep until manually deleted.
 /// Returns `Err` if no entry with that id exists.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn update_entry(
     entries: &mut Vec<VaultEntry>,
     mut updated: VaultEntry,
+    expiry_days: Option<u32>,
 ) -> Result<(), String> {
     let id = entry_id(&updated).to_string();
     let pos = entries
@@ -483,20 +488,84 @@ pub fn update_entry(
         .position(|e| entry_id(e) == id)
         .ok_or_else(|| format!("No entry found with id: {id}"))?;
 
-    // Stamp updated_at on the replacement entry.
-    // `ref mut e` borrows the inner value rather than moving it out of the
-    // enum — required because VaultEntry now implements Drop via ZeroizeOnDrop.
-    let updated = match updated {
-        VaultEntry::Login(ref mut e)    => { e.meta.updated_at = chrono_now(); updated }
-        VaultEntry::Note(ref mut e)     => { e.meta.updated_at = chrono_now(); updated }
-        VaultEntry::Identity(ref mut e) => { e.meta.updated_at = chrono_now(); updated }
-        VaultEntry::Card(ref mut e)     => { e.meta.updated_at = chrono_now(); updated }
-        VaultEntry::File(ref mut e)     => { e.meta.updated_at = chrono_now(); updated }
-        VaultEntry::Custom(ref mut e)   => { e.meta.updated_at = chrono_now(); updated }
-    };
+    let now = chrono_now();
+    let expires_at = expiry_days.map(|days| add_days_to_timestamp(&now, days));
+
+    // Snapshot sensitive fields that have changed, then stamp updated_at.
+    match (&entries[pos], &mut updated) {
+        (VaultEntry::Login(old), VaultEntry::Login(ref mut new)) => {
+            new.meta.updated_at = now.clone();
+            if old.password != new.password {
+                new.previous_password = Some(crate::vault::entry::PreviousSecret {
+                    value: old.password.clone(),
+                    saved_at: now.clone(),
+                    expires_at: expires_at.clone(),
+                });
+            } else {
+                // Password unchanged — preserve existing history.
+                new.previous_password = old.previous_password.clone();
+            }
+        }
+        (VaultEntry::Card(old), VaultEntry::Card(ref mut new)) => {
+            new.meta.updated_at = now.clone();
+            if old.cvv != new.cvv {
+                new.previous_cvv = Some(crate::vault::entry::PreviousSecret {
+                    value: old.cvv.clone(),
+                    saved_at: now.clone(),
+                    expires_at: expires_at.clone(),
+                });
+            } else {
+                new.previous_cvv = old.previous_cvv.clone();
+            }
+            if old.pin != new.pin {
+                new.previous_pin = Some(crate::vault::entry::PreviousSecret {
+                    value: old.pin.clone().unwrap_or_default(),
+                    saved_at: now.clone(),
+                    expires_at: expires_at.clone(),
+                });
+            } else {
+                new.previous_pin = old.previous_pin.clone();
+            }
+        }
+        (_, VaultEntry::Note(ref mut e))     => { e.meta.updated_at = now; }
+        (_, VaultEntry::Identity(ref mut e)) => { e.meta.updated_at = now; }
+        (_, VaultEntry::File(ref mut e))     => { e.meta.updated_at = now; }
+        (_, VaultEntry::Custom(ref mut e))   => { e.meta.updated_at = now; }
+        _ => return Err(String::from("Entry type mismatch during update")),
+    }
 
     entries[pos] = updated;
     Ok(())
+}
+
+/// Adds `days` to an ISO 8601 UTC timestamp string, returning a new timestamp.
+/// Falls back to the input string unchanged if parsing fails.
+fn add_days_to_timestamp(timestamp: &str, days: u32) -> String {
+    if timestamp.len() < 10 {
+        return timestamp.to_string();
+    }
+    let year:  u64 = timestamp[0..4].parse().unwrap_or(2025);
+    let month: u64 = timestamp[5..7].parse().unwrap_or(1);
+    let day:   u64 = timestamp[8..10].parse().unwrap_or(1);
+    let time_suffix = if timestamp.len() > 10 { &timestamp[10..] } else { "T00:00:00Z" };
+
+    let total_days = days_from_ymd(year, month, day) + days as u64;
+    let (ny, nm, nd) = days_to_ymd(total_days);
+    format!("{:04}-{:02}-{:02}{}", ny, nm, nd, time_suffix)
+}
+
+/// Converts a (year, month, day) triple to a count of days since 1970-01-01.
+fn days_from_ymd(year: u64, month: u64, day: u64) -> u64 {
+    let mut d = 0u64;
+    for y in 1970..year {
+        d += if is_leap(y) { 366 } else { 365 };
+    }
+    let days_in_month = [31u64, if is_leap(year) { 29 } else { 28 },
+                         31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    for m in 0..(month as usize - 1) {
+        d += days_in_month[m];
+    }
+    d + day - 1
 }
 
 /// Remove a single entry from the vault by UUID.
@@ -1176,7 +1245,7 @@ mod tests {
             attachments: vec![],
         });
 
-        update_entry(&mut entries, updated).unwrap();
+        update_entry(&mut entries, updated, Some(30)).unwrap();
         assert_eq!(entries.len(), 1);
         match &entries[0] {
             VaultEntry::Note(e) => {
@@ -1221,7 +1290,7 @@ mod tests {
             attachments: vec![],
         });
 
-        update_entry(&mut entries, updated).unwrap();
+        update_entry(&mut entries, updated, Some(30)).unwrap();
         match &entries[0] {
             VaultEntry::Note(e) => assert_ne!(e.meta.updated_at, "2025-01-01T00:00:00Z"),
             _ => panic!("Expected Note variant"),
@@ -1262,7 +1331,7 @@ mod tests {
             attachments: vec![],
         });
 
-        assert!(update_entry(&mut entries, ghost).is_err());
+        assert!(update_entry(&mut entries, ghost, Some(30)).is_err());
     }
 
     #[test]
@@ -1503,6 +1572,158 @@ mod tests {
             VaultEntry::Login(e) => {
                 assert_eq!(e.custom_fields[0].value, MASKED_VALUE); // hidden
                 assert_eq!(e.custom_fields[1].value, "eu-west-1");  // not hidden
+            }
+            _ => panic!("Expected Login variant"),
+        }
+    }
+
+    #[test]
+    fn update_entry_captures_previous_password() {
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+
+        let meta = EntryMeta {
+            id: String::from("id-001"),
+            created_at: String::from("2025-01-01T00:00:00Z"),
+            updated_at: String::from("2025-01-01T00:00:00Z"),
+            folder: String::from("Personal"),
+            tags: vec![],
+            favourite: false,
+        };
+        let mut entries = vec![VaultEntry::Login(LoginEntry {
+            meta: meta.clone(),
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("old_password"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        })];
+
+        let updated = VaultEntry::Login(LoginEntry {
+            meta: meta.clone(),
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("new_password"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        });
+
+        update_entry(&mut entries, updated, Some(30)).unwrap();
+
+        match &entries[0] {
+            VaultEntry::Login(e) => {
+                assert_eq!(e.password, "new_password");
+                let prev = e.previous_password.as_ref().expect("previous_password should be set");
+                assert_eq!(prev.value, "old_password");
+                assert!(prev.expires_at.is_some());
+            }
+            _ => panic!("Expected Login variant"),
+        }
+    }
+
+    #[test]
+    fn update_entry_no_expiry_keeps_forever() {
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+
+        let meta = EntryMeta {
+            id: String::from("id-001"),
+            created_at: String::from("2025-01-01T00:00:00Z"),
+            updated_at: String::from("2025-01-01T00:00:00Z"),
+            folder: String::from("Personal"),
+            tags: vec![],
+            favourite: false,
+        };
+        let mut entries = vec![VaultEntry::Login(LoginEntry {
+            meta: meta.clone(),
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("old_password"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        })];
+
+        let updated = VaultEntry::Login(LoginEntry {
+            meta: meta.clone(),
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("new_password"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        });
+
+        update_entry(&mut entries, updated, None).unwrap();
+
+        match &entries[0] {
+            VaultEntry::Login(e) => {
+                assert_eq!(e.password, "new_password");
+                let prev = e.previous_password.as_ref().expect("previous_password should be set");
+                assert_eq!(prev.value, "old_password");
+                assert!(prev.expires_at.is_none());
+            }
+            _ => panic!("Expected Login variant"),
+        }
+    }
+
+    #[test]
+    fn update_entry_unchanged_password_does_not_overwrite_history() {
+        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
+
+        let meta = EntryMeta {
+            id: String::from("id-001"),
+            created_at: String::from("2025-01-01T00:00:00Z"),
+            updated_at: String::from("2025-01-01T00:00:00Z"),
+            folder: String::from("Personal"),
+            tags: vec![],
+            favourite: false,
+        };
+        let existing_prev = PreviousSecret {
+            value: String::from("even_older"),
+            saved_at: String::from("2024-12-01T00:00:00Z"),
+            expires_at: Some(String::from("2024-12-31T00:00:00Z")),
+        };
+        let mut entries = vec![VaultEntry::Login(LoginEntry {
+            meta: meta.clone(),
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("same_password"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: Some(existing_prev),
+        })];
+
+        let updated = VaultEntry::Login(LoginEntry {
+            meta: meta.clone(),
+            title: String::from("GitHub — updated title"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("same_password"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        });
+
+        update_entry(&mut entries, updated, Some(30)).unwrap();
+
+        match &entries[0] {
+            VaultEntry::Login(e) => {
+                assert_eq!(e.title, "GitHub — updated title");
+                // password unchanged — existing history must be preserved as-is
+                let prev = e.previous_password.as_ref().expect("history should be preserved");
+                assert_eq!(prev.value, "even_older");
             }
             _ => panic!("Expected Login variant"),
         }
