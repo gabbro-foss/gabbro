@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/review_changes_screen.dart';
 import 'package:gabbro/settings.dart';
@@ -360,7 +361,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             field0.lastName != u.lastName ||
             field0.email != u.email ||
             field0.phone != u.phone ||
-            field0.address != u.address;
+            field0.address != u.address ||
+            !listEquals(field0.customFields, u.customFields);
       case (
         VaultEntryData_Card(:final field0),
         VaultEntryData_Card(field0: final u),

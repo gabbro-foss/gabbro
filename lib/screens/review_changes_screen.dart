@@ -33,7 +33,16 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
     });
     try {
       await widget.onSave(widget.updated, widget.expiryDays);
-      if (mounted) Navigator.of(context).pop(widget.updated);
+      final id = switch (widget.updated) {
+        VaultEntryData_Login(:final field0) => field0.id,
+        VaultEntryData_Note(:final field0) => field0.id,
+        VaultEntryData_Identity(:final field0) => field0.id,
+        VaultEntryData_Card(:final field0) => field0.id,
+        VaultEntryData_File(:final field0) => field0.id,
+        VaultEntryData_Custom(:final field0) => field0.id,
+      };
+      final refreshed = getEntry(id: id);
+      if (mounted) Navigator.of(context).pop(refreshed);
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
     } finally {
