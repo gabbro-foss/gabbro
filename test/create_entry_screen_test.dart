@@ -31,7 +31,6 @@ Widget _buildCreateScreen(
       home: CreateEntryScreen(
         entryType: entryType,
         onCreateEntry: onCreateEntry ?? (_) async {},
-        onUpdateEntry: (_) async {},
         onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
       ),
     );
@@ -41,7 +40,6 @@ Widget _buildEditScreen(VaultEntryData existing) => MaterialApp(
         entryType: 'Login',
         existing: existing,
         onCreateEntry: (_) async {},
-        onUpdateEntry: (_) async {},
         onGetEntry: (_) => existing,
       ),
     );

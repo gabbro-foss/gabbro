@@ -1,20 +1,19 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/main.dart';
+import 'package:gabbro/screens/review_changes_screen.dart';
+import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-Future<void> _defaultCreate(VaultEntryData entry) =>
-    createEntry(entry: entry);
-Future<void> _defaultUpdate(VaultEntryData entry) =>
-    updateEntry(entry: entry);
+Future<void> _defaultCreate(VaultEntryData entry) => createEntry(entry: entry);
 VaultEntryData _defaultGetEntry(String id) => getEntry(id: id);
 
 class CreateEntryScreen extends StatefulWidget {
   final String entryType;
   final VaultEntryData? existing;
   final Future<void> Function(VaultEntryData entry) onCreateEntry;
-  final Future<void> Function(VaultEntryData entry) onUpdateEntry;
   final VaultEntryData Function(String id) onGetEntry;
 
   const CreateEntryScreen({
@@ -22,7 +21,6 @@ class CreateEntryScreen extends StatefulWidget {
     required this.entryType,
     this.existing,
     this.onCreateEntry = _defaultCreate,
-    this.onUpdateEntry = _defaultUpdate,
     this.onGetEntry = _defaultGetEntry,
   });
 
@@ -167,19 +165,22 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     if (e case VaultEntryData_Card(:final field0)) {
       _cardNameController = TextEditingController(text: field0.cardName ?? '');
       _cardStatusController = TextEditingController(text: field0.status);
-      _cardholderNameController =
-          TextEditingController(text: field0.cardholderName);
+      _cardholderNameController = TextEditingController(
+        text: field0.cardholderName,
+      );
       _cardNumberController = TextEditingController(text: field0.cardNumber);
       _expiryController = TextEditingController(text: field0.expiry);
       _cvvController = TextEditingController(text: field0.cvv);
-      _creditLimitController =
-          TextEditingController(text: field0.creditLimit ?? '');
-      _cardAccountNumberController =
-          TextEditingController(text: field0.cardAccountNumber ?? '');
-      _paymentNetworkController =
-          TextEditingController(text: field0.paymentNetwork ?? '');
-      _cardNotesController =
-          TextEditingController(text: field0.notes ?? '');
+      _creditLimitController = TextEditingController(
+        text: field0.creditLimit ?? '',
+      );
+      _cardAccountNumberController = TextEditingController(
+        text: field0.cardAccountNumber ?? '',
+      );
+      _paymentNetworkController = TextEditingController(
+        text: field0.paymentNetwork ?? '',
+      );
+      _cardNotesController = TextEditingController(text: field0.notes ?? '');
     } else {
       _cardNameController = TextEditingController();
       _cardStatusController = TextEditingController(text: 'active');
@@ -197,8 +198,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     if (e case VaultEntryData_File(:final field0)) {
       _pickedFilename = field0.filename;
       _pickedFileBytes = Uint8List.fromList(field0.data);
-      _fileNotesController =
-          TextEditingController(text: field0.notes ?? '');
+      _fileNotesController = TextEditingController(text: field0.notes ?? '');
     } else {
       _fileNotesController = TextEditingController();
     }
@@ -286,26 +286,244 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _error = null;
     });
     try {
-      if (_isEditing) {
-        await _saveUpdate();
-        final id = switch (widget.existing!) {
-          VaultEntryData_Login(:final field0) => field0.id,
-          VaultEntryData_Note(:final field0) => field0.id,
-          VaultEntryData_Identity(:final field0) => field0.id,
-          VaultEntryData_Card(:final field0) => field0.id,
-          VaultEntryData_File(:final field0) => field0.id,
-          VaultEntryData_Custom(:final field0) => field0.id,
-        };
-        final updated = widget.onGetEntry(id);
-        if (mounted) Navigator.of(context).pop(updated);
-      } else {
-        await _saveCreate();
-        if (mounted) Navigator.of(context).pop(true);
-      }
+      await _saveCreate();
+      if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
     } finally {
       if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  /// Validates the form, builds the updated entry, checks for changes,
+  /// and pushes ReviewChangesScreen. Called only in edit mode.
+  Future<void> _review() async {
+    if (!_formKey.currentState!.validate()) return;
+    final updated = _buildUpdated();
+    if (updated == null) return;
+    if (!_hasChanges(widget.existing!, updated)) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('No changes to save.')));
+      }
+      return;
+    }
+    final expiry = _expiryDays();
+    if (!mounted) return;
+    final result = await Navigator.of(context).push<VaultEntryData>(
+      MaterialPageRoute(
+        builder: (context) => ReviewChangesScreen(
+          original: widget.existing!,
+          updated: updated,
+          expiryDays: expiry,
+          onSave: (entry, days) => updateEntry(entry: entry, expiryDays: days),
+        ),
+      ),
+    );
+    if (result != null && mounted) Navigator.of(context).pop(result);
+  }
+
+  /// Derives expiry days from AppSettings.passwordHistoryExpiry.
+  int? _expiryDays() {
+    final expiry = GabbroApp.of(context).settings.passwordHistoryExpiry;
+    return switch (expiry) {
+      PasswordHistoryExpiry.sevenDays => 7,
+      PasswordHistoryExpiry.thirtyDays => 30,
+      PasswordHistoryExpiry.ninetyDays => 90,
+      PasswordHistoryExpiry.keepForever => null,
+    };
+  }
+
+  /// Returns true if any field differs between [original] and [updated].
+  bool _hasChanges(VaultEntryData original, VaultEntryData updated) {
+    switch ((original, updated)) {
+      case (
+        VaultEntryData_Login(:final field0),
+        VaultEntryData_Login(field0: final u),
+      ):
+        return field0.title != u.title ||
+            field0.url != u.url ||
+            field0.username != u.username ||
+            field0.password != u.password ||
+            field0.notes != u.notes;
+      case (
+        VaultEntryData_Note(:final field0),
+        VaultEntryData_Note(field0: final u),
+      ):
+        return field0.title != u.title || field0.content != u.content;
+      case (
+        VaultEntryData_Identity(:final field0),
+        VaultEntryData_Identity(field0: final u),
+      ):
+        return field0.firstName != u.firstName ||
+            field0.lastName != u.lastName ||
+            field0.email != u.email ||
+            field0.phone != u.phone ||
+            field0.address != u.address;
+      case (
+        VaultEntryData_Card(:final field0),
+        VaultEntryData_Card(field0: final u),
+      ):
+        return field0.cardholderName != u.cardholderName ||
+            field0.cardNumber != u.cardNumber ||
+            field0.expiry != u.expiry ||
+            field0.cvv != u.cvv ||
+            field0.pin != u.pin ||
+            field0.cardName != u.cardName ||
+            field0.status != u.status;
+      case (
+        VaultEntryData_File(:final field0),
+        VaultEntryData_File(field0: final u),
+      ):
+        return field0.filename != u.filename || field0.notes != u.notes;
+      case (
+        VaultEntryData_Custom(:final field0),
+        VaultEntryData_Custom(field0: final u),
+      ):
+        return field0.title != u.title || field0.fields != u.fields;
+      default:
+        return true;
+    }
+  }
+
+  /// Builds the updated VaultEntryData from current form state.
+  /// Returns null if the entry type is not supported.
+  VaultEntryData? _buildUpdated() {
+    switch (widget.existing) {
+      case VaultEntryData_Login(:final field0):
+        return VaultEntryData.login(
+          LoginEntryData(
+            id: field0.id,
+            createdAt: field0.createdAt,
+            updatedAt: '',
+            folder: field0.folder,
+            tags: field0.tags,
+            favourite: field0.favourite,
+            title: _loginTitleController.text,
+            url: _urlController.text,
+            username: _usernameController.text,
+            password: _passwordController.text,
+            notes: null,
+            customFields: field0.customFields,
+            previousPassword: field0.previousPassword,
+          ),
+        );
+      case VaultEntryData_Note(:final field0):
+        return VaultEntryData.note(
+          NoteEntryData(
+            id: field0.id,
+            createdAt: field0.createdAt,
+            updatedAt: '',
+            folder: field0.folder,
+            tags: field0.tags,
+            favourite: field0.favourite,
+            title: _titleController.text,
+            content: _contentController.text,
+          ),
+        );
+      case VaultEntryData_Identity(:final field0):
+        return VaultEntryData.identity(
+          IdentityEntryData(
+            id: field0.id,
+            createdAt: field0.createdAt,
+            updatedAt: '',
+            folder: field0.folder,
+            tags: field0.tags,
+            favourite: field0.favourite,
+            firstName: _firstNameController.text,
+            lastName: _lastNameController.text,
+            email: _emailController.text,
+            phone: _phoneController.text.isEmpty ? null : _phoneController.text,
+            address: _addressController.text.isEmpty
+                ? null
+                : _addressController.text,
+            customFields: _identityCustomFields
+                .map(
+                  (f) => CustomFieldData(
+                    label: f.labelController.text,
+                    value: f.valueController.text,
+                    hidden: f.hidden,
+                  ),
+                )
+                .toList(),
+          ),
+        );
+      case VaultEntryData_Card(:final field0):
+        return VaultEntryData.card(
+          CardEntryData(
+            id: field0.id,
+            createdAt: field0.createdAt,
+            updatedAt: '',
+            folder: field0.folder,
+            tags: field0.tags,
+            favourite: field0.favourite,
+            cardName: _cardNameController.text.isEmpty
+                ? null
+                : _cardNameController.text,
+            status: _cardStatusController.text.isEmpty
+                ? 'active'
+                : _cardStatusController.text,
+            cardholderName: _cardholderNameController.text,
+            cardNumber: _cardNumberController.text,
+            expiry: _expiryController.text,
+            cvv: _cvvController.text,
+            creditLimit: _creditLimitController.text.isEmpty
+                ? null
+                : _creditLimitController.text,
+            cardAccountNumber: _cardAccountNumberController.text.isEmpty
+                ? null
+                : _cardAccountNumberController.text,
+            paymentNetwork: _paymentNetworkController.text.isEmpty
+                ? null
+                : _paymentNetworkController.text,
+            notes: _cardNotesController.text.isEmpty
+                ? null
+                : _cardNotesController.text,
+            customFields: field0.customFields,
+            previousCvv: field0.previousCvv,
+            previousPin: field0.previousPin,
+          ),
+        );
+      case VaultEntryData_File(:final field0):
+        return VaultEntryData.file(
+          FileEntryData(
+            id: field0.id,
+            createdAt: field0.createdAt,
+            updatedAt: '',
+            folder: field0.folder,
+            tags: field0.tags,
+            favourite: field0.favourite,
+            filename: _pickedFilename ?? field0.filename,
+            data: _pickedFileBytes ?? Uint8List.fromList(field0.data),
+            notes: _fileNotesController.text.isEmpty
+                ? null
+                : _fileNotesController.text,
+          ),
+        );
+      case VaultEntryData_Custom(:final field0):
+        return VaultEntryData.custom(
+          CustomEntryData(
+            id: field0.id,
+            createdAt: field0.createdAt,
+            updatedAt: '',
+            folder: field0.folder,
+            tags: field0.tags,
+            favourite: field0.favourite,
+            title: _customTitleController.text,
+            fields: _customFields
+                .map(
+                  (f) => CustomFieldData(
+                    label: f.labelController.text,
+                    value: f.valueController.text,
+                    hidden: f.hidden,
+                  ),
+                )
+                .toList(),
+          ),
+        );
+      default:
+        return null;
     }
   }
 
@@ -460,166 +678,18 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     }
   }
 
-  Future<void> _saveUpdate() async {
-    switch (widget.existing) {
-      case VaultEntryData_Login(:final field0):
-        await widget.onUpdateEntry(
-          VaultEntryData.login(
-            LoginEntryData(
-              id: field0.id,
-              createdAt: field0.createdAt,
-              updatedAt: '',
-              folder: field0.folder,
-              tags: field0.tags,
-              favourite: field0.favourite,
-              title: _loginTitleController.text,
-              url: _urlController.text,
-              username: _usernameController.text,
-              password: _passwordController.text,
-              customFields: field0.customFields,
-            ),
-          ),
-        );
-
-      case VaultEntryData_Note(:final field0):
-        await widget.onUpdateEntry(
-          VaultEntryData.note(
-            NoteEntryData(
-              id: field0.id,
-              createdAt: field0.createdAt,
-              updatedAt: '',
-              folder: field0.folder,
-              tags: field0.tags,
-              favourite: field0.favourite,
-              title: _titleController.text,
-              content: _contentController.text,
-            ),
-          ),
-        );
-
-      case VaultEntryData_Identity(:final field0):
-        await widget.onUpdateEntry(
-          VaultEntryData.identity(
-            IdentityEntryData(
-              id: field0.id,
-              createdAt: field0.createdAt,
-              updatedAt: '',
-              folder: field0.folder,
-              tags: field0.tags,
-              favourite: field0.favourite,
-              firstName: _firstNameController.text,
-              lastName: _lastNameController.text,
-              email: _emailController.text,
-              phone: _phoneController.text.isEmpty
-                  ? null
-                  : _phoneController.text,
-              address: _addressController.text.isEmpty
-                  ? null
-                  : _addressController.text,
-              customFields: _identityCustomFields
-                  .map(
-                    (f) => CustomFieldData(
-                      label: f.labelController.text,
-                      value: f.valueController.text,
-                      hidden: f.hidden,
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-        );
-
-      case VaultEntryData_Card(:final field0):
-        await widget.onUpdateEntry(
-          VaultEntryData.card(
-            CardEntryData(
-              id: field0.id,
-              createdAt: field0.createdAt,
-              updatedAt: '',
-              folder: field0.folder,
-              tags: field0.tags,
-              favourite: field0.favourite,
-              cardName: _cardNameController.text.isEmpty
-                  ? null
-                  : _cardNameController.text,
-              status: _cardStatusController.text.isEmpty
-                  ? 'active'
-                  : _cardStatusController.text,
-              cardholderName: _cardholderNameController.text,
-              cardNumber: _cardNumberController.text,
-              expiry: _expiryController.text,
-              cvv: _cvvController.text,
-              creditLimit: _creditLimitController.text.isEmpty
-                  ? null
-                  : _creditLimitController.text,
-              cardAccountNumber: _cardAccountNumberController.text.isEmpty
-                  ? null
-                  : _cardAccountNumberController.text,
-              paymentNetwork: _paymentNetworkController.text.isEmpty
-                  ? null
-                  : _paymentNetworkController.text,
-              notes: _cardNotesController.text.isEmpty
-                  ? null
-                  : _cardNotesController.text,
-              customFields: field0.customFields,
-            ),
-          ),
-        );
-
-      case VaultEntryData_File(:final field0):
-        await widget.onUpdateEntry(
-          VaultEntryData.file(
-            FileEntryData(
-              id: field0.id,
-              createdAt: field0.createdAt,
-              updatedAt: '',
-              folder: field0.folder,
-              tags: field0.tags,
-              favourite: field0.favourite,
-              filename: _pickedFilename ?? field0.filename,
-              data: _pickedFileBytes ?? Uint8List.fromList(field0.data),
-              notes: _fileNotesController.text.isEmpty
-                  ? null
-                  : _fileNotesController.text,
-            ),
-          ),
-        );
-
-      case VaultEntryData_Custom(:final field0):
-        await widget.onUpdateEntry(
-          VaultEntryData.custom(
-            CustomEntryData(
-              id: field0.id,
-              createdAt: field0.createdAt,
-              updatedAt: '',
-              folder: field0.folder,
-              tags: field0.tags,
-              favourite: field0.favourite,
-              title: _customTitleController.text,
-              fields: _customFields
-                  .map(
-                    (f) => CustomFieldData(
-                      label: f.labelController.text,
-                      value: f.valueController.text,
-                      hidden: f.hidden,
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
-        );
-
-      default:
-        throw Exception('Edit not supported for this entry type.');
-    }
-  }
-
   // ── Build ────────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_screenTitle())),
+      appBar: AppBar(
+        title: Text(_screenTitle()),
+        actions: [
+          if (_isEditing)
+            TextButton(onPressed: _review, child: const Text('Review →')),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -641,16 +711,17 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                       ),
                     ),
                   ),
-                FilledButton(
-                  onPressed: _isSaving ? null : _save,
-                  child: _isSaving
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text('Save'),
-                ),
+                if (!_isEditing)
+                  FilledButton(
+                    onPressed: _isSaving ? null : _save,
+                    child: _isSaving
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Save'),
+                  ),
               ],
             ),
           ),
@@ -771,8 +842,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: 'Content',
         border: OutlineInputBorder(),
       ),
-      validator: (v) =>
-          (v == null || v.isEmpty) ? 'Content is required' : null,
+      validator: (v) => (v == null || v.isEmpty) ? 'Content is required' : null,
     ),
   ];
 
@@ -802,8 +872,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       ),
       validator: (v) =>
           (v == null || v.isEmpty) ? 'Last name is required' : null,
-      onFieldSubmitted: (_) =>
-          FocusScope.of(context).requestFocus(_emailFocus),
+      onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
     ),
     const SizedBox(height: 12),
     TextFormField(
@@ -814,8 +883,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: 'Email (optional)',
         border: OutlineInputBorder(),
       ),
-      onFieldSubmitted: (_) =>
-          FocusScope.of(context).requestFocus(_phoneFocus),
+      onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_phoneFocus),
     ),
     const SizedBox(height: 12),
     TextFormField(
@@ -842,15 +910,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     const SizedBox(height: 16),
     _customFieldsSection(
       fields: _identityCustomFields,
-      onAdd: () => setState(
-          () => _identityCustomFields.add(_CustomFieldState.empty())),
+      onAdd: () =>
+          setState(() => _identityCustomFields.add(_CustomFieldState.empty())),
       onRemove: (i) => setState(() {
         _identityCustomFields[i].dispose();
         _identityCustomFields.removeAt(i);
       }),
       onToggleHidden: (i) => setState(
-        () => _identityCustomFields[i].hidden =
-            !_identityCustomFields[i].hidden,
+        () =>
+            _identityCustomFields[i].hidden = !_identityCustomFields[i].hidden,
       ),
     ),
   ];
@@ -973,8 +1041,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                 icon: Icon(
                   _cvvObscured ? Icons.visibility_off : Icons.visibility,
                 ),
-                onPressed: () =>
-                    setState(() => _cvvObscured = !_cvvObscured),
+                onPressed: () => setState(() => _cvvObscured = !_cvvObscured),
               ),
             ),
             validator: (v) {
@@ -1083,21 +1150,19 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: 'Title',
         border: OutlineInputBorder(),
       ),
-      validator: (v) =>
-          (v == null || v.isEmpty) ? 'Title is required' : null,
+      validator: (v) => (v == null || v.isEmpty) ? 'Title is required' : null,
       onFieldSubmitted: (_) => _save(),
     ),
     const SizedBox(height: 16),
     _customFieldsSection(
       fields: _customFields,
-      onAdd: () =>
-          setState(() => _customFields.add(_CustomFieldState.empty())),
+      onAdd: () => setState(() => _customFields.add(_CustomFieldState.empty())),
       onRemove: (i) => setState(() {
         _customFields[i].dispose();
         _customFields.removeAt(i);
       }),
-      onToggleHidden: (i) => setState(
-          () => _customFields[i].hidden = !_customFields[i].hidden),
+      onToggleHidden: (i) =>
+          setState(() => _customFields[i].hidden = !_customFields[i].hidden),
     ),
   ];
 
@@ -1113,8 +1178,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (fields.isNotEmpty)
-          Text('Custom fields',
-              style: Theme.of(context).textTheme.titleSmall),
+          Text('Custom fields', style: Theme.of(context).textTheme.titleSmall),
         if (fields.isNotEmpty) const SizedBox(height: 8),
         ...List.generate(fields.length, (i) {
           final f = fields[i];
@@ -1146,9 +1210,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          f.hidden
-                              ? Icons.visibility_off
-                              : Icons.visibility,
+                          f.hidden ? Icons.visibility_off : Icons.visibility,
                         ),
                         tooltip: f.hidden ? 'Show value' : 'Hide value',
                         onPressed: () => onToggleHidden(i),
@@ -1232,9 +1294,9 @@ class _CustomFieldState {
   });
 
   factory _CustomFieldState.empty() => _CustomFieldState(
-        labelController: TextEditingController(),
-        valueController: TextEditingController(),
-      );
+    labelController: TextEditingController(),
+    valueController: TextEditingController(),
+  );
 
   void dispose() {
     labelController.dispose();

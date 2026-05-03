@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
+import 'package:gabbro/screens/password_history_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
@@ -260,6 +261,27 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           obscured: _passwordObscured,
           onToggle: () =>
               setState(() => _passwordObscured = !_passwordObscured),
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: const Text(
+            'Password history',
+            style: TextStyle(fontSize: 14),
+          ),
+          trailing: const Icon(Icons.chevron_right, size: 18),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => PasswordHistoryScreen(
+                entry: e,
+                onDeleteHistory: () async {
+                  // TODO: wire to bridge — clear previous_password
+                },
+                onRevert: () async {
+                  // TODO: wire to bridge — revert to previous_password
+                },
+              ),
+            ),
+          ),
         ),
         if (e.notes != null) _field('Notes', e.notes!),
         if (e.customFields.isNotEmpty) ...[
