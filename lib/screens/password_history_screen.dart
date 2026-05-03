@@ -44,7 +44,7 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
                   color: Theme.of(context)
                       .colorScheme
                       .errorContainer
-                      .withOpacity(0.3),
+                      .withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(

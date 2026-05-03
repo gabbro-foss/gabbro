@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 class ReviewChangesScreen extends StatefulWidget {
@@ -119,7 +118,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
   List<Widget> _buildSensitiveChanges() {
     final changes = <Widget>[];
     switch ((widget.original, widget.updated)) {
-      case (VaultEntryData_Login(:final field0 as LoginEntryData),
+      case (VaultEntryData_Login(:final field0),
             VaultEntryData_Login(field0: final u)):
         if (field0.password != u.password) {
           changes.add(_sensitiveRow(
@@ -130,7 +129,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
             newValue: u.password,
           ));
         }
-      case (VaultEntryData_Card(:final field0 as CardEntryData),
+      case (VaultEntryData_Card(:final field0),
             VaultEntryData_Card(field0: final u)):
         if (field0.cvv != u.cvv) {
           changes.add(_sensitiveRow(
@@ -157,17 +156,17 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
   List<Widget> _buildFieldDiffs() {
     final diffs = <Widget>[];
     switch ((widget.original, widget.updated)) {
-      case (VaultEntryData_Login(:final field0 as LoginEntryData),
+      case (VaultEntryData_Login(:final field0),
             VaultEntryData_Login(field0: final u)):
         _addDiff(diffs, 'Title', field0.title, u.title);
         _addDiff(diffs, 'URL', field0.url, u.url);
         _addDiff(diffs, 'Username', field0.username, u.username);
         _addDiff(diffs, 'Notes', field0.notes ?? '', u.notes ?? '');
-      case (VaultEntryData_Note(:final field0 as NoteEntryData),
+      case (VaultEntryData_Note(:final field0),
             VaultEntryData_Note(field0: final u)):
         _addDiff(diffs, 'Title', field0.title, u.title);
         _addDiff(diffs, 'Content', field0.content, u.content);
-      case (VaultEntryData_Card(:final field0 as CardEntryData),
+      case (VaultEntryData_Card(:final field0),
             VaultEntryData_Card(field0: final u)):
         _addDiff(diffs, 'Card label', field0.cardName ?? '', u.cardName ?? '');
         _addDiff(diffs, 'Status', field0.status, u.status);
@@ -207,7 +206,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: colorScheme.errorContainer.withOpacity(0.3),
+        color: colorScheme.errorContainer.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -274,7 +273,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withOpacity(0.4),
+                  color: colorScheme.primaryContainer.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(

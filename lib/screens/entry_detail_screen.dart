@@ -274,10 +274,18 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
               builder: (context) => PasswordHistoryScreen(
                 entry: e,
                 onDeleteHistory: () async {
-                  // TODO: wire to bridge — clear previous_password
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Delete history — coming soon.')),
+                    );
+                  }
                 },
                 onRevert: () async {
-                  // TODO: wire to bridge — revert to previous_password
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Revert — coming soon.')),
+                    );
+                  }
                 },
               ),
             ),

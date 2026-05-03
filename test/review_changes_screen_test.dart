@@ -66,9 +66,11 @@ Widget _buildReviewScreen({
         original: original,
         updated: updated,
         expiryDays: 30,
-        onSave: onSave ?? (_, __) async {},
+        onSave: onSave ?? _noOpSave,
       ),
     );
+
+Future<void> _noOpSave(VaultEntryData entry, int? days) async {}
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
