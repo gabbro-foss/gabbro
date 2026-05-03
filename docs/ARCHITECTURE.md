@@ -33,7 +33,9 @@ gabbro/
 │   │   ├── change_passphrase_screen.dart  # Change master passphrase
 │   │   ├── about_screen.dart              # About screen — version, links, licences
 │   │   ├── appearance_screen.dart         # Appearance — theme, text size
-│   │   └── security_screen.dart           # Security — foreground and background lock timeouts
+│   │   ├── security_screen.dart           # Security — foreground and background lock timeouts
+│   │   ├── review_changes_screen.dart     # Safe edit — diff view before saving
+│   │   └── password_history_screen.dart   # Safe edit — previous password with revert
 │   ├── widgets/                      # Reusable UI components
 │   │   ├── path_field.dart           # Native file picker field (open + save modes)
 │   │   └── segmented_row.dart        # Shared SegmentedRow<T> and SectionHeader widgets
@@ -336,6 +338,56 @@ Each entry is an instance of a typed class:
   background timeout, app kill, resume within timeout, settings persistence,
   interaction reset, and Never option all confirmed.
 
+## Safe Entry Editing
+
+- **Status:** full stack implemented. Rust 177 tests, Flutter 107 tests.
+  Verified on Samsung S23 (Android 16).
+
+- **`PreviousSecret` struct** (`rust/src/vault/entry.rs`): holds `value`,
+  `saved_at`, and `expires_at: Option<String>`. Derives `Zeroize` +
+  `ZeroizeOnDrop`. Used by `LoginEntry.previous_password`,
+  `CardEntry.previous_cvv`, and `CardEntry.previous_pin`.
+
+- **`update_entry`** (`rust/src/api/vault.rs`): before overwriting, snapshots
+  the old sensitive value into `previous_*` with `saved_at = now` and
+  `expires_at = now + expiry_days` (or `None` for keep-forever). If the
+  sensitive field is unchanged, existing history is preserved. `expiry_days:
+  Option<u32>` flows from Flutter settings through `session_update_entry` →
+  `update_entry`. Date arithmetic is std-only — no chrono dependency.
+
+- **`PreviousSecretData` DTO** (`rust/src/api/vault.rs`): bridge-facing struct
+  with `value` (always masked to `"********"` at the bridge boundary),
+  `saved_at`, `expires_at`. Present on `LoginEntryData.previous_password`,
+  `CardEntryData.previous_cvv`, `CardEntryData.previous_pin`.
+
+- **`PasswordHistoryExpiry` setting** (`lib/settings.dart`): enum with
+  `sevenDays` / `thirtyDays` (default) / `ninetyDays` / `keepForever`.
+  Persisted to `settings.jsonc`. Surfaced in Settings → Security as a
+  `SegmentedRow`. Converted to `int?` (days) in `CreateEntryScreen._expiryDays()`
+  before passing to the bridge.
+
+- **Edit flow** (`lib/screens/create_entry_screen.dart`): in edit mode, "Save"
+  button is replaced by "Review →" in the app bar. Tapping it validates the
+  form, calls `_buildUpdated()` to construct the updated DTO, calls
+  `_hasChanges()` to diff original vs updated (uses `listEquals` for custom
+  field lists), and pushes `ReviewChangesScreen`. If no changes, shows a
+  snackbar and stays. `onUpdateEntry` dependency removed — `ReviewChangesScreen`
+  owns the save call directly.
+
+- **`ReviewChangesScreen`** (`lib/screens/review_changes_screen.dart`): shows
+  sensitive changes (password/CVV/PIN) in a warning row with show/hide toggle,
+  and non-sensitive field diffs in a before→after grid. Only changed fields
+  shown. Save calls `updateEntry(entry, expiryDays)` then re-fetches the entry
+  via `getEntry(id)` to get the Rust-stamped `updated_at` and populated
+  `previous_password` before popping. 6 widget tests.
+
+- **`PasswordHistoryScreen`** (`lib/screens/password_history_screen.dart`):
+  shows current password (masked, toggleable) and previous password (masked,
+  toggleable) with `saved_at` / `expires_at` metadata. "Revert" and "Delete
+  previous entry" are stub snackbars pending bridge implementation. Entry point:
+  "Password history →" `ListTile` in `EntryDetailScreen._loginView`. 7 widget
+  tests.
+
 ## Vault Domain Model
 - **Status:** all 6 entry types implemented in Rust
   (`rust/src/vault/entry.rs`), 11 unit tests passing.
@@ -603,14 +655,16 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Safe entry editing — Rust domain model phase complete.
-  `PreviousSecret` struct added; `LoginEntry` gains `previous_password`,
-  `CardEntry` gains `previous_cvv` and `previous_pin`. All fields
-  `Zeroize` + `ZeroizeOnDrop`. 176 Rust tests passing.
-- **Next task:** Safe entry editing — Flutter phase. Screens 2 (Review
-  changes confirmation) and 4 (Password history) per agreed wireframes.
-  Then wire `update_entry` in Rust API layer to capture previous value
-  before overwriting.
+- **Completed:** Safe entry editing — full stack. `PreviousSecret` gains
+  `expires_at`; `update_entry` snapshots old password/CVV/PIN before
+  overwriting; `PreviousSecretData` DTO crosses the bridge masked;
+  `ReviewChangesScreen` (diff + save) and `PasswordHistoryScreen` (history
+  + revert stub) implemented and verified on Samsung S23 (Android 16).
+  `PasswordHistoryExpiry` setting added to `AppSettings` and `SecurityScreen`.
+  177 Rust tests passing, 107 Flutter tests passing.
+- **Next task:** Structured Android testing of the safe editing flow.
+  Then wire "Delete previous entry" and "Revert" bridge calls (currently
+  stub snackbars). See Bikeshed for full test plan.
 
 ---
 
@@ -715,6 +769,36 @@ the first public tag.
   cases, untrusted input paths, and any deviation from RustCrypto crate
   best practices. AI review is a first pass — it complements but does not
   replace human expert review (see item below).
+
+- **Supply-chain attack surface review:** Triggered by the May 2026
+  bitwarden-cli npm supply-chain compromise. Before v1, conduct a full
+  review covering four areas:
+  (1) **Rust dependencies** — run `cargo audit` against the RustSec
+  advisory database; pin all crates to exact versions in `Cargo.lock`;
+  verify `cargo tree` for unexpected transitive deps; prefer crates from
+  the RustCrypto organisation (already the case for crypto stack) as they
+  have documented security policies.
+  (2) **Flutter/Dart dependencies** — run `flutter pub outdated` and
+  `dart pub audit`; verify each direct dep's GitHub repo for recent
+  suspicious commits or maintainer changes; check pub.dev for any
+  security advisories.
+  (3) **IDE extensions (CODE OSS / VS Code)** — audit every installed
+  extension: publisher identity, install count, last update, permissions
+  requested. Remove any extension that is not strictly necessary.
+  Extensions with filesystem or network access are the highest risk.
+  Treat extension updates as untrusted code updates — review changelogs.
+  (4) **Build and CI supply chain** — the current build is local-only
+  (no CI). When CI is added, pin all GitHub Actions to commit SHAs, not
+  tags. Never `uses: actions/checkout@v4` — use the full SHA. Audit the
+  flutter_rust_bridge_codegen binary provenance.
+  **Mitigation principles:** minimise dependency count (already a project
+  goal), prefer dependencies with reproducible builds, never run
+  `cargo install` or `pub global activate` from untrusted sources, and
+  treat any dependency update as a code review event — read the diff
+  before accepting. The fact that Gabbro is local-first with no network
+  connections significantly reduces the blast radius of a compromised
+  dependency, but does not eliminate it — a malicious dep could still
+  exfiltrate secrets via the filesystem or corrupt the vault.
 
 - **Pre-release security review — human expert:** Seek external
   cryptography review of `rust/src/crypto/` before any v1 public security
@@ -836,18 +920,31 @@ the first public tag.
   (custom launcher icon/label, yes; hiding from app drawer is limited) and iOS
   (more restricted)? Does offering this create a false sense of security?
 
-- **Safe entry editing — Flutter phase:** Rust domain model complete —
-  `PreviousSecret` on `LoginEntry.previous_password`, `CardEntry.previous_cvv`,
-  `CardEntry.previous_pin`. Wireframes agreed (4 screens). Remaining work:
-  (1) wire `update_entry` in Rust to capture previous value before overwriting,
-  with configurable auto-expiry (default 30 days, options 7/30/90/never);
-  (2) Flutter screen 2 — "Review →" replaces "Save", shows diff of changed
-  fields; (3) Flutter screen 4 — password history with show/hide toggle,
-  ↩ Revert, "Delete previous entry"; (4) Settings → Security: expiry picker.
-  Retention: 1 previous value only, global window, time-based, user can
-  purge early. Applies to: `password` (Login), `cvv` + `pin` (Card),
-  hidden `CustomField`s (Login, Custom). Identity hidden custom fields
-  excluded (YAGNI).
+- **Safe editing — remaining bridge calls:** "Delete previous entry" and
+  "Revert" on `PasswordHistoryScreen` are currently stub snackbars. Need
+  two new bridge functions: `session_clear_password_history(id)` — sets
+  `previous_password` to `None` and saves; `session_revert_password(id)`
+  — swaps `password` ↔ `previous_password.value` and saves. TDD as usual.
+  Do after the Android testing session.
+
+- **Structured Android testing — safe editing flow:** Before adding new
+  features, run a structured test pass on Samsung S23 (Android 16) covering:
+  (1) Edit Login — change password only → Review → shows "Password changed"
+  sensitive row, no diff grid → Save → detail screen shows updated timestamp
+  and masked password → Password history → shows current + previous masked,
+  both toggleable, expiry date shown.
+  (2) Edit Login — change URL only → Review → shows URL diff grid, no
+  sensitive row → Save → history unchanged.
+  (3) Edit Login — change nothing → "No changes to save" snackbar.
+  (4) Edit Login — change password → Review → Cancel → entry unchanged.
+  (5) Edit Card — change CVV → Review → shows "CVV changed" sensitive row.
+  (6) Edit Identity — change custom field → Review → shows field diff.
+  (7) Edit Note — change content → Review → shows content diff.
+  (8) Security screen → change history expiry to 7 days → edit password →
+  verify `expires_at` is ~7 days from now (check via password history screen).
+  (9) Password history → "Delete previous entry" stub snackbar shown.
+  (10) Password history → "Revert" stub snackbar shown.
+  Document any failures as bugs before proceeding.
 
 - **Card entry — `pin` field in Flutter UI:** `pin` exists on `CardEntry`
   in the Rust domain model (added for Enpass import) but is not rendered

@@ -2067,3 +2067,64 @@ N times without saving, then call save once at the end. In Gabbro this is
 implemented as paired functions: `session_add_entry_no_save` /
 `session_delete_entries_no_save` for the mutations, and `session_save` for
 the single persist. Both import and bulk delete use this pattern.
+
+---
+
+## Dart — `listEquals` for value equality on lists
+
+Dart's `==` operator on `List` is reference equality, not value equality.
+Two separately constructed lists with identical contents are not `==`:
+
+```dart
+[1, 2, 3] == [1, 2, 3] // false — different objects
+```
+
+To compare list contents, use `listEquals` from `package:flutter/foundation.dart`.
+This is important anywhere a list is rebuilt from form state and compared to
+the original — for example, detecting whether custom fields changed during
+an edit. Without `listEquals`, the diff always returns "changed" even when
+the user changed nothing.
+
+Python analogy: Python's `==` on lists IS value equality (`[1,2,3] == [1,2,3]`
+is `True`). Dart's behaviour is the exception, not the rule.
+
+---
+
+## Dart — re-fetching entry after bridge save
+
+After calling `updateEntry` (or any bridge save), the Flutter-side DTO is
+stale — it does not reflect fields stamped by Rust (`updated_at`, populated
+`previous_password`). Always call `getEntry(id: id)` immediately after a
+save to get the fresh DTO before navigating or updating state. Displaying
+the pre-save DTO causes "Saved Unknown" timestamps and missing history.
+
+---
+
+## Rust — `frb_generated.rs` manual patching pattern
+
+When a Rust function signature changes (new parameter, new struct field),
+`frb_generated.rs` becomes out of sync and the test suite fails to compile.
+The correct sequence:
+1. Patch `frb_generated.rs` manually with a placeholder (e.g. `None` for a
+   new `Option<u32>` parameter) to unblock `cargo test`.
+2. Run the affected tests to confirm they pass.
+3. Run `flutter_rust_bridge_codegen generate` from `gabbro/` to regenerate
+   all bridge files correctly.
+4. Run `cargo test` and `flutter test` again to confirm nothing broke.
+
+Never leave a manual patch in place — codegen is the source of truth.
+
+---
+
+## Rust — date arithmetic without chrono
+
+Adding days to an ISO 8601 timestamp without the `chrono` crate requires
+converting to a day count (days since epoch), adding, then converting back.
+Key points: the conversion must handle leap years correctly; use `u64` not
+`u32` for year values to avoid type mismatches with existing helpers; and
+keep time-of-day suffix intact by parsing only the date portion (`[0..10]`)
+and appending the original suffix unchanged.
+
+The `is_leap` helper must only be defined once per module — Rust does not
+allow duplicate function names even with different signatures. Check for
+existing helpers before adding new ones.
