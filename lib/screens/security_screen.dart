@@ -85,6 +85,29 @@ class _SecurityScreenState extends State<SecurityScreen> {
               ),
               const SizedBox(height: 32),
 
+              // ── Password history ───────────────────────────────────────
+              SectionHeader(label: 'Password history'),
+              const SizedBox(height: 4),
+              const Text(
+                'How long to keep a previous password after it is changed. '
+                '"Keep forever" means history is only deleted manually.',
+                style: TextStyle(fontSize: 12),
+              ),
+              const SizedBox(height: 8),
+              SegmentedRow<PasswordHistoryExpiry>(
+                values: PasswordHistoryExpiry.values,
+                selected: _settings.passwordHistoryExpiry,
+                label: (v) => switch (v) {
+                  PasswordHistoryExpiry.sevenDays => '7 days',
+                  PasswordHistoryExpiry.thirtyDays => '30 days',
+                  PasswordHistoryExpiry.ninetyDays => '90 days',
+                  PasswordHistoryExpiry.keepForever => 'Keep forever',
+                },
+                onSelected: (v) =>
+                    _update(_settings.copyWith(passwordHistoryExpiry: v)),
+              ),
+              const SizedBox(height: 32),
+
               // ── Clipboard clear ────────────────────────────────────────
               SectionHeader(label: 'Clipboard clear'),
               const SizedBox(height: 4),

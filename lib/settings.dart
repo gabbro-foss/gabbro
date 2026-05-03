@@ -15,6 +15,7 @@ class AppSettings {
   final ForegroundLockTimeout foregroundLockTimeout;
   final BackgroundLockTimeout backgroundLockTimeout;
   final ClipboardClearTimeout clipboardClearTimeout;
+  final PasswordHistoryExpiry passwordHistoryExpiry;
 
   const AppSettings({
     this.theme = ThemeChoice.system,
@@ -23,6 +24,7 @@ class AppSettings {
     this.foregroundLockTimeout = ForegroundLockTimeout.thirtySeconds,
     this.backgroundLockTimeout = BackgroundLockTimeout.fiveMinutes,
     this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
+    this.passwordHistoryExpiry = PasswordHistoryExpiry.thirtyDays,
   });
 
   static AppSettings get defaults => const AppSettings();
@@ -36,6 +38,7 @@ class AppSettings {
     'foreground_lock_timeout': foregroundLockTimeout.name,
     'background_lock_timeout': backgroundLockTimeout.name,
     'clipboard_clear_timeout': clipboardClearTimeout.name,
+    'password_history_expiry': passwordHistoryExpiry.name,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -54,6 +57,9 @@ class AppSettings {
       clipboardClearTimeout: ClipboardClearTimeout.values.byName(
         json['clipboard_clear_timeout'] as String? ?? 'sixtySeconds',
       ),
+      passwordHistoryExpiry: PasswordHistoryExpiry.values.byName(
+        json['password_history_expiry'] as String? ?? 'thirtyDays',
+      ),
     );
   }
 
@@ -64,6 +70,7 @@ class AppSettings {
     ForegroundLockTimeout? foregroundLockTimeout,
     BackgroundLockTimeout? backgroundLockTimeout,
     ClipboardClearTimeout? clipboardClearTimeout,
+    PasswordHistoryExpiry? passwordHistoryExpiry,
   }) => AppSettings(
     theme: theme ?? this.theme,
     textSize: textSize ?? this.textSize,
@@ -71,6 +78,7 @@ class AppSettings {
     foregroundLockTimeout: foregroundLockTimeout ?? this.foregroundLockTimeout,
     backgroundLockTimeout: backgroundLockTimeout ?? this.backgroundLockTimeout,
     clipboardClearTimeout: clipboardClearTimeout ?? this.clipboardClearTimeout,
+    passwordHistoryExpiry: passwordHistoryExpiry ?? this.passwordHistoryExpiry,
   );
 
   // ── File I/O ───────────────────────────────────────────────────────────
@@ -141,7 +149,11 @@ class AppSettings {
 
   // How long before the clipboard is cleared after copying a secret.
   // Options: "never" | "thirtySeconds" | "sixtySeconds" | "twoMinutes"
-  "clipboard_clear_timeout": "${clipboardClearTimeout.name}"
+  "clipboard_clear_timeout": "${clipboardClearTimeout.name}",
+
+  // How long to keep a previous password before auto-purging.
+  // Options: "sevenDays" | "thirtyDays" | "ninetyDays" | "keepForever"
+  "password_history_expiry": "${passwordHistoryExpiry.name}"
 }
 ''';
 
@@ -172,3 +184,5 @@ enum ForegroundLockTimeout { thirtySeconds, oneMinute, fiveMinutes, never }
 enum BackgroundLockTimeout { oneMinute, fiveMinutes, fifteenMinutes, never }
 
 enum ClipboardClearTimeout { never, thirtySeconds, sixtySeconds, twoMinutes }
+
+enum PasswordHistoryExpiry { sevenDays, thirtyDays, ninetyDays, keepForever }
