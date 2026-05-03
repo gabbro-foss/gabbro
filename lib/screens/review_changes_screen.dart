@@ -1,0 +1,294 @@
+import 'package:flutter/material.dart';
+import 'package:gabbro/src/rust/api/vault.dart';
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
+
+class ReviewChangesScreen extends StatefulWidget {
+  final VaultEntryData original;
+  final VaultEntryData updated;
+  final int? expiryDays;
+  final Future<void> Function(VaultEntryData, int?) onSave;
+
+  const ReviewChangesScreen({
+    super.key,
+    required this.original,
+    required this.updated,
+    required this.expiryDays,
+    required this.onSave,
+  });
+
+  @override
+  State<ReviewChangesScreen> createState() => _ReviewChangesScreenState();
+}
+
+class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
+  bool _isSaving = false;
+  String? _error;
+
+  // Sensitive field visibility toggles
+  bool _passwordObscured = true;
+
+  Future<void> _save() async {
+    setState(() {
+      _isSaving = true;
+      _error = null;
+    });
+    try {
+      await widget.onSave(widget.updated, widget.expiryDays);
+      if (mounted) Navigator.of(context).pop(widget.updated);
+    } catch (e) {
+      if (mounted) setState(() => _error = e.toString());
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sensitiveChanges = _buildSensitiveChanges();
+    final fieldDiffs = _buildFieldDiffs();
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        leadingWidth: 80,
+        title: const Text('Review changes'),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (sensitiveChanges.isNotEmpty) ...[
+                _sectionHeader('Sensitive fields'),
+                const SizedBox(height: 8),
+                ...sensitiveChanges,
+                const SizedBox(height: 16),
+              ],
+              if (fieldDiffs.isNotEmpty) ...[
+                _sectionHeader('Other fields'),
+                const SizedBox(height: 8),
+                ...fieldDiffs,
+                const SizedBox(height: 16),
+              ],
+              if (_error != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    _error!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: _isSaving ? null : _save,
+                      child: _isSaving
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Save'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ── Diff builders ────────────────────────────────────────────────────────────
+
+  List<Widget> _buildSensitiveChanges() {
+    final changes = <Widget>[];
+    switch ((widget.original, widget.updated)) {
+      case (VaultEntryData_Login(:final field0 as LoginEntryData),
+            VaultEntryData_Login(field0: final u)):
+        if (field0.password != u.password) {
+          changes.add(_sensitiveRow(
+            label: 'Password changed',
+            obscured: _passwordObscured,
+            onToggle: () =>
+                setState(() => _passwordObscured = !_passwordObscured),
+            newValue: u.password,
+          ));
+        }
+      case (VaultEntryData_Card(:final field0 as CardEntryData),
+            VaultEntryData_Card(field0: final u)):
+        if (field0.cvv != u.cvv) {
+          changes.add(_sensitiveRow(
+            label: 'CVV changed',
+            obscured: true,
+            onToggle: () {},
+            newValue: u.cvv,
+          ));
+        }
+        if (field0.pin != u.pin) {
+          changes.add(_sensitiveRow(
+            label: 'PIN changed',
+            obscured: true,
+            onToggle: () {},
+            newValue: u.pin ?? '',
+          ));
+        }
+      default:
+        break;
+    }
+    return changes;
+  }
+
+  List<Widget> _buildFieldDiffs() {
+    final diffs = <Widget>[];
+    switch ((widget.original, widget.updated)) {
+      case (VaultEntryData_Login(:final field0 as LoginEntryData),
+            VaultEntryData_Login(field0: final u)):
+        _addDiff(diffs, 'Title', field0.title, u.title);
+        _addDiff(diffs, 'URL', field0.url, u.url);
+        _addDiff(diffs, 'Username', field0.username, u.username);
+        _addDiff(diffs, 'Notes', field0.notes ?? '', u.notes ?? '');
+      case (VaultEntryData_Note(:final field0 as NoteEntryData),
+            VaultEntryData_Note(field0: final u)):
+        _addDiff(diffs, 'Title', field0.title, u.title);
+        _addDiff(diffs, 'Content', field0.content, u.content);
+      case (VaultEntryData_Card(:final field0 as CardEntryData),
+            VaultEntryData_Card(field0: final u)):
+        _addDiff(diffs, 'Card label', field0.cardName ?? '', u.cardName ?? '');
+        _addDiff(diffs, 'Status', field0.status, u.status);
+        _addDiff(diffs, 'Cardholder', field0.cardholderName, u.cardholderName);
+        _addDiff(diffs, 'Expiry', field0.expiry, u.expiry);
+      default:
+        break;
+    }
+    return diffs;
+  }
+
+  void _addDiff(
+      List<Widget> diffs, String label, String before, String after) {
+    if (before == after) return;
+    diffs.add(_diffRow(label: label, before: before, after: after));
+    diffs.add(const SizedBox(height: 8));
+  }
+
+  // ── Shared widgets ───────────────────────────────────────────────────────────
+
+  Widget _sectionHeader(String label) => Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        ),
+      );
+
+  Widget _sensitiveRow({
+    required String label,
+    required bool obscured,
+    required VoidCallback onToggle,
+    required String newValue,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: colorScheme.errorContainer.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.warning_amber_outlined,
+              size: 18, color: colorScheme.error),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                  fontSize: 14, color: colorScheme.onErrorContainer),
+            ),
+          ),
+          IconButton(
+            icon: Icon(
+              obscured ? Icons.visibility_off : Icons.visibility,
+              size: 18,
+            ),
+            tooltip: obscured ? 'Show new value' : 'Hide',
+            onPressed: onToggle,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _diffRow({
+    required String label,
+    required String before,
+    required String after,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label,
+            style:
+                const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  before.isEmpty ? '(empty)' : before,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Icon(Icons.arrow_forward, size: 16),
+            ),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: colorScheme.primaryContainer.withOpacity(0.4),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  after.isEmpty ? '(empty)' : after,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: colorScheme.onPrimaryContainer,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
