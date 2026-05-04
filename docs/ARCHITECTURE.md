@@ -379,14 +379,26 @@ Each entry is an instance of a typed class:
   and non-sensitive field diffs in a before→after grid. Only changed fields
   shown. Save calls `updateEntry(entry, expiryDays)` then re-fetches the entry
   via `getEntry(id)` to get the Rust-stamped `updated_at` and populated
-  `previous_password` before popping. 6 widget tests.
+  `previous_password` before popping. 6 widget tests. Known bugs (found during
+  structured Android testing, 04 May 2026):
+  (1) `_sensitiveRow` accepts a `newValue` parameter but never renders it —
+  the show/hide toggle cycles the icon but reveals nothing. CVV and PIN also
+  have `onToggle: () {}` (no-op) and `obscured` hardcoded `true`. Fix: render
+  old and new values (both masked by default, both revealable) inside
+  `_sensitiveRow`.
+  (2) `_buildFieldDiffs()` has no case for `VaultEntryData_Identity` or
+  `VaultEntryData_Custom` — editing a custom field on either entry type
+  produces a completely empty review screen. Fix: add the missing cases.
 
 - **`PasswordHistoryScreen`** (`lib/screens/password_history_screen.dart`):
   shows current password (masked, toggleable) and previous password (masked,
   toggleable) with `saved_at` / `expires_at` metadata. "Revert" and "Delete
   previous entry" are stub snackbars pending bridge implementation. Entry point:
   "Password history →" `ListTile` in `EntryDetailScreen._loginView`. 7 widget
-  tests.
+  tests. Known UI issue: "Revert" is a `TextButton` inline inside the previous
+  password row; "Delete previous entry" is a standalone `OutlinedButton` below
+  — inconsistent. Fix: promote "Revert" to a standalone button matching
+  "Delete previous entry".
 
 ## Vault Domain Model
 - **Status:** all 6 entry types implemented in Rust
@@ -655,16 +667,16 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Safe entry editing — full stack. `PreviousSecret` gains
-  `expires_at`; `update_entry` snapshots old password/CVV/PIN before
-  overwriting; `PreviousSecretData` DTO crosses the bridge masked;
-  `ReviewChangesScreen` (diff + save) and `PasswordHistoryScreen` (history
-  + revert stub) implemented and verified on Samsung S23 (Android 16).
-  `PasswordHistoryExpiry` setting added to `AppSettings` and `SecurityScreen`.
-  177 Rust tests passing, 107 Flutter tests passing.
-- **Next task:** Structured Android testing of the safe editing flow.
-  Then wire "Delete previous entry" and "Revert" bridge calls (currently
-  stub snackbars). See Bikeshed for full test plan.
+- **Completed:** Structured Android testing of safe editing flow (10 tests,
+  Samsung S23, Android 16). Flutter deps upgraded (build_runner 2.15,
+  async, hooks, vm_service et al). Bugs and UI issues documented in
+  ARCHITECTURE.md bikeshed. 107 Flutter tests passing, 180 Rust tests
+  passing.
+- **Next task:** Fix `ReviewChangesScreen` bugs (T01-A: sensitive row
+  show/hide non-functional; T06-A: Identity/Custom diff missing), then
+  fix hidden custom field toggle on detail screen (T06-B), then fix
+  Revert button placement (T10-B). Then wire bridge calls for "Delete
+  previous entry" and "Revert". See Bikeshed for full details.
 
 ---
 
@@ -925,7 +937,25 @@ the first public tag.
   two new bridge functions: `session_clear_password_history(id)` — sets
   `previous_password` to `None` and saves; `session_revert_password(id)`
   — swaps `password` ↔ `previous_password.value` and saves. TDD as usual.
-  Do after the Android testing session.
+
+- **Safe editing — `ReviewChangesScreen` bugs (fix before bridge calls):**
+  (1) `_sensitiveRow`: render old and new values masked by default, both
+  revealable via toggle. Old value comes from the original DTO's sensitive
+  field; new value from the updated DTO. CVV and PIN toggles are currently
+  no-ops — wire them up with per-field `bool` state variables.
+  (2) `_buildFieldDiffs()`: add cases for `VaultEntryData_Identity`
+  (diff custom fields list) and `VaultEntryData_Custom` (diff custom
+  fields map). Verify all entry types are covered.
+
+- **Safe editing — `PasswordHistoryScreen` UI fix:** Promote "Revert"
+  from an inline `TextButton` inside the previous password row to a
+  standalone `OutlinedButton` below "Delete previous entry", consistent
+  in style and placement.
+
+- **Safe editing — hidden custom field show/hide toggle on detail screen:**
+  Hidden custom fields on `EntryDetailScreen` are permanently masked with
+  no eye icon toggle. Fix: add show/hide toggle matching the pattern used
+  for password and CVV fields.
 
 - **Structured Android testing — safe editing flow:** Before adding new
   features, run a structured test pass on Samsung S23 (Android 16) covering:
