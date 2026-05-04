@@ -667,17 +667,13 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Safe editing fully wired and hardware-verified on Samsung
-  S23 (Android 16). `session_clear_password_history` and
-  `session_revert_password` wired in `entry_detail_screen.dart`; review
-  screen sensitive diff fixed (old→new side-by-side); `previous_password`
-  masking bug fixed in `vault_entry_to_data`. 113 Flutter tests, 185 Rust
-  tests passing.
-- **Next task:** Three candidates from bikeshed — pick one at session start:
-  (1) Card PIN field in `create_entry_screen.dart` (obscured field + show/hide,
-  same pattern as CVV); (2) Alphabet index bar usability fixes (tap target
-  size, scroll-to-A reliability); (3) Tablet two-pane layout (needs wireframe
-  first).
+- **Completed:** Card PIN field added to `create_entry_screen.dart` —
+  obscured by default, show/hide toggle, digits-only, max 16 chars, focus
+  chain wired (CVV → PIN → Credit limit). Hardware-verified on Samsung S23
+  (Android 16) and Linux. 118 Flutter tests, 185 Rust tests passing.
+- **Next task:** Two candidates from bikeshed — pick one at session start:
+  (1) Alphabet index bar usability fixes (tap target size, scroll-to-A
+  reliability); (2) Tablet two-pane layout (needs wireframe first).
 
 ---
 
@@ -939,12 +935,6 @@ the first public tag.
   after the configured expiry period elapses naturally (e.g. set expiry
   to 7 days, wait, reopen history). This requires either waiting or
   manually backdating `expires_at` in a test vault to simulate expiry.
-
-- **Card entry — `pin` field in Flutter UI:** `pin` exists on `CardEntry`
-  in the Rust domain model (added for Enpass import) but is not rendered
-  in `create_entry_screen.dart`. Needs a `obscureText` field with
-  show/hide toggle, same pattern as `cvv`. Do alongside safe entry editing
-  Flutter phase.
 
 - **Remote app / vault deletion:** Allow the user to trigger a remote wipe of
   the vault (and optionally the app) from another device or a web interface.
