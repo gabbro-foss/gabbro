@@ -341,7 +341,20 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           const SizedBox(height: 8),
           _sectionHeader('Custom fields'),
           ...e.customFields.map(
-            (f) => _field(f.label, f.value, obscure: f.hidden),
+            (f) => f.hidden
+                ? _toggleField(
+                    label: f.label,
+                    value: f.value,
+                    obscured: !_revealedFields.contains(f.label),
+                    onToggle: () => setState(() {
+                      if (_revealedFields.contains(f.label)) {
+                        _revealedFields.remove(f.label);
+                      } else {
+                        _revealedFields.add(f.label);
+                      }
+                    }),
+                  )
+                : _field(f.label, f.value),
           ),
         ],
         _timestampsRow(e.createdAt, e.updatedAt),

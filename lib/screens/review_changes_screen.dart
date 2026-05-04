@@ -25,6 +25,8 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
 
   // Sensitive field visibility toggles
   bool _passwordObscured = true;
+  bool _cvvObscured = true;
+  bool _pinObscured = true;
 
   Future<void> _save() async {
     setState(() {
@@ -143,16 +145,16 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         if (field0.cvv != u.cvv) {
           changes.add(_sensitiveRow(
             label: 'CVV changed',
-            obscured: true,
-            onToggle: () {},
+            obscured: _cvvObscured,
+            onToggle: () => setState(() => _cvvObscured = !_cvvObscured),
             newValue: u.cvv,
           ));
         }
         if (field0.pin != u.pin) {
           changes.add(_sensitiveRow(
             label: 'PIN changed',
-            obscured: true,
-            onToggle: () {},
+            obscured: _pinObscured,
+            onToggle: () => setState(() => _pinObscured = !_pinObscured),
             newValue: u.pin ?? '',
           ));
         }
@@ -181,6 +183,28 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         _addDiff(diffs, 'Status', field0.status, u.status);
         _addDiff(diffs, 'Cardholder', field0.cardholderName, u.cardholderName);
         _addDiff(diffs, 'Expiry', field0.expiry, u.expiry);
+      case (VaultEntryData_Identity(:final field0),
+            VaultEntryData_Identity(field0: final u)):
+        _addDiff(diffs, 'First name', field0.firstName, u.firstName);
+        _addDiff(diffs, 'Last name', field0.lastName, u.lastName);
+        _addDiff(diffs, 'Email', field0.email, u.email);
+        _addDiff(diffs, 'Phone', field0.phone ?? '', u.phone ?? '');
+        _addDiff(diffs, 'Address', field0.address ?? '', u.address ?? '');
+        for (var i = 0; i < field0.customFields.length; i++) {
+          if (i < u.customFields.length) {
+            _addDiff(diffs, field0.customFields[i].label,
+                field0.customFields[i].value, u.customFields[i].value);
+          }
+        }
+      case (VaultEntryData_Custom(:final field0),
+            VaultEntryData_Custom(field0: final u)):
+        _addDiff(diffs, 'Title', field0.title, u.title);
+        for (var i = 0; i < field0.fields.length; i++) {
+          if (i < u.fields.length) {
+            _addDiff(diffs, field0.fields[i].label,
+                field0.fields[i].value, u.fields[i].value);
+          }
+        }
       default:
         break;
     }
@@ -218,26 +242,44 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         color: colorScheme.errorContainer.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.warning_amber_outlined,
-              size: 18, color: colorScheme.error),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              label,
-              style: TextStyle(
-                  fontSize: 14, color: colorScheme.onErrorContainer),
-            ),
+          Row(
+            children: [
+              Icon(Icons.warning_amber_outlined,
+                  size: 18, color: colorScheme.error),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                      fontSize: 14, color: colorScheme.onErrorContainer),
+                ),
+              ),
+              IconButton(
+                icon: Icon(
+                  obscured ? Icons.visibility_off : Icons.visibility,
+                  size: 18,
+                ),
+                tooltip: obscured ? 'Show new value' : 'Hide',
+                onPressed: onToggle,
+              ),
+            ],
           ),
-          IconButton(
-            icon: Icon(
-              obscured ? Icons.visibility_off : Icons.visibility,
-              size: 18,
+          if (!obscured)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, left: 26),
+              child: Text(
+                newValue.isEmpty ? '(empty)' : newValue,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontFamily: 'monospace',
+                  letterSpacing: 1,
+                  color: colorScheme.onErrorContainer,
+                ),
+              ),
             ),
-            tooltip: obscured ? 'Show new value' : 'Hide',
-            onPressed: onToggle,
-          ),
         ],
       ),
     );

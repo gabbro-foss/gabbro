@@ -66,13 +66,6 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
                 obscured: _currentObscured,
                 onToggle: () =>
                     setState(() => _currentObscured = !_currentObscured),
-                trailing: Text(
-                  'current',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                ),
               ),
 
               // ── Previous ───────────────────────────────────────────────
@@ -86,10 +79,6 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
                   obscured: _previousObscured,
                   onToggle: () =>
                       setState(() => _previousObscured = !_previousObscured),
-                  trailing: TextButton(
-                    onPressed: widget.onRevert,
-                    child: const Text('Revert'),
-                  ),
                 ),
                 const SizedBox(height: 16),
                 OutlinedButton(
@@ -101,6 +90,11 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
                     ),
                   ),
                   child: const Text('Delete previous entry'),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: widget.onRevert,
+                  child: const Text('Revert'),
                 ),
               ],
             ],
@@ -131,7 +125,6 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
     required String value,
     required bool obscured,
     required VoidCallback onToggle,
-    required Widget trailing,
   }) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -174,7 +167,6 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
                 tooltip: obscured ? 'Show' : 'Hide',
                 onPressed: onToggle,
               ),
-              trailing,
             ],
           ),
         ],
