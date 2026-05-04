@@ -69,7 +69,7 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                 .map(|f| CustomFieldData { label: f.label.clone(), value: f.value.clone(), hidden: f.hidden })
                 .collect(),
             previous_password: e.previous_password.as_ref().map(|p| PreviousSecretData {
-                value: crate::api::vault::MASKED_VALUE.to_string(),
+                value: p.value.clone(),
                 saved_at: p.saved_at.clone(),
                 expires_at: p.expires_at.clone(),
             }),
