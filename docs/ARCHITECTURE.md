@@ -667,16 +667,15 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Structured Android testing of safe editing flow (10 tests,
-  Samsung S23, Android 16). Flutter deps upgraded (build_runner 2.15,
-  async, hooks, vm_service et al). Bugs and UI issues documented in
-  ARCHITECTURE.md bikeshed. 107 Flutter tests passing, 180 Rust tests
-  passing.
-- **Next task:** Fix `ReviewChangesScreen` bugs (T01-A: sensitive row
-  show/hide non-functional; T06-A: Identity/Custom diff missing), then
-  fix hidden custom field toggle on detail screen (T06-B), then fix
-  Revert button placement (T10-B). Then wire bridge calls for "Delete
-  previous entry" and "Revert". See Bikeshed for full details.
+- **Completed:** Fixed safe editing UI bugs: sensitive row toggles wired
+  (T01-A), Identity/Custom diffs added (T06-A), identity hidden custom
+  field toggle fixed (T06-B), Revert promoted to standalone OutlinedButton
+  (T10-B). 113 Flutter tests passing, 180 Rust tests passing.
+- **Next task:** Wire bridge calls for "Delete previous entry"
+  (`session_clear_password_history`) and "Revert"
+  (`session_revert_password`) on `PasswordHistoryScreen`. Then hardware
+  verification of all safe editing fixes on Samsung S23 (Android 16).
+  See Bikeshed for full details.
 
 ---
 
@@ -938,24 +937,12 @@ the first public tag.
   `previous_password` to `None` and saves; `session_revert_password(id)`
   — swaps `password` ↔ `previous_password.value` and saves. TDD as usual.
 
-- **Safe editing — `ReviewChangesScreen` bugs (fix before bridge calls):**
-  (1) `_sensitiveRow`: render old and new values masked by default, both
-  revealable via toggle. Old value comes from the original DTO's sensitive
-  field; new value from the updated DTO. CVV and PIN toggles are currently
-  no-ops — wire them up with per-field `bool` state variables.
-  (2) `_buildFieldDiffs()`: add cases for `VaultEntryData_Identity`
-  (diff custom fields list) and `VaultEntryData_Custom` (diff custom
-  fields map). Verify all entry types are covered.
-
-- **Safe editing — `PasswordHistoryScreen` UI fix:** Promote "Revert"
-  from an inline `TextButton` inside the previous password row to a
-  standalone `OutlinedButton` below "Delete previous entry", consistent
-  in style and placement.
-
-- **Safe editing — hidden custom field show/hide toggle on detail screen:**
-  Hidden custom fields on `EntryDetailScreen` are permanently masked with
-  no eye icon toggle. Fix: add show/hide toggle matching the pattern used
-  for password and CVV fields.
+- **Safe editing — hardware verification (Samsung S23, Android 16):**
+  T01-A, T06-A, T06-B, T10-B fixes not yet verified on device. Before
+  closing the safe editing work, run a structured test pass covering:
+  sensitive row reveal for Password, CVV, PIN; Identity and Custom diffs;
+  identity hidden custom field toggle; Revert and Delete buttons placement
+  and behaviour.
 
 - **Structured Android testing — safe editing flow:** Before adding new
   features, run a structured test pass on Samsung S23 (Android 16) covering:
