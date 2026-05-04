@@ -667,13 +667,13 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Rust bridge functions `session_clear_password_history`
-  and `session_revert_password` implemented, tested (5 new Rust tests,
-  185 total), and codegen run. 113 Flutter tests passing.
-- **Next task:** Wire the two new bridge calls in Flutter
-  (`entry_detail_screen.dart` — replace stub snackbars). Then hardware
-  verification of all safe editing fixes on Samsung S23 (Android 16).
-  See Bikeshed for full details.
+- **Completed:** Safe editing fully wired and hardware-verified on Samsung
+  S23 (Android 16). `session_clear_password_history` and
+  `session_revert_password` wired in `entry_detail_screen.dart`; review
+  screen sensitive diff fixed (old→new side-by-side); `previous_password`
+  masking bug fixed in `vault_entry_to_data`. 113 Flutter tests, 185 Rust
+  tests passing.
+- **Next task:** To be decided — see Bikeshed for candidates.
 
 ---
 
@@ -929,38 +929,12 @@ the first public tag.
   (custom launcher icon/label, yes; hiding from app drawer is limited) and iOS
   (more restricted)? Does offering this create a false sense of security?
 
-- **Safe editing — Flutter wiring:** Bridge functions
-  `session_clear_password_history` and `session_revert_password` are
-  implemented and bridged. Remaining: replace stub snackbars in
-  `entry_detail_screen.dart` `_loginView` with real async calls, refresh
-  `_entry` state after each call using `getEntry`, and pop
-  `PasswordHistoryScreen` after a successful revert.
-
-- **Safe editing — hardware verification (Samsung S23, Android 16):**
-  T01-A, T06-A, T06-B, T10-B fixes not yet verified on device. Before
-  closing the safe editing work, run a structured test pass covering:
-  sensitive row reveal for Password, CVV, PIN; Identity and Custom diffs;
-  identity hidden custom field toggle; Revert and Delete buttons placement
-  and behaviour.
-
-- **Structured Android testing — safe editing flow:** Before adding new
-  features, run a structured test pass on Samsung S23 (Android 16) covering:
-  (1) Edit Login — change password only → Review → shows "Password changed"
-  sensitive row, no diff grid → Save → detail screen shows updated timestamp
-  and masked password → Password history → shows current + previous masked,
-  both toggleable, expiry date shown.
-  (2) Edit Login — change URL only → Review → shows URL diff grid, no
-  sensitive row → Save → history unchanged.
-  (3) Edit Login — change nothing → "No changes to save" snackbar.
-  (4) Edit Login — change password → Review → Cancel → entry unchanged.
-  (5) Edit Card — change CVV → Review → shows "CVV changed" sensitive row.
-  (6) Edit Identity — change custom field → Review → shows field diff.
-  (7) Edit Note — change content → Review → shows content diff.
-  (8) Security screen → change history expiry to 7 days → edit password →
-  verify `expires_at` is ~7 days from now (check via password history screen).
-  (9) Password history → "Delete previous entry" stub snackbar shown.
-  (10) Password history → "Revert" stub snackbar shown.
-  Document any failures as bugs before proceeding.
+- **Password history — expiry auto-purge test:** After deleting previous
+  history manually, both "Delete previous entry" and "Revert" buttons
+  disappear correctly (correct — `prev == null`). Verify the same happens
+  after the configured expiry period elapses naturally (e.g. set expiry
+  to 7 days, wait, reopen history). This requires either waiting or
+  manually backdating `expires_at` in a test vault to simulate expiry.
 
 - **Card entry — `pin` field in Flutter UI:** `pin` exists on `CardEntry`
   in the Rust domain model (added for Enpass import) but is not rendered

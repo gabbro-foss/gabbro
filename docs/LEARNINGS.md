@@ -2128,3 +2128,51 @@ and appending the original suffix unchanged.
 The `is_leap` helper must only be defined once per module — Rust does not
 allow duplicate function names even with different signatures. Check for
 existing helpers before adding new ones.
+
+---
+
+## Rust — `vault_entry_to_data` masking boundary
+
+`vault_entry_to_data` in `vault_bridge.rs` masks sensitive history fields
+at the bridge boundary using `MASKED_VALUE` (`"********"`). This is correct
+for fields that are never displayed directly — but `PreviousSecretData.value`
+is rendered directly in `PasswordHistoryScreen` via `prev.value`, unlike the
+live `password` field which is held in full in the DTO and masked only in the
+UI via `_toggleField`. The fix: pass `p.value.clone()` for
+`previous_password.value` so the history screen can show/hide the real value.
+
+Rule of thumb: mask at the bridge boundary only when the Flutter layer will
+never need the plaintext. If the UI has a show/hide toggle that needs the real
+value, it must arrive from Rust in plaintext — the UI layer is responsible for
+the obscured display.
+
+---
+
+## Flutter/Dart — `getEntry` is synchronous
+
+`getEntry` in the flutter_rust_bridge API is a synchronous function (no
+`async` on the Rust side). Adding `await` to a synchronous bridge call is a
+compile error: "Uses 'await' on an instance of 'VaultEntryData', which is not
+a subtype of 'Future'." Always check the Rust function signature before adding
+`await` on the Dart side — `async fn` in Rust becomes `Future` in Dart;
+non-async `fn` becomes a direct return value.
+
+---
+
+## Flutter — `flutter_rust_bridge_codegen generate` frozen — fix with `build_runner clean`
+
+If `flutter_rust_bridge_codegen generate` hangs indefinitely (30+ minutes,
+no output), the cause is usually a stale `build_runner` cache that conflicts
+with the codegen step. The fix:
+
+1. Kill the hanging process.
+2. Run `dart run build_runner clean` from `gabbro/` — this wipes the
+   `.dart_tool/build` cache that `build_runner` maintains.
+3. Re-run `flutter_rust_bridge_codegen generate` from `gabbro/` — it should
+   complete in under a minute.
+4. Run `flutter test` and `cargo test -q` to confirm nothing broke.
+
+`dart run build_runner clean` is safe to run at any time — it only removes
+generated/cached artefacts, never source files. Worth trying as a first
+response to any inexplicable codegen hang before reaching for more invasive
+fixes like reinstalling the codegen tool.
