@@ -264,6 +264,56 @@ pub fn session_change_passphrase(
     Ok(())
 }
 
+/// Clear the previous password history for a Login entry and persist.
+///
+/// Sets `previous_password` to `None` on the identified entry.
+/// Returns `Err` if the entry is not found or is not a Login entry.
+pub fn session_clear_password_history(id: &str) -> Result<(), String> {
+    let (entries, passphrase, path) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        let entry = session.entries.iter_mut()
+            .find(|e| entry_id(e) == id)
+            .ok_or_else(|| format!("No entry found with id: {id}"))?;
+        match entry {
+            VaultEntry::Login(ref mut e) => {
+                e.previous_password = None;
+                e.meta.updated_at = crate::api::vault::chrono_now();
+            }
+            _ => return Err(format!("Entry {id} is not a Login entry")),
+        }
+        (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+    }; // ← lock released here
+    save_vault(&entries, &passphrase, &path)?;
+    Ok(())
+}
+
+/// Revert the current password to the previous password for a Login entry and persist.
+///
+/// Swaps `password` ← `previous_password.value`, then clears `previous_password`.
+/// Returns `Err` if the entry is not found, is not a Login entry, or has no history.
+pub fn session_revert_password(id: &str) -> Result<(), String> {
+    let (entries, passphrase, path) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        let entry = session.entries.iter_mut()
+            .find(|e| entry_id(e) == id)
+            .ok_or_else(|| format!("No entry found with id: {id}"))?;
+        match entry {
+            VaultEntry::Login(ref mut e) => {
+                let prev = e.previous_password.take()
+                    .ok_or_else(|| format!("Entry {id} has no password history to revert"))?;
+                e.password = prev.value.clone();
+                e.meta.updated_at = crate::api::vault::chrono_now();
+            }
+            _ => return Err(format!("Entry {id} is not a Login entry")),
+        }
+        (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+    }; // ← lock released here
+    save_vault(&entries, &passphrase, &path)?;
+    Ok(())
+}
+
 /// Write .gabbro + .gabbro.sha256 from current session state.
 pub fn session_export_vault(export_path: PathBuf) -> Result<(), String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
@@ -530,6 +580,202 @@ mod tests {
         let summary = entry_to_summary(&entry);
         assert_eq!(summary.title, "Visa Platinum",
             "summary should use card_name when present");
+    }
+
+    #[test]
+    #[serial]
+    fn clear_password_history_removes_previous_password() {
+        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry, PreviousSecret};
+
+        let pass = b"test passphrase";
+        let mut path = temp_dir();
+        path.push("gabbro_clear_history_test.gabbro");
+
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("login-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("current_password"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: Some(PreviousSecret {
+                value: String::from("old_password"),
+                saved_at: String::from("2025-01-01T00:00:00Z"),
+                expires_at: None,
+            }),
+        });
+
+        save_vault(&[entry], pass, &path).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        session_clear_password_history("login-001").unwrap();
+
+        let result = get_entry("login-001").unwrap();
+        match result {
+            VaultEntry::Login(ref e) => {
+                assert!(e.previous_password.is_none());
+                assert_eq!(e.password, "current_password");
+            }
+            _ => panic!("Expected Login variant"),
+        }
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn clear_password_history_persists_to_disk() {
+        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry, PreviousSecret};
+
+        let pass = b"test passphrase";
+        let mut path = temp_dir();
+        path.push("gabbro_clear_history_persist_test.gabbro");
+
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("login-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("current_password"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: Some(PreviousSecret {
+                value: String::from("old_password"),
+                saved_at: String::from("2025-01-01T00:00:00Z"),
+                expires_at: None,
+            }),
+        });
+
+        save_vault(&[entry], pass, &path).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+        session_clear_password_history("login-001").unwrap();
+
+        // Lock and reload to verify disk persistence
+        lock_vault().unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+        let result = get_entry("login-001").unwrap();
+        match result {
+            VaultEntry::Login(ref e) => assert!(e.previous_password.is_none()),
+            _ => panic!("Expected Login variant"),
+        }
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn clear_password_history_on_non_login_returns_error() {
+        let pass = b"test passphrase";
+        let path = setup_vault(pass); // Note entry with id "id-001"
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let result = session_clear_password_history("id-001");
+        assert!(result.is_err());
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn revert_password_swaps_current_and_previous() {
+        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry, PreviousSecret};
+
+        let pass = b"test passphrase";
+        let mut path = temp_dir();
+        path.push("gabbro_revert_test.gabbro");
+
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("login-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("current_password"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: Some(PreviousSecret {
+                value: String::from("old_password"),
+                saved_at: String::from("2025-01-01T00:00:00Z"),
+                expires_at: None,
+            }),
+        });
+
+        save_vault(&[entry], pass, &path).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        session_revert_password("login-001").unwrap();
+
+        let result = get_entry("login-001").unwrap();
+        match result {
+            VaultEntry::Login(ref e) => {
+                assert_eq!(e.password, "old_password");
+                assert!(e.previous_password.is_none());
+            }
+            _ => panic!("Expected Login variant"),
+        }
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn revert_password_with_no_history_returns_error() {
+        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry};
+
+        let pass = b"test passphrase";
+        let mut path = temp_dir();
+        path.push("gabbro_revert_no_history_test.gabbro");
+
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("login-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("current_password"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        });
+
+        save_vault(&[entry], pass, &path).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let result = session_revert_password("login-001");
+        assert!(result.is_err());
+
+        teardown(&path);
     }
 
     #[test]

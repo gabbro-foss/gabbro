@@ -86,6 +86,18 @@ Future<void> changePassphrase({
   newPassphrase: newPassphrase,
 );
 
+/// Clear the previous password history for a Login entry and persist.
+///
+/// Async — triggers a full vault save.
+Future<void> sessionClearPasswordHistory({required String id}) =>
+    RustLib.instance.api.crateApiVaultBridgeSessionClearPasswordHistory(id: id);
+
+/// Revert the current password to the previous password for a Login entry and persist.
+///
+/// Async — triggers a full vault save.
+Future<void> sessionRevertPassword({required String id}) =>
+    RustLib.instance.api.crateApiVaultBridgeSessionRevertPassword(id: id);
+
 /// Write .gabbro + .gabbro.sha256 from current session state.
 ///
 /// Async — filesystem operation.

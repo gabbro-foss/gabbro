@@ -388,6 +388,20 @@ pub async fn change_passphrase(
     session::session_change_passphrase(&old_passphrase, &new_passphrase)
 }
 
+/// Clear the previous password history for a Login entry and persist.
+///
+/// Async — triggers a full vault save.
+pub async fn session_clear_password_history(id: String) -> Result<(), String> {
+    session::session_clear_password_history(&id)
+}
+
+/// Revert the current password to the previous password for a Login entry and persist.
+///
+/// Async — triggers a full vault save.
+pub async fn session_revert_password(id: String) -> Result<(), String> {
+    session::session_revert_password(&id)
+}
+
 /// Write .gabbro + .gabbro.sha256 from current session state.
 ///
 /// Async — filesystem operation.
