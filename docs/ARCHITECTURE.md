@@ -673,7 +673,11 @@ SPDX identifier: `GPL-3.0-only`
   screen sensitive diff fixed (old→new side-by-side); `previous_password`
   masking bug fixed in `vault_entry_to_data`. 113 Flutter tests, 185 Rust
   tests passing.
-- **Next task:** To be decided — see Bikeshed for candidates.
+- **Next task:** Three candidates from bikeshed — pick one at session start:
+  (1) Card PIN field in `create_entry_screen.dart` (obscured field + show/hide,
+  same pattern as CVV); (2) Alphabet index bar usability fixes (tap target
+  size, scroll-to-A reliability); (3) Tablet two-pane layout (needs wireframe
+  first).
 
 ---
 
@@ -1036,12 +1040,6 @@ the first public tag.
   User-configurable via a toggle in Settings → Security (default: block).
   Defer until pre-release — current behaviour is acceptable for development
   and testing.
-
-- **URL opening in About screen:** Links in the About screen do not open
-  in the browser. This is addressable within Gabbro using the
-  `url_launcher` package (`launchUrl` with `LaunchMode.externalApplication`).
-  Not an OS-level limitation. Low effort; add to the About screen polish
-  pass.
 
 - **Clean up legacy vault on first launch:** When the app launches and no
   vault exists at the current app ID path (`app.gabbro.gabbro`), check for
