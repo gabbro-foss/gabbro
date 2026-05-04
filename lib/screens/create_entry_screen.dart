@@ -72,6 +72,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   late final TextEditingController _expiryController;
   late final TextEditingController _cvvController;
   bool _cvvObscured = true;
+  late final TextEditingController _pinController;
+  bool _pinObscured = true;
   late final TextEditingController _creditLimitController;
   late final TextEditingController _cardAccountNumberController;
   late final TextEditingController _paymentNetworkController;
@@ -81,6 +83,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   final FocusNode _cardNumberFocus = FocusNode();
   final FocusNode _expiryFocus = FocusNode();
   final FocusNode _cvvFocus = FocusNode();
+  final FocusNode _pinFocus = FocusNode();
   final FocusNode _creditLimitFocus = FocusNode();
   final FocusNode _cardAccountNumberFocus = FocusNode();
 
@@ -172,6 +175,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _cardNumberController = TextEditingController(text: field0.cardNumber);
       _expiryController = TextEditingController(text: field0.expiry);
       _cvvController = TextEditingController(text: field0.cvv);
+      _pinController = TextEditingController(text: field0.pin ?? '');
       _creditLimitController = TextEditingController(
         text: field0.creditLimit ?? '',
       );
@@ -189,6 +193,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _cardNumberController = TextEditingController();
       _expiryController = TextEditingController();
       _cvvController = TextEditingController();
+      _pinController = TextEditingController();
       _creditLimitController = TextEditingController();
       _cardAccountNumberController = TextEditingController();
       _paymentNetworkController = TextEditingController();
@@ -254,6 +259,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _cardNumberController.dispose();
     _expiryController.dispose();
     _cvvController.dispose();
+    _pinController.dispose();
     _creditLimitController.dispose();
     _cardAccountNumberController.dispose();
     _paymentNetworkController.dispose();
@@ -263,6 +269,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _cardNumberFocus.dispose();
     _expiryFocus.dispose();
     _cvvFocus.dispose();
+    _pinFocus.dispose();
     _creditLimitFocus.dispose();
     _cardAccountNumberFocus.dispose();
     _fileNotesController.dispose();
@@ -470,6 +477,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             cardNumber: _cardNumberController.text,
             expiry: _expiryController.text,
             cvv: _cvvController.text,
+            pin: _pinController.text.isEmpty ? null : _pinController.text,
             creditLimit: _creditLimitController.text.isEmpty
                 ? null
                 : _creditLimitController.text,
@@ -618,6 +626,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               cardNumber: _cardNumberController.text,
               expiry: _expiryController.text,
               cvv: _cvvController.text,
+              pin: _pinController.text.isEmpty ? null : _pinController.text,
               creditLimit: _creditLimitController.text.isEmpty
                   ? null
                   : _creditLimitController.text,
@@ -1054,10 +1063,34 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               return null;
             },
             onFieldSubmitted: (_) =>
-                FocusScope.of(context).requestFocus(_creditLimitFocus),
+                FocusScope.of(context).requestFocus(_pinFocus),
           ),
         ),
       ],
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _pinController,
+      focusNode: _pinFocus,
+      obscureText: _pinObscured,
+      keyboardType: TextInputType.number,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        LengthLimitingTextInputFormatter(16),
+      ],
+      decoration: InputDecoration(
+        labelText: 'PIN (optional)',
+        border: const OutlineInputBorder(),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _pinObscured ? Icons.visibility_off : Icons.visibility,
+          ),
+          tooltip: _pinObscured ? 'Show PIN' : 'Hide PIN',
+          onPressed: () => setState(() => _pinObscured = !_pinObscured),
+        ),
+      ),
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_creditLimitFocus),
     ),
     const SizedBox(height: 12),
     TextFormField(
