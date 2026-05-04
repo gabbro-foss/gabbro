@@ -32,12 +32,18 @@ String formatTimestamp(String iso) {
 Future<void> _defaultDelete(String id) => deleteEntry(id: id);
 Future<void> _defaultCopy(String value) =>
     Clipboard.setData(ClipboardData(text: value));
+Future<void> _defaultClearHistory(String id) =>
+    sessionClearPasswordHistory(id: id);
+Future<void> _defaultRevertPassword(String id) =>
+    sessionRevertPassword(id: id);
 
 class EntryDetailScreen extends StatefulWidget {
   final VaultEntryData entry;
   final Future<void> Function(String id) onDeleteEntry;
   final Future<void> Function(String value) onCopyToClipboard;
   final ClipboardClearTimeout clipboardClearTimeout;
+  final Future<void> Function(String id) onClearPasswordHistory;
+  final Future<void> Function(String id) onRevertPassword;
 
   const EntryDetailScreen({
     super.key,
@@ -45,6 +51,8 @@ class EntryDetailScreen extends StatefulWidget {
     this.onDeleteEntry = _defaultDelete,
     this.onCopyToClipboard = _defaultCopy,
     this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
+    this.onClearPasswordHistory = _defaultClearHistory,
+    this.onRevertPassword = _defaultRevertPassword,
   });
 
   @override
@@ -274,17 +282,41 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
               builder: (context) => PasswordHistoryScreen(
                 entry: e,
                 onDeleteHistory: () async {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Delete history — coming soon.')),
-                    );
+                  final id = _entryId();
+                  try {
+                    await widget.onClearPasswordHistory(id);
+                    final fresh = getEntry(id: id);
+                    if (mounted) setState(() => _entry = fresh);
+                    if (context.mounted) Navigator.of(context).pop();
+                  } catch (err) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to clear history: $err'),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.error,
+                        ),
+                      );
+                    }
                   }
                 },
                 onRevert: () async {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Revert — coming soon.')),
-                    );
+                  final id = _entryId();
+                  try {
+                    await widget.onRevertPassword(id);
+                    final fresh = getEntry(id: id);
+                    if (mounted) setState(() => _entry = fresh);
+                    if (context.mounted) Navigator.of(context).pop();
+                  } catch (err) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to revert password: $err'),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.error,
+                        ),
+                      );
+                    }
                   }
                 },
               ),

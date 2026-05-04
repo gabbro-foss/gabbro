@@ -137,6 +137,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
             obscured: _passwordObscured,
             onToggle: () =>
                 setState(() => _passwordObscured = !_passwordObscured),
+            oldValue: field0.password,
             newValue: u.password,
           ));
         }
@@ -147,6 +148,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
             label: 'CVV changed',
             obscured: _cvvObscured,
             onToggle: () => setState(() => _cvvObscured = !_cvvObscured),
+            oldValue: field0.cvv,
             newValue: u.cvv,
           ));
         }
@@ -155,6 +157,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
             label: 'PIN changed',
             obscured: _pinObscured,
             onToggle: () => setState(() => _pinObscured = !_pinObscured),
+            oldValue: field0.pin ?? '',
             newValue: u.pin ?? '',
           ));
         }
@@ -232,6 +235,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
     required String label,
     required bool obscured,
     required VoidCallback onToggle,
+    required String oldValue,
     required String newValue,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -262,24 +266,73 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
                   obscured ? Icons.visibility_off : Icons.visibility,
                   size: 18,
                 ),
-                tooltip: obscured ? 'Show new value' : 'Hide',
+                tooltip: obscured ? 'Show values' : 'Hide',
                 onPressed: onToggle,
               ),
             ],
           ),
-          if (!obscured)
-            Padding(
-              padding: const EdgeInsets.only(top: 4, left: 26),
-              child: Text(
-                newValue.isEmpty ? '(empty)' : newValue,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontFamily: 'monospace',
-                  letterSpacing: 1,
-                  color: colorScheme.onErrorContainer,
+          if (!obscured) ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Old',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onErrorContainer,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        oldValue.isEmpty ? '(empty)' : oldValue,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontFamily: 'monospace',
+                          letterSpacing: 1,
+                          color: colorScheme.onErrorContainer,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Icon(Icons.arrow_forward,
+                      size: 16, color: colorScheme.onErrorContainer),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'New',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: colorScheme.onErrorContainer,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        newValue.isEmpty ? '(empty)' : newValue,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontFamily: 'monospace',
+                          letterSpacing: 1,
+                          color: colorScheme.onErrorContainer,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
+          ],
         ],
       ),
     );
