@@ -667,13 +667,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Fixed safe editing UI bugs: sensitive row toggles wired
-  (T01-A), Identity/Custom diffs added (T06-A), identity hidden custom
-  field toggle fixed (T06-B), Revert promoted to standalone OutlinedButton
-  (T10-B). 113 Flutter tests passing, 180 Rust tests passing.
-- **Next task:** Wire bridge calls for "Delete previous entry"
-  (`session_clear_password_history`) and "Revert"
-  (`session_revert_password`) on `PasswordHistoryScreen`. Then hardware
+- **Completed:** Rust bridge functions `session_clear_password_history`
+  and `session_revert_password` implemented, tested (5 new Rust tests,
+  185 total), and codegen run. 113 Flutter tests passing.
+- **Next task:** Wire the two new bridge calls in Flutter
+  (`entry_detail_screen.dart` — replace stub snackbars). Then hardware
   verification of all safe editing fixes on Samsung S23 (Android 16).
   See Bikeshed for full details.
 
@@ -931,11 +929,12 @@ the first public tag.
   (custom launcher icon/label, yes; hiding from app drawer is limited) and iOS
   (more restricted)? Does offering this create a false sense of security?
 
-- **Safe editing — remaining bridge calls:** "Delete previous entry" and
-  "Revert" on `PasswordHistoryScreen` are currently stub snackbars. Need
-  two new bridge functions: `session_clear_password_history(id)` — sets
-  `previous_password` to `None` and saves; `session_revert_password(id)`
-  — swaps `password` ↔ `previous_password.value` and saves. TDD as usual.
+- **Safe editing — Flutter wiring:** Bridge functions
+  `session_clear_password_history` and `session_revert_password` are
+  implemented and bridged. Remaining: replace stub snackbars in
+  `entry_detail_screen.dart` `_loginView` with real async calls, refresh
+  `_entry` state after each call using `getEntry`, and pop
+  `PasswordHistoryScreen` after a successful revert.
 
 - **Safe editing — hardware verification (Samsung S23, Android 16):**
   T01-A, T06-A, T06-B, T10-B fixes not yet verified on device. Before
