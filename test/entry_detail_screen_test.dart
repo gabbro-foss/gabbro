@@ -171,4 +171,37 @@ void main() {
     expect(find.text('Basalt Notes'), findsWidgets);
     expect(find.text('Some important note content.'), findsOneWidget);
   });
+
+  testWidgets('identity hidden custom field has eye icon toggle',
+      (tester) async {
+    final entry = IdentityEntryData(
+      id: 'test-id-3',
+      firstName: 'Rob',
+      lastName: 'Example',
+      email: '',
+      phone: null,
+      address: null,
+      customFields: [
+        CustomFieldData(label: 'Passport', value: 'AB123456', hidden: true),
+      ],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+      tags: [],
+      favourite: false,
+    );
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.identity(entry)),
+    );
+
+    // Value is masked by default
+    expect(find.text('••••••••'), findsOneWidget);
+    expect(find.text('AB123456'), findsNothing);
+    // Eye icon toggle is present
+    expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+    // Tapping it reveals the value
+    await tester.tap(find.byIcon(Icons.visibility_off));
+    await tester.pump();
+    expect(find.text('AB123456'), findsOneWidget);
+  });
 }

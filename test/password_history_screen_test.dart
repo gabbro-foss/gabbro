@@ -127,4 +127,23 @@ void main() {
 
     expect(find.byIcon(Icons.visibility_off), findsNWidgets(2));
   });
+
+  testWidgets('Revert is a standalone button below Delete previous entry',
+      (tester) async {
+    await tester.pumpWidget(_buildHistoryScreen(
+      entry: _entryWithHistory(),
+    ));
+
+    // Both buttons must exist as OutlinedButtons (not TextButton)
+    expect(find.widgetWithText(OutlinedButton, 'Delete previous entry'),
+        findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'Revert'), findsOneWidget);
+
+    // Revert must appear below Delete — check render order in the Column
+    final deletePos =
+        tester.getTopLeft(find.widgetWithText(OutlinedButton, 'Delete previous entry'));
+    final revertPos =
+        tester.getTopLeft(find.widgetWithText(OutlinedButton, 'Revert'));
+    expect(revertPos.dy, greaterThan(deletePos.dy));
+  });
 }
