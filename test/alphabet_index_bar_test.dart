@@ -2,32 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 
-// ── Widget helper ─────────────────────────────────────────────────────────────
+// ── Widget helpers ────────────────────────────────────────────────────────────
 
-Widget _buildBar({
+// Pump the bar at a specific logical height by resizing the test surface.
+// This bypasses MaterialApp/Scaffold height consumption entirely.
+Future<void> pumpBar(
+  WidgetTester tester, {
+  required double height,
   required Set<String> presentLetters,
+  String? initialLetter,
   void Function(String)? onLetterSelected,
-}) =>
+}) async {
+  tester.view.physicalSize = Size(400, height);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+
+  await tester.pumpWidget(
     MaterialApp(
-      home: Scaffold(
-        body: SizedBox(
-          width: 36,
-          height: 600,
-          child: AlphabetIndexBar(
-            presentLetters: presentLetters,
-            onLetterSelected: onLetterSelected ?? (_) {},
-          ),
-        ),
+      home: AlphabetIndexBar(
+        presentLetters: presentLetters,
+        initialLetter: initialLetter,
+        onLetterSelected: onLetterSelected ?? (_) {},
       ),
-    );
+    ),
+  );
+}
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
+  // ── Existing tests ────────────────────────────────────────────────────────
+
   testWidgets('present letters are rendered', (tester) async {
-    await tester.pumpWidget(
-      _buildBar(presentLetters: {'A', 'B', 'C'}),
-    );
+    await pumpBar(tester, height: 756, presentLetters: {'A', 'B', 'C'});
 
     expect(find.text('A'), findsOneWidget);
     expect(find.text('B'), findsOneWidget);
@@ -36,12 +44,11 @@ void main() {
 
   testWidgets('tapping a present letter fires callback', (tester) async {
     String? selected;
-
-    await tester.pumpWidget(
-      _buildBar(
-        presentLetters: {'G'},
-        onLetterSelected: (l) => selected = l,
-      ),
+    await pumpBar(
+      tester,
+      height: 756,
+      presentLetters: {'G'},
+      onLetterSelected: (l) => selected = l,
     );
 
     await tester.tap(find.text('G'));
@@ -52,15 +59,164 @@ void main() {
 
   testWidgets('tapping an absent letter does not fire callback', (tester) async {
     String? selected;
-
-    await tester.pumpWidget(
-      _buildBar(
-        presentLetters: {'A'},
-        onLetterSelected: (l) => selected = l,
-      ),
+    await pumpBar(
+      tester,
+      height: 756,
+      presentLetters: {'A'},
+      onLetterSelected: (l) => selected = l,
     );
 
     await tester.tap(find.text('Z'));
+    await tester.pump();
+
+    expect(selected, isNull);
+  });
+
+  // ── Full mode ─────────────────────────────────────────────────────────────
+
+  testWidgets('full mode: all 27 letters visible when height >= 756dp',
+      (tester) async {
+    await pumpBar(tester, height: 756, presentLetters: {'A', 'M', 'Z'});
+
+    for (final letter in [
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+      'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '#',
+    ]) {
+      expect(find.text(letter), findsOneWidget,
+          reason: '$letter should be visible in full mode');
+    }
+  });
+
+  testWidgets('full mode: no chevrons rendered', (tester) async {
+    await pumpBar(tester, height: 756, presentLetters: {'A', 'B', 'C'});
+
+    expect(find.byIcon(Icons.keyboard_arrow_up), findsNothing);
+    expect(find.byIcon(Icons.keyboard_arrow_down), findsNothing);
+  });
+
+  testWidgets('full mode: no ellipsis rendered', (tester) async {
+    await pumpBar(tester, height: 756, presentLetters: {'A', 'B', 'C'});
+
+    expect(find.text('…'), findsNothing);
+  });
+
+  // ── Windowed mode ─────────────────────────────────────────────────────────
+
+  testWidgets('windowed mode: chevrons rendered when height < 756dp',
+      (tester) async {
+    await pumpBar(tester, height: 400, presentLetters: {'A', 'M', 'Z'});
+
+    expect(find.byIcon(Icons.keyboard_arrow_up), findsOneWidget);
+    expect(find.byIcon(Icons.keyboard_arrow_down), findsOneWidget);
+  });
+
+  testWidgets('windowed mode: not all letters visible', (tester) async {
+    await pumpBar(tester, height: 400, presentLetters: {'A', 'M', 'Z'});
+
+    int visibleCount = 0;
+    for (final letter in [
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+      'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '#',
+    ]) {
+      if (tester.any(find.text(letter))) visibleCount++;
+    }
+    expect(visibleCount, lessThan(27));
+  });
+
+  testWidgets('windowed mode: ellipsis shown above window when not at top',
+      (tester) async {
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'M', 'Z'},
+      initialLetter: 'M',
+    );
+
+    expect(find.text('…'), findsWidgets);
+  });
+
+  testWidgets('windowed mode: no ellipsis above when window starts at A',
+      (tester) async {
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'M', 'Z'},
+      initialLetter: 'A',
+    );
+
+    expect(find.text('A'), findsOneWidget);
+  });
+
+  testWidgets('windowed mode: initialLetter centres window on first present letter',
+      (tester) async {
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'M', 'Z'},
+    );
+
+    expect(find.text('M'), findsOneWidget);
+  });
+
+  testWidgets('windowed mode: chevron tap shifts window', (tester) async {
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'Z'},
+      initialLetter: 'A',
+    );
+
+    final before = <String>{};
+    for (final letter in [
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+      'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '#',
+    ]) {
+      if (tester.any(find.text(letter))) before.add(letter);
+    }
+
+    await tester.tap(find.byIcon(Icons.keyboard_arrow_down));
+    await tester.pump();
+
+    final after = <String>{};
+    for (final letter in [
+      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+      'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '#',
+    ]) {
+      if (tester.any(find.text(letter))) after.add(letter);
+    }
+
+    expect(after, isNot(equals(before)));
+  });
+
+  testWidgets('windowed mode: tapping present letter fires callback',
+      (tester) async {
+    String? selected;
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'M'},
+      initialLetter: 'M',
+      onLetterSelected: (l) => selected = l,
+    );
+
+    await tester.tap(find.text('M'));
+    await tester.pump();
+
+    expect(selected, equals('M'));
+  });
+
+  testWidgets('windowed mode: tapping absent letter does not fire callback',
+      (tester) async {
+    String? selected;
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'M'},
+      initialLetter: 'M',
+      onLetterSelected: (l) => selected = l,
+    );
+
+    await tester.tap(find.text('N'));
     await tester.pump();
 
     expect(selected, isNull);

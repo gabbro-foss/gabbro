@@ -215,7 +215,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
   void _scrollToLetter(String letter) {
     final index = _letterIndex[letter];
     if (index == null) return;
-    _itemScrollController.jumpTo(index: index);
+    _itemScrollController.scrollTo(
+      index: index,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+    );
   }
 
   Future<void> _showTypePicker() async {
@@ -685,14 +689,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
                         // at the bottom via padding. Left of the list so it
                         // does not sit on top of the platform scrollbar.
                         if (_searchQuery.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 80),
-                            child: SizedBox(
-                              width: 36,
-                              child: AlphabetIndexBar(
-                                presentLetters: _letterIndex.keys.toSet(),
-                                onLetterSelected: _scrollToLetter,
-                              ),
+                          SizedBox(
+                            width: 48,
+                            child: AlphabetIndexBar(
+                              presentLetters: _letterIndex.keys.toSet(),
+                              onLetterSelected: _scrollToLetter,
                             ),
                           ),
                         // List takes all remaining width.
