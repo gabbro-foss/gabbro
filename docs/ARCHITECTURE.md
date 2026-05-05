@@ -36,7 +36,8 @@ gabbro/
 │   │   ├── security_screen.dart           # Security — foreground and background lock timeouts
 │   │   ├── review_changes_screen.dart     # Safe edit — diff view before saving
 │   │   ├── password_history_screen.dart   # Safe edit — previous password with revert
-│   │   └── alphabet_index_bar.dart        # Alphabet index bar — height-adaptive, windowed with chevrons
+│   │   ├── alphabet_index_bar.dart        # Alphabet index bar — height-adaptive, windowed with chevrons
+│   │   └── tablet_vault_layout.dart       # Two-pane layout for ≥600dp — NavigationRail + list pane + detail pane
 │   ├── widgets/                      # Reusable UI components
 │   │   ├── path_field.dart           # Native file picker field (open + save modes)
 │   │   └── segmented_row.dart        # Shared SegmentedRow<T> and SectionHeader widgets
@@ -748,10 +749,14 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Tablet two-pane layout wireframe agreed and implementation
-  plan written. All four interaction states approved (browse, edit in place,
-  new entry modal, unlock centred). See ## Tablet Two-Pane Layout above.
-- **Next task:** Implement tablet two-pane layout per the plan above.
+- **Completed:** Tablet two-pane layout implemented and verified on phone
+  (portrait + landscape), Lenovo tablet, and Linux desktop. NavigationRail
+  at ≥600dp, alphabet index bar wired to tablet layout's own
+  ItemScrollController. 135 Flutter tests passing, 1 skipped (edit-mode
+  dim — phase 2). 185 Rust tests passing.
+- **Next task:** Fix known bugs in `ReviewChangesScreen` (sensitive row
+  not rendering values; missing Identity/Custom diff cases) — see
+  ## Password History & Safe Edit above.
 
 ---
 
@@ -1136,6 +1141,12 @@ the first public tag.
   form factors). Default: left on tablet (between nav rail and list pane),
   right on phone (matches current behaviour). Implement after the tablet
   two-pane layout is shipped.
+
+- **Tablet edit-mode dim (phase 2):** Wire `_isEditing` state in
+  `TabletVaultLayout` — set true when pencil tapped on detail pane
+  header, false on Cancel or Review →. List pane dims to 0.4 opacity and
+  is blocked by `IgnorePointer` during editing. Unskip test 6 in
+  `test/vault_list_tablet_test.dart` once implemented.
 
 - **App logo:** When a logo exists, add it to `OnboardingScreen`,
   `UnlockScreen`, and the centred tablet unlock layout. Defer until logo
