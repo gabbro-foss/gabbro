@@ -35,7 +35,8 @@ gabbro/
 │   │   ├── appearance_screen.dart         # Appearance — theme, text size
 │   │   ├── security_screen.dart           # Security — foreground and background lock timeouts
 │   │   ├── review_changes_screen.dart     # Safe edit — diff view before saving
-│   │   └── password_history_screen.dart   # Safe edit — previous password with revert
+│   │   ├── password_history_screen.dart   # Safe edit — previous password with revert
+│   │   └── alphabet_index_bar.dart        # Alphabet index bar — height-adaptive, windowed with chevrons
 │   ├── widgets/                      # Reusable UI components
 │   │   ├── path_field.dart           # Native file picker field (open + save modes)
 │   │   └── segmented_row.dart        # Shared SegmentedRow<T> and SectionHeader widgets
@@ -114,8 +115,6 @@ gabbro/
 │       └── ADR-006-encryption-implementation.md
 ├── chat_info/                  # Development session notes and ASCII wireframes
 │   └── ascii_art/              # (git-ignored — not versioned)
-├── lib/
-│   └── settings.dart           # AppSettings — JSONC load/save, theme/text-size enums
 ├── flutter_rust_bridge.yaml    # Bridge configuration
 ├── pubspec.yaml                # Flutter dependencies
 ├── pubspec.lock                # Pinned dependency versions
@@ -187,7 +186,7 @@ Each entry is an instance of a typed class:
 - **Types:** Login, Note, Identity, Card, File, Custom
 - **Status:** all 6 entry types fully implemented in the domain model
   (`rust/src/vault/entry.rs`) and bridged via DTOs and API functions
-  (`rust/src/api/vault.rs`). 172 Rust tests passing, 1 ignored across the project.
+  (`rust/src/api/vault.rs`). 185 Rust tests passing, 1 ignored across the project.
 - **Core fields:** type-specific
 - **Common fields:** UUID, created, modified, folder, tags, favourite
 - **Login entry:** URL, username, password (hidden by default,
@@ -340,7 +339,7 @@ Each entry is an instance of a typed class:
 
 ## Safe Entry Editing
 
-- **Status:** full stack implemented. Rust 177 tests, Flutter 107 tests.
+- **Status:** full stack implemented. Rust 185 tests, Flutter 129 tests.
   Verified on Samsung S23 (Android 16).
 
 - **`PreviousSecret` struct** (`rust/src/vault/entry.rs`): holds `value`,
@@ -431,7 +430,7 @@ Each entry is an instance of a typed class:
 
 ## Vault API Layer
 - **Status:** all 6 entry types fully implemented in `rust/src/api/vault.rs`.
-  142 Rust tests passing, 1 ignored across the project.
+  185 Rust tests passing, 1 ignored across the project.
 - Lives in `rust/src/api/vault.rs` — the bridge boundary between Flutter and
   the internal vault domain model.
 - **Pattern:** each entry type gets a bridge-facing DTO (Data Transfer Object —
@@ -667,13 +666,14 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Card PIN field added to `create_entry_screen.dart` —
-  obscured by default, show/hide toggle, digits-only, max 16 chars, focus
-  chain wired (CVV → PIN → Credit limit). Hardware-verified on Samsung S23
-  (Android 16) and Linux. 118 Flutter tests, 185 Rust tests passing.
-- **Next task:** Two candidates from bikeshed — pick one at session start:
-  (1) Alphabet index bar usability fixes (tap target size, scroll-to-A
-  reliability); (2) Tablet two-pane layout (needs wireframe first).
+- **Completed:** Alphabet index bar redesigned — height-adaptive layout
+  (full mode ≥756dp shows all 27 letters; windowed mode <756dp uses
+  chevron navigation + ellipsis), `initialLetter` centres window on
+  current scroll position, `jumpTo` replaced with `scrollTo` for reliable
+  scroll-to-A, bar width 48dp (Material touch target). Hardware-verified
+  on Samsung S23 (Android 16, portrait + landscape) and Linux. 129 Flutter
+  tests, 185 Rust tests passing.
+- **Next task:** Tablet two-pane layout (needs wireframe first).
 
 ---
 
@@ -1038,12 +1038,11 @@ the first public tag.
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
 
-- **Alphabet index bar — usability fixes:** Two known issues: (a) the
-  index letters are too small to tap reliably; (b) scrolling the index
-  bar does not reliably reach the letter `A` (first item) when scrolling
-  up from the middle. Investigate both before fixing — (a) may be a
-  simple font size / padding increase; (b) may be an off-by-one in the
-  `ItemScrollController.scrollTo` call or the index construction.
+- **ARCHITECTURE.md cleanup:** Test counts appear in multiple sections
+  (Vault Contents, Vault API Layer, Safe Entry Editing, Current Focus)
+  and will drift out of sync over time. In a dedicated session: consolidate
+  to a single authoritative test count location, remove duplicated prose,
+  and tighten stale descriptions. Low effort, high doc quality return.
 
 - **Custom filter chips:** Allow users to add new filter chips based on
   folders or custom tags, beyond the fixed entry-type chips. YAGNI risk is
