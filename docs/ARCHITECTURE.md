@@ -661,19 +661,97 @@ SPDX identifier: `GPL-3.0-only`
 
 ---
 
+## Tablet Two-Pane Layout
+
+### Wireframe decisions (session 05 May 2026 — approved)
+
+- **Breakpoint:** ≥600dp activates two-pane layout. Below 600dp: current
+  single-pane phone behaviour unchanged.
+- **Pane structure (left to right):**
+  1. Navigation rail (≈68dp, fixed) — icon + text label pairs matching the
+     phone's bottom nav bar destinations exactly (Vault, Security, Settings,
+     About). Same destinations, different widget. Selected item highlighted.
+  2. Alphabet index bar (≈28dp, fixed) — full A–Z + # column, same
+     height-adaptive and windowed logic as phone. Position (left-of-list)
+     follows the phone setting: if the user moves the bar to the right in
+     Settings → Appearance, the bar moves to the right edge of the list
+     pane on tablet too. One setting, consistent across form factors.
+  3. Vault list pane (≈200–240dp, fixed) — search bar, filter chips,
+     alphabetical groups, selected entry highlighted with left-border accent.
+  4. Detail pane (flex: 1) — entry detail view, filling remaining width.
+
+- **Four interaction states:**
+  - **Browse (default):** list selection active, detail shows selected entry.
+    Empty state (no entry selected): lock icon + "select an entry" placeholder.
+  - **Edit in place:** pencil tapped on detail pane header. Detail pane
+    becomes edit form in place. List pane dimmed and non-interactive.
+    Header shows Cancel and Review → buttons. Exits via Cancel or Review →.
+  - **New entry (+ button):** full-screen modal overlaying both panes.
+    Existing list/detail visible but non-interactive behind modal. Consistent
+    with phone behaviour; avoids conflicts with list selection.
+  - **Unlock screen:** centred single-column form, two-pane layout not
+    active. Same layout as phone unlock — no list or detail pane shown.
+
+- **Sub-screen navigation (Option 2 — approved):** Screens other than the
+  vault list (`CreateEntryScreen`, `EntryDetailScreen`, `SecurityScreen`,
+  `AppearanceScreen`, etc.) use full-screen push navigation, replacing the
+  two-pane shell entirely. Two-pane layout is the vault list screen's
+  layout, not persistent app chrome. Simplest implementation; reuses all
+  existing navigation code.
+
+- **Nav rail vs bottom nav bar:** Flutter's `NavigationRail` widget at
+  ≥600dp; `NavigationBar` (bottom) below 600dp. Destination list defined
+  once, shared between both. `LayoutBuilder` or
+  `MediaQuery.of(context).size.width` to switch.
+
+### Implementation plan
+
+1. **Wrap `VaultListScreen` in a `LayoutBuilder`** — read available width.
+   Below 600dp: render current layout unchanged. At ≥600dp: render
+   `_TabletVaultLayout` (new private widget in the same file or a
+   dedicated `tablet_vault_layout.dart`).
+
+2. **`NavigationRail` widget** — replace `NavigationBar` with
+   `NavigationRail` at ≥600dp. Extract destination definitions to a
+   shared list so phone and tablet stay in sync. `NavigationRailLabelType.all`
+   to show labels below icons.
+
+3. **`AlphabetIndexBar` position** — the existing widget already takes a
+   position parameter (left/right from settings). On tablet, pass the same
+   setting value; the widget renders in the appropriate position relative to
+   the list pane. No new parameter needed.
+
+4. **List pane interaction lock** — in edit state, wrap the list pane in
+   `IgnorePointer(ignoring: _isEditing)` and apply `Opacity(opacity: _isEditing ? 0.4 : 1.0)`. `_isEditing` is a `bool` on the tablet layout
+   widget, set true when the pencil is tapped, false on Cancel or
+   successful Review →.
+
+5. **New entry modal** — `+` button calls `showModalBottomSheet` or
+   `showDialog` with `CreateEntryScreen` as full-screen content. Same
+   call site as phone; no tablet-specific code needed if the existing
+   modal fills the screen.
+
+6. **Empty state** — when `_selectedEntryId == null` in the detail pane,
+   render a centred `Column` with `Icons.lock_outline` and the string
+   "Select an entry". Auto-selects the first entry on initial load if
+   the vault is non-empty.
+
+7. **Tests** — widget tests using `MediaQuery` overrides to simulate
+   ≥600dp and <600dp widths. Verify: rail visible at ≥600dp, bottom nav
+   visible below; list dims on edit; detail pane updates on list tap;
+   empty state shown when nothing selected.
+
+---
+
 ## Current Focus
 
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Alphabet index bar redesigned — height-adaptive layout
-  (full mode ≥756dp shows all 27 letters; windowed mode <756dp uses
-  chevron navigation + ellipsis), `initialLetter` centres window on
-  current scroll position, `jumpTo` replaced with `scrollTo` for reliable
-  scroll-to-A, bar width 48dp (Material touch target). Hardware-verified
-  on Samsung S23 (Android 16, portrait + landscape) and Linux. 129 Flutter
-  tests, 185 Rust tests passing.
-- **Next task:** Tablet two-pane layout (needs wireframe first).
+- **Completed:** Tablet two-pane layout wireframe agreed and implementation
+  plan written. All four interaction states approved (browse, edit in place,
+  new entry modal, unlock centred). See ## Tablet Two-Pane Layout above.
+- **Next task:** Implement tablet two-pane layout per the plan above.
 
 ---
 
@@ -1004,23 +1082,15 @@ the first public tag.
   Plan: find a willing community member with a de-Googled device to test
   a beta build before v1 release. Do not buy hardware prematurely.
 
-- **Responsive layout — mobile and desktop:** Flutter's layout system
-  (flex widgets, `MediaQuery`, `LayoutBuilder`) handles most screen-size
-  variation automatically, but deliberate decisions are still required.
-  Avoid hardcoded pixel values in favour of relative sizing and
-  constraints. The gap between a compact phone (~360dp wide) and a tablet
-  or desktop window (~800dp+) may warrant distinct layouts for some
-  screens — not just scaling, but restructuring (e.g. side panel on
-  desktop, bottom nav on phone). Font size scaling (see Accessible font
-  sizing above) and layout are coupled: a button that fits at Regular may
-  overflow at Extra Large, so both must be tested together.
-
-  Linux desktop requires particular attention: unlike Android, desktop
+- **Responsive layout — desktop:** The tablet two-pane layout (≥600dp) is
+  now designed and planned — see ## Tablet Two-Pane Layout. Remaining
+  open question is Linux desktop specifically: unlike Android, desktop
   windows are freely resizable. The app must be tested across a range of
   window sizes — from a narrow tiling WM column to a maximised widescreen
-  window — before v1 ships. No extra dependencies needed; this is a
-  testing discipline, not an architecture change. Reference: WCAG 1.4.4
-  (Resize Text) applies here alongside the font sizing work.
+  window — before v1 ships. Font size scaling and layout are coupled: a
+  button that fits at Regular may overflow at Extra Large; test both
+  together. No extra dependencies needed; this is a testing discipline.
+  Reference: WCAG 1.4.4 (Resize Text).
 
 - **Block copy/paste on master passphrase fields:** On `OnboardingScreen`
   and `UnlockScreen`, the master passphrase fields should block clipboard
@@ -1059,14 +1129,17 @@ the first public tag.
   sufficient? Does each vault get its own passphrase and KDF parameters?
   Significant architecture change — v2 at earliest.
 
-- **Test on Android tablet:** ✓ Tested on Lenovo tablet (Android). All
-  functionality works correctly. However, the UI has significant wasted
-  space at larger screen sizes — the layout scales but does not restructure.
-  A dedicated design session is needed before implementing: consider a
-  two-pane master/detail layout at ≥600dp (vault list left, entry detail
-  right), wider cards/tiles, and revisiting the filter chip row. Pairs with
-  the "Responsive layout — mobile and desktop" item above. Non-trivial —
-  do not start without a wireframe agreed first.
+- **Alphabet bar left/right setting (accessibility):** Add a toggle in
+  Settings → Appearance to move the alphabet index bar from its default
+  side to the opposite side. Applies on both phone and tablet — tablet
+  mirrors whatever the phone setting is (one setting, consistent across
+  form factors). Default: left on tablet (between nav rail and list pane),
+  right on phone (matches current behaviour). Implement after the tablet
+  two-pane layout is shipped.
+
+- **App logo:** When a logo exists, add it to `OnboardingScreen`,
+  `UnlockScreen`, and the centred tablet unlock layout. Defer until logo
+  is designed.
 
 - **Verify Android storage permissions:** Gabbro currently declares no
   storage permissions in `AndroidManifest.xml`. This is correct as long
