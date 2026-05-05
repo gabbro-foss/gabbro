@@ -22,13 +22,30 @@ List<EntrySummaryData> _threeEntries() => [
 ];
 
 // ── Widget helper ─────────────────────────────────────────────────────────────
+//
+// Forces a narrow (phone) surface so LayoutBuilder picks the phone layout.
+// The tablet layout has a different widget tree that would break these tests.
 
 Widget _buildScreen(List<EntrySummaryData> Function() listEntries) =>
-    MaterialApp(home: VaultListScreen(vaultPath: '/tmp/test.gabbro', listEntries: listEntries));
+    MaterialApp(
+      home: VaultListScreen(
+        vaultPath: '/tmp/test.gabbro',
+        listEntries: listEntries,
+      ),
+    );
+
+void _setNarrow(WidgetTester tester) {
+  tester.view.physicalSize = const Size(390, 844);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+}
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
+
 void main() {
   testWidgets('all entries shown when search query is empty', (tester) async {
+    _setNarrow(tester);
     await tester.pumpWidget(_buildScreen(_threeEntries));
 
     expect(find.text('Quartz'), findsOneWidget);
@@ -37,6 +54,7 @@ void main() {
   });
 
   testWidgets('typing a query filters entries by title', (tester) async {
+    _setNarrow(tester);
     await tester.pumpWidget(_buildScreen(_threeEntries));
 
     await tester.enterText(find.byType(TextField), 'musc');
@@ -51,6 +69,7 @@ void main() {
   });
 
   testWidgets('search is case-insensitive', (tester) async {
+    _setNarrow(tester);
     await tester.pumpWidget(_buildScreen(_threeEntries));
 
     await tester.enterText(find.byType(TextField), 'QUARTZ');
@@ -64,6 +83,7 @@ void main() {
   });
 
   testWidgets('clear button resets the list', (tester) async {
+    _setNarrow(tester);
     await tester.pumpWidget(_buildScreen(_threeEntries));
 
     await tester.enterText(find.byType(TextField), 'musc');
@@ -83,6 +103,7 @@ void main() {
   });
 
   testWidgets('filter chip filters by entry type', (tester) async {
+    _setNarrow(tester);
     await tester.pumpWidget(_buildScreen(_threeEntries));
 
     await tester.tap(find.widgetWithText(FilterChip, 'Note'));
@@ -96,9 +117,19 @@ void main() {
     expect(find.text('Olivine'), findsNothing);
   });
 
-  testWidgets('tapping checkbox enters selection mode', (tester) async {
+  testWidgets('tapping checklist icon then checkbox enters selection mode',
+      (tester) async {
+    // On the phone layout, checkboxes only appear after entering selection mode
+    // via the checklist icon. The old isWide behaviour (always-visible checkboxes)
+    // has been removed — phone layout is now checkbox-on-select only.
+    _setNarrow(tester);
     await tester.pumpWidget(_buildScreen(_threeEntries));
 
+    // Enter selection mode first.
+    await tester.tap(find.byIcon(Icons.checklist));
+    await tester.pump();
+
+    // Now tap the checkbox next to 'Quartz'.
     final quartzTile = find.ancestor(
       of: find.text('Quartz'),
       matching: find.byType(ListTile),
@@ -114,6 +145,7 @@ void main() {
   });
 
   testWidgets('empty query shows no results message', (tester) async {
+    _setNarrow(tester);
     await tester.pumpWidget(_buildScreen(_threeEntries));
 
     await tester.enterText(find.byType(TextField), 'zzz');

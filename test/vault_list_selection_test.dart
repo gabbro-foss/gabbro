@@ -21,28 +21,32 @@ List<EntrySummaryData> _twoEntries() => [
 ];
 
 // ── Widget helpers ────────────────────────────────────────────────────────────
+//
+// Both helpers use MaterialApp (no GabbroApp needed — these tests don't
+// exercise clipboard timeout or settings). Width is controlled via
+// tester.view.physicalSize so LayoutBuilder sees the correct constraint.
 
-Widget _buildNarrow(List<EntrySummaryData> Function() listEntries) =>
-    MediaQuery(
-      data: const MediaQueryData(size: Size(390, 844)),
-      child: MaterialApp(
-        home: VaultListScreen(
-          vaultPath: '/tmp/test.gabbro',
-          listEntries: listEntries,
-        ),
+Widget _buildScreen(List<EntrySummaryData> Function() listEntries) =>
+    MaterialApp(
+      home: VaultListScreen(
+        vaultPath: '/tmp/test.gabbro',
+        listEntries: listEntries,
       ),
     );
 
-Widget _buildWide(List<EntrySummaryData> Function() listEntries) =>
-    MediaQuery(
-      data: const MediaQueryData(size: Size(800, 600)),
-      child: MaterialApp(
-        home: VaultListScreen(
-          vaultPath: '/tmp/test.gabbro',
-          listEntries: listEntries,
-        ),
-      ),
-    );
+void _setNarrow(WidgetTester tester) {
+  tester.view.physicalSize = const Size(390, 844);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+}
+
+void _setWide(WidgetTester tester) {
+  tester.view.physicalSize = const Size(800, 600);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+}
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -50,16 +54,18 @@ void main() {
   testWidgets(
     'narrow: select icon is visible when not in selection mode',
     (tester) async {
-      await tester.pumpWidget(_buildNarrow(_twoEntries));
+      _setNarrow(tester);
+      await tester.pumpWidget(_buildScreen(_twoEntries));
 
       expect(find.byIcon(Icons.checklist), findsOneWidget);
     },
   );
 
   testWidgets(
-    'wide: select icon is absent — checkboxes are always visible',
+    'wide: select icon is absent — tablet layout has no checklist icon',
     (tester) async {
-      await tester.pumpWidget(_buildWide(_twoEntries));
+      _setWide(tester);
+      await tester.pumpWidget(_buildScreen(_twoEntries));
 
       expect(find.byIcon(Icons.checklist), findsNothing);
     },
@@ -68,7 +74,8 @@ void main() {
   testWidgets(
     'narrow: tapping select icon enters selection mode and shows checkboxes',
     (tester) async {
-      await tester.pumpWidget(_buildNarrow(_twoEntries));
+      _setNarrow(tester);
+      await tester.pumpWidget(_buildScreen(_twoEntries));
 
       await tester.tap(find.byIcon(Icons.checklist));
       await tester.pump();
@@ -81,7 +88,8 @@ void main() {
   testWidgets(
     'narrow: long-pressing a tile enters selection mode and selects that tile',
     (tester) async {
-      await tester.pumpWidget(_buildNarrow(_twoEntries));
+      _setNarrow(tester);
+      await tester.pumpWidget(_buildScreen(_twoEntries));
 
       final gabbroTile = find.ancestor(
         of: find.text('Gabbro'),
@@ -97,7 +105,8 @@ void main() {
   testWidgets(
     'narrow: close button exits selection mode and select icon reappears',
     (tester) async {
-      await tester.pumpWidget(_buildNarrow(_twoEntries));
+      _setNarrow(tester);
+      await tester.pumpWidget(_buildScreen(_twoEntries));
 
       await tester.tap(find.byIcon(Icons.checklist));
       await tester.pump();

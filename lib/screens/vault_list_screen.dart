@@ -12,6 +12,8 @@ import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
+import 'package:gabbro/screens/tablet_vault_layout.dart';
+import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 Future<void> _defaultDeleteVault() => deleteWholeVault();
@@ -33,6 +35,16 @@ class VaultListScreen extends StatefulWidget {
 }
 
 class _VaultListScreenState extends State<VaultListScreen> {
+  static const _filters = [
+    'All',
+    'Password',
+    'Note',
+    'Card',
+    'Identity',
+    'File',
+    'Custom',
+  ];
+
   List<EntrySummaryData> _entries = [];
   String? _error;
   String _selectedFilter = 'All';
@@ -459,21 +471,61 @@ class _VaultListScreenState extends State<VaultListScreen> {
     );
   }
 
+  Widget _buildFilterChipRow() {
+    return Stack(
+      alignment: Alignment.centerRight,
+      children: [
+        NotificationListener<ScrollMetricsNotification>(
+          onNotification: (notification) {
+            _updateChevrons();
+            return false;
+          },
+          child: SingleChildScrollView(
+            controller: _chipScrollController,
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Row(
+              children: _filters
+                  .map(
+                    (f) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: FilterChip(
+                        label: Text(f),
+                        selected: _selectedFilter == f,
+                        onSelected: (_) =>
+                            setState(() => _selectedFilter = f),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ),
+        if (_showRightChevron)
+          Positioned(
+            right: 0,
+            child: _ChipRowFadeEdge(
+              alignment: Alignment.centerRight,
+              onTap: () => _scrollChips(true),
+            ),
+          ),
+        if (_showLeftChevron)
+          Positioned(
+            left: 0,
+            child: _ChipRowFadeEdge(
+              alignment: Alignment.centerLeft,
+              onTap: () => _scrollChips(false),
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_error != null) {
       return Scaffold(body: Center(child: Text('Error: $_error')));
     }
-
-    const filters = [
-      'All',
-      'Password',
-      'Note',
-      'Card',
-      'Identity',
-      'File',
-      'Custom',
-    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -601,140 +653,155 @@ class _VaultListScreenState extends State<VaultListScreen> {
               onPressed: _showTypePicker,
               child: const Icon(Icons.add),
             ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search entries…',
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () => setState(() {
-                            _searchQuery = '';
-                            _searchController.clear();
-                          }),
-                        )
-                      : null,
-                  border: const OutlineInputBorder(),
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                ),
-                onChanged: (value) => setState(() => _searchQuery = value),
-              ),
-            ),
-            Stack(
-              alignment: Alignment.centerRight,
-              children: [
-                NotificationListener<ScrollMetricsNotification>(
-                  onNotification: (notification) {
-                    _updateChevrons();
-                    return false;
-                  },
-                  child: SingleChildScrollView(
-                    controller: _chipScrollController,
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    child: Row(
-                      children: filters
-                          .map(
-                            (f) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
-                              child: FilterChip(
-                                label: Text(f),
-                                selected: _selectedFilter == f,
-                                onSelected: (_) =>
-                                    setState(() => _selectedFilter = f),
-                              ),
-                            ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth >= 600) {
+            return TabletVaultLayout(
+              groupedEntries: _groupedEntries,
+              filteredEntries: _filteredEntries,
+              letterIndex: _letterIndex,
+              onLetterSelected: _scrollToLetter,
+              displayTitle: _displayTitle,
+              displayType: _displayType,
+              entryTypeIcon: _entryTypeIcon,
+              searchBar: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search entries…',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () => setState(() {
+                              _searchQuery = '';
+                              _searchController.clear();
+                            }),
                           )
-                          .toList(),
+                        : null,
+                    border: const OutlineInputBorder(),
+                    isDense: true,
+                    contentPadding:
+                        const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  onChanged: (value) =>
+                      setState(() => _searchQuery = value),
+                ),
+              ),
+              filterChipRow: _buildFilterChipRow(),
+              searchActive: _searchQuery.isNotEmpty,
+              onEntryTap: (_) {},
+              onRefresh: _loadEntries,
+              vaultPath: widget.vaultPath,
+              clipboardClearTimeout:
+                  GabbroApp.maybeOf(context)?.settings.clipboardClearTimeout ??
+                  ClipboardClearTimeout.sixtySeconds,
+            );
+          }
+          return SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search entries…',
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () => setState(() {
+                                _searchQuery = '';
+                                _searchController.clear();
+                              }),
+                            )
+                          : null,
+                      border: const OutlineInputBorder(),
+                      isDense: true,
+                      contentPadding:
+                          const EdgeInsets.symmetric(vertical: 10),
                     ),
+                    onChanged: (value) =>
+                        setState(() => _searchQuery = value),
                   ),
                 ),
-                if (_showRightChevron)
-                  Positioned(
-                    right: 0,
-                    child: _ChipRowFadeEdge(
-                      alignment: Alignment.centerRight,
-                      onTap: () => _scrollChips(true),
-                    ),
-                  ),
-                if (_showLeftChevron)
-                  Positioned(
-                    left: 0,
-                    child: _ChipRowFadeEdge(
-                      alignment: Alignment.centerLeft,
-                      onTap: () => _scrollChips(false),
-                    ),
-                  ),
-              ],
-            ),
-            Expanded(
-              child: _groupedEntries.isEmpty
-                  ? const Center(child: Text('No entries match your search.'))
-                  : Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Index bar — fixed width column, clear of the FAB
-                        // at the bottom via padding. Left of the list so it
-                        // does not sit on top of the platform scrollbar.
-                        if (_searchQuery.isEmpty)
-                          SizedBox(
-                            width: 48,
-                            child: AlphabetIndexBar(
-                              presentLetters: _letterIndex.keys.toSet(),
-                              onLetterSelected: _scrollToLetter,
-                            ),
-                          ),
-                        // List takes all remaining width.
-                        Expanded(
-                          child: ScrollConfiguration(
-                            behavior: ScrollConfiguration.of(
-                              context,
-                            ).copyWith(scrollbars: false),
-                            child: ScrollablePositionedList.builder(
-                              itemScrollController: _itemScrollController,
-                              padding: const EdgeInsets.only(bottom: 80),
-                              itemCount: _groupedEntries.length,
-                              itemBuilder: (context, index) {
-                                final item = _groupedEntries[index];
-                                if (item is String) {
-                                  return Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                      16,
-                                      8,
-                                      16,
-                                      4,
-                                    ),
-                                    child: Text(
-                                      item,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  );
-                                }
-                                final entry = item as EntrySummaryData;
-                                final isWide =
-                                    MediaQuery.of(context).size.width >= 600;
-                                return ListTile(
-                                  dense: true,
-                                  leading: isWide
-                                      ? Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
+                _buildFilterChipRow(),
+                Expanded(
+                  child: _groupedEntries.isEmpty
+                      ? const Center(
+                          child: Text('No entries match your search.'),
+                        )
+                      : Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Index bar — fixed width column, clear of the FAB
+                            // at the bottom via padding. Left of the list so it
+                            // does not sit on top of the platform scrollbar.
+                            if (_searchQuery.isEmpty)
+                              SizedBox(
+                                width: 48,
+                                child: AlphabetIndexBar(
+                                  presentLetters: _letterIndex.keys.toSet(),
+                                  onLetterSelected: _scrollToLetter,
+                                ),
+                              ),
+                            // List takes all remaining width.
+                            Expanded(
+                              child: ScrollConfiguration(
+                                behavior: ScrollConfiguration.of(
+                                  context,
+                                ).copyWith(scrollbars: false),
+                                child: ScrollablePositionedList.builder(
+                                  itemScrollController: _itemScrollController,
+                                  padding:
+                                      const EdgeInsets.only(bottom: 80),
+                                  itemCount: _groupedEntries.length,
+                                  itemBuilder: (context, index) {
+                                    final item = _groupedEntries[index];
+                                    if (item is String) {
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.fromLTRB(
+                                          16,
+                                          8,
+                                          16,
+                                          4,
+                                        ),
+                                        child: Text(
+                                          item,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    final entry = item as EntrySummaryData;
+                                    return ListTile(
+                                      dense: true,
+                                      leading: _isSelecting
+                                          ? Checkbox(
+                                              visualDensity:
+                                                  VisualDensity.compact,
+                                              value: _selectedIds.contains(
+                                                entry.id,
+                                              ),
+                                              onChanged: (_) =>
+                                                  setState(() {
+                                                if (_selectedIds.contains(
+                                                  entry.id,
+                                                )) {
+                                                  _selectedIds.remove(
+                                                    entry.id,
+                                                  );
+                                                } else {
+                                                  _selectedIds.add(entry.id);
+                                                }
+                                              }),
+                                            )
+                                          : Icon(
                                               _entryTypeIcon(entry.entryType),
                                               size: 20,
                                               color: Theme.of(
@@ -744,31 +811,17 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                                 entry.entryType,
                                               ),
                                             ),
-                                            Checkbox(
-                                              visualDensity:
-                                                  VisualDensity.compact,
-                                              value: _selectedIds.contains(
-                                                entry.id,
-                                              ),
-                                              onChanged: (_) => setState(() {
-                                                if (_selectedIds.contains(
-                                                  entry.id,
-                                                )) {
-                                                  _selectedIds.remove(entry.id);
-                                                } else {
-                                                  _selectedIds.add(entry.id);
-                                                }
-                                              }),
-                                            ),
-                                          ],
-                                        )
-                                      : _isSelecting
-                                      ? Checkbox(
-                                          visualDensity: VisualDensity.compact,
-                                          value: _selectedIds.contains(
-                                            entry.id,
-                                          ),
-                                          onChanged: (_) => setState(() {
+                                      title: Text(_displayTitle(entry)),
+                                      subtitle: Text(
+                                        _displayType(entry.entryType),
+                                      ),
+                                      onLongPress: () => setState(() {
+                                        _selectionMode = true;
+                                        _selectedIds.add(entry.id);
+                                      }),
+                                      onTap: () async {
+                                        if (_isSelecting) {
+                                          setState(() {
                                             if (_selectedIds.contains(
                                               entry.id,
                                             )) {
@@ -776,57 +829,35 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                             } else {
                                               _selectedIds.add(entry.id);
                                             }
-                                          }),
-                                        )
-                                      : Icon(
-                                          _entryTypeIcon(entry.entryType),
-                                          size: 20,
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.primary,
-                                          semanticLabel: _displayType(
-                                            entry.entryType,
-                                          ),
-                                        ),
-                                  title: Text(_displayTitle(entry)),
-                                  subtitle: Text(_displayType(entry.entryType)),
-                                  onLongPress: () => setState(() {
-                                    _selectionMode = true;
-                                    _selectedIds.add(entry.id);
-                                  }),
-                                  onTap: () async {
-                                    if (_isSelecting) {
-                                      setState(() {
-                                        if (_selectedIds.contains(entry.id)) {
-                                          _selectedIds.remove(entry.id);
-                                        } else {
-                                          _selectedIds.add(entry.id);
+                                          });
+                                          return;
                                         }
-                                      });
-                                      return;
-                                    }
-                                    await Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) => EntryDetailScreen(
-                                          entry: getEntry(id: entry.id),
-                                          clipboardClearTimeout: GabbroApp.of(
-                                            context,
-                                          ).settings.clipboardClearTimeout,
-                                        ),
-                                      ),
+                                        await Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                EntryDetailScreen(
+                                              entry: getEntry(id: entry.id),
+                                              clipboardClearTimeout:
+                                                  GabbroApp.of(
+                                                context,
+                                              ).settings.clipboardClearTimeout,
+                                            ),
+                                          ),
+                                        );
+                                        if (mounted) _loadEntries();
+                                      },
                                     );
-                                    if (mounted) _loadEntries();
                                   },
-                                );
-                              },
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
