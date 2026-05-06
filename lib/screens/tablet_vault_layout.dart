@@ -168,7 +168,9 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
   }
 
   Widget _buildDetailPane() {
-    if (_selectedEntryId == null) return _buildEmptyState();
+    if (_selectedEntryId == null || widget.filteredEntries.isEmpty) {
+      return _buildEmptyState();
+    }
     // ValueKey forces Flutter to rebuild EntryDetailScreen whenever the
     // selected id changes — this is how we refresh after an edit without
     // adding an onChanged callback to EntryDetailScreen.

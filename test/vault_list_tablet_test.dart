@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
+import 'package:gabbro/screens/tablet_vault_layout.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 
@@ -196,6 +197,68 @@ void main() {
       tester.view.physicalSize = const Size(700, 900);
       await tester.pumpAndSettle();
       expect(find.byType(NavigationRail), findsOneWidget);
+    });
+
+    // -----------------------------------------------------------------------
+    // Test 9: Delete all entries — detail pane shows empty state (not grey).
+    // Regression test for: bulk delete left _selectedEntryId set while
+    // filteredEntries became empty, causing the detail pane to render blank.
+    //
+    // Drives TabletVaultLayout directly: first render with one entry and
+    // tap it so _selectedEntryId is set, then rebuild with filteredEntries
+    // empty — the detail pane must show the empty state.
+    // -----------------------------------------------------------------------
+    testWidgets('detail pane shows empty state after delete-all', (
+      tester,
+    ) async {
+      _setWidth(tester, 700);
+
+      // StatefulWrapper lets us swap filteredEntries between pumps.
+      final entries = _fakeEntries();
+      final grouped = <dynamic>['A', entries[0], 'B', entries[1]];
+
+      Widget buildLayout(List<EntrySummaryData> filtered) =>
+          MaterialApp(
+            home: Scaffold(
+              body: TabletVaultLayout(
+                groupedEntries: filtered.isEmpty ? [] : grouped,
+                filteredEntries: filtered,
+                letterIndex: filtered.isEmpty ? {} : {'A': 0},
+                onLetterSelected: (_) {},
+                displayTitle: (e) => e.title,
+                displayType: (_) => 'Password',
+                entryTypeIcon: (_) => Icons.lock_outline,
+                searchBar: const SizedBox.shrink(),
+                filterChipRow: const SizedBox.shrink(),
+                searchActive: false,
+                onEntryTap: (_) {},
+                onRefresh: () {},
+                vaultPath: '/tmp/test.gabbro',
+                clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
+                getEntryFn: (_) => _fakeLoginEntry(),
+                onDeleteEntryFn: (_) async {},
+                selectionMode: false,
+                selectedIds: const {},
+                onToggleSelection: (_) {},
+              ),
+            ),
+          );
+
+      // First render — two entries present.
+      await tester.pumpWidget(buildLayout(entries));
+      await tester.pumpAndSettle();
+
+      // Tap Alice so _selectedEntryId is non-null inside the layout.
+      await tester.tap(find.text('Alice'));
+      await tester.pumpAndSettle();
+      expect(find.text('Select an entry'), findsNothing);
+
+      // Rebuild with empty list — simulates parent after delete-all + refresh.
+      await tester.pumpWidget(buildLayout([]));
+      await tester.pumpAndSettle();
+
+      // Detail pane must show empty state, not a blank grey widget.
+      expect(find.text('Select an entry'), findsOneWidget);
     });
   });
 }
