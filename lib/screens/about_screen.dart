@@ -398,6 +398,16 @@ const _kComponents = [
     licence: 'Apache-2.0 / MIT',
     url: 'https://github.com/rust-random/rand',
   ),
+  _Component(
+    name: 'once_cell',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/matklad/once_cell',
+  ),
+  _Component(
+    name: 'base64',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/marshallpierce/rust-base64',
+  ),
   // Languages & runtimes
   _Component(
     name: 'Rust',
