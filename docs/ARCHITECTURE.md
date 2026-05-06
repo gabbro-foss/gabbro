@@ -749,14 +749,16 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Tablet two-pane layout implemented and verified on phone
-  (portrait + landscape), Lenovo tablet, and Linux desktop. NavigationRail
-  at ≥600dp, alphabet index bar wired to tablet layout's own
-  ItemScrollController. 135 Flutter tests passing, 1 skipped (edit-mode
-  dim — phase 2). 185 Rust tests passing.
+- **Completed:** Fixed two tablet-mode bugs: (1) delete from detail pane
+  crashed app — resolved via `onDeleted` callback on `EntryDetailScreen`;
+  (2) long-press / multi-select not available in tablet mode — resolved by
+  passing selection state from `_VaultListScreenState` into
+  `TabletVaultLayout`. Verified on Linux, Samsung S23, and Lenovo tablet.
+  141 Flutter tests passing, 1 skipped (edit-mode dim — phase 2).
+  185 Rust tests passing.
 - **Next task:** Fix known bugs in `ReviewChangesScreen` (sensitive row
   not rendering values; missing Identity/Custom diff cases) — see
-  ## Password History & Safe Edit above.
+  ## Safe Entry Editing above.
 
 ---
 
@@ -1141,6 +1143,18 @@ the first public tag.
   form factors). Default: left on tablet (between nav rail and list pane),
   right on phone (matches current behaviour). Implement after the tablet
   two-pane layout is shipped.
+
+- **Enpass-style password detail view:** In the entry detail screen,
+  show a character-by-character breakdown of the password beneath the
+  masked field: a number under each character, colour-coded by type
+  (uppercase, lowercase, digit, symbol), using an unambiguous font for
+  visually similar characters (0/O, l/1/I). Colour must never be the
+  sole differentiator — ADR-003 applies. Design in a dedicated session.
+
+- **Tablet list pane width:** The list pane is currently fixed at 260dp.
+  Options: (1) widen the fixed value, or (2) make the divider draggable
+  so the user can adjust it. Option 2 is more flexible but adds
+  complexity. Revisit after other tablet polish is complete.
 
 - **Tablet edit-mode dim (phase 2):** Wire `_isEditing` state in
   `TabletVaultLayout` — set true when pencil tapped on detail pane
