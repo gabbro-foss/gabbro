@@ -283,6 +283,15 @@ Each entry is an instance of a typed class:
 - **Appearance screen:** two segmented button rows (theme, text size) plus
   a live preview box showing the current text scale. High-contrast toggle
   enabled — works in both light and dark mode.
+- **High-contrast themes:** `gabbroLightTheme({required bool highContrast})`
+  and `gabbroDarkTheme({required bool highContrast})` are top-level functions
+  in `main.dart` (extracted from `_GabbroAppState` for testability). When
+  `highContrast: true`: light variant uses black/white with error `#7A0000`
+  (8.2:1 on white); dark variant uses white/black with error `#FF9999`
+  (7.3:1 on black). Both pass WCAG 1.4.3 (AA, 4.5:1) and WCAG 1.4.6 (AAA,
+  7:1). ADR-003 compliant — error colours remain distinguishable under CVD
+  simulation. Verified on Samsung S23 (Android 16). 8 unit tests in
+  `test/theme_test.dart`.
 - **Accessibility shortcut:** `OutlinedButton.icon` (icon: `Icons.accessibility_new`,
   label: "Accessibility") positioned top-right on `OnboardingScreen` only
   (removed from `UnlockScreen` — settings persist after onboarding so the
@@ -601,7 +610,7 @@ export_vault(path)              → Result<(), String>
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
 | Rust (`cargo test -q`) | 188 | 1 ignored |
-| Flutter (`flutter test`) | 146 | 1 skipped |
+| Flutter (`flutter test`) | 154 | 1 skipped |
 
 ## Platforms
 
@@ -763,15 +772,15 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Password history expiry auto-purge (`is_expired`,
-  `purge_expired_history` in `api/vault.rs`, called from `unlock_vault`);
-  dependency licence audit — `once_cell` and `base64` added to About screen;
-  tablet two-pane layout (`TabletVaultLayout`, `LayoutBuilder` breakpoint
-  at 600dp, `NavigationRail`). 188 Rust tests, 154 Flutter tests passing.
-- **Next task:** High-contrast theme implementation — colour overrides
-  validated against ADR-003, WCAG 1.4.3, and WCAG 1.4.6. Plumbing already
-  done (`highContrast` bool in `AppSettings`, toggle in Appearance screen).
-  See ## Bikeshed / Backlog → Features & UX → High-contrast mode.
+- **Completed:** High-contrast light and dark themes — `gabbroLightTheme()`
+  and `gabbroDarkTheme()` extracted to top-level functions; high-contrast
+  colours pass WCAG 1.4.3 (AA) and WCAG 1.4.6 (AAA); ADR-003 compliant;
+  8 new theme unit tests. 188 Rust tests, 154 Flutter tests passing.
+- **Next task:** Import validation failures — user review flow. Items that
+  fail domain validation during import are currently silently skipped.
+  Design and implement `ImportFailure` struct, review dialog, and
+  pre-populated `CreateEntryScreen` edit path. See ## Bikeshed / Backlog →
+  Import → Import validation failures.
 
 ---
 
@@ -1025,18 +1034,6 @@ the first public tag.
   WCAG 1.4.1. Consider whether custom accent colours (already noted for the
   password display palette) generalise to a broader theming system, or whether
   that adds complexity for little gain.
-
-- **High-contrast mode:** Flutter can read the OS-level high-contrast signal via
-  `MediaQuery.of(context).highContrast` and honour it automatically — worth doing
-  for free. However, an in-app toggle is the more important piece: Linux tiling WM
-  users have no OS-level signal to send, and some users want high contrast only
-  inside their password manager. **Plumbing done:** toggle exists in Appearance
-  screen, `highContrast` bool persisted in `AppSettings`, accessibility shortcut
-  on `UnlockScreen` and `OnboardingScreen` activates it. **Remaining:** implement
-  the actual high-contrast theme — colour overrides validated against ADR-003
-  (colour-blind safety), WCAG 1.4.3 (Contrast, minimum), and WCAG 1.4.6
-  (Contrast, enhanced). Pairs naturally with the Themes — dark / light / custom
-  item above.
 
 - **Panic button / app hiding on mobile:** A visible "hide app" mechanism —
   e.g. disguise Gabbro as a calculator or notes app, or a panic button that
