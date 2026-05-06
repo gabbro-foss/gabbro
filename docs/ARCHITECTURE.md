@@ -765,10 +765,13 @@ SPDX identifier: `GPL-3.0-only`
 
 - **Completed:** Password history expiry auto-purge (`is_expired`,
   `purge_expired_history` in `api/vault.rs`, called from `unlock_vault`);
-  dependency licence audit — `once_cell` and `base64` added to About screen.
-  188 Rust tests, 146 Flutter tests passing.
-- **Next task:** Tablet two-pane layout implementation — see
-  ## Tablet Two-Pane Layout for the full wireframe and implementation plan.
+  dependency licence audit — `once_cell` and `base64` added to About screen;
+  tablet two-pane layout (`TabletVaultLayout`, `LayoutBuilder` breakpoint
+  at 600dp, `NavigationRail`). 188 Rust tests, 154 Flutter tests passing.
+- **Next task:** High-contrast theme implementation — colour overrides
+  validated against ADR-003, WCAG 1.4.3, and WCAG 1.4.6. Plumbing already
+  done (`highContrast` bool in `AppSettings`, toggle in Appearance screen).
+  See ## Bikeshed / Backlog → Features & UX → High-contrast mode.
 
 ---
 
