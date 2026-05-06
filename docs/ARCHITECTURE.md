@@ -89,8 +89,8 @@ gabbro/
 │       └── serialization.rs# Entry serialization — Vec<VaultEntry> ↔ JSON bytes
 │       ├── import/             # Importers for third-party password managers
 │       │   ├── mod.rs
-│       │   ├── enpass.rs       # Enpass JSON importer — 18 tests passing
-│       │   └── csv.rs          # Generic CSV importer — 14 tests passing
+│       │   ├── enpass.rs       # Enpass JSON importer
+│       │   └── csv.rs          # Generic CSV importer
 │       ├── bin/
 │       │   └── bench_kdf.rs    # Argon2id parameter audit tool
 │       ├── frb_generated.rs    # Auto-generated bridge code (do not edit)
@@ -187,7 +187,7 @@ Each entry is an instance of a typed class:
 - **Types:** Login, Note, Identity, Card, File, Custom
 - **Status:** all 6 entry types fully implemented in the domain model
   (`rust/src/vault/entry.rs`) and bridged via DTOs and API functions
-  (`rust/src/api/vault.rs`). 185 Rust tests passing, 1 ignored across the project.
+  (`rust/src/api/vault.rs`). See ## Testing Strategy → Test Counts.
 - **Core fields:** type-specific
 - **Common fields:** UUID, created, modified, folder, tags, favourite
 - **Login entry:** URL, username, password (hidden by default,
@@ -211,10 +211,10 @@ Each entry is an instance of a typed class:
 
 ## Password Generator
 - **Status:** classic password mode fully implemented in Rust
-  (`rust/src/api/password_generator.rs`), 6 unit tests passing.
-  Passphrase mode fully implemented in Rust
-  (`rust/src/api/passphrase_generator.rs`), 8 unit tests passing.
+  (`rust/src/api/password_generator.rs`). Passphrase mode fully
+  implemented in Rust (`rust/src/api/passphrase_generator.rs`).
   Both bridged to Flutter, Flutter build clean.
+  See ## Testing Strategy → Test Counts.
 - Two modes: classic password and wordlist-based passphrase
 - **Passphrase mode:**
   - 5 languages supported: English, French, German, Spanish, Italian
@@ -248,7 +248,7 @@ Each entry is an instance of a typed class:
 ## Appearance & Settings
 
 - **Status:** implemented. `lib/settings.dart` + `lib/screens/appearance_screen.dart`.
-  13 Flutter unit tests passing.
+  See ## Testing Strategy → Test Counts.
 - **Settings file:** `~/.config/gabbro/settings.jsonc` on Linux,
   `~/Library/Application Support/gabbro/settings.jsonc` on macOS,
   `<app support dir>/settings.jsonc` on Android.
@@ -312,7 +312,7 @@ Each entry is an instance of a typed class:
   an accent-coloured info banner with `Icons.info_outline`. Vault path reused
   as default for the new vault; passphrase guidance shown below the location
   label. `deleteVault` is injectable on `VaultListScreen` for testability.
-  8 tests in `test/vault_list_delete_vault_test.dart`. Verified on Samsung S23
+  Tests in `test/vault_list_delete_vault_test.dart`. Verified on Samsung S23
   (Android 16).
 
 ## Auto-lock
@@ -340,8 +340,8 @@ Each entry is an instance of a typed class:
 
 ## Safe Entry Editing
 
-- **Status:** full stack implemented. Rust 185 tests, Flutter 129 tests.
-  Verified on Samsung S23 (Android 16).
+- **Status:** full stack implemented. Verified on Samsung S23 (Android 16).
+  See ## Testing Strategy → Test Counts.
 
 - **`PreviousSecret` struct** (`rust/src/vault/entry.rs`): holds `value`,
   `saved_at`, and `expires_at: Option<String>`. Derives `Zeroize` +
@@ -379,16 +379,8 @@ Each entry is an instance of a typed class:
   and non-sensitive field diffs in a before→after grid. Only changed fields
   shown. Save calls `updateEntry(entry, expiryDays)` then re-fetches the entry
   via `getEntry(id)` to get the Rust-stamped `updated_at` and populated
-  `previous_password` before popping. 6 widget tests. Known bugs (found during
-  structured Android testing, 04 May 2026):
-  (1) `_sensitiveRow` accepts a `newValue` parameter but never renders it —
-  the show/hide toggle cycles the icon but reveals nothing. CVV and PIN also
-  have `onToggle: () {}` (no-op) and `obscured` hardcoded `true`. Fix: render
-  old and new values (both masked by default, both revealable) inside
-  `_sensitiveRow`.
-  (2) `_buildFieldDiffs()` has no case for `VaultEntryData_Identity` or
-  `VaultEntryData_Custom` — editing a custom field on either entry type
-  produces a completely empty review screen. Fix: add the missing cases.
+  `previous_password` before popping. Verified on Samsung S23 (Android 16).
+  See ## Testing Strategy → Test Counts.
 
 - **`PasswordHistoryScreen`** (`lib/screens/password_history_screen.dart`):
   shows current password (masked, toggleable) and previous password (masked,
@@ -402,7 +394,7 @@ Each entry is an instance of a typed class:
 
 ## Vault Domain Model
 - **Status:** all 6 entry types implemented in Rust
-  (`rust/src/vault/entry.rs`), 11 unit tests passing.
+  (`rust/src/vault/entry.rs`). See ## Testing Strategy → Test Counts.
 - Lives in `rust/src/vault/` — internal module, not exposed to Flutter
   directly. Flutter will call API functions that construct these types;
   it never builds them directly.
@@ -431,7 +423,7 @@ Each entry is an instance of a typed class:
 
 ## Vault API Layer
 - **Status:** all 6 entry types fully implemented in `rust/src/api/vault.rs`.
-  185 Rust tests passing, 1 ignored across the project.
+  See ## Testing Strategy → Test Counts.
 - Lives in `rust/src/api/vault.rs` — the bridge boundary between Flutter and
   the internal vault domain model.
 - **Pattern:** each entry type gets a bridge-facing DTO (Data Transfer Object —
@@ -588,6 +580,15 @@ export_vault(path)              → Result<(), String>
 - Flutter: unit and widget tests in `test/`, integration tests in `integration_test/`
 - Cross-layer: integration tests in `tests/`
 - TDD from day one — untested code is broken code
+
+### Test Counts
+> Single authoritative location. Update here only; do not repeat counts
+> elsewhere in this document.
+
+| Suite | Passing | Skipped / Ignored |
+|-------|---------|-------------------|
+| Rust (`cargo test -q`) | 186 | 1 ignored |
+| Flutter (`flutter test`) | 142 | 1 skipped |
 
 ## Platforms
 
@@ -749,16 +750,14 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Fixed two tablet-mode bugs: (1) delete from detail pane
-  crashed app — resolved via `onDeleted` callback on `EntryDetailScreen`;
-  (2) long-press / multi-select not available in tablet mode — resolved by
-  passing selection state from `_VaultListScreenState` into
-  `TabletVaultLayout`. Verified on Linux, Samsung S23, and Lenovo tablet.
-  141 Flutter tests passing, 1 skipped (edit-mode dim — phase 2).
-  185 Rust tests passing.
-- **Next task:** Fix known bugs in `ReviewChangesScreen` (sensitive row
-  not rendering values; missing Identity/Custom diff cases) — see
-  ## Safe Entry Editing above.
+- **Completed:** Verified `ReviewChangesScreen` bugs (from 04 May 2026
+  structured testing) already resolved in current code — sensitive row
+  reveal, CVV/PIN toggles, Identity and Custom diffs all correct.
+  Consolidated test counts to single authoritative table in
+  ## Testing Strategy → Test Counts.
+- **Next task:** Add URL open and copy-to-clipboard to `EntryDetailScreen`
+  (Login entries: open URL in browser; all entry types: copy field values
+  to clipboard with auto-clear). See ## Bikeshed / Backlog → Features & UX.
 
 ---
 
@@ -969,6 +968,23 @@ the first public tag.
   This is at minimum one full session; sub-case (iii) likely several.
   Do not start without a design doc agreed first.
 
+- **Open URL and copy-to-clipboard from detail view:** Two related UX
+  improvements to `EntryDetailScreen`:
+  (1) **Open URL:** Login entries show a tappable link icon next to the URL
+  field. Tapping uses the existing `url_launcher` dependency
+  (`LaunchMode.externalApplication`) with the same two-step
+  tap-to-dialog → "Open in browser" pattern used on `AboutScreen`.
+  No new dependency needed.
+  (2) **Copy to clipboard:** All entry types show a copy icon next to
+  copyable fields (URL, username, password, notes, custom fields, card
+  number, etc.). Tapping copies the plaintext value to the clipboard and
+  shows a brief `SnackBar` confirmation. Auto-clear after 60 seconds
+  (same policy as the password generator). Sensitive fields (password,
+  CVV, PIN) copy the real value — the user explicitly requested it.
+  Design question: should the copy icon be always visible or appear only
+  on long-press? Always visible is more discoverable; long-press is
+  cleaner. Decide in the implementation session.
+
 - **Timestamp localisation (i18n):** `formatTimestamp()` in
   `entry_detail_screen.dart` uses a hand-rolled English month
   abbreviations array. When internationalisation (i18n) is added,
@@ -1115,12 +1131,6 @@ the first public tag.
   during development, and will matter for any user who installed a pre-rename
   build. Implement in `main.dart` during the vault existence check.
 
-- **ARCHITECTURE.md cleanup:** Test counts appear in multiple sections
-  (Vault Contents, Vault API Layer, Safe Entry Editing, Current Focus)
-  and will drift out of sync over time. In a dedicated session: consolidate
-  to a single authoritative test count location, remove duplicated prose,
-  and tighten stale descriptions. Low effort, high doc quality return.
-
 - **Custom filter chips:** Allow users to add new filter chips based on
   folders or custom tags, beyond the fixed entry-type chips. YAGNI risk is
   real — the fixed chips cover the common case and custom ones add UI
@@ -1259,7 +1269,7 @@ the generic importer and document it clearly.
 
 ### Generic CSV importer — design and status
 
-**Status: complete — 14 tests passing.** Implemented in
+**Status: complete.** Implemented in
 `rust/src/import/csv.rs`. No new dependencies — hand-rolled parser,
 consistent with the project's minimal dependency philosophy.
 
@@ -1372,7 +1382,7 @@ constructor parameter carrying raw field values distinct from `existing`
 - Each field has: `label`, `type`, `value`, `sensitive`, `deleted`, `order`, `uid`
 - Each attachment has: `uuid`, `name`, `kind` (mime type), `data` (base64)
 
-**Status: complete — 18 tests passing.** The TDD strategy was followed:
+**Status: complete.** The TDD strategy was followed:
 anonymised test data, failing tests first, parser fixed until all passed.
 See `rust/src/import/enpass.rs` for the full test suite.
 
