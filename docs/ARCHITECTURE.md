@@ -600,7 +600,7 @@ export_vault(path)              → Result<(), String>
 
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
-| Rust (`cargo test -q`) | 186 | 1 ignored |
+| Rust (`cargo test -q`) | 188 | 1 ignored |
 | Flutter (`flutter test`) | 146 | 1 skipped |
 
 ## Platforms
@@ -763,16 +763,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** URL open and copy-to-clipboard on `EntryDetailScreen` —
-  launch icon on Login URL field (two-step dialog), copy icons on all
-  fields with auto-clear, `onLaunchUrl` injectable. 146 Flutter tests
-  passing.
-- **Next task:** (1) Password history expiry auto-purge test — backdate
-  `expires_at` in a test vault to simulate expiry, verify UI responds
-  correctly. (2) Dependency licence audit — verify every entry in
-  `_kComponents` in `about_screen.dart` against `Cargo.toml` and
-  `pubspec.yaml`; check dual-licence projects. See ## Bikeshed / Backlog
-  → Dependencies and → Testing.
+- **Completed:** Password history expiry auto-purge (`is_expired`,
+  `purge_expired_history` in `api/vault.rs`, called from `unlock_vault`);
+  dependency licence audit — `once_cell` and `base64` added to About screen.
+  188 Rust tests, 146 Flutter tests passing.
+- **Next task:** Tablet two-pane layout implementation — see
+  ## Tablet Two-Pane Layout for the full wireframe and implementation plan.
 
 ---
 
@@ -1046,13 +1042,6 @@ the first public tag.
   auto-lock and wipe logic? Is disguise-as-another-app feasible on Android
   (custom launcher icon/label, yes; hiding from app drawer is limited) and iOS
   (more restricted)? Does offering this create a false sense of security?
-
-- **Password history — expiry auto-purge test:** After deleting previous
-  history manually, both "Delete previous entry" and "Revert" buttons
-  disappear correctly (correct — `prev == null`). Verify the same happens
-  after the configured expiry period elapses naturally (e.g. set expiry
-  to 7 days, wait, reopen history). This requires either waiting or
-  manually backdating `expires_at` in a test vault to simulate expiry.
 
 - **Remote app / vault deletion:** Allow the user to trigger a remote wipe of
   the vault (and optionally the app) from another device or a web interface.

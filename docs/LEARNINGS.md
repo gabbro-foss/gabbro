@@ -2176,3 +2176,50 @@ with the codegen step. The fix:
 generated/cached artefacts, never source files. Worth trying as a first
 response to any inexplicable codegen hang before reaching for more invasive
 fixes like reinstalling the codegen tool.
+
+---
+
+## Rust — Expiry purge on unlock (`is_expired` + `purge_expired_history`)
+
+Password history expiry is enforced at unlock time, not at write time.
+The pattern: `purge_expired_history` iterates all entries, calls
+`is_expired` on each `PreviousSecret.expires_at`, and nulls out any
+expired history before the session is stored in memory.
+
+`is_expired` parses the ISO 8601 UTC string (`YYYY-MM-DDTHH:MM:SSZ`)
+into epoch days using the existing `days_from_ymd` helper and compares
+to today. `None` means keep-forever — never expired. An unparseable
+string is treated conservatively as not expired (no silent data loss).
+
+Both functions are `pub(crate)` in `api/vault.rs`, co-located with the
+timestamp helpers they depend on. `purge_expired_history` is called as
+the first step inside `unlock_vault` in `vault/session.rs`, so Flutter
+never sees stale expired history regardless of when the vault was last
+opened.
+
+TDD: three serial tests in `vault::session::tests` —
+`expired_history_is_purged_on_unlock` (backdated `expires_at: 2000-01-02`),
+`unexpired_history_is_preserved_on_unlock` (future `expires_at: 2099-12-31`),
+`keep_forever_history_is_preserved_on_unlock` (`expires_at: None`).
+
+---
+
+## Dependency licence audit — procedure
+
+Before each v1 release candidate, cross-check `_kComponents` in
+`lib/screens/about_screen.dart` against `rust/Cargo.toml` and
+`pubspec.yaml` manually:
+
+1. Every direct runtime dependency in both files must have a
+   corresponding `_Component` entry.
+2. Dev-dependencies (`serial_test`, `tokio`, `flutter_lints`,
+   `freezed`, `build_runner`, `integration_test`) are excluded —
+   they ship no code to the user.
+3. Licence strings must match each project's own `LICENSE` file.
+   Dual-licence projects (Apache-2.0 / MIT is the RustCrypto standard)
+   should be listed as such, not just one half.
+4. The three language/runtime entries (Rust, Dart, Flutter) are stable
+   and do not need re-checking unless a major version changes the licence.
+
+First audit (May 2026): found `once_cell` and `base64` missing — both
+added as `Apache-2.0 / MIT`.
