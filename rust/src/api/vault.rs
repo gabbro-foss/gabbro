@@ -818,6 +818,58 @@ fn is_leap(year: u64) -> bool {
     (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
 }
 
+/// Returns `true` if `expires_at` is set and the timestamp is in the past.
+///
+/// `None` means keep-forever — never expired.
+/// An unparseable string is treated as not expired (conservative).
+pub(crate) fn is_expired(expires_at: Option<&str>) -> bool {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let ts = match expires_at {
+        Some(s) if s.len() >= 10 => s,
+        _ => return false,
+    };
+    let year:  u64 = ts[0..4].parse().unwrap_or(9999);
+    let month: u64 = ts[5..7].parse().unwrap_or(12);
+    let day:   u64 = ts[8..10].parse().unwrap_or(31);
+    let expires_days = days_from_ymd(year, month, day);
+    let now_secs = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+    let now_days = now_secs / 86400;
+    // Expired if the expiry day is strictly before today.
+    expires_days < now_days
+}
+
+/// Purge expired `previous_password`, `previous_cvv`, and `previous_pin`
+/// from all entries in the session.
+///
+/// Called on every unlock — silent, no-op for entries with no history
+/// or future/keep-forever expiry.
+pub(crate) fn purge_expired_history(entries: &mut Vec<VaultEntry>) {
+    for entry in entries.iter_mut() {
+        match entry {
+            VaultEntry::Login(ref mut e) => {
+                if is_expired(e.previous_password.as_ref()
+                    .and_then(|p| p.expires_at.as_deref())) {
+                    e.previous_password = None;
+                }
+            }
+            VaultEntry::Card(ref mut e) => {
+                if is_expired(e.previous_cvv.as_ref()
+                    .and_then(|p| p.expires_at.as_deref())) {
+                    e.previous_cvv = None;
+                }
+                if is_expired(e.previous_pin.as_ref()
+                    .and_then(|p| p.expires_at.as_deref())) {
+                    e.previous_pin = None;
+                }
+            }
+            _ => {}
+        }
+    }
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]

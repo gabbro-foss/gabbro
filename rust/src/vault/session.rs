@@ -31,7 +31,8 @@ static VAULT_SESSION: Lazy<Mutex<Option<VaultSession>>> =
 ///
 /// Flutter awaits this — Argon2id takes ~667ms on target hardware.
 pub fn unlock_vault(passphrase: &[u8], path: PathBuf) -> Result<(), String> {
-    let entries = load_vault(passphrase, &path)?;
+    let mut entries = load_vault(passphrase, &path)?;
+    crate::api::vault::purge_expired_history(&mut entries);
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     *session = Some(VaultSession { entries, path, passphrase: passphrase.to_vec() });
     Ok(())
@@ -774,6 +775,151 @@ mod tests {
 
         let result = session_revert_password("login-001");
         assert!(result.is_err());
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn unexpired_history_is_preserved_on_unlock() {
+        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry, PreviousSecret};
+
+        let pass = b"test passphrase";
+        let mut path = temp_dir();
+        path.push("gabbro_unexpired_history_test.gabbro");
+
+        // expires_at is far in the future — 2099-12-31
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("login-unexp-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("Unexpired"),
+            url: String::from("https://example.com"),
+            username: String::from("rob"),
+            password: String::from("current"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: Some(PreviousSecret {
+                value: String::from("old"),
+                saved_at: String::from("2025-01-01T00:00:00Z"),
+                expires_at: Some(String::from("2099-12-31T00:00:00Z")),
+            }),
+        });
+
+        save_vault(&[entry], pass, &path).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let result = get_entry("login-unexp-001").unwrap();
+        match result {
+            VaultEntry::Login(ref e) => {
+                assert!(e.previous_password.is_some(),
+                    "unexpired history must be preserved on unlock");
+            }
+            _ => panic!("Expected Login variant"),
+        }
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn keep_forever_history_is_preserved_on_unlock() {
+        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry, PreviousSecret};
+
+        let pass = b"test passphrase";
+        let mut path = temp_dir();
+        path.push("gabbro_keep_forever_history_test.gabbro");
+
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("login-forever-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("Forever"),
+            url: String::from("https://example.com"),
+            username: String::from("rob"),
+            password: String::from("current"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: Some(PreviousSecret {
+                value: String::from("old"),
+                saved_at: String::from("2025-01-01T00:00:00Z"),
+                expires_at: None,
+            }),
+        });
+
+        save_vault(&[entry], pass, &path).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let result = get_entry("login-forever-001").unwrap();
+        match result {
+            VaultEntry::Login(ref e) => {
+                assert!(e.previous_password.is_some(),
+                    "keep-forever history (expires_at: None) must never be purged");
+            }
+            _ => panic!("Expected Login variant"),
+        }
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn expired_history_is_purged_on_unlock() {
+        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry, PreviousSecret};
+
+        let pass = b"test passphrase";
+        let mut path = temp_dir();
+        path.push("gabbro_expired_history_test.gabbro");
+
+        // expires_at is in the past — 2000-01-01
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("login-exp-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("Expired"),
+            url: String::from("https://example.com"),
+            username: String::from("rob"),
+            password: String::from("current"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: Some(PreviousSecret {
+                value: String::from("old"),
+                saved_at: String::from("2000-01-01T00:00:00Z"),
+                expires_at: Some(String::from("2000-01-02T00:00:00Z")),
+            }),
+        });
+
+        save_vault(&[entry], pass, &path).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let result = get_entry("login-exp-001").unwrap();
+        match result {
+            VaultEntry::Login(ref e) => {
+                assert!(e.previous_password.is_none(),
+                    "expired history should be purged on unlock");
+                assert_eq!(e.password, "current",
+                    "current password must not be affected");
+            }
+            _ => panic!("Expected Login variant"),
+        }
 
         teardown(&path);
     }
