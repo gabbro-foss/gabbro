@@ -41,6 +41,7 @@ Widget _buildScreen(
   Future<void> Function(String value)? onCopyToClipboard,
   ClipboardClearTimeout clipboardClearTimeout =
       ClipboardClearTimeout.sixtySeconds,
+  Future<void> Function(String url)? onLaunchUrl,
 }) =>
     MaterialApp(
       home: EntryDetailScreen(
@@ -48,6 +49,7 @@ Widget _buildScreen(
         onDeleteEntry: onDeleteEntry ?? (_) async {},
         onCopyToClipboard: onCopyToClipboard ?? (_) async {},
         clipboardClearTimeout: clipboardClearTimeout,
+        onLaunchUrl: onLaunchUrl ?? (_) async {},
       ),
     );
 
@@ -231,6 +233,62 @@ void main() {
 
     expect(deleteEntryCalled, isTrue);
     expect(popped, isTrue);
+  });
+
+  testWidgets('URL field shows launch icon when URL is non-empty',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.login(_loginEntry())),
+    );
+
+    expect(find.byIcon(Icons.open_in_browser_outlined), findsOneWidget);
+  });
+
+  testWidgets('tapping launch icon shows confirmation dialog', (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.login(_loginEntry())),
+    );
+
+    await tester.tap(find.byIcon(Icons.open_in_browser_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Open in browser?'), findsOneWidget);
+    expect(find.text('https://gneiss.example.com'), findsWidgets);
+  });
+
+  testWidgets('confirming launch dialog calls onLaunchUrl', (tester) async {
+    String? launched;
+    await tester.pumpWidget(
+      _buildScreen(
+        VaultEntryData.login(_loginEntry()),
+        onLaunchUrl: (url) async => launched = url,
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.open_in_browser_outlined));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open in browser'));
+    await tester.pumpAndSettle();
+
+    expect(launched, 'https://gneiss.example.com');
+  });
+
+  testWidgets('cancelling launch dialog does not call onLaunchUrl',
+      (tester) async {
+    bool launched = false;
+    await tester.pumpWidget(
+      _buildScreen(
+        VaultEntryData.login(_loginEntry()),
+        onLaunchUrl: (_) async => launched = true,
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.open_in_browser_outlined));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(launched, isFalse);
   });
 
   testWidgets('identity hidden custom field has eye icon toggle',

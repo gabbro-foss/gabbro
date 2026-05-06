@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/password_history_screen.dart';
 import 'package:gabbro/settings.dart';
@@ -32,6 +33,14 @@ String formatTimestamp(String iso) {
 Future<void> _defaultDelete(String id) => deleteEntry(id: id);
 Future<void> _defaultCopy(String value) =>
     Clipboard.setData(ClipboardData(text: value));
+Future<void> _defaultLaunchUrl(String url) async {
+  var uri = Uri.tryParse(url);
+  if (uri == null) return;
+  if (uri.scheme.isEmpty) uri = Uri.tryParse('https://$url');
+  if (uri == null) return;
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
+
 Future<void> _defaultClearHistory(String id) =>
     sessionClearPasswordHistory(id: id);
 Future<void> _defaultRevertPassword(String id) =>
@@ -50,6 +59,8 @@ class EntryDetailScreen extends StatefulWidget {
   /// without popping the route.
   final VoidCallback? onDeleted;
 
+  final Future<void> Function(String url) onLaunchUrl;
+
   const EntryDetailScreen({
     super.key,
     required this.entry,
@@ -58,6 +69,7 @@ class EntryDetailScreen extends StatefulWidget {
     this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
     this.onClearPasswordHistory = _defaultClearHistory,
     this.onRevertPassword = _defaultRevertPassword,
+    this.onLaunchUrl = _defaultLaunchUrl,
     this.onDeleted,
   });
 
@@ -272,7 +284,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _field('Title', e.title),
-        _field('URL', e.url),
+        _urlField(e.url),
         _field('Username', e.username),
         _toggleField(
           label: 'Password',
@@ -533,6 +545,65 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   }
 
   // ── Shared helpers ───────────────────────────────────────────────────────────
+
+  Future<void> _launchUrl(BuildContext context, String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null || url.isEmpty) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Open in browser?'),
+        content: Text(url),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Open in browser'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await widget.onLaunchUrl(url);
+  }
+
+  Widget _urlField(String url) {
+    if (url.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'URL',
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Expanded(
+                child: Text(url, style: const TextStyle(fontSize: 16)),
+              ),
+              IconButton(
+                icon: const Icon(Icons.open_in_browser_outlined, size: 18),
+                tooltip: 'Open in browser',
+                onPressed: () => _launchUrl(context, url),
+              ),
+              IconButton(
+                icon: const Icon(Icons.copy_outlined, size: 18),
+                tooltip: 'Copy',
+                onPressed: () => _copyToClipboard(url),
+              ),
+            ],
+          ),
+          const Divider(),
+        ],
+      ),
+    );
+  }
 
   Future<void> _copyToClipboard(String value) async {
     await widget.onCopyToClipboard(value);
