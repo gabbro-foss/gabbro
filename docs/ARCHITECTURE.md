@@ -978,6 +978,25 @@ the first public tag.
   This is at minimum one full session; sub-case (iii) likely several.
   Do not start without a design doc agreed first.
 
+- **URL launch icon on non-Login entries:** Currently the launch icon
+  (`Icons.open_in_browser_outlined`) only appears on the URL field of
+  Login entries. Custom entries and custom fields on any entry type may
+  also contain URL-shaped values. Two design options: (1) auto-detect
+  URL-shaped values heuristically (check for scheme or bare domain
+  pattern) and show the launch icon automatically — fragile, may produce
+  false positives; (2) add an explicit `field_type: url` variant to the
+  custom field domain model in Rust, and render the launch icon only for
+  fields so typed — requires a domain model change and bridge update but
+  is precise. Decide approach before implementing.
+
+- **Review screen does not show empty new fields:** When a new custom
+  field is added in `CreateEntryScreen` but left empty, tapping Review →
+  shows nothing to review — the user sees only Cancel and Save with no
+  diff. The field addition should appear in the diff even if the value is
+  empty, so the user can confirm or discard it. Likely `ReviewChangesScreen`
+  filters out empty values too aggressively. Investigate diff-building
+  logic before fixing.
+
 - **Timestamp localisation (i18n):** `formatTimestamp()` in
   `entry_detail_screen.dart` uses a hand-rolled English month
   abbreviations array. When internationalisation (i18n) is added,
