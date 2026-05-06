@@ -303,6 +303,19 @@ Each entry is an instance of a typed class:
   unparseable input. Month abbreviations are currently hard-coded in
   English — see i18n backlog item for the migration path.
 
+- **Entry detail — URL open and copy to clipboard:** All copyable fields
+  in `EntryDetailScreen` show a copy icon (`Icons.copy_outlined`) that
+  copies the plaintext value and shows a `SnackBar` confirmation.
+  Clipboard auto-clears after the duration configured in
+  `ClipboardClearTimeout` (read from `AppSettings`). Login entries
+  additionally show a launch icon (`Icons.open_in_browser_outlined`)
+  next to the URL field. Tapping uses a two-step tap-to-dialog →
+  "Open in browser" pattern (same as `AboutScreen`) via `url_launcher`
+  (`LaunchMode.externalApplication`). `onLaunchUrl` is injectable for
+  testability, defaulting to `_defaultLaunchUrl`. Sensitive fields
+  (password, CVV, PIN) copy the real value — the user explicitly
+  requested it.
+
 - **Vault deletion from UI:** Menu → Delete vault (previously greyed out)
   triggers a two-step confirmation: (1) warning dialog — Cancel / Continue;
   (2) user must type `DELETE` exactly — Confirm button disabled until matched.
@@ -588,7 +601,7 @@ export_vault(path)              → Result<(), String>
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
 | Rust (`cargo test -q`) | 186 | 1 ignored |
-| Flutter (`flutter test`) | 142 | 1 skipped |
+| Flutter (`flutter test`) | 146 | 1 skipped |
 
 ## Platforms
 
@@ -750,14 +763,11 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Verified `ReviewChangesScreen` bugs (from 04 May 2026
-  structured testing) already resolved in current code — sensitive row
-  reveal, CVV/PIN toggles, Identity and Custom diffs all correct.
-  Consolidated test counts to single authoritative table in
-  ## Testing Strategy → Test Counts.
-- **Next task:** Add URL open and copy-to-clipboard to `EntryDetailScreen`
-  (Login entries: open URL in browser; all entry types: copy field values
-  to clipboard with auto-clear). See ## Bikeshed / Backlog → Features & UX.
+- **Completed:** URL open and copy-to-clipboard on `EntryDetailScreen` —
+  launch icon on Login URL field (two-step dialog), copy icons on all
+  fields with auto-clear, `onLaunchUrl` injectable. 146 Flutter tests
+  passing.
+- **Next task:** TBD — see ## Bikeshed / Backlog for candidates.
 
 ---
 
@@ -967,23 +977,6 @@ the first public tag.
 
   This is at minimum one full session; sub-case (iii) likely several.
   Do not start without a design doc agreed first.
-
-- **Open URL and copy-to-clipboard from detail view:** Two related UX
-  improvements to `EntryDetailScreen`:
-  (1) **Open URL:** Login entries show a tappable link icon next to the URL
-  field. Tapping uses the existing `url_launcher` dependency
-  (`LaunchMode.externalApplication`) with the same two-step
-  tap-to-dialog → "Open in browser" pattern used on `AboutScreen`.
-  No new dependency needed.
-  (2) **Copy to clipboard:** All entry types show a copy icon next to
-  copyable fields (URL, username, password, notes, custom fields, card
-  number, etc.). Tapping copies the plaintext value to the clipboard and
-  shows a brief `SnackBar` confirmation. Auto-clear after 60 seconds
-  (same policy as the password generator). Sensitive fields (password,
-  CVV, PIN) copy the real value — the user explicitly requested it.
-  Design question: should the copy icon be always visible or appear only
-  on long-press? Always visible is more discoverable; long-press is
-  cleaner. Decide in the implementation session.
 
 - **Timestamp localisation (i18n):** `formatTimestamp()` in
   `entry_detail_screen.dart` uses a hand-rolled English month
