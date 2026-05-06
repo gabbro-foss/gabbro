@@ -767,7 +767,12 @@ SPDX identifier: `GPL-3.0-only`
   launch icon on Login URL field (two-step dialog), copy icons on all
   fields with auto-clear, `onLaunchUrl` injectable. 146 Flutter tests
   passing.
-- **Next task:** TBD — see ## Bikeshed / Backlog for candidates.
+- **Next task:** (1) Password history expiry auto-purge test — backdate
+  `expires_at` in a test vault to simulate expiry, verify UI responds
+  correctly. (2) Dependency licence audit — verify every entry in
+  `_kComponents` in `about_screen.dart` against `Cargo.toml` and
+  `pubspec.yaml`; check dual-licence projects. See ## Bikeshed / Backlog
+  → Dependencies and → Testing.
 
 ---
 
