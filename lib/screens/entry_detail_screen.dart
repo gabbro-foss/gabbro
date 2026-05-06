@@ -45,6 +45,11 @@ class EntryDetailScreen extends StatefulWidget {
   final Future<void> Function(String id) onClearPasswordHistory;
   final Future<void> Function(String id) onRevertPassword;
 
+  /// Optional callback invoked after a successful delete, in place of
+  /// [Navigator.pop]. Used by the tablet layout to clear the detail pane
+  /// without popping the route.
+  final VoidCallback? onDeleted;
+
   const EntryDetailScreen({
     super.key,
     required this.entry,
@@ -53,6 +58,7 @@ class EntryDetailScreen extends StatefulWidget {
     this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
     this.onClearPasswordHistory = _defaultClearHistory,
     this.onRevertPassword = _defaultRevertPassword,
+    this.onDeleted,
   });
 
   @override
@@ -112,7 +118,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     );
     if (confirmed != true) return;
     await widget.onDeleteEntry(_entryId());
-    if (context.mounted) Navigator.of(context).pop(true);
+    if (!context.mounted) return;
+    if (widget.onDeleted != null) {
+      widget.onDeleted!();
+    } else {
+      Navigator.of(context).pop(true);
+    }
   }
 
   /// Export a file entry's bytes to a user-specified path.

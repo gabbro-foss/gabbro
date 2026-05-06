@@ -172,6 +172,67 @@ void main() {
     expect(find.text('Some important note content.'), findsOneWidget);
   });
 
+  testWidgets('onDeleted callback is called on delete confirm when provided',
+      (tester) async {
+    bool deletedCalled = false;
+    bool deleteEntryCalled = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: EntryDetailScreen(
+          entry: VaultEntryData.login(_loginEntry()),
+          onDeleteEntry: (_) async { deleteEntryCalled = true; },
+          onCopyToClipboard: (_) async {},
+          onDeleted: () { deletedCalled = true; },
+        ),
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+
+    expect(deleteEntryCalled, isTrue);
+    expect(deletedCalled, isTrue);
+  });
+
+  testWidgets('Navigator.pop called on delete confirm when onDeleted is null',
+      (tester) async {
+    bool deleteEntryCalled = false;
+    bool popped = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => ElevatedButton(
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => EntryDetailScreen(
+                    entry: VaultEntryData.login(_loginEntry()),
+                    onDeleteEntry: (_) async { deleteEntryCalled = true; },
+                    onCopyToClipboard: (_) async {},
+                  ),
+                ),
+              );
+              popped = true;
+            },
+            child: const Text('Open'),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+
+    expect(deleteEntryCalled, isTrue);
+    expect(popped, isTrue);
+  });
+
   testWidgets('identity hidden custom field has eye icon toggle',
       (tester) async {
     final entry = IdentityEntryData(

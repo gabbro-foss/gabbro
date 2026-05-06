@@ -62,12 +62,26 @@ void main() {
   );
 
   testWidgets(
-    'wide: select icon is absent — tablet layout has no checklist icon',
+    'wide: select icon is visible in tablet layout',
     (tester) async {
       _setWide(tester);
       await tester.pumpWidget(_buildScreen(_twoEntries));
 
-      expect(find.byIcon(Icons.checklist), findsNothing);
+      expect(find.byIcon(Icons.checklist), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'wide: tapping select icon enters selection mode and shows checkboxes',
+    (tester) async {
+      _setWide(tester);
+      await tester.pumpWidget(_buildScreen(_twoEntries));
+
+      await tester.tap(find.byIcon(Icons.checklist));
+      await tester.pump();
+
+      expect(find.byType(Checkbox), findsWidgets);
+      expect(find.byIcon(Icons.close), findsOneWidget);
     },
   );
 
@@ -86,6 +100,23 @@ void main() {
   );
 
   testWidgets(
+    'wide: long-pressing a tile enters selection mode and selects that tile',
+    (tester) async {
+      _setWide(tester);
+      await tester.pumpWidget(_buildScreen(_twoEntries));
+
+      final gabbroTile = find.ancestor(
+        of: find.text('Gabbro'),
+        matching: find.byType(ListTile),
+      );
+      await tester.longPress(gabbroTile);
+      await tester.pump();
+
+      expect(find.text('1 selected'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'narrow: long-pressing a tile enters selection mode and selects that tile',
     (tester) async {
       _setNarrow(tester);
@@ -99,6 +130,24 @@ void main() {
       await tester.pump();
 
       expect(find.text('1 selected'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'wide: close button exits selection mode and select icon reappears',
+    (tester) async {
+      _setWide(tester);
+      await tester.pumpWidget(_buildScreen(_twoEntries));
+
+      await tester.tap(find.byIcon(Icons.checklist));
+      await tester.pump();
+      expect(find.byIcon(Icons.checklist), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.checklist), findsOneWidget);
+      expect(find.byType(Checkbox), findsNothing);
     },
   );
 

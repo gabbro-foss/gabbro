@@ -23,11 +23,18 @@ class VaultListScreen extends StatefulWidget {
   final List<EntrySummaryData> Function() listEntries;
   final Future<void> Function() deleteVault;
 
+  final VaultEntryData Function(String id)? getEntryFn;
+  final Future<void> Function(String id)? onDeleteEntryFn;
+  final void Function()? onRefreshFn;
+
   const VaultListScreen({
     super.key,
     required this.vaultPath,
     this.listEntries = listEntrySummaries,
     this.deleteVault = _defaultDeleteVault,
+    this.getEntryFn,
+    this.onDeleteEntryFn,
+    this.onRefreshFn,
   });
 
   @override
@@ -543,17 +550,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
               ),
             ),
           if (!_isSelecting) ...[
-            Builder(
-              builder: (context) {
-                final isNarrow = MediaQuery.of(context).size.width < 600;
-                return isNarrow
-                    ? IconButton(
-                        icon: const Icon(Icons.checklist),
-                        tooltip: 'Select entries',
-                        onPressed: () => setState(() => _selectionMode = true),
-                      )
-                    : const SizedBox.shrink();
-              },
+            IconButton(
+              icon: const Icon(Icons.checklist),
+              tooltip: 'Select entries',
+              onPressed: () => setState(() => _selectionMode = true),
             ),
             IconButton(
               icon: const Icon(Icons.lock_outline),
@@ -692,7 +692,19 @@ class _VaultListScreenState extends State<VaultListScreen> {
               filterChipRow: _buildFilterChipRow(),
               searchActive: _searchQuery.isNotEmpty,
               onEntryTap: (_) {},
-              onRefresh: _loadEntries,
+              onRefresh: widget.onRefreshFn ?? _loadEntries,
+              getEntryFn: widget.getEntryFn,
+              onDeleteEntryFn: widget.onDeleteEntryFn,
+              selectionMode: _selectionMode,
+              selectedIds: _selectedIds,
+              onToggleSelection: (id) => setState(() {
+                if (_selectedIds.contains(id)) {
+                  _selectedIds.remove(id);
+                } else {
+                  _selectedIds.add(id);
+                  _selectionMode = true;
+                }
+              }),
               vaultPath: widget.vaultPath,
               clipboardClearTimeout:
                   GabbroApp.maybeOf(context)?.settings.clipboardClearTimeout ??

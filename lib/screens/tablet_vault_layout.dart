@@ -68,6 +68,22 @@ class TabletVaultLayout extends StatefulWidget {
   /// Clipboard clear timeout from settings.
   final ClipboardClearTimeout clipboardClearTimeout;
 
+  /// Optional override for fetching a full entry — used in tests to avoid
+  /// hitting the Rust bridge.
+  final VaultEntryData Function(String id)? getEntryFn;
+
+  /// Optional override for deleting an entry — used in tests.
+  final Future<void> Function(String id)? onDeleteEntryFn;
+
+  /// Whether selection mode is active (driven by parent).
+  final bool selectionMode;
+
+  /// Currently selected entry ids (driven by parent).
+  final Set<String> selectedIds;
+
+  /// Called when a list tile is long-pressed or tapped in selection mode.
+  final void Function(String id) onToggleSelection;
+
   const TabletVaultLayout({
     super.key,
     required this.groupedEntries,
@@ -84,6 +100,11 @@ class TabletVaultLayout extends StatefulWidget {
     required this.onRefresh,
     required this.vaultPath,
     required this.clipboardClearTimeout,
+    this.getEntryFn,
+    this.onDeleteEntryFn,
+    required this.selectionMode,
+    required this.selectedIds,
+    required this.onToggleSelection,
   });
 
   @override
@@ -153,8 +174,13 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
     // adding an onChanged callback to EntryDetailScreen.
     return EntryDetailScreen(
       key: ValueKey(_selectedEntryId),
-      entry: getEntry(id: _selectedEntryId!),
+      entry: (widget.getEntryFn ?? (id) => getEntry(id: id))(_selectedEntryId!),
       clipboardClearTimeout: widget.clipboardClearTimeout,
+      onDeleteEntry: widget.onDeleteEntryFn ?? (id) => deleteEntry(id: id),
+      onDeleted: () {
+        setState(() => _selectedEntryId = null);
+        widget.onRefresh();
+      },
     );
   }
 
@@ -231,20 +257,35 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                   : null,
                               child: ListTile(
                                 dense: true,
-                                leading: Icon(
-                                  widget.entryTypeIcon(entry.entryType),
-                                  size: 20,
-                                  color: theme.colorScheme.primary,
-                                  semanticLabel: widget.displayType(
-                                    entry.entryType,
-                                  ),
-                                ),
+                                leading: widget.selectionMode
+                                    ? Checkbox(
+                                        visualDensity: VisualDensity.compact,
+                                        value: widget.selectedIds.contains(
+                                          entry.id,
+                                        ),
+                                        onChanged: (_) =>
+                                            widget.onToggleSelection(entry.id),
+                                      )
+                                    : Icon(
+                                        widget.entryTypeIcon(entry.entryType),
+                                        size: 20,
+                                        color: theme.colorScheme.primary,
+                                        semanticLabel: widget.displayType(
+                                          entry.entryType,
+                                        ),
+                                      ),
                                 title: Text(widget.displayTitle(entry)),
                                 subtitle: Text(
                                   widget.displayType(entry.entryType),
                                 ),
+                                onLongPress: () =>
+                                    widget.onToggleSelection(entry.id),
                                 onTap: () {
                                   if (_isEditing) return;
+                                  if (widget.selectionMode) {
+                                    widget.onToggleSelection(entry.id);
+                                    return;
+                                  }
                                   setState(
                                     () => _selectedEntryId = entry.id,
                                   );
