@@ -634,8 +634,8 @@ export_vault(path)              → Result<(), String>
 
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
-| Rust (`cargo test -q`) | 191 | 1 ignored |
-| Flutter (`flutter test`) | 174 | 1 skipped |
+| Rust (`cargo test -q`) | 193 | 1 ignored |
+| Flutter (`flutter test`) | 179 | 1 skipped |
 
 ## Platforms
 
@@ -797,15 +797,15 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Login notes field bug found and fixed. Duplicate import
-  detection policy decided: keep-all for third-party imports (with warning),
-  UUID-based skip for Gabbro → Gabbro sync (with skipped entry list).
-  191 Rust tests, 174 Flutter tests passing.
+- **Completed:** Duplicate import policies implemented. Pre-import warning
+  banner added to ImportScreen for all third-party imports (Enpass, Bitwarden,
+  CSV). Gabbro → Gabbro UUID-based skip implemented with skipped entry report
+  dialog. 193 Rust tests, 179 Flutter tests passing. Verified on Samsung S23
+  (Android 16) — skipped entries dialog unverified on hardware pending export
+  path picker fix (see Bikeshed).
 
-- **Next task:** Implement duplicate import policies:
-  (1) Add pre-import warning to ImportScreen for third-party imports.
-  (2) Implement Gabbro → Gabbro vault sync sub-case (i) — UUID-based skip
-      with skipped entry report.
+- **Next task:** Fix export path picker on Android (save-mode file picker
+  returns "select a destination" without opening the system picker).
 
 ---
 
@@ -901,24 +901,31 @@ the first public tag.
 
 ### Import
 
-- **Duplicate import detection — decided:** Two distinct strategies by
+- **Duplicate import detection — implemented:** Two distinct strategies by
   import type:
 
   **Third-party → Gabbro (Enpass, Bitwarden, CSV — one-time migration):**
   Keep-all (union). Fresh UUIDs generated for every imported entry; no
-  deduplication performed. A warning is shown on the import screen before
-  the user confirms: "If you have imported this file before, duplicate
-  entries may be created." Duplicate cleanup is the user's responsibility.
+  deduplication performed. A persistent warning card is shown at the top of
+  `ImportScreen`: "If you have imported this file before, duplicate entries
+  may be created. Duplicate cleanup is your responsibility."
 
   **Gabbro → Gabbro (device sync via `.gabbro` file):** UUID-based skip.
   If an incoming entry's UUID already exists in the session it is skipped —
   the local version is preserved. New entries (UUID not present) are added.
-  After import, the user is shown a list of skipped entries (title + reason:
-  "UUID already exists"). Single save at the end. Rationale: the target
-  vault is the user's clean vault; local edits must not be silently
-  overwritten by an incoming file.
+  After import, the user is shown `import_skipped_dialog.dart` listing
+  skipped entries (title + reason: "UUID already exists"). Single save at
+  the end. Bridge function: `import_from_gabbro(path, passphrase)` in
+  `rust/src/api/import.rs`. Skipped entries dialog unverified on hardware
+  pending export path picker fix.
 
   Content-hash deduplication and entry-level merge remain v2 candidates.
+
+- **Export path picker broken on Android (S23):** Save-mode file picker
+  on Android returns "select a destination" message without opening the
+  system file picker. Blocks hardware verification of export and
+  Gabbro → Gabbro sync round-trip. Needs investigation of `PathField`
+  save mode and `file_picker` behaviour on Android 16.
 
 
 ### Security
