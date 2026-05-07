@@ -803,8 +803,9 @@ SPDX identifier: `GPL-3.0-only`
   and correct value passing in both code paths. 4 tests added. Verified on
   Samsung S23 (Android 16). 191 Rust tests, 174 Flutter tests passing.
 
-- **Next task:** To be decided. Candidates from Bikeshed:
-  - Vault sync sub-case (i) — one-shot export/import overwrite
+- **Next task:** Implement keep-all duplicate import strategy — wire the
+  decided union behaviour into the import flow for all three import types
+  (Enpass, Bitwarden, CSV). Then vault sync sub-case (i).
 
 ---
 
@@ -900,15 +901,13 @@ the first public tag.
 
 ### Import
 
-- **Duplicate import detection:** Importing the same file twice creates
-  duplicate entries — each import run generates fresh UUIDs so duplicates
-  are not detected. Before v1, decide on a strategy: (a) content-hash
-  deduplication — hash the canonical fields of each incoming entry and
-  reject if a matching hash already exists in the vault; (b) user warning
-  only — warn the user that re-importing may create duplicates and let them
-  decide; (c) entry-level merge with conflict resolution — most complex,
-  most correct. Option (b) is the lowest effort and appropriate for v1;
-  options (a) and (c) are v2 candidates.
+- **Duplicate import detection — decided:** Keep-all (union) strategy
+  adopted for all import types. Fresh UUIDs are generated for every
+  imported entry; no deduplication is performed. Rationale: in both
+  primary use-cases (vault sync across devices; importing from another
+  password manager) the user expects all incoming entries to be added
+  without data loss. Duplicate cleanup is the user's responsibility.
+  Content-hash deduplication and entry-level merge remain v2 candidates.
 
 
 ### Security
