@@ -46,10 +46,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   late final TextEditingController _usernameController;
   late final TextEditingController _passwordController;
   bool _passwordObscured = true;
+  late final TextEditingController _loginNotesController;
   final FocusNode _loginTitleFocus = FocusNode();
   final FocusNode _urlFocus = FocusNode();
   final FocusNode _usernameFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
+  final FocusNode _loginNotesFocus = FocusNode();
 
   // ── Note fields ─────────────────────────────────────────────────────────────
   late final TextEditingController _titleController;
@@ -131,11 +133,13 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _urlController = TextEditingController(text: field0.url);
       _usernameController = TextEditingController(text: field0.username);
       _passwordController = TextEditingController(text: field0.password);
+      _loginNotesController = TextEditingController(text: field0.notes ?? '');
     } else {
       _loginTitleController = TextEditingController();
       _urlController = TextEditingController();
       _usernameController = TextEditingController();
       _passwordController = TextEditingController();
+      _loginNotesController = TextEditingController();
     }
 
     // ── Note ───────────────────────────────────────────────────────────────
@@ -251,10 +255,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _urlController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
+    _loginNotesController.dispose();
     _loginTitleFocus.dispose();
     _urlFocus.dispose();
     _usernameFocus.dispose();
     _passwordFocus.dispose();
+    _loginNotesFocus.dispose();
     _titleController.dispose();
     _contentController.dispose();
     _noteTitleFocus.dispose();
@@ -432,7 +438,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             url: _urlController.text,
             username: _usernameController.text,
             password: _passwordController.text,
-            notes: null,
+            notes: _loginNotesController.text.isEmpty
+                ? null
+                : _loginNotesController.text,
             customFields: field0.customFields,
             previousPassword: field0.previousPassword,
           ),
@@ -572,6 +580,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               url: _urlController.text,
               username: _usernameController.text,
               password: _passwordController.text,
+              notes: _loginNotesController.text.isEmpty
+                  ? null
+                  : _loginNotesController.text,
               customFields: [],
             ),
           ),
@@ -844,7 +855,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       ),
       validator: (v) =>
           (v == null || v.isEmpty) ? 'Password is required' : null,
-      onFieldSubmitted: (_) => _save(),
+      onFieldSubmitted: (_) =>
+          FocusScope.of(context).requestFocus(_loginNotesFocus),
+    ),
+    const SizedBox(height: 12),
+    _optionalTextField(
+      _loginNotesController,
+      'Notes',
+      focusNode: _loginNotesFocus,
+      maxLines: 3,
     ),
   ];
 
@@ -1300,9 +1319,11 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     String label, {
     int maxLines = 1,
     TextInputType? keyboardType,
+    FocusNode? focusNode,
   }) {
     return TextFormField(
       controller: controller,
+      focusNode: focusNode,
       maxLines: maxLines,
       keyboardType: keyboardType,
       decoration: InputDecoration(

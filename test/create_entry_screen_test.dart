@@ -197,6 +197,137 @@ void main() {
 
   // ── End card PIN tests ────────────────────────────────────────────────────
 
+  // ── Login notes tests ─────────────────────────────────────────────────────
+
+  testWidgets('login notes field pre-populates in edit mode', (tester) async {
+    final entry = LoginEntryData(
+      id: 'test-id-2',
+      title: 'Basalt Blog',
+      url: 'https://basalt.example.com',
+      username: 'rob',
+      password: 'p@ss',
+      notes: 'remember to update this annually',
+      customFields: [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+      tags: [],
+      favourite: false,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CreateEntryScreen(
+          entryType: 'Login',
+          existing: VaultEntryData.login(entry),
+          onCreateEntry: (_) async {},
+          onGetEntry: (_) => VaultEntryData.login(entry),
+        ),
+      ),
+    );
+    final notesField = tester.widget<TextFormField>(
+      find.widgetWithText(TextFormField, 'remember to update this annually'),
+    );
+    expect(
+      notesField.controller?.text,
+      equals('remember to update this annually'),
+    );
+  });
+
+  testWidgets('login notes field pre-populated value persists after title edit',
+      (tester) async {
+    final entry = LoginEntryData(
+      id: 'test-id-3',
+      title: 'Gabbro Vault',
+      url: 'https://gabbro.example.com',
+      username: 'rob',
+      password: 'p@ss',
+      notes: 'do not delete',
+      customFields: [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+      tags: [],
+      favourite: false,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CreateEntryScreen(
+          entryType: 'Login',
+          existing: VaultEntryData.login(entry),
+          onCreateEntry: (_) async {},
+          onGetEntry: (_) => VaultEntryData.login(entry),
+        ),
+      ),
+    );
+    // Edit the title — notes field should be unaffected
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Gabbro Vault'),
+      'Gabbro Vault Updated',
+    );
+    await tester.pump();
+    // Notes field still shows the original value
+    final notesField = tester.widget<TextFormField>(
+      find.widgetWithText(TextFormField, 'do not delete'),
+    );
+    expect(notesField.controller?.text, equals('do not delete'));
+  });
+
+  testWidgets('login notes field absent when entry has no notes',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildEditScreen(VaultEntryData.login(_loginEntry())),
+    );
+    // _loginEntry() has notes: null — notes field should render empty
+    // notes field is optional — find it by label text
+    final notesFieldFinder = find.widgetWithText(
+      TextFormField,
+      'Notes (optional)',
+    );
+    expect(notesFieldFinder, findsOneWidget);
+    final notesField = tester.widget<TextFormField>(notesFieldFinder);
+    expect(notesField.controller?.text, isEmpty);
+  });
+
+  testWidgets('login notes are passed to onCreateEntry', (tester) async {
+    VaultEntryData? captured;
+    await tester.pumpWidget(
+      _buildCreateScreen(
+        'Login',
+        onCreateEntry: (e) async => captured = e,
+      ),
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Title'),
+      'Obsidian Site',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'URL'),
+      'https://obsidian.example.com',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Username'),
+      'rob',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Password'),
+      'p@ssw0rd',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Notes (optional)'),
+      'created during hardware test',
+    );
+    await tester.pump();
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(captured, isA<VaultEntryData_Login>());
+    final login = (captured! as VaultEntryData_Login).field0;
+    expect(login.notes, equals('created during hardware test'));
+  });
+
+  // ── End login notes tests ─────────────────────────────────────────────────
+
   testWidgets('save button calls onCreateEntry with correct type',
       (tester) async {
     VaultEntryData? captured;
