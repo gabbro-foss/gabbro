@@ -6,6 +6,8 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`
+
 /// Sniff the headers and first 3 rows of a CSV string.
 ///
 /// Sync — no I/O, pure string parsing.
@@ -16,7 +18,7 @@ CsvPreviewData sniffCsvFile({required String input}) =>
 ///
 /// The vault must already be unlocked — returns `Err` if no session is active.
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
-Future<BigInt> importFromCsv({
+Future<ImportResult> importFromCsv({
   required String input,
   required CsvImportConfigData config,
 }) => RustLib.instance.api.crateApiImportImportFromCsv(
@@ -30,8 +32,11 @@ Future<BigInt> importFromCsv({
 /// `data` is the raw bytes of the Bitwarden `.json` export file.
 /// The vault must already be unlocked — returns `Err` if no session is active.
 ///
+/// Entries that fail domain validation are collected into `ImportResult.failures`
+/// rather than aborting the whole import.
+///
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
-Future<BigInt> importFromBitwarden({required List<int> data}) =>
+Future<ImportResult> importFromBitwarden({required List<int> data}) =>
     RustLib.instance.api.crateApiImportImportFromBitwarden(data: data);
 
 /// Import all entries from an Enpass JSON export into the live session,
@@ -40,8 +45,11 @@ Future<BigInt> importFromBitwarden({required List<int> data}) =>
 /// `data` is the raw bytes of the Enpass `.json` export file.
 /// The vault must already be unlocked — returns `Err` if no session is active.
 ///
+/// Entries that fail domain validation are collected into `ImportResult.failures`
+/// rather than aborting the whole import.
+///
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
-Future<BigInt> importFromEnpass({required List<int> data}) =>
+Future<ImportResult> importFromEnpass({required List<int> data}) =>
     RustLib.instance.api.crateApiImportImportFromEnpass(data: data);
 
 /// Column mapping config passed in by Flutter after the user maps columns.
@@ -102,4 +110,68 @@ class CsvPreviewData {
           runtimeType == other.runtimeType &&
           headers == other.headers &&
           rows == other.rows;
+}
+
+/// A single entry that failed domain validation during import.
+///
+/// Carries enough information for Flutter to show the user what was rejected
+/// and why, and to pre-populate `CreateEntryScreen` for manual correction.
+class ImportFailureData {
+  /// Display title of the failed item (from the source file).
+  final String title;
+
+  /// Source category string (e.g. `"creditcard"`, `"login"`).
+  final String category;
+
+  /// Human-readable rejection reason (e.g. `"card number must be 12–19 digits"`).
+  final String reason;
+
+  /// Raw field values from the source file, as `(key, value)` pairs.
+  /// Keys use Gabbro's canonical names where mappable
+  /// (`"card_number"`, `"username"`, `"password"`, `"url"`, `"notes"`),
+  /// falling back to the source label for unmapped fields.
+  final List<(String, String)> rawFields;
+
+  const ImportFailureData({
+    required this.title,
+    required this.category,
+    required this.reason,
+    required this.rawFields,
+  });
+
+  @override
+  int get hashCode =>
+      title.hashCode ^ category.hashCode ^ reason.hashCode ^ rawFields.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImportFailureData &&
+          runtimeType == other.runtimeType &&
+          title == other.title &&
+          category == other.category &&
+          reason == other.reason &&
+          rawFields == other.rawFields;
+}
+
+/// Returned by all three import bridge functions.
+class ImportResult {
+  /// Number of entries successfully imported into the vault.
+  final BigInt imported;
+
+  /// Entries that failed domain validation and were not imported.
+  final List<ImportFailureData> failures;
+
+  const ImportResult({required this.imported, required this.failures});
+
+  @override
+  int get hashCode => imported.hashCode ^ failures.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ImportResult &&
+          runtimeType == other.runtimeType &&
+          imported == other.imported &&
+          failures == other.failures;
 }

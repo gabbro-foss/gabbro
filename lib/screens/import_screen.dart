@@ -2,18 +2,19 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
+import 'package:gabbro/screens/import_failures_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/widgets/path_field.dart';
 
-Future<BigInt> _defaultImportEnpass(List<int> data) =>
+Future<ImportResult> _defaultImportEnpass(List<int> data) =>
     importFromEnpass(data: data);
-Future<BigInt> _defaultImportBitwarden(List<int> data) =>
+Future<ImportResult> _defaultImportBitwarden(List<int> data) =>
     importFromBitwarden(data: data);
 CsvPreviewData _defaultSniffCsv(String input) => sniffCsvFile(input: input);
 
 class ImportScreen extends StatefulWidget {
-  final Future<BigInt> Function(List<int> data) onImportEnpass;
-  final Future<BigInt> Function(List<int> data) onImportBitwarden;
+  final Future<ImportResult> Function(List<int> data) onImportEnpass;
+  final Future<ImportResult> Function(List<int> data) onImportBitwarden;
   final CsvPreviewData Function(String input) onSniffCsv;
 
   const ImportScreen({
@@ -59,8 +60,12 @@ class _ImportScreenState extends State<ImportScreen> {
     });
     try {
       final bytes = await file.readAsBytes();
-      final count = await widget.onImportEnpass(bytes);
-      if (mounted) Navigator.of(context).pop(count.toInt());
+      final result = await widget.onImportEnpass(bytes);
+      var editedCount = 0;
+      if (result.failures.isNotEmpty && mounted) {
+        editedCount = await showImportFailuresDialog(context, result.failures);
+      }
+      if (mounted) Navigator.of(context).pop(result.imported.toInt() + editedCount);
     } catch (e) {
       if (mounted) setState(() => _enpassError = e.toString());
     } finally {
@@ -87,8 +92,12 @@ class _ImportScreenState extends State<ImportScreen> {
     });
     try {
       final bytes = await file.readAsBytes();
-      final count = await widget.onImportBitwarden(bytes);
-      if (mounted) Navigator.of(context).pop(count.toInt());
+      final result = await widget.onImportBitwarden(bytes);
+      var editedCount = 0;
+      if (result.failures.isNotEmpty && mounted) {
+        editedCount = await showImportFailuresDialog(context, result.failures);
+      }
+      if (mounted) Navigator.of(context).pop(result.imported.toInt() + editedCount);
     } catch (e) {
       if (mounted) setState(() => _bitwardenError = e.toString());
     } finally {

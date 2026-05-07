@@ -31,6 +31,36 @@ pub struct CsvImportConfigData {
     pub favourite_col: Option<String>,
 }
 
+// ── Import result types ───────────────────────────────────────────────────────
+
+/// A single entry that failed domain validation during import.
+///
+/// Carries enough information for Flutter to show the user what was rejected
+/// and why, and to pre-populate `CreateEntryScreen` for manual correction.
+#[derive(Debug)]
+pub struct ImportFailureData {
+    /// Display title of the failed item (from the source file).
+    pub title: String,
+    /// Source category string (e.g. `"creditcard"`, `"login"`).
+    pub category: String,
+    /// Human-readable rejection reason (e.g. `"card number must be 12–19 digits"`).
+    pub reason: String,
+    /// Raw field values from the source file, as `(key, value)` pairs.
+    /// Keys use Gabbro's canonical names where mappable
+    /// (`"card_number"`, `"username"`, `"password"`, `"url"`, `"notes"`),
+    /// falling back to the source label for unmapped fields.
+    pub raw_fields: Vec<(String, String)>,
+}
+
+/// Returned by all three import bridge functions.
+#[derive(Debug)]
+pub struct ImportResult {
+    /// Number of entries successfully imported into the vault.
+    pub imported: usize,
+    /// Entries that failed domain validation and were not imported.
+    pub failures: Vec<ImportFailureData>,
+}
+
 // ── Bridge functions ──────────────────────────────────────────────────────────
 
 /// Sniff the headers and first 3 rows of a CSV string.
@@ -49,7 +79,7 @@ pub fn sniff_csv_file(input: String) -> Result<CsvPreviewData, String> {
 ///
 /// The vault must already be unlocked — returns `Err` if no session is active.
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
-pub async fn import_from_csv(input: String, config: CsvImportConfigData) -> Result<usize, String> {
+pub async fn import_from_csv(input: String, config: CsvImportConfigData) -> Result<ImportResult, String> {
     let csv_config = CsvImportConfig {
         title_col: config.title_col,
         url_col: config.url_col,
@@ -94,7 +124,10 @@ pub async fn import_from_csv(input: String, config: CsvImportConfigData) -> Resu
     }
 
     session::session_save()?;
-    Ok(count)
+    Ok(ImportResult {
+        imported: count,
+        failures: vec![],
+    })
 }
 
 /// Import all entries from a Bitwarden unencrypted JSON export into the
@@ -103,15 +136,29 @@ pub async fn import_from_csv(input: String, config: CsvImportConfigData) -> Resu
 /// `data` is the raw bytes of the Bitwarden `.json` export file.
 /// The vault must already be unlocked — returns `Err` if no session is active.
 ///
+/// Entries that fail domain validation are collected into `ImportResult.failures`
+/// rather than aborting the whole import.
+///
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
-pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<usize, String> {
-    let entries = bitwarden::parse(&data)?;
-    let count = entries.len();
+pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<ImportResult, String> {
+    let (entries, failures) = bitwarden::parse(&data)?;
+    let imported = entries.len();
     for entry in entries {
         session::session_add_entry_no_save(entry)?;
     }
     session::session_save()?;
-    Ok(count)
+    Ok(ImportResult {
+        imported,
+        failures: failures
+            .into_iter()
+            .map(|f| ImportFailureData {
+                title: f.title,
+                category: f.category,
+                reason: f.reason,
+                raw_fields: f.raw_fields,
+            })
+            .collect(),
+    })
 }
 
 /// Import all entries from an Enpass JSON export into the live session,
@@ -120,18 +167,36 @@ pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<usize, String> {
 /// `data` is the raw bytes of the Enpass `.json` export file.
 /// The vault must already be unlocked — returns `Err` if no session is active.
 ///
+/// Entries that fail domain validation are collected into `ImportResult.failures`
+/// rather than aborting the whole import.
+///
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
-pub async fn import_from_enpass(data: Vec<u8>) -> Result<usize, String> {
-    let entries = enpass::parse(&data)?;
-    let count = entries.len();
+pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
+    let (entries, failures) = enpass::parse(&data)?;
+    let imported = entries.len();
     for entry in entries {
         session::session_add_entry_no_save(entry)?;
     }
     session::session_save()?;
-    Ok(count)
+    Ok(ImportResult {
+        imported,
+        failures: failures
+            .into_iter()
+            .map(|f| ImportFailureData {
+                title: f.title,
+                category: f.category,
+                reason: f.reason,
+                raw_fields: f.raw_fields,
+            })
+            .collect(),
+    })
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
+
+// NOTE: ImportResult and ImportFailureData are defined here as stubs so the
+// test below can be written first (TDD red state). The real definitions will
+// replace these once the test compiles and fails for the right reason.
 
 #[cfg(test)]
 mod tests {
@@ -236,8 +301,9 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
             favourite_col: Some("favourite".to_string()),
         };
 
-        let count = run(import_from_csv(SAMPLE_CSV.to_string(), config)).unwrap();
-        assert_eq!(count, 2);
+        let result = run(import_from_csv(SAMPLE_CSV.to_string(), config)).unwrap();
+        assert_eq!(result.imported, 2);
+        assert!(result.failures.is_empty());
 
         let summaries = session::list_entry_summaries().unwrap();
         // 1 existing note + 2 imported logins
@@ -262,7 +328,7 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
             favourite_col: None,
         };
 
-        run(import_from_csv(SAMPLE_CSV.to_string(), config)).unwrap();
+        let _ = run(import_from_csv(SAMPLE_CSV.to_string(), config)).unwrap();
         session::lock_vault().unwrap();
 
         // Reload from disk and verify
@@ -280,11 +346,12 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
         let path = setup_vault(pass);
         session::unlock_vault(pass, path.clone()).unwrap();
 
-        let count = run(import_from_bitwarden(
+        let result = run(import_from_bitwarden(
             BITWARDEN_JSON.as_bytes().to_vec(),
         ))
         .unwrap();
-        assert_eq!(count, 4); // login, note, card, identity — unknown type skipped
+        assert_eq!(result.imported, 4); // login, note, card, identity — unknown type skipped
+        assert!(result.failures.is_empty());
 
         let summaries = session::list_entry_summaries().unwrap();
         // 1 existing note + 4 imported entries
@@ -300,8 +367,9 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
         let path = setup_vault(pass);
         session::unlock_vault(pass, path.clone()).unwrap();
 
-        let count = run(import_from_enpass(ENPASS_JSON.as_bytes().to_vec())).unwrap();
-        assert_eq!(count, 1);
+        let result = run(import_from_enpass(ENPASS_JSON.as_bytes().to_vec())).unwrap();
+        assert_eq!(result.imported, 1);
+        assert!(result.failures.is_empty());
 
         let summaries = session::list_entry_summaries().unwrap();
         // 1 existing note + 1 imported login
@@ -326,5 +394,61 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
 
         let result = run(import_from_csv(SAMPLE_CSV.to_string(), config));
         assert!(result.is_err());
+    }
+
+    // Enpass JSON with a card whose number has only 4 digits — invalid per
+    // CardEntry::new() (requires 12–19 digits). The entry must appear in
+    // ImportResult.failures, not be silently dropped.
+    const ENPASS_INVALID_CARD_JSON: &str = r#"{
+        "items": [{
+            "uuid": "enp-bad-001",
+            "title": "Bad Card",
+            "category": "creditcard",
+            "note": "",
+            "favorite": 0,
+            "archived": 0,
+            "trashed": 0,
+            "fields": [
+                {"label":"Card Number","type":"ccNumber","value":"1234","sensitive":0,"deleted":0},
+                {"label":"Name on Card","type":"ccName","value":"Rob","sensitive":0,"deleted":0}
+            ],
+            "attachments": []
+        }]
+    }"#;
+
+    #[test]
+    #[serial]
+    fn import_from_enpass_invalid_card_appears_in_failures() {
+        let pass = b"enpass failure test passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let result = run(import_from_enpass(
+            ENPASS_INVALID_CARD_JSON.as_bytes().to_vec(),
+        ))
+        .unwrap();
+
+        assert_eq!(result.imported, 0, "no valid entries should be imported");
+        assert_eq!(result.failures.len(), 1, "one failure expected");
+        assert_eq!(result.failures[0].title, "Bad Card");
+        assert!(
+            result.failures[0].category.contains("creditcard"),
+            "category should reflect source type"
+        );
+        assert!(
+            !result.failures[0].reason.is_empty(),
+            "rejection reason must not be empty"
+        );
+        // raw_fields must carry the original card number so Flutter can
+        // pre-populate CreateEntryScreen
+        assert!(
+            result.failures[0]
+                .raw_fields
+                .iter()
+                .any(|(k, v)| k == "card_number" && v == "1234"),
+            "raw_fields must contain the invalid card number"
+        );
+
+        teardown(&path);
     }
 }

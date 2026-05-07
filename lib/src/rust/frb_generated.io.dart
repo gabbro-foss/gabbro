@@ -102,6 +102,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   IdentityEntryData dco_decode_identity_entry_data(dynamic raw);
 
   @protected
+  ImportFailureData dco_decode_import_failure_data(dynamic raw);
+
+  @protected
+  ImportResult dco_decode_import_result(dynamic raw);
+
+  @protected
   Language dco_decode_language(dynamic raw);
 
   @protected
@@ -114,6 +120,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<EntrySummaryData> dco_decode_list_entry_summary_data(dynamic raw);
 
   @protected
+  List<ImportFailureData> dco_decode_list_import_failure_data(dynamic raw);
+
+  @protected
   List<List<String>> dco_decode_list_list_String(dynamic raw);
 
   @protected
@@ -121,6 +130,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
+
+  @protected
+  List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
 
   @protected
   LoginEntryData dco_decode_login_entry_data(dynamic raw);
@@ -147,6 +159,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PreviousSecretData dco_decode_previous_secret_data(dynamic raw);
+
+  @protected
+  (String, String) dco_decode_record_string_string(dynamic raw);
 
   @protected
   StrengthTier dco_decode_strength_tier(dynamic raw);
@@ -268,6 +283,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  ImportFailureData sse_decode_import_failure_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  ImportResult sse_decode_import_result(SseDeserializer deserializer);
+
+  @protected
   Language sse_decode_language(SseDeserializer deserializer);
 
   @protected
@@ -284,6 +307,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<ImportFailureData> sse_decode_list_import_failure_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<List<String>> sse_decode_list_list_String(SseDeserializer deserializer);
 
   @protected
@@ -291,6 +319,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
+
+  @protected
+  List<(String, String)> sse_decode_list_record_string_string(
+    SseDeserializer deserializer,
+  );
 
   @protected
   LoginEntryData sse_decode_login_entry_data(SseDeserializer deserializer);
@@ -317,6 +350,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PreviousSecretData sse_decode_previous_secret_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  (String, String) sse_decode_record_string_string(
     SseDeserializer deserializer,
   );
 
@@ -465,6 +503,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_import_failure_data(
+    ImportFailureData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_import_result(ImportResult self, SseSerializer serializer);
+
+  @protected
   void sse_encode_language(Language self, SseSerializer serializer);
 
   @protected
@@ -483,6 +530,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_import_failure_data(
+    List<ImportFailureData> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_list_String(
     List<List<String>> self,
     SseSerializer serializer,
@@ -494,6 +547,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_record_string_string(
+    List<(String, String)> self,
     SseSerializer serializer,
   );
 
@@ -533,6 +592,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_previous_secret_data(
     PreviousSecretData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_record_string_string(
+    (String, String) self,
     SseSerializer serializer,
   );
 

@@ -91,11 +91,26 @@ struct BwIdentity {
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
+/// An item that failed domain validation during parsing.
+///
+/// Kept internal to this module — the bridge layer maps it to
+/// `ImportFailureData` in `api/import.rs`.
+pub(crate) struct ParseFailure {
+    pub(crate) title: String,
+    pub(crate) category: String,
+    pub(crate) reason: String,
+    /// Raw `(key, value)` pairs using Gabbro canonical key names where
+    /// mappable, falling back to the source label otherwise.
+    pub(crate) raw_fields: Vec<(String, String)>,
+}
+
 /// Parse a Bitwarden unencrypted JSON export.
 ///
-/// Returns `Ok(Vec<VaultEntry>)` on success, `Err(String)` if the
+/// Returns `Ok((entries, failures))` on success, `Err(String)` if the
 /// JSON is malformed or the top-level structure is missing.
-pub fn parse(data: &[u8]) -> Result<Vec<VaultEntry>, String> {
+/// Items that fail domain validation are collected into `failures` rather
+/// than aborting the whole import.
+pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>), String> {
     let export: BwExport =
         serde_json::from_slice(data).map_err(|e| format!("Bitwarden JSON parse error: {e}"))?;
 
@@ -104,6 +119,7 @@ pub fn parse(data: &[u8]) -> Result<Vec<VaultEntry>, String> {
         export.folders.into_iter().map(|f| (f.id, f.name)).collect();
 
     let mut entries = Vec::new();
+    let mut failures = Vec::new();
 
     for item in export.items {
         let folder = item
@@ -136,8 +152,10 @@ pub fn parse(data: &[u8]) -> Result<Vec<VaultEntry>, String> {
                 entries.push(VaultEntry::Note(convert_note(meta, &item.name, item.notes)));
             }
             3 => {
-                if let Some(entry) = convert_card(meta, item.notes, custom_fields, item.card) {
-                    entries.push(VaultEntry::Card(entry));
+                match convert_card(meta, &item.name, item.notes, custom_fields, item.card) {
+                    Ok(Some(entry)) => entries.push(VaultEntry::Card(entry)),
+                    Ok(None) => {} // no card data present — skip silently
+                    Err(f) => failures.push(f),
                 }
             }
             4 => {
@@ -155,7 +173,7 @@ pub fn parse(data: &[u8]) -> Result<Vec<VaultEntry>, String> {
         }
     }
 
-    Ok(entries)
+    Ok((entries, failures))
 }
 
 // ── Conversion helpers ────────────────────────────────────────────────────────
@@ -210,11 +228,15 @@ fn convert_note(meta: EntryMeta, title: &str, notes: Option<String>) -> NoteEntr
 
 fn convert_card(
     meta: EntryMeta,
+    title: &str,
     notes: Option<String>,
     custom_fields: Vec<CustomField>,
     card: Option<BwCard>,
-) -> Option<CardEntry> {
-    let card = card?;
+) -> Result<Option<CardEntry>, ParseFailure> {
+    let card = match card {
+        Some(c) => c,
+        None => return Ok(None), // no card data present
+    };
 
     // Combine separate expMonth / expYear into MM/YY.
     let expiry = match (card.exp_month.as_deref(), card.exp_year.as_deref()) {
@@ -226,17 +248,19 @@ fn convert_card(
         _ => String::new(),
     };
 
+    let card_number = card.number.clone().unwrap_or_default();
+
     CardEntry::new(
         meta,
         None,
         "active".to_string(),
-        card.cardholder_name.unwrap_or_default(),
-        card.number.unwrap_or_default(),
-        expiry,
-        card.code.unwrap_or_default(),
+        card.cardholder_name.clone().unwrap_or_default(),
+        card_number.clone(),
+        expiry.clone(),
+        card.code.clone().unwrap_or_default(),
         None,
         None,
-        card.brand,
+        card.brand.clone(),
         None,
         None,
         None,
@@ -246,7 +270,23 @@ fn convert_card(
         None,
         None,
     )
-    .ok()
+    .map(Some)
+    .map_err(|reason| ParseFailure {
+        title: title.to_string(),
+        category: "creditcard".to_string(),
+        reason,
+        raw_fields: {
+            let mut fields = vec![
+                ("title".to_string(), title.to_string()),
+                ("card_number".to_string(), card_number),
+            ];
+            if let Some(name) = card.cardholder_name { fields.push(("cardholder_name".to_string(), name)); }
+            if !expiry.is_empty() { fields.push(("expiry".to_string(), expiry)); }
+            if let Some(cvv) = card.code { fields.push(("cvv".to_string(), cvv)); }
+            if let Some(brand) = card.brand { fields.push(("payment_network".to_string(), brand)); }
+            fields
+        },
+    })
 }
 
 fn convert_identity(
@@ -385,7 +425,7 @@ mod tests {
 
     #[test]
     fn parse_login_entry() {
-        let entries = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
+        let (entries, _) = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
 
         let login = entries
             .iter()
@@ -409,7 +449,7 @@ mod tests {
 
     #[test]
     fn parse_note_entry() {
-        let entries = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
+        let (entries, _) = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
 
         let note = entries
             .iter()
@@ -429,7 +469,7 @@ mod tests {
 
     #[test]
     fn parse_card_entry() {
-        let entries = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
+        let (entries, _) = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
 
         let card = entries
             .iter()
@@ -451,7 +491,7 @@ mod tests {
 
     #[test]
     fn parse_identity_maps_to_custom_entry() {
-        let entries = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
+        let (entries, _) = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
 
         let custom = entries
             .iter()
@@ -473,7 +513,7 @@ mod tests {
 
     #[test]
     fn unknown_type_is_skipped() {
-        let entries = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
+        let (entries, _) = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
         // fixture has 5 items: login, note, card, identity, unknown(99)
         // unknown should be silently dropped → 4 entries
         assert_eq!(entries.len(), 4);
@@ -481,7 +521,7 @@ mod tests {
 
     #[test]
     fn login_custom_fields_mapped_correctly() {
-        let entries = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
+        let (entries, _) = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
 
         let login = entries
             .iter()
@@ -514,7 +554,7 @@ mod tests {
 
     #[test]
     fn totp_field_is_not_imported() {
-        let entries = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
+        let (entries, _) = parse(BITWARDEN_EXPORT.as_bytes()).expect("parse failed");
 
         let login = entries
             .iter()

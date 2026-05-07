@@ -1500,6 +1500,35 @@ impl SseDecode for crate::api::vault::IdentityEntryData {
     }
 }
 
+impl SseDecode for crate::api::import::ImportFailureData {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_title = <String>::sse_decode(deserializer);
+        let mut var_category = <String>::sse_decode(deserializer);
+        let mut var_reason = <String>::sse_decode(deserializer);
+        let mut var_rawFields = <Vec<(String, String)>>::sse_decode(deserializer);
+        return crate::api::import::ImportFailureData {
+            title: var_title,
+            category: var_category,
+            reason: var_reason,
+            raw_fields: var_rawFields,
+        };
+    }
+}
+
+impl SseDecode for crate::api::import::ImportResult {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_imported = <usize>::sse_decode(deserializer);
+        let mut var_failures =
+            <Vec<crate::api::import::ImportFailureData>>::sse_decode(deserializer);
+        return crate::api::import::ImportResult {
+            imported: var_imported,
+            failures: var_failures,
+        };
+    }
+}
+
 impl SseDecode for crate::api::passphrase_generator::Language {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1555,6 +1584,20 @@ impl SseDecode for Vec<crate::api::vault_bridge::EntrySummaryData> {
     }
 }
 
+impl SseDecode for Vec<crate::api::import::ImportFailureData> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::import::ImportFailureData>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<Vec<String>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1574,6 +1617,18 @@ impl SseDecode for Vec<u8> {
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
             ans_.push(<u8>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<(String, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<(String, String)>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -1724,6 +1779,15 @@ impl SseDecode for crate::api::vault::PreviousSecretData {
             saved_at: var_savedAt,
             expires_at: var_expiresAt,
         };
+    }
+}
+
+impl SseDecode for (String, String) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_field0 = <String>::sse_decode(deserializer);
+        let mut var_field1 = <String>::sse_decode(deserializer);
+        return (var_field0, var_field1);
     }
 }
 
@@ -2147,6 +2211,50 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::IdentityEntryData>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::import::ImportFailureData {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.title.into_into_dart().into_dart(),
+            self.category.into_into_dart().into_dart(),
+            self.reason.into_into_dart().into_dart(),
+            self.raw_fields.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::import::ImportFailureData
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::import::ImportFailureData>
+    for crate::api::import::ImportFailureData
+{
+    fn into_into_dart(self) -> crate::api::import::ImportFailureData {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::import::ImportResult {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.imported.into_into_dart().into_dart(),
+            self.failures.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::import::ImportResult
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::import::ImportResult>
+    for crate::api::import::ImportResult
+{
+    fn into_into_dart(self) -> crate::api::import::ImportResult {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::passphrase_generator::Language {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
@@ -2517,6 +2625,24 @@ impl SseEncode for crate::api::vault::IdentityEntryData {
     }
 }
 
+impl SseEncode for crate::api::import::ImportFailureData {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.title, serializer);
+        <String>::sse_encode(self.category, serializer);
+        <String>::sse_encode(self.reason, serializer);
+        <Vec<(String, String)>>::sse_encode(self.raw_fields, serializer);
+    }
+}
+
+impl SseEncode for crate::api::import::ImportResult {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <usize>::sse_encode(self.imported, serializer);
+        <Vec<crate::api::import::ImportFailureData>>::sse_encode(self.failures, serializer);
+    }
+}
+
 impl SseEncode for crate::api::passphrase_generator::Language {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2566,6 +2692,16 @@ impl SseEncode for Vec<crate::api::vault_bridge::EntrySummaryData> {
     }
 }
 
+impl SseEncode for Vec<crate::api::import::ImportFailureData> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::import::ImportFailureData>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<Vec<String>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2582,6 +2718,16 @@ impl SseEncode for Vec<u8> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <u8>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<(String, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(String, String)>::sse_encode(item, serializer);
         }
     }
 }
@@ -2681,6 +2827,14 @@ impl SseEncode for crate::api::vault::PreviousSecretData {
         <String>::sse_encode(self.value, serializer);
         <String>::sse_encode(self.saved_at, serializer);
         <Option<String>>::sse_encode(self.expires_at, serializer);
+    }
+}
+
+impl SseEncode for (String, String) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.0, serializer);
+        <String>::sse_encode(self.1, serializer);
     }
 }
 

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 
-Future<BigInt> _defaultImportCsv(String input, CsvImportConfigData config) =>
+Future<ImportResult> _defaultImportCsv(String input, CsvImportConfigData config) =>
     importFromCsv(input: input, config: config);
 
 class CsvMappingScreen extends StatefulWidget {
   final String csvContent;
   final CsvPreviewData preview;
-  final Future<BigInt> Function(String input, CsvImportConfigData config) onImport;
+  final Future<ImportResult> Function(String input, CsvImportConfigData config) onImport;
 
   const CsvMappingScreen({
     super.key,
@@ -72,8 +72,8 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
         notesCol: _notesCol,
         favouriteCol: _favouriteCol,
       );
-      final count = await widget.onImport(widget.csvContent, config);
-      if (mounted) Navigator.of(context).pop(count.toInt());
+      final result = await widget.onImport(widget.csvContent, config);
+      if (mounted) Navigator.of(context).pop(result.imported.toInt());
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
     } finally {

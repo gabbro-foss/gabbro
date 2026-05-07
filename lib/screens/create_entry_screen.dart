@@ -14,6 +14,11 @@ VaultEntryData _defaultGetEntry(String id) => getEntry(id: id);
 class CreateEntryScreen extends StatefulWidget {
   final String entryType;
   final VaultEntryData? existing;
+  /// Raw field values from a failed import, keyed by Gabbro canonical names
+  /// (e.g. `"card_number"`, `"cardholder_name"`, `"expiry"`, `"cvv"`).
+  /// Distinct from [existing] — carries unvalidated data that never made it
+  /// into the vault. Used by the import failures review flow.
+  final Map<String, String>? prefill;
   final Future<void> Function(VaultEntryData entry) onCreateEntry;
   final VaultEntryData Function(String id) onGetEntry;
 
@@ -21,6 +26,7 @@ class CreateEntryScreen extends StatefulWidget {
     super.key,
     required this.entryType,
     this.existing,
+    this.prefill,
     this.onCreateEntry = _defaultCreate,
     this.onGetEntry = _defaultGetEntry,
   });
@@ -187,16 +193,29 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       );
       _cardNotesController = TextEditingController(text: field0.notes ?? '');
     } else {
-      _cardNameController = TextEditingController();
+      final p = widget.prefill;
+      _cardNameController = TextEditingController(text: p?['title'] ?? '');
       _cardStatusController = TextEditingController(text: 'active');
-      _cardholderNameController = TextEditingController();
-      _cardNumberController = TextEditingController();
-      _expiryController = TextEditingController();
-      _cvvController = TextEditingController();
-      _pinController = TextEditingController();
+      _cardholderNameController = TextEditingController(
+        text: p?['cardholder_name'] ?? '',
+      );
+      _cardNumberController = TextEditingController(
+        text: p?['card_number'] ?? '',
+      );
+      _expiryController = TextEditingController(
+        text: p?['expiry'] ?? '',
+      );
+      _cvvController = TextEditingController(
+        text: p?['cvv'] ?? '',
+      );
+      _pinController = TextEditingController(
+        text: p?['pin'] ?? '',
+      );
       _creditLimitController = TextEditingController();
       _cardAccountNumberController = TextEditingController();
-      _paymentNetworkController = TextEditingController();
+      _paymentNetworkController = TextEditingController(
+        text: p?['payment_network'] ?? '',
+      );
       _cardNotesController = TextEditingController();
     }
 

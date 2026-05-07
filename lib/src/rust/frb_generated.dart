@@ -188,14 +188,18 @@ abstract class RustLibApi extends BaseApi {
 
   String crateApiSimpleGreet({required String name});
 
-  Future<BigInt> crateApiImportImportFromBitwarden({required List<int> data});
+  Future<ImportResult> crateApiImportImportFromBitwarden({
+    required List<int> data,
+  });
 
-  Future<BigInt> crateApiImportImportFromCsv({
+  Future<ImportResult> crateApiImportImportFromCsv({
     required String input,
     required CsvImportConfigData config,
   });
 
-  Future<BigInt> crateApiImportImportFromEnpass({required List<int> data});
+  Future<ImportResult> crateApiImportImportFromEnpass({
+    required List<int> data,
+  });
 
   Future<void> crateApiSimpleInitApp();
 
@@ -960,7 +964,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "greet", argNames: ["name"]);
 
   @override
-  Future<BigInt> crateApiImportImportFromBitwarden({required List<int> data}) {
+  Future<ImportResult> crateApiImportImportFromBitwarden({
+    required List<int> data,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -974,7 +980,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_usize,
+          decodeSuccessData: sse_decode_import_result,
           decodeErrorData: sse_decode_String,
         ),
         constMeta: kCrateApiImportImportFromBitwardenConstMeta,
@@ -991,7 +997,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<BigInt> crateApiImportImportFromCsv({
+  Future<ImportResult> crateApiImportImportFromCsv({
     required String input,
     required CsvImportConfigData config,
   }) {
@@ -1009,7 +1015,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_usize,
+          decodeSuccessData: sse_decode_import_result,
           decodeErrorData: sse_decode_String,
         ),
         constMeta: kCrateApiImportImportFromCsvConstMeta,
@@ -1026,7 +1032,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<BigInt> crateApiImportImportFromEnpass({required List<int> data}) {
+  Future<ImportResult> crateApiImportImportFromEnpass({
+    required List<int> data,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -1040,7 +1048,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_usize,
+          decodeSuccessData: sse_decode_import_result,
           decodeErrorData: sse_decode_String,
         ),
         constMeta: kCrateApiImportImportFromEnpassConstMeta,
@@ -1611,6 +1619,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ImportFailureData dco_decode_import_failure_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return ImportFailureData(
+      title: dco_decode_String(arr[0]),
+      category: dco_decode_String(arr[1]),
+      reason: dco_decode_String(arr[2]),
+      rawFields: dco_decode_list_record_string_string(arr[3]),
+    );
+  }
+
+  @protected
+  ImportResult dco_decode_import_result(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return ImportResult(
+      imported: dco_decode_usize(arr[0]),
+      failures: dco_decode_list_import_failure_data(arr[1]),
+    );
+  }
+
+  @protected
   Language dco_decode_language(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return Language.values[raw as int];
@@ -1635,6 +1669,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<ImportFailureData> dco_decode_list_import_failure_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_import_failure_data).toList();
+  }
+
+  @protected
   List<List<String>> dco_decode_list_list_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_list_String).toList();
@@ -1650,6 +1690,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
+  }
+
+  @protected
+  List<(String, String)> dco_decode_list_record_string_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_record_string_string).toList();
   }
 
   @protected
@@ -1759,6 +1805,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       savedAt: dco_decode_String(arr[1]),
       expiresAt: dco_decode_opt_String(arr[2]),
     );
+  }
+
+  @protected
+  (String, String) dco_decode_record_string_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (dco_decode_String(arr[0]), dco_decode_String(arr[1]));
   }
 
   @protected
@@ -2149,6 +2205,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  ImportFailureData sse_decode_import_failure_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_title = sse_decode_String(deserializer);
+    var var_category = sse_decode_String(deserializer);
+    var var_reason = sse_decode_String(deserializer);
+    var var_rawFields = sse_decode_list_record_string_string(deserializer);
+    return ImportFailureData(
+      title: var_title,
+      category: var_category,
+      reason: var_reason,
+      rawFields: var_rawFields,
+    );
+  }
+
+  @protected
+  ImportResult sse_decode_import_result(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_imported = sse_decode_usize(deserializer);
+    var var_failures = sse_decode_list_import_failure_data(deserializer);
+    return ImportResult(imported: var_imported, failures: var_failures);
+  }
+
+  @protected
   Language sse_decode_language(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_i_32(deserializer);
@@ -2196,6 +2277,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<ImportFailureData> sse_decode_list_import_failure_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ImportFailureData>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_import_failure_data(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<List<String>> sse_decode_list_list_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -2219,6 +2314,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
     return deserializer.buffer.getUint8List(len_);
+  }
+
+  @protected
+  List<(String, String)> sse_decode_list_record_string_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(String, String)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_string_string(deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -2363,6 +2472,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       savedAt: var_savedAt,
       expiresAt: var_expiresAt,
     );
+  }
+
+  @protected
+  (String, String) sse_decode_record_string_string(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_String(deserializer);
+    var var_field1 = sse_decode_String(deserializer);
+    return (var_field0, var_field1);
   }
 
   @protected
@@ -2701,6 +2820,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_import_failure_data(
+    ImportFailureData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.title, serializer);
+    sse_encode_String(self.category, serializer);
+    sse_encode_String(self.reason, serializer);
+    sse_encode_list_record_string_string(self.rawFields, serializer);
+  }
+
+  @protected
+  void sse_encode_import_result(ImportResult self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(self.imported, serializer);
+    sse_encode_list_import_failure_data(self.failures, serializer);
+  }
+
+  @protected
   void sse_encode_language(Language self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.index, serializer);
@@ -2740,6 +2878,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_import_failure_data(
+    List<ImportFailureData> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_import_failure_data(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_list_String(
     List<List<String>> self,
     SseSerializer serializer,
@@ -2771,6 +2921,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint8List(self);
+  }
+
+  @protected
+  void sse_encode_list_record_string_string(
+    List<(String, String)> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_string_string(item, serializer);
+    }
   }
 
   @protected
@@ -2882,6 +3044,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.value, serializer);
     sse_encode_String(self.savedAt, serializer);
     sse_encode_opt_String(self.expiresAt, serializer);
+  }
+
+  @protected
+  void sse_encode_record_string_string(
+    (String, String) self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.$1, serializer);
+    sse_encode_String(self.$2, serializer);
   }
 
   @protected
