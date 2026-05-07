@@ -961,9 +961,11 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       focusNode: _cardNameFocus,
       autofocus: true,
       decoration: const InputDecoration(
-        labelText: 'Card label (e.g. "Visa Platinum") (optional)',
+        labelText: 'Card label (e.g. "Visa Platinum")',
         border: OutlineInputBorder(),
       ),
+      validator: (v) =>
+          (v == null || v.isEmpty) ? 'Card label is required' : null,
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_cardholderNameFocus),
     ),

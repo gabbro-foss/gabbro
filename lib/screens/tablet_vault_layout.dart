@@ -183,6 +183,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
         setState(() => _selectedEntryId = null);
         widget.onRefresh();
       },
+      onEdited: () => widget.onRefresh(),
     );
   }
 

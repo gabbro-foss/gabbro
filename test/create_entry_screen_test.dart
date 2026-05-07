@@ -145,6 +145,10 @@ void main() {
       _buildCreateScreen('Card', onCreateEntry: (e) async => captured = e),
     );
     await tester.enterText(
+      find.widgetWithText(TextFormField, 'Card label (e.g. "Visa Platinum")'),
+      'Visa Platinum',
+    );
+    await tester.enterText(
       find.widgetWithText(TextFormField, 'Cardholder name'),
       'Rob Bastian',
     );

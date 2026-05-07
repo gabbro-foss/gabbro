@@ -179,12 +179,23 @@ impl CardEntry {
         previous_cvv: Option<PreviousSecret>,
         previous_pin: Option<PreviousSecret>,
     ) -> Result<CardEntry, String> {
+        let mut errors: Vec<&str> = Vec::new();
+
         let digit_count = card_number.chars().filter(|c| c.is_ascii_digit()).count();
         if digit_count < 12 || digit_count > 19 {
-            return Err(format!(
-                "Card number must contain 12-19 digits, got {}",
-                digit_count
-            ));
+            errors.push("card number must contain 12–19 digits");
+        }
+        if cardholder_name.trim().is_empty() {
+            errors.push("cardholder name is required");
+        }
+        if expiry.trim().is_empty() {
+            errors.push("expiry is required");
+        }
+        if cvv.trim().is_empty() {
+            errors.push("CVV is required");
+        }
+        if !errors.is_empty() {
+            return Err(errors.join("; "));
         }
 
         Ok(CardEntry {
@@ -435,6 +446,26 @@ mod tests {
         );
 
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn card_entry_missing_required_fields_reports_all_failures() {
+        let result = CardEntry::new(
+            default_meta(),
+            None,
+            String::from("active"),
+            String::from(""),          // cardholder_name missing
+            String::from("1234"),      // card_number too short
+            String::from(""),          // expiry missing
+            String::from(""),          // cvv missing
+            None, None, None, None, None, None, None,
+            vec![], vec![], None, None,
+        );
+        let err = result.unwrap_err();
+        assert!(err.contains("card number"), "should mention card number: {err}");
+        assert!(err.contains("cardholder name"), "should mention cardholder name: {err}");
+        assert!(err.contains("expiry"), "should mention expiry: {err}");
+        assert!(err.contains("CVV"), "should mention CVV: {err}");
     }
 
     #[test]

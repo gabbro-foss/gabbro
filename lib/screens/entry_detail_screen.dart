@@ -59,6 +59,10 @@ class EntryDetailScreen extends StatefulWidget {
   /// without popping the route.
   final VoidCallback? onDeleted;
 
+  /// Optional callback invoked after a successful edit. Used by the tablet
+  /// layout to refresh the list pane without popping the route.
+  final VoidCallback? onEdited;
+
   final Future<void> Function(String url) onLaunchUrl;
 
   const EntryDetailScreen({
@@ -71,6 +75,7 @@ class EntryDetailScreen extends StatefulWidget {
     this.onRevertPassword = _defaultRevertPassword,
     this.onLaunchUrl = _defaultLaunchUrl,
     this.onDeleted,
+    this.onEdited,
   });
 
   @override
@@ -233,6 +238,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
               );
               if (updated != null && mounted) {
                 setState(() => _entry = updated);
+                widget.onEdited?.call();
               }
             },
           ),
