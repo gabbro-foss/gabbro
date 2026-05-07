@@ -772,15 +772,53 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** High-contrast light and dark themes — `gabbroLightTheme()`
-  and `gabbroDarkTheme()` extracted to top-level functions; high-contrast
-  colours pass WCAG 1.4.3 (AA) and WCAG 1.4.6 (AAA); ADR-003 compliant;
-  8 new theme unit tests. 188 Rust tests, 154 Flutter tests passing.
-- **Next task:** Import validation failures — user review flow. Items that
-  fail domain validation during import are currently silently skipped.
-  Design and implement `ImportFailure` struct, review dialog, and
-  pre-populated `CreateEntryScreen` edit path. See ## Bikeshed / Backlog →
-  Import → Import validation failures.
+- **Completed:** Import validation failures — user review flow.
+  `ImportFailureData` + `ImportResult` DTOs in Rust; all three importers
+  (Enpass, Bitwarden, CSV) return `ImportResult`; invalid cards surface as
+  failures instead of being silently dropped or accepted; `ParseFailure`
+  with `extract_raw_fields` in Enpass and Bitwarden parsers; blocking
+  `ImportFailuresDialog` with Skip / Edit actions; `CreateEntryScreen`
+  `prefill` parameter for pre-populated card form; snackbar count includes
+  entries saved via Edit path. 190 Rust tests, 170 Flutter tests passing.
+  Verified on Linux (happy path + invalid path, Enpass + Bitwarden + CSV).
+
+- **Next task — outstanding bugs and remaining test steps:**
+
+  Bugs to fix before closing this feature:
+  1. Card name field is optional in `CreateEntryScreen` card form — should
+     be required (no title → no label in vault list view). Add validator to
+     `_cardNameController` field in `_cardFields()`.
+  2. Tablet blank screen after Bitwarden import — `Navigator.of(context).pop`
+     in `_importBitwarden()` may not interact correctly with the tablet
+     two-pane layout. Investigate `VaultListScreen` push/pop handling at
+     ≥600dp. Possibly needs `Navigator.of(context, rootNavigator: true).pop`
+     or a different return mechanism on tablet.
+
+  Remaining hardware test matrix (must all pass before feature is done):
+  - Linux / Enpass / valid (✓ done)
+  - Linux / Enpass / invalid — Skip (✓ done)
+  - Linux / Enpass / invalid — Edit (✓ done)
+  - Linux / Bitwarden / valid (✓ done)
+  - Linux / Bitwarden / invalid — Skip (✓ done)
+  - Linux / Bitwarden / invalid — Edit (✓ done)
+  - Linux / CSV / valid (✓ done)
+  - Linux / CSV / invalid — MISSING TITLE row imports, no dialog (✓ done)
+  - Android (S23) / Enpass / valid (pending)
+  - Android (S23) / Enpass / invalid — Skip (pending)
+  - Android (S23) / Enpass / invalid — Edit (pending)
+  - Android (S23) / Bitwarden / valid (pending)
+  - Android (S23) / Bitwarden / invalid — Skip (pending)
+  - Android (S23) / Bitwarden / invalid — Edit (pending)
+  - Android (S23) / CSV / valid (pending)
+  - Android (S23) / CSV / invalid — MISSING TITLE row (pending)
+  - Tablet / Enpass / valid (pending)
+  - Tablet / Enpass / invalid — Skip (pending)
+  - Tablet / Enpass / invalid — Edit (pending)
+  - Tablet / Bitwarden / valid (pending — blank screen bug blocks this)
+  - Tablet / Bitwarden / invalid — Skip (pending — blank screen bug blocks)
+  - Tablet / Bitwarden / invalid — Edit (pending — blank screen bug blocks)
+  - Tablet / CSV / valid (pending)
+  - Tablet / CSV / invalid — MISSING TITLE row (pending)
 
 ---
 
@@ -1329,30 +1367,21 @@ The correct sequence, regardless of which importers we build:
 4. **Generic CSV / JSON importer** — implement last, once the field surface
    is stable.
 
-### Import validation failures — user review flow
+### Import validation failures — outstanding bugs
 
-Currently, items that fail domain validation during import (e.g. a card
-number outside the 12–19 digit range) are silently skipped with a log
-message. The user sees a count of imported entries but has no way to
-identify which items were dropped or why.
+Two bugs remain from the initial implementation (verified on Linux,
+pending Android and tablet):
 
-Proposed fix: collect all validation failures during import into a list of
-`ImportFailure` structs (item title, category, reason). After the import
-completes, if any failures exist, show a review dialog listing each failed
-item with its title and the rejection reason. For each item, offer two
-actions: "Edit" (open a pre-populated `CreateEntryScreen` with the raw
-field values so the user can correct the offending field and save manually)
-and "Skip" (discard the item). "Edit" is the high-value path — it lets the
-user recover data that Gabbro's validator correctly rejected but that the
-user knows is valid enough to keep in some corrected form.
+1. **Card name required** — `CreateEntryScreen` card form allows saving
+   without a card name. Cards without a name have no label in the vault
+   list view. Fix: add a required validator to the card name field in
+   `_cardFields()`.
 
-Key questions: should the review dialog be blocking (must resolve all
-failures before returning to the list) or non-blocking (failures queued
-for later review)? Blocking is simpler and less likely to be forgotten.
-How does `CreateEntryScreen` receive pre-populated data for a partially
-valid entry that never made it into the vault? Likely a new optional
-constructor parameter carrying raw field values distinct from `existing`
-(which requires a valid `VaultEntryData`).
+2. **Tablet blank screen after import** — `Navigator.of(context).pop`
+   in `_importBitwarden()` and `_importEnpass()` may not interact
+   correctly with the tablet two-pane layout, leaving a blank screen
+   after import completes. Investigate and fix before closing this
+   feature.
 
 ### Enpass — what we know from analysis of a real export (247 items)
 

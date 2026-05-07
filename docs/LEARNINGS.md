@@ -614,6 +614,41 @@ than trendy, available as `gabbro.app`.
 
 ## Rust & Bridge Concepts
 
+### Returning failures alongside successes — tuple return pattern
+When an operation can partially succeed (some items valid, some not),
+return a tuple `(Vec<Success>, Vec<Failure>)` rather than `Result<Vec<Success>, Error>`.
+The `Result` wrapper still handles catastrophic failure (malformed JSON),
+while the tuple handles per-item validation failures. In Gabbro:
+`parse()` returns `Result<(Vec<VaultEntry>, Vec<ParseFailure>), String>` —
+`Err` only for unparseable JSON; the tuple for per-item outcomes.
+Python analogy: a function returning `(results, errors)` where `errors`
+is a list of `(item, reason)` pairs.
+
+### `pub(crate)` — crate-internal visibility
+`pub(crate)` makes an item visible anywhere within the current crate but
+not to external crates. Used for `ParseFailure` and `parse()` in the
+importer modules — they are called by `api/import.rs` (same crate) but
+should never be part of the public bridge API. More restrictive than `pub`,
+more permissive than private. Python analogy: a leading `_` convention,
+but enforced by the compiler.
+
+### `map_err` — transforming error types
+`result.map_err(|e| transform(e))` converts a `Result<T, E>` into a
+`Result<T, F>` by applying a closure to the error value only. Used to
+convert `String` errors from `CardEntry::new()` into `ParseFailure`
+structs at the call site in `convert_item`. The success path is
+unchanged. Python analogy: wrapping a caught exception in a different
+exception type before re-raising.
+
+### `extract_raw_fields` — canonical key mapping at the boundary
+When collecting raw field values for failure reporting, map source-specific
+field type strings to Gabbro canonical key names at the extraction point
+(`"ccNumber"` → `"card_number"`, `"ccName"` → `"cardholder_name"`, etc.).
+This keeps the Flutter layer ignorant of source-specific naming — it only
+ever sees Gabbro canonical keys. Unknown field types fall back to the
+source label. Always include `"title"` as the first entry so `CreateEntryScreen`
+can prefill the entry name field.
+
 ### `#[cfg(test)]`
 A Rust attribute that marks a block as test-only. Code inside
 `#[cfg(test)]` is compiled only when running `cargo test` — it
@@ -1539,6 +1574,33 @@ the full Argon2id computation (~20s in debug builds).
 ---
 
 ## Flutter & Dart Concepts
+
+### Returning a value from a dialog flow
+`showDialog<T>` returns `Future<T?>` — the value passed to
+`Navigator.of(context).pop(value)` inside the dialog. Use an enum to
+distinguish actions: `pop(_FailureAction.edit)` vs `pop(_FailureAction.skip)`.
+The caller `await`s the future and branches on the result. `null` means
+the dialog was dismissed without a selection (barrier tap) — always guard
+against it.
+
+### Tracking side-effect counts across an async loop
+When a loop of async operations can each independently produce a result
+(e.g. "did the user save this entry?"), accumulate the count in a local
+variable and return it from the enclosing function. In Gabbro,
+`showImportFailuresDialog` returns `Future<int>` — the number of entries
+saved via the Edit path. The caller adds this to `result.imported` before
+popping with the total count. Keeping the accumulation inside the dialog
+function keeps the call site clean.
+
+### `prefill` vs `existing` on a form screen
+`existing` carries a fully valid `VaultEntryData` from the vault — used
+for edit mode. `prefill` carries raw `Map<String, String>` from a failed
+import — used to pre-populate a new entry form with unvalidated data that
+never made it into the vault. They are checked in order in `initState`:
+`existing` wins if both are set (should not happen in production, but
+defensive). `prefill` keys use Gabbro canonical names (`"card_number"`,
+`"cardholder_name"`, `"title"`, etc.) so the form layer never needs to
+know about source-specific field naming.
 
 ### `StatelessWidget` vs `StatefulWidget`
 Every visible element in Flutter is a widget. A `StatelessWidget` is a pure
