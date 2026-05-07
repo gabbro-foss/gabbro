@@ -426,11 +426,13 @@ Each entry is an instance of a typed class:
 - **CustomField:** reusable key/value struct used by LoginEntry (Vec) and
   CustomEntry (HashMap).
 - **CardEntry::new():** only entry type with a validated constructor —
-  enforces card number digit count (12–19) to reject nonsensical data at
-  construction time. Fields added for Enpass import gap closure: `pin`,
-  `bank_name`, `transaction_password` (all `Option<String>`). Other types
-  use struct literals; validation for those will live in the API layer when
-  it is built.
+  enforces card number digit count (12–19), non-empty cardholder name,
+  non-empty expiry, and non-empty CVV. All failing validations are
+  collected and returned as a single semicolon-joined error string so the
+  caller sees every problem at once, not just the first. Fields added for
+  Enpass import gap closure: `pin`, `bank_name`, `transaction_password`
+  (all `Option<String>`). Other types use struct literals; validation for
+  those will live in the API layer when it is built.
 - **EntryAttachment** — implemented in `rust/src/vault/entry.rs`.
   Derives `Zeroize` and `ZeroizeOnDrop` — attachment data may be sensitive
   (passport scans, etc.). Fields: `uuid`, `name`, `kind` (MIME type), `data`
@@ -772,53 +774,19 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Import validation failures — user review flow.
-  `ImportFailureData` + `ImportResult` DTOs in Rust; all three importers
-  (Enpass, Bitwarden, CSV) return `ImportResult`; invalid cards surface as
-  failures instead of being silently dropped or accepted; `ParseFailure`
-  with `extract_raw_fields` in Enpass and Bitwarden parsers; blocking
-  `ImportFailuresDialog` with Skip / Edit actions; `CreateEntryScreen`
-  `prefill` parameter for pre-populated card form; snackbar count includes
-  entries saved via Edit path. 190 Rust tests, 170 Flutter tests passing.
-  Verified on Linux (happy path + invalid path, Enpass + Bitwarden + CSV).
+- **Completed:** Import feature fully closed. Full hardware test matrix
+  passed on Linux, Android (S23), and Lenovo tablet. Three bugs found and
+  fixed during testing: card name required validator in `CreateEntryScreen`;
+  `CardEntry::new()` multi-field validation (cardholder name, expiry, CVV);
+  tablet list pane not refreshing after entry edit (`onEdited` callback
+  added to `EntryDetailScreen`, wired in `TabletVaultLayout`).
+  191 Rust tests, 171 Flutter tests passing.
 
-- **Next task — outstanding bugs and remaining test steps:**
-
-  Bugs to fix before closing this feature:
-  1. Card name field is optional in `CreateEntryScreen` card form — should
-     be required (no title → no label in vault list view). Add validator to
-     `_cardNameController` field in `_cardFields()`.
-  2. Tablet blank screen after Bitwarden import — `Navigator.of(context).pop`
-     in `_importBitwarden()` may not interact correctly with the tablet
-     two-pane layout. Investigate `VaultListScreen` push/pop handling at
-     ≥600dp. Possibly needs `Navigator.of(context, rootNavigator: true).pop`
-     or a different return mechanism on tablet.
-
-  Remaining hardware test matrix (must all pass before feature is done):
-  - Linux / Enpass / valid (✓ done)
-  - Linux / Enpass / invalid — Skip (✓ done)
-  - Linux / Enpass / invalid — Edit (✓ done)
-  - Linux / Bitwarden / valid (✓ done)
-  - Linux / Bitwarden / invalid — Skip (✓ done)
-  - Linux / Bitwarden / invalid — Edit (✓ done)
-  - Linux / CSV / valid (✓ done)
-  - Linux / CSV / invalid — MISSING TITLE row imports, no dialog (✓ done)
-  - Android (S23) / Enpass / valid (pending)
-  - Android (S23) / Enpass / invalid — Skip (pending)
-  - Android (S23) / Enpass / invalid — Edit (pending)
-  - Android (S23) / Bitwarden / valid (pending)
-  - Android (S23) / Bitwarden / invalid — Skip (pending)
-  - Android (S23) / Bitwarden / invalid — Edit (pending)
-  - Android (S23) / CSV / valid (pending)
-  - Android (S23) / CSV / invalid — MISSING TITLE row (pending)
-  - Tablet / Enpass / valid (pending)
-  - Tablet / Enpass / invalid — Skip (pending)
-  - Tablet / Enpass / invalid — Edit (pending)
-  - Tablet / Bitwarden / valid (pending — blank screen bug blocks this)
-  - Tablet / Bitwarden / invalid — Skip (pending — blank screen bug blocks)
-  - Tablet / Bitwarden / invalid — Edit (pending — blank screen bug blocks)
-  - Tablet / CSV / valid (pending)
-  - Tablet / CSV / invalid — MISSING TITLE row (pending)
+- **Next task:** To be decided. Candidates from Bikeshed:
+  - Review screen does not show empty new fields (`ReviewChangesScreen`
+    diff filters out empty values — investigate before fixing)
+  - URL launch icon on non-Login entries (design decision needed first)
+  - Vault sync sub-case (i) — one-shot export/import overwrite
 
 ---
 
@@ -911,6 +879,18 @@ the first public tag.
   tests cover domain logic. The bridge boundary is not yet tested end-to-end.
   Add a `tests/` folder with integration tests that run the full app against
   a real Rust binary before v1. See LEARNINGS.md testing pyramid for context.
+
+### Import
+
+- **Duplicate import detection:** Importing the same file twice creates
+  duplicate entries — each import run generates fresh UUIDs so duplicates
+  are not detected. Before v1, decide on a strategy: (a) content-hash
+  deduplication — hash the canonical fields of each incoming entry and
+  reject if a matching hash already exists in the vault; (b) user warning
+  only — warn the user that re-importing may create duplicates and let them
+  decide; (c) entry-level merge with conflict resolution — most complex,
+  most correct. Option (b) is the lowest effort and appropriate for v1;
+  options (a) and (c) are v2 candidates.
 
 
 ### Security
@@ -1367,21 +1347,33 @@ The correct sequence, regardless of which importers we build:
 4. **Generic CSV / JSON importer** — implement last, once the field surface
    is stable.
 
-### Import validation failures — outstanding bugs
+### Import validation failures — resolved bugs
 
-Two bugs remain from the initial implementation (verified on Linux,
-pending Android and tablet):
+Three bugs were found and fixed during the full hardware test matrix:
 
-1. **Card name required** — `CreateEntryScreen` card form allows saving
-   without a card name. Cards without a name have no label in the vault
-   list view. Fix: add a required validator to the card name field in
-   `_cardFields()`.
+1. **Card name required** — `CreateEntryScreen` card form allowed saving
+   without a card name, leaving cards with no label in the vault list view.
+   Fixed: required validator added to `_cardNameController` in `_cardFields()`.
+   Test added to `test/create_entry_screen_test.dart`.
 
-2. **Tablet blank screen after import** — `Navigator.of(context).pop`
-   in `_importBitwarden()` and `_importEnpass()` may not interact
-   correctly with the tablet two-pane layout, leaving a blank screen
-   after import completes. Investigate and fix before closing this
-   feature.
+2. **Multi-field validation in `CardEntry::new()`** — the constructor only
+   validated card number digit count; missing cardholder name, expiry, and
+   CVV were silently accepted as empty strings. Fixed: all four fields now
+   validated; all failures collected and returned as a single joined error
+   string. Test added to `rust/src/vault/entry.rs`.
+
+3. **Tablet list pane not refreshed after entry edit** — editing an entry
+   via `EntryDetailScreen` in the tablet two-pane layout updated the detail
+   pane but not the list pane. Root cause: `EntryDetailScreen` had no
+   `onEdited` callback; the inline detail pane had no mechanism to trigger
+   `VaultListScreen._loadEntries()`. Fixed: `onEdited: VoidCallback?` added
+   to `EntryDetailScreen`; wired in `TabletVaultLayout._buildDetailPane()`
+   to call `widget.onRefresh()`. Verified on Linux and Lenovo tablet.
+
+   Note: a fourth suspected bug (tablet blank screen after Bitwarden import)
+   could not be reproduced during the hardware test matrix. Tablet Bitwarden
+   import passed on all three test paths (valid, invalid–Skip, invalid–Edit).
+   Monitor in future sessions.
 
 ### Enpass — what we know from analysis of a real export (247 items)
 
