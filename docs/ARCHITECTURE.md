@@ -404,6 +404,20 @@ Each entry is an instance of a typed class:
   `previous_password` before popping. Verified on Samsung S23 (Android 16).
   See ## Testing Strategy → Test Counts.
 
+- **Login notes field — bug found and fixed:** `LoginEntryData.notes` was
+  never wired into `CreateEntryScreen`. No controller, no form widget,
+  `_buildUpdated()` hardcoded `notes: null` (silently wiping existing notes
+  on every edit save), and `_saveCreate()` omitted `notes` entirely (new
+  entries never retained notes). Fix: added `_loginNotesController` and
+  `_loginNotesFocus`; initialised from `field0.notes ?? ''` in edit mode;
+  added optional notes `TextFormField` at the bottom of `_loginFields()`;
+  fixed both `_buildUpdated()` and `_saveCreate()` to pass the controller
+  value. `_optionalTextField()` extended with an optional `focusNode`
+  parameter. 4 tests added to `test/create_entry_screen_test.dart`.
+  Verified on Samsung S23 (Android 16): edit preserves notes, clearing notes
+  shows diff, adding notes shows diff, new entry retains notes, no-change
+  guard fires correctly.
+
 - **`PasswordHistoryScreen`** (`lib/screens/password_history_screen.dart`):
   shows current password (masked, toggleable) and previous password (masked,
   toggleable) with `saved_at` / `expires_at` metadata. "Revert" and "Delete
@@ -611,8 +625,8 @@ export_vault(path)              → Result<(), String>
 
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
-| Rust (`cargo test -q`) | 188 | 1 ignored |
-| Flutter (`flutter test`) | 154 | 1 skipped |
+| Rust (`cargo test -q`) | 191 | 1 ignored |
+| Flutter (`flutter test`) | 174 | 1 skipped |
 
 ## Platforms
 
@@ -774,17 +788,13 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Import feature fully closed. Full hardware test matrix
-  passed on Linux, Android (S23), and Lenovo tablet. Three bugs found and
-  fixed during testing: card name required validator in `CreateEntryScreen`;
-  `CardEntry::new()` multi-field validation (cardholder name, expiry, CVV);
-  tablet list pane not refreshing after entry edit (`onEdited` callback
-  added to `EntryDetailScreen`, wired in `TabletVaultLayout`).
-  191 Rust tests, 171 Flutter tests passing.
+- **Completed:** Login notes field bug found and fixed. `LoginEntryData.notes`
+  was never wired into `CreateEntryScreen` — both `_buildUpdated()` and
+  `_saveCreate()` silently discarded notes. Fix adds controller, form field,
+  and correct value passing in both code paths. 4 tests added. Verified on
+  Samsung S23 (Android 16). 191 Rust tests, 174 Flutter tests passing.
 
 - **Next task:** To be decided. Candidates from Bikeshed:
-  - Review screen does not show empty new fields (`ReviewChangesScreen`
-    diff filters out empty values — investigate before fixing)
   - URL launch icon on non-Login entries (design decision needed first)
   - Vault sync sub-case (i) — one-shot export/import overwrite
 
