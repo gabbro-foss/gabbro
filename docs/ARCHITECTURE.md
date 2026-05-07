@@ -325,6 +325,15 @@ Each entry is an instance of a typed class:
   (password, CVV, PIN) copy the real value — the user explicitly
   requested it.
 
+- **URL launch on non-Login entries — decided against:** Browser launch
+  is intentionally restricted to `LoginEntry.url` only. Adding URL
+  detection to custom fields on other entry types would require heuristics
+  (scheme inference, string pattern matching) that introduce maintenance
+  debt and a potential social engineering surface — a malicious import
+  could populate a custom field with a URL pointing to a harmful site.
+  Gabbro does not open URLs it did not explicitly receive as a typed URL
+  field. Decision is final; do not reopen.
+
 - **Vault deletion from UI:** Menu → Delete vault (previously greyed out)
   triggers a two-step confirmation: (1) warning dialog — Cancel / Continue;
   (2) user must type `DELETE` exactly — Confirm button disabled until matched.
@@ -795,7 +804,6 @@ SPDX identifier: `GPL-3.0-only`
   Samsung S23 (Android 16). 191 Rust tests, 174 Flutter tests passing.
 
 - **Next task:** To be decided. Candidates from Bikeshed:
-  - URL launch icon on non-Login entries (design decision needed first)
   - Vault sync sub-case (i) — one-shot export/import overwrite
 
 ---
