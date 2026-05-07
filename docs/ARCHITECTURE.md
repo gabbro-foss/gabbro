@@ -797,15 +797,15 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Login notes field bug found and fixed. `LoginEntryData.notes`
-  was never wired into `CreateEntryScreen` — both `_buildUpdated()` and
-  `_saveCreate()` silently discarded notes. Fix adds controller, form field,
-  and correct value passing in both code paths. 4 tests added. Verified on
-  Samsung S23 (Android 16). 191 Rust tests, 174 Flutter tests passing.
+- **Completed:** Login notes field bug found and fixed. Duplicate import
+  detection policy decided: keep-all for third-party imports (with warning),
+  UUID-based skip for Gabbro → Gabbro sync (with skipped entry list).
+  191 Rust tests, 174 Flutter tests passing.
 
-- **Next task:** Implement keep-all duplicate import strategy — wire the
-  decided union behaviour into the import flow for all three import types
-  (Enpass, Bitwarden, CSV). Then vault sync sub-case (i).
+- **Next task:** Implement duplicate import policies:
+  (1) Add pre-import warning to ImportScreen for third-party imports.
+  (2) Implement Gabbro → Gabbro vault sync sub-case (i) — UUID-based skip
+      with skipped entry report.
 
 ---
 
@@ -901,12 +901,23 @@ the first public tag.
 
 ### Import
 
-- **Duplicate import detection — decided:** Keep-all (union) strategy
-  adopted for all import types. Fresh UUIDs are generated for every
-  imported entry; no deduplication is performed. Rationale: in both
-  primary use-cases (vault sync across devices; importing from another
-  password manager) the user expects all incoming entries to be added
-  without data loss. Duplicate cleanup is the user's responsibility.
+- **Duplicate import detection — decided:** Two distinct strategies by
+  import type:
+
+  **Third-party → Gabbro (Enpass, Bitwarden, CSV — one-time migration):**
+  Keep-all (union). Fresh UUIDs generated for every imported entry; no
+  deduplication performed. A warning is shown on the import screen before
+  the user confirms: "If you have imported this file before, duplicate
+  entries may be created." Duplicate cleanup is the user's responsibility.
+
+  **Gabbro → Gabbro (device sync via `.gabbro` file):** UUID-based skip.
+  If an incoming entry's UUID already exists in the session it is skipped —
+  the local version is preserved. New entries (UUID not present) are added.
+  After import, the user is shown a list of skipped entries (title + reason:
+  "UUID already exists"). Single save at the end. Rationale: the target
+  vault is the user's clean vault; local edits must not be silently
+  overwritten by an incoming file.
+
   Content-hash deduplication and entry-level merge remain v2 candidates.
 
 
