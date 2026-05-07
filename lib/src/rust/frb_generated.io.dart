@@ -96,6 +96,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FileEntryData dco_decode_file_entry_data(dynamic raw);
 
   @protected
+  GabbroImportResult dco_decode_gabbro_import_result(dynamic raw);
+
+  @protected
   int dco_decode_i_32(dynamic raw);
 
   @protected
@@ -135,6 +138,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
 
   @protected
+  List<SkippedEntryData> dco_decode_list_skipped_entry_data(dynamic raw);
+
+  @protected
   LoginEntryData dco_decode_login_entry_data(dynamic raw);
 
   @protected
@@ -162,6 +168,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (String, String) dco_decode_record_string_string(dynamic raw);
+
+  @protected
+  SkippedEntryData dco_decode_skipped_entry_data(dynamic raw);
 
   @protected
   StrengthTier dco_decode_strength_tier(dynamic raw);
@@ -275,6 +284,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FileEntryData sse_decode_file_entry_data(SseDeserializer deserializer);
 
   @protected
+  GabbroImportResult sse_decode_gabbro_import_result(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
@@ -326,6 +340,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<SkippedEntryData> sse_decode_list_skipped_entry_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   LoginEntryData sse_decode_login_entry_data(SseDeserializer deserializer);
 
   @protected
@@ -357,6 +376,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (String, String) sse_decode_record_string_string(
     SseDeserializer deserializer,
   );
+
+  @protected
+  SkippedEntryData sse_decode_skipped_entry_data(SseDeserializer deserializer);
 
   @protected
   StrengthTier sse_decode_strength_tier(SseDeserializer deserializer);
@@ -494,6 +516,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_file_entry_data(FileEntryData self, SseSerializer serializer);
 
   @protected
+  void sse_encode_gabbro_import_result(
+    GabbroImportResult self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
 
   @protected
@@ -557,6 +585,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_skipped_entry_data(
+    List<SkippedEntryData> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_login_entry_data(
     LoginEntryData self,
     SseSerializer serializer,
@@ -598,6 +632,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_record_string_string(
     (String, String) self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_skipped_entry_data(
+    SkippedEntryData self,
     SseSerializer serializer,
   );
 

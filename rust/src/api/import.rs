@@ -192,6 +192,82 @@ pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
     })
 }
 
+// ── Gabbro → Gabbro import ────────────────────────────────────────────────────
+
+/// A single entry skipped during Gabbro → Gabbro import.
+#[derive(Debug)]
+pub struct SkippedEntryData {
+    /// Display title of the skipped entry.
+    pub title: String,
+    /// Human-readable reason for skipping.
+    pub reason: String,
+}
+
+/// Returned by [`import_from_gabbro`].
+#[derive(Debug)]
+pub struct GabbroImportResult {
+    /// Number of entries added to the session.
+    pub imported: usize,
+    /// Entries that were skipped (UUID already present in the session).
+    pub skipped: Vec<SkippedEntryData>,
+}
+
+/// Import entries from a `.gabbro` vault file into the live session.
+///
+/// Decrypts the source vault at `path` using `passphrase`, then applies
+/// UUID-based deduplication: entries whose UUID already exists in the session
+/// are skipped; new entries are added. A single vault save is performed at
+/// the end.
+///
+/// The vault must already be unlocked — returns `Err` if no session is active.
+/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+pub async fn import_from_gabbro(
+    path: String,
+    passphrase: Vec<u8>,
+) -> Result<GabbroImportResult, String> {
+    use crate::api::vault::load_vault;
+    use crate::vault::session;
+
+    let source_path = std::path::PathBuf::from(&path);
+    let source_entries = load_vault(&passphrase, &source_path)?;
+    let existing_ids = session::session_entry_ids()?;
+
+    let mut imported = 0;
+    let mut skipped = Vec::new();
+
+    for entry in source_entries {
+        let id = match &entry {
+            crate::vault::entry::VaultEntry::Login(e)    => e.meta.id.clone(),
+            crate::vault::entry::VaultEntry::Note(e)     => e.meta.id.clone(),
+            crate::vault::entry::VaultEntry::Identity(e) => e.meta.id.clone(),
+            crate::vault::entry::VaultEntry::Card(e)     => e.meta.id.clone(),
+            crate::vault::entry::VaultEntry::File(e)     => e.meta.id.clone(),
+            crate::vault::entry::VaultEntry::Custom(e)   => e.meta.id.clone(),
+        };
+        let title = match &entry {
+            crate::vault::entry::VaultEntry::Login(e)    => e.title.clone(),
+            crate::vault::entry::VaultEntry::Note(e)     => e.title.clone(),
+            crate::vault::entry::VaultEntry::Identity(e) => format!("{} {}", e.first_name, e.last_name),
+            crate::vault::entry::VaultEntry::Card(e)     => e.card_name.clone().unwrap_or_else(|| e.cardholder_name.clone()),
+            crate::vault::entry::VaultEntry::File(e)     => e.filename.clone(),
+            crate::vault::entry::VaultEntry::Custom(e)   => e.title.clone(),
+        };
+
+        if existing_ids.contains(&id) {
+            skipped.push(SkippedEntryData {
+                title,
+                reason: String::from("UUID already exists"),
+            });
+        } else {
+            session::session_add_entry_no_save(entry)?;
+            imported += 1;
+        }
+    }
+
+    session::session_save()?;
+    Ok(GabbroImportResult { imported, skipped })
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 // NOTE: ImportResult and ImportFailureData are defined here as stubs so the
@@ -415,6 +491,90 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
             "attachments": []
         }]
     }"#;
+
+    // A minimal valid .gabbro vault containing two entries:
+    // - "existing-001" (already in the session from setup_vault)
+    // - "new-entry-001" (not in the session — should be imported)
+    fn setup_source_vault(passphrase: &[u8]) -> std::path::PathBuf {
+        let mut path = temp_dir();
+        path.push("gabbro_import_source_test.gabbro");
+        let entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("existing-001"), // already in session
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("Existing note"),
+                content: String::from("should be skipped"),
+                attachments: vec![],
+            }),
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("new-entry-001"), // not in session
+                    created_at: String::from("2025-02-01T00:00:00Z"),
+                    updated_at: String::from("2025-02-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("New note"),
+                content: String::from("should be imported"),
+                attachments: vec![],
+            }),
+        ];
+        save_vault(&entries, passphrase, &path).unwrap();
+        path
+    }
+
+    #[test]
+    #[serial]
+    fn import_from_gabbro_skips_existing_uuids() {
+        let session_pass = b"session passphrase";
+        let session_path = setup_vault(session_pass);
+        session::unlock_vault(session_pass, session_path.clone()).unwrap();
+
+        let source_pass = b"source passphrase";
+        let source_path = setup_source_vault(source_pass);
+
+        let result = run(import_from_gabbro(
+            source_path.to_str().unwrap().to_string(),
+            source_pass.to_vec(),
+        ))
+        .unwrap();
+
+        // "new-entry-001" is new → imported; "existing-001" is duplicate → skipped
+        assert_eq!(result.imported, 1, "only the new entry should be imported");
+        assert_eq!(result.skipped.len(), 1, "one entry should be skipped");
+        assert_eq!(result.skipped[0].title, "Existing note");
+        assert_eq!(result.skipped[0].reason, "UUID already exists");
+
+        let summaries = session::list_entry_summaries().unwrap();
+        // 1 original note + 1 new imported note
+        assert_eq!(summaries.len(), 2);
+
+        teardown(&session_path);
+        let _ = std::fs::remove_file(&source_path);
+    }
+
+    #[test]
+    #[serial]
+    fn import_from_gabbro_locked_vault_returns_error() {
+        session::lock_vault().unwrap();
+
+        let source_pass = b"source passphrase";
+        let mut source_path = temp_dir();
+        source_path.push("gabbro_nonexistent_source.gabbro");
+
+        let result = run(import_from_gabbro(
+            source_path.to_str().unwrap().to_string(),
+            source_pass.to_vec(),
+        ));
+        assert!(result.is_err());
+    }
 
     #[test]
     #[serial]

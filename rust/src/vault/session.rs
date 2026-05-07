@@ -173,6 +173,16 @@ pub fn session_delete_entries_no_save(ids: &[String]) -> Result<(), String> {
     Ok(())
 }
 
+/// Return the set of UUIDs of all entries currently in the session.
+///
+/// Used by import to check for existing entries before adding new ones.
+/// Sync — reads from in-memory session, no I/O.
+pub fn session_entry_ids() -> Result<std::collections::HashSet<String>, String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
+    Ok(session.entries.iter().map(|e| entry_id(e).to_string()).collect())
+}
+
 /// Add a new entry to the in-memory session only — no disk write.
 ///
 /// Used by bulk operations (e.g. import) that add many entries and

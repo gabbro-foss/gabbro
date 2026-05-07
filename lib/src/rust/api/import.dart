@@ -6,7 +6,7 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`, `fmt`
 
 /// Sniff the headers and first 3 rows of a CSV string.
 ///
@@ -51,6 +51,23 @@ Future<ImportResult> importFromBitwarden({required List<int> data}) =>
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
 Future<ImportResult> importFromEnpass({required List<int> data}) =>
     RustLib.instance.api.crateApiImportImportFromEnpass(data: data);
+
+/// Import entries from a `.gabbro` vault file into the live session.
+///
+/// Decrypts the source vault at `path` using `passphrase`, then applies
+/// UUID-based deduplication: entries whose UUID already exists in the session
+/// are skipped; new entries are added. A single vault save is performed at
+/// the end.
+///
+/// The vault must already be unlocked — returns `Err` if no session is active.
+/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+Future<GabbroImportResult> importFromGabbro({
+  required String path,
+  required List<int> passphrase,
+}) => RustLib.instance.api.crateApiImportImportFromGabbro(
+  path: path,
+  passphrase: passphrase,
+);
 
 /// Column mapping config passed in by Flutter after the user maps columns.
 class CsvImportConfigData {
@@ -110,6 +127,28 @@ class CsvPreviewData {
           runtimeType == other.runtimeType &&
           headers == other.headers &&
           rows == other.rows;
+}
+
+/// Returned by [`import_from_gabbro`].
+class GabbroImportResult {
+  /// Number of entries added to the session.
+  final BigInt imported;
+
+  /// Entries that were skipped (UUID already present in the session).
+  final List<SkippedEntryData> skipped;
+
+  const GabbroImportResult({required this.imported, required this.skipped});
+
+  @override
+  int get hashCode => imported.hashCode ^ skipped.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GabbroImportResult &&
+          runtimeType == other.runtimeType &&
+          imported == other.imported &&
+          skipped == other.skipped;
 }
 
 /// A single entry that failed domain validation during import.
@@ -174,4 +213,26 @@ class ImportResult {
           runtimeType == other.runtimeType &&
           imported == other.imported &&
           failures == other.failures;
+}
+
+/// A single entry skipped during Gabbro → Gabbro import.
+class SkippedEntryData {
+  /// Display title of the skipped entry.
+  final String title;
+
+  /// Human-readable reason for skipping.
+  final String reason;
+
+  const SkippedEntryData({required this.title, required this.reason});
+
+  @override
+  int get hashCode => title.hashCode ^ reason.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SkippedEntryData &&
+          runtimeType == other.runtimeType &&
+          title == other.title &&
+          reason == other.reason;
 }

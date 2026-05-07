@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
+import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/widgets/path_field.dart';
 
@@ -11,17 +13,23 @@ Future<ImportResult> _defaultImportEnpass(List<int> data) =>
 Future<ImportResult> _defaultImportBitwarden(List<int> data) =>
     importFromBitwarden(data: data);
 CsvPreviewData _defaultSniffCsv(String input) => sniffCsvFile(input: input);
+Future<GabbroImportResult> _defaultImportGabbro(
+        String path, List<int> passphrase) =>
+    importFromGabbro(path: path, passphrase: passphrase);
 
 class ImportScreen extends StatefulWidget {
   final Future<ImportResult> Function(List<int> data) onImportEnpass;
   final Future<ImportResult> Function(List<int> data) onImportBitwarden;
   final CsvPreviewData Function(String input) onSniffCsv;
+  final Future<GabbroImportResult> Function(String path, List<int> passphrase)
+      onImportGabbro;
 
   const ImportScreen({
     super.key,
     this.onImportEnpass = _defaultImportEnpass,
     this.onImportBitwarden = _defaultImportBitwarden,
     this.onSniffCsv = _defaultSniffCsv,
+    this.onImportGabbro = _defaultImportGabbro,
   });
 
   @override
@@ -32,14 +40,26 @@ class _ImportScreenState extends State<ImportScreen> {
   String? _enpassPath;
   String? _bitwardenPath;
   String? _csvPath;
+  String? _gabbroPath;
 
   bool _isImportingEnpass = false;
   bool _isImportingBitwarden = false;
   bool _isSniffingCsv = false;
+  bool _isImportingGabbro = false;
 
   String? _enpassError;
   String? _bitwardenError;
   String? _csvError;
+  String? _gabbroError;
+
+  final _passphraseController = TextEditingController();
+  bool _showPassphrase = false;
+
+  @override
+  void dispose() {
+    _passphraseController.dispose();
+    super.dispose();
+  }
 
   // ── Enpass ───────────────────────────────────────────────────────────────
 
@@ -105,6 +125,42 @@ class _ImportScreenState extends State<ImportScreen> {
     }
   }
 
+  // ── Gabbro ───────────────────────────────────────────────────────────────
+
+  Future<void> _importGabbro() async {
+    final path = _gabbroPath;
+    if (path == null || path.isEmpty) {
+      setState(() => _gabbroError = 'Select a file.');
+      return;
+    }
+    final file = File(path);
+    if (!file.existsSync()) {
+      setState(() => _gabbroError = 'File not found.');
+      return;
+    }
+    final passphrase = _passphraseController.text;
+    if (passphrase.isEmpty) {
+      setState(() => _gabbroError = 'Enter the passphrase for this vault.');
+      return;
+    }
+    setState(() {
+      _isImportingGabbro = true;
+      _gabbroError = null;
+    });
+    try {
+      final passphraseBytes = utf8.encode(passphrase);
+      final result = await widget.onImportGabbro(path, passphraseBytes);
+      if (result.skipped.isNotEmpty && mounted) {
+        await showSkippedEntriesDialog(context, result.skipped);
+      }
+      if (mounted) Navigator.of(context).pop(result.imported.toInt());
+    } catch (e) {
+      if (mounted) setState(() => _gabbroError = e.toString());
+    } finally {
+      if (mounted) setState(() => _isImportingGabbro = false);
+    }
+  }
+
   // ── CSV ──────────────────────────────────────────────────────────────────
 
   Future<void> _sniffAndPushCsvMapping() async {
@@ -140,6 +196,38 @@ class _ImportScreenState extends State<ImportScreen> {
     }
   }
 
+  // ── Warning banner ───────────────────────────────────────────────────────
+
+  Widget _duplicateWarningBanner(BuildContext context) {
+    return Card(
+      color: Theme.of(context).colorScheme.secondaryContainer,
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.warning_amber_rounded,
+              color: Theme.of(context).colorScheme.onSecondaryContainer,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'If you have imported this file before, duplicate entries '
+                'may be created. Duplicate cleanup is your responsibility.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSecondaryContainer,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ── Build ────────────────────────────────────────────────────────────────
 
   @override
@@ -153,6 +241,8 @@ class _ImportScreenState extends State<ImportScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              _duplicateWarningBanner(context),
+              const SizedBox(height: 20),
               _importSection(
                 title: 'Enpass',
                 subtitle: 'JSON export from Enpass (Tools → Export)',
@@ -181,10 +271,72 @@ class _ImportScreenState extends State<ImportScreen> {
               const Divider(),
               const SizedBox(height: 24),
               _csvSection(),
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 24),
+              _gabbroSection(),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _gabbroSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('Gabbro vault', style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 4),
+        Text(
+          'Sync entries from another Gabbro vault (.gabbro file)',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: 12),
+        PathField(
+          mode: PathFieldMode.open,
+          hint: '/home/user/vault.gabbro',
+          allowedExtensions: ['gabbro'],
+          onPathSelected: (p) => setState(() => _gabbroPath = p),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _passphraseController,
+          obscureText: !_showPassphrase,
+          decoration: InputDecoration(
+            labelText: 'Vault passphrase',
+            border: const OutlineInputBorder(),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _showPassphrase ? Icons.visibility_off : Icons.visibility,
+              ),
+              onPressed: () =>
+                  setState(() => _showPassphrase = !_showPassphrase),
+            ),
+          ),
+        ),
+        if (_gabbroError != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            _gabbroError!,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+              fontSize: 12,
+            ),
+          ),
+        ],
+        const SizedBox(height: 12),
+        FilledButton(
+          onPressed: _isImportingGabbro ? null : _importGabbro,
+          child: _isImportingGabbro
+              ? const SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Sync from vault'),
+        ),
+      ],
     );
   }
 
