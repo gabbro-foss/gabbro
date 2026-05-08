@@ -412,6 +412,10 @@ Each entry is an instance of a typed class:
   via `getEntry(id)` to get the Rust-stamped `updated_at` and populated
   `previous_password` before popping. Verified on Samsung S23 (Android 16).
   See ## Testing Strategy → Test Counts.
+  **Bug fixed:** `Custom` and `Identity` entry diffs previously omitted newly
+  added fields (fields present in the updated entry but absent in the original).
+  Fixed: both branches now iterate to `max(original.length, updated.length)`,
+  diffing new fields against an empty string. Verified on Linux (Lenovo tablet).
 
 - **Login notes field — bug found and fixed:** `LoginEntryData.notes` was
   never wired into `CreateEntryScreen`. No controller, no form widget,
@@ -635,7 +639,7 @@ export_vault(path)              → Result<(), String>
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
 | Rust (`cargo test -q`) | 193 | 1 ignored |
-| Flutter (`flutter test`) | 181 | 1 skipped |
+| Flutter (`flutter test`) | 183 | 1 skipped |
 
 ## Platforms
 
@@ -797,19 +801,22 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Gabbro → Gabbro sync round-trip hardware-verified in both
-  directions (Linux → Android and Android → Linux). Four test rounds: happy
-  path, full UUID-skip, partial overlap, and wrong-passphrase rejection.
-  All passed. Skipped-entries dialog verified on both platforms — correct
-  entries listed with "UUID already exists" reason. Console output revealed
-  a stale-ID bug in `TabletVaultLayout` (see Bikeshed → Features & UX).
+- **Completed:** Three bug fixes hardware-verified on Linux and Lenovo tablet:
+  (1) `TabletVaultLayout` stale `_selectedEntryId` — reset via `didUpdateWidget`
+  when the selected UUID is no longer present in `filteredEntries` after a vault
+  reload or import. Test 10 added to `test/vault_list_tablet_test.dart`.
+  (2) `ReviewChangesScreen` empty-new-fields diff — `Custom` and `Identity`
+  branches now show newly added fields (empty → value) in the diff.
+  Test added to `test/review_changes_screen_test.dart`.
+  (3) Vault deletion from UI — already implemented in a prior session; tests
+  confirmed passing (8/8).
 
 - **Next tasks (in order):**
-  1. Fix `TabletVaultLayout` stale `_selectedEntryId` bug — reset to `null`
-     after import/vault reload; add failing test first.
-  2. Fix `ReviewChangesScreen` empty-new-fields diff bug — empty added
-     fields should appear in the diff.
-  3. Vault deletion from within the UI.
+  1. Alphabet bar left/right position toggle — Settings → Appearance, phone
+     layout only. See Bikeshed → Features & UX.
+  2. Tablet edit-mode dim (phase 2) — wire `_isEditing` in
+     `TabletVaultLayout`; unskip test 6.
+  3. `zeroize` integration — see Bikeshed → Security.
 
 ---
 
@@ -1059,24 +1066,6 @@ the first public tag.
   fields so typed — requires a domain model change and bridge update but
   is precise. Decide approach before implementing.
 
-- **Vault deletion from within the UI:** Users should be able to delete
-  their vault from within the app (Settings → Security or a dedicated
-  danger zone). This covers the "start fresh" and "wipe before selling
-  device" use cases. Requirements: confirmation dialog with passphrase
-  re-entry (not just a tap — deletion is irreversible); deletes the
-  `.gabbro` and `.gabbro.sha256` files from disk; clears the Rust session;
-  returns the user to `OnboardingScreen`. Must not be reachable while the
-  vault is locked. Rust bridge function needed: `delete_vault() →
-  Result<(), String>`. TDD: failing test first.
-
-- **Review screen does not show empty new fields:** When a new custom
-  field is added in `CreateEntryScreen` but left empty, tapping Review →
-  shows nothing to review — the user sees only Cancel and Save with no
-  diff. The field addition should appear in the diff even if the value is
-  empty, so the user can confirm or discard it. Likely `ReviewChangesScreen`
-  filters out empty values too aggressively. Investigate diff-building
-  logic before fixing.
-
 - **Timestamp localisation (i18n):** `formatTimestamp()` in
   `entry_detail_screen.dart` uses a hand-rolled English month
   abbreviations array. When internationalisation (i18n) is added,
@@ -1239,16 +1228,6 @@ the first public tag.
   Options: (1) widen the fixed value, or (2) make the divider draggable
   so the user can adjust it. Option 2 is more flexible but adds
   complexity. Revisit after other tablet polish is complete.
-
-- **`TabletVaultLayout` stale `_selectedEntryId` after vault reload (bug):**
-  After a successful Gabbro → Gabbro import, `_selectedEntryId` is not
-  reset. The next layout pass calls `getEntry()` with a stale ID that no
-  longer exists in the session; Rust returns an error; the bridge throws.
-  UI falls back to the empty-state placeholder silently — no crash visible
-  to the user but a full stack trace logged to console. Fix: reset
-  `_selectedEntryId = null` (and clear the detail pane) wherever
-  `onRefresh()` is called after a vault-mutating operation. TDD: write
-  failing test first. File: `gabbro/lib/screens/tablet_vault_layout.dart`.
 
 - **Tablet edit-mode dim (phase 2):** Wire `_isEditing` state in
   `TabletVaultLayout` — set true when pencil tapped on detail pane
