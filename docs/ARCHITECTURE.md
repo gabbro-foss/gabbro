@@ -635,7 +635,7 @@ export_vault(path)              → Result<(), String>
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
 | Rust (`cargo test -q`) | 193 | 1 ignored |
-| Flutter (`flutter test`) | 179 | 1 skipped |
+| Flutter (`flutter test`) | 181 | 1 skipped |
 
 ## Platforms
 
@@ -797,15 +797,15 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Duplicate import policies implemented. Pre-import warning
-  banner added to ImportScreen for all third-party imports (Enpass, Bitwarden,
-  CSV). Gabbro → Gabbro UUID-based skip implemented with skipped entry report
-  dialog. 193 Rust tests, 179 Flutter tests passing. Verified on Samsung S23
-  (Android 16) — skipped entries dialog unverified on hardware pending export
-  path picker fix (see Bikeshed).
+- **Completed:** Export path picker partially fixed — `FilePicker.saveFile()`
+  replaced with `getApplicationSupportDirectory()` on Android; `PathField`
+  gained `readOnly` parameter; 2 new Flutter tests. 181 Flutter tests passing.
+  Hardware verified on Linux (cases 4+5 pass). Android export writes
+  successfully but to app-private storage — inaccessible to user without root.
 
-- **Next task:** Fix export path picker on Android (save-mode file picker
-  returns "select a destination" without opening the system picker).
+- **Next task:** Fix Android export destination — use `FilePicker.getDirectoryPath()`
+  (SAF) to let user pick a destination directory, then write export files there
+  via Dart `File` API. See Bikeshed for full diagnosis.
 
 ---
 
@@ -921,11 +921,19 @@ the first public tag.
 
   Content-hash deduplication and entry-level merge remain v2 candidates.
 
-- **Export path picker broken on Android (S23):** Save-mode file picker
-  on Android returns "select a destination" message without opening the
-  system file picker. Blocks hardware verification of export and
-  Gabbro → Gabbro sync round-trip. Needs investigation of `PathField`
-  save mode and `file_picker` behaviour on Android 16.
+- **Export path picker broken on Android (S23):** `FilePicker.saveFile()`
+  is desktop-only and silently returns `null` on Android. A partial fix
+  was implemented (pre-populate path from `getApplicationSupportDirectory()`,
+  suppress folder icon on Android) but this resolves to app-private storage
+  (`/data/data/app.gabbro.gabbro/files/`) which is inaccessible to the user
+  on a non-rooted device — making export silently useless for backup and sync.
+  The correct fix is to use `FilePicker.getDirectoryPath()` (SAF — Storage
+  Access Framework) to let the user pick a destination directory, then write
+  the export files there using Dart's `File` API. This gives the user a
+  picker on Android without requiring `FilePicker.saveFile()`. The partial
+  fix code is committed but the feature remains broken on Android pending
+  this full fix. Blocks hardware verification of Gabbro → Gabbro sync
+  round-trip.
 
 
 ### Security
