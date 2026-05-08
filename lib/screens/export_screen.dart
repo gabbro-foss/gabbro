@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
-import 'package:path_provider/path_provider.dart';
 
 Future<void> _defaultExport(String path) => exportVault(path: path);
 
@@ -24,6 +24,8 @@ class ExportScreen extends StatefulWidget {
 }
 
 class _ExportScreenState extends State<ExportScreen> {
+  // On Android: stores the chosen directory path (no filename appended yet).
+  // On Linux:   stores the full file path including filename.
   String? _path;
   bool _isExporting = false;
   String? _error;
@@ -31,16 +33,26 @@ class _ExportScreenState extends State<ExportScreen> {
   @override
   void initState() {
     super.initState();
+    // initialPath is used by tests to inject a pre-chosen directory on Android
+    // or a full file path on Linux.
     _path = widget.initialPath;
-    if (widget.isAndroid) {
-      _resolveAndroidPath();
+  }
+
+  Future<void> _pickDirectory() async {
+    final dir = await FilePicker.getDirectoryPath();
+    if (dir != null && mounted) {
+      setState(() {
+        _path = dir;
+        _error = null;
+      });
     }
   }
 
-  Future<void> _resolveAndroidPath() async {
-    final dir = await getApplicationSupportDirectory();
-    final path = '${dir.path}/vault.gabbro';
-    if (mounted) setState(() => _path = path);
+  String get _exportPath {
+    if (widget.isAndroid) {
+      return '$_path/vault.gabbro';
+    }
+    return _path!;
   }
 
   Future<void> _export() async {
@@ -53,7 +65,7 @@ class _ExportScreenState extends State<ExportScreen> {
       _error = null;
     });
     try {
-      await widget.onExport(_path!);
+      await widget.onExport(_exportPath);
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
       if (mounted) setState(() => _error = e.toString());
@@ -83,20 +95,32 @@ class _ExportScreenState extends State<ExportScreen> {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(height: 16),
-              PathField(
-                mode: PathFieldMode.save,
-                hint: widget.isAndroid
-                    ? _path ?? 'Resolving path…'
-                    : '/home/user/vault.gabbro',
-                allowedExtensions: ['gabbro'],
-                saveFileName: 'vault.gabbro',
-                initialPath: _path,
-                readOnly: widget.isAndroid,
-                onPathSelected: (p) => setState(() {
-                  _path = p;
-                  _error = null;
-                }),
-              ),
+              if (widget.isAndroid) ...[
+                OutlinedButton.icon(
+                  onPressed: _pickDirectory,
+                  icon: const Icon(Icons.folder),
+                  label: const Text('Choose folder'),
+                ),
+                if (_path != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _path!,
+                    style: Theme.of(context).textTheme.bodySmall,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ] else
+                PathField(
+                  mode: PathFieldMode.save,
+                  hint: '/home/user/vault.gabbro',
+                  allowedExtensions: ['gabbro'],
+                  saveFileName: 'vault.gabbro',
+                  initialPath: _path,
+                  onPathSelected: (p) => setState(() {
+                    _path = p;
+                    _error = null;
+                  }),
+                ),
               if (_error != null) ...[
                 const SizedBox(height: 4),
                 Text(
@@ -109,7 +133,7 @@ class _ExportScreenState extends State<ExportScreen> {
               ],
               const SizedBox(height: 16),
               FilledButton(
-                onPressed: _isExporting ? null : _export,
+                onPressed: (_isExporting || _path == null) ? null : _export,
                 child: _isExporting
                     ? const SizedBox(
                         height: 20,
