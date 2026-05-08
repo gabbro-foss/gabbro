@@ -912,32 +912,8 @@ the first public tag.
 
 ### Import
 
-- **Duplicate import detection — implemented:** Two distinct strategies by
-  import type:
-
-  **Third-party → Gabbro (Enpass, Bitwarden, CSV — one-time migration):**
-  Keep-all (union). Fresh UUIDs generated for every imported entry; no
-  deduplication performed. A persistent warning card is shown at the top of
-  `ImportScreen`: "If you have imported this file before, duplicate entries
-  may be created. Duplicate cleanup is your responsibility."
-
-  **Gabbro → Gabbro (device sync via `.gabbro` file):** UUID-based skip.
-  If an incoming entry's UUID already exists in the session it is skipped —
-  the local version is preserved. New entries (UUID not present) are added.
-  After import, the user is shown `import_skipped_dialog.dart` listing
-  skipped entries (title + reason: "UUID already exists"). Single save at
-  the end. Bridge function: `import_from_gabbro(path, passphrase)` in
-  `rust/src/api/import.rs`. Hardware-verified on Linux and Samsung S23
-  (Android 16) — both directions, all four test rounds passed.
-
-  Content-hash deduplication and entry-level merge remain v2 candidates.
-
-- **Export path picker — resolved:** `FilePicker.getDirectoryPath()` (SAF)
-  implemented on Android. User picks destination directory; export writes
-  `vault.gabbro` + `vault.gabbro.sha256` there. Hardware verified on
-  Samsung S23 (Android 16). `PathField` unchanged — Android bypasses it.
-  Gabbro → Gabbro sync round-trip hardware verification is the next step.
-
+- **Content-hash deduplication and entry-level merge:** Both remain v2
+  candidates. No design work started.
 
 ### Security
 
@@ -1055,33 +1031,22 @@ the first public tag.
   This is at minimum one full session; sub-case (iii) likely several.
   Do not start without a design doc agreed first.
 
-- **URL launch icon on non-Login entries:** Currently the launch icon
-  (`Icons.open_in_browser_outlined`) only appears on the URL field of
-  Login entries. Custom entries and custom fields on any entry type may
-  also contain URL-shaped values. Two design options: (1) auto-detect
-  URL-shaped values heuristically (check for scheme or bare domain
-  pattern) and show the launch icon automatically — fragile, may produce
-  false positives; (2) add an explicit `field_type: url` variant to the
-  custom field domain model in Rust, and render the launch icon only for
-  fields so typed — requires a domain model change and bridge update but
-  is precise. Decide approach before implementing.
-
 - **Timestamp localisation (i18n):** `formatTimestamp()` in
   `entry_detail_screen.dart` uses a hand-rolled English month
   abbreviations array. When internationalisation (i18n) is added,
   replace with `DateFormat('dd MMM yyyy, HH:mm').format(dt)` from
   `package:intl` — one-line change, picks up device locale automatically.
 
-- **Autofill:** How will autofill work across platforms? On desktop,
-  browser extensions (Chrome/Firefox/etc.) are the standard approach —
-  requires building and maintaining separate extension(s). On mobile there
-  are no extensions; Android exposes an Autofill Framework (AccessibilityService
-  or the dedicated AutofillService API) and iOS has a Password AutoFill
-  extension point. These are fundamentally different integration models per
-  platform. Key questions: which platforms get autofill in v1 vs v2? Is a
-  browser extension in scope at all given the GPL-3.0 and FOSS distribution
-  model? Does autofill change the security model (secrets closer to the
-  browser boundary)?
+- **Autofill:** Credentials go directly from the autofill service into the
+  target field via the OS autofill framework — bypassing clipboard history
+  managers entirely. This is a meaningful security advantage over copy-paste
+  and worth building in v2. On Android: AutofillService API. On desktop:
+  browser extension (separate distribution, requires building and maintaining
+  per-browser extensions). Key questions: which platforms get autofill in v1
+  vs v2? Is a browser extension in scope given the GPL-3.0 and FOSS
+  distribution model? Does autofill change the security model (secrets closer
+  to the browser boundary)? Prerequisite for passkey support.
+  Document the clipboard-vs-autofill security distinction in `docs/SECURITY.md`.
 
 - **Themes — dark / light / custom:** Dark and light modes are already noted
   as system-default with user override. Open questions: should Gabbro offer
@@ -1250,22 +1215,6 @@ the first public tag.
   app-private storage without SAF, `MANAGE_EXTERNAL_STORAGE` would be
   required — a heavily restricted permission that draws Play Store
   scrutiny.
-
-- **Copy to clipboard from detail screen:** Implemented and hardware-verified
-  on Linux and Samsung S23 (Android 16). No further action needed.
-
-- **Detail view — created/modified timestamps:** Show `created_at` and
-  `updated_at` on the detail screen so users can audit when an entry was
-  created or last changed. Data is already present in all entry DTOs.
-  Low effort, high audit value.
-
-- **Autofill:** Autofill does not use the OS clipboard — credentials go
-  directly from the autofill service into the target field via the OS
-  autofill framework, bypassing clipboard history managers entirely. This
-  is a meaningful security advantage over copy-paste and worth building
-  in v2. On Android: AutofillService API. On desktop: browser extension
-  (separate distribution). Prerequisite for passkey support.
-  Document the clipboard-vs-autofill security distinction in `docs/SECURITY.md`.
 
 - **Release builds for UI/UX testing:** Debug builds run Argon2id unoptimised
   (~20s per vault operation on Linux, worse on Android emulator). Always use
