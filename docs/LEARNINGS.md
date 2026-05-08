@@ -2285,3 +2285,37 @@ Before each v1 release candidate, cross-check `_kComponents` in
 
 First audit (May 2026): found `once_cell` and `base64` missing — both
 added as `Apache-2.0 / MIT`.
+
+---
+
+## Android — SAF directory picker for file export
+
+`FilePicker.saveFile()` is desktop-only. On Android it silently returns
+`null`, making export appear to succeed while writing nothing accessible
+to the user.
+
+The correct approach for Android is `FilePicker.getDirectoryPath()`,
+which invokes the Storage Access Framework (SAF) system picker. The user
+selects a destination directory; the app then constructs the full output
+path by appending the filename:
+
+```dart
+final dir = await FilePicker.getDirectoryPath();
+// dir is e.g. '/storage/emulated/0/Documents'
+final exportPath = '$dir/vault.gabbro';
+```
+
+Key design points:
+
+- The Export button must remain **disabled** (`onPressed: null`) until a
+  directory has been chosen — there is no pre-populated default on Android.
+- `PathField` is not used on Android for export — the Android branch calls
+  `getDirectoryPath()` directly and shows an `OutlinedButton.icon` instead.
+- The Rust `export_vault(path)` bridge receives the full file path
+  (directory + filename) unchanged — no Rust changes needed.
+- Use a distinct icon (`Icons.folder`) for the "Choose folder" button so
+  widget tests can distinguish it from `PathField`'s `Icons.folder_open`.
+
+Python analogy: like `tkinter.filedialog.askdirectory()` vs
+`asksaveasfilename()` — one returns a folder, the other a full path.
+You then join the folder with your chosen filename yourself.

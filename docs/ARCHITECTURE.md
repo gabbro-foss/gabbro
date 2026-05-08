@@ -797,15 +797,16 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Export path picker partially fixed — `FilePicker.saveFile()`
-  replaced with `getApplicationSupportDirectory()` on Android; `PathField`
-  gained `readOnly` parameter; 2 new Flutter tests. 181 Flutter tests passing.
-  Hardware verified on Linux (cases 4+5 pass). Android export writes
-  successfully but to app-private storage — inaccessible to user without root.
+- **Completed:** Android export destination fixed — `FilePicker.getDirectoryPath()`
+  (SAF) replaces `getApplicationSupportDirectory()`; user picks a destination
+  directory; export writes `vault.gabbro` + `vault.gabbro.sha256` there.
+  `_resolveAndroidPath()` removed; `ExportScreen` Android branch now shows
+  "Choose folder" button; Export button disabled until directory chosen.
+  6 Flutter tests passing. Hardware verified on Samsung S23 (Android 16).
 
-- **Next task:** Fix Android export destination — use `FilePicker.getDirectoryPath()`
-  (SAF) to let user pick a destination directory, then write export files there
-  via Dart `File` API. See Bikeshed for full diagnosis.
+- **Next task:** Hardware-verify Gabbro → Gabbro sync round-trip (export on
+  one device, import `.gabbro` on another). Skipped-entries dialog also
+  unverified on hardware — test both in the same session.
 
 ---
 
@@ -921,35 +922,11 @@ the first public tag.
 
   Content-hash deduplication and entry-level merge remain v2 candidates.
 
-- **Export path picker broken on Android (S23):** `FilePicker.saveFile()`
-  is desktop-only and silently returns `null` on Android. A partial fix
-  was implemented (pre-populate path from `getApplicationSupportDirectory()`,
-  suppress folder icon on Android) but this resolves to app-private storage
-  (`/data/data/app.gabbro.gabbro/files/`) which is inaccessible to the user
-  on a non-rooted device — making export silently useless for backup and sync.
-  The correct fix is to use `FilePicker.getDirectoryPath()` (SAF — Storage
-  Access Framework) to let the user pick a destination directory, then write
-  the export files there using Dart's `File` API. This gives the user a
-  picker on Android without requiring `FilePicker.saveFile()`. The partial
-  fix code is committed but the feature remains broken on Android pending
-  this full fix. Blocks hardware verification of Gabbro → Gabbro sync
-  round-trip.
-
-  **Implementation plan for next session:**
-  1. Upload `rust/src/api/vault_bridge.rs` first — verify how `export_vault`
-     constructs its `.gabbro` and `.gabbro.sha256` output paths from the
-     single `path` argument before touching any Dart code.
-  2. Remove `_resolveAndroidPath()` from `ExportScreen` — Android path is
-     no longer pre-populated; user must pick a directory.
-  3. On Android, call `FilePicker.getDirectoryPath()` to let the user pick
-     a destination directory. Store the result in `_path`. Export button
-     stays disabled until a directory is chosen. Pass `$_path/vault.gabbro`
-     to `export_vault`.
-  4. `PathField` likely needs no changes — the Android branch in
-     `ExportScreen` calls `getDirectoryPath()` directly, bypassing
-     `PathField` entirely on Android.
-  5. Update the two Android widget tests: no folder icon, but a
-     "Choose folder" button present; after directory picked, Export enabled.
+- **Export path picker — resolved:** `FilePicker.getDirectoryPath()` (SAF)
+  implemented on Android. User picks destination directory; export writes
+  `vault.gabbro` + `vault.gabbro.sha256` there. Hardware verified on
+  Samsung S23 (Android 16). `PathField` unchanged — Android bypasses it.
+  Gabbro → Gabbro sync round-trip hardware verification is the next step.
 
 
 ### Security
