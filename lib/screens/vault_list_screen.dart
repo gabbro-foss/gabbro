@@ -294,7 +294,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
   Future<void> _openExportScreen() async {
     await Navigator.of(
       context,
-    ).push<bool>(MaterialPageRoute(builder: (context) => const ExportScreen()));
+    ).push<bool>(MaterialPageRoute(builder: (context) => ExportScreen()));
   }
 
   Future<void> _openImportScreen() async {

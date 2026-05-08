@@ -1,18 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
+import 'package:path_provider/path_provider.dart';
 
 Future<void> _defaultExport(String path) => exportVault(path: path);
 
 class ExportScreen extends StatefulWidget {
   final String? initialPath;
   final Future<void> Function(String path) onExport;
+  final bool isAndroid;
 
-  const ExportScreen({
+  ExportScreen({
     super.key,
     this.initialPath,
     this.onExport = _defaultExport,
-  });
+    bool? isAndroid,
+  }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
   @override
   State<ExportScreen> createState() => _ExportScreenState();
@@ -27,6 +32,15 @@ class _ExportScreenState extends State<ExportScreen> {
   void initState() {
     super.initState();
     _path = widget.initialPath;
+    if (widget.isAndroid) {
+      _resolveAndroidPath();
+    }
+  }
+
+  Future<void> _resolveAndroidPath() async {
+    final dir = await getApplicationSupportDirectory();
+    final path = '${dir.path}/vault.gabbro';
+    if (mounted) setState(() => _path = path);
   }
 
   Future<void> _export() async {
@@ -71,10 +85,13 @@ class _ExportScreenState extends State<ExportScreen> {
               const SizedBox(height: 16),
               PathField(
                 mode: PathFieldMode.save,
-                hint: '/home/user/vault.gabbro',
+                hint: widget.isAndroid
+                    ? _path ?? 'Resolving path…'
+                    : '/home/user/vault.gabbro',
                 allowedExtensions: ['gabbro'],
                 saveFileName: 'vault.gabbro',
-                initialPath: widget.initialPath,
+                initialPath: _path,
+                readOnly: widget.isAndroid,
                 onPathSelected: (p) => setState(() {
                   _path = p;
                   _error = null;

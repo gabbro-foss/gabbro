@@ -11,6 +11,7 @@ class PathField extends StatefulWidget {
   final String? saveFileName;
   final void Function(String path) onPathSelected;
   final String? Function(String?)? validator;
+  final bool readOnly;
 
   const PathField({
     super.key,
@@ -21,6 +22,7 @@ class PathField extends StatefulWidget {
     this.allowedExtensions,
     this.saveFileName,
     this.validator,
+    this.readOnly = false,
   });
 
   @override
@@ -72,10 +74,12 @@ class _PathFieldState extends State<PathField> {
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
         hintText: widget.hint,
-        suffixIcon: IconButton(
-          icon: const Icon(Icons.folder_open),
-          onPressed: _pick,
-        ),
+        suffixIcon: widget.readOnly
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.folder_open),
+                onPressed: _pick,
+              ),
       ),
     );
   }

@@ -53,5 +53,43 @@ void main() {
       await tester.pump();
       expect(exportedPath, '/home/user/vault.gabbro');
     });
+
+    testWidgets('android mode: no folder icon, path pre-populated',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ExportScreen(
+            isAndroid: true,
+            initialPath: '/data/user/0/app.gabbro.gabbro/files/vault.gabbro',
+            onExport: (path) async {},
+          ),
+        ),
+      );
+      expect(find.byIcon(Icons.folder_open), findsNothing);
+      expect(
+        find.text('/data/user/0/app.gabbro.gabbro/files/vault.gabbro'),
+        findsWidgets,
+      );
+    });
+
+    testWidgets('android mode: export fires with pre-populated path',
+        (tester) async {
+      String? exportedPath;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ExportScreen(
+            isAndroid: true,
+            initialPath: '/data/user/0/app.gabbro.gabbro/files/vault.gabbro',
+            onExport: (path) async => exportedPath = path,
+          ),
+        ),
+      );
+      await tester.tap(find.text('Export'));
+      await tester.pump();
+      expect(
+        exportedPath,
+        '/data/user/0/app.gabbro.gabbro/files/vault.gabbro',
+      );
+    });
   });
 }
