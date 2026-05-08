@@ -2319,3 +2319,30 @@ Key design points:
 Python analogy: like `tkinter.filedialog.askdirectory()` vs
 `asksaveasfilename()` — one returns a folder, the other a full path.
 You then join the folder with your chosen filename yourself.
+
+---
+
+## Flutter — stale widget state after vault mutation
+
+When a vault-mutating operation (import, delete, passphrase change) completes,
+any widget state that holds a reference to a vault entry ID must be explicitly
+cleared. If it is not, the next layout pass will call `getEntry()` with a stale
+ID that no longer exists in the Rust session. Rust correctly returns an `Err`;
+the flutter_rust_bridge codec throws a Dart exception; Flutter logs a full stack
+trace to console but the UI falls back silently to the empty-state placeholder.
+No visible crash — but the log noise is a real bug.
+
+The pattern appears in `TabletVaultLayout`: `_selectedEntryId` is set when
+the user taps a list entry, but is not reset when `onRefresh()` is called after
+an import. Fix: wherever a vault-mutating operation triggers a list reload,
+also reset `_selectedEntryId = null` so the detail pane returns to the
+empty state cleanly.
+
+General rule: **any widget that caches a vault entry ID must subscribe to the
+same lifecycle events that mutate the vault**, and reset its cached ID on those
+events. This is the tablet-layout equivalent of the list-pane-not-refreshing
+bug fixed in the previous session — the same root cause, different symptom.
+
+Python analogy: like holding a reference to a list index after the list has
+been sorted or filtered in place — the index is stale the moment the underlying
+data changes.

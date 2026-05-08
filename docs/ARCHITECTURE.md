@@ -797,16 +797,19 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Android export destination fixed — `FilePicker.getDirectoryPath()`
-  (SAF) replaces `getApplicationSupportDirectory()`; user picks a destination
-  directory; export writes `vault.gabbro` + `vault.gabbro.sha256` there.
-  `_resolveAndroidPath()` removed; `ExportScreen` Android branch now shows
-  "Choose folder" button; Export button disabled until directory chosen.
-  6 Flutter tests passing. Hardware verified on Samsung S23 (Android 16).
+- **Completed:** Gabbro → Gabbro sync round-trip hardware-verified in both
+  directions (Linux → Android and Android → Linux). Four test rounds: happy
+  path, full UUID-skip, partial overlap, and wrong-passphrase rejection.
+  All passed. Skipped-entries dialog verified on both platforms — correct
+  entries listed with "UUID already exists" reason. Console output revealed
+  a stale-ID bug in `TabletVaultLayout` (see Bikeshed → Features & UX).
 
-- **Next task:** Hardware-verify Gabbro → Gabbro sync round-trip (export on
-  one device, import `.gabbro` on another). Skipped-entries dialog also
-  unverified on hardware — test both in the same session.
+- **Next tasks (in order):**
+  1. Fix `TabletVaultLayout` stale `_selectedEntryId` bug — reset to `null`
+     after import/vault reload; add failing test first.
+  2. Fix `ReviewChangesScreen` empty-new-fields diff bug — empty added
+     fields should appear in the diff.
+  3. Vault deletion from within the UI.
 
 ---
 
@@ -917,8 +920,8 @@ the first public tag.
   After import, the user is shown `import_skipped_dialog.dart` listing
   skipped entries (title + reason: "UUID already exists"). Single save at
   the end. Bridge function: `import_from_gabbro(path, passphrase)` in
-  `rust/src/api/import.rs`. Skipped entries dialog unverified on hardware
-  pending export path picker fix.
+  `rust/src/api/import.rs`. Hardware-verified on Linux and Samsung S23
+  (Android 16) — both directions, all four test rounds passed.
 
   Content-hash deduplication and entry-level merge remain v2 candidates.
 
@@ -1055,6 +1058,16 @@ the first public tag.
   custom field domain model in Rust, and render the launch icon only for
   fields so typed — requires a domain model change and bridge update but
   is precise. Decide approach before implementing.
+
+- **Vault deletion from within the UI:** Users should be able to delete
+  their vault from within the app (Settings → Security or a dedicated
+  danger zone). This covers the "start fresh" and "wipe before selling
+  device" use cases. Requirements: confirmation dialog with passphrase
+  re-entry (not just a tap — deletion is irreversible); deletes the
+  `.gabbro` and `.gabbro.sha256` files from disk; clears the Rust session;
+  returns the user to `OnboardingScreen`. Must not be reachable while the
+  vault is locked. Rust bridge function needed: `delete_vault() →
+  Result<(), String>`. TDD: failing test first.
 
 - **Review screen does not show empty new fields:** When a new custom
   field is added in `CreateEntryScreen` but left empty, tapping Review →
@@ -1208,11 +1221,12 @@ the first public tag.
 
 - **Alphabet bar left/right setting (accessibility):** Add a toggle in
   Settings → Appearance to move the alphabet index bar from its default
-  side to the opposite side. Applies on both phone and tablet — tablet
-  mirrors whatever the phone setting is (one setting, consistent across
-  form factors). Default: left on tablet (between nav rail and list pane),
-  right on phone (matches current behaviour). Implement after the tablet
-  two-pane layout is shipped.
+  left position to the right. Applies in <600dp (phone) mode only —
+  one-handed mobile use is the ergonomic case this serves; tablet users
+  almost never hold and manipulate the device one-handed so the setting
+  is not exposed there. Tablet layout always positions the bar on the left
+  (between nav rail and list pane), regardless of the phone setting.
+  Implement after the tablet two-pane layout is shipped.
 
 - **Enpass-style password detail view:** In the entry detail screen,
   show a character-by-character breakdown of the password beneath the
@@ -1225,6 +1239,16 @@ the first public tag.
   Options: (1) widen the fixed value, or (2) make the divider draggable
   so the user can adjust it. Option 2 is more flexible but adds
   complexity. Revisit after other tablet polish is complete.
+
+- **`TabletVaultLayout` stale `_selectedEntryId` after vault reload (bug):**
+  After a successful Gabbro → Gabbro import, `_selectedEntryId` is not
+  reset. The next layout pass calls `getEntry()` with a stale ID that no
+  longer exists in the session; Rust returns an error; the bridge throws.
+  UI falls back to the empty-state placeholder silently — no crash visible
+  to the user but a full stack trace logged to console. Fix: reset
+  `_selectedEntryId = null` (and clear the detail pane) wherever
+  `onRefresh()` is called after a vault-mutating operation. TDD: write
+  failing test first. File: `gabbro/lib/screens/tablet_vault_layout.dart`.
 
 - **Tablet edit-mode dim (phase 2):** Wire `_isEditing` state in
   `TabletVaultLayout` — set true when pencil tapped on detail pane
@@ -1247,6 +1271,9 @@ the first public tag.
   app-private storage without SAF, `MANAGE_EXTERNAL_STORAGE` would be
   required — a heavily restricted permission that draws Play Store
   scrutiny.
+
+- **Copy to clipboard from detail screen:** Implemented and hardware-verified
+  on Linux and Samsung S23 (Android 16). No further action needed.
 
 - **Detail view — created/modified timestamps:** Show `created_at` and
   `updated_at` on the detail screen so users can audit when an entry was
