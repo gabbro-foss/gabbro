@@ -935,6 +935,22 @@ the first public tag.
   this full fix. Blocks hardware verification of Gabbro → Gabbro sync
   round-trip.
 
+  **Implementation plan for next session:**
+  1. Upload `rust/src/api/vault_bridge.rs` first — verify how `export_vault`
+     constructs its `.gabbro` and `.gabbro.sha256` output paths from the
+     single `path` argument before touching any Dart code.
+  2. Remove `_resolveAndroidPath()` from `ExportScreen` — Android path is
+     no longer pre-populated; user must pick a directory.
+  3. On Android, call `FilePicker.getDirectoryPath()` to let the user pick
+     a destination directory. Store the result in `_path`. Export button
+     stays disabled until a directory is chosen. Pass `$_path/vault.gabbro`
+     to `export_vault`.
+  4. `PathField` likely needs no changes — the Android branch in
+     `ExportScreen` calls `getDirectoryPath()` directly, bypassing
+     `PathField` entirely on Android.
+  5. Update the two Android widget tests: no folder icon, but a
+     "Choose folder" button present; after directory picked, Export enabled.
+
 
 ### Security
 
