@@ -15,6 +15,9 @@ chat_info/
 docs/Session_protocol.md
 docs/Session_protocol_Claude.md
 
+# vscode related
+.vscode/
+
 # IntelliJ related
 *.iml
 *.ipr
