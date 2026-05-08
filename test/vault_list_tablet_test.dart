@@ -260,5 +260,81 @@ void main() {
       // Detail pane must show empty state, not a blank grey widget.
       expect(find.text('Select an entry'), findsOneWidget);
     });
+
+    // -----------------------------------------------------------------------
+    // Test 10: Stale _selectedEntryId reset after import/vault reload.
+    //
+    // Drives TabletVaultLayout directly. Tap id-1 to set _selectedEntryId,
+    // then rebuild with a new entry list that does NOT contain id-1 —
+    // simulating a vault reload after import. Detail pane must revert to
+    // empty state rather than trying to fetch a ghost entry.
+    // -----------------------------------------------------------------------
+    testWidgets('detail pane resets to empty state after vault reload removes selected entry', (
+      tester,
+    ) async {
+      _setWidth(tester, 700);
+
+      final originalEntries = _fakeEntries(); // id-1 Alice, id-2 Bob
+      final grouped = <dynamic>['A', originalEntries[0], 'B', originalEntries[1]];
+
+      // After reload: only Bob (id-2) remains — Alice (id-1) is gone.
+      final reloadedEntries = [
+        EntrySummaryData(
+          id: 'id-2',
+          entryType: 'Note',
+          title: 'Bob',
+          folder: 'Personal',
+          tags: [],
+          favourite: false,
+        ),
+      ];
+      final reloadedGrouped = <dynamic>['B', reloadedEntries[0]];
+
+      Widget buildLayout(
+        List<EntrySummaryData> filtered,
+        List<dynamic> groupedList,
+      ) =>
+          MaterialApp(
+            home: Scaffold(
+              body: TabletVaultLayout(
+                groupedEntries: groupedList,
+                filteredEntries: filtered,
+                letterIndex: {'A': 0},
+                onLetterSelected: (_) {},
+                displayTitle: (e) => e.title,
+                displayType: (_) => 'Password',
+                entryTypeIcon: (_) => Icons.lock_outline,
+                searchBar: const SizedBox.shrink(),
+                filterChipRow: const SizedBox.shrink(),
+                searchActive: false,
+                onEntryTap: (_) {},
+                onRefresh: () {},
+                vaultPath: '/tmp/test.gabbro',
+                clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
+                getEntryFn: (_) => _fakeLoginEntry(),
+                onDeleteEntryFn: (_) async {},
+                selectionMode: false,
+                selectedIds: const {},
+                onToggleSelection: (_) {},
+              ),
+            ),
+          );
+
+      // Initial render — two entries.
+      await tester.pumpWidget(buildLayout(originalEntries, grouped));
+      await tester.pumpAndSettle();
+
+      // Tap Alice → _selectedEntryId = 'id-1'.
+      await tester.tap(find.text('Alice'));
+      await tester.pumpAndSettle();
+      expect(find.text('Select an entry'), findsNothing);
+
+      // Vault reload: rebuild without id-1.
+      await tester.pumpWidget(buildLayout(reloadedEntries, reloadedGrouped));
+      await tester.pumpAndSettle();
+
+      // _selectedEntryId ('id-1') is no longer in filteredEntries — must reset.
+      expect(find.text('Select an entry'), findsOneWidget);
+    });
   });
 }

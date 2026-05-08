@@ -308,6 +308,41 @@ void main() {
     expect(find.text('ZZ999999'), findsOneWidget);
   });
 
+  testWidgets('Custom diff shows new field added (empty → value)', (tester) async {
+    // original has no fields; updated adds one — the new field must appear in diff
+    final original = CustomEntryData(
+      id: 'custom-id-2',
+      title: 'Wifi',
+      fields: [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+      tags: [],
+      favourite: false,
+    );
+    final updated = CustomEntryData(
+      id: 'custom-id-2',
+      title: 'Wifi',
+      fields: [
+        CustomFieldData(label: 'SSID', value: 'HomeNetwork', hidden: false),
+      ],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+      tags: [],
+      favourite: false,
+    );
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.custom(original),
+      updated: VaultEntryData.custom(updated),
+    ));
+
+    expect(find.text('Other fields'), findsOneWidget);
+    expect(find.text('SSID'), findsOneWidget);
+    expect(find.text('(empty)'), findsOneWidget);
+    expect(find.text('HomeNetwork'), findsOneWidget);
+  });
+
   testWidgets('Custom diff shows changed field', (tester) async {
     await tester.pumpWidget(_buildReviewScreen(
       original: VaultEntryData.custom(_originalCustom()),

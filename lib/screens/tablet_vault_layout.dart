@@ -126,6 +126,15 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
 
   final ItemScrollController _itemScrollController = ItemScrollController();
 
+  @override
+  void didUpdateWidget(TabletVaultLayout oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_selectedEntryId != null &&
+        !widget.filteredEntries.any((e) => e.id == _selectedEntryId)) {
+      setState(() => _selectedEntryId = null);
+    }
+  }
+
   void _onRailDestinationSelected(int index) {
     if (index == 0) {
       // Already on Vault — nothing to do.

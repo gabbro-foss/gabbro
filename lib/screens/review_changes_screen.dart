@@ -193,20 +193,30 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         _addDiff(diffs, 'Email', field0.email, u.email);
         _addDiff(diffs, 'Phone', field0.phone ?? '', u.phone ?? '');
         _addDiff(diffs, 'Address', field0.address ?? '', u.address ?? '');
-        for (var i = 0; i < field0.customFields.length; i++) {
-          if (i < u.customFields.length) {
-            _addDiff(diffs, field0.customFields[i].label,
-                field0.customFields[i].value, u.customFields[i].value);
-          }
+        final identityLen = field0.customFields.length > u.customFields.length
+            ? field0.customFields.length
+            : u.customFields.length;
+        for (var i = 0; i < identityLen; i++) {
+          final label = i < u.customFields.length
+              ? u.customFields[i].label
+              : field0.customFields[i].label;
+          final before = i < field0.customFields.length ? field0.customFields[i].value : '';
+          final after = i < u.customFields.length ? u.customFields[i].value : '';
+          _addDiff(diffs, label, before, after);
         }
       case (VaultEntryData_Custom(:final field0),
             VaultEntryData_Custom(field0: final u)):
         _addDiff(diffs, 'Title', field0.title, u.title);
-        for (var i = 0; i < field0.fields.length; i++) {
-          if (i < u.fields.length) {
-            _addDiff(diffs, field0.fields[i].label,
-                field0.fields[i].value, u.fields[i].value);
-          }
+        final customLen = field0.fields.length > u.fields.length
+            ? field0.fields.length
+            : u.fields.length;
+        for (var i = 0; i < customLen; i++) {
+          final label = i < u.fields.length
+              ? u.fields[i].label
+              : field0.fields[i].label;
+          final before = i < field0.fields.length ? field0.fields[i].value : '';
+          final after = i < u.fields.length ? u.fields[i].value : '';
+          _addDiff(diffs, label, before, after);
         }
       default:
         break;
