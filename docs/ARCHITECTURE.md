@@ -804,15 +804,15 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Tablet edit-mode dim (phase 2) — `_isEditing` removed as
-  dead code; edit mode uses full-screen push navigation (Option 2), so list
-  pane dimming is neither necessary nor observable. Test 6 rewritten to assert
-  that tapping the pencil navigates to `CreateEntryScreen`. 193 Flutter tests
-  passing, 0 skipped. Hardware-verified on Linux, Samsung S23 (Android 16),
-  and Lenovo tablet.
+- **Completed:** `zeroize` integration — crypto intermediates. All key
+  material and shared secret temporaries in `vault_crypto.rs`, `keypair.rs`,
+  and `ml_kem.rs` wrapped in `Zeroizing<T>` for automatic zeroing on drop.
+  Cloned passphrase `Vec<u8>` in all six `session_*` save calls wrapped in
+  `Zeroizing<Vec<u8>>`. Misleading comment in `lock_vault` corrected.
+  192 Rust / 193 Flutter tests passing. Hardware-verified on Linux, Samsung
+  S23 (Android 16), and Lenovo tablet.
 
-- **Next task:**
-  1. `zeroize` integration — see Bikeshed → Security.
+- **Next task:** to be decided at next session start.
 
 ---
 

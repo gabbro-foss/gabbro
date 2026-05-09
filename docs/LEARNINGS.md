@@ -4,6 +4,40 @@ A running journal of concepts covered during development.
 
 ---
 
+## Rust — `Zeroizing<T>` for automatic secret cleanup
+
+`Zeroizing<T>` from the `zeroize` crate is a newtype wrapper that calls
+`.zeroize()` on its inner value when dropped. It is the idiomatic way to
+ensure short-lived secret buffers are cleared from memory even if the
+function returns early or panics.
+
+Python analogy: a context manager (`with` block) that guarantees cleanup
+on exit regardless of how the block exits — except `Zeroizing<T>` works
+via Rust's ownership and `Drop` trait, so no explicit `with` syntax is
+needed. The cleanup is woven into the type system.
+
+Usage pattern for stack arrays and cloned `Vec<u8>`:
+
+```rust
+use zeroize::Zeroizing;
+
+// Stack array — zeroed on drop
+let key: Zeroizing<[u8; 32]> = Zeroizing::new(derive_key(...)?);
+some_function(&*key); // deref to &[u8; 32]
+
+// Cloned Vec — zeroed on drop
+let passphrase = Zeroizing::new(session.passphrase.clone());
+save_vault(&entries, &passphrase, &path)?;
+```
+
+Important nuance: `Zeroizing<T>` narrows the window during which a secret
+is recoverable in RAM — it does not eliminate the risk entirely. Swap,
+hibernation, and cold-boot attacks can still preserve zeroed memory pages.
+Full-disk encryption (FDE) remains a stated prerequisite for Gabbro's full
+security model.
+
+---
+
 ## TDD — rewriting tests when architecture decisions change
 
 TDD is not about locking in tests that can never change. A skipped test that
