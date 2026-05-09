@@ -4,6 +4,25 @@ A running journal of concepts covered during development.
 
 ---
 
+## TDD — rewriting tests when architecture decisions change
+
+TDD is not about locking in tests that can never change. A skipped test that
+was written anticipating an implementation that was never built (or was
+superseded by a better design decision) should be rewritten to match the
+actual architecture — not forced through or left skipped indefinitely.
+
+In this case: test 6 in `vault_list_tablet_test.dart` was written expecting
+in-place edit-mode dimming (`_isEditing` state). The implemented architecture
+uses full-screen push navigation (Option 2 from the wireframe decisions),
+which makes the dim both unnecessary and unobservable. The correct response
+was to remove the dead `_isEditing` code and rewrite the test to assert the
+actual behaviour: tapping the pencil pushes `CreateEntryScreen`.
+
+The principle: tests are specifications of intended behaviour. When the
+intended behaviour changes by design, the specification changes too.
+
+---
+
 ## Flutter — `ScrollMetricsNotification` for geometry-driven UI
 
 A `ScrollController` listener only fires when the user scrolls. It does

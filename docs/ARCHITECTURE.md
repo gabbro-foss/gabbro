@@ -641,7 +641,7 @@ export_vault(path)              → Result<(), String>
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
 | Rust (`cargo test -q`) | 193 | 1 ignored |
-| Flutter (`flutter test`) | 192 | 1 skipped |
+| Flutter (`flutter test`) | 193 | 0 skipped |
 
 ## Platforms
 
@@ -738,9 +738,10 @@ SPDX identifier: `GPL-3.0-only`
 - **Four interaction states:**
   - **Browse (default):** list selection active, detail shows selected entry.
     Empty state (no entry selected): lock icon + "select an entry" placeholder.
-  - **Edit in place:** pencil tapped on detail pane header. Detail pane
-    becomes edit form in place. List pane dimmed and non-interactive.
-    Header shows Cancel and Review → buttons. Exits via Cancel or Review →.
+  - **Edit (pencil tapped):** full-screen push navigation to `CreateEntryScreen`,
+    replacing the two-pane layout entirely (Option 2). Returns to two-pane on
+    Cancel or after Review → save. No list-pane dimming needed — the layout is
+    not visible during editing.
   - **New entry (+ button):** full-screen modal overlaying both panes.
     Existing list/detail visible but non-interactive behind modal. Consistent
     with phone behaviour; avoids conflicts with list selection.
@@ -776,10 +777,10 @@ SPDX identifier: `GPL-3.0-only`
    setting value; the widget renders in the appropriate position relative to
    the list pane. No new parameter needed.
 
-4. **List pane interaction lock** — in edit state, wrap the list pane in
-   `IgnorePointer(ignoring: _isEditing)` and apply `Opacity(opacity: _isEditing ? 0.4 : 1.0)`. `_isEditing` is a `bool` on the tablet layout
-   widget, set true when the pencil is tapped, false on Cancel or
-   successful Review →.
+4. **List pane interaction lock** — not required. Edit mode uses full-screen
+   push navigation (Option 2); the two-pane layout is not visible while
+   editing, so dimming the list pane is neither necessary nor observable.
+   `_isEditing` state was removed as dead code.
 
 5. **New entry modal** — `+` button calls `showModalBottomSheet` or
    `showDialog` with `CreateEntryScreen` as full-screen content. Same
@@ -803,20 +804,15 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Alphabet bar left/right position toggle — Settings → Appearance,
-  phone layout only. `AlphabetBarPosition` enum (`left`/`right`) added to
-  `AppSettings` with JSONC persistence. `AppearanceScreen` gains a
-  `SegmentedRow` for the setting with a subtitle noting tablet layout always
-  uses left. `VaultListScreen` reads the setting (or test override) via
-  `_alphabetBarPosition` getter; right position adds 80dp bottom padding to
-  clear the FAB. Hardware-verified on Samsung S23 (Android 16) and Linux
-  (phone and tablet modes). 9 Flutter tests passing (settings: 4, appearance:
-  3, vault list search: 2).
+- **Completed:** Tablet edit-mode dim (phase 2) — `_isEditing` removed as
+  dead code; edit mode uses full-screen push navigation (Option 2), so list
+  pane dimming is neither necessary nor observable. Test 6 rewritten to assert
+  that tapping the pencil navigates to `CreateEntryScreen`. 193 Flutter tests
+  passing, 0 skipped. Hardware-verified on Linux, Samsung S23 (Android 16),
+  and Lenovo tablet.
 
-- **Next tasks (in order):**
-  1. Tablet edit-mode dim (phase 2) — wire `_isEditing` in
-     `TabletVaultLayout`; unskip test 6.
-  2. `zeroize` integration — see Bikeshed → Security.
+- **Next task:**
+  1. `zeroize` integration — see Bikeshed → Security.
 
 ---
 
@@ -1191,12 +1187,6 @@ the first public tag.
   Options: (1) widen the fixed value, or (2) make the divider draggable
   so the user can adjust it. Option 2 is more flexible but adds
   complexity. Revisit after other tablet polish is complete.
-
-- **Tablet edit-mode dim (phase 2):** Wire `_isEditing` state in
-  `TabletVaultLayout` — set true when pencil tapped on detail pane
-  header, false on Cancel or Review →. List pane dims to 0.4 opacity and
-  is blocked by `IgnorePointer` during editing. Unskip test 6 in
-  `test/vault_list_tablet_test.dart` once implemented.
 
 - **App logo:** When a logo exists, add it to `OnboardingScreen`,
   `UnlockScreen`, and the centred tablet unlock layout. Defer until logo
