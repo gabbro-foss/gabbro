@@ -812,7 +812,12 @@ SPDX identifier: `GPL-3.0-only`
   192 Rust / 193 Flutter tests passing. Hardware-verified on Linux, Samsung
   S23 (Android 16), and Lenovo tablet.
 
-- **Next task:** to be decided at next session start.
+- **Next tasks (in order):**
+  1. Import source list order — reorder to `['gabbro', 'CSV', 'Enpass',
+     'Bitwarden']` in `import_screen.dart`. One-line change.
+  2. `ReviewChangesScreen` bug — empty new fields don't appear in the diff
+     for `Custom` and `Identity` entries. Fix: iterate to
+     `max(original.length, updated.length)` in both branches.
 
 ---
 
