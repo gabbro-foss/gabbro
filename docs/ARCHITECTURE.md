@@ -107,11 +107,13 @@ gabbro/
 ├── docs/                       # Project documentation
 │   ├── ARCHITECTURE.md
 │   ├── LEARNINGS.md
+│   ├── AI_AUTHORSHIP_AND_IP.md
+│   ├── artefacts/              # SVG diagrams and HTML wireframes (git-tracked)
 │   └── decisions/
 │       ├── ADR-001-rust-flutter-stack.md
 │       ├── ADR-002-export-integrity-hash.md
 │       ├── ADR-003-colourblind-password-display.md
-│       ├── ADR-004-licence.md
+│       ├── ADR-004-license.md
 │       ├── ADR-005-pq-authentication-signatures.md
 │       └── ADR-006-encryption-implementation.md
 ├── chat_info/                  # Development session notes and ASCII wireframes
@@ -438,10 +440,8 @@ Each entry is an instance of a typed class:
   toggleable) with `saved_at` / `expires_at` metadata. "Revert" and "Delete
   previous entry" are stub snackbars pending bridge implementation. Entry point:
   "Password history →" `ListTile` in `EntryDetailScreen._loginView`. 7 widget
-  tests. Known UI issue: "Revert" is a `TextButton` inline inside the previous
-  password row; "Delete previous entry" is a standalone `OutlinedButton` below
-  — inconsistent. Fix: promote "Revert" to a standalone button matching
-  "Delete previous entry".
+  tests. Both "Revert" and "Delete previous entry" are standalone `OutlinedButton`
+  widgets below the previous password row — consistent styling.
 
 ## Vault Domain Model
 - **Status:** all 6 entry types implemented in Rust
@@ -524,10 +524,10 @@ was explicitly considered and rejected for three reasons:
    full entry on demand, never the whole vault.
 
 2. **Natural auto-lock.** When the vault locks, Rust drops the session
-   state. Future `zeroize` integration (see Bikeshed) will ensure the
-   memory is actively cleared at that point. Flutter's lock event simply
-   calls `lock_vault()` — it does not need to zero its own copy because
-   it never held one.
+   state. `zeroize` integration ensures key material and shared secret
+   temporaries are actively cleared at that point. Flutter's lock event
+   simply calls `lock_vault()` — it does not need to zero its own copy
+   because it never held one.
 
 3. **Lazy loading.** A vault with hundreds of entries and file attachments
    should not be loaded across the bridge in full on unlock. The session
@@ -912,13 +912,6 @@ the first public tag.
 
 ### Import
 
-- **Import source list order:** Change the order of importers shown in
-  `ImportScreen` to: `['gabbro', 'CSV', 'Enpass', 'Bitwarden']`. Reasoning:
-  gabbro-native first (most common operation in the gabbro ecosystem); CSV
-  second (most platform-agnostic, no allegiance signal); Enpass third
-  (closed-source); Bitwarden last (open-source — least likely to be
-  "escaped from"). Low effort, one-line change in `import_screen.dart`.
-
 - **Content-hash deduplication and entry-level merge:** Both remain v2
   candidates. No design work started.
 
@@ -1054,14 +1047,6 @@ the first public tag.
   distribution model? Does autofill change the security model (secrets closer
   to the browser boundary)? Prerequisite for passkey support.
   Document the clipboard-vs-autofill security distinction in `docs/SECURITY.md`.
-
-- **Themes — dark / light / custom:** Dark and light modes are already noted
-  as system-default with user override. Open questions: should Gabbro offer
-  additional high-contrast or accessibility-focused themes beyond dark/light?
-  Any colour theme must be validated against ADR-003 (colour-blind safety) and
-  WCAG 1.4.1. Consider whether custom accent colours (already noted for the
-  password display palette) generalise to a broader theming system, or whether
-  that adds complexity for little gain.
 
 - **Panic button / app hiding on mobile:** A visible "hide app" mechanism —
   e.g. disguise Gabbro as a calculator or notes app, or a panic button that
@@ -1207,12 +1192,6 @@ the first public tag.
   app-private storage without SAF, `MANAGE_EXTERNAL_STORAGE` would be
   required — a heavily restricted permission that draws Play Store
   scrutiny.
-
-- **Release builds for UI/UX testing:** Debug builds run Argon2id unoptimised
-  (~20s per vault operation on Linux, worse on Android emulator). Always use
-  `flutter build linux --release` and `flutter build apk --release` for any
-  user-facing performance assessment or UI/UX testing. Never tune Argon2id
-  parameters or assess UX based on debug build timings.
 
 ## Import / Migration
 
