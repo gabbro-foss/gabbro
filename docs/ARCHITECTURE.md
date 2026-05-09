@@ -203,12 +203,17 @@ Each entry is an instance of a typed class:
   and 2FA separate is more secure
 
 ## Organisation & UX
+
+**Implemented:**
+- Fast fuzzy search: vault-wide or by field (Kvaesito-inspired)
+- Dark mode + light mode (system default, user overridable)
+- High-contrast mode (WCAG AAA — see ## Appearance & Settings)
+
+**Not yet implemented (see Bikeshed):**
 - Folders with defaults: Personal, Work, Social (renamable/deletable)
 - Custom tags
 - Favourites
 - Configurable sorting
-- Fast fuzzy search: vault-wide or by field (Kvaesito-inspired)
-- Dark mode + light mode (system default, user overridable)
 - Screenshot prevention + app switcher blur
 
 ## Password Generator
@@ -216,6 +221,7 @@ Each entry is an instance of a typed class:
   (`rust/src/api/password_generator.rs`). Passphrase mode fully
   implemented in Rust (`rust/src/api/passphrase_generator.rs`).
   Both bridged to Flutter, Flutter build clean.
+  **Flutter UI screen: not yet built — see Bikeshed.**
   See ## Testing Strategy → Test Counts.
 - Two modes: classic password and wordlist-based passphrase
 - **Passphrase mode:**
@@ -228,18 +234,17 @@ Each entry is an instance of a typed class:
   - `Language` enum: English, French, German, Spanish, Italian
   - Language enum is internal/bridge only — display strings handled in Flutter
   - Entropy calculated from actual wordlist size per language
-- Colour coded display with symbol markers — character types are
-  distinguished by **both colour and symbol** (never colour alone),
-  ensuring accessibility for colour-blind users — see ADR-003
-- Default palette is colour-blind-friendly (avoids pure red/green
-  confusion); user-overridable via colour picker in settings
-- Hidden by default, show/hide toggle
-- Entropy display (bits)
-- Exclude ambiguous characters option (0, O, l, 1, I)
+- Colour coded display with symbol markers — **planned, not yet built.**
+  Character types to be distinguished by **both colour and symbol** (never
+  colour alone), ensuring accessibility for colour-blind users — see ADR-003.
+  See Bikeshed for design notes.
+- Hidden by default, show/hide toggle — **planned, not yet built.**
+- Entropy display (bits) — **planned, not yet built.**
+- Exclude ambiguous characters option (0, O, l, 1, I) — **planned, not yet built.**
 - All generation happens in Rust
-- Accessible from main screen and inline within entry editor
-- Remembers user's last settings
-- Clipboard auto-clear after 60 seconds
+- Accessible from main screen and inline within entry editor — **planned, not yet built.**
+- Remembers user's last settings — **planned, not yet built.**
+- Clipboard auto-clear after 60 seconds — **planned, not yet built.**
 - **Length policy:** generator minimum 32 characters, maximum 256 characters,
   default 32. No upper limit enforced for manually typed passwords — user
   agency is respected; the entropy estimator provides feedback instead of
@@ -594,19 +599,12 @@ export_vault(path)              → Result<(), String>
   Async — filesystem operation.
 ```
 
-### Implementation plan
-- Add `rust/src/vault/session.rs` — `VaultSession` struct wrapping
-  `Mutex<Option<(Vec<VaultEntry>, PathBuf)>>` in a `once_cell` static.
-  The path is stored alongside the entries so bridge functions don't
-  require it on every call after unlock.
-- Add `EntrySummaryData` DTO to `vault_bridge.rs` — lightweight struct
-  with id, entry_type (String), title, folder, tags, favourite.
-- Rewrite `vault_bridge.rs` — replace the stateless `save_vault_to_disk`
-  / `load_vault_from_disk` pair with the session API above.
-- All internal `vault.rs` functions remain unchanged — they become the
-  implementation called by the session layer.
-- The existing `vault_bridge.rs` tests are superseded by new session
-  tests in the same file.
+### Implementation status
+Fully implemented in `rust/src/vault/session.rs` and `rust/src/api/vault_bridge.rs`.
+`VaultSession` wraps `Mutex<Option<(Vec<VaultEntry>, PathBuf)>>` in a
+`once_cell` static. `EntrySummaryData` DTO provides lightweight list-view
+data without crossing secrets over the bridge. All session API functions
+listed above are implemented and tested. See ## Testing Strategy → Test Counts.
 
 ## Vault Storage & Sync
 - v1: local path only, chosen during onboarding
@@ -708,11 +706,6 @@ rustup target list --installed   # should show the three targets above
 
 GPL-3.0-only — see ADR-004 for full reasoning.
 SPDX identifier: `GPL-3.0-only`
-
-## Monetization (future)
-- Freemium model TBD
-- Yubico partnership target
-- Advanced features (e.g. advanced tags) as premium tier
 
 ---
 
@@ -981,6 +974,21 @@ the first public tag.
 
 ### Password / Passphrase Generator
 
+- **Flutter UI screen:** The password and passphrase generators are fully
+  implemented in Rust and bridged to Flutter, but no Flutter UI screen exists
+  yet. Build the generator screen: two modes (classic/passphrase), language
+  selector for passphrase mode, entropy display, ambiguous character toggle,
+  colour-coded character display (ADR-003 compliant — colour + symbol, never
+  colour alone), show/hide toggle, clipboard copy with auto-clear. Accessible
+  from the main vault list and inline within `CreateEntryScreen`.
+
+- **Colour-coded password display in entry detail:** In `EntryDetailScreen`,
+  show a character-by-character breakdown beneath the masked password field:
+  each character colour-coded by type (uppercase, lowercase, digit, symbol)
+  with a symbol marker — ADR-003 applies, colour never the sole differentiator.
+  Use an unambiguous font for visually similar characters (0/O, l/1/I).
+  Design in the same session as the generator UI screen.
+
 - **Non-ASCII wordlist support (v2):** Add CJK and other non-Latin language
   wordlists (e.g. Japanese, Korean). Architecture already supports it —
   `include_str!` handles UTF-8 and entropy math is language-agnostic.
@@ -992,6 +1000,21 @@ the first public tag.
 
 
 ### Features & UX
+
+- **Folders, tags, favourites, configurable sorting:** The vault list
+  currently has no folder or tag organisation, no favourites flag in the UI,
+  and no sort order options. Design questions: are folders and tags mutually
+  exclusive or complementary? What sort orders are needed (alphabetical,
+  by type, by date modified, favourites first)? Favourites flag exists in
+  the domain model — needs surfacing in `CreateEntryScreen` and
+  `VaultListScreen`. Folders and tags require domain model additions.
+  Address as a group in one session before v1.
+
+- **Screenshot prevention + app switcher blur:** On Android, set
+  `FLAG_SECURE` on the window to prevent screenshots and hide vault content
+  in the app switcher. On Linux, equivalent mitigation is less
+  straightforward — document the gap honestly. Implement before v1 on
+  Android; assess feasibility on Linux separately.
 
 - **Vault sync across devices:** Moving or merging a `.gabbro` vault file
   between devices. Distinct from both "Import entries" (from other password
@@ -1195,185 +1218,44 @@ the first public tag.
 
 ## Import / Migration
 
-### Rationale — why not write N importers?
+**Status: complete.** Three importers implemented and hardware-verified:
+- **Enpass** (`rust/src/import/enpass.rs`) — JSON export. TDD, anonymised
+  test data. Full validation failure flow with user review.
+- **Bitwarden** (`rust/src/api/import.rs`) — unencrypted JSON export.
+  Full validation failure flow with user review.
+- **Generic CSV** (`rust/src/import/csv.rs`) — hand-rolled parser, no new
+  dependencies. Column-mapping UI in `lib/screens/csv_mapping_screen.dart`.
 
-Before writing any import code, we thought carefully about who actually
-migrates password managers and why. The analysis shaped the scope
-significantly.
+All importers return `ImportResult`. Validation failures surface to the user
+via `ImportFailuresDialog` (Skip/Edit) — no entry is ever silently discarded.
+Import screen order: Gabbro vault → CSV → Enpass → Bitwarden.
 
-**The user archetypes considered:**
+**Scope principle:** importers target the post-event migrant — the user who
+has already decided to leave their current manager. Every importer is a
+maintenance liability; keep the surface small. Everything else defers to
+the generic CSV importer.
 
-1. **Free-tier user** — uses a password manager for convenience. Low
-   switching cost, but also low motivation: the free tier is working fine.
-   Unlikely to migrate.
-2. **Paid-tier user** — already invested, likely has autofill and browser
-   integration set up. Switching has a real cost. Unlikely to migrate.
-3. **Browser built-in user** — convenience and laziness driven. No
-   subscription to escape from, but also no urgency to change. Unlikely
-   to migrate.
-4. **The post-event migrant** — the user whose subscription lapsed, who
-   got burned by a breach (LastPass 2022 is the concrete example), or who
-   has already decided to leave and is sitting on an exported file wondering
-   what to do next. This user is *actively looking* for a migration path.
-   Migration is triggered by a specific event, not gradual dissatisfaction.
-   This is Gabbro's target demographic for importers.
+**Suspected bug:** tablet blank screen after Bitwarden import could not be
+reproduced during the full hardware test matrix. Monitor in future sessions.
 
-**The conclusion:** importers are not about pulling users away from active
-subscriptions — they are about catching people at the moment they decide
-to leave. That reframe changes the priority order completely. We do not
-need to cover every password manager speculatively. We need to cover the
-ones most likely to be the prior home of a privacy-conscious user who has
-just decided to move on.
+### Enpass field mapping reference
 
-**Maintenance honesty:** every importer is a maintenance liability. Any
-time an upstream app changes its export format, the importer breaks silently
-or noisily. Keeping the importer surface small is not laziness — it is
-sustainable engineering.
-
-### Agreed scope
-
-Three importers, in implementation order:
-
-1. **Enpass** — required by the project author; also a natural fit for
-   Gabbro's audience (privacy-conscious, FOSS-adjacent users). Enpass
-   exports to JSON with a documented schema. Implement first.
-
-2. **Bitwarden** — the most likely prior home for someone who discovers
-   Gabbro. The values overlap is high: FOSS, self-hostable, privacy-focused.
-   If someone is leaving Bitwarden for Gabbro, that path should be
-   frictionless. Bitwarden's JSON export format is well-documented and
-   stable. Implement second.
-
-3. **Generic CSV / JSON importer** — covers the long tail: browser built-in
-   exports, lesser-known managers, and any manager not explicitly supported.
-   Most password managers export to CSV. The main design challenge is field
-   mapping: a simple UI step asking the user to map their columns to Gabbro
-   fields is more honest than silent guessing. Implement third.
-
-Everything else (1Password, LastPass, Dashlane, Keeper, etc.) — defer to
-the generic importer and document it clearly.
-
-### Generic CSV importer — design and status
-
-**Status: complete.** Implemented in
-`rust/src/import/csv.rs`. No new dependencies — hand-rolled parser,
-consistent with the project's minimal dependency philosophy.
-
-**Design decisions:**
-- All CSV input is treated as untrusted: 10 MB size limit enforced
-  before parsing; BOM (`\u{FEFF}`) stripped silently (Excel on Windows
-  prepends this to every CSV export); `"None"` values normalised to
-  empty string.
-- `sniff_csv()` returns headers and up to 3 preview rows as a
-  `CsvPreview` struct — for Flutter's mapping UI to display before
-  import begins.
-- `import_csv()` takes a `CsvImportConfig` struct with six optional
-  column mappings (`title_col`, `url_col`, `username_col`,
-  `password_col`, `notes_col`, `favourite_col`). Any column not
-  explicitly mapped becomes a `CustomField` on the resulting entry.
-- All rows produce `LoginEntry` — generic CSV has no type system.
-  Type information from the source manager (if any) lands in a
-  custom field.
-- Title fallback chain: mapped title column → mapped URL column →
-  `"MISSING TITLE"`. Title is the only required field; all others
-  are optional.
-- Favourite normalisation: `"1"`, `"yes"`, `"true"` (case-insensitive)
-  → `true`; everything else → `false`.
-- Quoted fields containing commas handled correctly by the hand-rolled
-  parser.
-- Rows with fewer columns than headers: missing fields default to
-  empty string. Rows with more columns than headers: extra fields
-  silently ignored.
-- A one-sentence warning is shown on the Flutter import screen:
-  "Only import CSV files you exported yourself from a trusted
-  password manager." Non-blocking, inline.
-
-### Implementation order
-
-The correct sequence, regardless of which importers we build:
-
-1. **Build a mock vault** — create a representative set of test entries
-   covering all six Gabbro entry types (Login, Note, Identity, Card, File,
-   Custom), with realistic field values. Load this into each target password
-   manager via their free tier and export it back out.
-
-2. **Field gap analysis** — compare what each manager exports against
-   Gabbro's current domain model. Identify any fields present in the export
-   that have no home in Gabbro's entry types. Document the gaps explicitly
-   before writing a single line of import code.
-
-3. **Domain model updates** — add any missing fields to the relevant entry
-   types in `rust/src/vault/entry.rs`. Do this before writing importers, not
-   after — retrofitting import code around a domain model change is messy.
-
-4. **Generic CSV / JSON importer** — implement last, once the field surface
-   is stable.
-
-### Import validation failures — resolved bugs
-
-Three bugs were found and fixed during the full hardware test matrix:
-
-1. **Card name required** — `CreateEntryScreen` card form allowed saving
-   without a card name, leaving cards with no label in the vault list view.
-   Fixed: required validator added to `_cardNameController` in `_cardFields()`.
-   Test added to `test/create_entry_screen_test.dart`.
-
-2. **Multi-field validation in `CardEntry::new()`** — the constructor only
-   validated card number digit count; missing cardholder name, expiry, and
-   CVV were silently accepted as empty strings. Fixed: all four fields now
-   validated; all failures collected and returned as a single joined error
-   string. Test added to `rust/src/vault/entry.rs`.
-
-3. **Tablet list pane not refreshed after entry edit** — editing an entry
-   via `EntryDetailScreen` in the tablet two-pane layout updated the detail
-   pane but not the list pane. Root cause: `EntryDetailScreen` had no
-   `onEdited` callback; the inline detail pane had no mechanism to trigger
-   `VaultListScreen._loadEntries()`. Fixed: `onEdited: VoidCallback?` added
-   to `EntryDetailScreen`; wired in `TabletVaultLayout._buildDetailPane()`
-   to call `widget.onRefresh()`. Verified on Linux and Lenovo tablet.
-
-   Note: a fourth suspected bug (tablet blank screen after Bitwarden import)
-   could not be reproduced during the hardware test matrix. Tablet Bitwarden
-   import passed on all three test paths (valid, invalid–Skip, invalid–Edit).
-   Monitor in future sessions.
-
-### Enpass — what we know from analysis of a real export (247 items)
-
-**Settled decisions:**
-- Parsing lives in Rust — untrusted external data mapping into the domain
-  model belongs where the domain model lives. Decided and implemented.
-- Attachments are preserved — imported as `Vec<EntryAttachment>` on the
-  entry they belong to. Not dropped, not split into separate FileEntries.
-  Attachment `data` is base64-encoded in the export; decode to `Vec<u8>` on import.
-- Archived and trashed items are silently skipped.
-- Deleted fields within an item are silently skipped.
-- `totp`, `section`, `.Android#`, `ccType` fields are dropped.
-- `numeric`, `date`, `phone`, `pin`, `text` fields not mapped to a canonical
-  field become `CustomField` entries on the parent entry.
-
-**Category → Gabbro type mapping:**
+**Category → Gabbro type:**
 - `login`, `computer`, `finance` → `LoginEntry`
 - `creditcard` → `CardEntry`
 - `note` → `NoteEntry`
-- `travel`, `misc`, and any unknown category → `CustomEntry`
-- `identity` → `CustomEntry` (no dedicated identity template in Enpass)
+- `travel`, `misc`, unknown → `CustomEntry`
+- `identity` → `CustomEntry`
 
-**Field type → LoginEntry field mapping:**
-- `username`, `email` → `username` (prefer first non-empty value)
+**Field type → LoginEntry field:**
+- `username`, `email` → `username` (first non-empty wins)
 - `url` → `url`
 - `password` → `password`
 - Everything else → `custom_fields`
 
-**Enpass export structure (confirmed from real data):**
-- Top-level: `{ "items": [...] }`
-- Each item has: `uuid`, `title`, `category`, `note`, `favorite`, `archived`,
-  `trashed`, `fields`, `attachments`, `template_type`
-- Each field has: `label`, `type`, `value`, `sensitive`, `deleted`, `order`, `uid`
-- Each attachment has: `uuid`, `name`, `kind` (mime type), `data` (base64)
-
-**Status: complete.** The TDD strategy was followed:
-anonymised test data, failing tests first, parser fixed until all passed.
-See `rust/src/import/enpass.rs` for the full test suite.
+**Dropped fields:** `totp`, `section`, `.Android#`, `ccType`.
+Archived, trashed, and deleted items/fields are silently skipped.
+Attachments preserved as `Vec<EntryAttachment>` (base64 decoded on import).
 
 ## Monetisation
 
@@ -1420,7 +1302,8 @@ See `rust/src/import/enpass.rs` for the full test suite.
   Gabbro's encryption stack vs Bitwarden / LastPass / Enpass / KeePass across
   KDF, authenticated encryption, post-quantum, storage model, and open-source
   status; (4) honest caveats — Ed25519 in v1 auth layer (not yet ML-DSA),
-  FDE as a prerequisite, zeroize not yet integrated. The no-telemetry
+  FDE as a prerequisite, zeroize integrated for crypto intermediates
+  (Dart runtime cannot zeroize — see ## Vault Session Model). The no-telemetry
   verification guide (see above) should be folded into this document rather
   than maintained separately. Write when the UI is stable enough that
   screenshots won't need frequent updating.
