@@ -127,24 +127,33 @@ void main() {
     });
 
     // -----------------------------------------------------------------------
-    // Test 6: List pane dims when editing (_isEditing = true).
-    // Skipped — requires _isEditing state wired up in phase 2.
+    // Test 6: Tapping the pencil on a selected entry navigates to
+    // CreateEntryScreen (edit mode uses full-screen push navigation —
+    // Option 2 from the wireframe decisions; in-place dim is not needed
+    // because the two-pane layout is not visible while editing).
     // -----------------------------------------------------------------------
-    testWidgets('list pane dims when edit mode active', (tester) async {
+    testWidgets('pencil tap on selected entry navigates to edit screen', (
+      tester,
+    ) async {
       _setWidth(tester, 700);
-      await tester.pumpWidget(_buildScreen());
+      await tester.pumpWidget(
+        GabbroApp(
+          vaultPath: '/tmp/test.gabbro',
+          vaultExists: false,
+          settings: const AppSettings(),
+          initialScreen: VaultListScreen(
+            vaultPath: '/tmp/test.gabbro',
+            listEntries: _fakeEntries,
+            getEntryFn: (_) => _fakeLoginEntry(),
+          ),
+        ),
+      );
       await tester.tap(find.text('Alice'));
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.edit_outlined));
       await tester.pumpAndSettle();
-      final opacityWidget = tester.widget<Opacity>(
-        find.ancestor(
-          of: find.widgetWithIcon(TextField, Icons.search),
-          matching: find.byType(Opacity),
-        ),
-      );
-      expect(opacityWidget.opacity, lessThan(1.0));
-    }, skip: true);
+      expect(find.byType(NavigationRail), findsNothing);
+    });
 
     // -----------------------------------------------------------------------
     // Test 7: Delete from detail pane returns to empty state (no crash).

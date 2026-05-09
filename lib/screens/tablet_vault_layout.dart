@@ -115,11 +115,6 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
   // Currently selected entry id — null means empty state in detail pane.
   String? _selectedEntryId;
 
-  // True while the detail pane is in edit mode.
-  // List pane is dimmed and non-interactive during editing.
-  // ignore: prefer_final_fields — mutated via setState in edit phase
-  bool _isEditing = false;
-
   // NavigationRail destination index.
   // 0 = Vault (default), 1 = Appearance, 2 = Security, 3 = About
   int _railIndex = 0;
@@ -293,7 +288,6 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                 onLongPress: () =>
                                     widget.onToggleSelection(entry.id),
                                 onTap: () {
-                                  if (_isEditing) return;
                                   if (widget.selectionMode) {
                                     widget.onToggleSelection(entry.id);
                                     return;
@@ -352,14 +346,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
         // ── List pane (fixed width, dimmed during editing) ─────────────────
         SizedBox(
           width: 260,
-          child: IgnorePointer(
-            ignoring: _isEditing,
-            child: AnimatedOpacity(
-              opacity: _isEditing ? 0.4 : 1.0,
-              duration: const Duration(milliseconds: 200),
-              child: _buildListPane(context),
-            ),
-          ),
+          child: _buildListPane(context),
         ),
         const VerticalDivider(width: 1),
         // ── Detail pane (flex) ─────────────────────────────────────────────
