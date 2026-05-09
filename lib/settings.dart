@@ -16,6 +16,7 @@ class AppSettings {
   final BackgroundLockTimeout backgroundLockTimeout;
   final ClipboardClearTimeout clipboardClearTimeout;
   final PasswordHistoryExpiry passwordHistoryExpiry;
+  final AlphabetBarPosition alphabetBarPosition;
 
   const AppSettings({
     this.theme = ThemeChoice.system,
@@ -25,6 +26,7 @@ class AppSettings {
     this.backgroundLockTimeout = BackgroundLockTimeout.fiveMinutes,
     this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
     this.passwordHistoryExpiry = PasswordHistoryExpiry.thirtyDays,
+    this.alphabetBarPosition = AlphabetBarPosition.left,
   });
 
   static AppSettings get defaults => const AppSettings();
@@ -39,6 +41,7 @@ class AppSettings {
     'background_lock_timeout': backgroundLockTimeout.name,
     'clipboard_clear_timeout': clipboardClearTimeout.name,
     'password_history_expiry': passwordHistoryExpiry.name,
+    'alphabet_bar_position': alphabetBarPosition.name,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -60,6 +63,9 @@ class AppSettings {
       passwordHistoryExpiry: PasswordHistoryExpiry.values.byName(
         json['password_history_expiry'] as String? ?? 'thirtyDays',
       ),
+      alphabetBarPosition: AlphabetBarPosition.values.byName(
+        json['alphabet_bar_position'] as String? ?? 'left',
+      ),
     );
   }
 
@@ -71,6 +77,7 @@ class AppSettings {
     BackgroundLockTimeout? backgroundLockTimeout,
     ClipboardClearTimeout? clipboardClearTimeout,
     PasswordHistoryExpiry? passwordHistoryExpiry,
+    AlphabetBarPosition? alphabetBarPosition,
   }) => AppSettings(
     theme: theme ?? this.theme,
     textSize: textSize ?? this.textSize,
@@ -79,6 +86,7 @@ class AppSettings {
     backgroundLockTimeout: backgroundLockTimeout ?? this.backgroundLockTimeout,
     clipboardClearTimeout: clipboardClearTimeout ?? this.clipboardClearTimeout,
     passwordHistoryExpiry: passwordHistoryExpiry ?? this.passwordHistoryExpiry,
+    alphabetBarPosition: alphabetBarPosition ?? this.alphabetBarPosition,
   );
 
   // ── File I/O ───────────────────────────────────────────────────────────
@@ -153,7 +161,11 @@ class AppSettings {
 
   // How long to keep a previous password before auto-purging.
   // Options: "sevenDays" | "thirtyDays" | "ninetyDays" | "keepForever"
-  "password_history_expiry": "${passwordHistoryExpiry.name}"
+  "password_history_expiry": "${passwordHistoryExpiry.name}",
+
+  // Position of the alphabet index bar (phone layout only).
+  // Options: "left" | "right"
+  "alphabet_bar_position": "${alphabetBarPosition.name}"
 }
 ''';
 
@@ -186,3 +198,5 @@ enum BackgroundLockTimeout { oneMinute, fiveMinutes, fifteenMinutes, never }
 enum ClipboardClearTimeout { never, thirtySeconds, sixtySeconds, twoMinutes }
 
 enum PasswordHistoryExpiry { sevenDays, thirtyDays, ninetyDays, keepForever }
+
+enum AlphabetBarPosition { left, right }

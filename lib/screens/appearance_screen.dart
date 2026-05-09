@@ -83,6 +83,28 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               ),
               const SizedBox(height: 32),
 
+              // ── Alphabet bar position ──────────────────────────────────
+              SectionHeader(label: 'Alphabet bar position'),
+              const SizedBox(height: 4),
+              Text(
+                'Phone layout only — tablet always uses left.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 8),
+              SegmentedRow<AlphabetBarPosition>(
+                values: AlphabetBarPosition.values,
+                selected: _settings.alphabetBarPosition,
+                label: (v) => switch (v) {
+                  AlphabetBarPosition.left => 'Left',
+                  AlphabetBarPosition.right => 'Right',
+                },
+                onSelected: (v) =>
+                    _update(_settings.copyWith(alphabetBarPosition: v)),
+              ),
+              const SizedBox(height: 32),
+
               // ── High contrast ──────────────────────────────────────────
               SectionHeader(label: 'Accessibility'),
               const SizedBox(height: 8),

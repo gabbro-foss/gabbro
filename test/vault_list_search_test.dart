@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
+import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 // ── Fake data helpers ─────────────────────────────────────────────────────────
@@ -142,6 +144,47 @@ void main() {
     await tester.pump();
 
     expect(find.text('1 selected'), findsOneWidget);
+  });
+
+  testWidgets('alphabet bar is first Row child when position is left',
+      (tester) async {
+    _setNarrow(tester);
+    await tester.pumpWidget(_buildScreen(_threeEntries));
+
+    final row = tester.widget<Row>(
+      find.ancestor(
+        of: find.byType(AlphabetIndexBar),
+        matching: find.byType(Row),
+      ).first,
+    );
+    expect(row.children.first, isA<SizedBox>());
+    expect(row.children.last, isA<Expanded>());
+  });
+
+  testWidgets('alphabet bar is last Row child when position is right',
+      (tester) async {
+    _setNarrow(tester);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MediaQuery(
+          data: const MediaQueryData(size: Size(390, 844)),
+          child: VaultListScreen(
+            vaultPath: '/tmp/test.gabbro',
+            listEntries: _threeEntries,
+            alphabetBarPosition: AlphabetBarPosition.right,
+          ),
+        ),
+      ),
+    );
+
+    final row = tester.widget<Row>(
+      find.ancestor(
+        of: find.byType(AlphabetIndexBar),
+        matching: find.byType(Row),
+      ).first,
+    );
+    expect(row.children.first, isA<Expanded>());
+    expect(row.children.last, isA<Padding>());
   });
 
   testWidgets('empty query shows no results message', (tester) async {

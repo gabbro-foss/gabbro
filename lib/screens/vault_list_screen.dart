@@ -26,6 +26,7 @@ class VaultListScreen extends StatefulWidget {
   final VaultEntryData Function(String id)? getEntryFn;
   final Future<void> Function(String id)? onDeleteEntryFn;
   final void Function()? onRefreshFn;
+  final AlphabetBarPosition? alphabetBarPosition;
 
   const VaultListScreen({
     super.key,
@@ -35,6 +36,7 @@ class VaultListScreen extends StatefulWidget {
     this.getEntryFn,
     this.onDeleteEntryFn,
     this.onRefreshFn,
+    this.alphabetBarPosition,
   });
 
   @override
@@ -230,6 +232,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
     }
     return result;
   }
+
+  AlphabetBarPosition get _alphabetBarPosition =>
+      widget.alphabetBarPosition ??
+      GabbroApp.maybeOf(context)?.settings.alphabetBarPosition ??
+      AlphabetBarPosition.left;
 
   void _scrollToLetter(String letter) {
     final index = _letterIndex[letter];
@@ -748,10 +755,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
                       : Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Index bar — fixed width column, clear of the FAB
-                            // at the bottom via padding. Left of the list so it
-                            // does not sit on top of the platform scrollbar.
-                            if (_searchQuery.isEmpty)
+                            // Index bar — fixed width column. Position (left or
+                            // right) is read from settings or the test override.
+                            if (_searchQuery.isEmpty &&
+                                _alphabetBarPosition ==
+                                    AlphabetBarPosition.left)
                               SizedBox(
                                 width: 48,
                                 child: AlphabetIndexBar(
@@ -863,6 +871,19 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                 ),
                               ),
                             ),
+                            if (_searchQuery.isEmpty &&
+                                _alphabetBarPosition ==
+                                    AlphabetBarPosition.right)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 80),
+                                child: SizedBox(
+                                  width: 48,
+                                  child: AlphabetIndexBar(
+                                    presentLetters: _letterIndex.keys.toSet(),
+                                    onLetterSelected: _scrollToLetter,
+                                  ),
+                                ),
+                              ),
                           ],
                         ),
                 ),

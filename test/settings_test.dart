@@ -212,6 +212,39 @@ void main() {
     });
   });
 
+  // ── AlphabetBarPosition ───────────────────────────────────────────────────
+
+  group('AlphabetBarPosition', () {
+    test('all values round-trip through fromJson', () {
+      for (final choice in AlphabetBarPosition.values) {
+        final s = AppSettings.fromJson({'alphabet_bar_position': choice.name});
+        expect(s.alphabetBarPosition, choice);
+      }
+    });
+
+    test('defaults to left', () {
+      final s = AppSettings.fromJson({});
+      expect(s.alphabetBarPosition, AlphabetBarPosition.left);
+    });
+
+    test('copyWith overrides alphabetBarPosition only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(
+        alphabetBarPosition: AlphabetBarPosition.right,
+      );
+      expect(updated.alphabetBarPosition, AlphabetBarPosition.right);
+      expect(updated.theme, original.theme);
+      expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
+    });
+
+    test('serialises to toJson', () {
+      const s = AppSettings(
+        alphabetBarPosition: AlphabetBarPosition.right,
+      );
+      expect(s.toJson()['alphabet_bar_position'], 'right');
+    });
+  });
+
   // ── BackgroundLockTimeout ─────────────────────────────────────────────────
 
   group('BackgroundLockTimeout', () {
