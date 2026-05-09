@@ -258,7 +258,9 @@ Each entry is an instance of a typed class:
   convention of a config file the user can read and modify directly.
 - **`AppSettings` class:** immutable, `const`-constructible. Fields:
   `theme` (`ThemeChoice`: system/light/dark), `textSize` (`TextSizeChoice`:
-  small/regular/large/extraLarge), `highContrast` (bool, placeholder).
+  small/regular/large/extraLarge), `highContrast` (bool, placeholder),
+  `alphabetBarPosition` (`AlphabetBarPosition`: left/right, default left —
+  phone layout only; tablet always uses left regardless of this setting).
   `load()` is async (file I/O); `save()` writes the full JSONC with comments.
   `copyWith()` for immutable updates. `fromJson()`/`toJson()` for
   serialisation. Comment stripping exposed via `stripCommentsForTest()` for
@@ -639,7 +641,7 @@ export_vault(path)              → Result<(), String>
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
 | Rust (`cargo test -q`) | 193 | 1 ignored |
-| Flutter (`flutter test`) | 183 | 1 skipped |
+| Flutter (`flutter test`) | 192 | 1 skipped |
 
 ## Platforms
 
@@ -801,22 +803,20 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Three bug fixes hardware-verified on Linux and Lenovo tablet:
-  (1) `TabletVaultLayout` stale `_selectedEntryId` — reset via `didUpdateWidget`
-  when the selected UUID is no longer present in `filteredEntries` after a vault
-  reload or import. Test 10 added to `test/vault_list_tablet_test.dart`.
-  (2) `ReviewChangesScreen` empty-new-fields diff — `Custom` and `Identity`
-  branches now show newly added fields (empty → value) in the diff.
-  Test added to `test/review_changes_screen_test.dart`.
-  (3) Vault deletion from UI — already implemented in a prior session; tests
-  confirmed passing (8/8).
+- **Completed:** Alphabet bar left/right position toggle — Settings → Appearance,
+  phone layout only. `AlphabetBarPosition` enum (`left`/`right`) added to
+  `AppSettings` with JSONC persistence. `AppearanceScreen` gains a
+  `SegmentedRow` for the setting with a subtitle noting tablet layout always
+  uses left. `VaultListScreen` reads the setting (or test override) via
+  `_alphabetBarPosition` getter; right position adds 80dp bottom padding to
+  clear the FAB. Hardware-verified on Samsung S23 (Android 16) and Linux
+  (phone and tablet modes). 9 Flutter tests passing (settings: 4, appearance:
+  3, vault list search: 2).
 
 - **Next tasks (in order):**
-  1. Alphabet bar left/right position toggle — Settings → Appearance, phone
-     layout only. See Bikeshed → Features & UX.
-  2. Tablet edit-mode dim (phase 2) — wire `_isEditing` in
+  1. Tablet edit-mode dim (phase 2) — wire `_isEditing` in
      `TabletVaultLayout`; unskip test 6.
-  3. `zeroize` integration — see Bikeshed → Security.
+  2. `zeroize` integration — see Bikeshed → Security.
 
 ---
 
@@ -911,6 +911,13 @@ the first public tag.
   a real Rust binary before v1. See LEARNINGS.md testing pyramid for context.
 
 ### Import
+
+- **Import source list order:** Change the order of importers shown in
+  `ImportScreen` to: `['gabbro', 'CSV', 'Enpass', 'Bitwarden']`. Reasoning:
+  gabbro-native first (most common operation in the gabbro ecosystem); CSV
+  second (most platform-agnostic, no allegiance signal); Enpass third
+  (closed-source); Bitwarden last (open-source — least likely to be
+  "escaped from"). Low effort, one-line change in `import_screen.dart`.
 
 - **Content-hash deduplication and entry-level merge:** Both remain v2
   candidates. No design work started.
@@ -1172,15 +1179,6 @@ the first public tag.
   open vaults? Does the UI need a vault switcher, or is open/close
   sufficient? Does each vault get its own passphrase and KDF parameters?
   Significant architecture change — v2 at earliest.
-
-- **Alphabet bar left/right setting (accessibility):** Add a toggle in
-  Settings → Appearance to move the alphabet index bar from its default
-  left position to the right. Applies in <600dp (phone) mode only —
-  one-handed mobile use is the ergonomic case this serves; tablet users
-  almost never hold and manipulate the device one-handed so the setting
-  is not exposed there. Tablet layout always positions the bar on the left
-  (between nav rail and list pane), regardless of the phone setting.
-  Implement after the tablet two-pane layout is shipped.
 
 - **Enpass-style password detail view:** In the entry detail screen,
   show a character-by-character breakdown of the password beneath the
