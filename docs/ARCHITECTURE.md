@@ -809,7 +809,9 @@ SPDX identifier: `GPL-3.0-only`
   Bitwarden in `import_screen.dart`. Verified on Linux, Samsung S23 (Android
   16), and Lenovo tablet.
 
-- **Next:** discuss next task from Bikeshed.
+- **Next tasks (in order):**
+  1. Duplicate import detection — warn or skip when an imported entry's UUID
+     already exists in the vault. Rust + Flutter + tests.
 
 ---
 
