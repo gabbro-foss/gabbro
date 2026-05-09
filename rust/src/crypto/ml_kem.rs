@@ -9,6 +9,7 @@
 use ml_kem::{MlKem1024, MlKem1024Params, KemCore, EncodedSizeUser};
 use rand::SeedableRng;
 use rand::rngs::StdRng;
+use zeroize::Zeroizing;
 
 /// An ML-KEM-1024 keypair derived from KDF output.
 pub struct MlKemKeypair {
@@ -20,10 +21,12 @@ impl MlKemKeypair {
     /// Derives an ML-KEM-1024 keypair from bytes [32..96] of KDF output.
     /// The 64 bytes are split into two 32-byte seeds d and z.
     pub fn from_kdf_output(kdf_output: &[u8; 96]) -> Self {
-        let seed: [u8; 32] = kdf_output[32..64]
-            .try_into()
-            .expect("slice is exactly 32 bytes");
-        let mut rng = StdRng::from_seed(seed);
+        let seed: Zeroizing<[u8; 32]> = Zeroizing::new(
+            kdf_output[32..64]
+                .try_into()
+                .expect("slice is exactly 32 bytes"),
+        );
+        let mut rng = StdRng::from_seed(*seed);
         let (decapsulation_key, encapsulation_key) =
             MlKem1024::generate(&mut rng);
         Self { encapsulation_key, decapsulation_key }

@@ -5,7 +5,7 @@
 //! and write them.
 
 use std::path::PathBuf;
-use zeroize::Zeroize;
+use zeroize::{Zeroize, Zeroizing};
 
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
@@ -46,8 +46,8 @@ pub fn lock_vault() -> Result<(), String> {
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     if let Some(ref mut s) = *session {
         // Cryptographic-grade zero: volatile writes the compiler cannot optimise away.
-        // Covers the passphrase bytes fully. The entries vec is cleared (drops all
-        // heap-allocated String fields promptly); full per-field zeroize is a backlog item.
+        // Covers the passphrase bytes fully. The entries vec is cleared via clear(),
+        // which drops each element — triggering ZeroizeOnDrop on every VaultEntry.
         s.passphrase.zeroize();
         s.entries.clear();
     }
@@ -202,7 +202,7 @@ pub fn session_save() -> Result<(), String> {
     let (entries, passphrase, path) = {
         let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_ref().ok_or("Vault is locked")?;
-        (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+        (session.entries.clone(), Zeroizing::new(session.passphrase.clone()), session.path.clone())
     };
     save_vault(&entries, &passphrase, &path)?;
     Ok(())
@@ -218,7 +218,7 @@ pub fn session_create_entry(entry: VaultEntry) -> Result<EntrySummaryData, Strin
         let session = session.as_mut().ok_or("Vault is locked")?;
         summary = entry_to_summary(&entry);
         session.entries.push(entry);
-        (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+        (session.entries.clone(), Zeroizing::new(session.passphrase.clone()), session.path.clone())
     }; // ← lock released here
     save_vault(&entries, &passphrase, &path)?;
     Ok(summary)
@@ -232,7 +232,7 @@ pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Re
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         crate::api::vault::update_entry(&mut session.entries, updated, expiry_days)?;
-        (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+        (session.entries.clone(), Zeroizing::new(session.passphrase.clone()), session.path.clone())
     }; // ← lock released here
     save_vault(&entries, &passphrase, &path)?;
     Ok(())
@@ -246,7 +246,7 @@ pub fn session_delete_entry(id: &str) -> Result<(), String> {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         crate::api::vault::delete_entry(&mut session.entries, id)?;
-        (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+        (session.entries.clone(), Zeroizing::new(session.passphrase.clone()), session.path.clone())
     }; // ← lock released here
     save_vault(&entries, &passphrase, &path)?;
     Ok(())
@@ -293,7 +293,7 @@ pub fn session_clear_password_history(id: &str) -> Result<(), String> {
             }
             _ => return Err(format!("Entry {id} is not a Login entry")),
         }
-        (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+        (session.entries.clone(), Zeroizing::new(session.passphrase.clone()), session.path.clone())
     }; // ← lock released here
     save_vault(&entries, &passphrase, &path)?;
     Ok(())
@@ -319,7 +319,7 @@ pub fn session_revert_password(id: &str) -> Result<(), String> {
             }
             _ => return Err(format!("Entry {id} is not a Login entry")),
         }
-        (session.entries.clone(), session.passphrase.clone(), session.path.clone())
+        (session.entries.clone(), Zeroizing::new(session.passphrase.clone()), session.path.clone())
     }; // ← lock released here
     save_vault(&entries, &passphrase, &path)?;
     Ok(())

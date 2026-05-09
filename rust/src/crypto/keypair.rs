@@ -10,6 +10,7 @@
 use rand::SeedableRng;
 use rand::rngs::StdRng;
 use x25519_dalek::{PublicKey, ReusableSecret};
+use zeroize::Zeroizing;
 
 /// An X25519 keypair derived from KDF output.
 pub struct X25519Keypair {
@@ -20,10 +21,12 @@ pub struct X25519Keypair {
 impl X25519Keypair {
     /// Derives an X25519 keypair from bytes [0..32] of KDF output.
     pub fn from_kdf_output(kdf_output: &[u8; 96]) -> Self {
-        let seed: [u8; 32] = kdf_output[0..32]
-            .try_into()
-            .expect("slice is exactly 32 bytes");
-        let mut rng = StdRng::from_seed(seed);
+        let seed: Zeroizing<[u8; 32]> = Zeroizing::new(
+            kdf_output[0..32]
+                .try_into()
+                .expect("slice is exactly 32 bytes"),
+        );
+        let mut rng = StdRng::from_seed(*seed);
         let secret = ReusableSecret::random_from_rng(&mut rng);
         let public = PublicKey::from(&secret);
         Self { public, secret }

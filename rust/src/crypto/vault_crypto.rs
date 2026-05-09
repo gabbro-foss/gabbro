@@ -11,6 +11,8 @@ use rand::rngs::OsRng;
 use x25519_dalek::EphemeralSecret;
 use x25519_dalek::PublicKey as X25519PublicKey;
 
+use zeroize::Zeroizing;
+
 use crate::crypto::aes_gcm;
 use crate::crypto::hkdf::derive_vault_key;
 use crate::crypto::kdf::{derive_key, Argon2idParams};
@@ -30,7 +32,7 @@ pub fn seal_vault(
     OsRng.fill_bytes(&mut argon2_salt);
 
     // Step 2: derive keypairs from passphrase
-    let kdf_output = derive_key(passphrase, &argon2_salt, &params)?;
+    let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
     let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
     let ml_kem_keypair = MlKemKeypair::from_kdf_output(&kdf_output);
 
@@ -49,15 +51,17 @@ pub fn seal_vault(
     // Step 5: HKDF combine → vault key
     let mut hkdf_salt = [0u8; 32];
     OsRng.fill_bytes(&mut hkdf_salt);
-    let ml_kem_secret_bytes: [u8; 32] = (*ml_kem_secret)
-        .try_into()
-        .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?;
-    let x25519_secret_bytes: [u8; 32] = x25519_secret.as_bytes().clone();
-    let vault_key = derive_vault_key(
+    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
+        (*ml_kem_secret)
+            .try_into()
+            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
+    );
+    let x25519_secret_bytes = Zeroizing::new(x25519_secret.as_bytes().clone());
+    let vault_key = Zeroizing::new(derive_vault_key(
         &ml_kem_secret_bytes,
         &x25519_secret_bytes,
         &hkdf_salt,
-    );
+    ));
 
     // Step 6: AES-256-GCM encrypt
     let (ciphertext, nonce) = aes_gcm::encrypt(&vault_key, plaintext)?;
@@ -79,7 +83,7 @@ pub fn open_vault(
     sealed: &SealedVault,
 ) -> Result<Vec<u8>, String> {
     // Step 1: re-derive keypairs from passphrase
-    let kdf_output = derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?;
+    let kdf_output = Zeroizing::new(derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?);
     let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
     let ml_kem_keypair = MlKemKeypair::from_kdf_output(&kdf_output);
 
@@ -101,15 +105,17 @@ pub fn open_vault(
     let x25519_secret = x25519_keypair.secret.diffie_hellman(&ephemeral_public);
 
     // Step 4: HKDF combine → vault key
-    let ml_kem_secret_bytes: [u8; 32] = (*ml_kem_secret)
-        .try_into()
-        .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?;
-    let x25519_secret_bytes: [u8; 32] = x25519_secret.as_bytes().clone();
-    let vault_key = derive_vault_key(
+    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
+        (*ml_kem_secret)
+            .try_into()
+            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
+    );
+    let x25519_secret_bytes = Zeroizing::new(x25519_secret.as_bytes().clone());
+    let vault_key = Zeroizing::new(derive_vault_key(
         &ml_kem_secret_bytes,
         &x25519_secret_bytes,
         &sealed.hkdf_salt,
-    );
+    ));
 
     // Step 5: AES-256-GCM decrypt
     aes_gcm::decrypt(&vault_key, &sealed.ciphertext, &sealed.nonce)
