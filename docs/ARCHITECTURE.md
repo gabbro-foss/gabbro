@@ -638,8 +638,8 @@ listed above are implemented and tested. See ## Testing Strategy → Test Counts
 
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
-| Rust (`cargo test -q`) | 193 | 1 ignored |
-| Flutter (`flutter test`) | 193 | 0 skipped |
+| Rust (`cargo test -q`) | 194 | 1 ignored |
+| Flutter (`flutter test`) | 195 | 0 skipped |
 
 ## Platforms
 
@@ -797,21 +797,13 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** `zeroize` integration — crypto intermediates. All key
-  material and shared secret temporaries in `vault_crypto.rs`, `keypair.rs`,
-  and `ml_kem.rs` wrapped in `Zeroizing<T>` for automatic zeroing on drop.
-  Cloned passphrase `Vec<u8>` in all six `session_*` save calls wrapped in
-  `Zeroizing<Vec<u8>>`. Misleading comment in `lock_vault` corrected.
-  192 Rust / 193 Flutter tests passing. Hardware-verified on Linux, Samsung
-  S23 (Android 16), and Lenovo tablet.
+- **Completed:** Duplicate import detection — all importers (Bitwarden, Enpass,
+  Gabbro) now skip entries whose UUID already exists in the vault. Bitwarden
+  parser fixed to preserve source UUIDs. `SkippedEntriesDialog` shown after
+  any import with duplicates. 194 Rust / 195 Flutter tests passing. Hardware-
+  verified on Linux and Samsung S23 (Android 16).
 
-- **Completed:** Import source list reordered to Gabbro → CSV → Enpass →
-  Bitwarden in `import_screen.dart`. Verified on Linux, Samsung S23 (Android
-  16), and Lenovo tablet.
-
-- **Next tasks (in order):**
-  1. Duplicate import detection — warn or skip when an imported entry's UUID
-     already exists in the vault. Rust + Flutter + tests.
+- **Next:** See Bikeshed for upcoming work.
 
 ---
 
@@ -1224,12 +1216,17 @@ the first public tag.
 - **Enpass** (`rust/src/import/enpass.rs`) — JSON export. TDD, anonymised
   test data. Full validation failure flow with user review.
 - **Bitwarden** (`rust/src/api/import.rs`) — unencrypted JSON export.
-  Full validation failure flow with user review.
+  Full validation failure flow with user review. Parser fixed to preserve
+  source `id` as `meta.id` (previously generated fresh UUIDs, breaking dedup).
 - **Generic CSV** (`rust/src/import/csv.rs`) — hand-rolled parser, no new
   dependencies. Column-mapping UI in `lib/screens/csv_mapping_screen.dart`.
+  CSV entries always get fresh UUIDs — dedup not applicable.
 
 All importers return `ImportResult`. Validation failures surface to the user
 via `ImportFailuresDialog` (Skip/Edit) — no entry is ever silently discarded.
+Duplicate detection: all importers (Bitwarden, Enpass, Gabbro) skip entries
+whose UUID already exists in the vault and show `SkippedEntriesDialog` with
+the full list. CSV is exempt — fresh UUIDs are always generated.
 Import screen order: Gabbro vault → CSV → Enpass → Bitwarden.
 
 **Scope principle:** importers target the post-event migrant — the user who

@@ -2215,6 +2215,23 @@ the pre-save DTO causes "Saved Unknown" timestamps and missing history.
 
 ---
 
+## Rust/Flutter — importer UUID preservation
+
+When writing a parser for a third-party password manager format, always
+preserve the source UUID as `meta.id` rather than generating a fresh one
+via `Uuid::new_v4()`. Fresh UUIDs break duplicate detection: importing
+the same file twice creates duplicates instead of skipping them.
+
+The Bitwarden parser had this bug — `BwItem` did not deserialize the `id`
+field, so every import generated fresh UUIDs. Fix: add `id: String` to the
+struct and use `item.id.clone()` as `meta.id`.
+
+Rule: every importer that receives a source UUID must thread it through to
+`meta.id`. Only CSV is exempt — CSV has no stable entry identity, so fresh
+UUIDs are correct and duplicate detection is not applicable.
+
+---
+
 ## Rust — `frb_generated.rs` manual patching pattern
 
 When a Rust function signature changes (new parameter, new struct field),
