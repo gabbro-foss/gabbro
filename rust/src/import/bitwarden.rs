@@ -28,6 +28,7 @@ struct BwFolder {
 
 #[derive(Deserialize)]
 struct BwItem {
+    id: String,
     #[serde(rename = "type")]
     item_type: u32,
     name: String,
@@ -130,7 +131,7 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
             .unwrap_or_default();
 
         let meta = EntryMeta {
-            id: uuid::Uuid::new_v4().to_string(),
+            id: item.id.clone(),
             created_at: crate::api::vault::chrono_now(),
             updated_at: crate::api::vault::chrono_now(),
             folder,

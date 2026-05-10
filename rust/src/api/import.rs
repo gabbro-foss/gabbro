@@ -59,6 +59,8 @@ pub struct ImportResult {
     pub imported: usize,
     /// Entries that failed domain validation and were not imported.
     pub failures: Vec<ImportFailureData>,
+    /// Entries skipped because their UUID already exists in the vault.
+    pub skipped: Vec<SkippedEntryData>,
 }
 
 // ── Bridge functions ──────────────────────────────────────────────────────────
@@ -127,7 +129,21 @@ pub async fn import_from_csv(input: String, config: CsvImportConfigData) -> Resu
     Ok(ImportResult {
         imported: count,
         failures: vec![],
+        skipped: vec![],
     })
+}
+
+/// Extract the UUID and display title from any `VaultEntry` variant.
+fn entry_id_and_title(entry: &crate::vault::entry::VaultEntry) -> (String, String) {
+    use crate::vault::entry::VaultEntry::*;
+    match entry {
+        Login(e)    => (e.meta.id.clone(), e.title.clone()),
+        Note(e)     => (e.meta.id.clone(), e.title.clone()),
+        Identity(e) => (e.meta.id.clone(), format!("{} {}", e.first_name, e.last_name)),
+        Card(e)     => (e.meta.id.clone(), e.card_name.clone().unwrap_or_else(|| e.cardholder_name.clone())),
+        File(e)     => (e.meta.id.clone(), e.filename.clone()),
+        Custom(e)   => (e.meta.id.clone(), e.title.clone()),
+    }
 }
 
 /// Import all entries from a Bitwarden unencrypted JSON export into the
@@ -142,10 +158,24 @@ pub async fn import_from_csv(input: String, config: CsvImportConfigData) -> Resu
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
 pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<ImportResult, String> {
     let (entries, failures) = bitwarden::parse(&data)?;
-    let imported = entries.len();
+    let existing_ids = session::session_entry_ids()?;
+
+    let mut imported = 0;
+    let mut skipped = Vec::new();
+
     for entry in entries {
-        session::session_add_entry_no_save(entry)?;
+        let (id, title) = entry_id_and_title(&entry);
+        if existing_ids.contains(&id) {
+            skipped.push(SkippedEntryData {
+                title,
+                reason: String::from("UUID already exists"),
+            });
+        } else {
+            session::session_add_entry_no_save(entry)?;
+            imported += 1;
+        }
     }
+
     session::session_save()?;
     Ok(ImportResult {
         imported,
@@ -158,6 +188,7 @@ pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<ImportResult, String
                 raw_fields: f.raw_fields,
             })
             .collect(),
+        skipped,
     })
 }
 
@@ -173,10 +204,24 @@ pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<ImportResult, String
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
 pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
     let (entries, failures) = enpass::parse(&data)?;
-    let imported = entries.len();
+    let existing_ids = session::session_entry_ids()?;
+
+    let mut imported = 0;
+    let mut skipped = Vec::new();
+
     for entry in entries {
-        session::session_add_entry_no_save(entry)?;
+        let (id, title) = entry_id_and_title(&entry);
+        if existing_ids.contains(&id) {
+            skipped.push(SkippedEntryData {
+                title,
+                reason: String::from("UUID already exists"),
+            });
+        } else {
+            session::session_add_entry_no_save(entry)?;
+            imported += 1;
+        }
     }
+
     session::session_save()?;
     Ok(ImportResult {
         imported,
@@ -189,6 +234,7 @@ pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
                 raw_fields: f.raw_fields,
             })
             .collect(),
+        skipped,
     })
 }
 
@@ -417,6 +463,40 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
 
     #[test]
     #[serial]
+    fn import_from_bitwarden_skips_existing_uuids() {
+        // "bw-exists" matches "existing-001" in the session — must be skipped.
+        let bitwarden_with_dupe: &str = r#"{
+            "encrypted": false,
+            "folders": [],
+            "items": [
+                {"id":"existing-001","folderId":null,"type":2,"name":"Dupe Note","notes":"already here","favorite":false,"fields":[],"secureNote":{}},
+                {"id":"bw-new-001","folderId":null,"type":2,"name":"New Note","notes":"brand new","favorite":false,"fields":[],"secureNote":{}}
+            ]
+        }"#;
+
+        let pass = b"bitwarden dedup passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let result = run(import_from_bitwarden(
+            bitwarden_with_dupe.as_bytes().to_vec(),
+        ))
+        .unwrap();
+
+        assert_eq!(result.imported, 1, "only the new entry should be imported");
+        assert_eq!(result.skipped.len(), 1, "one duplicate should be skipped");
+        assert_eq!(result.skipped[0].title, "Dupe Note");
+        assert_eq!(result.skipped[0].reason, "UUID already exists");
+
+        let summaries = session::list_entry_summaries().unwrap();
+        // 1 existing note + 1 new imported note
+        assert_eq!(summaries.len(), 2);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
     fn import_from_bitwarden_adds_entries_to_session() {
         let pass = b"bitwarden test passphrase";
         let path = setup_vault(pass);
@@ -449,6 +529,52 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
 
         let summaries = session::list_entry_summaries().unwrap();
         // 1 existing note + 1 imported login
+        assert_eq!(summaries.len(), 2);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn import_from_enpass_skips_existing_uuids() {
+        // "existing-001" matches the entry already in the session from setup_vault.
+        let enpass_with_dupe: &str = r#"{
+            "items": [{
+                "uuid": "existing-001",
+                "title": "Dupe Note",
+                "category": "note",
+                "note": "already here",
+                "favorite": 0,
+                "archived": 0,
+                "trashed": 0,
+                "fields": [],
+                "attachments": []
+            }, {
+                "uuid": "enp-new-001",
+                "title": "New Note",
+                "category": "note",
+                "note": "brand new",
+                "favorite": 0,
+                "archived": 0,
+                "trashed": 0,
+                "fields": [],
+                "attachments": []
+            }]
+        }"#;
+
+        let pass = b"enpass dedup passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let result = run(import_from_enpass(enpass_with_dupe.as_bytes().to_vec())).unwrap();
+
+        assert_eq!(result.imported, 1, "only the new entry should be imported");
+        assert_eq!(result.skipped.len(), 1, "one duplicate should be skipped");
+        assert_eq!(result.skipped[0].title, "Dupe Note");
+        assert_eq!(result.skipped[0].reason, "UUID already exists");
+
+        let summaries = session::list_entry_summaries().unwrap();
+        // 1 existing note + 1 new imported note
         assert_eq!(summaries.len(), 2);
 
         teardown(&path);

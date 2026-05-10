@@ -1573,9 +1573,11 @@ impl SseDecode for crate::api::import::ImportResult {
         let mut var_imported = <usize>::sse_decode(deserializer);
         let mut var_failures =
             <Vec<crate::api::import::ImportFailureData>>::sse_decode(deserializer);
+        let mut var_skipped = <Vec<crate::api::import::SkippedEntryData>>::sse_decode(deserializer);
         return crate::api::import::ImportResult {
             imported: var_imported,
             failures: var_failures,
+            skipped: var_skipped,
         };
     }
 }
@@ -2338,6 +2340,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::import::ImportResult {
         [
             self.imported.into_into_dart().into_dart(),
             self.failures.into_into_dart().into_dart(),
+            self.skipped.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -2768,6 +2771,7 @@ impl SseEncode for crate::api::import::ImportResult {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <usize>::sse_encode(self.imported, serializer);
         <Vec<crate::api::import::ImportFailureData>>::sse_encode(self.failures, serializer);
+        <Vec<crate::api::import::SkippedEntryData>>::sse_encode(self.skipped, serializer);
     }
 }
 

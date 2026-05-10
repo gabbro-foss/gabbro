@@ -85,6 +85,9 @@ class _ImportScreenState extends State<ImportScreen> {
       if (result.failures.isNotEmpty && mounted) {
         editedCount = await showImportFailuresDialog(context, result.failures);
       }
+      if (result.skipped.isNotEmpty && mounted) {
+        await showSkippedEntriesDialog(context, result.skipped);
+      }
       if (mounted) Navigator.of(context).pop(result.imported.toInt() + editedCount);
     } catch (e) {
       if (mounted) setState(() => _enpassError = e.toString());
@@ -116,6 +119,9 @@ class _ImportScreenState extends State<ImportScreen> {
       var editedCount = 0;
       if (result.failures.isNotEmpty && mounted) {
         editedCount = await showImportFailuresDialog(context, result.failures);
+      }
+      if (result.skipped.isNotEmpty && mounted) {
+        await showSkippedEntriesDialog(context, result.skipped);
       }
       if (mounted) Navigator.of(context).pop(result.imported.toInt() + editedCount);
     } catch (e) {
@@ -215,8 +221,8 @@ class _ImportScreenState extends State<ImportScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'If you have imported this file before, duplicate entries '
-                'may be created. Duplicate cleanup is your responsibility.',
+                'Entries whose UUID already exists in your vault will be '
+                'skipped automatically. You will be shown a summary.',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSecondaryContainer,
                 ),

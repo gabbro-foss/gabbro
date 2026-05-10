@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 
-/// Informational dialog shown after a Gabbro → Gabbro import when one or
-/// more entries were skipped because their UUID already exists in the vault.
+/// Informational dialog shown after an import when one or more entries were
+/// skipped because their UUID already exists in the vault.
 ///
 /// The user acknowledges the list and dismisses. No action is required —
 /// the local version of each skipped entry is preserved as-is.
@@ -44,44 +44,45 @@ class _SkippedEntriesDialog extends StatelessWidget {
           ),
         ],
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'These entries already exist in your vault and were not overwritten:',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
+      content: SizedBox(
+        width: double.maxFinite,
+        height: 300,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'These entries already exist in your vault and were not overwritten:',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 300),
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemCount: skipped.length,
-              separatorBuilder: (_, _) => const Divider(height: 1),
-              itemBuilder: (_, i) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      skipped[i].title,
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                    Text(
-                      skipped[i].reason,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
+            const SizedBox(height: 12),
+            Expanded(
+              child: ListView.separated(
+                itemCount: skipped.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (_, i) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        skipped[i].title,
+                        style: theme.textTheme.bodyMedium,
                       ),
-                    ),
-                  ],
+                      Text(
+                        skipped[i].reason,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         FilledButton(

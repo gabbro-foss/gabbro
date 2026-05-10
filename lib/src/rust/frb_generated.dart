@@ -1688,11 +1688,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   ImportResult dco_decode_import_result(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 2)
-      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
     return ImportResult(
       imported: dco_decode_usize(arr[0]),
       failures: dco_decode_list_import_failure_data(arr[1]),
+      skipped: dco_decode_list_skipped_entry_data(arr[2]),
     );
   }
 
@@ -2306,7 +2307,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_imported = sse_decode_usize(deserializer);
     var var_failures = sse_decode_list_import_failure_data(deserializer);
-    return ImportResult(imported: var_imported, failures: var_failures);
+    var var_skipped = sse_decode_list_skipped_entry_data(deserializer);
+    return ImportResult(
+      imported: var_imported,
+      failures: var_failures,
+      skipped: var_skipped,
+    );
   }
 
   @protected
@@ -2948,6 +2954,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(self.imported, serializer);
     sse_encode_list_import_failure_data(self.failures, serializer);
+    sse_encode_list_skipped_entry_data(self.skipped, serializer);
   }
 
   @protected

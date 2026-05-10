@@ -6,6 +6,7 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `entry_id_and_title`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`, `fmt`
 
 /// Sniff the headers and first 3 rows of a CSV string.
@@ -201,10 +202,17 @@ class ImportResult {
   /// Entries that failed domain validation and were not imported.
   final List<ImportFailureData> failures;
 
-  const ImportResult({required this.imported, required this.failures});
+  /// Entries skipped because their UUID already exists in the vault.
+  final List<SkippedEntryData> skipped;
+
+  const ImportResult({
+    required this.imported,
+    required this.failures,
+    required this.skipped,
+  });
 
   @override
-  int get hashCode => imported.hashCode ^ failures.hashCode;
+  int get hashCode => imported.hashCode ^ failures.hashCode ^ skipped.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -212,7 +220,8 @@ class ImportResult {
       other is ImportResult &&
           runtimeType == other.runtimeType &&
           imported == other.imported &&
-          failures == other.failures;
+          failures == other.failures &&
+          skipped == other.skipped;
 }
 
 /// A single entry skipped during Gabbro → Gabbro import.
