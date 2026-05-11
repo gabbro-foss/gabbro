@@ -869,16 +869,13 @@ Design that wiring in the same session as the generator UI build.
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** `PasswordBreakdownSheet` — character-by-character password
-  breakdown widget. Fira Code Regular bundled. Long-press trigger wired into
-  `EntryDetailScreen._loginView()` and `GeneratorWidget`. High-contrast
-  hardcoded colour palette (light + dark). Hardware-verified on Linux and
-  Samsung S23 (Android 16).
+- **Completed:** `PasswordBreakdownSheet` scroll discoverability — circled
+  chevron hints at both ends of the character row. `ScrollController` listener
+  + `ScrollMetricsNotification` for correct left/right visibility. Linux mouse
+  drag fixed via `ScrollConfiguration` + `PointerDeviceKind.mouse`. Hardware-
+  verified on Linux and Samsung S23 (Android 16).
 
 - **Next (deferred to next session):**
-  - Scroll discoverability: chevron hints at both ends of the character row
-    (like `alphabet_index_bar.dart`). Linux horizontal scroll not working —
-    investigate root cause.
   - Add Fira Code OFL licence entry to `AboutScreen` components list.
 
 ---
@@ -1055,13 +1052,6 @@ the first public tag.
   per type (uppercase, lowercase, digit, symbol), never colour alone (ADR-003).
   Design in the same session as the entry detail colour-coded display.
 
-- **[IN PROGRESS] Colour-coded password display in entry detail:** In `EntryDetailScreen`,
-  show a character-by-character breakdown beneath the masked password field:
-  each character colour-coded by type (uppercase, lowercase, digit, symbol)
-  with a symbol marker — ADR-003 applies, colour never the sole differentiator.
-  Use an unambiguous font for visually similar characters (0/O, l/1/I).
-  Design in the same session as the generator UI screen.
-
 - **Non-ASCII wordlist support (v2):** Add CJK and other non-Latin language
   wordlists (e.g. Japanese, Korean). Architecture already supports it —
   `include_str!` handles UTF-8 and entropy math is language-agnostic.
@@ -1073,6 +1063,14 @@ the first public tag.
 
 
 ### Features & UX
+
+- **Click-to-scroll in `PasswordBreakdownSheet`:** The chevron buttons are
+  currently display-only (scroll discoverability hints). Add tap-to-scroll
+  behaviour: tapping the left chevron scrolls left by one viewport width,
+  tapping the right chevron scrolls right by one viewport width, using
+  `_scrollController.animateTo()`. Useful for tiling WM / keyboard-driven
+  users. Design note: vim-style h/l key bindings are a natural follow-on
+  but require focus management — defer to a separate item.
 
 - **Folders, tags, favourites, configurable sorting:** The vault list
   currently has no folder or tag organisation, no favourites flag in the UI,
