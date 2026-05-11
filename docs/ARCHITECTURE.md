@@ -869,14 +869,13 @@ Design that wiring in the same session as the generator UI build.
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** `PasswordBreakdownSheet` scroll discoverability — circled
-  chevron hints at both ends of the character row. `ScrollController` listener
-  + `ScrollMetricsNotification` for correct left/right visibility. Linux mouse
-  drag fixed via `ScrollConfiguration` + `PointerDeviceKind.mouse`. Hardware-
-  verified on Linux and Samsung S23 (Android 16).
+- **Completed:** Fira Code OFL 1.1 licence entry added to `AboutScreen`
+  components list. `PasswordBreakdownSheet` scroll chevrons and Linux mouse
+  drag fix hardware-verified on Linux and Samsung S23 (Android 16).
 
-- **Next (deferred to next session):**
-  - Add Fira Code OFL licence entry to `AboutScreen` components list.
+- **Next:** Autofill planning session — Android `AutofillService` API design
+  only, no code. Map the service component, manifest declarations, vault
+  state access pattern, and Dart entry point before any implementation begins.
 
 ---
 
@@ -1045,12 +1044,6 @@ the first public tag.
   philosophy applied successfully in `wellpathpy` (numpy-only).
 
 ### Password / Passphrase Generator
-
-- **Colour-coded character display in generator screen:** The generator screen
-  exists (`GeneratorScreen`, `GeneratorWidget`) but does not yet show a
-  colour-coded character breakdown. Add per-character display — colour + symbol
-  per type (uppercase, lowercase, digit, symbol), never colour alone (ADR-003).
-  Design in the same session as the entry detail colour-coded display.
 
 - **Non-ASCII wordlist support (v2):** Add CJK and other non-Latin language
   wordlists (e.g. Japanese, Korean). Architecture already supports it —
@@ -1258,13 +1251,6 @@ the first public tag.
   open vaults? Does the UI need a vault switcher, or is open/close
   sufficient? Does each vault get its own passphrase and KDF parameters?
   Significant architecture change — v2 at earliest.
-
-- **Enpass-style password detail view:** In the entry detail screen,
-  show a character-by-character breakdown of the password beneath the
-  masked field: a number under each character, colour-coded by type
-  (uppercase, lowercase, digit, symbol), using an unambiguous font for
-  visually similar characters (0/O, l/1/I). Colour must never be the
-  sole differentiator — ADR-003 applies. Design in a dedicated session.
 
 - **Tablet list pane width:** The list pane is currently fixed at 260dp.
   Options: (1) widen the fixed value, or (2) make the divider draggable
