@@ -7,6 +7,7 @@ import 'package:gabbro/screens/review_changes_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/widgets/generator_widget.dart';
 
 Future<void> _defaultCreate(VaultEntryData entry) => createEntry(entry: entry);
 VaultEntryData _defaultGetEntry(String id) => getEntry(id: id);
@@ -857,6 +858,37 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
           (v == null || v.isEmpty) ? 'Password is required' : null,
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_loginNotesFocus),
+    ),
+    Align(
+      alignment: Alignment.centerRight,
+      child: TextButton.icon(
+        key: const Key('open_generator_button'),
+        icon: const Icon(Icons.auto_fix_high, size: 18),
+        label: const Text('Generate'),
+        onPressed: () async {
+          final settings = GabbroApp.of(context).settings;
+          final duration = switch (settings.clipboardClearTimeout) {
+            ClipboardClearTimeout.never         => const Duration(hours: 24),
+            ClipboardClearTimeout.thirtySeconds => const Duration(seconds: 30),
+            ClipboardClearTimeout.sixtySeconds  => const Duration(seconds: 60),
+            ClipboardClearTimeout.twoMinutes    => const Duration(minutes: 2),
+          };
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => Scaffold(
+                appBar: AppBar(title: const Text('Password generator')),
+                body: GeneratorWidget(
+                  clipboardClearDuration: duration,
+                  onUsePassword: (value) {
+                    setState(() => _passwordController.text = value);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     ),
     const SizedBox(height: 12),
     _optionalTextField(

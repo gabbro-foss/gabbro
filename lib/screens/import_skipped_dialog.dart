@@ -60,7 +60,7 @@ class _SkippedEntriesDialog extends StatelessWidget {
             Expanded(
               child: ListView.separated(
                 itemCount: skipped.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
+                separatorBuilder: (_, _) => const Divider(height: 1),
                 itemBuilder: (_, i) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Column(

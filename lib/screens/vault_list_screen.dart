@@ -10,6 +10,7 @@ import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
+import 'package:gabbro/screens/generator_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
@@ -380,6 +381,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
         );
       case 'vault_delete':
         _deleteWholeVault();
+      case 'generator':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const GeneratorScreen()),
+        );
       case 'about':
         Navigator.of(
           context,
@@ -605,7 +610,14 @@ class _VaultListScreenState extends State<VaultListScreen> {
                   value: 'appearance',
                   child: Text('Appearance'),
                 ),
-                const PopupMenuItem(value: 'security', child: Text('Security')),
+                const PopupMenuItem(
+                  value: 'security',
+                  child: Text('Security'),
+                ),
+                const PopupMenuItem(
+                  value: 'generator',
+                  child: Text('Password generator'),
+                ),
                 const PopupMenuDivider(),
                 const PopupMenuItem(value: 'about', child: Text('About')),
               ],
