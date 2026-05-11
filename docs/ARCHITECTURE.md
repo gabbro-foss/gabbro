@@ -826,16 +826,18 @@ dependencies required.
 
 **Character type encoding (ADR-003: colour + symbol, never colour alone):**
 
-| Type | Symbol | Colour token | Hex (approx) |
-|------|--------|-------------|--------------|
-| Uppercase | `▲` | `colorScheme.primary` (blue family) | `#185FA5` |
-| Lowercase | `▼` | `colorScheme.tertiary` (green family) | `#3B6D11` |
-| Digit | `●` | `colorScheme.secondary` (amber family) | `#854F0B` |
-| Symbol/special | `■` | purple | `#534AB7` |
+| Type | Symbol | Light mode | Dark mode |
+|------|--------|------------|-----------|
+| Uppercase | `▲` | `#1565C0` (strong blue) | `#90CAF9` (light blue) |
+| Lowercase | `▼` | `#2E7D32` (strong green) | `#A5D6A7` (light green) |
+| Digit | `●` | `#E65100` (strong orange) | `#FFAB40` (amber) |
+| Symbol/special | `■` | `#6A1B9A` (strong purple) | `#CE93D8` (light purple) |
 
-Exact colours are derived from the app `ColorScheme` where possible;
-purple is hardcoded (no scheme slot maps to it). Both colour and symbol
+All colours are hardcoded (not derived from `ColorScheme`) and selected
+for WCAG AA contrast on their respective backgrounds. Both colour and symbol
 always rendered together — colour is never the sole differentiator.
+CVD-safe: hues are maximally separated (blue/green/orange/purple);
+symbols carry the distinction under deuteranomaly and protanopia simulation.
 
 **Legend row:** four items, each showing: symbol (coloured) + example
 character (coloured, monospace) + label. Example characters: `A`, `a`,
@@ -867,21 +869,17 @@ Design that wiring in the same session as the generator UI build.
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Passphrase generator Rust improvements — random 50%
-  capitalise per word, random digit splicing into passphrase string
-  (count in range `[word_count, floor(word_count * 1.5)]`, positions
-  anywhere in string). Hardware-verified on Linux, Samsung S23 (Android 16).
+- **Completed:** `PasswordBreakdownSheet` — character-by-character password
+  breakdown widget. Fira Code Regular bundled. Long-press trigger wired into
+  `EntryDetailScreen._loginView()` and `GeneratorWidget`. High-contrast
+  hardcoded colour palette (light + dark). Hardware-verified on Linux and
+  Samsung S23 (Android 16).
 
-- **In progress:** Colour-coded password breakdown — design approved this
-  session, implementation not yet started. See ## Password Breakdown Widget
-  for full design spec.
-
-- **Next:**
-  1. Bundle Fira Code Regular (`assets/fonts/FiraCode-Regular.ttf`, OFL-1.1).
-  2. Write failing widget test for `PasswordBreakdownSheet`.
-  3. Implement `PasswordBreakdownSheet` widget.
-  4. Wire long-press trigger into `EntryDetailScreen._loginView()`.
-  5. Extend to generator screen (`GeneratorWidget`) — same widget, same font.
+- **Next (deferred to next session):**
+  - Scroll discoverability: chevron hints at both ends of the character row
+    (like `alphabet_index_bar.dart`). Linux horizontal scroll not working —
+    investigate root cause.
+  - Add Fira Code OFL licence entry to `AboutScreen` components list.
 
 ---
 
