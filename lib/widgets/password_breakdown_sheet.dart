@@ -1,0 +1,170 @@
+import 'package:flutter/material.dart';
+
+enum _CharType { uppercase, lowercase, digit, symbol }
+
+_CharType _classify(String ch) {
+  if (RegExp(r'[A-Z]').hasMatch(ch)) return _CharType.uppercase;
+  if (RegExp(r'[a-z]').hasMatch(ch)) return _CharType.lowercase;
+  if (RegExp(r'[0-9]').hasMatch(ch)) return _CharType.digit;
+  return _CharType.symbol;
+}
+
+const _kSymbol = {
+  _CharType.uppercase: '▲',
+  _CharType.lowercase: '▼',
+  _CharType.digit: '●',
+  _CharType.symbol: '■',
+};
+
+const _kLabel = {
+  _CharType.uppercase: 'Uppercase',
+  _CharType.lowercase: 'Lowercase',
+  _CharType.digit: 'Digit',
+  _CharType.symbol: 'Symbol',
+};
+
+const _kExample = {
+  _CharType.uppercase: 'A',
+  _CharType.lowercase: 'a',
+  _CharType.digit: '7',
+  _CharType.symbol: r'$',
+};
+
+Color _colorFor(_CharType t, Brightness brightness) {
+  final dark = brightness == Brightness.dark;
+  return switch (t) {
+    _CharType.uppercase => Color(dark ? 0xFF90CAF9 : 0xFF1565C0),
+    _CharType.lowercase => Color(dark ? 0xFFA5D6A7 : 0xFF2E7D32),
+    _CharType.digit     => Color(dark ? 0xFFFFAB40 : 0xFFE65100),
+    _CharType.symbol    => Color(dark ? 0xFFCE93D8 : 0xFF6A1B9A),
+  };
+}
+
+const _kFiraCode = TextStyle(fontFamily: 'FiraCode');
+
+class PasswordBreakdownSheet extends StatelessWidget {
+  const PasswordBreakdownSheet({super.key, required this.password});
+
+  final String password;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final brightness = Theme.of(context).brightness;
+    final muted = cs.onSurfaceVariant;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Drag handle
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Container(
+            width: 32,
+            height: 4,
+            decoration: BoxDecoration(
+              color: muted.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        // Title
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Text(
+            'Password breakdown',
+            style: TextStyle(fontSize: 13, color: muted),
+          ),
+        ),
+        // Character columns
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < password.length; i++)
+                _CharColumn(
+                  char: password[i],
+                  index: i,
+                  brightness: brightness,
+                  muted: muted,
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Divider(thickness: 0.5, color: muted.withValues(alpha: 0.3)),
+        // Legend
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+              16, 8, 16, 8 + MediaQuery.of(context).padding.bottom),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              for (final t in _CharType.values)
+                _LegendItem(type: t, brightness: brightness),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CharColumn extends StatelessWidget {
+  const _CharColumn({
+    required this.char,
+    required this.index,
+    required this.brightness,
+    required this.muted,
+  });
+
+  final String char;
+  final int index;
+  final Brightness brightness;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = _classify(char);
+    final color = _colorFor(t, brightness);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Column(
+        children: [
+          Text(char,
+              style: _kFiraCode.copyWith(fontSize: 15, color: color)),
+          Text(_kSymbol[t]!,
+              style: TextStyle(fontSize: 10, color: color)),
+          Text('$index',
+              style: TextStyle(fontSize: 9, color: muted)),
+        ],
+      ),
+    );
+  }
+}
+
+class _LegendItem extends StatelessWidget {
+  const _LegendItem({required this.type, required this.brightness});
+
+  final _CharType type;
+  final Brightness brightness;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _colorFor(type, brightness);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(_kSymbol[type]!, style: TextStyle(fontSize: 12, color: color)),
+        const SizedBox(width: 3),
+        Text(_kExample[type]!,
+            style: _kFiraCode.copyWith(fontSize: 12, color: color)),
+        const SizedBox(width: 4),
+        Text(_kLabel[type]!, style: const TextStyle(fontSize: 11)),
+      ],
+    );
+  }
+}

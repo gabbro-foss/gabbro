@@ -113,6 +113,24 @@ void main() {
     });
   });
 
+  group('GeneratorWidget — password breakdown sheet', () {
+    testWidgets('long-pressing revealed password shows breakdown sheet',
+        (tester) async {
+      await tester.pumpWidget(_wrap(_stubWidget()));
+      await tester.pumpAndSettle();
+
+      // Reveal the password
+      await tester.tap(find.byKey(const Key('visibility_toggle')));
+      await tester.pump();
+
+      // Long-press the revealed value
+      await tester.longPress(find.byKey(const Key('generated_value')));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Password breakdown'), findsOneWidget);
+    });
+  });
+
   group('GeneratorWidget — passphrase mode controls', () {
     Future<void> switchToPassphrase(WidgetTester tester) async {
       await tester.tap(find.text('Passphrase'));

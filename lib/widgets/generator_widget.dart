@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:gabbro/src/rust/api/password_generator.dart';
 import 'package:gabbro/src/rust/api/passphrase_generator.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
+import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 
 // ---------------------------------------------------------------------------
 // Default generator functions — call Rust via FFI in production.
@@ -279,19 +280,29 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              _generated.isEmpty
-                  ? '—'
-                  : (_obscured
-                      ? '•' * _generated.length.clamp(0, 32)
-                      : _generated),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontFamily: 'monospace',
-                    letterSpacing: _obscured ? 2 : 0.5,
-                  ),
-              maxLines: _obscured ? 1 : null,
-              overflow:
-                  _obscured ? TextOverflow.ellipsis : TextOverflow.visible,
+            child: GestureDetector(
+              onLongPress: (_obscured || _generated.isEmpty)
+                  ? null
+                  : () => showModalBottomSheet<void>(
+                        context: context,
+                        builder: (_) =>
+                            PasswordBreakdownSheet(password: _generated),
+                      ),
+              child: Text(
+                key: const Key('generated_value'),
+                _generated.isEmpty
+                    ? '—'
+                    : (_obscured
+                        ? '•' * _generated.length.clamp(0, 32)
+                        : _generated),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontFamily: 'monospace',
+                      letterSpacing: _obscured ? 2 : 0.5,
+                    ),
+                maxLines: _obscured ? 1 : null,
+                overflow:
+                    _obscured ? TextOverflow.ellipsis : TextOverflow.visible,
+              ),
             ),
           ),
           // Visibility toggle

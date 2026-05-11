@@ -5,7 +5,7 @@ import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 void main() {
   group('PasswordBreakdownSheet', () {
     testWidgets('renders one column per character', (tester) async {
-      const password = 'Ab1!';
+      const password = 'Zx9#';
 
       await tester.pumpWidget(
         const MaterialApp(
@@ -15,14 +15,14 @@ void main() {
         ),
       );
 
-      expect(find.text('A'), findsOneWidget);
-      expect(find.text('b'), findsOneWidget);
-      expect(find.text('1'), findsOneWidget);
-      expect(find.text('!'), findsOneWidget);
+      expect(find.text('Z'), findsOneWidget);
+      expect(find.text('x'), findsOneWidget);
+      expect(find.text('9'), findsOneWidget);
+      expect(find.text('#'), findsOneWidget);
     });
 
     testWidgets('renders 0-based position indices', (tester) async {
-      const password = 'Ab1!';
+      const password = 'Zx9#';
 
       await tester.pumpWidget(
         const MaterialApp(
@@ -49,10 +49,10 @@ void main() {
         ),
       );
 
-      expect(find.text('▲'), findsOneWidget);
-      expect(find.text('▼'), findsOneWidget);
-      expect(find.text('●'), findsOneWidget);
-      expect(find.text('■'), findsOneWidget);
+      expect(find.text('▲'), findsNWidgets(2));
+      expect(find.text('▼'), findsNWidgets(2));
+      expect(find.text('●'), findsNWidgets(2));
+      expect(find.text('■'), findsNWidgets(2));
     });
 
     testWidgets('renders legend with all four labels', (tester) async {

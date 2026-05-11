@@ -291,6 +291,24 @@ void main() {
     expect(launched, isFalse);
   });
 
+  testWidgets('long-pressing revealed password shows breakdown sheet',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.login(_loginEntry())),
+    );
+
+    // Reveal the password first
+    await tester.tap(find.byIcon(Icons.visibility_off).first);
+    await tester.pump();
+    expect(find.text('s3cr3tP@ss'), findsOneWidget);
+
+    // Long-press the revealed password text
+    await tester.longPress(find.text('s3cr3tP@ss'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Password breakdown'), findsOneWidget);
+  });
+
   testWidgets('identity hidden custom field has eye icon toggle',
       (tester) async {
     final entry = IdentityEntryData(

@@ -9,6 +9,7 @@ import 'package:gabbro/screens/password_history_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
+import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 
 /// Formats an ISO 8601 UTC timestamp string into a human-readable form.
 /// Returns 'Unknown' for empty or unparseable input.
@@ -298,6 +299,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           obscured: _passwordObscured,
           onToggle: () =>
               setState(() => _passwordObscured = !_passwordObscured),
+          onLongPress: () => showModalBottomSheet<void>(
+            context: context,
+            builder: (_) => PasswordBreakdownSheet(password: e.password),
+          ),
         ),
         ListTile(
           contentPadding: EdgeInsets.zero,
@@ -693,6 +698,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     required String value,
     required bool obscured,
     required VoidCallback onToggle,
+    VoidCallback? onLongPress,
   }) {
     if (value.isEmpty) return const SizedBox.shrink();
     return Padding(
@@ -708,9 +714,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           Row(
             children: [
               Expanded(
-                child: Text(
-                  obscured ? '••••••••' : value,
-                  style: const TextStyle(fontSize: 16),
+                child: GestureDetector(
+                  onLongPress: obscured ? null : onLongPress,
+                  child: Text(
+                    obscured ? '••••••••' : value,
+                    style: const TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
               IconButton(
