@@ -794,6 +794,74 @@ SPDX identifier: `GPL-3.0-only`
 
 ---
 
+## Password Breakdown Widget
+
+### Design (approved session 11 May 2026)
+
+A `PasswordBreakdownSheet` widget that renders a character-by-character
+breakdown of a revealed password or passphrase. Triggered by long-pressing
+the revealed password field in `EntryDetailScreen`. Reusable — also planned
+for `GeneratorWidget`.
+
+**Trigger:** long-press on the revealed password `Text`/`SelectableText` in
+`EntryDetailScreen._loginView()`. Only available when the password is
+revealed (show/hide toggle is on). No long-press affordance when masked.
+
+**Presentation:** `showModalBottomSheet()` — slides up from the bottom,
+dims the screen behind it, dismissed by swipe-down or tap outside. No new
+dependencies required.
+
+**Layout (top to bottom inside the sheet):**
+1. Drag handle pill (32×4dp, `colorScheme.onSurfaceVariant` at low opacity)
+2. Title: `"Password breakdown"` — 13sp, muted
+3. Horizontally scrollable `SingleChildScrollView` → `Row` of character
+   columns (handles passwords up to 256 characters)
+4. Legend (key) row — always visible at the bottom of the sheet
+
+**Each character column (top to bottom):**
+1. The character glyph — Fira Code Regular, 15sp, coloured by type
+2. Type symbol — 10sp, same colour as glyph
+3. Position index — 9sp, muted (`colorScheme.onSurfaceVariant`), **0-based**
+   (position 0 = first character, matching Python/C/Rust convention)
+
+**Character type encoding (ADR-003: colour + symbol, never colour alone):**
+
+| Type | Symbol | Colour token | Hex (approx) |
+|------|--------|-------------|--------------|
+| Uppercase | `▲` | `colorScheme.primary` (blue family) | `#185FA5` |
+| Lowercase | `▼` | `colorScheme.tertiary` (green family) | `#3B6D11` |
+| Digit | `●` | `colorScheme.secondary` (amber family) | `#854F0B` |
+| Symbol/special | `■` | purple | `#534AB7` |
+
+Exact colours are derived from the app `ColorScheme` where possible;
+purple is hardcoded (no scheme slot maps to it). Both colour and symbol
+always rendered together — colour is never the sole differentiator.
+
+**Legend row:** four items, each showing: symbol (coloured) + example
+character (coloured, monospace) + label. Example characters: `A`, `a`,
+`0`, `$`. Separated from the character row by a 0.5dp divider.
+
+**Font:** Fira Code Regular (`assets/fonts/FiraCode-Regular.ttf`).
+- Licence: SIL OFL 1.1 — compatible with GPL-3.0, may be bundled and
+  distributed. Copyright The Fira Code Project Authors.
+  Source: https://github.com/tonsky/FiraCode (v6.2.0)
+- Chosen for unambiguous character rendering: slash-zero distinguishes
+  `0` from `O`; distinct `l`, `1`, `I` glyphs.
+- Registered in `pubspec.yaml` under `flutter: fonts:`.
+- Used only in `PasswordBreakdownSheet` (and later `GeneratorWidget`).
+- OFL licence entry to be added to `AboutScreen` components list before v1.
+
+**File locations:**
+- Font asset: `gabbro/assets/fonts/FiraCode-Regular.ttf`
+- Widget: `gabbro/lib/widgets/password_breakdown_sheet.dart`
+- Tests: `gabbro/test/password_breakdown_sheet_test.dart`
+
+**Reuse:** `GeneratorWidget` will use the same `PasswordBreakdownSheet`
+with an identical long-press trigger on the generated password display.
+Design that wiring in the same session as the generator UI build.
+
+---
+
 ## Current Focus
 
 > Update this section at the end of each session. One or two bullets max.
@@ -804,10 +872,16 @@ SPDX identifier: `GPL-3.0-only`
   (count in range `[word_count, floor(word_count * 1.5)]`, positions
   anywhere in string). Hardware-verified on Linux, Samsung S23 (Android 16).
 
+- **In progress:** Colour-coded password breakdown — design approved this
+  session, implementation not yet started. See ## Password Breakdown Widget
+  for full design spec.
+
 - **Next:**
-  1. Colour-coded password display in `EntryDetailScreen` — character-by-character
-     breakdown beneath masked password field, colour + symbol per character type
-     (ADR-003 compliant). See Bikeshed for design notes.
+  1. Bundle Fira Code Regular (`assets/fonts/FiraCode-Regular.ttf`, OFL-1.1).
+  2. Write failing widget test for `PasswordBreakdownSheet`.
+  3. Implement `PasswordBreakdownSheet` widget.
+  4. Wire long-press trigger into `EntryDetailScreen._loginView()`.
+  5. Extend to generator screen (`GeneratorWidget`) — same widget, same font.
 
 ---
 
@@ -983,7 +1057,7 @@ the first public tag.
   per type (uppercase, lowercase, digit, symbol), never colour alone (ADR-003).
   Design in the same session as the entry detail colour-coded display.
 
-- **Colour-coded password display in entry detail:** In `EntryDetailScreen`,
+- **[IN PROGRESS] Colour-coded password display in entry detail:** In `EntryDetailScreen`,
   show a character-by-character breakdown beneath the masked password field:
   each character colour-coded by type (uppercase, lowercase, digit, symbol)
   with a symbol marker — ADR-003 applies, colour never the sole differentiator.
