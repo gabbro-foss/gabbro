@@ -408,6 +408,11 @@ const _kComponents = [
     licence: 'Apache-2.0 / MIT',
     url: 'https://github.com/marshallpierce/rust-base64',
   ),
+  _Component(
+    name: 'Fira Code',
+    licence: 'SIL OFL 1.1',
+    url: 'https://github.com/tonsky/FiraCode',
+  ),
   // Languages & runtimes
   _Component(
     name: 'Rust',
