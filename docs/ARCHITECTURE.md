@@ -641,7 +641,7 @@ listed above are implemented and tested. See ## Testing Strategy → Test Counts
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
 | Rust (`cargo test -q`) | 194 | 1 ignored |
-| Flutter (`flutter test`) | 210 | 0 skipped |
+| Flutter (`flutter test`) | 211 | 0 skipped |
 
 ## Platforms
 
@@ -802,21 +802,14 @@ SPDX identifier: `GPL-3.0-only`
 - **Completed:** Password/passphrase generator UI — `GeneratorWidget`
   (reusable, injectable stubs for testability), `GeneratorScreen` (standalone),
   inline entry point in `CreateEntryScreen` (wand button next to password
-  field), menu entry in `VaultListScreen`. 194 Rust / 210 Flutter tests
-  passing. Hardware-verified on Linux, Samsung S23 (Android 16) portrait
-  and landscape.
+  field), menu entry in `VaultListScreen`. Menu items regression test
+  (`test/vault_list_menu_test.dart`). Hardware-verified on Linux, Samsung
+  S23 (Android 16) portrait and landscape.
 
-- **Next (two items, in order):**
-  1. Menu items regression test (`test/vault_list_menu_test.dart`) —
-     assert all expected `PopupMenuItem` values present in `VaultListScreen`.
-     Pattern: use `_buildScreen()` + `_setNarrow()` helpers from
-     `vault_list_selection_test.dart`. Open menu via
-     `find.byIcon(Icons.menu)` + `pumpAndSettle`. Assert each menu item
-     text. No files need uploading — pattern is self-contained.
-  2. Passphrase generator Rust improvements — random capitalise subset,
+- **Next:**
+  1. Passphrase generator Rust improvements — random capitalise subset,
      random digit count at random positions. See Bikeshed for design notes.
-     Files needed: `rust/src/api/passphrase_generator.rs` (already read
-     this session — upload again at session start).
+     Files needed: `rust/src/api/passphrase_generator.rs`.
 
 ---
 
