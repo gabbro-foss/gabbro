@@ -2232,6 +2232,43 @@ UUIDs are correct and duplicate detection is not applicable.
 
 ---
 
+## Flutter — injectable functions pattern for FFI testability
+
+Flutter widget tests run in a pure Dart VM — no native binary, no Rust FFI.
+Any widget that calls Rust bridge functions directly cannot be widget-tested
+without this pattern.
+
+The fix: make the Rust call injectable as a function parameter with a
+top-level default that calls the real FFI function. Tests pass stubs.
+
+```dart
+// Top-level defaults — call Rust FFI in production
+String _defaultGeneratePassword(PasswordConfig config) =>
+    generatePassword(config: config);
+
+class GeneratorWidget extends StatefulWidget {
+  final String Function(PasswordConfig config) generatePasswordFn;
+
+  const GeneratorWidget({
+    this.generatePasswordFn = _defaultGeneratePassword,
+  });
+}
+
+// In tests — stub returns a predictable value, no FFI
+String _stubPassword(PasswordConfig config) => 'A' * config.length;
+final widget = GeneratorWidget(generatePasswordFn: _stubPassword);
+```
+
+This is the same pattern used throughout Gabbro for `onCreateEntry`,
+`onGetEntry`, `deleteVault`, etc. Apply it to any widget that calls
+Rust bridge functions directly.
+
+Python analogy: like dependency injection via a default argument —
+`def fn(generator=real_generator)` — tests pass a mock, production
+uses the real thing.
+
+---
+
 ## Rust — `frb_generated.rs` manual patching pattern
 
 When a Rust function signature changes (new parameter, new struct field),

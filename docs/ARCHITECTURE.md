@@ -33,6 +33,7 @@ gabbro/
 │   │   ├── change_passphrase_screen.dart  # Change master passphrase
 │   │   ├── about_screen.dart              # About screen — version, links, licences
 │   │   ├── appearance_screen.dart         # Appearance — theme, text size
+│   │   ├── generator_screen.dart          # Standalone password/passphrase generator screen
 │   │   ├── security_screen.dart           # Security — foreground and background lock timeouts
 │   │   ├── review_changes_screen.dart     # Safe edit — diff view before saving
 │   │   ├── password_history_screen.dart   # Safe edit — previous password with revert
@@ -40,7 +41,8 @@ gabbro/
 │   │   └── tablet_vault_layout.dart       # Two-pane layout for ≥600dp — NavigationRail + list pane + detail pane
 │   ├── widgets/                      # Reusable UI components
 │   │   ├── path_field.dart           # Native file picker field (open + save modes)
-│   │   └── segmented_row.dart        # Shared SegmentedRow<T> and SectionHeader widgets
+│   │   ├── segmented_row.dart        # Shared SegmentedRow<T> and SectionHeader widgets
+│   │   └── generator_widget.dart     # Reusable password/passphrase generator widget
 │   └── src/
 │       └── rust/               # Auto-generated bridge code (do not edit)
 │           ├── api/
@@ -639,7 +641,7 @@ listed above are implemented and tested. See ## Testing Strategy → Test Counts
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
 | Rust (`cargo test -q`) | 194 | 1 ignored |
-| Flutter (`flutter test`) | 195 | 0 skipped |
+| Flutter (`flutter test`) | 210 | 0 skipped |
 
 ## Platforms
 
@@ -797,11 +799,12 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Duplicate import detection — all importers (Bitwarden, Enpass,
-  Gabbro) now skip entries whose UUID already exists in the vault. Bitwarden
-  parser fixed to preserve source UUIDs. `SkippedEntriesDialog` shown after
-  any import with duplicates. 194 Rust / 195 Flutter tests passing. Hardware-
-  verified on Linux and Samsung S23 (Android 16).
+- **Completed:** Password/passphrase generator UI — `GeneratorWidget`
+  (reusable, injectable stubs for testability), `GeneratorScreen` (standalone),
+  inline entry point in `CreateEntryScreen` (wand button next to password
+  field), menu entry in `VaultListScreen`. 194 Rust / 210 Flutter tests
+  passing. Hardware-verified on Linux, Samsung S23 (Android 16) portrait
+  and landscape.
 
 - **Next:** See Bikeshed for upcoming work.
 
@@ -891,6 +894,11 @@ the first public tag.
   are fine.
 
 ### Testing
+
+- **Menu items regression test:** Add a widget test asserting all expected
+  `PopupMenuItem` values are present in `VaultListScreen`. Would have caught
+  the missing `security` item regression introduced during generator wiring.
+  Low effort, high value — add before v1.
 
 - **Cross-layer integration tests:** Widget tests cover UI behaviour; Rust
   tests cover domain logic. The bridge boundary is not yet tested end-to-end.
@@ -982,6 +990,17 @@ the first public tag.
   with a symbol marker — ADR-003 applies, colour never the sole differentiator.
   Use an unambiguous font for visually similar characters (0/O, l/1/I).
   Design in the same session as the generator UI screen.
+
+- **Passphrase generator — improved capitalise:** Currently capitalises all
+  words when enabled. Should randomly capitalise a subset of words (not all)
+  for better security and less predictability. Requires Rust change to
+  `passphrase_generator.rs` — `capitalise` bool becomes a probability or
+  count. Design decision: fixed probability (e.g. 50%) vs user-configurable.
+
+- **Passphrase generator — improved append number:** Currently appends a
+  single digit at the end. Should append a random count of digits (1–3) at
+  random positions within the word list. Requires Rust change to
+  `passphrase_generator.rs`.
 
 - **Non-ASCII wordlist support (v2):** Add CJK and other non-Latin language
   wordlists (e.g. Japanese, Korean). Architecture already supports it —
