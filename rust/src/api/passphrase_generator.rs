@@ -70,10 +70,10 @@ pub fn generate_passphrase(config: PassphraseConfig) -> Result<String, String> {
     }
 
     let mut rng = rand::thread_rng();
-    let mut chosen: Vec<String> = (0..config.word_count)
+    let chosen: Vec<String> = (0..config.word_count)
         .map(|_| {
             let word = words[rng.gen_range(0..words.len())];
-            if config.capitalise {
+            if config.capitalise && rng.gen_bool(0.5) {
                 let mut chars = word.chars();
                 match chars.next() {
                     None => String::new(),
@@ -87,11 +87,18 @@ pub fn generate_passphrase(config: PassphraseConfig) -> Result<String, String> {
         })
         .collect();
 
+    let mut passphrase = chosen.join(&config.separator);
+
     if config.append_number {
-        chosen.push(rng.gen_range(0..=9).to_string());
+        let num_dig = rng.gen_range(config.word_count..=(config.word_count * 3 / 2));
+        for _ in 0..num_dig {
+            let pos = rng.gen_range(0..=passphrase.len());
+            let digit = rng.gen_range(0u8..=9u8).to_string();
+            passphrase.insert_str(pos, &digit);
+        }
     }
 
-    Ok(chosen.join(&config.separator))
+    Ok(passphrase)
 }
 
 /// Calculate entropy in bits for a passphrase.
@@ -138,34 +145,56 @@ mod tests {
 
     #[test]
     fn test_capitalise() {
-        let config = PassphraseConfig {
-            capitalise: true,
-            ..default_config()
-        };
-        let result = generate_passphrase(config).unwrap();
-        for word in result.split('-') {
-            let first = word.chars().next().unwrap();
-            // Skip tokens that start with a digit — EFF wordlists contain
-            // entries like "2000s", and append_number adds a bare digit token.
-            // Capitalisation is a no-op on digits, so they are not a test failure.
-            if first.is_alphabetic() {
-                assert!(first.is_uppercase(), "Expected uppercase, got: {}", first);
+        // Over many runs, we must see at least one capitalised word and at
+        // least one lowercase word — proving it is random, not all-or-nothing.
+        let mut saw_upper = false;
+        let mut saw_lower = false;
+        for _ in 0..200 {
+            let config = PassphraseConfig {
+                word_count: 6,
+                capitalise: true,
+                ..default_config()
+            };
+            let result = generate_passphrase(config).unwrap();
+            for word in result.split('-') {
+                let first = word.chars().next().unwrap();
+                if first.is_alphabetic() {
+                    if first.is_uppercase() {
+                        saw_upper = true;
+                    } else {
+                        saw_lower = true;
+                    }
+                }
+            }
+            if saw_upper && saw_lower {
+                break;
             }
         }
+        assert!(saw_upper, "Never saw a capitalised word with capitalise=true");
+        assert!(saw_lower, "Never saw a lowercase word with capitalise=true — not random");
     }
 
     #[test]
     fn test_append_number() {
-        let config = PassphraseConfig {
-            append_number: true,
-            ..default_config()
-        };
-        let result = generate_passphrase(config).unwrap();
-        let parts: Vec<&str> = result.split('-').collect();
-        // 4 words + 1 digit = 5 parts
-        assert_eq!(parts.len(), 5);
-        let last = parts.last().unwrap();
-        assert!(last.parse::<u8>().is_ok(), "Last part should be a digit");
+        // Run many times to reduce flakiness from randomness.
+        for _ in 0..50 {
+            let config = PassphraseConfig {
+                word_count: 4,
+                append_number: true,
+                ..default_config()
+            };
+            let result = generate_passphrase(config).unwrap();
+            let digit_count = result.chars().filter(|c| c.is_ascii_digit()).count();
+            // 4 words → num_dig in [4, 6]
+            assert!(
+                (4..=6).contains(&digit_count),
+                "Expected 4–6 digits, got {} in \"{}\"",
+                digit_count,
+                result,
+            );
+            // Word count unchanged — still 4 separator-delimited tokens
+            assert_eq!(result.split('-').count(), 4);
+        }
     }
 
     #[test]
