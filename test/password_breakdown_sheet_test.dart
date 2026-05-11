@@ -71,5 +71,24 @@ void main() {
       expect(find.text('Digit'), findsOneWidget);
       expect(find.text('Symbol'), findsOneWidget);
     });
+  testWidgets('shows right chevron when content overflows viewport',
+        (tester) async {
+      // 32 characters forces overflow in a standard test viewport (800px wide).
+      const password = 'Abcdefgh1234!@#\$Abcdefgh1234!@#\$';
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 300,
+              child: PasswordBreakdownSheet(password: password),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+    });
   });
 }

@@ -1,3 +1,5 @@
+import 'dart:ui' show PointerDeviceKind;
+
 import 'package:flutter/material.dart';
 
 enum _CharType { uppercase, lowercase, digit, symbol }
@@ -42,10 +44,64 @@ Color _colorFor(_CharType t, Brightness brightness) {
 
 const _kFiraCode = TextStyle(fontFamily: 'FiraCode');
 
-class PasswordBreakdownSheet extends StatelessWidget {
+class PasswordBreakdownSheet extends StatefulWidget {
   const PasswordBreakdownSheet({super.key, required this.password});
 
   final String password;
+
+  @override
+  State<PasswordBreakdownSheet> createState() => _PasswordBreakdownSheetState();
+}
+
+class _PasswordBreakdownSheetState extends State<PasswordBreakdownSheet> {
+  late final ScrollController _scrollController;
+  bool _showLeft = false;
+  bool _showRight = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_updateChevrons);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _updateChevrons() {
+    if (!_scrollController.hasClients) return;
+    final pos = _scrollController.position;
+    final newLeft = pos.pixels > 0;
+    final newRight = pos.pixels < pos.maxScrollExtent;
+    if (newLeft != _showLeft || newRight != _showRight) {
+      setState(() {
+        _showLeft = newLeft;
+        _showRight = newRight;
+      });
+    }
+  }
+
+  Widget _scrollChevron({
+    required IconData icon,
+    required Color primary,
+    required Color onPrimary,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          color: primary,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, size: 16, color: onPrimary),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,20 +132,68 @@ class PasswordBreakdownSheet extends StatelessWidget {
             style: TextStyle(fontSize: 13, color: muted),
           ),
         ),
-        // Character columns
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+        // Character columns with chevron hints
+        NotificationListener<ScrollMetricsNotification>(
+          onNotification: (notification) {
+            _updateChevrons();
+            return false;
+          },
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              for (var i = 0; i < password.length; i++)
-                _CharColumn(
-                  char: password[i],
-                  index: i,
-                  brightness: brightness,
-                  muted: muted,
+              // Left chevron
+              AnimatedOpacity(
+                opacity: _showLeft ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 150),
+                child: IgnorePointer(
+                  ignoring: !_showLeft,
+                  child: _scrollChevron(
+                    icon: Icons.chevron_left,
+                    primary: cs.primary,
+                    onPrimary: cs.onPrimary,
+                  ),
                 ),
+              ),
+              // Scrollable character row
+              Expanded(
+                child: ScrollConfiguration(
+                  behavior: ScrollConfiguration.of(context).copyWith(
+                    dragDevices: {
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.mouse,
+                    },
+                  ),
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (var i = 0; i < widget.password.length; i++)
+                          _CharColumn(
+                            char: widget.password[i],
+                            index: i,
+                            brightness: brightness,
+                            muted: muted,
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Right chevron
+              AnimatedOpacity(
+                opacity: _showRight ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 150),
+                child: IgnorePointer(
+                  ignoring: !_showRight,
+                  child: _scrollChevron(
+                    icon: Icons.chevron_right,
+                    primary: cs.primary,
+                    onPrimary: cs.onPrimary,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -99,12 +203,18 @@ class PasswordBreakdownSheet extends StatelessWidget {
         Padding(
           padding: EdgeInsets.fromLTRB(
               16, 8, 16, 8 + MediaQuery.of(context).padding.bottom),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              for (final t in _CharType.values)
-                _LegendItem(type: t, brightness: brightness),
-            ],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final t in _CharType.values)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: _LegendItem(type: t, brightness: brightness),
+                  ),
+              ],
+            ),
           ),
         ),
       ],
