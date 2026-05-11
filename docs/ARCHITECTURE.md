@@ -799,17 +799,15 @@ SPDX identifier: `GPL-3.0-only`
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Password/passphrase generator UI — `GeneratorWidget`
-  (reusable, injectable stubs for testability), `GeneratorScreen` (standalone),
-  inline entry point in `CreateEntryScreen` (wand button next to password
-  field), menu entry in `VaultListScreen`. Menu items regression test
-  (`test/vault_list_menu_test.dart`). Hardware-verified on Linux, Samsung
-  S23 (Android 16) portrait and landscape.
+- **Completed:** Passphrase generator Rust improvements — random 50%
+  capitalise per word, random digit splicing into passphrase string
+  (count in range `[word_count, floor(word_count * 1.5)]`, positions
+  anywhere in string). Hardware-verified on Linux, Samsung S23 (Android 16).
 
 - **Next:**
-  1. Passphrase generator Rust improvements — random capitalise subset,
-     random digit count at random positions. See Bikeshed for design notes.
-     Files needed: `rust/src/api/passphrase_generator.rs`.
+  1. Colour-coded password display in `EntryDetailScreen` — character-by-character
+     breakdown beneath masked password field, colour + symbol per character type
+     (ADR-003 compliant). See Bikeshed for design notes.
 
 ---
 
@@ -979,13 +977,11 @@ the first public tag.
 
 ### Password / Passphrase Generator
 
-- **Flutter UI screen:** The password and passphrase generators are fully
-  implemented in Rust and bridged to Flutter, but no Flutter UI screen exists
-  yet. Build the generator screen: two modes (classic/passphrase), language
-  selector for passphrase mode, entropy display, ambiguous character toggle,
-  colour-coded character display (ADR-003 compliant — colour + symbol, never
-  colour alone), show/hide toggle, clipboard copy with auto-clear. Accessible
-  from the main vault list and inline within `CreateEntryScreen`.
+- **Colour-coded character display in generator screen:** The generator screen
+  exists (`GeneratorScreen`, `GeneratorWidget`) but does not yet show a
+  colour-coded character breakdown. Add per-character display — colour + symbol
+  per type (uppercase, lowercase, digit, symbol), never colour alone (ADR-003).
+  Design in the same session as the entry detail colour-coded display.
 
 - **Colour-coded password display in entry detail:** In `EntryDetailScreen`,
   show a character-by-character breakdown beneath the masked password field:
@@ -993,17 +989,6 @@ the first public tag.
   with a symbol marker — ADR-003 applies, colour never the sole differentiator.
   Use an unambiguous font for visually similar characters (0/O, l/1/I).
   Design in the same session as the generator UI screen.
-
-- **Passphrase generator — improved capitalise:** Currently capitalises all
-  words when enabled. Should randomly capitalise a subset of words (not all)
-  for better security and less predictability. Requires Rust change to
-  `passphrase_generator.rs` — `capitalise` bool becomes a probability or
-  count. Design decision: fixed probability (e.g. 50%) vs user-configurable.
-
-- **Passphrase generator — improved append number:** Currently appends a
-  single digit at the end. Should append a random count of digits (1–3) at
-  random positions within the word list. Requires Rust change to
-  `passphrase_generator.rs`.
 
 - **Non-ASCII wordlist support (v2):** Add CJK and other non-Latin language
   wordlists (e.g. Japanese, Korean). Architecture already supports it —
