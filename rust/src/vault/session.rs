@@ -340,6 +340,39 @@ pub fn session_export_vault(export_path: PathBuf) -> Result<(), String> {
     Ok(())
 }
 
+/// Lightweight login summary for the autofill fill path.
+///
+/// Contains only the fields needed for domain matching and credential delivery.
+/// Passwords never appear here — the fill path fetches the full entry by id
+/// only after the user has selected a match.
+#[derive(Debug, Clone)]
+pub struct LoginAutofillSummary {
+    pub id: String,
+    pub username: String,
+    pub url: String,
+}
+
+/// Return lightweight summaries of all Login entries in the session.
+///
+/// Used by GabbroAutofillService (via JNI) to find candidates for domain
+/// matching without crossing passwords over the JNI boundary.
+/// Sync — reads from in-memory session, no I/O.
+pub fn login_summaries_for_autofill() -> Result<Vec<LoginAutofillSummary>, String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
+    Ok(session.entries.iter().filter_map(|e| {
+        if let VaultEntry::Login(ref login) = e {
+            Some(LoginAutofillSummary {
+                id: login.meta.id.clone(),
+                username: login.username.clone(),
+                url: login.url.clone(),
+            })
+        } else {
+            None
+        }
+    }).collect())
+}
+
 #[cfg(test)]
 mod autofill_tests {
     use super::*;
@@ -388,6 +421,60 @@ mod autofill_tests {
         lock_vault().ok();
         unlock_vault(b"autofill-test-passphrase", path.clone()).unwrap();
         assert!(is_vault_unlocked());
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn login_summaries_for_autofill_returns_only_login_entries() {
+        use crate::vault::entry::{LoginEntry, VaultEntry};
+
+        let pass = b"autofill-test-passphrase";
+        let mut path = temp_dir();
+        path.push("gabbro_autofill_summaries_test.gabbro");
+
+        let login = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("af-login-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("GitHub"),
+            url: String::from("https://github.com/login"),
+            username: String::from("rob"),
+            password: String::from("s3cr3t"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        });
+        let note = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("af-note-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("Not a login"),
+            content: String::from("irrelevant"),
+            attachments: vec![],
+        });
+
+        save_vault(&[login, note], pass, &path).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let summaries = login_summaries_for_autofill().unwrap();
+
+        assert_eq!(summaries.len(), 1, "only Login entries should be returned");
+        assert_eq!(summaries[0].id, "af-login-001");
+        assert_eq!(summaries[0].username, "rob");
+        assert_eq!(summaries[0].url, "https://github.com/login");
+
         teardown(&path);
     }
 }

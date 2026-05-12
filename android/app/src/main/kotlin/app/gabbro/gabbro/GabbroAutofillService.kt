@@ -26,8 +26,8 @@ import android.widget.RemoteViews
  *       launches UnlockActivity. The OS presents it as a single suggestion;
  *       tapping it opens UnlockActivity, which unlocks the vault and returns
  *       the credential directly to the target field.
- *   3b. Vault unlocked → placeholder: return null (no suggestions yet).
- *       Real domain matching and credential Dataset construction come next session.
+ *   3b. Vault unlocked → domain-match Login entries and return one Dataset
+ *       per match. Returns null if no matches found.
  */
 class GabbroAutofillService : AutofillService() {
 
@@ -55,8 +55,6 @@ class GabbroAutofillService : AutofillService() {
         }
 
         // Check whether the Rust vault session is currently unlocked.
-        // RustBridge is the generated JNI companion object from flutter_rust_bridge.
-        // isVaultUnlocked() is a thin wrapper we will add in the next step.
         val unlocked = RustBridge.isVaultUnlocked()
 
         if (!unlocked) {
@@ -64,9 +62,25 @@ class GabbroAutofillService : AutofillService() {
             return
         }
 
-        // Vault is unlocked — real matching logic goes here next session.
-        // For now, return null (no suggestions) so the fill path compiles and runs.
-        callback.onSuccess(null)
+        // Vault is unlocked — find Login entries whose domain matches the
+        // domain of the screen requesting autofill.
+        val requestDomain = extractRegistrableDomain(parseResult.webDomain)
+        if (requestDomain == null) {
+            callback.onSuccess(null)
+            return
+        }
+
+        val summariesJson = RustBridge.listLoginSummaries()
+        val matches = parseSummariesJson(summariesJson).filter { summary ->
+            extractRegistrableDomain(summary.url) == requestDomain
+        }
+
+        if (matches.isEmpty()) {
+            callback.onSuccess(null)
+            return
+        }
+
+        callback.onSuccess(buildFillResponse(parseResult, matches))
     }
 
     override fun onSaveRequest(request: SaveRequest, callback: SaveCallback) {
@@ -115,6 +129,63 @@ class GabbroAutofillService : AutofillService() {
     }
 
     // -------------------------------------------------------------------------
+    // Fill response — matched credentials
+    // -------------------------------------------------------------------------
+
+    private fun buildFillResponse(
+        parsed: ParsedStructure,
+        matches: List<CredentialSummary>,
+    ): FillResponse {
+        val responseBuilder = FillResponse.Builder()
+        matches.forEach { cred ->
+            val presentation = RemoteViews(packageName, R.layout.autofill_unlock_item)
+            val datasetBuilder = Dataset.Builder()
+            parsed.usernameIds.forEach { id ->
+                datasetBuilder.setValue(id, AutofillValue.forText(cred.username), presentation)
+            }
+            parsed.passwordIds.forEach { id ->
+                datasetBuilder.setValue(id, AutofillValue.forText(cred.password), presentation)
+            }
+            responseBuilder.addDataset(datasetBuilder.build())
+        }
+        return responseBuilder.build()
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    private fun extractRegistrableDomain(input: String?): String? {
+        if (input.isNullOrBlank()) return null
+        val withScheme = if (input.contains("://")) input else "https://$input"
+        val host = android.net.Uri.parse(withScheme).host
+            ?.lowercase()
+            ?.trimEnd('.')
+            ?: return null
+        if (host.split(".").all { it.toIntOrNull() != null }) return null
+        val labels = host.split(".")
+        return if (labels.size >= 2) "${labels[labels.size - 2]}.${labels.last()}"
+        else host
+    }
+
+    private fun parseSummariesJson(json: String): List<CredentialSummary> {
+        return try {
+            val array = org.json.JSONArray(json)
+            (0 until array.length()).map { i ->
+                val obj = array.getJSONObject(i)
+                CredentialSummary(
+                    id = obj.getString("id"),
+                    username = obj.getString("username"),
+                    url = obj.getString("url"),
+                    password = "",
+                )
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    // -------------------------------------------------------------------------
     // Companion
     // -------------------------------------------------------------------------
 
@@ -122,6 +193,17 @@ class GabbroAutofillService : AutofillService() {
         private const val REQUEST_CODE_UNLOCK = 1001
     }
 }
+
+// -----------------------------------------------------------------------------
+// CredentialSummary — parsed login entry for fill path
+// -----------------------------------------------------------------------------
+
+data class CredentialSummary(
+    val id: String,
+    val username: String,
+    val url: String,
+    val password: String,
+)
 
 // -----------------------------------------------------------------------------
 // ParsedStructure — walks AssistStructure, collects AutofillIds by hint type
@@ -134,6 +216,7 @@ class GabbroAutofillService : AutofillService() {
 data class ParsedStructure(
     val usernameIds: List<AutofillId>,
     val passwordIds: List<AutofillId>,
+    val webDomain: String?,
 ) {
     fun isEmpty(): Boolean = usernameIds.isEmpty() && passwordIds.isEmpty()
 
@@ -141,12 +224,17 @@ data class ParsedStructure(
         fun from(structure: AssistStructure): ParsedStructure {
             val usernameIds = mutableListOf<AutofillId>()
             val passwordIds = mutableListOf<AutofillId>()
+            var webDomain: String? = null
 
             for (i in 0 until structure.windowNodeCount) {
-                collectIds(structure.getWindowNodeAt(i).rootViewNode, usernameIds, passwordIds)
+                val root = structure.getWindowNodeAt(i).rootViewNode
+                if (webDomain == null) {
+                    webDomain = root.webDomain?.takeIf { it.isNotBlank() }
+                }
+                collectIds(root, usernameIds, passwordIds)
             }
 
-            return ParsedStructure(usernameIds, passwordIds)
+            return ParsedStructure(usernameIds, passwordIds, webDomain)
         }
 
         private fun collectIds(

@@ -23,4 +23,36 @@ pub mod jni {
     ) -> jboolean {
         u8::from(is_vault_unlocked())
     }
+
+    /// Returns a JSON string encoding all Login entry summaries in the session.
+    ///
+    /// Shape: `[{"id":"...","username":"...","url":"..."}]`
+    /// Returns an empty array `[]` if the vault is locked or the session is empty.
+    /// Kotlin parses this with org.json.JSONArray — no new Android dependency needed.
+    #[no_mangle]
+    pub extern "system" fn Java_app_gabbro_gabbro_RustBridge_listLoginSummaries<'local>(
+        mut env: JNIEnv<'local>,
+        _class: JClass<'local>,
+    ) -> jni::objects::JString<'local> {
+        use crate::vault::session::login_summaries_for_autofill;
+
+        let json = match login_summaries_for_autofill() {
+            Ok(summaries) => {
+                let entries: Vec<String> = summaries.iter().map(|s| {
+                    format!(
+                        "{{\"id\":\"{}\",\"username\":\"{}\",\"url\":\"{}\"}}",
+                        s.id.replace('"', "\\\""),
+                        s.username.replace('"', "\\\""),
+                        s.url.replace('"', "\\\""),
+                    )
+                }).collect();
+                format!("[{}]", entries.join(","))
+            }
+            Err(_) => String::from("[]"),
+        };
+
+        env.new_string(json).unwrap_or_else(|_| {
+            env.new_string("[]").expect("failed to allocate empty JString")
+        })
+    }
 }

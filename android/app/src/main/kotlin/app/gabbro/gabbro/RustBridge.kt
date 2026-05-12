@@ -26,7 +26,14 @@ object RustBridge {
      */
     external fun isVaultUnlocked(): Boolean
 
+    /**
+     * Returns a JSON string encoding all Login entry summaries in the session.
+     * Shape: `[{"id":"...","username":"...","url":"..."}]`
+     * Returns "[]" if the vault is locked or contains no Login entries.
+     * Parse with org.json.JSONArray — no new dependency needed.
+     */
+    external fun listLoginSummaries(): String
+
     // Future additions (next sessions):
-    //   external fun listEntrySummaries(): Array<EntrySummaryData>
     //   external fun getEntry(id: String): String   // JSON-encoded EntryData
 }

@@ -1,10 +1,10 @@
 package app.gabbro.gabbro
 
-import android.app.assist.AssistStructure
 import android.content.Intent
 import android.os.Bundle
-import android.service.autofill.FillResponse
 import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodChannel
 
 /**
  * UnlockActivity — the autofill authentication wall.
@@ -26,44 +26,39 @@ import io.flutter.embedding.android.FlutterActivity
  */
 class UnlockActivity : FlutterActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // The Flutter route is rendered by FlutterActivity automatically
-        // once the engine is warm. The initial route is set via the manifest
-        // or overridden below. The /autofill-unlock route will be wired in
-        // the Flutter session that follows this Kotlin skeleton session.
+    companion object {
+        private const val CHANNEL = "app.gabbro.gabbro/autofill"
     }
 
-    /**
-     * Called by the Flutter layer (via MethodChannel, wired next session)
-     * when the user has successfully entered their passphrase and the vault
-     * is confirmed unlocked.
-     *
-     * [credential] — a map with keys "username" and "password" (either may
-     * be null if the target screen only had one field type).
-     *
-     * Packages the credential into a FillResponse and returns it to the OS.
-     */
-    fun onVaultUnlocked(credential: Map<String, String?>) {
-        // FillResponse construction with real AutofillIds requires the
-        // AssistStructure from the original fill request — passed via the
-        // intent in a later session. Placeholder result for now.
-        setResult(RESULT_OK, Intent().apply {
-            // Real FillResponse delivered here once MethodChannel is wired.
-            // For now RESULT_OK is never actually reached from Flutter
-            // because the /autofill-unlock route does not yet exist.
-        })
-        finish()
+    override fun getDartEntrypointFunctionName(): String = "autofillUnlockMain"
+
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "unlock" -> {
+                        val passphrase = call.argument<String>("passphrase") ?: ""
+                        // Vault unlock is handled by the Flutter layer via the
+                        // normal Rust bridge. Once unlocked, return RESULT_OK.
+                        // Credential delivery via FillResponse is wired in the
+                        // next session when AssistStructure passing is added.
+                        setResult(RESULT_OK)
+                        finish()
+                        result.success(null)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
     }
 
     /**
      * User pressed back or cancelled the unlock flow.
      * RESULT_CANCELED tells the OS to deliver nothing to the target field.
      */
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun onBackPressed() {
         setResult(RESULT_CANCELED)
         finish()
     }
-
-    override fun getInitialRoute(): String = "/autofill-unlock"
 }
