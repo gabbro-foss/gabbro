@@ -2453,3 +2453,49 @@ bug fixed in the previous session — the same root cause, different symptom.
 Python analogy: like holding a reference to a list index after the list has
 been sorted or filtered in place — the index is stale the moment the underlying
 data changes.
+
+---
+
+## Android — AutofillService field detection is not reliable
+
+Android's `AutofillService` API provides several signals for identifying
+username and password fields in an `AssistStructure`. In practice, apps use
+them inconsistently:
+
+1. **`autofillHints`** — the most reliable signal. Set via
+   `View.setAutofillHints()`. Values like `AUTOFILL_HINT_USERNAME`,
+   `AUTOFILL_HINT_EMAIL_ADDRESS`, `AUTOFILL_HINT_PASSWORD`. Many apps
+   (including PayPal) don't set these at all.
+
+2. **`inputType` bitmask** — the second signal. `TYPE_TEXT_VARIATION_PASSWORD`,
+   `TYPE_TEXT_VARIATION_WEB_PASSWORD` etc. catch most password fields.
+   Username fields often use `TYPE_TEXT_VARIATION_NORMAL` (variation=0)
+   even when they are clearly email/username fields.
+
+3. **`hint` text and `idEntry`** — last resort. PayPal's email field has
+   `hint="Email"` and `idEntry="email_or_phone_input"` but
+   `inputType=TYPE_TEXT_VARIATION_NORMAL`. Keyword matching on these
+   catches fields that slip through signals 1 and 2.
+
+**Production autofill services (Bitwarden, 1Password) use all three signals
+in priority order.** Relying on autofillHints alone will miss the majority
+of real-world apps.
+
+**`webDomain` is null for native apps.** Browsers pass the domain of the
+page being rendered; native apps do not. For native apps, extract a token
+from the requesting package name (e.g. `com.paypal.android.p2pmobile` →
+`paypal`) and match it against vault entry URLs by substring. This is an
+approximation — it can produce false positives — but it is the standard
+approach and is what Bitwarden uses.
+
+**The autofill service may be silently disabled** if it crashes on first
+invocation. A `System.loadLibrary()` failure (wrong library name, library
+not yet loaded by Flutter engine) will crash the service process silently.
+Android will stop invoking the service until it is re-enabled in settings.
+Always verify the `.so` filename with `unzip -l app-release.apk | grep so`
+before assuming a library load issue.
+
+Python analogy: like writing a CSV parser that only handles the happy path
+(comma-separated, quoted strings, standard headers) — real-world CSV files
+will break it in a dozen ways. Robust parsers handle all the edge cases
+that real files actually exhibit, not just the ones the spec describes.
