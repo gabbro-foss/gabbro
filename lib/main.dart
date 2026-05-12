@@ -9,6 +9,27 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/frb_generated.dart';
 import 'package:path_provider/path_provider.dart';
 
+@pragma('vm:entry-point')
+Future<void> autofillUnlockMain() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await RustLib.init();
+  final dir = await getApplicationSupportDirectory();
+  final vaultPath = '${dir.path}/gabbro.gabbro';
+  const channel = MethodChannel('app.gabbro.gabbro/autofill');
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: UnlockScreen(
+        vaultPath: vaultPath,
+        onUnlock: (passphrase, path) async {
+          await unlockVault(passphrase: passphrase, path: path);
+          await channel.invokeMethod('unlock');
+        },
+      ),
+    ),
+  );
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isAndroid) {
