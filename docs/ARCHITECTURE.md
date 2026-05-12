@@ -652,8 +652,8 @@ listed above are implemented and tested. See ## Testing Strategy → Test Counts
 
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
-| Rust (`cargo test -q`) | 196 | 1 ignored |
-| Flutter (`flutter test`) | 218 | 0 skipped |
+| Rust (`cargo test -q`) | 197 | 1 ignored |
+| Flutter (`flutter test`) | 221 | 0 skipped |
 
 ## Platforms
 
@@ -1003,15 +1003,70 @@ vault screens. No new Rust crate dependencies.
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Autofill skeleton — `GabbroAutofillService.kt`,
-  `UnlockActivity.kt`, `RustBridge.kt`, manifest declarations, XML
-  resources, and `is_vault_unlocked()` Rust function + 2 tests.
-  Fill-only path with authentication wall compiles for all three Android
-  targets. Hardware verified on Samsung S23 (Android 16).
+- **Completed:** Autofill fill path wired:
+  - `LoginAutofillSummary` struct and `login_summaries_for_autofill()`
+    in `gabbro/rust/src/vault/session.rs` — returns id/username/url for
+    all Login entries; no passwords cross the JNI boundary.
+  - `Java_app_gabbro_gabbro_RustBridge_listLoginSummaries` JNI function
+    in `gabbro/rust/src/api/autofill_bridge.rs` — returns JSON array.
+  - `listLoginSummaries()` external fun added to
+    `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/RustBridge.kt`.
+  - `ParsedStructure` extended with `webDomain: String?` extraction in
+    `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/GabbroAutofillService.kt`.
+  - `CredentialSummary` data class, `extractRegistrableDomain()`,
+    `parseSummariesJson()`, and `buildFillResponse()` added to
+    `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/GabbroAutofillService.kt`.
+  - `gabbro/lib/screens/autofill_unlock_screen.dart` — passphrase entry
+    screen with MethodChannel callback to Kotlin. 3 widget tests.
+  - `gabbro/lib/autofill_unlock_main.dart` — separate Flutter entry point
+    used exclusively by `UnlockActivity` (`@pragma('vm:entry-point')`).
+  - `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/UnlockActivity.kt`
+    wired to `autofillUnlockMain` via `getDartEntrypointFunctionName()`;
+    MethodChannel handler calls `setResult(RESULT_OK)` on unlock.
+  - Compiles clean for all three Android targets. Hardware verification
+    pending.
 
-- **Next:** Wire the fill path — domain matching logic in
-  `GabbroAutofillService`, `ParsedStructure` url extraction, and the
-  Flutter `/autofill-unlock` route in `UnlockActivity`.
+- **Next:** Complete the two remaining pieces of the fill path, then
+  hardware-verify. Upload these files before writing any code:
+  `gabbro/docs/ARCHITECTURE.md`, `gabbro/docs/LEARNINGS.md`,
+  `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/GabbroAutofillService.kt`,
+  `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/UnlockActivity.kt`,
+  `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/RustBridge.kt`,
+  `gabbro/rust/src/api/autofill_bridge.rs`,
+  `gabbro/rust/src/vault/session.rs`,
+  and terminal output of `git status && flutter test && cd rust && cargo test -q`.
+
+  1. **Password delivery (start here):** `CredentialSummary.password` is
+     always `""`. First failing test: add
+     `get_entry_for_autofill_returns_json_with_password` to the
+     `autofill_tests` module in `gabbro/rust/src/vault/session.rs`. It
+     should call `get_entry_for_autofill("af-login-001")` (function does
+     not exist yet) and assert the returned JSON string contains
+     `"password"` and the correct value. Once the test fails to compile,
+     implement `get_entry_for_autofill(id: &str) -> Result<String, String>`
+     in `gabbro/rust/src/vault/session.rs` — looks up the entry by id,
+     returns `Err` if not found or not a Login, serialises
+     `{"id":…,"username":…,"password":…}` manually (no serde dependency).
+     Then expose it via `Java_app_gabbro_gabbro_RustBridge_getEntry` in
+     `gabbro/rust/src/api/autofill_bridge.rs`, add
+     `external fun getEntry(id: String): String` to
+     `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/RustBridge.kt`,
+     and replace the `password = ""` line in `parseSummariesJson()` in
+     `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/GabbroAutofillService.kt`
+     with a `RustBridge.getEntry(id)` call that parses the returned JSON
+     for the password field.
+  2. **Real `FillResponse` delivery:** `UnlockActivity` currently calls
+     `setResult(RESULT_OK)` without a `FillResponse` — the OS delivers
+     nothing to the target field. Pass the `AssistStructure` client state
+     from `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/GabbroAutofillService.kt`
+     to `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/UnlockActivity.kt`
+     via intent extras, reconstruct the `AutofillId` list, build a real
+     `FillResponse` with the selected credential, and deliver it via
+     `setResult(RESULT_OK, intentWithFillResponse)`.
+  Then hardware-verify on Samsung S23 (Android 16): install release APK
+  via `adb install -r build/app/outputs/flutter-apk/app-release.apk` from
+  `gabbro/`, enable Gabbro as autofill provider in Android settings, test
+  locked path (auth wall chip) and unlocked path (credential chip).
 
 ---
 
