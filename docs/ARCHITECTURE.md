@@ -74,6 +74,7 @@ gabbro/
 │       │   ├── vault.rs        # Vault entry API — DTOs and create_* functions
 │       │   ├── vault_bridge.rs # Bridge wrappers — save/load vault
 │       │   ├── import.rs       # Import bridge — CSV, Enpass, Bitwarden
+│       │   ├── autofill_bridge.rs  # JNI bridge for autofill service (Android only)
 │       │   └── entropy.rs
 │       ├── crypto/             # Internal crypto stack (not bridge-exposed)
 │       │   ├── mod.rs
@@ -99,6 +100,17 @@ gabbro/
 │       └── lib.rs
 ├── rust_builder/               # Cargokit build integration (do not edit)
 ├── android/                    # Android platform files
+│   └── app/src/main/
+│       ├── kotlin/app/gabbro/gabbro/
+│       │   ├── GabbroAutofillService.kt  # AutofillService — onFillRequest, auth wall
+│       │   ├── UnlockActivity.kt         # Auth wall activity — shows /autofill-unlock
+│       │   └── RustBridge.kt             # JNI wrappers for autofill service → Rust
+│       ├── res/
+│       │   ├── drawable/ic_lock.xml      # Lock icon for autofill dropdown chip
+│       │   ├── layout/autofill_unlock_item.xml  # RemoteViews layout for dropdown chip
+│       │   ├── values/strings.xml        # String resources (autofill_unlock_label)
+│       │   └── xml/autofill_service_config.xml  # AutofillService config — settingsActivity
+│       └── AndroidManifest.xml           # + GabbroAutofillService, UnlockActivity, AutofillSettingsActivity
 ├── ios/                        # iOS platform files (v2 target)
 ├── linux/                      # Linux platform files (v1 target)
 ├── macos/                      # macOS platform files (v2 target)
@@ -640,8 +652,8 @@ listed above are implemented and tested. See ## Testing Strategy → Test Counts
 
 | Suite | Passing | Skipped / Ignored |
 |-------|---------|-------------------|
-| Rust (`cargo test -q`) | 194 | 1 ignored |
-| Flutter (`flutter test`) | 211 | 0 skipped |
+| Rust (`cargo test -q`) | 196 | 1 ignored |
+| Flutter (`flutter test`) | 218 | 0 skipped |
 
 ## Platforms
 
@@ -991,14 +1003,15 @@ vault screens. No new Rust crate dependencies.
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Autofill design session — architecture, manifest, vault
-  access pattern, domain matching, presentation, onboarding, and Dart entry
-  points all documented. ADR-007 written (no inline suggestions — security
-  stance). No code written.
+- **Completed:** Autofill skeleton — `GabbroAutofillService.kt`,
+  `UnlockActivity.kt`, `RustBridge.kt`, manifest declarations, XML
+  resources, and `is_vault_unlocked()` Rust function + 2 tests.
+  Fill-only path with authentication wall compiles for all three Android
+  targets. Hardware verified on Samsung S23 (Android 16).
 
-- **Next:** Autofill implementation — begin with `GabbroAutofillService`
-  Kotlin skeleton, manifest declarations, and fill-only path against a
-  locked vault (authentication wall). Save requests in a follow-on session.
+- **Next:** Wire the fill path — domain matching logic in
+  `GabbroAutofillService`, `ParsedStructure` url extraction, and the
+  Flutter `/autofill-unlock` route in `UnlockActivity`.
 
 ---
 
