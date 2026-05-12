@@ -864,18 +864,141 @@ Design that wiring in the same session as the generator UI build.
 
 ---
 
+## Autofill
+
+### Status
+Design complete. Implementation deferred to a dedicated session.
+
+### Overview
+Gabbro implements Android autofill via a dedicated `AutofillService` component
+(`GabbroAutofillService`), registered in the Android manifest and invoked by
+the OS framework when the user focuses a login field in any app. The service
+runs in Gabbro's process but is called by Android — not by Flutter.
+
+### Service component
+`GabbroAutofillService` extends Android's `AutofillService`, implemented in
+Kotlin. It handles two callbacks:
+
+- `onFillRequest()` — user focuses a field; service queries the vault and
+  returns matching credentials as a `FillResponse`.
+- `onSaveRequest()` — user submits credentials not in the vault; service
+  offers to save them. Both fill and save are in scope for v1.
+
+### Manifest declarations
+Three additions to `android/app/src/main/AndroidManifest.xml`:
+
+1. Service declaration inside `<application>`:
+```xml
+<service
+    android:name=".GabbroAutofillService"
+    android:exported="true"
+    android:permission="android.permission.BIND_AUTOFILL_SERVICE">
+    <intent-filter>
+        <action android:name="android.service.autofill.AutofillService" />
+    </intent-filter>
+    <meta-data
+        android:name="android.autofill"
+        android:resource="@xml/autofill_service_config" />
+</service>
+```
+
+2. Config file at `android/app/src/main/res/xml/autofill_service_config.xml`
+   (required even if minimal).
+
+3. No new `<uses-permission>` entries needed. `BIND_AUTOFILL_SERVICE` is a
+   system-level permission declared on the service, not requested by the app.
+
+### Vault access pattern
+The service calls Rust directly via JNI (Pattern A). Flutter is not involved
+in the `onFillRequest()` path. The Rust session model
+(`VAULT_SESSION: Lazy<Mutex<Option<VaultSession>>>`) is process-global — if
+the Flutter app has already unlocked the vault and the process is alive, the
+session is available to the service immediately. `list_entry_summaries()` and
+`get_entry()` are the only bridge functions needed; no new Rust API surface
+is required.
+
+Cold start is not a practical concern: a locked vault requires the
+authentication wall regardless of process state, and a user actively filling
+credentials will have Gabbro in memory.
+
+### Authentication wall
+When the vault is locked, `onFillRequest()` returns a `FillResponse`
+containing a single `Dataset` with an `IntentSender` pointing at
+`UnlockActivity` — a thin Flutter activity configured to show the
+`/autofill-unlock` route. On successful unlock, the activity returns the
+requested credential to the OS, which delivers it to the target app's field.
+This is the standard Android autofill authentication flow used by Bitwarden
+and 1Password.
+
+### Domain matching
+Exact eTLD+1 matching only. When `onFillRequest()` fires, the service
+extracts the web domain from the `AssistStructure` (passed by the browser)
+and matches it against the registrable domain portion of `LoginEntry.url`.
+
+- `github.com` matches `https://github.com/login` — yes.
+- `git-hub.com` does not match `github.com` — no.
+- No fuzzy matching, no substring fallback.
+
+False negatives are acceptable; false positives are not. Users with no
+matching entry receive no suggestion and fall back to copy/paste, which
+remains fully functional at all times.
+
+Multiple matching entries (e.g. two GitHub accounts) are returned as
+multiple `Dataset` objects in a single `FillResponse`. The OS renders
+them as a list; the user picks the correct one.
+
+Native app matching (package name rather than URL) is deferred to v2.
+Browsers that do not pass the web domain receive no suggestions — fail
+safe, not fail open.
+
+### Credential presentation
+Standard `FillResponse` dropdown overlay only — rendered by the Android
+framework, not by any keyboard app. Inline suggestions (Android 11+
+keyboard-bar chips) are explicitly excluded. See ADR-007.
+
+### Onboarding
+The autofill permission requires explicit user opt-in in Android system
+settings. Gabbro presents a skippable onboarding prompt with a single
+button that deep-links directly to the system settings page via
+`Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE`. The prompt explains what
+autofill does and makes clear that copy/paste remains available if the
+user declines. The decision is respected and not asked again.
+
+### Dart entry points
+Two Flutter surfaces involved in autofill:
+
+1. `UnlockActivity` — the authentication wall activity. A `FlutterActivity`
+   subclass showing only the `/autofill-unlock` route. Launched by the OS
+   when the vault is locked and a fill request arrives.
+2. Autofill settings screen — reachable from Android system settings via
+   the `settingsActivity` attribute in `autofill_service_config.xml`.
+   A normal Flutter screen for enable/disable and matching preferences.
+
+### Save requests
+`onSaveRequest()` receives submitted field values and presents a
+"save credential?" prompt without launching the full Flutter app, then
+calls `create_entry()` through the Rust bridge from Kotlin. Full design
+and implementation in a dedicated session.
+
+### What is not changing
+No changes to the existing Rust bridge API. No changes to the Flutter
+vault screens. No new Rust crate dependencies.
+
+---
+
 ## Current Focus
 
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Fira Code OFL 1.1 licence entry added to `AboutScreen`
-  components list. `PasswordBreakdownSheet` scroll chevrons and Linux mouse
-  drag fix hardware-verified on Linux and Samsung S23 (Android 16).
+- **Completed:** Autofill design session — architecture, manifest, vault
+  access pattern, domain matching, presentation, onboarding, and Dart entry
+  points all documented. ADR-007 written (no inline suggestions — security
+  stance). No code written.
 
-- **Next:** Autofill planning session — Android `AutofillService` API design
-  only, no code. Map the service component, manifest declarations, vault
-  state access pattern, and Dart entry point before any implementation begins.
+- **Next:** Autofill implementation — begin with `GabbroAutofillService`
+  Kotlin skeleton, manifest declarations, and fill-only path against a
+  locked vault (authentication wall). Save requests in a follow-on session.
 
 ---
 
