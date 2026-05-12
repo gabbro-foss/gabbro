@@ -1031,16 +1031,32 @@ vault screens. No new Rust crate dependencies.
     password directly) confirmed working in PayPal native app.
     Auth wall (locked path) hardware verification deferred — see backlog.
 
-- **Next:** Complete autofill hardware verification:
-  1. **Locked path:** with vault locked, tap a login field in PayPal,
-     confirm the "unlock Gabbro to autofill" chip appears, unlock via
-     `UnlockActivity`, confirm credentials fill into the target fields.
-  2. **Browser path:** test with a browser that passes `webDomain` (e.g.
-     Firefox for Android) against a vault entry whose URL matches the
-     site. Brave does not pass `webDomain` — treat as a known limitation,
-     not a bug.
-  Upload ARCHITECTURE.md, LEARNINGS.md, and relevant source files at
-  session start.
+- **Next:** Fix autofill locked path — `UnlockActivity` delivers
+  `RESULT_OK` too late; Android autofill framework expires the fill
+  response before it arrives at the target app.
+
+  **Root cause:** Flutter engine cold-start adds several seconds before
+  the passphrase screen renders. By the time the user unlocks and
+  `setResult` fires, the framework has called `onInvisibleForAutofill()`
+  and discarded the response. The MethodChannel round-trip is not the
+  issue — the vault is already unlocked when Kotlin receives it. The
+  issue is engine startup latency.
+
+  **Fix required:** Use a pre-warmed `FlutterEngine` in
+  `UnlockActivity` so the passphrase screen appears in under 1 second.
+  See https://docs.flutter.dev/add-to-app/android/add-flutter-fragment
+  for the engine caching API (`FlutterEngineCache`,
+  `FlutterEngineGroup`). The engine should be pre-warmed in
+  `MainActivity` on app start and cached under a known ID so
+  `UnlockActivity` can retrieve it immediately.
+
+  **Files needed at session start:**
+  - `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/UnlockActivity.kt`
+  - `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/RustBridge.kt`
+  - `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/GabbroAutofillService.kt`
+  - `gabbro/android/app/src/main/AndroidManifest.xml`
+  - `gabbro/lib/main.dart`
+  - `gabbro/android/app/build.gradle`
 
 ---
 
