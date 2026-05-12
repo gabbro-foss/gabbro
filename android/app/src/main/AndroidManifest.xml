@@ -30,6 +30,50 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!--
+            GabbroAutofillService — invoked by the Android OS when the user
+            focuses a login field in any app. Requires BIND_AUTOFILL_SERVICE,
+            which is a system-level permission (not a <uses-permission> entry).
+        -->
+        <service
+            android:name=".GabbroAutofillService"
+            android:exported="true"
+            android:permission="android.permission.BIND_AUTOFILL_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.autofill.AutofillService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.autofill"
+                android:resource="@xml/autofill_service_config" />
+        </service>
+
+        <!--
+            UnlockActivity — shown by the OS when a fill request arrives and
+            the vault is locked. A thin FlutterActivity subclass that renders
+            the /autofill-unlock route, collects the passphrase, and returns
+            the requested credential to the OS on success.
+        -->
+        <activity
+            android:name=".UnlockActivity"
+            android:exported="false"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!--
+            AutofillSettingsActivity — reachable from Android Settings →
+            Autofill service → Settings (via autofill_service_config.xml).
+            Renders the Flutter autofill settings route.
+        -->
+        <activity
+            android:name=".AutofillSettingsActivity"
+            android:exported="true"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

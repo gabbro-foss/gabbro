@@ -42,6 +42,13 @@ pub fn unlock_vault(passphrase: &[u8], path: PathBuf) -> Result<(), String> {
 ///
 /// After this call, all session functions return Err until unlock is
 /// called again.
+pub fn is_vault_unlocked() -> bool {
+    match VAULT_SESSION.lock() {
+        Ok(session) => session.is_some(),
+        Err(_) => false, // mutex poisoned — treat as locked
+    }
+}
+
 pub fn lock_vault() -> Result<(), String> {
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     if let Some(ref mut s) = *session {
@@ -331,6 +338,58 @@ pub fn session_export_vault(export_path: PathBuf) -> Result<(), String> {
     let session = session.as_ref().ok_or("Vault is locked")?;
     crate::api::vault::export_vault(&session.entries, &session.passphrase, &export_path)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod autofill_tests {
+    use super::*;
+    use serial_test::serial;
+    use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+    use std::env::temp_dir;
+
+    fn setup(passphrase: &[u8]) -> PathBuf {
+        let mut path = temp_dir();
+        path.push("gabbro_autofill_test.gabbro");
+        let entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("af-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("Autofill test note"),
+            content: String::from("test"),
+            attachments: vec![],
+        })];
+        save_vault(&entries, passphrase, &path).unwrap();
+        path
+    }
+
+    fn teardown(path: &PathBuf) {
+        let _ = lock_vault();
+        let _ = std::fs::remove_file(path);
+    }
+
+    #[test]
+    #[serial]
+    fn is_unlocked_returns_false_when_locked() {
+        let path = setup(b"autofill-test-passphrase");
+        lock_vault().ok();
+        assert!(!is_vault_unlocked());
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn is_unlocked_returns_true_after_unlock() {
+        let path = setup(b"autofill-test-passphrase");
+        lock_vault().ok();
+        unlock_vault(b"autofill-test-passphrase", path.clone()).unwrap();
+        assert!(is_vault_unlocked());
+        teardown(&path);
+    }
 }
 
 #[cfg(test)]
