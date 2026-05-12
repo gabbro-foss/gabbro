@@ -373,6 +373,36 @@ pub fn login_summaries_for_autofill() -> Result<Vec<LoginAutofillSummary>, Strin
     }).collect())
 }
 
+/// Return a JSON string encoding the id, username, and password for a
+/// single Login entry, looked up by UUID.
+///
+/// Used by GabbroAutofillService (via JNI) to fetch the password for a
+/// matched credential immediately before filling. The password only crosses
+/// the JNI boundary at the moment the user has explicitly selected an entry.
+///
+/// Returns `Err` if the vault is locked, the id is not found, or the entry
+/// is not a Login entry.
+pub fn get_entry_for_autofill(id: &str) -> Result<String, String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
+    let entry = session.entries
+        .iter()
+        .find(|e| entry_id(e) == id)
+        .ok_or_else(|| format!("No entry found with id: {id}"))?;
+    match entry {
+        VaultEntry::Login(e) => {
+            let json = format!(
+                "{{\"id\":\"{}\",\"username\":\"{}\",\"password\":\"{}\"}}",
+                e.meta.id.replace('"', "\\\""),
+                e.username.replace('"', "\\\""),
+                e.password.replace('"', "\\\""),
+            );
+            Ok(json)
+        }
+        _ => Err(format!("Entry {id} is not a Login entry")),
+    }
+}
+
 #[cfg(test)]
 mod autofill_tests {
     use super::*;
@@ -421,6 +451,66 @@ mod autofill_tests {
         lock_vault().ok();
         unlock_vault(b"autofill-test-passphrase", path.clone()).unwrap();
         assert!(is_vault_unlocked());
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn get_entry_for_autofill_returns_json_with_password() {
+        use crate::vault::entry::{LoginEntry, NoteEntry, VaultEntry};
+
+        let pass = b"autofill-test-passphrase";
+        let mut path = temp_dir();
+        path.push("gabbro_autofill_get_entry_test.gabbro");
+
+        let login = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("af-login-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("GitHub"),
+            url: String::from("https://github.com/login"),
+            username: String::from("rob"),
+            password: String::from("s3cr3t"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        });
+        let note = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("af-note-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+                tags: vec![],
+                favourite: false,
+            },
+            title: String::from("Not a login"),
+            content: String::from("irrelevant"),
+            attachments: vec![],
+        });
+
+        save_vault(&[login, note], pass, &path).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let json = get_entry_for_autofill("af-login-001").unwrap();
+        assert!(json.contains("\"password\""), "JSON must contain a password key");
+        assert!(json.contains("\"s3cr3t\""), "JSON must contain the correct password value");
+        assert!(json.contains("\"username\""), "JSON must contain a username key");
+        assert!(json.contains("\"rob\""), "JSON must contain the correct username value");
+        assert!(json.contains("\"id\""), "JSON must contain an id key");
+
+        let err = get_entry_for_autofill("af-note-001");
+        assert!(err.is_err(), "Non-Login entry should return Err");
+
+        let missing = get_entry_for_autofill("does-not-exist");
+        assert!(missing.is_err(), "Missing id should return Err");
+
         teardown(&path);
     }
 

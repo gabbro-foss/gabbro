@@ -47,7 +47,6 @@ class GabbroAutofillService : AutofillService() {
 
         // Walk the view tree to collect all username/password AutofillIds.
         val parseResult = ParsedStructure.from(structure)
-
         if (parseResult.isEmpty()) {
             // No autofillable fields found on this screen — nothing to offer.
             callback.onSuccess(null)
@@ -64,15 +63,30 @@ class GabbroAutofillService : AutofillService() {
 
         // Vault is unlocked — find Login entries whose domain matches the
         // domain of the screen requesting autofill.
-        val requestDomain = extractRegistrableDomain(parseResult.webDomain)
-        if (requestDomain == null) {
-            callback.onSuccess(null)
-            return
-        }
-
         val summariesJson = RustBridge.listLoginSummaries()
-        val matches = parseSummariesJson(summariesJson).filter { summary ->
-            extractRegistrableDomain(summary.url) == requestDomain
+        val matches = if (parseResult.webDomain != null) {
+            // Browser context — exact eTLD+1 domain match.
+            val requestDomain = extractRegistrableDomain(parseResult.webDomain)
+            if (requestDomain == null) {
+                callback.onSuccess(null)
+                return
+            }
+            parseSummariesJson(summariesJson).filter { summary ->
+                extractRegistrableDomain(summary.url) == requestDomain
+            }
+        } else {
+            // Native app context — extract app name from package and check
+            // if any vault entry URL contains it as a substring.
+            val packageName = request.fillContexts.lastOrNull()
+                ?.structure?.activityComponent?.packageName ?: ""
+            val appToken = extractAppToken(packageName)
+            if (appToken == null) {
+                callback.onSuccess(null)
+                return
+            }
+            parseSummariesJson(summariesJson).filter { summary ->
+                summary.url.contains(appToken, ignoreCase = true)
+            }
         }
 
         if (matches.isEmpty()) {
@@ -155,6 +169,19 @@ class GabbroAutofillService : AutofillService() {
     // Helpers
     // -------------------------------------------------------------------------
 
+    /**
+     * Extracts a matchable token from an Android package name.
+     * e.g. "com.paypal.android.p2pmobile" → "paypal"
+     * Drops known TLD-like prefixes (com, org, net, app, co, io)
+     * and takes the first remaining segment.
+     * Returns null if no usable token can be extracted.
+     */
+    private fun extractAppToken(packageName: String): String? {
+        val skipSegments = setOf("com", "org", "net", "app", "co", "io", "uk", "de", "fr", "ch")
+        return packageName.split(".")
+            .firstOrNull { it.length > 2 && it !in skipSegments }
+    }
+
     private fun extractRegistrableDomain(input: String?): String? {
         if (input.isNullOrBlank()) return null
         val withScheme = if (input.contains("://")) input else "https://$input"
@@ -173,11 +200,18 @@ class GabbroAutofillService : AutofillService() {
             val array = org.json.JSONArray(json)
             (0 until array.length()).map { i ->
                 val obj = array.getJSONObject(i)
+                val id = obj.getString("id")
+                val entryJson = RustBridge.getEntry(id)
+                val password = try {
+                    org.json.JSONObject(entryJson).optString("password", "")
+                } catch (_: Exception) {
+                    ""
+                }
                 CredentialSummary(
-                    id = obj.getString("id"),
+                    id = id,
                     username = obj.getString("username"),
                     url = obj.getString("url"),
-                    password = "",
+                    password = password,
                 )
             }
         } catch (_: Exception) {
@@ -245,14 +279,53 @@ data class ParsedStructure(
             val hints = node.autofillHints
             val id = node.autofillId
 
-            if (id != null && hints != null) {
+            if (id != null) {
                 when {
-                    hints.any { it.equals(android.view.View.AUTOFILL_HINT_USERNAME, ignoreCase = true) ||
-                                it.equals(android.view.View.AUTOFILL_HINT_EMAIL_ADDRESS, ignoreCase = true) } ->
-                        usernameIds.add(id)
+                    // Explicit autofill hints — most reliable signal.
+                    hints != null && hints.any {
+                        it.equals(android.view.View.AUTOFILL_HINT_USERNAME, ignoreCase = true) ||
+                        it.equals(android.view.View.AUTOFILL_HINT_EMAIL_ADDRESS, ignoreCase = true)
+                    } -> usernameIds.add(id)
 
-                    hints.any { it.equals(android.view.View.AUTOFILL_HINT_PASSWORD, ignoreCase = true) } ->
-                        passwordIds.add(id)
+                    hints != null && hints.any {
+                        it.equals(android.view.View.AUTOFILL_HINT_PASSWORD, ignoreCase = true)
+                    } -> passwordIds.add(id)
+
+                    // Fallback: inputType bitmask — used by most native apps
+                    // that don't declare explicit autofill hints.
+                    else -> {
+                        val inputType = node.inputType
+                        val typeClass = inputType and android.text.InputType.TYPE_MASK_CLASS
+                        val typeVariation = inputType and android.text.InputType.TYPE_MASK_VARIATION
+
+                        if (typeClass == android.text.InputType.TYPE_CLASS_TEXT) {
+                            when (typeVariation) {
+                                android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD,
+                                android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
+                                android.text.InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD ->
+                                    passwordIds.add(id)
+
+                                android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+                                android.text.InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS ->
+                                    usernameIds.add(id)
+
+                                else -> {
+                                    // Last resort: check the field's hint text for
+                                    // username/email keywords. Catches fields like
+                                    // PayPal's email_or_phone_input (inputType=1,
+                                    // variation=0, hint="Email").
+                                    val hint = node.hint?.lowercase() ?: ""
+                                    val entryId = node.idEntry?.lowercase() ?: ""
+                                    if (hint.contains("email") || hint.contains("username") ||
+                                        hint.contains("login") || hint.contains("phone") ||
+                                        entryId.contains("email") || entryId.contains("username") ||
+                                        entryId.contains("login") || entryId.contains("phone")) {
+                                        usernameIds.add(id)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
 

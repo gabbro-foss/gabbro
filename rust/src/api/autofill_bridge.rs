@@ -24,6 +24,35 @@ pub mod jni {
         u8::from(is_vault_unlocked())
     }
 
+    /// Returns a JSON string encoding id, username, and password for a single
+    /// Login entry looked up by UUID.
+    ///
+    /// Shape: `{"id":"...","username":"...","password":"..."}`
+    /// Returns `"{}"` if the vault is locked, the id is not found, or the
+    /// entry is not a Login entry.
+    #[no_mangle]
+    pub extern "system" fn Java_app_gabbro_gabbro_RustBridge_getEntry<'local>(
+        mut env: JNIEnv<'local>,
+        _class: JClass<'local>,
+        id: jni::objects::JString<'local>,
+    ) -> jni::objects::JString<'local> {
+        use crate::vault::session::get_entry_for_autofill;
+
+        let id_str: String = match env.get_string(&id) {
+            Ok(s) => s.into(),
+            Err(_) => return env.new_string("{}").expect("failed to allocate JString"),
+        };
+
+        let json = match get_entry_for_autofill(&id_str) {
+            Ok(j) => j,
+            Err(_) => String::from("{}"),
+        };
+
+        env.new_string(json).unwrap_or_else(|_| {
+            env.new_string("{}").expect("failed to allocate fallback JString")
+        })
+    }
+
     /// Returns a JSON string encoding all Login entry summaries in the session.
     ///
     /// Shape: `[{"id":"...","username":"...","url":"..."}]`

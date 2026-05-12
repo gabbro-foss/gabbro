@@ -17,6 +17,10 @@ package app.gabbro.gabbro
  */
 object RustBridge {
 
+    init {
+        System.loadLibrary("rust_lib_gabbro")
+    }
+
     /**
      * Returns true if the Rust vault session is currently unlocked
      * (i.e. VAULT_SESSION holds a live VaultSession).
@@ -34,6 +38,12 @@ object RustBridge {
      */
     external fun listLoginSummaries(): String
 
-    // Future additions (next sessions):
-    //   external fun getEntry(id: String): String   // JSON-encoded EntryData
+    /**
+     * Returns a JSON string encoding id, username, and password for a single
+     * Login entry looked up by UUID.
+     * Shape: `{"id":"...","username":"...","password":"..."}`
+     * Returns "{}" if the vault is locked, the id is not found, or the entry
+     * is not a Login entry.
+     */
+    external fun getEntry(id: String): String
 }
