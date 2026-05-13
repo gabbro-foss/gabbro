@@ -2499,3 +2499,57 @@ Python analogy: like writing a CSV parser that only handles the happy path
 (comma-separated, quoted strings, standard headers) — real-world CSV files
 will break it in a dozen ways. Robust parsers handle all the edge cases
 that real files actually exhibit, not just the ones the spec describes.
+
+---
+
+## Android — `EXTRA_ASSIST_STRUCTURE` is not forwarded to auth activities
+
+The Android autofill framework does **not** automatically deliver
+`AutofillManager.EXTRA_ASSIST_STRUCTURE` to the activity launched via
+the `PendingIntent` in an authentication `Dataset`. This is undocumented
+behaviour — the intent arrives at the auth activity with no structure
+attached, so any attempt to call `getParcelableExtra(EXTRA_ASSIST_STRUCTURE)`
+returns null.
+
+**Fix:** pack all context needed by the auth activity explicitly as intent
+extras when building the `PendingIntent` in `onFillRequest()`. For Gabbro
+this means passing the already-parsed `AutofillId` lists, the web domain,
+and the app package name. The auth activity reads those extras directly —
+no re-parsing needed.
+
+```kotlin
+// In GabbroAutofillService.buildAuthResponse():
+val unlockIntent = Intent(this, UnlockActivity::class.java).apply {
+    putParcelableArrayListExtra(EXTRA_USERNAME_IDS, ArrayList(parsed.usernameIds))
+    putParcelableArrayListExtra(EXTRA_PASSWORD_IDS, ArrayList(parsed.passwordIds))
+    putExtra(EXTRA_WEB_DOMAIN, parsed.webDomain)
+    putExtra(EXTRA_PACKAGE_NAME, parsed.packageName)
+}
+```
+
+---
+
+## Android — `logcat` as a TDD proxy for untestable platform code
+
+The Android autofill service and its auth activity cannot be exercised
+by Flutter or Rust unit tests — they require a real device, a real app
+with autofillable fields, and a live OS autofill session. For this class
+of code, `adb logcat` with a targeted tag is the closest equivalent to
+a failing test:
+
+1. Add a log tag (`android.util.Log.d("GabbroAutofill", ...)`) at each
+   decision point — entry to the function, each early-return branch, and
+   the final outcome.
+2. Trigger the scenario on hardware.
+3. Read the logcat output to identify exactly which branch fired.
+4. Fix the branch, re-run, confirm the log shows the expected path.
+5. Strip the logging before committing.
+
+This is the hardware equivalent of a red→green TDD cycle: the log output
+is the "test result", the fix is the "production code", and the clean
+re-run is the "passing test". The key discipline is the same — don't
+guess, don't iterate blindly. Get evidence first, then fix.
+
+Python analogy: like adding `print()` statements to a function you cannot
+unit-test (e.g. a Django middleware that only fires on live HTTP requests)
+— targeted, temporary, removed once the behaviour is confirmed.
