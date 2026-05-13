@@ -16,9 +16,18 @@ Future<void> autofillUnlockMain() async {
   final dir = await getApplicationSupportDirectory();
   final vaultPath = '${dir.path}/gabbro.gabbro';
   const channel = MethodChannel('app.gabbro.gabbro/autofill');
+  final settings = await AppSettings.load();
+  final hc = settings.highContrast;
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
+      themeMode: switch (settings.theme) {
+        ThemeChoice.system => ThemeMode.system,
+        ThemeChoice.light  => ThemeMode.light,
+        ThemeChoice.dark   => ThemeMode.dark,
+      },
+      theme: gabbroLightTheme(highContrast: hc),
+      darkTheme: gabbroDarkTheme(highContrast: hc),
       home: UnlockScreen(
         vaultPath: vaultPath,
         onUnlock: (passphrase, path) async {
