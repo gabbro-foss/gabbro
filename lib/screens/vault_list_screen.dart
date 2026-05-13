@@ -579,47 +579,93 @@ class _VaultListScreenState extends State<VaultListScreen> {
               itemBuilder: (context) => [
                 const PopupMenuItem(
                   value: 'export',
-                  child: Text('Export vault'),
+                  child: Row(children: [
+                    Icon(Icons.upload_outlined, size: 20),
+                    SizedBox(width: 12),
+                    Expanded(child: Text('Export vault')),
+                  ]),
                 ),
                 const PopupMenuItem(
                   value: 'import',
-                  child: Text('Import entries'),
+                  child: Row(children: [
+                    Icon(Icons.download_outlined, size: 20),
+                    SizedBox(width: 12),
+                    Expanded(child: Text('Import entries')),
+                  ]),
                 ),
                 const PopupMenuDivider(),
                 const PopupMenuItem(
                   enabled: false,
                   value: 'vault_add',
-                  child: Text('Add vault'),
+                  child: Row(children: [
+                    Icon(Icons.add, size: 20),
+                    SizedBox(width: 12),
+                    Text('Add vault'),
+                  ]),
                 ),
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'vault_delete',
-                  child: Text('Delete vault'),
+                  child: Row(children: [
+                    Icon(Icons.delete_forever_outlined, size: 20,
+                        color: Theme.of(context).colorScheme.error),
+                    const SizedBox(width: 12),
+                    Text('Delete vault',
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.error)),
+                  ]),
                 ),
                 const PopupMenuDivider(),
                 const PopupMenuItem(
                   value: 'change_passphrase',
-                  child: Text('Change passphrase'),
+                  child: Row(children: [
+                    Icon(Icons.key_outlined, size: 20),
+                    SizedBox(width: 12),
+                    Expanded(child: Text('Change passphrase')),
+                  ]),
                 ),
                 const PopupMenuItem(
                   enabled: false,
                   value: 'yubikeys',
-                  child: Text('Manage YubiKeys'),
+                  child: Row(children: [
+                    Icon(Icons.security_outlined, size: 20),
+                    SizedBox(width: 12),
+                    Text('Manage YubiKeys'),
+                  ]),
                 ),
                 const PopupMenuDivider(),
                 const PopupMenuItem(
                   value: 'appearance',
-                  child: Text('Appearance'),
+                  child: Row(children: [
+                    Icon(Icons.palette_outlined, size: 20),
+                    SizedBox(width: 12),
+                    Text('Appearance'),
+                  ]),
                 ),
                 const PopupMenuItem(
                   value: 'security',
-                  child: Text('Security'),
+                  child: Row(children: [
+                    Icon(Icons.shield_outlined, size: 20),
+                    SizedBox(width: 12),
+                    Text('Security'),
+                  ]),
                 ),
                 const PopupMenuItem(
                   value: 'generator',
-                  child: Text('Password generator'),
+                  child: Row(children: [
+                    Icon(Icons.casino_outlined, size: 20),
+                    SizedBox(width: 12),
+                    Expanded(child: Text('Password generator')),
+                  ]),
                 ),
                 const PopupMenuDivider(),
-                const PopupMenuItem(value: 'about', child: Text('About')),
+                const PopupMenuItem(
+                  value: 'about',
+                  child: Row(children: [
+                    Icon(Icons.info_outline, size: 20),
+                    SizedBox(width: 12),
+                    Text('About'),
+                  ]),
+                ),
               ],
             ),
           ],

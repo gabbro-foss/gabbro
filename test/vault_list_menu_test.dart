@@ -40,5 +40,49 @@ void main() {
       expect(find.text('Password generator'), findsOneWidget);
       expect(find.text('About'), findsOneWidget);
     });
+  testWidgets('each menu item has an icon', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      await _setNarrow(tester);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+
+      // Every PopupMenuItem child is a Row — each must contain at least one Icon.
+      final rows = find.descendant(
+        of: find.byType(PopupMenuItem<String>),
+        matching: find.byType(Row),
+      );
+      expect(rows, findsWidgets);
+      for (final row in tester.widgetList(rows)) {
+        final icons = find.descendant(
+          of: find.byElementPredicate((e) => e.widget == row),
+          matching: find.byType(Icon),
+        );
+        expect(icons, findsAtLeastNWidgets(1));
+      }
+    });
+
+    testWidgets('delete vault icon uses error colour', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      await _setNarrow(tester);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+
+      final deleteItem = find.ancestor(
+        of: find.text('Delete vault'),
+        matching: find.byType(PopupMenuItem<String>),
+      );
+      expect(deleteItem, findsOneWidget);
+
+      final icon = tester.widget<Icon>(
+        find.descendant(of: deleteItem, matching: find.byType(Icon)).first,
+      );
+      final expectedColor =
+          Theme.of(tester.element(deleteItem)).colorScheme.error;
+      expect(icon.color, expectedColor);
+    });
   });
 }

@@ -316,12 +316,6 @@ class _Component {
 }
 
 const _kComponents = [
-  // Rust crates
-  _Component(
-    name: 'ml-kem',
-    licence: 'Apache-2.0 / MIT',
-    url: 'https://github.com/RustCrypto/KEMs',
-  ),
   _Component(
     name: 'aes-gcm',
     licence: 'Apache-2.0 / MIT',
@@ -333,91 +327,9 @@ const _kComponents = [
     url: 'https://github.com/RustCrypto/password-hashes',
   ),
   _Component(
-    name: 'hkdf',
-    licence: 'Apache-2.0 / MIT',
-    url: 'https://github.com/RustCrypto/KDFs',
-  ),
-  _Component(
-    name: 'x25519-dalek',
-    licence: 'BSD-3-Clause',
-    url: 'https://github.com/dalek-cryptography/x25519-dalek',
-  ),
-  _Component(
-    name: 'uuid',
-    licence: 'Apache-2.0 / MIT',
-    url: 'https://github.com/uuid-rs/uuid',
-  ),
-  _Component(
-    name: 'zeroize',
-    licence: 'Apache-2.0 / MIT',
-    url: 'https://github.com/RustCrypto/utils',
-  ),
-  _Component(
-    name: 'serde / serde_json',
-    licence: 'Apache-2.0 / MIT',
-    url: 'https://github.com/serde-rs/serde',
-  ),
-  _Component(
-    name: 'flutter_rust_bridge',
-    licence: 'MIT',
-    url: 'https://github.com/fzyzcjy/flutter_rust_bridge',
-  ),
-  // Flutter / Dart packages
-  _Component(
-    name: 'scrollable_positioned_list',
-    licence: 'BSD-3-Clause',
-    url: 'https://github.com/google/flutter.widgets',
-  ),
-  _Component(
-    name: 'path_provider',
-    licence: 'BSD-3-Clause',
-    url: 'https://github.com/flutter/packages',
-  ),
-  _Component(
-    name: 'file_picker',
-    licence: 'MIT',
-    url: 'https://github.com/miguelpruivo/flutter_file_picker',
-  ),
-  _Component(
-    name: 'url_launcher',
-    licence: 'BSD-3-Clause',
-    url: 'https://github.com/flutter/packages',
-  ),
-  _Component(
-    name: 'freezed_annotation',
-    licence: 'MIT',
-    url: 'https://github.com/rrousselGit/freezed',
-  ),
-  _Component(
-    name: 'sha2',
-    licence: 'Apache-2.0 / MIT',
-    url: 'https://github.com/RustCrypto/hashes',
-  ),
-  _Component(
-    name: 'rand',
-    licence: 'Apache-2.0 / MIT',
-    url: 'https://github.com/rust-random/rand',
-  ),
-  _Component(
-    name: 'once_cell',
-    licence: 'Apache-2.0 / MIT',
-    url: 'https://github.com/matklad/once_cell',
-  ),
-  _Component(
     name: 'base64',
     licence: 'Apache-2.0 / MIT',
     url: 'https://github.com/marshallpierce/rust-base64',
-  ),
-  _Component(
-    name: 'Fira Code',
-    licence: 'SIL OFL 1.1',
-    url: 'https://github.com/tonsky/FiraCode',
-  ),
-  // Languages & runtimes
-  _Component(
-    name: 'Rust',
-    licence: 'Apache-2.0 / MIT',
-    url: 'https://github.com/rust-lang/rust',
   ),
   _Component(
     name: 'Dart',
@@ -425,8 +337,93 @@ const _kComponents = [
     url: 'https://github.com/dart-lang/sdk',
   ),
   _Component(
+    name: 'file_picker',
+    licence: 'MIT',
+    url: 'https://github.com/miguelpruivo/flutter_file_picker',
+  ),
+  _Component(
+    name: 'Fira Code',
+    licence: 'SIL OFL 1.1',
+    url: 'https://github.com/tonsky/FiraCode',
+  ),
+  _Component(
     name: 'Flutter',
     licence: 'BSD-3-Clause',
     url: 'https://github.com/flutter/flutter',
+  ),
+  _Component(
+    name: 'flutter_rust_bridge',
+    licence: 'MIT',
+    url: 'https://github.com/fzyzcjy/flutter_rust_bridge',
+  ),
+  _Component(
+    name: 'freezed_annotation',
+    licence: 'MIT',
+    url: 'https://github.com/rrousselGit/freezed',
+  ),
+  _Component(
+    name: 'hkdf',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/RustCrypto/KDFs',
+  ),
+  _Component(
+    name: 'ml-kem',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/RustCrypto/KEMs',
+  ),
+  _Component(
+    name: 'once_cell',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/matklad/once_cell',
+  ),
+  _Component(
+    name: 'path_provider',
+    licence: 'BSD-3-Clause',
+    url: 'https://github.com/flutter/packages',
+  ),
+  _Component(
+    name: 'rand',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/rust-random/rand',
+  ),
+  _Component(
+    name: 'Rust',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/rust-lang/rust',
+  ),
+  _Component(
+    name: 'scrollable_positioned_list',
+    licence: 'BSD-3-Clause',
+    url: 'https://github.com/google/flutter.widgets',
+  ),
+  _Component(
+    name: 'serde / serde_json',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/serde-rs/serde',
+  ),
+  _Component(
+    name: 'sha2',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/RustCrypto/hashes',
+  ),
+  _Component(
+    name: 'url_launcher',
+    licence: 'BSD-3-Clause',
+    url: 'https://github.com/flutter/packages',
+  ),
+  _Component(
+    name: 'uuid',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/uuid-rs/uuid',
+  ),
+  _Component(
+    name: 'x25519-dalek',
+    licence: 'BSD-3-Clause',
+    url: 'https://github.com/dalek-cryptography/x25519-dalek',
+  ),
+  _Component(
+    name: 'zeroize',
+    licence: 'Apache-2.0 / MIT',
+    url: 'https://github.com/RustCrypto/utils',
   ),
 ];
