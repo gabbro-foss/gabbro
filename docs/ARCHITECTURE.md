@@ -1003,8 +1003,8 @@ vault screens. No new Rust crate dependencies.
 > Update this section at the end of each session. One or two bullets max.
 > It is the first thing to check at the start of the next session.
 
-- **Completed:** Autofill fill path fully implemented and hardware-verified
-  on Samsung S23 (Android 16):
+- **Completed:** Autofill fill path and locked path fully implemented and
+  hardware-verified on Samsung S23 (Android 16):
   - `get_entry_for_autofill(id)` in `gabbro/rust/src/vault/session.rs` —
     returns `{"id":…,"username":…,"password":…}` JSON for a single Login
     entry. Password only crosses the JNI boundary at the moment the user
@@ -1012,13 +1012,8 @@ vault screens. No new Rust crate dependencies.
   - `Java_app_gabbro_gabbro_RustBridge_getEntry` JNI function in
     `gabbro/rust/src/api/autofill_bridge.rs`.
   - `getEntry(id: String): String` external fun in `RustBridge.kt`.
-  - `parseSummariesJson()` in `GabbroAutofillService.kt` now calls
+  - `parseSummariesJson()` in `GabbroAutofillService.kt` calls
     `RustBridge.getEntry(id)` to populate `CredentialSummary.password`.
-  - `UnlockActivity.kt` — `buildFillIntent()` extracts `AssistStructure`
-    from `EXTRA_ASSIST_STRUCTURE`, re-runs domain matching after unlock,
-    builds a real `FillResponse`, and delivers it via
-    `EXTRA_AUTHENTICATION_RESULT`. `setResult(RESULT_OK)` now carries
-    credentials to the target field.
   - `collectIds()` broadened: inputType bitmask fallback for fields
     without explicit autofill hints; hint-text keyword fallback for fields
     with `inputType=TYPE_TEXT_VARIATION_NORMAL` (e.g. PayPal email field).
@@ -1027,36 +1022,32 @@ vault screens. No new Rust crate dependencies.
     `paypal`) and matches against vault entry URLs by substring.
   - `System.loadLibrary("rust_lib_gabbro")` added to `RustBridge.init`
     to ensure the native library is loaded when the autofill service starts.
-  - Hardware-verified: unlocked path (credential chip fills email +
-    password directly) confirmed working in PayPal native app.
-    Auth wall (locked path) hardware verification deferred — see backlog.
+  - `ParsedStructure` extended with `packageName` field — populated from
+    `structure.getWindowNodeAt(i).title` (window title carries the
+    activity component string `package/activity`; we take the prefix
+    before `/`). Used by both `onFillRequest()` and `buildAuthResponse()`.
+  - `buildAuthResponse()` in `GabbroAutofillService.kt` now passes parsed
+    field IDs, web domain, and app package name as intent extras on the
+    `PendingIntent` that launches `UnlockActivity`. The OS does not
+    automatically deliver `EXTRA_ASSIST_STRUCTURE` to the auth activity.
+  - `buildFillIntent()` in `UnlockActivity.kt` reads those extras instead
+    of attempting to re-parse an `AssistStructure` that is never present.
+    Runs browser (eTLD+1) or native app (package token substring) matching
+    after unlock, builds a real `FillResponse`, and delivers it via
+    `EXTRA_AUTHENTICATION_RESULT`. `setResult(RESULT_OK)` carries
+    credentials to the target field.
+  - Hardware-verified: unlocked path and locked path (vault open, vault
+    locked, process dead) all confirmed working in PayPal native app.
 
-- **Next:** Fix autofill locked path — `UnlockActivity` delivers
-  `RESULT_OK` too late; Android autofill framework expires the fill
-  response before it arrives at the target app.
-
-  **Root cause:** Flutter engine cold-start adds several seconds before
-  the passphrase screen renders. By the time the user unlocks and
-  `setResult` fires, the framework has called `onInvisibleForAutofill()`
-  and discarded the response. The MethodChannel round-trip is not the
-  issue — the vault is already unlocked when Kotlin receives it. The
-  issue is engine startup latency.
-
-  **Fix required:** Use a pre-warmed `FlutterEngine` in
-  `UnlockActivity` so the passphrase screen appears in under 1 second.
-  See https://docs.flutter.dev/add-to-app/android/add-flutter-fragment
-  for the engine caching API (`FlutterEngineCache`,
-  `FlutterEngineGroup`). The engine should be pre-warmed in
-  `MainActivity` on app start and cached under a known ID so
-  `UnlockActivity` can retrieve it immediately.
+- **Next:** Fix `UnlockActivity` colour scheme — the passphrase screen
+  renders in the default Flutter blue instead of Gabbro's olivine green
+  theme. Root cause: `autofillUnlockMain()` in `main.dart` builds a
+  bare `MaterialApp` with no `theme` or `darkTheme` specified. Fix:
+  pass `gabbroLightTheme()` and `gabbroDarkTheme()` and `themeMode`
+  from settings, mirroring `GabbroApp`.
 
   **Files needed at session start:**
-  - `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/UnlockActivity.kt`
-  - `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/RustBridge.kt`
-  - `gabbro/android/app/src/main/kotlin/app/gabbro/gabbro/GabbroAutofillService.kt`
-  - `gabbro/android/app/src/main/AndroidManifest.xml`
   - `gabbro/lib/main.dart`
-  - `gabbro/android/app/build.gradle`
 
 ---
 
