@@ -48,17 +48,25 @@ class UnlockActivity : FlutterActivity() {
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "unlock" -> {
-                        // Vault unlock is handled by the Flutter layer via the
-                        // normal Rust bridge. Once unlocked, build a real
-                        // FillResponse and deliver it to the target field.
                         val fillIntent = buildFillIntent()
                         if (fillIntent != null) {
                             setResult(RESULT_OK, fillIntent)
+                            finish()
                         } else {
-                            // No matching credentials found — cancel gracefully.
-                            setResult(RESULT_CANCELED)
+                            // No matching credentials — show a dismissible
+                            // dialog explaining why, then cancel.
+                            val appPackageName = intent?.getStringExtra(EXTRA_PACKAGE_NAME)
+                            val token = appPackageName?.let { extractAppToken(it) } ?: appPackageName ?: "unknown"
+                            android.app.AlertDialog.Builder(this)
+                                .setTitle("No credentials found")
+                                .setMessage("No Gabbro credentials match this app ($token). If you trust it, copy/paste your credentials manually. Note: the app identifier may differ from its display name.")
+                                .setPositiveButton("Dismiss") { _, _ ->
+                                    setResult(RESULT_CANCELED)
+                                    finish()
+                                }
+                                .setCancelable(false)
+                                .show()
                         }
-                        finish()
                         result.success(null)
                     }
                     else -> result.notImplemented()
