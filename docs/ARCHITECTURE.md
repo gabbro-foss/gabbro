@@ -1004,27 +1004,20 @@ vault screens. No new Rust crate dependencies.
 > It is the first thing to check at the start of the next session.
 
 - **Completed this session (13 May 2026):**
-  - Autofill locked path fixed and hardware-verified on Samsung S23
-    (Android 16). Root cause: `EXTRA_ASSIST_STRUCTURE` is not delivered
-    to the auth activity by the OS — it must be passed explicitly.
-    `buildAuthResponse()` in `GabbroAutofillService.kt` now passes
-    parsed `AutofillId`s, web domain, and app package name as intent
-    extras on the `PendingIntent`. `buildFillIntent()` in
-    `UnlockActivity.kt` reads those extras and runs browser (eTLD+1) or
-    native app (package token substring) matching after unlock.
-    `ParsedStructure` extended with `packageName` field populated from
-    the window title. Verified: vault open + locked, vault locked, and
-    process dead — all fill correctly in PayPal native app.
-  - `autofillUnlockMain()` in `main.dart` now loads `AppSettings` and
-    passes `gabbroLightTheme()`, `gabbroDarkTheme()`, and `themeMode`
-    to `MaterialApp`. Unlock screen respects user theme and
-    high-contrast settings. Hardware-verified.
+  - Investigated Nolio autofill failure. Root cause: native app package
+    `dupont.nolio` yields token `dupont` which does not match vault entry
+    URL `nolio.io`. Heuristic package-name token matching rejected as a
+    credential-harvesting vector — any app can declare any package name.
+    Fix: transparent failure. When vault unlocks but no credentials match,
+    `UnlockActivity` shows an `AlertDialog` explaining the token tried and
+    advising copy/paste. `RESULT_CANCELED` delivered cleanly to OS.
+    Hardware-verified on Samsung S23 (Android 16).
 
-- **Next:** WebView-based app autofill — apps like Nolio that render
-  login screens in a WebView show no autofill chip. `collectIds()` does
-  not currently traverse WebView content nodes. Investigate whether the
-  app implements the WebView autofill API and extend `collectIds()` if
-  needed. Defer until a dedicated session.
+- **Next:** Silent no-match in the already-unlocked path — when the vault
+  is already unlocked and no credentials match, `GabbroAutofillService`
+  returns `callback.onSuccess(null)` silently (no chip, no message).
+  Decide whether to surface a notification or toast in this path.
+  Defer until a dedicated session.
 
 ---
 
@@ -1214,6 +1207,25 @@ the first public tag.
   users. Design note: vim-style h/l key bindings are a natural follow-on
   but require focus management — defer to a separate item.
 
+- **Icons for settings menu items:** Add leading icons to all settings
+  menu items for visual scannability.
+
+- **Icons for card entry fields:** Add leading icons to card entry fields
+  (card number, expiry, CVV, etc.) for visual clarity.
+
+- **Finger-drag alphabet bar:** Add drag-to-scroll behaviour to the
+  alphabet index bar, matching the interaction model of the password
+  detail character breakdown view.
+
+- **About screen — alphabetical ordering:** Sort the components list in
+  `AboutScreen` alphabetically unless a more canonical ordering (e.g. by
+  category) is clearly better.
+
+- **File picker for all export paths:** The file entry export path does
+  not use a file picker — the user cannot choose the destination.
+  Audit all export paths and ensure consistent use of `file_picker`
+  across all entry types.
+
 - **Folders, tags, favourites, configurable sorting:** The vault list
   currently has no folder or tag organisation, no favourites flag in the UI,
   and no sort order options. Design questions: are folders and tags mutually
@@ -1273,16 +1285,13 @@ the first public tag.
   replace with `DateFormat('dd MMM yyyy, HH:mm').format(dt)` from
   `package:intl` — one-line change, picks up device locale automatically.
 
-- **Autofill:** Credentials go directly from the autofill service into the
-  target field via the OS autofill framework — bypassing clipboard history
-  managers entirely. This is a meaningful security advantage over copy-paste
-  and worth building in v2. On Android: AutofillService API. On desktop:
-  browser extension (separate distribution, requires building and maintaining
-  per-browser extensions). Key questions: which platforms get autofill in v1
-  vs v2? Is a browser extension in scope given the GPL-3.0 and FOSS
-  distribution model? Does autofill change the security model (secrets closer
-  to the browser boundary)? Prerequisite for passkey support.
-  Document the clipboard-vs-autofill security distinction in `docs/SECURITY.md`.
+- **Autofill — silent no-match (unlocked path):** when the vault is already
+  unlocked and no credentials match the requesting app, `GabbroAutofillService`
+  returns `callback.onSuccess(null)` silently — no chip, no message to the
+  user. The locked-path equivalent shows an `AlertDialog` (added 13 May 2026).
+  Decide whether to surface a notification or toast in the unlocked path for
+  consistency. Note: showing UI from a background service requires a foreground
+  notification or a separate activity — non-trivial on Android 12+
 
 - **Panic button / app hiding on mobile:** A visible "hide app" mechanism —
   e.g. disguise Gabbro as a calculator or notes app, or a panic button that
