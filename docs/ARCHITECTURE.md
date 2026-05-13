@@ -138,7 +138,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 198 | 1 |
-| Flutter (`flutter test`) | 227 | 0 |
+| Flutter (`flutter test`) | 229 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
 
@@ -148,9 +148,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Completed (13 May 2026):** Brave/Chromium autofill working — `webDomain` collected from child nodes, HTML `autocomplete` hints added, lazy password fetch. Fixed `serde_json` escaping bug in `get_entry_for_autofill`. ADR-008: no browser extension, ever. Click-to-scroll chevrons in `PasswordBreakdownSheet` (`animateTo()`, one viewport width per tap). Finger-drag alphabet bar — drag shifts visible window and fires `onLetterSelected`; chevrons also fire `onLetterSelected`.
+- **Completed (13 May 2026):** Icons added to all popup menu items in `VaultListScreen` (Material Icons, `Expanded` text to prevent overflow); Delete vault icon + label styled with `colorScheme.error` (ADR-003 compliant, light + dark). `_kComponents` list in `about_screen.dart` sorted case-insensitively alphabetically. `vault_list_menu_test.dart` extended with icon presence and error colour tests (229 Flutter tests passing).
 
-- **Next:** Icons for settings menu items and card entry fields; About screen: sort components list alphabetically + add Fira Code OFL licence entry.
+- **Next:** To be decided — generator UI polish, YubiKey design, or other backlog item.
 
 ---
 
@@ -168,7 +168,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Testing (pre-v1 gates)
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
-- Menu items regression widget test (`PopupMenuItem` values in `VaultListScreen`).
 
 ### Features & UX
 - YubiKey / FIDO2 auth — design session first (ADR-005, Ed25519 v1 interim).
@@ -176,8 +175,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Screenshot prevention + app switcher blur — `FLAG_SECURE` on Android; assess Linux separately.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - Generator UI: entropy display, password hidden by default, clipboard auto-clear (60s), exclude ambiguous chars, remember last settings.
-- Icons for settings menu items and card entry fields.
-- About screen: sort components list alphabetically; add Fira Code OFL licence entry.
 - File picker for all export paths (audit for consistency).
 - `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
 - Clean up legacy vault on first launch (`com.example.gabbro` → `app.gabbro.gabbro` migration offer).
