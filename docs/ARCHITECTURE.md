@@ -126,11 +126,10 @@ gabbro/
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
 
 **Not yet implemented (see Bikeshed):**
-- Folders, tags, favourites, configurable sort order
+- Folders (entry grouping)
 - YubiKey / FIDO2 authentication
 - Screenshot prevention + app switcher blur
 - Autofill save requests (`onSaveRequest`)
-- Generator UI polish (entropy display, hidden by default, clipboard auto-clear)
 - Passkey support, breach alerts, vault sync
 
 ## Testing
@@ -150,7 +149,17 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 - **Completed (13 May 2026):** Icons added to all popup menu items in `VaultListScreen` (Material Icons, `Expanded` text to prevent overflow); Delete vault icon + label styled with `colorScheme.error` (ADR-003 compliant, light + dark). `_kComponents` list in `about_screen.dart` sorted case-insensitively alphabetically. `vault_list_menu_test.dart` extended with icon presence and error colour tests (229 Flutter tests passing).
 
-- **Next:** To be decided — generator UI polish, YubiKey design, or other backlog item.
+- **Next:** Folders implementation. Design complete — see below.
+
+**Folders design (agreed 13 May 2026):**
+- `VaultData` gets `folders: Vec<String>`, default `["Work", "Private", "Other"]`, persisted in Rust
+- `CommonFields.folder: String`, default `""` (empty = unfoldered); displayed as "None" in entry detail alongside `created_at` / `modified_at`
+- Migration: existing entries with `folder: "Personal"` → `folder: ""`
+- Tags and favourites dropped entirely — never implemented, no migration needed
+- Folder filter dropdown on vault list screen, independent of type filter chips; unfoldered entries only appear when no folder filter is active ("All folders" selected)
+- "Manage folders" screen: add, rename, delete; accessible from settings menu
+  - Delete with entries: offer (a) reassign all to another folder, (b) clear all to "None", or both
+- Entry create/edit: folder picker dropdown showing existing folders + "None"
 
 ---
 
@@ -171,10 +180,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Features & UX
 - YubiKey / FIDO2 auth — design session first (ADR-005, Ed25519 v1 interim).
-- Folders, tags, favourites, configurable sort order — design as a group in one session.
+- Folders — design complete (see Current Focus); implementation in next session.
 - Screenshot prevention + app switcher blur — `FLAG_SECURE` on Android; assess Linux separately.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
-- Generator UI: entropy display, password hidden by default, clipboard auto-clear (60s), exclude ambiguous chars, remember last settings.
 - File picker for all export paths (audit for consistency).
 - `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
 - Clean up legacy vault on first launch (`com.example.gabbro` → `app.gabbro.gabbro` migration offer).
