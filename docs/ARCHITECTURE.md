@@ -129,7 +129,9 @@ gabbro/
 │       ├── ADR-003-colourblind-password-display.md
 │       ├── ADR-004-license.md
 │       ├── ADR-005-pq-authentication-signatures.md
-│       └── ADR-006-encryption-implementation.md
+│       ├── ADR-006-encryption-implementation.md
+│       ├── ADR-007-autofill-no-inline-suggestions.md
+│       └── ADR-008-no-browser-extension.md
 ├── chat_info/                  # Development session notes and ASCII wireframes
 │   └── ascii_art/              # (git-ignored — not versioned)
 ├── flutter_rust_bridge.yaml    # Bridge configuration
@@ -879,7 +881,9 @@ Design that wiring in the same session as the generator UI build.
 ## Autofill
 
 ### Status
-Design complete. Implementation deferred to a dedicated session.
+Complete. Verified on Samsung S23 (Android 16) with Brave (Chromium-based)
+and Arch Wiki. Fill path fully operational. Save requests deferred to a
+dedicated session.
 
 ### Overview
 Gabbro implements Android autofill via a dedicated `AutofillService` component
@@ -963,6 +967,21 @@ Native app matching (package name rather than URL) is deferred to v2.
 Browsers that do not pass the web domain receive no suggestions — fail
 safe, not fail open.
 
+**Chromium/Brave behaviour:** Chromium-based browsers do not populate
+`webDomain` on the root `ViewNode`. Instead, the domain and field hints
+appear on child nodes inside the web content subtree. `collectIds()` walks
+the full node tree and collects `webDomain` from any node. HTML
+`autocomplete` attribute values (`email`, `current-password`, `new-password`,
+`username`) are matched in addition to Android autofill hint constants —
+Chromium passes HTML attribute values directly as autofill hints rather than
+mapping them to Android constants.
+
+**Sites that do not cooperate:** SPAs and sites that omit `autocomplete`
+attributes entirely produce no field nodes in the `AssistStructure`. These
+sites receive no autofill suggestion — correct fail-safe behaviour. Copy/paste
+remains available. No site-specific workarounds are in scope; the standard
+API is used correctly and honestly.
+
 ### Credential presentation
 Standard `FillResponse` dropdown overlay only — rendered by the Android
 framework, not by any keyboard app. Inline suggestions (Android 11+
@@ -996,6 +1015,18 @@ and implementation in a dedicated session.
 No changes to the existing Rust bridge API. No changes to the Flutter
 vault screens. No new Rust crate dependencies.
 
+### Implementation notes
+- `get_entry_for_autofill()` in `rust/src/vault/session.rs` uses
+  `serde_json` for JSON serialization — the hand-rolled `format!()` approach
+  silently corrupted passwords containing backslashes and other special
+  characters that require JSON escaping. `serde_json` is an existing
+  dependency; no new crate added.
+- Passwords are fetched lazily: `parseSummariesJson()` in
+  `GabbroAutofillService.kt` builds lightweight stubs (no password fetch),
+  domain filtering runs on stubs, then `fetchPassword()` is called only for
+  matched entries. This minimises plaintext exposure and avoids decrypting
+  the entire vault on every fill request.
+
 ---
 
 ## Current Focus
@@ -1004,13 +1035,16 @@ vault screens. No new Rust crate dependencies.
 > It is the first thing to check at the start of the next session.
 
 - **Completed this session (13 May 2026):**
-  - Silent no-match in the unlocked path — `callback.onSuccess(null)`
-    with no notification or toast. Intentional; documented in LEARNINGS.md.
+  - Brave/Chromium autofill working: `webDomain` collected from child nodes,
+    HTML `autocomplete` hint values (`email`, `current-password`) added to
+    `collectIds()`, lazy password fetch (only matched entries fetch passwords).
+  - Fixed `serde_json` escaping bug — hand-rolled JSON in `get_entry_for_autofill`
+    corrupted passwords containing backslashes and other special characters.
+  - ADR-008: no browser extension on any platform, ever — security stance,
+    not a resourcing decision.
 
-- **Next:** Browser autofill in Brave — verify that `webDomain` is
-  correctly populated when Brave renders login pages, and that
-  `collectIds()` detects fields reliably. Web-app login pages (SPA
-  frameworks, dynamic fields) are in scope for the same session.
+- **Next:** YubiKey / FIDO2 integration — Ed25519 v1 interim auth (ADR-005).
+  Design session first before any implementation.
 
 ---
 
