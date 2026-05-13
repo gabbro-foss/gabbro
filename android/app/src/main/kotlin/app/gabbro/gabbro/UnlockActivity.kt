@@ -1,6 +1,5 @@
 package app.gabbro.gabbro
 
-import android.app.assist.AssistStructure
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -35,6 +34,10 @@ class UnlockActivity : FlutterActivity() {
 
     companion object {
         private const val CHANNEL = "app.gabbro.gabbro/autofill"
+        const val EXTRA_USERNAME_IDS = "app.gabbro.gabbro.EXTRA_USERNAME_IDS"
+        const val EXTRA_PASSWORD_IDS = "app.gabbro.gabbro.EXTRA_PASSWORD_IDS"
+        const val EXTRA_WEB_DOMAIN = "app.gabbro.gabbro.EXTRA_WEB_DOMAIN"
+        const val EXTRA_PACKAGE_NAME = "app.gabbro.gabbro.EXTRA_PACKAGE_NAME"
     }
 
     override fun getDartEntrypointFunctionName(): String = "autofillUnlockMain"
@@ -64,42 +67,65 @@ class UnlockActivity : FlutterActivity() {
     }
 
     /**
-     * Re-runs domain matching after unlock and builds a FillResponse.
+     * Runs domain/package matching after unlock and builds a FillResponse.
      *
-     * The OS puts the AssistStructure into the launching intent automatically
-     * under EXTRA_ASSIST_STRUCTURE. We extract it, re-parse the structure,
-     * match Login entries by domain, and build a Dataset for the first match.
-     * Multiple matches: first match wins for now (v2: picker UI).
+     * GabbroAutofillService passes the parsed AutofillIds, web domain, and
+     * app package name as intent extras when building the PendingIntent for
+     * the auth wall. We read those extras here — no AssistStructure needed.
      *
-     * Returns null if the structure is missing, no domain is found, or no
+     * Browser context: eTLD+1 domain match against vault entry URLs.
+     * Native app context: package token substring match against vault entry URLs.
+     * Multiple matches: first match wins (v2: picker UI).
+     *
+     * Returns null if extras are missing, no token can be extracted, or no
      * Login entries match — caller sets RESULT_CANCELED in that case.
      */
     private fun buildFillIntent(): Intent? {
-        val structure: AssistStructure = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent?.getParcelableExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE, AssistStructure::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent?.getParcelableExtra(AutofillManager.EXTRA_ASSIST_STRUCTURE)
-        } ?: return null
+        val usernameIds: ArrayList<android.view.autofill.AutofillId> =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent?.getParcelableArrayListExtra(EXTRA_USERNAME_IDS, android.view.autofill.AutofillId::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent?.getParcelableArrayListExtra(EXTRA_USERNAME_IDS)
+            } ?: arrayListOf()
 
-        val parsed = ParsedStructure.from(structure)
-        if (parsed.isEmpty()) return null
+        val passwordIds: ArrayList<android.view.autofill.AutofillId> =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent?.getParcelableArrayListExtra(EXTRA_PASSWORD_IDS, android.view.autofill.AutofillId::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent?.getParcelableArrayListExtra(EXTRA_PASSWORD_IDS)
+            } ?: arrayListOf()
 
-        val requestDomain = extractRegistrableDomain(parsed.webDomain) ?: return null
+        if (usernameIds.isEmpty() && passwordIds.isEmpty()) return null
+
+        val webDomain = intent?.getStringExtra(EXTRA_WEB_DOMAIN)
+        val appPackageName = intent?.getStringExtra(EXTRA_PACKAGE_NAME)
 
         val summariesJson = RustBridge.listLoginSummaries()
-        val matches = parseSummariesJson(summariesJson).filter { summary ->
-            extractRegistrableDomain(summary.url) == requestDomain
+        val allCredentials = parseSummariesJson(summariesJson)
+
+        val matches = if (webDomain != null) {
+            val requestDomain = extractRegistrableDomain(webDomain) ?: return null
+            allCredentials.filter { summary ->
+                extractRegistrableDomain(summary.url) == requestDomain
+            }
+        } else {
+            val token = appPackageName?.let { extractAppToken(it) } ?: return null
+            allCredentials.filter { summary ->
+                summary.url.contains(token, ignoreCase = true)
+            }
         }
+
         if (matches.isEmpty()) return null
 
         val cred = matches.first()
         val presentation = RemoteViews(packageName, R.layout.autofill_unlock_item)
         val datasetBuilder = Dataset.Builder()
-        parsed.usernameIds.forEach { id ->
+        usernameIds.forEach { id ->
             datasetBuilder.setValue(id, AutofillValue.forText(cred.username), presentation)
         }
-        parsed.passwordIds.forEach { id ->
+        passwordIds.forEach { id ->
             datasetBuilder.setValue(id, AutofillValue.forText(cred.password), presentation)
         }
 
@@ -110,6 +136,17 @@ class UnlockActivity : FlutterActivity() {
         return Intent().apply {
             putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT, fillResponse)
         }
+    }
+
+    /**
+     * Extracts a matchable token from an Android package name.
+     * e.g. "com.paypal.android.p2pmobile" → "paypal"
+     * Mirrors the logic in GabbroAutofillService exactly.
+     */
+    private fun extractAppToken(packageName: String): String? {
+        val skipSegments = setOf("com", "org", "net", "app", "co", "io", "uk", "de", "fr", "ch")
+        return packageName.split(".")
+            .firstOrNull { it.length > 2 && it !in skipSegments }
     }
 
     /**

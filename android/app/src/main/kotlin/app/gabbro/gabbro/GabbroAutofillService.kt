@@ -77,8 +77,7 @@ class GabbroAutofillService : AutofillService() {
         } else {
             // Native app context — extract app name from package and check
             // if any vault entry URL contains it as a substring.
-            val packageName = request.fillContexts.lastOrNull()
-                ?.structure?.activityComponent?.packageName ?: ""
+            val packageName = parseResult.packageName ?: ""
             val appToken = extractAppToken(packageName)
             if (appToken == null) {
                 callback.onSuccess(null)
@@ -118,7 +117,18 @@ class GabbroAutofillService : AutofillService() {
     private fun buildAuthResponse(parsed: ParsedStructure): FillResponse {
         val presentation = RemoteViews(packageName, R.layout.autofill_unlock_item)
 
-        val unlockIntent = Intent(this, UnlockActivity::class.java)
+        val unlockIntent = Intent(this, UnlockActivity::class.java).apply {
+            putParcelableArrayListExtra(
+                UnlockActivity.EXTRA_USERNAME_IDS,
+                ArrayList(parsed.usernameIds),
+            )
+            putParcelableArrayListExtra(
+                UnlockActivity.EXTRA_PASSWORD_IDS,
+                ArrayList(parsed.passwordIds),
+            )
+            putExtra(UnlockActivity.EXTRA_WEB_DOMAIN, parsed.webDomain)
+            putExtra(UnlockActivity.EXTRA_PACKAGE_NAME, parsed.packageName)
+        }
         val pendingIntent = PendingIntent.getActivity(
             this,
             REQUEST_CODE_UNLOCK,
@@ -251,6 +261,7 @@ data class ParsedStructure(
     val usernameIds: List<AutofillId>,
     val passwordIds: List<AutofillId>,
     val webDomain: String?,
+    val packageName: String?,
 ) {
     fun isEmpty(): Boolean = usernameIds.isEmpty() && passwordIds.isEmpty()
 
@@ -259,16 +270,24 @@ data class ParsedStructure(
             val usernameIds = mutableListOf<AutofillId>()
             val passwordIds = mutableListOf<AutofillId>()
             var webDomain: String? = null
+            var packageName: String? = null
 
             for (i in 0 until structure.windowNodeCount) {
                 val root = structure.getWindowNodeAt(i).rootViewNode
                 if (webDomain == null) {
                     webDomain = root.webDomain?.takeIf { it.isNotBlank() }
                 }
+                if (packageName == null) {
+                    packageName = structure.getWindowNodeAt(i).title
+                        ?.toString()
+                        ?.substringBefore("/")
+                        ?.trim()
+                        ?.takeIf { it.contains(".") }
+                }
                 collectIds(root, usernameIds, passwordIds)
             }
 
-            return ParsedStructure(usernameIds, passwordIds, webDomain)
+            return ParsedStructure(usernameIds, passwordIds, webDomain, packageName)
         }
 
         private fun collectIds(
