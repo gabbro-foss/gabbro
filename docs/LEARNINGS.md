@@ -190,6 +190,23 @@ limitation (Gabbro does so via the copy snackbar). Document honestly in
 Python analogy: like `del my_dict['key']` — removes the reference, but if
 another dict also holds the value, it persists.
 
+## Android — autofill silent no-match is intentional
+
+When the vault is unlocked and no Login entry matches the current domain or
+package token, `GabbroAutofillService` calls `callback.onSuccess(null)`.
+The OS shows no chip. This is intentional.
+
+Alternatives considered and rejected:
+- **Notification** — fires on every unmatched field (search bars, comment
+  boxes). Unacceptably noisy.
+- **Toast** — deprecated for background services on Android 12+, silently
+  suppressed on Android 13+. Not viable.
+
+The absence of a chip is universally understood in password manager UX.
+Copy/paste remains available at all times. Decision is final; do not reopen.
+
+---
+
 ## Autofill vs clipboard — security distinction
 
 Autofill does not use the OS clipboard. Credentials go directly from the

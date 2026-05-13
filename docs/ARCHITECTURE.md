@@ -1004,20 +1004,13 @@ vault screens. No new Rust crate dependencies.
 > It is the first thing to check at the start of the next session.
 
 - **Completed this session (13 May 2026):**
-  - Investigated Nolio autofill failure. Root cause: native app package
-    `dupont.nolio` yields token `dupont` which does not match vault entry
-    URL `nolio.io`. Heuristic package-name token matching rejected as a
-    credential-harvesting vector — any app can declare any package name.
-    Fix: transparent failure. When vault unlocks but no credentials match,
-    `UnlockActivity` shows an `AlertDialog` explaining the token tried and
-    advising copy/paste. `RESULT_CANCELED` delivered cleanly to OS.
-    Hardware-verified on Samsung S23 (Android 16).
+  - Silent no-match in the unlocked path — `callback.onSuccess(null)`
+    with no notification or toast. Intentional; documented in LEARNINGS.md.
 
-- **Next:** Silent no-match in the already-unlocked path — when the vault
-  is already unlocked and no credentials match, `GabbroAutofillService`
-  returns `callback.onSuccess(null)` silently (no chip, no message).
-  Decide whether to surface a notification or toast in this path.
-  Defer until a dedicated session.
+- **Next:** Browser autofill in Brave — verify that `webDomain` is
+  correctly populated when Brave renders login pages, and that
+  `collectIds()` detects fields reliably. Web-app login pages (SPA
+  frameworks, dynamic fields) are in scope for the same session.
 
 ---
 
