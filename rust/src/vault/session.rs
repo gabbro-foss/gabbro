@@ -391,12 +391,11 @@ pub fn get_entry_for_autofill(id: &str) -> Result<String, String> {
         .ok_or_else(|| format!("No entry found with id: {id}"))?;
     match entry {
         VaultEntry::Login(e) => {
-            let json = format!(
-                "{{\"id\":\"{}\",\"username\":\"{}\",\"password\":\"{}\"}}",
-                e.meta.id.replace('"', "\\\""),
-                e.username.replace('"', "\\\""),
-                e.password.replace('"', "\\\""),
-            );
+            let mut map = serde_json::Map::new();
+            map.insert("id".to_string(), serde_json::Value::String(e.meta.id.clone()));
+            map.insert("username".to_string(), serde_json::Value::String(e.username.clone()));
+            map.insert("password".to_string(), serde_json::Value::String(e.password.clone()));
+            let json = serde_json::Value::Object(map).to_string();
             Ok(json)
         }
         _ => Err(format!("Entry {id} is not a Login entry")),

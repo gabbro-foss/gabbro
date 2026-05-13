@@ -93,7 +93,12 @@ class GabbroAutofillService : AutofillService() {
             return
         }
 
-        callback.onSuccess(buildFillResponse(parseResult, matches))
+        // Fetch passwords only for matched entries — not for the whole vault.
+        val matchesWithPasswords = matches.map { summary ->
+            summary.copy(password = fetchPassword(summary.id))
+        }
+
+        callback.onSuccess(buildFillResponse(parseResult, matchesWithPasswords))
     }
 
     override fun onSaveRequest(request: SaveRequest, callback: SaveCallback) {
@@ -205,27 +210,31 @@ class GabbroAutofillService : AutofillService() {
         else host
     }
 
+    /** Parse summaries JSON into lightweight stubs — no password fetch. */
     private fun parseSummariesJson(json: String): List<CredentialSummary> {
         return try {
             val array = org.json.JSONArray(json)
             (0 until array.length()).map { i ->
                 val obj = array.getJSONObject(i)
-                val id = obj.getString("id")
-                val entryJson = RustBridge.getEntry(id)
-                val password = try {
-                    org.json.JSONObject(entryJson).optString("password", "")
-                } catch (_: Exception) {
-                    ""
-                }
                 CredentialSummary(
-                    id = id,
+                    id = obj.getString("id"),
                     username = obj.getString("username"),
                     url = obj.getString("url"),
-                    password = password,
+                    password = "",
                 )
             }
         } catch (_: Exception) {
             emptyList()
+        }
+    }
+
+    /** Fetch the real password for a single matched credential. */
+    private fun fetchPassword(id: String): String {
+        return try {
+            val entryJson = RustBridge.getEntry(id)
+            org.json.JSONObject(entryJson).optString("password", "")
+        } catch (_: Exception) {
+            ""
         }
     }
 
@@ -271,20 +280,19 @@ data class ParsedStructure(
             val passwordIds = mutableListOf<AutofillId>()
             var webDomain: String? = null
             var packageName: String? = null
-
             for (i in 0 until structure.windowNodeCount) {
-                val root = structure.getWindowNodeAt(i).rootViewNode
-                if (webDomain == null) {
-                    webDomain = root.webDomain?.takeIf { it.isNotBlank() }
-                }
+                val windowNode = structure.getWindowNodeAt(i)
+                val root = windowNode.rootViewNode
                 if (packageName == null) {
-                    packageName = structure.getWindowNodeAt(i).title
+                    packageName = windowNode.title
                         ?.toString()
                         ?.substringBefore("/")
                         ?.trim()
                         ?.takeIf { it.contains(".") }
                 }
-                collectIds(root, usernameIds, passwordIds)
+                val foundDomain = arrayOfNulls<String>(1)
+                collectIds(root, usernameIds, passwordIds, foundDomain)
+                if (webDomain == null) webDomain = foundDomain[0]
             }
 
             return ParsedStructure(usernameIds, passwordIds, webDomain, packageName)
@@ -294,20 +302,32 @@ data class ParsedStructure(
             node: AssistStructure.ViewNode,
             usernameIds: MutableList<AutofillId>,
             passwordIds: MutableList<AutofillId>,
+            webDomainOut: Array<String?>,
         ) {
+            // Collect webDomain from any node in the tree.
+            if (webDomainOut[0] == null) {
+                webDomainOut[0] = node.webDomain?.takeIf { it.isNotBlank() }
+            }
+
             val hints = node.autofillHints
             val id = node.autofillId
 
             if (id != null) {
                 when {
                     // Explicit autofill hints — most reliable signal.
+                    // Covers both Android constants and HTML autocomplete attribute values
+                    // (e.g. "email", "username") used by Chromium-based browsers.
                     hints != null && hints.any {
                         it.equals(android.view.View.AUTOFILL_HINT_USERNAME, ignoreCase = true) ||
-                        it.equals(android.view.View.AUTOFILL_HINT_EMAIL_ADDRESS, ignoreCase = true)
+                        it.equals(android.view.View.AUTOFILL_HINT_EMAIL_ADDRESS, ignoreCase = true) ||
+                        it.equals("email", ignoreCase = true) ||
+                        it.equals("username", ignoreCase = true)
                     } -> usernameIds.add(id)
 
                     hints != null && hints.any {
-                        it.equals(android.view.View.AUTOFILL_HINT_PASSWORD, ignoreCase = true)
+                        it.equals(android.view.View.AUTOFILL_HINT_PASSWORD, ignoreCase = true) ||
+                        it.equals("current-password", ignoreCase = true) ||
+                        it.equals("new-password", ignoreCase = true)
                     } -> passwordIds.add(id)
 
                     // Fallback: inputType bitmask — used by most native apps
@@ -349,7 +369,7 @@ data class ParsedStructure(
             }
 
             for (i in 0 until node.childCount) {
-                collectIds(node.getChildAt(i), usernameIds, passwordIds)
+                collectIds(node.getChildAt(i), usernameIds, passwordIds, webDomainOut)
             }
         }
     }
