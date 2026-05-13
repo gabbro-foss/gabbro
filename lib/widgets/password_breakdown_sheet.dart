@@ -84,21 +84,37 @@ class _PasswordBreakdownSheetState extends State<PasswordBreakdownSheet> {
     }
   }
 
+  void _scrollByViewport(double direction) {
+    if (!_scrollController.hasClients) return;
+    final viewport = _scrollController.position.viewportDimension;
+    final target = (_scrollController.offset + direction * viewport)
+        .clamp(0.0, _scrollController.position.maxScrollExtent);
+    _scrollController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+    );
+  }
+
   Widget _scrollChevron({
     required IconData icon,
     required Color primary,
     required Color onPrimary,
+    required VoidCallback onTap,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          color: primary,
-          shape: BoxShape.circle,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: primary,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, size: 16, color: onPrimary),
         ),
-        child: Icon(icon, size: 16, color: onPrimary),
       ),
     );
   }
@@ -150,6 +166,7 @@ class _PasswordBreakdownSheetState extends State<PasswordBreakdownSheet> {
                     icon: Icons.chevron_left,
                     primary: cs.primary,
                     onPrimary: cs.onPrimary,
+                    onTap: () => _scrollByViewport(-1),
                   ),
                 ),
               ),
@@ -191,6 +208,7 @@ class _PasswordBreakdownSheetState extends State<PasswordBreakdownSheet> {
                     icon: Icons.chevron_right,
                     primary: cs.primary,
                     onPrimary: cs.onPrimary,
+                    onTap: () => _scrollByViewport(1),
                   ),
                 ),
               ),

@@ -98,7 +98,8 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
     }
   }
 
-  Widget _letterSlot(String letter, Color primary, double slotHeight) {
+  Widget _letterSlot(String letter, Color primary, double slotHeight,
+      {required int winSize}) {
     final isActive = letter == _activeLetter;
     final isPresent = widget.presentLetters.contains(letter);
     final circleSize = (slotHeight * 0.85).clamp(20.0, 36.0);
@@ -109,6 +110,12 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
           behavior: HitTestBehavior.opaque,
           onTap: () => _handleLetterTap(letter),
           onTapUp: (_) => setState(() => _activeLetter = null),
+          onVerticalDragUpdate: (details) =>
+              _onDragUpdate(details, winSize, slotHeight),
+          onVerticalDragEnd: (_) {
+            _dragAccumulator = 0.0;
+            setState(() => _activeLetter = null);
+          },
           child: Container(
             width: circleSize,
             height: circleSize,
@@ -179,6 +186,35 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
         ),
       );
 
+  double _dragAccumulator = 0.0;
+
+  void _handleDragOver(String letter) {
+    if (!widget.presentLetters.contains(letter)) return;
+    if (letter == _activeLetter) return;
+    setState(() => _activeLetter = letter);
+    widget.onLetterSelected(letter);
+  }
+
+  void _shiftWindowAndNotify(bool down, int windowSize) {
+    _shiftWindow(down, windowSize);
+    final visible = _windowedLetters(windowSize);
+    final first = visible.firstWhere(
+      (l) => widget.presentLetters.contains(l),
+      orElse: () => '',
+    );
+    if (first.isNotEmpty) _handleDragOver(first);
+  }
+
+  void _onDragUpdate(DragUpdateDetails details, int winSize, double slotHeight) {
+    _dragAccumulator += details.delta.dy;
+    if (_dragAccumulator.abs() >= slotHeight) {
+      final steps = (_dragAccumulator / slotHeight).truncate();
+      _dragAccumulator -= steps * slotHeight;
+      // Dragging down (positive dy) shifts window down toward Z.
+      _shiftWindowAndNotify(steps > 0, winSize);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
@@ -194,7 +230,8 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
         return Column(
           mainAxisSize: MainAxisSize.max,
           children: _kAllLetters
-              .map((l) => _letterSlot(l, primary, slotHeight))
+              .map((l) => _letterSlot(l, primary, slotHeight,
+                  winSize: _kAllLetters.length))
               .toList(),
         );
       }
@@ -238,13 +275,14 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
           _chevron(
             up: true,
             enabled: _canScrollUp,
-            onTap: () => _shiftWindow(false, winSize),
+            onTap: () => _shiftWindowAndNotify(false, winSize),
           ),
           if (showEllipsisTop)
             _ellipsis(primary, ellipsisHeight)
           else
             topSpacer!,
-          ...visible.map((l) => _letterSlot(l, primary, slotHeight)),
+          ...visible.map((l) =>
+              _letterSlot(l, primary, slotHeight, winSize: winSize)),
           if (showEllipsisBottom)
             _ellipsis(primary, ellipsisHeight)
           else
@@ -252,7 +290,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
           _chevron(
             up: false,
             enabled: _canScrollDown(winSize),
-            onTap: () => _shiftWindow(true, winSize),
+            onTap: () => _shiftWindowAndNotify(true, winSize),
           ),
         ],
       );

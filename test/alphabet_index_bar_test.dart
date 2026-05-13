@@ -221,4 +221,75 @@ void main() {
 
     expect(selected, isNull);
   });
+
+  // ── Drag-to-scroll ────────────────────────────────────────────────────────
+
+  testWidgets('drag down shifts visible window downward', (tester) async {
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'M', 'Z'},
+      initialLetter: 'A',
+    );
+
+    final before = <String>{};
+    for (final l in ['A','B','C','D','E','F','G','H','I','J','K','L','M',
+                     'N','O','P','Q','R','S','T','U','V','W','X','Y','Z','#']) {
+      if (tester.any(find.text(l))) before.add(l);
+    }
+
+    // Drag down by several slot heights to trigger a window shift.
+    await tester.drag(find.text('A'), const Offset(0, 84));
+    await tester.pump();
+
+    final after = <String>{};
+    for (final l in ['A','B','C','D','E','F','G','H','I','J','K','L','M',
+                     'N','O','P','Q','R','S','T','U','V','W','X','Y','Z','#']) {
+      if (tester.any(find.text(l))) after.add(l);
+    }
+
+    expect(after, isNot(equals(before)));
+  });
+
+  testWidgets('drag up shifts visible window upward', (tester) async {
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'M', 'Z'},
+      initialLetter: 'Z',
+    );
+
+    final before = <String>{};
+    for (final l in ['A','B','C','D','E','F','G','H','I','J','K','L','M',
+                     'N','O','P','Q','R','S','T','U','V','W','X','Y','Z','#']) {
+      if (tester.any(find.text(l))) before.add(l);
+    }
+
+    await tester.drag(find.text('Z'), const Offset(0, -84));
+    await tester.pump();
+
+    final after = <String>{};
+    for (final l in ['A','B','C','D','E','F','G','H','I','J','K','L','M',
+                     'N','O','P','Q','R','S','T','U','V','W','X','Y','Z','#']) {
+      if (tester.any(find.text(l))) after.add(l);
+    }
+
+    expect(after, isNot(equals(before)));
+  });
+
+  testWidgets('drag fires onLetterSelected', (tester) async {
+    final selected = <String>[];
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'M', 'Z'},
+      initialLetter: 'A',
+      onLetterSelected: (l) => selected.add(l),
+    );
+
+    await tester.drag(find.text('A'), const Offset(0, 84));
+    await tester.pump();
+
+    expect(selected, isNotEmpty);
+  });
 }
