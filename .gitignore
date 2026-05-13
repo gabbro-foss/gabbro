@@ -12,7 +12,6 @@
 .swiftpm/
 migrate_working_dir/
 chat_info/
-docs/Session_protocol.md
 docs/Session_protocol_Claude.md
 
 # vscode related
