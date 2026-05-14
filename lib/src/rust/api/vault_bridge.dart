@@ -33,6 +33,41 @@ void lockVault() => RustLib.instance.api.crateApiVaultBridgeLockVault();
 List<EntrySummaryData> listEntrySummaries() =>
     RustLib.instance.api.crateApiVaultBridgeListEntrySummaries();
 
+/// Return the list of folder names from the current session.
+///
+/// Sync — reads from in-memory session, no I/O.
+List<String> listFolders() =>
+    RustLib.instance.api.crateApiVaultBridgeListFolders();
+
+/// Rename an existing folder and update all entries that reference it.
+///
+/// Returns `Err` if `old_name` does not exist, `new_name` is empty,
+/// or `new_name` already exists.
+/// Async — triggers a full vault save.
+Future<void> renameFolder({required String oldName, required String newName}) =>
+    RustLib.instance.api.crateApiVaultBridgeRenameFolder(
+      oldName: oldName,
+      newName: newName,
+    );
+
+/// Delete a folder and either reassign its entries to another folder or
+/// clear them to unfoldered (`""`).
+///
+/// Returns `Err` if `name` does not exist, or if `reassign_to` names a
+/// folder that does not exist.
+/// Async — triggers a full vault save.
+Future<void> deleteFolder({required String name, String? reassignTo}) => RustLib
+    .instance
+    .api
+    .crateApiVaultBridgeDeleteFolder(name: name, reassignTo: reassignTo);
+
+/// Add a new folder to the session and persist the vault to disk.
+///
+/// Returns `Err` if the name is empty or already exists.
+/// Async — triggers a full vault save.
+Future<void> createFolder({required String name}) =>
+    RustLib.instance.api.crateApiVaultBridgeCreateFolder(name: name);
+
 /// Return one full entry DTO by UUID.
 ///
 /// Sync — reads from in-memory session, no I/O.

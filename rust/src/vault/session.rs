@@ -404,6 +404,416 @@ pub fn get_entry_for_autofill(id: &str) -> Result<String, String> {
     }
 }
 
+// ── Folder management ─────────────────────────────────────────────────────────
+
+/// Return the list of folder names from the current session.
+///
+/// Sync — reads from in-memory session, no I/O.
+pub fn session_list_folders() -> Result<Vec<String>, String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
+    Ok(session.folders.clone())
+}
+
+/// Rename an existing folder and update all entries that reference it.
+///
+/// Returns `Err` if `old_name` does not exist, `new_name` is empty,
+/// or `new_name` already exists.
+/// Async — triggers a full vault save.
+pub fn session_rename_folder(old_name: String, new_name: String) -> Result<(), String> {
+    if new_name.is_empty() {
+        return Err(String::from("Folder name must not be empty"));
+    }
+    let (body, passphrase, path) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        if !session.folders.contains(&old_name) {
+            return Err(format!("Folder not found: {old_name}"));
+        }
+        if session.folders.contains(&new_name) {
+            return Err(format!("Folder already exists: {new_name}"));
+        }
+        // Rename in folder list
+        for f in session.folders.iter_mut() {
+            if *f == old_name {
+                *f = new_name.clone();
+                break;
+            }
+        }
+        // Update all entries that reference the old name
+        for entry in session.entries.iter_mut() {
+            let folder = match entry {
+                VaultEntry::Login(e)    => &mut e.meta.folder,
+                VaultEntry::Note(e)     => &mut e.meta.folder,
+                VaultEntry::Identity(e) => &mut e.meta.folder,
+                VaultEntry::Card(e)     => &mut e.meta.folder,
+                VaultEntry::File(e)     => &mut e.meta.folder,
+                VaultEntry::Custom(e)   => &mut e.meta.folder,
+            };
+            if *folder == old_name {
+                *folder = new_name.clone();
+            }
+        }
+        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
+        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+    }; // ← lock released here
+    save_vault(&body, &passphrase, &path)?;
+    Ok(())
+}
+
+/// Delete a folder and either reassign its entries to another folder or
+/// clear them to `""` (unfoldered).
+///
+/// Returns `Err` if `name` does not exist, or if `reassign_to` names a
+/// folder that does not exist.
+/// Async — triggers a full vault save.
+pub fn session_delete_folder(name: String, reassign_to: Option<String>) -> Result<(), String> {
+    let (body, passphrase, path) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        if !session.folders.contains(&name) {
+            return Err(format!("Folder not found: {name}"));
+        }
+        if let Some(ref target) = reassign_to {
+            if !session.folders.contains(target) {
+                return Err(format!("Folder not found: {target}"));
+            }
+        }
+        // Remove folder from list
+        session.folders.retain(|f| *f != name);
+        // Reassign or clear entries
+        let target = reassign_to.unwrap_or_default(); // "" when None
+        for entry in session.entries.iter_mut() {
+            let folder = match entry {
+                VaultEntry::Login(e)    => &mut e.meta.folder,
+                VaultEntry::Note(e)     => &mut e.meta.folder,
+                VaultEntry::Identity(e) => &mut e.meta.folder,
+                VaultEntry::Card(e)     => &mut e.meta.folder,
+                VaultEntry::File(e)     => &mut e.meta.folder,
+                VaultEntry::Custom(e)   => &mut e.meta.folder,
+            };
+            if *folder == name {
+                *folder = target.clone();
+            }
+        }
+        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
+        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+    }; // ← lock released here
+    save_vault(&body, &passphrase, &path)?;
+    Ok(())
+}
+
+/// Add a new folder to the session and persist the vault to disk.
+///
+/// Returns `Err` if the name is empty or already exists.
+/// Async — triggers a full vault save.
+pub fn session_create_folder(name: String) -> Result<(), String> {
+    if name.is_empty() {
+        return Err(String::from("Folder name must not be empty"));
+    }
+    let (body, passphrase, path) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        if session.folders.contains(&name) {
+            return Err(format!("Folder already exists: {name}"));
+        }
+        session.folders.push(name);
+        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
+        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+    }; // ← lock released here
+    save_vault(&body, &passphrase, &path)?;
+    Ok(())
+}
+
+#[cfg(test)]
+mod folder_tests {
+    use super::*;
+    use serial_test::serial;
+    use crate::api::vault::save_vault;
+    use std::env::temp_dir;
+
+    fn setup_with_folders(passphrase: &[u8], path_suffix: &str, folders: Vec<String>) -> std::path::PathBuf {
+        let mut path = temp_dir();
+        path.push(format!("gabbro_folder_{}.gabbro", path_suffix));
+        save_vault(
+            &VaultBody { folders, entries: vec![] },
+            passphrase,
+            &path,
+        ).unwrap();
+        path
+    }
+
+    fn teardown(path: &std::path::PathBuf) {
+        let _ = lock_vault();
+        let _ = std::fs::remove_file(path);
+    }
+
+    #[test]
+    #[serial]
+    fn list_folders_returns_folders_from_session() {
+        let pass = b"folder-test-passphrase";
+        let folders = vec![
+            String::from("Work"),
+            String::from("Private"),
+            String::from("Other"),
+        ];
+        let path = setup_with_folders(pass, "list", folders.clone());
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let result = session_list_folders().unwrap();
+        assert_eq!(result, folders);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn create_folder_adds_folder_to_session() {
+        let pass = b"folder-test-passphrase";
+        let path = setup_with_folders(pass, "create", vec![String::from("Work")]);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        session_create_folder(String::from("Private")).unwrap();
+
+        let folders = session_list_folders().unwrap();
+        assert!(folders.contains(&String::from("Private")));
+        assert!(folders.contains(&String::from("Work")));
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn create_folder_rejects_duplicate() {
+        let pass = b"folder-test-passphrase";
+        let path = setup_with_folders(pass, "create_dup", vec![String::from("Work")]);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let result = session_create_folder(String::from("Work"));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Folder already exists: Work");
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn create_folder_rejects_empty_name() {
+        let pass = b"folder-test-passphrase";
+        let path = setup_with_folders(pass, "create_empty", vec![]);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let result = session_create_folder(String::from(""));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Folder name must not be empty");
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn rename_folder_updates_folder_name_and_entries() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let pass = b"folder-test-passphrase";
+        let path = setup_with_folders(pass, "rename", vec![String::from("Work")]);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        // Add an entry in "Work"
+        let entry = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("rename-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Work"),
+            },
+            title: String::from("Rename test note"),
+            content: String::from("content"),
+            attachments: vec![],
+        });
+        session_add_entry_no_save(entry).unwrap();
+
+        session_rename_folder(String::from("Work"), String::from("Career")).unwrap();
+
+        let folders = session_list_folders().unwrap();
+        assert!(folders.contains(&String::from("Career")), "new name must appear");
+        assert!(!folders.contains(&String::from("Work")), "old name must be gone");
+
+        let updated = get_entry("rename-001").unwrap();
+        match updated {
+            VaultEntry::Note(ref e) => assert_eq!(e.meta.folder, "Career",
+                "entry folder must be updated to new name"),
+            _ => panic!("Expected Note"),
+        }
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn rename_folder_rejects_nonexistent_old_name() {
+        let pass = b"folder-test-passphrase";
+        let path = setup_with_folders(pass, "rename_missing", vec![String::from("Work")]);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let result = session_rename_folder(String::from("Ghost"), String::from("Career"));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Folder not found: Ghost");
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn rename_folder_rejects_duplicate_new_name() {
+        let pass = b"folder-test-passphrase";
+        let path = setup_with_folders(pass, "rename_dup",
+            vec![String::from("Work"), String::from("Private")]);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let result = session_rename_folder(String::from("Work"), String::from("Private"));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Folder already exists: Private");
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn rename_folder_rejects_empty_new_name() {
+        let pass = b"folder-test-passphrase";
+        let path = setup_with_folders(pass, "rename_empty", vec![String::from("Work")]);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let result = session_rename_folder(String::from("Work"), String::from(""));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Folder name must not be empty");
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn delete_folder_removes_folder_and_clears_entries() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let pass = b"folder-test-passphrase";
+        let path = setup_with_folders(pass, "delete_clear",
+            vec![String::from("Work"), String::from("Private")]);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let entry = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("del-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Work"),
+            },
+            title: String::from("Delete test note"),
+            content: String::from("content"),
+            attachments: vec![],
+        });
+        session_add_entry_no_save(entry).unwrap();
+
+        // Delete "Work", no reassign — entry folder should become ""
+        session_delete_folder(String::from("Work"), None).unwrap();
+
+        let folders = session_list_folders().unwrap();
+        assert!(!folders.contains(&String::from("Work")), "deleted folder must be gone");
+        assert!(folders.contains(&String::from("Private")), "other folders must remain");
+
+        let updated = get_entry("del-001").unwrap();
+        match updated {
+            VaultEntry::Note(ref e) => assert_eq!(e.meta.folder, "",
+                "entry folder must be cleared to empty string"),
+            _ => panic!("Expected Note"),
+        }
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn delete_folder_reassigns_entries_to_target() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let pass = b"folder-test-passphrase";
+        let path = setup_with_folders(pass, "delete_reassign",
+            vec![String::from("Work"), String::from("Private")]);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let entry = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("del-002"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Work"),
+            },
+            title: String::from("Reassign test note"),
+            content: String::from("content"),
+            attachments: vec![],
+        });
+        session_add_entry_no_save(entry).unwrap();
+
+        // Delete "Work", reassign entries to "Private"
+        session_delete_folder(String::from("Work"), Some(String::from("Private"))).unwrap();
+
+        let folders = session_list_folders().unwrap();
+        assert!(!folders.contains(&String::from("Work")));
+
+        let updated = get_entry("del-002").unwrap();
+        match updated {
+            VaultEntry::Note(ref e) => assert_eq!(e.meta.folder, "Private",
+                "entry must be reassigned to target folder"),
+            _ => panic!("Expected Note"),
+        }
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn delete_folder_rejects_nonexistent_folder() {
+        let pass = b"folder-test-passphrase";
+        let path = setup_with_folders(pass, "delete_missing", vec![String::from("Work")]);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let result = session_delete_folder(String::from("Ghost"), None);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Folder not found: Ghost");
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn delete_folder_rejects_invalid_reassign_target() {
+        let pass = b"folder-test-passphrase";
+        let path = setup_with_folders(pass, "delete_bad_target", vec![String::from("Work")]);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let result = session_delete_folder(String::from("Work"), Some(String::from("Ghost")));
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Folder not found: Ghost");
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn list_folders_returns_error_when_locked() {
+        let pass = b"folder-test-passphrase";
+        let path = setup_with_folders(pass, "list_locked", vec![]);
+        lock_vault().ok();
+
+        let result = session_list_folders();
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Vault is locked");
+
+        teardown(&path);
+    }
+}
+
 #[cfg(test)]
 mod autofill_tests {
     use super::*;

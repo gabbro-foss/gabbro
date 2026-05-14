@@ -288,6 +288,41 @@ pub fn list_entry_summaries() -> Result<Vec<EntrySummaryData>, String> {
     session::list_entry_summaries()
 }
 
+/// Return the list of folder names from the current session.
+///
+/// Sync — reads from in-memory session, no I/O.
+#[flutter_rust_bridge::frb(sync)]
+pub fn list_folders() -> Result<Vec<String>, String> {
+    session::session_list_folders()
+}
+
+/// Rename an existing folder and update all entries that reference it.
+///
+/// Returns `Err` if `old_name` does not exist, `new_name` is empty,
+/// or `new_name` already exists.
+/// Async — triggers a full vault save.
+pub async fn rename_folder(old_name: String, new_name: String) -> Result<(), String> {
+    session::session_rename_folder(old_name, new_name)
+}
+
+/// Delete a folder and either reassign its entries to another folder or
+/// clear them to unfoldered (`""`).
+///
+/// Returns `Err` if `name` does not exist, or if `reassign_to` names a
+/// folder that does not exist.
+/// Async — triggers a full vault save.
+pub async fn delete_folder(name: String, reassign_to: Option<String>) -> Result<(), String> {
+    session::session_delete_folder(name, reassign_to)
+}
+
+/// Add a new folder to the session and persist the vault to disk.
+///
+/// Returns `Err` if the name is empty or already exists.
+/// Async — triggers a full vault save.
+pub async fn create_folder(name: String) -> Result<(), String> {
+    session::session_create_folder(name)
+}
+
 /// Return one full entry DTO by UUID.
 ///
 /// Sync — reads from in-memory session, no I/O.
@@ -445,6 +480,103 @@ mod tests {
         lock_vault().unwrap();
         assert!(list_entry_summaries().is_err());
 
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn list_folders_returns_folders_via_bridge() {
+        use std::env::temp_dir;
+        use crate::api::vault::save_vault;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_list_folders_test.gabbro");
+        let pass = b"bridge-folder-test";
+        let folders = vec![
+            String::from("Work"),
+            String::from("Private"),
+        ];
+
+        save_vault(&VaultBody { folders: folders.clone(), entries: vec![] }, pass, &path).unwrap();
+        run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
+
+        let result = list_folders().unwrap();
+        assert_eq!(result, folders);
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn create_folder_adds_folder_via_bridge() {
+        use std::env::temp_dir;
+        use crate::api::vault::save_vault;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_create_folder_test.gabbro");
+        let pass = b"bridge-folder-test";
+
+        save_vault(&VaultBody { folders: vec![String::from("Work")], entries: vec![] }, pass, &path).unwrap();
+        run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
+
+        run(create_folder(String::from("Private"))).unwrap();
+
+        let folders = list_folders().unwrap();
+        assert!(folders.contains(&String::from("Work")));
+        assert!(folders.contains(&String::from("Private")));
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn rename_folder_updates_name_via_bridge() {
+        use std::env::temp_dir;
+        use crate::api::vault::save_vault;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_rename_folder_test.gabbro");
+        let pass = b"bridge-folder-test";
+
+        save_vault(&VaultBody { folders: vec![String::from("Work")], entries: vec![] }, pass, &path).unwrap();
+        run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
+
+        run(rename_folder(String::from("Work"), String::from("Career"))).unwrap();
+
+        let folders = list_folders().unwrap();
+        assert!(folders.contains(&String::from("Career")), "new name must appear");
+        assert!(!folders.contains(&String::from("Work")), "old name must be gone");
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn delete_folder_removes_folder_via_bridge() {
+        use std::env::temp_dir;
+        use crate::api::vault::save_vault;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_delete_folder_test.gabbro");
+        let pass = b"bridge-folder-test";
+
+        save_vault(
+            &VaultBody { folders: vec![String::from("Work"), String::from("Private")], entries: vec![] },
+            pass,
+            &path,
+        ).unwrap();
+        run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
+
+        run(delete_folder(String::from("Work"), None)).unwrap();
+
+        let folders = list_folders().unwrap();
+        assert!(!folders.contains(&String::from("Work")), "deleted folder must be gone");
+        assert!(folders.contains(&String::from("Private")), "other folders must remain");
+
+        lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
     }
 
