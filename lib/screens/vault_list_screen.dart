@@ -18,10 +18,12 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 Future<void> _defaultDeleteVault() => deleteWholeVault();
+List<String> _defaultListFolders() => listFolders();
 
 class VaultListScreen extends StatefulWidget {
   final String vaultPath;
   final List<EntrySummaryData> Function() listEntries;
+  final List<String> Function()? listFolders;
   final Future<void> Function() deleteVault;
 
   final VaultEntryData Function(String id)? getEntryFn;
@@ -33,6 +35,7 @@ class VaultListScreen extends StatefulWidget {
     super.key,
     required this.vaultPath,
     this.listEntries = listEntrySummaries,
+    this.listFolders,
     this.deleteVault = _defaultDeleteVault,
     this.getEntryFn,
     this.onDeleteEntryFn,
@@ -56,8 +59,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
   ];
 
   List<EntrySummaryData> _entries = [];
+  List<String> _folders = [];
   String? _error;
   String _selectedFilter = 'All';
+  String _selectedFolder = '';
   Set<String> _selectedIds = {};
   bool _selectionMode = false;
   bool _isDeleting = false;
@@ -120,8 +125,15 @@ class _VaultListScreenState extends State<VaultListScreen> {
   void _loadEntries() {
     try {
       final entries = widget.listEntries();
+      List<String> folders = [];
+      try {
+        folders = (widget.listFolders ?? _defaultListFolders)();
+      } catch (_) {
+        // folders unavailable (e.g. vault locked) — degrade gracefully
+      }
       setState(() {
         _entries = entries;
+        _folders = folders;
       });
     } catch (e) {
       setState(() {
@@ -179,9 +191,13 @@ class _VaultListScreenState extends State<VaultListScreen> {
             return e.entryType == rustType;
           }).toList();
 
-    if (_searchQuery.isEmpty) return typeFiltered;
+    final folderFiltered = _selectedFolder.isEmpty
+        ? typeFiltered
+        : typeFiltered.where((e) => e.folder == _selectedFolder).toList();
+
+    if (_searchQuery.isEmpty) return folderFiltered;
     final query = _searchQuery.toLowerCase();
-    return typeFiltered
+    return folderFiltered
         .where((e) => _displayTitle(e).toLowerCase().contains(query))
         .toList();
   }
@@ -754,7 +770,32 @@ class _VaultListScreenState extends State<VaultListScreen> {
                       setState(() => _searchQuery = value),
                 ),
               ),
-              filterChipRow: _buildFilterChipRow(),
+              filterChipRow: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_folders.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        value: _selectedFolder,
+                        onChanged: (value) =>
+                            setState(() => _selectedFolder = value ?? ''),
+                        items: [
+                          const DropdownMenuItem(
+                            value: '',
+                            child: Text('All folders'),
+                          ),
+                          ..._folders.map(
+                            (f) =>
+                                DropdownMenuItem(value: f, child: Text(f)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  _buildFilterChipRow(),
+                ],
+              ),
               searchActive: _searchQuery.isNotEmpty,
               onEntryTap: (_) {},
               onRefresh: widget.onRefreshFn ?? _loadEntries,
@@ -804,6 +845,25 @@ class _VaultListScreenState extends State<VaultListScreen> {
                         setState(() => _searchQuery = value),
                   ),
                 ),
+                if (_folders.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: _selectedFolder,
+                      onChanged: (value) =>
+                          setState(() => _selectedFolder = value ?? ''),
+                      items: [
+                        const DropdownMenuItem(
+                          value: '',
+                          child: Text('All folders'),
+                        ),
+                        ..._folders.map(
+                          (f) => DropdownMenuItem(value: f, child: Text(f)),
+                        ),
+                      ],
+                    ),
+                  ),
                 _buildFilterChipRow(),
                 Expanded(
                   child: _groupedEntries.isEmpty

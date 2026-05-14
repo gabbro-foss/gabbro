@@ -161,6 +161,38 @@ void main() {
     expect(find.text('Updated'), findsOneWidget);
   });
 
+  testWidgets('folder label shows folder name when entry has a folder',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.login(_loginEntry())),
+    );
+
+    expect(find.text('Folder'), findsOneWidget);
+    expect(find.text('Personal'), findsOneWidget);
+  });
+
+  testWidgets('folder label shows None when entry folder is empty',
+      (tester) async {
+    final entry = LoginEntryData(
+      id: 'test-id-folder',
+      title: 'Schist Service',
+      url: 'https://schist.example.com',
+      username: 'rob@example.com',
+      password: 'p@ss',
+      notes: null,
+      customFields: [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+    );
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.login(entry)),
+    );
+
+    expect(find.text('Folder'), findsOneWidget);
+    expect(find.text('None'), findsOneWidget);
+  });
+
   testWidgets('note entry renders title and content', (tester) async {
     await tester.pumpWidget(
       _buildScreen(VaultEntryData.note(_noteEntry())),

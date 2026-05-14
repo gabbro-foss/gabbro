@@ -7,12 +7,13 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 // ── Fake data helpers ─────────────────────────────────────────────────────────
 
-EntrySummaryData _entry(String id, String title, String type) =>
+EntrySummaryData _entry(String id, String title, String type,
+        {String folder = 'Personal'}) =>
     EntrySummaryData(
       id: id,
       entryType: type,
       title: title,
-      folder: 'Personal',
+      folder: folder,
     );
 
 List<EntrySummaryData> _threeEntries() => [
@@ -21,16 +22,27 @@ List<EntrySummaryData> _threeEntries() => [
   _entry('3', 'Olivine', 'Login'),
 ];
 
+List<EntrySummaryData> _folderEntries() => [
+  _entry('1', 'Quartz', 'Login', folder: 'Work'),
+  _entry('2', 'Muscovite', 'Note', folder: 'Private'),
+  _entry('3', 'Olivine', 'Login', folder: 'Work'),
+  _entry('4', 'Feldspar', 'Login', folder: ''),
+];
+
 // ── Widget helper ─────────────────────────────────────────────────────────────
 //
 // Forces a narrow (phone) surface so LayoutBuilder picks the phone layout.
 // The tablet layout has a different widget tree that would break these tests.
 
-Widget _buildScreen(List<EntrySummaryData> Function() listEntries) =>
+Widget _buildScreen(
+  List<EntrySummaryData> Function() listEntries, {
+  List<String> Function()? listFolders,
+}) =>
     MaterialApp(
       home: VaultListScreen(
         vaultPath: '/tmp/test.gabbro',
         listEntries: listEntries,
+        listFolders: listFolders,
       ),
     );
 
@@ -196,5 +208,105 @@ void main() {
     expect(find.text('Muscovite'), findsNothing);
     expect(find.text('Olivine'), findsNothing);
     expect(find.text('No entries match your search.'), findsOneWidget);
+  });
+
+  testWidgets('folder dropdown renders with All folders option',
+      (tester) async {
+    _setNarrow(tester);
+    await tester.pumpWidget(
+      _buildScreen(
+        _folderEntries,
+        listFolders: () => ['Work', 'Private'],
+      ),
+    );
+
+    expect(find.text('All folders'), findsOneWidget);
+  });
+
+  testWidgets('selecting a folder shows only entries in that folder',
+      (tester) async {
+    _setNarrow(tester);
+    await tester.pumpWidget(
+      _buildScreen(
+        _folderEntries,
+        listFolders: () => ['Work', 'Private'],
+      ),
+    );
+
+    await tester.tap(find.text('All folders'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Work').last);
+    await tester.pumpAndSettle();
+
+    expect(find.descendant(of: find.byType(ListTile), matching: find.text('Quartz')), findsOneWidget);
+    expect(find.descendant(of: find.byType(ListTile), matching: find.text('Olivine')), findsOneWidget);
+    expect(find.text('Muscovite'), findsNothing);
+  });
+
+  testWidgets('selecting a folder hides unfoldered entries', (tester) async {
+    _setNarrow(tester);
+    await tester.pumpWidget(
+      _buildScreen(
+        _folderEntries,
+        listFolders: () => ['Work', 'Private'],
+      ),
+    );
+
+    await tester.tap(find.text('All folders'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Work').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Feldspar'), findsNothing);
+  });
+
+  testWidgets('folder filter and type filter work together', (tester) async {
+    _setNarrow(tester);
+    await tester.pumpWidget(
+      _buildScreen(
+        _folderEntries,
+        listFolders: () => ['Work', 'Private'],
+      ),
+    );
+
+    // Select Work folder
+    await tester.tap(find.text('All folders'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Work').last);
+    await tester.pumpAndSettle();
+
+    // Also filter by Note type — Work has no notes
+    await tester.tap(find.widgetWithText(FilterChip, 'Note'));
+    await tester.pump();
+
+    expect(find.text('Quartz'), findsNothing);
+    expect(find.text('Olivine'), findsNothing);
+    expect(find.text('No entries match your search.'), findsOneWidget);
+  });
+
+  testWidgets('selecting All folders restores all entries', (tester) async {
+    _setNarrow(tester);
+    await tester.pumpWidget(
+      _buildScreen(
+        _folderEntries,
+        listFolders: () => ['Work', 'Private'],
+      ),
+    );
+
+    // Select Work folder
+    await tester.tap(find.text('All folders'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Work').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Muscovite'), findsNothing);
+
+    // Back to All folders
+    await tester.tap(find.text('Work'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('All folders').last);
+    await tester.pumpAndSettle();
+
+    expect(find.descendant(of: find.byType(ListTile), matching: find.text('Muscovite')), findsOneWidget);
   });
 }

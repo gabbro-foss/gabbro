@@ -38,12 +38,14 @@ LoginEntryData _loginEntry() => LoginEntryData(
 Widget _buildCreateScreen(
   String entryType, {
   Future<void> Function(VaultEntryData)? onCreateEntry,
+  List<String> Function()? listFolders,
 }) =>
     MaterialApp(
       home: CreateEntryScreen(
         entryType: entryType,
         onCreateEntry: onCreateEntry ?? (_) async {},
         onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
+        listFolders: listFolders ?? () => ['Work', 'Private'],
       ),
     );
 
@@ -62,6 +64,8 @@ void main() {
   testWidgets('required field validation fires on empty save', (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Login'));
 
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Save'));
     await tester.pump();
 
@@ -102,6 +106,8 @@ void main() {
       'Ada',
     );
     // intentionally leave email empty
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Save'));
     await tester.pump();
 
@@ -349,10 +355,95 @@ void main() {
     );
     await tester.pump();
 
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
 
     expect(captured, isNotNull);
     expect(captured, isA<VaultEntryData_Login>());
+  });
+
+  testWidgets('folder picker renders with None option', (tester) async {
+    await tester.pumpWidget(
+      _buildCreateScreen('Login', listFolders: () => ['Work', 'Private']),
+    );
+
+    expect(find.text('Folder'), findsOneWidget);
+    expect(find.text('None'), findsOneWidget);
+  });
+
+  testWidgets('creating entry with folder selected passes folder to onCreateEntry',
+      (tester) async {
+    VaultEntryData? captured;
+    await tester.pumpWidget(
+      _buildCreateScreen(
+        'Login',
+        onCreateEntry: (e) async => captured = e,
+        listFolders: () => ['Work', 'Private'],
+      ),
+    );
+
+    // Pick 'Work' from the folder dropdown
+    await tester.tap(find.text('None'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Work').last);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Granite');
+    await tester.enterText(find.widgetWithText(TextFormField, 'URL'), 'https://granite.example.com');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Username'), 'rob');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'p@ss');
+    await tester.pump();
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(captured, isA<VaultEntryData_Login>());
+    expect((captured! as VaultEntryData_Login).field0.folder, equals('Work'));
+  });
+
+  testWidgets('creating entry with no folder selected passes empty string',
+      (tester) async {
+    VaultEntryData? captured;
+    await tester.pumpWidget(
+      _buildCreateScreen(
+        'Login',
+        onCreateEntry: (e) async => captured = e,
+        listFolders: () => ['Work', 'Private'],
+      ),
+    );
+
+    // Leave folder as None
+    await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Pumice');
+    await tester.enterText(find.widgetWithText(TextFormField, 'URL'), 'https://pumice.example.com');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Username'), 'rob');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'p@ss');
+    await tester.pump();
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(captured, isA<VaultEntryData_Login>());
+    expect((captured! as VaultEntryData_Login).field0.folder, equals(''));
+  });
+
+  testWidgets('edit mode pre-selects existing entry folder', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CreateEntryScreen(
+          entryType: 'Login',
+          existing: VaultEntryData.login(_loginEntry()),
+          onCreateEntry: (_) async {},
+          onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
+          listFolders: () => ['Work', 'Personal', 'Private'],
+        ),
+      ),
+    );
+
+    // _loginEntry() has folder: 'Personal' — should be pre-selected
+    expect(find.text('Personal'), findsOneWidget);
   });
 }

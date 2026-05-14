@@ -11,6 +11,7 @@ import 'package:gabbro/widgets/generator_widget.dart';
 
 Future<void> _defaultCreate(VaultEntryData entry) => createEntry(entry: entry);
 VaultEntryData _defaultGetEntry(String id) => getEntry(id: id);
+List<String> _defaultListFolders() => listFolders();
 
 class CreateEntryScreen extends StatefulWidget {
   final String entryType;
@@ -22,6 +23,7 @@ class CreateEntryScreen extends StatefulWidget {
   final Map<String, String>? prefill;
   final Future<void> Function(VaultEntryData entry) onCreateEntry;
   final VaultEntryData Function(String id) onGetEntry;
+  final List<String> Function()? listFolders;
 
   const CreateEntryScreen({
     super.key,
@@ -30,6 +32,7 @@ class CreateEntryScreen extends StatefulWidget {
     this.prefill,
     this.onCreateEntry = _defaultCreate,
     this.onGetEntry = _defaultGetEntry,
+    this.listFolders,
   });
 
   @override
@@ -40,6 +43,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isSaving = false;
   String? _error;
+  late String _selectedFolder;
+  List<String> _folders = [];
 
   // ── Login fields ────────────────────────────────────────────────────────────
   late final TextEditingController _loginTitleController;
@@ -123,6 +128,25 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   void initState() {
     super.initState();
     _initControllers();
+    _selectedFolder = _existingFolder();
+    try {
+      _folders = (widget.listFolders ?? _defaultListFolders)();
+    } catch (_) {
+      _folders = [];
+    }
+  }
+
+  String _existingFolder() {
+    final e = widget.existing;
+    if (e == null) return '';
+    return switch (e) {
+      VaultEntryData_Login(:final field0) => field0.folder,
+      VaultEntryData_Note(:final field0) => field0.folder,
+      VaultEntryData_Identity(:final field0) => field0.folder,
+      VaultEntryData_Card(:final field0) => field0.folder,
+      VaultEntryData_File(:final field0) => field0.folder,
+      VaultEntryData_Custom(:final field0) => field0.folder,
+    };
   }
 
   void _initControllers() {
@@ -380,7 +404,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             field0.url != u.url ||
             field0.username != u.username ||
             field0.password != u.password ||
-            field0.notes != u.notes;
+            field0.notes != u.notes ||
+            field0.folder != u.folder;
       case (
         VaultEntryData_Note(:final field0),
         VaultEntryData_Note(field0: final u),
@@ -432,7 +457,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             id: field0.id,
             createdAt: field0.createdAt,
             updatedAt: '',
-            folder: field0.folder,
+            folder: _selectedFolder,
             title: _loginTitleController.text,
             url: _urlController.text,
             username: _usernameController.text,
@@ -450,7 +475,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             id: field0.id,
             createdAt: field0.createdAt,
             updatedAt: '',
-            folder: field0.folder,
+            folder: _selectedFolder,
             title: _titleController.text,
             content: _contentController.text,
           ),
@@ -461,7 +486,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             id: field0.id,
             createdAt: field0.createdAt,
             updatedAt: '',
-            folder: field0.folder,
+            folder: _selectedFolder,
             firstName: _firstNameController.text,
             lastName: _lastNameController.text,
             email: _emailController.text,
@@ -486,7 +511,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             id: field0.id,
             createdAt: field0.createdAt,
             updatedAt: '',
-            folder: field0.folder,
+            folder: _selectedFolder,
             cardName: _cardNameController.text.isEmpty
                 ? null
                 : _cardNameController.text,
@@ -521,7 +546,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             id: field0.id,
             createdAt: field0.createdAt,
             updatedAt: '',
-            folder: field0.folder,
+            folder: _selectedFolder,
             filename: _pickedFilename ?? field0.filename,
             data: _pickedFileBytes ?? Uint8List.fromList(field0.data),
             notes: _fileNotesController.text.isEmpty
@@ -535,7 +560,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             id: field0.id,
             createdAt: field0.createdAt,
             updatedAt: '',
-            folder: field0.folder,
+            folder: _selectedFolder,
             title: _customTitleController.text,
             fields: _customFields
                 .map(
@@ -562,7 +587,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               id: '',
               createdAt: '',
               updatedAt: '',
-              folder: 'Personal',
+              folder: _selectedFolder,
               title: _loginTitleController.text,
               url: _urlController.text,
               username: _usernameController.text,
@@ -582,7 +607,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               id: '',
               createdAt: '',
               updatedAt: '',
-              folder: 'Personal',
+              folder: _selectedFolder,
               title: _titleController.text,
               content: _contentController.text,
             ),
@@ -596,7 +621,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               id: '',
               createdAt: '',
               updatedAt: '',
-              folder: 'Personal',
+              folder: _selectedFolder,
               firstName: _firstNameController.text,
               lastName: _lastNameController.text,
               email: _emailController.text,
@@ -626,7 +651,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               id: '',
               createdAt: '',
               updatedAt: '',
-              folder: 'Personal',
+              folder: _selectedFolder,
               cardName: _cardNameController.text.isEmpty
                   ? null
                   : _cardNameController.text,
@@ -662,7 +687,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               id: '',
               createdAt: '',
               updatedAt: '',
-              folder: 'Personal',
+              folder: _selectedFolder,
               filename: _pickedFilename!,
               data: _pickedFileBytes!,
               notes: _fileNotesController.text.isEmpty
@@ -679,7 +704,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               id: '',
               createdAt: '',
               updatedAt: '',
-              folder: 'Personal',
+              folder: _selectedFolder,
               title: _customTitleController.text,
               fields: _customFields
                   .map(
@@ -777,6 +802,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   // ── Login fields ─────────────────────────────────────────────────────────────
 
   List<Widget> _loginFields() => [
+    _folderPicker(),
+    const SizedBox(height: 12),
     TextFormField(
       controller: _loginTitleController,
       focusNode: _loginTitleFocus,
@@ -878,6 +905,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   // ── Note fields ──────────────────────────────────────────────────────────────
 
   List<Widget> _noteFields() => [
+    _folderPicker(),
+    const SizedBox(height: 12),
     TextFormField(
       controller: _titleController,
       focusNode: _noteTitleFocus,
@@ -906,6 +935,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   // ── Identity fields ──────────────────────────────────────────────────────────
 
   List<Widget> _identityFields() => [
+    _folderPicker(),
+    const SizedBox(height: 12),
     TextFormField(
       controller: _firstNameController,
       focusNode: _firstNameFocus,
@@ -983,6 +1014,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   // ── Card fields ──────────────────────────────────────────────────────────────
 
   List<Widget> _cardFields() => [
+    _folderPicker(),
+    const SizedBox(height: 12),
     TextFormField(
       controller: _cardNameController,
       focusNode: _cardNameFocus,
@@ -1176,6 +1209,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   // ── File fields ──────────────────────────────────────────────────────────────
 
   List<Widget> _fileFields() => [
+    _folderPicker(),
+    const SizedBox(height: 12),
     if (_pickedFilename != null)
       Padding(
         padding: const EdgeInsets.only(bottom: 12),
@@ -1225,6 +1260,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   // ── Custom entry fields ──────────────────────────────────────────────────────
 
   List<Widget> _customEntryFields() => [
+    _folderPicker(),
+    const SizedBox(height: 12),
     TextFormField(
       controller: _customTitleController,
       focusNode: _customTitleFocus,
@@ -1321,6 +1358,25 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   }
 
   // ── Field helpers ────────────────────────────────────────────────────────────
+
+  Widget _folderPicker() {
+    // Build a deduplicated items list that always contains the current value.
+    final folderSet = <String>{..._folders};
+    if (_selectedFolder.isNotEmpty) folderSet.add(_selectedFolder);
+    final folderItems = folderSet.toList()..sort();
+    return DropdownButtonFormField<String>(
+      initialValue: _selectedFolder,
+      decoration: const InputDecoration(
+        labelText: 'Folder',
+        border: OutlineInputBorder(),
+      ),
+      items: [
+        const DropdownMenuItem(value: '', child: Text('None')),
+        ...folderItems.map((f) => DropdownMenuItem(value: f, child: Text(f))),
+      ],
+      onChanged: (v) => setState(() => _selectedFolder = v ?? ''),
+    );
+  }
 
   Widget _optionalTextField(
     TextEditingController controller,

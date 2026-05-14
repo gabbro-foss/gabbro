@@ -378,7 +378,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 : _field(f.label, f.value),
           ),
         ],
-        _timestampsRow(e.createdAt, e.updatedAt),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder),
       ],
     );
   }
@@ -389,7 +389,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       children: [
         _field('Title', e.title),
         _field('Content', e.content),
-        _timestampsRow(e.createdAt, e.updatedAt),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder),
       ],
     );
   }
@@ -423,7 +423,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 : _field(f.label, f.value),
           ),
         ],
-        _timestampsRow(e.createdAt, e.updatedAt),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder),
       ],
     );
   }
@@ -502,7 +502,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 : _field(f.label, f.value),
           ),
         ],
-        _timestampsRow(e.createdAt, e.updatedAt),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder),
       ],
     );
   }
@@ -520,7 +520,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           icon: const Icon(Icons.download_outlined),
           label: const Text('Export file'),
         ),
-        _timestampsRow(e.createdAt, e.updatedAt),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder),
       ],
     );
   }
@@ -550,7 +550,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 : _field(f.label, f.value),
           ),
         ],
-        _timestampsRow(e.createdAt, e.updatedAt),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder),
       ],
     );
   }
@@ -743,40 +743,59 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     );
   }
 
-  Widget _timestampsRow(String createdAt, String updatedAt) {
+  Widget _timestampsRow(String createdAt, String updatedAt, String folder) {
+    final folderLabel = folder.isEmpty ? 'None' : folder;
     return Padding(
       padding: const EdgeInsets.only(top: 16),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Created',
+                  'Folder',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                 ),
-                Text(
-                  formatTimestamp(createdAt),
-                  style: const TextStyle(fontSize: 13),
-                ),
+                Text(folderLabel, style: const TextStyle(fontSize: 13)),
               ],
             ),
           ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Updated',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Created',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      formatTimestamp(createdAt),
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ],
                 ),
-                Text(
-                  formatTimestamp(updatedAt),
-                  style: const TextStyle(fontSize: 13),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Updated',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      formatTimestamp(updatedAt),
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
