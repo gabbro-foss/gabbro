@@ -126,7 +126,7 @@ gabbro/
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
 
 **Not yet implemented (see Bikeshed):**
-- Folders (entry grouping)
+- Folders (entry grouping — Rust layer complete; Flutter layer pending)
 - YubiKey / FIDO2 authentication
 - Screenshot prevention + app switcher blur
 - Autofill save requests (`onSaveRequest`)
@@ -136,7 +136,7 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 201 | 1 |
+| Rust (`cargo test -q`) | 218 | 1 |
 | Flutter (`flutter test`) | 229 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -147,43 +147,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Completed (14 May 2026):** Folders — Phase 1 (Rust serialization layer).
-  - `VaultBody` struct introduced in `gabbro/rust/src/vault/serialization.rs`:
-    `{ folders: Vec<String>, entries: Vec<VaultEntry> }`
-  - `serialize_vault_body()` / `deserialize_vault_body()` replace old
-    `serialize_entries()` / `deserialize_entries()`
-  - Legacy vault migration: bare JSON array on load → wrapped with
-    `DEFAULT_FOLDERS = ["Work", "Private", "Other"]`; entries with
-    `folder == "Personal"` migrated to `folder == ""`
-  - `VaultSession` gains `folders: Vec<String>` field
-  - All `save_vault` / `load_vault` callers updated across
-    `vault.rs`, `session.rs`, `vault_bridge.rs`, `import.rs`
-  - 200 Rust tests passing (was 198; +2 new serialization tests)
-
-- **Completed (14 May 2026):** Folders — Phase 2, Steps 1 & 2 (Rust + Flutter).
-  - `tags: Vec<String>` and `favourite: bool` removed from `EntryMeta` and all
-    DTOs (`LoginEntryData`, `NoteEntryData`, `IdentityEntryData`, `CardEntryData`,
-    `FileEntryData`, `CustomEntryData`), `EntrySummaryData`, all conversion
-    functions, all `create_*_entry()` signatures, and all test constructors across
-    `entry.rs`, `vault.rs`, `vault_bridge.rs`, `session.rs`, `serialization.rs`,
-    `import.rs`, `enpass.rs`, `bitwarden.rs`, `create_entry_screen.dart`.
-  - `change_passphrase` confirmed correct (was a false alarm in the previous note);
-    `change_passphrase_preserves_folders` test added to prove it.
-  - `flutter_rust_bridge_codegen generate` re-run after signature changes.
-
-- **Next session — Folders Phase 2, Steps 3–5 (remaining Rust):**
-  - Verify `flutter test` and `cargo test -q` are both green before starting
-    (clear any remaining Flutter IDE errors in other screens first).
-  1. Add folder management bridge functions to `vault_bridge.rs`:
-     - `list_folders() -> Vec<String>` (sync)
-     - `create_folder(name: String) -> Result<(), String>` (async, saves)
-     - `rename_folder(old: String, new: String) -> Result<(), String>` (async, saves)
-     - `delete_folder(name: String, reassign_to: Option<String>) -> Result<(), String>`
-       (async — reassigns or clears entries, saves once)
-  2. Add corresponding session functions in `session.rs`
-  3. TDD throughout — failing test first for each function
-
-- **Next session — Folders Phase 3 (Flutter), after Phase 2 is committed:**
+- **Next session — Folders Phase 3 (Flutter):**
   1. Folder filter dropdown on `VaultListScreen`
   2. Folder picker on `CreateEntryScreen` / `EntryDetailScreen`
   3. New `ManageFoldersScreen` (add, rename, delete with reassign dialog)
