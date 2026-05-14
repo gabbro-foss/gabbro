@@ -17,16 +17,12 @@ List<EntrySummaryData> _fakeEntries() => [
     entryType: 'Login',
     title: 'Alice',
     folder: 'Personal',
-    tags: [],
-    favourite: false,
   ),
   EntrySummaryData(
     id: 'id-2',
     entryType: 'Note',
     title: 'Bob',
     folder: 'Personal',
-    tags: [],
-    favourite: false,
   ),
 ];
 
@@ -45,8 +41,6 @@ VaultEntryData _fakeLoginEntry() => VaultEntryData.login(
     createdAt: '2025-01-01T00:00:00Z',
     updatedAt: '2025-01-01T00:00:00Z',
     folder: 'Personal',
-    tags: [],
-    favourite: false,
   ),
 );
 
@@ -293,8 +287,6 @@ void main() {
           entryType: 'Note',
           title: 'Bob',
           folder: 'Personal',
-          tags: [],
-          favourite: false,
         ),
       ];
       final reloadedGrouped = <dynamic>['B', reloadedEntries[0]];

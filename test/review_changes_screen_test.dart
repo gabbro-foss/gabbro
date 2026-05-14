@@ -25,8 +25,6 @@ CardEntryData _originalCard() => CardEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
 
 CardEntryData _updatedCardCvvAndPin() => CardEntryData(
@@ -48,8 +46,6 @@ CardEntryData _updatedCardCvvAndPin() => CardEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
 
 IdentityEntryData _originalIdentity() => IdentityEntryData(
@@ -65,8 +61,6 @@ IdentityEntryData _originalIdentity() => IdentityEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
 
 IdentityEntryData _updatedIdentityCustomField() => IdentityEntryData(
@@ -82,8 +76,6 @@ IdentityEntryData _updatedIdentityCustomField() => IdentityEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
 
 CustomEntryData _originalCustom() => CustomEntryData(
@@ -95,8 +87,6 @@ CustomEntryData _originalCustom() => CustomEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
 
 CustomEntryData _updatedCustomField() => CustomEntryData(
@@ -108,8 +98,6 @@ CustomEntryData _updatedCustomField() => CustomEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
 
 LoginEntryData _original() => LoginEntryData(
@@ -123,8 +111,6 @@ LoginEntryData _original() => LoginEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
       previousPassword: null,
     );
 
@@ -139,8 +125,6 @@ LoginEntryData _updatedPasswordAndUrl() => LoginEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
       previousPassword: null,
     );
 
@@ -155,8 +139,6 @@ LoginEntryData _updatedUrlOnly() => LoginEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
       previousPassword: null,
     );
 
@@ -317,8 +299,6 @@ void main() {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
     final updated = CustomEntryData(
       id: 'custom-id-2',
@@ -329,8 +309,6 @@ void main() {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
     await tester.pumpWidget(_buildReviewScreen(
       original: VaultEntryData.custom(original),

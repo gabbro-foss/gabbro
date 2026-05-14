@@ -18,8 +18,6 @@ LoginEntryData _loginEntry() => LoginEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
 
 NoteEntryData _noteEntry() => NoteEntryData(
@@ -29,8 +27,6 @@ NoteEntryData _noteEntry() => NoteEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
 
 // ── Widget helper ─────────────────────────────────────────────────────────────
@@ -324,8 +320,6 @@ void main() {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
     await tester.pumpWidget(
       _buildScreen(VaultEntryData.identity(entry)),

@@ -16,8 +16,6 @@ LoginEntryData _entryWithHistory() => LoginEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-05-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
       previousPassword: PreviousSecretData(
         value: '********',
         savedAt: '2025-04-01T00:00:00Z',
@@ -36,8 +34,6 @@ LoginEntryData _entryWithoutHistory() => LoginEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
       previousPassword: null,
     );
 

@@ -11,8 +11,6 @@ CardEntryData _cardEntry({String? pin}) => CardEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
       cardholderName: 'Rob Bastian',
       cardNumber: '4111111111111111',
       expiry: '12/28',
@@ -33,8 +31,6 @@ LoginEntryData _loginEntry() => LoginEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
 
 // ── Widget helpers ────────────────────────────────────────────────────────────
@@ -211,8 +207,6 @@ void main() {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
     await tester.pumpWidget(
       MaterialApp(
@@ -246,8 +240,6 @@ void main() {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
     await tester.pumpWidget(
       MaterialApp(

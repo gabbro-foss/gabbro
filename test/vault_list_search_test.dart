@@ -13,8 +13,6 @@ EntrySummaryData _entry(String id, String title, String type) =>
       entryType: type,
       title: title,
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
 
 List<EntrySummaryData> _threeEntries() => [

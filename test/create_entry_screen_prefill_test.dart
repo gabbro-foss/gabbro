@@ -17,8 +17,6 @@ LoginEntryData _loginEntry() => LoginEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
     );
 
 Widget _buildCardScreenWithPrefill(Map<String, String> prefill) => MaterialApp(
@@ -109,8 +107,6 @@ void main() {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      tags: [],
-      favourite: false,
       cardholderName: 'Rob Bastian',
       cardNumber: '4111111111111111',
       expiry: '12/28',
