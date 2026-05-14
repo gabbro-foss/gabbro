@@ -189,6 +189,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Responsive layout testing on Linux desktop across window sizes (tiling WM column → maximised widescreen); test with all text sizes.
 - Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
+- add passkey functionality if feasible - to discuss with Claude
+- make login entry url field optional to allow logins for non web items, e.g. computer logins
 
 ### Code Quality
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
