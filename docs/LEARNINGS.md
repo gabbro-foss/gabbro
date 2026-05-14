@@ -2546,6 +2546,43 @@ val unlockIntent = Intent(this, UnlockActivity::class.java).apply {
 
 ---
 
+## Rust — migrating serialized formats without a version bump
+
+When a vault body format changes (e.g. adding a `folders` list alongside
+`entries`), there are two options: bump the file format version and add a
+migration branch in the deserializer, or detect the old format by its
+shape and migrate inline.
+
+Gabbro uses shape detection: the first non-whitespace byte of the
+decrypted JSON body tells us everything we need to know.
+
+- `[` → legacy format: bare `Vec<VaultEntry>` array. Deserialize as the
+  old type, wrap in a `VaultBody` with default folders, and migrate any
+  `folder == "Personal"` entries to `folder == ""`.
+- `{` → new format: `VaultBody { folders, entries }`. Deserialize directly.
+
+```rust
+let first = bytes.iter().find(|&&b| !b.is_ascii_whitespace());
+if first == Some(&b'[') {
+    // legacy path
+}
+```
+
+This avoids a file format version bump (which would require updating
+`file_format.rs` and all version-check logic) for a change that is
+purely in the JSON body. The binary envelope (`SealedVault`) is unchanged.
+
+**When to use this pattern:** when the change is additive and the old
+format has a clearly distinguishable shape. If the old and new formats
+could be ambiguous, a version field is safer.
+
+Python analogy: like checking `isinstance(data, list)` vs
+`isinstance(data, dict)` before deciding how to parse an API response
+that changed shape between versions — no explicit version field needed
+if the shape itself is unambiguous.
+
+---
+
 ## Android — `logcat` as a TDD proxy for untestable platform code
 
 The Android autofill service and its auth activity cannot be exercised

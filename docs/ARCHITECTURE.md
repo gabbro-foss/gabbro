@@ -81,11 +81,11 @@ gabbro/
 │   │   │   ├── entry.rs
 │   │   │   ├── file_format.rs
 │   │   │   ├── io.rs
+│   │   │   ├── serialization.rs
 │   │   │   └── session.rs
 │   │   ├── import/
 │   │   │   ├── enpass.rs
 │   │   │   └── csv.rs
-│   │   ├── serialization.rs
 │   │   ├── bin/bench_kdf.rs
 │   │   └── lib.rs
 ├── android/app/src/main/
@@ -136,7 +136,7 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 198 | 1 |
+| Rust (`cargo test -q`) | 200 | 1 |
 | Flutter (`flutter test`) | 229 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -147,12 +147,58 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Completed (13 May 2026):** Icons added to all popup menu items in `VaultListScreen` (Material Icons, `Expanded` text to prevent overflow); Delete vault icon + label styled with `colorScheme.error` (ADR-003 compliant, light + dark). `_kComponents` list in `about_screen.dart` sorted case-insensitively alphabetically. `vault_list_menu_test.dart` extended with icon presence and error colour tests (229 Flutter tests passing).
+- **Completed (14 May 2026):** Folders — Phase 1 (Rust serialization layer).
+  - `VaultBody` struct introduced in `gabbro/rust/src/vault/serialization.rs`:
+    `{ folders: Vec<String>, entries: Vec<VaultEntry> }`
+  - `serialize_vault_body()` / `deserialize_vault_body()` replace old
+    `serialize_entries()` / `deserialize_entries()`
+  - Legacy vault migration: bare JSON array on load → wrapped with
+    `DEFAULT_FOLDERS = ["Work", "Private", "Other"]`; entries with
+    `folder == "Personal"` migrated to `folder == ""`
+  - `VaultSession` gains `folders: Vec<String>` field
+  - All `save_vault` / `load_vault` callers updated across
+    `vault.rs`, `session.rs`, `vault_bridge.rs`, `import.rs`
+  - 200 Rust tests passing (was 198; +2 new serialization tests)
 
-- **Next:** Folders implementation. Design complete — see below.
+- **Next session — Folders Phase 2 (remaining Rust):**
+  0a. **BUG TO FIX FIRST:** `change_passphrase()` in `gabbro/rust/src/api/vault.rs`
+      calls `load_vault()` then `save_vault()`. After our changes, `load_vault()`
+      returns `VaultBody` but `change_passphrase` discards the folders and saves
+      with `folders: vec![]`. Fix: capture the full `VaultBody` from `load_vault`
+      and pass it to `save_vault`. Write a failing test first that proves the folder
+      list survives a passphrase change.
+  0b. **NOTE:** `gabbro/rust/src/api/import.rs` line ~284 was changed from
+      `for entry in source_entries` to `for entry in source_entries.entries`
+      because `load_vault` now returns `VaultBody`. Any future import work must
+      access `.entries` on the returned `VaultBody`. The Gabbro-format importer
+      also calls `load_vault` directly — verify it handles `VaultBody` correctly
+      at the start of the next session.
+  1. Remove `tags: Vec<String>` and `favourite: bool` from `EntryMeta`
+     and from all DTOs in `vault.rs` (`LoginEntryData`, `NoteEntryData`,
+     `IdentityEntryData`, `CardEntryData`, `FileEntryData`, `CustomEntryData`)
+     and from `EntrySummaryData` in `vault_bridge.rs`
+     and from all conversion functions in `vault.rs` and `vault_bridge.rs`
+     and from all test `EntryMeta` constructors across all test files
+  2. Remove `tags` and `favourite` params from `create_*_entry()` functions
+     in `vault.rs`
+  3. Add folder management bridge functions to `vault_bridge.rs`:
+     - `list_folders() -> Vec<String>` (sync)
+     - `create_folder(name: String) -> Result<(), String>` (async, saves)
+     - `rename_folder(old: String, new: String) -> Result<(), String>` (async, saves)
+     - `delete_folder(name: String, reassign_to: Option<String>) -> Result<(), String>`
+       (async — reassigns or clears entries, saves once)
+  4. Add corresponding session functions in `session.rs`
+  5. TDD throughout — failing test first for each function
+
+- **Next session — Folders Phase 3 (Flutter), after Phase 2 is committed:**
+  1. Folder filter dropdown on `VaultListScreen`
+  2. Folder picker on `CreateEntryScreen` / `EntryDetailScreen`
+  3. New `ManageFoldersScreen` (add, rename, delete with reassign dialog)
+  4. Entry detail: show folder (display "None" when empty) alongside timestamps
+  5. Wire `ManageFoldersScreen` into settings menu
 
 **Folders design (agreed 13 May 2026):**
-- `VaultData` gets `folders: Vec<String>`, default `["Work", "Private", "Other"]`, persisted in Rust
+- `VaultBody` gets `folders: Vec<String>`, default `["Work", "Private", "Other"]`, persisted in Rust
 - `CommonFields.folder: String`, default `""` (empty = unfoldered); displayed as "None" in entry detail alongside `created_at` / `modified_at`
 - Migration: existing entries with `folder: "Personal"` → `folder: ""`
 - Tags and favourites dropped entirely — never implemented, no migration needed
@@ -181,7 +227,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Features & UX
 - YubiKey / FIDO2 auth — design session first (ADR-005, Ed25519 v1 interim).
-- Folders — design complete (see Current Focus); implementation in next session.
 - Screenshot prevention + app switcher blur — `FLAG_SECURE` on Android; assess Linux separately.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - File picker for all export paths (audit for consistency).
