@@ -160,35 +160,28 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
     `vault.rs`, `session.rs`, `vault_bridge.rs`, `import.rs`
   - 200 Rust tests passing (was 198; +2 new serialization tests)
 
-- **Next session — Folders Phase 2 (remaining Rust):**
-  0a. **BUG TO FIX FIRST:** `change_passphrase()` in `gabbro/rust/src/api/vault.rs`
-      calls `load_vault()` then `save_vault()`. After our changes, `load_vault()`
-      returns `VaultBody` but `change_passphrase` discards the folders and saves
-      with `folders: vec![]`. Fix: capture the full `VaultBody` from `load_vault`
-      and pass it to `save_vault`. Write a failing test first that proves the folder
-      list survives a passphrase change.
-  0b. **NOTE:** `gabbro/rust/src/api/import.rs` line ~284 was changed from
-      `for entry in source_entries` to `for entry in source_entries.entries`
-      because `load_vault` now returns `VaultBody`. Any future import work must
-      access `.entries` on the returned `VaultBody`. The Gabbro-format importer
-      also calls `load_vault` directly — verify it handles `VaultBody` correctly
-      at the start of the next session.
-  1. Remove `tags: Vec<String>` and `favourite: bool` from `EntryMeta`
-     and from all DTOs in `vault.rs` (`LoginEntryData`, `NoteEntryData`,
-     `IdentityEntryData`, `CardEntryData`, `FileEntryData`, `CustomEntryData`)
-     and from `EntrySummaryData` in `vault_bridge.rs`
-     and from all conversion functions in `vault.rs` and `vault_bridge.rs`
-     and from all test `EntryMeta` constructors across all test files
-  2. Remove `tags` and `favourite` params from `create_*_entry()` functions
-     in `vault.rs`
-  3. Add folder management bridge functions to `vault_bridge.rs`:
+- **Completed (14 May 2026):** Folders — Phase 2, Steps 1 & 2 (Rust + Flutter).
+  - `tags: Vec<String>` and `favourite: bool` removed from `EntryMeta` and all
+    DTOs (`LoginEntryData`, `NoteEntryData`, `IdentityEntryData`, `CardEntryData`,
+    `FileEntryData`, `CustomEntryData`), `EntrySummaryData`, all conversion
+    functions, all `create_*_entry()` signatures, and all test constructors across
+    `entry.rs`, `vault.rs`, `vault_bridge.rs`, `session.rs`, `serialization.rs`,
+    `import.rs`, `enpass.rs`, `bitwarden.rs`, `create_entry_screen.dart`.
+  - `change_passphrase` confirmed correct (was a false alarm in the previous note);
+    `change_passphrase_preserves_folders` test added to prove it.
+  - `flutter_rust_bridge_codegen generate` re-run after signature changes.
+
+- **Next session — Folders Phase 2, Steps 3–5 (remaining Rust):**
+  - Verify `flutter test` and `cargo test -q` are both green before starting
+    (clear any remaining Flutter IDE errors in other screens first).
+  1. Add folder management bridge functions to `vault_bridge.rs`:
      - `list_folders() -> Vec<String>` (sync)
      - `create_folder(name: String) -> Result<(), String>` (async, saves)
      - `rename_folder(old: String, new: String) -> Result<(), String>` (async, saves)
      - `delete_folder(name: String, reassign_to: Option<String>) -> Result<(), String>`
        (async — reassigns or clears entries, saves once)
-  4. Add corresponding session functions in `session.rs`
-  5. TDD throughout — failing test first for each function
+  2. Add corresponding session functions in `session.rs`
+  3. TDD throughout — failing test first for each function
 
 - **Next session — Folders Phase 3 (Flutter), after Phase 2 is committed:**
   1. Folder filter dropdown on `VaultListScreen`
