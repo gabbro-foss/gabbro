@@ -281,7 +281,7 @@ pub async fn import_from_gabbro(
     let mut imported = 0;
     let mut skipped = Vec::new();
 
-    for entry in source_entries {
+    for entry in source_entries.entries {
         let id = match &entry {
             crate::vault::entry::VaultEntry::Login(e)    => e.meta.id.clone(),
             crate::vault::entry::VaultEntry::Note(e)     => e.meta.id.clone(),
@@ -325,6 +325,7 @@ mod tests {
     use super::*;
     use crate::api::vault::save_vault;
     use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+    use crate::vault::serialization::VaultBody;
     use serial_test::serial;
     use std::env::temp_dir;
 
@@ -348,7 +349,7 @@ mod tests {
             content: String::from("already here"),
             attachments: vec![],
         })];
-        save_vault(&entries, passphrase, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries }, passphrase, &path).unwrap();
         path
     }
 
@@ -652,7 +653,7 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
                 attachments: vec![],
             }),
         ];
-        save_vault(&entries, passphrase, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries }, passphrase, &path).unwrap();
         path
     }
 

@@ -13,7 +13,7 @@ use crate::vault::entry::{
     NoteEntry, VaultEntry,
 };
 use crate::vault::io::{read_vault, write_vault};
-use crate::vault::serialization::{deserialize_entries, serialize_entries};
+use crate::vault::serialization::{deserialize_vault_body, serialize_vault_body, VaultBody};
 use uuid::Uuid;
 
 // ── Bridge-facing DTOs ────────────────────────────────────────────────────────
@@ -716,8 +716,8 @@ pub fn export_vault(
     passphrase: &[u8],
     export_path: &Path,
 ) -> Result<(), String> {
-    // Serialize and encrypt
-    let plaintext = serialize_entries(entries)?;
+    // Serialize and encrypt — export carries no folder list (self-contained snapshot)
+    let plaintext = serialize_vault_body(&VaultBody { folders: vec![], entries: entries.to_vec() })?;
     let sealed = seal_vault(passphrase, &plaintext)?;
     let vault_bytes = sealed.to_bytes();
 
@@ -752,11 +752,11 @@ pub fn export_vault(
 /// Entries → JSON → AES-256-GCM encrypted → .gabbro file on disk.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn save_vault(
-    entries: &[VaultEntry],
+    body: &VaultBody,
     passphrase: &[u8],
     path: &Path,
 ) -> Result<(), String> {
-    let plaintext = serialize_entries(entries)?;
+    let plaintext = serialize_vault_body(body)?;
     let sealed = seal_vault(passphrase, &plaintext)?;
     write_vault(&sealed, path)
 }
@@ -764,15 +764,15 @@ pub fn save_vault(
 /// Read, decrypt, and deserialize a vault from disk in one operation.
 ///
 /// This is the top-level load operation Flutter will call.
-/// .gabbro file → AES-256-GCM decrypt → JSON → Vec<VaultEntry>.
+/// .gabbro file → AES-256-GCM decrypt → JSON → VaultBody.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn load_vault(
     passphrase: &[u8],
     path: &Path,
-) -> Result<Vec<VaultEntry>, String> {
+) -> Result<VaultBody, String> {
     let sealed = read_vault(path)?;
     let plaintext = open_vault(passphrase, &sealed)?;
-    deserialize_entries(&plaintext)
+    deserialize_vault_body(&plaintext)
 }
 
 // ── Timestamp helper ──────────────────────────────────────────────────────────
@@ -1198,11 +1198,11 @@ mod tests {
         ];
 
         let passphrase = b"correct horst battery staple";
-        save_vault(&entries, passphrase, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries: entries.clone() }, passphrase, &path).unwrap();
         let recovered = load_vault(passphrase, &path).unwrap();
 
-        assert_eq!(recovered.len(), 1);
-        match &recovered[0] {
+        assert_eq!(recovered.entries.len(), 1);
+        match &recovered.entries[0] {
             VaultEntry::Note(e) => assert_eq!(e.content, "secret content"),
             _ => panic!("Expected Note variant"),
         }
@@ -1218,7 +1218,7 @@ mod tests {
         path.push("gabbro_api_wrong_pass_test.gabbro");
 
         let entries: Vec<VaultEntry> = vec![];
-        save_vault(&entries, b"correct passphrase", &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries }, b"correct passphrase", &path).unwrap();
         let result = load_vault(b"wrong passphrase", &path);
 
         let _ = std::fs::remove_file(&path);
@@ -1483,8 +1483,7 @@ mod tests {
         path.push("gabbro_delete_test.gabbro");
 
         // Create a real vault file first
-        let entries: Vec<VaultEntry> = vec![];
-        save_vault(&entries, b"passphrase", &path).unwrap();
+        save_vault(&VaultBody::empty(), b"passphrase", &path).unwrap();
         assert!(path.exists());
 
         delete_whole_vault(&path).unwrap();
@@ -1860,7 +1859,7 @@ mod tests {
         let old = b"old passphrase";
         let new = b"new passphrase";
 
-        save_vault(&entries, old, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries }, old, &path).unwrap();
         change_passphrase(&path, old, new).unwrap();
 
         // Old passphrase must no longer work
@@ -1868,8 +1867,8 @@ mod tests {
 
         // New passphrase must work and content must be preserved
         let recovered = load_vault(new, &path).unwrap();
-        assert_eq!(recovered.len(), 1);
-        match &recovered[0] {
+        assert_eq!(recovered.entries.len(), 1);
+        match &recovered.entries[0] {
             VaultEntry::Note(e) => assert_eq!(e.content, "secret content"),
             _ => panic!("Expected Note variant"),
         }
@@ -1884,8 +1883,7 @@ mod tests {
         let mut path = temp_dir();
         path.push("gabbro_change_pass_wrong_test.gabbro");
 
-        let entries: Vec<VaultEntry> = vec![];
-        save_vault(&entries, b"correct passphrase", &path).unwrap();
+        save_vault(&VaultBody::empty(), b"correct passphrase", &path).unwrap();
 
         let result = change_passphrase(&path, b"wrong passphrase", b"new passphrase");
 
@@ -1975,8 +1973,8 @@ mod tests {
         export_vault(&entries, passphrase, &path).unwrap();
         let recovered = load_vault(passphrase, &path).unwrap();
 
-        assert_eq!(recovered.len(), 1);
-        match &recovered[0] {
+        assert_eq!(recovered.entries.len(), 1);
+        match &recovered.entries[0] {
             VaultEntry::Note(e) => assert_eq!(e.content, "reloaded content"),
             _ => panic!("Expected Note variant"),
         }

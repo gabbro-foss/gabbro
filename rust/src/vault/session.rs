@@ -11,12 +11,14 @@ use once_cell::sync::Lazy;
 use std::sync::Mutex;
 
 use crate::api::vault::{load_vault, save_vault};
+use crate::vault::serialization::VaultBody;
 use crate::api::vault_bridge::EntrySummaryData;
 use crate::vault::entry::VaultEntry;
 
 // ── Session state ─────────────────────────────────────────────────────────────
 
 pub struct VaultSession {
+    pub folders: Vec<String>,
     pub entries: Vec<VaultEntry>,
     pub path: PathBuf,
     pub passphrase: Vec<u8>,
@@ -31,10 +33,15 @@ static VAULT_SESSION: Lazy<Mutex<Option<VaultSession>>> =
 ///
 /// Flutter awaits this — Argon2id takes ~667ms on target hardware.
 pub fn unlock_vault(passphrase: &[u8], path: PathBuf) -> Result<(), String> {
-    let mut entries = load_vault(passphrase, &path)?;
-    crate::api::vault::purge_expired_history(&mut entries);
+    let mut body = load_vault(passphrase, &path)?;
+    crate::api::vault::purge_expired_history(&mut body.entries);
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
-    *session = Some(VaultSession { entries, path, passphrase: passphrase.to_vec() });
+    *session = Some(VaultSession {
+        folders: body.folders,
+        entries: body.entries,
+        path,
+        passphrase: passphrase.to_vec(),
+    });
     Ok(())
 }
 
@@ -206,12 +213,13 @@ pub fn session_add_entry_no_save(entry: VaultEntry) -> Result<(), String> {
 /// Used after bulk operations that called `session_add_entry_no_save`
 /// for each entry and now want a single save.
 pub fn session_save() -> Result<(), String> {
-    let (entries, passphrase, path) = {
+    let (body, passphrase, path) = {
         let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_ref().ok_or("Vault is locked")?;
-        (session.entries.clone(), Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
+        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
     };
-    save_vault(&entries, &passphrase, &path)?;
+    save_vault(&body, &passphrase, &path)?;
     Ok(())
 }
 
@@ -220,14 +228,15 @@ pub fn session_save() -> Result<(), String> {
 /// Async — triggers a full vault save (Argon2id + encryption).
 pub fn session_create_entry(entry: VaultEntry) -> Result<EntrySummaryData, String> {
     let summary;
-    let (entries, passphrase, path) = {
+    let (body, passphrase, path) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         summary = entry_to_summary(&entry);
         session.entries.push(entry);
-        (session.entries.clone(), Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
+        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
     }; // ← lock released here
-    save_vault(&entries, &passphrase, &path)?;
+    save_vault(&body, &passphrase, &path)?;
     Ok(summary)
 }
 
@@ -235,13 +244,14 @@ pub fn session_create_entry(entry: VaultEntry) -> Result<EntrySummaryData, Strin
 ///
 /// Async — triggers a full vault save.
 pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Result<(), String> {
-    let (entries, passphrase, path) = {
+    let (body, passphrase, path) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         crate::api::vault::update_entry(&mut session.entries, updated, expiry_days)?;
-        (session.entries.clone(), Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
+        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
     }; // ← lock released here
-    save_vault(&entries, &passphrase, &path)?;
+    save_vault(&body, &passphrase, &path)?;
     Ok(())
 }
 
@@ -249,13 +259,14 @@ pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Re
 ///
 /// Async — triggers a full vault save.
 pub fn session_delete_entry(id: &str) -> Result<(), String> {
-    let (entries, passphrase, path) = {
+    let (body, passphrase, path) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         crate::api::vault::delete_entry(&mut session.entries, id)?;
-        (session.entries.clone(), Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
+        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
     }; // ← lock released here
-    save_vault(&entries, &passphrase, &path)?;
+    save_vault(&body, &passphrase, &path)?;
     Ok(())
 }
 
@@ -277,7 +288,8 @@ pub fn session_change_passphrase(
     let session = session.as_mut().ok_or("Vault is locked")?;
     // Verify old passphrase by attempting a load — reject if wrong
     load_vault(old_passphrase, &session.path)?;
-    save_vault(&session.entries, new_passphrase, &session.path)?;
+    let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
+    save_vault(&body, new_passphrase, &session.path)?;
     session.passphrase = new_passphrase.to_vec();
     Ok(())
 }
@@ -287,7 +299,7 @@ pub fn session_change_passphrase(
 /// Sets `previous_password` to `None` on the identified entry.
 /// Returns `Err` if the entry is not found or is not a Login entry.
 pub fn session_clear_password_history(id: &str) -> Result<(), String> {
-    let (entries, passphrase, path) = {
+    let (body, passphrase, path) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         let entry = session.entries.iter_mut()
@@ -300,9 +312,10 @@ pub fn session_clear_password_history(id: &str) -> Result<(), String> {
             }
             _ => return Err(format!("Entry {id} is not a Login entry")),
         }
-        (session.entries.clone(), Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
+        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
     }; // ← lock released here
-    save_vault(&entries, &passphrase, &path)?;
+    save_vault(&body, &passphrase, &path)?;
     Ok(())
 }
 
@@ -311,7 +324,7 @@ pub fn session_clear_password_history(id: &str) -> Result<(), String> {
 /// Swaps `password` ← `previous_password.value`, then clears `previous_password`.
 /// Returns `Err` if the entry is not found, is not a Login entry, or has no history.
 pub fn session_revert_password(id: &str) -> Result<(), String> {
-    let (entries, passphrase, path) = {
+    let (body, passphrase, path) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         let entry = session.entries.iter_mut()
@@ -326,9 +339,10 @@ pub fn session_revert_password(id: &str) -> Result<(), String> {
             }
             _ => return Err(format!("Entry {id} is not a Login entry")),
         }
-        (session.entries.clone(), Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
+        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
     }; // ← lock released here
-    save_vault(&entries, &passphrase, &path)?;
+    save_vault(&body, &passphrase, &path)?;
     Ok(())
 }
 
@@ -425,7 +439,7 @@ mod autofill_tests {
             content: String::from("test"),
             attachments: vec![],
         })];
-        save_vault(&entries, passphrase, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries }, passphrase, &path).unwrap();
         path
     }
 
@@ -494,7 +508,7 @@ mod autofill_tests {
             attachments: vec![],
         });
 
-        save_vault(&[login, note], pass, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries: vec![login, note] }, pass, &path).unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         let json = get_entry_for_autofill("af-login-001").unwrap();
@@ -554,7 +568,7 @@ mod autofill_tests {
             attachments: vec![],
         });
 
-        save_vault(&[login, note], pass, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries: vec![login, note] }, pass, &path).unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         let summaries = login_summaries_for_autofill().unwrap();
@@ -594,7 +608,7 @@ mod tests {
                 attachments: vec![],
             }),
         ];
-        save_vault(&entries, passphrase, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries }, passphrase, &path).unwrap();
         path
     }
 
@@ -860,7 +874,7 @@ mod tests {
             }),
         });
 
-        save_vault(&[entry], pass, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         session_clear_password_history("login-001").unwrap();
@@ -909,7 +923,7 @@ mod tests {
             }),
         });
 
-        save_vault(&[entry], pass, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
         unlock_vault(pass, path.clone()).unwrap();
         session_clear_password_history("login-001").unwrap();
 
@@ -970,7 +984,7 @@ mod tests {
             }),
         });
 
-        save_vault(&[entry], pass, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         session_revert_password("login-001").unwrap();
@@ -1015,7 +1029,7 @@ mod tests {
             previous_password: None,
         });
 
-        save_vault(&[entry], pass, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         let result = session_revert_password("login-001");
@@ -1057,7 +1071,7 @@ mod tests {
             }),
         });
 
-        save_vault(&[entry], pass, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         let result = get_entry("login-unexp-001").unwrap();
@@ -1104,7 +1118,7 @@ mod tests {
             }),
         });
 
-        save_vault(&[entry], pass, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         let result = get_entry("login-forever-001").unwrap();
@@ -1152,7 +1166,7 @@ mod tests {
             }),
         });
 
-        save_vault(&[entry], pass, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         let result = get_entry("login-exp-001").unwrap();

@@ -414,8 +414,9 @@ pub async fn export_vault(path: String) -> Result<(), String> {
 /// Called during onboarding. Async — runs Argon2id + encryption.
 pub async fn init_vault(passphrase: Vec<u8>, path: String) -> Result<(), String> {
     use crate::api::vault::save_vault;
+    use crate::vault::serialization::VaultBody;
     let vault_path = PathBuf::from(&path);
-    save_vault(&[], &passphrase, &vault_path)?;
+    save_vault(&VaultBody::empty(), &passphrase, &vault_path)?;
     // Unlock into session immediately so the user lands on the list screen
     session::unlock_vault(&passphrase, vault_path)
 }
@@ -426,6 +427,7 @@ pub async fn init_vault(passphrase: Vec<u8>, path: String) -> Result<(), String>
 mod tests {
     use super::*;
     use serial_test::serial;
+    use crate::vault::serialization::VaultBody;
 
     fn run<F: std::future::Future>(f: F) -> F::Output {
         tokio::runtime::Runtime::new().unwrap().block_on(f)
@@ -455,7 +457,7 @@ mod tests {
             content: String::from("bridge v2 content"),
             attachments: vec![],
         })];
-        save_vault(&entries, pass, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries }, pass, &path).unwrap();
 
         run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
         let summaries = list_entry_summaries().unwrap();
@@ -518,7 +520,7 @@ mod tests {
             }),
         ];
 
-        save_vault(&entries, pass, &path).unwrap();
+        save_vault(&VaultBody { folders: vec![], entries }, pass, &path).unwrap();
         println!("Test vault written to {:?}", path);
     }
 }
