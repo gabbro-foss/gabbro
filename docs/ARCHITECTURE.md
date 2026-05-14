@@ -121,6 +121,9 @@ gabbro/
   - All importers: validation failures surfaced via ImportFailuresDialog (Skip/Edit)
   - UUID dedup for Gabbro/Enpass/Bitwarden; fresh UUIDs for CSV
 - Android autofill service (fill path; eTLD+1 domain matching; Chromium/Brave compatible)
+- Folder display in entry detail (alongside timestamps; shows "None" when unfoldered)
+- Folder filter dropdown on vault list screen (independent of type filter chips; unfoldered entries hidden when a folder is active)
+- Folder picker on CreateEntryScreen and EntryDetailScreen (injected `listFolders` DI pattern; edit mode pre-selects existing folder)
 - Appearance: theme (system/light/dark), text size, high-contrast, alphabet bar position
 - Security: foreground + background lock timeouts
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
@@ -137,7 +140,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 218 | 1 |
-| Flutter (`flutter test`) | 229 | 0 |
+| Flutter (`flutter test`) | 240 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
 
@@ -147,12 +150,12 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next session — Folders Phase 3 (Flutter):**
-  1. Folder filter dropdown on `VaultListScreen`
-  2. Folder picker on `CreateEntryScreen` / `EntryDetailScreen`
-  3. New `ManageFoldersScreen` (add, rename, delete with reassign dialog)
-  4. Entry detail: show folder (display "None" when empty) alongside timestamps
-  5. Wire `ManageFoldersScreen` into settings menu
+- **Current session — Folders Phase 3 (Flutter), in progress:**
+  - ✅ Task 4: Entry detail shows folder alongside timestamps ("None" when empty)
+  - ✅ Task 1: Folder filter dropdown on `VaultListScreen`
+  - ✅ Task 2: Folder picker on `CreateEntryScreen` / `EntryDetailScreen`
+  - ⬜ Task 3: New `ManageFoldersScreen` (add, rename, delete with reassign dialog)
+  - ⬜ Task 5: Wire `ManageFoldersScreen` into settings menu
 
 **Folders design (agreed 13 May 2026):**
 - `VaultBody` gets `folders: Vec<String>`, default `["Work", "Private", "Other"]`, persisted in Rust
