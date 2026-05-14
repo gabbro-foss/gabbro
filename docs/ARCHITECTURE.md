@@ -159,6 +159,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Folder filter dropdown on vault list screen, independent of type filter chips; unfoldered entries only appear when no folder filter is active ("All folders" selected)
 - "Manage folders" screen: add, rename, delete; accessible from settings menu
   - Delete with entries: offer (a) reassign all to another folder, (b) clear all to "None", or both
+  - Default folders can also be edited/deleted by user
 - Entry create/edit: folder picker dropdown showing existing folders + "None"
 
 ---
