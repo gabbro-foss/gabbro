@@ -141,8 +141,6 @@ fn wire__crate__api__vault__create_card_entry_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_folder = <String>::sse_decode(&mut deserializer);
-            let api_tags = <Vec<String>>::sse_decode(&mut deserializer);
-            let api_favourite = <bool>::sse_decode(&mut deserializer);
             let api_card_name = <Option<String>>::sse_decode(&mut deserializer);
             let api_status = <String>::sse_decode(&mut deserializer);
             let api_cardholder_name = <String>::sse_decode(&mut deserializer);
@@ -161,8 +159,6 @@ fn wire__crate__api__vault__create_card_entry_impl(
                 transform_result_sse::<_, String>((move || {
                     let output_ok = crate::api::vault::create_card_entry(
                         api_folder,
-                        api_tags,
-                        api_favourite,
                         api_card_name,
                         api_status,
                         api_cardholder_name,
@@ -206,8 +202,6 @@ fn wire__crate__api__vault__create_custom_entry_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_folder = <String>::sse_decode(&mut deserializer);
-            let api_tags = <Vec<String>>::sse_decode(&mut deserializer);
-            let api_favourite = <bool>::sse_decode(&mut deserializer);
             let api_title = <String>::sse_decode(&mut deserializer);
             let api_fields =
                 <Vec<crate::api::vault::CustomFieldData>>::sse_decode(&mut deserializer);
@@ -215,11 +209,7 @@ fn wire__crate__api__vault__create_custom_entry_impl(
             move |context| {
                 transform_result_sse::<_, ()>((move || {
                     let output_ok = Result::<_, ()>::Ok(crate::api::vault::create_custom_entry(
-                        api_folder,
-                        api_tags,
-                        api_favourite,
-                        api_title,
-                        api_fields,
+                        api_folder, api_title, api_fields,
                     ))?;
                     Ok(output_ok)
                 })())
@@ -287,8 +277,6 @@ fn wire__crate__api__vault__create_file_entry_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_folder = <String>::sse_decode(&mut deserializer);
-            let api_tags = <Vec<String>>::sse_decode(&mut deserializer);
-            let api_favourite = <bool>::sse_decode(&mut deserializer);
             let api_filename = <String>::sse_decode(&mut deserializer);
             let api_data = <Vec<u8>>::sse_decode(&mut deserializer);
             let api_notes = <Option<String>>::sse_decode(&mut deserializer);
@@ -297,8 +285,6 @@ fn wire__crate__api__vault__create_file_entry_impl(
                 transform_result_sse::<_, ()>((move || {
                     let output_ok = Result::<_, ()>::Ok(crate::api::vault::create_file_entry(
                         api_folder,
-                        api_tags,
-                        api_favourite,
                         api_filename,
                         api_data,
                         api_notes,
@@ -332,8 +318,6 @@ fn wire__crate__api__vault__create_identity_entry_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_folder = <String>::sse_decode(&mut deserializer);
-            let api_tags = <Vec<String>>::sse_decode(&mut deserializer);
-            let api_favourite = <bool>::sse_decode(&mut deserializer);
             let api_first_name = <String>::sse_decode(&mut deserializer);
             let api_last_name = <String>::sse_decode(&mut deserializer);
             let api_email = <String>::sse_decode(&mut deserializer);
@@ -344,8 +328,6 @@ fn wire__crate__api__vault__create_identity_entry_impl(
                 transform_result_sse::<_, ()>((move || {
                     let output_ok = Result::<_, ()>::Ok(crate::api::vault::create_identity_entry(
                         api_folder,
-                        api_tags,
-                        api_favourite,
                         api_first_name,
                         api_last_name,
                         api_email,
@@ -381,8 +363,6 @@ fn wire__crate__api__vault__create_login_entry_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_folder = <String>::sse_decode(&mut deserializer);
-            let api_tags = <Vec<String>>::sse_decode(&mut deserializer);
-            let api_favourite = <bool>::sse_decode(&mut deserializer);
             let api_title = <String>::sse_decode(&mut deserializer);
             let api_url = <String>::sse_decode(&mut deserializer);
             let api_username = <String>::sse_decode(&mut deserializer);
@@ -395,8 +375,6 @@ fn wire__crate__api__vault__create_login_entry_impl(
                 transform_result_sse::<_, ()>((move || {
                     let output_ok = Result::<_, ()>::Ok(crate::api::vault::create_login_entry(
                         api_folder,
-                        api_tags,
-                        api_favourite,
                         api_title,
                         api_url,
                         api_username,
@@ -433,8 +411,6 @@ fn wire__crate__api__vault__create_note_entry_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_folder = <String>::sse_decode(&mut deserializer);
-            let api_tags = <Vec<String>>::sse_decode(&mut deserializer);
-            let api_favourite = <bool>::sse_decode(&mut deserializer);
             let api_title = <String>::sse_decode(&mut deserializer);
             let api_content = <String>::sse_decode(&mut deserializer);
             deserializer.end();
@@ -442,8 +418,6 @@ fn wire__crate__api__vault__create_note_entry_impl(
                 transform_result_sse::<_, ()>((move || {
                     let output_ok = Result::<_, ()>::Ok(crate::api::vault::create_note_entry(
                         api_folder,
-                        api_tags,
-                        api_favourite,
                         api_title,
                         api_content,
                     ))?;
@@ -1316,8 +1290,6 @@ impl SseDecode for crate::api::vault::CardEntryData {
         let mut var_createdAt = <String>::sse_decode(deserializer);
         let mut var_updatedAt = <String>::sse_decode(deserializer);
         let mut var_folder = <String>::sse_decode(deserializer);
-        let mut var_tags = <Vec<String>>::sse_decode(deserializer);
-        let mut var_favourite = <bool>::sse_decode(deserializer);
         let mut var_cardName = <Option<String>>::sse_decode(deserializer);
         let mut var_status = <String>::sse_decode(deserializer);
         let mut var_cardholderName = <String>::sse_decode(deserializer);
@@ -1342,8 +1314,6 @@ impl SseDecode for crate::api::vault::CardEntryData {
             created_at: var_createdAt,
             updated_at: var_updatedAt,
             folder: var_folder,
-            tags: var_tags,
-            favourite: var_favourite,
             card_name: var_cardName,
             status: var_status,
             cardholder_name: var_cardholderName,
@@ -1403,8 +1373,6 @@ impl SseDecode for crate::api::vault::CustomEntryData {
         let mut var_createdAt = <String>::sse_decode(deserializer);
         let mut var_updatedAt = <String>::sse_decode(deserializer);
         let mut var_folder = <String>::sse_decode(deserializer);
-        let mut var_tags = <Vec<String>>::sse_decode(deserializer);
-        let mut var_favourite = <bool>::sse_decode(deserializer);
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_fields = <Vec<crate::api::vault::CustomFieldData>>::sse_decode(deserializer);
         return crate::api::vault::CustomEntryData {
@@ -1412,8 +1380,6 @@ impl SseDecode for crate::api::vault::CustomEntryData {
             created_at: var_createdAt,
             updated_at: var_updatedAt,
             folder: var_folder,
-            tags: var_tags,
-            favourite: var_favourite,
             title: var_title,
             fields: var_fields,
         };
@@ -1453,15 +1419,11 @@ impl SseDecode for crate::api::vault_bridge::EntrySummaryData {
         let mut var_entryType = <String>::sse_decode(deserializer);
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_folder = <String>::sse_decode(deserializer);
-        let mut var_tags = <Vec<String>>::sse_decode(deserializer);
-        let mut var_favourite = <bool>::sse_decode(deserializer);
         return crate::api::vault_bridge::EntrySummaryData {
             id: var_id,
             entry_type: var_entryType,
             title: var_title,
             folder: var_folder,
-            tags: var_tags,
-            favourite: var_favourite,
         };
     }
 }
@@ -1480,8 +1442,6 @@ impl SseDecode for crate::api::vault::FileEntryData {
         let mut var_createdAt = <String>::sse_decode(deserializer);
         let mut var_updatedAt = <String>::sse_decode(deserializer);
         let mut var_folder = <String>::sse_decode(deserializer);
-        let mut var_tags = <Vec<String>>::sse_decode(deserializer);
-        let mut var_favourite = <bool>::sse_decode(deserializer);
         let mut var_filename = <String>::sse_decode(deserializer);
         let mut var_data = <Vec<u8>>::sse_decode(deserializer);
         let mut var_notes = <Option<String>>::sse_decode(deserializer);
@@ -1490,8 +1450,6 @@ impl SseDecode for crate::api::vault::FileEntryData {
             created_at: var_createdAt,
             updated_at: var_updatedAt,
             folder: var_folder,
-            tags: var_tags,
-            favourite: var_favourite,
             filename: var_filename,
             data: var_data,
             notes: var_notes,
@@ -1525,8 +1483,6 @@ impl SseDecode for crate::api::vault::IdentityEntryData {
         let mut var_createdAt = <String>::sse_decode(deserializer);
         let mut var_updatedAt = <String>::sse_decode(deserializer);
         let mut var_folder = <String>::sse_decode(deserializer);
-        let mut var_tags = <Vec<String>>::sse_decode(deserializer);
-        let mut var_favourite = <bool>::sse_decode(deserializer);
         let mut var_firstName = <String>::sse_decode(deserializer);
         let mut var_lastName = <String>::sse_decode(deserializer);
         let mut var_email = <String>::sse_decode(deserializer);
@@ -1539,8 +1495,6 @@ impl SseDecode for crate::api::vault::IdentityEntryData {
             created_at: var_createdAt,
             updated_at: var_updatedAt,
             folder: var_folder,
-            tags: var_tags,
-            favourite: var_favourite,
             first_name: var_firstName,
             last_name: var_lastName,
             email: var_email,
@@ -1708,8 +1662,6 @@ impl SseDecode for crate::api::vault::LoginEntryData {
         let mut var_createdAt = <String>::sse_decode(deserializer);
         let mut var_updatedAt = <String>::sse_decode(deserializer);
         let mut var_folder = <String>::sse_decode(deserializer);
-        let mut var_tags = <Vec<String>>::sse_decode(deserializer);
-        let mut var_favourite = <bool>::sse_decode(deserializer);
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_url = <String>::sse_decode(deserializer);
         let mut var_username = <String>::sse_decode(deserializer);
@@ -1724,8 +1676,6 @@ impl SseDecode for crate::api::vault::LoginEntryData {
             created_at: var_createdAt,
             updated_at: var_updatedAt,
             folder: var_folder,
-            tags: var_tags,
-            favourite: var_favourite,
             title: var_title,
             url: var_url,
             username: var_username,
@@ -1744,8 +1694,6 @@ impl SseDecode for crate::api::vault::NoteEntryData {
         let mut var_createdAt = <String>::sse_decode(deserializer);
         let mut var_updatedAt = <String>::sse_decode(deserializer);
         let mut var_folder = <String>::sse_decode(deserializer);
-        let mut var_tags = <Vec<String>>::sse_decode(deserializer);
-        let mut var_favourite = <bool>::sse_decode(deserializer);
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_content = <String>::sse_decode(deserializer);
         return crate::api::vault::NoteEntryData {
@@ -1753,8 +1701,6 @@ impl SseDecode for crate::api::vault::NoteEntryData {
             created_at: var_createdAt,
             updated_at: var_updatedAt,
             folder: var_folder,
-            tags: var_tags,
-            favourite: var_favourite,
             title: var_title,
             content: var_content,
         };
@@ -2057,8 +2003,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::CardEntryData {
             self.created_at.into_into_dart().into_dart(),
             self.updated_at.into_into_dart().into_dart(),
             self.folder.into_into_dart().into_dart(),
-            self.tags.into_into_dart().into_dart(),
-            self.favourite.into_into_dart().into_dart(),
             self.card_name.into_into_dart().into_dart(),
             self.status.into_into_dart().into_dart(),
             self.cardholder_name.into_into_dart().into_dart(),
@@ -2144,8 +2088,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::CustomEntryData {
             self.created_at.into_into_dart().into_dart(),
             self.updated_at.into_into_dart().into_dart(),
             self.folder.into_into_dart().into_dart(),
-            self.tags.into_into_dart().into_dart(),
-            self.favourite.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
             self.fields.into_into_dart().into_dart(),
         ]
@@ -2214,8 +2156,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault_bridge::EntrySummaryDat
             self.entry_type.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
             self.folder.into_into_dart().into_dart(),
-            self.tags.into_into_dart().into_dart(),
-            self.favourite.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -2239,8 +2179,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::FileEntryData {
             self.created_at.into_into_dart().into_dart(),
             self.updated_at.into_into_dart().into_dart(),
             self.folder.into_into_dart().into_dart(),
-            self.tags.into_into_dart().into_dart(),
-            self.favourite.into_into_dart().into_dart(),
             self.filename.into_into_dart().into_dart(),
             self.data.into_into_dart().into_dart(),
             self.notes.into_into_dart().into_dart(),
@@ -2288,8 +2226,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::IdentityEntryData {
             self.created_at.into_into_dart().into_dart(),
             self.updated_at.into_into_dart().into_dart(),
             self.folder.into_into_dart().into_dart(),
-            self.tags.into_into_dart().into_dart(),
-            self.favourite.into_into_dart().into_dart(),
             self.first_name.into_into_dart().into_dart(),
             self.last_name.into_into_dart().into_dart(),
             self.email.into_into_dart().into_dart(),
@@ -2388,8 +2324,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::LoginEntryData {
             self.created_at.into_into_dart().into_dart(),
             self.updated_at.into_into_dart().into_dart(),
             self.folder.into_into_dart().into_dart(),
-            self.tags.into_into_dart().into_dart(),
-            self.favourite.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
             self.url.into_into_dart().into_dart(),
             self.username.into_into_dart().into_dart(),
@@ -2420,8 +2354,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::NoteEntryData {
             self.created_at.into_into_dart().into_dart(),
             self.updated_at.into_into_dart().into_dart(),
             self.folder.into_into_dart().into_dart(),
-            self.tags.into_into_dart().into_dart(),
-            self.favourite.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
             self.content.into_into_dart().into_dart(),
         ]
@@ -2617,8 +2549,6 @@ impl SseEncode for crate::api::vault::CardEntryData {
         <String>::sse_encode(self.created_at, serializer);
         <String>::sse_encode(self.updated_at, serializer);
         <String>::sse_encode(self.folder, serializer);
-        <Vec<String>>::sse_encode(self.tags, serializer);
-        <bool>::sse_encode(self.favourite, serializer);
         <Option<String>>::sse_encode(self.card_name, serializer);
         <String>::sse_encode(self.status, serializer);
         <String>::sse_encode(self.cardholder_name, serializer);
@@ -2665,8 +2595,6 @@ impl SseEncode for crate::api::vault::CustomEntryData {
         <String>::sse_encode(self.created_at, serializer);
         <String>::sse_encode(self.updated_at, serializer);
         <String>::sse_encode(self.folder, serializer);
-        <Vec<String>>::sse_encode(self.tags, serializer);
-        <bool>::sse_encode(self.favourite, serializer);
         <String>::sse_encode(self.title, serializer);
         <Vec<crate::api::vault::CustomFieldData>>::sse_encode(self.fields, serializer);
     }
@@ -2696,8 +2624,6 @@ impl SseEncode for crate::api::vault_bridge::EntrySummaryData {
         <String>::sse_encode(self.entry_type, serializer);
         <String>::sse_encode(self.title, serializer);
         <String>::sse_encode(self.folder, serializer);
-        <Vec<String>>::sse_encode(self.tags, serializer);
-        <bool>::sse_encode(self.favourite, serializer);
     }
 }
 
@@ -2715,8 +2641,6 @@ impl SseEncode for crate::api::vault::FileEntryData {
         <String>::sse_encode(self.created_at, serializer);
         <String>::sse_encode(self.updated_at, serializer);
         <String>::sse_encode(self.folder, serializer);
-        <Vec<String>>::sse_encode(self.tags, serializer);
-        <bool>::sse_encode(self.favourite, serializer);
         <String>::sse_encode(self.filename, serializer);
         <Vec<u8>>::sse_encode(self.data, serializer);
         <Option<String>>::sse_encode(self.notes, serializer);
@@ -2745,8 +2669,6 @@ impl SseEncode for crate::api::vault::IdentityEntryData {
         <String>::sse_encode(self.created_at, serializer);
         <String>::sse_encode(self.updated_at, serializer);
         <String>::sse_encode(self.folder, serializer);
-        <Vec<String>>::sse_encode(self.tags, serializer);
-        <bool>::sse_encode(self.favourite, serializer);
         <String>::sse_encode(self.first_name, serializer);
         <String>::sse_encode(self.last_name, serializer);
         <String>::sse_encode(self.email, serializer);
@@ -2881,8 +2803,6 @@ impl SseEncode for crate::api::vault::LoginEntryData {
         <String>::sse_encode(self.created_at, serializer);
         <String>::sse_encode(self.updated_at, serializer);
         <String>::sse_encode(self.folder, serializer);
-        <Vec<String>>::sse_encode(self.tags, serializer);
-        <bool>::sse_encode(self.favourite, serializer);
         <String>::sse_encode(self.title, serializer);
         <String>::sse_encode(self.url, serializer);
         <String>::sse_encode(self.username, serializer);
@@ -2903,8 +2823,6 @@ impl SseEncode for crate::api::vault::NoteEntryData {
         <String>::sse_encode(self.created_at, serializer);
         <String>::sse_encode(self.updated_at, serializer);
         <String>::sse_encode(self.folder, serializer);
-        <Vec<String>>::sse_encode(self.tags, serializer);
-        <bool>::sse_encode(self.favourite, serializer);
         <String>::sse_encode(self.title, serializer);
         <String>::sse_encode(self.content, serializer);
     }

@@ -92,8 +92,6 @@ abstract class RustLibApi extends BaseApi {
 
   Future<CardEntryData> crateApiVaultCreateCardEntry({
     required String folder,
-    required List<String> tags,
-    required bool favourite,
     String? cardName,
     required String status,
     required String cardholderName,
@@ -111,8 +109,6 @@ abstract class RustLibApi extends BaseApi {
 
   Future<CustomEntryData> crateApiVaultCreateCustomEntry({
     required String folder,
-    required List<String> tags,
-    required bool favourite,
     required String title,
     required List<CustomFieldData> fields,
   });
@@ -123,8 +119,6 @@ abstract class RustLibApi extends BaseApi {
 
   Future<FileEntryData> crateApiVaultCreateFileEntry({
     required String folder,
-    required List<String> tags,
-    required bool favourite,
     required String filename,
     required List<int> data,
     String? notes,
@@ -132,8 +126,6 @@ abstract class RustLibApi extends BaseApi {
 
   Future<IdentityEntryData> crateApiVaultCreateIdentityEntry({
     required String folder,
-    required List<String> tags,
-    required bool favourite,
     required String firstName,
     required String lastName,
     required String email,
@@ -143,8 +135,6 @@ abstract class RustLibApi extends BaseApi {
 
   Future<LoginEntryData> crateApiVaultCreateLoginEntry({
     required String folder,
-    required List<String> tags,
-    required bool favourite,
     required String title,
     required String url,
     required String username,
@@ -155,8 +145,6 @@ abstract class RustLibApi extends BaseApi {
 
   Future<NoteEntryData> crateApiVaultCreateNoteEntry({
     required String folder,
-    required List<String> tags,
-    required bool favourite,
     required String title,
     required String content,
   });
@@ -314,8 +302,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<CardEntryData> crateApiVaultCreateCardEntry({
     required String folder,
-    required List<String> tags,
-    required bool favourite,
     String? cardName,
     required String status,
     required String cardholderName,
@@ -335,8 +321,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(folder, serializer);
-          sse_encode_list_String(tags, serializer);
-          sse_encode_bool(favourite, serializer);
           sse_encode_opt_String(cardName, serializer);
           sse_encode_String(status, serializer);
           sse_encode_String(cardholderName, serializer);
@@ -364,8 +348,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         constMeta: kCrateApiVaultCreateCardEntryConstMeta,
         argValues: [
           folder,
-          tags,
-          favourite,
           cardName,
           status,
           cardholderName,
@@ -390,8 +372,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         debugName: "create_card_entry",
         argNames: [
           "folder",
-          "tags",
-          "favourite",
           "cardName",
           "status",
           "cardholderName",
@@ -411,8 +391,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<CustomEntryData> crateApiVaultCreateCustomEntry({
     required String folder,
-    required List<String> tags,
-    required bool favourite,
     required String title,
     required List<CustomFieldData> fields,
   }) {
@@ -421,8 +399,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(folder, serializer);
-          sse_encode_list_String(tags, serializer);
-          sse_encode_bool(favourite, serializer);
           sse_encode_String(title, serializer);
           sse_encode_list_custom_field_data(fields, serializer);
           pdeCallFfi(
@@ -437,7 +413,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiVaultCreateCustomEntryConstMeta,
-        argValues: [folder, tags, favourite, title, fields],
+        argValues: [folder, title, fields],
         apiImpl: this,
       ),
     );
@@ -446,7 +422,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiVaultCreateCustomEntryConstMeta =>
       const TaskConstMeta(
         debugName: "create_custom_entry",
-        argNames: ["folder", "tags", "favourite", "title", "fields"],
+        argNames: ["folder", "title", "fields"],
       );
 
   @override
@@ -482,8 +458,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<FileEntryData> crateApiVaultCreateFileEntry({
     required String folder,
-    required List<String> tags,
-    required bool favourite,
     required String filename,
     required List<int> data,
     String? notes,
@@ -493,8 +467,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(folder, serializer);
-          sse_encode_list_String(tags, serializer);
-          sse_encode_bool(favourite, serializer);
           sse_encode_String(filename, serializer);
           sse_encode_list_prim_u_8_loose(data, serializer);
           sse_encode_opt_String(notes, serializer);
@@ -510,7 +482,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiVaultCreateFileEntryConstMeta,
-        argValues: [folder, tags, favourite, filename, data, notes],
+        argValues: [folder, filename, data, notes],
         apiImpl: this,
       ),
     );
@@ -519,14 +491,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiVaultCreateFileEntryConstMeta =>
       const TaskConstMeta(
         debugName: "create_file_entry",
-        argNames: ["folder", "tags", "favourite", "filename", "data", "notes"],
+        argNames: ["folder", "filename", "data", "notes"],
       );
 
   @override
   Future<IdentityEntryData> crateApiVaultCreateIdentityEntry({
     required String folder,
-    required List<String> tags,
-    required bool favourite,
     required String firstName,
     required String lastName,
     required String email,
@@ -538,8 +508,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(folder, serializer);
-          sse_encode_list_String(tags, serializer);
-          sse_encode_bool(favourite, serializer);
           sse_encode_String(firstName, serializer);
           sse_encode_String(lastName, serializer);
           sse_encode_String(email, serializer);
@@ -557,16 +525,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiVaultCreateIdentityEntryConstMeta,
-        argValues: [
-          folder,
-          tags,
-          favourite,
-          firstName,
-          lastName,
-          email,
-          phone,
-          address,
-        ],
+        argValues: [folder, firstName, lastName, email, phone, address],
         apiImpl: this,
       ),
     );
@@ -577,8 +536,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         debugName: "create_identity_entry",
         argNames: [
           "folder",
-          "tags",
-          "favourite",
           "firstName",
           "lastName",
           "email",
@@ -590,8 +547,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<LoginEntryData> crateApiVaultCreateLoginEntry({
     required String folder,
-    required List<String> tags,
-    required bool favourite,
     required String title,
     required String url,
     required String username,
@@ -604,8 +559,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(folder, serializer);
-          sse_encode_list_String(tags, serializer);
-          sse_encode_bool(favourite, serializer);
           sse_encode_String(title, serializer);
           sse_encode_String(url, serializer);
           sse_encode_String(username, serializer);
@@ -626,8 +579,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         constMeta: kCrateApiVaultCreateLoginEntryConstMeta,
         argValues: [
           folder,
-          tags,
-          favourite,
           title,
           url,
           username,
@@ -645,8 +596,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         debugName: "create_login_entry",
         argNames: [
           "folder",
-          "tags",
-          "favourite",
           "title",
           "url",
           "username",
@@ -659,8 +608,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<NoteEntryData> crateApiVaultCreateNoteEntry({
     required String folder,
-    required List<String> tags,
-    required bool favourite,
     required String title,
     required String content,
   }) {
@@ -669,8 +616,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(folder, serializer);
-          sse_encode_list_String(tags, serializer);
-          sse_encode_bool(favourite, serializer);
           sse_encode_String(title, serializer);
           sse_encode_String(content, serializer);
           pdeCallFfi(
@@ -685,7 +630,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiVaultCreateNoteEntryConstMeta,
-        argValues: [folder, tags, favourite, title, content],
+        argValues: [folder, title, content],
         apiImpl: this,
       ),
     );
@@ -694,7 +639,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiVaultCreateNoteEntryConstMeta =>
       const TaskConstMeta(
         debugName: "create_note_entry",
-        argNames: ["folder", "tags", "favourite", "title", "content"],
+        argNames: ["folder", "title", "content"],
       );
 
   @override
@@ -1490,31 +1435,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   CardEntryData dco_decode_card_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 22)
-      throw Exception('unexpected arr length: expect 22 but see ${arr.length}');
+    if (arr.length != 20)
+      throw Exception('unexpected arr length: expect 20 but see ${arr.length}');
     return CardEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
       updatedAt: dco_decode_String(arr[2]),
       folder: dco_decode_String(arr[3]),
-      tags: dco_decode_list_String(arr[4]),
-      favourite: dco_decode_bool(arr[5]),
-      cardName: dco_decode_opt_String(arr[6]),
-      status: dco_decode_String(arr[7]),
-      cardholderName: dco_decode_String(arr[8]),
-      cardNumber: dco_decode_String(arr[9]),
-      expiry: dco_decode_String(arr[10]),
-      cvv: dco_decode_String(arr[11]),
-      creditLimit: dco_decode_opt_String(arr[12]),
-      cardAccountNumber: dco_decode_opt_String(arr[13]),
-      paymentNetwork: dco_decode_opt_String(arr[14]),
-      pin: dco_decode_opt_String(arr[15]),
-      bankName: dco_decode_opt_String(arr[16]),
-      transactionPassword: dco_decode_opt_String(arr[17]),
-      notes: dco_decode_opt_String(arr[18]),
-      customFields: dco_decode_list_custom_field_data(arr[19]),
-      previousCvv: dco_decode_opt_box_autoadd_previous_secret_data(arr[20]),
-      previousPin: dco_decode_opt_box_autoadd_previous_secret_data(arr[21]),
+      cardName: dco_decode_opt_String(arr[4]),
+      status: dco_decode_String(arr[5]),
+      cardholderName: dco_decode_String(arr[6]),
+      cardNumber: dco_decode_String(arr[7]),
+      expiry: dco_decode_String(arr[8]),
+      cvv: dco_decode_String(arr[9]),
+      creditLimit: dco_decode_opt_String(arr[10]),
+      cardAccountNumber: dco_decode_opt_String(arr[11]),
+      paymentNetwork: dco_decode_opt_String(arr[12]),
+      pin: dco_decode_opt_String(arr[13]),
+      bankName: dco_decode_opt_String(arr[14]),
+      transactionPassword: dco_decode_opt_String(arr[15]),
+      notes: dco_decode_opt_String(arr[16]),
+      customFields: dco_decode_list_custom_field_data(arr[17]),
+      previousCvv: dco_decode_opt_box_autoadd_previous_secret_data(arr[18]),
+      previousPin: dco_decode_opt_box_autoadd_previous_secret_data(arr[19]),
     );
   }
 
@@ -1550,17 +1493,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   CustomEntryData dco_decode_custom_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return CustomEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
       updatedAt: dco_decode_String(arr[2]),
       folder: dco_decode_String(arr[3]),
-      tags: dco_decode_list_String(arr[4]),
-      favourite: dco_decode_bool(arr[5]),
-      title: dco_decode_String(arr[6]),
-      fields: dco_decode_list_custom_field_data(arr[7]),
+      title: dco_decode_String(arr[4]),
+      fields: dco_decode_list_custom_field_data(arr[5]),
     );
   }
 
@@ -1593,15 +1534,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   EntrySummaryData dco_decode_entry_summary_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return EntrySummaryData(
       id: dco_decode_String(arr[0]),
       entryType: dco_decode_String(arr[1]),
       title: dco_decode_String(arr[2]),
       folder: dco_decode_String(arr[3]),
-      tags: dco_decode_list_String(arr[4]),
-      favourite: dco_decode_bool(arr[5]),
     );
   }
 
@@ -1615,18 +1554,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   FileEntryData dco_decode_file_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 9)
-      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return FileEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
       updatedAt: dco_decode_String(arr[2]),
       folder: dco_decode_String(arr[3]),
-      tags: dco_decode_list_String(arr[4]),
-      favourite: dco_decode_bool(arr[5]),
-      filename: dco_decode_String(arr[6]),
-      data: dco_decode_list_prim_u_8_strict(arr[7]),
-      notes: dco_decode_opt_String(arr[8]),
+      filename: dco_decode_String(arr[4]),
+      data: dco_decode_list_prim_u_8_strict(arr[5]),
+      notes: dco_decode_opt_String(arr[6]),
     );
   }
 
@@ -1652,21 +1589,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   IdentityEntryData dco_decode_identity_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 12)
-      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
+    if (arr.length != 10)
+      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
     return IdentityEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
       updatedAt: dco_decode_String(arr[2]),
       folder: dco_decode_String(arr[3]),
-      tags: dco_decode_list_String(arr[4]),
-      favourite: dco_decode_bool(arr[5]),
-      firstName: dco_decode_String(arr[6]),
-      lastName: dco_decode_String(arr[7]),
-      email: dco_decode_String(arr[8]),
-      phone: dco_decode_opt_String(arr[9]),
-      address: dco_decode_opt_String(arr[10]),
-      customFields: dco_decode_list_custom_field_data(arr[11]),
+      firstName: dco_decode_String(arr[4]),
+      lastName: dco_decode_String(arr[5]),
+      email: dco_decode_String(arr[6]),
+      phone: dco_decode_opt_String(arr[7]),
+      address: dco_decode_opt_String(arr[8]),
+      customFields: dco_decode_list_custom_field_data(arr[9]),
     );
   }
 
@@ -1761,23 +1696,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LoginEntryData dco_decode_login_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 13)
-      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
     return LoginEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
       updatedAt: dco_decode_String(arr[2]),
       folder: dco_decode_String(arr[3]),
-      tags: dco_decode_list_String(arr[4]),
-      favourite: dco_decode_bool(arr[5]),
-      title: dco_decode_String(arr[6]),
-      url: dco_decode_String(arr[7]),
-      username: dco_decode_String(arr[8]),
-      password: dco_decode_String(arr[9]),
-      notes: dco_decode_opt_String(arr[10]),
-      customFields: dco_decode_list_custom_field_data(arr[11]),
+      title: dco_decode_String(arr[4]),
+      url: dco_decode_String(arr[5]),
+      username: dco_decode_String(arr[6]),
+      password: dco_decode_String(arr[7]),
+      notes: dco_decode_opt_String(arr[8]),
+      customFields: dco_decode_list_custom_field_data(arr[9]),
       previousPassword: dco_decode_opt_box_autoadd_previous_secret_data(
-        arr[12],
+        arr[10],
       ),
     );
   }
@@ -1786,17 +1719,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NoteEntryData dco_decode_note_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return NoteEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
       updatedAt: dco_decode_String(arr[2]),
       folder: dco_decode_String(arr[3]),
-      tags: dco_decode_list_String(arr[4]),
-      favourite: dco_decode_bool(arr[5]),
-      title: dco_decode_String(arr[6]),
-      content: dco_decode_String(arr[7]),
+      title: dco_decode_String(arr[4]),
+      content: dco_decode_String(arr[5]),
     );
   }
 
@@ -2065,8 +1996,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_createdAt = sse_decode_String(deserializer);
     var var_updatedAt = sse_decode_String(deserializer);
     var var_folder = sse_decode_String(deserializer);
-    var var_tags = sse_decode_list_String(deserializer);
-    var var_favourite = sse_decode_bool(deserializer);
     var var_cardName = sse_decode_opt_String(deserializer);
     var var_status = sse_decode_String(deserializer);
     var var_cardholderName = sse_decode_String(deserializer);
@@ -2092,8 +2021,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       createdAt: var_createdAt,
       updatedAt: var_updatedAt,
       folder: var_folder,
-      tags: var_tags,
-      favourite: var_favourite,
       cardName: var_cardName,
       status: var_status,
       cardholderName: var_cardholderName,
@@ -2149,8 +2076,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_createdAt = sse_decode_String(deserializer);
     var var_updatedAt = sse_decode_String(deserializer);
     var var_folder = sse_decode_String(deserializer);
-    var var_tags = sse_decode_list_String(deserializer);
-    var var_favourite = sse_decode_bool(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_fields = sse_decode_list_custom_field_data(deserializer);
     return CustomEntryData(
@@ -2158,8 +2083,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       createdAt: var_createdAt,
       updatedAt: var_updatedAt,
       folder: var_folder,
-      tags: var_tags,
-      favourite: var_favourite,
       title: var_title,
       fields: var_fields,
     );
@@ -2193,15 +2116,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_entryType = sse_decode_String(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_folder = sse_decode_String(deserializer);
-    var var_tags = sse_decode_list_String(deserializer);
-    var var_favourite = sse_decode_bool(deserializer);
     return EntrySummaryData(
       id: var_id,
       entryType: var_entryType,
       title: var_title,
       folder: var_folder,
-      tags: var_tags,
-      favourite: var_favourite,
     );
   }
 
@@ -2218,8 +2137,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_createdAt = sse_decode_String(deserializer);
     var var_updatedAt = sse_decode_String(deserializer);
     var var_folder = sse_decode_String(deserializer);
-    var var_tags = sse_decode_list_String(deserializer);
-    var var_favourite = sse_decode_bool(deserializer);
     var var_filename = sse_decode_String(deserializer);
     var var_data = sse_decode_list_prim_u_8_strict(deserializer);
     var var_notes = sse_decode_opt_String(deserializer);
@@ -2228,8 +2145,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       createdAt: var_createdAt,
       updatedAt: var_updatedAt,
       folder: var_folder,
-      tags: var_tags,
-      favourite: var_favourite,
       filename: var_filename,
       data: var_data,
       notes: var_notes,
@@ -2261,8 +2176,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_createdAt = sse_decode_String(deserializer);
     var var_updatedAt = sse_decode_String(deserializer);
     var var_folder = sse_decode_String(deserializer);
-    var var_tags = sse_decode_list_String(deserializer);
-    var var_favourite = sse_decode_bool(deserializer);
     var var_firstName = sse_decode_String(deserializer);
     var var_lastName = sse_decode_String(deserializer);
     var var_email = sse_decode_String(deserializer);
@@ -2274,8 +2187,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       createdAt: var_createdAt,
       updatedAt: var_updatedAt,
       folder: var_folder,
-      tags: var_tags,
-      favourite: var_favourite,
       firstName: var_firstName,
       lastName: var_lastName,
       email: var_email,
@@ -2437,8 +2348,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_createdAt = sse_decode_String(deserializer);
     var var_updatedAt = sse_decode_String(deserializer);
     var var_folder = sse_decode_String(deserializer);
-    var var_tags = sse_decode_list_String(deserializer);
-    var var_favourite = sse_decode_bool(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_url = sse_decode_String(deserializer);
     var var_username = sse_decode_String(deserializer);
@@ -2453,8 +2362,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       createdAt: var_createdAt,
       updatedAt: var_updatedAt,
       folder: var_folder,
-      tags: var_tags,
-      favourite: var_favourite,
       title: var_title,
       url: var_url,
       username: var_username,
@@ -2472,8 +2379,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_createdAt = sse_decode_String(deserializer);
     var var_updatedAt = sse_decode_String(deserializer);
     var var_folder = sse_decode_String(deserializer);
-    var var_tags = sse_decode_list_String(deserializer);
-    var var_favourite = sse_decode_bool(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_content = sse_decode_String(deserializer);
     return NoteEntryData(
@@ -2481,8 +2386,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       createdAt: var_createdAt,
       updatedAt: var_updatedAt,
       folder: var_folder,
-      tags: var_tags,
-      favourite: var_favourite,
       title: var_title,
       content: var_content,
     );
@@ -2780,8 +2683,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.createdAt, serializer);
     sse_encode_String(self.updatedAt, serializer);
     sse_encode_String(self.folder, serializer);
-    sse_encode_list_String(self.tags, serializer);
-    sse_encode_bool(self.favourite, serializer);
     sse_encode_opt_String(self.cardName, serializer);
     sse_encode_String(self.status, serializer);
     sse_encode_String(self.cardholderName, serializer);
@@ -2840,8 +2741,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.createdAt, serializer);
     sse_encode_String(self.updatedAt, serializer);
     sse_encode_String(self.folder, serializer);
-    sse_encode_list_String(self.tags, serializer);
-    sse_encode_bool(self.favourite, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_list_custom_field_data(self.fields, serializer);
   }
@@ -2874,8 +2773,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.entryType, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_String(self.folder, serializer);
-    sse_encode_list_String(self.tags, serializer);
-    sse_encode_bool(self.favourite, serializer);
   }
 
   @protected
@@ -2894,8 +2791,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.createdAt, serializer);
     sse_encode_String(self.updatedAt, serializer);
     sse_encode_String(self.folder, serializer);
-    sse_encode_list_String(self.tags, serializer);
-    sse_encode_bool(self.favourite, serializer);
     sse_encode_String(self.filename, serializer);
     sse_encode_list_prim_u_8_strict(self.data, serializer);
     sse_encode_opt_String(self.notes, serializer);
@@ -2927,8 +2822,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.createdAt, serializer);
     sse_encode_String(self.updatedAt, serializer);
     sse_encode_String(self.folder, serializer);
-    sse_encode_list_String(self.tags, serializer);
-    sse_encode_bool(self.favourite, serializer);
     sse_encode_String(self.firstName, serializer);
     sse_encode_String(self.lastName, serializer);
     sse_encode_String(self.email, serializer);
@@ -3076,8 +2969,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.createdAt, serializer);
     sse_encode_String(self.updatedAt, serializer);
     sse_encode_String(self.folder, serializer);
-    sse_encode_list_String(self.tags, serializer);
-    sse_encode_bool(self.favourite, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_String(self.url, serializer);
     sse_encode_String(self.username, serializer);
@@ -3100,8 +2991,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.createdAt, serializer);
     sse_encode_String(self.updatedAt, serializer);
     sse_encode_String(self.folder, serializer);
-    sse_encode_list_String(self.tags, serializer);
-    sse_encode_bool(self.favourite, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_String(self.content, serializer);
   }

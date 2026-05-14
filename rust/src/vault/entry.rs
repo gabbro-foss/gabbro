@@ -32,10 +32,6 @@ pub struct EntryMeta {
     pub updated_at: String,
     /// Which folder this entry belongs to (e.g. "Personal").
     pub folder: String,
-    /// Free-form tags for filtering and organisation.
-    pub tags: Vec<String>,
-    /// Whether this entry appears in the favourites list.
-    pub favourite: bool,
 }
 
 /// A binary attachment belonging to a vault entry.
@@ -276,8 +272,6 @@ mod tests {
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
             folder: String::from("Personal"),
-            tags: vec![],
-            favourite: false,
         }
     }
 
@@ -299,7 +293,6 @@ mod tests {
         assert_eq!(entry.url, "https://github.com");
         assert_eq!(entry.username, "rob");
         assert_eq!(entry.meta.id, "test-id-001");
-        assert_eq!(entry.meta.favourite, false);
     }
 
     #[test]

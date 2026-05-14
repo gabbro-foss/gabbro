@@ -121,26 +121,17 @@ class EntrySummaryData {
   final String entryType;
   final String title;
   final String folder;
-  final List<String> tags;
-  final bool favourite;
 
   const EntrySummaryData({
     required this.id,
     required this.entryType,
     required this.title,
     required this.folder,
-    required this.tags,
-    required this.favourite,
   });
 
   @override
   int get hashCode =>
-      id.hashCode ^
-      entryType.hashCode ^
-      title.hashCode ^
-      folder.hashCode ^
-      tags.hashCode ^
-      favourite.hashCode;
+      id.hashCode ^ entryType.hashCode ^ title.hashCode ^ folder.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -150,9 +141,7 @@ class EntrySummaryData {
           id == other.id &&
           entryType == other.entryType &&
           title == other.title &&
-          folder == other.folder &&
-          tags == other.tags &&
-          favourite == other.favourite;
+          folder == other.folder;
 }
 
 @freezed

@@ -91,8 +91,6 @@ mod tests {
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
             folder: String::from("Personal"),
-            tags: vec![],
-            favourite: false,
         }
     }
 

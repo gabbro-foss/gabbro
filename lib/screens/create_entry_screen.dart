@@ -433,8 +433,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             createdAt: field0.createdAt,
             updatedAt: '',
             folder: field0.folder,
-            tags: field0.tags,
-            favourite: field0.favourite,
             title: _loginTitleController.text,
             url: _urlController.text,
             username: _usernameController.text,
@@ -453,8 +451,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             createdAt: field0.createdAt,
             updatedAt: '',
             folder: field0.folder,
-            tags: field0.tags,
-            favourite: field0.favourite,
             title: _titleController.text,
             content: _contentController.text,
           ),
@@ -466,8 +462,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             createdAt: field0.createdAt,
             updatedAt: '',
             folder: field0.folder,
-            tags: field0.tags,
-            favourite: field0.favourite,
             firstName: _firstNameController.text,
             lastName: _lastNameController.text,
             email: _emailController.text,
@@ -493,8 +487,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             createdAt: field0.createdAt,
             updatedAt: '',
             folder: field0.folder,
-            tags: field0.tags,
-            favourite: field0.favourite,
             cardName: _cardNameController.text.isEmpty
                 ? null
                 : _cardNameController.text,
@@ -530,8 +522,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             createdAt: field0.createdAt,
             updatedAt: '',
             folder: field0.folder,
-            tags: field0.tags,
-            favourite: field0.favourite,
             filename: _pickedFilename ?? field0.filename,
             data: _pickedFileBytes ?? Uint8List.fromList(field0.data),
             notes: _fileNotesController.text.isEmpty
@@ -546,8 +536,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             createdAt: field0.createdAt,
             updatedAt: '',
             folder: field0.folder,
-            tags: field0.tags,
-            favourite: field0.favourite,
             title: _customTitleController.text,
             fields: _customFields
                 .map(
@@ -575,8 +563,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               createdAt: '',
               updatedAt: '',
               folder: 'Personal',
-              tags: [],
-              favourite: false,
               title: _loginTitleController.text,
               url: _urlController.text,
               username: _usernameController.text,
@@ -597,8 +583,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               createdAt: '',
               updatedAt: '',
               folder: 'Personal',
-              tags: [],
-              favourite: false,
               title: _titleController.text,
               content: _contentController.text,
             ),
@@ -613,8 +597,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               createdAt: '',
               updatedAt: '',
               folder: 'Personal',
-              tags: [],
-              favourite: false,
               firstName: _firstNameController.text,
               lastName: _lastNameController.text,
               email: _emailController.text,
@@ -645,8 +627,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               createdAt: '',
               updatedAt: '',
               folder: 'Personal',
-              tags: [],
-              favourite: false,
               cardName: _cardNameController.text.isEmpty
                   ? null
                   : _cardNameController.text,
@@ -683,8 +663,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               createdAt: '',
               updatedAt: '',
               folder: 'Personal',
-              tags: [],
-              favourite: false,
               filename: _pickedFilename!,
               data: _pickedFileBytes!,
               notes: _fileNotesController.text.isEmpty
@@ -702,8 +680,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               createdAt: '',
               updatedAt: '',
               folder: 'Personal',
-              tags: [],
-              favourite: false,
               title: _customTitleController.text,
               fields: _customFields
                   .map(

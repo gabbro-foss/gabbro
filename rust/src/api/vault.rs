@@ -39,8 +39,6 @@ pub struct LoginEntryData {
     pub created_at: String,
     pub updated_at: String,
     pub folder: String,
-    pub tags: Vec<String>,
-    pub favourite: bool,
     /// Human-readable item title (e.g. "GitHub", "Netflix").
     /// Distinct from the URL — used as the primary display label in list views.
     pub title: String,
@@ -59,8 +57,6 @@ pub struct NoteEntryData {
     pub created_at: String,
     pub updated_at: String,
     pub folder: String,
-    pub tags: Vec<String>,
-    pub favourite: bool,
     pub title: String,
     pub content: String,
 }
@@ -71,8 +67,6 @@ pub struct IdentityEntryData {
     pub created_at: String,
     pub updated_at: String,
     pub folder: String,
-    pub tags: Vec<String>,
-    pub favourite: bool,
     pub first_name: String,
     pub last_name: String,
     pub email: String,
@@ -87,8 +81,6 @@ pub struct CardEntryData {
     pub created_at: String,
     pub updated_at: String,
     pub folder: String,
-    pub tags: Vec<String>,
-    pub favourite: bool,
     pub card_name: Option<String>,
     pub status: String,
     pub cardholder_name: String,
@@ -115,8 +107,6 @@ pub struct FileEntryData {
     pub created_at: String,
     pub updated_at: String,
     pub folder: String,
-    pub tags: Vec<String>,
-    pub favourite: bool,
     pub filename: String,
     pub data: Vec<u8>,
     pub notes: Option<String>,
@@ -128,8 +118,6 @@ pub struct CustomEntryData {
     pub created_at: String,
     pub updated_at: String,
     pub folder: String,
-    pub tags: Vec<String>,
-    pub favourite: bool,
     pub title: String,
     pub fields: Vec<CustomFieldData>,
 }
@@ -161,8 +149,6 @@ fn login_entry_to_data(e: &LoginEntry) -> LoginEntryData {
         created_at: e.meta.created_at.clone(),
         updated_at: e.meta.updated_at.clone(),
         folder: e.meta.folder.clone(),
-        tags: e.meta.tags.clone(),
-        favourite: e.meta.favourite,
         title: e.title.clone(),
         url: e.url.clone(),
         username: e.username.clone(),
@@ -179,8 +165,6 @@ fn note_entry_to_data(e: &NoteEntry) -> NoteEntryData {
         created_at: e.meta.created_at.clone(),
         updated_at: e.meta.updated_at.clone(),
         folder: e.meta.folder.clone(),
-        tags: e.meta.tags.clone(),
-        favourite: e.meta.favourite,
         title: e.title.clone(),
         content: e.content.clone(),
     }
@@ -192,8 +176,6 @@ fn identity_entry_to_data(e: &IdentityEntry) -> IdentityEntryData {
         created_at: e.meta.created_at.clone(),
         updated_at: e.meta.updated_at.clone(),
         folder: e.meta.folder.clone(),
-        tags: e.meta.tags.clone(),
-        favourite: e.meta.favourite,
         first_name: e.first_name.clone(),
         last_name: e.last_name.clone(),
         email: e.email.clone(),
@@ -209,8 +191,6 @@ fn card_entry_to_data(e: &CardEntry) -> CardEntryData {
         created_at: e.meta.created_at.clone(),
         updated_at: e.meta.updated_at.clone(),
         folder: e.meta.folder.clone(),
-        tags: e.meta.tags.clone(),
-        favourite: e.meta.favourite,
         card_name: e.card_name.clone(),
         status: e.status.clone(),
         cardholder_name: e.cardholder_name.clone(),
@@ -236,8 +216,6 @@ fn file_entry_to_data(e: &FileEntry) -> FileEntryData {
         created_at: e.meta.created_at.clone(),
         updated_at: e.meta.updated_at.clone(),
         folder: e.meta.folder.clone(),
-        tags: e.meta.tags.clone(),
-        favourite: e.meta.favourite,
         filename: e.filename.clone(),
         data: e.data.clone(),
         notes: e.notes.clone(),
@@ -250,8 +228,6 @@ fn custom_entry_to_data(e: &CustomEntry) -> CustomEntryData {
         created_at: e.meta.created_at.clone(),
         updated_at: e.meta.updated_at.clone(),
         folder: e.meta.folder.clone(),
-        tags: e.meta.tags.clone(),
-        favourite: e.meta.favourite,
         title: e.title.clone(),
         fields: e.fields
             .values()
@@ -268,8 +244,6 @@ fn custom_entry_to_data(e: &CustomEntry) -> CustomEntryData {
 /// `LoginEntryData` DTO — the internal `LoginEntry` never crosses the bridge.
 pub fn create_login_entry(
     folder: String,
-    tags: Vec<String>,
-    favourite: bool,
     title: String,
     url: String,
     username: String,
@@ -283,8 +257,6 @@ pub fn create_login_entry(
         created_at: now.clone(),
         updated_at: now,
         folder,
-        tags,
-        favourite,
     };
     let internal_fields = custom_fields
         .into_iter()
@@ -311,8 +283,6 @@ pub fn create_login_entry(
 /// Creates a new note entry with a generated UUID and current timestamp.
 pub fn create_note_entry(
     folder: String,
-    tags: Vec<String>,
-    favourite: bool,
     title: String,
     content: String,
 ) -> NoteEntryData {
@@ -322,8 +292,6 @@ pub fn create_note_entry(
         created_at: now.clone(),
         updated_at: now,
         folder,
-        tags,
-        favourite,
     };
     let entry = NoteEntry { meta, title, content, attachments: vec![] };
     note_entry_to_data(&entry)
@@ -332,8 +300,6 @@ pub fn create_note_entry(
 /// Creates a new identity entry with a generated UUID and current timestamp.
 pub fn create_identity_entry(
     folder: String,
-    tags: Vec<String>,
-    favourite: bool,
     first_name: String,
     last_name: String,
     email: String,
@@ -346,8 +312,6 @@ pub fn create_identity_entry(
         created_at: now.clone(),
         updated_at: now,
         folder,
-        tags,
-        favourite,
     };
     let entry = IdentityEntry { meta, first_name, last_name, email, phone, address, custom_fields: vec![], attachments: vec![] };
     identity_entry_to_data(&entry)
@@ -358,8 +322,6 @@ pub fn create_identity_entry(
 /// Returns an error if the card number does not contain 12-19 digits.
 pub fn create_card_entry(
     folder: String,
-    tags: Vec<String>,
-    favourite: bool,
     card_name: Option<String>,
     status: String,
     cardholder_name: String,
@@ -380,8 +342,6 @@ pub fn create_card_entry(
         created_at: now.clone(),
         updated_at: now,
         folder,
-        tags,
-        favourite,
     };
     let entry = CardEntry::new(
         meta,
@@ -409,8 +369,6 @@ pub fn create_card_entry(
 /// Creates a new file entry with a generated UUID and current timestamp.
 pub fn create_file_entry(
     folder: String,
-    tags: Vec<String>,
-    favourite: bool,
     filename: String,
     data: Vec<u8>,
     notes: Option<String>,
@@ -421,8 +379,6 @@ pub fn create_file_entry(
         created_at: now.clone(),
         updated_at: now,
         folder,
-        tags,
-        favourite,
     };
     let entry = FileEntry { meta, filename, data, notes };
     file_entry_to_data(&entry)
@@ -431,8 +387,6 @@ pub fn create_file_entry(
 /// Creates a new custom entry with a generated UUID and current timestamp.
 pub fn create_custom_entry(
     folder: String,
-    tags: Vec<String>,
-    favourite: bool,
     title: String,
     fields: Vec<CustomFieldData>,
 ) -> CustomEntryData {
@@ -442,8 +396,6 @@ pub fn create_custom_entry(
         created_at: now.clone(),
         updated_at: now,
         folder,
-        tags,
-        favourite,
     };
     let internal_fields = fields
         .into_iter()
@@ -896,8 +848,6 @@ mod tests {
         assert_eq!(entry.username, "rob");
         assert_eq!(entry.password, "hunter2");
         assert!(entry.notes.is_none());
-        assert_eq!(entry.tags, vec!["web"]);
-        assert!(!entry.favourite);
     }
 
     #[test]
@@ -910,8 +860,6 @@ mod tests {
             String::from("https://a.com"),
             String::from("user"),
             String::from("pass"),
-            None,
-            vec![],
         );
         let b = create_login_entry(
             String::from("Work"),
@@ -921,8 +869,6 @@ mod tests {
             String::from("https://b.com"),
             String::from("user"),
             String::from("pass"),
-            None,
-            vec![],
         );
         assert_ne!(a.id, b.id);
     }
@@ -943,13 +889,12 @@ mod tests {
             String::from("rob"),
             String::from("s3cr3t"),
             Some(String::from("main account")),
-            vec![field],
         );
 
         assert!(entry.notes.is_some());
         assert_eq!(entry.custom_fields.len(), 1);
         assert_eq!(entry.custom_fields[0].label, "Recovery email");
-        assert!(entry.favourite);
+
     }
 
     #[test]
@@ -976,7 +921,7 @@ mod tests {
         assert_eq!(entry.title, "Shopping list");
         assert_eq!(entry.content, "Milk, eggs, bread");
         assert_eq!(entry.folder, "Personal");
-        assert!(!entry.favourite);
+
     }
 
     #[test]
@@ -1872,6 +1817,51 @@ mod tests {
             VaultEntry::Note(e) => assert_eq!(e.content, "secret content"),
             _ => panic!("Expected Note variant"),
         }
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn change_passphrase_preserves_folders() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_change_pass_folders_test.gabbro");
+
+        let body = VaultBody {
+            folders: vec![
+                String::from("Work"),
+                String::from("Private"),
+                String::from("Other"),
+            ],
+            entries: vec![VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Work"),
+                    tags: vec![],
+                    favourite: false,
+                },
+                title: String::from("Test note"),
+                content: String::from("secret content"),
+                attachments: vec![],
+            })],
+        };
+
+        let old = b"old passphrase";
+        let new = b"new passphrase";
+
+        save_vault(&body, old, &path).unwrap();
+        change_passphrase(&path, old, new).unwrap();
+
+        let recovered = load_vault(new, &path).unwrap();
+        assert_eq!(
+            recovered.folders,
+            vec!["Work", "Private", "Other"],
+            "folders must survive a passphrase change"
+        );
 
         let _ = std::fs::remove_file(&path);
     }

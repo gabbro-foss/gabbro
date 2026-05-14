@@ -374,14 +374,12 @@ fn non_empty(s: &str) -> Option<String> {
 
 /// Build an `EntryMeta` from Enpass item-level fields.
 /// Timestamps are left empty — Rust will stamp them on first save.
-fn make_meta(uuid: &str, folder: &str, favorite: u8) -> EntryMeta {
+fn make_meta(uuid: &str, folder: &str, _favorite: u8) -> EntryMeta {
     EntryMeta {
         id: uuid.to_string(),
         created_at: String::new(),
         updated_at: String::new(),
         folder: folder.to_string(),
-        tags: vec![],
-        favourite: favorite == 1,
     }
 }
 
@@ -451,7 +449,6 @@ mod tests {
         assert_eq!(e.username, "rob");
         assert_eq!(e.password, "h4x0r");
         assert_eq!(e.url, "https://github.com");
-        assert_eq!(e.meta.favourite, false);
     }
 
     #[test]
@@ -463,7 +460,6 @@ mod tests {
         assert_eq!(e.card_name, Some(String::from("Visa Platinum")));
         assert_eq!(e.cardholder_name, "Rob Smith");
         assert_eq!(e.card_number, "4111111111111111");
-        assert_eq!(e.meta.favourite, true);
     }
 
     #[test]

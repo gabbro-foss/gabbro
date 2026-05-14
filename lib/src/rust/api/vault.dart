@@ -15,8 +15,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 /// `LoginEntryData` DTO — the internal `LoginEntry` never crosses the bridge.
 Future<LoginEntryData> createLoginEntry({
   required String folder,
-  required List<String> tags,
-  required bool favourite,
   required String title,
   required String url,
   required String username,
@@ -25,8 +23,6 @@ Future<LoginEntryData> createLoginEntry({
   required List<CustomFieldData> customFields,
 }) => RustLib.instance.api.crateApiVaultCreateLoginEntry(
   folder: folder,
-  tags: tags,
-  favourite: favourite,
   title: title,
   url: url,
   username: username,
@@ -38,14 +34,10 @@ Future<LoginEntryData> createLoginEntry({
 /// Creates a new note entry with a generated UUID and current timestamp.
 Future<NoteEntryData> createNoteEntry({
   required String folder,
-  required List<String> tags,
-  required bool favourite,
   required String title,
   required String content,
 }) => RustLib.instance.api.crateApiVaultCreateNoteEntry(
   folder: folder,
-  tags: tags,
-  favourite: favourite,
   title: title,
   content: content,
 );
@@ -53,8 +45,6 @@ Future<NoteEntryData> createNoteEntry({
 /// Creates a new identity entry with a generated UUID and current timestamp.
 Future<IdentityEntryData> createIdentityEntry({
   required String folder,
-  required List<String> tags,
-  required bool favourite,
   required String firstName,
   required String lastName,
   required String email,
@@ -62,8 +52,6 @@ Future<IdentityEntryData> createIdentityEntry({
   String? address,
 }) => RustLib.instance.api.crateApiVaultCreateIdentityEntry(
   folder: folder,
-  tags: tags,
-  favourite: favourite,
   firstName: firstName,
   lastName: lastName,
   email: email,
@@ -76,8 +64,6 @@ Future<IdentityEntryData> createIdentityEntry({
 /// Returns an error if the card number does not contain 12-19 digits.
 Future<CardEntryData> createCardEntry({
   required String folder,
-  required List<String> tags,
-  required bool favourite,
   String? cardName,
   required String status,
   required String cardholderName,
@@ -93,8 +79,6 @@ Future<CardEntryData> createCardEntry({
   String? notes,
 }) => RustLib.instance.api.crateApiVaultCreateCardEntry(
   folder: folder,
-  tags: tags,
-  favourite: favourite,
   cardName: cardName,
   status: status,
   cardholderName: cardholderName,
@@ -113,15 +97,11 @@ Future<CardEntryData> createCardEntry({
 /// Creates a new file entry with a generated UUID and current timestamp.
 Future<FileEntryData> createFileEntry({
   required String folder,
-  required List<String> tags,
-  required bool favourite,
   required String filename,
   required List<int> data,
   String? notes,
 }) => RustLib.instance.api.crateApiVaultCreateFileEntry(
   folder: folder,
-  tags: tags,
-  favourite: favourite,
   filename: filename,
   data: data,
   notes: notes,
@@ -130,14 +110,10 @@ Future<FileEntryData> createFileEntry({
 /// Creates a new custom entry with a generated UUID and current timestamp.
 Future<CustomEntryData> createCustomEntry({
   required String folder,
-  required List<String> tags,
-  required bool favourite,
   required String title,
   required List<CustomFieldData> fields,
 }) => RustLib.instance.api.crateApiVaultCreateCustomEntry(
   folder: folder,
-  tags: tags,
-  favourite: favourite,
   title: title,
   fields: fields,
 );
@@ -152,8 +128,6 @@ class CardEntryData {
   final String createdAt;
   final String updatedAt;
   final String folder;
-  final List<String> tags;
-  final bool favourite;
   final String? cardName;
   final String status;
   final String cardholderName;
@@ -180,8 +154,6 @@ class CardEntryData {
     required this.createdAt,
     required this.updatedAt,
     required this.folder,
-    required this.tags,
-    required this.favourite,
     this.cardName,
     required this.status,
     required this.cardholderName,
@@ -206,8 +178,6 @@ class CardEntryData {
       createdAt.hashCode ^
       updatedAt.hashCode ^
       folder.hashCode ^
-      tags.hashCode ^
-      favourite.hashCode ^
       cardName.hashCode ^
       status.hashCode ^
       cardholderName.hashCode ^
@@ -234,8 +204,6 @@ class CardEntryData {
           createdAt == other.createdAt &&
           updatedAt == other.updatedAt &&
           folder == other.folder &&
-          tags == other.tags &&
-          favourite == other.favourite &&
           cardName == other.cardName &&
           status == other.status &&
           cardholderName == other.cardholderName &&
@@ -260,8 +228,6 @@ class CustomEntryData {
   final String createdAt;
   final String updatedAt;
   final String folder;
-  final List<String> tags;
-  final bool favourite;
   final String title;
   final List<CustomFieldData> fields;
 
@@ -270,8 +236,6 @@ class CustomEntryData {
     required this.createdAt,
     required this.updatedAt,
     required this.folder,
-    required this.tags,
-    required this.favourite,
     required this.title,
     required this.fields,
   });
@@ -282,8 +246,6 @@ class CustomEntryData {
       createdAt.hashCode ^
       updatedAt.hashCode ^
       folder.hashCode ^
-      tags.hashCode ^
-      favourite.hashCode ^
       title.hashCode ^
       fields.hashCode;
 
@@ -296,8 +258,6 @@ class CustomEntryData {
           createdAt == other.createdAt &&
           updatedAt == other.updatedAt &&
           folder == other.folder &&
-          tags == other.tags &&
-          favourite == other.favourite &&
           title == other.title &&
           fields == other.fields;
 }
@@ -333,8 +293,6 @@ class FileEntryData {
   final String createdAt;
   final String updatedAt;
   final String folder;
-  final List<String> tags;
-  final bool favourite;
   final String filename;
   final Uint8List data;
   final String? notes;
@@ -344,8 +302,6 @@ class FileEntryData {
     required this.createdAt,
     required this.updatedAt,
     required this.folder,
-    required this.tags,
-    required this.favourite,
     required this.filename,
     required this.data,
     this.notes,
@@ -357,8 +313,6 @@ class FileEntryData {
       createdAt.hashCode ^
       updatedAt.hashCode ^
       folder.hashCode ^
-      tags.hashCode ^
-      favourite.hashCode ^
       filename.hashCode ^
       data.hashCode ^
       notes.hashCode;
@@ -372,8 +326,6 @@ class FileEntryData {
           createdAt == other.createdAt &&
           updatedAt == other.updatedAt &&
           folder == other.folder &&
-          tags == other.tags &&
-          favourite == other.favourite &&
           filename == other.filename &&
           data == other.data &&
           notes == other.notes;
@@ -385,8 +337,6 @@ class IdentityEntryData {
   final String createdAt;
   final String updatedAt;
   final String folder;
-  final List<String> tags;
-  final bool favourite;
   final String firstName;
   final String lastName;
   final String email;
@@ -399,8 +349,6 @@ class IdentityEntryData {
     required this.createdAt,
     required this.updatedAt,
     required this.folder,
-    required this.tags,
-    required this.favourite,
     required this.firstName,
     required this.lastName,
     required this.email,
@@ -415,8 +363,6 @@ class IdentityEntryData {
       createdAt.hashCode ^
       updatedAt.hashCode ^
       folder.hashCode ^
-      tags.hashCode ^
-      favourite.hashCode ^
       firstName.hashCode ^
       lastName.hashCode ^
       email.hashCode ^
@@ -433,8 +379,6 @@ class IdentityEntryData {
           createdAt == other.createdAt &&
           updatedAt == other.updatedAt &&
           folder == other.folder &&
-          tags == other.tags &&
-          favourite == other.favourite &&
           firstName == other.firstName &&
           lastName == other.lastName &&
           email == other.email &&
@@ -449,8 +393,6 @@ class LoginEntryData {
   final String createdAt;
   final String updatedAt;
   final String folder;
-  final List<String> tags;
-  final bool favourite;
 
   /// Human-readable item title (e.g. "GitHub", "Netflix").
   /// Distinct from the URL — used as the primary display label in list views.
@@ -469,8 +411,6 @@ class LoginEntryData {
     required this.createdAt,
     required this.updatedAt,
     required this.folder,
-    required this.tags,
-    required this.favourite,
     required this.title,
     required this.url,
     required this.username,
@@ -486,8 +426,6 @@ class LoginEntryData {
       createdAt.hashCode ^
       updatedAt.hashCode ^
       folder.hashCode ^
-      tags.hashCode ^
-      favourite.hashCode ^
       title.hashCode ^
       url.hashCode ^
       username.hashCode ^
@@ -505,8 +443,6 @@ class LoginEntryData {
           createdAt == other.createdAt &&
           updatedAt == other.updatedAt &&
           folder == other.folder &&
-          tags == other.tags &&
-          favourite == other.favourite &&
           title == other.title &&
           url == other.url &&
           username == other.username &&
@@ -522,8 +458,6 @@ class NoteEntryData {
   final String createdAt;
   final String updatedAt;
   final String folder;
-  final List<String> tags;
-  final bool favourite;
   final String title;
   final String content;
 
@@ -532,8 +466,6 @@ class NoteEntryData {
     required this.createdAt,
     required this.updatedAt,
     required this.folder,
-    required this.tags,
-    required this.favourite,
     required this.title,
     required this.content,
   });
@@ -544,8 +476,6 @@ class NoteEntryData {
       createdAt.hashCode ^
       updatedAt.hashCode ^
       folder.hashCode ^
-      tags.hashCode ^
-      favourite.hashCode ^
       title.hashCode ^
       content.hashCode;
 
@@ -558,8 +488,6 @@ class NoteEntryData {
           createdAt == other.createdAt &&
           updatedAt == other.updatedAt &&
           folder == other.folder &&
-          tags == other.tags &&
-          favourite == other.favourite &&
           title == other.title &&
           content == other.content;
 }

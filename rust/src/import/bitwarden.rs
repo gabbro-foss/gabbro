@@ -34,7 +34,6 @@ struct BwItem {
     name: String,
     notes: Option<String>,
     #[serde(default)]
-    favorite: bool,
     #[serde(rename = "folderId")]
     folder_id: Option<String>,
     #[serde(default)]
@@ -135,8 +134,6 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
             created_at: crate::api::vault::chrono_now(),
             updated_at: crate::api::vault::chrono_now(),
             folder,
-            tags: vec![],
-            favourite: item.favorite,
         };
 
         let custom_fields = convert_fields(&item.fields);
@@ -444,7 +441,6 @@ mod tests {
         assert_eq!(login.username, "rob@example.com");
         assert_eq!(login.password, "hunter2");
         assert_eq!(login.notes, Some("Personal email account".to_string()));
-        assert_eq!(login.meta.favourite, true);
         assert_eq!(login.meta.folder, "Work");
     }
 
@@ -465,7 +461,6 @@ mod tests {
 
         assert_eq!(note.title, "SSH Key Passphrase");
         assert_eq!(note.content, "Passphrase for my ed25519 key");
-        assert_eq!(note.meta.favourite, false);
     }
 
     #[test]
