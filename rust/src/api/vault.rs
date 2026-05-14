@@ -832,8 +832,6 @@ mod tests {
     fn create_login_entry_returns_correct_fields() {
         let entry = create_login_entry(
             String::from("Personal"),
-            vec![String::from("web")],
-            false,
             String::from("GitHub"),
             String::from("https://github.com"),
             String::from("rob"),
@@ -854,21 +852,21 @@ mod tests {
     fn create_login_entry_generates_unique_ids() {
         let a = create_login_entry(
             String::from("Work"),
-            vec![],
-            false,
             String::from("Site A"),
             String::from("https://a.com"),
             String::from("user"),
             String::from("pass"),
+            None,
+            vec![],
         );
         let b = create_login_entry(
             String::from("Work"),
-            vec![],
-            false,
             String::from("Site B"),
             String::from("https://b.com"),
             String::from("user"),
             String::from("pass"),
+            None,
+            vec![],
         );
         assert_ne!(a.id, b.id);
     }
@@ -882,13 +880,12 @@ mod tests {
         };
         let entry = create_login_entry(
             String::from("Personal"),
-            vec![],
-            true,
             String::from("Example"),
             String::from("https://example.com"),
             String::from("rob"),
             String::from("s3cr3t"),
             Some(String::from("main account")),
+            vec![field],
         );
 
         assert!(entry.notes.is_some());
@@ -912,8 +909,6 @@ mod tests {
     fn create_note_entry_returns_correct_fields() {
         let entry = create_note_entry(
             String::from("Personal"),
-            vec![],
-            false,
             String::from("Shopping list"),
             String::from("Milk, eggs, bread"),
         );
@@ -928,15 +923,11 @@ mod tests {
     fn create_note_entry_generates_unique_ids() {
         let a = create_note_entry(
             String::from("Work"),
-            vec![],
-            false,
             String::from("Note A"),
             String::from("content a"),
         );
         let b = create_note_entry(
             String::from("Work"),
-            vec![],
-            false,
             String::from("Note B"),
             String::from("content b"),
         );
@@ -947,8 +938,6 @@ mod tests {
     fn create_identity_entry_returns_correct_fields() {
         let entry = create_identity_entry(
             String::from("Personal"),
-            vec![],
-            false,
             String::from("Rob"),
             String::from("Smith"),
             String::from("rob@example.com"),
@@ -962,15 +951,12 @@ mod tests {
         assert!(entry.phone.is_some());
         assert!(entry.address.is_some());
         assert_eq!(entry.folder, "Personal");
-        assert!(!entry.favourite);
     }
 
     #[test]
     fn create_identity_entry_optional_fields_can_be_absent() {
         let entry = create_identity_entry(
             String::from("Personal"),
-            vec![],
-            false,
             String::from("Rob"),
             String::from("Smith"),
             String::from("rob@example.com"),
@@ -986,8 +972,6 @@ mod tests {
     fn create_card_entry_valid_number_succeeds() {
         let result = create_card_entry(
             String::from("Personal"),
-            vec![],
-            false,
             Some(String::from("Visa Platinum")),
             String::from("active"),
             String::from("Rob Smith"),
@@ -1016,8 +1000,6 @@ mod tests {
     fn create_card_entry_invalid_number_returns_error() {
         let result = create_card_entry(
             String::from("Personal"),
-            vec![],
-            false,
             None,
             String::from("active"),
             String::from("Rob Smith"),
@@ -1041,8 +1023,6 @@ mod tests {
         let payload = vec![0u8, 1u8, 2u8, 255u8];
         let entry = create_file_entry(
             String::from("Personal"),
-            vec![],
-            false,
             String::from("secret.pdf"),
             payload,
             Some(String::from("my secret doc")),
@@ -1059,18 +1039,14 @@ mod tests {
     fn create_file_entry_generates_unique_ids() {
         let a = create_file_entry(
             String::from("Work"),
-            vec![],
-            false,
             String::from("a.pdf"),
-            vec![1u8],
+            vec![],
             None,
         );
         let b = create_file_entry(
             String::from("Work"),
-            vec![],
-            false,
             String::from("b.pdf"),
-            vec![2u8],
+            vec![],
             None,
         );
         assert_ne!(a.id, b.id);
@@ -1092,8 +1068,6 @@ mod tests {
         ];
         let entry = create_custom_entry(
             String::from("Work"),
-            vec![String::from("aws")],
-            false,
             String::from("AWS credentials"),
             fields,
         );
@@ -1101,15 +1075,12 @@ mod tests {
         assert_eq!(entry.title, "AWS credentials");
         assert_eq!(entry.fields.len(), 2);
         assert_eq!(entry.folder, "Work");
-        assert_eq!(entry.tags, vec!["aws"]);
     }
 
     #[test]
     fn create_custom_entry_empty_fields_succeeds() {
         let entry = create_custom_entry(
             String::from("Personal"),
-            vec![],
-            false,
             String::from("Empty custom"),
             vec![],
         );
@@ -1133,8 +1104,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("Test note"),
                 content: String::from("secret content"),
@@ -1181,8 +1150,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("First note"),
                 content: String::from("content one"),
@@ -1194,8 +1161,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("Second note"),
                 content: String::from("content two"),
@@ -1221,8 +1186,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("A note"),
                 content: String::from("some content"),
@@ -1244,8 +1207,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("Original title"),
                 content: String::from("original content"),
@@ -1259,8 +1220,6 @@ mod tests {
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
                 folder: String::from("Personal"),
-                tags: vec![],
-                favourite: false,
             },
             title: String::from("Updated title"),
             content: String::from("updated content"),
@@ -1289,8 +1248,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("Note"),
                 content: String::from("content"),
@@ -1304,8 +1261,6 @@ mod tests {
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
                 folder: String::from("Personal"),
-                tags: vec![],
-                favourite: false,
             },
             title: String::from("Note"),
             content: String::from("new content"),
@@ -1330,8 +1285,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("Note"),
                 content: String::from("content"),
@@ -1345,8 +1298,6 @@ mod tests {
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
                 folder: String::from("Personal"),
-                tags: vec![],
-                favourite: false,
             },
             title: String::from("Ghost"),
             content: String::from("ghost content"),
@@ -1367,8 +1318,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("First"),
                 content: String::from("first content"),
@@ -1380,8 +1329,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("Second"),
                 content: String::from("second content"),
@@ -1408,8 +1355,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("A note"),
                 content: String::from("some content"),
@@ -1452,8 +1397,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("Example"),
                 url: String::from("https://example.com"),
@@ -1484,8 +1427,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("Example"),
                 url: String::from("https://example.com"),
@@ -1519,8 +1460,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 card_name: Some(String::from("Visa Platinum")),
                 status: String::from("active"),
@@ -1563,8 +1502,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("Example"),
                 url: String::from("https://example.com"),
@@ -1607,8 +1544,6 @@ mod tests {
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
             folder: String::from("Personal"),
-            tags: vec![],
-            favourite: false,
         };
         let mut entries = vec![VaultEntry::Login(LoginEntry {
             meta: meta.clone(),
@@ -1656,8 +1591,6 @@ mod tests {
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
             folder: String::from("Personal"),
-            tags: vec![],
-            favourite: false,
         };
         let mut entries = vec![VaultEntry::Login(LoginEntry {
             meta: meta.clone(),
@@ -1705,8 +1638,6 @@ mod tests {
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
             folder: String::from("Personal"),
-            tags: vec![],
-            favourite: false,
         };
         let existing_prev = PreviousSecret {
             value: String::from("even_older"),
@@ -1761,8 +1692,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("My note"),
                 content: String::from("sensitive note content"),
@@ -1792,8 +1721,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("Test note"),
                 content: String::from("secret content"),
@@ -1841,8 +1768,7 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Work"),
-                    tags: vec![],
-                    favourite: false,
+
                 },
                 title: String::from("Test note"),
                 content: String::from("secret content"),
@@ -1897,8 +1823,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("Export test"),
                 content: String::from("exported content"),
@@ -1950,8 +1874,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Personal"),
-                    tags: vec![],
-                    favourite: false,
                 },
                 title: String::from("Reload test"),
                 content: String::from("reloaded content"),
