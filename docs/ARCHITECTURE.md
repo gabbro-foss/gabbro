@@ -156,7 +156,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - ✅ Task 1: Folder filter dropdown on `VaultListScreen`
   - ✅ Task 2: Folder picker on `CreateEntryScreen` / `EntryDetailScreen`
   - ✅ Task 3: New `ManageFoldersScreen` (add, rename, delete with reassign dialog)
-  - ⬜ Task 5: Wire `ManageFoldersScreen` into settings menu
+  - ✅ Task 5: Wire `ManageFoldersScreen` into settings menu
 
 **Folders design (agreed 13 May 2026):**
 - `VaultBody` gets `folders: Vec<String>`, default `["Work", "Private", "Other"]`, persisted in Rust
