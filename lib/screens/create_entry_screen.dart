@@ -828,10 +828,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       controller: _urlController,
       focusNode: _urlFocus,
       decoration: const InputDecoration(
-        labelText: 'URL',
+        labelText: 'URL (optional)',
         border: OutlineInputBorder(),
       ),
-      validator: (v) => (v == null || v.isEmpty) ? 'URL is required' : null,
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_usernameFocus),
     ),

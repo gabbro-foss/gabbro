@@ -70,7 +70,6 @@ void main() {
     await tester.pump();
 
     expect(find.text('Title is required'), findsOneWidget);
-    expect(find.text('URL is required'), findsOneWidget);
     expect(find.text('Username is required'), findsOneWidget);
     expect(find.text('Password is required'), findsOneWidget);
   });
@@ -299,7 +298,7 @@ void main() {
       'Obsidian Site',
     );
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'URL'),
+      find.widgetWithText(TextFormField, 'URL (optional)'),
       'https://obsidian.example.com',
     );
     await tester.enterText(
@@ -326,6 +325,37 @@ void main() {
 
   // ── End login notes tests ─────────────────────────────────────────────────
 
+  testWidgets('login can be saved without a URL', (tester) async {
+    VaultEntryData? captured;
+    await tester.pumpWidget(
+      _buildCreateScreen(
+        'Login',
+        onCreateEntry: (e) async => captured = e,
+      ),
+    );
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Title'),
+      'Basalt Computer',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Username'),
+      'rob',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Password'),
+      'p@ssw0rd',
+    );
+    await tester.pump();
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(captured, isA<VaultEntryData_Login>());
+    expect((captured! as VaultEntryData_Login).field0.url, equals(''));
+  });
+
   testWidgets('save button calls onCreateEntry with correct type',
       (tester) async {
     VaultEntryData? captured;
@@ -342,7 +372,7 @@ void main() {
       'Schist Site',
     );
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'URL'),
+      find.widgetWithText(TextFormField, 'URL (optional)'),
       'https://schist.example.com',
     );
     await tester.enterText(
@@ -391,7 +421,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Granite');
-    await tester.enterText(find.widgetWithText(TextFormField, 'URL'), 'https://granite.example.com');
+    await tester.enterText(find.widgetWithText(TextFormField, 'URL (optional)'), 'https://granite.example.com');
     await tester.enterText(find.widgetWithText(TextFormField, 'Username'), 'rob');
     await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'p@ss');
     await tester.pump();
@@ -417,7 +447,7 @@ void main() {
 
     // Leave folder as None
     await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Pumice');
-    await tester.enterText(find.widgetWithText(TextFormField, 'URL'), 'https://pumice.example.com');
+    await tester.enterText(find.widgetWithText(TextFormField, 'URL (optional)'), 'https://pumice.example.com');
     await tester.enterText(find.widgetWithText(TextFormField, 'Username'), 'rob');
     await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'p@ss');
     await tester.pump();
