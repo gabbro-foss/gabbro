@@ -52,7 +52,8 @@ gabbro/
 │   │   ├── review_changes_screen.dart
 │   │   ├── password_history_screen.dart
 │   │   ├── alphabet_index_bar.dart
-│   │   └── tablet_vault_layout.dart
+│   │   ├── tablet_vault_layout.dart
+│   │   └── manage_folders_screen.dart
 │   ├── widgets/
 │   │   ├── path_field.dart
 │   │   ├── segmented_row.dart
@@ -140,7 +141,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 218 | 1 |
-| Flutter (`flutter test`) | 240 | 0 |
+| Flutter (`flutter test`) | 256 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
 
@@ -154,7 +155,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - ✅ Task 4: Entry detail shows folder alongside timestamps ("None" when empty)
   - ✅ Task 1: Folder filter dropdown on `VaultListScreen`
   - ✅ Task 2: Folder picker on `CreateEntryScreen` / `EntryDetailScreen`
-  - ⬜ Task 3: New `ManageFoldersScreen` (add, rename, delete with reassign dialog)
+  - ✅ Task 3: New `ManageFoldersScreen` (add, rename, delete with reassign dialog)
   - ⬜ Task 5: Wire `ManageFoldersScreen` into settings menu
 
 **Folders design (agreed 13 May 2026):**

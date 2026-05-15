@@ -2583,6 +2583,49 @@ if the shape itself is unambiguous.
 
 ---
 
+## Flutter — `TextEditingController` dispose during dialog dismiss animation
+
+Disposing a `TextEditingController` immediately after `showDialog` returns
+causes a crash when the dialog has a dismiss animation. Flutter animates the
+dialog out after `Navigator.pop()`, and during that animation the framework
+rebuilds the `TextFormField` — which tries to re-attach to the now-disposed
+controller. The result is a cascade of framework assertions.
+
+The fix is to never dispose the controller from outside the dialog. Instead,
+declare the controller inside the dialog's `builder` and capture the value
+via `onChanged` into a local variable that outlives the dialog:
+
+```dart
+String newName = folder;
+final confirmed = await showDialog<bool>(
+  context: context,
+  builder: (context) {
+    final controller = TextEditingController(text: folder);
+    return StatefulBuilder(
+      builder: (context, setState) => AlertDialog(
+        content: TextFormField(
+          controller: controller,
+          onChanged: (v) => newName = v,
+        ),
+        ...
+      ),
+    );
+  },
+);
+// Use newName here — controller is gone, but the value is safe.
+```
+
+The controller is owned by the dialog's closure and is garbage-collected
+when the dialog's subtree is disposed — after the animation completes.
+The captured `newName` string is safe to use immediately after `showDialog`
+returns.
+
+Python analogy: like reading a value out of a context manager before
+exiting it, rather than trying to use the context manager's internal
+state after the `with` block has closed.
+
+---
+
 ## Android — `logcat` as a TDD proxy for untestable platform code
 
 The Android autofill service and its auth activity cannot be exercised
