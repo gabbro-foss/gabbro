@@ -126,6 +126,9 @@ gabbro/
 - Folder filter dropdown on vault list screen (independent of type filter chips; unfoldered entries hidden when a folder is active)
 - Folder picker on CreateEntryScreen and EntryDetailScreen (injected `listFolders` DI pattern; edit mode pre-selects existing folder)
 - Manage folders screen: add, rename, delete folders; delete offers reassign to another folder or clear to "None"; accessible from settings menu
+- Multi-select assign to folder: select entries in vault list, assign all to a folder in one operation
+- Folder changes shown in review screen diff (all entry types)
+- Enpass import: entries correctly land in "None" folder (category name was incorrectly used as folder name)
 - Appearance: theme (system/light/dark), text size, high-contrast, alphabet bar position
 - Security: foreground + background lock timeouts
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
@@ -140,8 +143,8 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 218 | 1 |
-| Flutter (`flutter test`) | 256 | 0 |
+| Rust (`cargo test -q`) | 220 | 1 |
+| Flutter (`flutter test`) | 258 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
 
@@ -151,13 +154,10 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next session — hardware verification of Folders Phase 3:**
-  - Test matrix: Linux desktop, Samsung S23 (Android 16), Lenovo tablet
-  - Folder filter dropdown on vault list screen
-  - Folder picker on create/edit entry
-  - Folder display in entry detail
-  - `ManageFoldersScreen`: add, rename, delete (reassign + clear)
-  - Settings menu → Manage folders navigation
+- **Next session — responsive layout testing on Linux desktop:**
+  - Test across window sizes: tiling WM column → maximised widescreen
+  - Test with all text sizes (small, normal, large)
+  - Verify tablet two-pane layout threshold (≥600dp) behaves correctly at all sizes
 
 ---
 
@@ -177,17 +177,16 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
+- make login entry url field optional to allow logins for non web items, e.g. computer logins
+- File picker for all export paths (audit for consistency).
+- add passkey functionality if feasible - to discuss with Claude
 - YubiKey / FIDO2 auth — design session first (ADR-005, Ed25519 v1 interim).
 - Screenshot prevention + app switcher blur — `FLAG_SECURE` on Android; assess Linux separately.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
-- File picker for all export paths (audit for consistency).
 - `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
 - Clean up legacy vault on first launch (`com.example.gabbro` → `app.gabbro.gabbro` migration offer).
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
-- Responsive layout testing on Linux desktop across window sizes (tiling WM column → maximised widescreen); test with all text sizes.
 - Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
-- add passkey functionality if feasible - to discuss with Claude
-- make login entry url field optional to allow logins for non web items, e.g. computer logins
 
 ### Code Quality
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
