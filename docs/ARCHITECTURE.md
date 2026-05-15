@@ -144,7 +144,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 220 | 1 |
-| Flutter (`flutter test`) | 258 | 0 |
+| Flutter (`flutter test`) | 259 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
 
@@ -154,10 +154,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next session — responsive layout testing on Linux desktop:**
-  - Test across window sizes: tiling WM column → maximised widescreen
-  - Test with all text sizes (small, normal, large)
-  - Verify tablet two-pane layout threshold (≥600dp) behaves correctly at all sizes
+- **Next task — file picker audit for export paths:**
+  - Audit all export paths for consistency
+  - Add file picker where missing
 
 ---
 
@@ -177,7 +176,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- make login entry url field optional to allow logins for non web items, e.g. computer logins
 - File picker for all export paths (audit for consistency).
 - add passkey functionality if feasible - to discuss with Claude
 - YubiKey / FIDO2 auth — design session first (ADR-005, Ed25519 v1 interim).
