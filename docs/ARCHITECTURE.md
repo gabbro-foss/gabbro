@@ -125,12 +125,12 @@ gabbro/
 - Folder display in entry detail (alongside timestamps; shows "None" when unfoldered)
 - Folder filter dropdown on vault list screen (independent of type filter chips; unfoldered entries hidden when a folder is active)
 - Folder picker on CreateEntryScreen and EntryDetailScreen (injected `listFolders` DI pattern; edit mode pre-selects existing folder)
+- Manage folders screen: add, rename, delete folders; delete offers reassign to another folder or clear to "None"; accessible from settings menu
 - Appearance: theme (system/light/dark), text size, high-contrast, alphabet bar position
 - Security: foreground + background lock timeouts
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
 
 **Not yet implemented (see Bikeshed):**
-- Folders (entry grouping — Rust layer complete; Flutter layer pending)
 - YubiKey / FIDO2 authentication
 - Screenshot prevention + app switcher blur
 - Autofill save requests (`onSaveRequest`)
@@ -151,23 +151,13 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Current session — Folders Phase 3 (Flutter), in progress:**
-  - ✅ Task 4: Entry detail shows folder alongside timestamps ("None" when empty)
-  - ✅ Task 1: Folder filter dropdown on `VaultListScreen`
-  - ✅ Task 2: Folder picker on `CreateEntryScreen` / `EntryDetailScreen`
-  - ✅ Task 3: New `ManageFoldersScreen` (add, rename, delete with reassign dialog)
-  - ✅ Task 5: Wire `ManageFoldersScreen` into settings menu
-
-**Folders design (agreed 13 May 2026):**
-- `VaultBody` gets `folders: Vec<String>`, default `["Work", "Private", "Other"]`, persisted in Rust
-- `CommonFields.folder: String`, default `""` (empty = unfoldered); displayed as "None" in entry detail alongside `created_at` / `modified_at`
-- Migration: existing entries with `folder: "Personal"` → `folder: ""`
-- Tags and favourites dropped entirely — never implemented, no migration needed
-- Folder filter dropdown on vault list screen, independent of type filter chips; unfoldered entries only appear when no folder filter is active ("All folders" selected)
-- "Manage folders" screen: add, rename, delete; accessible from settings menu
-  - Delete with entries: offer (a) reassign all to another folder, (b) clear all to "None", or both
-  - Default folders can also be edited/deleted by user
-- Entry create/edit: folder picker dropdown showing existing folders + "None"
+- **Next session — hardware verification of Folders Phase 3:**
+  - Test matrix: Linux desktop, Samsung S23 (Android 16), Lenovo tablet
+  - Folder filter dropdown on vault list screen
+  - Folder picker on create/edit entry
+  - Folder display in entry detail
+  - `ManageFoldersScreen`: add, rename, delete (reassign + clear)
+  - Settings menu → Manage folders navigation
 
 ---
 
