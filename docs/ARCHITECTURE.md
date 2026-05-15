@@ -157,7 +157,11 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 - **Next task — YubiKey / FIDO2 authentication:**
   - Design complete: ADR-010 documents the hmac-secret mechanism
-  - Implementation session next: vault format extension, Rust libfido2 binding, Android yubikit-android integration
+  - Implementation plan (three sessions, in order):
+    1. Vault format extension + HKDF combiner (pure Rust)
+    2. Linux libfido2 binding (Rust FFI)
+    3. Android yubikit-android integration (Kotlin)
+  - Start with session 1: vault format extension
 
 ---
 
