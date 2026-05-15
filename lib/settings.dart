@@ -17,6 +17,7 @@ class AppSettings {
   final ClipboardClearTimeout clipboardClearTimeout;
   final PasswordHistoryExpiry passwordHistoryExpiry;
   final AlphabetBarPosition alphabetBarPosition;
+  final bool blockPassphraseCopyPaste;
 
   const AppSettings({
     this.theme = ThemeChoice.system,
@@ -27,6 +28,7 @@ class AppSettings {
     this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
     this.passwordHistoryExpiry = PasswordHistoryExpiry.thirtyDays,
     this.alphabetBarPosition = AlphabetBarPosition.left,
+    this.blockPassphraseCopyPaste = true,
   });
 
   static AppSettings get defaults => const AppSettings();
@@ -42,6 +44,7 @@ class AppSettings {
     'clipboard_clear_timeout': clipboardClearTimeout.name,
     'password_history_expiry': passwordHistoryExpiry.name,
     'alphabet_bar_position': alphabetBarPosition.name,
+    'block_passphrase_copy_paste': blockPassphraseCopyPaste,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -66,6 +69,7 @@ class AppSettings {
       alphabetBarPosition: AlphabetBarPosition.values.byName(
         json['alphabet_bar_position'] as String? ?? 'left',
       ),
+      blockPassphraseCopyPaste: json['block_passphrase_copy_paste'] as bool? ?? true,
     );
   }
 
@@ -78,6 +82,7 @@ class AppSettings {
     ClipboardClearTimeout? clipboardClearTimeout,
     PasswordHistoryExpiry? passwordHistoryExpiry,
     AlphabetBarPosition? alphabetBarPosition,
+    bool? blockPassphraseCopyPaste,
   }) => AppSettings(
     theme: theme ?? this.theme,
     textSize: textSize ?? this.textSize,
@@ -87,6 +92,7 @@ class AppSettings {
     clipboardClearTimeout: clipboardClearTimeout ?? this.clipboardClearTimeout,
     passwordHistoryExpiry: passwordHistoryExpiry ?? this.passwordHistoryExpiry,
     alphabetBarPosition: alphabetBarPosition ?? this.alphabetBarPosition,
+    blockPassphraseCopyPaste: blockPassphraseCopyPaste ?? this.blockPassphraseCopyPaste,
   );
 
   // ── File I/O ───────────────────────────────────────────────────────────
@@ -165,7 +171,11 @@ class AppSettings {
 
   // Position of the alphabet index bar (phone layout only).
   // Options: "left" | "right"
-  "alphabet_bar_position": "${alphabetBarPosition.name}"
+  "alphabet_bar_position": "${alphabetBarPosition.name}",
+
+  // Block copy/paste on master passphrase fields.
+  // Options: true | false
+  "block_passphrase_copy_paste": $blockPassphraseCopyPaste
 }
 ''';
 

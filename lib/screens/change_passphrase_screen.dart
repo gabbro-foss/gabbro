@@ -17,11 +17,13 @@ class ChangePassphraseScreen extends StatefulWidget {
   final Future<void> Function(List<int> oldPassphrase, List<int> newPassphrase)
   onChangePassphrase;
   final EntropyResult Function(String password) onEstimateEntropy;
+  final bool blockPassphraseCopyPaste;
 
   const ChangePassphraseScreen({
     super.key,
     this.onChangePassphrase = _defaultChangePassphrase,
     this.onEstimateEntropy = _defaultEstimateEntropy,
+    this.blockPassphraseCopyPaste = true,
   });
 
   @override
@@ -121,6 +123,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                   TextFormField(
                     controller: _oldController,
                     obscureText: _oldObscured,
+                    enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
                     decoration: InputDecoration(
                       labelText: 'Current passphrase',
                       border: const OutlineInputBorder(),
@@ -142,6 +145,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                   TextFormField(
                     controller: _newController,
                     obscureText: _newObscured,
+                    enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
                     onChanged: _onNewPassphraseChanged,
                     decoration: InputDecoration(
                       labelText: 'New passphrase',
@@ -191,6 +195,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                   TextFormField(
                     controller: _confirmController,
                     obscureText: _confirmObscured,
+                    enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
                     onFieldSubmitted: (_) => _changePassphrase(),
                     onChanged: (v) {
                       setState(

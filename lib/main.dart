@@ -34,6 +34,7 @@ Future<void> autofillUnlockMain() async {
           await unlockVault(passphrase: passphrase, path: path);
           await channel.invokeMethod('unlock');
         },
+        blockPassphraseCopyPaste: settings.blockPassphraseCopyPaste,
       ),
     ),
   );
@@ -226,7 +227,10 @@ class _GabbroAppState extends State<GabbroApp>
     } catch (_) {}
     _navigatorKey.currentState?.pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (_) => UnlockScreen(vaultPath: widget.vaultPath),
+        builder: (_) => UnlockScreen(
+          vaultPath: widget.vaultPath,
+          blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+        ),
       ),
       (_) => false,
     );
@@ -271,8 +275,13 @@ class _GabbroAppState extends State<GabbroApp>
           darkTheme: gabbroDarkTheme(highContrast: hc),
           home: widget.initialScreen ??
               (widget.vaultExists
-                  ? UnlockScreen(vaultPath: widget.vaultPath)
-                  : const OnboardingScreen()),
+                  ? UnlockScreen(
+                      vaultPath: widget.vaultPath,
+                      blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+                    )
+                  : OnboardingScreen(
+                      blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+                    )),
         ),
       ),
     );

@@ -108,6 +108,31 @@ class _SecurityScreenState extends State<SecurityScreen> {
               ),
               const SizedBox(height: 32),
 
+              // ── Passphrase copy/paste ──────────────────────────────────
+              SectionHeader(label: 'Passphrase copy/paste'),
+              const SizedBox(height: 4),
+              const Text(
+                'Block copy and paste on master passphrase fields. '
+                'Recommended: prevents passphrase leaking via clipboard.',
+                style: TextStyle(fontSize: 12),
+              ),
+              const SizedBox(height: 8),
+              SwitchListTile(
+                title: const Text('Block copy/paste'),
+                value: _settings.blockPassphraseCopyPaste,
+                onChanged: (v) =>
+                    _update(_settings.copyWith(blockPassphraseCopyPaste: v)),
+                contentPadding: EdgeInsets.zero,
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Note: this blocks the long-press context menu and text selection. '
+                'Your keyboard\'s inline paste button may still work — '
+                'this is a platform limitation that cannot be blocked.',
+                style: TextStyle(fontSize: 11),
+              ),
+              const SizedBox(height: 32),
+
               // ── Clipboard clear ────────────────────────────────────────
               SectionHeader(label: 'Clipboard clear'),
               const SizedBox(height: 4),

@@ -16,12 +16,14 @@ EntropyResult _fakeStrongEntropy(String ignored) => EntropyResult(
 
 Widget _buildScreen({
   Future<void> Function(List<int>, String)? onInitVault,
+  bool blockPassphraseCopyPaste = true,
 }) =>
     MaterialApp(
       home: OnboardingScreen(
         initialPath: '/tmp/test.gabbro',
         onInitVault: onInitVault ?? (a, b) async {},
         onEstimateEntropy: _fakeStrongEntropy,
+        blockPassphraseCopyPaste: blockPassphraseCopyPaste,
       ),
     );
 
@@ -78,6 +80,23 @@ void main() {
     await tester.pump();
 
     expect(find.text('✗ Passphrases do not match'), findsOneWidget);
+  });
+
+  testWidgets('passphrase fields block selection when blockPassphraseCopyPaste is true', (tester) async {
+    await tester.pumpWidget(_buildScreen(blockPassphraseCopyPaste: true));
+
+    final fields = tester.widgetList<TextField>(find.byType(TextField)).toList();
+    // fields[0] is path, fields[1] is passphrase, fields[2] is confirm
+    expect(fields[1].enableInteractiveSelection, isFalse);
+    expect(fields[2].enableInteractiveSelection, isFalse);
+  });
+
+  testWidgets('passphrase fields allow selection when blockPassphraseCopyPaste is false', (tester) async {
+    await tester.pumpWidget(_buildScreen(blockPassphraseCopyPaste: false));
+
+    final fields = tester.widgetList<TextField>(find.byType(TextField)).toList();
+    expect(fields[1].enableInteractiveSelection, isNot(isFalse));
+    expect(fields[2].enableInteractiveSelection, isNot(isFalse));
   });
 
   testWidgets('passphrases match shows confirmation', (tester) async {

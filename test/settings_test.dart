@@ -245,6 +245,38 @@ void main() {
     });
   });
 
+  // ── blockPassphraseCopyPaste ──────────────────────────────────────────────
+
+  group('blockPassphraseCopyPaste', () {
+    test('defaults to true', () {
+      final s = AppSettings.fromJson({});
+      expect(s.blockPassphraseCopyPaste, isTrue);
+    });
+
+    test('round-trips true through fromJson', () {
+      final s = AppSettings.fromJson({'block_passphrase_copy_paste': true});
+      expect(s.blockPassphraseCopyPaste, isTrue);
+    });
+
+    test('round-trips false through fromJson', () {
+      final s = AppSettings.fromJson({'block_passphrase_copy_paste': false});
+      expect(s.blockPassphraseCopyPaste, isFalse);
+    });
+
+    test('serialises to toJson', () {
+      const s = AppSettings(blockPassphraseCopyPaste: false);
+      expect(s.toJson()['block_passphrase_copy_paste'], isFalse);
+    });
+
+    test('copyWith overrides blockPassphraseCopyPaste only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(blockPassphraseCopyPaste: false);
+      expect(updated.blockPassphraseCopyPaste, isFalse);
+      expect(updated.theme, original.theme);
+      expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
+    });
+  });
+
   // ── BackgroundLockTimeout ─────────────────────────────────────────────────
 
   group('BackgroundLockTimeout', () {

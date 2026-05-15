@@ -1,6 +1,7 @@
 package app.gabbro.gabbro
 
 import android.content.Intent
+import android.view.WindowManager
 import android.os.Build
 import android.os.Bundle
 import android.service.autofill.Dataset
@@ -38,6 +39,11 @@ class UnlockActivity : FlutterActivity() {
         const val EXTRA_PASSWORD_IDS = "app.gabbro.gabbro.EXTRA_PASSWORD_IDS"
         const val EXTRA_WEB_DOMAIN = "app.gabbro.gabbro.EXTRA_WEB_DOMAIN"
         const val EXTRA_PACKAGE_NAME = "app.gabbro.gabbro.EXTRA_PACKAGE_NAME"
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
     }
 
     override fun getDartEntrypointFunctionName(): String = "autofillUnlockMain"

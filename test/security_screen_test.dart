@@ -83,9 +83,29 @@ void main() {
     testWidgets('tapping a clipboard clear button calls onUpdate with correct value', (tester) async {
       AppSettings? updated;
       await tester.pumpWidget(_buildScreen(onUpdate: (s) => updated = s));
+      await tester.scrollUntilVisible(find.text('2 min'), 100);
       await tester.tap(find.text('2 min'));
       await tester.pumpAndSettle();
       expect(updated?.clipboardClearTimeout, ClipboardClearTimeout.twoMinutes);
+    });
+
+    testWidgets('block passphrase copy/paste section header is present', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      expect(find.text('Passphrase copy/paste'), findsOneWidget);
+    });
+
+    testWidgets('block passphrase copy/paste toggle is on by default', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      final toggle = tester.widget<Switch>(find.byType(Switch).last);
+      expect(toggle.value, isTrue);
+    });
+
+    testWidgets('tapping passphrase copy/paste toggle calls onUpdate with false', (tester) async {
+      AppSettings? updated;
+      await tester.pumpWidget(_buildScreen(onUpdate: (s) => updated = s));
+      await tester.tap(find.byType(Switch).last);
+      await tester.pumpAndSettle();
+      expect(updated?.blockPassphraseCopyPaste, isFalse);
     });
 
     testWidgets('selected foreground button reflects current settings', (tester) async {

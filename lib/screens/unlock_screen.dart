@@ -12,12 +12,14 @@ class UnlockScreen extends StatefulWidget {
   final String vaultPath;
   final Future<void> Function(List<int> passphrase, String path) onUnlock;
   final EntropyResult Function(String password) onEstimateEntropy;
+  final bool blockPassphraseCopyPaste;
 
   const UnlockScreen({
     super.key,
     required this.vaultPath,
     this.onUnlock = _defaultUnlock,
     this.onEstimateEntropy = _defaultEstimateEntropy,
+    this.blockPassphraseCopyPaste = true,
   });
 
   @override
@@ -112,6 +114,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
                       controller: _passphraseController,
                       autofocus: true,
                       obscureText: _obscured,
+                      enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
                       onSubmitted: (_) => _isUnlocking ? null : _unlock(),
                       onChanged: (v) => setState(
                         () => _entropy = widget.onEstimateEntropy(v),

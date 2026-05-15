@@ -14,12 +14,14 @@ EntropyResult _fakeEntropy(String ignored) => EntropyResult(
 
 Widget _buildScreen({
   Future<void> Function(List<int>, String)? onUnlock,
+  bool blockPassphraseCopyPaste = true,
 }) =>
     MaterialApp(
       home: UnlockScreen(
         vaultPath: '/tmp/test.gabbro',
         onUnlock: onUnlock ?? (a, b) async {},
         onEstimateEntropy: _fakeEntropy,
+        blockPassphraseCopyPaste: blockPassphraseCopyPaste,
       ),
     );
 
@@ -49,6 +51,20 @@ void main() {
       find.text('Could not unlock vault. Check your passphrase.'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('passphrase field blocks selection when blockPassphraseCopyPaste is true', (tester) async {
+    await tester.pumpWidget(_buildScreen(blockPassphraseCopyPaste: true));
+
+    final field = tester.widget<TextField>(find.byType(TextField));
+    expect(field.enableInteractiveSelection, isFalse);
+  });
+
+  testWidgets('passphrase field allows selection when blockPassphraseCopyPaste is false', (tester) async {
+    await tester.pumpWidget(_buildScreen(blockPassphraseCopyPaste: false));
+
+    final field = tester.widget<TextField>(find.byType(TextField));
+    expect(field.enableInteractiveSelection, isNot(isFalse));
   });
 
   testWidgets('unlock button is present and tappable', (tester) async {

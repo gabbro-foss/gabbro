@@ -425,9 +425,12 @@ class _VaultListScreenState extends State<VaultListScreen> {
       case 'import':
         _openImportScreen();
       case 'change_passphrase':
+        final cpAppState = GabbroApp.of(context);
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const ChangePassphraseScreen(),
+            builder: (context) => ChangePassphraseScreen(
+              blockPassphraseCopyPaste: cpAppState.settings.blockPassphraseCopyPaste,
+            ),
           ),
         );
       case 'appearance':
@@ -548,12 +551,14 @@ class _VaultListScreenState extends State<VaultListScreen> {
     await widget.deleteVault();
     if (!mounted) return;
 
+    final obAppState = GabbroApp.maybeOf(context);
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (context) => OnboardingScreen(
           initialPath: widget.vaultPath,
           postDeletionMessage:
               'Your vault has been deleted. Create a new one to continue.',
+          blockPassphraseCopyPaste: obAppState?.settings.blockPassphraseCopyPaste ?? true,
         ),
       ),
       (_) => false,
@@ -562,9 +567,13 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
   void _lockAndExit() {
     lockVault();
+    final lockAppState = GabbroApp.of(context);
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => UnlockScreen(vaultPath: widget.vaultPath),
+        builder: (context) => UnlockScreen(
+          vaultPath: widget.vaultPath,
+          blockPassphraseCopyPaste: lockAppState.settings.blockPassphraseCopyPaste,
+        ),
       ),
     );
   }

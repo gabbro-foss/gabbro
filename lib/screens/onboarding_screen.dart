@@ -18,6 +18,7 @@ class OnboardingScreen extends StatefulWidget {
   final String? postDeletionMessage;
   final Future<void> Function(List<int> passphrase, String path) onInitVault;
   final EntropyResult Function(String password) onEstimateEntropy;
+  final bool blockPassphraseCopyPaste;
 
   const OnboardingScreen({
     super.key,
@@ -25,6 +26,7 @@ class OnboardingScreen extends StatefulWidget {
     this.postDeletionMessage,
     this.onInitVault = _defaultInitVault,
     this.onEstimateEntropy = _defaultEstimateEntropy,
+    this.blockPassphraseCopyPaste = true,
   });
 
   @override
@@ -235,6 +237,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       TextFormField(
                         controller: _passphraseController,
                         obscureText: _passphraseObscured,
+                        enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
                         onChanged: _onPassphraseChanged,
                         decoration: InputDecoration(
                           labelText: 'Master passphrase',
@@ -285,6 +288,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       TextFormField(
                         controller: _confirmController,
                         obscureText: _confirmObscured,
+                        enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
                         onFieldSubmitted: (_) => _createVault(),
                         onChanged: (v) {
                           setState(
