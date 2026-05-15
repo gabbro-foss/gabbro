@@ -190,6 +190,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Code Quality
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
+- Gabbro vault sync: entries in vaults written before the folder feature may have entry type names (e.g. `"login"`, `"note"`) as folder values — needs a migration on unlock to clear invalid folder values.
+- CSV import: strip `favourite` column mapping — field no longer exists in the domain model.
 
 ### V2+ / Defer
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
