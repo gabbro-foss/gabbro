@@ -117,7 +117,7 @@ gabbro/
 - Tablet two-pane layout (≥600dp): NavigationRail + list pane + detail pane
 - Password/passphrase generator (screen + inline widget)
 - Password breakdown sheet (long-press revealed password; colour + symbol encoding per ADR-003)
-- Export: `.gabbro` + `.gabbro.sha256`
+- Export: `.gabbro` + `.gabbro.sha256`; file entry export uses native file picker (folder picker on Android, save dialog on Linux)
 - Import: Gabbro vault, Enpass JSON, Bitwarden JSON, generic CSV (with column-mapping UI)
   - All importers: validation failures surfaced via ImportFailuresDialog (Skip/Edit)
   - UUID dedup for Gabbro/Enpass/Bitwarden; fresh UUIDs for CSV
@@ -144,7 +144,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 220 | 1 |
-| Flutter (`flutter test`) | 259 | 0 |
+| Flutter (`flutter test`) | 260 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
 
@@ -154,9 +154,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next task — file picker audit for export paths:**
-  - Audit all export paths for consistency
-  - Add file picker where missing
+- **Next task — CSV import cleanup:**
+  - Strip `favourite` column mapping from CSV importer (field no longer exists in domain model)
+  - Audit all import/export paths and domain model for leftover `tag`, `favourite`, `favorite` fields and remove them
 
 ---
 
@@ -177,7 +177,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- File picker for all export paths (audit for consistency).
 - add passkey functionality if feasible - to discuss with Claude
 - YubiKey / FIDO2 auth — design session first (ADR-005, Ed25519 v1 interim).
 - Screenshot prevention + app switcher blur — `FLAG_SECURE` on Android; assess Linux separately.
