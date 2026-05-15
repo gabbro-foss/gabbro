@@ -131,11 +131,12 @@ gabbro/
 - Enpass import: entries correctly land in "None" folder (category name was incorrectly used as folder name)
 - Appearance: theme (system/light/dark), text size, high-contrast, alphabet bar position
 - Security: foreground + background lock timeouts
+- Android screenshot prevention + app switcher blur (`FLAG_SECURE` on `MainActivity` and `UnlockActivity`)
+- Copy/paste blocking on master passphrase fields (default on; user toggle in Settings → Security; keyboard inline paste is a platform limitation, documented in UI)
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
 
 **Not yet implemented (see Bikeshed):**
 - YubiKey / FIDO2 authentication
-- Screenshot prevention + app switcher blur
 - Autofill save requests (`onSaveRequest`)
 - Passkey support, breach alerts, vault sync
 
@@ -144,7 +145,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 220 | 1 |
-| Flutter (`flutter test`) | 260 | 0 |
+| Flutter (`flutter test`) | 275 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
 
@@ -154,10 +155,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next task — screenshot prevention + copy/paste blocking:**
-  - Android: `FLAG_SECURE` on all screens (prevents screenshots and app switcher preview)
-  - Linux: assess feasibility separately
-  - Block copy/paste on master passphrase fields (default on; user toggle in Settings → Security)
+- **Next task — passkey functionality:**
+  - Assess feasibility and design with Claude before any implementation
+  - See bikeshed item: "add passkey functionality if feasible"
 
 ---
 
@@ -171,7 +171,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Supply-chain audit: `cargo audit`, `flutter pub audit`, IDE extension review, pin CI Actions to commit SHAs when CI is added.
 - Verify Android storage permissions hold on Android 11+ (app-private storage + SAF — no `MANAGE_EXTERNAL_STORAGE`).
 - Test on de-Googled Android (GrapheneOS/CalyxOS) before v1 — find a willing community tester, don't buy hardware.
-- Block copy/paste on master passphrase fields (default: block; user toggle in Settings → Security).
 - test/measure code test coverage before launch
 
 ### Testing (pre-v1 gates)
@@ -180,7 +179,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 ### Features & UX
 - add passkey functionality if feasible - to discuss with Claude
 - YubiKey / FIDO2 auth — design session first (ADR-005, Ed25519 v1 interim).
-- Screenshot prevention + app switcher blur — `FLAG_SECURE` on Android; assess Linux separately.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
 - Clean up legacy vault on first launch (`com.example.gabbro` → `app.gabbro.gabbro` migration offer).
