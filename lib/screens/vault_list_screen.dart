@@ -11,6 +11,7 @@ import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/screens/generator_screen.dart';
+import 'package:gabbro/screens/manage_folders_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
@@ -369,7 +370,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
     _loadEntries();
   }
 
-  void _onMenuSelected(String value) {
+  Future<void> _onMenuSelected(String value) async {
     switch (value) {
       case 'export':
         _openExportScreen();
@@ -401,6 +402,20 @@ class _VaultListScreenState extends State<VaultListScreen> {
         Navigator.of(context).push(
           MaterialPageRoute(builder: (context) => const GeneratorScreen()),
         );
+      case 'manage_folders':
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ManageFoldersScreen(
+              listFolders: () async => listFolders(),
+              createFolder: (name) async => createFolder(name: name),
+              renameFolder: (oldName, newName) async =>
+                  renameFolder(oldName: oldName, newName: newName),
+              deleteFolder: (name, reassignTo) async =>
+                  deleteFolder(name: name, reassignTo: reassignTo),
+            ),
+          ),
+        );
+        if (mounted) _loadEntries();
       case 'about':
         Navigator.of(
           context,
@@ -663,6 +678,14 @@ class _VaultListScreenState extends State<VaultListScreen> {
                     Icon(Icons.shield_outlined, size: 20),
                     SizedBox(width: 12),
                     Text('Security'),
+                  ]),
+                ),
+                const PopupMenuItem(
+                  value: 'manage_folders',
+                  child: Row(children: [
+                    Icon(Icons.folder_outlined, size: 20),
+                    SizedBox(width: 12),
+                    Expanded(child: Text('Manage folders')),
                   ]),
                 ),
                 const PopupMenuItem(

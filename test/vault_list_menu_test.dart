@@ -39,6 +39,7 @@ void main() {
       expect(find.text('Security'), findsOneWidget);
       expect(find.text('Password generator'), findsOneWidget);
       expect(find.text('About'), findsOneWidget);
+      expect(find.text('Manage folders'), findsOneWidget);
     });
   testWidgets('each menu item has an icon', (tester) async {
       await tester.pumpWidget(_buildScreen());
