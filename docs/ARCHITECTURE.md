@@ -156,7 +156,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 > Update at the end of each session. First thing to read at the start of the next.
 
 - **Next task — YubiKey / FIDO2 authentication:**
-  - Design session with Claude before any implementation (ADR-005)
+  - Design complete: ADR-010 documents the hmac-secret mechanism
+  - Implementation session next: vault format extension, Rust libfido2 binding, Android yubikit-android integration
 
 ---
 
@@ -176,7 +177,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- YubiKey / FIDO2 auth — design session first (ADR-005, Ed25519 v1 interim).
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
 - Clean up legacy vault on first launch (`com.example.gabbro` → `app.gabbro.gabbro` migration offer).
