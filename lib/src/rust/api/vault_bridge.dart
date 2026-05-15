@@ -133,6 +133,19 @@ Future<void> sessionClearPasswordHistory({required String id}) =>
 Future<void> sessionRevertPassword({required String id}) =>
     RustLib.instance.api.crateApiVaultBridgeSessionRevertPassword(id: id);
 
+/// Assign a folder to a set of entries by UUID and persist.
+///
+/// Pass `folder: ""` to move entries to unfoldered.
+/// Returns `Err` if the folder name does not exist (empty string always valid).
+/// Async — triggers a full vault save.
+Future<void> assignFolderToEntries({
+  required List<String> ids,
+  required String folder,
+}) => RustLib.instance.api.crateApiVaultBridgeAssignFolderToEntries(
+  ids: ids,
+  folder: folder,
+);
+
 /// Write .gabbro + .gabbro.sha256 from current session state.
 ///
 /// Async — filesystem operation.

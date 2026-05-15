@@ -411,6 +411,15 @@ pub async fn session_revert_password(id: String) -> Result<(), String> {
     session::session_revert_password(&id)
 }
 
+/// Assign a folder to a set of entries by UUID and persist.
+///
+/// Pass `folder: ""` to move entries to unfoldered.
+/// Returns `Err` if the folder name does not exist (empty string always valid).
+/// Async — triggers a full vault save.
+pub async fn assign_folder_to_entries(ids: Vec<String>, folder: String) -> Result<(), String> {
+    session::session_assign_folder_to_entries(&ids, folder)
+}
+
 /// Write .gabbro + .gabbro.sha256 from current session state.
 ///
 /// Async — filesystem operation.
@@ -575,6 +584,57 @@ mod tests {
         let folders = list_folders().unwrap();
         assert!(!folders.contains(&String::from("Work")), "deleted folder must be gone");
         assert!(folders.contains(&String::from("Private")), "other folders must remain");
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn assign_folder_to_entries_via_bridge() {
+        use std::env::temp_dir;
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+        use crate::api::vault::save_vault;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_assign_folder_test.gabbro");
+        let pass = b"bridge-assign-folder-test";
+
+        let entries = vec![VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from(""),
+            },
+            title: String::from("GitHub"),
+            url: String::from("https://github.com"),
+            username: String::from("rob"),
+            password: String::from("hunter2"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        })];
+
+        save_vault(
+            &VaultBody { folders: vec![String::from("Work")], entries },
+            pass,
+            &path,
+        ).unwrap();
+        run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
+
+        run(assign_folder_to_entries(
+            vec![String::from("id-001")],
+            String::from("Work"),
+        )).unwrap();
+
+        let entry = get_entry(String::from("id-001")).unwrap();
+        match entry {
+            VaultEntryData::Login(e) => assert_eq!(e.folder, "Work",
+                "entry folder must be updated via bridge"),
+            _ => panic!("expected Login"),
+        }
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);

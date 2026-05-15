@@ -39,8 +39,6 @@ struct EnpassItem {
     #[serde(default)]
     note: String,
     #[serde(default)]
-    favorite: u8,
-    #[serde(default)]
     archived: u8,
     #[serde(default)]
     trashed: u8,
@@ -156,7 +154,7 @@ fn convert_item(item: EnpassItem) -> Result<VaultEntry, ParseFailure> {
         .collect();
 
     let attachments = decode_attachments(&item.attachments);
-    let meta = make_meta(&item.uuid, &item.category, item.favorite);
+    let meta = make_meta(&item.uuid);
 
     match item.category.as_str() {
         "login" | "computer" | "finance" => {
@@ -374,12 +372,12 @@ fn non_empty(s: &str) -> Option<String> {
 
 /// Build an `EntryMeta` from Enpass item-level fields.
 /// Timestamps are left empty — Rust will stamp them on first save.
-fn make_meta(uuid: &str, folder: &str, _favorite: u8) -> EntryMeta {
+fn make_meta(uuid: &str) -> EntryMeta {
     EntryMeta {
         id: uuid.to_string(),
         created_at: String::new(),
         updated_at: String::new(),
-        folder: folder.to_string(),
+        folder: String::new(),
     }
 }
 
@@ -586,6 +584,14 @@ mod tests {
         assert_eq!(e.url, "https://mybank.example",
             "url should come from the url field, not the item title");
         assert_eq!(e.meta.id, "f01-004");
+    }
+
+    #[test]
+    fn login_category_does_not_set_folder_to_category_name() {
+        let (entries, _) = parse(login_json().as_bytes()).unwrap();
+        let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
+        assert_eq!(e.meta.folder, "",
+            "Enpass items have no folder; folder must be empty string, not the category name");
     }
 
     #[test]

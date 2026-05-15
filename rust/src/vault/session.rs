@@ -503,6 +503,38 @@ pub fn session_delete_folder(name: String, reassign_to: Option<String>) -> Resul
     Ok(())
 }
 
+/// Assign a folder to a set of entries by UUID, in one pass, then persist.
+///
+/// Entries not in `ids` are unchanged. Returns `Err` if the vault is locked
+/// or `folder` names a folder that does not exist (empty string is always
+/// valid — it means unfoldered).
+pub fn session_assign_folder_to_entries(ids: &[String], folder: String) -> Result<(), String> {
+    let (body, passphrase, path) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        if !folder.is_empty() && !session.folders.contains(&folder) {
+            return Err(format!("Folder not found: {folder}"));
+        }
+        for entry in session.entries.iter_mut() {
+            let (id, f) = match entry {
+                VaultEntry::Login(e)    => (&e.meta.id, &mut e.meta.folder),
+                VaultEntry::Note(e)     => (&e.meta.id, &mut e.meta.folder),
+                VaultEntry::Identity(e) => (&e.meta.id, &mut e.meta.folder),
+                VaultEntry::Card(e)     => (&e.meta.id, &mut e.meta.folder),
+                VaultEntry::File(e)     => (&e.meta.id, &mut e.meta.folder),
+                VaultEntry::Custom(e)   => (&e.meta.id, &mut e.meta.folder),
+            };
+            if ids.contains(id) {
+                *f = folder.clone();
+            }
+        }
+        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
+        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+    }; // ← lock released here
+    save_vault(&body, &passphrase, &path)?;
+    Ok(())
+}
+
 /// Add a new folder to the session and persist the vault to disk.
 ///
 /// Returns `Err` if the name is empty or already exists.
@@ -523,6 +555,89 @@ pub fn session_create_folder(name: String) -> Result<(), String> {
     }; // ← lock released here
     save_vault(&body, &passphrase, &path)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod assign_folder_tests {
+    use super::*;
+    use serial_test::serial;
+    use crate::api::vault::save_vault;
+    use crate::vault::entry::{EntryMeta, LoginEntry, NoteEntry, VaultEntry};
+    use std::env::temp_dir;
+
+    fn teardown(path: &std::path::PathBuf) {
+        let _ = lock_vault();
+        let _ = std::fs::remove_file(path);
+    }
+
+    #[test]
+    #[serial]
+    fn assign_folder_to_entries_updates_selected_entries() {
+        let pass = b"assign-folder-test";
+        let mut path = temp_dir();
+        path.push("gabbro_assign_folder_test.gabbro");
+
+        let entries = vec![
+            VaultEntry::Login(LoginEntry {
+                meta: EntryMeta {
+                    id: String::from("id-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from(""),
+                },
+                title: String::from("GitHub"),
+                url: String::from("https://github.com"),
+                username: String::from("rob"),
+                password: String::from("hunter2"),
+                notes: None,
+                custom_fields: vec![],
+                attachments: vec![],
+                previous_password: None,
+            }),
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("id-002"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from(""),
+                },
+                title: String::from("A note"),
+                content: String::from("content"),
+                attachments: vec![],
+            }),
+        ];
+
+        save_vault(
+            &crate::vault::serialization::VaultBody {
+                folders: vec![String::from("Work")],
+                entries,
+            },
+            pass,
+            &path,
+        ).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        session_assign_folder_to_entries(
+            &[String::from("id-001")],
+            String::from("Work"),
+        ).unwrap();
+
+        let e1 = get_entry("id-001").unwrap();
+        let e2 = get_entry("id-002").unwrap();
+
+        match e1 {
+            VaultEntry::Login(ref e) => assert_eq!(e.meta.folder, "Work",
+                "selected entry must be moved to the target folder"),
+            _ => panic!("expected Login"),
+        }
+        match e2 {
+            VaultEntry::Note(ref e) => assert_eq!(e.meta.folder, "",
+                "unselected entry must not be changed"),
+            _ => panic!("expected Note"),
+        }
+
+        teardown(&path);
+    }
 }
 
 #[cfg(test)]

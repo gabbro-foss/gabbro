@@ -31,6 +31,7 @@ class VaultListScreen extends StatefulWidget {
   final Future<void> Function(String id)? onDeleteEntryFn;
   final void Function()? onRefreshFn;
   final AlphabetBarPosition? alphabetBarPosition;
+  final Future<void> Function(List<String> ids, String folder)? onAssignFolderFn;
 
   const VaultListScreen({
     super.key,
@@ -42,6 +43,7 @@ class VaultListScreen extends StatefulWidget {
     this.onDeleteEntryFn,
     this.onRefreshFn,
     this.alphabetBarPosition,
+    this.onAssignFolderFn,
   });
 
   @override
@@ -336,6 +338,52 @@ class _VaultListScreenState extends State<VaultListScreen> {
         _loadEntries();
       }
     }
+  }
+
+  Future<void> _confirmAssignFolder(Set<String> ids) async {
+    if (_folders.isEmpty) return;
+    String? selected;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: const Text('Assign to folder'),
+          content: DropdownButton<String>(
+            isExpanded: true,
+            value: selected,
+            hint: const Text('Select a folder'),
+            items: _folders
+                .map((f) => DropdownMenuItem(value: f, child: Text(f)))
+                .toList(),
+            onChanged: (v) => setState(() => selected = v),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: selected == null
+                  ? null
+                  : () => Navigator.of(ctx).pop(true),
+              child: const Text('Assign'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (confirmed != true || selected == null) return;
+    final fn = widget.onAssignFolderFn;
+    if (fn != null) {
+      await fn(ids.toList(), selected!);
+    } else {
+      await assignFolderToEntries(ids: ids.toList(), folder: selected!);
+    }
+    setState(() {
+      _selectedIds.clear();
+      _selectionMode = false;
+    });
+    _loadEntries();
   }
 
   Future<void> _confirmDelete(Set<String> ids) async {
@@ -735,6 +783,14 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 }
               }),
             ),
+            if (_folders.isNotEmpty)
+              IconButton(
+                icon: const Icon(Icons.folder_outlined),
+                tooltip: 'Assign to folder',
+                onPressed: _selectedIds.isEmpty
+                    ? null
+                    : () => _confirmAssignFolder(_selectedIds),
+              ),
             IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () => _confirmDelete(_selectedIds),

@@ -410,7 +410,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         VaultEntryData_Note(:final field0),
         VaultEntryData_Note(field0: final u),
       ):
-        return field0.title != u.title || field0.content != u.content;
+        return field0.title != u.title ||
+            field0.content != u.content ||
+            field0.folder != u.folder;
       case (
         VaultEntryData_Identity(:final field0),
         VaultEntryData_Identity(field0: final u),
@@ -420,7 +422,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             field0.email != u.email ||
             field0.phone != u.phone ||
             field0.address != u.address ||
-            !listEquals(field0.customFields, u.customFields);
+            !listEquals(field0.customFields, u.customFields) ||
+            field0.folder != u.folder;
       case (
         VaultEntryData_Card(:final field0),
         VaultEntryData_Card(field0: final u),
@@ -431,17 +434,22 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             field0.cvv != u.cvv ||
             field0.pin != u.pin ||
             field0.cardName != u.cardName ||
-            field0.status != u.status;
+            field0.status != u.status ||
+            field0.folder != u.folder;
       case (
         VaultEntryData_File(:final field0),
         VaultEntryData_File(field0: final u),
       ):
-        return field0.filename != u.filename || field0.notes != u.notes;
+        return field0.filename != u.filename ||
+            field0.notes != u.notes ||
+            field0.folder != u.folder;
       case (
         VaultEntryData_Custom(:final field0),
         VaultEntryData_Custom(field0: final u),
       ):
-        return field0.title != u.title || field0.fields != u.fields;
+        return field0.title != u.title ||
+            field0.fields != u.fields ||
+            field0.folder != u.folder;
       default:
         return true;
     }

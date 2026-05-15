@@ -176,16 +176,19 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         _addDiff(diffs, 'URL', field0.url, u.url);
         _addDiff(diffs, 'Username', field0.username, u.username);
         _addDiff(diffs, 'Notes', field0.notes ?? '', u.notes ?? '');
+        _addDiff(diffs, 'Folder', field0.folder, u.folder);
       case (VaultEntryData_Note(:final field0),
             VaultEntryData_Note(field0: final u)):
         _addDiff(diffs, 'Title', field0.title, u.title);
         _addDiff(diffs, 'Content', field0.content, u.content);
+        _addDiff(diffs, 'Folder', field0.folder, u.folder);
       case (VaultEntryData_Card(:final field0),
             VaultEntryData_Card(field0: final u)):
         _addDiff(diffs, 'Card label', field0.cardName ?? '', u.cardName ?? '');
         _addDiff(diffs, 'Status', field0.status, u.status);
         _addDiff(diffs, 'Cardholder', field0.cardholderName, u.cardholderName);
         _addDiff(diffs, 'Expiry', field0.expiry, u.expiry);
+        _addDiff(diffs, 'Folder', field0.folder, u.folder);
       case (VaultEntryData_Identity(:final field0),
             VaultEntryData_Identity(field0: final u)):
         _addDiff(diffs, 'First name', field0.firstName, u.firstName);
@@ -193,6 +196,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         _addDiff(diffs, 'Email', field0.email, u.email);
         _addDiff(diffs, 'Phone', field0.phone ?? '', u.phone ?? '');
         _addDiff(diffs, 'Address', field0.address ?? '', u.address ?? '');
+        _addDiff(diffs, 'Folder', field0.folder, u.folder);
         final identityLen = field0.customFields.length > u.customFields.length
             ? field0.customFields.length
             : u.customFields.length;
@@ -207,6 +211,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
       case (VaultEntryData_Custom(:final field0),
             VaultEntryData_Custom(field0: final u)):
         _addDiff(diffs, 'Title', field0.title, u.title);
+        _addDiff(diffs, 'Folder', field0.folder, u.folder);
         final customLen = field0.fields.length > u.fields.length
             ? field0.fields.length
             : u.fields.length;
@@ -218,6 +223,10 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
           final after = i < u.fields.length ? u.fields[i].value : '';
           _addDiff(diffs, label, before, after);
         }
+      case (VaultEntryData_File(:final field0),
+            VaultEntryData_File(field0: final u)):
+        _addDiff(diffs, 'Filename', field0.filename, u.filename);
+        _addDiff(diffs, 'Folder', field0.folder, u.folder);
       default:
         break;
     }

@@ -32,6 +32,20 @@ Widget _buildScreen(List<EntrySummaryData> Function() listEntries) =>
       ),
     );
 
+Widget _buildScreenWithFolders({
+  required List<EntrySummaryData> Function() listEntries,
+  required List<String> Function() listFolders,
+  required Future<void> Function(List<String> ids, String folder) onAssignFolder,
+}) =>
+    MaterialApp(
+      home: VaultListScreen(
+        vaultPath: '/tmp/test.gabbro',
+        listEntries: listEntries,
+        listFolders: listFolders,
+        onAssignFolderFn: onAssignFolder,
+      ),
+    );
+
 void _setNarrow(WidgetTester tester) {
   tester.view.physicalSize = const Size(390, 844);
   tester.view.devicePixelRatio = 1.0;
@@ -164,6 +178,55 @@ void main() {
 
       expect(find.byIcon(Icons.checklist), findsOneWidget);
       expect(find.byType(Checkbox), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'narrow: assign-folder button appears in selection mode and calls onAssignFolder',
+    (tester) async {
+      _setNarrow(tester);
+      List<String>? assignedIds;
+      String? assignedFolder;
+      await tester.pumpWidget(_buildScreenWithFolders(
+        listEntries: _twoEntries,
+        listFolders: () => ['Personal', 'Work'],
+        onAssignFolder: (ids, folder) async {
+          assignedIds = ids;
+          assignedFolder = folder;
+        },
+      ));
+
+      // Enter selection mode and select first entry
+      await tester.tap(find.byIcon(Icons.checklist));
+      await tester.pump();
+      await tester.tap(find.byType(Checkbox).first);
+      await tester.pump();
+
+      // Assign-folder button must be visible
+      expect(find.byIcon(Icons.folder_outlined), findsOneWidget);
+
+      // Tap it — dialog appears
+      await tester.tap(find.byIcon(Icons.folder_outlined));
+      await tester.pumpAndSettle();
+
+      // Open the dropdown inside the dialog
+      await tester.tap(find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(DropdownButton<String>),
+      ));
+      await tester.pumpAndSettle();
+
+      // Pick 'Work' from the dropdown menu
+      await tester.tap(find.text('Work').last);
+      await tester.pumpAndSettle();
+
+      // Confirm via Assign button
+      await tester.tap(find.text('Assign'));
+      await tester.pumpAndSettle();
+
+      expect(assignedFolder, 'Work');
+      expect(assignedIds, isNotNull);
+      expect(assignedIds!.length, 1);
     },
   );
 }

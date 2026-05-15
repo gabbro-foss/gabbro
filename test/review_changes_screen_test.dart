@@ -332,4 +332,30 @@ void main() {
     expect(find.text('10.0.0.1'), findsOneWidget);
     expect(find.text('10.0.0.2'), findsOneWidget);
   });
+
+  testWidgets('folder change appears in diff for Login entry', (tester) async {
+    final original = LoginEntryData(
+      id: 'test-id-1', title: 'GitHub', url: 'https://github.com',
+      username: 'rob@example.com', password: 'old_password', notes: null,
+      customFields: [], createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z', folder: 'Work',
+      previousPassword: null,
+    );
+    final updated = LoginEntryData(
+      id: 'test-id-1', title: 'GitHub', url: 'https://github.com',
+      username: 'rob@example.com', password: 'old_password', notes: null,
+      customFields: [], createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z', folder: 'Personal',
+      previousPassword: null,
+    );
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.login(original),
+      updated: VaultEntryData.login(updated),
+    ));
+
+    expect(find.text('Other fields'), findsOneWidget);
+    expect(find.text('Folder'), findsOneWidget);
+    expect(find.text('Work'), findsOneWidget);
+    expect(find.text('Personal'), findsOneWidget);
+  });
 }
