@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -162,9 +164,27 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             TextField(
               controller: pathController,
               autofocus: true,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
                 labelText: 'Export path',
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.folder_open),
+                  tooltip: 'Browse',
+                  onPressed: () async {
+                    String? picked;
+                    if (Platform.isAndroid) {
+                      final dir = await FilePicker.getDirectoryPath();
+                      if (dir != null) picked = '$dir/${e.filename}';
+                    } else {
+                      picked = await FilePicker.saveFile(
+                        fileName: e.filename,
+                      );
+                    }
+                    if (picked != null) {
+                      pathController.text = picked;
+                    }
+                  },
+                ),
               ),
               onSubmitted: (_) => Navigator.of(context).pop(true),
             ),

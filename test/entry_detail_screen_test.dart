@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
@@ -335,6 +337,33 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Password breakdown'), findsOneWidget);
+  });
+
+  testWidgets('file export dialog shows text field and picker button',
+      (tester) async {
+    final entry = FileEntryData(
+      id: 'test-id-file',
+      filename: 'secret.txt',
+      data: Uint8List.fromList([104, 101, 108, 108, 111]), // b"hello"
+      notes: null,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+    );
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.file(entry)),
+    );
+
+    // Tap the Export file button to open the dialog
+    await tester.tap(find.text('Export file'));
+    await tester.pumpAndSettle();
+
+    // Dialog title is present
+    expect(find.text('Export file'), findsWidgets);
+    // Manual path TextField is present
+    expect(find.byType(TextField), findsOneWidget);
+    // Picker IconButton is present
+    expect(find.byIcon(Icons.folder_open), findsOneWidget);
   });
 
   testWidgets('identity hidden custom field has eye icon toggle',
