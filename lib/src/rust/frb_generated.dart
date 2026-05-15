@@ -1639,15 +1639,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   CsvImportConfigData dco_decode_csv_import_config_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return CsvImportConfigData(
       titleCol: dco_decode_opt_String(arr[0]),
       urlCol: dco_decode_opt_String(arr[1]),
       usernameCol: dco_decode_opt_String(arr[2]),
       passwordCol: dco_decode_opt_String(arr[3]),
       notesCol: dco_decode_opt_String(arr[4]),
-      favouriteCol: dco_decode_opt_String(arr[5]),
     );
   }
 
@@ -2224,14 +2223,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_usernameCol = sse_decode_opt_String(deserializer);
     var var_passwordCol = sse_decode_opt_String(deserializer);
     var var_notesCol = sse_decode_opt_String(deserializer);
-    var var_favouriteCol = sse_decode_opt_String(deserializer);
     return CsvImportConfigData(
       titleCol: var_titleCol,
       urlCol: var_urlCol,
       usernameCol: var_usernameCol,
       passwordCol: var_passwordCol,
       notesCol: var_notesCol,
-      favouriteCol: var_favouriteCol,
     );
   }
 
@@ -2892,7 +2889,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.usernameCol, serializer);
     sse_encode_opt_String(self.passwordCol, serializer);
     sse_encode_opt_String(self.notesCol, serializer);
-    sse_encode_opt_String(self.favouriteCol, serializer);
   }
 
   @protected

@@ -77,7 +77,6 @@ class CsvImportConfigData {
   final String? usernameCol;
   final String? passwordCol;
   final String? notesCol;
-  final String? favouriteCol;
 
   const CsvImportConfigData({
     this.titleCol,
@@ -85,7 +84,6 @@ class CsvImportConfigData {
     this.usernameCol,
     this.passwordCol,
     this.notesCol,
-    this.favouriteCol,
   });
 
   @override
@@ -94,8 +92,7 @@ class CsvImportConfigData {
       urlCol.hashCode ^
       usernameCol.hashCode ^
       passwordCol.hashCode ^
-      notesCol.hashCode ^
-      favouriteCol.hashCode;
+      notesCol.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -106,8 +103,7 @@ class CsvImportConfigData {
           urlCol == other.urlCol &&
           usernameCol == other.usernameCol &&
           passwordCol == other.passwordCol &&
-          notesCol == other.notesCol &&
-          favouriteCol == other.favouriteCol;
+          notesCol == other.notesCol;
 }
 
 /// Preview of a CSV file — headers and up to 3 sample rows.

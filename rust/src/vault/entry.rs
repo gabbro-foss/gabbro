@@ -51,7 +51,7 @@ pub struct EntryAttachment {
 /// Stores credentials for a website or application
 #[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct LoginEntry {
-    /// Shared metadata (id, timestamp, folder, tags, favourite).
+    /// Shared metadata (id, timestamp, folder).
     pub meta: EntryMeta,
     /// Human-readable item title (e.g. "GitHub", "Netflix").
     /// Distinct from the URL — used as the primary display label in list views.

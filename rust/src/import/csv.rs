@@ -13,12 +13,11 @@ pub struct CsvPreview {
 /// Configuration for mapping CSV columns to Gabbro entry fields.
 /// Any column not mapped here becomes a custom field on the entry.
 pub struct CsvImportConfig {
-    pub title_col:     Option<String>,
-    pub url_col:       Option<String>,
-    pub username_col:  Option<String>,
-    pub password_col:  Option<String>,
-    pub notes_col:     Option<String>,
-    pub favourite_col: Option<String>,
+    pub title_col:    Option<String>,
+    pub url_col:      Option<String>,
+    pub username_col: Option<String>,
+    pub password_col: Option<String>,
+    pub notes_col:    Option<String>,
 }
 
 /// A single imported entry — flat struct ready for conversion to LoginEntry.
@@ -28,7 +27,6 @@ pub struct CsvEntry {
     pub username:      String,
     pub password:      String,
     pub notes:         Option<String>,
-    pub favourite:     bool,
     pub custom_fields: Vec<(String, String)>,
 }
 
@@ -58,11 +56,9 @@ pub fn import_csv(input: &str, config: &CsvImportConfig) -> Result<Vec<CsvEntry>
     let username_idx  = config.username_col.as_deref().and_then(col_index);
     let password_idx  = config.password_col.as_deref().and_then(col_index);
     let notes_idx     = config.notes_col.as_deref().and_then(col_index);
-    let favourite_idx = config.favourite_col.as_deref().and_then(col_index);
-
     let claimed: Vec<usize> = [
         title_idx, url_idx, username_idx,
-        password_idx, notes_idx, favourite_idx,
+        password_idx, notes_idx,
     ]
     .iter()
     .filter_map(|i| *i)
@@ -98,8 +94,6 @@ pub fn import_csv(input: &str, config: &CsvImportConfig) -> Result<Vec<CsvEntry>
             if n.is_empty() { None } else { Some(n) }
         };
 
-        let favourite = normalise_favourite(&get(favourite_idx));
-
         // Unclaimed columns become custom fields
         let custom_fields = headers.iter().enumerate()
             .filter(|(i, _)| !claimed.contains(i))
@@ -118,7 +112,6 @@ pub fn import_csv(input: &str, config: &CsvImportConfig) -> Result<Vec<CsvEntry>
             username: get(username_idx),
             password: get(password_idx),
             notes,
-            favourite,
             custom_fields,
         });
     }
@@ -156,15 +149,6 @@ fn normalise_field(value: &str) -> String {
     } else {
         value.to_string()
     }
-}
-
-/// Normalise a favourite field value to a bool.
-/// Truthy: "1", "yes", "true" (case-insensitive). Everything else: false.
-fn normalise_favourite(value: &str) -> bool {
-    matches!(
-        value.to_ascii_lowercase().as_str(),
-        "1" | "yes" | "true"
-    )
 }
 
 pub fn sniff_csv(input: &str) -> Result<CsvPreview, String> {
@@ -233,7 +217,6 @@ uid, name, login, password, type, number, comments, favourite
             password_col:  Some("password".to_string()),
             username_col:  None,
             notes_col:     None,
-            favourite_col: None,
         };
         let entries = import_csv(csv, &config).unwrap();
         assert_eq!(entries[0].title, "https://example.com");
@@ -248,30 +231,9 @@ uid, name, login, password, type, number, comments, favourite
             password_col:  Some("password".to_string()),
             username_col:  None,
             notes_col:     None,
-            favourite_col: None,
         };
         let entries = import_csv(csv, &config).unwrap();
         assert_eq!(entries[0].title, "MISSING TITLE");
-    }
-
-    #[test]
-    fn import_favourite_normalisation() {
-        let csv = "name,fav\nfirst,yes\nsecond,1\nthird,true\nfourth,no\nfifth,None\nsixth,0";
-        let config = CsvImportConfig {
-            title_col:     Some("name".to_string()),
-            favourite_col: Some("fav".to_string()),
-            url_col:       None,
-            username_col:  None,
-            password_col:  None,
-            notes_col:     None,
-        };
-        let entries = import_csv(csv, &config).unwrap();
-        assert!(entries[0].favourite,  "yes should be true");
-        assert!(entries[1].favourite,  "1 should be true");
-        assert!(entries[2].favourite,  "true should be true");
-        assert!(!entries[3].favourite, "no should be false");
-        assert!(!entries[4].favourite, "None should be false");
-        assert!(!entries[5].favourite, "0 should be false");
     }
 
     #[test]
@@ -297,7 +259,6 @@ uid, name, login, password, type, number, comments, favourite
             url_col:       None,
             username_col:  None,
             notes_col:     None,
-            favourite_col: None,
         };
         let entries = import_csv(csv, &config).unwrap();
         assert_eq!(entries[0].title, "Bank, Gold Card");
@@ -313,7 +274,6 @@ uid, name, login, password, type, number, comments, favourite
             url_col:       None,
             username_col:  None,
             notes_col:     None,
-            favourite_col: None,
         };
         let entries = import_csv(csv, &config).unwrap();
         assert_eq!(entries[0].title, "Visa");
@@ -336,7 +296,6 @@ uid, name, login, password, type, number, comments, favourite
             url_col:       None,
             username_col:  None,
             notes_col:     None,
-            favourite_col: None,
         };
         let entries = import_csv(csv, &config).unwrap();
         assert_eq!(entries.len(), 1);
@@ -359,7 +318,6 @@ uid, name, login, password, type, number, comments, favourite
             username_col:  Some("login".to_string()),
             password_col:  Some("password".to_string()),
             notes_col:     Some("comments".to_string()),
-            favourite_col: Some("favourite".to_string()),
         }
     }
 
@@ -371,7 +329,6 @@ uid, name, login, password, type, number, comments, favourite
             username_col:  Some("login".to_string()),
             password_col:  Some("password".to_string()),
             notes_col:     Some("comments".to_string()),
-            favourite_col: Some("favourite".to_string()),
         };
         let entries = import_csv(SAMPLE_CSV, &config).unwrap();
         assert_eq!(entries.len(), 3);
@@ -379,6 +336,5 @@ uid, name, login, password, type, number, comments, favourite
         assert_eq!(visa.title, "Visa");
         assert_eq!(visa.username, "");
         assert_eq!(visa.password, "secret sauce");
-        assert_eq!(visa.favourite, false);
     }
 }

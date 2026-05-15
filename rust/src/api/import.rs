@@ -28,7 +28,6 @@ pub struct CsvImportConfigData {
     pub username_col: Option<String>,
     pub password_col: Option<String>,
     pub notes_col: Option<String>,
-    pub favourite_col: Option<String>,
 }
 
 // ── Import result types ───────────────────────────────────────────────────────
@@ -88,7 +87,6 @@ pub async fn import_from_csv(input: String, config: CsvImportConfigData) -> Resu
         username_col: config.username_col,
         password_col: config.password_col,
         notes_col: config.notes_col,
-        favourite_col: config.favourite_col,
     };
 
     let entries = import_csv(&input, &csv_config)?;
@@ -417,7 +415,6 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
             username_col: Some("login".to_string()),
             password_col: Some("password".to_string()),
             notes_col: Some("comments".to_string()),
-            favourite_col: Some("favourite".to_string()),
         };
 
         let result = run(import_from_csv(SAMPLE_CSV.to_string(), config)).unwrap();
@@ -444,7 +441,6 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
             url_col: None,
             username_col: None,
             notes_col: None,
-            favourite_col: None,
         };
 
         let _ = run(import_from_csv(SAMPLE_CSV.to_string(), config)).unwrap();
@@ -588,7 +584,6 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
             username_col: None,
             password_col: None,
             notes_col: None,
-            favourite_col: None,
         };
 
         let result = run(import_from_csv(SAMPLE_CSV.to_string(), config));

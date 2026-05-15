@@ -1524,14 +1524,12 @@ impl SseDecode for crate::api::import::CsvImportConfigData {
         let mut var_usernameCol = <Option<String>>::sse_decode(deserializer);
         let mut var_passwordCol = <Option<String>>::sse_decode(deserializer);
         let mut var_notesCol = <Option<String>>::sse_decode(deserializer);
-        let mut var_favouriteCol = <Option<String>>::sse_decode(deserializer);
         return crate::api::import::CsvImportConfigData {
             title_col: var_titleCol,
             url_col: var_urlCol,
             username_col: var_usernameCol,
             password_col: var_passwordCol,
             notes_col: var_notesCol,
-            favourite_col: var_favouriteCol,
         };
     }
 }
@@ -2235,7 +2233,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::import::CsvImportConfigData {
             self.username_col.into_into_dart().into_dart(),
             self.password_col.into_into_dart().into_dart(),
             self.notes_col.into_into_dart().into_dart(),
-            self.favourite_col.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -2768,7 +2765,6 @@ impl SseEncode for crate::api::import::CsvImportConfigData {
         <Option<String>>::sse_encode(self.username_col, serializer);
         <Option<String>>::sse_encode(self.password_col, serializer);
         <Option<String>>::sse_encode(self.notes_col, serializer);
-        <Option<String>>::sse_encode(self.favourite_col, serializer);
     }
 }
 

@@ -26,7 +26,6 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
   late String? _usernameCol;
   late String? _passwordCol;
   late String? _notesCol;
-  late String? _favouriteCol;
   bool _isImporting = false;
   String? _error;
 
@@ -39,7 +38,6 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
     _usernameCol = _guess(['username', 'user', 'login', 'email']);
     _passwordCol = _guess(['password', 'pass', 'secret']);
     _notesCol = _guess(['notes', 'note', 'comments', 'comment']);
-    _favouriteCol = _guess(['favourite', 'favorite', 'fav']);
   }
 
   /// Return the first header that contains any of the candidate strings
@@ -70,7 +68,6 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
         usernameCol: _usernameCol,
         passwordCol: _passwordCol,
         notesCol: _notesCol,
-        favouriteCol: _favouriteCol,
       );
       final result = await widget.onImport(widget.csvContent, config);
       if (mounted) Navigator.of(context).pop(result.imported.toInt());
@@ -187,12 +184,6 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
                 _notesCol,
                 items,
                 (v) => setState(() => _notesCol = v),
-              ),
-              _mappingRow(
-                'Favourite',
-                _favouriteCol,
-                items,
-                (v) => setState(() => _favouriteCol = v),
               ),
               const SizedBox(height: 16),
 
