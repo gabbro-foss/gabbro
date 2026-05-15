@@ -171,6 +171,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Verify Android storage permissions hold on Android 11+ (app-private storage + SAF — no `MANAGE_EXTERNAL_STORAGE`).
 - Test on de-Googled Android (GrapheneOS/CalyxOS) before v1 — find a willing community tester, don't buy hardware.
 - Block copy/paste on master passphrase fields (default: block; user toggle in Settings → Security).
+- test/measure code test coverage before launch
 
 ### Testing (pre-v1 gates)
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
