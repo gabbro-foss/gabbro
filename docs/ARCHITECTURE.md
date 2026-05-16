@@ -181,9 +181,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- Fix bug: with folder filter selected in list view, when folder deleted in manage folder view
- (assign content to None), back in list view cannot pick another folder and get a white 
- screen - re-adding the deleted folder (same name) allows filtering again
 - Allow card entries to have 6 digits as mininum - current min is for credit cards but excludes debit cards
 - Make CVV entry optional - current status is valid for credit cards but excludes debit cards
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
