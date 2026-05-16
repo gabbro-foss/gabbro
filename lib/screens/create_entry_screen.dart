@@ -1082,8 +1082,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       ),
       validator: (v) {
         if (v == null || v.isEmpty) return 'Card number is required';
-        if (v.length < 12 || v.length > 19) {
-          return 'Card number must be 12–19 digits';
+        if (v.length < 6 || v.length > 19) {
+          return 'Card number must be 6–19 digits';
         }
         return null;
       },
@@ -1134,7 +1134,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               LengthLimitingTextInputFormatter(4),
             ],
             decoration: InputDecoration(
-              labelText: 'CVV',
+              labelText: 'CVV (optional)',
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -1144,8 +1144,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               ),
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return 'CVV is required';
-              if (v.length < 3 || v.length > 4) {
+              if (v != null && v.isNotEmpty && (v.length < 3 || v.length > 4)) {
                 return 'CVV must be 3 or 4 digits';
               }
               return null;

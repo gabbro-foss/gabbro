@@ -162,7 +162,7 @@ void main() {
       '12/28',
     );
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'CVV'),
+      find.widgetWithText(TextFormField, 'CVV (optional)'),
       '123',
     );
     await tester.enterText(
@@ -194,6 +194,68 @@ void main() {
       find.widgetWithText(TextFormField, 'PIN (optional)'),
     );
     expect(pinField.controller?.text, equals('1234'));
+  });
+
+  testWidgets('card form accepts 6-digit card number', (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Card'));
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Card label (e.g. "Visa Platinum")'),
+      'Debit Card',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Cardholder name'),
+      'Rob Bastian',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Card number'),
+      '123456',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Expiry (MM/YY)'),
+      '12/28',
+    );
+    await tester.pump();
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pump();
+
+    expect(find.text('Card number must be 6–19 digits'), findsNothing);
+  });
+
+  testWidgets('card form saves without CVV', (tester) async {
+    VaultEntryData? captured;
+    await tester.pumpWidget(
+      _buildCreateScreen('Card', onCreateEntry: (e) async => captured = e),
+    );
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Card label (e.g. "Visa Platinum")'),
+      'Debit Card',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Cardholder name'),
+      'Rob Bastian',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Card number'),
+      '4111111111111111',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Expiry (MM/YY)'),
+      '12/28',
+    );
+    // intentionally leave CVV empty
+    await tester.pump();
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(captured, isA<VaultEntryData_Card>());
+    final card = (captured! as VaultEntryData_Card).field0;
+    expect(card.cvv, equals(''));
   });
 
   // ── End card PIN tests ────────────────────────────────────────────────────

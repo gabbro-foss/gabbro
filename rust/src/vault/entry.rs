@@ -178,17 +178,14 @@ impl CardEntry {
         let mut errors: Vec<&str> = Vec::new();
 
         let digit_count = card_number.chars().filter(|c| c.is_ascii_digit()).count();
-        if digit_count < 12 || digit_count > 19 {
-            errors.push("card number must contain 12–19 digits");
+        if digit_count < 6 || digit_count > 19 {
+            errors.push("card number must contain 6–19 digits");
         }
         if cardholder_name.trim().is_empty() {
             errors.push("cardholder name is required");
         }
         if expiry.trim().is_empty() {
             errors.push("expiry is required");
-        }
-        if cvv.trim().is_empty() {
-            errors.push("CVV is required");
         }
         if !errors.is_empty() {
             return Err(errors.join("; "));
@@ -416,6 +413,22 @@ mod tests {
     }
 
     #[test]
+    fn card_entry_six_digit_number_succeeds() {
+        let result = CardEntry::new(
+            default_meta(),
+            None,
+            String::from("active"),
+            String::from("Rob Smith"),
+            String::from("123456"), // 6 digits — minimum for debit cards
+            String::from("12/28"),
+            String::from("123"),
+            None, None, None, None, None, None, None,
+            vec![], vec![], None, None,
+        );
+        assert!(result.is_ok(), "6-digit card number should be accepted");
+    }
+
+    #[test]
     fn card_entry_short_number_fails() {
         let result = CardEntry::new(
             default_meta(),
@@ -458,7 +471,22 @@ mod tests {
         assert!(err.contains("card number"), "should mention card number: {err}");
         assert!(err.contains("cardholder name"), "should mention cardholder name: {err}");
         assert!(err.contains("expiry"), "should mention expiry: {err}");
-        assert!(err.contains("CVV"), "should mention CVV: {err}");
+    }
+
+    #[test]
+    fn card_entry_cvv_optional() {
+        let result = CardEntry::new(
+            default_meta(),
+            None,
+            String::from("active"),
+            String::from("Rob Smith"),
+            String::from("4111111111111111"),
+            String::from("12/28"),
+            String::from(""), // empty CVV — should be accepted for debit cards
+            None, None, None, None, None, None, None,
+            vec![], vec![], None, None,
+        );
+        assert!(result.is_ok(), "empty CVV should be accepted");
     }
 
     #[test]
