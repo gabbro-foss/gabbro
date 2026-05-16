@@ -144,7 +144,7 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 222 | 1 |
+| Rust (`cargo test -q`) | 229 | 1 |
 | Flutter (`flutter test`) | 277 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -155,10 +155,10 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next task - YubiKey session 1: vault format extension + HKDF combiner (pure Rust)**
+- **Next task - YubiKey session 2: Linux libfido2 Rust FFI binding**
+  - Session 1 complete: vault format v2 with `YubiKeyRecord` struct; `combine_yubikey` HKDF combiner in `hkdf.rs`
   - See Bikeshed for full implementation plan (three sessions, in order)
   - Design complete: ADR-010 documents the hmac-secret mechanism
-  - Start here: extend vault format to hold per-key credential ID + salt records in header
 
 ---
 
@@ -192,6 +192,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - App logo (OnboardingScreen, UnlockScreen) — defer until designed.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
+- Audit and standardise app version display: `pubspec.yaml` currently shows `1.0.0`, About screen must match; both must be reset to `0.1.0` before first public tag.
 - Clean up legacy vault on first launch (`com.example.gabbro` → `app.gabbro.gabbro` migration offer).
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
