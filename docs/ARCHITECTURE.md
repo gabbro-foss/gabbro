@@ -84,6 +84,9 @@ gabbro/
 │   │   │   ├── io.rs
 │   │   │   ├── serialization.rs
 │   │   │   └── session.rs
+│   │   ├── fido/               # FIDO2/libfido2 FFI binding
+│   │   │   ├── mod.rs
+│   │   │   └── device.rs
 │   │   ├── import/
 │   │   │   ├── enpass.rs
 │   │   │   └── csv.rs
@@ -144,7 +147,7 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 229 | 1 |
+| Rust (`cargo test -q`) | 229 | 3 |
 | Flutter (`flutter test`) | 277 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -155,7 +158,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next task - YubiKey session 2: Linux libfido2 Rust FFI binding**
+- **Next task - YubiKey session 3: Android yubikit-android Kotlin integration**
+  - Session 2 complete: `rust/src/fido/` module — `register()` and `get_hmac_secret()` via libfido2 FFI; hardware-verified on YubiKey 5 via `/dev/hidraw5`
   - Session 1 complete: vault format v2 with `YubiKeyRecord` struct; `combine_yubikey` HKDF combiner in `hkdf.rs`
   - See Bikeshed for full implementation plan (three sessions, in order)
   - Design complete: ADR-010 documents the hmac-secret mechanism
@@ -182,10 +186,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - YubiKey / FIDO2 authentication:   
   - Design complete: ADR-010 documents the hmac-secret mechanism
   - Implementation plan (three sessions, in order):
-    1. Vault format extension + HKDF combiner (pure Rust)
-    2. Linux libfido2 binding (Rust FFI)
-    3. Android yubikit-android integration (Kotlin)
-  - Start with session 1: vault format extension
+    1. Vault format extension + HKDF combiner (pure Rust) ✓
+    2. Linux libfido2 binding (Rust FFI) ✓
+    3. Android yubikit-android integration (Kotlin) ← next
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
 - Multiple vaults.
 - Multiple app languages (v1: en,fr,de,it,es)
