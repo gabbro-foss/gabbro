@@ -137,6 +137,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
       setState(() {
         _entries = entries;
         _folders = folders;
+        if (!folders.contains(_selectedFolder)) {
+          _selectedFolder = '';
+        }
       });
     } catch (e) {
       setState(() {
