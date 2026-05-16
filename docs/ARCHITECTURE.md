@@ -155,13 +155,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next task — YubiKey / FIDO2 authentication:**
-  - Design complete: ADR-010 documents the hmac-secret mechanism
-  - Implementation plan (three sessions, in order):
-    1. Vault format extension + HKDF combiner (pure Rust)
-    2. Linux libfido2 binding (Rust FFI)
-    3. Android yubikit-android integration (Kotlin)
-  - Start with session 1: vault format extension
+- **Next task - card entry fix:**
+  - Allow card entries to have 6 digits as mininum - current min is for credit cards but excludes debit cards
+  - Make CVV entry optional - current status is valid for credit cards but excludes debit cards
 
 ---
 
@@ -181,8 +177,13 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- Allow card entries to have 6 digits as mininum - current min is for credit cards but excludes debit cards
-- Make CVV entry optional - current status is valid for credit cards but excludes debit cards
+- YubiKey / FIDO2 authentication:   
+  - Design complete: ADR-010 documents the hmac-secret mechanism
+  - Implementation plan (three sessions, in order):
+    1. Vault format extension + HKDF combiner (pure Rust)
+    2. Linux libfido2 binding (Rust FFI)
+    3. Android yubikit-android integration (Kotlin)
+  - Start with session 1: vault format extension
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
 - Multiple vaults.
 - Multiple app languages (v1: en,fr,de,it,es)
