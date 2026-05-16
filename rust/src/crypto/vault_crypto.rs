@@ -74,6 +74,7 @@ pub fn seal_vault(
         hkdf_salt,
         nonce,
         ciphertext,
+        yubikey_records: vec![],
     })
 }
 

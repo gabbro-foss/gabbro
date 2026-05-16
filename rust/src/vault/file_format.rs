@@ -14,16 +14,28 @@
 //! | AES-GCM nonce          | 12           |
 //! | ML-KEM ciphertext      | 1568         |
 //! | X25519 ephemeral pub   | 32           |
+//! | YubiKey record count   | 1            |
+//! | YubiKeyRecord × count  | variable     |
+//! |   credential_id length | 2            |
+//! |   credential_id        | variable     |
+//! |   salt                 | 32           |
 //! | Body length            | 8            |
 //! | Body (ciphertext)      | variable     |
 
 use crate::crypto::kdf::Argon2idParams;
 
+/// One YubiKey's credential ID and hmac-secret salt, stored in the vault header.
+#[derive(Debug, Clone, PartialEq)]
+pub struct YubiKeyRecord {
+    pub credential_id: Vec<u8>,
+    pub salt: [u8; 32],
+}
+
 /// Magic bytes that identify a Gabbro vault file.
 pub const MAGIC: &[u8; 6] = b"GABBRO";
 
 /// Current file format version.
-pub const VERSION: u8 = 1;
+pub const VERSION: u8 = 2;
 
 /// Size of the ML-KEM-1024 ciphertext in bytes.
 const ML_KEM_CIPHERTEXT_LEN: usize = 1568;
@@ -38,6 +50,7 @@ pub struct SealedVault {
     pub ml_kem_ciphertext: Vec<u8>,
     pub x25519_ephemeral_public: [u8; 32],
     pub ciphertext: Vec<u8>,
+    pub yubikey_records: Vec<YubiKeyRecord>,
 }
 
 impl SealedVault {
@@ -60,6 +73,15 @@ impl SealedVault {
         out.extend_from_slice(&self.nonce);
         out.extend_from_slice(&self.ml_kem_ciphertext);
         out.extend_from_slice(&self.x25519_ephemeral_public);
+
+        // YubiKey records — count byte then each record
+        out.push(self.yubikey_records.len() as u8);
+        for record in &self.yubikey_records {
+            let id_len = record.credential_id.len() as u16;
+            out.extend_from_slice(&id_len.to_be_bytes());
+            out.extend_from_slice(&record.credential_id);
+            out.extend_from_slice(&record.salt);
+        }
 
         // Body — length prefix then the bytes themselves
         let body_len = self.ciphertext.len() as u64;
@@ -138,6 +160,36 @@ impl SealedVault {
         let x25519_ephemeral_public: [u8; 32] = data[pos..pos + 32].try_into().unwrap();
         pos += 32;
 
+        // --- YubiKey records ---
+        if data.len() < pos + 1 {
+            return Err("File truncated at YubiKey record count".to_string());
+        }
+        let yubikey_count = data[pos] as usize;
+        pos += 1;
+
+        let mut yubikey_records = Vec::with_capacity(yubikey_count);
+        for _ in 0..yubikey_count {
+            if data.len() < pos + 2 {
+                return Err("File truncated at YubiKey credential_id length".to_string());
+            }
+            let id_len = u16::from_be_bytes(data[pos..pos + 2].try_into().unwrap()) as usize;
+            pos += 2;
+
+            if data.len() < pos + id_len {
+                return Err("File truncated at YubiKey credential_id".to_string());
+            }
+            let credential_id = data[pos..pos + id_len].to_vec();
+            pos += id_len;
+
+            if data.len() < pos + 32 {
+                return Err("File truncated at YubiKey salt".to_string());
+            }
+            let salt: [u8; 32] = data[pos..pos + 32].try_into().unwrap();
+            pos += 32;
+
+            yubikey_records.push(YubiKeyRecord { credential_id, salt });
+        }
+
         // --- Body length (8 bytes) ---
         if data.len() < pos + 8 {
             return Err("File truncated at body length".to_string());
@@ -159,6 +211,7 @@ impl SealedVault {
             ml_kem_ciphertext,
             x25519_ephemeral_public,
             ciphertext,
+            yubikey_records,
         })
     }
 }
@@ -181,15 +234,34 @@ mod tests {
             ml_kem_ciphertext: vec![4u8; 1568],
             x25519_ephemeral_public: [5u8; 32],
             ciphertext: vec![6u8; 64],
+            yubikey_records: vec![],
         }
     }
 
     #[test]
-    fn roundtrip_produces_identical_struct() {
+    fn roundtrip_with_no_yubikey_records() {
         let original = test_vault();
         let bytes = original.to_bytes();
         let recovered = SealedVault::from_bytes(&bytes).unwrap();
         assert_eq!(original, recovered);
+    }
+
+    #[test]
+    fn roundtrip_with_yubikey_records() {
+        let mut vault = test_vault();
+        vault.yubikey_records = vec![
+            YubiKeyRecord {
+                credential_id: vec![0xAAu8; 64],
+                salt: [0xBBu8; 32],
+            },
+            YubiKeyRecord {
+                credential_id: vec![0xCCu8; 32],
+                salt: [0xDDu8; 32],
+            },
+        ];
+        let bytes = vault.to_bytes();
+        let recovered = SealedVault::from_bytes(&bytes).unwrap();
+        assert_eq!(vault, recovered);
     }
 
     #[test]
@@ -217,7 +289,7 @@ mod tests {
     fn byte_length_is_correct() {
         let vault = test_vault();
         let bytes = vault.to_bytes();
-        // 6 + 1 + 4 + 4 + 4 + 32 + 32 + 12 + 1568 + 32 + 8 + 64 = 1767
-        assert_eq!(bytes.len(), 1767);
+        // 6 + 1 + 4 + 4 + 4 + 32 + 32 + 12 + 1568 + 32 + 1 + 8 + 64 = 1768
+        assert_eq!(bytes.len(), 1768);
     }
 }
