@@ -181,6 +181,15 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
+- Fix bug: with folder filter selected in list view, when folder deleted in manage folder view
+ (assign content to None), back in list view cannot pick another folder and get a white 
+ screen - re-adding the deleted folder (same name) allows filtering again
+- Allow card entries to have 6 digits as mininum - current min is for credit cards but excludes debit cards
+- Make CVV entry optional - current status is valid for credit cards but excludes debit cards
+- Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
+- Multiple vaults.
+- Multiple app languages (v1: en,fr,de,it,es)
+- App logo (OnboardingScreen, UnlockScreen) — defer until designed.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
 - Clean up legacy vault on first launch (`com.example.gabbro` → `app.gabbro.gabbro` migration offer).
@@ -191,9 +200,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
 
 ### V2+ / Defer
-- Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
-- Multiple vaults.
-- Passkey support (`PasskeyEntry`).
 - Data breach alerts / HaveIBeenPwned integration.
 - Coercion resistance / duress / decoy vault.
 - Panic button / app hiding on mobile.
@@ -202,7 +208,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Custom and hideable filter chips (post-v1 user feedback gate).
 - Tablet list pane width: draggable divider option.
 - Draggable divider for tablet list pane width.
-- App logo (OnboardingScreen, UnlockScreen) — defer until designed.
 - iOS, Windows, macOS support.
 - Yubico partnership.
 - Destination Linux podcast outreach (when approaching public release).
