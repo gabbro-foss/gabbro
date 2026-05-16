@@ -1,0 +1,2 @@
+[env]
+FIDO2_USE_PKG_CONFIG = "1"
