@@ -144,8 +144,8 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 220 | 1 |
-| Flutter (`flutter test`) | 275 | 0 |
+| Rust (`cargo test -q`) | 222 | 1 |
+| Flutter (`flutter test`) | 277 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
 
@@ -155,9 +155,10 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next task - card entry fix:**
-  - Allow card entries to have 6 digits as mininum - current min is for credit cards but excludes debit cards
-  - Make CVV entry optional - current status is valid for credit cards but excludes debit cards
+- **Next task - YubiKey session 1: vault format extension + HKDF combiner (pure Rust)**
+  - See Bikeshed for full implementation plan (three sessions, in order)
+  - Design complete: ADR-010 documents the hmac-secret mechanism
+  - Start here: extend vault format to hold per-key credential ID + salt records in header
 
 ---
 
