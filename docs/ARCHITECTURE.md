@@ -147,7 +147,7 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 229 | 3 |
+| Rust (`cargo test -q`) | 230 | 3 |
 | Flutter (`flutter test`) | 277 | 0 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
