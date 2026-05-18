@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "app.gabbro.gabbro"
-    compileSdk = flutter.compileSdkVersion
+    compileSdkVersion("android-36")
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -41,4 +41,9 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("com.yubico.yubikit:android:3.1.0")
+    implementation("com.yubico.yubikit:fido:3.1.0")
 }
