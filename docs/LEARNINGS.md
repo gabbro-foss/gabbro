@@ -2626,6 +2626,54 @@ state after the `with` block has closed.
 
 ---
 
+## Android build environment — Java version incompatibility
+
+Gradle/Kotlin builds on Arch Linux may fail with `java.lang.IllegalArgumentException: 26.0.1`
+if the system Java is version 26. Kotlin 2.2.x cannot parse Java 26's version string.
+
+Fix: point Gradle at Android Studio's bundled JBR (Java 21) via `android/gradle.properties`:
+
+    org.gradle.java.home=/opt/android-studio/jbr
+
+This is a machine-local setting. For Gabbro's single-developer setup it is committed
+intentionally.
+
+---
+
+## Android build environment — AGP version constraints
+
+AGP (Android Gradle Plugin) version must be compatible with both Flutter's gradle plugin
+and the project's transitive dependencies:
+
+- AGP < 8.9.1: too old for `androidx.core:core-ktx:1.17.0` and `androidx.browser:browser:1.9.0`
+- AGP 8.11+: breaks Flutter's gradle plugin — calls `.compileSdkVersion!!.substring(8)`,
+  a deprecated string getter that returns null in AGP 8.11+, causing an NPE. The exception
+  message is confusingly the AGP version string (e.g. `8.11.1`) or the Java version (`26.0.1`).
+- AGP 8.9.1: confirmed working with Flutter 3.41.9 and all transitive dependencies.
+
+---
+
+## Rust — platform-gating native dependencies for Android
+
+`libfido2-sys` links against OpenSSL and requires the host's `libfido2` — neither available
+when cross-compiling for Android. Gate it in `Cargo.toml`:
+
+    [target.'cfg(not(target_os = "android"))'.dependencies]
+    libfido2-sys = "0.5.1"
+
+And in `lib.rs`:
+
+    #[cfg(not(target_os = "android"))]
+    pub mod fido;
+
+The Android YubiKey integration uses `yubikit-android` (Kotlin) instead of `libfido2`.
+The two paths are mutually exclusive by platform — intentional architecture.
+
+Python analogy: like `if sys.platform != 'win32': import unix_only_module` — gated
+because the underlying library simply doesn't exist on that platform.
+
+---
+
 ## Android — `logcat` as a TDD proxy for untestable platform code
 
 The Android autofill service and its auth activity cannot be exercised
