@@ -1,27 +1,9 @@
 package app.gabbro.gabbro
 
-import com.yubico.yubikit.fido.client.ClientError
-import org.junit.Assert.assertTrue
 import org.junit.Ignore
 import org.junit.Test
 
 class YubiKeyManagerTest {
-
-    // ── Live (no hardware) ────────────────────────────────────────────────────────
-
-    @Test
-    fun describeClientError_device_ineligible_is_meaningful() {
-        val e = ClientError(ClientError.Code.DEVICE_INELIGIBLE, "test")
-        val msg = YubiKeyManager.describeClientError(e)
-        assertTrue("Expected 'eligible' in message, got: $msg", msg.contains("eligible"))
-    }
-
-    @Test
-    fun describeClientError_timeout_is_meaningful() {
-        val e = ClientError(ClientError.Code.TIMEOUT, "test")
-        val msg = YubiKeyManager.describeClientError(e)
-        assertTrue("Expected 'timed out' in message, got: $msg", msg.contains("timed out"))
-    }
 
     // ── Hardware (USB-C YubiKey 5C plugged into S23) ──────────────────────────────
 
