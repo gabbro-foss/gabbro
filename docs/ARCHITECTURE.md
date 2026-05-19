@@ -208,6 +208,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Clean up legacy vault on first launch (`com.example.gabbro` → `app.gabbro.gabbro` migration offer).
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
+- Bug noticed: an v1 vault cannot be opened once the app is updated to v2 vault - not an issue now so probably YAGNI
 
 ### Code Quality
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
