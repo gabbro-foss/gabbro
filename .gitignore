@@ -13,6 +13,7 @@
 migrate_working_dir/
 chat_info/
 docs/Session_protocol_Claude.md
+CLAUDE.md
 
 # vscode related
 .vscode/
