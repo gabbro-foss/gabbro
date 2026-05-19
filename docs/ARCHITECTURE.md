@@ -153,7 +153,7 @@ gabbro/
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 230 | 3 |
 | Flutter (`flutter test`) | 277 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 2 | 3 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 0 | 3 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
 
@@ -163,19 +163,25 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next task - YubiKey session 3 (in progress): Android yubikit-android Kotlin integration**
-  - Session 3 partial: `YubiKeyManager.kt` written and unit-tested (2 passing, 3 @Ignore hardware tests). Next steps: (a) hardware test — plug USB-C YubiKey 5C into S23, call `register()` then `getHmacSecret()`; (b) MethodChannel wiring in `MainActivity.kt`.
+- **YubiKey session 3 COMPLETE: Android yubikit-android Kotlin integration hardware-verified**
+  - `YubiKeyManager.kt`: `register()` + `getHmacSecret()` via `Ctap2Session` (raw CTAP2, not `Ctap2Client`)
+  - `MainActivity.kt`: MethodChannel `"app.gabbro.gabbro/yubikey_test"` with `register` and `get_hmac_secret` methods
+  - Hardware test on Samsung S23 + USB-C YubiKey 5C: register → 64-byte credential ID ✓; hmac-secret → 32 bytes ✓; determinism ✓
   - Session 2 complete: `rust/src/fido/` module — `register()` and `get_hmac_secret()` via libfido2 FFI; hardware-verified on YubiKey 5 via `/dev/hidraw5`
   - Session 1 complete: vault format v2 with `YubiKeyRecord` struct; `combine_yubikey` HKDF combiner in `hkdf.rs`
   - Design complete: ADR-010 documents the hmac-secret mechanism
+
+- **Next YubiKey sessions (separate, in order):**
+  1. Vault unlock integration — wire `YubiKeyManager` into the unlock flow; combine hmac-secret with Argon2id via `combine_yubikey` HKDF
+  2. NFC support — `startNfcDiscovery` (requires foreground Activity); separate session
 
   **Build environment notes (critical for next session):**
   - System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
   - AGP pinned to 8.9.1 in `android/settings.gradle.kts` (8.7.0 too old for transitive deps; 8.11+ breaks Flutter's `compileSdkVersion` string API).
   - `libfido2-sys` and `pub mod fido` are gated behind `cfg(not(target_os = "android"))` — libfido2 is Linux-only; Android uses yubikit-android via Kotlin.
-  - yubikit-android 3.1.0 modules: `com.yubico.yubikit:android` (transport) + `com.yubico.yubikit:fido` (CTAP2/hmac-secret). Both confirmed present in APK.
-  - Key API: `Ctap2Client(session, listOf(HmacSecretExtension(true)))` → `getAssertion(...)` → `PublicKeyCredential.clientExtensionResults`. The exact map key for extracting the raw 32-byte hmac-secret output is unconfirmed — verify at hardware test time via logcat.
-  - `YubiKitManager(context)` for USB/NFC discovery. USB: `startUsbDiscovery`. NFC: `startNfcDiscovery` (requires foreground Activity).
+  - yubikit-android 3.1.0: use `Ctap2Session` (raw CTAP2) not `Ctap2Client` (WebAuthn wrapper). `Ctap2Client` enforces WebAuthn domain validation — rejects `"app.gabbro.gabbro"` as RP ID. `Ctap2Session` has no such restriction.
+  - USB transport: `UsbFidoConnection` (HID interface), not `SmartCardConnection` (CCID). FIDO2 over USB uses HID.
+  - RP ID `"app.gabbro.gabbro"` is correct at CTAP2 level — it is just an identifier string, no domain required.
 
 ---
 
@@ -201,7 +207,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - Implementation plan (three sessions, in order):
     1. Vault format extension + HKDF combiner (pure Rust) ✓
     2. Linux libfido2 binding (Rust FFI) ✓
-    3. Android yubikit-android integration (Kotlin) ← in progress (see Current Focus)
+    3. Android yubikit-android integration (Kotlin) ✓
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
 - Search improvement: currently only searches title, needs an option to also search all fields and notes
 - Multiple vaults.

@@ -2764,3 +2764,82 @@ private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
 
 The same pattern applies to any Android context-dependent singleton member
 (e.g. `SensorManager`, `NotificationManager`) that should not block unit tests.
+
+---
+
+## Android — `Ctap2Session` vs `Ctap2Client`: use the raw CTAP2 layer for native apps
+
+`Ctap2Client` is a WebAuthn browser wrapper that enforces domain validation
+on the RP ID — it rejects `"app.gabbro.gabbro"` because it is not a valid
+eTLD+1 domain (no entry in the Public Suffix List). This is correct browser
+behaviour but wrong for a native app.
+
+`Ctap2Session` operates at the raw CTAP2 protocol level. The RP ID at CTAP2
+level is just an arbitrary string identifier — no domain required. Use
+`Ctap2Session` directly for native FIDO2 integration.
+
+```kotlin
+// Wrong — enforces WebAuthn domain validation; rejects "app.gabbro.gabbro"
+val client = Ctap2Client(session, rpId, ...)
+
+// Correct — raw CTAP2; RP ID is just a string
+val session = Ctap2Session(connection)
+```
+
+---
+
+## Android — USB FIDO2 requires `UsbFidoConnection`, not `SmartCardConnection`
+
+YubiKey supports two USB interfaces: HID (FIDO2) and CCID (smart card/PIV/OATH).
+`UsbFidoConnection` connects over HID and implements `FidoConnection`.
+`SmartCardConnection` connects over CCID — it cannot open a FIDO2 session.
+
+Always use `UsbFidoConnection` for FIDO2 over USB:
+
+```kotlin
+device.requestConnection(UsbFidoConnection::class.java) { result ->
+    onConnected(result.getValue())  // result is FidoConnection
+}
+```
+
+---
+
+## Android — hmac-secret key agreement is separate from PIN UV auth
+
+The FIDO2 hmac-secret extension requires two distinct key agreement operations:
+
+1. **PIN UV auth** (`clientPin.getPinToken`): establishes a PIN token used to
+   sign `clientDataHash`. This proves PIN knowledge to the authenticator.
+
+2. **hmac-secret key agreement** (`clientPin.getSharedSecret`): establishes a
+   platform key and shared secret used to *encrypt the salt* before sending it
+   to the authenticator, and to *decrypt the output* received back.
+
+These are independent — do not confuse the shared secrets. In yubikit-android,
+`getSharedSecret()` returns a `Pair<ByteArray, ByteArray>` of `(platformKey, sharedSecret)`.
+
+```kotlin
+val keyAgreementResult = clientPin.getSharedSecret()
+val platformKey = keyAgreementResult.first   // sent to authenticator
+val sharedSecret = keyAgreementResult.second // used locally to encrypt/decrypt
+
+val encryptedSalt = pinProtocol.encrypt(sharedSecret, salt)
+val saltAuth = pinProtocol.authenticate(sharedSecret, encryptedSalt)
+// ... then build extensions map with platformKey, encryptedSalt, saltAuth
+val secret = pinProtocol.decrypt(sharedSecret, encryptedOutput)
+```
+
+---
+
+## Android — flutter build apk with alternate entry point
+
+To build an APK using a file other than `lib/main.dart` as the entry point:
+
+```bash
+flutter build apk --release --target test/yubikey_test_screen.dart
+```
+
+The target file must define its own `main()` function. Useful for temporary
+hardware test screens that should not ship in the production app. Delete the
+file after testing; do not merge it into `lib/`.
+
