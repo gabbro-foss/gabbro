@@ -96,7 +96,11 @@ gabbro/
 │   └── kotlin/app/gabbro/gabbro/
 │       ├── GabbroAutofillService.kt
 │       ├── UnlockActivity.kt
-│       └── RustBridge.kt
+│       ├── RustBridge.kt
+│       └── YubiKeyManager.kt      # USB FIDO2 hmac-secret (register + getHmacSecret)
+├── android/app/src/test/
+│   └── kotlin/app/gabbro/gabbro/
+│       └── YubiKeyManagerTest.kt
 ├── docs/
 │   ├── ARCHITECTURE.md         # This file
 │   ├── LEARNINGS.md
@@ -149,6 +153,7 @@ gabbro/
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 230 | 3 |
 | Flutter (`flutter test`) | 277 | 0 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 2 | 3 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
 
@@ -159,7 +164,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 > Update at the end of each session. First thing to read at the start of the next.
 
 - **Next task - YubiKey session 3 (in progress): Android yubikit-android Kotlin integration**
-  - Session 3 partial: build environment fixed + yubikit-android 3.1.0 dependency added and verified in APK. Next step: write `YubiKeyManager.kt`.
+  - Session 3 partial: `YubiKeyManager.kt` written and unit-tested (2 passing, 3 @Ignore hardware tests). Next steps: (a) hardware test — plug USB-C YubiKey 5C into S23, call `register()` then `getHmacSecret()`; (b) MethodChannel wiring in `MainActivity.kt`.
   - Session 2 complete: `rust/src/fido/` module — `register()` and `get_hmac_secret()` via libfido2 FFI; hardware-verified on YubiKey 5 via `/dev/hidraw5`
   - Session 1 complete: vault format v2 with `YubiKeyRecord` struct; `combine_yubikey` HKDF combiner in `hkdf.rs`
   - Design complete: ADR-010 documents the hmac-secret mechanism

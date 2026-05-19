@@ -2698,3 +2698,69 @@ guess, don't iterate blindly. Get evidence first, then fix.
 Python analogy: like adding `print()` statements to a function you cannot
 unit-test (e.g. a Django middleware that only fires on live HTTP requests)
 — targeted, temporary, removed once the behaviour is confirmed.
+
+---
+
+## Android — yubikit-android 3.1.0 exact API surface (FIDO2 hmac-secret)
+
+Key classes and gotchas confirmed by `javap` bytecode inspection before writing
+any implementation code. Do not guess package names or method signatures in
+yubikit — the library has changed across major versions.
+
+**Packages:**
+- `com.yubico.yubikit.fido.client.Ctap2Client` — high-level FIDO2 client
+- `com.yubico.yubikit.fido.client.clientdata.ClientDataProvider` — offline RP
+- `com.yubico.yubikit.fido.client.extensions.HmacSecretExtension`
+- `com.yubico.yubikit.fido.ctap.Ctap2Session` — low-level CTAP2 session
+- `com.yubico.yubikit.fido.webauthn.*` — all WebAuthn data types
+
+**Gotcha 1 — `getErrorCode()` not `code`:**
+`ClientError` exposes `getErrorCode(): ClientError.Code`, not `.code`. In Kotlin
+this becomes `e.errorCode`. The `when` branch must use `e.errorCode`.
+
+**Gotcha 2 — `getClientExtensionResults()` is nullable:**
+`PublicKeyCredential.getClientExtensionResults()` returns `ClientExtensionResults?`
+in Kotlin. Must use safe-call: `assertion.getClientExtensionResults()?.toMap(...)`.
+
+**Gotcha 3 — `MultipleAssertionsAvailable extends Throwable`:**
+This exception does not extend `Exception` — it extends `Throwable` directly. A
+`catch (e: Exception)` block will not catch it. Must be caught explicitly before
+the general `Exception` handler.
+
+**Gotcha 4 — `PublicKeyCredentialUserEntity` constructor order:**
+`(String name, byte[] id, String displayName)` — `name` comes before `id`.
+
+**Offline RP pattern (`ClientDataProvider.fromHash`):**
+For CTAP2-direct use (no WebAuthn server), pass `ClientDataProvider.fromHash(randomBytes)`
+as the first argument to `makeCredential` / `getAssertion`. The 32-byte hash is
+sent as `clientDataHash` directly to the authenticator, bypassing the full
+WebAuthn clientDataJSON ceremony. The `challenge` field in the options objects is
+ignored in this mode.
+
+**Extension input/output keys (hmac-secret):**
+- Registration: `Extensions.fromMap(mapOf("hmacCreateSecret" to true))`
+- Assertion input: `Extensions.fromMap(mapOf("hmacGetSecret" to mapOf("salt1" to base64url_salt)))`
+- Assertion output: `extensionMap["hmac-secret"]["output1"] as ByteArray` (CBOR serialisation)
+
+---
+
+## Android — Kotlin `object` initialiser runs on first access; avoid Android APIs there
+
+A Kotlin `object` singleton's property initialisers run the first time any
+member of the object is accessed. If the initialiser calls Android-only code
+(e.g. `Handler(Looper.getMainLooper())`), it will crash in JVM unit tests
+because the Android runtime is not present.
+
+Fix: use `by lazy { ... }` to defer the initialisation until the property is
+first read at runtime (inside a method, never during class loading in a test):
+
+```kotlin
+// Crashes in unit tests — initialised at class load time
+private val mainHandler = Handler(Looper.getMainLooper())
+
+// Safe — only initialised when first used (inside register/getHmacSecret)
+private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+```
+
+The same pattern applies to any Android context-dependent singleton member
+(e.g. `SensorManager`, `NotificationManager`) that should not block unit tests.
