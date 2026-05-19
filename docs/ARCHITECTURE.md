@@ -198,6 +198,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
     2. Linux libfido2 binding (Rust FFI) ✓
     3. Android yubikit-android integration (Kotlin) ← in progress (see Current Focus)
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
+- Search improvement: currently only searches title, needs an option to also search all fields and notes
 - Multiple vaults.
 - Multiple app languages (v1: en,fr,de,it,es)
 - App logo (OnboardingScreen, UnlockScreen) — defer until designed.
