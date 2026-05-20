@@ -189,7 +189,14 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - Flutter tests: +2 new widget tests (YubiKey binding mention shown/not-shown)
   - Flutter: 291 passing (+2), Rust: 246 (unchanged), Android: 0 / 4 ignored (unchanged)
 
-- **Next: Session 7 — NFC support**
+- **Pre-session-7 hardware testing + bug fixes (complete):**
+  - Full hardware test matrix on Samsung S23 passed (all blocks 1–12 except 12.1 which is blocked pending YubiKey vault creation fix below)
+  - **Retry fix:** `get_hmac_secret` and `register_and_get_hmac` handlers in `MainActivity.kt` now retry once after 500ms on CTAP2 or USB error — guards against transient USB enumeration races
+  - **Card editing bug fixed:** `_hasChanges` in `create_entry_screen.dart` was missing `creditLimit`, `cardAccountNumber`, `paymentNetwork`, `notes` for Card entries → editing these optional fields silently showed "No changes to save"; `_buildFieldDiffs` in `review_changes_screen.dart` was missing `cardNumber`, `creditLimit`, `cardAccountNumber`, `paymentNetwork`, `notes` → no diff shown in review screen; both fixed
+  - **YubiKey touch:** brief tap (~0.5–1s on gold contact) is correct; `registerAndGetHmac` does two CTAP2 operations (makeCredential + getAssertions) so LED may blink twice — tap once per blink
+  - Flutter: 295 passing (+4), Rust: 246 (unchanged), Android: 0 / 4 ignored (unchanged)
+
+- **Next: Session 7 — NFC support** (resume hardware test 12.1 after NFC; test 11.4 confirmed correct — background lock controls locking in background)
 
   **Build environment notes (critical for Android sessions):**
   - System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
