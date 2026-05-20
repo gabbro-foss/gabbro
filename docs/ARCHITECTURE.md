@@ -152,7 +152,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 246 | 3 |
-| Flutter (`flutter test`) | 289 | 0 |
+| Flutter (`flutter test`) | 291 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 4 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -183,9 +183,13 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - YubiKey option in onboarding: already implemented (`SwitchListTile` defaults OFF, lets user choose); confirmed and removed from bikeshed
   - Flutter: 289 passing (+2), Rust: 246 (unchanged), Android: 0 / 4 ignored (unchanged)
 
-- **Next: Session 6 — Vault delete with YubiKey**
-  - Vault delete flow: detect YubiKey vault, show appropriate confirmation, call `deleteWholeVault` (already session-aware — no extra YubiKey tap needed, same pattern as change passphrase)
-  - Session 7: NFC support
+- **YubiKey session 6 COMPLETE: Vault delete with YubiKey**
+  - `vault_list_screen.dart`: added `yubikeyRecords` DI param (null = auto-detect via `listVaultYubikeyRecords` in `initState`); `_isYubikeyVault` getter; Step 1 delete dialog shows *"...and remove the YubiKey binding."* for YubiKey vaults
+  - **Key design decision:** No PIN field or extra YubiKey tap — `deleteWholeVault` just deletes the file and drops the session; YubiKey material was already verified at unlock; same reasoning as session 5
+  - Flutter tests: +2 new widget tests (YubiKey binding mention shown/not-shown)
+  - Flutter: 291 passing (+2), Rust: 246 (unchanged), Android: 0 / 4 ignored (unchanged)
+
+- **Next: Session 7 — NFC support**
 
   **Build environment notes (critical for Android sessions):**
   - System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
@@ -223,7 +227,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
     4a. Rust + bridge: `seal/open_vault_with_yubikey`, `YubikeyMaterial` session, all bridge functions ✓
     4b. Flutter UI: unlock screen YubiKey detect/prompt, onboarding YubiKey opt-in ✓
     5. Change passphrase with YubiKey ✓
-    6. Vault delete with YubiKey
+    6. Vault delete with YubiKey ✓
     7. NFC support
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
