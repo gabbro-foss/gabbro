@@ -224,7 +224,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 480),
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(32),
+                padding: EdgeInsets.fromLTRB(
+                  32, 32, 32,
+                  32 + MediaQuery.of(context).viewPadding.bottom,
+                ),
                 child: Form(
                   key: _formKey,
                   child: Column(
