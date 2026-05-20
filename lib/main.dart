@@ -225,6 +225,7 @@ class _GabbroAppState extends State<GabbroApp>
     try {
       lockVault();
     } catch (_) {}
+    if (!File(widget.vaultPath).existsSync()) return;
     _navigatorKey.currentState?.pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (_) => UnlockScreen(

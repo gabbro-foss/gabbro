@@ -101,10 +101,17 @@ object YubiKeyManager {
 
             val nonNullPin = pin ?: run { mainHandler.post { onError("PIN required") }; return }
 
-            // 1. makeCredential
+            // Single PIN token covering both MC and GA — avoids a second getPinToken
+            // call (which can itself prompt a touch on CTAP2.1 firmware 5.4+).
+            val pinToken = clientPin.getPinToken(
+                nonNullPin,
+                ClientPin.PIN_PERMISSION_MC or ClientPin.PIN_PERMISSION_GA,
+                RP_ID,
+            )
+
+            // 1. makeCredential — one tap here
             val mcClientDataHash = ByteArray(32).also { SecureRandom().nextBytes(it) }
-            val pinTokenMC = clientPin.getPinToken(nonNullPin, ClientPin.PIN_PERMISSION_MC, RP_ID)
-            val pinUvAuthParamMC = pinProtocol.authenticate(pinTokenMC, mcClientDataHash)
+            val pinUvAuthParamMC = pinProtocol.authenticate(pinToken, mcClientDataHash)
             val userId = ByteArray(16).also { SecureRandom().nextBytes(it) }
             val credential = session.makeCredential(
                 mcClientDataHash,
@@ -123,7 +130,7 @@ object YubiKeyManager {
             val credentialId = authDataMC.attestedCredentialData?.credentialId
                 ?: error("No attested credential data in makeCredential response")
 
-            // 2. getAssertions for hmac-secret — up=false so no second tap is needed
+            // 2. getAssertions for hmac-secret — reuse same token, up=false, no second tap
             val keyAgreementResult = clientPin.getSharedSecret()
             val platformKey = keyAgreementResult.first
             val sharedSecret = keyAgreementResult.second
@@ -131,8 +138,7 @@ object YubiKeyManager {
             val saltAuth = pinProtocol.authenticate(sharedSecret, encryptedSalt)
 
             val gaClientDataHash = ByteArray(32).also { SecureRandom().nextBytes(it) }
-            val pinTokenGA = clientPin.getPinToken(nonNullPin, ClientPin.PIN_PERMISSION_GA, RP_ID)
-            val pinUvAuthParamGA = pinProtocol.authenticate(pinTokenGA, gaClientDataHash)
+            val pinUvAuthParamGA = pinProtocol.authenticate(pinToken, gaClientDataHash)
 
             val allowList = listOf(mapOf("type" to "public-key", "id" to credentialId))
             val extensions = mapOf(

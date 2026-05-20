@@ -164,9 +164,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         );
       }
     } catch (e) {
-      setState(() => _error = e.toString());
+      if (mounted) setState(() => _error = e.toString());
     } finally {
-      setState(() => _isCreating = false);
+      if (mounted) setState(() => _isCreating = false);
     }
   }
 
