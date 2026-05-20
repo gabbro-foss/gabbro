@@ -223,7 +223,11 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
     5. Change passphrase with YubiKey
     6. Vault delete with YubiKey
     7. NFC support
+- onboarding screen needs message about "slow" vault creation process with yubikey to avoid user drop-out
+- bug: login screen with yubikey, login button inaccessible in landscape mode -> check also in tablet mode
 - Multiple vaults.
+  - feature: keep option to create vault with or without yubikey in onboarding screen -> useful for multiple vaults with different security levels
+  - multiple vaults should not be listed on login screen -> allows better obfuscation and coersion resistance
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
 - Export vault to JSON - consistent with gabbro stance: we don't lock the user in. Include warning about user's responsibility with a decrypted vault file.
 - Export/import security note: `.gabbro` exports are AES-256-GCM encrypted (passphrase-only — YubiKey not required to import, by design; passphrase is the durable recovery factor, YubiKey is the live-vault second factor). JSON exports are plaintext — no encryption at all. Add visible warnings in the export UI distinguishing the two: `.gabbro` ("protected by your passphrase only") and JSON ("completely unencrypted — store securely").
