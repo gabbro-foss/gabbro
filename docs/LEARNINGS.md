@@ -2950,3 +2950,74 @@ Tests pass `isAndroid: true` to exercise the Android-only section on Linux.
 The constructor must be non-const (can't call `Platform.isAndroid` in a const
 initializer list). This is a deliberate trade-off: testability over const.
 
+
+---
+
+## CTAP2.1 — UP flag, `up=false`, and `action_timeout` on YubiKey 5.4.x
+
+### Background
+
+Gabbro's YubiKey vault creation (`registerAndGetHmac`) needs to:
+1. Call `makeCredential` — creates the FIDO2 credential (always requires physical touch / UP).
+2. Call `getAssertions` with the `hmac-secret` extension — retrieves the vault key material.
+
+The goal is for step 2 to reuse the touch from step 1 so the user taps only once.
+
+### CTAP2 `up` option and the UP flag in pinUvAuthToken
+
+CTAP2 `getAssertions` accepts an `up` option. Setting `"up" to false` requests that the
+authenticator skip the user-presence check (no touch required). However, under CTAP2.1 this
+only works if the **pinUvAuthToken** used to compute the `pinUvAuthParam` has the **UP flag**
+set. The UP flag in a token is only established when the token was issued alongside a physical
+touch — i.e., via `getPinUvAuthTokenUsingUvWithPermissions` (biometric) or a flow that
+combined PIN entry with UP.
+
+### What `ClientPin.getPinToken` does on CTAP2.1
+
+On CTAP2.1 devices (like YubiKey 5.4.x), yubikit-android 3.1.0 routes
+`ClientPin.getPinToken(pin, permissions, rpId)` to
+`getPinUvAuthTokenUsingPinWithPermissions`. This is a PIN-only exchange.  
+The resulting token does **not** have the UP flag set because no physical touch occurred
+during token issuance.
+
+Without UP in the token, the YubiKey spec does not honour `up=false` in `getAssertions`.
+The authenticator still waits for a touch, and if none comes within its timeout window it
+returns `CTAP2_ERR_ACTION_TIMEOUT (0x3a)`.
+
+### Mitigation attempts (both failed on fw 5.4.3)
+
+1. **`up=false` in `getAssertions` options** — ignored, still waits for touch, `0x3a`.
+2. **Combined token** (`PIN_PERMISSION_MC | PIN_PERMISSION_GA`) + `up=false` — same result.
+   The combined permission does not inject the UP flag into the token.
+
+### Observed error
+
+```
+PlatformException(register_hmac_failed,
+  registerAndGetHmac failed: CTAP error: action_timeout (0x3a), null, null)
+```
+
+### Root cause
+
+`getPinToken` (PIN-only) → token has no UP flag → CTAP2.1 spec allows authenticator to
+ignore `up=false` → YubiKey 5.4.3 enforces a second touch → times out waiting → `0x3a`.
+
+### Proposed paths forward (documented in ARCHITECTURE.md § Current Focus)
+
+- **Option A (recommended):** Accept two touches, redesign UI to make this clear and smooth.
+- **Option B:** Use a UV-bearing token (`getPinUvAuthTokenUsingUv`) to embed the UP flag.
+  Requires biometric or a CTAP2.1 internal UV flow; may not be universally supported.
+- **Option C:** Split the flow — register first, then retrieve hmac-secret as a separate
+  "tap to unlock" interaction, keeping each individual operation to one touch.
+
+### Related Flutter bug (foreground lock timer during vault creation)
+
+The 30-second foreground inactivity timer in `GabbroApp._lock()` can fire while the
+CTAP2 operation is in progress, disposing `OnboardingScreen` before the Kotlin callback
+returns. This caused a `Null check operator used on a null value` crash in `_createVault`'s
+`finally` block. Two fixes applied:
+
+1. `_lock()` bails early if `widget.vaultPath` does not exist yet (vault creation in progress).
+2. `if (mounted)` guards on every `setState` call in `_createVault`'s `catch`/`finally`.
+
+These fixes prevent the crash but do not resolve the underlying two-touch issue.

@@ -189,14 +189,37 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - Flutter tests: +2 new widget tests (YubiKey binding mention shown/not-shown)
   - Flutter: 291 passing (+2), Rust: 246 (unchanged), Android: 0 / 4 ignored (unchanged)
 
-- **Pre-session-7 hardware testing + bug fixes (complete):**
-  - Full hardware test matrix on Samsung S23 passed (all blocks 1–12 except 12.1 which is blocked pending YubiKey vault creation fix below)
-  - **Retry fix:** `get_hmac_secret` and `register_and_get_hmac` handlers in `MainActivity.kt` now retry once after 500ms on CTAP2 or USB error — guards against transient USB enumeration races
-  - **Card editing bug fixed:** `_hasChanges` in `create_entry_screen.dart` was missing `creditLimit`, `cardAccountNumber`, `paymentNetwork`, `notes` for Card entries → editing these optional fields silently showed "No changes to save"; `_buildFieldDiffs` in `review_changes_screen.dart` was missing `cardNumber`, `creditLimit`, `cardAccountNumber`, `paymentNetwork`, `notes` → no diff shown in review screen; both fixed
-  - **YubiKey touch:** brief tap (~0.5–1s on gold contact) is correct; `registerAndGetHmac` does two CTAP2 operations (makeCredential + getAssertions) so LED may blink twice — tap once per blink
+- **Pre-session-7 hardware testing + fixes (partially complete):**
+  - Hardware test matrix blocks 1–11 passed on Samsung S23 (see below for block 12 status)
+  - **Retry fix:** `get_hmac_secret` and `register_and_get_hmac` handlers in `MainActivity.kt` now retry once after 500ms — guards against transient USB enumeration races
+  - **Card editing bug fixed:** `_hasChanges` missing `creditLimit`, `cardAccountNumber`, `paymentNetwork`, `notes` for Card → "No changes to save" on optional fields; `_buildFieldDiffs` missing `cardNumber` + same fields → no diff in review screen; both fixed (+4 regression tests)
   - Flutter: 295 passing (+4), Rust: 246 (unchanged), Android: 0 / 4 ignored (unchanged)
 
-- **Next: Session 7 — NFC support** (resume hardware test 12.1 after NFC; test 11.4 confirmed correct — background lock controls locking in background)
+- **UNRESOLVED — YubiKey vault creation single-tap (blocks test A.1 and block 12)**
+
+  **Symptom:** `CTAP error: action_timeout (0x3a)` from `registerAndGetHmac`. User taps once; YubiKey blinks a second time and times out.
+
+  **Device:** Samsung S23, YubiKey 5C + 5A, firmware 5.4.3 (both). CTAP2.1-capable.
+
+  **Root cause of earlier "passphrase-only login" report:** the 30s foreground lock timer was firing during the long CTAP2 operation, disposing `OnboardingScreen` and triggering an unhandled null-setState crash. The vault WAS being created correctly; the app was crashing after. Fixed (mounted guards + `_lock()` file guard).
+
+  **Mitigation attempts (all failed on 5.4.3 hardware):**
+  1. `up=false` on `getAssertions` — YubiKey ignored it, still prompted for touch
+  2. Combined PIN token (`PIN_PERMISSION_MC or PIN_PERMISSION_GA`) + `up=false` — same `action_timeout`
+
+  **Where the second blink comes from:** `registerAndGetHmac` does two CTAP2 operations: `makeCredential` (tap 1) then `getAssertions` (tap 2). All attempts to make `getAssertions` skip UP have failed, suggesting the YubiKey 5.4.3 firmware enforces UP for `getAssertions` regardless of `up=false` when the PIN token does not carry the UP flag (UP flag is only set in a pinUvAuthToken if UP was performed during token construction — PIN-only `getPinToken` does not set it on this firmware).
+
+  **Proposed solutions for next session (in order of preference):**
+
+  A. **Two-tap onboarding with clear UI (one-time only, simplest):** Keep `up=true` default, show explicit step UI: "Step 1 of 2 — tap YubiKey to register" → "Step 2 of 2 — tap again to activate". Unlock always remains one tap. This is the correct behaviour per the CTAP2 protocol.
+
+  B. **Retrieve hmac-secret via getPinToken + UV-bearing token:** Investigate whether `getPinUvAuthTokenUsingUvWithPermissions` (built-in UV, not PIN) or `getPinUvAuthTokenUsingPinWithPermissions` with explicit UP option sets the UP flag in the token on this firmware. If UP flag is set in the token, `getAssertions` with `up=false` MUST be respected per CTAP2.1 spec.
+
+  C. **Split registration from first hmac-secret fetch:** `makeCredential` (one tap) during onboarding → store credential ID; vault is created with a provisional key; on first unlock `getAssertions` (one tap, same as normal unlock) retrieves the real hmac-secret → vault re-sealed. Net: one tap per event, two total across two separate user interactions. Significant Rust+Kotlin+Dart change.
+
+  **Recommendation:** Try option A first — it is honest about the protocol constraint and unblocks the rest of the test matrix immediately. Option B should be investigated in parallel with a logcat trace to confirm exactly which CTAP2 operation is generating the second blink.
+
+- **Next: resolve YubiKey vault creation (options A/B/C above), then Session 7 — NFC support**
 
   **Build environment notes (critical for Android sessions):**
   - System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
