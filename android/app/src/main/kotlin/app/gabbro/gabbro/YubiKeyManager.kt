@@ -86,6 +86,82 @@ object YubiKeyManager {
         }
     }
 
+    fun registerAndGetHmac(
+        connection: FidoConnection,
+        salt: ByteArray,
+        pin: CharArray?,
+        onSuccess: (credentialId: ByteArray, hmacSecret: ByteArray) -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        try {
+            val session = Ctap2Session(connection)
+            val info = session.cachedInfo
+            val pinProtocol = pinProtocolFor(info)
+            val clientPin = ClientPin(session, pinProtocol)
+
+            val nonNullPin = pin ?: run { mainHandler.post { onError("PIN required") }; return }
+
+            // 1. makeCredential
+            val mcClientDataHash = ByteArray(32).also { SecureRandom().nextBytes(it) }
+            val pinTokenMC = clientPin.getPinToken(nonNullPin, ClientPin.PIN_PERMISSION_MC, RP_ID)
+            val pinUvAuthParamMC = pinProtocol.authenticate(pinTokenMC, mcClientDataHash)
+            val userId = ByteArray(16).also { SecureRandom().nextBytes(it) }
+            val credential = session.makeCredential(
+                mcClientDataHash,
+                mapOf("id" to RP_ID, "name" to "Gabbro"),
+                mapOf("id" to userId, "name" to "gabbro-user", "displayName" to "Gabbro User"),
+                listOf(mapOf("type" to "public-key", "alg" to -7)),
+                null,
+                mapOf("hmac-secret" to true),
+                null,
+                pinUvAuthParamMC,
+                pinProtocol.version,
+                null,
+                null,
+            )
+            val authDataMC = AuthenticatorData.parseFrom(ByteBuffer.wrap(credential.authenticatorData))
+            val credentialId = authDataMC.attestedCredentialData?.credentialId
+                ?: error("No attested credential data in makeCredential response")
+
+            // 2. getAssertions for hmac-secret using the same session (same tap)
+            val keyAgreementResult = clientPin.getSharedSecret()
+            val platformKey = keyAgreementResult.first
+            val sharedSecret = keyAgreementResult.second
+            val encryptedSalt = pinProtocol.encrypt(sharedSecret, salt)
+            val saltAuth = pinProtocol.authenticate(sharedSecret, encryptedSalt)
+
+            val gaClientDataHash = ByteArray(32).also { SecureRandom().nextBytes(it) }
+            val pinTokenGA = clientPin.getPinToken(nonNullPin, ClientPin.PIN_PERMISSION_GA, RP_ID)
+            val pinUvAuthParamGA = pinProtocol.authenticate(pinTokenGA, gaClientDataHash)
+
+            val allowList = listOf(mapOf("type" to "public-key", "id" to credentialId))
+            val extensions = mapOf(
+                "hmac-secret" to mapOf(1 to platformKey, 2 to encryptedSalt, 3 to saltAuth)
+            )
+            val assertions = session.getAssertions(
+                RP_ID, gaClientDataHash, allowList, extensions, null,
+                pinUvAuthParamGA, pinProtocol.version, null,
+            )
+            if (assertions.isEmpty()) {
+                mainHandler.post { onError("No credential matched after registration") }
+                return
+            }
+            val authDataGA = AuthenticatorData.parseFrom(
+                ByteBuffer.wrap(assertions.first().authenticatorData)
+            )
+            val encryptedOutput = authDataGA.extensions?.get("hmac-secret") as? ByteArray
+                ?: run {
+                    mainHandler.post { onError("hmac-secret missing from getAssertions response") }
+                    return
+                }
+            val hmacSecret = pinProtocol.decrypt(sharedSecret, encryptedOutput)
+            mainHandler.post { onSuccess(credentialId, hmacSecret) }
+
+        } catch (e: Exception) {
+            mainHandler.post { onError("registerAndGetHmac failed: ${e.message}") }
+        }
+    }
+
     fun getHmacSecret(
         connection: FidoConnection,
         credentialId: ByteArray,

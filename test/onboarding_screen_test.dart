@@ -17,6 +17,8 @@ EntropyResult _fakeStrongEntropy(String ignored) => EntropyResult(
 Widget _buildScreen({
   Future<void> Function(List<int>, String)? onInitVault,
   bool blockPassphraseCopyPaste = true,
+  bool isAndroid = false,
+  Future<void> Function(List<int>, String, String)? onInitVaultWithYubikey,
 }) =>
     MaterialApp(
       home: OnboardingScreen(
@@ -24,6 +26,9 @@ Widget _buildScreen({
         onInitVault: onInitVault ?? (a, b) async {},
         onEstimateEntropy: _fakeStrongEntropy,
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
+        isAndroid: isAndroid,
+        onInitVaultWithYubikey:
+            onInitVaultWithYubikey ?? (a, b, c) async {},
       ),
     );
 
@@ -116,5 +121,73 @@ void main() {
     await tester.pump();
 
     expect(find.text('✓ Passphrases match'), findsOneWidget);
+  });
+
+  // ── YubiKey opt-in ────────────────────────────────────────────────────────────
+
+  testWidgets('yubikey section hidden when isAndroid is false', (tester) async {
+    await tester.pumpWidget(_buildScreen(isAndroid: false));
+
+    expect(find.text('Protect with YubiKey'), findsNothing);
+  });
+
+  testWidgets('yubikey section shown when isAndroid is true', (tester) async {
+    await tester.pumpWidget(_buildScreen(isAndroid: true));
+
+    expect(find.text('Protect with YubiKey'), findsOneWidget);
+  });
+
+  testWidgets('yubikey pin field appears when yubikey toggle enabled',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(isAndroid: true));
+
+    expect(find.widgetWithText(TextFormField, 'YubiKey PIN'), findsNothing);
+
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pump();
+
+    expect(find.widgetWithText(TextFormField, 'YubiKey PIN'), findsOneWidget);
+  });
+
+  testWidgets('vault creation with yubikey calls onInitVaultWithYubikey',
+      (tester) async {
+    bool called = false;
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: true,
+      onInitVaultWithYubikey: (a, b, c) async => called = true,
+    ));
+
+    const passphrase = 'correct horse battery staple one two three four';
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Master passphrase'),
+      passphrase,
+    );
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Confirm passphrase'),
+      passphrase,
+    );
+    await tester.pump();
+
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pump();
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'YubiKey PIN'),
+      '123456',
+    );
+    await tester.pump();
+
+    await tester.ensureVisible(find.text('Create vault'));
+    // tester.runAsync lets real async I/O (file.parent.create) complete while
+    // the framework processes events — needed because pump() alone does not
+    // drive platform I/O completions.
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create vault'));
+      await Future.delayed(const Duration(milliseconds: 300));
+    });
+    await tester.pump();
+
+    expect(called, isTrue);
   });
 }

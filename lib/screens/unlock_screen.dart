@@ -1,12 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 
+// ── Hex helpers ───────────────────────────────────────────────────────────────
+
+String _toHex(List<int> bytes) =>
+    bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+
+List<int> _fromHex(String hex) {
+  final result = <int>[];
+  for (var i = 0; i < hex.length; i += 2) {
+    result.add(int.parse(hex.substring(i, i + 2), radix: 16));
+  }
+  return result;
+}
+
+// ── Bridge defaults ───────────────────────────────────────────────────────────
+
 Future<void> _defaultUnlock(List<int> passphrase, String path) =>
     unlockVault(passphrase: passphrase, path: path);
+
 EntropyResult _defaultEstimateEntropy(String password) =>
     estimateEntropy(password: password);
+
+const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
+
+Future<void> _defaultUnlockWithYubikey(
+  List<int> passphrase,
+  List<int> credentialId,
+  List<int> hkdfSalt,
+  String pin,
+  String path,
+) async {
+  final hmacHex = await _yubikeyChannel.invokeMethod<String>(
+    'get_hmac_secret',
+    {
+      'credentialId': _toHex(credentialId),
+      'salt': _toHex(hkdfSalt),
+      'pin': pin,
+    },
+  );
+  await unlockVaultWithYubikey(
+    passphrase: passphrase,
+    hmacSecret: _fromHex(hmacHex!),
+    credentialId: credentialId,
+    hkdfSalt: hkdfSalt,
+    path: path,
+  );
+}
+
+// ── Widget ────────────────────────────────────────────────────────────────────
 
 class UnlockScreen extends StatefulWidget {
   final String vaultPath;
@@ -14,12 +59,26 @@ class UnlockScreen extends StatefulWidget {
   final EntropyResult Function(String password) onEstimateEntropy;
   final bool blockPassphraseCopyPaste;
 
+  /// Pre-injected YubiKey records. `null` = auto-detect from vault file at
+  /// construction time. Pass `[]` to force passphrase-only mode (tests).
+  final List<YubikeyRecordData>? yubikeyRecords;
+
+  final Future<void> Function(
+    List<int> passphrase,
+    List<int> credentialId,
+    List<int> hkdfSalt,
+    String pin,
+    String path,
+  ) onUnlockWithYubikey;
+
   const UnlockScreen({
     super.key,
     required this.vaultPath,
     this.onUnlock = _defaultUnlock,
     this.onEstimateEntropy = _defaultEstimateEntropy,
     this.blockPassphraseCopyPaste = true,
+    this.yubikeyRecords,
+    this.onUnlockWithYubikey = _defaultUnlockWithYubikey,
   });
 
   @override
@@ -28,14 +87,34 @@ class UnlockScreen extends StatefulWidget {
 
 class _UnlockScreenState extends State<UnlockScreen> {
   final _passphraseController = TextEditingController();
+  final _pinController = TextEditingController();
   bool _obscured = true;
+  bool _pinObscured = true;
   bool _isUnlocking = false;
   String? _errorMessage;
   EntropyResult? _entropy;
+  late final List<YubikeyRecordData> _yubikeyRecords;
+
+  bool get _isYubikeyMode => _yubikeyRecords.isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
+  }
+
+  List<YubikeyRecordData> _detectYubikeyRecords() {
+    try {
+      return listVaultYubikeyRecords(path: widget.vaultPath);
+    } catch (_) {
+      return [];
+    }
+  }
 
   @override
   void dispose() {
     _passphraseController.dispose();
+    _pinController.dispose();
     super.dispose();
   }
 
@@ -45,10 +124,21 @@ class _UnlockScreenState extends State<UnlockScreen> {
       _errorMessage = null;
     });
     try {
-      await widget.onUnlock(
-        _passphraseController.text.codeUnits,
-        widget.vaultPath,
-      );
+      if (_isYubikeyMode) {
+        final record = _yubikeyRecords.first;
+        await widget.onUnlockWithYubikey(
+          _passphraseController.text.codeUnits,
+          record.credentialId,
+          record.salt,
+          _pinController.text,
+          widget.vaultPath,
+        );
+      } else {
+        await widget.onUnlock(
+          _passphraseController.text.codeUnits,
+          widget.vaultPath,
+        );
+      }
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -58,7 +148,9 @@ class _UnlockScreenState extends State<UnlockScreen> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Could not unlock vault. Check your passphrase.';
+        _errorMessage = _isYubikeyMode
+            ? 'Could not unlock vault. Check your passphrase and YubiKey PIN.'
+            : 'Could not unlock vault. Check your passphrase.';
       });
     } finally {
       setState(() => _isUnlocking = false);
@@ -66,29 +158,28 @@ class _UnlockScreenState extends State<UnlockScreen> {
   }
 
   Color _tierColor(StrengthTier tier) => switch (tier) {
-    StrengthTier.terrible => Colors.red,
-    StrengthTier.weak => Colors.orange,
-    StrengthTier.fair => Colors.yellow.shade700,
-    StrengthTier.strong => Colors.lightGreen,
-    StrengthTier.veryStrong => Colors.green,
-    StrengthTier.centuries => Colors.green.shade800,
-  };
+        StrengthTier.terrible => Colors.red,
+        StrengthTier.weak => Colors.orange,
+        StrengthTier.fair => Colors.yellow.shade700,
+        StrengthTier.strong => Colors.lightGreen,
+        StrengthTier.veryStrong => Colors.green,
+        StrengthTier.centuries => Colors.green.shade800,
+      };
 
   String _tierLabel(StrengthTier tier) => switch (tier) {
-    StrengthTier.terrible => 'Terrible',
-    StrengthTier.weak => 'Weak',
-    StrengthTier.fair => 'Fair',
-    StrengthTier.strong => 'Strong',
-    StrengthTier.veryStrong => 'Very strong',
-    StrengthTier.centuries => 'Excellent',
-  };
+        StrengthTier.terrible => 'Terrible',
+        StrengthTier.weak => 'Weak',
+        StrengthTier.fair => 'Fair',
+        StrengthTier.strong => 'Strong',
+        StrengthTier.veryStrong => 'Very strong',
+        StrengthTier.centuries => 'Excellent',
+      };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // ── Main content ───────────────────────────────────────────────
           Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
@@ -105,7 +196,9 @@ class _UnlockScreenState extends State<UnlockScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Enter your passphrase to unlock',
+                      _isYubikeyMode
+                          ? 'Enter your passphrase and YubiKey PIN to unlock'
+                          : 'Enter your passphrase to unlock',
                       style: Theme.of(context).textTheme.bodyMedium,
                       textAlign: TextAlign.center,
                     ),
@@ -114,7 +207,8 @@ class _UnlockScreenState extends State<UnlockScreen> {
                       controller: _passphraseController,
                       autofocus: true,
                       obscureText: _obscured,
-                      enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
+                      enableInteractiveSelection:
+                          !widget.blockPassphraseCopyPaste,
                       onSubmitted: (_) => _isUnlocking ? null : _unlock(),
                       onChanged: (v) => setState(
                         () => _entropy = widget.onEstimateEntropy(v),
@@ -124,11 +218,12 @@ class _UnlockScreenState extends State<UnlockScreen> {
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscured ? Icons.visibility_off : Icons.visibility,
+                            _obscured
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                           ),
-                          onPressed: () {
-                            setState(() => _obscured = !_obscured);
-                          },
+                          onPressed: () =>
+                              setState(() => _obscured = !_obscured),
                         ),
                       ),
                     ),
@@ -155,6 +250,34 @@ class _UnlockScreenState extends State<UnlockScreen> {
                         ),
                       ),
                     ],
+                    if (_isYubikeyMode) ...[
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _pinController,
+                        obscureText: _pinObscured,
+                        enableInteractiveSelection:
+                            !widget.blockPassphraseCopyPaste,
+                        decoration: InputDecoration(
+                          labelText: 'YubiKey PIN',
+                          border: const OutlineInputBorder(),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _pinObscured
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () =>
+                                setState(() => _pinObscured = !_pinObscured),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Insert your YubiKey and tap when prompted',
+                        style: Theme.of(context).textTheme.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                     const SizedBox(height: 16),
                     if (_errorMessage != null)
                       Text(
@@ -171,7 +294,8 @@ class _UnlockScreenState extends State<UnlockScreen> {
                           ? const SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                              child:
+                                  CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Text('Unlock'),
                     ),

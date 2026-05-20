@@ -152,6 +152,33 @@ Future<void> assignFolderToEntries({
 Future<void> exportVault({required String path}) =>
     RustLib.instance.api.crateApiVaultBridgeExportVault(path: path);
 
+/// Read the vault header at `path` and return any YubiKey records it contains.
+///
+/// Does **not** decrypt the vault body — safe to call before the user enters
+/// their passphrase. Returns an empty list for passphrase-only vaults.
+/// Sync — file I/O + header parse, no crypto.
+List<YubikeyRecordData> listVaultYubikeyRecords({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeListVaultYubikeyRecords(path: path);
+
+/// Decrypt the vault at `path` using both passphrase and YubiKey hmac-secret.
+///
+/// `hmac_secret` must be exactly 32 bytes (FIDO2 hmac-secret output).
+/// `hkdf_salt` must be exactly 32 bytes (from `YubikeyRecordData.salt`).
+/// Async — Argon2id takes ~667ms on target hardware.
+Future<void> unlockVaultWithYubikey({
+  required List<int> passphrase,
+  required List<int> hmacSecret,
+  required List<int> credentialId,
+  required List<int> hkdfSalt,
+  required String path,
+}) => RustLib.instance.api.crateApiVaultBridgeUnlockVaultWithYubikey(
+  passphrase: passphrase,
+  hmacSecret: hmacSecret,
+  credentialId: credentialId,
+  hkdfSalt: hkdfSalt,
+  path: path,
+);
+
 /// Create a new empty vault at `path`, sealed with `passphrase`.
 ///
 /// Called during onboarding. Async — runs Argon2id + encryption.
@@ -160,6 +187,26 @@ Future<void> initVault({required List<int> passphrase, required String path}) =>
       passphrase: passphrase,
       path: path,
     );
+
+/// Create a new empty vault at `path`, sealed with both passphrase and YubiKey.
+///
+/// Called during onboarding when the user opts in to YubiKey protection.
+/// After creation, unlocks into session immediately.
+/// `hmac_secret` must be exactly 32 bytes. `hkdf_salt` must be exactly 32 bytes.
+/// Async — runs Argon2id + encryption.
+Future<void> initVaultWithYubikey({
+  required List<int> passphrase,
+  required List<int> hmacSecret,
+  required List<int> credentialId,
+  required List<int> hkdfSalt,
+  required String path,
+}) => RustLib.instance.api.crateApiVaultBridgeInitVaultWithYubikey(
+  passphrase: passphrase,
+  hmacSecret: hmacSecret,
+  credentialId: credentialId,
+  hkdfSalt: hkdfSalt,
+  path: path,
+);
 
 /// Lightweight entry summary returned by `list_entry_summaries()`.
 ///
@@ -205,4 +252,26 @@ sealed class VaultEntryData with _$VaultEntryData {
   const factory VaultEntryData.file(FileEntryData field0) = VaultEntryData_File;
   const factory VaultEntryData.custom(CustomEntryData field0) =
       VaultEntryData_Custom;
+}
+
+/// YubiKey credential record returned by `list_vault_yubikey_records`.
+///
+/// The Android layer uses `credential_id` to identify which YubiKey credential
+/// to present, and `salt` as the CTAP2 hmac-secret challenge salt.
+class YubikeyRecordData {
+  final Uint8List credentialId;
+  final Uint8List salt;
+
+  const YubikeyRecordData({required this.credentialId, required this.salt});
+
+  @override
+  int get hashCode => credentialId.hashCode ^ salt.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is YubikeyRecordData &&
+          runtimeType == other.runtimeType &&
+          credentialId == other.credentialId &&
+          salt == other.salt;
 }

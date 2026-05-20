@@ -72,7 +72,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 136567539;
+  int get rustContentHash => -1915698731;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -213,9 +213,21 @@ abstract class RustLibApi extends BaseApi {
     required String path,
   });
 
+  Future<void> crateApiVaultBridgeInitVaultWithYubikey({
+    required List<int> passphrase,
+    required List<int> hmacSecret,
+    required List<int> credentialId,
+    required List<int> hkdfSalt,
+    required String path,
+  });
+
   List<EntrySummaryData> crateApiVaultBridgeListEntrySummaries();
 
   List<String> crateApiVaultBridgeListFolders();
+
+  List<YubikeyRecordData> crateApiVaultBridgeListVaultYubikeyRecords({
+    required String path,
+  });
 
   void crateApiVaultBridgeLockVault();
 
@@ -239,6 +251,14 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiVaultBridgeUnlockVault({
     required List<int> passphrase,
+    required String path,
+  });
+
+  Future<void> crateApiVaultBridgeUnlockVaultWithYubikey({
+    required List<int> passphrase,
+    required List<int> hmacSecret,
+    required List<int> credentialId,
+    required List<int> hkdfSalt,
     required String path,
   });
 
@@ -1226,12 +1246,59 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<void> crateApiVaultBridgeInitVaultWithYubikey({
+    required List<int> passphrase,
+    required List<int> hmacSecret,
+    required List<int> credentialId,
+    required List<int> hkdfSalt,
+    required String path,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_8_loose(passphrase, serializer);
+          sse_encode_list_prim_u_8_loose(hmacSecret, serializer);
+          sse_encode_list_prim_u_8_loose(credentialId, serializer);
+          sse_encode_list_prim_u_8_loose(hkdfSalt, serializer);
+          sse_encode_String(path, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 29,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiVaultBridgeInitVaultWithYubikeyConstMeta,
+        argValues: [passphrase, hmacSecret, credentialId, hkdfSalt, path],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultBridgeInitVaultWithYubikeyConstMeta =>
+      const TaskConstMeta(
+        debugName: "init_vault_with_yubikey",
+        argNames: [
+          "passphrase",
+          "hmacSecret",
+          "credentialId",
+          "hkdfSalt",
+          "path",
+        ],
+      );
+
+  @override
   List<EntrySummaryData> crateApiVaultBridgeListEntrySummaries() {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 29)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_entry_summary_data,
@@ -1253,7 +1320,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 30)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_String,
@@ -1270,12 +1337,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "list_folders", argNames: []);
 
   @override
+  List<YubikeyRecordData> crateApiVaultBridgeListVaultYubikeyRecords({
+    required String path,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(path, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 32)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_yubikey_record_data,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiVaultBridgeListVaultYubikeyRecordsConstMeta,
+        argValues: [path],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultBridgeListVaultYubikeyRecordsConstMeta =>
+      const TaskConstMeta(
+        debugName: "list_vault_yubikey_records",
+        argNames: ["path"],
+      );
+
+  @override
   void crateApiVaultBridgeLockVault() {
     return handler.executeSync(
       SyncTask(
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 31)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 33)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_unit,
@@ -1305,7 +1400,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 32,
+            funcId: 34,
             port: port_,
           );
         },
@@ -1341,7 +1436,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 33,
+            funcId: 35,
             port: port_,
           );
         },
@@ -1374,7 +1469,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 34,
+            funcId: 36,
             port: port_,
           );
         },
@@ -1405,7 +1500,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 35,
+            funcId: 37,
             port: port_,
           );
         },
@@ -1433,7 +1528,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(input, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 36)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 38)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_csv_preview_data,
@@ -1463,7 +1558,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 37,
+            funcId: 39,
             port: port_,
           );
         },
@@ -1485,6 +1580,53 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<void> crateApiVaultBridgeUnlockVaultWithYubikey({
+    required List<int> passphrase,
+    required List<int> hmacSecret,
+    required List<int> credentialId,
+    required List<int> hkdfSalt,
+    required String path,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_prim_u_8_loose(passphrase, serializer);
+          sse_encode_list_prim_u_8_loose(hmacSecret, serializer);
+          sse_encode_list_prim_u_8_loose(credentialId, serializer);
+          sse_encode_list_prim_u_8_loose(hkdfSalt, serializer);
+          sse_encode_String(path, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 40,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiVaultBridgeUnlockVaultWithYubikeyConstMeta,
+        argValues: [passphrase, hmacSecret, credentialId, hkdfSalt, path],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultBridgeUnlockVaultWithYubikeyConstMeta =>
+      const TaskConstMeta(
+        debugName: "unlock_vault_with_yubikey",
+        argNames: [
+          "passphrase",
+          "hmacSecret",
+          "credentialId",
+          "hkdfSalt",
+          "path",
+        ],
+      );
+
+  @override
   Future<void> crateApiVaultBridgeUpdateEntry({
     required VaultEntryData entry,
     int? expiryDays,
@@ -1498,7 +1640,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 38,
+            funcId: 41,
             port: port_,
           );
         },
@@ -1866,6 +2008,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<YubikeyRecordData> dco_decode_list_yubikey_record_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_yubikey_record_data).toList();
+  }
+
+  @protected
   LoginEntryData dco_decode_login_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -2053,6 +2201,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       default:
         throw Exception("unreachable");
     }
+  }
+
+  @protected
+  YubikeyRecordData dco_decode_yubikey_record_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return YubikeyRecordData(
+      credentialId: dco_decode_list_prim_u_8_strict(arr[0]),
+      salt: dco_decode_list_prim_u_8_strict(arr[1]),
+    );
   }
 
   @protected
@@ -2513,6 +2673,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<YubikeyRecordData> sse_decode_list_yubikey_record_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <YubikeyRecordData>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_yubikey_record_data(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   LoginEntryData sse_decode_login_entry_data(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_id = sse_decode_String(deserializer);
@@ -2725,6 +2899,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       default:
         throw UnimplementedError('');
     }
+  }
+
+  @protected
+  YubikeyRecordData sse_decode_yubikey_record_data(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_credentialId = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_salt = sse_decode_list_prim_u_8_strict(deserializer);
+    return YubikeyRecordData(credentialId: var_credentialId, salt: var_salt);
   }
 
   @protected
@@ -3130,6 +3314,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_yubikey_record_data(
+    List<YubikeyRecordData> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_yubikey_record_data(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_login_entry_data(
     LoginEntryData self,
     SseSerializer serializer,
@@ -3311,5 +3507,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(5, serializer);
         sse_encode_box_autoadd_custom_entry_data(field0, serializer);
     }
+  }
+
+  @protected
+  void sse_encode_yubikey_record_data(
+    YubikeyRecordData self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.credentialId, serializer);
+    sse_encode_list_prim_u_8_strict(self.salt, serializer);
   }
 }

@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `add_days_to_timestamp`, `card_entry_to_data`, `custom_entry_to_data`, `custom_field_to_data`, `days_from_ymd`, `days_to_ymd`, `entry_id`, `file_entry_to_data`, `identity_entry_to_data`, `is_expired`, `is_leap`, `login_entry_to_data`, `mask_entry`, `note_entry_to_data`, `previous_secret_to_data`, `purge_expired_history`
-// These functions are ignored (category: IgnoreBecauseExplicitAttribute): `change_passphrase`, `delete_entry`, `delete_whole_vault`, `export_vault`, `get_entry_by_id`, `list_entries`, `load_vault`, `save_vault`, `update_entry`
+// These functions are ignored (category: IgnoreBecauseExplicitAttribute): `change_passphrase`, `delete_entry`, `delete_whole_vault`, `export_vault`, `get_entry_by_id`, `list_entries`, `load_vault_with_yubikey`, `load_vault`, `save_vault_with_yubikey`, `save_vault`, `update_entry`
 
 /// Creates a new login entry with a generated UUID and current timestamp.
 ///

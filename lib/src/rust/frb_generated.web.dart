@@ -143,6 +143,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<SkippedEntryData> dco_decode_list_skipped_entry_data(dynamic raw);
 
   @protected
+  List<YubikeyRecordData> dco_decode_list_yubikey_record_data(dynamic raw);
+
+  @protected
   LoginEntryData dco_decode_login_entry_data(dynamic raw);
 
   @protected
@@ -191,6 +194,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   VaultEntryData dco_decode_vault_entry_data(dynamic raw);
+
+  @protected
+  YubikeyRecordData dco_decode_yubikey_record_data(dynamic raw);
 
   @protected
   String sse_decode_String(SseDeserializer deserializer);
@@ -347,6 +353,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<YubikeyRecordData> sse_decode_list_yubikey_record_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   LoginEntryData sse_decode_login_entry_data(SseDeserializer deserializer);
 
   @protected
@@ -399,6 +410,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   VaultEntryData sse_decode_vault_entry_data(SseDeserializer deserializer);
+
+  @protected
+  YubikeyRecordData sse_decode_yubikey_record_data(
+    SseDeserializer deserializer,
+  );
 
   @protected
   void sse_encode_String(String self, SseSerializer serializer);
@@ -593,6 +609,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_yubikey_record_data(
+    List<YubikeyRecordData> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_login_entry_data(
     LoginEntryData self,
     SseSerializer serializer,
@@ -661,6 +683,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_vault_entry_data(
     VaultEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_yubikey_record_data(
+    YubikeyRecordData self,
     SseSerializer serializer,
   );
 }

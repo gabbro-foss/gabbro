@@ -1,7 +1,9 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 // ── Fake entropy ──────────────────────────────────────────────────────────────
 
@@ -10,11 +12,21 @@ EntropyResult _fakeEntropy(String ignored) => EntropyResult(
       tier: StrengthTier.terrible,
     );
 
+// ── Fake YubiKey record ───────────────────────────────────────────────────────
+
+YubikeyRecordData _fakeRecord() => YubikeyRecordData(
+      credentialId: Uint8List.fromList([1, 2, 3, 4]),
+      salt: Uint8List(32),
+    );
+
 // ── Widget helper ─────────────────────────────────────────────────────────────
 
 Widget _buildScreen({
   Future<void> Function(List<int>, String)? onUnlock,
   bool blockPassphraseCopyPaste = true,
+  List<YubikeyRecordData>? yubikeyRecords,
+  Future<void> Function(List<int>, List<int>, List<int>, String, String)?
+      onUnlockWithYubikey,
 }) =>
     MaterialApp(
       home: UnlockScreen(
@@ -22,6 +34,8 @@ Widget _buildScreen({
         onUnlock: onUnlock ?? (a, b) async {},
         onEstimateEntropy: _fakeEntropy,
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
+        yubikeyRecords: yubikeyRecords ?? [],
+        onUnlockWithYubikey: onUnlockWithYubikey ?? (a, b, c, d, e) async {},
       ),
     );
 
@@ -78,5 +92,51 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(called, isTrue);
+  });
+
+  // ── YubiKey mode ─────────────────────────────────────────────────────────────
+
+  testWidgets('passphrase-only mode when yubikey records are empty', (tester) async {
+    await tester.pumpWidget(_buildScreen(yubikeyRecords: []));
+
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('Enter your passphrase to unlock'), findsOneWidget);
+  });
+
+  testWidgets('yubikey mode when yubikey records are present', (tester) async {
+    await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+
+    expect(find.byType(TextField), findsNWidgets(2));
+    expect(find.text('Insert your YubiKey and tap when prompted'), findsOneWidget);
+  });
+
+  testWidgets('yubikey unlock calls onUnlockWithYubikey', (tester) async {
+    bool called = false;
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      onUnlockWithYubikey: (a, b, c, d, e) async => called = true,
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.enterText(find.byType(TextField).last, '123456');
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(called, isTrue);
+  });
+
+  testWidgets('yubikey error shown when onUnlockWithYubikey throws', (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      onUnlockWithYubikey: (a, b, c, d, e) async =>
+          throw Exception('bad yubikey'),
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.enterText(find.byType(TextField).last, '000000');
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Could not unlock vault'), findsOneWidget);
   });
 }

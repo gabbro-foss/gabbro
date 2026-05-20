@@ -9,7 +9,7 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
 
     private companion object {
-        const val CHANNEL = "app.gabbro.gabbro/yubikey_test"
+        const val CHANNEL = "app.gabbro.gabbro/yubikey"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +23,35 @@ class MainActivity : FlutterActivity() {
             .setMethodCallHandler { call, result ->
                 val pin = call.argument<String>("pin")?.toCharArray()
                 when (call.method) {
+                    "register_and_get_hmac" -> {
+                        val saltHex = call.argument<String>("salt")
+                        if (saltHex == null) {
+                            result.error("BAD_ARGS", "salt required", null)
+                            return@setMethodCallHandler
+                        }
+                        YubiKeyManager.startUsbDiscovery(
+                            this,
+                            onConnected = { connection ->
+                                YubiKeyManager.registerAndGetHmac(
+                                    connection, saltHex.fromHex(), pin,
+                                    onSuccess = { credId, hmacSecret ->
+                                        YubiKeyManager.stopUsbDiscovery()
+                                        result.success(mapOf(
+                                            "credentialId" to credId.toHex(),
+                                            "hmacSecret" to hmacSecret.toHex(),
+                                        ))
+                                    },
+                                    onError = { msg ->
+                                        YubiKeyManager.stopUsbDiscovery()
+                                        result.error("REGISTER_HMAC_FAILED", msg, null)
+                                    },
+                                )
+                            },
+                            onError = { msg ->
+                                result.error("USB_ERROR", msg, null)
+                            },
+                        )
+                    }
                     "register" -> {
                         YubiKeyManager.startUsbDiscovery(
                             this,

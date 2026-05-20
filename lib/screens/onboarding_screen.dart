@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/settings.dart';
@@ -8,10 +10,54 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
 import 'package:path_provider/path_provider.dart';
 
+// ── Hex helpers ───────────────────────────────────────────────────────────────
+
+String _toHex(List<int> bytes) =>
+    bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+
+List<int> _fromHex(String hex) {
+  final result = <int>[];
+  for (var i = 0; i < hex.length; i += 2) {
+    result.add(int.parse(hex.substring(i, i + 2), radix: 16));
+  }
+  return result;
+}
+
+// ── Bridge defaults ───────────────────────────────────────────────────────────
+
 Future<void> _defaultInitVault(List<int> passphrase, String path) =>
     initVault(passphrase: passphrase, path: path);
+
 EntropyResult _defaultEstimateEntropy(String password) =>
     estimateEntropy(password: password);
+
+const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
+
+Future<void> _defaultInitVaultWithYubikey(
+  List<int> passphrase,
+  String pin,
+  String path,
+) async {
+  final salt = List<int>.generate(32, (_) => Random.secure().nextInt(256));
+  final result = await _yubikeyChannel.invokeMapMethod<String, String>(
+    'register_and_get_hmac',
+    {
+      'salt': _toHex(salt),
+      'pin': pin,
+    },
+  );
+  final credentialId = _fromHex(result!['credentialId']!);
+  final hmacSecret = _fromHex(result['hmacSecret']!);
+  await initVaultWithYubikey(
+    passphrase: passphrase,
+    hmacSecret: hmacSecret,
+    credentialId: credentialId,
+    hkdfSalt: salt,
+    path: path,
+  );
+}
+
+// ── Widget ────────────────────────────────────────────────────────────────────
 
 class OnboardingScreen extends StatefulWidget {
   final String? initialPath;
@@ -20,14 +66,26 @@ class OnboardingScreen extends StatefulWidget {
   final EntropyResult Function(String password) onEstimateEntropy;
   final bool blockPassphraseCopyPaste;
 
-  const OnboardingScreen({
+  /// Controls YubiKey opt-in section visibility. Defaults to `Platform.isAndroid`
+  /// so tests on Linux can pass `isAndroid: true` to exercise the YubiKey UI.
+  final bool isAndroid;
+
+  final Future<void> Function(
+    List<int> passphrase,
+    String pin,
+    String path,
+  ) onInitVaultWithYubikey;
+
+  OnboardingScreen({
     super.key,
     this.initialPath,
     this.postDeletionMessage,
     this.onInitVault = _defaultInitVault,
     this.onEstimateEntropy = _defaultEstimateEntropy,
     this.blockPassphraseCopyPaste = true,
-  });
+    bool? isAndroid,
+    this.onInitVaultWithYubikey = _defaultInitVaultWithYubikey,
+  }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -37,14 +95,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passphraseController = TextEditingController();
   final _confirmController = TextEditingController();
+  final _pinController = TextEditingController();
   String _vaultPath = '';
 
   bool _passphraseObscured = true;
   bool _confirmObscured = true;
+  bool _pinObscured = true;
   bool _isCreating = false;
   String? _error;
   EntropyResult? _entropy;
   bool? _confirmMatches;
+  bool _useYubikey = false;
 
   @override
   void initState() {
@@ -65,6 +126,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void dispose() {
     _passphraseController.dispose();
     _confirmController.dispose();
+    _pinController.dispose();
     super.dispose();
   }
 
@@ -82,15 +144,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     try {
       final file = File(_vaultPath);
       await file.parent.create(recursive: true);
-      await widget.onInitVault(
-        _passphraseController.text.codeUnits,
-        _vaultPath,
-      );
+      if (_useYubikey) {
+        await widget.onInitVaultWithYubikey(
+          _passphraseController.text.codeUnits,
+          _pinController.text,
+          _vaultPath,
+        );
+      } else {
+        await widget.onInitVault(
+          _passphraseController.text.codeUnits,
+          _vaultPath,
+        );
+      }
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) =>
-                VaultListScreen(vaultPath: _vaultPath),
+            builder: (context) => VaultListScreen(vaultPath: _vaultPath),
           ),
         );
       }
@@ -102,22 +171,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Color _tierColor(StrengthTier tier) => switch (tier) {
-    StrengthTier.terrible => Colors.red,
-    StrengthTier.weak => Colors.orange,
-    StrengthTier.fair => Colors.yellow.shade700,
-    StrengthTier.strong => Colors.lightGreen,
-    StrengthTier.veryStrong => Colors.green,
-    StrengthTier.centuries => Colors.green.shade800,
-  };
+        StrengthTier.terrible => Colors.red,
+        StrengthTier.weak => Colors.orange,
+        StrengthTier.fair => Colors.yellow.shade700,
+        StrengthTier.strong => Colors.lightGreen,
+        StrengthTier.veryStrong => Colors.green,
+        StrengthTier.centuries => Colors.green.shade800,
+      };
 
   String _tierLabel(StrengthTier tier) => switch (tier) {
-    StrengthTier.terrible => 'Terrible',
-    StrengthTier.weak => 'Weak',
-    StrengthTier.fair => 'Fair',
-    StrengthTier.strong => 'Strong',
-    StrengthTier.veryStrong => 'Very strong',
-    StrengthTier.centuries => 'Excellent',
-  };
+        StrengthTier.terrible => 'Terrible',
+        StrengthTier.weak => 'Weak',
+        StrengthTier.fair => 'Fair',
+        StrengthTier.strong => 'Strong',
+        StrengthTier.veryStrong => 'Very strong',
+        StrengthTier.centuries => 'Excellent',
+      };
 
   bool get _strongEnough =>
       _entropy != null &&
@@ -171,7 +240,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primaryContainer,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primaryContainer,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -187,7 +258,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 child: Text(
                                   widget.postDeletionMessage!,
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer,
                                   ),
                                 ),
                               ),
@@ -209,7 +282,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 8),
-                      if (Platform.isAndroid)
+                      if (widget.isAndroid)
                         Text(
                           _vaultPath.isEmpty ? 'Loading…' : _vaultPath,
                           style: Theme.of(context).textTheme.bodySmall,
@@ -218,10 +291,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         PathField(
                           mode: PathFieldMode.save,
                           hint: 'Path to vault file',
-                          initialPath: _vaultPath.isEmpty ? null : _vaultPath,
+                          initialPath:
+                              _vaultPath.isEmpty ? null : _vaultPath,
                           allowedExtensions: const ['gabbro'],
                           saveFileName: 'gabbro.gabbro',
-                          onPathSelected: (path) => setState(() => _vaultPath = path),
+                          onPathSelected: (path) =>
+                              setState(() => _vaultPath = path),
                           validator: (v) => (v == null || v.isEmpty)
                               ? 'Path is required'
                               : null,
@@ -237,7 +312,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       TextFormField(
                         controller: _passphraseController,
                         obscureText: _passphraseObscured,
-                        enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
+                        enableInteractiveSelection:
+                            !widget.blockPassphraseCopyPaste,
                         onChanged: _onPassphraseChanged,
                         decoration: InputDecoration(
                           labelText: 'Master passphrase',
@@ -288,7 +364,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       TextFormField(
                         controller: _confirmController,
                         obscureText: _confirmObscured,
-                        enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
+                        enableInteractiveSelection:
+                            !widget.blockPassphraseCopyPaste,
                         onFieldSubmitted: (_) => _createVault(),
                         onChanged: (v) {
                           setState(
@@ -335,6 +412,50 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                       ],
+                      // ── YubiKey opt-in (Android only) ──────────────────
+                      if (widget.isAndroid) ...[
+                        const SizedBox(height: 16),
+                        const Divider(),
+                        SwitchListTile(
+                          title: const Text('Protect with YubiKey'),
+                          subtitle: const Text('Hardware security key (recommended)'),
+                          value: _useYubikey,
+                          onChanged: (v) => setState(() => _useYubikey = v),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        if (_useYubikey) ...[
+                          const SizedBox(height: 12),
+                          TextFormField(
+                            controller: _pinController,
+                            obscureText: _pinObscured,
+                            decoration: InputDecoration(
+                              labelText: 'YubiKey PIN',
+                              border: const OutlineInputBorder(),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _pinObscured
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                ),
+                                onPressed: () => setState(
+                                  () => _pinObscured = !_pinObscured,
+                                ),
+                              ),
+                            ),
+                            validator: _useYubikey
+                                ? (v) => (v == null || v.isEmpty)
+                                    ? 'YubiKey PIN is required'
+                                    : null
+                                : null,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Insert your YubiKey and tap when prompted',
+                            style: Theme.of(context).textTheme.bodySmall,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ],
                       const SizedBox(height: 24),
                       if (_error != null)
                         Padding(
@@ -372,7 +493,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             right: 8,
             child: SafeArea(
               child: AnimatedOpacity(
-                opacity: MediaQuery.of(context).viewInsets.bottom > 0 ? 0.0 : 1.0,
+                opacity:
+                    MediaQuery.of(context).viewInsets.bottom > 0 ? 0.0 : 1.0,
                 duration: const Duration(milliseconds: 200),
                 child: OutlinedButton.icon(
                   icon: Icon(

@@ -27,4 +27,11 @@ class YubiKeyManagerTest {
         // When: getHmacSecret() called twice with identical credentialId and salt
         // Then: both outputs are byte-for-byte equal
     }
+
+    @Test
+    @Ignore("Requires USB-C YubiKey 5C plugged into S23")
+    fun registerAndGetHmac_returns_credential_id_and_32_byte_hmac_secret() {
+        // When: registerAndGetHmac() called with a 32-byte salt and valid PIN
+        // Then: onSuccess fires with non-empty credentialId and exactly 32-byte hmacSecret
+    }
 }
