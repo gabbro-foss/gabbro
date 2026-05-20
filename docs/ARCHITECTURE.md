@@ -152,7 +152,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 246 | 3 |
-| Flutter (`flutter test`) | 287 | 0 |
+| Flutter (`flutter test`) | 289 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 4 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -177,8 +177,13 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - Session 2 complete: `rust/src/fido/` — libfido2 FFI, hardware-verified on Linux
   - Session 1 complete: vault format v2 `YubiKeyRecord`; `combine_yubikey` HKDF combiner
 
+- **Pre-session-6 bikeshed cleanup (complete):**
+  - `onboarding_screen.dart`: added "20–30 seconds" slow-vault warning container inside the YubiKey opt-in block
+  - `unlock_screen.dart`: fixed landscape bug — replaced `Stack` + `Center` body with `LayoutBuilder` + `SingleChildScrollView` + `ConstrainedBox(minHeight)` so the Unlock button is reachable in short-height (landscape) viewports; `mainAxisSize: MainAxisSize.min` added to Column
+  - YubiKey option in onboarding: already implemented (`SwitchListTile` defaults OFF, lets user choose); confirmed and removed from bikeshed
+  - Flutter: 289 passing (+2), Rust: 246 (unchanged), Android: 0 / 4 ignored (unchanged)
+
 - **Next: Session 6 — Vault delete with YubiKey**
-  - `change_passphrase_screen.dart`: detect YubiKey vault (complete ✓)
   - Vault delete flow: detect YubiKey vault, show appropriate confirmation, call `deleteWholeVault` (already session-aware — no extra YubiKey tap needed, same pattern as change passphrase)
   - Session 7: NFC support
 
@@ -220,11 +225,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
     5. Change passphrase with YubiKey ✓
     6. Vault delete with YubiKey
     7. NFC support
-- onboarding screen needs message about "slow" vault creation process with yubikey to avoid user drop-out
-- bug: login screen with yubikey, login button inaccessible in landscape mode -> check also in tablet mode
 - Multiple vaults.
-  - feature: keep option to create vault with or without yubikey in onboarding screen -> useful for multiple vaults with different security levels
-  - multiple vaults should not be listed on login screen -> allows better obfuscation and coersion resistance
+  - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
 - Export vault to JSON - consistent with gabbro stance: we don't lock the user in. Include warning about user's responsibility with a decrypted vault file.
 - Export/import security note: `.gabbro` exports are AES-256-GCM encrypted (passphrase-only — YubiKey not required to import, by design; passphrase is the durable recovery factor, YubiKey is the live-vault second factor). JSON exports are plaintext — no encryption at all. Add visible warnings in the export UI distinguishing the two: `.gabbro` ("protected by your passphrase only") and JSON ("completely unencrypted — store securely").
