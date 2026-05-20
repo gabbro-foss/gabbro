@@ -123,7 +123,7 @@ object YubiKeyManager {
             val credentialId = authDataMC.attestedCredentialData?.credentialId
                 ?: error("No attested credential data in makeCredential response")
 
-            // 2. getAssertions for hmac-secret using the same session (same tap)
+            // 2. getAssertions for hmac-secret — up=false so no second tap is needed
             val keyAgreementResult = clientPin.getSharedSecret()
             val platformKey = keyAgreementResult.first
             val sharedSecret = keyAgreementResult.second
@@ -139,7 +139,7 @@ object YubiKeyManager {
                 "hmac-secret" to mapOf(1 to platformKey, 2 to encryptedSalt, 3 to saltAuth)
             )
             val assertions = session.getAssertions(
-                RP_ID, gaClientDataHash, allowList, extensions, null,
+                RP_ID, gaClientDataHash, allowList, extensions, mapOf("up" to false),
                 pinUvAuthParamGA, pinProtocol.version, null,
             )
             if (assertions.isEmpty()) {
