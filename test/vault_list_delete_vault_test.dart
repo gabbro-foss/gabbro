@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
@@ -17,12 +18,21 @@ List<EntrySummaryData> _oneEntry() => [_entry('1', 'Quartz', 'Login')];
 
 // ── Widget helper ─────────────────────────────────────────────────────────────
 
-Widget _buildScreen({required Future<void> Function() deleteVault}) =>
+YubikeyRecordData _fakeRecord() => YubikeyRecordData(
+      credentialId: Uint8List.fromList([1, 2, 3, 4]),
+      salt: Uint8List(32),
+    );
+
+Widget _buildScreen({
+  required Future<void> Function() deleteVault,
+  List<YubikeyRecordData>? yubikeyRecords,
+}) =>
     MaterialApp(
       home: VaultListScreen(
         vaultPath: '/tmp/test.gabbro',
         listEntries: _oneEntry,
         deleteVault: deleteVault,
+        yubikeyRecords: yubikeyRecords ?? [],
       ),
     );
 
@@ -171,5 +181,38 @@ void main() {
       find.text('Your vault has been deleted. Create a new one to continue.'),
       findsOneWidget,
     );
+  });
+
+  // ── YubiKey vault delete ──────────────────────────────────────────────────────
+
+  testWidgets('step 1 dialog mentions YubiKey binding for YubiKey vault',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(
+        deleteVault: () async {},
+        yubikeyRecords: [_fakeRecord()],
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete vault'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('YubiKey binding'), findsOneWidget);
+  });
+
+  testWidgets('step 1 dialog does not mention YubiKey for passphrase-only vault',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(deleteVault: () async {}, yubikeyRecords: []),
+    );
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete vault'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('YubiKey'), findsNothing);
   });
 }

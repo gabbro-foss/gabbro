@@ -33,6 +33,10 @@ class VaultListScreen extends StatefulWidget {
   final AlphabetBarPosition? alphabetBarPosition;
   final Future<void> Function(List<String> ids, String folder)? onAssignFolderFn;
 
+  /// Pre-injected YubiKey records. `null` = auto-detect from vault file at
+  /// construction time. Pass `[]` to force passphrase-only mode (tests).
+  final List<YubikeyRecordData>? yubikeyRecords;
+
   const VaultListScreen({
     super.key,
     required this.vaultPath,
@@ -44,6 +48,7 @@ class VaultListScreen extends StatefulWidget {
     this.onRefreshFn,
     this.alphabetBarPosition,
     this.onAssignFolderFn,
+    this.yubikeyRecords,
   });
 
   @override
@@ -71,6 +76,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
   bool _isDeleting = false;
   bool _isImporting = false;
   bool get _isSelecting => _selectionMode || _selectedIds.isNotEmpty;
+  late final List<YubikeyRecordData> _yubikeyRecords;
+  bool get _isYubikeyVault => _yubikeyRecords.isNotEmpty;
 
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
@@ -79,9 +86,18 @@ class _VaultListScreenState extends State<VaultListScreen> {
   bool _showLeftChevron = false;
   bool _showRightChevron = false;
 
+  List<YubikeyRecordData> _detectYubikeyRecords() {
+    try {
+      return listVaultYubikeyRecords(path: widget.vaultPath);
+    } catch (_) {
+      return [];
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
     _loadEntries();
     _chipScrollController.addListener(_updateChevrons);
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateChevrons());
@@ -484,8 +500,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Delete vault?'),
-        content: const Text(
-          'This will permanently delete all entries. This cannot be undone.',
+        content: Text(
+          _isYubikeyVault
+              ? 'This will permanently delete all entries and remove the YubiKey binding. This cannot be undone.'
+              : 'This will permanently delete all entries. This cannot be undone.',
         ),
         actions: [
           TextButton(
