@@ -224,7 +224,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
     7. NFC support
 - Multiple vaults.
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
-- Export vault to JSON - consistent with gabbro stance: we don't lock the user in.
+- Export vault to JSON - consistent with gabbro stance: we don't lock the user in. Include warning about user's responsibility with a decrypted vault file.
 - Search improvement: currently only searches title, needs an option to also search all fields and notes
 - Multiple app languages (v1: en,fr,de,it,es)
 - App logo (OnboardingScreen, UnlockScreen) — defer until designed.
