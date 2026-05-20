@@ -208,9 +208,10 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
     1. Vault format extension + HKDF combiner (pure Rust) ✓
     2. Linux libfido2 binding (Rust FFI) ✓
     3. Android yubikit-android integration (Kotlin) ✓
-- Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
-- Search improvement: currently only searches title, needs an option to also search all fields and notes
 - Multiple vaults.
+- Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
+- Export vault to JSON - consistent with gabbro stance: we don't lock the user in.
+- Search improvement: currently only searches title, needs an option to also search all fields and notes
 - Multiple app languages (v1: en,fr,de,it,es)
 - App logo (OnboardingScreen, UnlockScreen) — defer until designed.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
@@ -226,7 +227,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### V2+ / Defer
 - Data breach alerts / HaveIBeenPwned integration.
-- Coercion resistance / duress / decoy vault.
+- Coercion resistance / duress / decoy vault. -Y fixed by multiple vaults, onus on the user to use this feature
 - Panic button / app hiding on mobile.
 - Remote app / vault deletion.
 - Non-ASCII wordlists (CJK) for passphrase generator.
