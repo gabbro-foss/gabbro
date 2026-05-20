@@ -262,7 +262,9 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                           .withValues(alpha: 0.3),
                                     )
                                   : null,
-                              child: ListTile(
+                              child: Material(
+                                color: Colors.transparent,
+                                child: ListTile(
                                 dense: true,
                                 leading: widget.selectionMode
                                     ? Checkbox(
@@ -297,6 +299,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                   );
                                   widget.onEntryTap(entry.id);
                                 },
+                                ),
                               ),
                             );
                           },
