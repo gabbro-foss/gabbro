@@ -538,4 +538,30 @@ void main() {
     // _loginEntry() has folder: 'Personal' — should be pre-selected
     expect(find.text('Personal'), findsOneWidget);
   });
+
+  // ── Card _hasChanges regression ───────────────────────────────────────────────
+
+  testWidgets('editing card notes in edit mode reaches review screen',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CreateEntryScreen(
+          entryType: 'Card',
+          existing: VaultEntryData.card(_cardEntry()),
+          onCreateEntry: (_) async {},
+          onGetEntry: (_) => VaultEntryData.card(_cardEntry()),
+          listFolders: () => ['Personal'],
+        ),
+      ),
+    );
+
+    final notesField = find.widgetWithText(TextFormField, 'Notes (optional)').last;
+    await tester.ensureVisible(notesField);
+    await tester.pumpAndSettle();
+    await tester.enterText(notesField, 'primary travel card');
+    await tester.tap(find.text('Review →'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('No changes to save.'), findsNothing);
+  });
 }

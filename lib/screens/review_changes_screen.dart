@@ -187,7 +187,12 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         _addDiff(diffs, 'Card label', field0.cardName ?? '', u.cardName ?? '');
         _addDiff(diffs, 'Status', field0.status, u.status);
         _addDiff(diffs, 'Cardholder', field0.cardholderName, u.cardholderName);
+        _addDiff(diffs, 'Card number', field0.cardNumber, u.cardNumber);
         _addDiff(diffs, 'Expiry', field0.expiry, u.expiry);
+        _addDiff(diffs, 'Credit limit', field0.creditLimit ?? '', u.creditLimit ?? '');
+        _addDiff(diffs, 'Account number', field0.cardAccountNumber ?? '', u.cardAccountNumber ?? '');
+        _addDiff(diffs, 'Network', field0.paymentNetwork ?? '', u.paymentNetwork ?? '');
+        _addDiff(diffs, 'Notes', field0.notes ?? '', u.notes ?? '');
         _addDiff(diffs, 'Folder', field0.folder, u.folder);
       case (VaultEntryData_Identity(:final field0),
             VaultEntryData_Identity(field0: final u)):

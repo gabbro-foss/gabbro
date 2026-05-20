@@ -333,6 +333,101 @@ void main() {
     expect(find.text('10.0.0.2'), findsOneWidget);
   });
 
+  // ── Card optional-field diff regression ──────────────────────────────────────
+
+  testWidgets('card number change appears in diff', (tester) async {
+    final updated = CardEntryData(
+      id: 'card-id-1',
+      cardName: 'Granite Visa',
+      cardholderName: 'Rob Example',
+      cardNumber: '5500000000000004',
+      expiry: '12/26',
+      cvv: '123',
+      pin: '4567',
+      status: 'active',
+      paymentNetwork: null,
+      creditLimit: null,
+      cardAccountNumber: null,
+      bankName: null,
+      transactionPassword: null,
+      notes: null,
+      customFields: [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+    );
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.card(_originalCard()),
+      updated: VaultEntryData.card(updated),
+    ));
+
+    expect(find.text('Card number'), findsOneWidget);
+    expect(find.text('4111111111111111'), findsOneWidget);
+    expect(find.text('5500000000000004'), findsOneWidget);
+  });
+
+  testWidgets('credit limit change appears in diff for Card', (tester) async {
+    final updated = CardEntryData(
+      id: 'card-id-1',
+      cardName: 'Granite Visa',
+      cardholderName: 'Rob Example',
+      cardNumber: '4111111111111111',
+      expiry: '12/26',
+      cvv: '123',
+      pin: '4567',
+      status: 'active',
+      paymentNetwork: null,
+      creditLimit: '5000',
+      cardAccountNumber: null,
+      bankName: null,
+      transactionPassword: null,
+      notes: null,
+      customFields: [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+    );
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.card(_originalCard()),
+      updated: VaultEntryData.card(updated),
+    ));
+
+    expect(find.text('Credit limit'), findsOneWidget);
+    expect(find.text('(empty)'), findsOneWidget);
+    expect(find.text('5000'), findsOneWidget);
+  });
+
+  testWidgets('notes change appears in diff for Card', (tester) async {
+    final updated = CardEntryData(
+      id: 'card-id-1',
+      cardName: 'Granite Visa',
+      cardholderName: 'Rob Example',
+      cardNumber: '4111111111111111',
+      expiry: '12/26',
+      cvv: '123',
+      pin: '4567',
+      status: 'active',
+      paymentNetwork: null,
+      creditLimit: null,
+      cardAccountNumber: null,
+      bankName: null,
+      transactionPassword: null,
+      notes: 'Primary travel card',
+      customFields: [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+    );
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.card(_originalCard()),
+      updated: VaultEntryData.card(updated),
+    ));
+
+    expect(find.text('Notes'), findsOneWidget);
+    expect(find.text('(empty)'), findsOneWidget);
+    expect(find.text('Primary travel card'), findsOneWidget);
+  });
+
   testWidgets('folder change appears in diff for Login entry', (tester) async {
     final original = LoginEntryData(
       id: 'test-id-1', title: 'GitHub', url: 'https://github.com',

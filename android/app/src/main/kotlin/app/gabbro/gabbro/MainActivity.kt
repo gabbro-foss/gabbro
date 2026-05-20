@@ -29,28 +29,41 @@ class MainActivity : FlutterActivity() {
                             result.error("BAD_ARGS", "salt required", null)
                             return@setMethodCallHandler
                         }
-                        YubiKeyManager.startUsbDiscovery(
-                            this,
-                            onConnected = { connection ->
-                                YubiKeyManager.registerAndGetHmac(
-                                    connection, saltHex.fromHex(), pin,
-                                    onSuccess = { credId, hmacSecret ->
-                                        YubiKeyManager.stopUsbDiscovery()
-                                        result.success(mapOf(
-                                            "credentialId" to credId.toHex(),
-                                            "hmacSecret" to hmacSecret.toHex(),
-                                        ))
-                                    },
-                                    onError = { msg ->
-                                        YubiKeyManager.stopUsbDiscovery()
-                                        result.error("REGISTER_HMAC_FAILED", msg, null)
-                                    },
-                                )
-                            },
-                            onError = { msg ->
-                                result.error("USB_ERROR", msg, null)
-                            },
-                        )
+                        fun attempt(retriesLeft: Int) {
+                            YubiKeyManager.startUsbDiscovery(
+                                this,
+                                onConnected = { connection ->
+                                    YubiKeyManager.registerAndGetHmac(
+                                        connection, saltHex.fromHex(), pin,
+                                        onSuccess = { credId, hmacSecret ->
+                                            YubiKeyManager.stopUsbDiscovery()
+                                            result.success(mapOf(
+                                                "credentialId" to credId.toHex(),
+                                                "hmacSecret" to hmacSecret.toHex(),
+                                            ))
+                                        },
+                                        onError = { msg ->
+                                            YubiKeyManager.stopUsbDiscovery()
+                                            if (retriesLeft > 0) {
+                                                android.os.Handler(android.os.Looper.getMainLooper())
+                                                    .postDelayed({ attempt(retriesLeft - 1) }, 500)
+                                            } else {
+                                                result.error("REGISTER_HMAC_FAILED", msg, null)
+                                            }
+                                        },
+                                    )
+                                },
+                                onError = { msg ->
+                                    if (retriesLeft > 0) {
+                                        android.os.Handler(android.os.Looper.getMainLooper())
+                                            .postDelayed({ attempt(retriesLeft - 1) }, 500)
+                                    } else {
+                                        result.error("USB_ERROR", msg, null)
+                                    }
+                                },
+                            )
+                        }
+                        attempt(1)
                     }
                     "register" -> {
                         YubiKeyManager.startUsbDiscovery(
@@ -84,25 +97,38 @@ class MainActivity : FlutterActivity() {
                             result.error("BAD_ARGS", "salt required", null)
                             return@setMethodCallHandler
                         }
-                        YubiKeyManager.startUsbDiscovery(
-                            this,
-                            onConnected = { connection ->
-                                YubiKeyManager.getHmacSecret(
-                                    connection, credIdHex.fromHex(), saltHex.fromHex(), pin,
-                                    onSuccess = { secret ->
-                                        YubiKeyManager.stopUsbDiscovery()
-                                        result.success(secret.toHex())
-                                    },
-                                    onError = { msg ->
-                                        YubiKeyManager.stopUsbDiscovery()
-                                        result.error("HMAC_FAILED", msg, null)
-                                    },
-                                )
-                            },
-                            onError = { msg ->
-                                result.error("USB_ERROR", msg, null)
-                            },
-                        )
+                        fun attempt(retriesLeft: Int) {
+                            YubiKeyManager.startUsbDiscovery(
+                                this,
+                                onConnected = { connection ->
+                                    YubiKeyManager.getHmacSecret(
+                                        connection, credIdHex.fromHex(), saltHex.fromHex(), pin,
+                                        onSuccess = { secret ->
+                                            YubiKeyManager.stopUsbDiscovery()
+                                            result.success(secret.toHex())
+                                        },
+                                        onError = { msg ->
+                                            YubiKeyManager.stopUsbDiscovery()
+                                            if (retriesLeft > 0) {
+                                                android.os.Handler(android.os.Looper.getMainLooper())
+                                                    .postDelayed({ attempt(retriesLeft - 1) }, 500)
+                                            } else {
+                                                result.error("HMAC_FAILED", msg, null)
+                                            }
+                                        },
+                                    )
+                                },
+                                onError = { msg ->
+                                    if (retriesLeft > 0) {
+                                        android.os.Handler(android.os.Looper.getMainLooper())
+                                            .postDelayed({ attempt(retriesLeft - 1) }, 500)
+                                    } else {
+                                        result.error("USB_ERROR", msg, null)
+                                    }
+                                },
+                            )
+                        }
+                        attempt(1)
                     }
                     else -> result.notImplemented()
                 }

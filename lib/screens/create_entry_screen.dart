@@ -435,7 +435,11 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             field0.pin != u.pin ||
             field0.cardName != u.cardName ||
             field0.status != u.status ||
-            field0.folder != u.folder;
+            field0.folder != u.folder ||
+            field0.creditLimit != u.creditLimit ||
+            field0.cardAccountNumber != u.cardAccountNumber ||
+            field0.paymentNetwork != u.paymentNetwork ||
+            field0.notes != u.notes;
       case (
         VaultEntryData_File(:final field0),
         VaultEntryData_File(field0: final u),
