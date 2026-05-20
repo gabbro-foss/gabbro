@@ -106,7 +106,7 @@ gabbro/
 │   ├── LEARNINGS.md
 │   ├── AI_AUTHORSHIP_AND_IP.md
 │   ├── artefacts/
-│   └── decisions/              # ADR-001 through ADR-008
+│   └── decisions/              # ADR documents
 ├── test/                       # Flutter unit/widget tests
 ├── integration_test/
 └── README.md
@@ -151,9 +151,9 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 230 | 3 |
-| Flutter (`flutter test`) | 277 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 0 | 3 |
+| Rust (`cargo test -q`) | 246 | 3 |
+| Flutter (`flutter test`) | 285 | 0 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 0 | 4 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
 
@@ -163,26 +163,27 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **YubiKey session 4a COMPLETE: Rust + bridge layer for YubiKey vault create/unlock**
-  - `vault_crypto.rs`: `seal_vault_with_yubikey`, `open_vault_with_yubikey`
-  - `vault.rs`: `save_vault_with_yubikey`, `load_vault_with_yubikey` (both `#[frb(ignore)]`)
-  - `session.rs`: `YubikeyMaterial` struct cached in session; `unlock_vault_with_yubikey`; `do_save` / `extract_yubikey` helpers; all 10 save-calling functions updated to use `do_save` (YubiKey-aware); `session_change_passphrase` inline YubiKey paths; `lock_vault` zeroizes `hmac_secret`
-  - `vault_bridge.rs`: `YubikeyRecordData` DTO; `list_vault_yubikey_records` (sync, reads header only); `unlock_vault_with_yubikey`; `init_vault_with_yubikey`
-  - `MainActivity.kt`: `register` + `get_hmac_secret` MethodChannel handlers (done session 3, confirmed complete)
-  - **Key design decisions:** `do_save` unifies passphrase-only vs YubiKey save path; `YubikeyMaterial` caches hmac-secret for CRUD re-seals without re-tap (deterministic); `list_vault_yubikey_records` reads header pre-passphrase entry so Android can identify which YubiKey credential to present; `session_export_vault` intentionally passphrase-only per ADR-010
-  - All test counts: vault_crypto +7, session +5, vault_bridge +4 = 16 new YubiKey tests; all pass
+- **YubiKey session 4b COMPLETE: Flutter UI for YubiKey vault create + unlock**
+  - `unlock_screen.dart`: auto-detects YubiKey records from vault header in `initState`; switches to YubiKey mode (PIN field + "Insert your YubiKey" instruction) when records are present; DI via `yubikeyRecords` (null = auto-detect) and `onUnlockWithYubikey` callbacks; passphrase-only mode unchanged
+  - `onboarding_screen.dart`: Android-gated YubiKey opt-in section (SwitchListTile + PIN field + instruction); `isAndroid` DI param (default `Platform.isAndroid`) for testability; `onInitVaultWithYubikey` DI callback; branches `_createVault()` on `_useYubikey` flag
+  - `YubiKeyManager.kt`: added `registerAndGetHmac` — does `makeCredential` + `getAssertions` in a single YubiKey connection (single tap for onboarding registration)
+  - `MainActivity.kt`: renamed channel `yubikey_test` → `yubikey`; added `register_and_get_hmac` handler returning `{credentialId, hmacSecret}` map
+  - `YubiKeyManagerTest.kt`: added ignored hardware test for `registerAndGetHmac`
+  - Bridge codegen: ran `flutter_rust_bridge_codegen generate` to expose `listVaultYubikeyRecords`, `unlockVaultWithYubikey`, `initVaultWithYubikey`, `YubikeyRecordData` to Dart
+  - **Key design decisions:** single YubiKey tap for onboarding (`registerAndGetHmac` in one connection); YubiKey mode detected at screen init (sync, graceful fallback to passphrase-only); autofill unlock left passphrase-only (autofill runs in `UnlockActivity`, not `MainActivity` — YubiKey MethodChannel not wired there; deferred); Linux FIDO2 UI deferred (separate session); hex helpers duplicated in each screen file (no premature shared utility)
+  - Flutter tests: +8 new widget tests (4 unlock, 4 onboarding); `tester.runAsync` used for the onboarding vault-creation test (real file I/O via `File.parent.create` doesn't settle through `pump()` alone)
+  - Flutter: 285 passing (+8), Rust: 246 passing (unchanged), Android: 0 passing / 4 ignored (+1)
 
 - **Previous sessions:**
+  - Session 4a complete: Rust + bridge layer (`seal/open_vault_with_yubikey`, `YubikeyMaterial`, bridge functions)
   - Session 3 complete: `YubiKeyManager.kt` hardware-verified on Samsung S23 + YubiKey 5C
   - Session 2 complete: `rust/src/fido/` — libfido2 FFI, hardware-verified on Linux
   - Session 1 complete: vault format v2 `YubiKeyRecord`; `combine_yubikey` HKDF combiner
 
-- **Next: Session 4b — Flutter UI for YubiKey vault create + unlock screen**
-  - `unlock_screen.dart`: detect YubiKey records via `listVaultYubikeyRecords`, show "Insert YubiKey" prompt, call `unlockVaultWithYubikey`
-  - Onboarding / new vault creation: offer YubiKey opt-in, call `initVaultWithYubikey`
-  - Change passphrase with YubiKey (session 5)
-  - Vault delete with YubiKey (session 6)
-  - NFC support (session 7)
+- **Next: Session 5 — Change passphrase with YubiKey**
+  - `change_passphrase_screen.dart`: detect YubiKey vault, add PIN field, call YubiKey-aware change-passphrase bridge function
+  - Session 6: Vault delete with YubiKey
+  - Session 7: NFC support
 
   **Build environment notes (critical for Android sessions):**
   - System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
@@ -218,7 +219,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
     2. Linux libfido2 binding (Rust FFI) ✓
     3. Android yubikit-android integration (Kotlin) ✓
     4a. Rust + bridge: `seal/open_vault_with_yubikey`, `YubikeyMaterial` session, all bridge functions ✓
-    4b. Flutter UI: unlock screen YubiKey detect/prompt, onboarding YubiKey opt-in
+    4b. Flutter UI: unlock screen YubiKey detect/prompt, onboarding YubiKey opt-in ✓
     5. Change passphrase with YubiKey
     6. Vault delete with YubiKey
     7. NFC support

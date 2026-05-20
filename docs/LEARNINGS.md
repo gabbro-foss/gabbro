@@ -2908,3 +2908,45 @@ The hmac-secret is **deterministic** (same credential + same salt → same
 32-byte output from the YubiKey), so caching it in `YubikeyMaterial` for the
 session lifetime is safe: CRUD saves do not require a re-tap.
 
+## Flutter — `tester.runAsync` for real I/O in widget tests
+
+`tester.pump()` drives the Flutter test binding's virtual clock (timers,
+animations) but does **not** advance platform I/O completions. A widget
+that calls `File.parent.create(recursive: true)` inside an async handler
+will hang `pumpAndSettle` because the I/O event never arrives to resolve
+the Future.
+
+Fix: wrap the triggering action in `tester.runAsync()`, which temporarily
+suspends the test binding and runs in real Dart async mode, allowing actual
+OS file operations to complete:
+
+```dart
+await tester.runAsync(() async {
+  await tester.tap(find.text('Create vault'));
+  await Future.delayed(const Duration(milliseconds: 300));
+});
+await tester.pump(); // rebuild with updated state
+```
+
+Observed in: `onboarding_screen_test.dart` — `_createVault()` calls
+`File(_vaultPath).parent.create(recursive: true)` before dispatching to
+the injected callback.
+
+## Flutter — `isAndroid` DI parameter for platform-gated UI
+
+When a widget has UI that only makes sense on one platform (e.g. Android
+YubiKey opt-in), `Platform.isAndroid` in the build method makes the feature
+untestable on Linux (test environment). Solution: expose `isAndroid` as a
+constructor parameter defaulting to `Platform.isAndroid`:
+
+```dart
+OnboardingScreen({
+  bool? isAndroid,
+  ...
+}) : isAndroid = isAndroid ?? Platform.isAndroid;
+```
+
+Tests pass `isAndroid: true` to exercise the Android-only section on Linux.
+The constructor must be non-const (can't call `Platform.isAndroid` in a const
+initializer list). This is a deliberate trade-off: testability over const.
+
