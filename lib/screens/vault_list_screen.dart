@@ -432,6 +432,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => ChangePassphraseScreen(
+              vaultPath: widget.vaultPath,
               blockPassphraseCopyPaste: cpAppState.settings.blockPassphraseCopyPaste,
             ),
           ),

@@ -14,16 +14,23 @@ EntropyResult _defaultEstimateEntropy(String password) =>
     estimateEntropy(password: password);
 
 class ChangePassphraseScreen extends StatefulWidget {
+  final String vaultPath;
   final Future<void> Function(List<int> oldPassphrase, List<int> newPassphrase)
   onChangePassphrase;
   final EntropyResult Function(String password) onEstimateEntropy;
   final bool blockPassphraseCopyPaste;
 
+  /// Pre-injected YubiKey records. `null` = auto-detect from vault file at
+  /// construction time. Pass `[]` to force passphrase-only mode (tests).
+  final List<YubikeyRecordData>? yubikeyRecords;
+
   const ChangePassphraseScreen({
     super.key,
+    required this.vaultPath,
     this.onChangePassphrase = _defaultChangePassphrase,
     this.onEstimateEntropy = _defaultEstimateEntropy,
     this.blockPassphraseCopyPaste = true,
+    this.yubikeyRecords,
   });
 
   @override
@@ -43,6 +50,23 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
   String? _error;
   EntropyResult? _entropy;
   bool? _confirmMatches;
+  late final List<YubikeyRecordData> _yubikeyRecords;
+
+  bool get _isYubikeyMode => _yubikeyRecords.isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
+  }
+
+  List<YubikeyRecordData> _detectYubikeyRecords() {
+    try {
+      return listVaultYubikeyRecords(path: widget.vaultPath);
+    } catch (_) {
+      return [];
+    }
+  }
 
   @override
   void dispose() {
@@ -120,6 +144,35 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  if (_isYubikeyMode) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .primaryContainer
+                            .withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.security,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'YubiKey-protected vault — your YubiKey binding will be preserved.',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                   TextFormField(
                     controller: _oldController,
                     obscureText: _oldObscured,

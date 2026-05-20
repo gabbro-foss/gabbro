@@ -1,7 +1,9 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 // ── Fake entropy ──────────────────────────────────────────────────────────────
 
@@ -10,17 +12,27 @@ EntropyResult _fakeStrongEntropy(String ignored) => EntropyResult(
       tier: StrengthTier.veryStrong,
     );
 
+// ── Fake YubiKey record ───────────────────────────────────────────────────────
+
+YubikeyRecordData _fakeRecord() => YubikeyRecordData(
+      credentialId: Uint8List.fromList([1, 2, 3, 4]),
+      salt: Uint8List(32),
+    );
+
 // ── Widget helper ─────────────────────────────────────────────────────────────
 
 Widget _buildScreen({
   Future<void> Function(List<int>, List<int>)? onChangePassphrase,
   bool blockPassphraseCopyPaste = true,
+  List<YubikeyRecordData>? yubikeyRecords,
 }) =>
     MaterialApp(
       home: ChangePassphraseScreen(
+        vaultPath: '/tmp/test.gabbro',
         onChangePassphrase: onChangePassphrase ?? (a, b) async {},
         onEstimateEntropy: _fakeStrongEntropy,
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
+        yubikeyRecords: yubikeyRecords ?? [],
       ),
     );
 
@@ -56,5 +68,20 @@ void main() {
     expect(fields[0].enableInteractiveSelection, isNot(isFalse));
     expect(fields[1].enableInteractiveSelection, isNot(isFalse));
     expect(fields[2].enableInteractiveSelection, isNot(isFalse));
+  });
+
+  // ── YubiKey mode ─────────────────────────────────────────────────────────────
+
+  testWidgets('yubikey mode shows YubiKey info banner', (tester) async {
+    await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+
+    expect(find.byIcon(Icons.security), findsOneWidget);
+    expect(find.textContaining('YubiKey'), findsWidgets);
+  });
+
+  testWidgets('passphrase-only mode does not show YubiKey banner', (tester) async {
+    await tester.pumpWidget(_buildScreen(yubikeyRecords: []));
+
+    expect(find.byIcon(Icons.security), findsNothing);
   });
 }
