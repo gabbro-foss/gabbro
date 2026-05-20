@@ -5,8 +5,7 @@
 /// These are stored in the vault file header so that a vault can
 /// always be decrypted using the parameters it was created with,
 /// even if the defaults change in a future version.
-
-use argon2::{Argon2, Algorithm, Version, Params};
+use argon2::{Algorithm, Argon2, Params, Version};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Argon2idParams {
@@ -42,12 +41,8 @@ pub fn derive_key(
     salt: &[u8; 32],
     params: &Argon2idParams,
 ) -> Result<[u8; 96], String> {
-    let argon2_params = Params::new(
-        params.m_cost,
-        params.t_cost,
-        params.p_cost,
-        Some(96),
-    ).map_err(|e| format!("invalid Argon2id params: {e}"))?;
+    let argon2_params = Params::new(params.m_cost, params.t_cost, params.p_cost, Some(96))
+        .map_err(|e| format!("invalid Argon2id params: {e}"))?;
 
     let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, argon2_params);
 
@@ -95,7 +90,11 @@ mod tests {
     #[test]
     fn derive_key_is_deterministic() {
         let salt = [1u8; 32];
-        let params = Argon2idParams { m_cost: 4096, t_cost: 1, p_cost: 1 };
+        let params = Argon2idParams {
+            m_cost: 4096,
+            t_cost: 1,
+            p_cost: 1,
+        };
         let a = derive_key(b"passphrase", &salt, &params).unwrap();
         let b = derive_key(b"passphrase", &salt, &params).unwrap();
         assert_eq!(a, b);
@@ -104,7 +103,11 @@ mod tests {
     #[test]
     fn different_passphrases_produce_different_keys() {
         let salt = [2u8; 32];
-        let params = Argon2idParams { m_cost: 4096, t_cost: 1, p_cost: 1 };
+        let params = Argon2idParams {
+            m_cost: 4096,
+            t_cost: 1,
+            p_cost: 1,
+        };
         let a = derive_key(b"passphrase one", &salt, &params).unwrap();
         let b = derive_key(b"passphrase two", &salt, &params).unwrap();
         assert_ne!(a, b);
@@ -112,10 +115,13 @@ mod tests {
 
     #[test]
     fn different_salts_produce_different_keys() {
-        let params = Argon2idParams { m_cost: 4096, t_cost: 1, p_cost: 1 };
+        let params = Argon2idParams {
+            m_cost: 4096,
+            t_cost: 1,
+            p_cost: 1,
+        };
         let a = derive_key(b"passphrase", &[3u8; 32], &params).unwrap();
         let b = derive_key(b"passphrase", &[4u8; 32], &params).unwrap();
         assert_ne!(a, b);
     }
-
 }

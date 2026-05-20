@@ -32,7 +32,7 @@ pub fn read_vault(path: &Path) -> Result<SealedVault, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::crypto::vault_crypto::{seal_vault, open_vault};
+    use crate::crypto::vault_crypto::{open_vault, seal_vault};
     use std::env::temp_dir;
 
     fn temp_vault_path() -> std::path::PathBuf {
@@ -72,5 +72,4 @@ mod tests {
         let _ = std::fs::remove_file(&path);
         assert!(result.is_err());
     }
-
 }

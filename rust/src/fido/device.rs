@@ -56,11 +56,8 @@ pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord
             return Err(format!("fido_cred_set_type failed: {r}"));
         }
 
-        let r = fido_cred_set_clientdata_hash(
-            cred,
-            client_data_hash.as_ptr(),
-            client_data_hash.len(),
-        );
+        let r =
+            fido_cred_set_clientdata_hash(cred, client_data_hash.as_ptr(), client_data_hash.len());
         if r != FIDO_OK as i32 {
             return Err(format!("fido_cred_set_clientdata_hash failed: {r}"));
         }
@@ -116,7 +113,10 @@ pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord
         fido_dev_close(dev);
         fido_dev_free(&mut (dev as *mut _));
 
-        Ok(YubiKeyRecord { credential_id, salt })
+        Ok(YubiKeyRecord {
+            credential_id,
+            salt,
+        })
     }
 }
 

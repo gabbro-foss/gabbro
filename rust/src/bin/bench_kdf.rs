@@ -11,7 +11,7 @@
 //! One-shot Argon2id benchmark — run with:
 //! cargo run --bin bench_kdf --release
 
-use argon2::{Argon2, Params, Version, Algorithm};
+use argon2::{Algorithm, Argon2, Params, Version};
 use std::time::Instant;
 
 fn main() {
@@ -19,11 +19,12 @@ fn main() {
     let salt = b"gabbro__salt____"; // 16 bytes exactly
 
     let params = Params::new(
-        65536, // m_cost: 64 MiB in KiB
-        25,     // t_cost: iterations
-        4,     // p_cost: parallelism
+        65536,    // m_cost: 64 MiB in KiB
+        25,       // t_cost: iterations
+        4,        // p_cost: parallelism
         Some(96), // output length: 96 bytes
-    ).expect("valid params");
+    )
+    .expect("valid params");
 
     let argon2 = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
 
@@ -31,7 +32,8 @@ fn main() {
 
     println!("Running Argon2id (m=64MiB, t=25, p=4) ...");
     let start = Instant::now();
-    argon2.hash_password_into(password, salt, &mut output)
+    argon2
+        .hash_password_into(password, salt, &mut output)
         .expect("hash failed");
     let elapsed = start.elapsed();
 

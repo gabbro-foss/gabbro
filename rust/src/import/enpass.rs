@@ -14,12 +14,12 @@
 //! - `deleted` fields — soft-deleted fields inside an item
 //! - `history` — password history not yet in Gabbro domain model
 
-use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
-use serde::Deserialize;
 use crate::vault::entry::{
-    CardEntry, CustomEntry, CustomField, EntryAttachment, EntryMeta,
-    LoginEntry, NoteEntry, VaultEntry,
+    CardEntry, CustomEntry, CustomField, EntryAttachment, EntryMeta, LoginEntry, NoteEntry,
+    VaultEntry,
 };
+use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
+use serde::Deserialize;
 use std::collections::HashMap;
 
 // ── Enpass JSON structs ───────────────────────────────────────────────────────
@@ -94,8 +94,8 @@ pub(crate) struct ParseFailure {
 /// fail domain validation are collected into the second element of the tuple
 /// rather than aborting the whole import.
 pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>), String> {
-    let export: EnpassExport = serde_json::from_slice(data)
-        .map_err(|e| format!("Failed to parse Enpass JSON: {}", e))?;
+    let export: EnpassExport =
+        serde_json::from_slice(data).map_err(|e| format!("Failed to parse Enpass JSON: {}", e))?;
 
     let mut entries = Vec::new();
     let mut failures = Vec::new();
@@ -126,18 +126,18 @@ fn extract_raw_fields(fields: &[&EnpassField]) -> Vec<(String, String)> {
         .filter(|f| !f.value.is_empty())
         .map(|f| {
             let key = match f.field_type.as_str() {
-                "ccNumber"      => "card_number".to_string(),
-                "ccName"        => "cardholder_name".to_string(),
-                "ccExpiry"      => "expiry".to_string(),
-                "ccCvc"         => "cvv".to_string(),
-                "ccPin"         => "pin".to_string(),
-                "ccBankname"    => "bank_name".to_string(),
+                "ccNumber" => "card_number".to_string(),
+                "ccName" => "cardholder_name".to_string(),
+                "ccExpiry" => "expiry".to_string(),
+                "ccCvc" => "cvv".to_string(),
+                "ccPin" => "pin".to_string(),
+                "ccBankname" => "bank_name".to_string(),
                 "ccTxnpassword" => "transaction_password".to_string(),
-                "username"      => "username".to_string(),
-                "email"         => "username".to_string(),
-                "password"      => "password".to_string(),
-                "url"           => "url".to_string(),
-                _               => f.label.clone(),
+                "username" => "username".to_string(),
+                "email" => "username".to_string(),
+                "password" => "password".to_string(),
+                "url" => "url".to_string(),
+                _ => f.label.clone(),
             };
             (key, f.value.clone())
         })
@@ -157,34 +157,38 @@ fn convert_item(item: EnpassItem) -> Result<VaultEntry, ParseFailure> {
     let meta = make_meta(&item.uuid);
 
     match item.category.as_str() {
-        "login" | "computer" | "finance" => {
-            Ok(VaultEntry::Login(convert_login(meta, &item.title, &item.note, &fields, attachments)))
-        }
-        "creditcard" => {
-            convert_card(meta, &item.title, &item.note, &fields, attachments)
-                .map(VaultEntry::Card)
-                .map_err(|reason| {
-                    let mut raw = vec![("title".to_string(), item.title.clone())];
-                    raw.extend(extract_raw_fields(&fields));
-                    ParseFailure {
-                        title: item.title.clone(),
-                        category: item.category.clone(),
-                        reason,
-                        raw_fields: raw,
-                    }
-                })
-        }
-        "note" => {
-            Ok(VaultEntry::Note(NoteEntry {
-                meta,
-                title: item.title,
-                content: item.note,
-                attachments,
-            }))
-        }
-        _ => {
-            Ok(VaultEntry::Custom(convert_custom(meta, &item.title, &item.note, &fields, attachments)))
-        }
+        "login" | "computer" | "finance" => Ok(VaultEntry::Login(convert_login(
+            meta,
+            &item.title,
+            &item.note,
+            &fields,
+            attachments,
+        ))),
+        "creditcard" => convert_card(meta, &item.title, &item.note, &fields, attachments)
+            .map(VaultEntry::Card)
+            .map_err(|reason| {
+                let mut raw = vec![("title".to_string(), item.title.clone())];
+                raw.extend(extract_raw_fields(&fields));
+                ParseFailure {
+                    title: item.title.clone(),
+                    category: item.category.clone(),
+                    reason,
+                    raw_fields: raw,
+                }
+            }),
+        "note" => Ok(VaultEntry::Note(NoteEntry {
+            meta,
+            title: item.title,
+            content: item.note,
+            attachments,
+        })),
+        _ => Ok(VaultEntry::Custom(convert_custom(
+            meta,
+            &item.title,
+            &item.note,
+            &fields,
+            attachments,
+        ))),
     }
 }
 
@@ -197,7 +201,7 @@ fn convert_login(
     fields: &[&EnpassField],
     attachments: Vec<EntryAttachment>,
 ) -> LoginEntry {
-    let url      = find_field_value(fields, &["url"]);
+    let url = find_field_value(fields, &["url"]);
     let username = find_field_value(fields, &["username", "email"]);
     let password = find_field_value(fields, &["password"]);
 
@@ -235,8 +239,16 @@ fn convert_card(
 
     // Fields that map to dedicated CardEntry slots — everything else overflows
     // to custom_fields so no data is silently dropped on import.
-    let cc_skip = ["ccName", "ccNumber", "ccExpiry", "ccCvc", "ccPin",
-                   "ccBankname", "ccTxnpassword", "ccType"];
+    let cc_skip = [
+        "ccName",
+        "ccNumber",
+        "ccExpiry",
+        "ccCvc",
+        "ccPin",
+        "ccBankname",
+        "ccTxnpassword",
+        "ccType",
+    ];
     let custom_fields = fields
         .iter()
         .filter(|f| !cc_skip.contains(&f.field_type.as_str()))
@@ -245,19 +257,19 @@ fn convert_card(
 
     CardEntry::new(
         meta,
-        Some(title.to_string()),                                       // card_name from item title
-        String::from("active"),                                        // status
-        find_field_value(fields, &["ccName"]),                        // cardholder_name
+        Some(title.to_string()),               // card_name from item title
+        String::from("active"),                // status
+        find_field_value(fields, &["ccName"]), // cardholder_name
         card_number,
-        normalise_expiry(&find_field_value(fields, &["ccExpiry"])),   // expiry
-        find_field_value(fields, &["ccCvc"]),                         // cvv
-        None,                                                          // credit_limit
-        None,                                                          // card_account_number
-        None,                                                          // payment_network
-        opt_field_value(fields, &["ccPin"]),                          // pin
-        opt_field_value(fields, &["ccBankname"]),                     // bank_name
-        opt_field_value(fields, &["ccTxnpassword"]),                  // transaction_password
-        non_empty(note),                                               // notes
+        normalise_expiry(&find_field_value(fields, &["ccExpiry"])), // expiry
+        find_field_value(fields, &["ccCvc"]),                       // cvv
+        None,                                                       // credit_limit
+        None,                                                       // card_account_number
+        None,                                                       // payment_network
+        opt_field_value(fields, &["ccPin"]),                        // pin
+        opt_field_value(fields, &["ccBankname"]),                   // bank_name
+        opt_field_value(fields, &["ccTxnpassword"]),                // transaction_password
+        non_empty(note),                                            // notes
         custom_fields,
         attachments,
         None,
@@ -282,7 +294,11 @@ fn convert_custom(
     if let Some(note_text) = non_empty(note) {
         field_map.insert(
             String::from("notes"),
-            CustomField { label: String::from("Notes"), value: note_text, hidden: false },
+            CustomField {
+                label: String::from("Notes"),
+                value: note_text,
+                hidden: false,
+            },
         );
     }
 
@@ -302,18 +318,16 @@ fn convert_custom(
 /// skipped — a corrupt attachment should not fail the whole import.
 fn decode_attachments(raw: &[EnpassAttachment]) -> Vec<EntryAttachment> {
     raw.iter()
-        .filter_map(|a| {
-            match BASE64.decode(&a.data) {
-                Ok(bytes) => Some(EntryAttachment {
-                    uuid: a.uuid.clone(),
-                    name: a.name.clone(),
-                    kind: a.kind.clone(),
-                    data: bytes,
-                }),
-                Err(e) => {
-                    eprintln!("[enpass import] skipping attachment {}: {}", a.name, e);
-                    None
-                }
+        .filter_map(|a| match BASE64.decode(&a.data) {
+            Ok(bytes) => Some(EntryAttachment {
+                uuid: a.uuid.clone(),
+                name: a.name.clone(),
+                kind: a.kind.clone(),
+                data: bytes,
+            }),
+            Err(e) => {
+                eprintln!("[enpass import] skipping attachment {}: {}", a.name, e);
+                None
             }
         })
         .collect()
@@ -321,9 +335,7 @@ fn decode_attachments(raw: &[EnpassAttachment]) -> Vec<EntryAttachment> {
 
 /// Fields that carry no user data and should be dropped before mapping.
 fn should_drop_field(field_type: &str) -> bool {
-    matches!(field_type,
-        "totp" | "section" | "ccType"
-    ) || field_type.starts_with(".Android")
+    matches!(field_type, "totp" | "section" | "ccType") || field_type.starts_with(".Android")
 }
 
 /// Find the first non-empty matching field value by type.
@@ -367,7 +379,11 @@ fn sanitise_key(label: &str) -> String {
 
 /// Return `Some(s)` only if the string is non-empty, `None` otherwise.
 fn non_empty(s: &str) -> Option<String> {
-    if s.is_empty() { None } else { Some(s.to_string()) }
+    if s.is_empty() {
+        None
+    } else {
+        Some(s.to_string())
+    }
 }
 
 /// Build an `EntryMeta` from Enpass item-level fields.
@@ -441,7 +457,9 @@ mod tests {
     fn parse_login_entry() {
         let (entries, _) = parse(login_json().as_bytes()).unwrap();
         assert_eq!(entries.len(), 1);
-        let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
+        let VaultEntry::Login(ref e) = entries[0] else {
+            panic!("expected Login")
+        };
         assert_eq!(e.meta.id, "aaa-111");
         assert_eq!(e.title, "GitHub");
         assert_eq!(e.username, "rob");
@@ -453,7 +471,9 @@ mod tests {
     fn parse_card_entry() {
         let (entries, _) = parse(card_json().as_bytes()).unwrap();
         assert_eq!(entries.len(), 1);
-        let VaultEntry::Card(ref e) = entries[0] else { panic!("expected Card") };
+        let VaultEntry::Card(ref e) = entries[0] else {
+            panic!("expected Card")
+        };
         assert_eq!(e.meta.id, "bbb-222");
         assert_eq!(e.card_name, Some(String::from("Visa Platinum")));
         assert_eq!(e.cardholder_name, "Rob Smith");
@@ -498,7 +518,9 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
+        let VaultEntry::Login(ref e) = entries[0] else {
+            panic!("expected Login")
+        };
         assert_eq!(e.password, "new");
     }
 
@@ -523,7 +545,9 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
+        let VaultEntry::Login(ref e) = entries[0] else {
+            panic!("expected Login")
+        };
         assert_eq!(e.username, "gabbro_user");
     }
 
@@ -541,7 +565,9 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
+        let VaultEntry::Login(ref e) = entries[0] else {
+            panic!("expected Login")
+        };
         assert_eq!(e.username, "user@example.com");
     }
 
@@ -559,9 +585,13 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
-        assert_eq!(e.username, "gabbro_user",
-            "username field should be preferred over email when both are non-empty");
+        let VaultEntry::Login(ref e) = entries[0] else {
+            panic!("expected Login")
+        };
+        assert_eq!(
+            e.username, "gabbro_user",
+            "username field should be preferred over email when both are non-empty"
+        );
     }
 
     #[test]
@@ -578,20 +608,30 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
-        assert_eq!(e.title, "My Bank",
-            "title field should come from item.title");
-        assert_eq!(e.url, "https://mybank.example",
-            "url should come from the url field, not the item title");
+        let VaultEntry::Login(ref e) = entries[0] else {
+            panic!("expected Login")
+        };
+        assert_eq!(
+            e.title, "My Bank",
+            "title field should come from item.title"
+        );
+        assert_eq!(
+            e.url, "https://mybank.example",
+            "url should come from the url field, not the item title"
+        );
         assert_eq!(e.meta.id, "f01-004");
     }
 
     #[test]
     fn login_category_does_not_set_folder_to_category_name() {
         let (entries, _) = parse(login_json().as_bytes()).unwrap();
-        let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
-        assert_eq!(e.meta.folder, "",
-            "Enpass items have no folder; folder must be empty string, not the category name");
+        let VaultEntry::Login(ref e) = entries[0] else {
+            panic!("expected Login")
+        };
+        assert_eq!(
+            e.meta.folder, "",
+            "Enpass items have no folder; folder must be empty string, not the category name"
+        );
     }
 
     #[test]
@@ -607,8 +647,10 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        assert!(matches!(entries[0], VaultEntry::Login(_)),
-            "computer category should map to LoginEntry");
+        assert!(
+            matches!(entries[0], VaultEntry::Login(_)),
+            "computer category should map to LoginEntry"
+        );
     }
 
     #[test]
@@ -624,8 +666,10 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        assert!(matches!(entries[0], VaultEntry::Login(_)),
-            "finance category should map to LoginEntry");
+        assert!(
+            matches!(entries[0], VaultEntry::Login(_)),
+            "finance category should map to LoginEntry"
+        );
     }
 
     #[test]
@@ -645,7 +689,9 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        let VaultEntry::Card(ref e) = entries[0] else { panic!("expected Card") };
+        let VaultEntry::Card(ref e) = entries[0] else {
+            panic!("expected Card")
+        };
         assert_eq!(e.cardholder_name, "Rob Smith");
         assert_eq!(e.card_number, "4111111111111111");
         assert!(
@@ -653,7 +699,9 @@ mod tests {
             "username field on a card should become a custom field"
         );
         assert!(
-            e.custom_fields.iter().any(|f| f.label == "Portal pass" && f.hidden),
+            e.custom_fields
+                .iter()
+                .any(|f| f.label == "Portal pass" && f.hidden),
             "password field on a card should become a hidden custom field"
         );
     }
@@ -671,8 +719,10 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        assert!(matches!(entries[0], VaultEntry::Custom(_)),
-            "travel category should map to CustomEntry");
+        assert!(
+            matches!(entries[0], VaultEntry::Custom(_)),
+            "travel category should map to CustomEntry"
+        );
     }
 
     #[test]
@@ -689,7 +739,9 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
+        let VaultEntry::Login(ref e) = entries[0] else {
+            panic!("expected Login")
+        };
         assert!(
             e.custom_fields.iter().any(|f| f.label == "Account number"),
             "numeric field type should become a custom field on the login entry"
@@ -710,7 +762,9 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
+        let VaultEntry::Login(ref e) = entries[0] else {
+            panic!("expected Login")
+        };
         assert!(
             !e.custom_fields.iter().any(|f| f.label == "Section header"),
             "section fields should be dropped and never appear as custom fields"
@@ -731,7 +785,9 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
+        let VaultEntry::Login(ref e) = entries[0] else {
+            panic!("expected Login")
+        };
         assert!(
             !e.custom_fields.iter().any(|f| f.label == "TOTP"),
             "totp fields should be dropped and never appear as custom fields"
@@ -753,9 +809,13 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        let VaultEntry::Card(ref e) = entries[0] else { panic!("expected Card") };
-        assert_eq!(e.expiry, "12/28",
-            "MM/YYYY expiry from Enpass should be normalised to MM/YY");
+        let VaultEntry::Card(ref e) = entries[0] else {
+            panic!("expected Card")
+        };
+        assert_eq!(
+            e.expiry, "12/28",
+            "MM/YYYY expiry from Enpass should be normalised to MM/YY"
+        );
     }
 
     #[test]
@@ -778,11 +838,15 @@ mod tests {
           }]
         }"#;
         let (entries, _) = parse(json.as_bytes()).unwrap();
-        let VaultEntry::Login(ref e) = entries[0] else { panic!("expected Login") };
+        let VaultEntry::Login(ref e) = entries[0] else {
+            panic!("expected Login")
+        };
         assert_eq!(e.attachments.len(), 1, "attachment should be imported");
         assert_eq!(e.attachments[0].name, "photo.jpg");
         assert_eq!(e.attachments[0].kind, "image/jpeg");
-        assert_eq!(e.attachments[0].data, b"hello",
-            "attachment data should be base64-decoded to raw bytes");
+        assert_eq!(
+            e.attachments[0].data, b"hello",
+            "attachment data should be base64-decoded to raw bytes"
+        );
     }
 }

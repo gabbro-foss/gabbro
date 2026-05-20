@@ -54,12 +54,11 @@ mod tests {
     #[serial]
     #[ignore] // requires YubiKey hardware; set GABBRO_TEST_PIN and GABBRO_TEST_DEVICE
     fn register_returns_yubikey_record() {
-        let pin = std::env::var("GABBRO_TEST_PIN")
-            .expect("GABBRO_TEST_PIN must be set");
-        let device = std::env::var("GABBRO_TEST_DEVICE")
-            .unwrap_or_else(|_| "/dev/hidraw5".to_string());
-        let record = register(&device, &pin)
-            .expect("registration should succeed with YubiKey present");
+        let pin = std::env::var("GABBRO_TEST_PIN").expect("GABBRO_TEST_PIN must be set");
+        let device =
+            std::env::var("GABBRO_TEST_DEVICE").unwrap_or_else(|_| "/dev/hidraw5".to_string());
+        let record =
+            register(&device, &pin).expect("registration should succeed with YubiKey present");
         assert!(!record.credential_id.is_empty());
         assert_eq!(record.salt.len(), 32);
     }
@@ -68,16 +67,14 @@ mod tests {
     #[serial]
     #[ignore] // requires YubiKey hardware; set GABBRO_TEST_PIN and GABBRO_TEST_DEVICE
     fn get_hmac_secret_is_deterministic() {
-        let pin = std::env::var("GABBRO_TEST_PIN")
-            .expect("GABBRO_TEST_PIN must be set");
-        let device = std::env::var("GABBRO_TEST_DEVICE")
-            .unwrap_or_else(|_| "/dev/hidraw5".to_string());
-        let record = register(&device, &pin)
-            .expect("registration should succeed");
-        let out1 = get_hmac_secret(&device, &record, &pin)
-            .expect("first hmac-secret should succeed");
-        let out2 = get_hmac_secret(&device, &record, &pin)
-            .expect("second hmac-secret should succeed");
+        let pin = std::env::var("GABBRO_TEST_PIN").expect("GABBRO_TEST_PIN must be set");
+        let device =
+            std::env::var("GABBRO_TEST_DEVICE").unwrap_or_else(|_| "/dev/hidraw5".to_string());
+        let record = register(&device, &pin).expect("registration should succeed");
+        let out1 =
+            get_hmac_secret(&device, &record, &pin).expect("first hmac-secret should succeed");
+        let out2 =
+            get_hmac_secret(&device, &record, &pin).expect("second hmac-secret should succeed");
         assert_eq!(out1, out2, "same salt must produce same hmac-secret");
     }
 }

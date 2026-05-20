@@ -5,10 +5,10 @@
 //! encryption and stored in the vault header alongside the ciphertext.
 //! The GCM authentication tag detects any tampering.
 
-use aes_gcm::{Aes256Gcm, Key, Nonce};
 use aes_gcm::aead::{Aead, KeyInit};
-use rand::RngCore;
+use aes_gcm::{Aes256Gcm, Key, Nonce};
 use rand::rngs::OsRng;
+use rand::RngCore;
 
 /// Encrypts plaintext with AES-256-GCM.
 ///
@@ -35,11 +35,7 @@ pub fn encrypt(key: &[u8; 32], plaintext: &[u8]) -> Result<(Vec<u8>, [u8; 12]), 
 /// Returns the plaintext if the key and nonce are correct and the
 /// authentication tag is valid. Returns `Err` if the tag fails —
 /// this means either the wrong key or tampered ciphertext.
-pub fn decrypt(
-    key: &[u8; 32],
-    ciphertext: &[u8],
-    nonce: &[u8; 12],
-) -> Result<Vec<u8>, String> {
+pub fn decrypt(key: &[u8; 32], ciphertext: &[u8], nonce: &[u8; 12]) -> Result<Vec<u8>, String> {
     let key = Key::<Aes256Gcm>::from_slice(key);
     let cipher = Aes256Gcm::new(key);
     let nonce = Nonce::from_slice(nonce);

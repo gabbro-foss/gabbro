@@ -13,20 +13,20 @@ pub struct CsvPreview {
 /// Configuration for mapping CSV columns to Gabbro entry fields.
 /// Any column not mapped here becomes a custom field on the entry.
 pub struct CsvImportConfig {
-    pub title_col:    Option<String>,
-    pub url_col:      Option<String>,
+    pub title_col: Option<String>,
+    pub url_col: Option<String>,
     pub username_col: Option<String>,
     pub password_col: Option<String>,
-    pub notes_col:    Option<String>,
+    pub notes_col: Option<String>,
 }
 
 /// A single imported entry — flat struct ready for conversion to LoginEntry.
 pub struct CsvEntry {
-    pub title:         String,
-    pub url:           String,
-    pub username:      String,
-    pub password:      String,
-    pub notes:         Option<String>,
+    pub title: String,
+    pub url: String,
+    pub username: String,
+    pub password: String,
+    pub notes: Option<String>,
     pub custom_fields: Vec<(String, String)>,
 }
 
@@ -46,23 +46,18 @@ pub fn import_csv(input: &str, config: &CsvImportConfig) -> Result<Vec<CsvEntry>
     }
 
     // Build a lookup: column name → index
-    let col_index = |name: &str| -> Option<usize> {
-        headers.iter().position(|h| h == name)
-    };
+    let col_index = |name: &str| -> Option<usize> { headers.iter().position(|h| h == name) };
 
     // Identify which indices are claimed by the config
-    let title_idx     = config.title_col.as_deref().and_then(col_index);
-    let url_idx       = config.url_col.as_deref().and_then(col_index);
-    let username_idx  = config.username_col.as_deref().and_then(col_index);
-    let password_idx  = config.password_col.as_deref().and_then(col_index);
-    let notes_idx     = config.notes_col.as_deref().and_then(col_index);
-    let claimed: Vec<usize> = [
-        title_idx, url_idx, username_idx,
-        password_idx, notes_idx,
-    ]
-    .iter()
-    .filter_map(|i| *i)
-    .collect();
+    let title_idx = config.title_col.as_deref().and_then(col_index);
+    let url_idx = config.url_col.as_deref().and_then(col_index);
+    let username_idx = config.username_col.as_deref().and_then(col_index);
+    let password_idx = config.password_col.as_deref().and_then(col_index);
+    let notes_idx = config.notes_col.as_deref().and_then(col_index);
+    let claimed: Vec<usize> = [title_idx, url_idx, username_idx, password_idx, notes_idx]
+        .iter()
+        .filter_map(|i| *i)
+        .collect();
 
     let mut entries = Vec::new();
 
@@ -74,9 +69,9 @@ pub fn import_csv(input: &str, config: &CsvImportConfig) -> Result<Vec<CsvEntry>
 
         let get = |idx: Option<usize>| -> String {
             idx.and_then(|i| fields.get(i))
-               .map(|s| s.as_str())
-               .unwrap_or("")
-               .to_string()
+                .map(|s| s.as_str())
+                .unwrap_or("")
+                .to_string()
         };
 
         let title = {
@@ -85,30 +80,37 @@ pub fn import_csv(input: &str, config: &CsvImportConfig) -> Result<Vec<CsvEntry>
                 t
             } else {
                 let u = get(url_idx);
-                if !u.is_empty() { u } else { "MISSING TITLE".to_string() }
+                if !u.is_empty() {
+                    u
+                } else {
+                    "MISSING TITLE".to_string()
+                }
             }
         };
 
         let notes = {
             let n = get(notes_idx);
-            if n.is_empty() { None } else { Some(n) }
+            if n.is_empty() {
+                None
+            } else {
+                Some(n)
+            }
         };
 
         // Unclaimed columns become custom fields
-        let custom_fields = headers.iter().enumerate()
+        let custom_fields = headers
+            .iter()
+            .enumerate()
             .filter(|(i, _)| !claimed.contains(i))
             .map(|(i, name)| {
-                let value = fields.get(i)
-                    .map(|s| s.as_str())
-                    .unwrap_or("")
-                    .to_string();
+                let value = fields.get(i).map(|s| s.as_str()).unwrap_or("").to_string();
                 (name.clone(), value)
             })
             .collect();
 
         entries.push(CsvEntry {
             title,
-            url:      get(url_idx),
+            url: get(url_idx),
             username: get(username_idx),
             password: get(password_idx),
             notes,
@@ -161,10 +163,7 @@ pub fn sniff_csv(input: &str) -> Result<CsvPreview, String> {
         return Err("CSV has no headers".to_string());
     }
 
-    let rows = lines
-        .take(3)
-        .map(parse_csv_line)
-        .collect();
+    let rows = lines.take(3).map(parse_csv_line).collect();
 
     Ok(CsvPreview { headers, rows })
 }
@@ -182,10 +181,19 @@ uid, name, login, password, type, number, comments, favourite
     #[test]
     fn sniff_returns_correct_headers() {
         let preview = sniff_csv(SAMPLE_CSV).unwrap();
-        assert_eq!(preview.headers, vec![
-            "uid", "name", "login", "password",
-            "type", "number", "comments", "favourite"
-        ]);
+        assert_eq!(
+            preview.headers,
+            vec![
+                "uid",
+                "name",
+                "login",
+                "password",
+                "type",
+                "number",
+                "comments",
+                "favourite"
+            ]
+        );
     }
 
     #[test]
@@ -212,11 +220,11 @@ uid, name, login, password, type, number, comments, favourite
     fn import_missing_title_falls_back_to_url() {
         let csv = "name,url,password\n,https://example.com,secret";
         let config = CsvImportConfig {
-            title_col:     Some("name".to_string()),
-            url_col:       Some("url".to_string()),
-            password_col:  Some("password".to_string()),
-            username_col:  None,
-            notes_col:     None,
+            title_col: Some("name".to_string()),
+            url_col: Some("url".to_string()),
+            password_col: Some("password".to_string()),
+            username_col: None,
+            notes_col: None,
         };
         let entries = import_csv(csv, &config).unwrap();
         assert_eq!(entries[0].title, "https://example.com");
@@ -226,11 +234,11 @@ uid, name, login, password, type, number, comments, favourite
     fn import_missing_title_and_url_gives_missing_title() {
         let csv = "name,password\n,secret";
         let config = CsvImportConfig {
-            title_col:     Some("name".to_string()),
-            url_col:       None,
-            password_col:  Some("password".to_string()),
-            username_col:  None,
-            notes_col:     None,
+            title_col: Some("name".to_string()),
+            url_col: None,
+            password_col: Some("password".to_string()),
+            username_col: None,
+            notes_col: None,
         };
         let entries = import_csv(csv, &config).unwrap();
         assert_eq!(entries[0].title, "MISSING TITLE");
@@ -242,11 +250,9 @@ uid, name, login, password, type, number, comments, favourite
         let entries = import_csv(SAMPLE_CSV, &config).unwrap();
         let visa = &entries[0];
         // uid, type, number are unmapped
-        let keys: Vec<&str> = visa.custom_fields.iter()
-            .map(|(k, _)| k.as_str())
-            .collect();
-        assert!(keys.contains(&"uid"),    "uid should be a custom field");
-        assert!(keys.contains(&"type"),   "type should be a custom field");
+        let keys: Vec<&str> = visa.custom_fields.iter().map(|(k, _)| k.as_str()).collect();
+        assert!(keys.contains(&"uid"), "uid should be a custom field");
+        assert!(keys.contains(&"type"), "type should be a custom field");
         assert!(keys.contains(&"number"), "number should be a custom field");
     }
 
@@ -254,11 +260,11 @@ uid, name, login, password, type, number, comments, favourite
     fn import_handles_quoted_comma_in_field() {
         let csv = "name,password\n\"Bank, Gold Card\",secret";
         let config = CsvImportConfig {
-            title_col:    Some("name".to_string()),
+            title_col: Some("name".to_string()),
             password_col: Some("password".to_string()),
-            url_col:       None,
-            username_col:  None,
-            notes_col:     None,
+            url_col: None,
+            username_col: None,
+            notes_col: None,
         };
         let entries = import_csv(csv, &config).unwrap();
         assert_eq!(entries[0].title, "Bank, Gold Card");
@@ -269,11 +275,11 @@ uid, name, login, password, type, number, comments, favourite
         // Excel on Windows prepends a UTF-8 BOM to every CSV export
         let csv = "\u{FEFF}name,password\nVisa,secret";
         let config = CsvImportConfig {
-            title_col:     Some("name".to_string()),
-            password_col:  Some("password".to_string()),
-            url_col:       None,
-            username_col:  None,
-            notes_col:     None,
+            title_col: Some("name".to_string()),
+            password_col: Some("password".to_string()),
+            url_col: None,
+            username_col: None,
+            notes_col: None,
         };
         let entries = import_csv(csv, &config).unwrap();
         assert_eq!(entries[0].title, "Visa");
@@ -291,17 +297,20 @@ uid, name, login, password, type, number, comments, favourite
         // Row has more fields than headers — extra fields ignored cleanly
         let csv = "name,password\nVisa,secret,extra1,extra2";
         let config = CsvImportConfig {
-            title_col:     Some("name".to_string()),
-            password_col:  Some("password".to_string()),
-            url_col:       None,
-            username_col:  None,
-            notes_col:     None,
+            title_col: Some("name".to_string()),
+            password_col: Some("password".to_string()),
+            url_col: None,
+            username_col: None,
+            notes_col: None,
         };
         let entries = import_csv(csv, &config).unwrap();
         assert_eq!(entries.len(), 1);
         assert_eq!(entries[0].title, "Visa");
-        assert_eq!(entries[0].custom_fields.len(), 0,
-            "extra columns beyond header count should be ignored");
+        assert_eq!(
+            entries[0].custom_fields.len(),
+            0,
+            "extra columns beyond header count should be ignored"
+        );
     }
 
     #[test]
@@ -313,22 +322,22 @@ uid, name, login, password, type, number, comments, favourite
 
     fn default_config() -> CsvImportConfig {
         CsvImportConfig {
-            title_col:     Some("name".to_string()),
-            url_col:       None,
-            username_col:  Some("login".to_string()),
-            password_col:  Some("password".to_string()),
-            notes_col:     Some("comments".to_string()),
+            title_col: Some("name".to_string()),
+            url_col: None,
+            username_col: Some("login".to_string()),
+            password_col: Some("password".to_string()),
+            notes_col: Some("comments".to_string()),
         }
     }
 
     #[test]
     fn import_maps_basic_fields() {
         let config = CsvImportConfig {
-            title_col:     Some("name".to_string()),
-            url_col:       None,
-            username_col:  Some("login".to_string()),
-            password_col:  Some("password".to_string()),
-            notes_col:     Some("comments".to_string()),
+            title_col: Some("name".to_string()),
+            url_col: None,
+            username_col: Some("login".to_string()),
+            password_col: Some("password".to_string()),
+            notes_col: Some("comments".to_string()),
         };
         let entries = import_csv(SAMPLE_CSV, &config).unwrap();
         assert_eq!(entries.len(), 3);

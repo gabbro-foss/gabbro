@@ -7,8 +7,8 @@
 //! Only X25519 is handled here. ML-KEM keypair derivation lives in
 //! the ml_kem module, which is added next.
 
-use rand::SeedableRng;
 use rand::rngs::StdRng;
+use rand::SeedableRng;
 use x25519_dalek::{PublicKey, ReusableSecret};
 use zeroize::Zeroizing;
 
@@ -39,13 +39,16 @@ mod tests {
     use crate::crypto::kdf::{derive_key, Argon2idParams};
 
     fn test_params() -> Argon2idParams {
-        Argon2idParams { m_cost: 4096, t_cost: 1, p_cost: 1 }
+        Argon2idParams {
+            m_cost: 4096,
+            t_cost: 1,
+            p_cost: 1,
+        }
     }
 
     #[test]
     fn x25519_keypair_derives_from_kdf_output() {
-        let kdf_output = derive_key(b"passphrase", &[0u8; 32], &test_params())
-            .unwrap();
+        let kdf_output = derive_key(b"passphrase", &[0u8; 32], &test_params()).unwrap();
         let keypair = X25519Keypair::from_kdf_output(&kdf_output);
         // public key is 32 bytes — just verify it is non-zero
         assert_ne!(keypair.public.as_bytes(), &[0u8; 32]);
@@ -53,8 +56,7 @@ mod tests {
 
     #[test]
     fn x25519_keypair_is_deterministic() {
-        let kdf_output = derive_key(b"passphrase", &[1u8; 32], &test_params())
-            .unwrap();
+        let kdf_output = derive_key(b"passphrase", &[1u8; 32], &test_params()).unwrap();
         let a = X25519Keypair::from_kdf_output(&kdf_output);
         let b = X25519Keypair::from_kdf_output(&kdf_output);
         assert_eq!(a.public.as_bytes(), b.public.as_bytes());

@@ -187,7 +187,10 @@ impl SealedVault {
             let salt: [u8; 32] = data[pos..pos + 32].try_into().unwrap();
             pos += 32;
 
-            yubikey_records.push(YubiKeyRecord { credential_id, salt });
+            yubikey_records.push(YubiKeyRecord {
+                credential_id,
+                salt,
+            });
         }
 
         // --- Body length (8 bytes) ---
@@ -204,7 +207,11 @@ impl SealedVault {
         let ciphertext = data[pos..pos + body_len].to_vec();
 
         Ok(SealedVault {
-            params: Argon2idParams { m_cost, t_cost, p_cost },
+            params: Argon2idParams {
+                m_cost,
+                t_cost,
+                p_cost,
+            },
             argon2_salt,
             hkdf_salt,
             nonce,

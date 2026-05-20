@@ -39,8 +39,8 @@ pub struct PassphraseConfig {
 fn wordlist_for(language: &Language) -> Vec<&'static str> {
     let raw = match language {
         Language::English => WORDLIST_EN,
-        Language::French  => WORDLIST_FR,
-        Language::German  => WORDLIST_DE,
+        Language::French => WORDLIST_FR,
+        Language::German => WORDLIST_DE,
         Language::Spanish => WORDLIST_ES,
         Language::Italian => WORDLIST_IT,
     };
@@ -77,9 +77,7 @@ pub fn generate_passphrase(config: PassphraseConfig) -> Result<String, String> {
                 let mut chars = word.chars();
                 match chars.next() {
                     None => String::new(),
-                    Some(first) => {
-                        first.to_uppercase().collect::<String>() + chars.as_str()
-                    }
+                    Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
                 }
             } else {
                 word.to_string()
@@ -170,8 +168,14 @@ mod tests {
                 break;
             }
         }
-        assert!(saw_upper, "Never saw a capitalised word with capitalise=true");
-        assert!(saw_lower, "Never saw a lowercase word with capitalise=true — not random");
+        assert!(
+            saw_upper,
+            "Never saw a capitalised word with capitalise=true"
+        );
+        assert!(
+            saw_lower,
+            "Never saw a lowercase word with capitalise=true — not random"
+        );
     }
 
     #[test]
@@ -256,5 +260,4 @@ mod tests {
         };
         assert!(generate_passphrase(config).is_err());
     }
-
 }

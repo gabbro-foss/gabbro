@@ -176,5 +176,4 @@ mod tests {
         };
         assert!(generate_password(config).is_err());
     }
-    
 }

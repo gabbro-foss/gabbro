@@ -7,7 +7,9 @@ use std::path::Path;
 
 use sha2::{Digest, Sha256};
 
-use crate::crypto::vault_crypto::{open_vault, seal_vault};
+use crate::crypto::vault_crypto::{
+    open_vault, open_vault_with_yubikey, seal_vault, seal_vault_with_yubikey,
+};
 use crate::vault::entry::{
     CardEntry, CustomEntry, CustomField, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
     NoteEntry, VaultEntry,
@@ -229,10 +231,7 @@ fn custom_entry_to_data(e: &CustomEntry) -> CustomEntryData {
         updated_at: e.meta.updated_at.clone(),
         folder: e.meta.folder.clone(),
         title: e.title.clone(),
-        fields: e.fields
-            .values()
-            .map(custom_field_to_data)
-            .collect(),
+        fields: e.fields.values().map(custom_field_to_data).collect(),
     }
 }
 
@@ -281,11 +280,7 @@ pub fn create_login_entry(
 }
 
 /// Creates a new note entry with a generated UUID and current timestamp.
-pub fn create_note_entry(
-    folder: String,
-    title: String,
-    content: String,
-) -> NoteEntryData {
+pub fn create_note_entry(folder: String, title: String, content: String) -> NoteEntryData {
     let now = chrono_now();
     let meta = EntryMeta {
         id: Uuid::new_v4().to_string(),
@@ -293,7 +288,12 @@ pub fn create_note_entry(
         updated_at: now,
         folder,
     };
-    let entry = NoteEntry { meta, title, content, attachments: vec![] };
+    let entry = NoteEntry {
+        meta,
+        title,
+        content,
+        attachments: vec![],
+    };
     note_entry_to_data(&entry)
 }
 
@@ -313,7 +313,16 @@ pub fn create_identity_entry(
         updated_at: now,
         folder,
     };
-    let entry = IdentityEntry { meta, first_name, last_name, email, phone, address, custom_fields: vec![], attachments: vec![] };
+    let entry = IdentityEntry {
+        meta,
+        first_name,
+        last_name,
+        email,
+        phone,
+        address,
+        custom_fields: vec![],
+        attachments: vec![],
+    };
     identity_entry_to_data(&entry)
 }
 
@@ -380,7 +389,12 @@ pub fn create_file_entry(
         updated_at: now,
         folder,
     };
-    let entry = FileEntry { meta, filename, data, notes };
+    let entry = FileEntry {
+        meta,
+        filename,
+        data,
+        notes,
+    };
     file_entry_to_data(&entry)
 }
 
@@ -399,13 +413,23 @@ pub fn create_custom_entry(
     };
     let internal_fields = fields
         .into_iter()
-        .map(|f| (f.label.clone(), CustomField {
-            label: f.label,
-            value: f.value,
-            hidden: f.hidden,
-        }))
+        .map(|f| {
+            (
+                f.label.clone(),
+                CustomField {
+                    label: f.label,
+                    value: f.value,
+                    hidden: f.hidden,
+                },
+            )
+        })
         .collect();
-    let entry = CustomEntry { meta, title, fields: internal_fields, attachments: vec![] };
+    let entry = CustomEntry {
+        meta,
+        title,
+        fields: internal_fields,
+        attachments: vec![],
+    };
     custom_entry_to_data(&entry)
 }
 
@@ -419,12 +443,12 @@ pub const MASKED_VALUE: &str = "********";
 /// Returns a helper that extracts the UUID from any VaultEntry variant.
 fn entry_id(entry: &VaultEntry) -> &str {
     match entry {
-        VaultEntry::Login(e)    => &e.meta.id,
-        VaultEntry::Note(e)     => &e.meta.id,
+        VaultEntry::Login(e) => &e.meta.id,
+        VaultEntry::Note(e) => &e.meta.id,
         VaultEntry::Identity(e) => &e.meta.id,
-        VaultEntry::Card(e)     => &e.meta.id,
-        VaultEntry::File(e)     => &e.meta.id,
-        VaultEntry::Custom(e)   => &e.meta.id,
+        VaultEntry::Card(e) => &e.meta.id,
+        VaultEntry::File(e) => &e.meta.id,
+        VaultEntry::Custom(e) => &e.meta.id,
     }
 }
 
@@ -433,10 +457,7 @@ fn entry_id(entry: &VaultEntry) -> &str {
 /// Returns a clone of the matching entry, or `Err` if no entry with
 /// that id exists.
 #[flutter_rust_bridge::frb(ignore)]
-pub fn get_entry_by_id(
-    entries: &[VaultEntry],
-    id: &str,
-) -> Result<VaultEntry, String> {
+pub fn get_entry_by_id(entries: &[VaultEntry], id: &str) -> Result<VaultEntry, String> {
     entries
         .iter()
         .find(|e| entry_id(e) == id)
@@ -504,10 +525,18 @@ pub fn update_entry(
                 new.previous_pin = old.previous_pin.clone();
             }
         }
-        (_, VaultEntry::Note(ref mut e))     => { e.meta.updated_at = now; }
-        (_, VaultEntry::Identity(ref mut e)) => { e.meta.updated_at = now; }
-        (_, VaultEntry::File(ref mut e))     => { e.meta.updated_at = now; }
-        (_, VaultEntry::Custom(ref mut e))   => { e.meta.updated_at = now; }
+        (_, VaultEntry::Note(ref mut e)) => {
+            e.meta.updated_at = now;
+        }
+        (_, VaultEntry::Identity(ref mut e)) => {
+            e.meta.updated_at = now;
+        }
+        (_, VaultEntry::File(ref mut e)) => {
+            e.meta.updated_at = now;
+        }
+        (_, VaultEntry::Custom(ref mut e)) => {
+            e.meta.updated_at = now;
+        }
         _ => return Err(String::from("Entry type mismatch during update")),
     }
 
@@ -521,10 +550,14 @@ fn add_days_to_timestamp(timestamp: &str, days: u32) -> String {
     if timestamp.len() < 10 {
         return timestamp.to_string();
     }
-    let year:  u64 = timestamp[0..4].parse().unwrap_or(2025);
+    let year: u64 = timestamp[0..4].parse().unwrap_or(2025);
     let month: u64 = timestamp[5..7].parse().unwrap_or(1);
-    let day:   u64 = timestamp[8..10].parse().unwrap_or(1);
-    let time_suffix = if timestamp.len() > 10 { &timestamp[10..] } else { "T00:00:00Z" };
+    let day: u64 = timestamp[8..10].parse().unwrap_or(1);
+    let time_suffix = if timestamp.len() > 10 {
+        &timestamp[10..]
+    } else {
+        "T00:00:00Z"
+    };
 
     let total_days = days_from_ymd(year, month, day) + days as u64;
     let (ny, nm, nd) = days_to_ymd(total_days);
@@ -537,8 +570,20 @@ fn days_from_ymd(year: u64, month: u64, day: u64) -> u64 {
     for y in 1970..year {
         d += if is_leap(y) { 366 } else { 365 };
     }
-    let days_in_month = [31u64, if is_leap(year) { 29 } else { 28 },
-                         31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let days_in_month = [
+        31u64,
+        if is_leap(year) { 29 } else { 28 },
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31,
+    ];
     for m in 0..(month as usize - 1) {
         d += days_in_month[m];
     }
@@ -549,10 +594,7 @@ fn days_from_ymd(year: u64, month: u64, day: u64) -> u64 {
 ///
 /// Returns `Err` if no entry with that id exists.
 #[flutter_rust_bridge::frb(ignore)]
-pub fn delete_entry(
-    entries: &mut Vec<VaultEntry>,
-    id: &str,
-) -> Result<(), String> {
+pub fn delete_entry(entries: &mut Vec<VaultEntry>, id: &str) -> Result<(), String> {
     let pos = entries
         .iter()
         .position(|e| entry_id(e) == id)
@@ -568,8 +610,7 @@ pub fn delete_entry(
 /// executes the deletion unconditionally when this is called.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn delete_whole_vault(path: &Path) -> Result<(), String> {
-    std::fs::remove_file(path)
-        .map_err(|e| format!("Failed to delete vault: {e}"))
+    std::fs::remove_file(path).map_err(|e| format!("Failed to delete vault: {e}"))
 }
 
 /// Return all entries from the vault, optionally masking sensitive values.
@@ -578,10 +619,7 @@ pub fn delete_whole_vault(path: &Path) -> Result<(), String> {
 /// `MASKED_VALUE` — a fixed-length placeholder that deliberately reveals
 /// nothing about the actual value's length.
 #[flutter_rust_bridge::frb(ignore)]
-pub fn list_entries(
-    entries: &[VaultEntry],
-    masked: bool,
-) -> Vec<VaultEntry> {
+pub fn list_entries(entries: &[VaultEntry], masked: bool) -> Vec<VaultEntry> {
     if !masked {
         return entries.to_vec();
     }
@@ -599,11 +637,16 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
             username: e.username.clone(),
             password: MASKED_VALUE.to_string(),
             notes: e.notes.clone(),
-            custom_fields: e.custom_fields
+            custom_fields: e
+                .custom_fields
                 .iter()
                 .map(|f| CustomField {
                     label: f.label.clone(),
-                    value: if f.hidden { MASKED_VALUE.to_string() } else { f.value.clone() },
+                    value: if f.hidden {
+                        MASKED_VALUE.to_string()
+                    } else {
+                        f.value.clone()
+                    },
                     hidden: f.hidden,
                 })
                 .collect(),
@@ -669,7 +712,10 @@ pub fn export_vault(
     export_path: &Path,
 ) -> Result<(), String> {
     // Serialize and encrypt — export carries no folder list (self-contained snapshot)
-    let plaintext = serialize_vault_body(&VaultBody { folders: vec![], entries: entries.to_vec() })?;
+    let plaintext = serialize_vault_body(&VaultBody {
+        folders: vec![],
+        entries: entries.to_vec(),
+    })?;
     let sealed = seal_vault(passphrase, &plaintext)?;
     let vault_bytes = sealed.to_bytes();
 
@@ -681,17 +727,21 @@ pub fn export_vault(
     let mut hasher = Sha256::new();
     hasher.update(&vault_bytes);
     let hash_bytes: [u8; 32] = hasher.finalize().into();
-    let hash_hex = format!("{}  {}\n",
-        hash_bytes.iter().map(|b| format!("{:02x}", b)).collect::<String>(),
-        export_path.file_name()
+    let hash_hex = format!(
+        "{}  {}\n",
+        hash_bytes
+            .iter()
+            .map(|b| format!("{:02x}", b))
+            .collect::<String>(),
+        export_path
+            .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("vault.gabbro")
     );
 
     // Write the .sha256 companion file
     let hash_path = export_path.with_extension("gabbro.sha256");
-    std::fs::write(&hash_path, hash_hex)
-        .map_err(|e| format!("Failed to write hash file: {e}"))?;
+    std::fs::write(&hash_path, hash_hex).map_err(|e| format!("Failed to write hash file: {e}"))?;
 
     Ok(())
 }
@@ -703,11 +753,7 @@ pub fn export_vault(
 /// This is the top-level save operation Flutter will call.
 /// Entries → JSON → AES-256-GCM encrypted → .gabbro file on disk.
 #[flutter_rust_bridge::frb(ignore)]
-pub fn save_vault(
-    body: &VaultBody,
-    passphrase: &[u8],
-    path: &Path,
-) -> Result<(), String> {
+pub fn save_vault(body: &VaultBody, passphrase: &[u8], path: &Path) -> Result<(), String> {
     let plaintext = serialize_vault_body(body)?;
     let sealed = seal_vault(passphrase, &plaintext)?;
     write_vault(&sealed, path)
@@ -718,12 +764,43 @@ pub fn save_vault(
 /// This is the top-level load operation Flutter will call.
 /// .gabbro file → AES-256-GCM decrypt → JSON → VaultBody.
 #[flutter_rust_bridge::frb(ignore)]
-pub fn load_vault(
+pub fn load_vault(passphrase: &[u8], path: &Path) -> Result<VaultBody, String> {
+    let sealed = read_vault(path)?;
+    let plaintext = open_vault(passphrase, &sealed)?;
+    deserialize_vault_body(&plaintext)
+}
+
+/// Serialize, encrypt with YubiKey, and write a vault to disk.
+#[flutter_rust_bridge::frb(ignore)]
+pub fn save_vault_with_yubikey(
+    body: &VaultBody,
     passphrase: &[u8],
+    hmac_secret: &[u8; 32],
+    credential_id: Vec<u8>,
+    yubikey_salt: [u8; 32],
+    path: &Path,
+) -> Result<(), String> {
+    let plaintext = serialize_vault_body(body)?;
+    let sealed = seal_vault_with_yubikey(
+        passphrase,
+        hmac_secret,
+        credential_id,
+        yubikey_salt,
+        &plaintext,
+    )?;
+    write_vault(&sealed, path)
+}
+
+/// Read, decrypt with YubiKey, and deserialize a vault from disk.
+#[flutter_rust_bridge::frb(ignore)]
+pub fn load_vault_with_yubikey(
+    passphrase: &[u8],
+    hmac_secret: &[u8; 32],
+    yubikey_salt: &[u8; 32],
     path: &Path,
 ) -> Result<VaultBody, String> {
     let sealed = read_vault(path)?;
-    let plaintext = open_vault(passphrase, &sealed)?;
+    let plaintext = open_vault_with_yubikey(passphrase, hmac_secret, yubikey_salt, &sealed)?;
     deserialize_vault_body(&plaintext)
 }
 
@@ -745,21 +822,41 @@ pub fn chrono_now() -> String {
     let hour = (s / 3600) % 24;
     let days = s / 86400; // days since 1970-01-01
     let (year, month, day) = days_to_ymd(days);
-    format!("{:04}-{:02}-{:02}T{:02}:{:02}:{:02}Z", year, month, day, hour, min, sec)
+    format!(
+        "{:04}-{:02}-{:02}T{:02}:{:02}:{:02}Z",
+        year, month, day, hour, min, sec
+    )
 }
 
 fn days_to_ymd(mut days: u64) -> (u64, u64, u64) {
     let mut year = 1970u64;
     loop {
         let days_in_year = if is_leap(year) { 366 } else { 365 };
-        if days < days_in_year { break; }
+        if days < days_in_year {
+            break;
+        }
         days -= days_in_year;
         year += 1;
     }
-    let months = [31, if is_leap(year) { 29 } else { 28 }, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let months = [
+        31,
+        if is_leap(year) { 29 } else { 28 },
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31,
+    ];
     let mut month = 1u64;
     for &m in &months {
-        if days < m { break; }
+        if days < m {
+            break;
+        }
         days -= m;
         month += 1;
     }
@@ -780,9 +877,9 @@ pub(crate) fn is_expired(expires_at: Option<&str>) -> bool {
         Some(s) if s.len() >= 10 => s,
         _ => return false,
     };
-    let year:  u64 = ts[0..4].parse().unwrap_or(9999);
+    let year: u64 = ts[0..4].parse().unwrap_or(9999);
     let month: u64 = ts[5..7].parse().unwrap_or(12);
-    let day:   u64 = ts[8..10].parse().unwrap_or(31);
+    let day: u64 = ts[8..10].parse().unwrap_or(31);
     let expires_days = days_from_ymd(year, month, day);
     let now_secs = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -802,18 +899,27 @@ pub(crate) fn purge_expired_history(entries: &mut Vec<VaultEntry>) {
     for entry in entries.iter_mut() {
         match entry {
             VaultEntry::Login(ref mut e) => {
-                if is_expired(e.previous_password.as_ref()
-                    .and_then(|p| p.expires_at.as_deref())) {
+                if is_expired(
+                    e.previous_password
+                        .as_ref()
+                        .and_then(|p| p.expires_at.as_deref()),
+                ) {
                     e.previous_password = None;
                 }
             }
             VaultEntry::Card(ref mut e) => {
-                if is_expired(e.previous_cvv.as_ref()
-                    .and_then(|p| p.expires_at.as_deref())) {
+                if is_expired(
+                    e.previous_cvv
+                        .as_ref()
+                        .and_then(|p| p.expires_at.as_deref()),
+                ) {
                     e.previous_cvv = None;
                 }
-                if is_expired(e.previous_pin.as_ref()
-                    .and_then(|p| p.expires_at.as_deref())) {
+                if is_expired(
+                    e.previous_pin
+                        .as_ref()
+                        .and_then(|p| p.expires_at.as_deref()),
+                ) {
                     e.previous_pin = None;
                 }
             }
@@ -891,7 +997,6 @@ mod tests {
         assert!(entry.notes.is_some());
         assert_eq!(entry.custom_fields.len(), 1);
         assert_eq!(entry.custom_fields[0].label, "Recovery email");
-
     }
 
     #[test]
@@ -916,7 +1021,6 @@ mod tests {
         assert_eq!(entry.title, "Shopping list");
         assert_eq!(entry.content, "Milk, eggs, bread");
         assert_eq!(entry.folder, "Personal");
-
     }
 
     #[test]
@@ -1037,18 +1141,8 @@ mod tests {
 
     #[test]
     fn create_file_entry_generates_unique_ids() {
-        let a = create_file_entry(
-            String::from("Work"),
-            String::from("a.pdf"),
-            vec![],
-            None,
-        );
-        let b = create_file_entry(
-            String::from("Work"),
-            String::from("b.pdf"),
-            vec![],
-            None,
-        );
+        let a = create_file_entry(String::from("Work"), String::from("a.pdf"), vec![], None);
+        let b = create_file_entry(String::from("Work"), String::from("b.pdf"), vec![], None);
         assert_ne!(a.id, b.id);
     }
 
@@ -1097,22 +1191,28 @@ mod tests {
         let mut path = temp_dir();
         path.push("gabbro_api_test.gabbro");
 
-        let entries = vec![
-            VaultEntry::Note(NoteEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("Test note"),
-                content: String::from("secret content"),
-                attachments: vec![],
-            }),
-        ];
+        let entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("Test note"),
+            content: String::from("secret content"),
+            attachments: vec![],
+        })];
 
         let passphrase = b"correct horst battery staple";
-        save_vault(&VaultBody { folders: vec![], entries: entries.clone() }, passphrase, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: entries.clone(),
+            },
+            passphrase,
+            &path,
+        )
+        .unwrap();
         let recovered = load_vault(passphrase, &path).unwrap();
 
         assert_eq!(recovered.entries.len(), 1);
@@ -1132,7 +1232,15 @@ mod tests {
         path.push("gabbro_api_wrong_pass_test.gabbro");
 
         let entries: Vec<VaultEntry> = vec![];
-        save_vault(&VaultBody { folders: vec![], entries }, b"correct passphrase", &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries,
+            },
+            b"correct passphrase",
+            &path,
+        )
+        .unwrap();
         let result = load_vault(b"wrong passphrase", &path);
 
         let _ = std::fs::remove_file(&path);
@@ -1179,19 +1287,17 @@ mod tests {
     fn get_entry_by_id_missing_returns_error() {
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
 
-        let entries = vec![
-            VaultEntry::Note(NoteEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("A note"),
-                content: String::from("some content"),
-                attachments: vec![],
-            }),
-        ];
+        let entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("A note"),
+            content: String::from("some content"),
+            attachments: vec![],
+        })];
 
         assert!(get_entry_by_id(&entries, "does-not-exist").is_err());
     }
@@ -1200,19 +1306,17 @@ mod tests {
     fn update_entry_replaces_correct_entry() {
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
 
-        let mut entries = vec![
-            VaultEntry::Note(NoteEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("Original title"),
-                content: String::from("original content"),
-                attachments: vec![],
-            }),
-        ];
+        let mut entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("Original title"),
+            content: String::from("original content"),
+            attachments: vec![],
+        })];
 
         let updated = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -1241,19 +1345,17 @@ mod tests {
     fn update_entry_stamps_updated_at() {
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
 
-        let mut entries = vec![
-            VaultEntry::Note(NoteEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("Note"),
-                content: String::from("content"),
-                attachments: vec![],
-            }),
-        ];
+        let mut entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("Note"),
+            content: String::from("content"),
+            attachments: vec![],
+        })];
 
         let updated = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -1278,19 +1380,17 @@ mod tests {
     fn update_entry_missing_id_returns_error() {
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
 
-        let mut entries = vec![
-            VaultEntry::Note(NoteEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("Note"),
-                content: String::from("content"),
-                attachments: vec![],
-            }),
-        ];
+        let mut entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("Note"),
+            content: String::from("content"),
+            attachments: vec![],
+        })];
 
         let ghost = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -1348,19 +1448,17 @@ mod tests {
     fn delete_entry_missing_id_returns_error() {
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
 
-        let mut entries = vec![
-            VaultEntry::Note(NoteEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("A note"),
-                content: String::from("some content"),
-                attachments: vec![],
-            }),
-        ];
+        let mut entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("A note"),
+            content: String::from("some content"),
+            attachments: vec![],
+        })];
 
         assert!(delete_entry(&mut entries, "does-not-exist").is_err());
     }
@@ -1390,24 +1488,22 @@ mod tests {
     fn list_entries_unmasked_returns_plaintext() {
         use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
 
-        let entries = vec![
-            VaultEntry::Login(LoginEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("Example"),
-                url: String::from("https://example.com"),
-                username: String::from("rob"),
-                password: String::from("s3cr3t"),
-                notes: None,
-                custom_fields: vec![],
-                attachments: vec![],
-                previous_password: None,
-            }),
-        ];
+        let entries = vec![VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("rob"),
+            password: String::from("s3cr3t"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        })];
 
         let result = list_entries(&entries, false);
         match &result[0] {
@@ -1420,24 +1516,22 @@ mod tests {
     fn list_entries_masked_hides_password() {
         use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
 
-        let entries = vec![
-            VaultEntry::Login(LoginEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("Example"),
-                url: String::from("https://example.com"),
-                username: String::from("rob"),
-                password: String::from("correct horst battery staple"),
-                notes: None,
-                custom_fields: vec![],
-                attachments: vec![],
-                previous_password: None,
-            }),
-        ];
+        let entries = vec![VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("rob"),
+            password: String::from("correct horst battery staple"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        })];
 
         let result = list_entries(&entries, true);
         match &result[0] {
@@ -1453,33 +1547,31 @@ mod tests {
     fn list_entries_masked_hides_cvv() {
         use crate::vault::entry::{CardEntry, EntryMeta, VaultEntry};
 
-        let entries = vec![
-            VaultEntry::Card(CardEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                card_name: Some(String::from("Visa Platinum")),
-                status: String::from("active"),
-                cardholder_name: String::from("Rob Smith"),
-                card_number: String::from("4111111111111111"),
-                expiry: String::from("12/28"),
-                cvv: String::from("123"),
-                credit_limit: None,
-                card_account_number: None,
-                payment_network: Some(String::from("Visa")),
-                pin: None,
-                bank_name: None,
-                transaction_password: None,
-                notes: None,
-                custom_fields: vec![],
-                attachments: vec![],
-                previous_cvv: None,
-                previous_pin: None,
-            }),
-        ];
+        let entries = vec![VaultEntry::Card(CardEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            card_name: Some(String::from("Visa Platinum")),
+            status: String::from("active"),
+            cardholder_name: String::from("Rob Smith"),
+            card_number: String::from("4111111111111111"),
+            expiry: String::from("12/28"),
+            cvv: String::from("123"),
+            credit_limit: None,
+            card_account_number: None,
+            payment_network: Some(String::from("Visa")),
+            pin: None,
+            bank_name: None,
+            transaction_password: None,
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_cvv: None,
+            previous_pin: None,
+        })];
 
         let result = list_entries(&entries, true);
         match &result[0] {
@@ -1495,41 +1587,39 @@ mod tests {
     fn list_entries_masked_hides_hidden_custom_fields() {
         use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
 
-        let entries = vec![
-            VaultEntry::Login(LoginEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
+        let entries = vec![VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("rob"),
+            password: String::from("s3cr3t"),
+            notes: None,
+            custom_fields: vec![
+                CustomField {
+                    label: String::from("API key"),
+                    value: String::from("sk-abc123"),
+                    hidden: true,
                 },
-                title: String::from("Example"),
-                url: String::from("https://example.com"),
-                username: String::from("rob"),
-                password: String::from("s3cr3t"),
-                notes: None,
-                custom_fields: vec![
-                    CustomField {
-                        label: String::from("API key"),
-                        value: String::from("sk-abc123"),
-                        hidden: true,
-                    },
-                    CustomField {
-                        label: String::from("Region"),
-                        value: String::from("eu-west-1"),
-                        hidden: false,
-                    },
-                ],
-                attachments: vec![],
-                previous_password: None,
-            }),
-        ];
+                CustomField {
+                    label: String::from("Region"),
+                    value: String::from("eu-west-1"),
+                    hidden: false,
+                },
+            ],
+            attachments: vec![],
+            previous_password: None,
+        })];
 
         let result = list_entries(&entries, true);
         match &result[0] {
             VaultEntry::Login(e) => {
                 assert_eq!(e.custom_fields[0].value, MASKED_VALUE); // hidden
-                assert_eq!(e.custom_fields[1].value, "eu-west-1");  // not hidden
+                assert_eq!(e.custom_fields[1].value, "eu-west-1"); // not hidden
             }
             _ => panic!("Expected Login variant"),
         }
@@ -1574,7 +1664,10 @@ mod tests {
         match &entries[0] {
             VaultEntry::Login(e) => {
                 assert_eq!(e.password, "new_password");
-                let prev = e.previous_password.as_ref().expect("previous_password should be set");
+                let prev = e
+                    .previous_password
+                    .as_ref()
+                    .expect("previous_password should be set");
                 assert_eq!(prev.value, "old_password");
                 assert!(prev.expires_at.is_some());
             }
@@ -1621,7 +1714,10 @@ mod tests {
         match &entries[0] {
             VaultEntry::Login(e) => {
                 assert_eq!(e.password, "new_password");
-                let prev = e.previous_password.as_ref().expect("previous_password should be set");
+                let prev = e
+                    .previous_password
+                    .as_ref()
+                    .expect("previous_password should be set");
                 assert_eq!(prev.value, "old_password");
                 assert!(prev.expires_at.is_none());
             }
@@ -1674,7 +1770,10 @@ mod tests {
             VaultEntry::Login(e) => {
                 assert_eq!(e.title, "GitHub — updated title");
                 // password unchanged — existing history must be preserved as-is
-                let prev = e.previous_password.as_ref().expect("history should be preserved");
+                let prev = e
+                    .previous_password
+                    .as_ref()
+                    .expect("history should be preserved");
                 assert_eq!(prev.value, "even_older");
             }
             _ => panic!("Expected Login variant"),
@@ -1685,19 +1784,17 @@ mod tests {
     fn list_entries_masked_does_not_alter_note() {
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
 
-        let entries = vec![
-            VaultEntry::Note(NoteEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("My note"),
-                content: String::from("sensitive note content"),
-                attachments: vec![],
-            }),
-        ];
+        let entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("My note"),
+            content: String::from("sensitive note content"),
+            attachments: vec![],
+        })];
 
         let result = list_entries(&entries, true);
         match &result[0] {
@@ -1714,24 +1811,30 @@ mod tests {
         let mut path = temp_dir();
         path.push("gabbro_change_pass_test.gabbro");
 
-        let entries = vec![
-            VaultEntry::Note(NoteEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("Test note"),
-                content: String::from("secret content"),
-                attachments: vec![],
-            }),
-        ];
+        let entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("Test note"),
+            content: String::from("secret content"),
+            attachments: vec![],
+        })];
 
         let old = b"old passphrase";
         let new = b"new passphrase";
 
-        save_vault(&VaultBody { folders: vec![], entries }, old, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries,
+            },
+            old,
+            &path,
+        )
+        .unwrap();
         change_passphrase(&path, old, new).unwrap();
 
         // Old passphrase must no longer work
@@ -1768,7 +1871,6 @@ mod tests {
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Work"),
-
                 },
                 title: String::from("Test note"),
                 content: String::from("secret content"),
@@ -1816,19 +1918,17 @@ mod tests {
         path.push("gabbro_export_test.gabbro");
         let hash_path = path.with_extension("gabbro.sha256");
 
-        let entries = vec![
-            VaultEntry::Note(NoteEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("Export test"),
-                content: String::from("exported content"),
-                attachments: vec![],
-            }),
-        ];
+        let entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("Export test"),
+            content: String::from("exported content"),
+            attachments: vec![],
+        })];
 
         export_vault(&entries, b"correct horst battery staple", &path).unwrap();
 
@@ -1867,19 +1967,17 @@ mod tests {
         path.push("gabbro_export_reload_test.gabbro");
         let hash_path = path.with_extension("gabbro.sha256");
 
-        let entries = vec![
-            VaultEntry::Note(NoteEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("Reload test"),
-                content: String::from("reloaded content"),
-                attachments: vec![],
-            }),
-        ];
+        let entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("Reload test"),
+            content: String::from("reloaded content"),
+            attachments: vec![],
+        })];
 
         let passphrase = b"correct horst battery staple";
         export_vault(&entries, passphrase, &path).unwrap();

@@ -60,9 +60,14 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
             username: e.username.clone(),
             password: e.password.clone(),
             notes: e.notes.clone(),
-            custom_fields: e.custom_fields
+            custom_fields: e
+                .custom_fields
                 .iter()
-                .map(|f| CustomFieldData { label: f.label.clone(), value: f.value.clone(), hidden: f.hidden })
+                .map(|f| CustomFieldData {
+                    label: f.label.clone(),
+                    value: f.value.clone(),
+                    hidden: f.hidden,
+                })
                 .collect(),
             previous_password: e.previous_password.as_ref().map(|p| PreviousSecretData {
                 value: p.value.clone(),
@@ -88,9 +93,14 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
             email: e.email.clone(),
             phone: e.phone.clone(),
             address: e.address.clone(),
-            custom_fields: e.custom_fields
+            custom_fields: e
+                .custom_fields
                 .iter()
-                .map(|f| CustomFieldData { label: f.label.clone(), value: f.value.clone(), hidden: f.hidden })
+                .map(|f| CustomFieldData {
+                    label: f.label.clone(),
+                    value: f.value.clone(),
+                    hidden: f.hidden,
+                })
                 .collect(),
         }),
         VaultEntry::Card(e) => VaultEntryData::Card(CardEntryData {
@@ -111,11 +121,15 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
             bank_name: e.bank_name.clone(),
             transaction_password: e.transaction_password.clone(),
             notes: e.notes.clone(),
-            custom_fields: e.custom_fields.iter().map(|f| CustomFieldData {
-                label: f.label.clone(),
-                value: f.value.clone(),
-                hidden: f.hidden,
-            }).collect(),
+            custom_fields: e
+                .custom_fields
+                .iter()
+                .map(|f| CustomFieldData {
+                    label: f.label.clone(),
+                    value: f.value.clone(),
+                    hidden: f.hidden,
+                })
+                .collect(),
             previous_cvv: e.previous_cvv.as_ref().map(|p| PreviousSecretData {
                 value: crate::api::vault::MASKED_VALUE.to_string(),
                 saved_at: p.saved_at.clone(),
@@ -142,9 +156,14 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
             updated_at: e.meta.updated_at.clone(),
             folder: e.meta.folder.clone(),
             title: e.title.clone(),
-            fields: e.fields
+            fields: e
+                .fields
                 .values()
-                .map(|f| CustomFieldData { label: f.label.clone(), value: f.value.clone(), hidden: f.hidden })
+                .map(|f| CustomFieldData {
+                    label: f.label.clone(),
+                    value: f.value.clone(),
+                    hidden: f.hidden,
+                })
                 .collect(),
         }),
     }
@@ -166,16 +185,23 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
             username: d.username,
             password: d.password,
             notes: d.notes,
-            custom_fields: d.custom_fields
+            custom_fields: d
+                .custom_fields
                 .into_iter()
-                .map(|f| CustomField { label: f.label, value: f.value, hidden: f.hidden })
+                .map(|f| CustomField {
+                    label: f.label,
+                    value: f.value,
+                    hidden: f.hidden,
+                })
                 .collect(),
             attachments: vec![],
-            previous_password: d.previous_password.map(|p| crate::vault::entry::PreviousSecret {
-                value: p.value,
-                saved_at: p.saved_at,
-                expires_at: p.expires_at,
-            }),
+            previous_password: d
+                .previous_password
+                .map(|p| crate::vault::entry::PreviousSecret {
+                    value: p.value,
+                    saved_at: p.saved_at,
+                    expires_at: p.expires_at,
+                }),
         })),
         VaultEntryData::Note(d) => Ok(VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -200,9 +226,14 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
             email: d.email,
             phone: d.phone,
             address: d.address,
-            custom_fields: d.custom_fields
+            custom_fields: d
+                .custom_fields
                 .into_iter()
-                .map(|f| CustomField { label: f.label, value: f.value, hidden: f.hidden })
+                .map(|f| CustomField {
+                    label: f.label,
+                    value: f.value,
+                    hidden: f.hidden,
+                })
                 .collect(),
             attachments: vec![],
         })),
@@ -254,9 +285,19 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 folder: d.folder,
             },
             title: d.title,
-            fields: d.fields
+            fields: d
+                .fields
                 .into_iter()
-                .map(|f| (f.label.clone(), CustomField { label: f.label, value: f.value, hidden: f.hidden }))
+                .map(|f| {
+                    (
+                        f.label.clone(),
+                        CustomField {
+                            label: f.label,
+                            value: f.value,
+                            hidden: f.hidden,
+                        },
+                    )
+                })
                 .collect(),
             attachments: vec![],
         })),
@@ -336,20 +377,44 @@ pub fn get_entry(id: String) -> Result<VaultEntryData, String> {
 ///
 /// Async — triggers a full vault save (Argon2id + encryption).
 pub async fn create_entry(entry: VaultEntryData) -> Result<EntrySummaryData, String> {
-    use uuid::Uuid;
     use crate::api::vault::chrono_now;
+    use uuid::Uuid;
     let mut internal = vault_entry_from_data(entry)?;
     let now = chrono_now();
     let id = Uuid::new_v4().to_string();
     // `ref mut e` borrows the inner value rather than moving it — required
     // because VaultEntry now implements Drop via ZeroizeOnDrop.
     match &mut internal {
-        VaultEntry::Login(ref mut e)    => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; }
-        VaultEntry::Note(ref mut e)     => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; }
-        VaultEntry::Identity(ref mut e) => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; }
-        VaultEntry::Card(ref mut e)     => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; }
-        VaultEntry::File(ref mut e)     => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; }
-        VaultEntry::Custom(ref mut e)   => { e.meta.id = id; e.meta.created_at = now.clone(); e.meta.updated_at = now; }
+        VaultEntry::Login(ref mut e) => {
+            e.meta.id = id;
+            e.meta.created_at = now.clone();
+            e.meta.updated_at = now;
+        }
+        VaultEntry::Note(ref mut e) => {
+            e.meta.id = id;
+            e.meta.created_at = now.clone();
+            e.meta.updated_at = now;
+        }
+        VaultEntry::Identity(ref mut e) => {
+            e.meta.id = id;
+            e.meta.created_at = now.clone();
+            e.meta.updated_at = now;
+        }
+        VaultEntry::Card(ref mut e) => {
+            e.meta.id = id;
+            e.meta.created_at = now.clone();
+            e.meta.updated_at = now;
+        }
+        VaultEntry::File(ref mut e) => {
+            e.meta.id = id;
+            e.meta.created_at = now.clone();
+            e.meta.updated_at = now;
+        }
+        VaultEntry::Custom(ref mut e) => {
+            e.meta.id = id;
+            e.meta.created_at = now.clone();
+            e.meta.updated_at = now;
+        }
     }
     session::session_create_entry(internal)
 }
@@ -427,6 +492,61 @@ pub async fn export_vault(path: String) -> Result<(), String> {
     session::session_export_vault(PathBuf::from(path))
 }
 
+/// YubiKey credential record returned by `list_vault_yubikey_records`.
+///
+/// The Android layer uses `credential_id` to identify which YubiKey credential
+/// to present, and `salt` as the CTAP2 hmac-secret challenge salt.
+pub struct YubikeyRecordData {
+    pub credential_id: Vec<u8>,
+    pub salt: Vec<u8>,
+}
+
+/// Read the vault header at `path` and return any YubiKey records it contains.
+///
+/// Does **not** decrypt the vault body — safe to call before the user enters
+/// their passphrase. Returns an empty list for passphrase-only vaults.
+/// Sync — file I/O + header parse, no crypto.
+#[flutter_rust_bridge::frb(sync)]
+pub fn list_vault_yubikey_records(path: String) -> Result<Vec<YubikeyRecordData>, String> {
+    use crate::vault::io::read_vault;
+    let sealed = read_vault(&PathBuf::from(path))?;
+    Ok(sealed
+        .yubikey_records
+        .into_iter()
+        .map(|r| YubikeyRecordData {
+            credential_id: r.credential_id,
+            salt: r.salt.to_vec(),
+        })
+        .collect())
+}
+
+/// Decrypt the vault at `path` using both passphrase and YubiKey hmac-secret.
+///
+/// `hmac_secret` must be exactly 32 bytes (FIDO2 hmac-secret output).
+/// `hkdf_salt` must be exactly 32 bytes (from `YubikeyRecordData.salt`).
+/// Async — Argon2id takes ~667ms on target hardware.
+pub async fn unlock_vault_with_yubikey(
+    passphrase: Vec<u8>,
+    hmac_secret: Vec<u8>,
+    credential_id: Vec<u8>,
+    hkdf_salt: Vec<u8>,
+    path: String,
+) -> Result<(), String> {
+    let secret: [u8; 32] = hmac_secret
+        .try_into()
+        .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
+    let salt: [u8; 32] = hkdf_salt
+        .try_into()
+        .map_err(|_| "hkdf_salt must be exactly 32 bytes".to_string())?;
+    session::unlock_vault_with_yubikey(
+        &passphrase,
+        &secret,
+        credential_id,
+        &salt,
+        PathBuf::from(path),
+    )
+}
+
 /// Create a new empty vault at `path`, sealed with `passphrase`.
 ///
 /// Called during onboarding. Async — runs Argon2id + encryption.
@@ -439,13 +559,46 @@ pub async fn init_vault(passphrase: Vec<u8>, path: String) -> Result<(), String>
     session::unlock_vault(&passphrase, vault_path)
 }
 
+/// Create a new empty vault at `path`, sealed with both passphrase and YubiKey.
+///
+/// Called during onboarding when the user opts in to YubiKey protection.
+/// After creation, unlocks into session immediately.
+/// `hmac_secret` must be exactly 32 bytes. `hkdf_salt` must be exactly 32 bytes.
+/// Async — runs Argon2id + encryption.
+pub async fn init_vault_with_yubikey(
+    passphrase: Vec<u8>,
+    hmac_secret: Vec<u8>,
+    credential_id: Vec<u8>,
+    hkdf_salt: Vec<u8>,
+    path: String,
+) -> Result<(), String> {
+    use crate::api::vault::save_vault_with_yubikey;
+    use crate::vault::serialization::VaultBody;
+    let secret: [u8; 32] = hmac_secret
+        .try_into()
+        .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
+    let salt: [u8; 32] = hkdf_salt
+        .try_into()
+        .map_err(|_| "hkdf_salt must be exactly 32 bytes".to_string())?;
+    let vault_path = PathBuf::from(&path);
+    save_vault_with_yubikey(
+        &VaultBody::empty(),
+        &passphrase,
+        &secret,
+        credential_id.clone(),
+        salt,
+        &vault_path,
+    )?;
+    session::unlock_vault_with_yubikey(&passphrase, &secret, credential_id, &salt, vault_path)
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serial_test::serial;
     use crate::vault::serialization::VaultBody;
+    use serial_test::serial;
 
     fn run<F: std::future::Future>(f: F) -> F::Output {
         tokio::runtime::Runtime::new().unwrap().block_on(f)
@@ -454,9 +607,9 @@ mod tests {
     #[test]
     #[serial]
     fn unlock_lock_roundtrip() {
-        use std::env::temp_dir;
-        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
         use crate::api::vault::save_vault;
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        use std::env::temp_dir;
 
         let mut path = temp_dir();
         path.push("gabbro_bridge_v2_test.gabbro");
@@ -473,9 +626,21 @@ mod tests {
             content: String::from("bridge v2 content"),
             attachments: vec![],
         })];
-        save_vault(&VaultBody { folders: vec![], entries }, pass, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries,
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
 
-        run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
         let summaries = list_entry_summaries().unwrap();
         assert_eq!(summaries.len(), 1);
         assert_eq!(summaries[0].entry_type, "Note");
@@ -495,19 +660,28 @@ mod tests {
     #[test]
     #[serial]
     fn list_folders_returns_folders_via_bridge() {
-        use std::env::temp_dir;
         use crate::api::vault::save_vault;
+        use std::env::temp_dir;
 
         let mut path = temp_dir();
         path.push("gabbro_bridge_list_folders_test.gabbro");
         let pass = b"bridge-folder-test";
-        let folders = vec![
-            String::from("Work"),
-            String::from("Private"),
-        ];
+        let folders = vec![String::from("Work"), String::from("Private")];
 
-        save_vault(&VaultBody { folders: folders.clone(), entries: vec![] }, pass, &path).unwrap();
-        run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: folders.clone(),
+                entries: vec![],
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
 
         let result = list_folders().unwrap();
         assert_eq!(result, folders);
@@ -519,15 +693,27 @@ mod tests {
     #[test]
     #[serial]
     fn create_folder_adds_folder_via_bridge() {
-        use std::env::temp_dir;
         use crate::api::vault::save_vault;
+        use std::env::temp_dir;
 
         let mut path = temp_dir();
         path.push("gabbro_bridge_create_folder_test.gabbro");
         let pass = b"bridge-folder-test";
 
-        save_vault(&VaultBody { folders: vec![String::from("Work")], entries: vec![] }, pass, &path).unwrap();
-        run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![String::from("Work")],
+                entries: vec![],
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
 
         run(create_folder(String::from("Private"))).unwrap();
 
@@ -542,21 +728,39 @@ mod tests {
     #[test]
     #[serial]
     fn rename_folder_updates_name_via_bridge() {
-        use std::env::temp_dir;
         use crate::api::vault::save_vault;
+        use std::env::temp_dir;
 
         let mut path = temp_dir();
         path.push("gabbro_bridge_rename_folder_test.gabbro");
         let pass = b"bridge-folder-test";
 
-        save_vault(&VaultBody { folders: vec![String::from("Work")], entries: vec![] }, pass, &path).unwrap();
-        run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![String::from("Work")],
+                entries: vec![],
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
 
         run(rename_folder(String::from("Work"), String::from("Career"))).unwrap();
 
         let folders = list_folders().unwrap();
-        assert!(folders.contains(&String::from("Career")), "new name must appear");
-        assert!(!folders.contains(&String::from("Work")), "old name must be gone");
+        assert!(
+            folders.contains(&String::from("Career")),
+            "new name must appear"
+        );
+        assert!(
+            !folders.contains(&String::from("Work")),
+            "old name must be gone"
+        );
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
@@ -565,25 +769,39 @@ mod tests {
     #[test]
     #[serial]
     fn delete_folder_removes_folder_via_bridge() {
-        use std::env::temp_dir;
         use crate::api::vault::save_vault;
+        use std::env::temp_dir;
 
         let mut path = temp_dir();
         path.push("gabbro_bridge_delete_folder_test.gabbro");
         let pass = b"bridge-folder-test";
 
         save_vault(
-            &VaultBody { folders: vec![String::from("Work"), String::from("Private")], entries: vec![] },
+            &VaultBody {
+                folders: vec![String::from("Work"), String::from("Private")],
+                entries: vec![],
+            },
             pass,
             &path,
-        ).unwrap();
-        run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
+        )
+        .unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
 
         run(delete_folder(String::from("Work"), None)).unwrap();
 
         let folders = list_folders().unwrap();
-        assert!(!folders.contains(&String::from("Work")), "deleted folder must be gone");
-        assert!(folders.contains(&String::from("Private")), "other folders must remain");
+        assert!(
+            !folders.contains(&String::from("Work")),
+            "deleted folder must be gone"
+        );
+        assert!(
+            folders.contains(&String::from("Private")),
+            "other folders must remain"
+        );
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
@@ -592,9 +810,9 @@ mod tests {
     #[test]
     #[serial]
     fn assign_folder_to_entries_via_bridge() {
-        use std::env::temp_dir;
-        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
         use crate::api::vault::save_vault;
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+        use std::env::temp_dir;
 
         let mut path = temp_dir();
         path.push("gabbro_bridge_assign_folder_test.gabbro");
@@ -618,21 +836,31 @@ mod tests {
         })];
 
         save_vault(
-            &VaultBody { folders: vec![String::from("Work")], entries },
+            &VaultBody {
+                folders: vec![String::from("Work")],
+                entries,
+            },
             pass,
             &path,
-        ).unwrap();
-        run(unlock_vault(pass.to_vec(), path.to_str().unwrap().to_string())).unwrap();
+        )
+        .unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
 
         run(assign_folder_to_entries(
             vec![String::from("id-001")],
             String::from("Work"),
-        )).unwrap();
+        ))
+        .unwrap();
 
         let entry = get_entry(String::from("id-001")).unwrap();
         match entry {
-            VaultEntryData::Login(e) => assert_eq!(e.folder, "Work",
-                "entry folder must be updated via bridge"),
+            VaultEntryData::Login(e) => {
+                assert_eq!(e.folder, "Work", "entry folder must be updated via bridge")
+            }
             _ => panic!("expected Login"),
         }
 
@@ -643,8 +871,8 @@ mod tests {
     #[test]
     #[ignore]
     fn create_test_vault_on_disk() {
-        use crate::vault::entry::{EntryMeta, NoteEntry, LoginEntry, VaultEntry};
         use crate::api::vault::save_vault;
+        use crate::vault::entry::{EntryMeta, LoginEntry, NoteEntry, VaultEntry};
         use std::path::PathBuf;
 
         let path = PathBuf::from("/tmp/gabbro_dev.gabbro");
@@ -680,7 +908,142 @@ mod tests {
             }),
         ];
 
-        save_vault(&VaultBody { folders: vec![], entries }, pass, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries,
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
         println!("Test vault written to {:?}", path);
+    }
+
+    // ── YubiKey bridge tests ──────────────────────────────────────────────────
+
+    #[test]
+    #[serial]
+    fn list_yubikey_records_empty_for_passphrase_only_vault() {
+        use crate::api::vault::save_vault;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_yubikey_list_empty_test.gabbro");
+        let pass = b"passphrase-only";
+
+        save_vault(&VaultBody::empty(), pass, &path).unwrap();
+        let records = list_vault_yubikey_records(path.to_str().unwrap().to_string()).unwrap();
+        assert!(
+            records.is_empty(),
+            "passphrase-only vault must have no YubiKey records"
+        );
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn list_yubikey_records_returns_record_for_yubikey_vault() {
+        use crate::api::vault::save_vault_with_yubikey;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_yubikey_list_record_test.gabbro");
+        let pass = b"test-passphrase";
+        let hmac_secret = [0x42u8; 32];
+        let credential_id = vec![0xABu8; 64];
+        let hkdf_salt = [0x11u8; 32];
+
+        save_vault_with_yubikey(
+            &VaultBody::empty(),
+            pass,
+            &hmac_secret,
+            credential_id.clone(),
+            hkdf_salt,
+            &path,
+        )
+        .unwrap();
+
+        let records = list_vault_yubikey_records(path.to_str().unwrap().to_string()).unwrap();
+        assert_eq!(records.len(), 1, "YubiKey vault must have one record");
+        assert_eq!(records[0].credential_id, credential_id);
+        assert_eq!(records[0].salt, hkdf_salt.to_vec());
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn unlock_vault_with_yubikey_via_bridge() {
+        use crate::api::vault::save_vault_with_yubikey;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_yubikey_unlock_test.gabbro");
+        let pass = b"unlock-test-pass";
+        let hmac_secret = [0x77u8; 32];
+        let credential_id = vec![0xCDu8; 48];
+        let hkdf_salt = [0x22u8; 32];
+
+        save_vault_with_yubikey(
+            &VaultBody::empty(),
+            pass,
+            &hmac_secret,
+            credential_id.clone(),
+            hkdf_salt,
+            &path,
+        )
+        .unwrap();
+
+        run(unlock_vault_with_yubikey(
+            pass.to_vec(),
+            hmac_secret.to_vec(),
+            credential_id,
+            hkdf_salt.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        let summaries = list_entry_summaries().unwrap();
+        assert_eq!(summaries.len(), 0, "empty vault must have no entries");
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn init_vault_with_yubikey_creates_and_unlocks() {
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_yubikey_init_test.gabbro");
+        let pass = b"init-yubikey-pass";
+        let hmac_secret = [0x55u8; 32];
+        let credential_id = vec![0xEFu8; 32];
+        let hkdf_salt = [0x33u8; 32];
+
+        run(init_vault_with_yubikey(
+            pass.to_vec(),
+            hmac_secret.to_vec(),
+            credential_id.clone(),
+            hkdf_salt.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        // Session is live after init
+        let summaries = list_entry_summaries().unwrap();
+        assert_eq!(summaries.len(), 0, "fresh vault must be empty");
+
+        lock_vault().unwrap();
+
+        // Vault file must carry the YubiKey record
+        let records = list_vault_yubikey_records(path.to_str().unwrap().to_string()).unwrap();
+        assert_eq!(records.len(), 1, "init must write YubiKey record");
+        assert_eq!(records[0].credential_id, credential_id);
+
+        let _ = std::fs::remove_file(&path);
     }
 }

@@ -3,8 +3,8 @@
 //! All sensitive data lives in Rust. Flutter never constructs
 //! these types directly — it calls API functions that build them.
 
-use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// The six entry types Gabbro support.
@@ -404,7 +404,8 @@ mod tests {
             vec![],
             None,
             None,
-        ).unwrap();
+        )
+        .unwrap();
 
         assert_eq!(entry.cardholder_name, "Rob Smith");
         assert_eq!(entry.expiry, "12/28");
@@ -422,8 +423,17 @@ mod tests {
             String::from("123456"), // 6 digits — minimum for debit cards
             String::from("12/28"),
             String::from("123"),
-            None, None, None, None, None, None, None,
-            vec![], vec![], None, None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            vec![],
+            vec![],
+            None,
+            None,
         );
         assert!(result.is_ok(), "6-digit card number should be accepted");
     }
@@ -460,16 +470,31 @@ mod tests {
             default_meta(),
             None,
             String::from("active"),
-            String::from(""),          // cardholder_name missing
-            String::from("1234"),      // card_number too short
-            String::from(""),          // expiry missing
-            String::from(""),          // cvv missing
-            None, None, None, None, None, None, None,
-            vec![], vec![], None, None,
+            String::from(""),     // cardholder_name missing
+            String::from("1234"), // card_number too short
+            String::from(""),     // expiry missing
+            String::from(""),     // cvv missing
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            vec![],
+            vec![],
+            None,
+            None,
         );
         let err = result.unwrap_err();
-        assert!(err.contains("card number"), "should mention card number: {err}");
-        assert!(err.contains("cardholder name"), "should mention cardholder name: {err}");
+        assert!(
+            err.contains("card number"),
+            "should mention card number: {err}"
+        );
+        assert!(
+            err.contains("cardholder name"),
+            "should mention cardholder name: {err}"
+        );
         assert!(err.contains("expiry"), "should mention expiry: {err}");
     }
 
@@ -483,8 +508,17 @@ mod tests {
             String::from("4111111111111111"),
             String::from("12/28"),
             String::from(""), // empty CVV — should be accepted for debit cards
-            None, None, None, None, None, None, None,
-            vec![], vec![], None, None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            vec![],
+            vec![],
+            None,
+            None,
         );
         assert!(result.is_ok(), "empty CVV should be accepted");
     }
@@ -582,7 +616,10 @@ mod tests {
             previous_password: Some(prev),
         };
         assert!(entry.previous_password.is_some());
-        assert_eq!(entry.previous_password.clone().unwrap().value, "old_hunter2");
+        assert_eq!(
+            entry.previous_password.clone().unwrap().value,
+            "old_hunter2"
+        );
     }
 
     #[test]
@@ -595,17 +632,23 @@ mod tests {
             String::from("4111111111111111"),
             String::from("12/28"),
             String::from("999"),
-            None, None,
+            None,
+            None,
             Some(String::from("Visa")),
-            None, None, None, None,
-            vec![], vec![],
+            None,
+            None,
+            None,
+            None,
+            vec![],
+            vec![],
             Some(PreviousSecret {
                 value: String::from("123"),
                 saved_at: String::from("2025-01-01T00:00:00Z"),
                 expires_at: Some(String::from("2025-01-31T00:00:00Z")),
             }),
             None,
-        ).unwrap();
+        )
+        .unwrap();
         assert!(entry.previous_cvv.is_some());
         assert_eq!(entry.previous_cvv.clone().unwrap().value, "123");
     }
@@ -620,17 +663,23 @@ mod tests {
             String::from("4111111111111111"),
             String::from("12/28"),
             String::from("123"),
-            None, None,
+            None,
+            None,
             Some(String::from("Visa")),
-            None, None, None, None,
-            vec![], vec![],
+            None,
+            None,
+            None,
+            None,
+            vec![],
+            vec![],
             None,
             Some(PreviousSecret {
                 value: String::from("4321"),
                 saved_at: String::from("2025-01-01T00:00:00Z"),
                 expires_at: Some(String::from("2025-01-31T00:00:00Z")),
             }),
-        ).unwrap();
+        )
+        .unwrap();
         assert!(entry.previous_pin.is_some());
         assert_eq!(entry.previous_pin.clone().unwrap().value, "4321");
     }

@@ -278,10 +278,18 @@ fn convert_card(
                 ("title".to_string(), title.to_string()),
                 ("card_number".to_string(), card_number),
             ];
-            if let Some(name) = card.cardholder_name { fields.push(("cardholder_name".to_string(), name)); }
-            if !expiry.is_empty() { fields.push(("expiry".to_string(), expiry)); }
-            if let Some(cvv) = card.code { fields.push(("cvv".to_string(), cvv)); }
-            if let Some(brand) = card.brand { fields.push(("payment_network".to_string(), brand)); }
+            if let Some(name) = card.cardholder_name {
+                fields.push(("cardholder_name".to_string(), name));
+            }
+            if !expiry.is_empty() {
+                fields.push(("expiry".to_string(), expiry));
+            }
+            if let Some(cvv) = card.code {
+                fields.push(("cvv".to_string(), cvv));
+            }
+            if let Some(brand) = card.brand {
+                fields.push(("payment_network".to_string(), brand));
+            }
             fields
         },
     })

@@ -80,7 +80,10 @@ pub fn sniff_csv_file(input: String) -> Result<CsvPreviewData, String> {
 ///
 /// The vault must already be unlocked — returns `Err` if no session is active.
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
-pub async fn import_from_csv(input: String, config: CsvImportConfigData) -> Result<ImportResult, String> {
+pub async fn import_from_csv(
+    input: String,
+    config: CsvImportConfigData,
+) -> Result<ImportResult, String> {
     let csv_config = CsvImportConfig {
         title_col: config.title_col,
         url_col: config.url_col,
@@ -133,12 +136,20 @@ pub async fn import_from_csv(input: String, config: CsvImportConfigData) -> Resu
 fn entry_id_and_title(entry: &crate::vault::entry::VaultEntry) -> (String, String) {
     use crate::vault::entry::VaultEntry::*;
     match entry {
-        Login(e)    => (e.meta.id.clone(), e.title.clone()),
-        Note(e)     => (e.meta.id.clone(), e.title.clone()),
-        Identity(e) => (e.meta.id.clone(), format!("{} {}", e.first_name, e.last_name)),
-        Card(e)     => (e.meta.id.clone(), e.card_name.clone().unwrap_or_else(|| e.cardholder_name.clone())),
-        File(e)     => (e.meta.id.clone(), e.filename.clone()),
-        Custom(e)   => (e.meta.id.clone(), e.title.clone()),
+        Login(e) => (e.meta.id.clone(), e.title.clone()),
+        Note(e) => (e.meta.id.clone(), e.title.clone()),
+        Identity(e) => (
+            e.meta.id.clone(),
+            format!("{} {}", e.first_name, e.last_name),
+        ),
+        Card(e) => (
+            e.meta.id.clone(),
+            e.card_name
+                .clone()
+                .unwrap_or_else(|| e.cardholder_name.clone()),
+        ),
+        File(e) => (e.meta.id.clone(), e.filename.clone()),
+        Custom(e) => (e.meta.id.clone(), e.title.clone()),
     }
 }
 
@@ -279,20 +290,25 @@ pub async fn import_from_gabbro(
 
     for entry in source_entries.entries {
         let id = match &entry {
-            crate::vault::entry::VaultEntry::Login(e)    => e.meta.id.clone(),
-            crate::vault::entry::VaultEntry::Note(e)     => e.meta.id.clone(),
+            crate::vault::entry::VaultEntry::Login(e) => e.meta.id.clone(),
+            crate::vault::entry::VaultEntry::Note(e) => e.meta.id.clone(),
             crate::vault::entry::VaultEntry::Identity(e) => e.meta.id.clone(),
-            crate::vault::entry::VaultEntry::Card(e)     => e.meta.id.clone(),
-            crate::vault::entry::VaultEntry::File(e)     => e.meta.id.clone(),
-            crate::vault::entry::VaultEntry::Custom(e)   => e.meta.id.clone(),
+            crate::vault::entry::VaultEntry::Card(e) => e.meta.id.clone(),
+            crate::vault::entry::VaultEntry::File(e) => e.meta.id.clone(),
+            crate::vault::entry::VaultEntry::Custom(e) => e.meta.id.clone(),
         };
         let title = match &entry {
-            crate::vault::entry::VaultEntry::Login(e)    => e.title.clone(),
-            crate::vault::entry::VaultEntry::Note(e)     => e.title.clone(),
-            crate::vault::entry::VaultEntry::Identity(e) => format!("{} {}", e.first_name, e.last_name),
-            crate::vault::entry::VaultEntry::Card(e)     => e.card_name.clone().unwrap_or_else(|| e.cardholder_name.clone()),
-            crate::vault::entry::VaultEntry::File(e)     => e.filename.clone(),
-            crate::vault::entry::VaultEntry::Custom(e)   => e.title.clone(),
+            crate::vault::entry::VaultEntry::Login(e) => e.title.clone(),
+            crate::vault::entry::VaultEntry::Note(e) => e.title.clone(),
+            crate::vault::entry::VaultEntry::Identity(e) => {
+                format!("{} {}", e.first_name, e.last_name)
+            }
+            crate::vault::entry::VaultEntry::Card(e) => e
+                .card_name
+                .clone()
+                .unwrap_or_else(|| e.cardholder_name.clone()),
+            crate::vault::entry::VaultEntry::File(e) => e.filename.clone(),
+            crate::vault::entry::VaultEntry::Custom(e) => e.title.clone(),
         };
 
         if existing_ids.contains(&id) {
@@ -343,7 +359,15 @@ mod tests {
             content: String::from("already here"),
             attachments: vec![],
         })];
-        save_vault(&VaultBody { folders: vec![], entries }, passphrase, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries,
+            },
+            passphrase,
+            &path,
+        )
+        .unwrap();
         path
     }
 
@@ -495,10 +519,7 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
         let path = setup_vault(pass);
         session::unlock_vault(pass, path.clone()).unwrap();
 
-        let result = run(import_from_bitwarden(
-            BITWARDEN_JSON.as_bytes().to_vec(),
-        ))
-        .unwrap();
+        let result = run(import_from_bitwarden(BITWARDEN_JSON.as_bytes().to_vec())).unwrap();
         assert_eq!(result.imported, 4); // login, note, card, identity — unknown type skipped
         assert!(result.failures.is_empty());
 
@@ -640,7 +661,15 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
                 attachments: vec![],
             }),
         ];
-        save_vault(&VaultBody { folders: vec![], entries }, passphrase, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries,
+            },
+            passphrase,
+            &path,
+        )
+        .unwrap();
         path
     }
 

@@ -8,10 +8,10 @@
 /// Package: app.gabbro.gabbro  →  app_gabbro_gabbro
 #[cfg(target_os = "android")]
 pub mod jni {
-    use jni::JNIEnv;
+    use crate::vault::session::is_vault_unlocked;
     use jni::objects::JClass;
     use jni::sys::jboolean;
-    use crate::vault::session::is_vault_unlocked;
+    use jni::JNIEnv;
 
     /// Returns JNI_TRUE if the vault session is currently unlocked.
     /// Delegates to is_vault_unlocked() — a public function that encapsulates
@@ -49,7 +49,8 @@ pub mod jni {
         };
 
         env.new_string(json).unwrap_or_else(|_| {
-            env.new_string("{}").expect("failed to allocate fallback JString")
+            env.new_string("{}")
+                .expect("failed to allocate fallback JString")
         })
     }
 
@@ -67,21 +68,25 @@ pub mod jni {
 
         let json = match login_summaries_for_autofill() {
             Ok(summaries) => {
-                let entries: Vec<String> = summaries.iter().map(|s| {
-                    format!(
-                        "{{\"id\":\"{}\",\"username\":\"{}\",\"url\":\"{}\"}}",
-                        s.id.replace('"', "\\\""),
-                        s.username.replace('"', "\\\""),
-                        s.url.replace('"', "\\\""),
-                    )
-                }).collect();
+                let entries: Vec<String> = summaries
+                    .iter()
+                    .map(|s| {
+                        format!(
+                            "{{\"id\":\"{}\",\"username\":\"{}\",\"url\":\"{}\"}}",
+                            s.id.replace('"', "\\\""),
+                            s.username.replace('"', "\\\""),
+                            s.url.replace('"', "\\\""),
+                        )
+                    })
+                    .collect();
                 format!("[{}]", entries.join(","))
             }
             Err(_) => String::from("[]"),
         };
 
         env.new_string(json).unwrap_or_else(|_| {
-            env.new_string("[]").expect("failed to allocate empty JString")
+            env.new_string("[]")
+                .expect("failed to allocate empty JString")
         })
     }
 }

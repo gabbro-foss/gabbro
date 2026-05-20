@@ -8,8 +8,8 @@
 //!   - Default folders are applied.
 //!   - Entries with folder="Personal" are migrated to folder="".
 
-use serde::{Deserialize, Serialize};
 use crate::vault::entry::VaultEntry;
+use serde::{Deserialize, Serialize};
 
 /// Default folders applied to new vaults and legacy vaults on migration.
 pub const DEFAULT_FOLDERS: [&str; 3] = ["Work", "Private", "Other"];
@@ -33,8 +33,7 @@ impl VaultBody {
 
 /// Serialize a `VaultBody` to JSON bytes for encryption.
 pub fn serialize_vault_body(body: &VaultBody) -> Result<Vec<u8>, String> {
-    serde_json::to_vec(body)
-        .map_err(|e| format!("Failed to serialize vault body: {e}"))
+    serde_json::to_vec(body).map_err(|e| format!("Failed to serialize vault body: {e}"))
 }
 
 /// Deserialize JSON bytes (from decryption) back into a `VaultBody`.
@@ -56,20 +55,19 @@ pub fn deserialize_vault_body(bytes: &[u8]) -> Result<VaultBody, String> {
             entries,
         });
     }
-    serde_json::from_slice(bytes)
-        .map_err(|e| format!("Failed to deserialize vault body: {e}"))
+    serde_json::from_slice(bytes).map_err(|e| format!("Failed to deserialize vault body: {e}"))
 }
 
 /// Migrate legacy `folder == "Personal"` entries to `folder == ""`.
 fn migrate_folders(mut entries: Vec<VaultEntry>) -> Vec<VaultEntry> {
     for entry in &mut entries {
         let folder = match entry {
-            VaultEntry::Login(e)    => &mut e.meta.folder,
-            VaultEntry::Note(e)     => &mut e.meta.folder,
+            VaultEntry::Login(e) => &mut e.meta.folder,
+            VaultEntry::Note(e) => &mut e.meta.folder,
             VaultEntry::Identity(e) => &mut e.meta.folder,
-            VaultEntry::Card(e)     => &mut e.meta.folder,
-            VaultEntry::File(e)     => &mut e.meta.folder,
-            VaultEntry::Custom(e)   => &mut e.meta.folder,
+            VaultEntry::Card(e) => &mut e.meta.folder,
+            VaultEntry::File(e) => &mut e.meta.folder,
+            VaultEntry::Custom(e) => &mut e.meta.folder,
         };
         if folder == "Personal" {
             *folder = String::new();
@@ -81,9 +79,7 @@ fn migrate_folders(mut entries: Vec<VaultEntry>) -> Vec<VaultEntry> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::vault::entry::{
-        CustomField, EntryMeta, LoginEntry, NoteEntry, VaultEntry,
-    };
+    use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, NoteEntry, VaultEntry};
 
     fn default_meta(id: &str) -> EntryMeta {
         EntryMeta {
@@ -148,7 +144,10 @@ mod tests {
         let bytes = serialize_vault_body(&body).unwrap();
         let recovered = deserialize_vault_body(&bytes).unwrap();
         assert_eq!(recovered.entries.len(), 0);
-        assert_eq!(recovered.folders, DEFAULT_FOLDERS.map(String::from).to_vec());
+        assert_eq!(
+            recovered.folders,
+            DEFAULT_FOLDERS.map(String::from).to_vec()
+        );
     }
 
     #[test]
@@ -164,7 +163,10 @@ mod tests {
             attachments: vec![],
             previous_password: None,
         });
-        let body = VaultBody { folders: DEFAULT_FOLDERS.map(String::from).to_vec(), entries: vec![entry] };
+        let body = VaultBody {
+            folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
+            entries: vec![entry],
+        };
         let bytes = serialize_vault_body(&body).unwrap();
         let recovered = deserialize_vault_body(&bytes).unwrap();
         assert_eq!(recovered.entries.len(), 1);
@@ -202,7 +204,10 @@ mod tests {
                 attachments: vec![],
             }),
         ];
-        let body = VaultBody { folders: DEFAULT_FOLDERS.map(String::from).to_vec(), entries };
+        let body = VaultBody {
+            folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
+            entries,
+        };
         let bytes = serialize_vault_body(&body).unwrap();
         let recovered = deserialize_vault_body(&bytes).unwrap();
         assert_eq!(recovered.entries.len(), 2);
@@ -222,7 +227,10 @@ mod tests {
             content: String::from("Hello"),
             attachments: vec![],
         });
-        let body = VaultBody { folders: DEFAULT_FOLDERS.map(String::from).to_vec(), entries: vec![entry] };
+        let body = VaultBody {
+            folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
+            entries: vec![entry],
+        };
         let bytes = serialize_vault_body(&body).unwrap();
         let json_str = std::str::from_utf8(&bytes).expect("bytes should be valid UTF-8");
         assert!(json_str.starts_with('{'));

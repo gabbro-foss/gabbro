@@ -10,22 +10,35 @@ use zeroize::{Zeroize, Zeroizing};
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
 
-use crate::api::vault::{load_vault, save_vault};
-use crate::vault::serialization::VaultBody;
+use crate::api::vault::{load_vault, load_vault_with_yubikey, save_vault, save_vault_with_yubikey};
 use crate::api::vault_bridge::EntrySummaryData;
 use crate::vault::entry::VaultEntry;
+use crate::vault::serialization::VaultBody;
+
+// Extracted YubiKey triple: (hmac_secret, credential_id, hkdf_salt).
+type YubikeyTriple = Option<(Zeroizing<Vec<u8>>, Vec<u8>, [u8; 32])>;
 
 // ── Session state ─────────────────────────────────────────────────────────────
+
+/// YubiKey material cached in memory for the duration of an unlocked session.
+///
+/// The hmac-secret is deterministic (same credential + salt → same bytes),
+/// so caching it enables CRUD saves without requiring a re-tap.
+pub struct YubikeyMaterial {
+    pub hmac_secret: Vec<u8>, // 32 bytes; zeroized in lock_vault
+    pub hkdf_salt: [u8; 32],
+    pub credential_id: Vec<u8>,
+}
 
 pub struct VaultSession {
     pub folders: Vec<String>,
     pub entries: Vec<VaultEntry>,
     pub path: PathBuf,
     pub passphrase: Vec<u8>,
+    pub yubikey: Option<YubikeyMaterial>,
 }
 
-static VAULT_SESSION: Lazy<Mutex<Option<VaultSession>>> =
-    Lazy::new(|| Mutex::new(None));
+static VAULT_SESSION: Lazy<Mutex<Option<VaultSession>>> = Lazy::new(|| Mutex::new(None));
 
 // ── Session API ───────────────────────────────────────────────────────────────
 
@@ -41,6 +54,32 @@ pub fn unlock_vault(passphrase: &[u8], path: PathBuf) -> Result<(), String> {
         entries: body.entries,
         path,
         passphrase: passphrase.to_vec(),
+        yubikey: None,
+    });
+    Ok(())
+}
+
+/// Decrypt a YubiKey-protected vault and store it in memory.
+pub fn unlock_vault_with_yubikey(
+    passphrase: &[u8],
+    hmac_secret: &[u8; 32],
+    credential_id: Vec<u8>,
+    yubikey_salt: &[u8; 32],
+    path: PathBuf,
+) -> Result<(), String> {
+    let mut body = load_vault_with_yubikey(passphrase, hmac_secret, yubikey_salt, &path)?;
+    crate::api::vault::purge_expired_history(&mut body.entries);
+    let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    *session = Some(VaultSession {
+        folders: body.folders,
+        entries: body.entries,
+        path,
+        passphrase: passphrase.to_vec(),
+        yubikey: Some(YubikeyMaterial {
+            hmac_secret: hmac_secret.to_vec(),
+            hkdf_salt: *yubikey_salt,
+            credential_id,
+        }),
     });
     Ok(())
 }
@@ -63,21 +102,55 @@ pub fn lock_vault() -> Result<(), String> {
         // Covers the passphrase bytes fully. The entries vec is cleared via clear(),
         // which drops each element — triggering ZeroizeOnDrop on every VaultEntry.
         s.passphrase.zeroize();
+        if let Some(ref mut yk) = s.yubikey {
+            yk.hmac_secret.zeroize();
+        }
         s.entries.clear();
     }
     *session = None;
     Ok(())
 }
 
+/// Extracts YubiKey material from the session while the lock is held.
+fn extract_yubikey(session: &VaultSession) -> YubikeyTriple {
+    session.yubikey.as_ref().map(|yk| {
+        (
+            Zeroizing::new(yk.hmac_secret.clone()),
+            yk.credential_id.clone(),
+            yk.hkdf_salt,
+        )
+    })
+}
+
+/// Saves using passphrase alone, or passphrase + YubiKey if the session
+/// has YubiKey material cached.
+fn do_save(
+    body: &VaultBody,
+    passphrase: &[u8],
+    path: &std::path::Path,
+    yubikey: YubikeyTriple,
+) -> Result<(), String> {
+    match yubikey {
+        Some((hmac_secret, credential_id, hkdf_salt)) => {
+            let secret: [u8; 32] = hmac_secret
+                .as_slice()
+                .try_into()
+                .map_err(|_| "invalid cached hmac_secret length".to_string())?;
+            save_vault_with_yubikey(body, passphrase, &secret, credential_id, hkdf_salt, path)
+        }
+        None => save_vault(body, passphrase, path),
+    }
+}
+
 /// Returns the UUID of any entry variant.
 fn entry_id(entry: &VaultEntry) -> &str {
     match entry {
-        VaultEntry::Login(e)    => &e.meta.id,
-        VaultEntry::Note(e)     => &e.meta.id,
+        VaultEntry::Login(e) => &e.meta.id,
+        VaultEntry::Note(e) => &e.meta.id,
         VaultEntry::Identity(e) => &e.meta.id,
-        VaultEntry::Card(e)     => &e.meta.id,
-        VaultEntry::File(e)     => &e.meta.id,
-        VaultEntry::Custom(e)   => &e.meta.id,
+        VaultEntry::Card(e) => &e.meta.id,
+        VaultEntry::File(e) => &e.meta.id,
+        VaultEntry::Custom(e) => &e.meta.id,
     }
 }
 
@@ -119,7 +192,8 @@ fn entry_to_summary(entry: &VaultEntry) -> EntrySummaryData {
         VaultEntry::Card(e) => EntrySummaryData {
             id: e.meta.id.clone(),
             entry_type: String::from("Card"),
-            title: e.card_name
+            title: e
+                .card_name
                 .as_deref()
                 .filter(|s| !s.is_empty())
                 .unwrap_or(&e.cardholder_name)
@@ -157,7 +231,8 @@ pub fn list_entry_summaries() -> Result<Vec<EntrySummaryData>, String> {
 pub fn get_entry(id: &str) -> Result<VaultEntry, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
-    session.entries
+    session
+        .entries
         .iter()
         .find(|e| entry_id(e) == id)
         .cloned()
@@ -171,7 +246,9 @@ pub fn get_entry(id: &str) -> Result<VaultEntry, String> {
 pub fn session_delete_entries_no_save(ids: &[String]) -> Result<(), String> {
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_mut().ok_or("Vault is locked")?;
-    session.entries.retain(|e| !ids.contains(&entry_id(e).to_string()));
+    session
+        .entries
+        .retain(|e| !ids.contains(&entry_id(e).to_string()));
     Ok(())
 }
 
@@ -182,7 +259,11 @@ pub fn session_delete_entries_no_save(ids: &[String]) -> Result<(), String> {
 pub fn session_entry_ids() -> Result<std::collections::HashSet<String>, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
-    Ok(session.entries.iter().map(|e| entry_id(e).to_string()).collect())
+    Ok(session
+        .entries
+        .iter()
+        .map(|e| entry_id(e).to_string())
+        .collect())
 }
 
 /// Add a new entry to the in-memory session only — no disk write.
@@ -201,13 +282,22 @@ pub fn session_add_entry_no_save(entry: VaultEntry) -> Result<(), String> {
 /// Used after bulk operations that called `session_add_entry_no_save`
 /// for each entry and now want a single save.
 pub fn session_save() -> Result<(), String> {
-    let (body, passphrase, path) = {
+    let (body, passphrase, path, yubikey) = {
         let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_ref().ok_or("Vault is locked")?;
-        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
-        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody {
+            folders: session.folders.clone(),
+            entries: session.entries.clone(),
+        };
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            Zeroizing::new(session.passphrase.clone()),
+            session.path.clone(),
+            yubikey,
+        )
     };
-    save_vault(&body, &passphrase, &path)?;
+    do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
 
@@ -216,15 +306,24 @@ pub fn session_save() -> Result<(), String> {
 /// Async — triggers a full vault save (Argon2id + encryption).
 pub fn session_create_entry(entry: VaultEntry) -> Result<EntrySummaryData, String> {
     let summary;
-    let (body, passphrase, path) = {
+    let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         summary = entry_to_summary(&entry);
         session.entries.push(entry);
-        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
-        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody {
+            folders: session.folders.clone(),
+            entries: session.entries.clone(),
+        };
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            Zeroizing::new(session.passphrase.clone()),
+            session.path.clone(),
+            yubikey,
+        )
     }; // ← lock released here
-    save_vault(&body, &passphrase, &path)?;
+    do_save(&body, &passphrase, &path, yubikey)?;
     Ok(summary)
 }
 
@@ -232,14 +331,23 @@ pub fn session_create_entry(entry: VaultEntry) -> Result<EntrySummaryData, Strin
 ///
 /// Async — triggers a full vault save.
 pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Result<(), String> {
-    let (body, passphrase, path) = {
+    let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         crate::api::vault::update_entry(&mut session.entries, updated, expiry_days)?;
-        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
-        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody {
+            folders: session.folders.clone(),
+            entries: session.entries.clone(),
+        };
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            Zeroizing::new(session.passphrase.clone()),
+            session.path.clone(),
+            yubikey,
+        )
     }; // ← lock released here
-    save_vault(&body, &passphrase, &path)?;
+    do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
 
@@ -247,14 +355,23 @@ pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Re
 ///
 /// Async — triggers a full vault save.
 pub fn session_delete_entry(id: &str) -> Result<(), String> {
-    let (body, passphrase, path) = {
+    let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         crate::api::vault::delete_entry(&mut session.entries, id)?;
-        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
-        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody {
+            folders: session.folders.clone(),
+            entries: session.entries.clone(),
+        };
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            Zeroizing::new(session.passphrase.clone()),
+            session.path.clone(),
+            yubikey,
+        )
     }; // ← lock released here
-    save_vault(&body, &passphrase, &path)?;
+    do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
 
@@ -274,10 +391,39 @@ pub fn session_change_passphrase(
 ) -> Result<(), String> {
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_mut().ok_or("Vault is locked")?;
-    // Verify old passphrase by attempting a load — reject if wrong
-    load_vault(old_passphrase, &session.path)?;
-    let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
-    save_vault(&body, new_passphrase, &session.path)?;
+    // Verify old passphrase — use YubiKey path if vault was unlocked with YubiKey
+    if let Some(ref yk) = session.yubikey {
+        let secret: [u8; 32] = yk
+            .hmac_secret
+            .as_slice()
+            .try_into()
+            .map_err(|_| "invalid cached hmac_secret length".to_string())?;
+        load_vault_with_yubikey(old_passphrase, &secret, &yk.hkdf_salt, &session.path)?;
+    } else {
+        load_vault(old_passphrase, &session.path)?;
+    }
+    let body = VaultBody {
+        folders: session.folders.clone(),
+        entries: session.entries.clone(),
+    };
+    // Re-seal with new passphrase, preserving YubiKey material
+    if let Some(ref yk) = session.yubikey {
+        let secret: [u8; 32] = yk
+            .hmac_secret
+            .as_slice()
+            .try_into()
+            .map_err(|_| "invalid cached hmac_secret length".to_string())?;
+        save_vault_with_yubikey(
+            &body,
+            new_passphrase,
+            &secret,
+            yk.credential_id.clone(),
+            yk.hkdf_salt,
+            &session.path,
+        )?;
+    } else {
+        save_vault(&body, new_passphrase, &session.path)?;
+    }
     session.passphrase = new_passphrase.to_vec();
     Ok(())
 }
@@ -287,10 +433,12 @@ pub fn session_change_passphrase(
 /// Sets `previous_password` to `None` on the identified entry.
 /// Returns `Err` if the entry is not found or is not a Login entry.
 pub fn session_clear_password_history(id: &str) -> Result<(), String> {
-    let (body, passphrase, path) = {
+    let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
-        let entry = session.entries.iter_mut()
+        let entry = session
+            .entries
+            .iter_mut()
             .find(|e| entry_id(e) == id)
             .ok_or_else(|| format!("No entry found with id: {id}"))?;
         match entry {
@@ -300,10 +448,19 @@ pub fn session_clear_password_history(id: &str) -> Result<(), String> {
             }
             _ => return Err(format!("Entry {id} is not a Login entry")),
         }
-        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
-        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody {
+            folders: session.folders.clone(),
+            entries: session.entries.clone(),
+        };
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            Zeroizing::new(session.passphrase.clone()),
+            session.path.clone(),
+            yubikey,
+        )
     }; // ← lock released here
-    save_vault(&body, &passphrase, &path)?;
+    do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
 
@@ -312,25 +469,38 @@ pub fn session_clear_password_history(id: &str) -> Result<(), String> {
 /// Swaps `password` ← `previous_password.value`, then clears `previous_password`.
 /// Returns `Err` if the entry is not found, is not a Login entry, or has no history.
 pub fn session_revert_password(id: &str) -> Result<(), String> {
-    let (body, passphrase, path) = {
+    let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
-        let entry = session.entries.iter_mut()
+        let entry = session
+            .entries
+            .iter_mut()
             .find(|e| entry_id(e) == id)
             .ok_or_else(|| format!("No entry found with id: {id}"))?;
         match entry {
             VaultEntry::Login(ref mut e) => {
-                let prev = e.previous_password.take()
+                let prev = e
+                    .previous_password
+                    .take()
                     .ok_or_else(|| format!("Entry {id} has no password history to revert"))?;
                 e.password = prev.value.clone();
                 e.meta.updated_at = crate::api::vault::chrono_now();
             }
             _ => return Err(format!("Entry {id} is not a Login entry")),
         }
-        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
-        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody {
+            folders: session.folders.clone(),
+            entries: session.entries.clone(),
+        };
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            Zeroizing::new(session.passphrase.clone()),
+            session.path.clone(),
+            yubikey,
+        )
     }; // ← lock released here
-    save_vault(&body, &passphrase, &path)?;
+    do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
 
@@ -362,17 +532,21 @@ pub struct LoginAutofillSummary {
 pub fn login_summaries_for_autofill() -> Result<Vec<LoginAutofillSummary>, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
-    Ok(session.entries.iter().filter_map(|e| {
-        if let VaultEntry::Login(ref login) = e {
-            Some(LoginAutofillSummary {
-                id: login.meta.id.clone(),
-                username: login.username.clone(),
-                url: login.url.clone(),
-            })
-        } else {
-            None
-        }
-    }).collect())
+    Ok(session
+        .entries
+        .iter()
+        .filter_map(|e| {
+            if let VaultEntry::Login(ref login) = e {
+                Some(LoginAutofillSummary {
+                    id: login.meta.id.clone(),
+                    username: login.username.clone(),
+                    url: login.url.clone(),
+                })
+            } else {
+                None
+            }
+        })
+        .collect())
 }
 
 /// Return a JSON string encoding the id, username, and password for a
@@ -387,16 +561,26 @@ pub fn login_summaries_for_autofill() -> Result<Vec<LoginAutofillSummary>, Strin
 pub fn get_entry_for_autofill(id: &str) -> Result<String, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
-    let entry = session.entries
+    let entry = session
+        .entries
         .iter()
         .find(|e| entry_id(e) == id)
         .ok_or_else(|| format!("No entry found with id: {id}"))?;
     match entry {
         VaultEntry::Login(e) => {
             let mut map = serde_json::Map::new();
-            map.insert("id".to_string(), serde_json::Value::String(e.meta.id.clone()));
-            map.insert("username".to_string(), serde_json::Value::String(e.username.clone()));
-            map.insert("password".to_string(), serde_json::Value::String(e.password.clone()));
+            map.insert(
+                "id".to_string(),
+                serde_json::Value::String(e.meta.id.clone()),
+            );
+            map.insert(
+                "username".to_string(),
+                serde_json::Value::String(e.username.clone()),
+            );
+            map.insert(
+                "password".to_string(),
+                serde_json::Value::String(e.password.clone()),
+            );
             let json = serde_json::Value::Object(map).to_string();
             Ok(json)
         }
@@ -424,7 +608,7 @@ pub fn session_rename_folder(old_name: String, new_name: String) -> Result<(), S
     if new_name.is_empty() {
         return Err(String::from("Folder name must not be empty"));
     }
-    let (body, passphrase, path) = {
+    let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         if !session.folders.contains(&old_name) {
@@ -433,31 +617,38 @@ pub fn session_rename_folder(old_name: String, new_name: String) -> Result<(), S
         if session.folders.contains(&new_name) {
             return Err(format!("Folder already exists: {new_name}"));
         }
-        // Rename in folder list
         for f in session.folders.iter_mut() {
             if *f == old_name {
                 *f = new_name.clone();
                 break;
             }
         }
-        // Update all entries that reference the old name
         for entry in session.entries.iter_mut() {
             let folder = match entry {
-                VaultEntry::Login(e)    => &mut e.meta.folder,
-                VaultEntry::Note(e)     => &mut e.meta.folder,
+                VaultEntry::Login(e) => &mut e.meta.folder,
+                VaultEntry::Note(e) => &mut e.meta.folder,
                 VaultEntry::Identity(e) => &mut e.meta.folder,
-                VaultEntry::Card(e)     => &mut e.meta.folder,
-                VaultEntry::File(e)     => &mut e.meta.folder,
-                VaultEntry::Custom(e)   => &mut e.meta.folder,
+                VaultEntry::Card(e) => &mut e.meta.folder,
+                VaultEntry::File(e) => &mut e.meta.folder,
+                VaultEntry::Custom(e) => &mut e.meta.folder,
             };
             if *folder == old_name {
                 *folder = new_name.clone();
             }
         }
-        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
-        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody {
+            folders: session.folders.clone(),
+            entries: session.entries.clone(),
+        };
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            Zeroizing::new(session.passphrase.clone()),
+            session.path.clone(),
+            yubikey,
+        )
     }; // ← lock released here
-    save_vault(&body, &passphrase, &path)?;
+    do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
 
@@ -468,7 +659,7 @@ pub fn session_rename_folder(old_name: String, new_name: String) -> Result<(), S
 /// folder that does not exist.
 /// Async — triggers a full vault save.
 pub fn session_delete_folder(name: String, reassign_to: Option<String>) -> Result<(), String> {
-    let (body, passphrase, path) = {
+    let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         if !session.folders.contains(&name) {
@@ -479,27 +670,34 @@ pub fn session_delete_folder(name: String, reassign_to: Option<String>) -> Resul
                 return Err(format!("Folder not found: {target}"));
             }
         }
-        // Remove folder from list
         session.folders.retain(|f| *f != name);
-        // Reassign or clear entries
-        let target = reassign_to.unwrap_or_default(); // "" when None
+        let target = reassign_to.unwrap_or_default();
         for entry in session.entries.iter_mut() {
             let folder = match entry {
-                VaultEntry::Login(e)    => &mut e.meta.folder,
-                VaultEntry::Note(e)     => &mut e.meta.folder,
+                VaultEntry::Login(e) => &mut e.meta.folder,
+                VaultEntry::Note(e) => &mut e.meta.folder,
                 VaultEntry::Identity(e) => &mut e.meta.folder,
-                VaultEntry::Card(e)     => &mut e.meta.folder,
-                VaultEntry::File(e)     => &mut e.meta.folder,
-                VaultEntry::Custom(e)   => &mut e.meta.folder,
+                VaultEntry::Card(e) => &mut e.meta.folder,
+                VaultEntry::File(e) => &mut e.meta.folder,
+                VaultEntry::Custom(e) => &mut e.meta.folder,
             };
             if *folder == name {
                 *folder = target.clone();
             }
         }
-        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
-        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody {
+            folders: session.folders.clone(),
+            entries: session.entries.clone(),
+        };
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            Zeroizing::new(session.passphrase.clone()),
+            session.path.clone(),
+            yubikey,
+        )
     }; // ← lock released here
-    save_vault(&body, &passphrase, &path)?;
+    do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
 
@@ -509,7 +707,7 @@ pub fn session_delete_folder(name: String, reassign_to: Option<String>) -> Resul
 /// or `folder` names a folder that does not exist (empty string is always
 /// valid — it means unfoldered).
 pub fn session_assign_folder_to_entries(ids: &[String], folder: String) -> Result<(), String> {
-    let (body, passphrase, path) = {
+    let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         if !folder.is_empty() && !session.folders.contains(&folder) {
@@ -517,21 +715,30 @@ pub fn session_assign_folder_to_entries(ids: &[String], folder: String) -> Resul
         }
         for entry in session.entries.iter_mut() {
             let (id, f) = match entry {
-                VaultEntry::Login(e)    => (&e.meta.id, &mut e.meta.folder),
-                VaultEntry::Note(e)     => (&e.meta.id, &mut e.meta.folder),
+                VaultEntry::Login(e) => (&e.meta.id, &mut e.meta.folder),
+                VaultEntry::Note(e) => (&e.meta.id, &mut e.meta.folder),
                 VaultEntry::Identity(e) => (&e.meta.id, &mut e.meta.folder),
-                VaultEntry::Card(e)     => (&e.meta.id, &mut e.meta.folder),
-                VaultEntry::File(e)     => (&e.meta.id, &mut e.meta.folder),
-                VaultEntry::Custom(e)   => (&e.meta.id, &mut e.meta.folder),
+                VaultEntry::Card(e) => (&e.meta.id, &mut e.meta.folder),
+                VaultEntry::File(e) => (&e.meta.id, &mut e.meta.folder),
+                VaultEntry::Custom(e) => (&e.meta.id, &mut e.meta.folder),
             };
             if ids.contains(id) {
                 *f = folder.clone();
             }
         }
-        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
-        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody {
+            folders: session.folders.clone(),
+            entries: session.entries.clone(),
+        };
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            Zeroizing::new(session.passphrase.clone()),
+            session.path.clone(),
+            yubikey,
+        )
     }; // ← lock released here
-    save_vault(&body, &passphrase, &path)?;
+    do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
 
@@ -543,26 +750,35 @@ pub fn session_create_folder(name: String) -> Result<(), String> {
     if name.is_empty() {
         return Err(String::from("Folder name must not be empty"));
     }
-    let (body, passphrase, path) = {
+    let (body, passphrase, path, yubikey) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         if session.folders.contains(&name) {
             return Err(format!("Folder already exists: {name}"));
         }
         session.folders.push(name);
-        let body = VaultBody { folders: session.folders.clone(), entries: session.entries.clone() };
-        (body, Zeroizing::new(session.passphrase.clone()), session.path.clone())
+        let body = VaultBody {
+            folders: session.folders.clone(),
+            entries: session.entries.clone(),
+        };
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            Zeroizing::new(session.passphrase.clone()),
+            session.path.clone(),
+            yubikey,
+        )
     }; // ← lock released here
-    save_vault(&body, &passphrase, &path)?;
+    do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
 
 #[cfg(test)]
 mod assign_folder_tests {
     use super::*;
-    use serial_test::serial;
     use crate::api::vault::save_vault;
     use crate::vault::entry::{EntryMeta, LoginEntry, NoteEntry, VaultEntry};
+    use serial_test::serial;
     use std::env::temp_dir;
 
     fn teardown(path: &std::path::PathBuf) {
@@ -614,25 +830,26 @@ mod assign_folder_tests {
             },
             pass,
             &path,
-        ).unwrap();
+        )
+        .unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
-        session_assign_folder_to_entries(
-            &[String::from("id-001")],
-            String::from("Work"),
-        ).unwrap();
+        session_assign_folder_to_entries(&[String::from("id-001")], String::from("Work")).unwrap();
 
         let e1 = get_entry("id-001").unwrap();
         let e2 = get_entry("id-002").unwrap();
 
         match e1 {
-            VaultEntry::Login(ref e) => assert_eq!(e.meta.folder, "Work",
-                "selected entry must be moved to the target folder"),
+            VaultEntry::Login(ref e) => assert_eq!(
+                e.meta.folder, "Work",
+                "selected entry must be moved to the target folder"
+            ),
             _ => panic!("expected Login"),
         }
         match e2 {
-            VaultEntry::Note(ref e) => assert_eq!(e.meta.folder, "",
-                "unselected entry must not be changed"),
+            VaultEntry::Note(ref e) => {
+                assert_eq!(e.meta.folder, "", "unselected entry must not be changed")
+            }
             _ => panic!("expected Note"),
         }
 
@@ -643,18 +860,26 @@ mod assign_folder_tests {
 #[cfg(test)]
 mod folder_tests {
     use super::*;
-    use serial_test::serial;
     use crate::api::vault::save_vault;
+    use serial_test::serial;
     use std::env::temp_dir;
 
-    fn setup_with_folders(passphrase: &[u8], path_suffix: &str, folders: Vec<String>) -> std::path::PathBuf {
+    fn setup_with_folders(
+        passphrase: &[u8],
+        path_suffix: &str,
+        folders: Vec<String>,
+    ) -> std::path::PathBuf {
         let mut path = temp_dir();
         path.push(format!("gabbro_folder_{}.gabbro", path_suffix));
         save_vault(
-            &VaultBody { folders, entries: vec![] },
+            &VaultBody {
+                folders,
+                entries: vec![],
+            },
             passphrase,
             &path,
-        ).unwrap();
+        )
+        .unwrap();
         path
     }
 
@@ -751,13 +976,21 @@ mod folder_tests {
         session_rename_folder(String::from("Work"), String::from("Career")).unwrap();
 
         let folders = session_list_folders().unwrap();
-        assert!(folders.contains(&String::from("Career")), "new name must appear");
-        assert!(!folders.contains(&String::from("Work")), "old name must be gone");
+        assert!(
+            folders.contains(&String::from("Career")),
+            "new name must appear"
+        );
+        assert!(
+            !folders.contains(&String::from("Work")),
+            "old name must be gone"
+        );
 
         let updated = get_entry("rename-001").unwrap();
         match updated {
-            VaultEntry::Note(ref e) => assert_eq!(e.meta.folder, "Career",
-                "entry folder must be updated to new name"),
+            VaultEntry::Note(ref e) => assert_eq!(
+                e.meta.folder, "Career",
+                "entry folder must be updated to new name"
+            ),
             _ => panic!("Expected Note"),
         }
 
@@ -782,8 +1015,11 @@ mod folder_tests {
     #[serial]
     fn rename_folder_rejects_duplicate_new_name() {
         let pass = b"folder-test-passphrase";
-        let path = setup_with_folders(pass, "rename_dup",
-            vec![String::from("Work"), String::from("Private")]);
+        let path = setup_with_folders(
+            pass,
+            "rename_dup",
+            vec![String::from("Work"), String::from("Private")],
+        );
         unlock_vault(pass, path.clone()).unwrap();
 
         let result = session_rename_folder(String::from("Work"), String::from("Private"));
@@ -813,8 +1049,11 @@ mod folder_tests {
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
 
         let pass = b"folder-test-passphrase";
-        let path = setup_with_folders(pass, "delete_clear",
-            vec![String::from("Work"), String::from("Private")]);
+        let path = setup_with_folders(
+            pass,
+            "delete_clear",
+            vec![String::from("Work"), String::from("Private")],
+        );
         unlock_vault(pass, path.clone()).unwrap();
 
         let entry = VaultEntry::Note(NoteEntry {
@@ -834,13 +1073,21 @@ mod folder_tests {
         session_delete_folder(String::from("Work"), None).unwrap();
 
         let folders = session_list_folders().unwrap();
-        assert!(!folders.contains(&String::from("Work")), "deleted folder must be gone");
-        assert!(folders.contains(&String::from("Private")), "other folders must remain");
+        assert!(
+            !folders.contains(&String::from("Work")),
+            "deleted folder must be gone"
+        );
+        assert!(
+            folders.contains(&String::from("Private")),
+            "other folders must remain"
+        );
 
         let updated = get_entry("del-001").unwrap();
         match updated {
-            VaultEntry::Note(ref e) => assert_eq!(e.meta.folder, "",
-                "entry folder must be cleared to empty string"),
+            VaultEntry::Note(ref e) => assert_eq!(
+                e.meta.folder, "",
+                "entry folder must be cleared to empty string"
+            ),
             _ => panic!("Expected Note"),
         }
 
@@ -853,8 +1100,11 @@ mod folder_tests {
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
 
         let pass = b"folder-test-passphrase";
-        let path = setup_with_folders(pass, "delete_reassign",
-            vec![String::from("Work"), String::from("Private")]);
+        let path = setup_with_folders(
+            pass,
+            "delete_reassign",
+            vec![String::from("Work"), String::from("Private")],
+        );
         unlock_vault(pass, path.clone()).unwrap();
 
         let entry = VaultEntry::Note(NoteEntry {
@@ -878,8 +1128,10 @@ mod folder_tests {
 
         let updated = get_entry("del-002").unwrap();
         match updated {
-            VaultEntry::Note(ref e) => assert_eq!(e.meta.folder, "Private",
-                "entry must be reassigned to target folder"),
+            VaultEntry::Note(ref e) => assert_eq!(
+                e.meta.folder, "Private",
+                "entry must be reassigned to target folder"
+            ),
             _ => panic!("Expected Note"),
         }
 
@@ -932,8 +1184,8 @@ mod folder_tests {
 #[cfg(test)]
 mod autofill_tests {
     use super::*;
-    use serial_test::serial;
     use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+    use serial_test::serial;
     use std::env::temp_dir;
 
     fn setup(passphrase: &[u8]) -> PathBuf {
@@ -950,7 +1202,15 @@ mod autofill_tests {
             content: String::from("test"),
             attachments: vec![],
         })];
-        save_vault(&VaultBody { folders: vec![], entries }, passphrase, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries,
+            },
+            passphrase,
+            &path,
+        )
+        .unwrap();
         path
     }
 
@@ -1015,14 +1275,34 @@ mod autofill_tests {
             attachments: vec![],
         });
 
-        save_vault(&VaultBody { folders: vec![], entries: vec![login, note] }, pass, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![login, note],
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         let json = get_entry_for_autofill("af-login-001").unwrap();
-        assert!(json.contains("\"password\""), "JSON must contain a password key");
-        assert!(json.contains("\"s3cr3t\""), "JSON must contain the correct password value");
-        assert!(json.contains("\"username\""), "JSON must contain a username key");
-        assert!(json.contains("\"rob\""), "JSON must contain the correct username value");
+        assert!(
+            json.contains("\"password\""),
+            "JSON must contain a password key"
+        );
+        assert!(
+            json.contains("\"s3cr3t\""),
+            "JSON must contain the correct password value"
+        );
+        assert!(
+            json.contains("\"username\""),
+            "JSON must contain a username key"
+        );
+        assert!(
+            json.contains("\"rob\""),
+            "JSON must contain the correct username value"
+        );
         assert!(json.contains("\"id\""), "JSON must contain an id key");
 
         let err = get_entry_for_autofill("af-note-001");
@@ -1071,7 +1351,15 @@ mod autofill_tests {
             attachments: vec![],
         });
 
-        save_vault(&VaultBody { folders: vec![], entries: vec![login, note] }, pass, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![login, note],
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         let summaries = login_summaries_for_autofill().unwrap();
@@ -1088,28 +1376,34 @@ mod autofill_tests {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serial_test::serial;
     use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+    use serial_test::serial;
     use std::env::temp_dir;
 
     /// Helper — creates a minimal vault file on disk and returns its path.
     fn setup_vault(passphrase: &[u8]) -> PathBuf {
         let mut path = temp_dir();
         path.push("gabbro_session_test.gabbro");
-        let entries = vec![
-            VaultEntry::Note(NoteEntry {
-                meta: EntryMeta {
-                    id: String::from("id-001"),
-                    created_at: String::from("2025-01-01T00:00:00Z"),
-                    updated_at: String::from("2025-01-01T00:00:00Z"),
-                    folder: String::from("Personal"),
-                },
-                title: String::from("Session test note"),
-                content: String::from("session secret content"),
-                attachments: vec![],
-            }),
-        ];
-        save_vault(&VaultBody { folders: vec![], entries }, passphrase, &path).unwrap();
+        let entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("Session test note"),
+            content: String::from("session secret content"),
+            attachments: vec![],
+        })];
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries,
+            },
+            passphrase,
+            &path,
+        )
+        .unwrap();
         path
     }
 
@@ -1248,7 +1542,7 @@ mod tests {
     #[test]
     #[serial]
     fn login_entry_to_summary_uses_title() {
-        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry};
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
 
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
@@ -1268,14 +1562,16 @@ mod tests {
         });
 
         let summary = entry_to_summary(&entry);
-        assert_eq!(summary.title, "GitHub",
-            "summary title should use LoginEntry.title, not url or username");
+        assert_eq!(
+            summary.title, "GitHub",
+            "summary title should use LoginEntry.title, not url or username"
+        );
     }
 
     #[test]
     #[serial]
     fn login_entry_to_summary_falls_back_to_url_when_title_empty() {
-        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry};
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
 
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
@@ -1295,8 +1591,10 @@ mod tests {
         });
 
         let summary = entry_to_summary(&entry);
-        assert_eq!(summary.title, "https://example.com",
-            "summary should fall back to url when title is empty");
+        assert_eq!(
+            summary.title, "https://example.com",
+            "summary should fall back to url when title is empty"
+        );
     }
 
     #[test]
@@ -1331,14 +1629,16 @@ mod tests {
         });
 
         let summary = entry_to_summary(&entry);
-        assert_eq!(summary.title, "Visa Platinum",
-            "summary should use card_name when present");
+        assert_eq!(
+            summary.title, "Visa Platinum",
+            "summary should use card_name when present"
+        );
     }
 
     #[test]
     #[serial]
     fn clear_password_history_removes_previous_password() {
-        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry, PreviousSecret};
+        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
 
         let pass = b"test passphrase";
         let mut path = temp_dir();
@@ -1365,7 +1665,15 @@ mod tests {
             }),
         });
 
-        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![entry],
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         session_clear_password_history("login-001").unwrap();
@@ -1385,7 +1693,7 @@ mod tests {
     #[test]
     #[serial]
     fn clear_password_history_persists_to_disk() {
-        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry, PreviousSecret};
+        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
 
         let pass = b"test passphrase";
         let mut path = temp_dir();
@@ -1412,7 +1720,15 @@ mod tests {
             }),
         });
 
-        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![entry],
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
         unlock_vault(pass, path.clone()).unwrap();
         session_clear_password_history("login-001").unwrap();
 
@@ -1444,7 +1760,7 @@ mod tests {
     #[test]
     #[serial]
     fn revert_password_swaps_current_and_previous() {
-        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry, PreviousSecret};
+        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
 
         let pass = b"test passphrase";
         let mut path = temp_dir();
@@ -1471,7 +1787,15 @@ mod tests {
             }),
         });
 
-        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![entry],
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         session_revert_password("login-001").unwrap();
@@ -1491,7 +1815,7 @@ mod tests {
     #[test]
     #[serial]
     fn revert_password_with_no_history_returns_error() {
-        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry};
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
 
         let pass = b"test passphrase";
         let mut path = temp_dir();
@@ -1514,7 +1838,15 @@ mod tests {
             previous_password: None,
         });
 
-        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![entry],
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         let result = session_revert_password("login-001");
@@ -1526,7 +1858,7 @@ mod tests {
     #[test]
     #[serial]
     fn unexpired_history_is_preserved_on_unlock() {
-        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry, PreviousSecret};
+        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
 
         let pass = b"test passphrase";
         let mut path = temp_dir();
@@ -1554,14 +1886,24 @@ mod tests {
             }),
         });
 
-        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![entry],
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         let result = get_entry("login-unexp-001").unwrap();
         match result {
             VaultEntry::Login(ref e) => {
-                assert!(e.previous_password.is_some(),
-                    "unexpired history must be preserved on unlock");
+                assert!(
+                    e.previous_password.is_some(),
+                    "unexpired history must be preserved on unlock"
+                );
             }
             _ => panic!("Expected Login variant"),
         }
@@ -1572,7 +1914,7 @@ mod tests {
     #[test]
     #[serial]
     fn keep_forever_history_is_preserved_on_unlock() {
-        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry, PreviousSecret};
+        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
 
         let pass = b"test passphrase";
         let mut path = temp_dir();
@@ -1599,14 +1941,24 @@ mod tests {
             }),
         });
 
-        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![entry],
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         let result = get_entry("login-forever-001").unwrap();
         match result {
             VaultEntry::Login(ref e) => {
-                assert!(e.previous_password.is_some(),
-                    "keep-forever history (expires_at: None) must never be purged");
+                assert!(
+                    e.previous_password.is_some(),
+                    "keep-forever history (expires_at: None) must never be purged"
+                );
             }
             _ => panic!("Expected Login variant"),
         }
@@ -1617,7 +1969,7 @@ mod tests {
     #[test]
     #[serial]
     fn expired_history_is_purged_on_unlock() {
-        use crate::vault::entry::{LoginEntry, EntryMeta, VaultEntry, PreviousSecret};
+        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
 
         let pass = b"test passphrase";
         let mut path = temp_dir();
@@ -1645,16 +1997,28 @@ mod tests {
             }),
         });
 
-        save_vault(&VaultBody { folders: vec![], entries: vec![entry] }, pass, &path).unwrap();
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![entry],
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
         let result = get_entry("login-exp-001").unwrap();
         match result {
             VaultEntry::Login(ref e) => {
-                assert!(e.previous_password.is_none(),
-                    "expired history should be purged on unlock");
-                assert_eq!(e.password, "current",
-                    "current password must not be affected");
+                assert!(
+                    e.previous_password.is_none(),
+                    "expired history should be purged on unlock"
+                );
+                assert_eq!(
+                    e.password, "current",
+                    "current password must not be affected"
+                );
             }
             _ => panic!("Expected Login variant"),
         }
@@ -1694,7 +2058,159 @@ mod tests {
         });
 
         let summary = entry_to_summary(&entry);
-        assert_eq!(summary.title, "Rob Smith",
-            "summary should fall back to cardholder_name when card_name is absent");
+        assert_eq!(
+            summary.title, "Rob Smith",
+            "summary should fall back to cardholder_name when card_name is absent"
+        );
+    }
+}
+
+#[cfg(test)]
+mod yubikey_session_tests {
+    use super::*;
+    use crate::api::vault::save_vault_with_yubikey;
+    use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+    use serial_test::serial;
+    use std::env::temp_dir;
+
+    const HMAC: [u8; 32] = [0xAAu8; 32];
+    const CRED_ID: &[u8] = &[0xBBu8; 64];
+    const YK_SALT: [u8; 32] = [0xCCu8; 32];
+
+    fn setup_yubikey_vault(passphrase: &[u8]) -> std::path::PathBuf {
+        let mut path = temp_dir();
+        path.push("gabbro_yk_session_test.gabbro");
+        let body = VaultBody {
+            folders: vec![],
+            entries: vec![VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("yk-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from(""),
+                },
+                title: String::from("YubiKey test note"),
+                content: String::from("secret content"),
+                attachments: vec![],
+            })],
+        };
+        save_vault_with_yubikey(&body, passphrase, &HMAC, CRED_ID.to_vec(), YK_SALT, &path)
+            .unwrap();
+        path
+    }
+
+    fn teardown(path: &std::path::PathBuf) {
+        let _ = lock_vault();
+        let _ = std::fs::remove_file(path);
+    }
+
+    #[test]
+    #[serial]
+    fn unlock_vault_with_yubikey_loads_session() {
+        let pass = b"yubikey-test-passphrase";
+        let path = setup_yubikey_vault(pass);
+
+        unlock_vault_with_yubikey(pass, &HMAC, CRED_ID.to_vec(), &YK_SALT, path.clone()).unwrap();
+
+        let summaries = list_entry_summaries().unwrap();
+        assert_eq!(summaries.len(), 1);
+        assert_eq!(summaries[0].id, "yk-001");
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn wrong_hmac_secret_fails_to_unlock() {
+        let pass = b"yubikey-test-passphrase";
+        let path = setup_yubikey_vault(pass);
+        let wrong_hmac = [0x00u8; 32];
+
+        let result =
+            unlock_vault_with_yubikey(pass, &wrong_hmac, CRED_ID.to_vec(), &YK_SALT, path.clone());
+        assert!(result.is_err());
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn wrong_passphrase_with_yubikey_fails_to_unlock() {
+        let path = setup_yubikey_vault(b"correct-pass");
+
+        let result = unlock_vault_with_yubikey(
+            b"wrong-pass",
+            &HMAC,
+            CRED_ID.to_vec(),
+            &YK_SALT,
+            path.clone(),
+        );
+        assert!(result.is_err());
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn session_save_after_yubikey_unlock_preserves_yubikey_protection() {
+        let pass = b"yubikey-test-passphrase";
+        let path = setup_yubikey_vault(pass);
+
+        unlock_vault_with_yubikey(pass, &HMAC, CRED_ID.to_vec(), &YK_SALT, path.clone()).unwrap();
+
+        // Add an entry and save — must re-seal with YubiKey
+        let new_entry = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("yk-002"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from(""),
+            },
+            title: String::from("Added after unlock"),
+            content: String::from("more secrets"),
+            attachments: vec![],
+        });
+        session_create_entry(new_entry).unwrap();
+        lock_vault().unwrap();
+
+        // Passphrase-only open must fail (vault is still YubiKey-protected)
+        let result = unlock_vault(pass, path.clone());
+        assert!(
+            result.is_err(),
+            "passphrase-only unlock must fail on a YubiKey vault"
+        );
+
+        // YubiKey open must succeed and show both entries
+        unlock_vault_with_yubikey(pass, &HMAC, CRED_ID.to_vec(), &YK_SALT, path.clone()).unwrap();
+        let summaries = list_entry_summaries().unwrap();
+        assert_eq!(summaries.len(), 2, "both entries must survive the re-seal");
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn change_passphrase_on_yubikey_vault_preserves_yubikey_protection() {
+        let old_pass = b"old-yubikey-pass";
+        let new_pass = b"new-yubikey-pass";
+        let path = setup_yubikey_vault(old_pass);
+
+        unlock_vault_with_yubikey(old_pass, &HMAC, CRED_ID.to_vec(), &YK_SALT, path.clone())
+            .unwrap();
+        session_change_passphrase(old_pass, new_pass).unwrap();
+        lock_vault().unwrap();
+
+        // Old passphrase must no longer work
+        let result =
+            unlock_vault_with_yubikey(old_pass, &HMAC, CRED_ID.to_vec(), &YK_SALT, path.clone());
+        assert!(result.is_err());
+
+        // New passphrase + YubiKey must work
+        unlock_vault_with_yubikey(new_pass, &HMAC, CRED_ID.to_vec(), &YK_SALT, path.clone())
+            .unwrap();
+        let summaries = list_entry_summaries().unwrap();
+        assert_eq!(summaries.len(), 1);
+
+        teardown(&path);
     }
 }
