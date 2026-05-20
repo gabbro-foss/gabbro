@@ -2843,3 +2843,68 @@ The target file must define its own `main()` function. Useful for temporary
 hardware test screens that should not ship in the production app. Delete the
 file after testing; do not merge it into `lib/`.
 
+---
+
+## Rust — type alias to silence `clippy::type_complexity`
+
+When a function returns or accepts a complex generic type (e.g. a tuple
+wrapped in `Option` that contains `Zeroizing<Vec<u8>>`), Clippy will flag it
+as `type_complexity`. The idiomatic fix is a `type` alias defined near the
+site of use:
+
+```rust
+// Before — triggers clippy::type_complexity
+fn extract_yubikey(s: &VaultSession) -> Option<(Zeroizing<Vec<u8>>, Vec<u8>, [u8; 32])> { ... }
+fn do_save(body: &VaultBody, pass: &[u8], path: &Path,
+           yubikey: Option<(Zeroizing<Vec<u8>>, Vec<u8>, [u8; 32])>) -> Result<(), String> { ... }
+
+// After — clean alias, one place to change if the type evolves
+type YubikeyTriple = Option<(Zeroizing<Vec<u8>>, Vec<u8>, [u8; 32])>;
+
+fn extract_yubikey(s: &VaultSession) -> YubikeyTriple { ... }
+fn do_save(body: &VaultBody, pass: &[u8], path: &Path, yubikey: YubikeyTriple) -> Result<(), String> { ... }
+```
+
+Adding `#[allow(clippy::type_complexity)]` is a valid alternative when the
+type appears in public API and renaming it would be misleading, but for
+private helpers a `type` alias is cleaner.
+
+---
+
+## Rust — `do_save` / `extract_yubikey` pattern for optional YubiKey paths
+
+When a session can be either passphrase-only or YubiKey-protected, and many
+functions all need to save the vault, a private helper pair avoids duplicating
+the branch everywhere:
+
+```rust
+// Extract material while the session mutex is held
+fn extract_yubikey(session: &VaultSession) -> YubikeyTriple {
+    session.yubikey.as_ref().map(|yk| (
+        Zeroizing::new(yk.hmac_secret.clone()),
+        yk.credential_id.clone(),
+        yk.hkdf_salt,
+    ))
+}
+
+// Dispatch to the right save path
+fn do_save(body: &VaultBody, passphrase: &[u8], path: &Path, yubikey: YubikeyTriple) -> Result<(), String> {
+    match yubikey {
+        Some((hmac_secret, credential_id, hkdf_salt)) => {
+            let secret: [u8; 32] = hmac_secret.as_slice().try_into()
+                .map_err(|_| "invalid cached hmac_secret length".to_string())?;
+            save_vault_with_yubikey(body, passphrase, &secret, credential_id, hkdf_salt, path)
+        }
+        None => save_vault(body, passphrase, path),
+    }
+}
+```
+
+Every save-calling function then becomes a one-liner: call `extract_yubikey`,
+pass the result to `do_save`. The distinction between YubiKey and
+passphrase-only is invisible at the call site.
+
+The hmac-secret is **deterministic** (same credential + same salt → same
+32-byte output from the YubiKey), so caching it in `YubikeyMaterial` for the
+session lifetime is safe: CRUD saves do not require a re-tap.
+

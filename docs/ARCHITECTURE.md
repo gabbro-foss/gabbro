@@ -163,19 +163,28 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **YubiKey session 3 COMPLETE: Android yubikit-android Kotlin integration hardware-verified**
-  - `YubiKeyManager.kt`: `register()` + `getHmacSecret()` via `Ctap2Session` (raw CTAP2, not `Ctap2Client`)
-  - `MainActivity.kt`: MethodChannel `"app.gabbro.gabbro/yubikey_test"` with `register` and `get_hmac_secret` methods
-  - Hardware test on Samsung S23 + USB-C YubiKey 5C: register → 64-byte credential ID ✓; hmac-secret → 32 bytes ✓; determinism ✓
-  - Session 2 complete: `rust/src/fido/` module — `register()` and `get_hmac_secret()` via libfido2 FFI; hardware-verified on YubiKey 5 via `/dev/hidraw5`
-  - Session 1 complete: vault format v2 with `YubiKeyRecord` struct; `combine_yubikey` HKDF combiner in `hkdf.rs`
-  - Design complete: ADR-010 documents the hmac-secret mechanism
+- **YubiKey session 4a COMPLETE: Rust + bridge layer for YubiKey vault create/unlock**
+  - `vault_crypto.rs`: `seal_vault_with_yubikey`, `open_vault_with_yubikey`
+  - `vault.rs`: `save_vault_with_yubikey`, `load_vault_with_yubikey` (both `#[frb(ignore)]`)
+  - `session.rs`: `YubikeyMaterial` struct cached in session; `unlock_vault_with_yubikey`; `do_save` / `extract_yubikey` helpers; all 10 save-calling functions updated to use `do_save` (YubiKey-aware); `session_change_passphrase` inline YubiKey paths; `lock_vault` zeroizes `hmac_secret`
+  - `vault_bridge.rs`: `YubikeyRecordData` DTO; `list_vault_yubikey_records` (sync, reads header only); `unlock_vault_with_yubikey`; `init_vault_with_yubikey`
+  - `MainActivity.kt`: `register` + `get_hmac_secret` MethodChannel handlers (done session 3, confirmed complete)
+  - **Key design decisions:** `do_save` unifies passphrase-only vs YubiKey save path; `YubikeyMaterial` caches hmac-secret for CRUD re-seals without re-tap (deterministic); `list_vault_yubikey_records` reads header pre-passphrase entry so Android can identify which YubiKey credential to present; `session_export_vault` intentionally passphrase-only per ADR-010
+  - All test counts: vault_crypto +7, session +5, vault_bridge +4 = 16 new YubiKey tests; all pass
 
-- **Next YubiKey sessions (separate, in order):**
-  1. Vault unlock integration — wire `YubiKeyManager` into the unlock flow; combine hmac-secret with Argon2id via `combine_yubikey` HKDF
-  2. NFC support — `startNfcDiscovery` (requires foreground Activity); separate session
+- **Previous sessions:**
+  - Session 3 complete: `YubiKeyManager.kt` hardware-verified on Samsung S23 + YubiKey 5C
+  - Session 2 complete: `rust/src/fido/` — libfido2 FFI, hardware-verified on Linux
+  - Session 1 complete: vault format v2 `YubiKeyRecord`; `combine_yubikey` HKDF combiner
 
-  **Build environment notes (critical for next session):**
+- **Next: Session 4b — Flutter UI for YubiKey vault create + unlock screen**
+  - `unlock_screen.dart`: detect YubiKey records via `listVaultYubikeyRecords`, show "Insert YubiKey" prompt, call `unlockVaultWithYubikey`
+  - Onboarding / new vault creation: offer YubiKey opt-in, call `initVaultWithYubikey`
+  - Change passphrase with YubiKey (session 5)
+  - Vault delete with YubiKey (session 6)
+  - NFC support (session 7)
+
+  **Build environment notes (critical for Android sessions):**
   - System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
   - AGP pinned to 8.9.1 in `android/settings.gradle.kts` (8.7.0 too old for transitive deps; 8.11+ breaks Flutter's `compileSdkVersion` string API).
   - `libfido2-sys` and `pub mod fido` are gated behind `cfg(not(target_os = "android"))` — libfido2 is Linux-only; Android uses yubikit-android via Kotlin.
@@ -202,12 +211,17 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- YubiKey / FIDO2 authentication:   
+- YubiKey / FIDO2 authentication:
   - Design complete: ADR-010 documents the hmac-secret mechanism
-  - Implementation plan (three sessions, in order):
+  - Implementation progress:
     1. Vault format extension + HKDF combiner (pure Rust) ✓
     2. Linux libfido2 binding (Rust FFI) ✓
     3. Android yubikit-android integration (Kotlin) ✓
+    4a. Rust + bridge: `seal/open_vault_with_yubikey`, `YubikeyMaterial` session, all bridge functions ✓
+    4b. Flutter UI: unlock screen YubiKey detect/prompt, onboarding YubiKey opt-in
+    5. Change passphrase with YubiKey
+    6. Vault delete with YubiKey
+    7. NFC support
 - Multiple vaults.
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
 - Export vault to JSON - consistent with gabbro stance: we don't lock the user in.
