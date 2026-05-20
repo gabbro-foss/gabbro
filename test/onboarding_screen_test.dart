@@ -149,6 +149,15 @@ void main() {
     expect(find.widgetWithText(TextFormField, 'YubiKey PIN'), findsOneWidget);
   });
 
+  testWidgets('slow-vault warning shown when yubikey toggle enabled', (tester) async {
+    await tester.pumpWidget(_buildScreen(isAndroid: true));
+
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pump();
+
+    expect(find.textContaining('20'), findsOneWidget);
+  });
+
   testWidgets('vault creation with yubikey calls onInitVaultWithYubikey',
       (tester) async {
     bool called = false;

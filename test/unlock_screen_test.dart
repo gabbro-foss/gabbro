@@ -125,6 +125,20 @@ void main() {
     expect(called, isTrue);
   });
 
+  testWidgets('unlock screen is scrollable in landscape-like viewport (yubikey mode)', (tester) async {
+    tester.view.physicalSize = const Size(800, 400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.reset());
+
+    await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+    await tester.pumpAndSettle();
+
+    // Screen must wrap content in a SingleChildScrollView so the Unlock
+    // button is reachable in landscape / short-height viewports.
+    expect(find.byType(SingleChildScrollView), findsOneWidget);
+    expect(find.text('Unlock'), findsOneWidget);
+  });
+
   testWidgets('yubikey error shown when onUnlockWithYubikey throws', (tester) async {
     await tester.pumpWidget(_buildScreen(
       yubikeyRecords: [_fakeRecord()],
