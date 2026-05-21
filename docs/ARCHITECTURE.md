@@ -152,7 +152,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 246 | 3 |
-| Flutter (`flutter test`) | 297 | 0 |
+| Flutter (`flutter test`) | 301 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 4 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -202,6 +202,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Export/import security note: `.gabbro` exports are AES-256-GCM encrypted (passphrase-only — YubiKey not required to import, by design; passphrase is the durable recovery factor, YubiKey is the live-vault second factor). JSON exports are plaintext — no encryption at all. Add visible warnings in the export UI distinguishing the two: `.gabbro` ("protected by your passphrase only") and JSON ("completely unencrypted — store securely").
 - Search improvement: currently only searches title, needs an option to also search all fields and notes
 - Multiple app languages (v1: en,fr,de,it,es)
+- `onboarding_screen.dart` — accessibility button (top-right) partially hidden behind "Welcome to Gabbro" headline on some screen sizes; fix layout so button is never obscured. **Priority: needed for accessibility.**
+- `onboarding_screen.dart` — keyboard slides up when PIN field is focused during YubiKey vault creation, obscuring the step indicator card; fix so step indicator remains visible.
 - App logo (OnboardingScreen, UnlockScreen) — defer until designed.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
