@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
@@ -18,7 +19,7 @@ Widget _buildScreen({
   Future<void> Function(List<int>, String)? onInitVault,
   bool blockPassphraseCopyPaste = true,
   bool isAndroid = false,
-  Future<void> Function(List<int>, String, String)? onInitVaultWithYubikey,
+  Future<void> Function(List<int>, String, String, void Function())? onInitVaultWithYubikey,
 }) =>
     MaterialApp(
       home: OnboardingScreen(
@@ -28,7 +29,7 @@ Widget _buildScreen({
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
         isAndroid: isAndroid,
         onInitVaultWithYubikey:
-            onInitVaultWithYubikey ?? (a, b, c) async {},
+            onInitVaultWithYubikey ?? (a, b, c, onStep2) async {},
       ),
     );
 
@@ -163,7 +164,7 @@ void main() {
     bool called = false;
     await tester.pumpWidget(_buildScreen(
       isAndroid: true,
-      onInitVaultWithYubikey: (a, b, c) async => called = true,
+      onInitVaultWithYubikey: (a, b, c, onStep2) async => called = true,
     ));
 
     const passphrase = 'correct horse battery staple one two three four';
@@ -198,5 +199,77 @@ void main() {
     await tester.pump();
 
     expect(called, isTrue);
+  });
+
+  // ── Step indicator ────────────────────────────────────────────────────────────
+
+  Future<void> fillAndSubmitYubikey(
+    WidgetTester tester,
+    Future<void> Function(List<int>, String, String, void Function()) onInitVaultWithYubikey,
+  ) async {
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: true,
+      onInitVaultWithYubikey: onInitVaultWithYubikey,
+    ));
+    const passphrase = 'correct horse battery staple one two three four';
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Master passphrase'),
+      passphrase,
+    );
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Confirm passphrase'),
+      passphrase,
+    );
+    await tester.pump();
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'YubiKey PIN'),
+      '123456',
+    );
+    await tester.pump();
+    await tester.ensureVisible(find.text('Create vault'));
+  }
+
+  testWidgets('step 1 indicator shown immediately after Create vault tapped', (tester) async {
+    // Completer (no timer) blocks _createVault without leaving a fake timer pending.
+    final hold = Completer<void>();
+    await fillAndSubmitYubikey(
+      tester,
+      (_, _, _, onStep2) => hold.future,
+    );
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create vault'));
+      await Future.delayed(const Duration(milliseconds: 50));
+    });
+    await tester.pump();
+
+    expect(find.text('Register'), findsOneWidget);
+    expect(find.text('Touch your YubiKey now'), findsOneWidget);
+    expect(find.text('Activate'), findsOneWidget);
+    // Step 2 hint not shown yet — waiting for tap 1
+    expect(find.text('Touch your YubiKey again to seal the vault'), findsNothing);
+  });
+
+  testWidgets('step 2 indicator shown after onStep2 callback fires', (tester) async {
+    await fillAndSubmitYubikey(
+      tester,
+      (_, _, _, onStep2) async {
+        onStep2();
+        // Hold indefinitely so we can inspect the UI before navigation
+        await Future<void>.delayed(const Duration(seconds: 30));
+      },
+    );
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create vault'));
+      await Future.delayed(const Duration(milliseconds: 50));
+    });
+    await tester.pump();
+
+    expect(find.text('Activate'), findsOneWidget);
+    expect(find.text('Touch your YubiKey again to seal the vault'), findsOneWidget);
+    // Step 1 hint gone — step 1 is done
+    expect(find.text('Touch your YubiKey now'), findsNothing);
   });
 }

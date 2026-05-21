@@ -66,25 +66,38 @@ class MainActivity : FlutterActivity() {
                         attempt(1)
                     }
                     "register" -> {
-                        YubiKeyManager.startUsbDiscovery(
-                            this,
-                            onConnected = { connection ->
-                                YubiKeyManager.register(
-                                    connection, pin,
-                                    onSuccess = { credId ->
-                                        YubiKeyManager.stopUsbDiscovery()
-                                        result.success(credId.toHex())
-                                    },
-                                    onError = { msg ->
-                                        YubiKeyManager.stopUsbDiscovery()
-                                        result.error("REGISTER_FAILED", msg, null)
-                                    },
-                                )
-                            },
-                            onError = { msg ->
-                                result.error("USB_ERROR", msg, null)
-                            },
-                        )
+                        fun attempt(retriesLeft: Int) {
+                            YubiKeyManager.startUsbDiscovery(
+                                this,
+                                onConnected = { connection ->
+                                    YubiKeyManager.register(
+                                        connection, pin,
+                                        onSuccess = { credId ->
+                                            YubiKeyManager.stopUsbDiscovery()
+                                            result.success(credId.toHex())
+                                        },
+                                        onError = { msg ->
+                                            YubiKeyManager.stopUsbDiscovery()
+                                            if (retriesLeft > 0) {
+                                                android.os.Handler(android.os.Looper.getMainLooper())
+                                                    .postDelayed({ attempt(retriesLeft - 1) }, 500)
+                                            } else {
+                                                result.error("REGISTER_FAILED", msg, null)
+                                            }
+                                        },
+                                    )
+                                },
+                                onError = { msg ->
+                                    if (retriesLeft > 0) {
+                                        android.os.Handler(android.os.Looper.getMainLooper())
+                                            .postDelayed({ attempt(retriesLeft - 1) }, 500)
+                                    } else {
+                                        result.error("USB_ERROR", msg, null)
+                                    }
+                                },
+                            )
+                        }
+                        attempt(1)
                     }
                     "get_hmac_secret" -> {
                         val credIdHex = call.argument<String>("credentialId")

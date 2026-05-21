@@ -37,21 +37,31 @@ Future<void> _defaultInitVaultWithYubikey(
   List<int> passphrase,
   String pin,
   String path,
+  void Function() onStep2,
 ) async {
   final salt = List<int>.generate(32, (_) => Random.secure().nextInt(256));
-  final result = await _yubikeyChannel.invokeMapMethod<String, String>(
-    'register_and_get_hmac',
-    {
-      'salt': _toHex(salt),
-      'pin': pin,
-    },
+
+  // Tap 1: makeCredential (register the hardware credential)
+  final credIdHex = await _yubikeyChannel.invokeMethod<String>(
+    'register',
+    {'pin': pin},
   );
-  final credentialId = _fromHex(result!['credentialId']!);
-  final hmacSecret = _fromHex(result['hmacSecret']!);
+  if (credIdHex == null) throw Exception('YubiKey registration returned no credential');
+
+  // Step 1 done — advance UI to step 2 before requesting the second tap
+  onStep2();
+
+  // Tap 2: getAssertions (retrieve hmac-secret to seal the vault)
+  final hmacHex = await _yubikeyChannel.invokeMethod<String>(
+    'get_hmac_secret',
+    {'credentialId': credIdHex, 'salt': _toHex(salt), 'pin': pin},
+  );
+  if (hmacHex == null) throw Exception('YubiKey activation returned no secret');
+
   await initVaultWithYubikey(
     passphrase: passphrase,
-    hmacSecret: hmacSecret,
-    credentialId: credentialId,
+    hmacSecret: _fromHex(hmacHex),
+    credentialId: _fromHex(credIdHex),
     hkdfSalt: salt,
     path: path,
   );
@@ -74,6 +84,7 @@ class OnboardingScreen extends StatefulWidget {
     List<int> passphrase,
     String pin,
     String path,
+    void Function() onStep2,
   ) onInitVaultWithYubikey;
 
   OnboardingScreen({
@@ -106,6 +117,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   EntropyResult? _entropy;
   bool? _confirmMatches;
   bool _useYubikey = false;
+  // 0 = idle, 1 = waiting for tap 1 (register), 2 = waiting for tap 2 (activate)
+  int _yubikeyStep = 0;
 
   @override
   void initState() {
@@ -140,6 +153,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     setState(() {
       _isCreating = true;
       _error = null;
+      if (_useYubikey) _yubikeyStep = 1;
     });
     try {
       final file = File(_vaultPath);
@@ -149,6 +163,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _passphraseController.text.codeUnits,
           _pinController.text,
           _vaultPath,
+          () { if (mounted) setState(() => _yubikeyStep = 2); },
         );
       } else {
         await widget.onInitVault(
@@ -164,7 +179,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         );
       }
     } catch (e) {
-      if (mounted) setState(() => _error = e.toString());
+      if (mounted) setState(() { _error = e.toString(); _yubikeyStep = 0; });
     } finally {
       if (mounted) setState(() => _isCreating = false);
     }
@@ -204,6 +219,117 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       current.copyWith(
         highContrast: !isOn,
         textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.xxLarge,
+      ),
+    );
+  }
+
+  Widget _buildStepRow(
+    BuildContext context, {
+    required int number,
+    required String label,
+    required String hint,
+    required bool done,
+    required bool active,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+    final circleColor = done
+        ? Colors.green.shade600
+        : active
+            ? cs.primary
+            : cs.outlineVariant;
+    final labelColor = done
+        ? Colors.green.shade600
+        : active
+            ? cs.onSurface
+            : cs.onSurfaceVariant;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: circleColor),
+          child: Center(
+            child: done
+                ? const Icon(Icons.check, color: Colors.white, size: 16)
+                : Text(
+                    '$number',
+                    style: TextStyle(
+                      color: active ? Colors.white : cs.onSurfaceVariant,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: labelColor,
+                ),
+              ),
+              if (active)
+                Text(
+                  hint,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: cs.onSurface,
+                      ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildYubikeyCreationSteps(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final step1Done = _yubikeyStep >= 2;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerHighest.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: cs.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildStepRow(
+            context,
+            number: 1,
+            label: 'Register',
+            hint: 'Touch your YubiKey now',
+            done: step1Done,
+            active: _yubikeyStep == 1,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 13, top: 4, bottom: 4),
+            child: Container(
+              width: 2,
+              height: 14,
+              color: step1Done ? Colors.green.shade600 : cs.outlineVariant,
+            ),
+          ),
+          _buildStepRow(
+            context,
+            number: 2,
+            label: 'Activate',
+            hint: 'Touch your YubiKey again to seal the vault',
+            done: false,
+            active: _yubikeyStep == 2,
+          ),
+          const SizedBox(height: 14),
+          const LinearProgressIndicator(),
+        ],
       ),
     );
   }
@@ -452,30 +578,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 : null,
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            'Insert your YubiKey and tap when prompted',
-                            style: Theme.of(context).textTheme.bodySmall,
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .tertiaryContainer
-                                  .withValues(alpha: 0.5),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              'Vault creation with YubiKey takes 20–30 seconds. The app may appear unresponsive — this is normal.',
+                          if (_isCreating)
+                            _buildYubikeyCreationSteps(context)
+                          else ...[
+                            Text(
+                              'You will tap your YubiKey twice: once to register, once to activate.',
                               style: Theme.of(context).textTheme.bodySmall,
                               textAlign: TextAlign.center,
                             ),
-                          ),
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .tertiaryContainer
+                                    .withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Vault creation with YubiKey takes 20–30 seconds. The app may appear unresponsive — this is normal.',
+                                style: Theme.of(context).textTheme.bodySmall,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
                         ],
                       ],
                       const SizedBox(height: 24),
