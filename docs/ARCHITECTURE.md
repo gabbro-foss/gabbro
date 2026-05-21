@@ -153,7 +153,7 @@ gabbro/
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 246 | 3 |
 | Flutter (`flutter test`) | 301 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 0 | 4 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
 
@@ -163,16 +163,22 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next: Session 7 — NFC support**
+- **Next: Session 8 — wire NFC transport into MethodChannel and Flutter screens**
   - USB YubiKey path complete and hardware-verified (Samsung S23, YubiKey 5C/5A, firmware 5.4.3)
-  - Add NFC transport to `YubiKeyManager.kt` alongside existing USB HID path
+  - NFC transport layer written in `YubiKeyManager.kt` (`startNfcDiscovery` / `stopNfcDiscovery`) — **not yet wired to `MainActivity.kt` MethodChannel**
+  - Hardware testing of NFC is blocked until wiring is done
+  - Next steps:
+    1. Add `transport` parameter (`"usb"` / `"nfc"`) to all three MethodChannel methods in `MainActivity.kt` (`register_and_get_hmac`, `register`, `get_hmac_secret`)
+    2. Add transport selector to Flutter screens that call the YubiKey channel (`onboarding_screen.dart`, `unlock_screen.dart`, `change_passphrase_screen.dart`, `vault_list_screen.dart`)
+    3. Hardware-test all NFC paths (test matrix: 4 NFC-only tests + 2 cross-transport tests using YubiKey 5 NFC USB-C; manual check of NFC-disabled error path)
 
   **Build environment notes (critical for Android sessions):**
   - System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
-  - AGP pinned to 8.9.1 in `android/settings.gradle.kts` (8.7.0 too old for transitive deps; 8.11+ breaks Flutter's `compileSdkVersion` string API).
+  - AGP 8.11.1 in `android/settings.gradle.kts`. Java and Kotlin JVM target both set to 21 in `app/build.gradle.kts`.
   - `libfido2-sys` and `pub mod fido` are gated behind `cfg(not(target_os = "android"))` — libfido2 is Linux-only; Android uses yubikit-android via Kotlin.
   - yubikit-android 3.1.0: use `Ctap2Session` (raw CTAP2) not `Ctap2Client` (WebAuthn wrapper). `Ctap2Client` enforces WebAuthn domain validation — rejects `"app.gabbro.gabbro"` as RP ID. `Ctap2Session` has no such restriction.
-  - USB transport: `UsbFidoConnection` (HID interface), not `SmartCardConnection` (CCID). FIDO2 over USB uses HID.
+  - `Ctap2Session` has no unified `YubiKeyConnection` constructor — use the `ctap2Session()` private helper in `YubiKeyManager` which dispatches on `SmartCardConnection` (NFC) vs `FidoConnection` (USB HID).
+  - USB transport: `UsbFidoConnection` (HID interface). NFC transport: `SmartCardConnection` (ISO 7816). Both produce a `YubiKeyConnection` usable with `ctap2Session()`.
   - RP ID `"app.gabbro.gabbro"` is correct at CTAP2 level — it is just an identifier string, no domain required.
 
 ---
@@ -194,7 +200,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- YubiKey / FIDO2 authentication — NFC support (session 7; ADR-010 has hmac-secret design)
+- YubiKey / FIDO2 authentication — NFC transport layer written in `YubiKeyManager.kt` (session 7) but not yet wired to `MainActivity.kt` MethodChannel or Flutter screens; see Current Focus for next steps
+- ADR-010 mentions two yubikeys as minimum at vault creation, check ADR-010 and implement accordingly
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
