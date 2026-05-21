@@ -3020,4 +3020,40 @@ returns. This caused a `Null check operator used on a null value` crash in `_cre
 1. `_lock()` bails early if `widget.vaultPath` does not exist yet (vault creation in progress).
 2. `if (mounted)` guards on every `setState` call in `_createVault`'s `catch`/`finally`.
 
+---
+
+## YubiKey NFC — disabling OTP over NFC to fix the NDEF browser-opening bug
+
+**The bug:** Every time Gabbro activated the NFC reader, Android opened a browser tab to
+`https://my.yubico.com/yk/...`. The YubiKey broadcasts its OTP slot 1 as an NDEF URI over
+NFC; Android's browser (Chrome) is registered for `NDEF_DISCOVERED` on https and wins as the
+default handler. Three in-code mitigations (foreground dispatch, manifest intent filters,
+combination) all failed because yubikit's `enableReaderMode` suppresses foreground dispatch
+internally, and the system browser still wins.
+
+**The fix:** Disable the OTP application over NFC on the YubiKey itself:
+
+```bash
+ykman config nfc --disable OTP
+```
+
+Run once per YubiKey. Verified: onboarding, unlock, change passphrase, and delete vault all
+work correctly after the change; FIDO2/CTAP2 over NFC is unaffected.
+
+**Collateral effects — what is disabled:**
+- Yubico OTP (slot 1) over NFC — the NDEF URI source.
+- HOTP / static password (slot 2) over NFC.
+- Challenge-response (slot 2) over NFC (already USB-only in practice).
+
+**What is not affected:**
+- OTP over USB — short/long press still emits codes; GitHub via USB confirmed working.
+- FIDO2/WebAuthn over NFC — separate application; Gabbro's CTAP2 flow unaffected.
+- FIDO2/WebAuthn over USB — separate application; unaffected.
+- OATH TOTP/HOTP (Yubico Authenticator) — uses the OATH application, not OTP; NFC still works.
+- PIV and OpenPGP over NFC — separate applications; unaffected.
+
+**Real-world breakage risk:** very low. The only scenario that breaks is a service that uses
+legacy Yubico OTP *and* requires NFC delivery specifically (not USB). No mainstream service
+imposes this combination.
+
 These fixes prevent the crash but do not resolve the underlying two-touch issue.

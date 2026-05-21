@@ -17,6 +17,8 @@ FOSS, GPL-3.0-only. Potential Yubico partnership.
 
 **Authentication (app access):** Mandatory FIDO2/WebAuthn hardware key (YubiKey). v1 uses Ed25519 (hardware constraint); target ML-DSA-44 once Yubico ships PQ-capable hardware (ADR-005). Min 2 keys (primary + backup), max 4. Biometric replaces passphrase entry only, never YubiKey tap. Auto-lock: 30s default, configurable.
 
+**YubiKey NFC prerequisite — NDEF OTP:** YubiKeys ship with OTP slot 1 configured as an NDEF URI (`https://my.yubico.com/yk/...`). When the Android NFC reader is active, the key broadcasts this URI and Android opens a browser tab — even foreground-dispatch and manifest intent-filter mitigations cannot suppress it, because yubikit's `enableReaderMode` owns the NFC stack. **Workaround (one-time, per key):** run `ykman config nfc --disable OTP`. This disables the OTP application over NFC only; FIDO2/CTAP2 over NFC and all USB functions are unaffected. See LEARNINGS.md for full collateral-effects analysis.
+
 **Vault file format:** `.gabbro` binary. Plaintext header (magic, version, Argon2id params + salt, HKDF salt, nonce, ML-KEM ciphertext, X25519 ephemeral pubkey) + AES-256-GCM encrypted body (JSON-serialised entries). Self-contained; auth tag detects tampering.
 
 **Vault entries:** 6 types — Login (displayed as "Password" in UI), Note, Identity, Card, File, Custom. Common fields: UUID, created, modified, folder, tags, favourite. No TOTP — YubiKey covers 2FA; keeping them separate is more secure.
@@ -163,23 +165,26 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Session 8 complete — NFC transport wired and hardware-verified**
-  - `transport` param (`"usb"` / `"nfc"`) added to all three MethodChannel methods; `startDiscovery`/`stopDiscovery` helpers dispatch to correct yubikit API
-  - USB/NFC `SegmentedRow` selector added to all four YubiKey screens
-  - All NFC happy paths hardware-verified: create, unlock, change passphrase, delete, cross-transport
-  - Error messages improved: `PlatformException.message` shown for `TRANSPORT_ERROR` on all screens; generic "Authorization failed" still shown for auth failures
-  - NFC-disabled error message now says "Move your YubiKey away from the phone, then enable NFC in Settings"
-  - **Open bug: YubiKey NDEF OTP URL opens browser during NFC operations — see Bikeshed**
-  - **Next: to be decided — check Bikeshed**
+- **Session 9 complete — NDEF browser-opening bug resolved**
+  - Root cause: YubiKey OTP slot 1 broadcasts an NDEF URI over NFC; Android browser wins the `NDEF_DISCOVERED` intent even with foreground dispatch and manifest filters in place.
+  - Fix: `ykman config nfc --disable OTP` — disables OTP application over NFC on the key itself. FIDO2/CTAP2 over NFC is a separate application and is unaffected.
+  - Hardware-verified: onboarding, unlock, change passphrase, delete vault — no browser opening. OTP over USB (GitHub) confirmed still working.
+  - See LEARNINGS.md "YubiKey NFC — disabling OTP over NFC" for full collateral-effects analysis.
+  - **Next: test YubiKey (USB) on Linux release**
 
-  **Build environment notes (critical for Android sessions):**
-  - System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
-  - AGP 8.11.1 in `android/settings.gradle.kts`. Java and Kotlin JVM target both set to 21 in `app/build.gradle.kts`.
-  - `libfido2-sys` and `pub mod fido` are gated behind `cfg(not(target_os = "android"))` — libfido2 is Linux-only; Android uses yubikit-android via Kotlin.
-  - yubikit-android 3.1.0: use `Ctap2Session` (raw CTAP2) not `Ctap2Client` (WebAuthn wrapper). `Ctap2Client` enforces WebAuthn domain validation — rejects `"app.gabbro.gabbro"` as RP ID. `Ctap2Session` has no such restriction.
-  - `Ctap2Session` has no unified `YubiKeyConnection` constructor — use the `ctap2Session()` private helper in `YubiKeyManager` which dispatches on `SmartCardConnection` (NFC) vs `FidoConnection` (USB HID).
-  - USB transport: `UsbFidoConnection` (HID interface). NFC transport: `SmartCardConnection` (ISO 7816). Both produce a `YubiKeyConnection` usable with `ctap2Session()`.
-  - RP ID `"app.gabbro.gabbro"` is correct at CTAP2 level — it is just an identifier string, no domain required.
+---
+
+## Build Environment
+
+**Critical notes — read before Android or Kotlin sessions.**
+
+- System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
+- AGP 8.11.1 in `android/settings.gradle.kts`. Java and Kotlin JVM target both set to 21 in `app/build.gradle.kts`.
+- `libfido2-sys` and `pub mod fido` are gated behind `cfg(not(target_os = "android"))` — libfido2 is Linux-only; Android uses yubikit-android via Kotlin.
+- yubikit-android 3.1.0: use `Ctap2Session` (raw CTAP2) not `Ctap2Client` (WebAuthn wrapper). `Ctap2Client` enforces WebAuthn domain validation — rejects `"app.gabbro.gabbro"` as RP ID. `Ctap2Session` has no such restriction.
+- `Ctap2Session` has no unified `YubiKeyConnection` constructor — use the `ctap2Session()` private helper in `YubiKeyManager` which dispatches on `SmartCardConnection` (NFC) vs `FidoConnection` (USB HID).
+- USB transport: `UsbFidoConnection` (HID interface). NFC transport: `SmartCardConnection` (ISO 7816). Both produce a `YubiKeyConnection` usable with `ctap2Session()`.
+- RP ID `"app.gabbro.gabbro"` is correct at CTAP2 level — it is just an identifier string, no domain required.
 
 ---
 
@@ -200,12 +205,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- **YubiKey NFC — NDEF browser bug (open, hard):** Every time the NFC field is active, the YubiKey broadcasts its OTP slot as an NDEF URI (`https://my.yubico.com/yk/...`). Android's browser/Chrome intercepts this and opens a browser tab, even while Gabbro is in the foreground. Three mitigations were attempted and all failed:
-  1. `NfcAdapter.enableForegroundDispatch` in `onResume`/`onPause` with `onNewIntent` override — ineffective because yubikit's `enableReaderMode` disables foreground dispatch internally, and `disableReaderMode` does not restore it.
-  2. Manifest `NDEF_DISCOVERED` intent filters for `my.yubico.com` and `demo.yubico.com` — ineffective because Chrome/the system browser is also registered for `NDEF_DISCOVERED` on https and wins as the default.
-  3. Combination of 1 + 2 — same result. Browser opens immediately after `disableReaderMode` is called (i.e., as soon as the CTAP2 operation completes or fails), and also during Settings visit when enabling NFC.
-  Known approaches not yet tried: (a) disable the NDEF slot on the YubiKey via the YubiKey Manager app (user action, not fixable in code); (b) keep reader mode active for a few hundred milliseconds after the CTAP2 op completes to give the user time to pull the key away; (c) suppress the NDEF at the yubikit `NfcConfiguration` level if an API exists for it.
-  Current code state: mitigations 1 and 2 are committed — harmless, provide no benefit for the core bug but kept for reference.
 - ADR-010 mentions two yubikeys as minimum at vault creation, check ADR-010 and implement accordingly
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
