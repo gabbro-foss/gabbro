@@ -152,7 +152,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 246 | 3 |
-| Flutter (`flutter test`) | 291 | 0 |
+| Flutter (`flutter test`) | 297 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 4 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -195,31 +195,15 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - **Card editing bug fixed:** `_hasChanges` missing `creditLimit`, `cardAccountNumber`, `paymentNetwork`, `notes` for Card → "No changes to save" on optional fields; `_buildFieldDiffs` missing `cardNumber` + same fields → no diff in review screen; both fixed (+4 regression tests)
   - Flutter: 295 passing (+4), Rust: 246 (unchanged), Android: 0 / 4 ignored (unchanged)
 
-- **UNRESOLVED — YubiKey vault creation single-tap (blocks test A.1 and block 12)**
+- **YubiKey vault creation two-tap UX RESOLVED (Option A)**
+  - Root cause confirmed: CTAP2.1 firmware 5.4.3 enforces user presence for both `makeCredential` and `getAssertions` — two taps are unavoidable at the protocol level.
+  - Split `_defaultInitVaultWithYubikey` into two sequential channel calls: `register` (tap 1, makeCredential only) → `onStep2()` callback → `get_hmac_secret` (tap 2, getAssertions).
+  - `onboarding_screen.dart`: new `_buildYubikeyCreationSteps` widget shows a numbered step card during creation — step 1 active (filled circle, "Touch your YubiKey now"), transitions to step 2 active (green checkmark on step 1, "Touch your YubiKey again to seal the vault") once `onStep2` fires. Static hint updated to "You will tap your YubiKey twice: once to register, once to activate."
+  - `MainActivity.kt`: added retry-on-USB-error to `register` handler (was missing; now matches `register_and_get_hmac` and `get_hmac_secret`).
+  - Hardware-verified on Samsung S23 + YubiKey 5C (firmware 5.4.3). Test A.1 and block 12 now pass.
+  - Flutter: 297 passing (+2), Rust: 246 (unchanged), Android: 0/4 ignored (unchanged)
 
-  **Symptom:** `CTAP error: action_timeout (0x3a)` from `registerAndGetHmac`. User taps once; YubiKey blinks a second time and times out.
-
-  **Device:** Samsung S23, YubiKey 5C + 5A, firmware 5.4.3 (both). CTAP2.1-capable.
-
-  **Root cause of earlier "passphrase-only login" report:** the 30s foreground lock timer was firing during the long CTAP2 operation, disposing `OnboardingScreen` and triggering an unhandled null-setState crash. The vault WAS being created correctly; the app was crashing after. Fixed (mounted guards + `_lock()` file guard).
-
-  **Mitigation attempts (all failed on 5.4.3 hardware):**
-  1. `up=false` on `getAssertions` — YubiKey ignored it, still prompted for touch
-  2. Combined PIN token (`PIN_PERMISSION_MC or PIN_PERMISSION_GA`) + `up=false` — same `action_timeout`
-
-  **Where the second blink comes from:** `registerAndGetHmac` does two CTAP2 operations: `makeCredential` (tap 1) then `getAssertions` (tap 2). All attempts to make `getAssertions` skip UP have failed, suggesting the YubiKey 5.4.3 firmware enforces UP for `getAssertions` regardless of `up=false` when the PIN token does not carry the UP flag (UP flag is only set in a pinUvAuthToken if UP was performed during token construction — PIN-only `getPinToken` does not set it on this firmware).
-
-  **Proposed solutions for next session (in order of preference):**
-
-  A. **Two-tap onboarding with clear UI (one-time only, simplest):** Keep `up=true` default, show explicit step UI: "Step 1 of 2 — tap YubiKey to register" → "Step 2 of 2 — tap again to activate". Unlock always remains one tap. This is the correct behaviour per the CTAP2 protocol.
-
-  B. **Retrieve hmac-secret via getPinToken + UV-bearing token:** Investigate whether `getPinUvAuthTokenUsingUvWithPermissions` (built-in UV, not PIN) or `getPinUvAuthTokenUsingPinWithPermissions` with explicit UP option sets the UP flag in the token on this firmware. If UP flag is set in the token, `getAssertions` with `up=false` MUST be respected per CTAP2.1 spec.
-
-  C. **Split registration from first hmac-secret fetch:** `makeCredential` (one tap) during onboarding → store credential ID; vault is created with a provisional key; on first unlock `getAssertions` (one tap, same as normal unlock) retrieves the real hmac-secret → vault re-sealed. Net: one tap per event, two total across two separate user interactions. Significant Rust+Kotlin+Dart change.
-
-  **Recommendation:** Try option A first — it is honest about the protocol constraint and unblocks the rest of the test matrix immediately. Option B should be investigated in parallel with a logcat trace to confirm exactly which CTAP2 operation is generating the second blink.
-
-- **Next: resolve YubiKey vault creation (options A/B/C above), then Session 7 — NFC support**
+- **Next: Session 7 — NFC support**
 
   **Build environment notes (critical for Android sessions):**
   - System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
