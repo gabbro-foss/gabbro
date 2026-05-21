@@ -37,7 +37,7 @@ pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord
         }
 
         let r = fido_dev_open(dev, device_path_c.as_ptr());
-        if r != FIDO_OK as i32 {
+        if r != FIDO_OK {
             fido_dev_free(&mut (dev as *mut _));
             return Err(format!("fido_dev_open failed: {r}"));
         }
@@ -51,19 +51,19 @@ pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord
         }
 
         // ES256 = COSE algorithm -7 (ECDSA P-256). Required by CTAP2.
-        let r = fido_cred_set_type(cred, COSE_ES256 as i32);
-        if r != FIDO_OK as i32 {
+        let r = fido_cred_set_type(cred, COSE_ES256);
+        if r != FIDO_OK {
             return Err(format!("fido_cred_set_type failed: {r}"));
         }
 
         let r =
             fido_cred_set_clientdata_hash(cred, client_data_hash.as_ptr(), client_data_hash.len());
-        if r != FIDO_OK as i32 {
+        if r != FIDO_OK {
             return Err(format!("fido_cred_set_clientdata_hash failed: {r}"));
         }
 
         let r = fido_cred_set_rp(cred, rp_id_c.as_ptr(), rp_name_c.as_ptr());
-        if r != FIDO_OK as i32 {
+        if r != FIDO_OK {
             return Err(format!("fido_cred_set_rp failed: {r}"));
         }
 
@@ -75,19 +75,19 @@ pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord
             ptr::null(),
             ptr::null(),
         );
-        if r != FIDO_OK as i32 {
+        if r != FIDO_OK {
             return Err(format!("fido_cred_set_user failed: {r}"));
         }
 
         // Enable hmac-secret extension on the credential.
-        let r = fido_cred_set_extensions(cred, FIDO_EXT_HMAC_SECRET as i32);
-        if r != FIDO_OK as i32 {
+        let r = fido_cred_set_extensions(cred, FIDO_EXT_HMAC_SECRET);
+        if r != FIDO_OK {
             return Err(format!("fido_cred_set_extensions failed: {r}"));
         }
 
         // Make the credential — this triggers the YubiKey tap.
         let r = fido_dev_make_cred(dev, cred, pin_c.as_ptr());
-        if r != FIDO_OK as i32 {
+        if r != FIDO_OK {
             fido_cred_free(&mut (cred as *mut _));
             fido_dev_close(dev);
             fido_dev_free(&mut (dev as *mut _));
@@ -143,7 +143,7 @@ pub fn get_hmac_secret(
         }
 
         let r = fido_dev_open(dev, device_path_c.as_ptr());
-        if r != FIDO_OK as i32 {
+        if r != FIDO_OK {
             fido_dev_free(&mut (dev as *mut _));
             return Err(format!("fido_dev_open failed: {r}"));
         }
@@ -161,12 +161,12 @@ pub fn get_hmac_secret(
             client_data_hash.as_ptr(),
             client_data_hash.len(),
         );
-        if r != FIDO_OK as i32 {
+        if r != FIDO_OK {
             return Err(format!("fido_assert_set_clientdata_hash failed: {r}"));
         }
 
         let r = fido_assert_set_rp(assert, rp_id_c.as_ptr());
-        if r != FIDO_OK as i32 {
+        if r != FIDO_OK {
             return Err(format!("fido_assert_set_rp failed: {r}"));
         }
 
@@ -176,24 +176,24 @@ pub fn get_hmac_secret(
             record.credential_id.as_ptr(),
             record.credential_id.len(),
         );
-        if r != FIDO_OK as i32 {
+        if r != FIDO_OK {
             return Err(format!("fido_assert_allow_cred failed: {r}"));
         }
 
         // Enable hmac-secret extension and set our stored salt.
-        let r = fido_assert_set_extensions(assert, FIDO_EXT_HMAC_SECRET as i32);
-        if r != FIDO_OK as i32 {
+        let r = fido_assert_set_extensions(assert, FIDO_EXT_HMAC_SECRET);
+        if r != FIDO_OK {
             return Err(format!("fido_assert_set_extensions failed: {r}"));
         }
 
         let r = fido_assert_set_hmac_salt(assert, record.salt.as_ptr(), record.salt.len());
-        if r != FIDO_OK as i32 {
+        if r != FIDO_OK {
             return Err(format!("fido_assert_set_hmac_salt failed: {r}"));
         }
 
         // Get the assertion — this triggers the YubiKey tap.
         let r = fido_dev_get_assert(dev, assert, pin_c.as_ptr());
-        if r != FIDO_OK as i32 {
+        if r != FIDO_OK {
             fido_assert_free(&mut (assert as *mut _));
             fido_dev_close(dev);
             fido_dev_free(&mut (dev as *mut _));

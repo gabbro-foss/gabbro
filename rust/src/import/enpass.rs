@@ -212,7 +212,7 @@ fn convert_login(
     let custom_fields = fields
         .iter()
         .filter(|f| !skip.contains(&f.field_type.as_str()))
-        .map(|f| enpass_field_to_custom(*f))
+        .map(|f| enpass_field_to_custom(f))
         .collect();
 
     LoginEntry {
@@ -252,7 +252,7 @@ fn convert_card(
     let custom_fields = fields
         .iter()
         .filter(|f| !cc_skip.contains(&f.field_type.as_str()))
-        .map(|f| enpass_field_to_custom(*f))
+        .map(|f| enpass_field_to_custom(f))
         .collect();
 
     CardEntry::new(

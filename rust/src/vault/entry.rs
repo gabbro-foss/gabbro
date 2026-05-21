@@ -155,6 +155,7 @@ pub struct CardEntry {
 impl CardEntry {
     /// Creates a new CardEntry, validating that the card number length
     /// is within the range of known real-world card formats (12-19 digits).
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         meta: EntryMeta,
         card_name: Option<String>,
@@ -178,7 +179,7 @@ impl CardEntry {
         let mut errors: Vec<&str> = Vec::new();
 
         let digit_count = card_number.chars().filter(|c| c.is_ascii_digit()).count();
-        if digit_count < 6 || digit_count > 19 {
+        if !(6..=19).contains(&digit_count) {
             errors.push("card number must contain 6–19 digits");
         }
         if cardholder_name.trim().is_empty() {
@@ -250,6 +251,7 @@ impl ZeroizeOnDrop for CustomEntry {}
 /// This is the type that gets serialized to JSON and encrypted into
 /// the vault body. A `Vec<VaultEntry>` represents the full vault contents.
 #[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+#[allow(clippy::large_enum_variant)]
 pub enum VaultEntry {
     Login(LoginEntry),
     Note(NoteEntry),

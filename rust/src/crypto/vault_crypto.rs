@@ -53,7 +53,7 @@ pub fn seal_vault(passphrase: &[u8], plaintext: &[u8]) -> Result<SealedVault, St
             .try_into()
             .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
     );
-    let x25519_secret_bytes = Zeroizing::new(x25519_secret.as_bytes().clone());
+    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
     let vault_key = Zeroizing::new(derive_vault_key(
         &ml_kem_secret_bytes,
         &x25519_secret_bytes,
@@ -105,7 +105,7 @@ pub fn open_vault(passphrase: &[u8], sealed: &SealedVault) -> Result<Vec<u8>, St
             .try_into()
             .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
     );
-    let x25519_secret_bytes = Zeroizing::new(x25519_secret.as_bytes().clone());
+    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
     let vault_key = Zeroizing::new(derive_vault_key(
         &ml_kem_secret_bytes,
         &x25519_secret_bytes,
@@ -154,7 +154,7 @@ pub fn seal_vault_with_yubikey(
             .try_into()
             .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
     );
-    let x25519_secret_bytes = Zeroizing::new(x25519_secret.as_bytes().clone());
+    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
     let intermediate_key = Zeroizing::new(derive_vault_key(
         &ml_kem_secret_bytes,
         &x25519_secret_bytes,
@@ -216,7 +216,7 @@ pub fn open_vault_with_yubikey(
             .try_into()
             .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
     );
-    let x25519_secret_bytes = Zeroizing::new(x25519_secret.as_bytes().clone());
+    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
     let intermediate_key = Zeroizing::new(derive_vault_key(
         &ml_kem_secret_bytes,
         &x25519_secret_bytes,

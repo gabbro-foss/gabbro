@@ -35,6 +35,7 @@ pub struct EntrySummaryData {
 /// This is a bridge-facing enum that wraps the existing DTOs.
 /// flutter_rust_bridge generates a Dart sealed class hierarchy from this,
 /// which Flutter code can switch/match on — one case per entry type.
+#[allow(clippy::large_enum_variant)]
 pub enum VaultEntryData {
     Login(LoginEntryData),
     Note(NoteEntryData),

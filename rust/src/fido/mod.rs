@@ -57,6 +57,7 @@ mod tests {
         let pin = std::env::var("GABBRO_TEST_PIN").expect("GABBRO_TEST_PIN must be set");
         let device =
             std::env::var("GABBRO_TEST_DEVICE").unwrap_or_else(|_| "/dev/hidraw5".to_string());
+        println!("\n>>> TAP your YubiKey to register a credential...");
         let record =
             register(&device, &pin).expect("registration should succeed with YubiKey present");
         assert!(!record.credential_id.is_empty());
@@ -70,9 +71,12 @@ mod tests {
         let pin = std::env::var("GABBRO_TEST_PIN").expect("GABBRO_TEST_PIN must be set");
         let device =
             std::env::var("GABBRO_TEST_DEVICE").unwrap_or_else(|_| "/dev/hidraw5".to_string());
+        println!("\n>>> TAP your YubiKey to register a credential (tap 1/3)...");
         let record = register(&device, &pin).expect("registration should succeed");
+        println!(">>> TAP your YubiKey for first hmac-secret assertion (tap 2/3)...");
         let out1 =
             get_hmac_secret(&device, &record, &pin).expect("first hmac-secret should succeed");
+        println!(">>> TAP your YubiKey for second hmac-secret assertion (tap 3/3)...");
         let out2 =
             get_hmac_secret(&device, &record, &pin).expect("second hmac-secret should succeed");
         assert_eq!(out1, out2, "same salt must produce same hmac-secret");

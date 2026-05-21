@@ -134,7 +134,7 @@ fn pool_size(password: &str) -> u32 {
     if password.chars().any(|c| c.is_ascii_punctuation()) {
         pool += POOL_SYMBOLS;
     }
-    if password.chars().any(|c| !c.is_ascii()) {
+    if !password.is_ascii() {
         pool += POOL_NON_ASCII;
     }
 

@@ -329,6 +329,7 @@ pub fn create_identity_entry(
 /// Creates a new card entry with a generated UUID and current timestamp.
 ///
 /// Returns an error if the card number does not contain 12-19 digits.
+#[allow(clippy::too_many_arguments)]
 pub fn create_card_entry(
     folder: String,
     card_name: Option<String>,
@@ -476,7 +477,7 @@ pub fn get_entry_by_id(entries: &[VaultEntry], id: &str) -> Result<VaultEntry, S
 /// Returns `Err` if no entry with that id exists.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn update_entry(
-    entries: &mut Vec<VaultEntry>,
+    entries: &mut [VaultEntry],
     mut updated: VaultEntry,
     expiry_days: Option<u32>,
 ) -> Result<(), String> {
@@ -584,8 +585,8 @@ fn days_from_ymd(year: u64, month: u64, day: u64) -> u64 {
         30,
         31,
     ];
-    for m in 0..(month as usize - 1) {
-        d += days_in_month[m];
+    for days in days_in_month.iter().take(month as usize - 1) {
+        d += days;
     }
     d + day - 1
 }
@@ -864,7 +865,7 @@ fn days_to_ymd(mut days: u64) -> (u64, u64, u64) {
 }
 
 fn is_leap(year: u64) -> bool {
-    (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
+    (year.is_multiple_of(4) && !year.is_multiple_of(100)) || year.is_multiple_of(400)
 }
 
 /// Returns `true` if `expires_at` is set and the timestamp is in the past.
@@ -895,7 +896,7 @@ pub(crate) fn is_expired(expires_at: Option<&str>) -> bool {
 ///
 /// Called on every unlock — silent, no-op for entries with no history
 /// or future/keep-forever expiry.
-pub(crate) fn purge_expired_history(entries: &mut Vec<VaultEntry>) {
+pub(crate) fn purge_expired_history(entries: &mut [VaultEntry]) {
     for entry in entries.iter_mut() {
         match entry {
             VaultEntry::Login(ref mut e) => {
