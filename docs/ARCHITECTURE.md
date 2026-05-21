@@ -163,47 +163,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **YubiKey session 5 COMPLETE: Change passphrase with YubiKey**
-  - `change_passphrase_screen.dart`: added `vaultPath` (required) and `yubikeyRecords` (DI, null = auto-detect via `listVaultYubikeyRecords`); shows YubiKey info banner when vault is YubiKey-protected; same passphrase flow for both modes; no PIN field needed
-  - `vault_list_screen.dart`: passes `vaultPath: widget.vaultPath` to `ChangePassphraseScreen`
-  - **Key design decision:** No PIN field or extra YubiKey tap. `session_change_passphrase` (Rust) already caches the `hmac_secret` from unlock; CTAP2 hmac-secret is deterministic (same credential + salt → same bytes), so a second tap would return identical bytes — pure ceremony. The old passphrase check is the re-authentication factor.
-  - Flutter tests: +2 new widget tests (YubiKey banner shown/not-shown)
-  - Flutter: 287 passing (+2), Rust: 246 passing (unchanged), Android: 0 passing / 4 ignored (unchanged)
-
-- **Previous sessions:**
-  - Session 4b complete: Flutter UI for YubiKey vault create + unlock
-  - Session 4a complete: Rust + bridge layer (`seal/open_vault_with_yubikey`, `YubikeyMaterial`, bridge functions)
-  - Session 3 complete: `YubiKeyManager.kt` hardware-verified on Samsung S23 + YubiKey 5C
-  - Session 2 complete: `rust/src/fido/` — libfido2 FFI, hardware-verified on Linux
-  - Session 1 complete: vault format v2 `YubiKeyRecord`; `combine_yubikey` HKDF combiner
-
-- **Pre-session-6 bikeshed cleanup (complete):**
-  - `onboarding_screen.dart`: added "20–30 seconds" slow-vault warning container inside the YubiKey opt-in block
-  - `unlock_screen.dart`: fixed landscape bug — replaced `Stack` + `Center` body with `LayoutBuilder` + `SingleChildScrollView` + `ConstrainedBox(minHeight)` so the Unlock button is reachable in short-height (landscape) viewports; `mainAxisSize: MainAxisSize.min` added to Column
-  - YubiKey option in onboarding: already implemented (`SwitchListTile` defaults OFF, lets user choose); confirmed and removed from bikeshed
-  - Flutter: 289 passing (+2), Rust: 246 (unchanged), Android: 0 / 4 ignored (unchanged)
-
-- **YubiKey session 6 COMPLETE: Vault delete with YubiKey**
-  - `vault_list_screen.dart`: added `yubikeyRecords` DI param (null = auto-detect via `listVaultYubikeyRecords` in `initState`); `_isYubikeyVault` getter; Step 1 delete dialog shows *"...and remove the YubiKey binding."* for YubiKey vaults
-  - **Key design decision:** No PIN field or extra YubiKey tap — `deleteWholeVault` just deletes the file and drops the session; YubiKey material was already verified at unlock; same reasoning as session 5
-  - Flutter tests: +2 new widget tests (YubiKey binding mention shown/not-shown)
-  - Flutter: 291 passing (+2), Rust: 246 (unchanged), Android: 0 / 4 ignored (unchanged)
-
-- **Pre-session-7 hardware testing + fixes (partially complete):**
-  - Hardware test matrix blocks 1–11 passed on Samsung S23 (see below for block 12 status)
-  - **Retry fix:** `get_hmac_secret` and `register_and_get_hmac` handlers in `MainActivity.kt` now retry once after 500ms — guards against transient USB enumeration races
-  - **Card editing bug fixed:** `_hasChanges` missing `creditLimit`, `cardAccountNumber`, `paymentNetwork`, `notes` for Card → "No changes to save" on optional fields; `_buildFieldDiffs` missing `cardNumber` + same fields → no diff in review screen; both fixed (+4 regression tests)
-  - Flutter: 295 passing (+4), Rust: 246 (unchanged), Android: 0 / 4 ignored (unchanged)
-
-- **YubiKey vault creation two-tap UX RESOLVED (Option A)**
-  - Root cause confirmed: CTAP2.1 firmware 5.4.3 enforces user presence for both `makeCredential` and `getAssertions` — two taps are unavoidable at the protocol level.
-  - Split `_defaultInitVaultWithYubikey` into two sequential channel calls: `register` (tap 1, makeCredential only) → `onStep2()` callback → `get_hmac_secret` (tap 2, getAssertions).
-  - `onboarding_screen.dart`: new `_buildYubikeyCreationSteps` widget shows a numbered step card during creation — step 1 active (filled circle, "Touch your YubiKey now"), transitions to step 2 active (green checkmark on step 1, "Touch your YubiKey again to seal the vault") once `onStep2` fires. Static hint updated to "You will tap your YubiKey twice: once to register, once to activate."
-  - `MainActivity.kt`: added retry-on-USB-error to `register` handler (was missing; now matches `register_and_get_hmac` and `get_hmac_secret`).
-  - Hardware-verified on Samsung S23 + YubiKey 5C (firmware 5.4.3). Test A.1 and block 12 now pass.
-  - Flutter: 297 passing (+2), Rust: 246 (unchanged), Android: 0/4 ignored (unchanged)
-
 - **Next: Session 7 — NFC support**
+  - USB YubiKey path complete and hardware-verified (Samsung S23, YubiKey 5C/5A, firmware 5.4.3)
+  - Add NFC transport to `YubiKeyManager.kt` alongside existing USB HID path
 
   **Build environment notes (critical for Android sessions):**
   - System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
@@ -232,17 +194,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- YubiKey / FIDO2 authentication:
-  - Design complete: ADR-010 documents the hmac-secret mechanism
-  - Implementation progress:
-    1. Vault format extension + HKDF combiner (pure Rust) ✓
-    2. Linux libfido2 binding (Rust FFI) ✓
-    3. Android yubikit-android integration (Kotlin) ✓
-    4a. Rust + bridge: `seal/open_vault_with_yubikey`, `YubikeyMaterial` session, all bridge functions ✓
-    4b. Flutter UI: unlock screen YubiKey detect/prompt, onboarding YubiKey opt-in ✓
-    5. Change passphrase with YubiKey ✓
-    6. Vault delete with YubiKey ✓
-    7. NFC support
+- YubiKey / FIDO2 authentication — NFC support (session 7; ADR-010 has hmac-secret design)
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
