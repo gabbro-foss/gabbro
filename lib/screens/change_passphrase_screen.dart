@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/widgets/segmented_row.dart';
 
 Future<void> _defaultChangePassphrase(
   List<int> oldPassphrase,
@@ -23,10 +24,11 @@ Future<void> _defaultConfirmYubikey(
   List<int> credentialId,
   List<int> salt,
   String pin,
+  String transport,
 ) async {
   await _yubikeyChannel.invokeMethod<String>(
     'get_hmac_secret',
-    {'credentialId': _toHex(credentialId), 'salt': _toHex(salt), 'pin': pin},
+    {'credentialId': _toHex(credentialId), 'salt': _toHex(salt), 'pin': pin, 'transport': transport},
   );
 }
 
@@ -43,7 +45,7 @@ class ChangePassphraseScreen extends StatefulWidget {
 
   /// Called in YubiKey mode before changing the passphrase.
   /// Triggers a YubiKey tap (get_hmac_secret) to confirm physical presence.
-  final Future<void> Function(List<int> credentialId, List<int> salt, String pin)
+  final Future<void> Function(List<int> credentialId, List<int> salt, String pin, String transport)
       onConfirmYubikey;
 
   const ChangePassphraseScreen({
@@ -71,6 +73,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
   bool _confirmObscured = true;
   bool _pinObscured = true;
   bool _isChanging = false;
+  String _transport = 'usb';
   String? _error;
   EntropyResult? _entropy;
   bool? _confirmMatches;
@@ -145,12 +148,13 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
             record.credentialId,
             record.salt,
             _pinController.text,
+            _transport,
           );
-        } catch (_) {
+        } catch (e) {
           if (mounted) {
-            setState(
-              () => _error = 'Authorization failed — check your PIN and try again.',
-            );
+            setState(() => _error = (e is PlatformException && e.code == 'TRANSPORT_ERROR')
+                ? e.message ?? 'Transport error.'
+                : 'Authorization failed — check your PIN and try again.');
           }
           return;
         }
@@ -234,6 +238,13 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                       validator: (v) => (v == null || v.isEmpty)
                           ? 'YubiKey PIN is required'
                           : null,
+                    ),
+                    const SizedBox(height: 12),
+                    SegmentedRow<String>(
+                      values: const ['usb', 'nfc'],
+                      selected: _transport,
+                      label: (v) => v.toUpperCase(),
+                      onSelected: (v) => setState(() => _transport = v),
                     ),
                     const SizedBox(height: 8),
                     Text(

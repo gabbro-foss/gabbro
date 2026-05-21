@@ -19,7 +19,7 @@ Widget _buildScreen({
   Future<void> Function(List<int>, String)? onInitVault,
   bool blockPassphraseCopyPaste = true,
   bool isAndroid = false,
-  Future<void> Function(List<int>, String, String, void Function())? onInitVaultWithYubikey,
+  Future<void> Function(List<int>, String, String, void Function(), String)? onInitVaultWithYubikey,
 }) =>
     MaterialApp(
       home: OnboardingScreen(
@@ -29,7 +29,7 @@ Widget _buildScreen({
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
         isAndroid: isAndroid,
         onInitVaultWithYubikey:
-            onInitVaultWithYubikey ?? (a, b, c, onStep2) async {},
+            onInitVaultWithYubikey ?? (a, b, c, onStep2, t) async {},
       ),
     );
 
@@ -164,7 +164,7 @@ void main() {
     bool called = false;
     await tester.pumpWidget(_buildScreen(
       isAndroid: true,
-      onInitVaultWithYubikey: (a, b, c, onStep2) async => called = true,
+      onInitVaultWithYubikey: (a, b, c, onStep2, t) async => called = true,
     ));
 
     const passphrase = 'correct horse battery staple one two three four';
@@ -205,7 +205,7 @@ void main() {
 
   Future<void> fillAndSubmitYubikey(
     WidgetTester tester,
-    Future<void> Function(List<int>, String, String, void Function()) onInitVaultWithYubikey,
+    Future<void> Function(List<int>, String, String, void Function(), String) onInitVaultWithYubikey,
   ) async {
     await tester.pumpWidget(_buildScreen(
       isAndroid: true,
@@ -237,7 +237,7 @@ void main() {
     final hold = Completer<void>();
     await fillAndSubmitYubikey(
       tester,
-      (_, _, _, onStep2) => hold.future,
+      (_, _, _, onStep2, t) => hold.future,
     );
     await tester.runAsync(() async {
       await tester.tap(find.text('Create vault'));
@@ -255,7 +255,7 @@ void main() {
   testWidgets('step 2 indicator shown after onStep2 callback fires', (tester) async {
     await fillAndSubmitYubikey(
       tester,
-      (_, _, _, onStep2) async {
+      (_, _, _, onStep2, t) async {
         onStep2();
         // Hold indefinitely so we can inspect the UI before navigation
         await Future<void>.delayed(const Duration(seconds: 30));

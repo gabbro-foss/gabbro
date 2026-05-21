@@ -26,7 +26,7 @@ YubikeyRecordData _fakeRecord() => YubikeyRecordData(
 Widget _buildScreen({
   required Future<void> Function() deleteVault,
   List<YubikeyRecordData>? yubikeyRecords,
-  Future<void> Function(List<int>, List<int>, String)? onConfirmYubikey,
+  Future<void> Function(List<int>, List<int>, String, String)? onConfirmYubikey,
 }) =>
     MaterialApp(
       home: VaultListScreen(
@@ -34,7 +34,7 @@ Widget _buildScreen({
         listEntries: _oneEntry,
         deleteVault: deleteVault,
         yubikeyRecords: yubikeyRecords ?? [],
-        onConfirmYubikey: onConfirmYubikey ?? (_, _, _) async {},
+        onConfirmYubikey: onConfirmYubikey ?? (_, _, _, _) async {},
       ),
     );
 
@@ -261,7 +261,7 @@ void main() {
     await tester.pumpWidget(_buildScreen(
       deleteVault: () async => deleteCalled = true,
       yubikeyRecords: [_fakeRecord()],
-      onConfirmYubikey: (_, _, _) async => confirmCalled = true,
+      onConfirmYubikey: (_, _, _, _) async => confirmCalled = true,
     ));
     await throughStep2(tester);
 

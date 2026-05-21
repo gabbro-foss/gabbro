@@ -18,6 +18,7 @@ import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/widgets/segmented_row.dart';
 
 Future<void> _defaultDeleteVault() => deleteWholeVault();
 List<String> _defaultListFolders() => listFolders();
@@ -31,10 +32,11 @@ Future<void> _defaultConfirmYubikey(
   List<int> credentialId,
   List<int> salt,
   String pin,
+  String transport,
 ) async {
   await _yubikeyChannel.invokeMethod<String>(
     'get_hmac_secret',
-    {'credentialId': _toHex(credentialId), 'salt': _toHex(salt), 'pin': pin},
+    {'credentialId': _toHex(credentialId), 'salt': _toHex(salt), 'pin': pin, 'transport': transport},
   );
 }
 
@@ -56,7 +58,7 @@ class VaultListScreen extends StatefulWidget {
 
   /// Called before deleting a YubiKey-protected vault.
   /// Triggers a YubiKey tap (get_hmac_secret) to confirm physical presence.
-  final Future<void> Function(List<int> credentialId, List<int> salt, String pin)
+  final Future<void> Function(List<int> credentialId, List<int> salt, String pin, String transport)
       onConfirmYubikey;
 
   const VaultListScreen({
@@ -99,6 +101,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
   bool _isDeleting = false;
   bool _isImporting = false;
   bool get _isSelecting => _selectionMode || _selectedIds.isNotEmpty;
+  String _transport = 'usb';
   late final List<YubikeyRecordData> _yubikeyRecords;
   bool get _isYubikeyVault => _yubikeyRecords.isNotEmpty;
 
@@ -598,6 +601,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
       final pinController = TextEditingController();
       bool isAuthorizing = false;
       String? authError;
+      String dialogTransport = _transport;
 
       final step3 = await showDialog<bool>(
         context: context,
@@ -623,6 +627,13 @@ class _VaultListScreenState extends State<VaultListScreen> {
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (_) => setState(() {}),
+                ),
+                const SizedBox(height: 12),
+                SegmentedRow<String>(
+                  values: const ['usb', 'nfc'],
+                  selected: dialogTransport,
+                  label: (v) => v.toUpperCase(),
+                  onSelected: (v) => setState(() => dialogTransport = v),
                 ),
                 if (authError != null) ...[
                   const SizedBox(height: 8),
@@ -657,13 +668,16 @@ class _VaultListScreenState extends State<VaultListScreen> {
                             record.credentialId,
                             record.salt,
                             pinController.text,
+                            dialogTransport,
                           );
                           if (ctx.mounted) Navigator.of(ctx).pop(true);
-                        } catch (_) {
+                        } catch (e) {
                           if (ctx.mounted) {
                             setState(() {
                               isAuthorizing = false;
-                              authError = 'Authorization failed — check your PIN and try again.';
+                              authError = (e is PlatformException && e.code == 'TRANSPORT_ERROR')
+                                  ? e.message ?? 'Transport error.'
+                                  : 'Authorization failed — check your PIN and try again.';
                             });
                           }
                         }
@@ -686,6 +700,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
       WidgetsBinding.instance.addPostFrameCallback(
         (_) => pinController.dispose(),
       );
+      if (mounted) setState(() => _transport = dialogTransport);
       if (step3 != true) return;
       if (!mounted) return;
     }

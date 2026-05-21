@@ -8,6 +8,7 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
+import 'package:gabbro/widgets/segmented_row.dart';
 import 'package:path_provider/path_provider.dart';
 
 // ── Hex helpers ───────────────────────────────────────────────────────────────
@@ -38,13 +39,14 @@ Future<void> _defaultInitVaultWithYubikey(
   String pin,
   String path,
   void Function() onStep2,
+  String transport,
 ) async {
   final salt = List<int>.generate(32, (_) => Random.secure().nextInt(256));
 
   // Tap 1: makeCredential (register the hardware credential)
   final credIdHex = await _yubikeyChannel.invokeMethod<String>(
     'register',
-    {'pin': pin},
+    {'pin': pin, 'transport': transport},
   );
   if (credIdHex == null) throw Exception('YubiKey registration returned no credential');
 
@@ -54,7 +56,7 @@ Future<void> _defaultInitVaultWithYubikey(
   // Tap 2: getAssertions (retrieve hmac-secret to seal the vault)
   final hmacHex = await _yubikeyChannel.invokeMethod<String>(
     'get_hmac_secret',
-    {'credentialId': credIdHex, 'salt': _toHex(salt), 'pin': pin},
+    {'credentialId': credIdHex, 'salt': _toHex(salt), 'pin': pin, 'transport': transport},
   );
   if (hmacHex == null) throw Exception('YubiKey activation returned no secret');
 
@@ -85,6 +87,7 @@ class OnboardingScreen extends StatefulWidget {
     String pin,
     String path,
     void Function() onStep2,
+    String transport,
   ) onInitVaultWithYubikey;
 
   OnboardingScreen({
@@ -117,6 +120,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   EntropyResult? _entropy;
   bool? _confirmMatches;
   bool _useYubikey = false;
+  String _transport = 'usb';
   // 0 = idle, 1 = waiting for tap 1 (register), 2 = waiting for tap 2 (activate)
   int _yubikeyStep = 0;
 
@@ -164,6 +168,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _pinController.text,
           _vaultPath,
           () { if (mounted) setState(() => _yubikeyStep = 2); },
+          _transport,
         );
       } else {
         await widget.onInitVault(
@@ -179,7 +184,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         );
       }
     } catch (e) {
-      if (mounted) setState(() { _error = e.toString(); _yubikeyStep = 0; });
+      if (mounted) {
+        setState(() {
+          _error = e is PlatformException
+              ? (e.message ?? 'YubiKey operation failed.')
+              : e.toString();
+          _yubikeyStep = 0;
+        });
+      }
     } finally {
       if (mounted) setState(() => _isCreating = false);
     }
@@ -576,6 +588,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     ? 'YubiKey PIN is required'
                                     : null
                                 : null,
+                          ),
+                          const SizedBox(height: 12),
+                          SegmentedRow<String>(
+                            values: const ['usb', 'nfc'],
+                            selected: _transport,
+                            label: (v) => v.toUpperCase(),
+                            onSelected: (v) => setState(() => _transport = v),
                           ),
                           const SizedBox(height: 8),
                           if (_isCreating)

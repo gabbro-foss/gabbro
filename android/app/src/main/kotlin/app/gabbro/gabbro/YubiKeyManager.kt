@@ -61,7 +61,7 @@ object YubiKeyManager {
             return
         }
         if (!adapter.isEnabled) {
-            mainHandler.post { onError("NFC is disabled — enable it in Settings") }
+            mainHandler.post { onError("NFC is disabled. Move your YubiKey away from the phone, then enable NFC in Settings.") }
             return
         }
         val manager = YubiKitManager(activity).also { nfcManager = it }

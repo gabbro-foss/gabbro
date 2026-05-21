@@ -25,7 +25,7 @@ Widget _buildScreen({
   Future<void> Function(List<int>, String)? onUnlock,
   bool blockPassphraseCopyPaste = true,
   List<YubikeyRecordData>? yubikeyRecords,
-  Future<void> Function(List<int>, List<int>, List<int>, String, String)?
+  Future<void> Function(List<int>, List<int>, List<int>, String, String, String)?
       onUnlockWithYubikey,
 }) =>
     MaterialApp(
@@ -35,7 +35,7 @@ Widget _buildScreen({
         onEstimateEntropy: _fakeEntropy,
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
         yubikeyRecords: yubikeyRecords ?? [],
-        onUnlockWithYubikey: onUnlockWithYubikey ?? (a, b, c, d, e) async {},
+        onUnlockWithYubikey: onUnlockWithYubikey ?? (a, b, c, d, e, f) async {},
       ),
     );
 
@@ -114,7 +114,7 @@ void main() {
     bool called = false;
     await tester.pumpWidget(_buildScreen(
       yubikeyRecords: [_fakeRecord()],
-      onUnlockWithYubikey: (a, b, c, d, e) async => called = true,
+      onUnlockWithYubikey: (a, b, c, d, e, f) async => called = true,
     ));
 
     await tester.enterText(find.byType(TextField).first, 'anypassphrase');
@@ -142,7 +142,7 @@ void main() {
   testWidgets('yubikey error shown when onUnlockWithYubikey throws', (tester) async {
     await tester.pumpWidget(_buildScreen(
       yubikeyRecords: [_fakeRecord()],
-      onUnlockWithYubikey: (a, b, c, d, e) async =>
+      onUnlockWithYubikey: (a, b, c, d, e, f) async =>
           throw Exception('bad yubikey'),
     ));
 

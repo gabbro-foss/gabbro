@@ -25,7 +25,7 @@ Widget _buildScreen({
   Future<void> Function(List<int>, List<int>)? onChangePassphrase,
   bool blockPassphraseCopyPaste = true,
   List<YubikeyRecordData>? yubikeyRecords,
-  Future<void> Function(List<int>, List<int>, String)? onConfirmYubikey,
+  Future<void> Function(List<int>, List<int>, String, String)? onConfirmYubikey,
 }) =>
     MaterialApp(
       home: ChangePassphraseScreen(
@@ -34,7 +34,7 @@ Widget _buildScreen({
         onEstimateEntropy: _fakeStrongEntropy,
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
         yubikeyRecords: yubikeyRecords ?? [],
-        onConfirmYubikey: onConfirmYubikey ?? (_, _, _) async {},
+        onConfirmYubikey: onConfirmYubikey ?? (_, _, _, _) async {},
       ),
     );
 
@@ -99,7 +99,7 @@ void main() {
     bool confirmCalled = false;
     await tester.pumpWidget(_buildScreen(
       yubikeyRecords: [_fakeRecord()],
-      onConfirmYubikey: (_, _, _) async => confirmCalled = true,
+      onConfirmYubikey: (_, _, _, _) async => confirmCalled = true,
       // Throw so the screen does not navigate away — we only need to check
       // that onConfirmYubikey was called first.
       onChangePassphrase: (_, _) async => throw Exception('stop'),
@@ -127,6 +127,7 @@ void main() {
     );
     await tester.pump();
 
+    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Change passphrase'));
     await tester.tap(find.widgetWithText(FilledButton, 'Change passphrase'));
     await tester.pumpAndSettle();
 

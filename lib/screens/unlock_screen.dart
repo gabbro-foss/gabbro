@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
+import 'package:gabbro/widgets/segmented_row.dart';
 
 // ── Hex helpers ───────────────────────────────────────────────────────────────
 
@@ -33,6 +34,7 @@ Future<void> _defaultUnlockWithYubikey(
   List<int> hkdfSalt,
   String pin,
   String path,
+  String transport,
 ) async {
   final hmacHex = await _yubikeyChannel.invokeMethod<String>(
     'get_hmac_secret',
@@ -40,6 +42,7 @@ Future<void> _defaultUnlockWithYubikey(
       'credentialId': _toHex(credentialId),
       'salt': _toHex(hkdfSalt),
       'pin': pin,
+      'transport': transport,
     },
   );
   await unlockVaultWithYubikey(
@@ -69,6 +72,7 @@ class UnlockScreen extends StatefulWidget {
     List<int> hkdfSalt,
     String pin,
     String path,
+    String transport,
   ) onUnlockWithYubikey;
 
   const UnlockScreen({
@@ -91,6 +95,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
   bool _obscured = true;
   bool _pinObscured = true;
   bool _isUnlocking = false;
+  String _transport = 'usb';
   String? _errorMessage;
   EntropyResult? _entropy;
   late final List<YubikeyRecordData> _yubikeyRecords;
@@ -132,6 +137,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
           record.salt,
           _pinController.text,
           widget.vaultPath,
+          _transport,
         );
       } else {
         await widget.onUnlock(
@@ -148,9 +154,11 @@ class _UnlockScreenState extends State<UnlockScreen> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = _isYubikeyMode
-            ? 'Could not unlock vault. Check your passphrase and YubiKey PIN.'
-            : 'Could not unlock vault. Check your passphrase.';
+        _errorMessage = (e is PlatformException && e.code == 'TRANSPORT_ERROR')
+            ? e.message ?? 'Transport error.'
+            : (_isYubikeyMode
+                ? 'Could not unlock vault. Check your passphrase and YubiKey PIN.'
+                : 'Could not unlock vault. Check your passphrase.');
       });
     } finally {
       setState(() => _isUnlocking = false);
@@ -273,6 +281,13 @@ class _UnlockScreenState extends State<UnlockScreen> {
                                 setState(() => _pinObscured = !_pinObscured),
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 12),
+                      SegmentedRow<String>(
+                        values: const ['usb', 'nfc'],
+                        selected: _transport,
+                        label: (v) => v.toUpperCase(),
+                        onSelected: (v) => setState(() => _transport = v),
                       ),
                       const SizedBox(height: 8),
                       Text(
