@@ -1,12 +1,17 @@
 package app.gabbro.gabbro
 
+import android.app.Activity
 import android.content.Context
+import android.nfc.NfcAdapter
 import android.os.Handler
 import android.os.Looper
 import com.yubico.yubikit.android.YubiKitManager
+import com.yubico.yubikit.android.transport.nfc.NfcConfiguration
 import com.yubico.yubikit.android.transport.usb.UsbConfiguration
 import com.yubico.yubikit.android.transport.usb.connection.UsbFidoConnection
+import com.yubico.yubikit.core.YubiKeyConnection
 import com.yubico.yubikit.core.fido.FidoConnection
+import com.yubico.yubikit.core.smartcard.SmartCardConnection
 import com.yubico.yubikit.fido.ctap.ClientPin
 import com.yubico.yubikit.fido.ctap.Ctap2Session
 import com.yubico.yubikit.fido.ctap.PinUvAuthProtocolV1
@@ -20,14 +25,15 @@ object YubiKeyManager {
 
     private const val RP_ID = "app.gabbro.gabbro"
     private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
-    private var yubiKitManager: YubiKitManager? = null
+    private var usbManager: YubiKitManager? = null
+    private var nfcManager: YubiKitManager? = null
 
     fun startUsbDiscovery(
         context: Context,
-        onConnected: (FidoConnection) -> Unit,
+        onConnected: (YubiKeyConnection) -> Unit,
         onError: (String) -> Unit,
     ) {
-        val manager = YubiKitManager(context).also { yubiKitManager = it }
+        val manager = YubiKitManager(context).also { usbManager = it }
         manager.startUsbDiscovery(UsbConfiguration()) { device ->
             device.requestConnection(UsbFidoConnection::class.java) { result ->
                 try {
@@ -40,18 +46,49 @@ object YubiKeyManager {
     }
 
     fun stopUsbDiscovery() {
-        yubiKitManager?.stopUsbDiscovery()
-        yubiKitManager = null
+        usbManager?.stopUsbDiscovery()
+        usbManager = null
+    }
+
+    fun startNfcDiscovery(
+        activity: Activity,
+        onConnected: (YubiKeyConnection) -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        val adapter = NfcAdapter.getDefaultAdapter(activity)
+        if (adapter == null) {
+            mainHandler.post { onError("NFC not available on this device") }
+            return
+        }
+        if (!adapter.isEnabled) {
+            mainHandler.post { onError("NFC is disabled — enable it in Settings") }
+            return
+        }
+        val manager = YubiKitManager(activity).also { nfcManager = it }
+        manager.startNfcDiscovery(NfcConfiguration(), activity) { device ->
+            device.requestConnection(SmartCardConnection::class.java) { result ->
+                try {
+                    onConnected(result.getValue())
+                } catch (e: IOException) {
+                    mainHandler.post { onError("NFC connection failed: ${e.message}") }
+                }
+            }
+        }
+    }
+
+    fun stopNfcDiscovery(activity: Activity) {
+        nfcManager?.stopNfcDiscovery(activity)
+        nfcManager = null
     }
 
     fun register(
-        connection: FidoConnection,
+        connection: YubiKeyConnection,
         pin: CharArray?,
         onSuccess: (credentialId: ByteArray) -> Unit,
         onError: (String) -> Unit,
     ) {
         try {
-            val session = Ctap2Session(connection)
+            val session = ctap2Session(connection)
             val info = session.cachedInfo
             val pinProtocol = pinProtocolFor(info)
             val clientPin = ClientPin(session, pinProtocol)
@@ -87,14 +124,14 @@ object YubiKeyManager {
     }
 
     fun registerAndGetHmac(
-        connection: FidoConnection,
+        connection: YubiKeyConnection,
         salt: ByteArray,
         pin: CharArray?,
         onSuccess: (credentialId: ByteArray, hmacSecret: ByteArray) -> Unit,
         onError: (String) -> Unit,
     ) {
         try {
-            val session = Ctap2Session(connection)
+            val session = ctap2Session(connection)
             val info = session.cachedInfo
             val pinProtocol = pinProtocolFor(info)
             val clientPin = ClientPin(session, pinProtocol)
@@ -169,7 +206,7 @@ object YubiKeyManager {
     }
 
     fun getHmacSecret(
-        connection: FidoConnection,
+        connection: YubiKeyConnection,
         credentialId: ByteArray,
         salt: ByteArray,
         pin: CharArray?,
@@ -177,7 +214,7 @@ object YubiKeyManager {
         onError: (String) -> Unit,
     ) {
         try {
-            val session = Ctap2Session(connection)
+            val session = ctap2Session(connection)
             val info = session.cachedInfo
             val pinProtocol = pinProtocolFor(info)
             val clientPin = ClientPin(session, pinProtocol)
@@ -227,6 +264,12 @@ object YubiKeyManager {
         } catch (e: Exception) {
             mainHandler.post { onError("getHmacSecret failed: ${e.message}") }
         }
+    }
+
+    private fun ctap2Session(connection: YubiKeyConnection): Ctap2Session = when (connection) {
+        is SmartCardConnection -> Ctap2Session(connection)
+        is FidoConnection -> Ctap2Session(connection)
+        else -> throw IllegalArgumentException("Unsupported connection: ${connection::class.simpleName}")
     }
 
     private fun pinProtocolFor(info: Ctap2Session.InfoData) =
