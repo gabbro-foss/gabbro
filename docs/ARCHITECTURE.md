@@ -163,14 +163,14 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next: Session 8 — wire NFC transport into MethodChannel and Flutter screens**
-  - USB YubiKey path complete and hardware-verified (Samsung S23, YubiKey 5C/5A, firmware 5.4.3)
-  - NFC transport layer written in `YubiKeyManager.kt` (`startNfcDiscovery` / `stopNfcDiscovery`) — **not yet wired to `MainActivity.kt` MethodChannel**
-  - Hardware testing of NFC is blocked until wiring is done
-  - Next steps:
-    1. Add `transport` parameter (`"usb"` / `"nfc"`) to all three MethodChannel methods in `MainActivity.kt` (`register_and_get_hmac`, `register`, `get_hmac_secret`)
-    2. Add transport selector to Flutter screens that call the YubiKey channel (`onboarding_screen.dart`, `unlock_screen.dart`, `change_passphrase_screen.dart`, `vault_list_screen.dart`)
-    3. Hardware-test all NFC paths (test matrix: 4 NFC-only tests + 2 cross-transport tests using YubiKey 5 NFC USB-C; manual check of NFC-disabled error path)
+- **Session 8 complete — NFC transport wired and hardware-verified**
+  - `transport` param (`"usb"` / `"nfc"`) added to all three MethodChannel methods; `startDiscovery`/`stopDiscovery` helpers dispatch to correct yubikit API
+  - USB/NFC `SegmentedRow` selector added to all four YubiKey screens
+  - All NFC happy paths hardware-verified: create, unlock, change passphrase, delete, cross-transport
+  - Error messages improved: `PlatformException.message` shown for `TRANSPORT_ERROR` on all screens; generic "Authorization failed" still shown for auth failures
+  - NFC-disabled error message now says "Move your YubiKey away from the phone, then enable NFC in Settings"
+  - **Open bug: YubiKey NDEF OTP URL opens browser during NFC operations — see Bikeshed**
+  - **Next: to be decided — check Bikeshed**
 
   **Build environment notes (critical for Android sessions):**
   - System Java is 26.0.1 — incompatible with Kotlin compiler. Fix: `org.gradle.java.home=/opt/android-studio/jbr` in `android/gradle.properties` (points to Java 21).
@@ -200,7 +200,12 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- YubiKey / FIDO2 authentication — NFC transport layer written in `YubiKeyManager.kt` (session 7) but not yet wired to `MainActivity.kt` MethodChannel or Flutter screens; see Current Focus for next steps
+- **YubiKey NFC — NDEF browser bug (open, hard):** Every time the NFC field is active, the YubiKey broadcasts its OTP slot as an NDEF URI (`https://my.yubico.com/yk/...`). Android's browser/Chrome intercepts this and opens a browser tab, even while Gabbro is in the foreground. Three mitigations were attempted and all failed:
+  1. `NfcAdapter.enableForegroundDispatch` in `onResume`/`onPause` with `onNewIntent` override — ineffective because yubikit's `enableReaderMode` disables foreground dispatch internally, and `disableReaderMode` does not restore it.
+  2. Manifest `NDEF_DISCOVERED` intent filters for `my.yubico.com` and `demo.yubico.com` — ineffective because Chrome/the system browser is also registered for `NDEF_DISCOVERED` on https and wins as the default.
+  3. Combination of 1 + 2 — same result. Browser opens immediately after `disableReaderMode` is called (i.e., as soon as the CTAP2 operation completes or fails), and also during Settings visit when enabling NFC.
+  Known approaches not yet tried: (a) disable the NDEF slot on the YubiKey via the YubiKey Manager app (user action, not fixable in code); (b) keep reader mode active for a few hundred milliseconds after the CTAP2 op completes to give the user time to pull the key away; (c) suppress the NDEF at the yubikit `NfcConfiguration` level if an API exists for it.
+  Current code state: mitigations 1 and 2 are committed — harmless, provide no benefit for the core bug but kept for reference.
 - ADR-010 mentions two yubikeys as minimum at vault creation, check ADR-010 and implement accordingly
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
