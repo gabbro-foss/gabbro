@@ -165,12 +165,13 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Session 9 complete — NDEF browser-opening bug resolved**
-  - Root cause: YubiKey OTP slot 1 broadcasts an NDEF URI over NFC; Android browser wins the `NDEF_DISCOVERED` intent even with foreground dispatch and manifest filters in place.
-  - Fix: `ykman config nfc --disable OTP` — disables OTP application over NFC on the key itself. FIDO2/CTAP2 over NFC is a separate application and is unaffected.
-  - Hardware-verified: onboarding, unlock, change passphrase, delete vault — no browser opening. OTP over USB (GitHub) confirmed still working.
-  - See LEARNINGS.md "YubiKey NFC — disabling OTP over NFC" for full collateral-effects analysis.
-  - **Next: test YubiKey (USB) on Linux release**
+- **Session 10 complete — YubiKey USB validated on Linux (Rust layer)**
+  - Both hardware-gated fido tests pass: `register_returns_yubikey_record` and `get_hmac_secret_is_deterministic`.
+  - Added `println!` tap prompts to hardware tests; run with `--nocapture` (4 taps total across both tests).
+  - Fixed 35 pre-existing clippy warnings triggered by Rust 1.94 toolchain update (7 files: `fido/device.rs`, `api/vault.rs`, `api/vault_bridge.rs`, `api/entropy.rs`, `crypto/vault_crypto.rs`, `import/enpass.rs`, `vault/entry.rs`).
+  - See LEARNINGS.md "Rust — hardware-gated tests need tap-count prompts" for the pattern.
+  - **`cargo test -q` was NOT run this session** — required at the start of next session before any work begins (clippy fixes touched crypto and vault code).
+  - **Next: run `cargo test -q`, then determine next task**
 
 ---
 

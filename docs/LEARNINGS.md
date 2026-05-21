@@ -3057,3 +3057,37 @@ work correctly after the change; FIDO2/CTAP2 over NFC is unaffected.
 **Real-world breakage risk:** very low. The only scenario that breaks is a service that uses
 legacy Yubico OTP *and* requires NFC delivery specifically (not USB). No mainstream service
 imposes this combination.
+
+---
+
+## Rust — hardware-gated tests need tap-count prompts and `--nocapture`
+
+FIDO2 operations (register, get_hmac_secret) each require a physical YubiKey touch. Without
+visible prompts, the operator has no way to know how many taps are needed or when to provide
+them — leading to silent timeouts and misleading error codes (e.g. `FIDO_ERR_NOT_ALLOWED`
+after a missed touch).
+
+**Pattern:** add a `println!` before every call that blocks on user presence, with a tap counter:
+
+```rust
+println!("\n>>> TAP your YubiKey to register a credential (tap 1/3)...");
+let record = register(&device, &pin).expect("registration should succeed");
+println!(">>> TAP your YubiKey for first hmac-secret assertion (tap 2/3)...");
+let out1 = get_hmac_secret(&device, &record, &pin).expect("first should succeed");
+println!(">>> TAP your YubiKey for second hmac-secret assertion (tap 3/3)...");
+let out2 = get_hmac_secret(&device, &record, &pin).expect("second should succeed");
+```
+
+Run with `--nocapture` so the prompts are visible during the test:
+
+```bash
+GABBRO_TEST_PIN=<pin> cargo test fido -- --ignored --test-threads=1 --nocapture
+```
+
+`--test-threads=1` is required because the tests are `#[serial]` and both open the same
+`/dev/hidraw5` device — parallel execution would cause one to fail with a device-busy error.
+
+**Tap count for the fido module tests:**
+- `register_returns_yubikey_record`: 1 tap
+- `get_hmac_secret_is_deterministic`: 3 taps (1 register + 2 assertions)
+- Total: 4 taps to run both tests
