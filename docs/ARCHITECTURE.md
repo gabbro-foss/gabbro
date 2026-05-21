@@ -72,6 +72,7 @@ gabbro/
 │   │   │   ├── vault_bridge.rs
 │   │   │   ├── import.rs
 │   │   │   ├── autofill_bridge.rs
+│   │   │   ├── fido_bridge.rs      # Linux FIDO2 bridge (fido_list_devices, fido_register, fido_get_hmac_secret)
 │   │   │   └── entropy.rs
 │   │   ├── crypto/             # Internal crypto (not bridge-exposed)
 │   │   │   ├── kdf.rs
@@ -145,7 +146,7 @@ gabbro/
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
 
 **Not yet implemented (see Bikeshed):**
-- YubiKey / FIDO2 authentication
+- YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2) implemented; minimum-2-keys enforcement not yet added; change_passphrase YubiKey wiring pending
 - Autofill save requests (`onSaveRequest`)
 - Passkey support, breach alerts, vault sync
 
@@ -153,7 +154,7 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 246 | 3 |
+| Rust (`cargo test -q`) | 247 | 5 |
 | Flutter (`flutter test`) | 301 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
@@ -165,13 +166,14 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Session 10 complete — YubiKey USB validated on Linux (Rust layer)**
-  - Both hardware-gated fido tests pass: `register_returns_yubikey_record` and `get_hmac_secret_is_deterministic`.
-  - Added `println!` tap prompts to hardware tests; run with `--nocapture` (4 taps total across both tests).
-  - Fixed 35 pre-existing clippy warnings triggered by Rust 1.94 toolchain update (7 files: `fido/device.rs`, `api/vault.rs`, `api/vault_bridge.rs`, `api/entropy.rs`, `crypto/vault_crypto.rs`, `import/enpass.rs`, `vault/entry.rs`).
-  - See LEARNINGS.md "Rust — hardware-gated tests need tap-count prompts" for the pattern.
-  - **`cargo test -q` was NOT run this session** — required at the start of next session before any work begins (clippy fixes touched crypto and vault code).
-  - **Next: run `cargo test -q`, then determine next task**
+- **Session 11 complete — YubiKey USB end-to-end on Linux (--release)**
+  - `rust/src/api/fido_bridge.rs` added: `fido_list_devices` (sync), `fido_register` (async), `fido_get_hmac_secret` (async). Linux impl + Android stubs. 1 non-hardware test + 2 hardware-gated tests.
+  - FRB codegen regenerated — Dart bindings in `lib/src/rust/api/fido_bridge.dart`.
+  - `onboarding_screen.dart`: added `showYubikey` parameter (defaults `isAndroid || isLinux`); Linux vault creation uses Rust bridge directly; NFC transport selector gated to Android-only.
+  - `unlock_screen.dart`: Linux unlock uses Rust bridge; NFC transport selector hidden on Linux; `NO_FIDO2_DEVICE` error surfaced clearly when no key is present.
+  - All 8 hardware tests passed: vault creation with YubiKey, unlock, wrong PIN, no device.
+  - Any CTAP2 + hmac-secret device works (SoloKeys, Nitrokey FIDO2, etc.); Google Titan does not (no hmac-secret).
+  - **Next: ADR-010 minimum-2-keys enforcement at vault creation; then change_passphrase YubiKey wiring**
 
 ---
 
@@ -207,6 +209,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Features & UX
 - ADR-010 mentions two yubikeys as minimum at vault creation, check ADR-010 and implement accordingly
+  - Add manage yubikey screen once yubikes work on android and linux and multiple yubikeys can be used
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).

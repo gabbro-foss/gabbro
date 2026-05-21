@@ -4,6 +4,51 @@ A running journal of concepts covered during development.
 
 ---
 
+## FIDO2 — device compatibility beyond YubiKey
+
+libfido2 speaks standard CTAP2 over USB HID. Any FIDO2 device that supports
+the **hmac-secret extension** works with Gabbro's Linux path without any code
+changes. Notable examples:
+
+- **YubiKey 5 series** — confirmed working (USB, NFC variants)
+- **SoloKeys Solo 2** — open-source, supports hmac-secret ✓
+- **Nitrokey FIDO2** — open-source, supports hmac-secret ✓
+- **Google Titan (USB-A / USB-C)** — FIDO2 but **no hmac-secret** ✗ — will
+  fail at `fido_dev_make_cred` with a libfido2 error that surfaces through
+  `fido_register`'s `Result<_, String>` return; no special handling needed
+
+`fido_list_devices()` enumerates all USB HID FIDO2 devices, so non-YubiKey
+hardware is auto-detected the same way.
+
+---
+
+## Flutter — use `PlatformException` for user-facing hardware errors on Linux
+
+When a Linux-specific Dart function needs to surface a user-facing error
+through a generic Flutter catch block (one that already handles
+`PlatformException`), throw `PlatformException` rather than a bare
+`Exception`. This allows the catch block to use code-based dispatch cleanly:
+
+```dart
+// In the Linux function:
+throw PlatformException(
+  code: 'NO_FIDO2_DEVICE',
+  message: 'No FIDO2 device found. Insert your YubiKey and try again.',
+);
+
+// In the catch block:
+_errorMessage = switch (e) {
+  PlatformException(code: 'TRANSPORT_ERROR') => e.message ?? '…',
+  PlatformException(code: 'NO_FIDO2_DEVICE') => e.message ?? '…',
+  _ => 'Could not unlock vault. Check your passphrase and YubiKey PIN.',
+};
+```
+
+A bare `Exception` from the Linux path would be caught by the `_` arm and
+show the generic message, hiding the actual problem.
+
+---
+
 ## Rust — `Zeroizing<T>` for automatic secret cleanup
 
 `Zeroizing<T>` from the `zeroize` crate is a newtype wrapper that calls
