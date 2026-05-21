@@ -3020,6 +3020,8 @@ returns. This caused a `Null check operator used on a null value` crash in `_cre
 1. `_lock()` bails early if `widget.vaultPath` does not exist yet (vault creation in progress).
 2. `if (mounted)` guards on every `setState` call in `_createVault`'s `catch`/`finally`.
 
+These fixes prevent the crash but do not resolve the underlying two-touch issue.
+
 ---
 
 ## YubiKey NFC — disabling OTP over NFC to fix the NDEF browser-opening bug
@@ -3055,5 +3057,3 @@ work correctly after the change; FIDO2/CTAP2 over NFC is unaffected.
 **Real-world breakage risk:** very low. The only scenario that breaks is a service that uses
 legacy Yubico OTP *and* requires NFC delivery specifically (not USB). No mainstream service
 imposes this combination.
-
-These fixes prevent the crash but do not resolve the underlying two-touch issue.
