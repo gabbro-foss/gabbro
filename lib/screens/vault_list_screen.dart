@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
@@ -21,6 +22,22 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 Future<void> _defaultDeleteVault() => deleteWholeVault();
 List<String> _defaultListFolders() => listFolders();
 
+const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
+
+String _toHex(List<int> bytes) =>
+    bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+
+Future<void> _defaultConfirmYubikey(
+  List<int> credentialId,
+  List<int> salt,
+  String pin,
+) async {
+  await _yubikeyChannel.invokeMethod<String>(
+    'get_hmac_secret',
+    {'credentialId': _toHex(credentialId), 'salt': _toHex(salt), 'pin': pin},
+  );
+}
+
 class VaultListScreen extends StatefulWidget {
   final String vaultPath;
   final List<EntrySummaryData> Function() listEntries;
@@ -37,6 +54,11 @@ class VaultListScreen extends StatefulWidget {
   /// construction time. Pass `[]` to force passphrase-only mode (tests).
   final List<YubikeyRecordData>? yubikeyRecords;
 
+  /// Called before deleting a YubiKey-protected vault.
+  /// Triggers a YubiKey tap (get_hmac_secret) to confirm physical presence.
+  final Future<void> Function(List<int> credentialId, List<int> salt, String pin)
+      onConfirmYubikey;
+
   const VaultListScreen({
     super.key,
     required this.vaultPath,
@@ -49,6 +71,7 @@ class VaultListScreen extends StatefulWidget {
     this.alphabetBarPosition,
     this.onAssignFolderFn,
     this.yubikeyRecords,
+    this.onConfirmYubikey = _defaultConfirmYubikey,
   });
 
   @override
@@ -569,6 +592,103 @@ class _VaultListScreenState extends State<VaultListScreen> {
     );
     if (step2 != true) return;
     if (!mounted) return;
+
+    // Step 3 — YubiKey tap authorization (YubiKey vaults only)
+    if (_isYubikeyVault) {
+      final pinController = TextEditingController();
+      bool isAuthorizing = false;
+      String? authError;
+
+      final step3 = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => StatefulBuilder(
+          builder: (ctx, setState) => AlertDialog(
+            title: const Text('Touch your YubiKey'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Enter your PIN and touch your YubiKey to authorize this deletion.',
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  key: const Key('delete_vault_yubikey_pin_field'),
+                  controller: pinController,
+                  obscureText: true,
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    labelText: 'YubiKey PIN',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+                if (authError != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    authError!,
+                    style: TextStyle(
+                      color: Theme.of(ctx).colorScheme.error,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: isAuthorizing
+                    ? null
+                    : () => Navigator.of(ctx).pop(false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: (isAuthorizing || pinController.text.isEmpty)
+                    ? null
+                    : () async {
+                        setState(() {
+                          isAuthorizing = true;
+                          authError = null;
+                        });
+                        try {
+                          final record = _yubikeyRecords.first;
+                          await widget.onConfirmYubikey(
+                            record.credentialId,
+                            record.salt,
+                            pinController.text,
+                          );
+                          if (ctx.mounted) Navigator.of(ctx).pop(true);
+                        } catch (_) {
+                          if (ctx.mounted) {
+                            setState(() {
+                              isAuthorizing = false;
+                              authError = 'Authorization failed — check your PIN and try again.';
+                            });
+                          }
+                        }
+                      },
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(ctx).colorScheme.error,
+                ),
+                child: isAuthorizing
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Authorize'),
+              ),
+            ],
+          ),
+        ),
+      );
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => pinController.dispose(),
+      );
+      if (step3 != true) return;
+      if (!mounted) return;
+    }
 
     await widget.deleteVault();
     if (!mounted) return;

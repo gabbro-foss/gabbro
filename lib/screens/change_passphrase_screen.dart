@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
@@ -13,6 +14,22 @@ Future<void> _defaultChangePassphrase(
 EntropyResult _defaultEstimateEntropy(String password) =>
     estimateEntropy(password: password);
 
+const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
+
+String _toHex(List<int> bytes) =>
+    bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+
+Future<void> _defaultConfirmYubikey(
+  List<int> credentialId,
+  List<int> salt,
+  String pin,
+) async {
+  await _yubikeyChannel.invokeMethod<String>(
+    'get_hmac_secret',
+    {'credentialId': _toHex(credentialId), 'salt': _toHex(salt), 'pin': pin},
+  );
+}
+
 class ChangePassphraseScreen extends StatefulWidget {
   final String vaultPath;
   final Future<void> Function(List<int> oldPassphrase, List<int> newPassphrase)
@@ -24,6 +41,11 @@ class ChangePassphraseScreen extends StatefulWidget {
   /// construction time. Pass `[]` to force passphrase-only mode (tests).
   final List<YubikeyRecordData>? yubikeyRecords;
 
+  /// Called in YubiKey mode before changing the passphrase.
+  /// Triggers a YubiKey tap (get_hmac_secret) to confirm physical presence.
+  final Future<void> Function(List<int> credentialId, List<int> salt, String pin)
+      onConfirmYubikey;
+
   const ChangePassphraseScreen({
     super.key,
     required this.vaultPath,
@@ -31,6 +53,7 @@ class ChangePassphraseScreen extends StatefulWidget {
     this.onEstimateEntropy = _defaultEstimateEntropy,
     this.blockPassphraseCopyPaste = true,
     this.yubikeyRecords,
+    this.onConfirmYubikey = _defaultConfirmYubikey,
   });
 
   @override
@@ -46,11 +69,13 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
   bool _oldObscured = true;
   bool _newObscured = true;
   bool _confirmObscured = true;
+  bool _pinObscured = true;
   bool _isChanging = false;
   String? _error;
   EntropyResult? _entropy;
   bool? _confirmMatches;
   late final List<YubikeyRecordData> _yubikeyRecords;
+  final _pinController = TextEditingController();
 
   bool get _isYubikeyMode => _yubikeyRecords.isNotEmpty;
 
@@ -73,6 +98,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
     _oldController.dispose();
     _newController.dispose();
     _confirmController.dispose();
+    _pinController.dispose();
     super.dispose();
   }
 
@@ -112,6 +138,23 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
       _error = null;
     });
     try {
+      if (_isYubikeyMode) {
+        final record = _yubikeyRecords.first;
+        try {
+          await widget.onConfirmYubikey(
+            record.credentialId,
+            record.salt,
+            _pinController.text,
+          );
+        } catch (_) {
+          if (mounted) {
+            setState(
+              () => _error = 'Authorization failed — check your PIN and try again.',
+            );
+          }
+          return;
+        }
+      }
       await widget.onChangePassphrase(
         _oldController.text.codeUnits,
         _newController.text.codeUnits,
@@ -171,7 +214,34 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _pinController,
+                      obscureText: _pinObscured,
+                      decoration: InputDecoration(
+                        labelText: 'YubiKey PIN',
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _pinObscured
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () =>
+                              setState(() => _pinObscured = !_pinObscured),
+                        ),
+                      ),
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'YubiKey PIN is required'
+                          : null,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Touch your YubiKey to authorize this change.',
+                      style: Theme.of(context).textTheme.bodySmall,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
                   ],
                   TextFormField(
                     controller: _oldController,

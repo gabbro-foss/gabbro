@@ -26,6 +26,7 @@ YubikeyRecordData _fakeRecord() => YubikeyRecordData(
 Widget _buildScreen({
   required Future<void> Function() deleteVault,
   List<YubikeyRecordData>? yubikeyRecords,
+  Future<void> Function(List<int>, List<int>, String)? onConfirmYubikey,
 }) =>
     MaterialApp(
       home: VaultListScreen(
@@ -33,6 +34,7 @@ Widget _buildScreen({
         listEntries: _oneEntry,
         deleteVault: deleteVault,
         yubikeyRecords: yubikeyRecords ?? [],
+        onConfirmYubikey: onConfirmYubikey ?? (_, _, _) async {},
       ),
     );
 
@@ -214,5 +216,68 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('YubiKey'), findsNothing);
+  });
+
+  // ── Step 3: YubiKey tap authorization ────────────────────────────────────────
+
+  Future<void> throughStep2(WidgetTester tester) async {
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete vault'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('delete_vault_confirm_field')),
+      'DELETE',
+    );
+    await tester.pump();
+    await tester.tap(find.widgetWithText(TextButton, 'Confirm'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('yubikey vault shows YubiKey authorization dialog after step 2',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      deleteVault: () async {},
+      yubikeyRecords: [_fakeRecord()],
+    ));
+    await throughStep2(tester);
+
+    expect(find.text('Touch your YubiKey'), findsOneWidget);
+    expect(
+      find.text(
+        'Enter your PIN and touch your YubiKey to authorize this deletion.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets(
+      'yubikey vault calls onConfirmYubikey and deleteVault on authorize',
+      (tester) async {
+    bool confirmCalled = false;
+    bool deleteCalled = false;
+    await tester.pumpWidget(_buildScreen(
+      deleteVault: () async => deleteCalled = true,
+      yubikeyRecords: [_fakeRecord()],
+      onConfirmYubikey: (_, _, _) async => confirmCalled = true,
+    ));
+    await throughStep2(tester);
+
+    await tester.enterText(
+      find.byKey(const Key('delete_vault_yubikey_pin_field')),
+      '123456',
+    );
+    await tester.pump();
+    await tester.tap(find.widgetWithText(TextButton, 'Authorize'));
+    await tester.pumpAndSettle();
+
+    expect(confirmCalled, isTrue);
+    expect(deleteCalled, isTrue);
+    expect(
+      find.text('Your vault has been deleted. Create a new one to continue.'),
+      findsOneWidget,
+    );
   });
 }

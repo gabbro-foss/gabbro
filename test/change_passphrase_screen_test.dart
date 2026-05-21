@@ -25,14 +25,16 @@ Widget _buildScreen({
   Future<void> Function(List<int>, List<int>)? onChangePassphrase,
   bool blockPassphraseCopyPaste = true,
   List<YubikeyRecordData>? yubikeyRecords,
+  Future<void> Function(List<int>, List<int>, String)? onConfirmYubikey,
 }) =>
     MaterialApp(
       home: ChangePassphraseScreen(
         vaultPath: '/tmp/test.gabbro',
-        onChangePassphrase: onChangePassphrase ?? (a, b) async {},
+        onChangePassphrase: onChangePassphrase ?? (_, _) async {},
         onEstimateEntropy: _fakeStrongEntropy,
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
         yubikeyRecords: yubikeyRecords ?? [],
+        onConfirmYubikey: onConfirmYubikey ?? (_, _, _) async {},
       ),
     );
 
@@ -83,5 +85,52 @@ void main() {
     await tester.pumpWidget(_buildScreen(yubikeyRecords: []));
 
     expect(find.byIcon(Icons.security), findsNothing);
+  });
+
+  testWidgets('yubikey mode shows YubiKey PIN field', (tester) async {
+    await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+
+    expect(find.widgetWithText(TextFormField, 'YubiKey PIN'), findsOneWidget);
+    expect(find.textContaining('Touch your YubiKey'), findsOneWidget);
+  });
+
+  testWidgets('yubikey mode calls onConfirmYubikey before onChangePassphrase',
+      (tester) async {
+    bool confirmCalled = false;
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      onConfirmYubikey: (_, _, _) async => confirmCalled = true,
+      // Throw so the screen does not navigate away — we only need to check
+      // that onConfirmYubikey was called first.
+      onChangePassphrase: (_, _) async => throw Exception('stop'),
+    ));
+
+    const newPass = 'correct horse battery staple one two three four';
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Current passphrase'),
+      'oldpass',
+    );
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'New passphrase'),
+      newPass,
+    );
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Confirm new passphrase'),
+      newPass,
+    );
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'YubiKey PIN'),
+      '123456',
+    );
+    await tester.pump();
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Change passphrase'));
+    await tester.pumpAndSettle();
+
+    expect(confirmCalled, isTrue);
+    expect(find.textContaining('stop'), findsOneWidget);
   });
 }
