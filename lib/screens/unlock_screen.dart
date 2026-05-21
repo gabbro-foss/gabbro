@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
@@ -28,6 +31,37 @@ EntropyResult _defaultEstimateEntropy(String password) =>
 
 const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
 
+Future<void> _linuxUnlockWithYubikey(
+  List<int> passphrase,
+  List<int> credentialId,
+  List<int> hkdfSalt,
+  String pin,
+  String path,
+) async {
+  final devices = fidoListDevices();
+  if (devices.isEmpty) {
+    throw PlatformException(
+      code: 'NO_FIDO2_DEVICE',
+      message: 'No FIDO2 device found. Insert your YubiKey and try again.',
+    );
+  }
+  final devicePath = devices.first;
+
+  final hmacSecret = await fidoGetHmacSecret(
+    devicePath: devicePath,
+    credentialId: Uint8List.fromList(credentialId),
+    salt: Uint8List.fromList(hkdfSalt),
+    pin: pin,
+  );
+  await unlockVaultWithYubikey(
+    passphrase: passphrase,
+    hmacSecret: hmacSecret,
+    credentialId: credentialId,
+    hkdfSalt: hkdfSalt,
+    path: path,
+  );
+}
+
 Future<void> _defaultUnlockWithYubikey(
   List<int> passphrase,
   List<int> credentialId,
@@ -36,6 +70,11 @@ Future<void> _defaultUnlockWithYubikey(
   String path,
   String transport,
 ) async {
+  if (Platform.isLinux) {
+    return _linuxUnlockWithYubikey(
+        passphrase, credentialId, hkdfSalt, pin, path);
+  }
+
   final hmacHex = await _yubikeyChannel.invokeMethod<String>(
     'get_hmac_secret',
     {
@@ -154,11 +193,15 @@ class _UnlockScreenState extends State<UnlockScreen> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = (e is PlatformException && e.code == 'TRANSPORT_ERROR')
-            ? e.message ?? 'Transport error.'
-            : (_isYubikeyMode
-                ? 'Could not unlock vault. Check your passphrase and YubiKey PIN.'
-                : 'Could not unlock vault. Check your passphrase.');
+        _errorMessage = switch (e) {
+          PlatformException(code: 'TRANSPORT_ERROR') =>
+            e.message ?? 'Transport error.',
+          PlatformException(code: 'NO_FIDO2_DEVICE') =>
+            e.message ?? 'No FIDO2 device found. Insert your YubiKey and try again.',
+          _ => _isYubikeyMode
+              ? 'Could not unlock vault. Check your passphrase and YubiKey PIN.'
+              : 'Could not unlock vault. Check your passphrase.',
+        };
       });
     } finally {
       setState(() => _isUnlocking = false);
@@ -282,16 +325,18 @@ class _UnlockScreenState extends State<UnlockScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      SegmentedRow<String>(
-                        values: const ['usb', 'nfc'],
-                        selected: _transport,
-                        label: (v) => v.toUpperCase(),
-                        onSelected: (v) => setState(() => _transport = v),
-                      ),
+                      if (!Platform.isLinux) ...[
+                        const SizedBox(height: 12),
+                        SegmentedRow<String>(
+                          values: const ['usb', 'nfc'],
+                          selected: _transport,
+                          label: (v) => v.toUpperCase(),
+                          onSelected: (v) => setState(() => _transport = v),
+                        ),
+                      ],
                       const SizedBox(height: 8),
                       Text(
-                        'Insert your YubiKey and tap when prompted',
+                        'Insert your YubiKey and tap when it flashes',
                         style: Theme.of(context).textTheme.bodySmall,
                         textAlign: TextAlign.center,
                       ),

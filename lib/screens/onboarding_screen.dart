@@ -6,6 +6,7 @@ import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
+import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
@@ -34,6 +35,44 @@ EntropyResult _defaultEstimateEntropy(String password) =>
 
 const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
 
+Future<void> _linuxInitVaultWithYubikey(
+  List<int> passphrase,
+  String pin,
+  String path,
+  void Function() onStep2,
+) async {
+  final devices = fidoListDevices();
+  if (devices.isEmpty) {
+    throw PlatformException(
+      code: 'NO_FIDO2_DEVICE',
+      message: 'No FIDO2 device found. Insert your YubiKey and try again.',
+    );
+  }
+  final devicePath = devices.first;
+
+  // Tap 1: register the hardware credential
+  final cred = await fidoRegister(devicePath: devicePath, pin: pin);
+
+  // Advance UI to step 2 before requesting the second tap
+  onStep2();
+
+  // Tap 2: retrieve hmac-secret to seal the vault
+  final hmacSecret = await fidoGetHmacSecret(
+    devicePath: devicePath,
+    credentialId: cred.credentialId,
+    salt: cred.salt,
+    pin: pin,
+  );
+
+  await initVaultWithYubikey(
+    passphrase: passphrase,
+    hmacSecret: hmacSecret,
+    credentialId: cred.credentialId,
+    hkdfSalt: cred.salt,
+    path: path,
+  );
+}
+
 Future<void> _defaultInitVaultWithYubikey(
   List<int> passphrase,
   String pin,
@@ -41,6 +80,10 @@ Future<void> _defaultInitVaultWithYubikey(
   void Function() onStep2,
   String transport,
 ) async {
+  if (Platform.isLinux) {
+    return _linuxInitVaultWithYubikey(passphrase, pin, path, onStep2);
+  }
+
   final salt = List<int>.generate(32, (_) => Random.secure().nextInt(256));
 
   // Tap 1: makeCredential (register the hardware credential)
@@ -78,8 +121,12 @@ class OnboardingScreen extends StatefulWidget {
   final EntropyResult Function(String password) onEstimateEntropy;
   final bool blockPassphraseCopyPaste;
 
-  /// Controls YubiKey opt-in section visibility. Defaults to `Platform.isAndroid`
-  /// so tests on Linux can pass `isAndroid: true` to exercise the YubiKey UI.
+  /// Controls YubiKey opt-in section visibility. Defaults to Android or Linux.
+  /// Tests can pass `showYubikey: true` to exercise the YubiKey UI.
+  final bool showYubikey;
+
+  /// True only on Android — controls NFC transport selector visibility.
+  /// Tests simulating Android can pass `isAndroid: true`.
   final bool isAndroid;
 
   final Future<void> Function(
@@ -97,9 +144,11 @@ class OnboardingScreen extends StatefulWidget {
     this.onInitVault = _defaultInitVault,
     this.onEstimateEntropy = _defaultEstimateEntropy,
     this.blockPassphraseCopyPaste = true,
+    bool? showYubikey,
     bool? isAndroid,
     this.onInitVaultWithYubikey = _defaultInitVaultWithYubikey,
-  }) : isAndroid = isAndroid ?? Platform.isAndroid;
+  })  : showYubikey = showYubikey ?? (Platform.isAndroid || Platform.isLinux),
+        isAndroid = isAndroid ?? Platform.isAndroid;
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -553,8 +602,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                       ],
-                      // ── YubiKey opt-in (Android only) ──────────────────
-                      if (widget.isAndroid) ...[
+                      // ── YubiKey opt-in (Android and Linux) ─────────────
+                      if (widget.showYubikey) ...[
                         const SizedBox(height: 16),
                         const Divider(),
                         SwitchListTile(
@@ -589,13 +638,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     : null
                                 : null,
                           ),
-                          const SizedBox(height: 12),
-                          SegmentedRow<String>(
-                            values: const ['usb', 'nfc'],
-                            selected: _transport,
-                            label: (v) => v.toUpperCase(),
-                            onSelected: (v) => setState(() => _transport = v),
-                          ),
+                          if (widget.isAndroid) ...[
+                            const SizedBox(height: 12),
+                            SegmentedRow<String>(
+                              values: const ['usb', 'nfc'],
+                              selected: _transport,
+                              label: (v) => v.toUpperCase(),
+                              onSelected: (v) => setState(() => _transport = v),
+                            ),
+                          ],
                           const SizedBox(height: 8),
                           if (_isCreating)
                             _buildYubikeyCreationSteps(context)

@@ -107,7 +107,7 @@ void main() {
     await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
 
     expect(find.byType(TextField), findsNWidgets(2));
-    expect(find.text('Insert your YubiKey and tap when prompted'), findsOneWidget);
+    expect(find.text('Insert your YubiKey and tap when it flashes'), findsOneWidget);
   });
 
   testWidgets('yubikey unlock calls onUnlockWithYubikey', (tester) async {

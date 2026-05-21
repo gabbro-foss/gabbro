@@ -19,6 +19,7 @@ Widget _buildScreen({
   Future<void> Function(List<int>, String)? onInitVault,
   bool blockPassphraseCopyPaste = true,
   bool isAndroid = false,
+  bool? showYubikey,
   Future<void> Function(List<int>, String, String, void Function(), String)? onInitVaultWithYubikey,
 }) =>
     MaterialApp(
@@ -28,6 +29,7 @@ Widget _buildScreen({
         onEstimateEntropy: _fakeStrongEntropy,
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
         isAndroid: isAndroid,
+        showYubikey: showYubikey ?? isAndroid,
         onInitVaultWithYubikey:
             onInitVaultWithYubikey ?? (a, b, c, onStep2, t) async {},
       ),

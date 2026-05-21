@@ -4,6 +4,7 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/entropy.dart';
+import 'api/fido_bridge.dart';
 import 'api/import.dart';
 import 'api/passphrase_generator.dart';
 import 'api/password_generator.dart';
@@ -91,6 +92,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   double dco_decode_f_64(dynamic raw);
+
+  @protected
+  FidoCredentialData dco_decode_fido_credential_data(dynamic raw);
 
   @protected
   FileEntryData dco_decode_file_entry_data(dynamic raw);
@@ -285,6 +289,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   double sse_decode_f_64(SseDeserializer deserializer);
+
+  @protected
+  FidoCredentialData sse_decode_fido_credential_data(
+    SseDeserializer deserializer,
+  );
 
   @protected
   FileEntryData sse_decode_file_entry_data(SseDeserializer deserializer);
@@ -527,6 +536,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_f_64(double self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_fido_credential_data(
+    FidoCredentialData self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_file_entry_data(FileEntryData self, SseSerializer serializer);
