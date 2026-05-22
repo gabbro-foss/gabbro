@@ -266,6 +266,135 @@ object YubiKeyManager {
         }
     }
 
+    /**
+     * Multi-credential hmac-secret assertion — one tap regardless of which registered key is
+     * inserted.
+     *
+     * For 2+ records, all C(n,2) credential pairs are tried sequentially using a 64-byte combined
+     * salt (salt_i ∥ salt_j). The authenticator returns NO_CREDENTIALS immediately (no tap) for
+     * non-matching pairs and taps once for the matching pair. The correct 32-byte half is
+     * extracted based on which credential matched.
+     *
+     * Mirrors [get_hmac_secret_any_of] in rust/src/fido/device.rs.
+     */
+    fun getHmacSecretAny(
+        connection: YubiKeyConnection,
+        records: List<Pair<ByteArray, ByteArray>>,
+        pin: CharArray?,
+        onSuccess: (hmac: ByteArray, credentialId: ByteArray) -> Unit,
+        onError: (String) -> Unit,
+    ) {
+        if (records.isEmpty()) {
+            mainHandler.post { onError("No records provided") }
+            return
+        }
+
+        try {
+            val session = ctap2Session(connection)
+            val info = session.cachedInfo
+            val pinProtocol = pinProtocolFor(info)
+            val clientPin = ClientPin(session, pinProtocol)
+
+            val nonNullPin = pin ?: run { mainHandler.post { onError("PIN required") }; return }
+            val pinToken = clientPin.getPinToken(nonNullPin, ClientPin.PIN_PERMISSION_GA, RP_ID)
+
+            // One key-agreement for the whole session.
+            val keyAgreementResult = clientPin.getSharedSecret()
+            val platformKey = keyAgreementResult.first
+            val sharedSecret = keyAgreementResult.second
+
+            if (records.size == 1) {
+                // Single-credential path: 32-byte salt, mirrors getHmacSecret.
+                val (credId, salt) = records[0]
+                val encryptedSalt = pinProtocol.encrypt(sharedSecret, salt)
+                val saltAuth = pinProtocol.authenticate(sharedSecret, encryptedSalt)
+                val clientDataHash = ByteArray(32).also { SecureRandom().nextBytes(it) }
+                val pinUvAuthParam = pinProtocol.authenticate(pinToken, clientDataHash)
+                val allowList = listOf(mapOf("type" to "public-key", "id" to credId))
+                val extensions = mapOf("hmac-secret" to mapOf(1 to platformKey, 2 to encryptedSalt, 3 to saltAuth))
+                val assertions = session.getAssertions(RP_ID, clientDataHash, allowList, extensions, null, pinUvAuthParam, pinProtocol.version, null)
+                if (assertions.isEmpty()) { mainHandler.post { onError("No credential matched") }; return }
+                val authData = AuthenticatorData.parseFrom(ByteBuffer.wrap(assertions.first().authenticatorData))
+                val encryptedOutput = authData.extensions?.get("hmac-secret") as? ByteArray
+                    ?: run { mainHandler.post { onError("hmac-secret missing from assertion") }; return }
+                mainHandler.post { onSuccess(pinProtocol.decrypt(sharedSecret, encryptedOutput), credId) }
+                return
+            }
+
+            // 2+ records: try all C(n,2) pairs. Non-matching pairs throw CtapException
+            // (NO_CREDENTIALS) before user interaction — loop continues without a tap.
+            for (i in records.indices) {
+                for (j in (i + 1) until records.size) {
+                    try {
+                        val (cred0, salt0) = records[i]
+                        val (cred1, salt1) = records[j]
+
+                        val combinedSalt = ByteArray(64)
+                        System.arraycopy(salt0, 0, combinedSalt, 0, 32)
+                        System.arraycopy(salt1, 0, combinedSalt, 32, 32)
+
+                        val encryptedSalt = pinProtocol.encrypt(sharedSecret, combinedSalt)
+                        val saltAuth = pinProtocol.authenticate(sharedSecret, encryptedSalt)
+
+                        val clientDataHash = ByteArray(32).also { SecureRandom().nextBytes(it) }
+                        val pinUvAuthParam = pinProtocol.authenticate(pinToken, clientDataHash)
+
+                        val allowList = listOf(
+                            mapOf("type" to "public-key", "id" to cred0),
+                            mapOf("type" to "public-key", "id" to cred1),
+                        )
+                        val extensions = mapOf(
+                            "hmac-secret" to mapOf(1 to platformKey, 2 to encryptedSalt, 3 to saltAuth)
+                        )
+
+                        val assertions = session.getAssertions(
+                            RP_ID, clientDataHash, allowList, extensions, null,
+                            pinUvAuthParam, pinProtocol.version, null,
+                        )
+
+                        if (assertions.isEmpty()) continue
+
+                        val firstAssertion = assertions.first()
+                        val matchedCredId = firstAssertion.credential?.get("id") as? ByteArray
+                            ?: run { mainHandler.post { onError("No credential ID in assertion response") }; return }
+
+                        val authData = AuthenticatorData.parseFrom(
+                            ByteBuffer.wrap(firstAssertion.authenticatorData)
+                        )
+                        val encryptedOutput = authData.extensions?.get("hmac-secret") as? ByteArray
+                            ?: run { mainHandler.post { onError("hmac-secret missing from assertion") }; return }
+
+                        val decryptedOutput = pinProtocol.decrypt(sharedSecret, encryptedOutput)
+                        if (decryptedOutput.size < 64) {
+                            mainHandler.post { onError("hmac-secret output too short: ${decryptedOutput.size}") }
+                            return
+                        }
+
+                        val hmac = when {
+                            matchedCredId.contentEquals(cred0) -> decryptedOutput.copyOfRange(0, 32)
+                            matchedCredId.contentEquals(cred1) -> decryptedOutput.copyOfRange(32, 64)
+                            else -> {
+                                mainHandler.post { onError("Assertion credential ID does not match either record in pair ($i, $j)") }
+                                return
+                            }
+                        }
+
+                        mainHandler.post { onSuccess(hmac, matchedCredId) }
+                        return
+
+                    } catch (_: Exception) {
+                        continue  // NO_CREDENTIALS or transient failure — try next pair
+                    }
+                }
+            }
+
+            mainHandler.post { onError("No matching FIDO2 credential found among registered records") }
+
+        } catch (e: Exception) {
+            mainHandler.post { onError("getHmacSecretAny failed: ${e.message}") }
+        }
+    }
+
     private fun ctap2Session(connection: YubiKeyConnection): Ctap2Session = when (connection) {
         is SmartCardConnection -> Ctap2Session(connection)
         is FidoConnection -> Ctap2Session(connection)

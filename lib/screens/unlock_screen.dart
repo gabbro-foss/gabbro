@@ -93,6 +93,97 @@ Future<void> _defaultUnlockWithYubikey(
   );
 }
 
+Future<void> _linuxUnlockWithAnyYubikey(
+  List<int> passphrase,
+  List<YubikeyRecordData> records,
+  String pin,
+  String path,
+  String transport,
+) async {
+  final devices = fidoListDevices();
+  if (devices.isEmpty) {
+    throw PlatformException(
+      code: 'NO_FIDO2_DEVICE',
+      message: 'No FIDO2 device found. Insert your YubiKey and try again.',
+    );
+  }
+  final devicePath = devices.first;
+
+  final match = await fidoGetHmacSecretAny(
+    devicePath: devicePath,
+    records: records
+        .map((r) => FidoRecordInput(credentialId: r.credentialId, salt: r.salt))
+        .toList(),
+    pin: pin,
+  );
+
+  // Find the matching record to retrieve the correct hkdfSalt.
+  final matchedRecord = records.firstWhere(
+    (r) => _listEqual(r.credentialId, match.credentialId),
+  );
+
+  await unlockVaultWithYubikey(
+    passphrase: passphrase,
+    hmacSecret: match.hmac,
+    credentialId: match.credentialId,
+    hkdfSalt: matchedRecord.salt,
+    path: path,
+  );
+}
+
+Future<void> _defaultUnlockWithAnyYubikey(
+  List<int> passphrase,
+  List<YubikeyRecordData> records,
+  String pin,
+  String path,
+  String transport,
+) async {
+  if (Platform.isLinux) {
+    return _linuxUnlockWithAnyYubikey(passphrase, records, pin, path, transport);
+  }
+
+  // Android: one MethodChannel call with all records. Kotlin dispatches a
+  // single CTAP2 getAssertions with all credential IDs in the allowList and a
+  // 64-byte combined salt (for the first pair), then returns the matched hmac
+  // and credential ID.
+  final recordsArg = records
+      .map((r) => {'credentialId': _toHex(r.credentialId), 'salt': _toHex(r.salt)})
+      .toList();
+
+  final result = await _yubikeyChannel.invokeMethod<Map<Object?, Object?>>(
+    'get_hmac_secret_multi',
+    {
+      'records': recordsArg,
+      'pin': pin,
+      'transport': transport,
+    },
+  );
+
+  final hmacHex = result!['hmac'] as String;
+  final credentialIdHex = result['credentialId'] as String;
+  final matchedCredentialId = _fromHex(credentialIdHex);
+
+  final matchedRecord = records.firstWhere(
+    (r) => _listEqual(r.credentialId, matchedCredentialId),
+  );
+
+  await unlockVaultWithYubikey(
+    passphrase: passphrase,
+    hmacSecret: _fromHex(hmacHex),
+    credentialId: matchedCredentialId,
+    hkdfSalt: matchedRecord.salt,
+    path: path,
+  );
+}
+
+bool _listEqual(List<int> a, List<int> b) {
+  if (a.length != b.length) return false;
+  for (int i = 0; i < a.length; i++) {
+    if (a[i] != b[i]) return false;
+  }
+  return true;
+}
+
 // ── Widget ────────────────────────────────────────────────────────────────────
 
 class UnlockScreen extends StatefulWidget {
@@ -114,6 +205,16 @@ class UnlockScreen extends StatefulWidget {
     String transport,
   ) onUnlockWithYubikey;
 
+  /// Called when the vault has 2+ YubiKey records. Sends all records in one
+  /// FIDO2 assertion call (one tap regardless of which key is inserted).
+  final Future<void> Function(
+    List<int> passphrase,
+    List<YubikeyRecordData> records,
+    String pin,
+    String path,
+    String transport,
+  ) onUnlockWithAnyYubikey;
+
   const UnlockScreen({
     super.key,
     required this.vaultPath,
@@ -122,6 +223,7 @@ class UnlockScreen extends StatefulWidget {
     this.blockPassphraseCopyPaste = true,
     this.yubikeyRecords,
     this.onUnlockWithYubikey = _defaultUnlockWithYubikey,
+    this.onUnlockWithAnyYubikey = _defaultUnlockWithAnyYubikey,
   });
 
   @override
@@ -169,27 +271,27 @@ class _UnlockScreenState extends State<UnlockScreen> {
     });
     try {
       if (_isYubikeyMode) {
-        // Try each registered credential in turn. Non-matching credentials
-        // fail immediately (no YubiKey tap required); the matching one will
-        // prompt a single tap and succeed.
-        Object? lastError;
-        for (final record in _yubikeyRecords) {
-          try {
-            await widget.onUnlockWithYubikey(
-              _passphraseController.text.codeUnits,
-              record.credentialId,
-              record.salt,
-              _pinController.text,
-              widget.vaultPath,
-              _transport,
-            );
-            lastError = null;
-            break;
-          } catch (e) {
-            lastError = e;
-          }
+        if (_yubikeyRecords.length == 1) {
+          // Single-key path: one credential ID, one tap.
+          final record = _yubikeyRecords.first;
+          await widget.onUnlockWithYubikey(
+            _passphraseController.text.codeUnits,
+            record.credentialId,
+            record.salt,
+            _pinController.text,
+            widget.vaultPath,
+            _transport,
+          );
+        } else {
+          // Multi-key path: all records in one FIDO2 assertion, one tap.
+          await widget.onUnlockWithAnyYubikey(
+            _passphraseController.text.codeUnits,
+            _yubikeyRecords,
+            _pinController.text,
+            widget.vaultPath,
+            _transport,
+          );
         }
-        if (lastError != null) throw lastError;
       } else {
         await widget.onUnlock(
           _passphraseController.text.codeUnits,

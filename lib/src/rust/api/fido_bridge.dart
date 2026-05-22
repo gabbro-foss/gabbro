@@ -43,6 +43,24 @@ Future<Uint8List> fidoGetHmacSecret({
   pin: pin,
 );
 
+/// Obtain the 32-byte hmac-secret for whichever registered YubiKey is inserted.
+///
+/// For 2 records, sends a single CTAP2 assertion with both credential IDs in
+/// the `allowList` and a 64-byte combined salt. The YubiKey taps once and the
+/// matching half is extracted. For >2 records, C(n,2) pair attempts are tried
+/// until the inserted key is identified; non-matching pairs return immediately
+/// without a tap. For 1 record, falls back to the single-credential path.
+/// Async — blocks until the user taps the key.
+Future<FidoHmacMatch> fidoGetHmacSecretAny({
+  required String devicePath,
+  required List<FidoRecordInput> records,
+  required String pin,
+}) => RustLib.instance.api.crateApiFidoBridgeFidoGetHmacSecretAny(
+  devicePath: devicePath,
+  records: records,
+  pin: pin,
+);
+
 /// Credential record returned by `fido_register`.
 class FidoCredentialData {
   final Uint8List credentialId;
@@ -57,6 +75,49 @@ class FidoCredentialData {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is FidoCredentialData &&
+          runtimeType == other.runtimeType &&
+          credentialId == other.credentialId &&
+          salt == other.salt;
+}
+
+/// Result of a multi-credential hmac-secret assertion.
+class FidoHmacMatch {
+  /// 32-byte hmac-secret output for the matched credential.
+  final Uint8List hmac;
+
+  /// Credential ID of the key that responded.
+  final Uint8List credentialId;
+
+  const FidoHmacMatch({required this.hmac, required this.credentialId});
+
+  @override
+  int get hashCode => hmac.hashCode ^ credentialId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FidoHmacMatch &&
+          runtimeType == other.runtimeType &&
+          hmac == other.hmac &&
+          credentialId == other.credentialId;
+}
+
+/// One registered YubiKey record passed to `fido_get_hmac_secret_any`.
+class FidoRecordInput {
+  final Uint8List credentialId;
+
+  /// 32-byte HKDF salt stored in the vault header for this credential.
+  final Uint8List salt;
+
+  const FidoRecordInput({required this.credentialId, required this.salt});
+
+  @override
+  int get hashCode => credentialId.hashCode ^ salt.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FidoRecordInput &&
           runtimeType == other.runtimeType &&
           credentialId == other.credentialId &&
           salt == other.salt;

@@ -12,6 +12,21 @@ pub struct FidoCredentialData {
     pub salt: Vec<u8>,
 }
 
+/// One registered YubiKey record passed to `fido_get_hmac_secret_any`.
+pub struct FidoRecordInput {
+    pub credential_id: Vec<u8>,
+    /// 32-byte HKDF salt stored in the vault header for this credential.
+    pub salt: Vec<u8>,
+}
+
+/// Result of a multi-credential hmac-secret assertion.
+pub struct FidoHmacMatch {
+    /// 32-byte hmac-secret output for the matched credential.
+    pub hmac: Vec<u8>,
+    /// Credential ID of the key that responded.
+    pub credential_id: Vec<u8>,
+}
+
 // ── Linux implementations ─────────────────────────────────────────────────────
 
 #[cfg(not(target_os = "android"))]
@@ -97,6 +112,45 @@ pub async fn fido_get_hmac_secret(
     Ok(hmac.to_vec())
 }
 
+#[cfg(not(target_os = "android"))]
+/// Obtain the 32-byte hmac-secret for whichever registered YubiKey is inserted.
+///
+/// For 2 records, sends a single CTAP2 assertion with both credential IDs in
+/// the `allowList` and a 64-byte combined salt. The YubiKey taps once and the
+/// matching half is extracted. For >2 records, C(n,2) pair attempts are tried
+/// until the inserted key is identified; non-matching pairs return immediately
+/// without a tap. For 1 record, falls back to the single-credential path.
+/// Async — blocks until the user taps the key.
+pub async fn fido_get_hmac_secret_any(
+    device_path: String,
+    records: Vec<FidoRecordInput>,
+    pin: String,
+) -> Result<FidoHmacMatch, String> {
+    use crate::vault::file_format::YubiKeyRecord;
+
+    let yubikey_records: Vec<YubiKeyRecord> = records
+        .into_iter()
+        .map(|r| {
+            let salt: [u8; 32] = r
+                .salt
+                .try_into()
+                .map_err(|_| "salt must be exactly 32 bytes".to_string())?;
+            Ok(YubiKeyRecord {
+                credential_id: r.credential_id,
+                salt,
+                key_blob: vec![],
+            })
+        })
+        .collect::<Result<Vec<_>, String>>()?;
+
+    let m = crate::fido::get_hmac_secret_any_of(&device_path, &yubikey_records, &pin)?;
+
+    Ok(FidoHmacMatch {
+        hmac: m.hmac.to_vec(),
+        credential_id: m.credential_id,
+    })
+}
+
 // ── Android stubs (never called; Flutter guards with Platform.isLinux) ─────────
 
 #[cfg(target_os = "android")]
@@ -121,6 +175,15 @@ pub async fn fido_get_hmac_secret(
     _pin: String,
 ) -> Result<Vec<u8>, String> {
     Err("fido_get_hmac_secret is not available on Android".to_string())
+}
+
+#[cfg(target_os = "android")]
+pub async fn fido_get_hmac_secret_any(
+    _device_path: String,
+    _records: Vec<FidoRecordInput>,
+    _pin: String,
+) -> Result<FidoHmacMatch, String> {
+    Err("fido_get_hmac_secret_any is not available on Android".to_string())
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -184,5 +247,33 @@ mod tests {
             ))
             .expect("get_hmac_secret should succeed");
         assert_eq!(hmac.len(), 32, "hmac-secret must be 32 bytes");
+    }
+
+    #[test]
+    #[serial]
+    #[ignore] // requires YubiKey; set GABBRO_TEST_PIN and GABBRO_TEST_DEVICE
+    #[cfg(not(target_os = "android"))]
+    fn fido_get_hmac_secret_any_single_record_returns_32_bytes() {
+        let rt = tokio::runtime::Runtime::new().unwrap();
+        let pin = std::env::var("GABBRO_TEST_PIN").expect("GABBRO_TEST_PIN must be set");
+        let device =
+            std::env::var("GABBRO_TEST_DEVICE").unwrap_or_else(|_| "/dev/hidraw5".to_string());
+        println!("\n>>> TAP your YubiKey to register (tap 1/2)...");
+        let cred = rt
+            .block_on(fido_register(device.clone(), pin.clone()))
+            .expect("register should succeed");
+        let record = FidoRecordInput {
+            credential_id: cred.credential_id,
+            salt: cred.salt,
+        };
+        println!(">>> TAP your YubiKey for hmac-secret-any (tap 2/2)...");
+        let result = rt
+            .block_on(fido_get_hmac_secret_any(device, vec![record], pin))
+            .expect("fido_get_hmac_secret_any should succeed");
+        assert_eq!(result.hmac.len(), 32, "hmac must be 32 bytes");
+        assert!(
+            !result.credential_id.is_empty(),
+            "credential_id must not be empty"
+        );
     }
 }

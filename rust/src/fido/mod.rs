@@ -5,10 +5,13 @@
 //!   `YubiKeyRecord` ready to store in the vault header.
 //! - `get_hmac_secret`: given a `YubiKeyRecord`, obtain the 32-byte
 //!   hmac-secret output from the YubiKey for use in `combine_yubikey`.
+//! - `get_hmac_secret_any_of`: multi-credential assertion — one tap regardless
+//!   of which registered key is inserted (two-salt CTAP2 trick for ≥2 keys).
 
 use crate::vault::file_format::YubiKeyRecord;
 
 pub mod device;
+pub use device::{get_hmac_secret_any_of, HmacMatch};
 
 /// Relying party ID used for all Gabbro FIDO2 credentials.
 pub const RP_ID: &str = "app.gabbro.gabbro";

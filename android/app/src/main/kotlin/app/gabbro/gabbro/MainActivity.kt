@@ -181,6 +181,54 @@ class MainActivity : FlutterActivity() {
                         }
                         attempt(1)
                     }
+                    "get_hmac_secret_multi" -> {
+                        val rawRecords = call.argument<List<Map<String, Any>>>("records")
+                        if (rawRecords.isNullOrEmpty()) {
+                            result.error("BAD_ARGS", "records required", null)
+                            return@setMethodCallHandler
+                        }
+                        val records = rawRecords.map { r ->
+                            Pair(
+                                (r["credentialId"] as String).fromHex(),
+                                (r["salt"] as String).fromHex(),
+                            )
+                        }
+                        fun attempt(retriesLeft: Int) {
+                            startDiscovery(
+                                transport,
+                                onConnected = { connection ->
+                                    YubiKeyManager.getHmacSecretAny(
+                                        connection, records, pin,
+                                        onSuccess = { hmac, credentialId ->
+                                            stopDiscovery(transport)
+                                            result.success(mapOf(
+                                                "hmac" to hmac.toHex(),
+                                                "credentialId" to credentialId.toHex(),
+                                            ))
+                                        },
+                                        onError = { msg ->
+                                            stopDiscovery(transport)
+                                            if (retriesLeft > 0) {
+                                                android.os.Handler(android.os.Looper.getMainLooper())
+                                                    .postDelayed({ attempt(retriesLeft - 1) }, 500)
+                                            } else {
+                                                result.error("HMAC_MULTI_FAILED", msg, null)
+                                            }
+                                        },
+                                    )
+                                },
+                                onError = { msg ->
+                                    if (retriesLeft > 0) {
+                                        android.os.Handler(android.os.Looper.getMainLooper())
+                                            .postDelayed({ attempt(retriesLeft - 1) }, 500)
+                                    } else {
+                                        result.error("TRANSPORT_ERROR", msg, null)
+                                    }
+                                },
+                            )
+                        }
+                        attempt(1)
+                    }
                     else -> result.notImplemented()
                 }
             }

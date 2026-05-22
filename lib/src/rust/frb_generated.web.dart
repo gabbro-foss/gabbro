@@ -99,6 +99,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FidoCredentialData dco_decode_fido_credential_data(dynamic raw);
 
   @protected
+  FidoHmacMatch dco_decode_fido_hmac_match(dynamic raw);
+
+  @protected
+  FidoRecordInput dco_decode_fido_record_input(dynamic raw);
+
+  @protected
   FileEntryData dco_decode_file_entry_data(dynamic raw);
 
   @protected
@@ -127,6 +133,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<EntrySummaryData> dco_decode_list_entry_summary_data(dynamic raw);
+
+  @protected
+  List<FidoRecordInput> dco_decode_list_fido_record_input(dynamic raw);
 
   @protected
   List<ImportFailureData> dco_decode_list_import_failure_data(dynamic raw);
@@ -304,6 +313,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  FidoHmacMatch sse_decode_fido_hmac_match(SseDeserializer deserializer);
+
+  @protected
+  FidoRecordInput sse_decode_fido_record_input(SseDeserializer deserializer);
+
+  @protected
   FileEntryData sse_decode_file_entry_data(SseDeserializer deserializer);
 
   @protected
@@ -340,6 +355,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<EntrySummaryData> sse_decode_list_entry_summary_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<FidoRecordInput> sse_decode_list_fido_record_input(
     SseDeserializer deserializer,
   );
 
@@ -560,6 +580,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_fido_hmac_match(FidoHmacMatch self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_fido_record_input(
+    FidoRecordInput self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_file_entry_data(FileEntryData self, SseSerializer serializer);
 
   @protected
@@ -601,6 +630,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_entry_summary_data(
     List<EntrySummaryData> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_fido_record_input(
+    List<FidoRecordInput> self,
     SseSerializer serializer,
   );
 

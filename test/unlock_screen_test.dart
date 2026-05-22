@@ -27,6 +27,8 @@ Widget _buildScreen({
   List<YubikeyRecordData>? yubikeyRecords,
   Future<void> Function(List<int>, List<int>, List<int>, String, String, String)?
       onUnlockWithYubikey,
+  Future<void> Function(List<int>, List<YubikeyRecordData>, String, String, String)?
+      onUnlockWithAnyYubikey,
 }) =>
     MaterialApp(
       home: UnlockScreen(
@@ -36,6 +38,7 @@ Widget _buildScreen({
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
         yubikeyRecords: yubikeyRecords ?? [],
         onUnlockWithYubikey: onUnlockWithYubikey ?? (a, b, c, d, e, f) async {},
+        onUnlockWithAnyYubikey: onUnlockWithAnyYubikey ?? (a, b, c, d, e) async {},
       ),
     );
 
@@ -152,5 +155,25 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Could not unlock vault'), findsOneWidget);
+  });
+
+  testWidgets('multi-key vault calls onUnlockWithAnyYubikey not onUnlockWithYubikey',
+      (tester) async {
+    bool anyCalled = false;
+    bool singleCalled = false;
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord(), _fakeRecord()],
+      onUnlockWithYubikey: (a, b, c, d, e, f) async => singleCalled = true,
+      onUnlockWithAnyYubikey: (passphrase, records, pin, path, transport) async =>
+          anyCalled = true,
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.enterText(find.byType(TextField).last, '123456');
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(anyCalled, isTrue);
+    expect(singleCalled, isFalse);
   });
 }
