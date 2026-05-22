@@ -146,7 +146,7 @@ gabbro/
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
 
 **Not yet implemented (see Bikeshed):**
-- YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2) implemented; minimum-2-keys enforcement not yet added; change_passphrase YubiKey wiring pending
+- YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2) implemented; minimum-2-keys enforcement (ADR-010, VERSION 3 vault format) implemented; change_passphrase YubiKey wiring pending
 - Autofill save requests (`onSaveRequest`)
 - Passkey support, breach alerts, vault sync
 
@@ -154,7 +154,7 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 247 | 5 |
+| Rust (`cargo test -q`) | ~260 | 5 |
 | Flutter (`flutter test`) | 301 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
@@ -166,14 +166,15 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Session 11 complete — YubiKey USB end-to-end on Linux (--release)**
-  - `rust/src/api/fido_bridge.rs` added: `fido_list_devices` (sync), `fido_register` (async), `fido_get_hmac_secret` (async). Linux impl + Android stubs. 1 non-hardware test + 2 hardware-gated tests.
-  - FRB codegen regenerated — Dart bindings in `lib/src/rust/api/fido_bridge.dart`.
-  - `onboarding_screen.dart`: added `showYubikey` parameter (defaults `isAndroid || isLinux`); Linux vault creation uses Rust bridge directly; NFC transport selector gated to Android-only.
-  - `unlock_screen.dart`: Linux unlock uses Rust bridge; NFC transport selector hidden on Linux; `NO_FIDO2_DEVICE` error surfaced clearly when no key is present.
-  - All 8 hardware tests passed: vault creation with YubiKey, unlock, wrong PIN, no device.
-  - Any CTAP2 + hmac-secret device works (SoloKeys, Nitrokey FIDO2, etc.); Google Titan does not (no hmac-secret).
-  - **Next: ADR-010 minimum-2-keys enforcement at vault creation; then change_passphrase YubiKey wiring**
+- **Session 12 complete — ADR-010 minimum-2-keys enforcement (VERSION 3 vault format)**
+  - `rust/src/vault/file_format.rs`: `VERSION = 3`; `YubiKeyRecord` gains `key_blob: Vec<u8>` (60 bytes: nonce + ciphertext + GCM tag); `from_bytes` accepts VERSION 2 (key_blob empty) and VERSION 3.
+  - `rust/src/crypto/vault_crypto.rs`: `seal_vault_with_keys` (enforces ≥2 keys, generates random `vault_key_master`, wraps it per-key via AES-256-GCM); `open_vault_with_key_record` (finds record by credential_id, decrypts key_blob → vault_key_master); `reseal_vault_body` (re-encrypts body without re-deriving keys).
+  - `rust/src/vault/session.rs`: `YubikeyMaterial` caches `vault_key_master: Option<Zeroizing<[u8; 32]>>`; VERSION 3 CRUD save uses `reseal_vault_body`; `lock_vault` zeroizes it.
+  - `rust/src/api/vault_bridge.rs`: `init_vault_with_keys` bridge function; `YubiKeyInitData` bridge type.
+  - `lib/screens/onboarding_screen.dart`: 4-tap vault creation UI (register primary → activate primary → register backup → activate backup); 4-step progress indicator.
+  - `lib/screens/unlock_screen.dart`: try-all-records loop — non-matching credentials fail immediately (no tap), matching one taps once and succeeds.
+  - 10 new TDD tests in `vault_crypto.rs`; 3 new tests in `file_format.rs`; FRB codegen regenerated; Flutter 301 / Rust ~260; clippy clean.
+  - **Next: hardware test multi-key vault creation and unlock on Linux and Android; then change_passphrase YubiKey wiring**
 
 ---
 
@@ -208,8 +209,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- ADR-010 mentions two yubikeys as minimum at vault creation, check ADR-010 and implement accordingly
-  - Add manage yubikey screen once yubikes work on android and linux and multiple yubikeys can be used
+- Add manage yubikey screen (add/remove keys) once multi-key vault creation is hardware-tested
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
     - add security toggle to show vault alias list on login screen or not if user wants to bypass this
