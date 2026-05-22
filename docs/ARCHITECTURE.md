@@ -212,6 +212,11 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - Add manage yubikey screen once yubikes work on android and linux and multiple yubikeys can be used
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
+    - add security toggle to show vault alias list on login screen or not if user wants to bypass this
+  - remove add vault button from settings
+  - add vault button on login screen that togggles to onboarding screen
+  - add vault alias to name each vault (avoids collisions) -> update vault file entry
+  - export vault includes alias in name to avoid collision
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
 - Export vault to JSON - consistent with gabbro stance: we don't lock the user in. Include warning about user's responsibility with a decrypted vault file.
 - Export/import security note: `.gabbro` exports are AES-256-GCM encrypted (passphrase-only — YubiKey not required to import, by design; passphrase is the durable recovery factor, YubiKey is the live-vault second factor). JSON exports are plaintext — no encryption at all. Add visible warnings in the export UI distinguishing the two: `.gabbro` ("protected by your passphrase only") and JSON ("completely unencrypted — store securely").
