@@ -10,24 +10,36 @@ use zeroize::{Zeroize, Zeroizing};
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
 
-use crate::api::vault::{load_vault, load_vault_with_yubikey, save_vault, save_vault_with_yubikey};
+use crate::api::vault::{
+    load_vault, load_vault_with_key_record, load_vault_with_yubikey, reseal_vault_body, save_vault,
+    save_vault_with_yubikey,
+};
 use crate::api::vault_bridge::EntrySummaryData;
 use crate::vault::entry::VaultEntry;
 use crate::vault::serialization::VaultBody;
 
-// Extracted YubiKey triple: (hmac_secret, credential_id, hkdf_salt).
-type YubikeyTriple = Option<(Zeroizing<Vec<u8>>, Vec<u8>, [u8; 32])>;
+// Extracted YubiKey quad: (hmac_secret, credential_id, hkdf_salt, vault_key_master?).
+type YubikeyTriple = Option<(
+    Zeroizing<Vec<u8>>,
+    Vec<u8>,
+    [u8; 32],
+    Option<Zeroizing<[u8; 32]>>,
+)>;
 
 // ── Session state ─────────────────────────────────────────────────────────────
 
 /// YubiKey material cached in memory for the duration of an unlocked session.
 ///
-/// The hmac-secret is deterministic (same credential + salt → same bytes),
-/// so caching it enables CRUD saves without requiring a re-tap.
+/// For VERSION 3 multi-key vaults, `vault_key_master` holds the random master
+/// key that encrypts the vault body.  CRUD saves use it directly (no re-tap).
+/// For legacy VERSION 2 single-key vaults it is None; saves use the old
+/// `save_vault_with_yubikey` path which re-derives with the cached hmac_secret.
 pub struct YubikeyMaterial {
     pub hmac_secret: Vec<u8>, // 32 bytes; zeroized in lock_vault
     pub hkdf_salt: [u8; 32],
     pub credential_id: Vec<u8>,
+    /// Cached master key for CRUD re-seals (VERSION 3 multi-key vaults only).
+    pub vault_key_master: Option<Zeroizing<[u8; 32]>>,
 }
 
 pub struct VaultSession {
@@ -78,7 +90,38 @@ pub fn unlock_vault_with_yubikey(
         yubikey: Some(YubikeyMaterial {
             hmac_secret: hmac_secret.to_vec(),
             hkdf_salt: *yubikey_salt,
+            vault_key_master: None,
             credential_id,
+        }),
+    });
+    Ok(())
+}
+
+/// Decrypt a VERSION 3 multi-key vault using any one registered YubiKey.
+///
+/// Caches `vault_key_master` for subsequent CRUD re-seals so the user
+/// never needs to re-tap their key during an active session.
+pub fn unlock_vault_with_key_record(
+    passphrase: &[u8],
+    hmac_secret: &[u8; 32],
+    credential_id: Vec<u8>,
+    yubikey_salt: &[u8; 32],
+    path: PathBuf,
+) -> Result<(), String> {
+    let (mut body, master) =
+        load_vault_with_key_record(passphrase, hmac_secret, &credential_id, &path)?;
+    crate::api::vault::purge_expired_history(&mut body.entries);
+    let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    *session = Some(VaultSession {
+        folders: body.folders,
+        entries: body.entries,
+        path,
+        passphrase: passphrase.to_vec(),
+        yubikey: Some(YubikeyMaterial {
+            hmac_secret: hmac_secret.to_vec(),
+            hkdf_salt: *yubikey_salt,
+            credential_id,
+            vault_key_master: Some(master),
         }),
     });
     Ok(())
@@ -104,6 +147,9 @@ pub fn lock_vault() -> Result<(), String> {
         s.passphrase.zeroize();
         if let Some(ref mut yk) = s.yubikey {
             yk.hmac_secret.zeroize();
+            if let Some(ref mut master) = yk.vault_key_master {
+                master.zeroize();
+            }
         }
         s.entries.clear();
     }
@@ -118,12 +164,17 @@ fn extract_yubikey(session: &VaultSession) -> YubikeyTriple {
             Zeroizing::new(yk.hmac_secret.clone()),
             yk.credential_id.clone(),
             yk.hkdf_salt,
+            yk.vault_key_master.as_ref().map(|m| Zeroizing::new(**m)),
         )
     })
 }
 
 /// Saves using passphrase alone, or passphrase + YubiKey if the session
 /// has YubiKey material cached.
+///
+/// VERSION 3 multi-key vaults: re-seals only the body using `vault_key_master`
+/// (no Argon2id re-derivation; all YubiKey records stay intact).
+/// Legacy VERSION 2 single-key vaults: full re-seal via `save_vault_with_yubikey`.
 fn do_save(
     body: &VaultBody,
     passphrase: &[u8],
@@ -131,7 +182,10 @@ fn do_save(
     yubikey: YubikeyTriple,
 ) -> Result<(), String> {
     match yubikey {
-        Some((hmac_secret, credential_id, hkdf_salt)) => {
+        Some((_, _, _, Some(ref vault_key_master))) => {
+            reseal_vault_body(body, vault_key_master, path)
+        }
+        Some((hmac_secret, credential_id, hkdf_salt, None)) => {
             let secret: [u8; 32] = hmac_secret
                 .as_slice()
                 .try_into()

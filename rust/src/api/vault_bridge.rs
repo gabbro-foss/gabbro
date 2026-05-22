@@ -523,6 +523,10 @@ pub fn list_vault_yubikey_records(path: String) -> Result<Vec<YubikeyRecordData>
 
 /// Decrypt the vault at `path` using both passphrase and YubiKey hmac-secret.
 ///
+/// Handles both VERSION 2 (legacy single-key) and VERSION 3 (multi-key) vaults.
+/// For VERSION 3, caches `vault_key_master` in the session so CRUD saves
+/// never require a YubiKey re-tap.
+///
 /// `hmac_secret` must be exactly 32 bytes (FIDO2 hmac-secret output).
 /// `hkdf_salt` must be exactly 32 bytes (from `YubikeyRecordData.salt`).
 /// Async — Argon2id takes ~667ms on target hardware.
@@ -539,7 +543,7 @@ pub async fn unlock_vault_with_yubikey(
     let salt: [u8; 32] = hkdf_salt
         .try_into()
         .map_err(|_| "hkdf_salt must be exactly 32 bytes".to_string())?;
-    session::unlock_vault_with_yubikey(
+    session::unlock_vault_with_key_record(
         &passphrase,
         &secret,
         credential_id,
@@ -558,6 +562,81 @@ pub async fn init_vault(passphrase: Vec<u8>, path: String) -> Result<(), String>
     save_vault(&VaultBody::empty(), &passphrase, &vault_path)?;
     // Unlock into session immediately so the user lands on the list screen
     session::unlock_vault(&passphrase, vault_path)
+}
+
+/// Key material for one YubiKey, supplied during multi-key vault creation.
+pub struct YubiKeyInitData {
+    pub credential_id: Vec<u8>,
+    pub hmac_secret: Vec<u8>, // 32 bytes — FIDO2 hmac-secret output
+    pub hkdf_salt: Vec<u8>,   // 32 bytes — per-key CTAP2 challenge salt
+}
+
+/// Create a new empty vault sealed with a passphrase and two or more YubiKeys.
+///
+/// Enforces ADR-010: minimum 2 registered keys at vault creation.
+/// After creation, unlocks into session immediately using the first key.
+/// Async — runs Argon2id + encryption.
+pub async fn init_vault_with_keys(
+    passphrase: Vec<u8>,
+    keys: Vec<YubiKeyInitData>,
+    path: String,
+) -> Result<(), String> {
+    use crate::api::vault::save_vault_with_keys;
+    use crate::crypto::vault_crypto::YubiKeyRegistration;
+    use crate::vault::serialization::VaultBody;
+
+    if keys.len() < 2 {
+        return Err(format!("at least 2 YubiKeys required; got {}", keys.len()));
+    }
+
+    let registrations = keys
+        .iter()
+        .map(|k| {
+            let hmac: [u8; 32] = k
+                .hmac_secret
+                .as_slice()
+                .try_into()
+                .map_err(|_| "hmac_secret must be 32 bytes".to_string())?;
+            let salt: [u8; 32] = k
+                .hkdf_salt
+                .as_slice()
+                .try_into()
+                .map_err(|_| "hkdf_salt must be 32 bytes".to_string())?;
+            Ok(YubiKeyRegistration {
+                credential_id: k.credential_id.clone(),
+                hmac_secret: hmac,
+                salt,
+            })
+        })
+        .collect::<Result<Vec<_>, String>>()?;
+
+    let vault_path = PathBuf::from(&path);
+    save_vault_with_keys(
+        &VaultBody::empty(),
+        &passphrase,
+        &registrations,
+        &vault_path,
+    )?;
+
+    // Unlock into session using the first key's material
+    let first = &keys[0];
+    let secret: [u8; 32] = first
+        .hmac_secret
+        .as_slice()
+        .try_into()
+        .map_err(|_| "hmac_secret must be 32 bytes".to_string())?;
+    let salt: [u8; 32] = first
+        .hkdf_salt
+        .as_slice()
+        .try_into()
+        .map_err(|_| "hkdf_salt must be 32 bytes".to_string())?;
+    session::unlock_vault_with_key_record(
+        &passphrase,
+        &secret,
+        first.credential_id.clone(),
+        &salt,
+        vault_path,
+    )
 }
 
 /// Create a new empty vault at `path`, sealed with both passphrase and YubiKey.

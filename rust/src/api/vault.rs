@@ -805,6 +805,55 @@ pub fn load_vault_with_yubikey(
     deserialize_vault_body(&plaintext)
 }
 
+/// Serialize, encrypt with multiple YubiKeys, and write a vault to disk.
+/// Requires at least 2 keys (enforces ADR-010 minimum).
+#[flutter_rust_bridge::frb(ignore)]
+pub fn save_vault_with_keys(
+    body: &VaultBody,
+    passphrase: &[u8],
+    keys: &[crate::crypto::vault_crypto::YubiKeyRegistration],
+    path: &Path,
+) -> Result<(), String> {
+    let plaintext = serialize_vault_body(body)?;
+    let sealed = crate::crypto::vault_crypto::seal_vault_with_keys(passphrase, keys, &plaintext)?;
+    write_vault(&sealed, path)
+}
+
+/// Read a vault from disk, decrypt using one registered key, and return both
+/// the body and the `vault_key_master` needed for subsequent CRUD re-seals.
+#[flutter_rust_bridge::frb(ignore)]
+pub fn load_vault_with_key_record(
+    passphrase: &[u8],
+    hmac_secret: &[u8; 32],
+    credential_id: &[u8],
+    path: &Path,
+) -> Result<(VaultBody, zeroize::Zeroizing<[u8; 32]>), String> {
+    let sealed = read_vault(path)?;
+    let (plaintext, master) = crate::crypto::vault_crypto::open_vault_with_key_record(
+        passphrase,
+        hmac_secret,
+        credential_id,
+        &sealed,
+    )?;
+    let body = deserialize_vault_body(&plaintext)?;
+    Ok((body, master))
+}
+
+/// Re-seal only the vault body using a cached `vault_key_master`, leaving all
+/// YubiKey records intact.  Used for CRUD saves in a multi-key session.
+#[flutter_rust_bridge::frb(ignore)]
+pub fn reseal_vault_body(
+    body: &VaultBody,
+    vault_key_master: &[u8; 32],
+    path: &Path,
+) -> Result<(), String> {
+    use crate::vault::io::read_vault;
+    let mut sealed = read_vault(path)?;
+    let plaintext = serialize_vault_body(body)?;
+    crate::crypto::vault_crypto::reseal_vault_body(&mut sealed, vault_key_master, &plaintext)?;
+    write_vault(&sealed, path)
+}
+
 // ── Timestamp helper ──────────────────────────────────────────────────────────
 
 /// Returns the current UTC time as an ISO 8601 string.

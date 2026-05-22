@@ -17,12 +17,12 @@ import 'package:path_provider/path_provider.dart';
 String _toHex(List<int> bytes) =>
     bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
 
-List<int> _fromHex(String hex) {
+Uint8List _fromHex(String hex) {
   final result = <int>[];
   for (var i = 0; i < hex.length; i += 2) {
     result.add(int.parse(hex.substring(i, i + 2), radix: 16));
   }
-  return result;
+  return Uint8List.fromList(result);
 }
 
 // ── Bridge defaults ───────────────────────────────────────────────────────────
@@ -40,6 +40,8 @@ Future<void> _linuxInitVaultWithYubikey(
   String pin,
   String path,
   void Function() onStep2,
+  void Function() onStep3,
+  void Function() onStep4,
 ) async {
   final devices = fidoListDevices();
   if (devices.isEmpty) {
@@ -50,25 +52,45 @@ Future<void> _linuxInitVaultWithYubikey(
   }
   final devicePath = devices.first;
 
-  // Tap 1: register the hardware credential
-  final cred = await fidoRegister(devicePath: devicePath, pin: pin);
-
-  // Advance UI to step 2 before requesting the second tap
+  // Tap 1: register primary key
+  final cred1 = await fidoRegister(devicePath: devicePath, pin: pin);
   onStep2();
 
-  // Tap 2: retrieve hmac-secret to seal the vault
-  final hmacSecret = await fidoGetHmacSecret(
+  // Tap 2: activate primary key (get hmac-secret)
+  final hmac1 = await fidoGetHmacSecret(
     devicePath: devicePath,
-    credentialId: cred.credentialId,
-    salt: cred.salt,
+    credentialId: cred1.credentialId,
+    salt: cred1.salt,
+    pin: pin,
+  );
+  onStep3();
+
+  // Tap 3: register backup key
+  final cred2 = await fidoRegister(devicePath: devicePath, pin: pin);
+  onStep4();
+
+  // Tap 4: activate backup key (get hmac-secret)
+  final hmac2 = await fidoGetHmacSecret(
+    devicePath: devicePath,
+    credentialId: cred2.credentialId,
+    salt: cred2.salt,
     pin: pin,
   );
 
-  await initVaultWithYubikey(
+  await initVaultWithKeys(
     passphrase: passphrase,
-    hmacSecret: hmacSecret,
-    credentialId: cred.credentialId,
-    hkdfSalt: cred.salt,
+    keys: [
+      YubiKeyInitData(
+        credentialId: cred1.credentialId,
+        hmacSecret: hmac1,
+        hkdfSalt: cred1.salt,
+      ),
+      YubiKeyInitData(
+        credentialId: cred2.credentialId,
+        hmacSecret: hmac2,
+        hkdfSalt: cred2.salt,
+      ),
+    ],
     path: path,
   );
 }
@@ -78,36 +100,66 @@ Future<void> _defaultInitVaultWithYubikey(
   String pin,
   String path,
   void Function() onStep2,
+  void Function() onStep3,
+  void Function() onStep4,
   String transport,
 ) async {
   if (Platform.isLinux) {
-    return _linuxInitVaultWithYubikey(passphrase, pin, path, onStep2);
+    return _linuxInitVaultWithYubikey(passphrase, pin, path, onStep2, onStep3, onStep4);
   }
 
-  final salt = List<int>.generate(32, (_) => Random.secure().nextInt(256));
+  // Android: register and activate 2 keys via platform channel.
+  // Each call blocks until the YubiKey responds.
 
-  // Tap 1: makeCredential (register the hardware credential)
-  final credIdHex = await _yubikeyChannel.invokeMethod<String>(
+  // Tap 1: register primary key
+  final credId1Hex = await _yubikeyChannel.invokeMethod<String>(
     'register',
     {'pin': pin, 'transport': transport},
   );
-  if (credIdHex == null) throw Exception('YubiKey registration returned no credential');
+  if (credId1Hex == null) throw Exception('YubiKey registration returned no credential');
 
-  // Step 1 done — advance UI to step 2 before requesting the second tap
+  final salt1 = Uint8List.fromList(List.generate(32, (_) => Random.secure().nextInt(256)));
   onStep2();
 
-  // Tap 2: getAssertions (retrieve hmac-secret to seal the vault)
-  final hmacHex = await _yubikeyChannel.invokeMethod<String>(
+  // Tap 2: activate primary key
+  final hmac1Hex = await _yubikeyChannel.invokeMethod<String>(
     'get_hmac_secret',
-    {'credentialId': credIdHex, 'salt': _toHex(salt), 'pin': pin, 'transport': transport},
+    {'credentialId': credId1Hex, 'salt': _toHex(salt1), 'pin': pin, 'transport': transport},
   );
-  if (hmacHex == null) throw Exception('YubiKey activation returned no secret');
+  if (hmac1Hex == null) throw Exception('YubiKey activation returned no secret');
+  onStep3();
 
-  await initVaultWithYubikey(
+  // Tap 3: register backup key
+  final credId2Hex = await _yubikeyChannel.invokeMethod<String>(
+    'register',
+    {'pin': pin, 'transport': transport},
+  );
+  if (credId2Hex == null) throw Exception('YubiKey registration returned no credential');
+
+  final salt2 = Uint8List.fromList(List.generate(32, (_) => Random.secure().nextInt(256)));
+  onStep4();
+
+  // Tap 4: activate backup key
+  final hmac2Hex = await _yubikeyChannel.invokeMethod<String>(
+    'get_hmac_secret',
+    {'credentialId': credId2Hex, 'salt': _toHex(salt2), 'pin': pin, 'transport': transport},
+  );
+  if (hmac2Hex == null) throw Exception('YubiKey activation returned no secret');
+
+  await initVaultWithKeys(
     passphrase: passphrase,
-    hmacSecret: _fromHex(hmacHex),
-    credentialId: _fromHex(credIdHex),
-    hkdfSalt: salt,
+    keys: [
+      YubiKeyInitData(
+        credentialId: _fromHex(credId1Hex),
+        hmacSecret: _fromHex(hmac1Hex),
+        hkdfSalt: salt1,
+      ),
+      YubiKeyInitData(
+        credentialId: _fromHex(credId2Hex),
+        hmacSecret: _fromHex(hmac2Hex),
+        hkdfSalt: salt2,
+      ),
+    ],
     path: path,
   );
 }
@@ -134,6 +186,8 @@ class OnboardingScreen extends StatefulWidget {
     String pin,
     String path,
     void Function() onStep2,
+    void Function() onStep3,
+    void Function() onStep4,
     String transport,
   ) onInitVaultWithYubikey;
 
@@ -170,7 +224,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool? _confirmMatches;
   bool _useYubikey = false;
   String _transport = 'usb';
-  // 0 = idle, 1 = waiting for tap 1 (register), 2 = waiting for tap 2 (activate)
+  // 0 = idle, 1 = tap 1 (register key 1), 2 = tap 2 (activate key 1),
+  // 3 = tap 3 (register key 2), 4 = tap 4 (activate key 2)
   int _yubikeyStep = 0;
 
   @override
@@ -217,6 +272,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _pinController.text,
           _vaultPath,
           () { if (mounted) setState(() => _yubikeyStep = 2); },
+          () { if (mounted) setState(() => _yubikeyStep = 3); },
+          () { if (mounted) setState(() => _yubikeyStep = 4); },
           _transport,
         );
       } else {
@@ -352,7 +409,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildYubikeyCreationSteps(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final step1Done = _yubikeyStep >= 2;
+
+    Widget connector(bool done) => Padding(
+          padding: const EdgeInsets.only(left: 13, top: 4, bottom: 4),
+          child: Container(
+            width: 2,
+            height: 14,
+            color: done ? Colors.green.shade600 : cs.outlineVariant,
+          ),
+        );
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -367,26 +432,37 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _buildStepRow(
             context,
             number: 1,
-            label: 'Register',
+            label: 'Register primary key',
             hint: 'Touch your YubiKey now',
-            done: step1Done,
+            done: _yubikeyStep >= 2,
             active: _yubikeyStep == 1,
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 13, top: 4, bottom: 4),
-            child: Container(
-              width: 2,
-              height: 14,
-              color: step1Done ? Colors.green.shade600 : cs.outlineVariant,
-            ),
-          ),
+          connector(_yubikeyStep >= 2),
           _buildStepRow(
             context,
             number: 2,
-            label: 'Activate',
-            hint: 'Touch your YubiKey again to seal the vault',
-            done: false,
+            label: 'Activate primary key',
+            hint: 'Touch your YubiKey again',
+            done: _yubikeyStep >= 3,
             active: _yubikeyStep == 2,
+          ),
+          connector(_yubikeyStep >= 3),
+          _buildStepRow(
+            context,
+            number: 3,
+            label: 'Register backup key',
+            hint: 'Touch your YubiKey to register the second key',
+            done: _yubikeyStep >= 4,
+            active: _yubikeyStep == 3,
+          ),
+          connector(_yubikeyStep >= 4),
+          _buildStepRow(
+            context,
+            number: 4,
+            label: 'Activate backup key',
+            hint: 'Touch your YubiKey one final time',
+            done: false,
+            active: _yubikeyStep == 4,
           ),
           const SizedBox(height: 14),
           const LinearProgressIndicator(),
@@ -652,7 +728,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             _buildYubikeyCreationSteps(context)
                           else ...[
                             Text(
-                              'You will tap your YubiKey twice: once to register, once to activate.',
+                              'You will tap your YubiKey four times to register and activate two keys.',
                               style: Theme.of(context).textTheme.bodySmall,
                               textAlign: TextAlign.center,
                             ),

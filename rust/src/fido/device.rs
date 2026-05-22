@@ -116,6 +116,7 @@ pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord
         Ok(YubiKeyRecord {
             credential_id,
             salt,
+            key_blob: vec![],
         })
     }
 }

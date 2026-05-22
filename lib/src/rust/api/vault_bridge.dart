@@ -162,6 +162,10 @@ List<YubikeyRecordData> listVaultYubikeyRecords({required String path}) =>
 
 /// Decrypt the vault at `path` using both passphrase and YubiKey hmac-secret.
 ///
+/// Handles both VERSION 2 (legacy single-key) and VERSION 3 (multi-key) vaults.
+/// For VERSION 3, caches `vault_key_master` in the session so CRUD saves
+/// never require a YubiKey re-tap.
+///
 /// `hmac_secret` must be exactly 32 bytes (FIDO2 hmac-secret output).
 /// `hkdf_salt` must be exactly 32 bytes (from `YubikeyRecordData.salt`).
 /// Async — Argon2id takes ~667ms on target hardware.
@@ -187,6 +191,21 @@ Future<void> initVault({required List<int> passphrase, required String path}) =>
       passphrase: passphrase,
       path: path,
     );
+
+/// Create a new empty vault sealed with a passphrase and two or more YubiKeys.
+///
+/// Enforces ADR-010: minimum 2 registered keys at vault creation.
+/// After creation, unlocks into session immediately using the first key.
+/// Async — runs Argon2id + encryption.
+Future<void> initVaultWithKeys({
+  required List<int> passphrase,
+  required List<YubiKeyInitData> keys,
+  required String path,
+}) => RustLib.instance.api.crateApiVaultBridgeInitVaultWithKeys(
+  passphrase: passphrase,
+  keys: keys,
+  path: path,
+);
 
 /// Create a new empty vault at `path`, sealed with both passphrase and YubiKey.
 ///
@@ -252,6 +271,32 @@ sealed class VaultEntryData with _$VaultEntryData {
   const factory VaultEntryData.file(FileEntryData field0) = VaultEntryData_File;
   const factory VaultEntryData.custom(CustomEntryData field0) =
       VaultEntryData_Custom;
+}
+
+/// Key material for one YubiKey, supplied during multi-key vault creation.
+class YubiKeyInitData {
+  final Uint8List credentialId;
+  final Uint8List hmacSecret;
+  final Uint8List hkdfSalt;
+
+  const YubiKeyInitData({
+    required this.credentialId,
+    required this.hmacSecret,
+    required this.hkdfSalt,
+  });
+
+  @override
+  int get hashCode =>
+      credentialId.hashCode ^ hmacSecret.hashCode ^ hkdfSalt.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is YubiKeyInitData &&
+          runtimeType == other.runtimeType &&
+          credentialId == other.credentialId &&
+          hmacSecret == other.hmacSecret &&
+          hkdfSalt == other.hkdfSalt;
 }
 
 /// YubiKey credential record returned by `list_vault_yubikey_records`.

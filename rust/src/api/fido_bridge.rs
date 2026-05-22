@@ -63,10 +63,7 @@ pub fn fido_list_devices() -> Result<Vec<String>, String> {
 /// Triggers one YubiKey tap. Returns credential ID and a fresh random
 /// 32-byte salt — both must be stored in the vault header.
 /// Async — blocks until the user taps the key.
-pub async fn fido_register(
-    device_path: String,
-    pin: String,
-) -> Result<FidoCredentialData, String> {
+pub async fn fido_register(device_path: String, pin: String) -> Result<FidoCredentialData, String> {
     let record = crate::fido::register(&device_path, &pin)?;
     Ok(FidoCredentialData {
         credential_id: record.credential_id,
@@ -94,6 +91,7 @@ pub async fn fido_get_hmac_secret(
     let record = YubiKeyRecord {
         credential_id,
         salt: salt_arr,
+        key_blob: vec![],
     };
     let hmac = crate::fido::get_hmac_secret(&device_path, &record, &pin)?;
     Ok(hmac.to_vec())
@@ -156,7 +154,10 @@ mod tests {
         let result = rt
             .block_on(fido_register(device, pin))
             .expect("fido_register should succeed");
-        assert!(!result.credential_id.is_empty(), "credential_id must not be empty");
+        assert!(
+            !result.credential_id.is_empty(),
+            "credential_id must not be empty"
+        );
         assert_eq!(result.salt.len(), 32, "salt must be 32 bytes");
     }
 

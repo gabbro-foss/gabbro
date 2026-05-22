@@ -169,15 +169,27 @@ class _UnlockScreenState extends State<UnlockScreen> {
     });
     try {
       if (_isYubikeyMode) {
-        final record = _yubikeyRecords.first;
-        await widget.onUnlockWithYubikey(
-          _passphraseController.text.codeUnits,
-          record.credentialId,
-          record.salt,
-          _pinController.text,
-          widget.vaultPath,
-          _transport,
-        );
+        // Try each registered credential in turn. Non-matching credentials
+        // fail immediately (no YubiKey tap required); the matching one will
+        // prompt a single tap and succeed.
+        Object? lastError;
+        for (final record in _yubikeyRecords) {
+          try {
+            await widget.onUnlockWithYubikey(
+              _passphraseController.text.codeUnits,
+              record.credentialId,
+              record.salt,
+              _pinController.text,
+              widget.vaultPath,
+              _transport,
+            );
+            lastError = null;
+            break;
+          } catch (e) {
+            lastError = e;
+          }
+        }
+        if (lastError != null) throw lastError;
       } else {
         await widget.onUnlock(
           _passphraseController.text.codeUnits,

@@ -20,7 +20,7 @@ Widget _buildScreen({
   bool blockPassphraseCopyPaste = true,
   bool isAndroid = false,
   bool? showYubikey,
-  Future<void> Function(List<int>, String, String, void Function(), String)? onInitVaultWithYubikey,
+  Future<void> Function(List<int>, String, String, void Function(), void Function(), void Function(), String)? onInitVaultWithYubikey,
 }) =>
     MaterialApp(
       home: OnboardingScreen(
@@ -31,7 +31,7 @@ Widget _buildScreen({
         isAndroid: isAndroid,
         showYubikey: showYubikey ?? isAndroid,
         onInitVaultWithYubikey:
-            onInitVaultWithYubikey ?? (a, b, c, onStep2, t) async {},
+            onInitVaultWithYubikey ?? (a, b, c, onStep2, onStep3, onStep4, t) async {},
       ),
     );
 
@@ -166,7 +166,7 @@ void main() {
     bool called = false;
     await tester.pumpWidget(_buildScreen(
       isAndroid: true,
-      onInitVaultWithYubikey: (a, b, c, onStep2, t) async => called = true,
+      onInitVaultWithYubikey: (a, b, c, onStep2, onStep3, onStep4, t) async => called = true,
     ));
 
     const passphrase = 'correct horse battery staple one two three four';
@@ -207,7 +207,7 @@ void main() {
 
   Future<void> fillAndSubmitYubikey(
     WidgetTester tester,
-    Future<void> Function(List<int>, String, String, void Function(), String) onInitVaultWithYubikey,
+    Future<void> Function(List<int>, String, String, void Function(), void Function(), void Function(), String) onInitVaultWithYubikey,
   ) async {
     await tester.pumpWidget(_buildScreen(
       isAndroid: true,
@@ -239,7 +239,7 @@ void main() {
     final hold = Completer<void>();
     await fillAndSubmitYubikey(
       tester,
-      (_, _, _, onStep2, t) => hold.future,
+      (_, _, _, onStep2, onStep3, onStep4, t) => hold.future,
     );
     await tester.runAsync(() async {
       await tester.tap(find.text('Create vault'));
@@ -247,17 +247,17 @@ void main() {
     });
     await tester.pump();
 
-    expect(find.text('Register'), findsOneWidget);
+    expect(find.text('Register primary key'), findsOneWidget);
     expect(find.text('Touch your YubiKey now'), findsOneWidget);
-    expect(find.text('Activate'), findsOneWidget);
-    // Step 2 hint not shown yet — waiting for tap 1
-    expect(find.text('Touch your YubiKey again to seal the vault'), findsNothing);
+    expect(find.text('Activate primary key'), findsOneWidget);
+    // Steps 2–4 hints not shown yet — waiting for tap 1
+    expect(find.text('Touch your YubiKey again'), findsNothing);
   });
 
   testWidgets('step 2 indicator shown after onStep2 callback fires', (tester) async {
     await fillAndSubmitYubikey(
       tester,
-      (_, _, _, onStep2, t) async {
+      (_, _, _, onStep2, onStep3, onStep4, t) async {
         onStep2();
         // Hold indefinitely so we can inspect the UI before navigation
         await Future<void>.delayed(const Duration(seconds: 30));
@@ -269,8 +269,8 @@ void main() {
     });
     await tester.pump();
 
-    expect(find.text('Activate'), findsOneWidget);
-    expect(find.text('Touch your YubiKey again to seal the vault'), findsOneWidget);
+    expect(find.text('Activate primary key'), findsOneWidget);
+    expect(find.text('Touch your YubiKey again'), findsOneWidget);
     // Step 1 hint gone — step 1 is done
     expect(find.text('Touch your YubiKey now'), findsNothing);
   });
