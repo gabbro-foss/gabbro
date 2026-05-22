@@ -146,7 +146,7 @@ gabbro/
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
 
 **Not yet implemented (see Bikeshed):**
-- YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2) implemented; minimum-2-keys enforcement (ADR-010, VERSION 3 vault format) implemented; multi-key unlock (CTAP2 two-salt one-tap, hardware-validated); vault delete and change_passphrase YubiKey wiring pending
+- YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2) implemented; minimum-2-keys enforcement (ADR-010, VERSION 4 vault format) implemented; multi-key unlock, vault delete, and change_passphrase YubiKey wiring complete (CTAP2 one-tap any-key, hardware-validated on Linux + Android USB + Android NFC); manage YubiKeys screen pending
 - Autofill save requests (`onSaveRequest`)
 - Passkey support, breach alerts, vault sync
 
@@ -154,8 +154,8 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | ~262 | 8 |
-| Flutter (`flutter test`) | 305 | 0 |
+| Rust (`cargo test -q`) | pending — run at session start | 8 |
+| Flutter (`flutter test`) | 308 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -166,10 +166,12 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next task — wire YubiKey(s) to vault delete and change passphrase**
-  - `change_passphrase_screen.dart`: requires YubiKey tap(s) to authorise re-encryption; must use `onUnlockWithAnyYubikey` path (or single-key equivalent) to verify the current key before sealing with new passphrase.
-  - Vault delete: requires YubiKey tap to confirm before the `.gabbro` file is removed; prevent accidental deletion without hardware confirmation.
-  - Both operations must handle 1-key and multi-key vaults consistently with the unlock flow.
+- **Next task — add manage YubiKeys screen (add/remove keys)**
+  - Accessible from Settings menu on `VaultListScreen`.
+  - Allow adding a new YubiKey (up to max 4): register credential, update vault header with new `YubiKeyRecord`, require existing-key tap to authorise.
+  - Allow removing a YubiKey: tap remaining key to authorise, update vault header.
+  - Enforce minimum-2-keys invariant from ADR-010: cannot remove below 2 registered keys.
+  - Both Linux (libfido2) and Android (yubikit) transports.
 
 
 ---
@@ -205,7 +207,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- Add manage yubikey screen (add/remove keys) once multi-key vault creation is hardware-tested
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
     - add security toggle to show vault alias list on login screen or not if user wants to bypass this

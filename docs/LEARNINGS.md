@@ -3136,3 +3136,79 @@ GABBRO_TEST_PIN=<pin> cargo test fido -- --ignored --test-threads=1 --nocapture
 - `register_returns_yubikey_record`: 1 tap
 - `get_hmac_secret_is_deterministic`: 3 taps (1 register + 2 assertions)
 - Total: 4 taps to run both tests
+
+---
+
+## Vault format VERSION 4 — `passphrase_blob` / `wrapping_key` design
+
+### Problem: passphrase change with multi-key vaults requires all keys simultaneously
+
+In VERSION 3 each `key_blob_i` was:
+
+```
+key_blob_i = AES-GCM(vault_key_master, combine_yubikey(intermediate_key, hmac_i, salt_i))
+```
+
+`intermediate_key` is derived by the KDF from the passphrase. Changing the passphrase changes
+`intermediate_key`, which invalidates every `key_blob_i`. Re-sealing all blobs requires all N
+registered hmac secrets at once — that means N sequential YubiKey taps, one per key. Bad UX.
+
+### Solution: decouple key_blobs from the passphrase with a stable `wrapping_key`
+
+VERSION 4 introduces two new constructs:
+
+**`wrapping_key`** — a random 32-byte key generated once at vault creation and never changed.
+
+**`passphrase_blob`** — `nonce(12) || AES-GCM(wrapping_key, intermediate_key)(48)` = 60 bytes.
+Stored in the vault header after the YubiKey records.
+
+Each `key_blob_i` is now:
+
+```
+key_blob_i = AES-GCM(vault_key_master, combine_yubikey(wrapping_key, hmac_i, salt_i))
+```
+
+`wrapping_key` is stable → `key_blob_i` is stable → changing the passphrase only needs to
+re-encrypt `passphrase_blob`. One write, zero YubiKey taps.
+
+### Unlock path
+
+Passphrase-only vault (no YubiKey): `passphrase_blob` is empty; body is encrypted directly
+under `intermediate_key` as before (VERSION 2 compatible path).
+
+Multi-key vault (VERSION 4):
+1. Derive `intermediate_key` from passphrase + stored PQ material.
+2. Decrypt `passphrase_blob` → `wrapping_key` (wrong passphrase → auth-tag failure here).
+3. Call CTAP2 with any single registered credential → `hmac_i`.
+4. `combine_yubikey(wrapping_key, hmac_i, salt_i)` → decrypt `key_blob_i` → `vault_key_master`.
+5. Decrypt body.
+
+Security is maintained: unlock requires both the passphrase (step 1-2) and a YubiKey (step 3-4).
+
+### Passphrase change path (`change_vault_passphrase_with_keys`)
+
+1. Re-derive `old_intermediate_key`; decrypt `passphrase_blob` → `wrapping_key` (verifies old passphrase).
+2. Generate fresh PQ material (new Argon2 salt, ML-KEM encap, X25519, HKDF salt).
+3. Re-encrypt `wrapping_key` under `new_intermediate_key` → `new_passphrase_blob`.
+4. Write new PQ fields + `new_passphrase_blob`; `key_blobs`, `ciphertext`, `nonce` untouched.
+
+Zero YubiKey taps needed for a passphrase change on a multi-key vault.
+
+### File format additions
+
+After the YubiKey records section, before the body length field:
+
+```
+pb_len       2 bytes  u16 big-endian  0 = passphrase-only, 60 = multi-key
+passphrase_blob  pb_len bytes         nonce(12) + ciphertext+tag(48)
+```
+
+Backward compatibility: VERSION_MIN_READABLE stays 2. VERSION 3 vaults are still readable
+(passphrase_blob absent → pb_len absent → read as 0 bytes, treated as passphrase-only).
+
+### Hardware validation
+
+Session 16, 2026-05-22. Tested on:
+- Linux: onboarding, login, change passphrase (either key), delete vault (either key) — all pass
+- Android USB: onboarding, login, change passphrase, delete vault — all pass
+- Android NFC: onboarding, login, change passphrase, delete vault — all pass
