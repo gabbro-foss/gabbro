@@ -207,6 +207,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
+- `onboarding_screen.dart` — accessibility button (top-right) partially hidden behind "Welcome to Gabbro" headline on some screen sizes; fix layout so button is never obscured. **Priority: needed for accessibility.**
+- Search improvement: currently only searches title, needs an option to also search all fields and notes
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
     - add security toggle to show vault alias list on login screen or not if user wants to bypass this
@@ -217,9 +219,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
 - Export vault to JSON - consistent with gabbro stance: we don't lock the user in. Include warning about user's responsibility with a decrypted vault file.
 - Export/import security note: `.gabbro` exports are AES-256-GCM encrypted (passphrase-only — YubiKey not required to import, by design; passphrase is the durable recovery factor, YubiKey is the live-vault second factor). JSON exports are plaintext — no encryption at all. Add visible warnings in the export UI distinguishing the two: `.gabbro` ("protected by your passphrase only") and JSON ("completely unencrypted — store securely").
-- Search improvement: currently only searches title, needs an option to also search all fields and notes
 - Multiple app languages (v1: en,fr,de,it,es)
-- `onboarding_screen.dart` — accessibility button (top-right) partially hidden behind "Welcome to Gabbro" headline on some screen sizes; fix layout so button is never obscured. **Priority: needed for accessibility.**
 - `onboarding_screen.dart` — keyboard slides up when PIN field is focused during YubiKey vault creation, obscuring the step indicator card; fix so step indicator remains visible.
 - App logo (OnboardingScreen, UnlockScreen) — defer until designed.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
@@ -228,7 +228,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Clean up legacy vault on first launch (`com.example.gabbro` → `app.gabbro.gabbro` migration offer).
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
-- Bug noticed: an v1 vault cannot be opened once the app is updated to v2 vault - not an issue now so probably YAGNI
 
 ### Code Quality
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
