@@ -146,7 +146,7 @@ gabbro/
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
 
 **Not yet implemented (see Bikeshed):**
-- YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2) implemented; minimum-2-keys enforcement (ADR-010, VERSION 3 vault format) implemented; change_passphrase YubiKey wiring pending
+- YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2) implemented; minimum-2-keys enforcement (ADR-010, VERSION 3 vault format) implemented; multi-key unlock (CTAP2 two-salt one-tap, hardware-validated); vault delete and change_passphrase YubiKey wiring pending
 - Autofill save requests (`onSaveRequest`)
 - Passkey support, breach alerts, vault sync
 
@@ -154,8 +154,8 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | ~260 | 5 |
-| Flutter (`flutter test`) | 301 | 0 |
+| Rust (`cargo test -q`) | ~262 | 8 |
+| Flutter (`flutter test`) | 305 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -166,42 +166,11 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Session 12 complete — ADR-010 minimum-2-keys enforcement (VERSION 3 vault format)**
-  - `rust/src/vault/file_format.rs`: `VERSION = 3`; `YubiKeyRecord` gains `key_blob: Vec<u8>` (60 bytes: nonce + ciphertext + GCM tag); `from_bytes` accepts VERSION 2 (key_blob empty) and VERSION 3.
-  - `rust/src/crypto/vault_crypto.rs`: `seal_vault_with_keys` (enforces ≥2 keys, generates random `vault_key_master`, wraps it per-key via AES-256-GCM); `open_vault_with_key_record` (finds record by credential_id, decrypts key_blob → vault_key_master); `reseal_vault_body` (re-encrypts body without re-deriving keys).
-  - `rust/src/vault/session.rs`: `YubikeyMaterial` caches `vault_key_master: Option<Zeroizing<[u8; 32]>>`; VERSION 3 CRUD save uses `reseal_vault_body`; `lock_vault` zeroizes it.
-  - `rust/src/api/vault_bridge.rs`: `init_vault_with_keys` bridge function; `YubiKeyInitData` bridge type.
-  - `lib/screens/onboarding_screen.dart`: 4-tap vault creation UI (register primary → activate primary → register backup → activate backup); 4-step progress indicator.
-  - `lib/screens/unlock_screen.dart`: try-all-records loop — non-matching credentials fail immediately (no tap), matching one taps once and succeeds.
-  - 10 new TDD tests in `vault_crypto.rs`; 3 new tests in `file_format.rs`; FRB codegen regenerated; Flutter 301 / Rust ~260; clippy clean.
+- **Next task — wire YubiKey(s) to vault delete and change passphrase**
+  - `change_passphrase_screen.dart`: requires YubiKey tap(s) to authorise re-encryption; must use `onUnlockWithAnyYubikey` path (or single-key equivalent) to verify the current key before sealing with new passphrase.
+  - Vault delete: requires YubiKey tap to confirm before the `.gabbro` file is removed; prevent accidental deletion without hardware confirmation.
+  - Both operations must handle 1-key and multi-key vaults consistently with the unlock flow.
 
-- **Session 13 complete — Fix multi-key vault creation: enforce separate physical keys and per-key PINs**
-  - Root cause (bug 1): Linux used `devices.first` for all 4 FIDO2 ops; Android had no gate between primary and backup registration, so the same key was tapped 4 times with no backup ever enrolled.
-  - Root cause (bug 2): a single `pin` field was shared across both keys; keys with different PINs would fail on taps 3/4.
-  - `lib/screens/onboarding_screen.dart`:
-    - `onInitVaultWithYubikey` signature: `String pin` → `List<String> pins` (index 0 = primary, 1 = backup, extensible to 4 per ADR-010); `onAwaitBackupKey: Future<void> Function()` gate added between step 2 and step 3.
-    - Linux: re-scans `fidoListDevices()` after gate resolves; uses `pins[0]`/`pins[1]` for correct key.
-    - Android: each MethodChannel call starts fresh discovery; uses `pins[0]`/`pins[1]`.
-    - UI: 5-step progress — step 3 "Swap to backup key" with Continue button; `_pinController` → `_pinControllers: List<TextEditingController>` (2 entries, loops); `_pinObscured` → `List<bool>`; shows "Primary key PIN" / "Backup key PIN"; helper `_pinLabel(int)` handles up to N keys.
-  - `test/onboarding_screen_test.dart`: updated all type signatures; 3 new tests; Flutter 304 / Rust ~260; clippy clean.
-
-- **Session 14 diagnosis — backup key unlock is slow and sometimes fails (unfixed, next task)**
-  - Hardware test results: two-key vault creation ✓, primary key unlock ✓, backup key unlock FAIL (very slow, sometimes fails) — both Linux and Android.
-  - Root cause (Android NFC): `_unlock` tries each YubiKey record sequentially; each `get_hmac_secret` MethodChannel call runs `startDiscovery` + `stopDiscovery` as its own NFC session. After the first attempt (wrong credential) fails and `stopDiscovery` closes the session, the app starts a new NFC discovery for the second attempt — but the user has already moved the phone. Result: timeout or fail.
-  - Root cause (Linux): per-record `fido_dev_get_assert` with PIN incurs a full PIN protocol exchange (~200 ms) even for the wrong credential. Possible USB HID state issue after a failed attempt also contributes.
-  - Fix (CTAP2 two-salt multi-credential): place ALL credential IDs in the FIDO2 `allowList` and send a 64-byte combined salt (record[0].salt ∥ record[1].salt) in ONE `getAssertion` call. The YubiKey taps once, self-identifies which credential it owns, and returns a 64-byte HMAC output. We read `fido_assert_id_ptr` to know which credential matched and extract the correct 32-byte half. This is one PIN exchange, one tap, regardless of which key is inserted.
-  - libfido2_sys bindings confirm all required functions are available: `fido_assert_id_ptr`, `fido_assert_id_len`, `fido_assert_allow_cred` (call N times for N credentials), `fido_assert_set_hmac_salt` (accepts 64-byte input), `fido_assert_hmac_secret_len` (returns 64 when 64-byte salt used).
-  - `flutter_rust_bridge_codegen 2.11.1` is installed — frb regen is needed after adding bridge types.
-  - **Next session implementation plan (TDD order):**
-    1. `test/unlock_screen_test.dart`: new failing test — multi-record vault calls `onUnlockWithAnyYubikey`
-    2. `rust/src/fido/device.rs`: add `get_hmac_secret_for_pair` (two-salt, 2 records, one tap) and `get_hmac_secret_any_of` (dispatches: 1→single, 2→pair, >2→pairs)
-    3. `rust/src/fido/mod.rs`: re-export `get_hmac_secret_any_of`
-    4. `rust/src/api/fido_bridge.rs`: add `FidoRecordInput`, `FidoHmacMatch` structs; add `fido_get_hmac_secret_any` async function (Linux impl + Android stub)
-    5. Run `flutter_rust_bridge_codegen generate` from `gabbro/`
-    6. `lib/screens/unlock_screen.dart`: add `onUnlockWithAnyYubikey` callback to `UnlockScreen`; add `_linuxUnlockWithAnyYubikey` and `_defaultUnlockWithAnyYubikey`; change `_unlock` to use new callback when `_yubikeyRecords.length > 1`
-    7. `android/app/src/main/kotlin/app/gabbro/gabbro/YubiKeyManager.kt`: add `getHmacSecretAny` (one `getAssertions` call, 64-byte salt, read matched credential from assertion response)
-    8. `android/app/src/main/kotlin/app/gabbro/gabbro/MainActivity.kt`: add `get_hmac_secret_multi` MethodChannel handler
-  - After fix: hardware test backup key unlock on both platforms before committing.
 
 ---
 
