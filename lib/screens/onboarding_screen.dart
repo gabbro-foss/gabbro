@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -37,44 +38,58 @@ const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
 
 Future<void> _linuxInitVaultWithYubikey(
   List<int> passphrase,
-  String pin,
+  List<String> pins,
   String path,
   void Function() onStep2,
   void Function() onStep3,
+  Future<void> Function() onAwaitBackupKey,
   void Function() onStep4,
 ) async {
-  final devices = fidoListDevices();
-  if (devices.isEmpty) {
+  final primaryDevices = fidoListDevices();
+  if (primaryDevices.isEmpty) {
     throw PlatformException(
       code: 'NO_FIDO2_DEVICE',
       message: 'No FIDO2 device found. Insert your YubiKey and try again.',
     );
   }
-  final devicePath = devices.first;
+  final primaryDevicePath = primaryDevices.first;
 
   // Tap 1: register primary key
-  final cred1 = await fidoRegister(devicePath: devicePath, pin: pin);
+  final cred1 = await fidoRegister(devicePath: primaryDevicePath, pin: pins[0]);
   onStep2();
 
   // Tap 2: activate primary key (get hmac-secret)
   final hmac1 = await fidoGetHmacSecret(
-    devicePath: devicePath,
+    devicePath: primaryDevicePath,
     credentialId: cred1.credentialId,
     salt: cred1.salt,
-    pin: pin,
+    pin: pins[0],
   );
   onStep3();
 
+  // Wait for user to swap to a different physical key
+  await onAwaitBackupKey();
+
+  // Re-scan: user should have swapped to their backup key
+  final backupDevices = fidoListDevices();
+  if (backupDevices.isEmpty) {
+    throw PlatformException(
+      code: 'NO_FIDO2_DEVICE',
+      message: 'No backup FIDO2 device found. Insert your backup YubiKey.',
+    );
+  }
+  final backupDevicePath = backupDevices.first;
+
   // Tap 3: register backup key
-  final cred2 = await fidoRegister(devicePath: devicePath, pin: pin);
+  final cred2 = await fidoRegister(devicePath: backupDevicePath, pin: pins[1]);
   onStep4();
 
   // Tap 4: activate backup key (get hmac-secret)
   final hmac2 = await fidoGetHmacSecret(
-    devicePath: devicePath,
+    devicePath: backupDevicePath,
     credentialId: cred2.credentialId,
     salt: cred2.salt,
-    pin: pin,
+    pin: pins[1],
   );
 
   await initVaultWithKeys(
@@ -97,24 +112,27 @@ Future<void> _linuxInitVaultWithYubikey(
 
 Future<void> _defaultInitVaultWithYubikey(
   List<int> passphrase,
-  String pin,
+  List<String> pins,
   String path,
   void Function() onStep2,
   void Function() onStep3,
+  Future<void> Function() onAwaitBackupKey,
   void Function() onStep4,
   String transport,
 ) async {
   if (Platform.isLinux) {
-    return _linuxInitVaultWithYubikey(passphrase, pin, path, onStep2, onStep3, onStep4);
+    return _linuxInitVaultWithYubikey(
+        passphrase, pins, path, onStep2, onStep3, onAwaitBackupKey, onStep4);
   }
 
   // Android: register and activate 2 keys via platform channel.
-  // Each call blocks until the YubiKey responds.
+  // Each MethodChannel call starts fresh discovery, so it accepts whatever
+  // key is physically presented at that moment.
 
   // Tap 1: register primary key
   final credId1Hex = await _yubikeyChannel.invokeMethod<String>(
     'register',
-    {'pin': pin, 'transport': transport},
+    {'pin': pins[0], 'transport': transport},
   );
   if (credId1Hex == null) throw Exception('YubiKey registration returned no credential');
 
@@ -124,15 +142,18 @@ Future<void> _defaultInitVaultWithYubikey(
   // Tap 2: activate primary key
   final hmac1Hex = await _yubikeyChannel.invokeMethod<String>(
     'get_hmac_secret',
-    {'credentialId': credId1Hex, 'salt': _toHex(salt1), 'pin': pin, 'transport': transport},
+    {'credentialId': credId1Hex, 'salt': _toHex(salt1), 'pin': pins[0], 'transport': transport},
   );
   if (hmac1Hex == null) throw Exception('YubiKey activation returned no secret');
   onStep3();
 
-  // Tap 3: register backup key
+  // Wait for user to swap to a different physical key before backup registration
+  await onAwaitBackupKey();
+
+  // Tap 3: register backup key (fresh discovery — accepts the backup key now presented)
   final credId2Hex = await _yubikeyChannel.invokeMethod<String>(
     'register',
-    {'pin': pin, 'transport': transport},
+    {'pin': pins[1], 'transport': transport},
   );
   if (credId2Hex == null) throw Exception('YubiKey registration returned no credential');
 
@@ -142,7 +163,7 @@ Future<void> _defaultInitVaultWithYubikey(
   // Tap 4: activate backup key
   final hmac2Hex = await _yubikeyChannel.invokeMethod<String>(
     'get_hmac_secret',
-    {'credentialId': credId2Hex, 'salt': _toHex(salt2), 'pin': pin, 'transport': transport},
+    {'credentialId': credId2Hex, 'salt': _toHex(salt2), 'pin': pins[1], 'transport': transport},
   );
   if (hmac2Hex == null) throw Exception('YubiKey activation returned no secret');
 
@@ -183,10 +204,11 @@ class OnboardingScreen extends StatefulWidget {
 
   final Future<void> Function(
     List<int> passphrase,
-    String pin,
+    List<String> pins,
     String path,
     void Function() onStep2,
     void Function() onStep3,
+    Future<void> Function() onAwaitBackupKey,
     void Function() onStep4,
     String transport,
   ) onInitVaultWithYubikey;
@@ -212,12 +234,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passphraseController = TextEditingController();
   final _confirmController = TextEditingController();
-  final _pinController = TextEditingController();
+  // One controller per key (index 0 = primary, 1 = backup, …)
+  final List<TextEditingController> _pinControllers = [
+    TextEditingController(),
+    TextEditingController(),
+  ];
   String _vaultPath = '';
 
   bool _passphraseObscured = true;
   bool _confirmObscured = true;
-  bool _pinObscured = true;
+  final List<bool> _pinObscured = [true, true];
   bool _isCreating = false;
   String? _error;
   EntropyResult? _entropy;
@@ -225,8 +251,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool _useYubikey = false;
   String _transport = 'usb';
   // 0 = idle, 1 = tap 1 (register key 1), 2 = tap 2 (activate key 1),
-  // 3 = tap 3 (register key 2), 4 = tap 4 (activate key 2)
+  // 3 = swap key (user presses Continue), 4 = tap 3 (register key 2),
+  // 5 = tap 4 (activate key 2)
   int _yubikeyStep = 0;
+  Completer<void>? _backupKeyCompleter;
 
   @override
   void initState() {
@@ -247,9 +275,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void dispose() {
     _passphraseController.dispose();
     _confirmController.dispose();
-    _pinController.dispose();
+    for (final c in _pinControllers) {
+      c.dispose();
+    }
+    final c = _backupKeyCompleter;
+    if (c != null && !c.isCompleted) c.completeError(Exception('Widget disposed'));
     super.dispose();
   }
+
+  Future<void> _awaitBackupKey() {
+    _backupKeyCompleter = Completer<void>();
+    return _backupKeyCompleter!.future;
+  }
+
+  void _onContinueWithBackupKey() {
+    final c = _backupKeyCompleter;
+    if (c == null || c.isCompleted) return;
+    if (mounted) setState(() => _yubikeyStep = 4);
+    c.complete();
+  }
+
+  String _pinLabel(int index) => switch (index) {
+        0 => 'Primary key PIN',
+        1 => 'Backup key PIN',
+        _ => 'Key ${index + 1} PIN',
+      };
 
   void _onPassphraseChanged(String value) {
     final result = widget.onEstimateEntropy(value);
@@ -269,11 +319,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       if (_useYubikey) {
         await widget.onInitVaultWithYubikey(
           _passphraseController.text.codeUnits,
-          _pinController.text,
+          _pinControllers.map((c) => c.text).toList(),
           _vaultPath,
           () { if (mounted) setState(() => _yubikeyStep = 2); },
           () { if (mounted) setState(() => _yubikeyStep = 3); },
-          () { if (mounted) setState(() => _yubikeyStep = 4); },
+          _awaitBackupKey,
+          () { if (mounted) setState(() => _yubikeyStep = 5); },
           _transport,
         );
       } else {
@@ -450,19 +501,41 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _buildStepRow(
             context,
             number: 3,
-            label: 'Register backup key',
-            hint: 'Touch your YubiKey to register the second key',
+            label: 'Swap to backup key',
+            hint: 'Remove your primary key, then connect your backup YubiKey',
             done: _yubikeyStep >= 4,
             active: _yubikeyStep == 3,
           ),
+          if (_yubikeyStep == 3) ...[
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 40),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: FilledButton.tonal(
+                  onPressed: _onContinueWithBackupKey,
+                  child: const Text('Continue'),
+                ),
+              ),
+            ),
+          ],
           connector(_yubikeyStep >= 4),
           _buildStepRow(
             context,
             number: 4,
-            label: 'Activate backup key',
-            hint: 'Touch your YubiKey one final time',
-            done: false,
+            label: 'Register backup key',
+            hint: 'Touch your backup YubiKey',
+            done: _yubikeyStep >= 5,
             active: _yubikeyStep == 4,
+          ),
+          connector(_yubikeyStep >= 5),
+          _buildStepRow(
+            context,
+            number: 5,
+            label: 'Activate backup key',
+            hint: 'Touch your backup YubiKey one final time',
+            done: false,
+            active: _yubikeyStep == 5,
           ),
           const SizedBox(height: 14),
           const LinearProgressIndicator(),
@@ -690,30 +763,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           contentPadding: EdgeInsets.zero,
                         ),
                         if (_useYubikey) ...[
-                          const SizedBox(height: 12),
-                          TextFormField(
-                            controller: _pinController,
-                            obscureText: _pinObscured,
-                            decoration: InputDecoration(
-                              labelText: 'YubiKey PIN',
-                              border: const OutlineInputBorder(),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _pinObscured
-                                      ? Icons.visibility_off
-                                      : Icons.visibility,
-                                ),
-                                onPressed: () => setState(
-                                  () => _pinObscured = !_pinObscured,
+                          for (var i = 0; i < _pinControllers.length; i++) ...[
+                            const SizedBox(height: 12),
+                            TextFormField(
+                              controller: _pinControllers[i],
+                              obscureText: _pinObscured[i],
+                              decoration: InputDecoration(
+                                labelText: _pinLabel(i),
+                                border: const OutlineInputBorder(),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _pinObscured[i]
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                  ),
+                                  onPressed: () => setState(
+                                    () => _pinObscured[i] = !_pinObscured[i],
+                                  ),
                                 ),
                               ),
+                              validator: (v) => (v == null || v.isEmpty)
+                                  ? '${_pinLabel(i)} is required'
+                                  : null,
                             ),
-                            validator: _useYubikey
-                                ? (v) => (v == null || v.isEmpty)
-                                    ? 'YubiKey PIN is required'
-                                    : null
-                                : null,
-                          ),
+                          ],
                           if (widget.isAndroid) ...[
                             const SizedBox(height: 12),
                             SegmentedRow<String>(
@@ -728,7 +801,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             _buildYubikeyCreationSteps(context)
                           else ...[
                             Text(
-                              'You will tap your YubiKey four times to register and activate two keys.',
+                              'You will tap each YubiKey twice (4 taps total). Between the two keys, you will be prompted to swap.',
                               style: Theme.of(context).textTheme.bodySmall,
                               textAlign: TextAlign.center,
                             ),

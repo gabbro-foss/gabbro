@@ -20,7 +20,7 @@ Widget _buildScreen({
   bool blockPassphraseCopyPaste = true,
   bool isAndroid = false,
   bool? showYubikey,
-  Future<void> Function(List<int>, String, String, void Function(), void Function(), void Function(), String)? onInitVaultWithYubikey,
+  Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), String)? onInitVaultWithYubikey,
 }) =>
     MaterialApp(
       home: OnboardingScreen(
@@ -30,8 +30,8 @@ Widget _buildScreen({
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
         isAndroid: isAndroid,
         showYubikey: showYubikey ?? isAndroid,
-        onInitVaultWithYubikey:
-            onInitVaultWithYubikey ?? (a, b, c, onStep2, onStep3, onStep4, t) async {},
+        onInitVaultWithYubikey: onInitVaultWithYubikey ??
+            (a, b, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async {},
       ),
     );
 
@@ -140,16 +140,18 @@ void main() {
     expect(find.text('Protect with YubiKey'), findsOneWidget);
   });
 
-  testWidgets('yubikey pin field appears when yubikey toggle enabled',
+  testWidgets('yubikey pin fields appear when yubikey toggle enabled',
       (tester) async {
     await tester.pumpWidget(_buildScreen(isAndroid: true));
 
-    expect(find.widgetWithText(TextFormField, 'YubiKey PIN'), findsNothing);
+    expect(find.widgetWithText(TextFormField, 'Primary key PIN'), findsNothing);
+    expect(find.widgetWithText(TextFormField, 'Backup key PIN'), findsNothing);
 
     await tester.tap(find.byType(SwitchListTile));
     await tester.pump();
 
-    expect(find.widgetWithText(TextFormField, 'YubiKey PIN'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'Primary key PIN'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'Backup key PIN'), findsOneWidget);
   });
 
   testWidgets('slow-vault warning shown when yubikey toggle enabled', (tester) async {
@@ -161,12 +163,53 @@ void main() {
     expect(find.textContaining('20'), findsOneWidget);
   });
 
+  testWidgets('per-key pins are passed separately to onInitVaultWithYubikey',
+      (tester) async {
+    List<String>? capturedPins;
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: true,
+      onInitVaultWithYubikey:
+          (a, pins, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async {
+        capturedPins = pins;
+      },
+    ));
+
+    const passphrase = 'correct horse battery staple one two three four';
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
+    await tester.pump();
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
+    await tester.pump();
+
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pump();
+
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Primary key PIN'), 'pin-primary');
+    await tester.pump();
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Backup key PIN'), 'pin-backup');
+    await tester.pump();
+
+    await tester.ensureVisible(find.text('Create vault'));
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create vault'));
+      await Future.delayed(const Duration(milliseconds: 300));
+    });
+    await tester.pump();
+
+    expect(capturedPins, isNotNull);
+    expect(capturedPins![0], 'pin-primary');
+    expect(capturedPins![1], 'pin-backup');
+  });
+
   testWidgets('vault creation with yubikey calls onInitVaultWithYubikey',
       (tester) async {
     bool called = false;
     await tester.pumpWidget(_buildScreen(
       isAndroid: true,
-      onInitVaultWithYubikey: (a, b, c, onStep2, onStep3, onStep4, t) async => called = true,
+      onInitVaultWithYubikey: (a, pins, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async => called = true,
     ));
 
     const passphrase = 'correct horse battery staple one two three four';
@@ -185,8 +228,13 @@ void main() {
     await tester.pump();
 
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'YubiKey PIN'),
+      find.widgetWithText(TextFormField, 'Primary key PIN'),
       '123456',
+    );
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Backup key PIN'),
+      '654321',
     );
     await tester.pump();
 
@@ -207,7 +255,7 @@ void main() {
 
   Future<void> fillAndSubmitYubikey(
     WidgetTester tester,
-    Future<void> Function(List<int>, String, String, void Function(), void Function(), void Function(), String) onInitVaultWithYubikey,
+    Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), String) onInitVaultWithYubikey,
   ) async {
     await tester.pumpWidget(_buildScreen(
       isAndroid: true,
@@ -227,8 +275,13 @@ void main() {
     await tester.tap(find.byType(SwitchListTile));
     await tester.pump();
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'YubiKey PIN'),
+      find.widgetWithText(TextFormField, 'Primary key PIN'),
       '123456',
+    );
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Backup key PIN'),
+      '654321',
     );
     await tester.pump();
     await tester.ensureVisible(find.text('Create vault'));
@@ -239,7 +292,7 @@ void main() {
     final hold = Completer<void>();
     await fillAndSubmitYubikey(
       tester,
-      (_, _, _, onStep2, onStep3, onStep4, t) => hold.future,
+      (_, _, _, onStep2, onStep3, onAwaitBackupKey, onStep4, t) => hold.future,
     );
     await tester.runAsync(() async {
       await tester.tap(find.text('Create vault'));
@@ -257,7 +310,7 @@ void main() {
   testWidgets('step 2 indicator shown after onStep2 callback fires', (tester) async {
     await fillAndSubmitYubikey(
       tester,
-      (_, _, _, onStep2, onStep3, onStep4, t) async {
+      (_, _, _, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async {
         onStep2();
         // Hold indefinitely so we can inspect the UI before navigation
         await Future<void>.delayed(const Duration(seconds: 30));
@@ -273,5 +326,58 @@ void main() {
     expect(find.text('Touch your YubiKey again'), findsOneWidget);
     // Step 1 hint gone — step 1 is done
     expect(find.text('Touch your YubiKey now'), findsNothing);
+  });
+
+  testWidgets('swap key step shown after onStep3 fires', (tester) async {
+    await fillAndSubmitYubikey(
+      tester,
+      (_, _, _, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async {
+        onStep2();
+        onStep3();
+        await Completer<void>().future;
+      },
+    );
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create vault'));
+      await Future.delayed(const Duration(milliseconds: 50));
+    });
+    await tester.pump();
+
+    expect(find.text('Swap to backup key'), findsOneWidget);
+    expect(find.text('Continue'), findsOneWidget);
+    // Backup key steps not yet active — no hints shown
+    expect(find.text('Touch your backup YubiKey'), findsNothing);
+  });
+
+  testWidgets('Continue button advances past swap step and gates onAwaitBackupKey', (tester) async {
+    var backupGateReached = false;
+    await fillAndSubmitYubikey(
+      tester,
+      (_, _, _, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async {
+        onStep2();
+        onStep3();
+        await onAwaitBackupKey();
+        backupGateReached = true;
+        await Completer<void>().future;
+      },
+    );
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create vault'));
+      await Future.delayed(const Duration(milliseconds: 100));
+    });
+    await tester.pump();
+
+    expect(find.text('Continue'), findsOneWidget);
+
+    // Tap outside runAsync — _onContinueWithBackupKey runs synchronously and
+    // calls c.complete(), which schedules the mock continuation as a microtask.
+    await tester.tap(find.text('Continue'));
+    // Give the event loop a turn so the microtask (backupGateReached = true) runs.
+    await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 50)));
+    await tester.pump();
+
+    expect(backupGateReached, isTrue);
+    expect(find.text('Continue'), findsNothing);
+    expect(find.text('Touch your backup YubiKey'), findsOneWidget);
   });
 }
