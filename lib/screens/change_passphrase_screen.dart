@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
+import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 
@@ -26,9 +29,56 @@ Future<void> _defaultConfirmYubikey(
   String pin,
   String transport,
 ) async {
+  if (Platform.isLinux) {
+    final devices = fidoListDevices();
+    if (devices.isEmpty) {
+      throw PlatformException(
+        code: 'NO_FIDO2_DEVICE',
+        message: 'No FIDO2 device found. Insert your YubiKey and try again.',
+      );
+    }
+    await fidoGetHmacSecret(
+      devicePath: devices.first,
+      credentialId: credentialId,
+      salt: salt,
+      pin: pin,
+    );
+    return;
+  }
   await _yubikeyChannel.invokeMethod<String>(
     'get_hmac_secret',
     {'credentialId': _toHex(credentialId), 'salt': _toHex(salt), 'pin': pin, 'transport': transport},
+  );
+}
+
+Future<void> _defaultConfirmAnyYubikey(
+  List<YubikeyRecordData> records,
+  String pin,
+  String transport,
+) async {
+  if (Platform.isLinux) {
+    final devices = fidoListDevices();
+    if (devices.isEmpty) {
+      throw PlatformException(
+        code: 'NO_FIDO2_DEVICE',
+        message: 'No FIDO2 device found. Insert your YubiKey and try again.',
+      );
+    }
+    await fidoGetHmacSecretAny(
+      devicePath: devices.first,
+      records: records
+          .map((r) => FidoRecordInput(credentialId: r.credentialId, salt: r.salt))
+          .toList(),
+      pin: pin,
+    );
+    return;
+  }
+  final recordsArg = records
+      .map((r) => {'credentialId': _toHex(r.credentialId), 'salt': _toHex(r.salt)})
+      .toList();
+  await _yubikeyChannel.invokeMethod<Map<Object?, Object?>>(
+    'get_hmac_secret_multi',
+    {'records': recordsArg, 'pin': pin, 'transport': transport},
   );
 }
 
@@ -43,10 +93,14 @@ class ChangePassphraseScreen extends StatefulWidget {
   /// construction time. Pass `[]` to force passphrase-only mode (tests).
   final List<YubikeyRecordData>? yubikeyRecords;
 
-  /// Called in YubiKey mode before changing the passphrase.
-  /// Triggers a YubiKey tap (get_hmac_secret) to confirm physical presence.
+  /// Called in single-key YubiKey mode before changing the passphrase.
   final Future<void> Function(List<int> credentialId, List<int> salt, String pin, String transport)
       onConfirmYubikey;
+
+  /// Called in multi-key YubiKey mode (2+ keys) before changing the passphrase.
+  /// Sends all records in one FIDO2 assertion — one tap regardless of which key is inserted.
+  final Future<void> Function(List<YubikeyRecordData> records, String pin, String transport)
+      onConfirmAnyYubikey;
 
   const ChangePassphraseScreen({
     super.key,
@@ -56,6 +110,7 @@ class ChangePassphraseScreen extends StatefulWidget {
     this.blockPassphraseCopyPaste = true,
     this.yubikeyRecords,
     this.onConfirmYubikey = _defaultConfirmYubikey,
+    this.onConfirmAnyYubikey = _defaultConfirmAnyYubikey,
   });
 
   @override
@@ -142,19 +197,33 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
     });
     try {
       if (_isYubikeyMode) {
-        final record = _yubikeyRecords.first;
         try {
-          await widget.onConfirmYubikey(
-            record.credentialId,
-            record.salt,
-            _pinController.text,
-            _transport,
-          );
+          if (_yubikeyRecords.length == 1) {
+            final record = _yubikeyRecords.first;
+            await widget.onConfirmYubikey(
+              record.credentialId,
+              record.salt,
+              _pinController.text,
+              _transport,
+            );
+          } else {
+            await widget.onConfirmAnyYubikey(
+              _yubikeyRecords,
+              _pinController.text,
+              _transport,
+            );
+          }
         } catch (e) {
           if (mounted) {
-            setState(() => _error = (e is PlatformException && e.code == 'TRANSPORT_ERROR')
-                ? e.message ?? 'Transport error.'
-                : 'Authorization failed — check your PIN and try again.');
+            setState(() {
+              _error = switch (e) {
+                PlatformException(code: 'TRANSPORT_ERROR') =>
+                  e.message ?? 'Transport error.',
+                PlatformException(code: 'NO_FIDO2_DEVICE') =>
+                  e.message ?? 'No FIDO2 device found. Insert your YubiKey and try again.',
+                _ => 'Authorization failed — check your PIN and try again.',
+              };
+            });
           }
           return;
         }
@@ -239,16 +308,20 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                           ? 'YubiKey PIN is required'
                           : null,
                     ),
-                    const SizedBox(height: 12),
-                    SegmentedRow<String>(
-                      values: const ['usb', 'nfc'],
-                      selected: _transport,
-                      label: (v) => v.toUpperCase(),
-                      onSelected: (v) => setState(() => _transport = v),
-                    ),
+                    if (!Platform.isLinux) ...[
+                      const SizedBox(height: 12),
+                      SegmentedRow<String>(
+                        values: const ['usb', 'nfc'],
+                        selected: _transport,
+                        label: (v) => v.toUpperCase(),
+                        onSelected: (v) => setState(() => _transport = v),
+                      ),
+                    ],
                     const SizedBox(height: 8),
                     Text(
-                      'Touch your YubiKey to authorize this change.',
+                      _isChanging
+                          ? 'Tap your YubiKey now…'
+                          : 'Touch your YubiKey to authorize this change.',
                       style: Theme.of(context).textTheme.bodySmall,
                       textAlign: TextAlign.center,
                     ),

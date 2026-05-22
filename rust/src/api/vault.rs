@@ -854,6 +854,27 @@ pub fn reseal_vault_body(
     write_vault(&sealed, path)
 }
 
+/// Change the passphrase on a VERSION 4 multi-key vault.
+///
+/// Reads the vault from disk, verifies the old passphrase via `passphrase_blob`,
+/// generates fresh PQ material for the new passphrase, re-encrypts `wrapping_key`
+/// as the new `passphrase_blob`, and writes back.  All `key_blob`s and the vault
+/// body are unchanged — any single registered key continues to work.
+#[flutter_rust_bridge::frb(ignore)]
+pub fn change_passphrase_with_keys(
+    old_passphrase: &[u8],
+    new_passphrase: &[u8],
+    path: &Path,
+) -> Result<(), String> {
+    let sealed = read_vault(path)?;
+    let new_sealed = crate::crypto::vault_crypto::change_vault_passphrase_with_keys(
+        &sealed,
+        old_passphrase,
+        new_passphrase,
+    )?;
+    write_vault(&new_sealed, path)
+}
+
 // ── Timestamp helper ──────────────────────────────────────────────────────────
 
 /// Returns the current UTC time as an ISO 8601 string.

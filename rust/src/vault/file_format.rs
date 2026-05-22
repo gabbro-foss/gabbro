@@ -21,12 +21,15 @@
 //! |   salt                 | 32           |
 //! |   key_blob length      | 2  (v3+)     |
 //! |   key_blob             | 0 or 60      |
+//! | passphrase_blob length | 2  (v4+)     |
+//! | passphrase_blob        | 0 or 60      |
 //! | Body length            | 8            |
 //! | Body (ciphertext)      | variable     |
 //!
-//! VERSION 2 (legacy): records have no key_blob fields.
-//! VERSION 3 (current): records include key_blob_len + key_blob per entry.
-//! Reads both; always writes VERSION 3.
+//! VERSION 2 (legacy single-key): records have no key_blob fields; no passphrase_blob.
+//! VERSION 3 (deprecated multi-key): records include key_blob_len + key_blob; no passphrase_blob.
+//! VERSION 4 (current multi-key): adds passphrase_blob for single-tap passphrase change.
+//! Reads v2+; always writes VERSION 4.
 
 use crate::crypto::kdf::Argon2idParams;
 
@@ -46,7 +49,7 @@ pub struct YubiKeyRecord {
 pub const MAGIC: &[u8; 6] = b"GABBRO";
 
 /// Current file format version (written by this build).
-pub const VERSION: u8 = 3;
+pub const VERSION: u8 = 4;
 
 /// Oldest version this build can still read.
 const VERSION_MIN_READABLE: u8 = 2;
@@ -65,6 +68,13 @@ pub struct SealedVault {
     pub x25519_ephemeral_public: [u8; 32],
     pub ciphertext: Vec<u8>,
     pub yubikey_records: Vec<YubiKeyRecord>,
+    /// AES-256-GCM ciphertext of the wrapping_key under intermediate_key.
+    ///
+    /// Layout: nonce (12) + ciphertext+tag (48) = 60 bytes.
+    /// Empty for passphrase-only vaults and VERSION 2/3 files.
+    /// Present (60 bytes) for VERSION 4 multi-key vaults — enables single-tap
+    /// passphrase change without requiring all registered keys.
+    pub passphrase_blob: Vec<u8>,
 }
 
 impl SealedVault {
@@ -100,6 +110,11 @@ impl SealedVault {
             out.extend_from_slice(&record.key_blob);
         }
 
+        // passphrase_blob — length prefix then the bytes themselves (VERSION 4+)
+        let pb_len = self.passphrase_blob.len() as u16;
+        out.extend_from_slice(&pb_len.to_be_bytes());
+        out.extend_from_slice(&self.passphrase_blob);
+
         // Body — length prefix then the bytes themselves
         let body_len = self.ciphertext.len() as u64;
         out.extend_from_slice(&body_len.to_be_bytes());
@@ -130,6 +145,7 @@ impl SealedVault {
             return Err(format!("Unsupported version: {}", version));
         }
         let is_v3 = version >= 3;
+        let is_v4 = version >= 4;
         pos += 1;
 
         // --- Argon2id parameters (3 x u32 = 12 bytes) ---
@@ -229,6 +245,23 @@ impl SealedVault {
             });
         }
 
+        // --- passphrase_blob (VERSION 4+) ---
+        let passphrase_blob = if is_v4 {
+            if data.len() < pos + 2 {
+                return Err("File truncated at passphrase_blob length".to_string());
+            }
+            let pb_len = u16::from_be_bytes(data[pos..pos + 2].try_into().unwrap()) as usize;
+            pos += 2;
+            if data.len() < pos + pb_len {
+                return Err("File truncated at passphrase_blob".to_string());
+            }
+            let pb = data[pos..pos + pb_len].to_vec();
+            pos += pb_len;
+            pb
+        } else {
+            vec![]
+        };
+
         // --- Body length (8 bytes) ---
         if data.len() < pos + 8 {
             return Err("File truncated at body length".to_string());
@@ -255,6 +288,7 @@ impl SealedVault {
             x25519_ephemeral_public,
             ciphertext,
             yubikey_records,
+            passphrase_blob,
         })
     }
 }
@@ -278,6 +312,7 @@ mod tests {
             x25519_ephemeral_public: [5u8; 32],
             ciphertext: vec![6u8; 64],
             yubikey_records: vec![],
+            passphrase_blob: vec![],
         }
     }
 
@@ -330,6 +365,21 @@ mod tests {
     }
 
     #[test]
+    fn roundtrip_with_passphrase_blob() {
+        let mut vault = test_vault();
+        vault.yubikey_records = vec![YubiKeyRecord {
+            credential_id: vec![0xAAu8; 64],
+            salt: [0xBBu8; 32],
+            key_blob: vec![0xEEu8; 60],
+        }];
+        vault.passphrase_blob = vec![0xFFu8; 60];
+        let bytes = vault.to_bytes();
+        let recovered = SealedVault::from_bytes(&bytes).unwrap();
+        assert_eq!(vault, recovered);
+        assert_eq!(recovered.passphrase_blob.len(), 60);
+    }
+
+    #[test]
     fn version_2_records_readable_without_key_blob() {
         // Craft a raw VERSION 2 vault with one YubiKey record (no key_blob fields).
         let mut bytes = test_vault().to_bytes();
@@ -368,8 +418,8 @@ mod tests {
     fn byte_length_no_records() {
         let vault = test_vault();
         let bytes = vault.to_bytes();
-        // 6 + 1 + 4 + 4 + 4 + 32 + 32 + 12 + 1568 + 32 + 1 + 8 + 64 = 1768
-        assert_eq!(bytes.len(), 1768);
+        // 6 + 1 + 4 + 4 + 4 + 32 + 32 + 12 + 1568 + 32 + 1 + 2(pb_len) + 0(pb) + 8 + 64 = 1770
+        assert_eq!(bytes.len(), 1770);
     }
 
     #[test]
@@ -388,9 +438,30 @@ mod tests {
             },
         ];
         let bytes = vault.to_bytes();
-        // Base: 1768 bytes (0 records)
+        // Base: 1770 bytes (0 records, empty passphrase_blob)
         // Per record: 2 (id_len) + 64 (id) + 32 (salt) + 2 (kb_len) + 60 (key_blob) = 160
         // 2 records: 320 bytes
-        assert_eq!(bytes.len(), 1768 + 320);
+        assert_eq!(bytes.len(), 1770 + 320);
+    }
+
+    #[test]
+    fn byte_length_two_records_with_passphrase_blob() {
+        let mut vault = test_vault();
+        vault.yubikey_records = vec![
+            YubiKeyRecord {
+                credential_id: vec![0xAAu8; 64],
+                salt: [0xBBu8; 32],
+                key_blob: vec![0xEEu8; 60],
+            },
+            YubiKeyRecord {
+                credential_id: vec![0xCCu8; 64],
+                salt: [0xDDu8; 32],
+                key_blob: vec![0xFFu8; 60],
+            },
+        ];
+        vault.passphrase_blob = vec![0xAAu8; 60];
+        let bytes = vault.to_bytes();
+        // Base 1770 + 320 records + 60 passphrase_blob = 2150
+        assert_eq!(bytes.len(), 1770 + 320 + 60);
     }
 }

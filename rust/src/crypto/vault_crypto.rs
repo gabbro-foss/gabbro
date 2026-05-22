@@ -72,6 +72,7 @@ pub fn seal_vault(passphrase: &[u8], plaintext: &[u8]) -> Result<SealedVault, St
         nonce,
         ciphertext,
         yubikey_records: vec![],
+        passphrase_blob: vec![],
     })
 }
 
@@ -181,6 +182,7 @@ pub fn seal_vault_with_yubikey(
             salt: yubikey_salt,
             key_blob: vec![],
         }],
+        passphrase_blob: vec![],
     })
 }
 
@@ -241,10 +243,12 @@ pub struct YubiKeyRegistration {
     pub salt: [u8; 32],
 }
 
-/// Encrypts plaintext under the given passphrase and two or more YubiKeys.
+/// Encrypts plaintext under the given passphrase and two or more YubiKeys (VERSION 4).
 ///
-/// Generates a random `vault_key_master`; wraps it independently for each
-/// key so any single registered key can later unlock the vault.
+/// Generates a random `wrapping_key` and a random `vault_key_master`.
+/// `passphrase_blob` = AES-GCM(wrapping_key, intermediate_key) — enables
+/// passphrase change without requiring all registered keys.
+/// Each key's `key_blob` = AES-GCM(vault_key_master, combine_yubikey(wrapping_key, hmac_i, salt_i)).
 /// Returns `Err` if fewer than 2 keys are supplied.
 pub fn seal_vault_with_keys(
     passphrase: &[u8],
@@ -288,7 +292,18 @@ pub fn seal_vault_with_keys(
         &hkdf_salt,
     ));
 
-    // Random master key that encrypts the vault body.
+    // wrapping_key: stable random key that mediates between passphrase and YubiKeys.
+    // Encrypted under intermediate_key → passphrase_blob (enables single-tap passphrase change).
+    // Used in combine_yubikey instead of intermediate_key → key_blobs survive passphrase changes.
+    let mut wrapping_key = Zeroizing::new([0u8; 32]);
+    OsRng.fill_bytes(&mut *wrapping_key);
+
+    let (pb_ct, pb_nonce) = aes_gcm::encrypt(&intermediate_key, &wrapping_key[..])?;
+    let mut passphrase_blob = Vec::with_capacity(12 + pb_ct.len());
+    passphrase_blob.extend_from_slice(&pb_nonce);
+    passphrase_blob.extend_from_slice(&pb_ct);
+
+    // vault_key_master: random key that encrypts the vault body.
     // Each registered key gets an independent encrypted copy (key_blob).
     let mut vault_key_master = Zeroizing::new([0u8; 32]);
     OsRng.fill_bytes(&mut *vault_key_master);
@@ -296,8 +311,9 @@ pub fn seal_vault_with_keys(
     let yubikey_records = keys
         .iter()
         .map(|k| {
-            let wrap_key =
-                Zeroizing::new(combine_yubikey(&intermediate_key, &k.hmac_secret, &k.salt));
+            // wrap_key uses wrapping_key (not intermediate_key) so key_blobs are
+            // independent of the passphrase and survive passphrase changes.
+            let wrap_key = Zeroizing::new(combine_yubikey(&wrapping_key, &k.hmac_secret, &k.salt));
             let (blob_ct, blob_nonce) = aes_gcm::encrypt(&wrap_key, &vault_key_master[..])?;
             // key_blob layout: nonce (12) || ciphertext+tag (48) = 60 bytes
             let mut key_blob = Vec::with_capacity(12 + blob_ct.len());
@@ -322,14 +338,18 @@ pub fn seal_vault_with_keys(
         x25519_ephemeral_public: *ephemeral_public.as_bytes(),
         ciphertext,
         yubikey_records,
+        passphrase_blob,
     })
 }
 
 /// Decrypts a multi-key vault using the passphrase and one registered YubiKey.
 ///
-/// Finds the record matching `credential_id`, unwraps the `vault_key_master`
-/// from its `key_blob`, and decrypts the body.  Falls back to the legacy
-/// single-key path when `key_blob` is empty (VERSION 2 vaults).
+/// VERSION 4 path (passphrase_blob present):
+///   intermediate_key → decrypt passphrase_blob → wrapping_key →
+///   combine_yubikey(wrapping_key, hmac, salt) → decrypt key_blob → vault_key_master → body.
+///
+/// Legacy VERSION 2 path (key_blob empty, passphrase_blob empty):
+///   intermediate_key → combine_yubikey(intermediate_key, hmac, salt) → body.
 ///
 /// Returns `(plaintext, vault_key_master)`.  The caller should cache
 /// `vault_key_master` in the session for subsequent CRUD re-seals.
@@ -376,19 +396,35 @@ pub fn open_vault_with_key_record(
         .find(|r| r.credential_id == credential_id)
         .ok_or_else(|| "no YubiKey record found for this credential".to_string())?;
 
-    let wrap_key = Zeroizing::new(combine_yubikey(
-        &intermediate_key,
-        hmac_secret,
-        &record.salt,
-    ));
-
     if record.key_blob.is_empty() {
-        // Legacy VERSION 2 single-key: body encrypted directly with wrap_key.
+        // Legacy VERSION 2 single-key: body encrypted directly with combine_yubikey(intermediate_key, ...).
+        let wrap_key = Zeroizing::new(combine_yubikey(
+            &intermediate_key,
+            hmac_secret,
+            &record.salt,
+        ));
         let plaintext = aes_gcm::decrypt(&wrap_key, &sealed.ciphertext, &sealed.nonce)?;
         return Ok((plaintext, wrap_key));
     }
 
-    // VERSION 3: unwrap vault_key_master from key_blob (nonce || ciphertext+tag)
+    // VERSION 4: decrypt passphrase_blob → wrapping_key, then unwrap key_blob.
+    if sealed.passphrase_blob.len() != 60 {
+        return Err(format!(
+            "invalid passphrase_blob length: {} (expected 60 for VERSION 4 multi-key vault)",
+            sealed.passphrase_blob.len()
+        ));
+    }
+    let pb_nonce: [u8; 12] = sealed.passphrase_blob[..12].try_into().unwrap();
+    let pb_ct = &sealed.passphrase_blob[12..];
+    let wrapping_key_bytes = aes_gcm::decrypt(&intermediate_key, pb_ct, &pb_nonce)
+        .map_err(|_| "decryption failed: wrong passphrase or corrupted vault".to_string())?;
+    let wrapping_key: Zeroizing<[u8; 32]> = Zeroizing::new(
+        wrapping_key_bytes
+            .as_slice()
+            .try_into()
+            .map_err(|_| "wrapping_key must be 32 bytes".to_string())?,
+    );
+
     if record.key_blob.len() != 60 {
         return Err(format!(
             "invalid key_blob length: {} (expected 60)",
@@ -398,6 +434,7 @@ pub fn open_vault_with_key_record(
     let blob_nonce: [u8; 12] = record.key_blob[..12].try_into().unwrap();
     let blob_ct = &record.key_blob[12..];
 
+    let wrap_key = Zeroizing::new(combine_yubikey(&wrapping_key, hmac_secret, &record.salt));
     let master_bytes = aes_gcm::decrypt(&wrap_key, blob_ct, &blob_nonce)?;
     let vault_key_master: Zeroizing<[u8; 32]> = Zeroizing::new(
         master_bytes
@@ -423,6 +460,126 @@ pub fn reseal_vault_body(
     sealed.ciphertext = new_ciphertext;
     sealed.nonce = new_nonce;
     Ok(())
+}
+
+/// Changes the passphrase for a VERSION 4 multi-key vault.
+///
+/// Verifies the old passphrase by decrypting `passphrase_blob` → `wrapping_key`.
+/// Generates fresh PQ material for the new passphrase, re-encrypts `wrapping_key`
+/// as the new `passphrase_blob`. All `key_blob`s and the vault body are unchanged —
+/// any single registered key continues to work with the new passphrase.
+pub fn change_vault_passphrase_with_keys(
+    sealed: &SealedVault,
+    old_passphrase: &[u8],
+    new_passphrase: &[u8],
+) -> Result<SealedVault, String> {
+    // Step 1: Re-derive intermediate_key from old passphrase and stored PQ material.
+    let old_kdf = Zeroizing::new(derive_key(
+        old_passphrase,
+        &sealed.argon2_salt,
+        &sealed.params,
+    )?);
+    let old_x25519 = X25519Keypair::from_kdf_output(&old_kdf);
+    let old_ml_kem = MlKemKeypair::from_kdf_output(&old_kdf);
+
+    let ml_kem_ct_bytes: &[u8; 1568] = sealed
+        .ml_kem_ciphertext
+        .as_slice()
+        .try_into()
+        .map_err(|_| "ML-KEM ciphertext is not 1568 bytes".to_string())?;
+    let ml_kem_ct = Ciphertext::<ml_kem::MlKem1024>::try_from(ml_kem_ct_bytes.as_ref())
+        .map_err(|e| format!("ML-KEM ciphertext decode failed: {e:?}"))?;
+    let ml_kem_secret = old_ml_kem
+        .decapsulation_key
+        .decapsulate(&ml_kem_ct)
+        .map_err(|e| format!("ML-KEM decapsulation failed: {e:?}"))?;
+
+    let ephemeral_public = X25519PublicKey::from(sealed.x25519_ephemeral_public);
+    let x25519_secret = old_x25519.secret.diffie_hellman(&ephemeral_public);
+
+    let ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
+        (*ml_kem_secret)
+            .try_into()
+            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
+    );
+    let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
+    let old_intermediate_key = Zeroizing::new(derive_vault_key(
+        &ml_kem_secret_bytes,
+        &x25519_secret_bytes,
+        &sealed.hkdf_salt,
+    ));
+
+    // Step 2: Decrypt passphrase_blob → wrapping_key (verifies old passphrase).
+    if sealed.passphrase_blob.len() != 60 {
+        return Err(
+            "vault does not support single-key passphrase change — not a VERSION 4 multi-key vault"
+                .to_string(),
+        );
+    }
+    let pb_nonce: [u8; 12] = sealed.passphrase_blob[..12].try_into().unwrap();
+    let pb_ct = &sealed.passphrase_blob[12..];
+    let wrapping_key_bytes = aes_gcm::decrypt(&old_intermediate_key, pb_ct, &pb_nonce)
+        .map_err(|_| "wrong passphrase".to_string())?;
+    let wrapping_key: Zeroizing<[u8; 32]> = Zeroizing::new(
+        wrapping_key_bytes
+            .as_slice()
+            .try_into()
+            .map_err(|_| "wrapping_key must be 32 bytes".to_string())?,
+    );
+
+    // Step 3: Generate fresh PQ material for the new passphrase.
+    let new_params = Argon2idParams::default();
+    let mut new_argon2_salt = [0u8; 32];
+    OsRng.fill_bytes(&mut new_argon2_salt);
+
+    let new_kdf = Zeroizing::new(derive_key(new_passphrase, &new_argon2_salt, &new_params)?);
+    let new_x25519 = X25519Keypair::from_kdf_output(&new_kdf);
+    let new_ml_kem = MlKemKeypair::from_kdf_output(&new_kdf);
+
+    let mut encap_rng = OsRng;
+    let (new_ml_kem_ct, new_ml_kem_secret) = new_ml_kem
+        .encapsulation_key
+        .encapsulate(&mut encap_rng)
+        .map_err(|e| format!("ML-KEM encapsulation failed: {e:?}"))?;
+
+    let new_ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
+    let new_ephemeral_public = X25519PublicKey::from(&new_ephemeral_secret);
+    let new_x25519_secret = new_ephemeral_secret.diffie_hellman(&new_x25519.public);
+
+    let mut new_hkdf_salt = [0u8; 32];
+    OsRng.fill_bytes(&mut new_hkdf_salt);
+
+    let new_ml_kem_secret_bytes: Zeroizing<[u8; 32]> = Zeroizing::new(
+        (*new_ml_kem_secret)
+            .try_into()
+            .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
+    );
+    let new_x25519_secret_bytes = Zeroizing::new(*new_x25519_secret.as_bytes());
+    let new_intermediate_key = Zeroizing::new(derive_vault_key(
+        &new_ml_kem_secret_bytes,
+        &new_x25519_secret_bytes,
+        &new_hkdf_salt,
+    ));
+
+    // Step 4: Re-encrypt wrapping_key under the new passphrase.
+    let (new_pb_ct, new_pb_nonce) = aes_gcm::encrypt(&new_intermediate_key, &wrapping_key[..])?;
+    let mut new_passphrase_blob = Vec::with_capacity(60);
+    new_passphrase_blob.extend_from_slice(&new_pb_nonce);
+    new_passphrase_blob.extend_from_slice(&new_pb_ct);
+
+    // Step 5: Return new SealedVault with fresh PQ material and passphrase_blob.
+    // key_blobs and body are unchanged — vault_key_master is stable.
+    Ok(SealedVault {
+        params: new_params,
+        argon2_salt: new_argon2_salt,
+        hkdf_salt: new_hkdf_salt,
+        nonce: sealed.nonce,
+        ml_kem_ciphertext: new_ml_kem_ct.to_vec(),
+        x25519_ephemeral_public: *new_ephemeral_public.as_bytes(),
+        ciphertext: sealed.ciphertext.clone(),
+        yubikey_records: sealed.yubikey_records.clone(),
+        passphrase_blob: new_passphrase_blob,
+    })
 }
 
 #[cfg(test)]
@@ -782,6 +939,13 @@ mod tests {
     }
 
     #[test]
+    fn seal_with_keys_produces_passphrase_blob() {
+        let keys = two_test_keys();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        assert_eq!(sealed.passphrase_blob.len(), 60);
+    }
+
+    #[test]
     fn reseal_body_produces_decryptable_ciphertext() {
         let keys = two_test_keys();
         let plaintext = b"initial body";
@@ -803,5 +967,111 @@ mod tests {
         )
         .unwrap();
         assert_eq!(recovered, new_plaintext);
+    }
+
+    // ── change_vault_passphrase_with_keys ─────────────────────────────────────
+
+    #[test]
+    fn change_passphrase_with_keys_key_blobs_unchanged() {
+        let keys = two_test_keys();
+        let sealed = seal_vault_with_keys(b"old-pass", &keys, b"data").unwrap();
+        let old_blobs: Vec<_> = sealed
+            .yubikey_records
+            .iter()
+            .map(|r| r.key_blob.clone())
+            .collect();
+
+        let new_sealed =
+            change_vault_passphrase_with_keys(&sealed, b"old-pass", b"new-pass").unwrap();
+        let new_blobs: Vec<_> = new_sealed
+            .yubikey_records
+            .iter()
+            .map(|r| r.key_blob.clone())
+            .collect();
+
+        assert_eq!(
+            old_blobs, new_blobs,
+            "key_blobs must be unchanged after passphrase change"
+        );
+        assert_ne!(
+            sealed.passphrase_blob, new_sealed.passphrase_blob,
+            "passphrase_blob must be refreshed"
+        );
+    }
+
+    #[test]
+    fn change_passphrase_with_keys_old_passphrase_no_longer_opens() {
+        let keys = two_test_keys();
+        let plaintext = b"secret";
+        let sealed = seal_vault_with_keys(b"old-pass", &keys, plaintext).unwrap();
+        let new_sealed =
+            change_vault_passphrase_with_keys(&sealed, b"old-pass", b"new-pass").unwrap();
+
+        let result = open_vault_with_key_record(
+            b"old-pass",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &new_sealed,
+        );
+        assert!(
+            result.is_err(),
+            "old passphrase must no longer work after change"
+        );
+    }
+
+    #[test]
+    fn change_passphrase_with_keys_new_passphrase_opens_with_any_key() {
+        let keys = two_test_keys();
+        let plaintext = b"my vault data";
+        let sealed = seal_vault_with_keys(b"old-pass", &keys, plaintext).unwrap();
+        let new_sealed =
+            change_vault_passphrase_with_keys(&sealed, b"old-pass", b"new-pass").unwrap();
+
+        let (pt0, _) = open_vault_with_key_record(
+            b"new-pass",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &new_sealed,
+        )
+        .unwrap();
+        assert_eq!(pt0, plaintext);
+
+        let (pt1, _) = open_vault_with_key_record(
+            b"new-pass",
+            &keys[1].hmac_secret,
+            &keys[1].credential_id,
+            &new_sealed,
+        )
+        .unwrap();
+        assert_eq!(pt1, plaintext);
+    }
+
+    #[test]
+    fn change_passphrase_wrong_old_passphrase_fails() {
+        let keys = two_test_keys();
+        let sealed = seal_vault_with_keys(b"correct", &keys, b"data").unwrap();
+        let result = change_vault_passphrase_with_keys(&sealed, b"wrong", b"new-pass");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn change_passphrase_roundtrip_through_bytes() {
+        let keys = two_test_keys();
+        let plaintext = b"roundtrip after passphrase change";
+        let sealed = seal_vault_with_keys(b"old", &keys, plaintext).unwrap();
+        let new_sealed = change_vault_passphrase_with_keys(&sealed, b"old", b"new").unwrap();
+
+        // Serialize and deserialize the new sealed vault
+        let bytes = new_sealed.to_bytes();
+        let restored = SealedVault::from_bytes(&bytes).unwrap();
+
+        let (pt, _) = open_vault_with_key_record(
+            b"new",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &restored,
+        )
+        .unwrap();
+        assert_eq!(pt, plaintext);
     }
 }

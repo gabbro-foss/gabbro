@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
@@ -17,6 +19,7 @@ import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
 import 'package:gabbro/settings.dart';
+import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 
@@ -34,9 +37,56 @@ Future<void> _defaultConfirmYubikey(
   String pin,
   String transport,
 ) async {
+  if (Platform.isLinux) {
+    final devices = fidoListDevices();
+    if (devices.isEmpty) {
+      throw PlatformException(
+        code: 'NO_FIDO2_DEVICE',
+        message: 'No FIDO2 device found. Insert your YubiKey and try again.',
+      );
+    }
+    await fidoGetHmacSecret(
+      devicePath: devices.first,
+      credentialId: credentialId,
+      salt: salt,
+      pin: pin,
+    );
+    return;
+  }
   await _yubikeyChannel.invokeMethod<String>(
     'get_hmac_secret',
     {'credentialId': _toHex(credentialId), 'salt': _toHex(salt), 'pin': pin, 'transport': transport},
+  );
+}
+
+Future<void> _defaultConfirmAnyYubikey(
+  List<YubikeyRecordData> records,
+  String pin,
+  String transport,
+) async {
+  if (Platform.isLinux) {
+    final devices = fidoListDevices();
+    if (devices.isEmpty) {
+      throw PlatformException(
+        code: 'NO_FIDO2_DEVICE',
+        message: 'No FIDO2 device found. Insert your YubiKey and try again.',
+      );
+    }
+    await fidoGetHmacSecretAny(
+      devicePath: devices.first,
+      records: records
+          .map((r) => FidoRecordInput(credentialId: r.credentialId, salt: r.salt))
+          .toList(),
+      pin: pin,
+    );
+    return;
+  }
+  final recordsArg = records
+      .map((r) => {'credentialId': _toHex(r.credentialId), 'salt': _toHex(r.salt)})
+      .toList();
+  await _yubikeyChannel.invokeMethod<Map<Object?, Object?>>(
+    'get_hmac_secret_multi',
+    {'records': recordsArg, 'pin': pin, 'transport': transport},
   );
 }
 
@@ -56,10 +106,14 @@ class VaultListScreen extends StatefulWidget {
   /// construction time. Pass `[]` to force passphrase-only mode (tests).
   final List<YubikeyRecordData>? yubikeyRecords;
 
-  /// Called before deleting a YubiKey-protected vault.
-  /// Triggers a YubiKey tap (get_hmac_secret) to confirm physical presence.
+  /// Called before deleting a single-key YubiKey-protected vault.
   final Future<void> Function(List<int> credentialId, List<int> salt, String pin, String transport)
       onConfirmYubikey;
+
+  /// Called before deleting a multi-key (2+) YubiKey-protected vault.
+  /// Sends all records in one FIDO2 assertion — one tap regardless of which key is inserted.
+  final Future<void> Function(List<YubikeyRecordData> records, String pin, String transport)
+      onConfirmAnyYubikey;
 
   const VaultListScreen({
     super.key,
@@ -74,6 +128,7 @@ class VaultListScreen extends StatefulWidget {
     this.onAssignFolderFn,
     this.yubikeyRecords,
     this.onConfirmYubikey = _defaultConfirmYubikey,
+    this.onConfirmAnyYubikey = _defaultConfirmAnyYubikey,
   });
 
   @override
@@ -628,13 +683,23 @@ class _VaultListScreenState extends State<VaultListScreen> {
                   ),
                   onChanged: (_) => setState(() {}),
                 ),
-                const SizedBox(height: 12),
-                SegmentedRow<String>(
-                  values: const ['usb', 'nfc'],
-                  selected: dialogTransport,
-                  label: (v) => v.toUpperCase(),
-                  onSelected: (v) => setState(() => dialogTransport = v),
-                ),
+                if (!Platform.isLinux) ...[
+                  const SizedBox(height: 12),
+                  SegmentedRow<String>(
+                    values: const ['usb', 'nfc'],
+                    selected: dialogTransport,
+                    label: (v) => v.toUpperCase(),
+                    onSelected: (v) => setState(() => dialogTransport = v),
+                  ),
+                ],
+                if (isAuthorizing) ...[
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Tap your YubiKey now…',
+                    style: TextStyle(fontSize: 12),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
                 if (authError != null) ...[
                   const SizedBox(height: 8),
                   Text(
@@ -663,21 +728,33 @@ class _VaultListScreenState extends State<VaultListScreen> {
                           authError = null;
                         });
                         try {
-                          final record = _yubikeyRecords.first;
-                          await widget.onConfirmYubikey(
-                            record.credentialId,
-                            record.salt,
-                            pinController.text,
-                            dialogTransport,
-                          );
+                          if (_yubikeyRecords.length == 1) {
+                            final record = _yubikeyRecords.first;
+                            await widget.onConfirmYubikey(
+                              record.credentialId,
+                              record.salt,
+                              pinController.text,
+                              dialogTransport,
+                            );
+                          } else {
+                            await widget.onConfirmAnyYubikey(
+                              _yubikeyRecords,
+                              pinController.text,
+                              dialogTransport,
+                            );
+                          }
                           if (ctx.mounted) Navigator.of(ctx).pop(true);
                         } catch (e) {
                           if (ctx.mounted) {
                             setState(() {
                               isAuthorizing = false;
-                              authError = (e is PlatformException && e.code == 'TRANSPORT_ERROR')
-                                  ? e.message ?? 'Transport error.'
-                                  : 'Authorization failed — check your PIN and try again.';
+                              authError = switch (e) {
+                                PlatformException(code: 'TRANSPORT_ERROR') =>
+                                  e.message ?? 'Transport error.',
+                                PlatformException(code: 'NO_FIDO2_DEVICE') =>
+                                  e.message ?? 'No FIDO2 device found. Insert your YubiKey and try again.',
+                                _ => 'Authorization failed — check your PIN and try again.',
+                              };
                             });
                           }
                         }
