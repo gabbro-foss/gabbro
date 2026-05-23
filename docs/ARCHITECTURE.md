@@ -146,7 +146,7 @@ gabbro/
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
 
 **Not yet implemented (see Bikeshed):**
-- YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2) implemented; minimum-2-keys enforcement (ADR-010, VERSION 4 vault format) implemented; multi-key unlock, vault delete, and change_passphrase YubiKey wiring complete (CTAP2 one-tap any-key, hardware-validated on Linux + Android USB + Android NFC); manage YubiKeys screen pending
+- YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2) implemented; minimum-2-keys enforcement (ADR-010, VERSION 4 vault format) implemented; multi-key unlock, vault delete, and change_passphrase YubiKey wiring complete (CTAP2 one-tap any-key, hardware-validated on Linux + Android USB + Android NFC); manage YubiKeys screen implemented (Linux hardware-validated); one Android bug remaining — see Bikeshed
 - Autofill save requests (`onSaveRequest`)
 - Passkey support, breach alerts, vault sync
 
@@ -166,12 +166,29 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next task — add manage YubiKeys screen (add/remove keys)**
-  - Accessible from Settings menu on `VaultListScreen`.
-  - Allow adding a new YubiKey (up to max 4): register credential, update vault header with new `YubiKeyRecord`, require existing-key tap to authorise.
-  - Allow removing a YubiKey: tap remaining key to authorise, update vault header.
-  - Enforce minimum-2-keys invariant from ADR-010: cannot remove below 2 registered keys.
-  - Both Linux (libfido2) and Android (yubikit) transports.
+- **Manage YubiKeys screen — implemented, one Android bug remaining**
+
+  **Status (hardware-validated):**
+  - Linux: all test cases pass — add key (inc. 3rd key), remove key, alias edit, warnings, no-device message, export/import.
+  - Android: onboarding, login, remove, alias edit, warnings pass. One failure: `registerAndGetHmac` CTAP error when adding any key.
+
+  **Android `registerAndGetHmac` CTAP error — unsolved**
+  - Error: `PlatformException RegisterHMAC failed registerandgethmac failed: wrong channel id, expecting:### got:###, null, null` (channel IDs change each attempt)
+  - Happens on both USB and NFC (unconfirmed — test may have been USB only)
+  - Attempted fix: moved `clientPin.getSharedSecret()` to before `makeCredential` in `YubiKeyManager.registerAndGetHmac` → did not resolve
+
+  **Diagnostic ideas for next session:**
+  1. Confirm whether the error is USB-only or also NFC (test each transport separately).
+  2. Add `Thread.sleep(200)` after `makeCredential` before `getAssertions` — test if it's a timing race.
+  3. Print channel IDs via Android logcat to understand exactly which CTAP command triggers the wrong-channel response.
+  4. Try dropping `up=false` from the `getAssertions` options map — some firmware may reject it.
+  5. Try passing `null` instead of the `pinUvAuthParamGA` / `pinProtocol.version` to `getAssertions` — the hmac-secret extension may not need PIN UV auth on the GA leg.
+  6. Check yubikit-android 3.x release notes / GitHub issues for "wrong channel id".
+
+  **Mitigation if diagnosis fails:**
+  - Fall back to two-tap Android flow (mirrors Linux): tap 1 = `register` only, tap 2 = `getHmacSecret` with the registered credential. Eliminates same-session channel confusion entirely at the cost of one extra tap.
+
+  **Next task:** diagnose and fix the Android `registerAndGetHmac` CTAP channel error (pick from diagnostic ideas above).
 
 
 ---
@@ -207,6 +224,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
+- **Android `registerAndGetHmac` CTAP "wrong channel id" error** — `YubiKeyManager.registerAndGetHmac` fails with "wrong channel id, expecting:X got:Y" during the `getAssertions` call that follows `makeCredential`. Attempted fix (moving `getSharedSecret` before the touch) did not resolve it. See full diagnostic plan and two-tap mitigation in `## Current Focus`. **Priority: blocks add-key on Android.**
 - `onboarding_screen.dart` — accessibility button (top-right) partially hidden behind "Welcome to Gabbro" headline on some screen sizes; fix layout so button is never obscured. **Priority: needed for accessibility.**
 - Search improvement: currently only searches title, needs an option to also search all fields and notes
 - Multiple vaults.
@@ -231,6 +249,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Code Quality
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
+- fix: `14 packages have newer versions incompatible with dependency constraints.
+Try `dart pub outdated` for more information.`
 
 ### V2+ / Defer
 - Data breach alerts / HaveIBeenPwned integration.
