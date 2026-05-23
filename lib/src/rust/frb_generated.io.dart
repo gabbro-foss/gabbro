@@ -157,6 +157,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<YubiKeyInitData> dco_decode_list_yubi_key_init_data(dynamic raw);
 
   @protected
+  List<YubikeyAliasData> dco_decode_list_yubikey_alias_data(dynamic raw);
+
+  @protected
   List<YubikeyRecordData> dco_decode_list_yubikey_record_data(dynamic raw);
 
   @protected
@@ -211,6 +214,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   YubiKeyInitData dco_decode_yubi_key_init_data(dynamic raw);
+
+  @protected
+  YubikeyAliasData dco_decode_yubikey_alias_data(dynamic raw);
 
   @protected
   YubikeyRecordData dco_decode_yubikey_record_data(dynamic raw);
@@ -391,6 +397,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<YubikeyAliasData> sse_decode_list_yubikey_alias_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<YubikeyRecordData> sse_decode_list_yubikey_record_data(
     SseDeserializer deserializer,
   );
@@ -451,6 +462,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   YubiKeyInitData sse_decode_yubi_key_init_data(SseDeserializer deserializer);
+
+  @protected
+  YubikeyAliasData sse_decode_yubikey_alias_data(SseDeserializer deserializer);
 
   @protected
   YubikeyRecordData sse_decode_yubikey_record_data(
@@ -677,6 +691,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_yubikey_alias_data(
+    List<YubikeyAliasData> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_yubikey_record_data(
     List<YubikeyRecordData> self,
     SseSerializer serializer,
@@ -757,6 +777,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_yubi_key_init_data(
     YubiKeyInitData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_yubikey_alias_data(
+    YubikeyAliasData self,
     SseSerializer serializer,
   );
 

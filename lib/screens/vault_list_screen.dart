@@ -15,6 +15,7 @@ import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/screens/generator_screen.dart';
 import 'package:gabbro/screens/manage_folders_screen.dart';
+import 'package:gabbro/screens/manage_yubikeys_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
@@ -548,6 +549,15 @@ class _VaultListScreenState extends State<VaultListScreen> {
             ),
           ),
         );
+      case 'yubikeys':
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ManageYubiKeysScreen(
+              vaultPath: widget.vaultPath,
+              transport: _transport,
+            ),
+          ),
+        );
       case 'vault_delete':
         _deleteWholeVault();
       case 'generator':
@@ -945,8 +955,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
                     Expanded(child: Text('Change passphrase')),
                   ]),
                 ),
-                const PopupMenuItem(
-                  enabled: false,
+                PopupMenuItem(
+                  enabled: _isYubikeyVault,
                   value: 'yubikeys',
                   child: Row(children: [
                     Icon(Icons.security_outlined, size: 20),

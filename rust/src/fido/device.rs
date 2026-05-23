@@ -10,6 +10,21 @@ use crate::vault::file_format::YubiKeyRecord;
 
 use super::RP_ID;
 
+/// Map a libfido2/CTAP2 error code to a short human-readable hint.
+fn fido_err_hint(r: i32) -> String {
+    let hint = match r {
+        0x05 => "timeout — no YubiKey tapped in time",
+        0x30 => "operation not allowed",
+        0x31 => "wrong PIN — check your FIDO2 PIN and try again",
+        0x32 => "PIN blocked — too many wrong attempts, the key must be reset",
+        0x33 | 0x34 => "PIN authentication failed",
+        0x35 => "PIN not set — configure a FIDO2 PIN first (ykman fido access change-pin)",
+        0x36 => "PIN required",
+        _ => return r.to_string(),
+    };
+    format!("{r} ({hint})")
+}
+
 /// Register a new FIDO2 credential on the YubiKey at `device_path`.
 pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord, String> {
     // A random 32-byte client data hash stands in for a real WebAuthn
@@ -91,7 +106,7 @@ pub fn register_credential(device_path: &str, pin: &str) -> Result<YubiKeyRecord
             fido_cred_free(&mut (cred as *mut _));
             fido_dev_close(dev);
             fido_dev_free(&mut (dev as *mut _));
-            return Err(format!("fido_dev_make_cred failed: {r}"));
+            return Err(format!("fido_dev_make_cred failed: {}", fido_err_hint(r)));
         }
 
         // Extract the credential ID.
@@ -207,7 +222,7 @@ pub fn get_hmac_secret(
             fido_assert_free(&mut (assert as *mut _));
             fido_dev_close(dev);
             fido_dev_free(&mut (dev as *mut _));
-            return Err(format!("fido_dev_get_assert failed: {r}"));
+            return Err(format!("fido_dev_get_assert failed: {}", fido_err_hint(r)));
         }
 
         // Extract the hmac-secret output (32 bytes, assertion index 0).
@@ -322,7 +337,7 @@ pub fn get_hmac_secret_for_pair(
             fido_assert_free(&mut (assert as *mut _));
             fido_dev_close(dev);
             fido_dev_free(&mut (dev as *mut _));
-            return Err(format!("fido_dev_get_assert failed: {r}"));
+            return Err(format!("fido_dev_get_assert failed: {}", fido_err_hint(r)));
         }
 
         // Read which credential matched (assertion statement index 0).

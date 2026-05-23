@@ -716,6 +716,7 @@ pub fn export_vault(
     let plaintext = serialize_vault_body(&VaultBody {
         folders: vec![],
         entries: entries.to_vec(),
+        ..Default::default()
     })?;
     let sealed = seal_vault(passphrase, &plaintext)?;
     let vault_bytes = sealed.to_bytes();
@@ -819,24 +820,64 @@ pub fn save_vault_with_keys(
     write_vault(&sealed, path)
 }
 
-/// Read a vault from disk, decrypt using one registered key, and return both
-/// the body and the `vault_key_master` needed for subsequent CRUD re-seals.
+/// Read a vault from disk, decrypt using one registered key, and return the body,
+/// `vault_key_master` (for CRUD re-seals), and `wrapping_key` (for key add/remove).
+/// `wrapping_key` is `None` for legacy VERSION 2 vaults.
+#[allow(clippy::type_complexity)]
 #[flutter_rust_bridge::frb(ignore)]
 pub fn load_vault_with_key_record(
     passphrase: &[u8],
     hmac_secret: &[u8; 32],
     credential_id: &[u8],
     path: &Path,
-) -> Result<(VaultBody, zeroize::Zeroizing<[u8; 32]>), String> {
+) -> Result<
+    (
+        VaultBody,
+        zeroize::Zeroizing<[u8; 32]>,
+        Option<zeroize::Zeroizing<[u8; 32]>>,
+    ),
+    String,
+> {
     let sealed = read_vault(path)?;
-    let (plaintext, master) = crate::crypto::vault_crypto::open_vault_with_key_record(
-        passphrase,
-        hmac_secret,
-        credential_id,
-        &sealed,
-    )?;
+    let (plaintext, master, wrapping_key) =
+        crate::crypto::vault_crypto::open_vault_with_key_record(
+            passphrase,
+            hmac_secret,
+            credential_id,
+            &sealed,
+        )?;
     let body = deserialize_vault_body(&plaintext)?;
-    Ok((body, master))
+    Ok((body, master, wrapping_key))
+}
+
+/// Add a new YubiKey record to a VERSION 4 vault on disk, without re-sealing the body.
+#[flutter_rust_bridge::frb(ignore)]
+pub fn add_yubikey_to_vault(
+    wrapping_key: &[u8; 32],
+    vault_key_master: &[u8; 32],
+    new_cred_id: Vec<u8>,
+    new_hmac: &[u8; 32],
+    new_salt: [u8; 32],
+    path: &Path,
+) -> Result<(), String> {
+    let sealed = read_vault(path)?;
+    let new_sealed = crate::crypto::vault_crypto::add_key_to_sealed(
+        &sealed,
+        new_cred_id,
+        new_hmac,
+        new_salt,
+        wrapping_key,
+        vault_key_master,
+    )?;
+    write_vault(&new_sealed, path)
+}
+
+/// Remove a YubiKey record from a vault on disk, without re-sealing the body.
+#[flutter_rust_bridge::frb(ignore)]
+pub fn remove_yubikey_from_vault(cred_id: &[u8], path: &Path) -> Result<(), String> {
+    let sealed = read_vault(path)?;
+    let new_sealed = crate::crypto::vault_crypto::remove_key_from_sealed(&sealed, cred_id)?;
+    write_vault(&new_sealed, path)
 }
 
 /// Re-seal only the vault body using a cached `vault_key_master`, leaving all
@@ -1279,6 +1320,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries: entries.clone(),
+                ..Default::default()
             },
             passphrase,
             &path,
@@ -1307,6 +1349,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries,
+                ..Default::default()
             },
             b"correct passphrase",
             &path,
@@ -1901,6 +1944,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries,
+                ..Default::default()
             },
             old,
             &path,
@@ -1947,6 +1991,7 @@ mod tests {
                 content: String::from("secret content"),
                 attachments: vec![],
             })],
+            ..Default::default()
         };
 
         let old = b"old passphrase";

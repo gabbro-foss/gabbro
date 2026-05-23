@@ -545,7 +545,7 @@ mod tests {
             .find(|f| f.label == "recovery-email")
             .unwrap();
         assert_eq!(recovery.value, "backup@example.com");
-        assert_eq!(recovery.hidden, false);
+        assert!(!recovery.hidden);
 
         let secret = login
             .custom_fields
@@ -553,7 +553,7 @@ mod tests {
             .find(|f| f.label == "secret-answer")
             .unwrap();
         assert_eq!(secret.value, "fluffy");
-        assert_eq!(secret.hidden, true);
+        assert!(secret.hidden);
     }
 
     #[test]

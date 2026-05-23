@@ -11,8 +11,9 @@ use once_cell::sync::Lazy;
 use std::sync::Mutex;
 
 use crate::api::vault::{
-    change_passphrase_with_keys, load_vault, load_vault_with_key_record, load_vault_with_yubikey,
-    reseal_vault_body, save_vault, save_vault_with_yubikey,
+    add_yubikey_to_vault, change_passphrase_with_keys, load_vault, load_vault_with_key_record,
+    load_vault_with_yubikey, remove_yubikey_from_vault, reseal_vault_body, save_vault,
+    save_vault_with_yubikey,
 };
 use crate::api::vault_bridge::EntrySummaryData;
 use crate::vault::entry::VaultEntry;
@@ -32,7 +33,9 @@ type YubikeyTriple = Option<(
 ///
 /// For VERSION 4 multi-key vaults, `vault_key_master` holds the random master
 /// key that encrypts the vault body.  CRUD saves use it directly (no re-tap).
-/// For legacy VERSION 2 single-key vaults it is None; saves use the old
+/// `wrapping_key` mediates between passphrase and per-key blobs; it is needed
+/// to add a new key without Argon2id re-derivation.
+/// For legacy VERSION 2 single-key vaults both are None; saves use the old
 /// `save_vault_with_yubikey` path which re-derives with the cached hmac_secret.
 pub struct YubikeyMaterial {
     pub hmac_secret: Vec<u8>, // 32 bytes; zeroized in lock_vault
@@ -40,6 +43,8 @@ pub struct YubikeyMaterial {
     pub credential_id: Vec<u8>,
     /// Cached master key for CRUD re-seals (VERSION 4 multi-key vaults only).
     pub vault_key_master: Option<Zeroizing<[u8; 32]>>,
+    /// Cached wrapping key for add-key operations (VERSION 4 multi-key vaults only).
+    pub wrapping_key: Option<Zeroizing<[u8; 32]>>,
 }
 
 pub struct VaultSession {
@@ -48,6 +53,9 @@ pub struct VaultSession {
     pub path: PathBuf,
     pub passphrase: Vec<u8>,
     pub yubikey: Option<YubikeyMaterial>,
+    /// User-defined aliases for registered YubiKeys, keyed by credential_id hex string.
+    /// Stored in the encrypted vault body for portability across devices.
+    pub yubikey_aliases: std::collections::HashMap<String, String>,
 }
 
 static VAULT_SESSION: Lazy<Mutex<Option<VaultSession>>> = Lazy::new(|| Mutex::new(None));
@@ -64,6 +72,7 @@ pub fn unlock_vault(passphrase: &[u8], path: PathBuf) -> Result<(), String> {
     *session = Some(VaultSession {
         folders: body.folders,
         entries: body.entries,
+        yubikey_aliases: body.yubikey_aliases,
         path,
         passphrase: passphrase.to_vec(),
         yubikey: None,
@@ -85,12 +94,14 @@ pub fn unlock_vault_with_yubikey(
     *session = Some(VaultSession {
         folders: body.folders,
         entries: body.entries,
+        yubikey_aliases: body.yubikey_aliases,
         path,
         passphrase: passphrase.to_vec(),
         yubikey: Some(YubikeyMaterial {
             hmac_secret: hmac_secret.to_vec(),
             hkdf_salt: *yubikey_salt,
             vault_key_master: None,
+            wrapping_key: None,
             credential_id,
         }),
     });
@@ -108,13 +119,14 @@ pub fn unlock_vault_with_key_record(
     yubikey_salt: &[u8; 32],
     path: PathBuf,
 ) -> Result<(), String> {
-    let (mut body, master) =
+    let (mut body, master, wrapping_key) =
         load_vault_with_key_record(passphrase, hmac_secret, &credential_id, &path)?;
     crate::api::vault::purge_expired_history(&mut body.entries);
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     *session = Some(VaultSession {
         folders: body.folders,
         entries: body.entries,
+        yubikey_aliases: body.yubikey_aliases,
         path,
         passphrase: passphrase.to_vec(),
         yubikey: Some(YubikeyMaterial {
@@ -122,6 +134,7 @@ pub fn unlock_vault_with_key_record(
             hkdf_salt: *yubikey_salt,
             credential_id,
             vault_key_master: Some(master),
+            wrapping_key,
         }),
     });
     Ok(())
@@ -150,11 +163,23 @@ pub fn lock_vault() -> Result<(), String> {
             if let Some(ref mut master) = yk.vault_key_master {
                 master.zeroize();
             }
+            if let Some(ref mut wk) = yk.wrapping_key {
+                wk.zeroize();
+            }
         }
         s.entries.clear();
     }
     *session = None;
     Ok(())
+}
+
+/// Build a `VaultBody` snapshot from the current session state.
+fn build_body(session: &VaultSession) -> VaultBody {
+    VaultBody {
+        folders: session.folders.clone(),
+        entries: session.entries.clone(),
+        yubikey_aliases: session.yubikey_aliases.clone(),
+    }
 }
 
 /// Extracts YubiKey material from the session while the lock is held.
@@ -339,10 +364,7 @@ pub fn session_save() -> Result<(), String> {
     let (body, passphrase, path, yubikey) = {
         let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_ref().ok_or("Vault is locked")?;
-        let body = VaultBody {
-            folders: session.folders.clone(),
-            entries: session.entries.clone(),
-        };
+        let body = build_body(session);
         let yubikey = extract_yubikey(session);
         (
             body,
@@ -365,10 +387,7 @@ pub fn session_create_entry(entry: VaultEntry) -> Result<EntrySummaryData, Strin
         let session = session.as_mut().ok_or("Vault is locked")?;
         summary = entry_to_summary(&entry);
         session.entries.push(entry);
-        let body = VaultBody {
-            folders: session.folders.clone(),
-            entries: session.entries.clone(),
-        };
+        let body = build_body(session);
         let yubikey = extract_yubikey(session);
         (
             body,
@@ -389,10 +408,7 @@ pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Re
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         crate::api::vault::update_entry(&mut session.entries, updated, expiry_days)?;
-        let body = VaultBody {
-            folders: session.folders.clone(),
-            entries: session.entries.clone(),
-        };
+        let body = build_body(session);
         let yubikey = extract_yubikey(session);
         (
             body,
@@ -413,10 +429,7 @@ pub fn session_delete_entry(id: &str) -> Result<(), String> {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         crate::api::vault::delete_entry(&mut session.entries, id)?;
-        let body = VaultBody {
-            folders: session.folders.clone(),
-            entries: session.entries.clone(),
-        };
+        let body = build_body(session);
         let yubikey = extract_yubikey(session);
         (
             body,
@@ -470,10 +483,7 @@ pub fn session_change_passphrase(
         let hkdf_salt = yk.hkdf_salt;
         let credential_id = yk.credential_id.clone();
         load_vault_with_yubikey(old_passphrase, &secret, &hkdf_salt, &path)?;
-        let body = VaultBody {
-            folders: session.folders.clone(),
-            entries: session.entries.clone(),
-        };
+        let body = build_body(session);
         save_vault_with_yubikey(
             &body,
             new_passphrase,
@@ -484,10 +494,7 @@ pub fn session_change_passphrase(
         )?;
     } else {
         load_vault(old_passphrase, &path)?;
-        let body = VaultBody {
-            folders: session.folders.clone(),
-            entries: session.entries.clone(),
-        };
+        let body = build_body(session);
         save_vault(&body, new_passphrase, &path)?;
     }
 
@@ -515,10 +522,7 @@ pub fn session_clear_password_history(id: &str) -> Result<(), String> {
             }
             _ => return Err(format!("Entry {id} is not a Login entry")),
         }
-        let body = VaultBody {
-            folders: session.folders.clone(),
-            entries: session.entries.clone(),
-        };
+        let body = build_body(session);
         let yubikey = extract_yubikey(session);
         (
             body,
@@ -555,10 +559,7 @@ pub fn session_revert_password(id: &str) -> Result<(), String> {
             }
             _ => return Err(format!("Entry {id} is not a Login entry")),
         }
-        let body = VaultBody {
-            folders: session.folders.clone(),
-            entries: session.entries.clone(),
-        };
+        let body = build_body(session);
         let yubikey = extract_yubikey(session);
         (
             body,
@@ -703,10 +704,7 @@ pub fn session_rename_folder(old_name: String, new_name: String) -> Result<(), S
                 *folder = new_name.clone();
             }
         }
-        let body = VaultBody {
-            folders: session.folders.clone(),
-            entries: session.entries.clone(),
-        };
+        let body = build_body(session);
         let yubikey = extract_yubikey(session);
         (
             body,
@@ -752,10 +750,7 @@ pub fn session_delete_folder(name: String, reassign_to: Option<String>) -> Resul
                 *folder = target.clone();
             }
         }
-        let body = VaultBody {
-            folders: session.folders.clone(),
-            entries: session.entries.clone(),
-        };
+        let body = build_body(session);
         let yubikey = extract_yubikey(session);
         (
             body,
@@ -793,10 +788,7 @@ pub fn session_assign_folder_to_entries(ids: &[String], folder: String) -> Resul
                 *f = folder.clone();
             }
         }
-        let body = VaultBody {
-            folders: session.folders.clone(),
-            entries: session.entries.clone(),
-        };
+        let body = build_body(session);
         let yubikey = extract_yubikey(session);
         (
             body,
@@ -824,10 +816,7 @@ pub fn session_create_folder(name: String) -> Result<(), String> {
             return Err(format!("Folder already exists: {name}"));
         }
         session.folders.push(name);
-        let body = VaultBody {
-            folders: session.folders.clone(),
-            entries: session.entries.clone(),
-        };
+        let body = build_body(session);
         let yubikey = extract_yubikey(session);
         (
             body,
@@ -838,6 +827,94 @@ pub fn session_create_folder(name: String) -> Result<(), String> {
     }; // ← lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
+}
+
+// ── YubiKey key-management ────────────────────────────────────────────────────
+
+/// Add a new YubiKey to the vault header.
+///
+/// Requires a VERSION 4 vault (`wrapping_key` must be cached from unlock).
+/// Returns an error for legacy VERSION 2 single-key vaults.
+/// Enforces a maximum of 4 registered keys.
+pub fn session_add_yubikey(
+    new_cred_id: Vec<u8>,
+    new_hmac_secret: Vec<u8>,
+    new_salt: Vec<u8>,
+) -> Result<(), String> {
+    let (path, wrapping_key, vault_key_master) = {
+        let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_ref().ok_or("Vault is locked")?;
+        let yk = session.yubikey.as_ref().ok_or("Not a YubiKey vault")?;
+        let wk = yk
+            .wrapping_key
+            .as_ref()
+            .ok_or("Adding a YubiKey requires a VERSION 4 vault")?;
+        let master = yk
+            .vault_key_master
+            .as_ref()
+            .ok_or("Adding a YubiKey requires a VERSION 4 vault")?;
+        (
+            session.path.clone(),
+            Zeroizing::new(**wk),
+            Zeroizing::new(**master),
+        )
+    };
+    let hmac: [u8; 32] = new_hmac_secret
+        .as_slice()
+        .try_into()
+        .map_err(|_| "new_hmac_secret must be 32 bytes".to_string())?;
+    let salt: [u8; 32] = new_salt
+        .as_slice()
+        .try_into()
+        .map_err(|_| "new_salt must be 32 bytes".to_string())?;
+    add_yubikey_to_vault(
+        &wrapping_key,
+        &vault_key_master,
+        new_cred_id,
+        &hmac,
+        salt,
+        &path,
+    )
+}
+
+/// Remove a YubiKey record from the vault header by its credential ID.
+///
+/// Enforces a minimum of 1 key (removing the last key returns an error).
+pub fn session_remove_yubikey(cred_id: Vec<u8>) -> Result<(), String> {
+    let path = {
+        let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_ref().ok_or("Vault is locked")?;
+        session.path.clone()
+    };
+    remove_yubikey_from_vault(&cred_id, &path)
+}
+
+/// Set or update the display alias for a registered YubiKey.
+///
+/// `credential_id_hex` is the hex-encoded credential ID (key in `yubikey_aliases`).
+/// Stored in the encrypted vault body and persisted to disk immediately.
+pub fn session_set_yubikey_alias(credential_id_hex: String, alias: String) -> Result<(), String> {
+    let (body, passphrase, path, yubikey) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        session.yubikey_aliases.insert(credential_id_hex, alias);
+        let body = build_body(session);
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            Zeroizing::new(session.passphrase.clone()),
+            session.path.clone(),
+            yubikey,
+        )
+    };
+    do_save(&body, &passphrase, &path, yubikey)
+}
+
+/// Return a snapshot of all YubiKey aliases stored in the current session.
+pub fn session_list_yubikey_aliases() -> Result<std::collections::HashMap<String, String>, String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
+    Ok(session.yubikey_aliases.clone())
 }
 
 #[cfg(test)]
@@ -894,6 +971,7 @@ mod assign_folder_tests {
             &crate::vault::serialization::VaultBody {
                 folders: vec![String::from("Work")],
                 entries,
+                ..Default::default()
             },
             pass,
             &path,
@@ -942,6 +1020,7 @@ mod folder_tests {
             &VaultBody {
                 folders,
                 entries: vec![],
+                ..Default::default()
             },
             passphrase,
             &path,
@@ -1273,6 +1352,7 @@ mod autofill_tests {
             &VaultBody {
                 folders: vec![],
                 entries,
+                ..Default::default()
             },
             passphrase,
             &path,
@@ -1346,6 +1426,7 @@ mod autofill_tests {
             &VaultBody {
                 folders: vec![],
                 entries: vec![login, note],
+                ..Default::default()
             },
             pass,
             &path,
@@ -1422,6 +1503,7 @@ mod autofill_tests {
             &VaultBody {
                 folders: vec![],
                 entries: vec![login, note],
+                ..Default::default()
             },
             pass,
             &path,
@@ -1466,6 +1548,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries,
+                ..Default::default()
             },
             passphrase,
             &path,
@@ -1736,6 +1819,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries: vec![entry],
+                ..Default::default()
             },
             pass,
             &path,
@@ -1791,6 +1875,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries: vec![entry],
+                ..Default::default()
             },
             pass,
             &path,
@@ -1858,6 +1943,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries: vec![entry],
+                ..Default::default()
             },
             pass,
             &path,
@@ -1909,6 +1995,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries: vec![entry],
+                ..Default::default()
             },
             pass,
             &path,
@@ -1957,6 +2044,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries: vec![entry],
+                ..Default::default()
             },
             pass,
             &path,
@@ -2012,6 +2100,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries: vec![entry],
+                ..Default::default()
             },
             pass,
             &path,
@@ -2068,6 +2157,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries: vec![entry],
+                ..Default::default()
             },
             pass,
             &path,
@@ -2161,6 +2251,7 @@ mod yubikey_session_tests {
                 content: String::from("secret content"),
                 attachments: vec![],
             })],
+            ..Default::default()
         };
         save_vault_with_yubikey(&body, passphrase, &HMAC, CRED_ID.to_vec(), YK_SALT, &path)
             .unwrap();
@@ -2300,6 +2391,7 @@ mod yubikey_session_tests {
                 content: String::from("secret content"),
                 attachments: vec![],
             })],
+            ..Default::default()
         };
         let keys = [
             YubiKeyRegistration {
@@ -2376,6 +2468,278 @@ mod yubikey_session_tests {
         )
         .unwrap();
         assert_eq!(list_entry_summaries().unwrap().len(), 1);
+
+        teardown(&path);
+    }
+}
+
+#[cfg(test)]
+mod yubikey_mgmt_tests {
+    use super::*;
+    use crate::api::vault::save_vault_with_keys;
+    use crate::crypto::vault_crypto::YubiKeyRegistration;
+    use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+    use serial_test::serial;
+    use std::env::temp_dir;
+
+    fn setup_two_key_vault(passphrase: &[u8], suffix: &str) -> std::path::PathBuf {
+        let mut path = temp_dir();
+        path.push(format!("gabbro_yk_mgmt_{suffix}.gabbro"));
+        let body = VaultBody {
+            folders: vec![],
+            entries: vec![VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("mgmt-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from(""),
+                },
+                title: String::from("Key mgmt test note"),
+                content: String::from("secret"),
+                attachments: vec![],
+            })],
+            ..Default::default()
+        };
+        let keys = [
+            YubiKeyRegistration {
+                credential_id: vec![0x01u8; 64],
+                hmac_secret: [0x11u8; 32],
+                salt: [0x22u8; 32],
+            },
+            YubiKeyRegistration {
+                credential_id: vec![0x02u8; 48],
+                hmac_secret: [0x33u8; 32],
+                salt: [0x44u8; 32],
+            },
+        ];
+        save_vault_with_keys(&body, passphrase, &keys, &path).unwrap();
+        path
+    }
+
+    fn teardown(path: &std::path::PathBuf) {
+        let _ = lock_vault();
+        let _ = std::fs::remove_file(path);
+    }
+
+    // ── session_add_yubikey ───────────────────────────────────────────────────
+
+    #[test]
+    #[serial]
+    fn add_yubikey_succeeds_on_v4_vault() {
+        let pass = b"add-key-pass";
+        let path = setup_two_key_vault(pass, "add");
+
+        unlock_vault_with_key_record(
+            pass,
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            path.clone(),
+        )
+        .unwrap();
+        session_add_yubikey(vec![0x03u8; 32], vec![0x55u8; 32], vec![0x66u8; 32]).unwrap();
+        lock_vault().unwrap();
+
+        // New credential must be able to unlock
+        unlock_vault_with_key_record(
+            pass,
+            &[0x55u8; 32],
+            vec![0x03u8; 32],
+            &[0x66u8; 32],
+            path.clone(),
+        )
+        .unwrap();
+        assert_eq!(list_entry_summaries().unwrap().len(), 1);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn add_yubikey_fails_on_legacy_vault() {
+        use crate::api::vault::save_vault_with_yubikey;
+
+        let pass = b"legacy-add-key-pass";
+        let mut path = temp_dir();
+        path.push("gabbro_yk_mgmt_legacy.gabbro");
+        let body = VaultBody {
+            ..Default::default()
+        };
+        save_vault_with_yubikey(
+            &body,
+            pass,
+            &[0xAAu8; 32],
+            vec![0xBBu8; 64],
+            [0xCCu8; 32],
+            &path,
+        )
+        .unwrap();
+
+        // Legacy unlock → wrapping_key is None
+        unlock_vault_with_yubikey(
+            pass,
+            &[0xAAu8; 32],
+            vec![0xBBu8; 64],
+            &[0xCCu8; 32],
+            path.clone(),
+        )
+        .unwrap();
+        let result = session_add_yubikey(vec![0x03u8; 32], vec![0x55u8; 32], vec![0x66u8; 32]);
+        assert!(result.is_err(), "add must fail on legacy VERSION 2 vault");
+
+        teardown(&path);
+    }
+
+    // ── session_remove_yubikey ────────────────────────────────────────────────
+
+    #[test]
+    #[serial]
+    fn remove_yubikey_reduces_key_count() {
+        let pass = b"remove-key-pass";
+        let path = setup_two_key_vault(pass, "remove");
+
+        unlock_vault_with_key_record(
+            pass,
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            path.clone(),
+        )
+        .unwrap();
+        session_remove_yubikey(vec![0x02u8; 48]).unwrap();
+        lock_vault().unwrap();
+
+        // Removed key must no longer work
+        let result = unlock_vault_with_key_record(
+            pass,
+            &[0x33u8; 32],
+            vec![0x02u8; 48],
+            &[0x44u8; 32],
+            path.clone(),
+        );
+        assert!(result.is_err(), "removed key must not unlock");
+
+        // Remaining key must still work
+        unlock_vault_with_key_record(
+            pass,
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            path.clone(),
+        )
+        .unwrap();
+        assert_eq!(list_entry_summaries().unwrap().len(), 1);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn remove_last_yubikey_returns_error() {
+        let pass = b"remove-last-pass";
+        let mut path = temp_dir();
+        path.push("gabbro_yk_mgmt_remove_last.gabbro");
+        let body = VaultBody {
+            ..Default::default()
+        };
+        let keys = [YubiKeyRegistration {
+            credential_id: vec![0x01u8; 64],
+            hmac_secret: [0x11u8; 32],
+            salt: [0x22u8; 32],
+        }];
+        save_vault_with_keys(&body, pass, &keys, &path).unwrap();
+
+        unlock_vault_with_key_record(
+            pass,
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            path.clone(),
+        )
+        .unwrap();
+        let result = session_remove_yubikey(vec![0x01u8; 64]);
+        assert!(result.is_err(), "cannot remove the last registered key");
+
+        teardown(&path);
+    }
+
+    // ── session_set_yubikey_alias / session_list_yubikey_aliases ─────────────
+
+    #[test]
+    #[serial]
+    fn set_and_list_aliases_round_trips() {
+        let pass = b"alias-pass";
+        let path = setup_two_key_vault(pass, "alias_roundtrip");
+
+        unlock_vault_with_key_record(
+            pass,
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            path.clone(),
+        )
+        .unwrap();
+        session_set_yubikey_alias(String::from("aabb"), String::from("Primary")).unwrap();
+        session_set_yubikey_alias(String::from("ccdd"), String::from("Backup")).unwrap();
+
+        let aliases = session_list_yubikey_aliases().unwrap();
+        assert_eq!(aliases.get("aabb").map(|s| s.as_str()), Some("Primary"));
+        assert_eq!(aliases.get("ccdd").map(|s| s.as_str()), Some("Backup"));
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn alias_persists_across_lock_unlock() {
+        let pass = b"alias-persist-pass";
+        let path = setup_two_key_vault(pass, "alias_persist");
+
+        unlock_vault_with_key_record(
+            pass,
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            path.clone(),
+        )
+        .unwrap();
+        session_set_yubikey_alias(String::from("aabb"), String::from("Main")).unwrap();
+        lock_vault().unwrap();
+
+        unlock_vault_with_key_record(
+            pass,
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            path.clone(),
+        )
+        .unwrap();
+        let aliases = session_list_yubikey_aliases().unwrap();
+        assert_eq!(
+            aliases.get("aabb").map(|s| s.as_str()),
+            Some("Main"),
+            "alias must survive lock/unlock cycle"
+        );
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn list_aliases_empty_on_fresh_vault() {
+        let pass = b"alias-empty-pass";
+        let path = setup_two_key_vault(pass, "alias_empty");
+
+        unlock_vault_with_key_record(
+            pass,
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            path.clone(),
+        )
+        .unwrap();
+        let aliases = session_list_yubikey_aliases().unwrap();
+        assert!(aliases.is_empty(), "fresh vault must have no aliases");
 
         teardown(&path);
     }

@@ -66,6 +66,11 @@ Future<void> main() async {
 abstract class GabbroAppState {
   AppSettings get settings;
   Future<void> updateSettings(AppSettings updated);
+  /// Pause the foreground inactivity lock timer for the duration of a
+  /// hardware operation (e.g. YubiKey tap).  Call [resumeForegroundLock]
+  /// when the operation finishes (success or failure).
+  void suspendForegroundLock();
+  void resumeForegroundLock();
 }
 
 ThemeData gabbroLightTheme({required bool highContrast}) {
@@ -184,9 +189,24 @@ class _GabbroAppState extends State<GabbroApp>
 
   void _resetForegroundTimer() {
     _foregroundTimer?.cancel();
+    if (_foregroundSuspended) return;
     final duration = _foregroundDuration;
     if (duration == null) return;
     _foregroundTimer = Timer(duration, _lock);
+  }
+
+  bool _foregroundSuspended = false;
+
+  @override
+  void suspendForegroundLock() {
+    _foregroundSuspended = true;
+    _foregroundTimer?.cancel();
+  }
+
+  @override
+  void resumeForegroundLock() {
+    _foregroundSuspended = false;
+    _resetForegroundTimer();
   }
 
   // ── Background timer ──────────────────────────────────────────────────────

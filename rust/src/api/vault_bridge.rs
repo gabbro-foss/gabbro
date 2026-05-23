@@ -672,6 +672,61 @@ pub async fn init_vault_with_yubikey(
     session::unlock_vault_with_yubikey(&passphrase, &secret, credential_id, &salt, vault_path)
 }
 
+// ── YubiKey key-management bridge ─────────────────────────────────────────────
+
+/// Alias record for one registered YubiKey, returned by `list_yubikey_aliases`.
+pub struct YubikeyAliasData {
+    /// Hex-encoded credential ID (map key in the vault body).
+    pub credential_id_hex: String,
+    /// User-supplied display name; empty string if no alias has been set.
+    pub alias: String,
+}
+
+/// Return all YubiKey aliases stored in the current session.
+///
+/// Sync — reads from in-memory session, no I/O.
+#[flutter_rust_bridge::frb(sync)]
+pub fn list_yubikey_aliases() -> Result<Vec<YubikeyAliasData>, String> {
+    let map = session::session_list_yubikey_aliases()?;
+    Ok(map
+        .into_iter()
+        .map(|(credential_id_hex, alias)| YubikeyAliasData {
+            credential_id_hex,
+            alias,
+        })
+        .collect())
+}
+
+/// Set or update the display alias for a registered YubiKey.
+///
+/// `credential_id_hex` is the hex-encoded credential ID.
+/// Async — triggers a full vault body save.
+pub async fn set_yubikey_alias(credential_id_hex: String, alias: String) -> Result<(), String> {
+    session::session_set_yubikey_alias(credential_id_hex, alias)
+}
+
+/// Add a new YubiKey to the vault.
+///
+/// Requires a VERSION 4 vault (wrapping_key must be cached from unlock).
+/// Returns `Err` if the vault already has 4 keys or `new_cred_id` is already registered.
+/// `new_hmac_secret` and `new_salt` must each be exactly 32 bytes.
+/// Async — writes the updated vault header to disk.
+pub async fn add_yubikey(
+    new_cred_id: Vec<u8>,
+    new_hmac_secret: Vec<u8>,
+    new_salt: Vec<u8>,
+) -> Result<(), String> {
+    session::session_add_yubikey(new_cred_id, new_hmac_secret, new_salt)
+}
+
+/// Remove a YubiKey from the vault by credential ID.
+///
+/// Enforces a minimum of 1 remaining key.
+/// Async — writes the updated vault header to disk.
+pub async fn remove_yubikey(cred_id: Vec<u8>) -> Result<(), String> {
+    session::session_remove_yubikey(cred_id)
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -710,6 +765,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries,
+                ..Default::default()
             },
             pass,
             &path,
@@ -752,6 +808,7 @@ mod tests {
             &VaultBody {
                 folders: folders.clone(),
                 entries: vec![],
+                ..Default::default()
             },
             pass,
             &path,
@@ -784,6 +841,7 @@ mod tests {
             &VaultBody {
                 folders: vec![String::from("Work")],
                 entries: vec![],
+                ..Default::default()
             },
             pass,
             &path,
@@ -819,6 +877,7 @@ mod tests {
             &VaultBody {
                 folders: vec![String::from("Work")],
                 entries: vec![],
+                ..Default::default()
             },
             pass,
             &path,
@@ -860,6 +919,7 @@ mod tests {
             &VaultBody {
                 folders: vec![String::from("Work"), String::from("Private")],
                 entries: vec![],
+                ..Default::default()
             },
             pass,
             &path,
@@ -919,6 +979,7 @@ mod tests {
             &VaultBody {
                 folders: vec![String::from("Work")],
                 entries,
+                ..Default::default()
             },
             pass,
             &path,
@@ -992,6 +1053,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries,
+                ..Default::default()
             },
             pass,
             &path,

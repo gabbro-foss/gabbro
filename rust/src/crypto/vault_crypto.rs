@@ -351,14 +351,16 @@ pub fn seal_vault_with_keys(
 /// Legacy VERSION 2 path (key_blob empty, passphrase_blob empty):
 ///   intermediate_key → combine_yubikey(intermediate_key, hmac, salt) → body.
 ///
-/// Returns `(plaintext, vault_key_master)`.  The caller should cache
-/// `vault_key_master` in the session for subsequent CRUD re-seals.
+/// Returns `(plaintext, vault_key_master, wrapping_key)`.  The caller should cache
+/// both in the session for CRUD re-seals and future key-add operations.
+/// For VERSION 2 vaults `wrapping_key` is `None` — add/remove key is not supported.
+#[allow(clippy::type_complexity)]
 pub fn open_vault_with_key_record(
     passphrase: &[u8],
     hmac_secret: &[u8; 32],
     credential_id: &[u8],
     sealed: &SealedVault,
-) -> Result<(Vec<u8>, Zeroizing<[u8; 32]>), String> {
+) -> Result<(Vec<u8>, Zeroizing<[u8; 32]>, Option<Zeroizing<[u8; 32]>>), String> {
     let kdf_output = Zeroizing::new(derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?);
     let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
     let ml_kem_keypair = MlKemKeypair::from_kdf_output(&kdf_output);
@@ -404,7 +406,8 @@ pub fn open_vault_with_key_record(
             &record.salt,
         ));
         let plaintext = aes_gcm::decrypt(&wrap_key, &sealed.ciphertext, &sealed.nonce)?;
-        return Ok((plaintext, wrap_key));
+        // V2 has no separate wrapping_key — key add/remove not supported on legacy vaults.
+        return Ok((plaintext, wrap_key, None));
     }
 
     // VERSION 4: decrypt passphrase_blob → wrapping_key, then unwrap key_blob.
@@ -444,7 +447,74 @@ pub fn open_vault_with_key_record(
     );
 
     let plaintext = aes_gcm::decrypt(&vault_key_master, &sealed.ciphertext, &sealed.nonce)?;
-    Ok((plaintext, vault_key_master))
+    Ok((plaintext, vault_key_master, Some(wrapping_key)))
+}
+
+/// Add a new YubiKey record to a VERSION 4 vault without re-sealing the body.
+///
+/// Requires `wrapping_key` and `vault_key_master` from the active session — both
+/// are cached at unlock time so the user needs only one existing-key tap to authorise.
+/// Returns `Err` if the vault already has 4 keys or the credential_id is already
+/// registered.
+pub fn add_key_to_sealed(
+    sealed: &SealedVault,
+    new_cred_id: Vec<u8>,
+    new_hmac: &[u8; 32],
+    new_salt: [u8; 32],
+    wrapping_key: &[u8; 32],
+    vault_key_master: &[u8; 32],
+) -> Result<SealedVault, String> {
+    if sealed.yubikey_records.len() >= 4 {
+        return Err(format!(
+            "maximum 4 YubiKeys; vault already has {}",
+            sealed.yubikey_records.len()
+        ));
+    }
+    if sealed
+        .yubikey_records
+        .iter()
+        .any(|r| r.credential_id == new_cred_id)
+    {
+        return Err("credential_id already registered in this vault".to_string());
+    }
+    let wrap_key = Zeroizing::new(combine_yubikey(wrapping_key, new_hmac, &new_salt));
+    let (blob_ct, blob_nonce) = aes_gcm::encrypt(&wrap_key, vault_key_master)?;
+    let mut key_blob = Vec::with_capacity(60);
+    key_blob.extend_from_slice(&blob_nonce);
+    key_blob.extend_from_slice(&blob_ct);
+    let mut new_records = sealed.yubikey_records.clone();
+    new_records.push(YubiKeyRecord {
+        credential_id: new_cred_id,
+        salt: new_salt,
+        key_blob,
+    });
+    Ok(SealedVault {
+        yubikey_records: new_records,
+        ..sealed.clone()
+    })
+}
+
+/// Remove a YubiKey record from a vault.
+///
+/// Enforces a minimum of 1 remaining record — callers that wish to enforce
+/// the ADR-010 minimum-2 invariant at vault creation should do so before calling
+/// this.  Returns `Err` if the credential_id is not found or only one record
+/// remains.
+pub fn remove_key_from_sealed(sealed: &SealedVault, cred_id: &[u8]) -> Result<SealedVault, String> {
+    let pos = sealed
+        .yubikey_records
+        .iter()
+        .position(|r| r.credential_id == cred_id)
+        .ok_or_else(|| "credential_id not found in vault".to_string())?;
+    if sealed.yubikey_records.len() <= 1 {
+        return Err("cannot remove the last YubiKey from the vault".to_string());
+    }
+    let mut new_records = sealed.yubikey_records.clone();
+    new_records.remove(pos);
+    Ok(SealedVault {
+        yubikey_records: new_records,
+        ..sealed.clone()
+    })
 }
 
 /// Re-seals a vault body using a cached `vault_key_master` and the existing header.
@@ -838,7 +908,7 @@ mod tests {
         let keys = two_test_keys();
         let plaintext = b"my secret vault data";
         let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
-        let (recovered, _master) = open_vault_with_key_record(
+        let (recovered, _master, _wk) = open_vault_with_key_record(
             b"passphrase",
             &keys[0].hmac_secret,
             &keys[0].credential_id,
@@ -853,7 +923,7 @@ mod tests {
         let keys = two_test_keys();
         let plaintext = b"my secret vault data";
         let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
-        let (recovered, _master) = open_vault_with_key_record(
+        let (recovered, _master, _wk) = open_vault_with_key_record(
             b"passphrase",
             &keys[1].hmac_secret,
             &keys[1].credential_id,
@@ -903,14 +973,14 @@ mod tests {
         let keys = two_test_keys();
         let plaintext = b"consistent decryption";
         let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
-        let (pt1, _) = open_vault_with_key_record(
+        let (pt1, _, _) = open_vault_with_key_record(
             b"passphrase",
             &keys[0].hmac_secret,
             &keys[0].credential_id,
             &sealed,
         )
         .unwrap();
-        let (pt2, _) = open_vault_with_key_record(
+        let (pt2, _, _) = open_vault_with_key_record(
             b"passphrase",
             &keys[1].hmac_secret,
             &keys[1].credential_id,
@@ -928,7 +998,7 @@ mod tests {
         let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
         let bytes = sealed.to_bytes();
         let recovered_sealed = SealedVault::from_bytes(&bytes).unwrap();
-        let (pt, _) = open_vault_with_key_record(
+        let (pt, _, _) = open_vault_with_key_record(
             b"passphrase",
             &keys[1].hmac_secret,
             &keys[1].credential_id,
@@ -951,7 +1021,7 @@ mod tests {
         let plaintext = b"initial body";
         let new_plaintext = b"updated body after CRUD";
         let mut sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
-        let (_, master) = open_vault_with_key_record(
+        let (_, master, _) = open_vault_with_key_record(
             b"passphrase",
             &keys[0].hmac_secret,
             &keys[0].credential_id,
@@ -959,7 +1029,7 @@ mod tests {
         )
         .unwrap();
         reseal_vault_body(&mut sealed, &master, new_plaintext).unwrap();
-        let (recovered, _) = open_vault_with_key_record(
+        let (recovered, _, _) = open_vault_with_key_record(
             b"passphrase",
             &keys[1].hmac_secret,
             &keys[1].credential_id,
@@ -1027,7 +1097,7 @@ mod tests {
         let new_sealed =
             change_vault_passphrase_with_keys(&sealed, b"old-pass", b"new-pass").unwrap();
 
-        let (pt0, _) = open_vault_with_key_record(
+        let (pt0, _, _) = open_vault_with_key_record(
             b"new-pass",
             &keys[0].hmac_secret,
             &keys[0].credential_id,
@@ -1036,7 +1106,7 @@ mod tests {
         .unwrap();
         assert_eq!(pt0, plaintext);
 
-        let (pt1, _) = open_vault_with_key_record(
+        let (pt1, _, _) = open_vault_with_key_record(
             b"new-pass",
             &keys[1].hmac_secret,
             &keys[1].credential_id,
@@ -1065,7 +1135,7 @@ mod tests {
         let bytes = new_sealed.to_bytes();
         let restored = SealedVault::from_bytes(&bytes).unwrap();
 
-        let (pt, _) = open_vault_with_key_record(
+        let (pt, _, _) = open_vault_with_key_record(
             b"new",
             &keys[0].hmac_secret,
             &keys[0].credential_id,
@@ -1073,5 +1143,199 @@ mod tests {
         )
         .unwrap();
         assert_eq!(pt, plaintext);
+    }
+
+    // ── add_key_to_sealed / remove_key_from_sealed ────────────────────────────
+
+    #[test]
+    fn add_key_to_sealed_adds_third_record() {
+        let keys = two_test_keys();
+        let plaintext = b"vault body";
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
+
+        let (_, master, wk) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+        let wrapping_key = wk.unwrap();
+
+        let new_cred_id = vec![0x03u8; 64];
+        let new_hmac = [0x55u8; 32];
+        let new_salt = [0x66u8; 32];
+
+        let new_sealed = add_key_to_sealed(
+            &sealed,
+            new_cred_id.clone(),
+            &new_hmac,
+            new_salt,
+            &wrapping_key,
+            &master,
+        )
+        .unwrap();
+
+        assert_eq!(new_sealed.yubikey_records.len(), 3);
+        assert_eq!(new_sealed.yubikey_records[2].credential_id, new_cred_id);
+        assert_eq!(new_sealed.yubikey_records[2].key_blob.len(), 60);
+    }
+
+    #[test]
+    fn added_key_can_decrypt_vault_body() {
+        let keys = two_test_keys();
+        let plaintext = b"decryptable by new key";
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
+
+        let (_, master, wk) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+        let wrapping_key = wk.unwrap();
+
+        let new_cred_id = vec![0x03u8; 64];
+        let new_hmac = [0x77u8; 32];
+        let new_salt = [0x88u8; 32];
+
+        let new_sealed = add_key_to_sealed(
+            &sealed,
+            new_cred_id.clone(),
+            &new_hmac,
+            new_salt,
+            &wrapping_key,
+            &master,
+        )
+        .unwrap();
+
+        let (recovered, _, _) =
+            open_vault_with_key_record(b"passphrase", &new_hmac, &new_cred_id, &new_sealed)
+                .unwrap();
+        assert_eq!(recovered, plaintext);
+    }
+
+    #[test]
+    fn add_key_rejects_duplicate_credential_id() {
+        let keys = two_test_keys();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        let (_, master, wk) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+        let wrapping_key = wk.unwrap();
+
+        let result = add_key_to_sealed(
+            &sealed,
+            keys[0].credential_id.clone(),
+            &keys[0].hmac_secret,
+            keys[0].salt,
+            &wrapping_key,
+            &master,
+        );
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("already registered"));
+    }
+
+    #[test]
+    fn add_key_rejects_when_at_max_four() {
+        // Build a vault with 4 keys by adding them one at a time.
+        let keys = two_test_keys();
+        let sealed0 = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        let (_, master, wk) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed0,
+        )
+        .unwrap();
+        let wrapping_key = wk.unwrap();
+
+        let sealed1 = add_key_to_sealed(
+            &sealed0,
+            vec![0x03u8; 64],
+            &[0x33u8; 32],
+            [0x44u8; 32],
+            &wrapping_key,
+            &master,
+        )
+        .unwrap();
+        let sealed2 = add_key_to_sealed(
+            &sealed1,
+            vec![0x04u8; 64],
+            &[0x55u8; 32],
+            [0x66u8; 32],
+            &wrapping_key,
+            &master,
+        )
+        .unwrap();
+        assert_eq!(sealed2.yubikey_records.len(), 4);
+
+        let result = add_key_to_sealed(
+            &sealed2,
+            vec![0x05u8; 64],
+            &[0x77u8; 32],
+            [0x88u8; 32],
+            &wrapping_key,
+            &master,
+        );
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("maximum 4"));
+    }
+
+    #[test]
+    fn remove_key_from_sealed_removes_correct_record() {
+        let keys = two_test_keys();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+
+        let new_sealed = remove_key_from_sealed(&sealed, &keys[0].credential_id).unwrap();
+
+        assert_eq!(new_sealed.yubikey_records.len(), 1);
+        assert_eq!(
+            new_sealed.yubikey_records[0].credential_id,
+            keys[1].credential_id
+        );
+    }
+
+    #[test]
+    fn remove_key_rejects_last_key() {
+        let keys = two_test_keys();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        let one_key = remove_key_from_sealed(&sealed, &keys[0].credential_id).unwrap();
+
+        let result = remove_key_from_sealed(&one_key, &keys[1].credential_id);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("last YubiKey"));
+    }
+
+    #[test]
+    fn remove_key_rejects_unknown_credential_id() {
+        let keys = two_test_keys();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+
+        let result = remove_key_from_sealed(&sealed, &[0xFFu8; 32]);
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("not found"));
+    }
+
+    #[test]
+    fn remaining_key_still_decrypts_after_removal() {
+        let keys = two_test_keys();
+        let plaintext = b"still readable after removal";
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
+        let new_sealed = remove_key_from_sealed(&sealed, &keys[0].credential_id).unwrap();
+
+        let (recovered, _, _) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[1].hmac_secret,
+            &keys[1].credential_id,
+            &new_sealed,
+        )
+        .unwrap();
+        assert_eq!(recovered, plaintext);
     }
 }

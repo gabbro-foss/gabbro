@@ -227,6 +227,47 @@ Future<void> initVaultWithYubikey({
   path: path,
 );
 
+/// Return all YubiKey aliases stored in the current session.
+///
+/// Sync — reads from in-memory session, no I/O.
+List<YubikeyAliasData> listYubikeyAliases() =>
+    RustLib.instance.api.crateApiVaultBridgeListYubikeyAliases();
+
+/// Set or update the display alias for a registered YubiKey.
+///
+/// `credential_id_hex` is the hex-encoded credential ID.
+/// Async — triggers a full vault body save.
+Future<void> setYubikeyAlias({
+  required String credentialIdHex,
+  required String alias,
+}) => RustLib.instance.api.crateApiVaultBridgeSetYubikeyAlias(
+  credentialIdHex: credentialIdHex,
+  alias: alias,
+);
+
+/// Add a new YubiKey to the vault.
+///
+/// Requires a VERSION 4 vault (wrapping_key must be cached from unlock).
+/// Returns `Err` if the vault already has 4 keys or `new_cred_id` is already registered.
+/// `new_hmac_secret` and `new_salt` must each be exactly 32 bytes.
+/// Async — writes the updated vault header to disk.
+Future<void> addYubikey({
+  required List<int> newCredId,
+  required List<int> newHmacSecret,
+  required List<int> newSalt,
+}) => RustLib.instance.api.crateApiVaultBridgeAddYubikey(
+  newCredId: newCredId,
+  newHmacSecret: newHmacSecret,
+  newSalt: newSalt,
+);
+
+/// Remove a YubiKey from the vault by credential ID.
+///
+/// Enforces a minimum of 1 remaining key.
+/// Async — writes the updated vault header to disk.
+Future<void> removeYubikey({required List<int> credId}) =>
+    RustLib.instance.api.crateApiVaultBridgeRemoveYubikey(credId: credId);
+
 /// Lightweight entry summary returned by `list_entry_summaries()`.
 ///
 /// Contains just enough for Flutter to render a list row — no secrets.
@@ -297,6 +338,28 @@ class YubiKeyInitData {
           credentialId == other.credentialId &&
           hmacSecret == other.hmacSecret &&
           hkdfSalt == other.hkdfSalt;
+}
+
+/// Alias record for one registered YubiKey, returned by `list_yubikey_aliases`.
+class YubikeyAliasData {
+  /// Hex-encoded credential ID (map key in the vault body).
+  final String credentialIdHex;
+
+  /// User-supplied display name; empty string if no alias has been set.
+  final String alias;
+
+  const YubikeyAliasData({required this.credentialIdHex, required this.alias});
+
+  @override
+  int get hashCode => credentialIdHex.hashCode ^ alias.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is YubikeyAliasData &&
+          runtimeType == other.runtimeType &&
+          credentialIdHex == other.credentialIdHex &&
+          alias == other.alias;
 }
 
 /// YubiKey credential record returned by `list_vault_yubikey_records`.

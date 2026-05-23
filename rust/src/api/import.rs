@@ -363,6 +363,7 @@ mod tests {
             &VaultBody {
                 folders: vec![],
                 entries,
+                ..Default::default()
             },
             passphrase,
             &path,
@@ -665,6 +666,7 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
             &VaultBody {
                 folders: vec![],
                 entries,
+                ..Default::default()
             },
             passphrase,
             &path,

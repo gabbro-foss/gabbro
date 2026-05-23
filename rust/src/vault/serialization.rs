@@ -10,15 +10,21 @@
 
 use crate::vault::entry::VaultEntry;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// Default folders applied to new vaults and legacy vaults on migration.
 pub const DEFAULT_FOLDERS: [&str; 3] = ["Work", "Private", "Other"];
 
 /// The complete decrypted vault body — folders list plus all entries.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+///
+/// `yubikey_aliases` is optional at the JSON level (`#[serde(default)]`) so vaults
+/// written by older builds (without the field) deserialise cleanly with an empty map.
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct VaultBody {
     pub folders: Vec<String>,
     pub entries: Vec<VaultEntry>,
+    #[serde(default)]
+    pub yubikey_aliases: HashMap<String, String>,
 }
 
 impl VaultBody {
@@ -27,6 +33,7 @@ impl VaultBody {
         VaultBody {
             folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
             entries: vec![],
+            yubikey_aliases: HashMap::new(),
         }
     }
 }
@@ -53,6 +60,7 @@ pub fn deserialize_vault_body(bytes: &[u8]) -> Result<VaultBody, String> {
         return Ok(VaultBody {
             folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
             entries,
+            yubikey_aliases: HashMap::new(),
         });
     }
     serde_json::from_slice(bytes).map_err(|e| format!("Failed to deserialize vault body: {e}"))
@@ -106,6 +114,7 @@ mod tests {
                 content: String::from("Hello"),
                 attachments: vec![],
             })],
+            ..Default::default()
         };
         let bytes = serialize_vault_body(&body).unwrap();
         let recovered = deserialize_vault_body(&bytes).unwrap();
@@ -166,6 +175,7 @@ mod tests {
         let body = VaultBody {
             folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
             entries: vec![entry],
+            ..Default::default()
         };
         let bytes = serialize_vault_body(&body).unwrap();
         let recovered = deserialize_vault_body(&bytes).unwrap();
@@ -207,6 +217,7 @@ mod tests {
         let body = VaultBody {
             folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
             entries,
+            ..Default::default()
         };
         let bytes = serialize_vault_body(&body).unwrap();
         let recovered = deserialize_vault_body(&bytes).unwrap();
@@ -220,6 +231,32 @@ mod tests {
     }
 
     #[test]
+    fn yubikey_aliases_defaults_when_absent_from_json() {
+        // Simulates an old vault body that predates the yubikey_aliases field.
+        let legacy_json = br#"{"folders":["Work","Private"],"entries":[]}"#;
+        let body = deserialize_vault_body(legacy_json).unwrap();
+        assert!(
+            body.yubikey_aliases.is_empty(),
+            "missing yubikey_aliases must default to empty map"
+        );
+    }
+
+    #[test]
+    fn yubikey_aliases_roundtrips() {
+        let mut aliases = HashMap::new();
+        aliases.insert(String::from("aabbcc"), String::from("main"));
+        aliases.insert(String::from("ddeeff"), String::from("backup1"));
+        let body = VaultBody {
+            folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
+            entries: vec![],
+            yubikey_aliases: aliases.clone(),
+        };
+        let bytes = serialize_vault_body(&body).unwrap();
+        let recovered = deserialize_vault_body(&bytes).unwrap();
+        assert_eq!(recovered.yubikey_aliases, aliases);
+    }
+
+    #[test]
     fn serialized_bytes_are_valid_utf8_json() {
         let entry = VaultEntry::Note(NoteEntry {
             meta: default_meta("id-001"),
@@ -230,6 +267,7 @@ mod tests {
         let body = VaultBody {
             folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
             entries: vec![entry],
+            ..Default::default()
         };
         let bytes = serialize_vault_body(&body).unwrap();
         let json_str = std::str::from_utf8(&bytes).expect("bytes should be valid UTF-8");

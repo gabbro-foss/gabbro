@@ -146,6 +146,15 @@ object YubiKeyManager {
                 RP_ID,
             )
 
+            // Pre-compute hmac-secret key agreement BEFORE the user-touch makeCredential.
+            // On USB HID, calling getSharedSecret() after a touch can corrupt the channel
+            // state and cause "wrong channel id" errors on the subsequent getAssertions call.
+            val keyAgreementResult = clientPin.getSharedSecret()
+            val platformKey = keyAgreementResult.first
+            val sharedSecret = keyAgreementResult.second
+            val encryptedSalt = pinProtocol.encrypt(sharedSecret, salt)
+            val saltAuth = pinProtocol.authenticate(sharedSecret, encryptedSalt)
+
             // 1. makeCredential — one tap here
             val mcClientDataHash = ByteArray(32).also { SecureRandom().nextBytes(it) }
             val pinUvAuthParamMC = pinProtocol.authenticate(pinToken, mcClientDataHash)
@@ -168,12 +177,6 @@ object YubiKeyManager {
                 ?: error("No attested credential data in makeCredential response")
 
             // 2. getAssertions for hmac-secret — reuse same token, up=false, no second tap
-            val keyAgreementResult = clientPin.getSharedSecret()
-            val platformKey = keyAgreementResult.first
-            val sharedSecret = keyAgreementResult.second
-            val encryptedSalt = pinProtocol.encrypt(sharedSecret, salt)
-            val saltAuth = pinProtocol.authenticate(sharedSecret, encryptedSalt)
-
             val gaClientDataHash = ByteArray(32).also { SecureRandom().nextBytes(it) }
             val pinUvAuthParamGA = pinProtocol.authenticate(pinToken, gaClientDataHash)
 

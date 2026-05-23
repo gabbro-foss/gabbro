@@ -350,7 +350,7 @@ mod tests {
 
         assert_eq!(entry.custom_fields.len(), 1);
         assert_eq!(entry.custom_fields[0].label, "Recovery email");
-        assert_eq!(entry.custom_fields[0].hidden, false);
+        assert!(!entry.custom_fields[0].hidden);
     }
 
     #[test]
