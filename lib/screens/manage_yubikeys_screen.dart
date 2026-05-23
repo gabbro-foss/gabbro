@@ -259,59 +259,90 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     final salt = Uint8List.fromList(
         List.generate(32, (_) => Random.secure().nextInt(256)));
 
-    // Cancellable progress dialog — lets the user abort if no key is present.
+    final isNfc = transport == 'nfc';
+    // step: 0 = step 1 in progress, 1 = step 1 done / step 2 in progress
+    final stepNotifier = ValueNotifier<int>(0);
+    String? credIdHex;
+
     _progressShown = true;
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Tap your new YubiKey…', textAlign: TextAlign.center),
+      builder: (ctx) => ValueListenableBuilder<int>(
+        valueListenable: stepNotifier,
+        builder: (ctx, step, _) => AlertDialog(
+          title: const Text('Add YubiKey'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _stepRow(
+                ctx,
+                label: isNfc
+                    ? 'Hold key to phone to register'
+                    : 'Once connected, tap the key to register',
+                done: step >= 1,
+                active: step == 0,
+              ),
+              const SizedBox(height: 16),
+              _stepRow(
+                ctx,
+                label: isNfc
+                    ? 'Hold key to phone again to activate'
+                    : 'Once connected, tap the key again to activate',
+                done: false,
+                active: step == 1,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                _progressShown = false;
+                Navigator.of(ctx).pop();
+              },
+              child: const Text('Cancel'),
+            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _progressShown = false;
-              Navigator.of(ctx).pop();
-            },
-            child: const Text('Cancel'),
-          ),
-        ],
       ),
     ).then((_) => _progressShown = false);
 
     try {
-      final result = await _yubikeyChannel
-          .invokeMethod<Map<Object?, Object?>>('register_and_get_hmac', {
-        'salt': _toHex(salt),
-        'pin': pin,
-        'transport': transport,
-      });
+      // Step 1: register — obtain credentialId.
+      final cred = await _yubikeyChannel.invokeMethod<String>(
+        'register',
+        {'pin': pin, 'transport': transport},
+      );
+      if (!mounted) return;
+      if (cred == null) throw Exception('No result from YubiKey');
+      credIdHex = cred;
+      stepNotifier.value = 1;
 
+      if (!mounted) return;
+
+      // Step 2: get_hmac_secret — obtain HMAC secret using the new credential.
+      final hmacHex = await _yubikeyChannel.invokeMethod<String>(
+        'get_hmac_secret',
+        {
+          'credentialId': credIdHex,
+          'salt': _toHex(salt),
+          'pin': pin,
+          'transport': transport,
+        },
+      );
       if (!mounted) return;
       if (_progressShown) {
         Navigator.of(context).pop();
         _progressShown = false;
       }
-
-      if (result == null) throw Exception('No result from YubiKey');
-      final credIdHex = result['credentialId'] as String?;
-      final hmacHex = result['hmacSecret'] as String?;
-      if (credIdHex == null || hmacHex == null) {
-        throw Exception('Missing fields in YubiKey result');
-      }
+      if (hmacHex == null) throw Exception('No HMAC secret from YubiKey');
 
       await addYubikey(
         newCredId: _fromHex(credIdHex),
         newHmacSecret: _fromHex(hmacHex),
         newSalt: salt,
       );
-      await _load();
+      await _silentRefresh();
       if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('YubiKey added')));
@@ -324,9 +355,72 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
           } catch (_) {}
           _progressShown = false;
         }
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Failed to add key: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(credIdHex == null
+              ? 'Failed to register key: $e'
+              : 'Failed to activate key: $e'),
+        ));
       }
+    } finally {
+      stepNotifier.dispose();
+    }
+  }
+
+  Widget _stepRow(
+    BuildContext context, {
+    required String label,
+    required bool done,
+    required bool active,
+  }) {
+    final theme = Theme.of(context);
+    final Widget indicator;
+    if (done) {
+      indicator = Icon(Icons.check_circle_rounded,
+          color: theme.colorScheme.primary, size: 24);
+    } else if (active) {
+      indicator = SizedBox(
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator(
+            strokeWidth: 2.5, color: theme.colorScheme.primary),
+      );
+    } else {
+      indicator = Icon(Icons.radio_button_unchecked,
+          color: theme.disabledColor, size: 24);
+    }
+    return Row(
+      children: [
+        SizedBox(width: 24, height: 24, child: Center(child: indicator)),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: active || done ? null : theme.disabledColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Refresh records without showing the full-screen loading spinner.
+  Future<void> _silentRefresh() async {
+    try {
+      final records = listVaultYubikeyRecords(path: widget.vaultPath);
+      final aliases = listYubikeyAliases();
+      final aliasMap = <String, String>{};
+      for (final a in aliases) {
+        aliasMap[a.credentialIdHex] = a.alias;
+      }
+      if (mounted) {
+        setState(() {
+          _records = records;
+          _aliases = aliasMap;
+        });
+      }
+    } catch (_) {
+      await _load();
     }
   }
 
