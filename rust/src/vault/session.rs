@@ -2637,17 +2637,7 @@ mod yubikey_mgmt_tests {
     #[serial]
     fn remove_last_yubikey_returns_error() {
         let pass = b"remove-last-pass";
-        let mut path = temp_dir();
-        path.push("gabbro_yk_mgmt_remove_last.gabbro");
-        let body = VaultBody {
-            ..Default::default()
-        };
-        let keys = [YubiKeyRegistration {
-            credential_id: vec![0x01u8; 64],
-            hmac_secret: [0x11u8; 32],
-            salt: [0x22u8; 32],
-        }];
-        save_vault_with_keys(&body, pass, &keys, &path).unwrap();
+        let path = setup_two_key_vault(pass, "remove_last");
 
         unlock_vault_with_key_record(
             pass,
@@ -2657,6 +2647,11 @@ mod yubikey_mgmt_tests {
             path.clone(),
         )
         .unwrap();
+
+        // Remove the second key — leaves one key on disk
+        session_remove_yubikey(vec![0x02u8; 48]).unwrap();
+
+        // Removing the last remaining key must fail
         let result = session_remove_yubikey(vec![0x01u8; 64]);
         assert!(result.is_err(), "cannot remove the last registered key");
 
