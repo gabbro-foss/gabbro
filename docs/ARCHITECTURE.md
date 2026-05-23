@@ -144,9 +144,9 @@ gabbro/
 - Android screenshot prevention + app switcher blur (`FLAG_SECURE` on `MainActivity` and `UnlockActivity`)
 - Copy/paste blocking on master passphrase fields (default on; user toggle in Settings → Security; keyboard inline paste is a platform limitation, documented in UI)
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
+- YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2); minimum-2-keys enforcement (ADR-010, VERSION 4 vault format); multi-key unlock, vault delete, and change_passphrase YubiKey wiring (CTAP2 one-tap any-key); manage YubiKeys screen (add, remove, alias edit); hardware-validated on Linux and Android (USB + NFC)
 
 **Not yet implemented (see Bikeshed):**
-- YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2) implemented; minimum-2-keys enforcement (ADR-010, VERSION 4 vault format) implemented; multi-key unlock, vault delete, and change_passphrase YubiKey wiring complete (CTAP2 one-tap any-key, hardware-validated on Linux + Android USB + Android NFC); manage YubiKeys screen implemented (Linux hardware-validated); one Android bug remaining — see Bikeshed
 - Autofill save requests (`onSaveRequest`)
 - Passkey support, breach alerts, vault sync
 
@@ -154,7 +154,7 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | pending — run at session start | 8 |
+| Rust (`cargo test -q`) | 288 | 8 |
 | Flutter (`flutter test`) | 308 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
@@ -166,29 +166,11 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Manage YubiKeys screen — implemented, one Android bug remaining**
+- **`onboarding_screen.dart` — accessibility button partially obscured**
 
-  **Status (hardware-validated):**
-  - Linux: all test cases pass — add key (inc. 3rd key), remove key, alias edit, warnings, no-device message, export/import.
-  - Android: onboarding, login, remove, alias edit, warnings pass. One failure: `registerAndGetHmac` CTAP error when adding any key.
+  Accessibility button (top-right) partially hidden behind "Welcome to Gabbro" headline on some screen sizes. Fix layout so the button is never obscured.
 
-  **Android `registerAndGetHmac` CTAP error — unsolved**
-  - Error: `PlatformException RegisterHMAC failed registerandgethmac failed: wrong channel id, expecting:### got:###, null, null` (channel IDs change each attempt)
-  - Happens on both USB and NFC (unconfirmed — test may have been USB only)
-  - Attempted fix: moved `clientPin.getSharedSecret()` to before `makeCredential` in `YubiKeyManager.registerAndGetHmac` → did not resolve
-
-  **Diagnostic ideas for next session:**
-  1. Confirm whether the error is USB-only or also NFC (test each transport separately).
-  2. Add `Thread.sleep(200)` after `makeCredential` before `getAssertions` — test if it's a timing race.
-  3. Print channel IDs via Android logcat to understand exactly which CTAP command triggers the wrong-channel response.
-  4. Try dropping `up=false` from the `getAssertions` options map — some firmware may reject it.
-  5. Try passing `null` instead of the `pinUvAuthParamGA` / `pinProtocol.version` to `getAssertions` — the hmac-secret extension may not need PIN UV auth on the GA leg.
-  6. Check yubikit-android 3.x release notes / GitHub issues for "wrong channel id".
-
-  **Mitigation if diagnosis fails:**
-  - Fall back to two-tap Android flow (mirrors Linux): tap 1 = `register` only, tap 2 = `getHmacSecret` with the registered credential. Eliminates same-session channel confusion entirely at the cost of one extra tap.
-
-  **Next task:** diagnose and fix the Android `registerAndGetHmac` CTAP channel error (pick from diagnostic ideas above).
+  **Next task:** fix layout so accessibility button is always fully visible.
 
 
 ---
@@ -224,8 +206,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- **Android `registerAndGetHmac` CTAP "wrong channel id" error** — `YubiKeyManager.registerAndGetHmac` fails with "wrong channel id, expecting:X got:Y" during the `getAssertions` call that follows `makeCredential`. Attempted fix (moving `getSharedSecret` before the touch) did not resolve it. See full diagnostic plan and two-tap mitigation in `## Current Focus`. **Priority: blocks add-key on Android.**
-- `onboarding_screen.dart` — accessibility button (top-right) partially hidden behind "Welcome to Gabbro" headline on some screen sizes; fix layout so button is never obscured. **Priority: needed for accessibility.**
 - Search improvement: currently only searches title, needs an option to also search all fields and notes
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
