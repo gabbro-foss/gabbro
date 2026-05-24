@@ -122,7 +122,14 @@ Future<void> _defaultInitVaultWithYubikey(
 ) async {
   if (Platform.isLinux) {
     return _linuxInitVaultWithYubikey(
-        passphrase, pins, path, onStep2, onStep3, onAwaitBackupKey, onStep4);
+      passphrase,
+      pins,
+      path,
+      onStep2,
+      onStep3,
+      onAwaitBackupKey,
+      onStep4,
+    );
   }
 
   // Android: register and activate 2 keys via platform channel.
@@ -130,42 +137,60 @@ Future<void> _defaultInitVaultWithYubikey(
   // key is physically presented at that moment.
 
   // Tap 1: register primary key
-  final credId1Hex = await _yubikeyChannel.invokeMethod<String>(
-    'register',
-    {'pin': pins[0], 'transport': transport},
-  );
-  if (credId1Hex == null) throw Exception('YubiKey registration returned no credential');
+  final credId1Hex = await _yubikeyChannel.invokeMethod<String>('register', {
+    'pin': pins[0],
+    'transport': transport,
+  });
+  if (credId1Hex == null) {
+    throw Exception('YubiKey registration returned no credential');
+  }
 
-  final salt1 = Uint8List.fromList(List.generate(32, (_) => Random.secure().nextInt(256)));
+  final salt1 = Uint8List.fromList(
+    List.generate(32, (_) => Random.secure().nextInt(256)),
+  );
   onStep2();
 
   // Tap 2: activate primary key
-  final hmac1Hex = await _yubikeyChannel.invokeMethod<String>(
-    'get_hmac_secret',
-    {'credentialId': credId1Hex, 'salt': _toHex(salt1), 'pin': pins[0], 'transport': transport},
-  );
-  if (hmac1Hex == null) throw Exception('YubiKey activation returned no secret');
+  final hmac1Hex = await _yubikeyChannel
+      .invokeMethod<String>('get_hmac_secret', {
+        'credentialId': credId1Hex,
+        'salt': _toHex(salt1),
+        'pin': pins[0],
+        'transport': transport,
+      });
+  if (hmac1Hex == null) {
+    throw Exception('YubiKey activation returned no secret');
+  }
   onStep3();
 
   // Wait for user to swap to a different physical key before backup registration
   await onAwaitBackupKey();
 
   // Tap 3: register backup key (fresh discovery — accepts the backup key now presented)
-  final credId2Hex = await _yubikeyChannel.invokeMethod<String>(
-    'register',
-    {'pin': pins[1], 'transport': transport},
-  );
-  if (credId2Hex == null) throw Exception('YubiKey registration returned no credential');
+  final credId2Hex = await _yubikeyChannel.invokeMethod<String>('register', {
+    'pin': pins[1],
+    'transport': transport,
+  });
+  if (credId2Hex == null) {
+    throw Exception('YubiKey registration returned no credential');
+  }
 
-  final salt2 = Uint8List.fromList(List.generate(32, (_) => Random.secure().nextInt(256)));
+  final salt2 = Uint8List.fromList(
+    List.generate(32, (_) => Random.secure().nextInt(256)),
+  );
   onStep4();
 
   // Tap 4: activate backup key
-  final hmac2Hex = await _yubikeyChannel.invokeMethod<String>(
-    'get_hmac_secret',
-    {'credentialId': credId2Hex, 'salt': _toHex(salt2), 'pin': pins[1], 'transport': transport},
-  );
-  if (hmac2Hex == null) throw Exception('YubiKey activation returned no secret');
+  final hmac2Hex = await _yubikeyChannel
+      .invokeMethod<String>('get_hmac_secret', {
+        'credentialId': credId2Hex,
+        'salt': _toHex(salt2),
+        'pin': pins[1],
+        'transport': transport,
+      });
+  if (hmac2Hex == null) {
+    throw Exception('YubiKey activation returned no secret');
+  }
 
   await initVaultWithKeys(
     passphrase: passphrase,
@@ -211,7 +236,8 @@ class OnboardingScreen extends StatefulWidget {
     Future<void> Function() onAwaitBackupKey,
     void Function() onStep4,
     String transport,
-  ) onInitVaultWithYubikey;
+  )
+  onInitVaultWithYubikey;
 
   OnboardingScreen({
     super.key,
@@ -223,8 +249,8 @@ class OnboardingScreen extends StatefulWidget {
     bool? showYubikey,
     bool? isAndroid,
     this.onInitVaultWithYubikey = _defaultInitVaultWithYubikey,
-  })  : showYubikey = showYubikey ?? (Platform.isAndroid || Platform.isLinux),
-        isAndroid = isAndroid ?? Platform.isAndroid;
+  }) : showYubikey = showYubikey ?? (Platform.isAndroid || Platform.isLinux),
+       isAndroid = isAndroid ?? Platform.isAndroid;
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -279,7 +305,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       c.dispose();
     }
     final c = _backupKeyCompleter;
-    if (c != null && !c.isCompleted) c.completeError(Exception('Widget disposed'));
+    if (c != null && !c.isCompleted) {
+      c.completeError(Exception('Widget disposed'));
+    }
     super.dispose();
   }
 
@@ -296,10 +324,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   String _pinLabel(int index) => switch (index) {
-        0 => 'Primary key PIN',
-        1 => 'Backup key PIN',
-        _ => 'Key ${index + 1} PIN',
-      };
+    0 => 'Primary key PIN',
+    1 => 'Backup key PIN',
+    _ => 'Key ${index + 1} PIN',
+  };
 
   void _onPassphraseChanged(String value) {
     final result = widget.onEstimateEntropy(value);
@@ -321,10 +349,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _passphraseController.text.codeUnits,
           _pinControllers.map((c) => c.text).toList(),
           _vaultPath,
-          () { if (mounted) setState(() => _yubikeyStep = 2); },
-          () { if (mounted) setState(() => _yubikeyStep = 3); },
+          () {
+            if (mounted) setState(() => _yubikeyStep = 2);
+          },
+          () {
+            if (mounted) setState(() => _yubikeyStep = 3);
+          },
           _awaitBackupKey,
-          () { if (mounted) setState(() => _yubikeyStep = 5); },
+          () {
+            if (mounted) setState(() => _yubikeyStep = 5);
+          },
           _transport,
         );
       } else {
@@ -355,22 +389,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Color _tierColor(StrengthTier tier) => switch (tier) {
-        StrengthTier.terrible => Colors.red,
-        StrengthTier.weak => Colors.orange,
-        StrengthTier.fair => Colors.yellow.shade700,
-        StrengthTier.strong => Colors.lightGreen,
-        StrengthTier.veryStrong => Colors.green,
-        StrengthTier.centuries => Colors.green.shade800,
-      };
+    StrengthTier.terrible => Colors.red,
+    StrengthTier.weak => Colors.orange,
+    StrengthTier.fair => Colors.yellow.shade700,
+    StrengthTier.strong => Colors.lightGreen,
+    StrengthTier.veryStrong => Colors.green,
+    StrengthTier.centuries => Colors.green.shade800,
+  };
 
   String _tierLabel(StrengthTier tier) => switch (tier) {
-        StrengthTier.terrible => 'Terrible',
-        StrengthTier.weak => 'Weak',
-        StrengthTier.fair => 'Fair',
-        StrengthTier.strong => 'Strong',
-        StrengthTier.veryStrong => 'Very strong',
-        StrengthTier.centuries => 'Excellent',
-      };
+    StrengthTier.terrible => 'Terrible',
+    StrengthTier.weak => 'Weak',
+    StrengthTier.fair => 'Fair',
+    StrengthTier.strong => 'Strong',
+    StrengthTier.veryStrong => 'Very strong',
+    StrengthTier.centuries => 'Excellent',
+  };
 
   bool get _strongEnough =>
       _entropy != null &&
@@ -404,13 +438,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final circleColor = done
         ? Colors.green.shade600
         : active
-            ? cs.primary
-            : cs.outlineVariant;
+        ? cs.primary
+        : cs.outlineVariant;
     final labelColor = done
         ? Colors.green.shade600
         : active
-            ? cs.onSurface
-            : cs.onSurfaceVariant;
+        ? cs.onSurface
+        : cs.onSurfaceVariant;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -447,9 +481,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               if (active)
                 Text(
                   hint,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: cs.onSurface,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: cs.onSurface),
                 ),
             ],
           ),
@@ -462,13 +496,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final cs = Theme.of(context).colorScheme;
 
     Widget connector(bool done) => Padding(
-          padding: const EdgeInsets.only(left: 13, top: 4, bottom: 4),
-          child: Container(
-            width: 2,
-            height: 14,
-            color: done ? Colors.green.shade600 : cs.outlineVariant,
-          ),
-        );
+      padding: const EdgeInsets.only(left: 13, top: 4, bottom: 4),
+      child: Container(
+        width: 2,
+        height: 14,
+        color: done ? Colors.green.shade600 : cs.outlineVariant,
+      ),
+    );
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -553,337 +587,362 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         app.settings.textSize == TextSizeChoice.xxLarge;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          // ── Main content ───────────────────────────────────────────────
-          Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(
-                  32, 32, 32,
-                  32 + MediaQuery.of(context).viewPadding.bottom,
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // ── Accessibility shortcut — always above the headline ──────
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                child: AnimatedOpacity(
+                  opacity: MediaQuery.of(context).viewInsets.bottom > 0
+                      ? 0.0
+                      : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: OutlinedButton.icon(
+                    icon: Icon(
+                      Icons.accessibility_new,
+                      color: isAccessibilityOn
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
+                    ),
+                    label: const Text('Accessibility'),
+                    onPressed: _toggleAccessibility,
+                    style: OutlinedButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
                 ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'Welcome to Gabbro',
-                        style: Theme.of(context).textTheme.headlineLarge,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      if (widget.postDeletionMessage != null) ...[
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primaryContainer,
-                            borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            // ── Main content ────────────────────────────────────────────
+            Expanded(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 480),
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      32,
+                      16,
+                      32,
+                      32 + MediaQuery.of(context).viewPadding.bottom,
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            'Gabbro',
+                            style: Theme.of(context).textTheme.headlineLarge,
+                            textAlign: TextAlign.center,
                           ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: Theme.of(context).colorScheme.primary,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  widget.postDeletionMessage!,
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ] else ...[
-                        Text(
-                          'Create your vault to get started.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                      const SizedBox(height: 40),
-                      Text(
-                        widget.postDeletionMessage != null
-                            ? 'New vault location (same as before)'
-                            : 'Vault location',
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 8),
-                      if (widget.isAndroid)
-                        Text(
-                          _vaultPath.isEmpty ? 'Loading…' : _vaultPath,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        )
-                      else
-                        PathField(
-                          mode: PathFieldMode.save,
-                          hint: 'Path to vault file',
-                          initialPath:
-                              _vaultPath.isEmpty ? null : _vaultPath,
-                          allowedExtensions: const ['gabbro'],
-                          saveFileName: 'gabbro.gabbro',
-                          onPathSelected: (path) =>
-                              setState(() => _vaultPath = path),
-                          validator: (v) => (v == null || v.isEmpty)
-                              ? 'Path is required'
-                              : null,
-                        ),
-                      if (widget.postDeletionMessage != null) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          'Choose a new master passphrase, or re-use your previous one if you prefer.',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                      const SizedBox(height: 24),
-                      TextFormField(
-                        controller: _passphraseController,
-                        obscureText: _passphraseObscured,
-                        enableInteractiveSelection:
-                            !widget.blockPassphraseCopyPaste,
-                        onChanged: _onPassphraseChanged,
-                        decoration: InputDecoration(
-                          labelText: 'Master passphrase',
-                          border: const OutlineInputBorder(),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _passphraseObscured
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                            ),
-                            onPressed: () => setState(
-                              () => _passphraseObscured = !_passphraseObscured,
-                            ),
-                          ),
-                        ),
-                        validator: (v) {
-                          if (v == null || v.isEmpty) {
-                            return 'Passphrase is required';
-                          }
-                          if (!_strongEnough) return 'Passphrase is too weak';
-                          return null;
-                        },
-                      ),
-                      if (_entropy != null) ...[
-                        const SizedBox(height: 8),
-                        LinearProgressIndicator(
-                          value: switch (_entropy!.tier) {
-                            StrengthTier.terrible => 0.1,
-                            StrengthTier.weak => 0.25,
-                            StrengthTier.fair => 0.5,
-                            StrengthTier.strong => 0.75,
-                            StrengthTier.veryStrong => 0.9,
-                            StrengthTier.centuries => 1.0,
-                          },
-                          color: _tierColor(_entropy!.tier),
-                          backgroundColor: Colors.grey.shade300,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${_tierLabel(_entropy!.tier)} · ${_entropy!.bits.toStringAsFixed(1)} bits of entropy',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: _tierColor(_entropy!.tier),
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _confirmController,
-                        obscureText: _confirmObscured,
-                        enableInteractiveSelection:
-                            !widget.blockPassphraseCopyPaste,
-                        onFieldSubmitted: (_) => _createVault(),
-                        onChanged: (v) {
-                          setState(
-                            () => _confirmMatches = v.isEmpty
-                                ? null
-                                : v == _passphraseController.text,
-                          );
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Confirm passphrase',
-                          border: const OutlineInputBorder(),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _confirmObscured
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                            ),
-                            onPressed: () => setState(
-                              () => _confirmObscured = !_confirmObscured,
-                            ),
-                          ),
-                        ),
-                        validator: (v) {
-                          if (v == null || v.isEmpty) {
-                            return 'Please confirm your passphrase';
-                          }
-                          if (v != _passphraseController.text) {
-                            return 'Passphrases do not match';
-                          }
-                          return null;
-                        },
-                      ),
-                      if (_confirmMatches != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          _confirmMatches!
-                              ? '✓ Passphrases match'
-                              : '✗ Passphrases do not match',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: _confirmMatches!
-                                ? Colors.green.shade700
-                                : Theme.of(context).colorScheme.error,
-                          ),
-                        ),
-                      ],
-                      // ── YubiKey opt-in (Android and Linux) ─────────────
-                      if (widget.showYubikey) ...[
-                        const SizedBox(height: 16),
-                        const Divider(),
-                        SwitchListTile(
-                          title: const Text('Protect with YubiKey'),
-                          subtitle: const Text('Hardware security key (recommended)'),
-                          value: _useYubikey,
-                          onChanged: (v) => setState(() => _useYubikey = v),
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                        if (_useYubikey) ...[
-                          for (var i = 0; i < _pinControllers.length; i++) ...[
-                            const SizedBox(height: 12),
-                            TextFormField(
-                              controller: _pinControllers[i],
-                              obscureText: _pinObscured[i],
-                              decoration: InputDecoration(
-                                labelText: _pinLabel(i),
-                                border: const OutlineInputBorder(),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _pinObscured[i]
-                                        ? Icons.visibility_off
-                                        : Icons.visibility,
-                                  ),
-                                  onPressed: () => setState(
-                                    () => _pinObscured[i] = !_pinObscured[i],
-                                  ),
-                                ),
-                              ),
-                              validator: (v) => (v == null || v.isEmpty)
-                                  ? '${_pinLabel(i)} is required'
-                                  : null,
-                            ),
-                          ],
-                          if (widget.isAndroid) ...[
-                            const SizedBox(height: 12),
-                            SegmentedRow<String>(
-                              values: const ['usb', 'nfc'],
-                              selected: _transport,
-                              label: (v) => v.toUpperCase(),
-                              onSelected: (v) => setState(() => _transport = v),
-                            ),
-                          ],
                           const SizedBox(height: 8),
-                          if (_isCreating)
-                            _buildYubikeyCreationSteps(context)
-                          else ...[
-                            Text(
-                              'You will tap each YubiKey twice (4 taps total). Between the two keys, you will be prompted to swap.',
-                              style: Theme.of(context).textTheme.bodySmall,
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 8),
+                          if (widget.postDeletionMessage != null) ...[
                             Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
+                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .tertiaryContainer
-                                    .withValues(alpha: 0.5),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primaryContainer,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Text(
-                                'Vault creation with YubiKey takes 20–30 seconds. The app may appear unresponsive — this is normal.',
-                                style: Theme.of(context).textTheme.bodySmall,
-                                textAlign: TextAlign.center,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    Icons.info_outline,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      widget.postDeletionMessage!,
+                                      style: TextStyle(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimaryContainer,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ] else ...[
+                            Text(
+                              'Create your vault to get started.',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                          const SizedBox(height: 40),
+                          Text(
+                            widget.postDeletionMessage != null
+                                ? 'New vault location (same as before)'
+                                : 'Vault location',
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          if (widget.isAndroid)
+                            Text(
+                              _vaultPath.isEmpty ? 'Loading…' : _vaultPath,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            )
+                          else
+                            PathField(
+                              mode: PathFieldMode.save,
+                              hint: 'Path to vault file',
+                              initialPath: _vaultPath.isEmpty
+                                  ? null
+                                  : _vaultPath,
+                              allowedExtensions: const ['gabbro'],
+                              saveFileName: 'gabbro.gabbro',
+                              onPathSelected: (path) =>
+                                  setState(() => _vaultPath = path),
+                              validator: (v) => (v == null || v.isEmpty)
+                                  ? 'Path is required'
+                                  : null,
+                            ),
+                          if (widget.postDeletionMessage != null) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              'Choose a new master passphrase, or re-use your previous one if you prefer.',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                          const SizedBox(height: 24),
+                          TextFormField(
+                            controller: _passphraseController,
+                            obscureText: _passphraseObscured,
+                            enableInteractiveSelection:
+                                !widget.blockPassphraseCopyPaste,
+                            onChanged: _onPassphraseChanged,
+                            decoration: InputDecoration(
+                              labelText: 'Master passphrase',
+                              border: const OutlineInputBorder(),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _passphraseObscured
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                ),
+                                onPressed: () => setState(
+                                  () => _passphraseObscured =
+                                      !_passphraseObscured,
+                                ),
+                              ),
+                            ),
+                            validator: (v) {
+                              if (v == null || v.isEmpty) {
+                                return 'Passphrase is required';
+                              }
+                              if (!_strongEnough) {
+                                return 'Passphrase is too weak';
+                              }
+                              return null;
+                            },
+                          ),
+                          if (_entropy != null) ...[
+                            const SizedBox(height: 8),
+                            LinearProgressIndicator(
+                              value: switch (_entropy!.tier) {
+                                StrengthTier.terrible => 0.1,
+                                StrengthTier.weak => 0.25,
+                                StrengthTier.fair => 0.5,
+                                StrengthTier.strong => 0.75,
+                                StrengthTier.veryStrong => 0.9,
+                                StrengthTier.centuries => 1.0,
+                              },
+                              color: _tierColor(_entropy!.tier),
+                              backgroundColor: Colors.grey.shade300,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${_tierLabel(_entropy!.tier)} · ${_entropy!.bits.toStringAsFixed(1)} bits of entropy',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: _tierColor(_entropy!.tier),
                               ),
                             ),
                           ],
-                        ],
-                      ],
-                      const SizedBox(height: 24),
-                      if (_error != null)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: Text(
-                            _error!,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                          ),
-                        ),
-                      FilledButton(
-                        onPressed: (_isCreating || !_strongEnough)
-                            ? null
-                            : _createVault,
-                        child: _isCreating
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _confirmController,
+                            obscureText: _confirmObscured,
+                            enableInteractiveSelection:
+                                !widget.blockPassphraseCopyPaste,
+                            onFieldSubmitted: (_) => _createVault(),
+                            onChanged: (v) {
+                              setState(
+                                () => _confirmMatches = v.isEmpty
+                                    ? null
+                                    : v == _passphraseController.text,
+                              );
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Confirm passphrase',
+                              border: const OutlineInputBorder(),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _confirmObscured
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
                                 ),
-                              )
-                            : const Text('Create vault'),
+                                onPressed: () => setState(
+                                  () => _confirmObscured = !_confirmObscured,
+                                ),
+                              ),
+                            ),
+                            validator: (v) {
+                              if (v == null || v.isEmpty) {
+                                return 'Please confirm your passphrase';
+                              }
+                              if (v != _passphraseController.text) {
+                                return 'Passphrases do not match';
+                              }
+                              return null;
+                            },
+                          ),
+                          if (_confirmMatches != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              _confirmMatches!
+                                  ? '✓ Passphrases match'
+                                  : '✗ Passphrases do not match',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: _confirmMatches!
+                                    ? Colors.green.shade700
+                                    : Theme.of(context).colorScheme.error,
+                              ),
+                            ),
+                          ],
+                          // ── YubiKey opt-in (Android and Linux) ─────────────
+                          if (widget.showYubikey) ...[
+                            const SizedBox(height: 16),
+                            const Divider(),
+                            SwitchListTile(
+                              title: const Text('Protect with YubiKey'),
+                              subtitle: const Text(
+                                'Hardware security key (recommended)',
+                              ),
+                              value: _useYubikey,
+                              onChanged: (v) => setState(() => _useYubikey = v),
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                            if (_useYubikey) ...[
+                              for (
+                                var i = 0;
+                                i < _pinControllers.length;
+                                i++
+                              ) ...[
+                                const SizedBox(height: 12),
+                                TextFormField(
+                                  controller: _pinControllers[i],
+                                  obscureText: _pinObscured[i],
+                                  decoration: InputDecoration(
+                                    labelText: _pinLabel(i),
+                                    border: const OutlineInputBorder(),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _pinObscured[i]
+                                            ? Icons.visibility_off
+                                            : Icons.visibility,
+                                      ),
+                                      onPressed: () => setState(
+                                        () =>
+                                            _pinObscured[i] = !_pinObscured[i],
+                                      ),
+                                    ),
+                                  ),
+                                  validator: (v) => (v == null || v.isEmpty)
+                                      ? '${_pinLabel(i)} is required'
+                                      : null,
+                                ),
+                              ],
+                              if (widget.isAndroid) ...[
+                                const SizedBox(height: 12),
+                                SegmentedRow<String>(
+                                  values: const ['usb', 'nfc'],
+                                  selected: _transport,
+                                  label: (v) => v.toUpperCase(),
+                                  onSelected: (v) =>
+                                      setState(() => _transport = v),
+                                ),
+                              ],
+                              const SizedBox(height: 8),
+                              if (_isCreating)
+                                _buildYubikeyCreationSteps(context)
+                              else ...[
+                                Text(
+                                  'You will tap each YubiKey twice (4 taps total). Between the two keys, you will be prompted to swap.',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .tertiaryContainer
+                                        .withValues(alpha: 0.5),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    'Vault creation with YubiKey takes 20–30 seconds. The app may appear unresponsive — this is normal.',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ],
+                          const SizedBox(height: 24),
+                          if (_error != null)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Text(
+                                _error!,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                              ),
+                            ),
+                          FilledButton(
+                            onPressed: (_isCreating || !_strongEnough)
+                                ? null
+                                : _createVault,
+                            child: _isCreating
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text('Create vault'),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          // ── Accessibility shortcut — top-right corner ──────────────────
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
-            right: 8,
-            child: SafeArea(
-              child: AnimatedOpacity(
-                opacity:
-                    MediaQuery.of(context).viewInsets.bottom > 0 ? 0.0 : 1.0,
-                duration: const Duration(milliseconds: 200),
-                child: OutlinedButton.icon(
-                  icon: Icon(
-                    Icons.accessibility_new,
-                    color: isAccessibilityOn
-                        ? Theme.of(context).colorScheme.primary
-                        : null,
-                  ),
-                  label: const Text('Accessibility'),
-                  onPressed: _toggleAccessibility,
-                  style: OutlinedButton.styleFrom(
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

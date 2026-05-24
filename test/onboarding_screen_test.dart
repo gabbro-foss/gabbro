@@ -41,7 +41,7 @@ void main() {
   testWidgets('onboarding screen renders key elements', (tester) async {
     await tester.pumpWidget(_buildScreen());
 
-    expect(find.text('Welcome to Gabbro'), findsOneWidget);
+    expect(find.text('Gabbro'), findsOneWidget);
     expect(find.text('Create vault'), findsOneWidget);
   });
 
