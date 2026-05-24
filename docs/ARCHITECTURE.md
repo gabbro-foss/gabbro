@@ -168,7 +168,25 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 - **Vault sync across devices**
 
-  One-shot overwrite is the v1 candidate: export the vault file, copy it to the other device, import/replace. File-level sync warning (both devices modified since last sync) is also a v1 candidate. Entry-level merge is v2.
+  No network layer — the user transfers the `.gabbro` file manually (USB, cloud drive, etc.). The app's job is to merge the two diverged vaults correctly. One-shot overwrite was considered but rejected: if both devices have new entries since the last sync, overwrite loses one side's work.
+
+  **Chosen approach: entry-level merge with last-write-wins and tombstones.**
+
+  Entries already have stable UUIDs and `updated_at` timestamps, so merge is well-defined:
+
+  1. **Additions** — union both entry lists by UUID. Entries present on only one side are added to the result.
+  2. **Edit conflicts** (same UUID edited on both devices) — last-write-wins: keep the entry with the newer `updated_at`. Simple, predictable, occasionally lossy.
+  3. **Deletions** — without a record of intent, a deleted entry looks identical to an entry that was never on the other device and would reappear after merge. Fix: add `deleted_ids: Vec<DeletedEntry>` (`{ id, deleted_at }`) to `VaultBody`. On merge, a tombstone wins over an entry if `deleted_at > entry.updated_at`.
+  4. **Folders** — no UUIDs, just strings. Union both folder lists (deduplicated). Folder rename conflicts surface as two separate folder names; user tidies up.
+
+  **Pieces of work:**
+
+  - `VaultBody` gains `deleted_ids: Vec<DeletedEntry>` (Rust). Backward-compatible — old vaults deserialise to an empty vec.
+  - Entry delete path records a tombstone instead of just removing the entry from the vec.
+  - New `merge_vault_from_file(path, passphrase)` bridge function (Rust): loads the incoming vault, runs the merge algorithm against the live session, saves the result. Distinct from the existing import path (which is for migrating from other apps).
+  - Conflict warning (Flutter): before merging, if both vaults have changes since the last common `vault_updated_at`, show a summary ("N entries will be added, M conflicts resolved by last-write-wins") and ask the user to confirm.
+  - `vault_updated_at: String` added to `VaultBody` — stamped on every save, used to detect whether both sides diverged.
+  - Sync UX entry point in Settings (or alongside Export): "Sync from file" button → file picker → conflict summary dialog → merge.
 
 ---
 
