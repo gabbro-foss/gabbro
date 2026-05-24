@@ -127,7 +127,7 @@ gabbro/
 - Tablet two-pane layout (≥600dp): NavigationRail + list pane + detail pane
 - Password/passphrase generator (screen + inline widget)
 - Password breakdown sheet (long-press revealed password; colour + symbol encoding per ADR-003)
-- Export: `.gabbro` + `.gabbro.sha256`; file entry export uses native file picker (folder picker on Android, save dialog on Linux)
+- Export: `.gabbro` + `.gabbro.sha256`; JSON (plaintext) with prominent unencrypted warning and format selector; file entry export uses native file picker (folder picker on Android, save dialog on Linux)
 - Import: Gabbro vault, Enpass JSON, Bitwarden JSON, generic CSV (with column-mapping UI)
   - All importers: validation failures surfaced via ImportFailuresDialog (Skip/Edit)
   - UUID dedup for Gabbro/Enpass/Bitwarden; fresh UUIDs for CSV
@@ -154,8 +154,8 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 288 | 8 |
-| Flutter (`flutter test`) | 308 | 0 |
+| Rust (`cargo test -q`) | 292 | 8 |
+| Flutter (`flutter test`) | 313 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -166,10 +166,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Export vault to JSON**
+- **Search improvement**
 
-  Consistent with Gabbro's stance: we don't lock the user in. Include a clear warning that JSON exports are completely unencrypted and the user is responsible for handling the file securely. Surface warnings distinguishing `.gabbro` exports ("protected by your passphrase only") from JSON ("completely unencrypted — store securely").
-
+  Currently only searches entry titles. Add an option to also search all fields and notes (username, URL, notes, custom field values, etc.). Keep title-only as the default for speed; toggle or mode switch to expand scope.
 
 ---
 
@@ -204,7 +203,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- Search improvement: currently only searches title, needs an option to also search all fields and notes
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
     - add security toggle to show vault alias list on login screen or not if user wants to bypass this
@@ -213,7 +211,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - add vault alias to name each vault (avoids collisions) -> update vault file entry
   - export vault includes alias in name to avoid collision
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
-- Export/import security note: `.gabbro` exports are AES-256-GCM encrypted (passphrase-only — YubiKey not required to import, by design; passphrase is the durable recovery factor, YubiKey is the live-vault second factor). JSON exports are plaintext — no encryption at all. Add visible warnings in the export UI distinguishing the two: `.gabbro` ("protected by your passphrase only") and JSON ("completely unencrypted — store securely").
 - Multiple app languages (v1: en,fr,de,it,es)
 - App logo (OnboardingScreen, UnlockScreen) — defer until designed.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
@@ -247,3 +244,4 @@ Try `dart pub outdated` for more information.`
 - i18n: replace hand-rolled month array in `formatTimestamp()` with `package:intl` `DateFormat`.
 - Import: content-hash deduplication and entry-level merge.
 - Native app autofill matching by package name (v2).
+- ensure no webpage opens with yubico OTP enabled in `ykman info`
