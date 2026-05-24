@@ -122,7 +122,7 @@ gabbro/
 - 6 entry types: Login (Password), Note, Identity, Card, File, Custom
 - Entry create, edit, delete with safe-edit diff review
 - Password history with revert
-- Fast fuzzy search, entry type filter chips
+- Vault list search: title-only (default) or full-field toggle (`Icons.search` / `Icons.manage_search` prefix button); full-field searches username, URL, notes, custom field labels/values (non-hidden) via `search_blob` built in Rust at list time
 - Alphabet index bar (height-adaptive, windowed, left/right configurable)
 - Tablet two-pane layout (≥600dp): NavigationRail + list pane + detail pane
 - Password/passphrase generator (screen + inline widget)
@@ -154,8 +154,8 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 292 | 8 |
-| Flutter (`flutter test`) | 313 | 0 |
+| Rust (`cargo test -q`) | 301 | 8 |
+| Flutter (`flutter test`) | 318 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -166,9 +166,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Search improvement**
-
-  Currently only searches entry titles. Add an option to also search all fields and notes (username, URL, notes, custom field values, etc.). Keep title-only as the default for speed; toggle or mode switch to expand scope.
+- **Next task TBD** — check with user
 
 ---
 
