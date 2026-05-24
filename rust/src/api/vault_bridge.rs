@@ -21,11 +21,14 @@ use crate::vault::session;
 /// Lightweight entry summary returned by `list_entry_summaries()`.
 ///
 /// Contains just enough for Flutter to render a list row — no secrets.
+/// `search_blob` is a lowercase, space-joined string of all searchable
+/// non-secret fields; Flutter uses it for opt-in full-text search.
 pub struct EntrySummaryData {
     pub id: String,
     pub entry_type: String,
     pub title: String,
     pub folder: String,
+    pub search_blob: String,
 }
 
 // ── Bridge-facing VaultEntry enum ────────────────────────────────────────────

@@ -162,6 +162,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
   bool get _isYubikeyVault => _yubikeyRecords.isNotEmpty;
 
   String _searchQuery = '';
+  bool _fullTextSearch = false;
   final TextEditingController _searchController = TextEditingController();
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ScrollController _chipScrollController = ScrollController();
@@ -302,7 +303,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
     if (_searchQuery.isEmpty) return folderFiltered;
     final query = _searchQuery.toLowerCase();
     return folderFiltered
-        .where((e) => _displayTitle(e).toLowerCase().contains(query))
+        .where((e) => _fullTextSearch
+            ? e.searchBlob.contains(query)
+            : _displayTitle(e).toLowerCase().contains(query))
         .toList();
   }
 
@@ -1082,8 +1085,19 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    hintText: 'Search entries…',
-                    prefixIcon: const Icon(Icons.search),
+                    hintText: _fullTextSearch
+                        ? 'Search all fields…'
+                        : 'Search entries…',
+                    prefixIcon: IconButton(
+                      icon: Icon(_fullTextSearch
+                          ? Icons.manage_search
+                          : Icons.search),
+                      tooltip: _fullTextSearch
+                          ? 'Searching all fields'
+                          : 'Searching by title',
+                      onPressed: () =>
+                          setState(() => _fullTextSearch = !_fullTextSearch),
+                    ),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear),
@@ -1157,8 +1171,19 @@ class _VaultListScreenState extends State<VaultListScreen> {
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: 'Search entries…',
-                      prefixIcon: const Icon(Icons.search),
+                      hintText: _fullTextSearch
+                          ? 'Search all fields…'
+                          : 'Search entries…',
+                      prefixIcon: IconButton(
+                        icon: Icon(_fullTextSearch
+                            ? Icons.manage_search
+                            : Icons.search),
+                        tooltip: _fullTextSearch
+                            ? 'Searching all fields'
+                            : 'Searching by title',
+                        onPressed: () =>
+                            setState(() => _fullTextSearch = !_fullTextSearch),
+                      ),
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear),

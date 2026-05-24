@@ -16,7 +16,7 @@ use crate::api::vault::{
     save_vault_with_yubikey,
 };
 use crate::api::vault_bridge::EntrySummaryData;
-use crate::vault::entry::VaultEntry;
+use crate::vault::entry::{CustomField, VaultEntry};
 use crate::vault::serialization::VaultBody;
 
 // Extracted YubiKey quad: (hmac_secret, credential_id, hkdf_salt, vault_key_master?).
@@ -233,6 +233,26 @@ fn entry_id(entry: &VaultEntry) -> &str {
     }
 }
 
+/// Concatenates non-empty strings into a single lowercase, space-joined blob.
+fn make_blob(parts: &[&str]) -> String {
+    parts
+        .iter()
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_lowercase())
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// Appends custom field labels and, for non-hidden fields, values to `parts`.
+fn push_custom_fields<'a>(parts: &mut Vec<&'a str>, fields: &'a [CustomField]) {
+    for f in fields {
+        parts.push(&f.label);
+        if !f.hidden {
+            parts.push(&f.value);
+        }
+    }
+}
+
 /// Builds a lightweight summary DTO from any entry variant.
 ///
 /// Display title selection per type:
@@ -242,55 +262,103 @@ fn entry_id(entry: &VaultEntry) -> &str {
 /// - Card:     `card_name` if present; falls back to `cardholder_name`
 /// - File:     `filename`
 /// - Custom:   `title` field
+///
+/// `search_blob` is a lowercase union of all searchable non-secret fields.
+/// Passwords, card numbers, CVVs, PINs, and hidden custom field values
+/// are excluded.
 fn entry_to_summary(entry: &VaultEntry) -> EntrySummaryData {
     match entry {
-        VaultEntry::Login(e) => EntrySummaryData {
-            id: e.meta.id.clone(),
-            entry_type: String::from("Login"),
-            title: if !e.title.is_empty() {
-                e.title.clone()
-            } else if !e.url.is_empty() {
-                e.url.clone()
-            } else {
-                e.meta.id.clone()
-            },
-            folder: e.meta.folder.clone(),
-        },
+        VaultEntry::Login(e) => {
+            let mut parts: Vec<&str> = vec![
+                &e.title,
+                &e.username,
+                &e.url,
+                e.notes.as_deref().unwrap_or(""),
+            ];
+            push_custom_fields(&mut parts, &e.custom_fields);
+            EntrySummaryData {
+                id: e.meta.id.clone(),
+                entry_type: String::from("Login"),
+                title: if !e.title.is_empty() {
+                    e.title.clone()
+                } else if !e.url.is_empty() {
+                    e.url.clone()
+                } else {
+                    e.meta.id.clone()
+                },
+                folder: e.meta.folder.clone(),
+                search_blob: make_blob(&parts),
+            }
+        }
         VaultEntry::Note(e) => EntrySummaryData {
             id: e.meta.id.clone(),
             entry_type: String::from("Note"),
             title: e.title.clone(),
             folder: e.meta.folder.clone(),
+            search_blob: make_blob(&[&e.title, &e.content]),
         },
-        VaultEntry::Identity(e) => EntrySummaryData {
-            id: e.meta.id.clone(),
-            entry_type: String::from("Identity"),
-            title: format!("{} {}", e.first_name, e.last_name),
-            folder: e.meta.folder.clone(),
-        },
-        VaultEntry::Card(e) => EntrySummaryData {
-            id: e.meta.id.clone(),
-            entry_type: String::from("Card"),
-            title: e
-                .card_name
-                .as_deref()
-                .filter(|s| !s.is_empty())
-                .unwrap_or(&e.cardholder_name)
-                .to_string(),
-            folder: e.meta.folder.clone(),
-        },
+        VaultEntry::Identity(e) => {
+            let mut parts: Vec<&str> = vec![
+                &e.first_name,
+                &e.last_name,
+                &e.email,
+                e.phone.as_deref().unwrap_or(""),
+                e.address.as_deref().unwrap_or(""),
+            ];
+            push_custom_fields(&mut parts, &e.custom_fields);
+            EntrySummaryData {
+                id: e.meta.id.clone(),
+                entry_type: String::from("Identity"),
+                title: format!("{} {}", e.first_name, e.last_name),
+                folder: e.meta.folder.clone(),
+                search_blob: make_blob(&parts),
+            }
+        }
+        VaultEntry::Card(e) => {
+            let mut parts: Vec<&str> = vec![
+                e.card_name.as_deref().unwrap_or(""),
+                &e.cardholder_name,
+                e.bank_name.as_deref().unwrap_or(""),
+                e.payment_network.as_deref().unwrap_or(""),
+                e.notes.as_deref().unwrap_or(""),
+            ];
+            push_custom_fields(&mut parts, &e.custom_fields);
+            EntrySummaryData {
+                id: e.meta.id.clone(),
+                entry_type: String::from("Card"),
+                title: e
+                    .card_name
+                    .as_deref()
+                    .filter(|s| !s.is_empty())
+                    .unwrap_or(&e.cardholder_name)
+                    .to_string(),
+                folder: e.meta.folder.clone(),
+                search_blob: make_blob(&parts),
+            }
+        }
         VaultEntry::File(e) => EntrySummaryData {
             id: e.meta.id.clone(),
             entry_type: String::from("File"),
             title: e.filename.clone(),
             folder: e.meta.folder.clone(),
+            search_blob: make_blob(&[&e.filename, e.notes.as_deref().unwrap_or("")]),
         },
-        VaultEntry::Custom(e) => EntrySummaryData {
-            id: e.meta.id.clone(),
-            entry_type: String::from("Custom"),
-            title: e.title.clone(),
-            folder: e.meta.folder.clone(),
-        },
+        VaultEntry::Custom(e) => {
+            let mut parts: Vec<&str> = vec![&e.title];
+            for f in e.fields.values() {
+                parts.push(&f.label);
+                if !f.hidden {
+                    parts.push(&f.value);
+                }
+            }
+            EntrySummaryData {
+                id: e.meta.id.clone(),
+                entry_type: String::from("Custom"),
+                title: e.title.clone(),
+                folder: e.meta.folder.clone(),
+                search_blob: make_blob(&parts),
+            }
+        }
     }
 }
 
@@ -2894,5 +2962,275 @@ mod json_export_tests {
         assert!(parsed["folders"].as_array().unwrap().is_empty());
 
         teardown(&vault_path, &json_path);
+    }
+
+    // ── search_blob unit tests (no vault session needed) ──────────────────────
+
+    #[test]
+    fn search_blob_for_login_includes_username_and_url() {
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: "id-blob-1".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            title: "GitHub".to_string(),
+            url: "https://github.com".to_string(),
+            username: "rob@example.com".to_string(),
+            password: "s3cr3t".to_string(),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        });
+        let s = entry_to_summary(&entry);
+        assert!(
+            s.search_blob.contains("rob@example.com"),
+            "blob must include username"
+        );
+        assert!(
+            s.search_blob.contains("github.com"),
+            "blob must include url"
+        );
+    }
+
+    #[test]
+    fn search_blob_for_login_excludes_password() {
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: "id-blob-2".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            title: "GitHub".to_string(),
+            url: "https://github.com".to_string(),
+            username: "rob".to_string(),
+            password: "s3cr3t_password_xyz".to_string(),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        });
+        let s = entry_to_summary(&entry);
+        assert!(
+            !s.search_blob.contains("s3cr3t_password_xyz"),
+            "blob must not include password"
+        );
+    }
+
+    #[test]
+    fn search_blob_for_login_includes_notes() {
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: "id-blob-3".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            title: "Work VPN".to_string(),
+            url: "".to_string(),
+            username: "rob".to_string(),
+            password: "pw".to_string(),
+            notes: Some("corporate access only".to_string()),
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        });
+        let s = entry_to_summary(&entry);
+        assert!(
+            s.search_blob.contains("corporate access only"),
+            "blob must include notes"
+        );
+    }
+
+    #[test]
+    fn search_blob_for_login_includes_visible_custom_field_value() {
+        use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: "id-blob-4".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            title: "Example".to_string(),
+            url: "".to_string(),
+            username: "rob".to_string(),
+            password: "pw".to_string(),
+            notes: None,
+            custom_fields: vec![CustomField {
+                label: "Recovery email".to_string(),
+                value: "backup@example.com".to_string(),
+                hidden: false,
+            }],
+            attachments: vec![],
+            previous_password: None,
+        });
+        let s = entry_to_summary(&entry);
+        assert!(
+            s.search_blob.contains("recovery email"),
+            "blob must include custom field label"
+        );
+        assert!(
+            s.search_blob.contains("backup@example.com"),
+            "blob must include non-hidden custom field value"
+        );
+    }
+
+    #[test]
+    fn search_blob_for_login_excludes_hidden_custom_field_value() {
+        use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: "id-blob-5".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            title: "Example".to_string(),
+            url: "".to_string(),
+            username: "rob".to_string(),
+            password: "pw".to_string(),
+            notes: None,
+            custom_fields: vec![CustomField {
+                label: "Secret token".to_string(),
+                value: "tok_xyz_hidden_1234".to_string(),
+                hidden: true,
+            }],
+            attachments: vec![],
+            previous_password: None,
+        });
+        let s = entry_to_summary(&entry);
+        assert!(
+            !s.search_blob.contains("tok_xyz_hidden_1234"),
+            "blob must not include hidden custom field value"
+        );
+        assert!(
+            s.search_blob.contains("secret token"),
+            "blob must still include hidden field label"
+        );
+    }
+
+    #[test]
+    fn search_blob_for_note_includes_content() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        let entry = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: "id-blob-6".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            title: "Shopping".to_string(),
+            content: "Milk eggs bread olive oil".to_string(),
+            attachments: vec![],
+        });
+        let s = entry_to_summary(&entry);
+        assert!(
+            s.search_blob.contains("olive oil"),
+            "blob must include note content"
+        );
+    }
+
+    #[test]
+    fn search_blob_for_identity_includes_email_and_address() {
+        use crate::vault::entry::{EntryMeta, IdentityEntry, VaultEntry};
+        let entry = VaultEntry::Identity(IdentityEntry {
+            meta: EntryMeta {
+                id: "id-blob-7".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            first_name: "Alice".to_string(),
+            last_name: "Smith".to_string(),
+            email: "alice@example.com".to_string(),
+            phone: Some("+41791234567".to_string()),
+            address: Some("Rue du Rhône 10, Geneva".to_string()),
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+        let s = entry_to_summary(&entry);
+        assert!(
+            s.search_blob.contains("alice@example.com"),
+            "blob must include email"
+        );
+        assert!(
+            s.search_blob.contains("rue du rhône"),
+            "blob must include address (lowercased)"
+        );
+    }
+
+    #[test]
+    fn search_blob_for_card_includes_cardholder_and_bank_excludes_card_number() {
+        use crate::vault::entry::{CardEntry, EntryMeta, VaultEntry};
+        let entry = VaultEntry::Card(CardEntry {
+            meta: EntryMeta {
+                id: "id-blob-8".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            card_name: Some("Visa Platinum".to_string()),
+            status: "active".to_string(),
+            cardholder_name: "Rob Smith".to_string(),
+            card_number: "4111999988887777".to_string(),
+            expiry: "12/28".to_string(),
+            cvv: "999".to_string(),
+            credit_limit: None,
+            card_account_number: None,
+            payment_network: Some("Visa".to_string()),
+            pin: None,
+            bank_name: Some("UBS".to_string()),
+            transaction_password: None,
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_cvv: None,
+            previous_pin: None,
+        });
+        let s = entry_to_summary(&entry);
+        assert!(
+            s.search_blob.contains("rob smith"),
+            "blob must include cardholder name"
+        );
+        assert!(s.search_blob.contains("ubs"), "blob must include bank name");
+        assert!(
+            !s.search_blob.contains("4111999988887777"),
+            "blob must not include card number"
+        );
+        assert!(!s.search_blob.contains("999"), "blob must not include cvv");
+    }
+
+    #[test]
+    fn search_blob_is_lowercase() {
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: "id-blob-9".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            title: "UPPERCASE TITLE".to_string(),
+            url: "https://EXAMPLE.COM".to_string(),
+            username: "Rob@Example.Com".to_string(),
+            password: "pw".to_string(),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        });
+        let s = entry_to_summary(&entry);
+        assert_eq!(
+            s.search_blob,
+            s.search_blob.to_lowercase(),
+            "search_blob must be fully lowercase"
+        );
     }
 }

@@ -2112,11 +2112,13 @@ impl SseDecode for crate::api::vault_bridge::EntrySummaryData {
         let mut var_entryType = <String>::sse_decode(deserializer);
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_folder = <String>::sse_decode(deserializer);
+        let mut var_searchBlob = <String>::sse_decode(deserializer);
         return crate::api::vault_bridge::EntrySummaryData {
             id: var_id,
             entry_type: var_entryType,
             title: var_title,
             folder: var_folder,
+            search_blob: var_searchBlob,
         };
     }
 }
@@ -3046,6 +3048,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault_bridge::EntrySummaryDat
             self.entry_type.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
             self.folder.into_into_dart().into_dart(),
+            self.search_blob.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -3640,6 +3643,7 @@ impl SseEncode for crate::api::vault_bridge::EntrySummaryData {
         <String>::sse_encode(self.entry_type, serializer);
         <String>::sse_encode(self.title, serializer);
         <String>::sse_encode(self.folder, serializer);
+        <String>::sse_encode(self.search_blob, serializer);
     }
 }
 

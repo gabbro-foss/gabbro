@@ -12,6 +12,7 @@ EntrySummaryData _entry(String id, String title, String type) =>
       entryType: type,
       title: title,
       folder: 'Personal',
+      searchBlob: '',
     );
 
 List<EntrySummaryData> _oneEntry() => [_entry('1', 'Quartz', 'Login')];

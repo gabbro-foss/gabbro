@@ -279,22 +279,30 @@ Future<void> removeYubikey({required List<int> credId}) =>
 /// Lightweight entry summary returned by `list_entry_summaries()`.
 ///
 /// Contains just enough for Flutter to render a list row — no secrets.
+/// `search_blob` is a lowercase, space-joined string of all searchable
+/// non-secret fields; Flutter uses it for opt-in full-text search.
 class EntrySummaryData {
   final String id;
   final String entryType;
   final String title;
   final String folder;
+  final String searchBlob;
 
   const EntrySummaryData({
     required this.id,
     required this.entryType,
     required this.title,
     required this.folder,
+    required this.searchBlob,
   });
 
   @override
   int get hashCode =>
-      id.hashCode ^ entryType.hashCode ^ title.hashCode ^ folder.hashCode;
+      id.hashCode ^
+      entryType.hashCode ^
+      title.hashCode ^
+      folder.hashCode ^
+      searchBlob.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -304,7 +312,8 @@ class EntrySummaryData {
           id == other.id &&
           entryType == other.entryType &&
           title == other.title &&
-          folder == other.folder;
+          folder == other.folder &&
+          searchBlob == other.searchBlob;
 }
 
 @freezed

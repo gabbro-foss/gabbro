@@ -17,12 +17,14 @@ List<EntrySummaryData> _fakeEntries() => [
     entryType: 'Login',
     title: 'Alice',
     folder: 'Personal',
+    searchBlob: '',
   ),
   EntrySummaryData(
     id: 'id-2',
     entryType: 'Note',
     title: 'Bob',
     folder: 'Personal',
+    searchBlob: '',
   ),
 ];
 
@@ -287,6 +289,7 @@ void main() {
           entryType: 'Note',
           title: 'Bob',
           folder: 'Personal',
+          searchBlob: '',
         ),
       ];
       final reloadedGrouped = <dynamic>['B', reloadedEntries[0]];

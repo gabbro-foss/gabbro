@@ -2214,13 +2214,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   EntrySummaryData dco_decode_entry_summary_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return EntrySummaryData(
       id: dco_decode_String(arr[0]),
       entryType: dco_decode_String(arr[1]),
       title: dco_decode_String(arr[2]),
       folder: dco_decode_String(arr[3]),
+      searchBlob: dco_decode_String(arr[4]),
     );
   }
 
@@ -2891,11 +2892,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_entryType = sse_decode_String(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_folder = sse_decode_String(deserializer);
+    var var_searchBlob = sse_decode_String(deserializer);
     return EntrySummaryData(
       id: var_id,
       entryType: var_entryType,
       title: var_title,
       folder: var_folder,
+      searchBlob: var_searchBlob,
     );
   }
 
@@ -3663,6 +3666,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.entryType, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_String(self.folder, serializer);
+    sse_encode_String(self.searchBlob, serializer);
   }
 
   @protected
