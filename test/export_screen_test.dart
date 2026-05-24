@@ -9,6 +9,7 @@ void main() {
         MaterialApp(
           home: ExportScreen(
             onExport: (path) async {},
+            onExportJson: (path) async {},
           ),
         ),
       );
@@ -20,6 +21,7 @@ void main() {
         MaterialApp(
           home: ExportScreen(
             onExport: (path) async {},
+            onExportJson: (path) async {},
           ),
         ),
       );
@@ -32,6 +34,7 @@ void main() {
           home: ExportScreen(
             isAndroid: false,
             onExport: (path) async {},
+            onExportJson: (path) async {},
           ),
         ),
       );
@@ -41,13 +44,15 @@ void main() {
       expect(exportBtn.onPressed, isNull);
     });
 
-    testWidgets('calls onExport with selected path', (tester) async {
+    testWidgets('calls onExport with selected path when format is gabbro',
+        (tester) async {
       String? exportedPath;
       await tester.pumpWidget(
         MaterialApp(
           home: ExportScreen(
             initialPath: '/home/user/vault.gabbro',
             onExport: (path) async => exportedPath = path,
+            onExportJson: (path) async {},
           ),
         ),
       );
@@ -63,6 +68,7 @@ void main() {
           home: ExportScreen(
             isAndroid: true,
             onExport: (path) async {},
+            onExportJson: (path) async {},
           ),
         ),
       );
@@ -84,12 +90,96 @@ void main() {
             isAndroid: true,
             initialPath: '/storage/emulated/0/Documents',
             onExport: (path) async => exportedPath = path,
+            onExportJson: (path) async {},
           ),
         ),
       );
       await tester.tap(find.text('Export'));
       await tester.pump();
       expect(exportedPath, '/storage/emulated/0/Documents/vault.gabbro');
+    });
+
+    // ── Format selector ──────────────────────────────────────────────────────
+
+    testWidgets('shows format selector with Gabbro and JSON options',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ExportScreen(
+            onExport: (path) async {},
+            onExportJson: (path) async {},
+          ),
+        ),
+      );
+      expect(find.text('.gabbro'), findsOneWidget);
+      expect(find.text('JSON'), findsOneWidget);
+    });
+
+    testWidgets('default format is gabbro — shows passphrase-only note',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ExportScreen(
+            onExport: (path) async {},
+            onExportJson: (path) async {},
+          ),
+        ),
+      );
+      expect(find.textContaining('passphrase only'), findsOneWidget);
+    });
+
+    testWidgets('selecting JSON format shows plaintext warning', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ExportScreen(
+            onExport: (path) async {},
+            onExportJson: (path) async {},
+          ),
+        ),
+      );
+      await tester.tap(find.text('JSON'));
+      await tester.pump();
+      expect(find.textContaining('unencrypted'), findsOneWidget);
+    });
+
+    testWidgets('selecting JSON format calls onExportJson on android',
+        (tester) async {
+      String? jsonExportedPath;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ExportScreen(
+            isAndroid: true,
+            initialPath: '/storage/emulated/0/Documents',
+            onExport: (path) async {},
+            onExportJson: (path) async => jsonExportedPath = path,
+          ),
+        ),
+      );
+      await tester.tap(find.text('JSON'));
+      await tester.pump();
+      await tester.tap(find.text('Export'));
+      await tester.pump();
+      expect(jsonExportedPath, '/storage/emulated/0/Documents/vault.json');
+    });
+
+    testWidgets('selecting JSON format calls onExportJson on linux',
+        (tester) async {
+      String? jsonExportedPath;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ExportScreen(
+            isAndroid: false,
+            initialPath: '/home/user/vault.json',
+            onExport: (path) async {},
+            onExportJson: (path) async => jsonExportedPath = path,
+          ),
+        ),
+      );
+      await tester.tap(find.text('JSON'));
+      await tester.pump();
+      await tester.tap(find.text('Export'));
+      await tester.pump();
+      expect(jsonExportedPath, '/home/user/vault.json');
     });
   });
 }

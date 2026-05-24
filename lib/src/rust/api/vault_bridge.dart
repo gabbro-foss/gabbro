@@ -152,6 +152,14 @@ Future<void> assignFolderToEntries({
 Future<void> exportVault({required String path}) =>
     RustLib.instance.api.crateApiVaultBridgeExportVault(path: path);
 
+/// Serialize the current session to a plaintext JSON file at `path`.
+///
+/// WARNING: the output file is completely unencrypted — all secrets appear
+/// in plain text. Flutter must surface a visible warning before calling this.
+/// Async — filesystem write.
+Future<void> exportVaultJson({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeExportVaultJson(path: path);
+
 /// Read the vault header at `path` and return any YubiKey records it contains.
 ///
 /// Does **not** decrypt the vault body — safe to call before the user enters

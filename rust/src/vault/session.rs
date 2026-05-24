@@ -580,6 +580,34 @@ pub fn session_export_vault(export_path: PathBuf) -> Result<(), String> {
     Ok(())
 }
 
+/// Serialize the current session to a plaintext JSON file at `export_path`.
+///
+/// The output is completely unencrypted — all secrets appear in plain text.
+/// Flutter must surface a visible warning before calling this.
+pub fn session_export_vault_json(export_path: PathBuf) -> Result<(), String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
+
+    #[derive(serde::Serialize)]
+    struct JsonExport<'a> {
+        exported_at: String,
+        gabbro_version: &'static str,
+        folders: &'a [String],
+        entries: &'a [VaultEntry],
+    }
+
+    let export = JsonExport {
+        exported_at: crate::api::vault::chrono_now(),
+        gabbro_version: "1.0.0",
+        folders: &session.folders,
+        entries: &session.entries,
+    };
+
+    let json = serde_json::to_string_pretty(&export).map_err(|e| e.to_string())?;
+    std::fs::write(&export_path, json.as_bytes()).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 /// Lightweight login summary for the autofill fill path.
 ///
 /// Contains only the fields needed for domain matching and credential delivery.
@@ -2737,5 +2765,134 @@ mod yubikey_mgmt_tests {
         assert!(aliases.is_empty(), "fresh vault must have no aliases");
 
         teardown(&path);
+    }
+}
+
+#[cfg(test)]
+mod json_export_tests {
+    use super::*;
+    use crate::api::vault::save_vault;
+    use crate::vault::entry::{EntryMeta, LoginEntry, NoteEntry, VaultEntry};
+    use serial_test::serial;
+    use std::env::temp_dir;
+
+    fn teardown(vault_path: &PathBuf, json_path: &PathBuf) {
+        let _ = lock_vault();
+        let _ = std::fs::remove_file(vault_path);
+        let _ = std::fs::remove_file(json_path);
+    }
+
+    #[test]
+    #[serial]
+    fn export_vault_json_returns_err_when_locked() {
+        let mut json_path = temp_dir();
+        json_path.push("gabbro_json_export_locked.json");
+        lock_vault().ok();
+        let result = session_export_vault_json(json_path);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Vault is locked");
+    }
+
+    #[test]
+    #[serial]
+    fn export_vault_json_writes_file_with_valid_json() {
+        let pass = b"json-export-test";
+        let mut vault_path = temp_dir();
+        vault_path.push("gabbro_json_export_source.gabbro");
+        let mut json_path = temp_dir();
+        json_path.push("gabbro_json_export_output.json");
+
+        let entries = vec![
+            VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("je-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Personal"),
+                },
+                title: String::from("JSON export test note"),
+                content: String::from("test content"),
+                attachments: vec![],
+            }),
+            VaultEntry::Login(LoginEntry {
+                meta: EntryMeta {
+                    id: String::from("je-002"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from("Work"),
+                },
+                title: String::from("GitHub"),
+                url: String::from("https://github.com"),
+                username: String::from("rob"),
+                password: String::from("s3cr3t"),
+                notes: None,
+                custom_fields: vec![],
+                attachments: vec![],
+                previous_password: None,
+            }),
+        ];
+
+        save_vault(
+            &VaultBody {
+                folders: vec![String::from("Personal"), String::from("Work")],
+                entries,
+                ..Default::default()
+            },
+            pass,
+            &vault_path,
+        )
+        .unwrap();
+        unlock_vault(pass, vault_path.clone()).unwrap();
+
+        session_export_vault_json(json_path.clone()).unwrap();
+
+        let raw = std::fs::read_to_string(&json_path).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&raw).unwrap();
+
+        assert!(
+            parsed["exported_at"].is_string(),
+            "must have exported_at timestamp"
+        );
+        assert_eq!(parsed["gabbro_version"], "1.0.0");
+        assert_eq!(parsed["folders"].as_array().unwrap().len(), 2);
+        assert_eq!(parsed["entries"].as_array().unwrap().len(), 2);
+        assert!(
+            raw.contains("s3cr3t"),
+            "password must appear in plaintext export"
+        );
+
+        teardown(&vault_path, &json_path);
+    }
+
+    #[test]
+    #[serial]
+    fn export_vault_json_empty_vault_writes_empty_arrays() {
+        let pass = b"json-export-empty";
+        let mut vault_path = temp_dir();
+        vault_path.push("gabbro_json_export_empty.gabbro");
+        let mut json_path = temp_dir();
+        json_path.push("gabbro_json_export_empty_output.json");
+
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![],
+                ..Default::default()
+            },
+            pass,
+            &vault_path,
+        )
+        .unwrap();
+        unlock_vault(pass, vault_path.clone()).unwrap();
+
+        session_export_vault_json(json_path.clone()).unwrap();
+
+        let raw = std::fs::read_to_string(&json_path).unwrap();
+        let parsed: serde_json::Value = serde_json::from_str(&raw).unwrap();
+
+        assert!(parsed["entries"].as_array().unwrap().is_empty());
+        assert!(parsed["folders"].as_array().unwrap().is_empty());
+
+        teardown(&vault_path, &json_path);
     }
 }

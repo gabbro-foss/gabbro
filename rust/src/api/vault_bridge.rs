@@ -493,6 +493,15 @@ pub async fn export_vault(path: String) -> Result<(), String> {
     session::session_export_vault(PathBuf::from(path))
 }
 
+/// Serialize the current session to a plaintext JSON file at `path`.
+///
+/// WARNING: the output file is completely unencrypted — all secrets appear
+/// in plain text. Flutter must surface a visible warning before calling this.
+/// Async — filesystem write.
+pub async fn export_vault_json(path: String) -> Result<(), String> {
+    session::session_export_vault_json(PathBuf::from(path))
+}
+
 /// YubiKey credential record returned by `list_vault_yubikey_records`.
 ///
 /// The Android layer uses `credential_id` to identify which YubiKey credential
@@ -1007,6 +1016,60 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn export_vault_json_via_bridge() {
+        use crate::api::vault::save_vault;
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        use std::env::temp_dir;
+
+        let pass = b"bridge-json-export";
+        let mut vault_path = temp_dir();
+        vault_path.push("gabbro_bridge_json_export.gabbro");
+        let mut json_path = temp_dir();
+        json_path.push("gabbro_bridge_json_export_output.json");
+
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![VaultEntry::Note(NoteEntry {
+                    meta: EntryMeta {
+                        id: String::from("bje-001"),
+                        created_at: String::from("2025-01-01T00:00:00Z"),
+                        updated_at: String::from("2025-01-01T00:00:00Z"),
+                        folder: String::from(""),
+                    },
+                    title: String::from("Bridge JSON export test"),
+                    content: String::from("bridge content"),
+                    attachments: vec![],
+                })],
+                ..Default::default()
+            },
+            pass,
+            &vault_path,
+        )
+        .unwrap();
+
+        run(unlock_vault(
+            pass.to_vec(),
+            vault_path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        run(export_vault_json(json_path.to_str().unwrap().to_string())).unwrap();
+
+        let raw = std::fs::read_to_string(&json_path).unwrap();
+        assert!(
+            raw.contains("Bridge JSON export test"),
+            "note title must appear in JSON export"
+        );
+        assert!(raw.contains("gabbro_version"), "must include version field");
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&vault_path);
+        let _ = std::fs::remove_file(&json_path);
     }
 
     #[test]
