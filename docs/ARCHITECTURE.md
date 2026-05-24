@@ -166,11 +166,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **`onboarding_screen.dart` — accessibility button partially obscured**
+- **Export vault to JSON**
 
-  Accessibility button (top-right) partially hidden behind "Welcome to Gabbro" headline on some screen sizes. Fix layout so the button is never obscured.
-
-  **Next task:** fix layout so accessibility button is always fully visible.
+  Consistent with Gabbro's stance: we don't lock the user in. Include a clear warning that JSON exports are completely unencrypted and the user is responsible for handling the file securely. Surface warnings distinguishing `.gabbro` exports ("protected by your passphrase only") from JSON ("completely unencrypted — store securely").
 
 
 ---
@@ -215,10 +213,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - add vault alias to name each vault (avoids collisions) -> update vault file entry
   - export vault includes alias in name to avoid collision
 - Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
-- Export vault to JSON - consistent with gabbro stance: we don't lock the user in. Include warning about user's responsibility with a decrypted vault file.
 - Export/import security note: `.gabbro` exports are AES-256-GCM encrypted (passphrase-only — YubiKey not required to import, by design; passphrase is the durable recovery factor, YubiKey is the live-vault second factor). JSON exports are plaintext — no encryption at all. Add visible warnings in the export UI distinguishing the two: `.gabbro` ("protected by your passphrase only") and JSON ("completely unencrypted — store securely").
 - Multiple app languages (v1: en,fr,de,it,es)
-- `onboarding_screen.dart` — keyboard slides up when PIN field is focused during YubiKey vault creation, obscuring the step indicator card; fix so step indicator remains visible.
 - App logo (OnboardingScreen, UnlockScreen) — defer until designed.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
