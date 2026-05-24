@@ -166,7 +166,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next task TBD** — check with user
+- **Vault sync across devices**
+
+  One-shot overwrite is the v1 candidate: export the vault file, copy it to the other device, import/replace. File-level sync warning (both devices modified since last sync) is also a v1 candidate. Entry-level merge is v2.
 
 ---
 
@@ -208,13 +210,11 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - add vault button on login screen that togggles to onboarding screen
   - add vault alias to name each vault (avoids collisions) -> update vault file entry
   - export vault includes alias in name to avoid collision
-- Vault sync across devices (one-shot overwrite is v1 candidate; file-level sync warning is v1 candidate; entry-level merge is v2).
 - Multiple app languages (v1: en,fr,de,it,es)
 - App logo (OnboardingScreen, UnlockScreen) — defer until designed.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
 - Audit and standardise app version display: `pubspec.yaml` currently shows `1.0.0`, About screen must match; both must be reset to `0.1.0` before first public tag.
-- Clean up legacy vault on first launch (`com.example.gabbro` → `app.gabbro.gabbro` migration offer).
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
 
