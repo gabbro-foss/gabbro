@@ -3212,3 +3212,45 @@ Session 16, 2026-05-22. Tested on:
 - Linux: onboarding, login, change passphrase (either key), delete vault (either key) — all pass
 - Android USB: onboarding, login, change passphrase, delete vault — all pass
 - Android NFC: onboarding, login, change passphrase, delete vault — all pass
+
+---
+
+## Flutter — `pumpAndSettle` times out when a dialog TextField cursor is still ticking
+
+`pumpAndSettle` pumps frames (each advancing fake time by 100 ms) until no
+more pending work exists. A focused `TextField` runs a periodic cursor-blink
+`AnimationController` that keeps requesting repaints — so `pumpAndSettle`
+never sees the app as idle and eventually hits its 10-second timeout.
+
+This surfaces in widget tests where:
+1. A dialog with a `TextField` is opened.
+2. `enterText` focuses the field (cursor timer starts).
+3. The test taps a button that dismisses the dialog **and** immediately opens
+   a second dialog (error dialog, result dialog, etc.).
+4. The passphrase dialog is animating out (cursor timer still running) while
+   the second dialog is animating in.
+5. `pumpAndSettle` keeps pumping to settle the cursor timer — it never settles
+   because the cursor blink is a periodic animation.
+
+**Fix:** use explicit `pump(duration)` calls for these multi-dialog transitions
+instead of `pumpAndSettle`:
+
+```dart
+await tester.tap(find.text('Sync'));
+await tester.pump();                                   // process tap
+await tester.pump(const Duration(milliseconds: 350)); // passphrase dialog exit
+await tester.pump(const Duration(milliseconds: 350)); // result dialog enter
+// assertions here
+```
+
+This only affects tests where two dialogs transition in sequence and the first
+contains a `TextField`. Simple flows (dialog → snackbar) settle fine with
+`pumpAndSettle` because the snackbar auto-dismiss does not involve a cursor.
+
+**Root cause reminder:** the deeper issue is that `TextEditingController` must
+be owned by a `StatefulWidget` so Flutter disposes it after the exit animation
+completes (see the earlier entry on controller disposal). Using a `StatefulWidget`
+for the dialog (`_SyncPassphraseDialog`) is both the correct lifecycle fix
+*and* the fix that prevents the use-after-dispose crash — but the cursor blink
+timer still runs during the exit animation, so `pumpAndSettle` is still fragile
+in tests that chain two dialogs.

@@ -155,7 +155,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 317 | 8 |
-| Flutter (`flutter test`) | 318 | 0 |
+| Flutter (`flutter test`) | 326 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -190,11 +190,29 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - `merge_vault_from_file(path, passphrase) -> Result<MergeSummary, String>` — bridge function in `rust/src/api/vault_bridge.rs`.
   - 16 new Rust tests (3 serialization + 13 merge).
 
-  **Pieces of work (Session B — Flutter) — NEXT:**
+  **Session B (Flutter) — DONE (Session 23, 2026-05-25):**
 
-  - Run bridge codegen: `flutter_rust_bridge_codegen generate` from project root.
-  - Sync UX entry point in Settings menu: "Sync from file" → file picker → pre-merge summary dialog → merge → result snackbar.
-  - Detect passphrase mismatch from Rust error string; show the correct error dialog.
+  - Bridge codegen run: `flutter_rust_bridge_codegen generate` — Dart bindings for `mergeVaultFromFile` and `MergeSummary` generated.
+  - "Sync from file" menu entry in `VaultListScreen`: file picker → passphrase dialog → merge → result snackbar / result dialog.
+  - `_SyncPassphraseDialog` — dedicated `StatefulWidget` owns the `TextEditingController`; Flutter disposes it after the exit animation via `State.dispose()`.
+  - `mergeVault` and `onPickSyncFile` injected on `VaultListScreen` (DI pattern) for testability without hitting Rust or the file system.
+  - Passphrase mismatch detected from `"decryption failed"` in Rust error string → user-facing error dialog.
+  - "Vaults already identical" (all `MergeSummary` fields zero) → info snackbar.
+  - `edit_survived_delete` warnings shown in a dismissible result dialog.
+  - 8 new Flutter widget tests in `test/vault_list_sync_test.dart`.
+
+  **Hardware test vault sync — NEXT:**
+
+  Test the full sync flow end-to-end on physical hardware before shipping.
+  Use `cargo test -q` (full Rust suite) between sessions to confirm no regressions.
+
+  | Platform | Steps to test |
+  |---|---|
+  | Linux | Export vault from device A (`.gabbro`). Open on device B, add/edit/delete entries. Menu → Sync from file → pick device A export → enter passphrase → confirm result snackbar counts. |
+  | Android | Same flow over USB file transfer or cloud drive. |
+  | Wrong passphrase | Sync from file, enter wrong passphrase → "different passphrase" error dialog. |
+  | Identical vaults | Sync the same file twice → "Nothing to sync" snackbar. |
+  | Edit-survived-delete | On device A delete an entry; on device B edit the same entry with a newer timestamp; sync → warning dialog shows the entry title. |
 
   **User messages (all shown in Flutter):**
 
