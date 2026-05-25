@@ -168,6 +168,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   LoginEntryData dco_decode_login_entry_data(dynamic raw);
 
   @protected
+  MergeSummary dco_decode_merge_summary(dynamic raw);
+
+  @protected
   NoteEntryData dco_decode_note_entry_data(dynamic raw);
 
   @protected
@@ -410,6 +413,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   LoginEntryData sse_decode_login_entry_data(SseDeserializer deserializer);
+
+  @protected
+  MergeSummary sse_decode_merge_summary(SseDeserializer deserializer);
 
   @protected
   NoteEntryData sse_decode_note_entry_data(SseDeserializer deserializer);
@@ -709,6 +715,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     LoginEntryData self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_merge_summary(MergeSummary self, SseSerializer serializer);
 
   @protected
   void sse_encode_note_entry_data(NoteEntryData self, SseSerializer serializer);

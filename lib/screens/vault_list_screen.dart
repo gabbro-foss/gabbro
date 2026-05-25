@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
@@ -21,11 +23,21 @@ import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
+import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 
 Future<void> _defaultDeleteVault() => deleteWholeVault();
 List<String> _defaultListFolders() => listFolders();
+Future<MergeSummary> _defaultMergeVault(String path, List<int> passphrase) =>
+    mergeVaultFromFile(path: path, passphrase: passphrase);
+Future<String?> _defaultPickSyncFile() async {
+  final result = await FilePicker.pickFiles(
+    type: FileType.custom,
+    allowedExtensions: ['gabbro'],
+  );
+  return result?.files.single.path;
+}
 
 const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
 
@@ -96,6 +108,8 @@ class VaultListScreen extends StatefulWidget {
   final List<EntrySummaryData> Function() listEntries;
   final List<String> Function()? listFolders;
   final Future<void> Function() deleteVault;
+  final Future<MergeSummary> Function(String path, List<int> passphrase) mergeVault;
+  final Future<String?> Function() onPickSyncFile;
 
   final VaultEntryData Function(String id)? getEntryFn;
   final Future<void> Function(String id)? onDeleteEntryFn;
@@ -122,6 +136,8 @@ class VaultListScreen extends StatefulWidget {
     this.listEntries = listEntrySummaries,
     this.listFolders,
     this.deleteVault = _defaultDeleteVault,
+    this.mergeVault = _defaultMergeVault,
+    this.onPickSyncFile = _defaultPickSyncFile,
     this.getEntryFn,
     this.onDeleteEntryFn,
     this.onRefreshFn,
@@ -156,6 +172,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
   bool _selectionMode = false;
   bool _isDeleting = false;
   bool _isImporting = false;
+  bool _isSyncing = false;
   bool get _isSelecting => _selectionMode || _selectedIds.isNotEmpty;
   String _transport = 'usb';
   late final List<YubikeyRecordData> _yubikeyRecords;
@@ -522,12 +539,127 @@ class _VaultListScreenState extends State<VaultListScreen> {
     _loadEntries();
   }
 
+  Future<void> _syncFromFile() async {
+    final path = await widget.onPickSyncFile();
+    if (path == null || !mounted) return;
+
+    // _SyncPassphraseDialog owns the controller; returns passphrase or null.
+    final passphraseText = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => _SyncPassphraseDialog(filePath: path),
+    );
+    if (passphraseText == null || !mounted) return;
+
+    final passphraseBytes = utf8.encode(passphraseText);
+      setState(() => _isSyncing = true);
+      try {
+        final summary = await widget.mergeVault(path, passphraseBytes);
+        if (!mounted) return;
+
+        final isIdentical = summary.added == 0 &&
+            summary.updated == 0 &&
+            summary.deleted == 0 &&
+            summary.editSurvivedDelete.isEmpty;
+
+        if (isIdentical) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+                  Text('Nothing to sync — both vaults are already up to date.'),
+            ),
+          );
+          return;
+        }
+
+        _loadEntries();
+
+        if (summary.editSurvivedDelete.isNotEmpty) {
+          final warnings = summary.editSurvivedDelete
+              .map((title) =>
+                  "'$title' was deleted on one device but later edited on the other — the edited version has been kept. Delete it manually if that is not what you want.")
+              .join('\n\n');
+          if (mounted) {
+            await showDialog<void>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: const Text('Vault synced'),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${summary.added} entries added, '
+                        '${summary.updated} updated, '
+                        '${summary.deleted} deleted.',
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        warnings,
+                        style: TextStyle(
+                            color: Theme.of(ctx).colorScheme.error),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Vault synced — '
+                  '${summary.added} entries added, '
+                  '${summary.updated} updated, '
+                  '${summary.deleted} deleted.',
+                ),
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        if (!mounted) return;
+        final msg = e.toString();
+        final isPassphraseMismatch = msg.contains('decryption failed');
+        await showDialog<void>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Sync failed'),
+            content: Text(
+              isPassphraseMismatch
+                  ? 'This vault file uses a different passphrase. Sync is only supported between vaults that share a passphrase.'
+                  : msg,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Dismiss'),
+              ),
+            ],
+          ),
+        );
+      } finally {
+        if (mounted) setState(() => _isSyncing = false);
+      }
+  }
+
   Future<void> _onMenuSelected(String value) async {
     switch (value) {
       case 'export':
         _openExportScreen();
       case 'import':
         _openImportScreen();
+      case 'sync':
+        _syncFromFile();
       case 'change_passphrase':
         final cpAppState = GabbroApp.of(context);
         Navigator.of(context).push(
@@ -887,7 +1019,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
           _isSelecting ? '${_selectedIds.length} selected' : 'Gabbro',
         ),
         actions: [
-          if (_isImporting)
+          if (_isImporting || _isSyncing)
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: SizedBox(
@@ -926,6 +1058,14 @@ class _VaultListScreenState extends State<VaultListScreen> {
                     Icon(Icons.download_outlined, size: 20),
                     SizedBox(width: 12),
                     Expanded(child: Text('Import entries')),
+                  ]),
+                ),
+                const PopupMenuItem(
+                  value: 'sync',
+                  child: Row(children: [
+                    Icon(Icons.sync, size: 20),
+                    SizedBox(width: 12),
+                    Expanded(child: Text('Sync from file')),
                   ]),
                 ),
                 const PopupMenuDivider(),
@@ -1369,6 +1509,69 @@ class _VaultListScreenState extends State<VaultListScreen> {
       ),
     );
   }
+}
+
+/// Passphrase dialog for "Sync from file".
+///
+/// Owns its TextEditingController so Flutter can dispose it safely during the
+/// dialog exit animation via State.dispose(), avoiding use-after-dispose errors.
+/// Returns the entered passphrase text on confirm, or null on cancel.
+class _SyncPassphraseDialog extends StatefulWidget {
+  final String filePath;
+  const _SyncPassphraseDialog({required this.filePath});
+
+  @override
+  State<_SyncPassphraseDialog> createState() => _SyncPassphraseDialogState();
+}
+
+class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
+  final _ctrl = TextEditingController();
+  bool _showPass = false;
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+        title: const Text('Sync from file'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.filePath,
+              style: Theme.of(context).textTheme.bodySmall,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _ctrl,
+              obscureText: !_showPass,
+              decoration: InputDecoration(
+                labelText: 'Vault passphrase',
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(_showPass ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () => setState(() => _showPass = !_showPass),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(_ctrl.text),
+            child: const Text('Sync'),
+          ),
+        ],
+      );
 }
 
 class _ChipRowFadeEdge extends StatelessWidget {

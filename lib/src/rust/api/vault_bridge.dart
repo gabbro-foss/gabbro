@@ -276,6 +276,24 @@ Future<void> addYubikey({
 Future<void> removeYubikey({required List<int> credId}) =>
     RustLib.instance.api.crateApiVaultBridgeRemoveYubikey(credId: credId);
 
+/// Merge an incoming `.gabbro` file into the current session and persist.
+///
+/// Loads and decrypts the file at `path` using `passphrase`, then runs the
+/// entry-level merge algorithm against the live session.  Returns a summary
+/// for Flutter to display in the pre-merge confirmation dialog.
+///
+/// Returns `Err` if:
+/// - the vault is locked
+/// - `path` cannot be read or is not a valid Gabbro file
+/// - the passphrase is wrong (decryption failure)
+Future<MergeSummary> mergeVaultFromFile({
+  required String path,
+  required List<int> passphrase,
+}) => RustLib.instance.api.crateApiVaultBridgeMergeVaultFromFile(
+  path: path,
+  passphrase: passphrase,
+);
+
 /// Lightweight entry summary returned by `list_entry_summaries()`.
 ///
 /// Contains just enough for Flutter to render a list row — no secrets.

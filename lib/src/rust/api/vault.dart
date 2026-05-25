@@ -452,6 +452,46 @@ class LoginEntryData {
           previousPassword == other.previousPassword;
 }
 
+/// Summary returned to Flutter after a vault merge operation.
+class MergeSummary {
+  /// Entries added from the incoming vault (UUIDs not present locally).
+  final int added;
+
+  /// Entries updated because the incoming version had a newer timestamp.
+  final int updated;
+
+  /// Entries removed because a tombstone on either side won.
+  final int deleted;
+
+  /// Display titles of entries where an edit beat a deletion tombstone.
+  /// Flutter shows a per-entry warning for each of these.
+  final List<String> editSurvivedDelete;
+
+  const MergeSummary({
+    required this.added,
+    required this.updated,
+    required this.deleted,
+    required this.editSurvivedDelete,
+  });
+
+  @override
+  int get hashCode =>
+      added.hashCode ^
+      updated.hashCode ^
+      deleted.hashCode ^
+      editSurvivedDelete.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MergeSummary &&
+          runtimeType == other.runtimeType &&
+          added == other.added &&
+          updated == other.updated &&
+          deleted == other.deleted &&
+          editSurvivedDelete == other.editSurvivedDelete;
+}
+
 /// A note entry as seen by Flutter.
 class NoteEntryData {
   final String id;

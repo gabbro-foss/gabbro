@@ -73,7 +73,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.12.0';
 
   @override
-  int get rustContentHash => -1135054293;
+  int get rustContentHash => -555652193;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -268,6 +268,11 @@ abstract class RustLibApi extends BaseApi {
   List<YubikeyAliasData> crateApiVaultBridgeListYubikeyAliases();
 
   void crateApiVaultBridgeLockVault();
+
+  Future<MergeSummary> crateApiVaultBridgeMergeVaultFromFile({
+    required String path,
+    required List<int> passphrase,
+  });
 
   Future<double> crateApiPassphraseGeneratorPassphraseEntropyBits({
     required int wordCount,
@@ -1689,6 +1694,41 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(debugName: "lock_vault", argNames: []);
 
   @override
+  Future<MergeSummary> crateApiVaultBridgeMergeVaultFromFile({
+    required String path,
+    required List<int> passphrase,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_String(path, serializer);
+          sse_encode_list_prim_u_8_loose(passphrase, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 42,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_merge_summary,
+          decodeErrorData: sse_decode_String,
+        ),
+        constMeta: kCrateApiVaultBridgeMergeVaultFromFileConstMeta,
+        argValues: [path, passphrase],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiVaultBridgeMergeVaultFromFileConstMeta =>
+      const TaskConstMeta(
+        debugName: "merge_vault_from_file",
+        argNames: ["path", "passphrase"],
+      );
+
+  @override
   Future<double> crateApiPassphraseGeneratorPassphraseEntropyBits({
     required int wordCount,
     required Language language,
@@ -1702,7 +1742,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 42,
+            funcId: 43,
             port: port_,
           );
         },
@@ -1734,7 +1774,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 43,
+            funcId: 44,
             port: port_,
           );
         },
@@ -1766,7 +1806,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 44,
+            funcId: 45,
             port: port_,
           );
         },
@@ -1799,7 +1839,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 45,
+            funcId: 46,
             port: port_,
           );
         },
@@ -1830,7 +1870,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 46,
+            funcId: 47,
             port: port_,
           );
         },
@@ -1865,7 +1905,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 47,
+            funcId: 48,
             port: port_,
           );
         },
@@ -1893,7 +1933,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         callFfi: () {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_String(input, serializer);
-          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 48)!;
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 49)!;
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_csv_preview_data,
@@ -1923,7 +1963,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 49,
+            funcId: 50,
             port: port_,
           );
         },
@@ -1964,7 +2004,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 50,
+            funcId: 51,
             port: port_,
           );
         },
@@ -2005,7 +2045,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 51,
+            funcId: 52,
             port: port_,
           );
         },
@@ -2453,6 +2493,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       previousPassword: dco_decode_opt_box_autoadd_previous_secret_data(
         arr[10],
       ),
+    );
+  }
+
+  @protected
+  MergeSummary dco_decode_merge_summary(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return MergeSummary(
+      added: dco_decode_u_32(arr[0]),
+      updated: dco_decode_u_32(arr[1]),
+      deleted: dco_decode_u_32(arr[2]),
+      editSurvivedDelete: dco_decode_list_String(arr[3]),
     );
   }
 
@@ -3233,6 +3287,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  MergeSummary sse_decode_merge_summary(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_added = sse_decode_u_32(deserializer);
+    var var_updated = sse_decode_u_32(deserializer);
+    var var_deleted = sse_decode_u_32(deserializer);
+    var var_editSurvivedDelete = sse_decode_list_String(deserializer);
+    return MergeSummary(
+      added: var_added,
+      updated: var_updated,
+      deleted: var_deleted,
+      editSurvivedDelete: var_editSurvivedDelete,
+    );
+  }
+
+  @protected
   NoteEntryData sse_decode_note_entry_data(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_id = sse_decode_String(deserializer);
@@ -3951,6 +4020,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       self.previousPassword,
       serializer,
     );
+  }
+
+  @protected
+  void sse_encode_merge_summary(MergeSummary self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.added, serializer);
+    sse_encode_u_32(self.updated, serializer);
+    sse_encode_u_32(self.deleted, serializer);
+    sse_encode_list_String(self.editSurvivedDelete, serializer);
   }
 
   @protected
