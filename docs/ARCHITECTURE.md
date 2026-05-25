@@ -154,7 +154,7 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 301 | 8 |
+| Rust (`cargo test -q`) | 317 | 8 |
 | Flutter (`flutter test`) | 318 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
@@ -180,17 +180,21 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   4. **Delete-vs-edit ordering** — if an entry was deleted on device A but edited on device B *after* that deletion (`entry.updated_at > tombstone.deleted_at`), the edit wins and the entry is kept. The user is shown a per-entry warning (see User messages below). If the deletion is newer, the entry is removed.
   5. **Folders** — no UUIDs, just strings. Union both folder lists (deduplicated). Folder rename conflicts surface as two separate folder names; user tidies up manually.
 
-  **Pieces of work (Session A — Rust):**
+  **Session A (Rust) — DONE (Session 22, 2026-05-25):**
 
-  - `VaultBody` gains `vault_updated_at: String` and `deleted_ids: Vec<DeletedEntry>` (`{ id: String, deleted_at: String }`). Backward-compatible — old vaults deserialise both fields to their defaults (`""` and `[]`). `vault_updated_at` stamped on every save.
-  - Entry delete path records a tombstone in `deleted_ids` as well as removing the entry from the vec.
-  - New `merge_vault_from_file(path, passphrase) -> MergeSummary` bridge function: loads the incoming vault, runs the merge algorithm against the live session, saves the result. Returns a `MergeSummary` DTO for Flutter to display. Distinct from the existing import path (which is for migrating from other apps).
-  - `MergeSummary { added: u32, updated: u32, deleted: u32, edit_survived_delete: Vec<String> }` — `edit_survived_delete` carries the titles of entries where an edit beat a deletion, for the per-entry warning.
+  - `VaultBody` gained `vault_updated_at: String` and `deleted_ids: Vec<DeletedEntry>` (`{ id: String, deleted_at: String }`). Both `#[serde(default)]` — backward-compatible. `vault_updated_at` stamped on every save via `build_body()`.
+  - `session_delete_entry` and `session_delete_entries_no_save` both write a tombstone to `deleted_ids` before removing the entry.
+  - `MergeSummary { added: u32, updated: u32, deleted: u32, edit_survived_delete: Vec<String> }` defined in `rust/src/api/vault.rs`.
+  - `do_merge()` in `rust/src/vault/session.rs` — pure merge algorithm (last-write-wins, tombstone ordering, folder union, tombstone union).
+  - `session_merge_vault_from_body(incoming: VaultBody) -> Result<MergeSummary, String>` — merges and saves.
+  - `merge_vault_from_file(path, passphrase) -> Result<MergeSummary, String>` — bridge function in `rust/src/api/vault_bridge.rs`.
+  - 16 new Rust tests (3 serialization + 13 merge).
 
-  **Pieces of work (Session B — Flutter):**
+  **Pieces of work (Session B — Flutter) — NEXT:**
 
+  - Run bridge codegen: `flutter_rust_bridge_codegen generate` from project root.
   - Sync UX entry point in Settings menu: "Sync from file" → file picker → pre-merge summary dialog → merge → result snackbar.
-  - Bridge codegen after Session A.
+  - Detect passphrase mismatch from Rust error string; show the correct error dialog.
 
   **User messages (all shown in Flutter):**
 
