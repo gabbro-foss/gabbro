@@ -201,18 +201,61 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - `edit_survived_delete` warnings shown in a dismissible result dialog.
   - 8 new Flutter widget tests in `test/vault_list_sync_test.dart`.
 
-  **Hardware test vault sync — NEXT:**
+  **Hardware test vault sync — DONE (2026-05-25); 2 bugs found:**
 
-  Test the full sync flow end-to-end on physical hardware before shipping.
-  Use `cargo test -q` (full Rust suite) between sessions to confirm no regressions.
-
-  | Platform | Steps to test |
+  | Scenario | Result |
   |---|---|
-  | Linux | Export vault from device A (`.gabbro`). Open on device B, add/edit/delete entries. Menu → Sync from file → pick device A export → enter passphrase → confirm result snackbar counts. |
-  | Android | Same flow over USB file transfer or cloud drive. |
-  | Wrong passphrase | Sync from file, enter wrong passphrase → "different passphrase" error dialog. |
-  | Identical vaults | Sync the same file twice → "Nothing to sync" snackbar. |
-  | Edit-survived-delete | On device A delete an entry; on device B edit the same entry with a newer timestamp; sync → warning dialog shows the entry title. |
+  | Linux → Android (add entries, export, sync) | PASS |
+  | Android → Linux (add entries, export, sync) | PASS |
+  | Wrong passphrase (both directions) | PASS |
+  | Identical vaults (both directions) | PASS |
+  | Edit survived delete | PASS |
+  | Delete synced | **FAIL** |
+  | Folder names and folder entries synced | **FAIL** |
+
+  **Messages tested:**
+
+  | Message | Result |
+  |---|---|
+  | Both vaults have changes | PASS |
+  | Edit survived deletion warning | PASS |
+  | Passphrase mismatch | PASS |
+  | Vaults already identical | PASS |
+  | Merge succeeded | PASS |
+  | Folder name collision | **FAIL** (not triggered — folders not exported) |
+
+  **Bug analysis:**
+
+  Root cause for both failures is the same: `session_export_vault` passes only
+  `session.entries` to `export_vault` (`rust/src/api/vault.rs:723`), which
+  constructs a `VaultBody` with `folders: vec![]` and `..Default::default()`
+  (giving `deleted_ids: vec![]`). Every `.gabbro` export silently discards
+  tombstones and the folder list.
+
+  - **Bug 1 — Delete not synced:** `deleted_ids` is stripped from the export.
+    The receiving device sees no tombstones in the incoming body → `do_merge`
+    never triggers the deletion path → deleted entries survive on the other
+    device as if they were never removed.
+  - **Bug 2 — Folder names not synced:** `folders` is stripped from the export.
+    The receiving device's `do_merge` sees an empty incoming folder list → no
+    new folder names are transferred → entries imported with a non-empty
+    `meta.folder` field arrive orphaned from any folder the receiving device
+    does not already have in its own list.
+
+  **Proposed fix — Fix vault sync export (NEXT):**
+
+  Replace `session_export_vault` with a version that calls `build_body()`
+  (already used for every save) so the export includes the live `folders` and
+  `deleted_ids`. `export_vault` in `vault.rs` should accept a full `VaultBody`
+  instead of just `&[VaultEntry]`.  The SHA-256 sidecar logic stays unchanged.
+
+  New regression tests needed:
+  1. Export a vault that has tombstones → load the export → confirm `deleted_ids`
+     round-trips correctly.
+  2. Export a vault with a named folder → sync into a vault that lacks that
+     folder → confirm the folder name appears after merge.
+  3. Delete entry on device A, export, merge into device B → confirm deleted
+     count = 1 and entry is gone from B.
 
   **User messages (all shown in Flutter):**
 
