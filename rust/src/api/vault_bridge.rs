@@ -739,6 +739,27 @@ pub async fn remove_yubikey(cred_id: Vec<u8>) -> Result<(), String> {
     session::session_remove_yubikey(cred_id)
 }
 
+// ── Vault sync ────────────────────────────────────────────────────────────────
+
+/// Merge an incoming `.gabbro` file into the current session and persist.
+///
+/// Loads and decrypts the file at `path` using `passphrase`, then runs the
+/// entry-level merge algorithm against the live session.  Returns a summary
+/// for Flutter to display in the pre-merge confirmation dialog.
+///
+/// Returns `Err` if:
+/// - the vault is locked
+/// - `path` cannot be read or is not a valid Gabbro file
+/// - the passphrase is wrong (decryption failure)
+pub async fn merge_vault_from_file(
+    path: String,
+    passphrase: Vec<u8>,
+) -> Result<crate::api::vault::MergeSummary, String> {
+    let file_path = PathBuf::from(path);
+    let incoming_body = crate::api::vault::load_vault(&passphrase, &file_path)?;
+    session::session_merge_vault_from_body(incoming_body)
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]

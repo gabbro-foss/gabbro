@@ -124,6 +124,19 @@ pub struct CustomEntryData {
     pub fields: Vec<CustomFieldData>,
 }
 
+/// Summary returned to Flutter after a vault merge operation.
+pub struct MergeSummary {
+    /// Entries added from the incoming vault (UUIDs not present locally).
+    pub added: u32,
+    /// Entries updated because the incoming version had a newer timestamp.
+    pub updated: u32,
+    /// Entries removed because a tombstone on either side won.
+    pub deleted: u32,
+    /// Display titles of entries where an edit beat a deletion tombstone.
+    /// Flutter shows a per-entry warning for each of these.
+    pub edit_survived_delete: Vec<String>,
+}
+
 // ── Conversion helpers (internal → DTO) ──────────────────────────────────────
 
 // All conversion helpers take references to avoid moving out of types that

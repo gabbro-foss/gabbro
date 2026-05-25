@@ -15,16 +15,37 @@ use std::collections::HashMap;
 /// Default folders applied to new vaults and legacy vaults on migration.
 pub const DEFAULT_FOLDERS: [&str; 3] = ["Work", "Private", "Other"];
 
+/// A record of an intentionally deleted entry.
+///
+/// Written to `VaultBody.deleted_ids` when an entry is removed so that sync
+/// merge can distinguish "this entry was deleted" from "this entry never existed
+/// on this device".
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct DeletedEntry {
+    pub id: String,
+    /// ISO 8601 UTC timestamp of the deletion.
+    pub deleted_at: String,
+}
+
 /// The complete decrypted vault body — folders list plus all entries.
 ///
-/// `yubikey_aliases` is optional at the JSON level (`#[serde(default)]`) so vaults
-/// written by older builds (without the field) deserialise cleanly with an empty map.
+/// `yubikey_aliases`, `vault_updated_at`, and `deleted_ids` are optional at
+/// the JSON level (`#[serde(default)]`) so vaults written by older builds
+/// deserialise cleanly with sensible defaults.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct VaultBody {
     pub folders: Vec<String>,
     pub entries: Vec<VaultEntry>,
     #[serde(default)]
     pub yubikey_aliases: HashMap<String, String>,
+    /// ISO 8601 UTC timestamp set on every save.  Used by sync to detect
+    /// whether two vaults are already identical.  Empty string on old vaults.
+    #[serde(default)]
+    pub vault_updated_at: String,
+    /// Tombstones for intentionally deleted entries.  Used by sync merge to
+    /// propagate deletions across devices.  Empty on old vaults.
+    #[serde(default)]
+    pub deleted_ids: Vec<DeletedEntry>,
 }
 
 impl VaultBody {
@@ -34,6 +55,8 @@ impl VaultBody {
             folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
             entries: vec![],
             yubikey_aliases: HashMap::new(),
+            vault_updated_at: String::new(),
+            deleted_ids: vec![],
         }
     }
 }
@@ -61,6 +84,8 @@ pub fn deserialize_vault_body(bytes: &[u8]) -> Result<VaultBody, String> {
             folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
             entries,
             yubikey_aliases: HashMap::new(),
+            vault_updated_at: String::new(),
+            deleted_ids: vec![],
         });
     }
     serde_json::from_slice(bytes).map_err(|e| format!("Failed to deserialize vault body: {e}"))
@@ -242,6 +267,47 @@ mod tests {
     }
 
     #[test]
+    fn vault_updated_at_defaults_when_absent_from_json() {
+        let legacy_json = br#"{"folders":[],"entries":[]}"#;
+        let body = deserialize_vault_body(legacy_json).unwrap();
+        assert_eq!(
+            body.vault_updated_at, "",
+            "missing vault_updated_at must default to empty string"
+        );
+    }
+
+    #[test]
+    fn deleted_ids_defaults_when_absent_from_json() {
+        let legacy_json = br#"{"folders":[],"entries":[]}"#;
+        let body = deserialize_vault_body(legacy_json).unwrap();
+        assert!(
+            body.deleted_ids.is_empty(),
+            "missing deleted_ids must default to empty vec"
+        );
+    }
+
+    #[test]
+    fn deleted_entry_roundtrips() {
+        use super::DeletedEntry;
+        let body = VaultBody {
+            folders: vec![],
+            entries: vec![],
+            deleted_ids: vec![DeletedEntry {
+                id: String::from("uuid-abc"),
+                deleted_at: String::from("2026-01-01T10:00:00Z"),
+            }],
+            vault_updated_at: String::from("2026-01-01T10:00:01Z"),
+            ..Default::default()
+        };
+        let bytes = serialize_vault_body(&body).unwrap();
+        let recovered = deserialize_vault_body(&bytes).unwrap();
+        assert_eq!(recovered.deleted_ids.len(), 1);
+        assert_eq!(recovered.deleted_ids[0].id, "uuid-abc");
+        assert_eq!(recovered.deleted_ids[0].deleted_at, "2026-01-01T10:00:00Z");
+        assert_eq!(recovered.vault_updated_at, "2026-01-01T10:00:01Z");
+    }
+
+    #[test]
     fn yubikey_aliases_roundtrips() {
         let mut aliases = HashMap::new();
         aliases.insert(String::from("aabbcc"), String::from("main"));
@@ -250,6 +316,7 @@ mod tests {
             folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
             entries: vec![],
             yubikey_aliases: aliases.clone(),
+            ..Default::default()
         };
         let bytes = serialize_vault_body(&body).unwrap();
         let recovered = deserialize_vault_body(&bytes).unwrap();

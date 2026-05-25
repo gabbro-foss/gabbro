@@ -13,11 +13,11 @@ use std::sync::Mutex;
 use crate::api::vault::{
     add_yubikey_to_vault, change_passphrase_with_keys, load_vault, load_vault_with_key_record,
     load_vault_with_yubikey, remove_yubikey_from_vault, reseal_vault_body, save_vault,
-    save_vault_with_yubikey,
+    save_vault_with_yubikey, MergeSummary,
 };
 use crate::api::vault_bridge::EntrySummaryData;
 use crate::vault::entry::{CustomField, VaultEntry};
-use crate::vault::serialization::VaultBody;
+use crate::vault::serialization::{DeletedEntry, VaultBody};
 
 // Extracted YubiKey quad: (hmac_secret, credential_id, hkdf_salt, vault_key_master?).
 type YubikeyTriple = Option<(
@@ -56,6 +56,8 @@ pub struct VaultSession {
     /// User-defined aliases for registered YubiKeys, keyed by credential_id hex string.
     /// Stored in the encrypted vault body for portability across devices.
     pub yubikey_aliases: std::collections::HashMap<String, String>,
+    /// Tombstones for intentionally deleted entries, propagated during vault sync.
+    pub deleted_ids: Vec<DeletedEntry>,
 }
 
 static VAULT_SESSION: Lazy<Mutex<Option<VaultSession>>> = Lazy::new(|| Mutex::new(None));
@@ -73,6 +75,7 @@ pub fn unlock_vault(passphrase: &[u8], path: PathBuf) -> Result<(), String> {
         folders: body.folders,
         entries: body.entries,
         yubikey_aliases: body.yubikey_aliases,
+        deleted_ids: body.deleted_ids,
         path,
         passphrase: passphrase.to_vec(),
         yubikey: None,
@@ -95,6 +98,7 @@ pub fn unlock_vault_with_yubikey(
         folders: body.folders,
         entries: body.entries,
         yubikey_aliases: body.yubikey_aliases,
+        deleted_ids: body.deleted_ids,
         path,
         passphrase: passphrase.to_vec(),
         yubikey: Some(YubikeyMaterial {
@@ -127,6 +131,7 @@ pub fn unlock_vault_with_key_record(
         folders: body.folders,
         entries: body.entries,
         yubikey_aliases: body.yubikey_aliases,
+        deleted_ids: body.deleted_ids,
         path,
         passphrase: passphrase.to_vec(),
         yubikey: Some(YubikeyMaterial {
@@ -179,6 +184,8 @@ fn build_body(session: &VaultSession) -> VaultBody {
         folders: session.folders.clone(),
         entries: session.entries.clone(),
         yubikey_aliases: session.yubikey_aliases.clone(),
+        vault_updated_at: crate::api::vault::chrono_now(),
+        deleted_ids: session.deleted_ids.clone(),
     }
 }
 
@@ -393,6 +400,15 @@ pub fn get_entry(id: &str) -> Result<VaultEntry, String> {
 pub fn session_delete_entries_no_save(ids: &[String]) -> Result<(), String> {
     let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_mut().ok_or("Vault is locked")?;
+    let now = crate::api::vault::chrono_now();
+    for id in ids {
+        if session.entries.iter().any(|e| entry_id(e) == id.as_str()) {
+            session.deleted_ids.push(DeletedEntry {
+                id: id.clone(),
+                deleted_at: now.clone(),
+            });
+        }
+    }
     session
         .entries
         .retain(|e| !ids.contains(&entry_id(e).to_string()));
@@ -497,6 +513,10 @@ pub fn session_delete_entry(id: &str) -> Result<(), String> {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
         crate::api::vault::delete_entry(&mut session.entries, id)?;
+        session.deleted_ids.push(DeletedEntry {
+            id: id.to_string(),
+            deleted_at: crate::api::vault::chrono_now(),
+        });
         let body = build_body(session);
         let yubikey = extract_yubikey(session);
         (
@@ -1011,6 +1031,198 @@ pub fn session_list_yubikey_aliases() -> Result<std::collections::HashMap<String
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
     Ok(session.yubikey_aliases.clone())
+}
+
+// ── Vault sync merge ──────────────────────────────────────────────────────────
+
+/// Return the `updated_at` timestamp of any entry variant.
+fn entry_updated_at(entry: &VaultEntry) -> &str {
+    match entry {
+        VaultEntry::Login(e) => &e.meta.updated_at,
+        VaultEntry::Note(e) => &e.meta.updated_at,
+        VaultEntry::Identity(e) => &e.meta.updated_at,
+        VaultEntry::Card(e) => &e.meta.updated_at,
+        VaultEntry::File(e) => &e.meta.updated_at,
+        VaultEntry::Custom(e) => &e.meta.updated_at,
+    }
+}
+
+/// Return a human-readable display title for any entry variant.
+///
+/// Uses the same fallback logic as `entry_to_summary`.
+fn entry_display_title(entry: &VaultEntry) -> String {
+    match entry {
+        VaultEntry::Login(e) => {
+            if !e.title.is_empty() {
+                e.title.clone()
+            } else if !e.url.is_empty() {
+                e.url.clone()
+            } else {
+                e.meta.id.clone()
+            }
+        }
+        VaultEntry::Note(e) => e.title.clone(),
+        VaultEntry::Identity(e) => format!("{} {}", e.first_name, e.last_name),
+        VaultEntry::Card(e) => e
+            .card_name
+            .as_deref()
+            .filter(|s| !s.is_empty())
+            .unwrap_or(&e.cardholder_name)
+            .to_string(),
+        VaultEntry::File(e) => e.filename.clone(),
+        VaultEntry::Custom(e) => e.title.clone(),
+    }
+}
+
+/// Apply the entry-level merge algorithm to `session`, mutating it in place.
+///
+/// Merge rules (all timestamps are ISO 8601 strings; lexicographic ordering
+/// is equivalent to temporal ordering for the format produced by `chrono_now`):
+///
+/// - **Additions**: entries present only on one side are added to the result.
+/// - **Edit conflicts** (same UUID on both sides): last-write-wins on `updated_at`.
+/// - **Deletions**: a tombstone beats a live entry when `deleted_at > updated_at`.
+/// - **Edit survived delete**: when `updated_at >= deleted_at` the live entry wins;
+///   the entry title is recorded in `edit_survived_delete` for the Flutter warning.
+/// - **Folders**: union, deduplicated by string equality.
+/// - **Tombstones**: union of both `deleted_ids` lists, deduped by id (newer
+///   `deleted_at` kept when the same id appears on both sides).
+fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
+    let mut added: u32 = 0;
+    let mut updated: u32 = 0;
+    let mut deleted: u32 = 0;
+    let mut edit_survived_delete: Vec<String> = Vec::new();
+
+    // Build lookup maps.
+    let local_by_id: std::collections::HashMap<&str, &VaultEntry> =
+        session.entries.iter().map(|e| (entry_id(e), e)).collect();
+    let incoming_by_id: std::collections::HashMap<&str, &VaultEntry> =
+        incoming.entries.iter().map(|e| (entry_id(e), e)).collect();
+    let local_deletions: std::collections::HashMap<&str, &str> = session
+        .deleted_ids
+        .iter()
+        .map(|d| (d.id.as_str(), d.deleted_at.as_str()))
+        .collect();
+    let incoming_deletions: std::collections::HashMap<&str, &str> = incoming
+        .deleted_ids
+        .iter()
+        .map(|d| (d.id.as_str(), d.deleted_at.as_str()))
+        .collect();
+
+    let mut result_entries: Vec<VaultEntry> = Vec::new();
+
+    // --- Process local entries ---
+    for local_entry in &session.entries {
+        let id = entry_id(local_entry);
+
+        if let Some(inc_entry) = incoming_by_id.get(id) {
+            // Entry exists on both sides — last-write-wins.
+            if entry_updated_at(inc_entry) > entry_updated_at(local_entry) {
+                result_entries.push((*inc_entry).clone());
+                updated += 1;
+            } else {
+                result_entries.push(local_entry.clone());
+            }
+        } else if let Some(&tomb_ts) = incoming_deletions.get(id) {
+            // Local entry, incoming tombstone — compare timestamps.
+            if tomb_ts > entry_updated_at(local_entry) {
+                // Tombstone wins — entry is removed.
+                deleted += 1;
+            } else {
+                // Edit wins — keep local entry.
+                result_entries.push(local_entry.clone());
+                edit_survived_delete.push(entry_display_title(local_entry));
+            }
+        } else {
+            // Only on local, no incoming tombstone — keep it.
+            result_entries.push(local_entry.clone());
+        }
+    }
+
+    // --- Process incoming-only entries ---
+    for inc_entry in &incoming.entries {
+        let id = entry_id(inc_entry);
+        if local_by_id.contains_key(id) {
+            continue; // already handled above
+        }
+
+        if let Some(&tomb_ts) = local_deletions.get(id) {
+            // Incoming entry, local tombstone — compare timestamps.
+            if tomb_ts > entry_updated_at(inc_entry) {
+                // Tombstone wins — don't add.
+                deleted += 1;
+            } else {
+                // Edit wins — add entry.
+                result_entries.push(inc_entry.clone());
+                edit_survived_delete.push(entry_display_title(inc_entry));
+            }
+        } else {
+            // Only on incoming, no local tombstone — add it.
+            result_entries.push(inc_entry.clone());
+            added += 1;
+        }
+    }
+
+    // --- Merge folders (union, dedup by name) ---
+    let mut merged_folders = session.folders.clone();
+    for folder in &incoming.folders {
+        if !merged_folders.contains(folder) {
+            merged_folders.push(folder.clone());
+        }
+    }
+
+    // --- Union deleted_ids (keep newer deleted_at for the same id) ---
+    let mut merged_tombstones: std::collections::HashMap<String, String> = session
+        .deleted_ids
+        .iter()
+        .map(|d| (d.id.clone(), d.deleted_at.clone()))
+        .collect();
+    for d in &incoming.deleted_ids {
+        let entry = merged_tombstones
+            .entry(d.id.clone())
+            .or_insert_with(|| d.deleted_at.clone());
+        if d.deleted_at > *entry {
+            *entry = d.deleted_at.clone();
+        }
+    }
+    let merged_deleted_ids: Vec<DeletedEntry> = merged_tombstones
+        .into_iter()
+        .map(|(id, deleted_at)| DeletedEntry { id, deleted_at })
+        .collect();
+
+    session.entries = result_entries;
+    session.folders = merged_folders;
+    session.deleted_ids = merged_deleted_ids;
+
+    MergeSummary {
+        added,
+        updated,
+        deleted,
+        edit_survived_delete,
+    }
+}
+
+/// Merge an already-decrypted incoming `VaultBody` into the live session,
+/// then persist the result.
+///
+/// Called by `merge_vault_from_file` after decryption.
+pub fn session_merge_vault_from_body(incoming: VaultBody) -> Result<MergeSummary, String> {
+    let (body, passphrase, path, yubikey, summary) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        let summary = do_merge(session, incoming);
+        let body = build_body(session);
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            Zeroizing::new(session.passphrase.clone()),
+            session.path.clone(),
+            yubikey,
+            summary,
+        )
+    }; // ← lock released here
+    do_save(&body, &passphrase, &path, yubikey)?;
+    Ok(summary)
 }
 
 #[cfg(test)]
@@ -3232,5 +3444,506 @@ mod json_export_tests {
             s.search_blob.to_lowercase(),
             "search_blob must be fully lowercase"
         );
+    }
+}
+
+#[cfg(test)]
+mod merge_tests {
+    use super::*;
+    use crate::api::vault::save_vault;
+    use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+    use serial_test::serial;
+    use std::env::temp_dir;
+
+    fn note(id: &str, title: &str, updated_at: &str) -> VaultEntry {
+        VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: id.to_string(),
+                created_at: String::from("2026-01-01T00:00:00Z"),
+                updated_at: updated_at.to_string(),
+                folder: String::from(""),
+            },
+            title: title.to_string(),
+            content: String::from("content"),
+            attachments: vec![],
+        })
+    }
+
+    fn tombstone(id: &str, deleted_at: &str) -> DeletedEntry {
+        DeletedEntry {
+            id: id.to_string(),
+            deleted_at: deleted_at.to_string(),
+        }
+    }
+
+    fn setup(pass: &[u8], path_suffix: &str, entries: Vec<VaultEntry>) -> std::path::PathBuf {
+        let mut path = temp_dir();
+        path.push(format!("gabbro_merge_{path_suffix}.gabbro"));
+        save_vault(
+            &VaultBody {
+                entries,
+                folders: vec![String::from("Work")],
+                ..Default::default()
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
+        path
+    }
+
+    fn teardown(path: &std::path::PathBuf) {
+        let _ = lock_vault();
+        let _ = std::fs::remove_file(path);
+    }
+
+    // ── tombstone recorded on single delete ───────────────────────────────────
+
+    #[test]
+    #[serial]
+    fn delete_entry_records_tombstone() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "tombstone_single",
+            vec![note("n1", "Note", "2026-01-01T00:00:00Z")],
+        );
+        unlock_vault(pass, path.clone()).unwrap();
+        session_delete_entry("n1").unwrap();
+
+        // Reload and verify tombstone persisted
+        lock_vault().unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let session = VAULT_SESSION.lock().unwrap();
+        let s = session.as_ref().unwrap();
+        assert!(s.entries.is_empty(), "entry must be gone");
+        assert_eq!(s.deleted_ids.len(), 1);
+        assert_eq!(s.deleted_ids[0].id, "n1");
+        assert!(!s.deleted_ids[0].deleted_at.is_empty());
+
+        drop(session);
+        teardown(&path);
+    }
+
+    // ── tombstones recorded on bulk delete ────────────────────────────────────
+
+    #[test]
+    #[serial]
+    fn bulk_delete_records_tombstones() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "tombstone_bulk",
+            vec![
+                note("n1", "Note 1", "2026-01-01T00:00:00Z"),
+                note("n2", "Note 2", "2026-01-01T00:00:00Z"),
+            ],
+        );
+        unlock_vault(pass, path.clone()).unwrap();
+        session_delete_entries_no_save(&[String::from("n1"), String::from("n2")]).unwrap();
+        session_save().unwrap();
+
+        lock_vault().unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let session = VAULT_SESSION.lock().unwrap();
+        let s = session.as_ref().unwrap();
+        assert!(s.entries.is_empty());
+        let ids: Vec<&str> = s.deleted_ids.iter().map(|d| d.id.as_str()).collect();
+        assert!(ids.contains(&"n1"));
+        assert!(ids.contains(&"n2"));
+
+        drop(session);
+        teardown(&path);
+    }
+
+    // ── merge: addition (entry only in incoming) ──────────────────────────────
+
+    #[test]
+    #[serial]
+    fn merge_adds_incoming_only_entry() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "add",
+            vec![note("local-1", "Local", "2026-01-01T00:00:00Z")],
+        );
+
+        let incoming = VaultBody {
+            entries: vec![
+                note("local-1", "Local", "2026-01-01T00:00:00Z"),
+                note("remote-1", "Remote", "2026-01-02T00:00:00Z"),
+            ],
+            folders: vec![],
+            ..Default::default()
+        };
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+
+        assert_eq!(summary.added, 1);
+        assert_eq!(summary.updated, 0);
+        assert_eq!(summary.deleted, 0);
+        assert!(summary.edit_survived_delete.is_empty());
+
+        let ids: Vec<String> = list_entry_summaries()
+            .unwrap()
+            .into_iter()
+            .map(|s| s.id)
+            .collect();
+        assert!(ids.contains(&String::from("local-1")));
+        assert!(ids.contains(&String::from("remote-1")));
+
+        teardown(&path);
+    }
+
+    // ── merge: edit conflict — last-write-wins ────────────────────────────────
+
+    #[test]
+    #[serial]
+    fn merge_last_write_wins_incoming_newer() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "lww_remote",
+            vec![note("shared", "Old title", "2026-01-01T00:00:00Z")],
+        );
+
+        let incoming = VaultBody {
+            entries: vec![note("shared", "New title", "2026-01-02T00:00:00Z")],
+            folders: vec![],
+            ..Default::default()
+        };
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+
+        assert_eq!(summary.added, 0);
+        assert_eq!(summary.updated, 1);
+        assert_eq!(summary.deleted, 0);
+
+        let entry = get_entry("shared").unwrap();
+        match entry {
+            VaultEntry::Note(ref n) => assert_eq!(n.title, "New title"),
+            _ => panic!("expected Note"),
+        }
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn merge_last_write_wins_local_newer() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "lww_local",
+            vec![note("shared", "Local newer", "2026-01-03T00:00:00Z")],
+        );
+
+        let incoming = VaultBody {
+            entries: vec![note("shared", "Remote older", "2026-01-01T00:00:00Z")],
+            folders: vec![],
+            ..Default::default()
+        };
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+
+        assert_eq!(summary.updated, 0, "local wins — no update counted");
+        let entry = get_entry("shared").unwrap();
+        match entry {
+            VaultEntry::Note(ref n) => assert_eq!(n.title, "Local newer"),
+            _ => panic!("expected Note"),
+        }
+
+        teardown(&path);
+    }
+
+    // ── merge: tombstone beats older entry ────────────────────────────────────
+
+    #[test]
+    #[serial]
+    fn merge_incoming_tombstone_beats_local_entry() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "tomb_beats_local",
+            vec![note("victim", "Deleted remotely", "2026-01-01T00:00:00Z")],
+        );
+
+        // Incoming deleted "victim" after the local edit.
+        let incoming = VaultBody {
+            entries: vec![],
+            deleted_ids: vec![tombstone("victim", "2026-01-02T00:00:00Z")],
+            ..Default::default()
+        };
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+
+        assert_eq!(summary.deleted, 1);
+        assert!(summary.edit_survived_delete.is_empty());
+        assert!(list_entry_summaries().unwrap().is_empty());
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn merge_local_tombstone_beats_incoming_entry() {
+        let pass = b"merge-test-pass";
+        // Local vault is empty with a tombstone for "victim".
+        let path = setup(pass, "tomb_beats_remote", vec![]);
+
+        // Manually add the tombstone by unlocking and deleting (requires the entry to exist first).
+        // Instead, use session_merge_vault_from_body with a body that has the tombstone.
+        // Easiest: save a body that already has a tombstone, then unlock.
+        let pass2 = pass;
+        let body_with_tombstone = VaultBody {
+            entries: vec![],
+            deleted_ids: vec![tombstone("victim", "2026-01-02T00:00:00Z")],
+            folders: vec![],
+            ..Default::default()
+        };
+        save_vault(&body_with_tombstone, pass2, &path).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        // Incoming has the entry with an older timestamp — tombstone wins.
+        let incoming = VaultBody {
+            entries: vec![note("victim", "Added remotely", "2026-01-01T00:00:00Z")],
+            deleted_ids: vec![],
+            ..Default::default()
+        };
+
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+
+        assert_eq!(summary.deleted, 1);
+        assert!(list_entry_summaries().unwrap().is_empty());
+
+        teardown(&path);
+    }
+
+    // ── merge: edit beats tombstone ───────────────────────────────────────────
+
+    #[test]
+    #[serial]
+    fn merge_local_edit_beats_incoming_tombstone() {
+        let pass = b"merge-test-pass";
+        // Local has an entry edited AFTER the remote deletion.
+        let path = setup(
+            pass,
+            "edit_beats_tomb",
+            vec![note("survivor", "Edited locally", "2026-01-03T00:00:00Z")],
+        );
+
+        let incoming = VaultBody {
+            entries: vec![],
+            deleted_ids: vec![tombstone("survivor", "2026-01-02T00:00:00Z")],
+            ..Default::default()
+        };
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+
+        assert_eq!(summary.deleted, 0);
+        assert_eq!(
+            summary.edit_survived_delete,
+            vec![String::from("Edited locally")]
+        );
+        assert_eq!(list_entry_summaries().unwrap().len(), 1);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn merge_incoming_edit_beats_local_tombstone() {
+        let pass = b"merge-test-pass";
+        // Local has a tombstone for "survivor", incoming has a NEWER edit.
+        let body_with_tombstone = VaultBody {
+            entries: vec![],
+            deleted_ids: vec![tombstone("survivor", "2026-01-01T00:00:00Z")],
+            folders: vec![],
+            ..Default::default()
+        };
+        let mut path = temp_dir();
+        path.push("gabbro_merge_incoming_edit_beats_tomb.gabbro");
+        save_vault(&body_with_tombstone, pass, &path).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let incoming = VaultBody {
+            entries: vec![note("survivor", "Edited remotely", "2026-01-02T00:00:00Z")],
+            deleted_ids: vec![],
+            ..Default::default()
+        };
+
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+
+        assert_eq!(summary.deleted, 0);
+        assert_eq!(
+            summary.edit_survived_delete,
+            vec![String::from("Edited remotely")]
+        );
+        assert_eq!(list_entry_summaries().unwrap().len(), 1);
+
+        teardown(&path);
+    }
+
+    // ── merge: folder union ───────────────────────────────────────────────────
+
+    #[test]
+    #[serial]
+    fn merge_unions_folders() {
+        let pass = b"merge-test-pass";
+        let mut path = temp_dir();
+        path.push("gabbro_merge_folders.gabbro");
+        save_vault(
+            &VaultBody {
+                folders: vec![String::from("Work"), String::from("Private")],
+                entries: vec![],
+                ..Default::default()
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let incoming = VaultBody {
+            folders: vec![String::from("Private"), String::from("Personal")],
+            entries: vec![],
+            ..Default::default()
+        };
+
+        session_merge_vault_from_body(incoming).unwrap();
+
+        let folders = session_list_folders().unwrap();
+        assert!(folders.contains(&String::from("Work")));
+        assert!(folders.contains(&String::from("Private")));
+        assert!(folders.contains(&String::from("Personal")));
+        assert_eq!(
+            folders.iter().filter(|f| *f == "Private").count(),
+            1,
+            "dedup: Private must appear only once"
+        );
+
+        teardown(&path);
+    }
+
+    // ── merge: identical vaults → zero-change summary ─────────────────────────
+
+    #[test]
+    #[serial]
+    fn merge_identical_vaults_returns_zero_summary() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "identical",
+            vec![note("n1", "Same", "2026-01-01T00:00:00Z")],
+        );
+
+        let incoming = VaultBody {
+            entries: vec![note("n1", "Same", "2026-01-01T00:00:00Z")],
+            folders: vec![String::from("Work")],
+            ..Default::default()
+        };
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+
+        assert_eq!(summary.added, 0);
+        assert_eq!(summary.updated, 0);
+        assert_eq!(summary.deleted, 0);
+        assert!(summary.edit_survived_delete.is_empty());
+
+        teardown(&path);
+    }
+
+    // ── merge: tombstone union (dedup, keep newer) ────────────────────────────
+
+    #[test]
+    #[serial]
+    fn merge_unions_tombstones_keeping_newer() {
+        let pass = b"merge-test-pass";
+        let body = VaultBody {
+            entries: vec![],
+            deleted_ids: vec![
+                tombstone("a", "2026-01-01T00:00:00Z"),
+                tombstone("b", "2026-01-01T00:00:00Z"),
+            ],
+            folders: vec![],
+            ..Default::default()
+        };
+        let mut path = temp_dir();
+        path.push("gabbro_merge_tombstone_union.gabbro");
+        save_vault(&body, pass, &path).unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let incoming = VaultBody {
+            entries: vec![],
+            deleted_ids: vec![
+                tombstone("b", "2026-01-02T00:00:00Z"), // newer for "b"
+                tombstone("c", "2026-01-01T00:00:00Z"), // new id
+            ],
+            ..Default::default()
+        };
+
+        session_merge_vault_from_body(incoming).unwrap();
+
+        lock_vault().unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let session = VAULT_SESSION.lock().unwrap();
+        let s = session.as_ref().unwrap();
+        let tombstone_map: std::collections::HashMap<&str, &str> = s
+            .deleted_ids
+            .iter()
+            .map(|d| (d.id.as_str(), d.deleted_at.as_str()))
+            .collect();
+
+        assert_eq!(tombstone_map.len(), 3, "a, b, c must all be present");
+        assert_eq!(tombstone_map["a"], "2026-01-01T00:00:00Z");
+        assert_eq!(
+            tombstone_map["b"], "2026-01-02T00:00:00Z",
+            "newer timestamp must win"
+        );
+        assert_eq!(tombstone_map["c"], "2026-01-01T00:00:00Z");
+
+        drop(session);
+        teardown(&path);
+    }
+
+    // ── vault_updated_at is stamped on every save ─────────────────────────────
+
+    #[test]
+    #[serial]
+    fn vault_updated_at_is_set_after_save() {
+        let pass = b"merge-test-pass";
+        let path = setup(pass, "updated_at", vec![]);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        // Trigger a save via merge with an empty incoming vault.
+        let incoming = VaultBody {
+            ..Default::default()
+        };
+        session_merge_vault_from_body(incoming).unwrap();
+
+        lock_vault().unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let session = VAULT_SESSION.lock().unwrap();
+        let _ = session.as_ref().unwrap();
+        drop(session);
+
+        // Load the body directly to inspect vault_updated_at.
+        let loaded_body = crate::api::vault::load_vault(pass, &path).unwrap();
+        assert!(
+            !loaded_body.vault_updated_at.is_empty(),
+            "vault_updated_at must be stamped after save"
+        );
+
+        teardown(&path);
     }
 }
