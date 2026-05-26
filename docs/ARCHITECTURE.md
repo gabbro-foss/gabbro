@@ -313,11 +313,11 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - export vault includes alias in name to avoid collision
 - Multiple app languages (v1: en,fr,de,it,es)
 - App logo (OnboardingScreen, UnlockScreen) — defer until designed.
-- Autofill save requests (`onSaveRequest` — full design in a dedicated session).
-- `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
-- Audit and standardise app version display: `pubspec.yaml` currently shows `1.0.0`, About screen must match; both must be reset to `0.1.0` before first public tag.
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
+- Autofill save requests (`onSaveRequest` — full design in a dedicated session).
+- Audit and standardise app version display: `pubspec.yaml` currently shows `1.0.0`, About screen must match; both must be reset to `0.1.0` before first public tag.
 - Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
+- `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
 
 ### Code Quality
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
