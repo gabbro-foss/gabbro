@@ -228,7 +228,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- All `entry` types must allow multiple attachments: YAGNI?
 - All `fields` must show edit diffs: currently some fields show no diffs in `review_changes_screen.dart` screen -> audit and fix
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
