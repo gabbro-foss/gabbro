@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 /// Hard-coded version string — updated manually when pubspec.yaml version
 /// changes. Avoids the package_info_plus dependency for a value that changes
 /// rarely and always coincides with other source edits.
-const _kAppVersion = '1.0.0';
+const _kAppVersion = '0.1.0';
 
 const _kGitHubUrl = 'https://github.com/Zabamund/gabbro';
 const _kIssuesUrl = 'https://github.com/Zabamund/gabbro/issues';
