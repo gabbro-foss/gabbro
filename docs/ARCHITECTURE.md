@@ -166,7 +166,34 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Next task TBD** — vault sync merge algorithm rework complete and hardware-tested. Ask user for next task.
+- **Custom fields for all entry types** — Login and Card already have `custom_fields` in Rust and the bridge; Note and File need it added everywhere. Plan:
+
+  **Phase 1 — Rust (TDD, Note + File only)**
+  1. Failing tests: `note_entry_supports_custom_fields`, `file_entry_supports_custom_fields` in `entry.rs`
+  2. Add `custom_fields: Vec<CustomField>` to `NoteEntry` and `FileEntry` → tests pass
+  3. Failing tests: `create_note_entry_with_custom_fields`, `create_file_entry_with_custom_fields` in `vault.rs`
+  4. Update `NoteEntryData` + `FileEntryData` DTOs, `note_entry_to_data` + `file_entry_to_data`, `create_note_entry` + `create_file_entry` signatures → tests pass
+  5. Update `mask_entry` Note/File branches to mask hidden custom fields (consistent with Login)
+
+  **Phase 2 — Bridge regeneration**
+  - Run `flutter_rust_bridge_codegen generate` after Rust API changes
+
+  **Phase 3 — Flutter (all 4 types)**
+  6. `entry_detail_screen.dart`: add custom fields section to `_noteView` and `_fileView`
+  7. `create_entry_screen.dart`: add `_loginCustomFields`, `_noteCustomFields`, `_cardCustomFields`, `_fileCustomFields`; wire `_customFieldsSection`; pass real fields in `_saveCreate` and `_buildUpdated`
+  8. `review_changes_screen.dart`: add `!listEquals(customFields)` to `_hasChanges` for Login/Card/Note/File; add diff rows
+
+  **Phase 4 — Flutter tests** for create/edit form custom fields
+
+  **Gap table (pre-session state):**
+
+  | Layer | Login | Note | Card | File |
+  |-------|-------|------|------|------|
+  | Rust struct | done | missing | done | missing |
+  | Rust DTO + API | done | missing | done | missing |
+  | Detail view display | done | missing | done | missing |
+  | Create/edit form | missing | missing | missing | missing |
+  | `_hasChanges` / review diff | missing | missing | missing | missing |
 
 ---
 
@@ -201,7 +228,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- All `entry` types must allow custom fields
 - All `entry` types must allow multiple attachments: YAGNI?
 - All `fields` must show edit diffs: currently some fields show no diffs in `review_changes_screen.dart` screen -> audit and fix
 - Multiple vaults.
