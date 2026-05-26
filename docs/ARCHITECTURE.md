@@ -207,10 +207,10 @@ Files: `lib/main.dart`, `lib/screens/unlock_screen.dart`, `lib/screens/vault_sel
 
 - `main.dart`: load `VaultRegistry` at startup; route to `OnboardingScreen` if empty, else `UnlockScreen` with `lastUsed` vault.
 - `unlock_screen.dart`: show vault alias below app title; discreet "switch" icon in AppBar; replace `list_vault_yubikey_records` call with `read_vault_header` (returns alias + YubiKey records in one call).
-- `vault_selector_screen.dart` (new): if `showVaultList == true` shows alias list; always shows "Add vault" button → `OnboardingScreen`; allows removing from registry (no file delete).
+- `vault_selector_screen.dart` (new): if `showVaultList == true` shows alias list; always shows "Add vault" button → `OnboardingScreen`; allows removing from registry (no file delete); each vault row has an edit (pencil) icon that opens an inline rename dialog — pre-filled with current alias, empty-alias guard, calls `set_vault_alias` bridge then `VaultRegistry.updateAlias()`.
 - `onboarding_screen.dart`: add required alias text field; after creation call `VaultRegistry.add()`; Android path generation scans registry for first unused numbered path; pass alias to `init_vault*` bridge calls.
 - `security_screen.dart`: add "Show vault list on login" toggle (`showVaultList`).
-- TDD: `VaultSelectorScreen` list shown/hidden; `UnlockScreen` alias + switch link; `OnboardingScreen` alias field + empty-alias guard.
+- TDD: `VaultSelectorScreen` list shown/hidden; `UnlockScreen` alias + switch link; `OnboardingScreen` alias field + empty-alias guard; rename dialog pre-fills alias, rejects empty input, updates registry and bridge.
 
 #### Phase 4 — Export + Android autofill
 
