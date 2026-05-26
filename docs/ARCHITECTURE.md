@@ -166,34 +166,21 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Custom fields for all entry types** — Login and Card already have `custom_fields` in Rust and the bridge; Note and File need it added everywhere. Plan:
+- **Hardware tests** — verify the following in the running app on device/desktop:
 
-  **Phase 1 — Rust (TDD, Note + File only)**
-  1. Failing tests: `note_entry_supports_custom_fields`, `file_entry_supports_custom_fields` in `entry.rs`
-  2. Add `custom_fields: Vec<CustomField>` to `NoteEntry` and `FileEntry` → tests pass
-  3. Failing tests: `create_note_entry_with_custom_fields`, `create_file_entry_with_custom_fields` in `vault.rs`
-  4. Update `NoteEntryData` + `FileEntryData` DTOs, `note_entry_to_data` + `file_entry_to_data`, `create_note_entry` + `create_file_entry` signatures → tests pass
-  5. Update `mask_entry` Note/File branches to mask hidden custom fields (consistent with Login)
+  **Custom fields for all entry types** (Login, Note, Card, File):
+  1. Create each entry type with one or more custom fields (visible + hidden) — confirm saved and displayed correctly in detail view
+  2. Edit each entry type — confirm existing custom fields pre-populate, can be changed, and the review diff shows the change
+  3. Add a new custom field during edit — confirm it appears in the saved entry
+  4. Remove a custom field during edit — confirm it is gone from the saved entry
+  5. Hidden custom field: confirm value is obscured in detail view with a working reveal toggle
 
-  **Phase 2 — Bridge regeneration**
-  - Run `flutter_rust_bridge_codegen generate` after Rust API changes
+  **All fields show edit diffs** (review_changes_screen):
+  6. Card: change bank name → diff shows "Bank" row
+  7. Card: change transaction password → "Sensitive fields" section shows "Transaction password changed"
+  8. File: replace file (different size) → diff shows "Size" row; change notes → diff shows "Notes" row
 
-  **Phase 3 — Flutter (all 4 types)**
-  6. `entry_detail_screen.dart`: add custom fields section to `_noteView` and `_fileView`
-  7. `create_entry_screen.dart`: add `_loginCustomFields`, `_noteCustomFields`, `_cardCustomFields`, `_fileCustomFields`; wire `_customFieldsSection`; pass real fields in `_saveCreate` and `_buildUpdated`
-  8. `review_changes_screen.dart`: add `!listEquals(customFields)` to `_hasChanges` for Login/Card/Note/File; add diff rows
-
-  **Phase 4 — Flutter tests** for create/edit form custom fields
-
-  **Gap table (pre-session state):**
-
-  | Layer | Login | Note | Card | File |
-  |-------|-------|------|------|------|
-  | Rust struct | done | missing | done | missing |
-  | Rust DTO + API | done | missing | done | missing |
-  | Detail view display | done | missing | done | missing |
-  | Create/edit form | missing | missing | missing | missing |
-  | `_hasChanges` / review diff | missing | missing | missing | missing |
+  After a clean hardware test: remove the bikeshed item marked **"done; remove after dedicated hardware test"**.
 
 ---
 
@@ -228,7 +215,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- All `fields` must show edit diffs: currently some fields show no diffs in `review_changes_screen.dart` screen -> audit and fix
+- All `fields` must show edit diffs: currently some fields show no diffs in `review_changes_screen.dart` screen -> audit and fix -> **done; remove after dedicated hardware test**
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
     - add security toggle to show vault alias list on login screen or not if user wants to bypass this
