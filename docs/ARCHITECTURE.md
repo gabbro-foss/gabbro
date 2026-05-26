@@ -155,7 +155,7 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 330 | 8 |
+| Rust (`cargo test -q`) | 338 | 8 |
 | Flutter (`flutter test`) | 340 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
@@ -167,7 +167,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Multiple Vaults — implementation ready (plan approved, ~3–4 sessions)
+### Multiple Vaults — Phase 1 ✓ done; Phase 2 next
 
 **Agreed design decisions:**
 - One vault active at a time (lock → switch → unlock). No Rust session refactor.
@@ -176,20 +176,10 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Android: numbered app-storage paths (`gabbro_2.gabbro`, `gabbro_3.gabbro` …).
 - Must ship before app languages and before cross-layer integration tests.
 
+**Phase 1 done:** VERSION 5 format (`alias` field after YubiKey records, before `passphrase_blob`); `read_vault_header` bridge (alias + YubiKey records in one call); `set_vault_alias` (read-modify-write, ciphertext intact); `init_vault*` accept `alias: Option<String>`; VERSION 4 backward compat; `frb_generated.rs` updated for new `init_vault*` signatures.
+**Known Phase 1 limitation:** passphrase-only vault CRUD saves re-seal from scratch and write `alias: None`. Multi-key vaults are unaffected (`reseal_vault_body` preserves the header). Fix planned once `VaultRegistry` (Phase 2) is in place and session state carries the alias.
+
 ---
-
-#### Phase 1 — Rust: VERSION 5 format + alias bridge
-
-Files: `rust/src/vault/file_format.rs`, `rust/src/vault/io.rs`, `rust/src/api/vault_bridge.rs`
-
-- `file_format.rs`: add `VERSION_5 = 5`; extend header write/read: after YubiKey records, before `passphrase_blob`, write `alias_len: u16` + UTF-8 alias bytes (0 = no alias). VERSION 4 read path → alias = `None`.
-- `io.rs`: add `read_vault_header(path) -> Result<VaultHeader, VaultError>` — reads alias + YubiKey records without decrypting.
-- `vault_bridge.rs`:
-  - New DTO: `VaultHeaderData { alias: Option<String>, yubikey_records: Vec<YubikeyRecordData> }`
-  - New bridge fn: `read_vault_header(path: String) -> Result<VaultHeaderData, String>`
-  - `init_vault`, `init_vault_with_yubikey`, `init_vault_with_keys`: add `alias: Option<String>` param
-  - `set_vault_alias(path: String, alias: String) -> Result<(), String>`: patch alias field in header in-place
-- TDD: VERSION 5 round-trip; VERSION 4 backward compat; `set_vault_alias` leaves ciphertext intact.
 
 #### Phase 2 — Flutter: VaultRegistry + settings migration
 
