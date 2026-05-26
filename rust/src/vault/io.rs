@@ -8,7 +8,7 @@
 use std::fs;
 use std::path::Path;
 
-use crate::vault::file_format::SealedVault;
+use crate::vault::file_format::{SealedVault, YubiKeyRecord};
 
 /// Write a sealed vault to a `.gabbro` file at the given path.
 ///
@@ -27,6 +27,23 @@ pub fn write_vault(sealed: &SealedVault, path: &Path) -> Result<(), String> {
 pub fn read_vault(path: &Path) -> Result<SealedVault, String> {
     let bytes = fs::read(path).map_err(|e| format!("Failed to read vault: {e}"))?;
     SealedVault::from_bytes(&bytes)
+}
+
+/// Lightweight vault header: alias and YubiKey records only, no body decryption.
+pub struct VaultHeader {
+    pub alias: Option<String>,
+    pub yubikey_records: Vec<YubiKeyRecord>,
+}
+
+/// Read the vault header at `path` without decrypting the body.
+///
+/// Returns alias and YubiKey records. Safe to call before passphrase entry.
+pub fn read_vault_header(path: &Path) -> Result<VaultHeader, String> {
+    let sealed = read_vault(path)?;
+    Ok(VaultHeader {
+        alias: sealed.alias,
+        yubikey_records: sealed.yubikey_records,
+    })
 }
 
 #[cfg(test)]
@@ -55,6 +72,46 @@ mod tests {
         assert_eq!(recovered_plaintext, plaintext);
 
         // Clean up — don't leave test files on disk
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn read_vault_header_returns_alias_and_yubikey_records() {
+        use crate::crypto::vault_crypto::seal_vault;
+
+        let path = temp_vault_path();
+        let passphrase = b"header test passphrase";
+        let plaintext = b"header test body";
+
+        let mut sealed = seal_vault(passphrase, plaintext).unwrap();
+        sealed.alias = Some("Personal".to_string());
+        write_vault(&sealed, &path).unwrap();
+
+        let header = read_vault_header(&path).unwrap();
+        assert_eq!(header.alias, Some("Personal".to_string()));
+        assert!(header.yubikey_records.is_empty());
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn read_vault_header_alias_none_when_not_set() {
+        use crate::crypto::vault_crypto::seal_vault;
+
+        let path = {
+            let mut p = std::env::temp_dir();
+            p.push("gabbro_io_header_noalias_test.gabbro");
+            p
+        };
+        let passphrase = b"no alias test";
+        let plaintext = b"no alias body";
+
+        let sealed = seal_vault(passphrase, plaintext).unwrap();
+        write_vault(&sealed, &path).unwrap();
+
+        let header = read_vault_header(&path).unwrap();
+        assert_eq!(header.alias, None);
+
         let _ = std::fs::remove_file(&path);
     }
 

@@ -72,6 +72,7 @@ pub fn seal_vault(passphrase: &[u8], plaintext: &[u8]) -> Result<SealedVault, St
         nonce,
         ciphertext,
         yubikey_records: vec![],
+        alias: None,
         passphrase_blob: vec![],
     })
 }
@@ -182,6 +183,7 @@ pub fn seal_vault_with_yubikey(
             salt: yubikey_salt,
             key_blob: vec![],
         }],
+        alias: None,
         passphrase_blob: vec![],
     })
 }
@@ -338,6 +340,7 @@ pub fn seal_vault_with_keys(
         x25519_ephemeral_public: *ephemeral_public.as_bytes(),
         ciphertext,
         yubikey_records,
+        alias: None,
         passphrase_blob,
     })
 }
@@ -638,7 +641,7 @@ pub fn change_vault_passphrase_with_keys(
     new_passphrase_blob.extend_from_slice(&new_pb_ct);
 
     // Step 5: Return new SealedVault with fresh PQ material and passphrase_blob.
-    // key_blobs and body are unchanged — vault_key_master is stable.
+    // key_blobs, body, and alias are unchanged — vault_key_master is stable.
     Ok(SealedVault {
         params: new_params,
         argon2_salt: new_argon2_salt,
@@ -648,6 +651,7 @@ pub fn change_vault_passphrase_with_keys(
         x25519_ephemeral_public: *new_ephemeral_public.as_bytes(),
         ciphertext: sealed.ciphertext.clone(),
         yubikey_records: sealed.yubikey_records.clone(),
+        alias: sealed.alias.clone(),
         passphrase_blob: new_passphrase_blob,
     })
 }

@@ -21,6 +21,8 @@
 //! |   salt                 | 32           |
 //! |   key_blob length      | 2  (v3+)     |
 //! |   key_blob             | 0 or 60      |
+//! | alias length           | 2  (v5+)     |
+//! | alias                  | 0–512 UTF-8  |
 //! | passphrase_blob length | 2  (v4+)     |
 //! | passphrase_blob        | 0 or 60      |
 //! | Body length            | 8            |
@@ -29,7 +31,8 @@
 //! VERSION 2 (legacy single-key): records have no key_blob fields; no passphrase_blob.
 //! VERSION 3 (deprecated multi-key): records include key_blob_len + key_blob; no passphrase_blob.
 //! VERSION 4 (current multi-key): adds passphrase_blob for single-tap passphrase change.
-//! Reads v2+; always writes VERSION 4.
+//! VERSION 5 (current): adds alias field (after YubiKey records, before passphrase_blob).
+//! Reads v2+; always writes VERSION 5.
 
 use crate::crypto::kdf::Argon2idParams;
 
@@ -49,7 +52,7 @@ pub struct YubiKeyRecord {
 pub const MAGIC: &[u8; 6] = b"GABBRO";
 
 /// Current file format version (written by this build).
-pub const VERSION: u8 = 4;
+pub const VERSION: u8 = 5;
 
 /// Oldest version this build can still read.
 const VERSION_MIN_READABLE: u8 = 2;
@@ -68,11 +71,16 @@ pub struct SealedVault {
     pub x25519_ephemeral_public: [u8; 32],
     pub ciphertext: Vec<u8>,
     pub yubikey_records: Vec<YubiKeyRecord>,
+    /// Human-readable vault alias stored in the plaintext header (VERSION 5+).
+    ///
+    /// Travels with the file so aliases survive export/import across devices.
+    /// `None` for new vaults without an alias, and for VERSION 2–4 files on read.
+    pub alias: Option<String>,
     /// AES-256-GCM ciphertext of the wrapping_key under intermediate_key.
     ///
     /// Layout: nonce (12) + ciphertext+tag (48) = 60 bytes.
     /// Empty for passphrase-only vaults and VERSION 2/3 files.
-    /// Present (60 bytes) for VERSION 4 multi-key vaults — enables single-tap
+    /// Present (60 bytes) for VERSION 4+ multi-key vaults — enables single-tap
     /// passphrase change without requiring all registered keys.
     pub passphrase_blob: Vec<u8>,
 }
@@ -110,6 +118,12 @@ impl SealedVault {
             out.extend_from_slice(&record.key_blob);
         }
 
+        // alias — length prefix then UTF-8 bytes (VERSION 5+); empty string encodes None
+        let alias_bytes = self.alias.as_deref().unwrap_or("").as_bytes();
+        let alias_len = alias_bytes.len() as u16;
+        out.extend_from_slice(&alias_len.to_be_bytes());
+        out.extend_from_slice(alias_bytes);
+
         // passphrase_blob — length prefix then the bytes themselves (VERSION 4+)
         let pb_len = self.passphrase_blob.len() as u16;
         out.extend_from_slice(&pb_len.to_be_bytes());
@@ -146,6 +160,7 @@ impl SealedVault {
         }
         let is_v3 = version >= 3;
         let is_v4 = version >= 4;
+        let is_v5 = version >= 5;
         pos += 1;
 
         // --- Argon2id parameters (3 x u32 = 12 bytes) ---
@@ -245,6 +260,29 @@ impl SealedVault {
             });
         }
 
+        // --- alias (VERSION 5+) ---
+        let alias = if is_v5 {
+            if data.len() < pos + 2 {
+                return Err("File truncated at alias length".to_string());
+            }
+            let a_len = u16::from_be_bytes(data[pos..pos + 2].try_into().unwrap()) as usize;
+            pos += 2;
+            if data.len() < pos + a_len {
+                return Err("File truncated at alias".to_string());
+            }
+            let alias_str = std::str::from_utf8(&data[pos..pos + a_len])
+                .map_err(|_| "Invalid UTF-8 in alias".to_string())?
+                .to_string();
+            pos += a_len;
+            if alias_str.is_empty() {
+                None
+            } else {
+                Some(alias_str)
+            }
+        } else {
+            None
+        };
+
         // --- passphrase_blob (VERSION 4+) ---
         let passphrase_blob = if is_v4 {
             if data.len() < pos + 2 {
@@ -288,6 +326,7 @@ impl SealedVault {
             x25519_ephemeral_public,
             ciphertext,
             yubikey_records,
+            alias,
             passphrase_blob,
         })
     }
@@ -312,8 +351,35 @@ mod tests {
             x25519_ephemeral_public: [5u8; 32],
             ciphertext: vec![6u8; 64],
             yubikey_records: vec![],
+            alias: None,
             passphrase_blob: vec![],
         }
+    }
+
+    /// Build a raw VERSION 4 byte stream (no alias field) for backward-compat tests.
+    fn test_vault_v4_bytes() -> Vec<u8> {
+        let v = test_vault();
+        let mut out = Vec::new();
+        out.extend_from_slice(MAGIC);
+        out.push(4u8);
+        out.extend_from_slice(&v.params.m_cost.to_be_bytes());
+        out.extend_from_slice(&v.params.t_cost.to_be_bytes());
+        out.extend_from_slice(&v.params.p_cost.to_be_bytes());
+        out.extend_from_slice(&v.argon2_salt);
+        out.extend_from_slice(&v.hkdf_salt);
+        out.extend_from_slice(&v.nonce);
+        out.extend_from_slice(&v.ml_kem_ciphertext);
+        out.extend_from_slice(&v.x25519_ephemeral_public);
+        out.push(0u8); // 0 YubiKey records
+                       // passphrase_blob (VERSION 4 has this; no alias)
+        let pb_len = v.passphrase_blob.len() as u16;
+        out.extend_from_slice(&pb_len.to_be_bytes());
+        out.extend_from_slice(&v.passphrase_blob);
+        // body
+        let body_len = v.ciphertext.len() as u64;
+        out.extend_from_slice(&body_len.to_be_bytes());
+        out.extend_from_slice(&v.ciphertext);
+        out
     }
 
     #[test]
@@ -418,8 +484,8 @@ mod tests {
     fn byte_length_no_records() {
         let vault = test_vault();
         let bytes = vault.to_bytes();
-        // 6 + 1 + 4 + 4 + 4 + 32 + 32 + 12 + 1568 + 32 + 1 + 2(pb_len) + 0(pb) + 8 + 64 = 1770
-        assert_eq!(bytes.len(), 1770);
+        // 6 + 1 + 4 + 4 + 4 + 32 + 32 + 12 + 1568 + 32 + 1 + 2(alias_len) + 0(alias) + 2(pb_len) + 0(pb) + 8 + 64 = 1772
+        assert_eq!(bytes.len(), 1772);
     }
 
     #[test]
@@ -438,10 +504,36 @@ mod tests {
             },
         ];
         let bytes = vault.to_bytes();
-        // Base: 1770 bytes (0 records, empty passphrase_blob)
+        // Base: 1772 bytes (0 records, empty alias, empty passphrase_blob)
         // Per record: 2 (id_len) + 64 (id) + 32 (salt) + 2 (kb_len) + 60 (key_blob) = 160
         // 2 records: 320 bytes
-        assert_eq!(bytes.len(), 1770 + 320);
+        assert_eq!(bytes.len(), 1772 + 320);
+    }
+
+    #[test]
+    fn version5_with_alias_roundtrip() {
+        let mut vault = test_vault();
+        vault.alias = Some("Work Vault".to_string());
+        let bytes = vault.to_bytes();
+        let recovered = SealedVault::from_bytes(&bytes).unwrap();
+        assert_eq!(recovered.alias, Some("Work Vault".to_string()));
+    }
+
+    #[test]
+    fn version5_alias_len_included_in_byte_count() {
+        let mut vault = test_vault();
+        vault.alias = Some("Work".to_string()); // 4 ASCII bytes
+        let bytes = vault.to_bytes();
+        // 1772 (base with empty alias) - 0 (empty alias) + 4 (alias bytes) = 1776
+        assert_eq!(bytes.len(), 1776);
+    }
+
+    #[test]
+    fn version4_backward_compat_alias_is_none() {
+        let bytes = test_vault_v4_bytes();
+        let recovered = SealedVault::from_bytes(&bytes).unwrap();
+        assert_eq!(recovered.alias, None);
+        assert_eq!(recovered.ciphertext, vec![6u8; 64]);
     }
 
     #[test]
@@ -461,7 +553,7 @@ mod tests {
         ];
         vault.passphrase_blob = vec![0xAAu8; 60];
         let bytes = vault.to_bytes();
-        // Base 1770 + 320 records + 60 passphrase_blob = 2150
-        assert_eq!(bytes.len(), 1770 + 320 + 60);
+        // Base 1772 + 320 records + 60 passphrase_blob = 2152
+        assert_eq!(bytes.len(), 1772 + 320 + 60);
     }
 }

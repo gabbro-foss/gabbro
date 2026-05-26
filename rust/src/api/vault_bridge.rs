@@ -578,6 +578,52 @@ pub fn list_vault_yubikey_records(path: String) -> Result<Vec<YubikeyRecordData>
         .collect())
 }
 
+/// Vault header data returned by `read_vault_header`.
+///
+/// Contains the alias and YubiKey records from the plaintext header.
+/// Safe to read before the user enters their passphrase.
+pub struct VaultHeaderData {
+    pub alias: Option<String>,
+    pub yubikey_records: Vec<YubikeyRecordData>,
+}
+
+/// Read the vault header at `path` and return alias + YubiKey records.
+///
+/// Does **not** decrypt the vault body — safe to call before passphrase entry.
+/// Replaces `list_vault_yubikey_records` for the unlock screen so alias and
+/// YubiKey records are fetched in one call.
+/// Sync — file I/O + header parse, no crypto.
+#[flutter_rust_bridge::frb(sync)]
+pub fn read_vault_header(path: String) -> Result<VaultHeaderData, String> {
+    use crate::vault::io::read_vault_header as io_read_vault_header;
+    let header = io_read_vault_header(&PathBuf::from(path))?;
+    Ok(VaultHeaderData {
+        alias: header.alias,
+        yubikey_records: header
+            .yubikey_records
+            .into_iter()
+            .map(|r| YubikeyRecordData {
+                credential_id: r.credential_id,
+                salt: r.salt.to_vec(),
+            })
+            .collect(),
+    })
+}
+
+/// Patch the alias stored in the vault file header at `path`.
+///
+/// Reads the existing sealed vault, updates `alias`, and writes back.
+/// The body ciphertext is never decrypted — all key_blobs and the encrypted
+/// body are preserved exactly as-is. Passing an empty string clears the alias.
+/// Async — file I/O.
+pub async fn set_vault_alias(path: String, alias: String) -> Result<(), String> {
+    use crate::vault::io::{read_vault, write_vault};
+    let vault_path = PathBuf::from(&path);
+    let mut sealed = read_vault(&vault_path)?;
+    sealed.alias = if alias.is_empty() { None } else { Some(alias) };
+    write_vault(&sealed, &vault_path)
+}
+
 /// Decrypt the vault at `path` using both passphrase and YubiKey hmac-secret.
 ///
 /// Handles both VERSION 2 (legacy single-key) and VERSION 3 (multi-key) vaults.
@@ -611,13 +657,21 @@ pub async fn unlock_vault_with_yubikey(
 
 /// Create a new empty vault at `path`, sealed with `passphrase`.
 ///
+/// `alias` is stored in the VERSION 5 plaintext header and travels with the file.
 /// Called during onboarding. Async — runs Argon2id + encryption.
-pub async fn init_vault(passphrase: Vec<u8>, path: String) -> Result<(), String> {
-    use crate::api::vault::save_vault;
-    use crate::vault::serialization::VaultBody;
+pub async fn init_vault(
+    passphrase: Vec<u8>,
+    path: String,
+    alias: Option<String>,
+) -> Result<(), String> {
+    use crate::crypto::vault_crypto::seal_vault;
+    use crate::vault::io::write_vault;
+    use crate::vault::serialization::{serialize_vault_body, VaultBody};
     let vault_path = PathBuf::from(&path);
-    save_vault(&VaultBody::empty(), &passphrase, &vault_path)?;
-    // Unlock into session immediately so the user lands on the list screen
+    let plaintext = serialize_vault_body(&VaultBody::empty())?;
+    let mut sealed = seal_vault(&passphrase, &plaintext)?;
+    sealed.alias = alias;
+    write_vault(&sealed, &vault_path)?;
     session::unlock_vault(&passphrase, vault_path)
 }
 
@@ -631,16 +685,18 @@ pub struct YubiKeyInitData {
 /// Create a new empty vault sealed with a passphrase and two or more YubiKeys.
 ///
 /// Enforces ADR-010: minimum 2 registered keys at vault creation.
+/// `alias` is stored in the VERSION 5 plaintext header and travels with the file.
 /// After creation, unlocks into session immediately using the first key.
 /// Async — runs Argon2id + encryption.
 pub async fn init_vault_with_keys(
     passphrase: Vec<u8>,
     keys: Vec<YubiKeyInitData>,
     path: String,
+    alias: Option<String>,
 ) -> Result<(), String> {
-    use crate::api::vault::save_vault_with_keys;
-    use crate::crypto::vault_crypto::YubiKeyRegistration;
-    use crate::vault::serialization::VaultBody;
+    use crate::crypto::vault_crypto::{seal_vault_with_keys, YubiKeyRegistration};
+    use crate::vault::io::write_vault;
+    use crate::vault::serialization::{serialize_vault_body, VaultBody};
 
     if keys.len() < 2 {
         return Err(format!("at least 2 YubiKeys required; got {}", keys.len()));
@@ -668,12 +724,10 @@ pub async fn init_vault_with_keys(
         .collect::<Result<Vec<_>, String>>()?;
 
     let vault_path = PathBuf::from(&path);
-    save_vault_with_keys(
-        &VaultBody::empty(),
-        &passphrase,
-        &registrations,
-        &vault_path,
-    )?;
+    let plaintext = serialize_vault_body(&VaultBody::empty())?;
+    let mut sealed = seal_vault_with_keys(&passphrase, &registrations, &plaintext)?;
+    sealed.alias = alias;
+    write_vault(&sealed, &vault_path)?;
 
     // Unlock into session using the first key's material
     let first = &keys[0];
@@ -698,6 +752,7 @@ pub async fn init_vault_with_keys(
 
 /// Create a new empty vault at `path`, sealed with both passphrase and YubiKey.
 ///
+/// `alias` is stored in the VERSION 5 plaintext header and travels with the file.
 /// Called during onboarding when the user opts in to YubiKey protection.
 /// After creation, unlocks into session immediately.
 /// `hmac_secret` must be exactly 32 bytes. `hkdf_salt` must be exactly 32 bytes.
@@ -708,9 +763,11 @@ pub async fn init_vault_with_yubikey(
     credential_id: Vec<u8>,
     hkdf_salt: Vec<u8>,
     path: String,
+    alias: Option<String>,
 ) -> Result<(), String> {
-    use crate::api::vault::save_vault_with_yubikey;
-    use crate::vault::serialization::VaultBody;
+    use crate::crypto::vault_crypto::seal_vault_with_yubikey;
+    use crate::vault::io::write_vault;
+    use crate::vault::serialization::{serialize_vault_body, VaultBody};
     let secret: [u8; 32] = hmac_secret
         .try_into()
         .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
@@ -718,14 +775,16 @@ pub async fn init_vault_with_yubikey(
         .try_into()
         .map_err(|_| "hkdf_salt must be exactly 32 bytes".to_string())?;
     let vault_path = PathBuf::from(&path);
-    save_vault_with_yubikey(
-        &VaultBody::empty(),
+    let plaintext = serialize_vault_body(&VaultBody::empty())?;
+    let mut sealed = seal_vault_with_yubikey(
         &passphrase,
         &secret,
         credential_id.clone(),
         salt,
-        &vault_path,
+        &plaintext,
     )?;
+    sealed.alias = alias;
+    write_vault(&sealed, &vault_path)?;
     session::unlock_vault_with_yubikey(&passphrase, &secret, credential_id, &salt, vault_path)
 }
 
@@ -1307,6 +1366,7 @@ mod tests {
             credential_id.clone(),
             hkdf_salt.to_vec(),
             path.to_str().unwrap().to_string(),
+            None,
         ))
         .unwrap();
 
@@ -1320,6 +1380,99 @@ mod tests {
         let records = list_vault_yubikey_records(path.to_str().unwrap().to_string()).unwrap();
         assert_eq!(records.len(), 1, "init must write YubiKey record");
         assert_eq!(records[0].credential_id, credential_id);
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn read_vault_header_returns_alias_and_yubikey_records() {
+        use crate::api::vault::save_vault_with_yubikey;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_read_header_test.gabbro");
+        let pass = b"header-read-pass";
+        let hmac_secret = [0x42u8; 32];
+        let credential_id = vec![0xABu8; 64];
+        let hkdf_salt = [0x11u8; 32];
+
+        save_vault_with_yubikey(
+            &VaultBody::empty(),
+            pass,
+            &hmac_secret,
+            credential_id.clone(),
+            hkdf_salt,
+            &path,
+        )
+        .unwrap();
+
+        // Patch alias in after creation to test reading it back
+        run(set_vault_alias(
+            path.to_str().unwrap().to_string(),
+            String::from("Test Vault"),
+        ))
+        .unwrap();
+
+        let header = read_vault_header(path.to_str().unwrap().to_string()).unwrap();
+        assert_eq!(header.alias, Some(String::from("Test Vault")));
+        assert_eq!(header.yubikey_records.len(), 1);
+        assert_eq!(header.yubikey_records[0].credential_id, credential_id);
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn set_vault_alias_leaves_ciphertext_intact() {
+        use crate::api::vault::save_vault;
+        use crate::vault::io::read_vault;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_set_alias_test.gabbro");
+        let pass = b"alias-integrity-pass";
+
+        save_vault(&VaultBody::empty(), pass, &path).unwrap();
+
+        // Capture ciphertext before alias change
+        let ciphertext_before = read_vault(&path).unwrap().ciphertext.clone();
+
+        run(set_vault_alias(
+            path.to_str().unwrap().to_string(),
+            String::from("My Vault"),
+        ))
+        .unwrap();
+
+        // Ciphertext must be identical after alias patch
+        let sealed_after = read_vault(&path).unwrap();
+        assert_eq!(sealed_after.ciphertext, ciphertext_before);
+        assert_eq!(sealed_after.alias, Some(String::from("My Vault")));
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn init_vault_stores_alias_in_header() {
+        use crate::vault::io::read_vault;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_init_alias_test.gabbro");
+        let pass = b"init-alias-pass";
+
+        run(init_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+            Some(String::from("Work")),
+        ))
+        .unwrap();
+
+        lock_vault().unwrap();
+
+        let sealed = read_vault(&path).unwrap();
+        assert_eq!(sealed.alias, Some(String::from("Work")));
 
         let _ = std::fs::remove_file(&path);
     }

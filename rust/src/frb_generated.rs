@@ -1327,12 +1327,17 @@ fn wire__crate__api__vault_bridge__init_vault_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_passphrase = <Vec<u8>>::sse_decode(&mut deserializer);
             let api_path = <String>::sse_decode(&mut deserializer);
+            let api_alias = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::vault_bridge::init_vault(api_passphrase, api_path).await?;
+                        let output_ok = crate::api::vault_bridge::init_vault(
+                            api_passphrase,
+                            api_path,
+                            api_alias,
+                        )
+                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1367,6 +1372,7 @@ fn wire__crate__api__vault_bridge__init_vault_with_keys_impl(
             let api_keys =
                 <Vec<crate::api::vault_bridge::YubiKeyInitData>>::sse_decode(&mut deserializer);
             let api_path = <String>::sse_decode(&mut deserializer);
+            let api_alias = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -1375,6 +1381,7 @@ fn wire__crate__api__vault_bridge__init_vault_with_keys_impl(
                             api_passphrase,
                             api_keys,
                             api_path,
+                            api_alias,
                         )
                         .await?;
                         Ok(output_ok)
@@ -1412,6 +1419,7 @@ fn wire__crate__api__vault_bridge__init_vault_with_yubikey_impl(
             let api_credential_id = <Vec<u8>>::sse_decode(&mut deserializer);
             let api_hkdf_salt = <Vec<u8>>::sse_decode(&mut deserializer);
             let api_path = <String>::sse_decode(&mut deserializer);
+            let api_alias = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -1422,6 +1430,7 @@ fn wire__crate__api__vault_bridge__init_vault_with_yubikey_impl(
                             api_credential_id,
                             api_hkdf_salt,
                             api_path,
+                            api_alias,
                         )
                         .await?;
                         Ok(output_ok)
