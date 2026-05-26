@@ -357,6 +357,7 @@ mod tests {
             },
             title: String::from("Existing note"),
             content: String::from("already here"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
         save_vault(
@@ -648,6 +649,7 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
                 },
                 title: String::from("Existing note"),
                 content: String::from("should be skipped"),
+                custom_fields: vec![],
                 attachments: vec![],
             }),
             VaultEntry::Note(NoteEntry {
@@ -659,6 +661,7 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
                 },
                 title: String::from("New note"),
                 content: String::from("should be imported"),
+                custom_fields: vec![],
                 attachments: vec![],
             }),
         ];

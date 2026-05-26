@@ -137,6 +137,7 @@ mod tests {
                 meta: default_meta("id-001"),
                 title: String::from("Test"),
                 content: String::from("Hello"),
+                custom_fields: vec![],
                 attachments: vec![],
             })],
             ..Default::default()
@@ -236,6 +237,7 @@ mod tests {
                 meta: default_meta("id-002"),
                 title: String::from("Recovery codes"),
                 content: String::from("code1\ncode2\ncode3"),
+                custom_fields: vec![],
                 attachments: vec![],
             }),
         ];
@@ -329,6 +331,7 @@ mod tests {
             meta: default_meta("id-001"),
             title: String::from("Test"),
             content: String::from("Hello"),
+            custom_fields: vec![],
             attachments: vec![],
         });
         let body = VaultBody {

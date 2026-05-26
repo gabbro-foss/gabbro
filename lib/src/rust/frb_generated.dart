@@ -135,6 +135,7 @@ abstract class RustLibApi extends BaseApi {
     required String filename,
     required List<int> data,
     String? notes,
+    required List<CustomFieldData> customFields,
   });
 
   Future<void> crateApiVaultBridgeCreateFolder({required String name});
@@ -162,6 +163,7 @@ abstract class RustLibApi extends BaseApi {
     required String folder,
     required String title,
     required String content,
+    required List<CustomFieldData> customFields,
   });
 
   Future<void> crateApiVaultBridgeDeleteEntries({required List<String> ids});
@@ -622,6 +624,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required String filename,
     required List<int> data,
     String? notes,
+    required List<CustomFieldData> customFields,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -631,6 +634,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(filename, serializer);
           sse_encode_list_prim_u_8_loose(data, serializer);
           sse_encode_opt_String(notes, serializer);
+          sse_encode_list_custom_field_data(customFields, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -643,7 +647,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiVaultCreateFileEntryConstMeta,
-        argValues: [folder, filename, data, notes],
+        argValues: [folder, filename, data, notes, customFields],
         apiImpl: this,
       ),
     );
@@ -652,7 +656,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiVaultCreateFileEntryConstMeta =>
       const TaskConstMeta(
         debugName: "create_file_entry",
-        argNames: ["folder", "filename", "data", "notes"],
+        argNames: ["folder", "filename", "data", "notes", "customFields"],
       );
 
   @override
@@ -799,6 +803,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required String folder,
     required String title,
     required String content,
+    required List<CustomFieldData> customFields,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -807,6 +812,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_String(folder, serializer);
           sse_encode_String(title, serializer);
           sse_encode_String(content, serializer);
+          sse_encode_list_custom_field_data(customFields, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -819,7 +825,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: null,
         ),
         constMeta: kCrateApiVaultCreateNoteEntryConstMeta,
-        argValues: [folder, title, content],
+        argValues: [folder, title, content, customFields],
         apiImpl: this,
       ),
     );
@@ -828,7 +834,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiVaultCreateNoteEntryConstMeta =>
       const TaskConstMeta(
         debugName: "create_note_entry",
-        argNames: ["folder", "title", "content"],
+        argNames: ["folder", "title", "content", "customFields"],
       );
 
   @override
@@ -2311,8 +2317,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   FileEntryData dco_decode_file_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return FileEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -2321,6 +2327,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       filename: dco_decode_String(arr[4]),
       data: dco_decode_list_prim_u_8_strict(arr[5]),
       notes: dco_decode_opt_String(arr[6]),
+      customFields: dco_decode_list_custom_field_data(arr[7]),
     );
   }
 
@@ -2540,8 +2547,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NoteEntryData dco_decode_note_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return NoteEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -2549,6 +2556,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       folder: dco_decode_String(arr[3]),
       title: dco_decode_String(arr[4]),
       content: dco_decode_String(arr[5]),
+      customFields: dco_decode_list_custom_field_data(arr[6]),
     );
   }
 
@@ -3036,6 +3044,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_filename = sse_decode_String(deserializer);
     var var_data = sse_decode_list_prim_u_8_strict(deserializer);
     var var_notes = sse_decode_opt_String(deserializer);
+    var var_customFields = sse_decode_list_custom_field_data(deserializer);
     return FileEntryData(
       id: var_id,
       createdAt: var_createdAt,
@@ -3044,6 +3053,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       filename: var_filename,
       data: var_data,
       notes: var_notes,
+      customFields: var_customFields,
     );
   }
 
@@ -3395,6 +3405,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_folder = sse_decode_String(deserializer);
     var var_title = sse_decode_String(deserializer);
     var var_content = sse_decode_String(deserializer);
+    var var_customFields = sse_decode_list_custom_field_data(deserializer);
     return NoteEntryData(
       id: var_id,
       createdAt: var_createdAt,
@@ -3402,6 +3413,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       folder: var_folder,
       title: var_title,
       content: var_content,
+      customFields: var_customFields,
     );
   }
 
@@ -3882,6 +3894,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.filename, serializer);
     sse_encode_list_prim_u_8_strict(self.data, serializer);
     sse_encode_opt_String(self.notes, serializer);
+    sse_encode_list_custom_field_data(self.customFields, serializer);
   }
 
   @protected
@@ -4174,6 +4187,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.folder, serializer);
     sse_encode_String(self.title, serializer);
     sse_encode_String(self.content, serializer);
+    sse_encode_list_custom_field_data(self.customFields, serializer);
   }
 
   @protected

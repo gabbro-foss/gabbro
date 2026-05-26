@@ -363,6 +363,8 @@ fn wire__crate__api__vault__create_file_entry_impl(
             let api_filename = <String>::sse_decode(&mut deserializer);
             let api_data = <Vec<u8>>::sse_decode(&mut deserializer);
             let api_notes = <Option<String>>::sse_decode(&mut deserializer);
+            let api_custom_fields =
+                <Vec<crate::api::vault::CustomFieldData>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
                 transform_result_sse::<_, ()>((move || {
@@ -371,6 +373,7 @@ fn wire__crate__api__vault__create_file_entry_impl(
                         api_filename,
                         api_data,
                         api_notes,
+                        api_custom_fields,
                     ))?;
                     Ok(output_ok)
                 })())
@@ -532,6 +535,8 @@ fn wire__crate__api__vault__create_note_entry_impl(
             let api_folder = <String>::sse_decode(&mut deserializer);
             let api_title = <String>::sse_decode(&mut deserializer);
             let api_content = <String>::sse_decode(&mut deserializer);
+            let api_custom_fields =
+                <Vec<crate::api::vault::CustomFieldData>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
                 transform_result_sse::<_, ()>((move || {
@@ -539,6 +544,7 @@ fn wire__crate__api__vault__create_note_entry_impl(
                         api_folder,
                         api_title,
                         api_content,
+                        api_custom_fields,
                     ))?;
                     Ok(output_ok)
                 })())
@@ -2217,6 +2223,8 @@ impl SseDecode for crate::api::vault::FileEntryData {
         let mut var_filename = <String>::sse_decode(deserializer);
         let mut var_data = <Vec<u8>>::sse_decode(deserializer);
         let mut var_notes = <Option<String>>::sse_decode(deserializer);
+        let mut var_customFields =
+            <Vec<crate::api::vault::CustomFieldData>>::sse_decode(deserializer);
         return crate::api::vault::FileEntryData {
             id: var_id,
             created_at: var_createdAt,
@@ -2225,6 +2233,7 @@ impl SseDecode for crate::api::vault::FileEntryData {
             filename: var_filename,
             data: var_data,
             notes: var_notes,
+            custom_fields: var_customFields,
         };
     }
 }
@@ -2586,6 +2595,8 @@ impl SseDecode for crate::api::vault::NoteEntryData {
         let mut var_folder = <String>::sse_decode(deserializer);
         let mut var_title = <String>::sse_decode(deserializer);
         let mut var_content = <String>::sse_decode(deserializer);
+        let mut var_customFields =
+            <Vec<crate::api::vault::CustomFieldData>>::sse_decode(deserializer);
         return crate::api::vault::NoteEntryData {
             id: var_id,
             created_at: var_createdAt,
@@ -2593,6 +2604,7 @@ impl SseDecode for crate::api::vault::NoteEntryData {
             folder: var_folder,
             title: var_title,
             content: var_content,
+            custom_fields: var_customFields,
         };
     }
 }
@@ -3259,6 +3271,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::FileEntryData {
             self.filename.into_into_dart().into_dart(),
             self.data.into_into_dart().into_dart(),
             self.notes.into_into_dart().into_dart(),
+            self.custom_fields.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -3479,6 +3492,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::NoteEntryData {
             self.folder.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
             self.content.into_into_dart().into_dart(),
+            self.custom_fields.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -3876,6 +3890,7 @@ impl SseEncode for crate::api::vault::FileEntryData {
         <String>::sse_encode(self.filename, serializer);
         <Vec<u8>>::sse_encode(self.data, serializer);
         <Option<String>>::sse_encode(self.notes, serializer);
+        <Vec<crate::api::vault::CustomFieldData>>::sse_encode(self.custom_fields, serializer);
     }
 }
 
@@ -4137,6 +4152,7 @@ impl SseEncode for crate::api::vault::NoteEntryData {
         <String>::sse_encode(self.folder, serializer);
         <String>::sse_encode(self.title, serializer);
         <String>::sse_encode(self.content, serializer);
+        <Vec<crate::api::vault::CustomFieldData>>::sse_encode(self.custom_fields, serializer);
     }
 }
 

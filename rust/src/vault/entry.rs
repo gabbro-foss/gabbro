@@ -65,6 +65,7 @@ pub struct LoginEntry {
     /// Optional free-text notes attached to this entry.
     pub notes: Option<String>,
     /// User-defined extra fields (e.g. "Security question").
+    #[serde(default)]
     pub custom_fields: Vec<CustomField>,
     pub attachments: Vec<EntryAttachment>,
     /// Previous password value, retained for typo recovery.
@@ -98,6 +99,8 @@ pub struct NoteEntry {
     pub meta: EntryMeta,
     pub title: String,
     pub content: String,
+    #[serde(default)]
+    pub custom_fields: Vec<CustomField>,
     pub attachments: Vec<EntryAttachment>,
 }
 
@@ -111,6 +114,7 @@ pub struct IdentityEntry {
     pub phone: Option<String>,
     pub address: Option<String>,
     /// User-defined extra fields (e.g. "Maiden name", "Mobile", "Landline").
+    #[serde(default)]
     pub custom_fields: Vec<CustomField>,
     pub attachments: Vec<EntryAttachment>,
 }
@@ -144,6 +148,7 @@ pub struct CardEntry {
     pub transaction_password: Option<String>,
     pub notes: Option<String>,
     /// User-defined extra fields — overflow from import (e.g. portal username/password).
+    #[serde(default)]
     pub custom_fields: Vec<CustomField>,
     pub attachments: Vec<EntryAttachment>,
     /// Previous CVV value, retained for typo recovery.
@@ -223,6 +228,8 @@ pub struct FileEntry {
     /// Raw file bytes - encrypted at rest as part of the vault body
     pub data: Vec<u8>,
     pub notes: Option<String>,
+    #[serde(default)]
+    pub custom_fields: Vec<CustomField>,
 }
 
 /// A fully custom entry - user-defined fields only.
@@ -359,11 +366,32 @@ mod tests {
             meta: default_meta(),
             title: String::from("Shopping list"),
             content: String::from("Milk, eggs, bread"),
+            custom_fields: vec![],
             attachments: vec![],
         };
 
         assert_eq!(entry.title, "Shopping list");
         assert_eq!(entry.content, "Milk, eggs, bread");
+    }
+
+    #[test]
+    fn note_entry_supports_custom_fields() {
+        let field = CustomField {
+            label: String::from("Source"),
+            value: String::from("my own recipe"),
+            hidden: false,
+        };
+        let entry = NoteEntry {
+            meta: default_meta(),
+            title: String::from("Shopping list"),
+            content: String::from("Milk, eggs, bread"),
+            custom_fields: vec![field],
+            attachments: vec![],
+        };
+
+        assert_eq!(entry.custom_fields.len(), 1);
+        assert_eq!(entry.custom_fields[0].label, "Source");
+        assert!(!entry.custom_fields[0].hidden);
     }
 
     #[test]
@@ -559,11 +587,32 @@ mod tests {
             filename: String::from("secret.pdf"),
             data: payload,
             notes: None,
+            custom_fields: vec![],
         };
 
         assert_eq!(entry.filename, "secret.pdf");
         assert_eq!(entry.data.len(), 4);
         assert_eq!(entry.data[3], 255u8);
+    }
+
+    #[test]
+    fn file_entry_supports_custom_fields() {
+        let field = CustomField {
+            label: String::from("Classification"),
+            value: String::from("confidential"),
+            hidden: false,
+        };
+        let entry = FileEntry {
+            meta: default_meta(),
+            filename: String::from("report.pdf"),
+            data: vec![],
+            notes: Some(String::from("annual report")),
+            custom_fields: vec![field],
+        };
+
+        assert_eq!(entry.custom_fields.len(), 1);
+        assert_eq!(entry.custom_fields[0].label, "Classification");
+        assert!(!entry.custom_fields[0].hidden);
     }
 
     #[test]

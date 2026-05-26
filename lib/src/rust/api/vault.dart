@@ -36,10 +36,12 @@ Future<NoteEntryData> createNoteEntry({
   required String folder,
   required String title,
   required String content,
+  required List<CustomFieldData> customFields,
 }) => RustLib.instance.api.crateApiVaultCreateNoteEntry(
   folder: folder,
   title: title,
   content: content,
+  customFields: customFields,
 );
 
 /// Creates a new identity entry with a generated UUID and current timestamp.
@@ -100,11 +102,13 @@ Future<FileEntryData> createFileEntry({
   required String filename,
   required List<int> data,
   String? notes,
+  required List<CustomFieldData> customFields,
 }) => RustLib.instance.api.crateApiVaultCreateFileEntry(
   folder: folder,
   filename: filename,
   data: data,
   notes: notes,
+  customFields: customFields,
 );
 
 /// Creates a new custom entry with a generated UUID and current timestamp.
@@ -296,6 +300,7 @@ class FileEntryData {
   final String filename;
   final Uint8List data;
   final String? notes;
+  final List<CustomFieldData> customFields;
 
   const FileEntryData({
     required this.id,
@@ -305,6 +310,7 @@ class FileEntryData {
     required this.filename,
     required this.data,
     this.notes,
+    required this.customFields,
   });
 
   @override
@@ -315,7 +321,8 @@ class FileEntryData {
       folder.hashCode ^
       filename.hashCode ^
       data.hashCode ^
-      notes.hashCode;
+      notes.hashCode ^
+      customFields.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -328,7 +335,8 @@ class FileEntryData {
           folder == other.folder &&
           filename == other.filename &&
           data == other.data &&
-          notes == other.notes;
+          notes == other.notes &&
+          customFields == other.customFields;
 }
 
 /// A folder assignment conflict discovered during vault merge.
@@ -536,6 +544,7 @@ class NoteEntryData {
   final String folder;
   final String title;
   final String content;
+  final List<CustomFieldData> customFields;
 
   const NoteEntryData({
     required this.id,
@@ -544,6 +553,7 @@ class NoteEntryData {
     required this.folder,
     required this.title,
     required this.content,
+    required this.customFields,
   });
 
   @override
@@ -553,7 +563,8 @@ class NoteEntryData {
       updatedAt.hashCode ^
       folder.hashCode ^
       title.hashCode ^
-      content.hashCode;
+      content.hashCode ^
+      customFields.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -565,7 +576,8 @@ class NoteEntryData {
           updatedAt == other.updatedAt &&
           folder == other.folder &&
           title == other.title &&
-          content == other.content;
+          content == other.content &&
+          customFields == other.customFields;
 }
 
 /// An entry flagged for user-consent deletion during vault merge.

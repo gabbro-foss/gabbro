@@ -1273,6 +1273,7 @@ mod assign_folder_tests {
                 },
                 title: String::from("A note"),
                 content: String::from("content"),
+                custom_fields: vec![],
                 attachments: vec![],
             }),
         ];
@@ -1425,6 +1426,7 @@ mod folder_tests {
             },
             title: String::from("Rename test note"),
             content: String::from("content"),
+            custom_fields: vec![],
             attachments: vec![],
         });
         session_add_entry_no_save(entry).unwrap();
@@ -1521,6 +1523,7 @@ mod folder_tests {
             },
             title: String::from("Delete test note"),
             content: String::from("content"),
+            custom_fields: vec![],
             attachments: vec![],
         });
         session_add_entry_no_save(entry).unwrap();
@@ -1572,6 +1575,7 @@ mod folder_tests {
             },
             title: String::from("Reassign test note"),
             content: String::from("content"),
+            custom_fields: vec![],
             attachments: vec![],
         });
         session_add_entry_no_save(entry).unwrap();
@@ -1656,6 +1660,7 @@ mod autofill_tests {
             },
             title: String::from("Autofill test note"),
             content: String::from("test"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
         save_vault(
@@ -1729,6 +1734,7 @@ mod autofill_tests {
             },
             title: String::from("Not a login"),
             content: String::from("irrelevant"),
+            custom_fields: vec![],
             attachments: vec![],
         });
 
@@ -1806,6 +1812,7 @@ mod autofill_tests {
             },
             title: String::from("Not a login"),
             content: String::from("irrelevant"),
+            custom_fields: vec![],
             attachments: vec![],
         });
 
@@ -1852,6 +1859,7 @@ mod tests {
             },
             title: String::from("Session test note"),
             content: String::from("session secret content"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
         save_vault(
@@ -1949,6 +1957,7 @@ mod tests {
             },
             title: String::from("New note"),
             content: String::from("new content"),
+            custom_fields: vec![],
             attachments: vec![],
         });
 
@@ -2559,6 +2568,7 @@ mod yubikey_session_tests {
                 },
                 title: String::from("YubiKey test note"),
                 content: String::from("secret content"),
+                custom_fields: vec![],
                 attachments: vec![],
             })],
             ..Default::default()
@@ -2637,6 +2647,7 @@ mod yubikey_session_tests {
             },
             title: String::from("Added after unlock"),
             content: String::from("more secrets"),
+            custom_fields: vec![],
             attachments: vec![],
         });
         session_create_entry(new_entry).unwrap();
@@ -2699,6 +2710,7 @@ mod yubikey_session_tests {
                 },
                 title: String::from("Multi-key test note"),
                 content: String::from("secret content"),
+                custom_fields: vec![],
                 attachments: vec![],
             })],
             ..Default::default()
@@ -2806,6 +2818,7 @@ mod yubikey_mgmt_tests {
                 },
                 title: String::from("Key mgmt test note"),
                 content: String::from("secret"),
+                custom_fields: vec![],
                 attachments: vec![],
             })],
             ..Default::default()
@@ -3094,6 +3107,7 @@ mod json_export_tests {
                 },
                 title: String::from("JSON export test note"),
                 content: String::from("test content"),
+                custom_fields: vec![],
                 attachments: vec![],
             }),
             VaultEntry::Login(LoginEntry {
@@ -3342,6 +3356,7 @@ mod json_export_tests {
             },
             title: "Shopping".to_string(),
             content: "Milk eggs bread olive oil".to_string(),
+            custom_fields: vec![],
             attachments: vec![],
         });
         let s = entry_to_summary(&entry);
@@ -3467,6 +3482,7 @@ mod merge_tests {
             },
             title: title.to_string(),
             content: String::from("content"),
+            custom_fields: vec![],
             attachments: vec![],
         })
     }
@@ -3481,6 +3497,7 @@ mod merge_tests {
             },
             title: title.to_string(),
             content: String::from("content"),
+            custom_fields: vec![],
             attachments: vec![],
         })
     }
@@ -4059,6 +4076,7 @@ mod export_sync_tests {
             },
             title: format!("Note {id}"),
             content: String::from("content"),
+            custom_fields: vec![],
             attachments: vec![],
         })
     }
@@ -4073,6 +4091,7 @@ mod export_sync_tests {
             },
             title: format!("Note {id}"),
             content: String::from("content"),
+            custom_fields: vec![],
             attachments: vec![],
         })
     }

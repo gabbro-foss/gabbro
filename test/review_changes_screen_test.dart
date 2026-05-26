@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/review_changes_screen.dart';
@@ -427,6 +429,275 @@ void main() {
     expect(find.text('(empty)'), findsOneWidget);
     expect(find.text('Primary travel card'), findsOneWidget);
   });
+
+  // ── Note / File / Login / Card custom field and new-field diffs ──────────────
+
+  testWidgets('Note diff shows changed custom field', (tester) async {
+    final original = NoteEntryData(
+      id: 'note-1',
+      title: 'Deploy notes',
+      content: 'Step 1...',
+      customFields: const [
+        CustomFieldData(label: 'Token', value: 'abc123', hidden: false),
+      ],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+    );
+    final updated = NoteEntryData(
+      id: 'note-1',
+      title: 'Deploy notes',
+      content: 'Step 1...',
+      customFields: const [
+        CustomFieldData(label: 'Token', value: 'xyz789', hidden: false),
+      ],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+    );
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.note(original),
+      updated: VaultEntryData.note(updated),
+    ));
+
+    expect(find.text('Other fields'), findsOneWidget);
+    expect(find.text('Token'), findsOneWidget);
+    expect(find.text('abc123'), findsOneWidget);
+    expect(find.text('xyz789'), findsOneWidget);
+  });
+
+  testWidgets('File diff shows notes change and size change', (tester) async {
+    final original = FileEntryData(
+      id: 'file-1',
+      filename: 'backup.tar',
+      data: Uint8List.fromList([1, 2, 3]),
+      notes: null,
+      customFields: const [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+    );
+    final updated = FileEntryData(
+      id: 'file-1',
+      filename: 'backup.tar',
+      data: Uint8List.fromList([1, 2, 3, 4, 5]),
+      notes: 'updated backup',
+      customFields: const [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+    );
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.file(original),
+      updated: VaultEntryData.file(updated),
+    ));
+
+    expect(find.text('Notes'), findsOneWidget);
+    expect(find.text('(empty)'), findsOneWidget);
+    expect(find.text('updated backup'), findsOneWidget);
+    expect(find.text('Size'), findsOneWidget);
+    expect(find.text('3 bytes'), findsOneWidget);
+    expect(find.text('5 bytes'), findsOneWidget);
+  });
+
+  testWidgets('File diff shows changed custom field', (tester) async {
+    final original = FileEntryData(
+      id: 'file-1',
+      filename: 'key.pem',
+      data: Uint8List.fromList([1]),
+      notes: null,
+      customFields: const [
+        CustomFieldData(label: 'Passphrase', value: 'old_pass', hidden: true),
+      ],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+    );
+    final updated = FileEntryData(
+      id: 'file-1',
+      filename: 'key.pem',
+      data: Uint8List.fromList([1]),
+      notes: null,
+      customFields: const [
+        CustomFieldData(label: 'Passphrase', value: 'new_pass', hidden: true),
+      ],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+    );
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.file(original),
+      updated: VaultEntryData.file(updated),
+    ));
+
+    expect(find.text('Other fields'), findsOneWidget);
+    expect(find.text('Passphrase'), findsOneWidget);
+    expect(find.text('old_pass'), findsOneWidget);
+    expect(find.text('new_pass'), findsOneWidget);
+  });
+
+  testWidgets('Login diff shows changed custom field', (tester) async {
+    final original = LoginEntryData(
+      id: 'test-id-1',
+      title: 'GitHub',
+      url: 'https://github.com',
+      username: 'rob',
+      password: 'pass',
+      notes: null,
+      customFields: const [
+        CustomFieldData(label: '2FA backup', value: 'code-old', hidden: false),
+      ],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+      previousPassword: null,
+    );
+    final updated = LoginEntryData(
+      id: 'test-id-1',
+      title: 'GitHub',
+      url: 'https://github.com',
+      username: 'rob',
+      password: 'pass',
+      notes: null,
+      customFields: const [
+        CustomFieldData(label: '2FA backup', value: 'code-new', hidden: false),
+      ],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+      previousPassword: null,
+    );
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.login(original),
+      updated: VaultEntryData.login(updated),
+    ));
+
+    expect(find.text('Other fields'), findsOneWidget);
+    expect(find.text('2FA backup'), findsOneWidget);
+    expect(find.text('code-old'), findsOneWidget);
+    expect(find.text('code-new'), findsOneWidget);
+  });
+
+  testWidgets('Card bank name change appears in diff', (tester) async {
+    final updated = CardEntryData(
+      id: 'card-id-1',
+      cardName: 'Granite Visa',
+      cardholderName: 'Rob Example',
+      cardNumber: '4111111111111111',
+      expiry: '12/26',
+      cvv: '123',
+      pin: '4567',
+      status: 'active',
+      paymentNetwork: null,
+      creditLimit: null,
+      cardAccountNumber: null,
+      bankName: 'Gneiss Bank',
+      transactionPassword: null,
+      notes: null,
+      customFields: const [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+    );
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.card(_originalCard()),
+      updated: VaultEntryData.card(updated),
+    ));
+
+    expect(find.text('Bank'), findsOneWidget);
+    expect(find.text('(empty)'), findsOneWidget);
+    expect(find.text('Gneiss Bank'), findsOneWidget);
+  });
+
+  testWidgets(
+      'Card transaction password change appears in sensitive fields section',
+      (tester) async {
+    final updated = CardEntryData(
+      id: 'card-id-1',
+      cardName: 'Granite Visa',
+      cardholderName: 'Rob Example',
+      cardNumber: '4111111111111111',
+      expiry: '12/26',
+      cvv: '123',
+      pin: '4567',
+      status: 'active',
+      paymentNetwork: null,
+      creditLimit: null,
+      cardAccountNumber: null,
+      bankName: null,
+      transactionPassword: 's3cr3t',
+      notes: null,
+      customFields: const [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+    );
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.card(_originalCard()),
+      updated: VaultEntryData.card(updated),
+    ));
+
+    expect(find.text('Sensitive fields'), findsOneWidget);
+    expect(find.text('Transaction password changed'), findsOneWidget);
+  });
+
+  testWidgets('Card diff shows changed custom field', (tester) async {
+    final original = CardEntryData(
+      id: 'card-id-1',
+      cardName: 'Granite Visa',
+      cardholderName: 'Rob Example',
+      cardNumber: '4111111111111111',
+      expiry: '12/26',
+      cvv: '123',
+      status: 'active',
+      paymentNetwork: null,
+      creditLimit: null,
+      cardAccountNumber: null,
+      bankName: null,
+      transactionPassword: null,
+      notes: null,
+      pin: null,
+      customFields: const [
+        CustomFieldData(label: 'Membership', value: 'Gold', hidden: false),
+      ],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+    );
+    final updated = CardEntryData(
+      id: 'card-id-1',
+      cardName: 'Granite Visa',
+      cardholderName: 'Rob Example',
+      cardNumber: '4111111111111111',
+      expiry: '12/26',
+      cvv: '123',
+      status: 'active',
+      paymentNetwork: null,
+      creditLimit: null,
+      cardAccountNumber: null,
+      bankName: null,
+      transactionPassword: null,
+      notes: null,
+      pin: null,
+      customFields: const [
+        CustomFieldData(label: 'Membership', value: 'Platinum', hidden: false),
+      ],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+    );
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.card(original),
+      updated: VaultEntryData.card(updated),
+    ));
+
+    expect(find.text('Other fields'), findsOneWidget);
+    expect(find.text('Membership'), findsOneWidget);
+    expect(find.text('Gold'), findsOneWidget);
+    expect(find.text('Platinum'), findsOneWidget);
+  });
+
+  // ── End custom field diff tests ───────────────────────────────────────────
 
   testWidgets('folder change appears in diff for Login entry', (tester) async {
     final original = LoginEntryData(

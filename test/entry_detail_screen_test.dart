@@ -29,6 +29,7 @@ NoteEntryData _noteEntry() => NoteEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
+      customFields: const [],
     );
 
 // ── Widget helper ─────────────────────────────────────────────────────────────
@@ -349,6 +350,7 @@ void main() {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
+      customFields: const [],
     );
     await tester.pumpWidget(
       _buildScreen(VaultEntryData.file(entry)),

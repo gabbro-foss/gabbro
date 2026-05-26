@@ -180,6 +180,7 @@ fn convert_item(item: EnpassItem) -> Result<VaultEntry, ParseFailure> {
             meta,
             title: item.title,
             content: item.note,
+            custom_fields: vec![],
             attachments,
         })),
         _ => Ok(VaultEntry::Custom(convert_custom(

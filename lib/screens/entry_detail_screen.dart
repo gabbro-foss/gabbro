@@ -409,6 +409,26 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       children: [
         _field('Title', e.title),
         _field('Content', e.content),
+        if (e.customFields.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          _sectionHeader('Custom fields'),
+          ...e.customFields.map(
+            (f) => f.hidden
+                ? _toggleField(
+                    label: f.label,
+                    value: f.value,
+                    obscured: !_revealedFields.contains(f.label),
+                    onToggle: () => setState(() {
+                      if (_revealedFields.contains(f.label)) {
+                        _revealedFields.remove(f.label);
+                      } else {
+                        _revealedFields.add(f.label);
+                      }
+                    }),
+                  )
+                : _field(f.label, f.value),
+          ),
+        ],
         _timestampsRow(e.createdAt, e.updatedAt, e.folder),
       ],
     );
@@ -534,6 +554,26 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
         _field('Filename', e.filename),
         _field('Size', _formatBytes(e.data.length)),
         if (e.notes != null) _field('Notes', e.notes!),
+        if (e.customFields.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          _sectionHeader('Custom fields'),
+          ...e.customFields.map(
+            (f) => f.hidden
+                ? _toggleField(
+                    label: f.label,
+                    value: f.value,
+                    obscured: !_revealedFields.contains(f.label),
+                    onToggle: () => setState(() {
+                      if (_revealedFields.contains(f.label)) {
+                        _revealedFields.remove(f.label);
+                      } else {
+                        _revealedFields.add(f.label);
+                      }
+                    }),
+                  )
+                : _field(f.label, f.value),
+          ),
+        ],
         const SizedBox(height: 16),
         OutlinedButton.icon(
           onPressed: () => _exportFile(e),

@@ -220,6 +220,7 @@ fn convert_note(meta: EntryMeta, title: &str, notes: Option<String>) -> NoteEntr
         meta,
         title: title.to_string(),
         content: notes.unwrap_or_default(),
+        custom_fields: vec![],
         attachments: vec![],
     }
 }

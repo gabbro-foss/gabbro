@@ -86,6 +86,15 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
             folder: e.meta.folder.clone(),
             title: e.title.clone(),
             content: e.content.clone(),
+            custom_fields: e
+                .custom_fields
+                .iter()
+                .map(|f| CustomFieldData {
+                    label: f.label.clone(),
+                    value: f.value.clone(),
+                    hidden: f.hidden,
+                })
+                .collect(),
         }),
         VaultEntry::Identity(e) => VaultEntryData::Identity(IdentityEntryData {
             id: e.meta.id.clone(),
@@ -153,6 +162,15 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
             filename: e.filename.clone(),
             data: e.data.clone(),
             notes: e.notes.clone(),
+            custom_fields: e
+                .custom_fields
+                .iter()
+                .map(|f| CustomFieldData {
+                    label: f.label.clone(),
+                    value: f.value.clone(),
+                    hidden: f.hidden,
+                })
+                .collect(),
         }),
         VaultEntry::Custom(e) => VaultEntryData::Custom(CustomEntryData {
             id: e.meta.id.clone(),
@@ -216,6 +234,15 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
             },
             title: d.title,
             content: d.content,
+            custom_fields: d
+                .custom_fields
+                .into_iter()
+                .map(|f| CustomField {
+                    label: f.label,
+                    value: f.value,
+                    hidden: f.hidden,
+                })
+                .collect(),
             attachments: vec![],
         })),
         VaultEntryData::Identity(d) => Ok(VaultEntry::Identity(IdentityEntry {
@@ -280,6 +307,15 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
             filename: d.filename,
             data: d.data,
             notes: d.notes,
+            custom_fields: d
+                .custom_fields
+                .into_iter()
+                .map(|f| CustomField {
+                    label: f.label,
+                    value: f.value,
+                    hidden: f.hidden,
+                })
+                .collect(),
         })),
         VaultEntryData::Custom(d) => Ok(VaultEntry::Custom(CustomEntry {
             meta: EntryMeta {
@@ -792,6 +828,7 @@ mod tests {
             },
             title: String::from("Bridge v2 test"),
             content: String::from("bridge v2 content"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
         save_vault(
@@ -1067,6 +1104,7 @@ mod tests {
                     },
                     title: String::from("Bridge JSON export test"),
                     content: String::from("bridge content"),
+                    custom_fields: vec![],
                     attachments: vec![],
                 })],
                 ..Default::default()
@@ -1116,6 +1154,7 @@ mod tests {
                 },
                 title: String::from("NAS recovery key"),
                 content: String::from("secret content here"),
+                custom_fields: vec![],
                 attachments: vec![],
             }),
             VaultEntry::Login(LoginEntry {

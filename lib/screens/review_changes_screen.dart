@@ -27,6 +27,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
   bool _passwordObscured = true;
   bool _cvvObscured = true;
   bool _pinObscured = true;
+  bool _transactionPasswordObscured = true;
 
   Future<void> _save() async {
     setState(() {
@@ -161,6 +162,17 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
             newValue: u.pin ?? '',
           ));
         }
+        if (field0.transactionPassword != u.transactionPassword) {
+          changes.add(_sensitiveRow(
+            label: 'Transaction password changed',
+            obscured: _transactionPasswordObscured,
+            onToggle: () => setState(
+              () => _transactionPasswordObscured = !_transactionPasswordObscured,
+            ),
+            oldValue: field0.transactionPassword ?? '',
+            newValue: u.transactionPassword ?? '',
+          ));
+        }
       default:
         break;
     }
@@ -177,11 +189,33 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         _addDiff(diffs, 'Username', field0.username, u.username);
         _addDiff(diffs, 'Notes', field0.notes ?? '', u.notes ?? '');
         _addDiff(diffs, 'Folder', field0.folder, u.folder);
+        final loginLen = field0.customFields.length > u.customFields.length
+            ? field0.customFields.length
+            : u.customFields.length;
+        for (var i = 0; i < loginLen; i++) {
+          final label = i < u.customFields.length
+              ? u.customFields[i].label
+              : field0.customFields[i].label;
+          final before = i < field0.customFields.length ? field0.customFields[i].value : '';
+          final after = i < u.customFields.length ? u.customFields[i].value : '';
+          _addDiff(diffs, label, before, after);
+        }
       case (VaultEntryData_Note(:final field0),
             VaultEntryData_Note(field0: final u)):
         _addDiff(diffs, 'Title', field0.title, u.title);
         _addDiff(diffs, 'Content', field0.content, u.content);
         _addDiff(diffs, 'Folder', field0.folder, u.folder);
+        final noteLen = field0.customFields.length > u.customFields.length
+            ? field0.customFields.length
+            : u.customFields.length;
+        for (var i = 0; i < noteLen; i++) {
+          final label = i < u.customFields.length
+              ? u.customFields[i].label
+              : field0.customFields[i].label;
+          final before = i < field0.customFields.length ? field0.customFields[i].value : '';
+          final after = i < u.customFields.length ? u.customFields[i].value : '';
+          _addDiff(diffs, label, before, after);
+        }
       case (VaultEntryData_Card(:final field0),
             VaultEntryData_Card(field0: final u)):
         _addDiff(diffs, 'Card label', field0.cardName ?? '', u.cardName ?? '');
@@ -192,8 +226,20 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         _addDiff(diffs, 'Credit limit', field0.creditLimit ?? '', u.creditLimit ?? '');
         _addDiff(diffs, 'Account number', field0.cardAccountNumber ?? '', u.cardAccountNumber ?? '');
         _addDiff(diffs, 'Network', field0.paymentNetwork ?? '', u.paymentNetwork ?? '');
+        _addDiff(diffs, 'Bank', field0.bankName ?? '', u.bankName ?? '');
         _addDiff(diffs, 'Notes', field0.notes ?? '', u.notes ?? '');
         _addDiff(diffs, 'Folder', field0.folder, u.folder);
+        final cardLen = field0.customFields.length > u.customFields.length
+            ? field0.customFields.length
+            : u.customFields.length;
+        for (var i = 0; i < cardLen; i++) {
+          final label = i < u.customFields.length
+              ? u.customFields[i].label
+              : field0.customFields[i].label;
+          final before = i < field0.customFields.length ? field0.customFields[i].value : '';
+          final after = i < u.customFields.length ? u.customFields[i].value : '';
+          _addDiff(diffs, label, before, after);
+        }
       case (VaultEntryData_Identity(:final field0),
             VaultEntryData_Identity(field0: final u)):
         _addDiff(diffs, 'First name', field0.firstName, u.firstName);
@@ -231,7 +277,22 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
       case (VaultEntryData_File(:final field0),
             VaultEntryData_File(field0: final u)):
         _addDiff(diffs, 'Filename', field0.filename, u.filename);
+        if (field0.data.length != u.data.length) {
+          _addDiff(diffs, 'Size', '${field0.data.length} bytes', '${u.data.length} bytes');
+        }
+        _addDiff(diffs, 'Notes', field0.notes ?? '', u.notes ?? '');
         _addDiff(diffs, 'Folder', field0.folder, u.folder);
+        final fileLen = field0.customFields.length > u.customFields.length
+            ? field0.customFields.length
+            : u.customFields.length;
+        for (var i = 0; i < fileLen; i++) {
+          final label = i < u.customFields.length
+              ? u.customFields[i].label
+              : field0.customFields[i].label;
+          final before = i < field0.customFields.length ? field0.customFields[i].value : '';
+          final after = i < u.customFields.length ? u.customFields[i].value : '';
+          _addDiff(diffs, label, before, after);
+        }
       default:
         break;
     }

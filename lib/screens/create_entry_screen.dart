@@ -53,6 +53,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   late final TextEditingController _passwordController;
   bool _passwordObscured = true;
   late final TextEditingController _loginNotesController;
+  final List<_CustomFieldState> _loginCustomFields = [];
   final FocusNode _loginTitleFocus = FocusNode();
   final FocusNode _urlFocus = FocusNode();
   final FocusNode _usernameFocus = FocusNode();
@@ -62,6 +63,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   // ── Note fields ─────────────────────────────────────────────────────────────
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
+  final List<_CustomFieldState> _noteCustomFields = [];
   final FocusNode _noteTitleFocus = FocusNode();
   final FocusNode _noteContentFocus = FocusNode();
 
@@ -79,6 +81,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   final FocusNode _addressFocus = FocusNode();
 
   // ── Card fields ─────────────────────────────────────────────────────────────
+  final List<_CustomFieldState> _cardCustomFields = [];
   late final TextEditingController _cardNameController;
   late final TextEditingController _cardStatusController;
   late final TextEditingController _cardholderNameController;
@@ -105,6 +108,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   String? _pickedFilename;
   Uint8List? _pickedFileBytes;
   late final TextEditingController _fileNotesController;
+  final List<_CustomFieldState> _fileCustomFields = [];
 
   // ── Custom entry fields ─────────────────────────────────────────────────────
   late final TextEditingController _customTitleController;
@@ -159,6 +163,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _usernameController = TextEditingController(text: field0.username);
       _passwordController = TextEditingController(text: field0.password);
       _loginNotesController = TextEditingController(text: field0.notes ?? '');
+      for (final f in field0.customFields) {
+        _loginCustomFields.add(
+          _CustomFieldState(
+            labelController: TextEditingController(text: f.label),
+            valueController: TextEditingController(text: f.value),
+            hidden: f.hidden,
+          ),
+        );
+      }
     } else {
       _loginTitleController = TextEditingController();
       _urlController = TextEditingController();
@@ -171,6 +184,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     if (e case VaultEntryData_Note(:final field0)) {
       _titleController = TextEditingController(text: field0.title);
       _contentController = TextEditingController(text: field0.content);
+      for (final f in field0.customFields) {
+        _noteCustomFields.add(
+          _CustomFieldState(
+            labelController: TextEditingController(text: f.label),
+            valueController: TextEditingController(text: f.value),
+            hidden: f.hidden,
+          ),
+        );
+      }
     } else {
       _titleController = TextEditingController();
       _contentController = TextEditingController();
@@ -221,6 +243,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         text: field0.paymentNetwork ?? '',
       );
       _cardNotesController = TextEditingController(text: field0.notes ?? '');
+      for (final f in field0.customFields) {
+        _cardCustomFields.add(
+          _CustomFieldState(
+            labelController: TextEditingController(text: f.label),
+            valueController: TextEditingController(text: f.value),
+            hidden: f.hidden,
+          ),
+        );
+      }
     } else {
       final p = widget.prefill;
       _cardNameController = TextEditingController(text: p?['title'] ?? '');
@@ -253,6 +284,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _pickedFilename = field0.filename;
       _pickedFileBytes = Uint8List.fromList(field0.data);
       _fileNotesController = TextEditingController(text: field0.notes ?? '');
+      for (final f in field0.customFields) {
+        _fileCustomFields.add(
+          _CustomFieldState(
+            labelController: TextEditingController(text: f.label),
+            valueController: TextEditingController(text: f.value),
+            hidden: f.hidden,
+          ),
+        );
+      }
     } else {
       _fileNotesController = TextEditingController();
     }
@@ -281,6 +321,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _usernameController.dispose();
     _passwordController.dispose();
     _loginNotesController.dispose();
+    for (final f in _loginCustomFields) {
+      f.dispose();
+    }
     _loginTitleFocus.dispose();
     _urlFocus.dispose();
     _usernameFocus.dispose();
@@ -288,6 +331,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _loginNotesFocus.dispose();
     _titleController.dispose();
     _contentController.dispose();
+    for (final f in _noteCustomFields) {
+      f.dispose();
+    }
     _noteTitleFocus.dispose();
     _noteContentFocus.dispose();
     _firstNameController.dispose();
@@ -314,6 +360,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _cardAccountNumberController.dispose();
     _paymentNetworkController.dispose();
     _cardNotesController.dispose();
+    for (final f in _cardCustomFields) {
+      f.dispose();
+    }
     _cardNameFocus.dispose();
     _cardholderNameFocus.dispose();
     _cardNumberFocus.dispose();
@@ -323,6 +372,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _creditLimitFocus.dispose();
     _cardAccountNumberFocus.dispose();
     _fileNotesController.dispose();
+    for (final f in _fileCustomFields) {
+      f.dispose();
+    }
     _customTitleController.dispose();
     _customTitleFocus.dispose();
     for (final f in _customFields) {
@@ -405,6 +457,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             field0.username != u.username ||
             field0.password != u.password ||
             field0.notes != u.notes ||
+            !listEquals(field0.customFields, u.customFields) ||
             field0.folder != u.folder;
       case (
         VaultEntryData_Note(:final field0),
@@ -412,6 +465,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       ):
         return field0.title != u.title ||
             field0.content != u.content ||
+            !listEquals(field0.customFields, u.customFields) ||
             field0.folder != u.folder;
       case (
         VaultEntryData_Identity(:final field0),
@@ -439,13 +493,17 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             field0.creditLimit != u.creditLimit ||
             field0.cardAccountNumber != u.cardAccountNumber ||
             field0.paymentNetwork != u.paymentNetwork ||
-            field0.notes != u.notes;
+            field0.bankName != u.bankName ||
+            field0.transactionPassword != u.transactionPassword ||
+            field0.notes != u.notes ||
+            !listEquals(field0.customFields, u.customFields);
       case (
         VaultEntryData_File(:final field0),
         VaultEntryData_File(field0: final u),
       ):
         return field0.filename != u.filename ||
             field0.notes != u.notes ||
+            !listEquals(field0.customFields, u.customFields) ||
             field0.folder != u.folder;
       case (
         VaultEntryData_Custom(:final field0),
@@ -477,7 +535,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             notes: _loginNotesController.text.isEmpty
                 ? null
                 : _loginNotesController.text,
-            customFields: field0.customFields,
+            customFields: _loginCustomFields
+                .map(
+                  (f) => CustomFieldData(
+                    label: f.labelController.text,
+                    value: f.valueController.text,
+                    hidden: f.hidden,
+                  ),
+                )
+                .toList(),
             previousPassword: field0.previousPassword,
           ),
         );
@@ -490,6 +556,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             folder: _selectedFolder,
             title: _titleController.text,
             content: _contentController.text,
+            customFields: _noteCustomFields
+                .map(
+                  (f) => CustomFieldData(
+                    label: f.labelController.text,
+                    value: f.valueController.text,
+                    hidden: f.hidden,
+                  ),
+                )
+                .toList(),
           ),
         );
       case VaultEntryData_Identity(:final field0):
@@ -544,10 +619,20 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             paymentNetwork: _paymentNetworkController.text.isEmpty
                 ? null
                 : _paymentNetworkController.text,
+            bankName: field0.bankName,
+            transactionPassword: field0.transactionPassword,
             notes: _cardNotesController.text.isEmpty
                 ? null
                 : _cardNotesController.text,
-            customFields: field0.customFields,
+            customFields: _cardCustomFields
+                .map(
+                  (f) => CustomFieldData(
+                    label: f.labelController.text,
+                    value: f.valueController.text,
+                    hidden: f.hidden,
+                  ),
+                )
+                .toList(),
             previousCvv: field0.previousCvv,
             previousPin: field0.previousPin,
           ),
@@ -564,6 +649,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             notes: _fileNotesController.text.isEmpty
                 ? null
                 : _fileNotesController.text,
+            customFields: _fileCustomFields
+                .map(
+                  (f) => CustomFieldData(
+                    label: f.labelController.text,
+                    value: f.valueController.text,
+                    hidden: f.hidden,
+                  ),
+                )
+                .toList(),
           ),
         );
       case VaultEntryData_Custom(:final field0):
@@ -607,7 +701,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               notes: _loginNotesController.text.isEmpty
                   ? null
                   : _loginNotesController.text,
-              customFields: [],
+              customFields: _loginCustomFields
+                  .map(
+                    (f) => CustomFieldData(
+                      label: f.labelController.text,
+                      value: f.valueController.text,
+                      hidden: f.hidden,
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         );
@@ -622,6 +724,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               folder: _selectedFolder,
               title: _titleController.text,
               content: _contentController.text,
+              customFields: _noteCustomFields
+                  .map(
+                    (f) => CustomFieldData(
+                      label: f.labelController.text,
+                      value: f.valueController.text,
+                      hidden: f.hidden,
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         );
@@ -687,7 +798,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               notes: _cardNotesController.text.isEmpty
                   ? null
                   : _cardNotesController.text,
-              customFields: const [],
+              customFields: _cardCustomFields
+                  .map(
+                    (f) => CustomFieldData(
+                      label: f.labelController.text,
+                      value: f.valueController.text,
+                      hidden: f.hidden,
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         );
@@ -705,6 +824,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               notes: _fileNotesController.text.isEmpty
                   ? null
                   : _fileNotesController.text,
+              customFields: _fileCustomFields
+                  .map(
+                    (f) => CustomFieldData(
+                      label: f.labelController.text,
+                      value: f.valueController.text,
+                      hidden: f.hidden,
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         );
@@ -911,6 +1039,19 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       focusNode: _loginNotesFocus,
       maxLines: 3,
     ),
+    const SizedBox(height: 16),
+    _customFieldsSection(
+      fields: _loginCustomFields,
+      onAdd: () =>
+          setState(() => _loginCustomFields.add(_CustomFieldState.empty())),
+      onRemove: (i) => setState(() {
+        _loginCustomFields[i].dispose();
+        _loginCustomFields.removeAt(i);
+      }),
+      onToggleHidden: (i) => setState(
+        () => _loginCustomFields[i].hidden = !_loginCustomFields[i].hidden,
+      ),
+    ),
   ];
 
   // ── Note fields ──────────────────────────────────────────────────────────────
@@ -940,6 +1081,19 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         border: OutlineInputBorder(),
       ),
       validator: (v) => (v == null || v.isEmpty) ? 'Content is required' : null,
+    ),
+    const SizedBox(height: 16),
+    _customFieldsSection(
+      fields: _noteCustomFields,
+      onAdd: () =>
+          setState(() => _noteCustomFields.add(_CustomFieldState.empty())),
+      onRemove: (i) => setState(() {
+        _noteCustomFields[i].dispose();
+        _noteCustomFields.removeAt(i);
+      }),
+      onToggleHidden: (i) => setState(
+        () => _noteCustomFields[i].hidden = !_noteCustomFields[i].hidden,
+      ),
     ),
   ];
 
@@ -1214,6 +1368,19 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         border: OutlineInputBorder(),
       ),
     ),
+    const SizedBox(height: 16),
+    _customFieldsSection(
+      fields: _cardCustomFields,
+      onAdd: () =>
+          setState(() => _cardCustomFields.add(_CustomFieldState.empty())),
+      onRemove: (i) => setState(() {
+        _cardCustomFields[i].dispose();
+        _cardCustomFields.removeAt(i);
+      }),
+      onToggleHidden: (i) => setState(
+        () => _cardCustomFields[i].hidden = !_cardCustomFields[i].hidden,
+      ),
+    ),
   ];
 
   // ── File fields ──────────────────────────────────────────────────────────────
@@ -1254,6 +1421,19 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     ),
     const SizedBox(height: 12),
     _optionalTextField(_fileNotesController, 'Notes', maxLines: 3),
+    const SizedBox(height: 16),
+    _customFieldsSection(
+      fields: _fileCustomFields,
+      onAdd: () =>
+          setState(() => _fileCustomFields.add(_CustomFieldState.empty())),
+      onRemove: (i) => setState(() {
+        _fileCustomFields[i].dispose();
+        _fileCustomFields.removeAt(i);
+      }),
+      onToggleHidden: (i) => setState(
+        () => _fileCustomFields[i].hidden = !_fileCustomFields[i].hidden,
+      ),
+    ),
   ];
 
   Future<void> _pickFile() async {

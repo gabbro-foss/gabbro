@@ -564,4 +564,147 @@ void main() {
 
     expect(find.text('No changes to save.'), findsNothing);
   });
+
+  // ── Custom field tests ────────────────────────────────────────────────────
+
+  testWidgets('note form shows Add custom field button', (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Note'));
+    await tester.ensureVisible(find.text('Add custom field'));
+    expect(find.text('Add custom field'), findsOneWidget);
+  });
+
+  testWidgets('file form shows Add custom field button', (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('File'));
+    await tester.ensureVisible(find.text('Add custom field'));
+    expect(find.text('Add custom field'), findsOneWidget);
+  });
+
+  testWidgets('login form shows Add custom field button', (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Login'));
+    await tester.ensureVisible(find.text('Add custom field'));
+    expect(find.text('Add custom field'), findsOneWidget);
+  });
+
+  testWidgets('adding a custom field to a note includes it in saved entry',
+      (tester) async {
+    VaultEntryData? captured;
+    await tester.pumpWidget(
+      _buildCreateScreen('Note', onCreateEntry: (e) async => captured = e),
+    );
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Title'),
+      'Deploy guide',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Content'),
+      'Step 1...',
+    );
+    await tester.ensureVisible(find.text('Add custom field'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add custom field'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Label'),
+      'Token',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Value'),
+      'abc123',
+    );
+
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(captured, isA<VaultEntryData_Note>());
+    final note = (captured! as VaultEntryData_Note).field0;
+    expect(note.customFields.length, equals(1));
+    expect(note.customFields[0].label, equals('Token'));
+    expect(note.customFields[0].value, equals('abc123'));
+  });
+
+  testWidgets('note edit mode pre-populates custom fields', (tester) async {
+    final entry = NoteEntryData(
+      id: 'note-1',
+      title: 'My note',
+      content: 'some content',
+      customFields: const [
+        CustomFieldData(label: 'Pin', value: '1234', hidden: true),
+      ],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: CreateEntryScreen(
+          entryType: 'Note',
+          existing: VaultEntryData.note(entry),
+          onCreateEntry: (_) async {},
+          onGetEntry: (_) => VaultEntryData.note(entry),
+        ),
+      ),
+    );
+
+    await tester.ensureVisible(find.widgetWithText(TextFormField, 'Pin'));
+    expect(find.widgetWithText(TextFormField, 'Pin'), findsOneWidget);
+    expect(
+      tester
+          .widget<TextFormField>(find.widgetWithText(TextFormField, 'Pin'))
+          .controller
+          ?.text,
+      equals('Pin'),
+    );
+    expect(find.widgetWithText(TextFormField, '1234'), findsOneWidget);
+  });
+
+  testWidgets('adding a custom field to a login includes it in saved entry',
+      (tester) async {
+    VaultEntryData? captured;
+    await tester.pumpWidget(
+      _buildCreateScreen('Login', onCreateEntry: (e) async => captured = e),
+    );
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Title'),
+      'GitHub',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Username'),
+      'rob',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Password'),
+      'p@ssw0rd',
+    );
+    await tester.ensureVisible(find.text('Add custom field'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add custom field'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Label'),
+      'Recovery code',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Value'),
+      'ABC-123',
+    );
+
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(captured, isA<VaultEntryData_Login>());
+    final login = (captured! as VaultEntryData_Login).field0;
+    expect(login.customFields.length, equals(1));
+    expect(login.customFields[0].label, equals('Recovery code'));
+    expect(login.customFields[0].value, equals('ABC-123'));
+  });
+
+  // ── End custom field tests ────────────────────────────────────────────────
 }

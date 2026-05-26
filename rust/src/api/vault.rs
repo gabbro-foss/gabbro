@@ -61,6 +61,7 @@ pub struct NoteEntryData {
     pub folder: String,
     pub title: String,
     pub content: String,
+    pub custom_fields: Vec<CustomFieldData>,
 }
 
 /// An identity entry as seen by Flutter.
@@ -112,6 +113,7 @@ pub struct FileEntryData {
     pub filename: String,
     pub data: Vec<u8>,
     pub notes: Option<String>,
+    pub custom_fields: Vec<CustomFieldData>,
 }
 
 /// A custom entry as seen by Flutter.
@@ -203,6 +205,7 @@ fn note_entry_to_data(e: &NoteEntry) -> NoteEntryData {
         folder: e.meta.folder.clone(),
         title: e.title.clone(),
         content: e.content.clone(),
+        custom_fields: e.custom_fields.iter().map(custom_field_to_data).collect(),
     }
 }
 
@@ -255,6 +258,7 @@ fn file_entry_to_data(e: &FileEntry) -> FileEntryData {
         filename: e.filename.clone(),
         data: e.data.clone(),
         notes: e.notes.clone(),
+        custom_fields: e.custom_fields.iter().map(custom_field_to_data).collect(),
     }
 }
 
@@ -314,7 +318,12 @@ pub fn create_login_entry(
 }
 
 /// Creates a new note entry with a generated UUID and current timestamp.
-pub fn create_note_entry(folder: String, title: String, content: String) -> NoteEntryData {
+pub fn create_note_entry(
+    folder: String,
+    title: String,
+    content: String,
+    custom_fields: Vec<CustomFieldData>,
+) -> NoteEntryData {
     let now = chrono_now();
     let meta = EntryMeta {
         id: Uuid::new_v4().to_string(),
@@ -322,10 +331,19 @@ pub fn create_note_entry(folder: String, title: String, content: String) -> Note
         updated_at: now,
         folder,
     };
+    let internal_fields = custom_fields
+        .into_iter()
+        .map(|f| CustomField {
+            label: f.label,
+            value: f.value,
+            hidden: f.hidden,
+        })
+        .collect();
     let entry = NoteEntry {
         meta,
         title,
         content,
+        custom_fields: internal_fields,
         attachments: vec![],
     };
     note_entry_to_data(&entry)
@@ -416,6 +434,7 @@ pub fn create_file_entry(
     filename: String,
     data: Vec<u8>,
     notes: Option<String>,
+    custom_fields: Vec<CustomFieldData>,
 ) -> FileEntryData {
     let now = chrono_now();
     let meta = EntryMeta {
@@ -424,11 +443,20 @@ pub fn create_file_entry(
         updated_at: now,
         folder,
     };
+    let internal_fields = custom_fields
+        .into_iter()
+        .map(|f| CustomField {
+            label: f.label,
+            value: f.value,
+            hidden: f.hidden,
+        })
+        .collect();
     let entry = FileEntry {
         meta,
         filename,
         data,
         notes,
+        custom_fields: internal_fields,
     };
     file_entry_to_data(&entry)
 }
@@ -708,8 +736,45 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
             previous_cvv: e.previous_cvv.clone(),
             previous_pin: e.previous_pin.clone(),
         }),
-        // Note, Identity, File, Custom carry no password-class fields —
-        // return a plain clone.
+        VaultEntry::Note(e) => VaultEntry::Note(NoteEntry {
+            meta: e.meta.clone(),
+            title: e.title.clone(),
+            content: e.content.clone(),
+            custom_fields: e
+                .custom_fields
+                .iter()
+                .map(|f| CustomField {
+                    label: f.label.clone(),
+                    value: if f.hidden {
+                        MASKED_VALUE.to_string()
+                    } else {
+                        f.value.clone()
+                    },
+                    hidden: f.hidden,
+                })
+                .collect(),
+            attachments: e.attachments.clone(),
+        }),
+        VaultEntry::File(e) => VaultEntry::File(FileEntry {
+            meta: e.meta.clone(),
+            filename: e.filename.clone(),
+            data: e.data.clone(),
+            notes: e.notes.clone(),
+            custom_fields: e
+                .custom_fields
+                .iter()
+                .map(|f| CustomField {
+                    label: f.label.clone(),
+                    value: if f.hidden {
+                        MASKED_VALUE.to_string()
+                    } else {
+                        f.value.clone()
+                    },
+                    hidden: f.hidden,
+                })
+                .collect(),
+        }),
+        // Identity and Custom carry no password-class fields — return a plain clone.
         other => other.clone(),
     }
 }
@@ -1153,6 +1218,7 @@ mod tests {
             String::from("Personal"),
             String::from("Shopping list"),
             String::from("Milk, eggs, bread"),
+            vec![],
         );
 
         assert_eq!(entry.title, "Shopping list");
@@ -1166,13 +1232,34 @@ mod tests {
             String::from("Work"),
             String::from("Note A"),
             String::from("content a"),
+            vec![],
         );
         let b = create_note_entry(
             String::from("Work"),
             String::from("Note B"),
             String::from("content b"),
+            vec![],
         );
         assert_ne!(a.id, b.id);
+    }
+
+    #[test]
+    fn create_note_entry_with_custom_fields() {
+        let field = CustomFieldData {
+            label: String::from("Source"),
+            value: String::from("my own recipe"),
+            hidden: false,
+        };
+        let entry = create_note_entry(
+            String::from("Personal"),
+            String::from("Shopping list"),
+            String::from("Milk, eggs, bread"),
+            vec![field],
+        );
+
+        assert_eq!(entry.custom_fields.len(), 1);
+        assert_eq!(entry.custom_fields[0].label, "Source");
+        assert!(!entry.custom_fields[0].hidden);
     }
 
     #[test]
@@ -1267,6 +1354,7 @@ mod tests {
             String::from("secret.pdf"),
             payload,
             Some(String::from("my secret doc")),
+            vec![],
         );
 
         assert_eq!(entry.filename, "secret.pdf");
@@ -1278,9 +1366,41 @@ mod tests {
 
     #[test]
     fn create_file_entry_generates_unique_ids() {
-        let a = create_file_entry(String::from("Work"), String::from("a.pdf"), vec![], None);
-        let b = create_file_entry(String::from("Work"), String::from("b.pdf"), vec![], None);
+        let a = create_file_entry(
+            String::from("Work"),
+            String::from("a.pdf"),
+            vec![],
+            None,
+            vec![],
+        );
+        let b = create_file_entry(
+            String::from("Work"),
+            String::from("b.pdf"),
+            vec![],
+            None,
+            vec![],
+        );
         assert_ne!(a.id, b.id);
+    }
+
+    #[test]
+    fn create_file_entry_with_custom_fields() {
+        let field = CustomFieldData {
+            label: String::from("Classification"),
+            value: String::from("confidential"),
+            hidden: true,
+        };
+        let entry = create_file_entry(
+            String::from("Work"),
+            String::from("report.pdf"),
+            vec![],
+            None,
+            vec![field],
+        );
+
+        assert_eq!(entry.custom_fields.len(), 1);
+        assert_eq!(entry.custom_fields[0].label, "Classification");
+        assert!(entry.custom_fields[0].hidden);
     }
 
     #[test]
@@ -1337,6 +1457,7 @@ mod tests {
             },
             title: String::from("Test note"),
             content: String::from("secret content"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
 
@@ -1400,6 +1521,7 @@ mod tests {
                 },
                 title: String::from("First note"),
                 content: String::from("content one"),
+                custom_fields: vec![],
                 attachments: vec![],
             }),
             VaultEntry::Note(NoteEntry {
@@ -1411,6 +1533,7 @@ mod tests {
                 },
                 title: String::from("Second note"),
                 content: String::from("content two"),
+                custom_fields: vec![],
                 attachments: vec![],
             }),
         ];
@@ -1435,6 +1558,7 @@ mod tests {
             },
             title: String::from("A note"),
             content: String::from("some content"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
 
@@ -1454,6 +1578,7 @@ mod tests {
             },
             title: String::from("Original title"),
             content: String::from("original content"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
 
@@ -1466,6 +1591,7 @@ mod tests {
             },
             title: String::from("Updated title"),
             content: String::from("updated content"),
+            custom_fields: vec![],
             attachments: vec![],
         });
 
@@ -1493,6 +1619,7 @@ mod tests {
             },
             title: String::from("Note"),
             content: String::from("content"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
 
@@ -1505,6 +1632,7 @@ mod tests {
             },
             title: String::from("Note"),
             content: String::from("new content"),
+            custom_fields: vec![],
             attachments: vec![],
         });
 
@@ -1528,6 +1656,7 @@ mod tests {
             },
             title: String::from("Note"),
             content: String::from("content"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
 
@@ -1540,6 +1669,7 @@ mod tests {
             },
             title: String::from("Ghost"),
             content: String::from("ghost content"),
+            custom_fields: vec![],
             attachments: vec![],
         });
 
@@ -1560,6 +1690,7 @@ mod tests {
                 },
                 title: String::from("First"),
                 content: String::from("first content"),
+                custom_fields: vec![],
                 attachments: vec![],
             }),
             VaultEntry::Note(NoteEntry {
@@ -1571,6 +1702,7 @@ mod tests {
                 },
                 title: String::from("Second"),
                 content: String::from("second content"),
+                custom_fields: vec![],
                 attachments: vec![],
             }),
         ];
@@ -1596,6 +1728,7 @@ mod tests {
             },
             title: String::from("A note"),
             content: String::from("some content"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
 
@@ -1932,6 +2065,7 @@ mod tests {
             },
             title: String::from("My note"),
             content: String::from("sensitive note content"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
 
@@ -1939,6 +2073,82 @@ mod tests {
         match &result[0] {
             VaultEntry::Note(e) => assert_eq!(e.content, "sensitive note content"),
             _ => panic!("Expected Note variant"),
+        }
+    }
+
+    #[test]
+    fn list_entries_masked_hides_hidden_custom_fields_on_note() {
+        use crate::vault::entry::{CustomField, EntryMeta, NoteEntry, VaultEntry};
+
+        let entries = vec![VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("My note"),
+            content: String::from("content"),
+            custom_fields: vec![
+                CustomField {
+                    label: String::from("Secret key"),
+                    value: String::from("sk-xyz"),
+                    hidden: true,
+                },
+                CustomField {
+                    label: String::from("Category"),
+                    value: String::from("finance"),
+                    hidden: false,
+                },
+            ],
+            attachments: vec![],
+        })];
+
+        let result = list_entries(&entries, true);
+        match &result[0] {
+            VaultEntry::Note(e) => {
+                assert_eq!(e.custom_fields[0].value, MASKED_VALUE);
+                assert_eq!(e.custom_fields[1].value, "finance");
+            }
+            _ => panic!("Expected Note variant"),
+        }
+    }
+
+    #[test]
+    fn list_entries_masked_hides_hidden_custom_fields_on_file() {
+        use crate::vault::entry::{CustomField, EntryMeta, FileEntry, VaultEntry};
+
+        let entries = vec![VaultEntry::File(FileEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            filename: String::from("report.pdf"),
+            data: vec![],
+            notes: None,
+            custom_fields: vec![
+                CustomField {
+                    label: String::from("Password"),
+                    value: String::from("s3cr3t"),
+                    hidden: true,
+                },
+                CustomField {
+                    label: String::from("Author"),
+                    value: String::from("Rob"),
+                    hidden: false,
+                },
+            ],
+        })];
+
+        let result = list_entries(&entries, true);
+        match &result[0] {
+            VaultEntry::File(e) => {
+                assert_eq!(e.custom_fields[0].value, MASKED_VALUE);
+                assert_eq!(e.custom_fields[1].value, "Rob");
+            }
+            _ => panic!("Expected File variant"),
         }
     }
 
@@ -1959,6 +2169,7 @@ mod tests {
             },
             title: String::from("Test note"),
             content: String::from("secret content"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
 
@@ -2014,6 +2225,7 @@ mod tests {
                 },
                 title: String::from("Test note"),
                 content: String::from("secret content"),
+                custom_fields: vec![],
                 attachments: vec![],
             })],
             ..Default::default()
@@ -2068,6 +2280,7 @@ mod tests {
             },
             title: String::from("Export test"),
             content: String::from("exported content"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
 
@@ -2124,6 +2337,7 @@ mod tests {
             },
             title: String::from("Reload test"),
             content: String::from("reloaded content"),
+            custom_fields: vec![],
             attachments: vec![],
         })];
 
