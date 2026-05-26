@@ -2229,6 +2229,22 @@ impl SseDecode for crate::api::vault::FileEntryData {
     }
 }
 
+impl SseDecode for crate::api::vault::FolderConflictItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <String>::sse_decode(deserializer);
+        let mut var_title = <String>::sse_decode(deserializer);
+        let mut var_localFolder = <String>::sse_decode(deserializer);
+        let mut var_incomingFolder = <String>::sse_decode(deserializer);
+        return crate::api::vault::FolderConflictItem {
+            id: var_id,
+            title: var_title,
+            local_folder: var_localFolder,
+            incoming_folder: var_incomingFolder,
+        };
+    }
+}
+
 impl SseDecode for crate::api::import::GabbroImportResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2377,6 +2393,20 @@ impl SseDecode for Vec<crate::api::fido_bridge::FidoRecordInput> {
     }
 }
 
+impl SseDecode for Vec<crate::api::vault::FolderConflictItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::vault::FolderConflictItem>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::api::import::ImportFailureData> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2398,6 +2428,20 @@ impl SseDecode for Vec<Vec<String>> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<Vec<String>>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::vault::PendingDeleteItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::vault::PendingDeleteItem>::sse_decode(
+                deserializer,
+            ));
         }
         return ans_;
     }
@@ -2520,13 +2564,15 @@ impl SseDecode for crate::api::vault::MergeSummary {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_added = <u32>::sse_decode(deserializer);
         let mut var_updated = <u32>::sse_decode(deserializer);
-        let mut var_deleted = <u32>::sse_decode(deserializer);
-        let mut var_editSurvivedDelete = <Vec<String>>::sse_decode(deserializer);
+        let mut var_pendingDeletes =
+            <Vec<crate::api::vault::PendingDeleteItem>>::sse_decode(deserializer);
+        let mut var_folderConflicts =
+            <Vec<crate::api::vault::FolderConflictItem>>::sse_decode(deserializer);
         return crate::api::vault::MergeSummary {
             added: var_added,
             updated: var_updated,
-            deleted: var_deleted,
-            edit_survived_delete: var_editSurvivedDelete,
+            pending_deletes: var_pendingDeletes,
+            folder_conflicts: var_folderConflicts,
         };
     }
 }
@@ -2621,6 +2667,18 @@ impl SseDecode for crate::api::password_generator::PasswordConfig {
             use_digits: var_useDigits,
             use_symbols: var_useSymbols,
             exclude_ambiguous: var_excludeAmbiguous,
+        };
+    }
+}
+
+impl SseDecode for crate::api::vault::PendingDeleteItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <String>::sse_decode(deserializer);
+        let mut var_title = <String>::sse_decode(deserializer);
+        return crate::api::vault::PendingDeleteItem {
+            id: var_id,
+            title: var_title,
         };
     }
 }
@@ -3217,6 +3275,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::FileEntryData>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::vault::FolderConflictItem {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.title.into_into_dart().into_dart(),
+            self.local_folder.into_into_dart().into_dart(),
+            self.incoming_folder.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::vault::FolderConflictItem
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::FolderConflictItem>
+    for crate::api::vault::FolderConflictItem
+{
+    fn into_into_dart(self) -> crate::api::vault::FolderConflictItem {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::import::GabbroImportResult {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -3371,8 +3452,8 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::MergeSummary {
         [
             self.added.into_into_dart().into_dart(),
             self.updated.into_into_dart().into_dart(),
-            self.deleted.into_into_dart().into_dart(),
-            self.edit_survived_delete.into_into_dart().into_dart(),
+            self.pending_deletes.into_into_dart().into_dart(),
+            self.folder_conflicts.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -3459,6 +3540,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::password_generator::PasswordC
     for crate::api::password_generator::PasswordConfig
 {
     fn into_into_dart(self) -> crate::api::password_generator::PasswordConfig {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::vault::PendingDeleteItem {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.title.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::vault::PendingDeleteItem
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::PendingDeleteItem>
+    for crate::api::vault::PendingDeleteItem
+{
+    fn into_into_dart(self) -> crate::api::vault::PendingDeleteItem {
         self
     }
 }
@@ -3777,6 +3879,16 @@ impl SseEncode for crate::api::vault::FileEntryData {
     }
 }
 
+impl SseEncode for crate::api::vault::FolderConflictItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.title, serializer);
+        <String>::sse_encode(self.local_folder, serializer);
+        <String>::sse_encode(self.incoming_folder, serializer);
+    }
+}
+
 impl SseEncode for crate::api::import::GabbroImportResult {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -3886,6 +3998,16 @@ impl SseEncode for Vec<crate::api::fido_bridge::FidoRecordInput> {
     }
 }
 
+impl SseEncode for Vec<crate::api::vault::FolderConflictItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::vault::FolderConflictItem>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::api::import::ImportFailureData> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -3902,6 +4024,16 @@ impl SseEncode for Vec<Vec<String>> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <Vec<String>>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::vault::PendingDeleteItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::vault::PendingDeleteItem>::sse_encode(item, serializer);
         }
     }
 }
@@ -3991,8 +4123,8 @@ impl SseEncode for crate::api::vault::MergeSummary {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <u32>::sse_encode(self.added, serializer);
         <u32>::sse_encode(self.updated, serializer);
-        <u32>::sse_encode(self.deleted, serializer);
-        <Vec<String>>::sse_encode(self.edit_survived_delete, serializer);
+        <Vec<crate::api::vault::PendingDeleteItem>>::sse_encode(self.pending_deletes, serializer);
+        <Vec<crate::api::vault::FolderConflictItem>>::sse_encode(self.folder_conflicts, serializer);
     }
 }
 
@@ -4058,6 +4190,14 @@ impl SseEncode for crate::api::password_generator::PasswordConfig {
         <bool>::sse_encode(self.use_digits, serializer);
         <bool>::sse_encode(self.use_symbols, serializer);
         <bool>::sse_encode(self.exclude_ambiguous, serializer);
+    }
+}
+
+impl SseEncode for crate::api::vault::PendingDeleteItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.title, serializer);
     }
 }
 

@@ -559,8 +559,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
         final isIdentical = summary.added == 0 &&
             summary.updated == 0 &&
-            summary.deleted == 0 &&
-            summary.editSurvivedDelete.isEmpty;
+            summary.pendingDeletes.isEmpty &&
+            summary.folderConflicts.isEmpty;
 
         if (isIdentical) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -574,57 +574,97 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
         _loadEntries();
 
-        if (summary.editSurvivedDelete.isNotEmpty) {
-          final warnings = summary.editSurvivedDelete
-              .map((title) =>
-                  "'$title' was deleted on one device but later edited on the other — the edited version has been kept. Delete it manually if that is not what you want.")
-              .join('\n\n');
-          if (mounted) {
-            await showDialog<void>(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                title: const Text('Vault synced'),
-                content: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${summary.added} entries added, '
-                        '${summary.updated} updated, '
-                        '${summary.deleted} deleted.',
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        warnings,
-                        style: TextStyle(
-                            color: Theme.of(ctx).colorScheme.error),
-                      ),
-                    ],
+        // --- Pending deletes: ask user to confirm each deletion ---
+        var deletedCount = 0;
+        for (final item in summary.pendingDeletes) {
+          if (!mounted) break;
+          final confirmed = await showDialog<bool>(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Delete entry?'),
+              content: Text(
+                "The other device deleted '${item.title}'.\n\nDelete it here too, or keep it?",
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                  child: const Text('Keep'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(ctx).colorScheme.error,
+                  ),
+                  child: const Text('Delete'),
+                ),
+              ],
+            ),
+          );
+          if (confirmed == true) {
+            await deleteEntry(id: item.id);
+            deletedCount++;
+          }
+        }
+
+        // --- Folder conflicts: ask user to pick which folder ---
+        var folderChangedCount = 0;
+        for (final conflict in summary.folderConflicts) {
+          if (!mounted) break;
+          final chosenFolder = await showDialog<String>(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              title: const Text('Folder conflict'),
+              content: Text(
+                "'${conflict.title}' is in different folders on each device.\n\n"
+                'This device: ${conflict.localFolder.isEmpty ? '(none)' : conflict.localFolder}\n'
+                'Other device: ${conflict.incomingFolder.isEmpty ? '(none)' : conflict.incomingFolder}',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () =>
+                      Navigator.of(ctx).pop(conflict.localFolder),
+                  child: Text(
+                    conflict.localFolder.isEmpty
+                        ? 'Keep unfoldered'
+                        : 'Keep "${conflict.localFolder}"',
                   ),
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(ctx).pop(),
-                    child: const Text('OK'),
+                TextButton(
+                  onPressed: () =>
+                      Navigator.of(ctx).pop(conflict.incomingFolder),
+                  child: Text(
+                    conflict.incomingFolder.isEmpty
+                        ? 'Move to unfoldered'
+                        : 'Move to "${conflict.incomingFolder}"',
                   ),
-                ],
-              ),
-            );
-          }
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Vault synced — '
-                  '${summary.added} entries added, '
-                  '${summary.updated} updated, '
-                  '${summary.deleted} deleted.',
                 ),
-              ),
-            );
+              ],
+            ),
+          );
+          if (chosenFolder != null) {
+            await assignFolderToEntries(
+                ids: [conflict.id], folder: chosenFolder);
+            if (chosenFolder != conflict.localFolder) folderChangedCount++;
           }
+        }
+
+        if (deletedCount > 0 || summary.folderConflicts.isNotEmpty) {
+          _loadEntries();
+        }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Vault synced — '
+                '${summary.added} added, '
+                '${summary.updated + folderChangedCount} updated, '
+                '$deletedCount deleted.',
+              ),
+            ),
+          );
         }
       } catch (e) {
         if (!mounted) return;

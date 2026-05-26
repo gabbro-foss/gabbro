@@ -2325,6 +2325,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  FolderConflictItem dco_decode_folder_conflict_item(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    return FolderConflictItem(
+      id: dco_decode_String(arr[0]),
+      title: dco_decode_String(arr[1]),
+      localFolder: dco_decode_String(arr[2]),
+      incomingFolder: dco_decode_String(arr[3]),
+    );
+  }
+
+  @protected
   GabbroImportResult dco_decode_gabbro_import_result(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -2420,6 +2434,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<FolderConflictItem> dco_decode_list_folder_conflict_item(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_folder_conflict_item).toList();
+  }
+
+  @protected
   List<ImportFailureData> dco_decode_list_import_failure_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_import_failure_data).toList();
@@ -2429,6 +2449,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<List<String>> dco_decode_list_list_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_list_String).toList();
+  }
+
+  @protected
+  List<PendingDeleteItem> dco_decode_list_pending_delete_item(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_pending_delete_item).toList();
   }
 
   @protected
@@ -2505,8 +2531,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return MergeSummary(
       added: dco_decode_u_32(arr[0]),
       updated: dco_decode_u_32(arr[1]),
-      deleted: dco_decode_u_32(arr[2]),
-      editSurvivedDelete: dco_decode_list_String(arr[3]),
+      pendingDeletes: dco_decode_list_pending_delete_item(arr[2]),
+      folderConflicts: dco_decode_list_folder_conflict_item(arr[3]),
     );
   }
 
@@ -2576,6 +2602,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       useDigits: dco_decode_bool(arr[3]),
       useSymbols: dco_decode_bool(arr[4]),
       excludeAmbiguous: dco_decode_bool(arr[5]),
+    );
+  }
+
+  @protected
+  PendingDeleteItem dco_decode_pending_delete_item(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return PendingDeleteItem(
+      id: dco_decode_String(arr[0]),
+      title: dco_decode_String(arr[1]),
     );
   }
 
@@ -3010,6 +3048,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  FolderConflictItem sse_decode_folder_conflict_item(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_title = sse_decode_String(deserializer);
+    var var_localFolder = sse_decode_String(deserializer);
+    var var_incomingFolder = sse_decode_String(deserializer);
+    return FolderConflictItem(
+      id: var_id,
+      title: var_title,
+      localFolder: var_localFolder,
+      incomingFolder: var_incomingFolder,
+    );
+  }
+
+  @protected
   GabbroImportResult sse_decode_gabbro_import_result(
     SseDeserializer deserializer,
   ) {
@@ -3146,6 +3201,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<FolderConflictItem> sse_decode_list_folder_conflict_item(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <FolderConflictItem>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_folder_conflict_item(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<ImportFailureData> sse_decode_list_import_failure_data(
     SseDeserializer deserializer,
   ) {
@@ -3167,6 +3236,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <List<String>>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_list_String(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<PendingDeleteItem> sse_decode_list_pending_delete_item(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <PendingDeleteItem>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_pending_delete_item(deserializer));
     }
     return ans_;
   }
@@ -3291,13 +3374,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_added = sse_decode_u_32(deserializer);
     var var_updated = sse_decode_u_32(deserializer);
-    var var_deleted = sse_decode_u_32(deserializer);
-    var var_editSurvivedDelete = sse_decode_list_String(deserializer);
+    var var_pendingDeletes = sse_decode_list_pending_delete_item(deserializer);
+    var var_folderConflicts = sse_decode_list_folder_conflict_item(
+      deserializer,
+    );
     return MergeSummary(
       added: var_added,
       updated: var_updated,
-      deleted: var_deleted,
-      editSurvivedDelete: var_editSurvivedDelete,
+      pendingDeletes: var_pendingDeletes,
+      folderConflicts: var_folderConflicts,
     );
   }
 
@@ -3389,6 +3474,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       useSymbols: var_useSymbols,
       excludeAmbiguous: var_excludeAmbiguous,
     );
+  }
+
+  @protected
+  PendingDeleteItem sse_decode_pending_delete_item(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_title = sse_decode_String(deserializer);
+    return PendingDeleteItem(id: var_id, title: var_title);
   }
 
   @protected
@@ -3790,6 +3885,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_folder_conflict_item(
+    FolderConflictItem self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.title, serializer);
+    sse_encode_String(self.localFolder, serializer);
+    sse_encode_String(self.incomingFolder, serializer);
+  }
+
+  @protected
   void sse_encode_gabbro_import_result(
     GabbroImportResult self,
     SseSerializer serializer,
@@ -3895,6 +4002,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_folder_conflict_item(
+    List<FolderConflictItem> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_folder_conflict_item(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_import_failure_data(
     List<ImportFailureData> self,
     SseSerializer serializer,
@@ -3915,6 +4034,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_list_String(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_pending_delete_item(
+    List<PendingDeleteItem> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_pending_delete_item(item, serializer);
     }
   }
 
@@ -4027,8 +4158,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_32(self.added, serializer);
     sse_encode_u_32(self.updated, serializer);
-    sse_encode_u_32(self.deleted, serializer);
-    sse_encode_list_String(self.editSurvivedDelete, serializer);
+    sse_encode_list_pending_delete_item(self.pendingDeletes, serializer);
+    sse_encode_list_folder_conflict_item(self.folderConflicts, serializer);
   }
 
   @protected
@@ -4103,6 +4234,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.useDigits, serializer);
     sse_encode_bool(self.useSymbols, serializer);
     sse_encode_bool(self.excludeAmbiguous, serializer);
+  }
+
+  @protected
+  void sse_encode_pending_delete_item(
+    PendingDeleteItem self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_String(self.title, serializer);
   }
 
   @protected

@@ -10,14 +10,14 @@ import 'package:gabbro/src/rust/api/vault.dart';
 MergeSummary _summary({
   int added = 0,
   int updated = 0,
-  int deleted = 0,
-  List<String> editSurvivedDelete = const [],
+  List<PendingDeleteItem> pendingDeletes = const [],
+  List<FolderConflictItem> folderConflicts = const [],
 }) =>
     MergeSummary(
       added: added,
       updated: updated,
-      deleted: deleted,
-      editSurvivedDelete: editSurvivedDelete,
+      pendingDeletes: pendingDeletes,
+      folderConflicts: folderConflicts,
     );
 
 Widget _buildScreen({
@@ -125,7 +125,7 @@ void main() {
     testWidgets('successful merge shows synced snackbar', (tester) async {
       await tester.pumpWidget(_buildScreen(
         pickedPath: '/tmp/other.gabbro',
-        mergeVault: (_, _) async => _summary(added: 3, updated: 1, deleted: 0),
+        mergeVault: (_, _) async => _summary(added: 3, updated: 1),
       ));
       await _openMenu(tester);
       await tester.tap(find.text('Sync from file'));
@@ -142,7 +142,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Vault synced'), findsOneWidget);
-      expect(find.textContaining('3 entries added'), findsOneWidget);
+      expect(find.textContaining('3 added'), findsOneWidget);
       expect(find.textContaining('1 updated'), findsOneWidget);
     });
 
@@ -203,15 +203,13 @@ void main() {
       );
     });
 
-    testWidgets('edit-survived-delete warning shown in result dialog',
-        (tester) async {
+    testWidgets('pending delete shows Delete/Keep dialog', (tester) async {
       await tester.pumpWidget(_buildScreen(
         pickedPath: '/tmp/other.gabbro',
         mergeVault: (_, _) async => _summary(
-          added: 0,
-          updated: 1,
-          deleted: 0,
-          editSurvivedDelete: ['GitHub'],
+          pendingDeletes: [
+            const PendingDeleteItem(id: 'uuid-1', title: 'GitHub'),
+          ],
         ),
       ));
       await _openMenu(tester);
@@ -227,12 +225,49 @@ void main() {
       );
       await tester.tap(find.text('Sync'));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 350)); // passphrase exit
-      await tester.pump(const Duration(milliseconds: 350)); // result dialog enter
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pump(const Duration(milliseconds: 350));
 
-      expect(find.text('Vault synced'), findsOneWidget);
-      expect(find.textContaining("'GitHub' was deleted"), findsOneWidget);
-      expect(find.text('OK'), findsOneWidget);
+      expect(find.text('Delete entry?'), findsOneWidget);
+      expect(find.textContaining("'GitHub'"), findsOneWidget);
+      expect(find.text('Keep'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
+    });
+
+    testWidgets('folder conflict shows folder picker dialog', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        pickedPath: '/tmp/other.gabbro',
+        mergeVault: (_, _) async => _summary(
+          folderConflicts: [
+            const FolderConflictItem(
+              id: 'uuid-2',
+              title: 'Work note',
+              localFolder: 'Work',
+              incomingFolder: 'Personal',
+            ),
+          ],
+        ),
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+        'passphrase',
+      );
+      await tester.tap(find.text('Sync'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pump(const Duration(milliseconds: 350));
+
+      expect(find.text('Folder conflict'), findsOneWidget);
+      expect(find.textContaining("'Work note'"), findsOneWidget);
+      expect(find.textContaining('Work'), findsWidgets);
+      expect(find.textContaining('Personal'), findsWidgets);
     });
   });
 }

@@ -106,6 +106,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FileEntryData dco_decode_file_entry_data(dynamic raw);
 
   @protected
+  FolderConflictItem dco_decode_folder_conflict_item(dynamic raw);
+
+  @protected
   GabbroImportResult dco_decode_gabbro_import_result(dynamic raw);
 
   @protected
@@ -136,10 +139,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<FidoRecordInput> dco_decode_list_fido_record_input(dynamic raw);
 
   @protected
+  List<FolderConflictItem> dco_decode_list_folder_conflict_item(dynamic raw);
+
+  @protected
   List<ImportFailureData> dco_decode_list_import_failure_data(dynamic raw);
 
   @protected
   List<List<String>> dco_decode_list_list_String(dynamic raw);
+
+  @protected
+  List<PendingDeleteItem> dco_decode_list_pending_delete_item(dynamic raw);
 
   @protected
   List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
@@ -187,6 +196,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PasswordConfig dco_decode_password_config(dynamic raw);
+
+  @protected
+  PendingDeleteItem dco_decode_pending_delete_item(dynamic raw);
 
   @protected
   PreviousSecretData dco_decode_previous_secret_data(dynamic raw);
@@ -329,6 +341,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FileEntryData sse_decode_file_entry_data(SseDeserializer deserializer);
 
   @protected
+  FolderConflictItem sse_decode_folder_conflict_item(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   GabbroImportResult sse_decode_gabbro_import_result(
     SseDeserializer deserializer,
   );
@@ -371,12 +388,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<FolderConflictItem> sse_decode_list_folder_conflict_item(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<ImportFailureData> sse_decode_list_import_failure_data(
     SseDeserializer deserializer,
   );
 
   @protected
   List<List<String>> sse_decode_list_list_String(SseDeserializer deserializer);
+
+  @protected
+  List<PendingDeleteItem> sse_decode_list_pending_delete_item(
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
@@ -434,6 +461,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   PasswordConfig sse_decode_password_config(SseDeserializer deserializer);
+
+  @protected
+  PendingDeleteItem sse_decode_pending_delete_item(
+    SseDeserializer deserializer,
+  );
 
   @protected
   PreviousSecretData sse_decode_previous_secret_data(
@@ -610,6 +642,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_file_entry_data(FileEntryData self, SseSerializer serializer);
 
   @protected
+  void sse_encode_folder_conflict_item(
+    FolderConflictItem self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_gabbro_import_result(
     GabbroImportResult self,
     SseSerializer serializer,
@@ -658,6 +696,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_folder_conflict_item(
+    List<FolderConflictItem> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_import_failure_data(
     List<ImportFailureData> self,
     SseSerializer serializer,
@@ -666,6 +710,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_list_String(
     List<List<String>> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_pending_delete_item(
+    List<PendingDeleteItem> self,
     SseSerializer serializer,
   );
 
@@ -741,6 +791,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_password_config(
     PasswordConfig self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_pending_delete_item(
+    PendingDeleteItem self,
     SseSerializer serializer,
   );
 

@@ -331,6 +331,41 @@ class FileEntryData {
           notes == other.notes;
 }
 
+/// A folder assignment conflict discovered during vault merge.
+///
+/// Returned when the same entry UUID exists in both vaults assigned to different
+/// folders. Flutter prompts the user to pick which folder to keep.
+class FolderConflictItem {
+  final String id;
+  final String title;
+  final String localFolder;
+  final String incomingFolder;
+
+  const FolderConflictItem({
+    required this.id,
+    required this.title,
+    required this.localFolder,
+    required this.incomingFolder,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      title.hashCode ^
+      localFolder.hashCode ^
+      incomingFolder.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FolderConflictItem &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title &&
+          localFolder == other.localFolder &&
+          incomingFolder == other.incomingFolder;
+}
+
 /// An identity entry as seen by Flutter.
 class IdentityEntryData {
   final String id;
@@ -460,26 +495,27 @@ class MergeSummary {
   /// Entries updated because the incoming version had a newer timestamp.
   final int updated;
 
-  /// Entries removed because a tombstone on either side won.
-  final int deleted;
+  /// Incoming tombstones that matched local entries — awaiting user consent.
+  /// Flutter shows a Delete/Keep dialog for each; no deletion occurs automatically.
+  final List<PendingDeleteItem> pendingDeletes;
 
-  /// Display titles of entries where an edit beat a deletion tombstone.
-  /// Flutter shows a per-entry warning for each of these.
-  final List<String> editSurvivedDelete;
+  /// Same-UUID entries with different folder assignments on each device.
+  /// Flutter prompts the user to pick which folder to keep.
+  final List<FolderConflictItem> folderConflicts;
 
   const MergeSummary({
     required this.added,
     required this.updated,
-    required this.deleted,
-    required this.editSurvivedDelete,
+    required this.pendingDeletes,
+    required this.folderConflicts,
   });
 
   @override
   int get hashCode =>
       added.hashCode ^
       updated.hashCode ^
-      deleted.hashCode ^
-      editSurvivedDelete.hashCode;
+      pendingDeletes.hashCode ^
+      folderConflicts.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -488,8 +524,8 @@ class MergeSummary {
           runtimeType == other.runtimeType &&
           added == other.added &&
           updated == other.updated &&
-          deleted == other.deleted &&
-          editSurvivedDelete == other.editSurvivedDelete;
+          pendingDeletes == other.pendingDeletes &&
+          folderConflicts == other.folderConflicts;
 }
 
 /// A note entry as seen by Flutter.
@@ -530,6 +566,28 @@ class NoteEntryData {
           folder == other.folder &&
           title == other.title &&
           content == other.content;
+}
+
+/// An entry flagged for user-consent deletion during vault merge.
+///
+/// Returned when an incoming vault contains a tombstone that matches a local
+/// entry. Flutter shows a per-entry Delete/Keep dialog before any deletion occurs.
+class PendingDeleteItem {
+  final String id;
+  final String title;
+
+  const PendingDeleteItem({required this.id, required this.title});
+
+  @override
+  int get hashCode => id.hashCode ^ title.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PendingDeleteItem &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title;
 }
 
 /// A previous sensitive value as seen by Flutter.

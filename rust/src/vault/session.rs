@@ -664,7 +664,8 @@ pub fn session_revert_password(id: &str) -> Result<(), String> {
 pub fn session_export_vault(export_path: PathBuf) -> Result<(), String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
-    crate::api::vault::export_vault(&session.entries, &session.passphrase, &export_path)?;
+    let body = build_body(session);
+    crate::api::vault::export_vault(&body, &session.passphrase, &export_path)?;
     Ok(())
 }
 
@@ -1047,6 +1048,18 @@ fn entry_updated_at(entry: &VaultEntry) -> &str {
     }
 }
 
+/// Return the folder of any entry variant.
+fn entry_folder(entry: &VaultEntry) -> &str {
+    match entry {
+        VaultEntry::Login(e) => &e.meta.folder,
+        VaultEntry::Note(e) => &e.meta.folder,
+        VaultEntry::Identity(e) => &e.meta.folder,
+        VaultEntry::Card(e) => &e.meta.folder,
+        VaultEntry::File(e) => &e.meta.folder,
+        VaultEntry::Custom(e) => &e.meta.folder,
+    }
+}
+
 /// Return a human-readable display title for any entry variant.
 ///
 /// Uses the same fallback logic as `entry_to_summary`.
@@ -1079,30 +1092,26 @@ fn entry_display_title(entry: &VaultEntry) -> String {
 /// Merge rules (all timestamps are ISO 8601 strings; lexicographic ordering
 /// is equivalent to temporal ordering for the format produced by `chrono_now`):
 ///
-/// - **Additions**: entries present only on one side are added to the result.
-/// - **Edit conflicts** (same UUID on both sides): last-write-wins on `updated_at`.
-/// - **Deletions**: a tombstone beats a live entry when `deleted_at > updated_at`.
-/// - **Edit survived delete**: when `updated_at >= deleted_at` the live entry wins;
-///   the entry title is recorded in `edit_survived_delete` for the Flutter warning.
-/// - **Folders**: union, deduplicated by string equality.
+/// - **Entries — UNION + LWW**: always add incoming entries not present locally;
+///   for same-UUID conflicts the newer `updated_at` wins as a whole.
+/// - **Deletions — user consent**: incoming tombstones matching local entries are
+///   collected in `pending_deletes`; no entry is ever deleted automatically.
+/// - **Folders — UNION**: all folder names from both sides are kept; no auto-deletion.
+/// - **Folder conflicts**: same-UUID entries with different folder assignments on each
+///   device are collected in `folder_conflicts`; Flutter lets the user pick.
 /// - **Tombstones**: union of both `deleted_ids` lists, deduped by id (newer
 ///   `deleted_at` kept when the same id appears on both sides).
 fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
     let mut added: u32 = 0;
     let mut updated: u32 = 0;
-    let mut deleted: u32 = 0;
-    let mut edit_survived_delete: Vec<String> = Vec::new();
+    let mut pending_deletes: Vec<crate::api::vault::PendingDeleteItem> = Vec::new();
+    let mut folder_conflicts: Vec<crate::api::vault::FolderConflictItem> = Vec::new();
 
     // Build lookup maps.
     let local_by_id: std::collections::HashMap<&str, &VaultEntry> =
         session.entries.iter().map(|e| (entry_id(e), e)).collect();
     let incoming_by_id: std::collections::HashMap<&str, &VaultEntry> =
         incoming.entries.iter().map(|e| (entry_id(e), e)).collect();
-    let local_deletions: std::collections::HashMap<&str, &str> = session
-        .deleted_ids
-        .iter()
-        .map(|d| (d.id.as_str(), d.deleted_at.as_str()))
-        .collect();
     let incoming_deletions: std::collections::HashMap<&str, &str> = incoming
         .deleted_ids
         .iter()
@@ -1116,54 +1125,47 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
         let id = entry_id(local_entry);
 
         if let Some(inc_entry) = incoming_by_id.get(id) {
-            // Entry exists on both sides — last-write-wins.
+            // Same UUID on both sides — check for folder conflict, then LWW on content.
+            let local_folder = entry_folder(local_entry);
+            let incoming_folder = entry_folder(inc_entry);
+            if local_folder != incoming_folder {
+                folder_conflicts.push(crate::api::vault::FolderConflictItem {
+                    id: id.to_string(),
+                    title: entry_display_title(local_entry),
+                    local_folder: local_folder.to_string(),
+                    incoming_folder: incoming_folder.to_string(),
+                });
+            }
             if entry_updated_at(inc_entry) > entry_updated_at(local_entry) {
                 result_entries.push((*inc_entry).clone());
                 updated += 1;
             } else {
                 result_entries.push(local_entry.clone());
             }
-        } else if let Some(&tomb_ts) = incoming_deletions.get(id) {
-            // Local entry, incoming tombstone — compare timestamps.
-            if tomb_ts > entry_updated_at(local_entry) {
-                // Tombstone wins — entry is removed.
-                deleted += 1;
-            } else {
-                // Edit wins — keep local entry.
-                result_entries.push(local_entry.clone());
-                edit_survived_delete.push(entry_display_title(local_entry));
-            }
+        } else if incoming_deletions.contains_key(id) {
+            // Incoming tombstone — requires user consent before deletion; keep entry for now.
+            pending_deletes.push(crate::api::vault::PendingDeleteItem {
+                id: id.to_string(),
+                title: entry_display_title(local_entry),
+            });
+            result_entries.push(local_entry.clone());
         } else {
-            // Only on local, no incoming tombstone — keep it.
+            // Only on local side, no incoming tombstone — keep it.
             result_entries.push(local_entry.clone());
         }
     }
 
-    // --- Process incoming-only entries ---
+    // --- Process incoming-only entries (UNION) ---
     for inc_entry in &incoming.entries {
         let id = entry_id(inc_entry);
-        if local_by_id.contains_key(id) {
-            continue; // already handled above
-        }
-
-        if let Some(&tomb_ts) = local_deletions.get(id) {
-            // Incoming entry, local tombstone — compare timestamps.
-            if tomb_ts > entry_updated_at(inc_entry) {
-                // Tombstone wins — don't add.
-                deleted += 1;
-            } else {
-                // Edit wins — add entry.
-                result_entries.push(inc_entry.clone());
-                edit_survived_delete.push(entry_display_title(inc_entry));
-            }
-        } else {
-            // Only on incoming, no local tombstone — add it.
+        if !local_by_id.contains_key(id) {
+            // Not present locally — always add, even if a local tombstone exists.
             result_entries.push(inc_entry.clone());
             added += 1;
         }
     }
 
-    // --- Merge folders (union, dedup by name) ---
+    // --- Merge folders (UNION, dedup by name) ---
     let mut merged_folders = session.folders.clone();
     for folder in &incoming.folders {
         if !merged_folders.contains(folder) {
@@ -1197,8 +1199,8 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
     MergeSummary {
         added,
         updated,
-        deleted,
-        edit_survived_delete,
+        pending_deletes,
+        folder_conflicts,
     }
 }
 
@@ -3469,6 +3471,20 @@ mod merge_tests {
         })
     }
 
+    fn note_with_folder(id: &str, title: &str, updated_at: &str, folder: &str) -> VaultEntry {
+        VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: id.to_string(),
+                created_at: String::from("2026-01-01T00:00:00Z"),
+                updated_at: updated_at.to_string(),
+                folder: folder.to_string(),
+            },
+            title: title.to_string(),
+            content: String::from("content"),
+            attachments: vec![],
+        })
+    }
+
     fn tombstone(id: &str, deleted_at: &str) -> DeletedEntry {
         DeletedEntry {
             id: id.to_string(),
@@ -3584,8 +3600,8 @@ mod merge_tests {
 
         assert_eq!(summary.added, 1);
         assert_eq!(summary.updated, 0);
-        assert_eq!(summary.deleted, 0);
-        assert!(summary.edit_survived_delete.is_empty());
+        assert!(summary.pending_deletes.is_empty());
+        assert!(summary.folder_conflicts.is_empty());
 
         let ids: Vec<String> = list_entry_summaries()
             .unwrap()
@@ -3621,7 +3637,7 @@ mod merge_tests {
 
         assert_eq!(summary.added, 0);
         assert_eq!(summary.updated, 1);
-        assert_eq!(summary.deleted, 0);
+        assert!(summary.pending_deletes.is_empty());
 
         let entry = get_entry("shared").unwrap();
         match entry {
@@ -3661,19 +3677,19 @@ mod merge_tests {
         teardown(&path);
     }
 
-    // ── merge: tombstone beats older entry ────────────────────────────────────
+    // ── merge: incoming tombstone → pending_delete (user consent required) ──────
 
     #[test]
     #[serial]
-    fn merge_incoming_tombstone_beats_local_entry() {
+    fn merge_incoming_tombstone_becomes_pending_delete() {
         let pass = b"merge-test-pass";
         let path = setup(
             pass,
-            "tomb_beats_local",
+            "tomb_pending",
             vec![note("victim", "Deleted remotely", "2026-01-01T00:00:00Z")],
         );
 
-        // Incoming deleted "victim" after the local edit.
+        // Incoming deleted "victim" — requires user consent, not silent delete.
         let incoming = VaultBody {
             entries: vec![],
             deleted_ids: vec![tombstone("victim", "2026-01-02T00:00:00Z")],
@@ -3683,34 +3699,32 @@ mod merge_tests {
         unlock_vault(pass, path.clone()).unwrap();
         let summary = session_merge_vault_from_body(incoming).unwrap();
 
-        assert_eq!(summary.deleted, 1);
-        assert!(summary.edit_survived_delete.is_empty());
-        assert!(list_entry_summaries().unwrap().is_empty());
+        assert_eq!(summary.pending_deletes.len(), 1);
+        assert_eq!(summary.pending_deletes[0].id, "victim");
+        assert_eq!(summary.pending_deletes[0].title, "Deleted remotely");
+        // Entry must still be present — not deleted without user consent.
+        assert_eq!(list_entry_summaries().unwrap().len(), 1);
 
         teardown(&path);
     }
 
     #[test]
     #[serial]
-    fn merge_local_tombstone_beats_incoming_entry() {
+    fn merge_local_tombstone_incoming_entry_added_via_union() {
         let pass = b"merge-test-pass";
-        // Local vault is empty with a tombstone for "victim".
-        let path = setup(pass, "tomb_beats_remote", vec![]);
-
-        // Manually add the tombstone by unlocking and deleting (requires the entry to exist first).
-        // Instead, use session_merge_vault_from_body with a body that has the tombstone.
-        // Easiest: save a body that already has a tombstone, then unlock.
-        let pass2 = pass;
+        // Local vault has a tombstone for "victim" but no live entry.
         let body_with_tombstone = VaultBody {
             entries: vec![],
             deleted_ids: vec![tombstone("victim", "2026-01-02T00:00:00Z")],
             folders: vec![],
             ..Default::default()
         };
-        save_vault(&body_with_tombstone, pass2, &path).unwrap();
+        let mut path = temp_dir();
+        path.push("gabbro_merge_local_tomb_union.gabbro");
+        save_vault(&body_with_tombstone, pass, &path).unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
-        // Incoming has the entry with an older timestamp — tombstone wins.
+        // Incoming has the entry — UNION means it is always added.
         let incoming = VaultBody {
             entries: vec![note("victim", "Added remotely", "2026-01-01T00:00:00Z")],
             deleted_ids: vec![],
@@ -3719,22 +3733,23 @@ mod merge_tests {
 
         let summary = session_merge_vault_from_body(incoming).unwrap();
 
-        assert_eq!(summary.deleted, 1);
-        assert!(list_entry_summaries().unwrap().is_empty());
+        assert_eq!(summary.added, 1);
+        assert!(summary.pending_deletes.is_empty());
+        assert_eq!(list_entry_summaries().unwrap().len(), 1);
 
         teardown(&path);
     }
 
-    // ── merge: edit beats tombstone ───────────────────────────────────────────
+    // ── merge: incoming tombstone + local entry → pending_delete regardless of timestamp
 
     #[test]
     #[serial]
-    fn merge_local_edit_beats_incoming_tombstone() {
+    fn merge_incoming_tombstone_on_locally_edited_entry_is_pending_delete() {
         let pass = b"merge-test-pass";
-        // Local has an entry edited AFTER the remote deletion.
+        // Local entry edited AFTER the remote deletion timestamp.
         let path = setup(
             pass,
-            "edit_beats_tomb",
+            "tomb_pending_newer",
             vec![note("survivor", "Edited locally", "2026-01-03T00:00:00Z")],
         );
 
@@ -3747,11 +3762,10 @@ mod merge_tests {
         unlock_vault(pass, path.clone()).unwrap();
         let summary = session_merge_vault_from_body(incoming).unwrap();
 
-        assert_eq!(summary.deleted, 0);
-        assert_eq!(
-            summary.edit_survived_delete,
-            vec![String::from("Edited locally")]
-        );
+        // Regardless of timestamps, incoming tombstone → pending_delete (user consent).
+        assert_eq!(summary.pending_deletes.len(), 1);
+        assert_eq!(summary.pending_deletes[0].title, "Edited locally");
+        // Entry must still be present.
         assert_eq!(list_entry_summaries().unwrap().len(), 1);
 
         teardown(&path);
@@ -3759,9 +3773,9 @@ mod merge_tests {
 
     #[test]
     #[serial]
-    fn merge_incoming_edit_beats_local_tombstone() {
+    fn merge_incoming_entry_with_local_tombstone_added_via_union() {
         let pass = b"merge-test-pass";
-        // Local has a tombstone for "survivor", incoming has a NEWER edit.
+        // Local has a tombstone for "survivor", incoming has the entry (any timestamp).
         let body_with_tombstone = VaultBody {
             entries: vec![],
             deleted_ids: vec![tombstone("survivor", "2026-01-01T00:00:00Z")],
@@ -3769,7 +3783,7 @@ mod merge_tests {
             ..Default::default()
         };
         let mut path = temp_dir();
-        path.push("gabbro_merge_incoming_edit_beats_tomb.gabbro");
+        path.push("gabbro_merge_inc_entry_local_tomb.gabbro");
         save_vault(&body_with_tombstone, pass, &path).unwrap();
         unlock_vault(pass, path.clone()).unwrap();
 
@@ -3781,11 +3795,9 @@ mod merge_tests {
 
         let summary = session_merge_vault_from_body(incoming).unwrap();
 
-        assert_eq!(summary.deleted, 0);
-        assert_eq!(
-            summary.edit_survived_delete,
-            vec![String::from("Edited remotely")]
-        );
+        // UNION: incoming entry is added; no pending_delete (tombstone is local, not incoming).
+        assert_eq!(summary.added, 1);
+        assert!(summary.pending_deletes.is_empty());
         assert_eq!(list_entry_summaries().unwrap().len(), 1);
 
         teardown(&path);
@@ -3855,8 +3867,8 @@ mod merge_tests {
 
         assert_eq!(summary.added, 0);
         assert_eq!(summary.updated, 0);
-        assert_eq!(summary.deleted, 0);
-        assert!(summary.edit_survived_delete.is_empty());
+        assert!(summary.pending_deletes.is_empty());
+        assert!(summary.folder_conflicts.is_empty());
 
         teardown(&path);
     }
@@ -3915,6 +3927,87 @@ mod merge_tests {
         teardown(&path);
     }
 
+    // ── merge: folder assignment conflict ─────────────────────────────────────
+
+    #[test]
+    #[serial]
+    fn merge_surfaces_folder_conflict_for_same_uuid_different_folder() {
+        let pass = b"merge-test-pass";
+        let mut path = temp_dir();
+        path.push("gabbro_merge_folder_conflict.gabbro");
+        save_vault(
+            &VaultBody {
+                folders: vec![String::from("Work"), String::from("Personal")],
+                entries: vec![note_with_folder(
+                    "shared",
+                    "Shared entry",
+                    "2026-01-01T00:00:00Z",
+                    "Work",
+                )],
+                ..Default::default()
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let incoming = VaultBody {
+            folders: vec![String::from("Work"), String::from("Personal")],
+            entries: vec![note_with_folder(
+                "shared",
+                "Shared entry",
+                "2026-01-01T00:00:00Z",
+                "Personal",
+            )],
+            ..Default::default()
+        };
+
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+
+        assert_eq!(summary.folder_conflicts.len(), 1);
+        assert_eq!(summary.folder_conflicts[0].id, "shared");
+        assert_eq!(summary.folder_conflicts[0].local_folder, "Work");
+        assert_eq!(summary.folder_conflicts[0].incoming_folder, "Personal");
+        assert!(summary.pending_deletes.is_empty());
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn merge_no_folder_conflict_when_folders_match() {
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "no_folder_conflict",
+            vec![note_with_folder(
+                "shared",
+                "Shared",
+                "2026-01-01T00:00:00Z",
+                "Work",
+            )],
+        );
+
+        let incoming = VaultBody {
+            folders: vec![String::from("Work")],
+            entries: vec![note_with_folder(
+                "shared",
+                "Shared",
+                "2026-01-01T00:00:00Z",
+                "Work",
+            )],
+            ..Default::default()
+        };
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+
+        assert!(summary.folder_conflicts.is_empty());
+
+        teardown(&path);
+    }
+
     // ── vault_updated_at is stamped on every save ─────────────────────────────
 
     #[test]
@@ -3945,5 +4038,201 @@ mod merge_tests {
         );
 
         teardown(&path);
+    }
+}
+
+#[cfg(test)]
+mod export_sync_tests {
+    use super::*;
+    use crate::api::vault::{load_vault, save_vault};
+    use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+    use serial_test::serial;
+    use std::env::temp_dir;
+
+    fn note(id: &str, updated_at: &str) -> VaultEntry {
+        VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: id.to_string(),
+                created_at: String::from("2026-01-01T00:00:00Z"),
+                updated_at: updated_at.to_string(),
+                folder: String::from(""),
+            },
+            title: format!("Note {id}"),
+            content: String::from("content"),
+            attachments: vec![],
+        })
+    }
+
+    fn note_in_folder(id: &str, folder: &str) -> VaultEntry {
+        VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: id.to_string(),
+                created_at: String::from("2026-01-01T00:00:00Z"),
+                updated_at: String::from("2026-01-01T00:00:00Z"),
+                folder: folder.to_string(),
+            },
+            title: format!("Note {id}"),
+            content: String::from("content"),
+            attachments: vec![],
+        })
+    }
+
+    fn teardown(paths: &[std::path::PathBuf]) {
+        let _ = lock_vault();
+        for p in paths {
+            let _ = std::fs::remove_file(p);
+            let _ = std::fs::remove_file(p.with_extension("gabbro.sha256"));
+        }
+    }
+
+    // ── test 1: deleted_ids round-trips through export ────────────────────────
+
+    #[test]
+    #[serial]
+    fn export_roundtrips_deleted_ids() {
+        let pass = b"export-sync-pass";
+        let mut vault_path = temp_dir();
+        vault_path.push("gabbro_export_sync_tomb.gabbro");
+        let mut export_path = temp_dir();
+        export_path.push("gabbro_export_sync_tomb_out.gabbro");
+
+        save_vault(
+            &VaultBody {
+                entries: vec![note("n1", "2026-01-01T00:00:00Z")],
+                ..Default::default()
+            },
+            pass,
+            &vault_path,
+        )
+        .unwrap();
+        unlock_vault(pass, vault_path.clone()).unwrap();
+        session_delete_entry("n1").unwrap();
+        session_export_vault(export_path.clone()).unwrap();
+
+        let body = load_vault(pass, &export_path).unwrap();
+        assert_eq!(
+            body.deleted_ids.len(),
+            1,
+            "tombstone must be present in export"
+        );
+        assert_eq!(body.deleted_ids[0].id, "n1");
+
+        teardown(&[vault_path, export_path]);
+    }
+
+    // ── test 2: folder names round-trip through export and merge ─────────────
+
+    #[test]
+    #[serial]
+    fn export_folder_names_merge_into_receiving_vault() {
+        let pass = b"export-sync-pass";
+        let mut vault_a = temp_dir();
+        vault_a.push("gabbro_export_sync_folder_a.gabbro");
+        let mut vault_b = temp_dir();
+        vault_b.push("gabbro_export_sync_folder_b.gabbro");
+        let mut export_path = temp_dir();
+        export_path.push("gabbro_export_sync_folder_out.gabbro");
+
+        // Vault A: folder "Work" with one entry
+        save_vault(
+            &VaultBody {
+                folders: vec![String::from("Work")],
+                entries: vec![note_in_folder("n1", "Work")],
+                ..Default::default()
+            },
+            pass,
+            &vault_a,
+        )
+        .unwrap();
+        unlock_vault(pass, vault_a.clone()).unwrap();
+        session_export_vault(export_path.clone()).unwrap();
+        lock_vault().unwrap();
+
+        // Vault B: no folders
+        save_vault(
+            &VaultBody {
+                ..Default::default()
+            },
+            pass,
+            &vault_b,
+        )
+        .unwrap();
+        unlock_vault(pass, vault_b.clone()).unwrap();
+
+        let incoming = load_vault(pass, &export_path).unwrap();
+        session_merge_vault_from_body(incoming).unwrap();
+
+        let folders = session_list_folders().unwrap();
+        assert!(
+            folders.contains(&String::from("Work")),
+            "folder 'Work' must appear in vault B after merge"
+        );
+
+        teardown(&[vault_a, vault_b, export_path]);
+    }
+
+    // ── test 3: tombstone in export causes deletion on receiving vault ────────
+
+    #[test]
+    #[serial]
+    fn export_tombstone_causes_delete_on_receiving_vault() {
+        let pass = b"export-sync-pass";
+        let mut vault_a = temp_dir();
+        vault_a.push("gabbro_export_sync_del_a.gabbro");
+        let mut vault_b = temp_dir();
+        vault_b.push("gabbro_export_sync_del_b.gabbro");
+        let mut export_path = temp_dir();
+        export_path.push("gabbro_export_sync_del_out.gabbro");
+
+        let shared = note("n1", "2026-01-01T00:00:00Z");
+
+        // Vault A: shared entry then deleted (creates tombstone with current timestamp)
+        save_vault(
+            &VaultBody {
+                entries: vec![shared.clone()],
+                ..Default::default()
+            },
+            pass,
+            &vault_a,
+        )
+        .unwrap();
+        unlock_vault(pass, vault_a.clone()).unwrap();
+        session_delete_entry("n1").unwrap();
+        session_export_vault(export_path.clone()).unwrap();
+        lock_vault().unwrap();
+
+        // Vault B: still has the shared entry
+        save_vault(
+            &VaultBody {
+                entries: vec![shared],
+                ..Default::default()
+            },
+            pass,
+            &vault_b,
+        )
+        .unwrap();
+        unlock_vault(pass, vault_b.clone()).unwrap();
+
+        let incoming = load_vault(pass, &export_path).unwrap();
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+
+        assert_eq!(
+            summary.pending_deletes.len(),
+            1,
+            "tombstone must create a pending_delete requiring user consent"
+        );
+        assert_eq!(summary.pending_deletes[0].id, "n1");
+        // Entry must still be present — not deleted without explicit user consent.
+        let ids: Vec<String> = list_entry_summaries()
+            .unwrap()
+            .into_iter()
+            .map(|s| s.id)
+            .collect();
+        assert!(
+            ids.contains(&String::from("n1")),
+            "entry must still be present in vault B pending user consent"
+        );
+
+        teardown(&[vault_a, vault_b, export_path]);
     }
 }

@@ -124,17 +124,38 @@ pub struct CustomEntryData {
     pub fields: Vec<CustomFieldData>,
 }
 
+/// An entry flagged for user-consent deletion during vault merge.
+///
+/// Returned when an incoming vault contains a tombstone that matches a local
+/// entry. Flutter shows a per-entry Delete/Keep dialog before any deletion occurs.
+pub struct PendingDeleteItem {
+    pub id: String,
+    pub title: String,
+}
+
+/// A folder assignment conflict discovered during vault merge.
+///
+/// Returned when the same entry UUID exists in both vaults assigned to different
+/// folders. Flutter prompts the user to pick which folder to keep.
+pub struct FolderConflictItem {
+    pub id: String,
+    pub title: String,
+    pub local_folder: String,
+    pub incoming_folder: String,
+}
+
 /// Summary returned to Flutter after a vault merge operation.
 pub struct MergeSummary {
     /// Entries added from the incoming vault (UUIDs not present locally).
     pub added: u32,
     /// Entries updated because the incoming version had a newer timestamp.
     pub updated: u32,
-    /// Entries removed because a tombstone on either side won.
-    pub deleted: u32,
-    /// Display titles of entries where an edit beat a deletion tombstone.
-    /// Flutter shows a per-entry warning for each of these.
-    pub edit_survived_delete: Vec<String>,
+    /// Incoming tombstones that matched local entries — awaiting user consent.
+    /// Flutter shows a Delete/Keep dialog for each; no deletion occurs automatically.
+    pub pending_deletes: Vec<PendingDeleteItem>,
+    /// Same-UUID entries with different folder assignments on each device.
+    /// Flutter prompts the user to pick which folder to keep.
+    pub folder_conflicts: Vec<FolderConflictItem>,
 }
 
 // ── Conversion helpers (internal → DTO) ──────────────────────────────────────
@@ -720,17 +741,8 @@ pub fn change_passphrase(
 /// `export_path` should point to the desired `.gabbro` output file.
 /// The `.sha256` file is written alongside it automatically.
 #[flutter_rust_bridge::frb(ignore)]
-pub fn export_vault(
-    entries: &[VaultEntry],
-    passphrase: &[u8],
-    export_path: &Path,
-) -> Result<(), String> {
-    // Serialize and encrypt — export carries no folder list (self-contained snapshot)
-    let plaintext = serialize_vault_body(&VaultBody {
-        folders: vec![],
-        entries: entries.to_vec(),
-        ..Default::default()
-    })?;
+pub fn export_vault(body: &VaultBody, passphrase: &[u8], export_path: &Path) -> Result<(), String> {
+    let plaintext = serialize_vault_body(body)?;
     let sealed = seal_vault(passphrase, &plaintext)?;
     let vault_bytes = sealed.to_bytes();
 
@@ -2059,7 +2071,15 @@ mod tests {
             attachments: vec![],
         })];
 
-        export_vault(&entries, b"correct horst battery staple", &path).unwrap();
+        export_vault(
+            &VaultBody {
+                entries,
+                ..Default::default()
+            },
+            b"correct horst battery staple",
+            &path,
+        )
+        .unwrap();
 
         assert!(path.exists(), ".gabbro file should exist");
         assert!(hash_path.exists(), ".gabbro.sha256 file should exist");
@@ -2076,8 +2096,7 @@ mod tests {
         path.push("gabbro_export_hash_test.gabbro");
         let hash_path = path.with_extension("gabbro.sha256");
 
-        let entries: Vec<VaultEntry> = vec![];
-        export_vault(&entries, b"passphrase", &path).unwrap();
+        export_vault(&VaultBody::default(), b"passphrase", &path).unwrap();
 
         let hash_contents = std::fs::read_to_string(&hash_path).unwrap();
         assert!(hash_contents.contains("gabbro_export_hash_test.gabbro"));
@@ -2109,7 +2128,15 @@ mod tests {
         })];
 
         let passphrase = b"correct horst battery staple";
-        export_vault(&entries, passphrase, &path).unwrap();
+        export_vault(
+            &VaultBody {
+                entries,
+                ..Default::default()
+            },
+            passphrase,
+            &path,
+        )
+        .unwrap();
         let recovered = load_vault(passphrase, &path).unwrap();
 
         assert_eq!(recovered.entries.len(), 1);
