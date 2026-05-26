@@ -167,12 +167,69 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Multiple vaults — planning session first, then implementation.**
-  - Vault alias to name each vault (avoids file-name collisions); update vault file format.
-  - Login screen: vaults not listed by default (coercion resistance); security toggle to show alias list.
-  - Vault button on login screen toggles to onboarding screen; remove add-vault button from settings.
-  - Export includes alias in filename.
-  - Must be done before app languages (i18n strings will need updating once the flow is settled) and before cross-layer integration tests (those would just need extending later).
+### Multiple Vaults — implementation ready (plan approved, ~3–4 sessions)
+
+**Agreed design decisions:**
+- One vault active at a time (lock → switch → unlock). No Rust session refactor.
+- Alias stored in the `.gabbro` plaintext header (VERSION 5 format bump). Also kept in Flutter registry. Alias travels with the file.
+- Login screen shows last-used vault + discreet "switch" link (coercion mode is the default — vault list hidden).
+- Android: numbered app-storage paths (`gabbro_2.gabbro`, `gabbro_3.gabbro` …).
+- Must ship before app languages and before cross-layer integration tests.
+
+---
+
+#### Phase 1 — Rust: VERSION 5 format + alias bridge
+
+Files: `rust/src/vault/file_format.rs`, `rust/src/vault/io.rs`, `rust/src/api/vault_bridge.rs`
+
+- `file_format.rs`: add `VERSION_5 = 5`; extend header write/read: after YubiKey records, before `passphrase_blob`, write `alias_len: u16` + UTF-8 alias bytes (0 = no alias). VERSION 4 read path → alias = `None`.
+- `io.rs`: add `read_vault_header(path) -> Result<VaultHeader, VaultError>` — reads alias + YubiKey records without decrypting.
+- `vault_bridge.rs`:
+  - New DTO: `VaultHeaderData { alias: Option<String>, yubikey_records: Vec<YubikeyRecordData> }`
+  - New bridge fn: `read_vault_header(path: String) -> Result<VaultHeaderData, String>`
+  - `init_vault`, `init_vault_with_yubikey`, `init_vault_with_keys`: add `alias: Option<String>` param
+  - `set_vault_alias(path: String, alias: String) -> Result<(), String>`: patch alias field in header in-place
+- TDD: VERSION 5 round-trip; VERSION 4 backward compat; `set_vault_alias` leaves ciphertext intact.
+
+#### Phase 2 — Flutter: VaultRegistry + settings migration
+
+Files: `lib/vault_registry.dart` (new), `lib/settings.dart`
+
+- New `lib/vault_registry.dart`: `VaultRecord { path, alias, lastUsedAt }` + `VaultRegistry` with `load()`, `save()`, `add()`, `remove()`, `updateAlias()`, `touchLastUsed()`, `lastUsed` getter.
+- Storage: same directory as `settings.jsonc` → `vaults.jsonc`.
+- Migration (one-time in `load()`): if `vaults.jsonc` absent AND `gabbro.gabbro` exists → create registry with one entry `{path: gabbro.gabbro, alias: "Gabbro"}`.
+- `lib/settings.dart`: add `showVaultList: bool` (default `false`) to `AppSettings`.
+- TDD: load/save round-trip; migration; empty state; `lastUsed` ordering.
+
+#### Phase 3 — Flutter: Login + vault switching UI
+
+Files: `lib/main.dart`, `lib/screens/unlock_screen.dart`, `lib/screens/vault_selector_screen.dart` (new), `lib/screens/onboarding_screen.dart`, `lib/screens/security_screen.dart`
+
+- `main.dart`: load `VaultRegistry` at startup; route to `OnboardingScreen` if empty, else `UnlockScreen` with `lastUsed` vault.
+- `unlock_screen.dart`: show vault alias below app title; discreet "switch" icon in AppBar; replace `list_vault_yubikey_records` call with `read_vault_header` (returns alias + YubiKey records in one call).
+- `vault_selector_screen.dart` (new): if `showVaultList == true` shows alias list; always shows "Add vault" button → `OnboardingScreen`; allows removing from registry (no file delete).
+- `onboarding_screen.dart`: add required alias text field; after creation call `VaultRegistry.add()`; Android path generation scans registry for first unused numbered path; pass alias to `init_vault*` bridge calls.
+- `security_screen.dart`: add "Show vault list on login" toggle (`showVaultList`).
+- TDD: `VaultSelectorScreen` list shown/hidden; `UnlockScreen` alias + switch link; `OnboardingScreen` alias field + empty-alias guard.
+
+#### Phase 4 — Export + Android autofill
+
+Files: `lib/screens/export_screen.dart`, `android/.../GabbroAutofillService.kt`, `android/.../UnlockActivity.kt`
+
+- Export default filename: `{alias}_YYYY-MM-DD.gabbro` (sanitise alias: spaces → `_`, strip non-alphanum except `-_`).
+- Autofill service + UnlockActivity: read last-used vault path from registry (or via shared preferences set by Flutter on unlock) instead of hardcoded path.
+
+---
+
+#### Hardware test checklist (after all phases)
+1. Existing vault migrates into registry on first launch; alias "Gabbro"; unlocks normally.
+2. Create second vault with alias "Work" → lands in registry; can unlock it.
+3. Switch vaults: lock "Work", switch to "Gabbro", unlock.
+4. Rename alias via `set_vault_alias`; new alias shown on unlock screen.
+5. `showVaultList = false` (default): switch link present but list hidden.
+6. `showVaultList = true`: list shown in selector.
+7. Export filename contains alias.
+8. Open VERSION 4 vault on VERSION 5 build: unlocks; alias shows registry fallback.
 
 ---
 
