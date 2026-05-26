@@ -29,7 +29,7 @@ FOSS, GPL-3.0-only. Potential Yubico partnership.
 
 **Platforms:** v1: Linux (Arch + Mint/deb), Android (F-Droid + Play Store). v2: Windows, macOS, iOS.
 
-**Versioning:** SemVer. Currently `1.0.0` in pubspec.yaml — must be reset to `0.1.0` before first public tag. `1.0` is a public trust commitment; don't ship it prematurely.
+**Versioning:** SemVer (semver.org/spec/v2.0.0.html). `pubspec.yaml` is `0.1.0+1`. `1.0` is a public trust commitment; don't ship it prematurely. CHANGELOG.md follows Keep a Changelog 1.0.0.
 
 **Licence:** GPL-3.0-only (ADR-004). Play Store one-time payment is licence-compatible; F-Droid free build coexists without conflict.
 
@@ -112,6 +112,7 @@ gabbro/
 │   └── decisions/              # ADR documents
 ├── test/                       # Flutter unit/widget tests
 ├── integration_test/
+├── CHANGELOG.md
 └── README.md
 ```
 
@@ -158,7 +159,7 @@ gabbro/
 | Flutter (`flutter test`) | 340 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
-Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
+Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
 
 ---
 
@@ -166,10 +167,12 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Audit and standardise app version display** (quick wins):
-  - `pubspec.yaml` currently shows `1.0.0` — reset to `0.1.0` before first public tag
-  - About screen version must match `pubspec.yaml`
-  - Add `CHANGELOG.md` at project root
+- **Multiple vaults — planning session first, then implementation.**
+  - Vault alias to name each vault (avoids file-name collisions); update vault file format.
+  - Login screen: vaults not listed by default (coercion resistance); security toggle to show alias list.
+  - Vault button on login screen toggles to onboarding screen; remove add-vault button from settings.
+  - Export includes alias in filename.
+  - Must be done before app languages (i18n strings will need updating once the flow is settled) and before cross-layer integration tests (those would just need extending later).
 
 ---
 
@@ -200,18 +203,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - test/measure code test coverage before launch
 - read https://drive.proton.me/urls/11VHB59C60#CVCj696Qxkxd to see if any learnings can be transferred to gabbro to increase security
 
-### Testing (pre-v1 gates)
-- Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
-
 ### Features & UX
-- Multiple vaults.
-  - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
-    - add security toggle to show vault alias list on login screen or not if user wants to bypass this
-  - remove add vault button from settings
-  - add vault button on login screen that togggles to onboarding screen
-  - add vault alias to name each vault (avoids collisions) -> update vault file entry
-  - export vault includes alias in name to avoid collision
-- Multiple app languages (v1: en,fr,de,it,es)
+- Multiple app languages (v1: en,fr,de,it,es) — after Multiple Vaults.
 - App logo (OnboardingScreen, UnlockScreen) — defer until designed.
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
@@ -224,13 +217,12 @@ Try `dart pub outdated` for more information.`
 
 ### V2+ / Defer
 - Data breach alerts / HaveIBeenPwned integration.
-- Coercion resistance / duress / decoy vault. -Y fixed by multiple vaults, onus on the user to use this feature
 - Panic button / app hiding on mobile.
 - Remote app / vault deletion.
 - Non-ASCII wordlists (CJK) for passphrase generator.
 - Custom and hideable filter chips (post-v1 user feedback gate).
-- Tablet list pane width: draggable divider option.
-- Draggable divider for tablet list pane width.
+- Tablet list pane width: draggable divider.
+- Cross-layer integration tests (`integration_test/` + Rust `tests/` crate). YAGNI: if users file bugs, those become the organic integration test suite.
 - iOS, Windows, macOS support.
 - Yubico partnership.
 - Destination Linux podcast outreach (when approaching public release).
