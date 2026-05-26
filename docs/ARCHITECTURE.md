@@ -154,8 +154,8 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 322 | 8 |
-| Flutter (`flutter test`) | 327 | 0 |
+| Rust (`cargo test -q`) | 330 | 8 |
+| Flutter (`flutter test`) | 340 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -166,21 +166,10 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Hardware tests** — verify the following in the running app on device/desktop:
-
-  **Custom fields for all entry types** (Login, Note, Card, File):
-  1. Create each entry type with one or more custom fields (visible + hidden) — confirm saved and displayed correctly in detail view
-  2. Edit each entry type — confirm existing custom fields pre-populate, can be changed, and the review diff shows the change
-  3. Add a new custom field during edit — confirm it appears in the saved entry
-  4. Remove a custom field during edit — confirm it is gone from the saved entry
-  5. Hidden custom field: confirm value is obscured in detail view with a working reveal toggle
-
-  **All fields show edit diffs** (review_changes_screen):
-  6. Card: change bank name → diff shows "Bank" row
-  7. Card: change transaction password → "Sensitive fields" section shows "Transaction password changed"
-  8. File: replace file (different size) → diff shows "Size" row; change notes → diff shows "Notes" row
-
-  After a clean hardware test: remove the bikeshed item marked **"done; remove after dedicated hardware test"**.
+- **Audit and standardise app version display** (quick wins):
+  - `pubspec.yaml` currently shows `1.0.0` — reset to `0.1.0` before first public tag
+  - About screen version must match `pubspec.yaml`
+  - Add `CHANGELOG.md` at project root
 
 ---
 
@@ -215,7 +204,6 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Cross-layer integration tests in `tests/` — bridge boundary not yet tested end-to-end.
 
 ### Features & UX
-- All `fields` must show edit diffs: currently some fields show no diffs in `review_changes_screen.dart` screen -> audit and fix -> **done; remove after dedicated hardware test**
 - Multiple vaults.
   - multiple vaults should not be listed on login screen -> allows better obfuscation and coercion resistance
     - add security toggle to show vault alias list on login screen or not if user wants to bypass this
@@ -227,9 +215,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - App logo (OnboardingScreen, UnlockScreen) — defer until designed.
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
-- Audit and standardise app version display: `pubspec.yaml` currently shows `1.0.0`, About screen must match; both must be reset to `0.1.0` before first public tag.
 - Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
-- `CHANGELOG.md` at project root; reset `pubspec.yaml` version to `0.1.0` before first public tag.
 
 ### Code Quality
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
