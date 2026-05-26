@@ -275,6 +275,15 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 updated_at: d.updated_at,
                 folder: d.folder,
             };
+            let custom_fields = d
+                .custom_fields
+                .into_iter()
+                .map(|f| CustomField {
+                    label: f.label,
+                    value: f.value,
+                    hidden: f.hidden,
+                })
+                .collect();
             let entry = CardEntry::new(
                 meta,
                 d.card_name,
@@ -290,7 +299,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 d.bank_name,
                 d.transaction_password,
                 d.notes,
-                vec![],
+                custom_fields,
                 vec![],
                 None,
                 None,
@@ -1312,6 +1321,124 @@ mod tests {
         assert_eq!(records.len(), 1, "init must write YubiKey record");
         assert_eq!(records[0].credential_id, credential_id);
 
+        let _ = std::fs::remove_file(&path);
+    }
+
+    // ── Custom-field roundtrip tests ──────────────────────────────────────────
+
+    #[test]
+    fn card_entry_from_data_preserves_custom_fields() {
+        use crate::api::vault::CustomFieldData;
+
+        let data = VaultEntryData::Card(crate::api::vault::CardEntryData {
+            id: String::from("card-cf-001"),
+            created_at: String::from("2025-01-01T00:00:00Z"),
+            updated_at: String::from("2025-01-01T00:00:00Z"),
+            folder: String::from(""),
+            card_name: None,
+            status: String::from("active"),
+            cardholder_name: String::from("Rob Smith"),
+            card_number: String::from("4111111111111111"),
+            expiry: String::from("12/28"),
+            cvv: String::from("123"),
+            credit_limit: None,
+            card_account_number: None,
+            payment_network: None,
+            pin: None,
+            bank_name: None,
+            transaction_password: None,
+            notes: None,
+            custom_fields: vec![
+                CustomFieldData {
+                    label: String::from("Loyalty number"),
+                    value: String::from("LN-9876"),
+                    hidden: false,
+                },
+                CustomFieldData {
+                    label: String::from("Portal password"),
+                    value: String::from("s3cr3t"),
+                    hidden: true,
+                },
+            ],
+            previous_cvv: None,
+            previous_pin: None,
+        });
+
+        let entry = vault_entry_from_data(data).unwrap();
+        match entry {
+            VaultEntry::Card(ref e) => {
+                assert_eq!(e.custom_fields.len(), 2, "custom fields must be preserved");
+                assert_eq!(e.custom_fields[0].label, "Loyalty number");
+                assert!(!e.custom_fields[0].hidden);
+                assert_eq!(e.custom_fields[1].label, "Portal password");
+                assert!(e.custom_fields[1].hidden);
+            }
+            _ => panic!("expected Card variant"),
+        }
+    }
+
+    #[test]
+    #[serial]
+    fn card_create_entry_preserves_custom_fields() {
+        use crate::api::vault::{save_vault, CustomFieldData};
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_card_cf_test.gabbro");
+        let pass = b"card-cf-test-pass";
+
+        save_vault(&VaultBody::empty(), pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        let summary = run(create_entry(VaultEntryData::Card(
+            crate::api::vault::CardEntryData {
+                id: String::from(""),
+                created_at: String::from(""),
+                updated_at: String::from(""),
+                folder: String::from(""),
+                card_name: None,
+                status: String::from("active"),
+                cardholder_name: String::from("Rob Smith"),
+                card_number: String::from("4111111111111111"),
+                expiry: String::from("12/28"),
+                cvv: String::from("123"),
+                credit_limit: None,
+                card_account_number: None,
+                payment_network: None,
+                pin: None,
+                bank_name: None,
+                transaction_password: None,
+                notes: None,
+                custom_fields: vec![CustomFieldData {
+                    label: String::from("Loyalty number"),
+                    value: String::from("LN-9876"),
+                    hidden: false,
+                }],
+                previous_cvv: None,
+                previous_pin: None,
+            },
+        )))
+        .unwrap();
+
+        let entry = get_entry(summary.id).unwrap();
+        match entry {
+            VaultEntryData::Card(e) => {
+                assert_eq!(
+                    e.custom_fields.len(),
+                    1,
+                    "custom fields must survive create + get"
+                );
+                assert_eq!(e.custom_fields[0].label, "Loyalty number");
+                assert_eq!(e.custom_fields[0].value, "LN-9876");
+            }
+            _ => panic!("expected Card variant"),
+        }
+
+        lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
     }
 }
