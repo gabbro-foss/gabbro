@@ -154,8 +154,8 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 317 | 8 |
-| Flutter (`flutter test`) | 326 | 0 |
+| Rust (`cargo test -q`) | 322 | 8 |
+| Flutter (`flutter test`) | 327 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`; cross-layer integration tests in `tests/` (not yet created — before v1).
@@ -166,107 +166,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-- **Vault sync across devices**
-
-  No network layer — the user transfers the `.gabbro` file manually (USB, cloud drive, etc.). The app's job is to merge the two diverged vaults correctly. One-shot overwrite was considered but rejected: if both devices have new entries since the last sync, overwrite loses one side's work.
-
-  **Chosen approach: entry-level merge with last-write-wins and tombstones.**
-
-  Entries already have stable UUIDs and `updated_at` timestamps, so merge is well-defined:
-
-  1. **Additions** — union both entry lists by UUID. Entries present on only one side are added to the result.
-  2. **Edit conflicts** (same UUID edited on both devices) — last-write-wins: keep the entry with the newer `updated_at`. Simple, predictable, occasionally lossy.
-  3. **Deletions** — without a record of intent, a deleted entry looks identical to an entry that was never on the other device and would reappear after merge. Fix: add `deleted_ids: Vec<DeletedEntry>` (`{ id, deleted_at }`) to `VaultBody`. On merge, a tombstone wins over an entry if `deleted_at > entry.updated_at`.
-  4. **Delete-vs-edit ordering** — if an entry was deleted on device A but edited on device B *after* that deletion (`entry.updated_at > tombstone.deleted_at`), the edit wins and the entry is kept. The user is shown a per-entry warning (see User messages below). If the deletion is newer, the entry is removed.
-  5. **Folders** — no UUIDs, just strings. Union both folder lists (deduplicated). Folder rename conflicts surface as two separate folder names; user tidies up manually.
-
-  **Session A (Rust) — DONE (Session 22, 2026-05-25):**
-
-  - `VaultBody` gained `vault_updated_at: String` and `deleted_ids: Vec<DeletedEntry>` (`{ id: String, deleted_at: String }`). Both `#[serde(default)]` — backward-compatible. `vault_updated_at` stamped on every save via `build_body()`.
-  - `session_delete_entry` and `session_delete_entries_no_save` both write a tombstone to `deleted_ids` before removing the entry.
-  - `MergeSummary { added: u32, updated: u32, deleted: u32, edit_survived_delete: Vec<String> }` defined in `rust/src/api/vault.rs`.
-  - `do_merge()` in `rust/src/vault/session.rs` — pure merge algorithm (last-write-wins, tombstone ordering, folder union, tombstone union).
-  - `session_merge_vault_from_body(incoming: VaultBody) -> Result<MergeSummary, String>` — merges and saves.
-  - `merge_vault_from_file(path, passphrase) -> Result<MergeSummary, String>` — bridge function in `rust/src/api/vault_bridge.rs`.
-  - 16 new Rust tests (3 serialization + 13 merge).
-
-  **Session B (Flutter) — DONE (Session 23, 2026-05-25):**
-
-  - Bridge codegen run: `flutter_rust_bridge_codegen generate` — Dart bindings for `mergeVaultFromFile` and `MergeSummary` generated.
-  - "Sync from file" menu entry in `VaultListScreen`: file picker → passphrase dialog → merge → result snackbar / result dialog.
-  - `_SyncPassphraseDialog` — dedicated `StatefulWidget` owns the `TextEditingController`; Flutter disposes it after the exit animation via `State.dispose()`.
-  - `mergeVault` and `onPickSyncFile` injected on `VaultListScreen` (DI pattern) for testability without hitting Rust or the file system.
-  - Passphrase mismatch detected from `"decryption failed"` in Rust error string → user-facing error dialog.
-  - "Vaults already identical" (all `MergeSummary` fields zero) → info snackbar.
-  - `edit_survived_delete` warnings shown in a dismissible result dialog.
-  - 8 new Flutter widget tests in `test/vault_list_sync_test.dart`.
-
-  **Hardware test vault sync — DONE (2026-05-25); 2 bugs found:**
-
-  | Scenario | Result |
-  |---|---|
-  | Linux → Android (add entries, export, sync) | PASS |
-  | Android → Linux (add entries, export, sync) | PASS |
-  | Wrong passphrase (both directions) | PASS |
-  | Identical vaults (both directions) | PASS |
-  | Edit survived delete | PASS |
-  | Delete synced | **FAIL** |
-  | Folder names and folder entries synced | **FAIL** |
-
-  **Messages tested:**
-
-  | Message | Result |
-  |---|---|
-  | Both vaults have changes | PASS |
-  | Edit survived deletion warning | PASS |
-  | Passphrase mismatch | PASS |
-  | Vaults already identical | PASS |
-  | Merge succeeded | PASS |
-  | Folder name collision | **FAIL** (not triggered — folders not exported) |
-
-  **Bug analysis:**
-
-  Root cause for both failures is the same: `session_export_vault` passes only
-  `session.entries` to `export_vault` (`rust/src/api/vault.rs:723`), which
-  constructs a `VaultBody` with `folders: vec![]` and `..Default::default()`
-  (giving `deleted_ids: vec![]`). Every `.gabbro` export silently discards
-  tombstones and the folder list.
-
-  - **Bug 1 — Delete not synced:** `deleted_ids` is stripped from the export.
-    The receiving device sees no tombstones in the incoming body → `do_merge`
-    never triggers the deletion path → deleted entries survive on the other
-    device as if they were never removed.
-  - **Bug 2 — Folder names not synced:** `folders` is stripped from the export.
-    The receiving device's `do_merge` sees an empty incoming folder list → no
-    new folder names are transferred → entries imported with a non-empty
-    `meta.folder` field arrive orphaned from any folder the receiving device
-    does not already have in its own list.
-
-  **Proposed fix — Fix vault sync export (NEXT):**
-
-  Replace `session_export_vault` with a version that calls `build_body()`
-  (already used for every save) so the export includes the live `folders` and
-  `deleted_ids`. `export_vault` in `vault.rs` should accept a full `VaultBody`
-  instead of just `&[VaultEntry]`.  The SHA-256 sidecar logic stays unchanged.
-
-  New regression tests needed:
-  1. Export a vault that has tombstones → load the export → confirm `deleted_ids`
-     round-trips correctly.
-  2. Export a vault with a named folder → sync into a vault that lacks that
-     folder → confirm the folder name appears after merge.
-  3. Delete entry on device A, export, merge into device B → confirm deleted
-     count = 1 and entry is gone from B.
-
-  **User messages (all shown in Flutter):**
-
-  | Situation | Message | Action |
-  |---|---|---|
-  | Both vaults have changes | Pre-merge summary dialog: "Merging will add N entries, update M, and delete P. X conflicts were resolved by keeping the most recently edited version." | Confirm / Cancel |
-  | Edit survived a deletion | Warning in summary dialog: "'{title}' was deleted on one device but later edited on the other — the edited version has been kept. Delete it manually if that is not what you want." | Acknowledged in the same Confirm dialog |
-  | Folder name collision | Note in summary dialog: "'{name}' exists on both devices as separate folders. Both have been kept — use Manage Folders to merge them." | Acknowledged in the same Confirm dialog |
-  | Passphrase mismatch | Error dialog: "This vault file uses a different passphrase. Sync is only supported between vaults that share a passphrase." | Dismiss |
-  | Vaults already identical | Info snackbar: "Nothing to sync — both vaults are already up to date." | Auto-dismiss |
-  | Merge succeeded, no conflicts | Success snackbar: "Vault synced — N entries added, M updated, P deleted." | Auto-dismiss |
+- **Next task TBD** — vault sync merge algorithm rework complete and hardware-tested. Ask user for next task.
 
 ---
 
