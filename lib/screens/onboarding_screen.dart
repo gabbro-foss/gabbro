@@ -739,13 +739,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             )
                           else
                             PathField(
+                              key: Key(_vaultPath),
                               mode: PathFieldMode.save,
                               hint: 'Path to vault file',
                               initialPath: _vaultPath.isEmpty
                                   ? null
                                   : _vaultPath,
                               allowedExtensions: const ['gabbro'],
-                              saveFileName: 'gabbro.gabbro',
+                              saveFileName: _vaultPath.isEmpty
+                                  ? 'gabbro.gabbro'
+                                  : _vaultPath.split('/').last,
                               onPathSelected: (path) =>
                                   setState(() => _vaultPath = path),
                               validator: (v) => (v == null || v.isEmpty)
