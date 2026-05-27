@@ -18,6 +18,7 @@ class AppSettings {
   final PasswordHistoryExpiry passwordHistoryExpiry;
   final AlphabetBarPosition alphabetBarPosition;
   final bool blockPassphraseCopyPaste;
+  final bool showVaultList;
 
   const AppSettings({
     this.theme = ThemeChoice.system,
@@ -29,6 +30,7 @@ class AppSettings {
     this.passwordHistoryExpiry = PasswordHistoryExpiry.thirtyDays,
     this.alphabetBarPosition = AlphabetBarPosition.left,
     this.blockPassphraseCopyPaste = true,
+    this.showVaultList = false,
   });
 
   static AppSettings get defaults => const AppSettings();
@@ -45,6 +47,7 @@ class AppSettings {
     'password_history_expiry': passwordHistoryExpiry.name,
     'alphabet_bar_position': alphabetBarPosition.name,
     'block_passphrase_copy_paste': blockPassphraseCopyPaste,
+    'show_vault_list': showVaultList,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -70,6 +73,7 @@ class AppSettings {
         json['alphabet_bar_position'] as String? ?? 'left',
       ),
       blockPassphraseCopyPaste: json['block_passphrase_copy_paste'] as bool? ?? true,
+      showVaultList: json['show_vault_list'] as bool? ?? false,
     );
   }
 
@@ -83,6 +87,7 @@ class AppSettings {
     PasswordHistoryExpiry? passwordHistoryExpiry,
     AlphabetBarPosition? alphabetBarPosition,
     bool? blockPassphraseCopyPaste,
+    bool? showVaultList,
   }) => AppSettings(
     theme: theme ?? this.theme,
     textSize: textSize ?? this.textSize,
@@ -93,6 +98,7 @@ class AppSettings {
     passwordHistoryExpiry: passwordHistoryExpiry ?? this.passwordHistoryExpiry,
     alphabetBarPosition: alphabetBarPosition ?? this.alphabetBarPosition,
     blockPassphraseCopyPaste: blockPassphraseCopyPaste ?? this.blockPassphraseCopyPaste,
+    showVaultList: showVaultList ?? this.showVaultList,
   );
 
   // ── File I/O ───────────────────────────────────────────────────────────
@@ -175,7 +181,11 @@ class AppSettings {
 
   // Block copy/paste on master passphrase fields.
   // Options: true | false
-  "block_passphrase_copy_paste": $blockPassphraseCopyPaste
+  "block_passphrase_copy_paste": $blockPassphraseCopyPaste,
+
+  // Show vault list on the login screen instead of the last-used vault only.
+  // Options: true | false
+  "show_vault_list": $showVaultList
 }
 ''';
 

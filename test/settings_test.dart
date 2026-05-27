@@ -277,6 +277,38 @@ void main() {
     });
   });
 
+  // ── showVaultList ─────────────────────────────────────────────────────────
+
+  group('showVaultList', () {
+    test('defaults to false', () {
+      final s = AppSettings.fromJson({});
+      expect(s.showVaultList, isFalse);
+    });
+
+    test('round-trips true through fromJson', () {
+      final s = AppSettings.fromJson({'show_vault_list': true});
+      expect(s.showVaultList, isTrue);
+    });
+
+    test('round-trips false through fromJson', () {
+      final s = AppSettings.fromJson({'show_vault_list': false});
+      expect(s.showVaultList, isFalse);
+    });
+
+    test('serialises to toJson', () {
+      const s = AppSettings(showVaultList: true);
+      expect(s.toJson()['show_vault_list'], isTrue);
+    });
+
+    test('copyWith overrides showVaultList only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(showVaultList: true);
+      expect(updated.showVaultList, isTrue);
+      expect(updated.theme, original.theme);
+      expect(updated.blockPassphraseCopyPaste, original.blockPassphraseCopyPaste);
+    });
+  });
+
   // ── BackgroundLockTimeout ─────────────────────────────────────────────────
 
   group('BackgroundLockTimeout', () {
