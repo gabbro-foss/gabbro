@@ -160,7 +160,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 414 | 0 |
+| Flutter (`flutter test`) | 423 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -171,26 +171,28 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Multiple Vaults — CRUD redesign done; hardware re-test needed
+### Multiple Vaults — fixes from hardware test round 2; re-test needed
 
-**Agreed design decisions:**
+**Bug fixes applied (round 2):**
+- VaultListScreen AppBar now shows vault alias (was hardcoded `'Gabbro'`).
+- ManageVaultsScreen delete: upgraded to 2-step confirmation matching VaultListScreen flow (Continue → type DELETE → Confirm).
+- ManageVaultsScreen delete active vault: `isActive` check now uses `_registry.lastUsed?.path` (was `_activeVaultPath` which could be stale); `_activeVaultPath` field removed.
+- OnboardingScreen: cancel/close button shown in top-left when pushed onto navigation stack; hidden at root (first-run) to avoid confusion.
+
+**Agreed design decisions:** _(unchanged from round 1)_
 - One vault active at a time (lock → switch → unlock). No Rust session refactor.
-- Alias stored in the `.gabbro` plaintext header (VERSION 5 format bump). Also kept in Flutter registry. Alias travels with the file.
-- `showVaultList=false` (default, high-security): login screen shows only the last-used vault. No switch button. Vault management via Menu → Manage vaults (authenticated).
-- `showVaultList=true`: inline dropdown on the login screen lists all registered vaults for quick switching.
-- ManageVaultsScreen (authenticated, Menu → Manage vaults): full CRUD — add (→ onboarding), rename alias, delete (confirm → delete file + remove from registry), switch to another vault.
-- Android: numbered app-storage paths (`gabbro_2.gabbro`, `gabbro_3.gabbro` …).
+- Alias stored in the `.gabbro` plaintext header (VERSION 5 format bump). Also kept in Flutter registry.
+- `showVaultList=false` (default, high-security): login screen shows only last-used vault. No switch button.
+- `showVaultList=true`: inline dropdown on login screen for quick vault switching.
+- ManageVaultsScreen (authenticated, Menu → Manage vaults): full CRUD — add (→ onboarding with cancel), rename alias, delete (2-step confirm → delete file + remove registry), switch to vault.
 
-#### Hardware re-test checklist
-1. Existing vault migrates into registry on first launch; alias "Gabbro"; unlocks normally.
-2. `showVaultList=false` (default): login screen shows only last-used vault, no switch button.
-3. Switch vaults (`showVaultList=false`): unlock → Menu → Manage vaults → tap vault → unlock screen → unlock.
-4. Switch vaults (`showVaultList=true`): dropdown visible on login screen; select other vault; unlock.
-5. Add vault: Menu → Manage vaults → Add vault → onboarding → vault appears in Manage vaults list.
-6. Rename alias: Menu → Manage vaults → edit icon → new alias shown on login screen.
-7. Delete vault: Menu → Manage vaults → delete icon → confirm → file deleted, removed from list.
-8. Export filename contains alias.
-9. Open VERSION 4 vault on VERSION 5 build: unlocks; alias shows registry fallback.
+#### Hardware re-test checklist (round 2)
+1. VaultListScreen AppBar shows vault alias (not "Gabbro").
+2. Add vault: Menu → Manage vaults → Add vault → onboarding shows × cancel button → cancel returns to Manage vaults.
+3. Add vault: complete onboarding → vault appears in Manage vaults list.
+4. Delete vault (non-active): step 1 warning → Continue → type DELETE → Confirm → file deleted, removed from list; app stays on current vault.
+5. Delete vault (active vault): step 1 → Continue → type DELETE → Confirm → app navigates to unlock screen for next vault (or onboarding if last vault).
+6. All previously passing items 1–8 from round 1 still pass.
 
 ---
 
