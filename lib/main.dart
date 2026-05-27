@@ -348,7 +348,10 @@ class _GabbroAppState extends State<GabbroApp>
   Future<void> onActiveVaultDeleted(String path) async {
     final updated = _registry.remove(path);
     await updated.save();
-    setState(() => _registry = updated);
+    // Direct field mutation — no setState, so _buildHome() is not called before
+    // the pushAndRemoveUntil navigation completes. _onVaultCreated / touchVaultLastUsed
+    // will call setState the next time the registry legitimately changes.
+    _registry = updated;
     final lastUsed = updated.lastUsed;
     if (lastUsed == null) {
       _navigatorKey.currentState?.pushAndRemoveUntil(
