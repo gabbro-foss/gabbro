@@ -215,6 +215,12 @@ class UnlockScreen extends StatefulWidget {
     String transport,
   ) onUnlockWithAnyYubikey;
 
+  /// Vault alias shown below the app title. Null = no alias displayed.
+  final String? vaultAlias;
+
+  /// Called when the user taps the vault-switch icon. Null = icon hidden.
+  final VoidCallback? onSwitch;
+
   const UnlockScreen({
     super.key,
     required this.vaultPath,
@@ -224,6 +230,8 @@ class UnlockScreen extends StatefulWidget {
     this.yubikeyRecords,
     this.onUnlockWithYubikey = _defaultUnlockWithYubikey,
     this.onUnlockWithAnyYubikey = _defaultUnlockWithAnyYubikey,
+    this.vaultAlias,
+    this.onSwitch,
   });
 
   @override
@@ -343,6 +351,17 @@ class _UnlockScreenState extends State<UnlockScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: widget.onSwitch != null
+          ? AppBar(
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.swap_horiz),
+                  tooltip: 'Switch vault',
+                  onPressed: widget.onSwitch,
+                ),
+              ],
+            )
+          : null,
       body: LayoutBuilder(
         builder: (context, constraints) => SingleChildScrollView(
           child: ConstrainedBox(
@@ -362,6 +381,14 @@ class _UnlockScreenState extends State<UnlockScreen> {
                       style: Theme.of(context).textTheme.headlineLarge,
                       textAlign: TextAlign.center,
                     ),
+                    if (widget.vaultAlias != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.vaultAlias!,
+                        style: Theme.of(context).textTheme.titleMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                     const SizedBox(height: 8),
                     Text(
                       _isYubikeyMode

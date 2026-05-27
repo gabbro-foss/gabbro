@@ -133,6 +133,23 @@ class _SecurityScreenState extends State<SecurityScreen> {
               ),
               const SizedBox(height: 32),
 
+              // ── Vault list ─────────────────────────────────────────────
+              SectionHeader(label: 'Vault list'),
+              const SizedBox(height: 4),
+              const Text(
+                'Show all vaults on the login screen instead of only the last-used one.',
+                style: TextStyle(fontSize: 12),
+              ),
+              const SizedBox(height: 8),
+              SwitchListTile(
+                title: const Text('Show vault list on login'),
+                value: _settings.showVaultList,
+                onChanged: (v) =>
+                    _update(_settings.copyWith(showVaultList: v)),
+                contentPadding: EdgeInsets.zero,
+              ),
+              const SizedBox(height: 32),
+
               // ── Clipboard clear ────────────────────────────────────────
               SectionHeader(label: 'Clipboard clear'),
               const SizedBox(height: 4),

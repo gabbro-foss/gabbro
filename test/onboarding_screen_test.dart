@@ -21,6 +21,7 @@ Widget _buildScreen({
   bool isAndroid = false,
   bool? showYubikey,
   Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), String)? onInitVaultWithYubikey,
+  Future<void> Function(String path, String alias)? onVaultCreated,
 }) =>
     MaterialApp(
       home: OnboardingScreen(
@@ -32,6 +33,7 @@ Widget _buildScreen({
         showYubikey: showYubikey ?? isAndroid,
         onInitVaultWithYubikey: onInitVaultWithYubikey ??
             (a, b, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async {},
+        onVaultCreated: onVaultCreated,
       ),
     );
 
@@ -69,7 +71,8 @@ void main() {
     // the button after entering a weak passphrase to enable it briefly.
     // Easier: just assert the validators exist by checking field presence.
     // The validators are tested individually below.
-    expect(find.byType(TextFormField), findsNWidgets(3));
+    // Fields: alias, path (PathField), passphrase, confirm = 4
+    expect(find.byType(TextFormField), findsNWidgets(4));
   });
 
   testWidgets('passphrases do not match shows error', (tester) async {
@@ -93,18 +96,39 @@ void main() {
   testWidgets('passphrase fields block selection when blockPassphraseCopyPaste is true', (tester) async {
     await tester.pumpWidget(_buildScreen(blockPassphraseCopyPaste: true));
 
-    final fields = tester.widgetList<TextField>(find.byType(TextField)).toList();
-    // fields[0] is path, fields[1] is passphrase, fields[2] is confirm
-    expect(fields[1].enableInteractiveSelection, isFalse);
-    expect(fields[2].enableInteractiveSelection, isFalse);
+    final passphrase = tester.firstWidget<TextField>(
+      find.descendant(
+        of: find.widgetWithText(TextFormField, 'Master passphrase'),
+        matching: find.byType(TextField),
+      ),
+    );
+    final confirm = tester.firstWidget<TextField>(
+      find.descendant(
+        of: find.widgetWithText(TextFormField, 'Confirm passphrase'),
+        matching: find.byType(TextField),
+      ),
+    );
+    expect(passphrase.enableInteractiveSelection, isFalse);
+    expect(confirm.enableInteractiveSelection, isFalse);
   });
 
   testWidgets('passphrase fields allow selection when blockPassphraseCopyPaste is false', (tester) async {
     await tester.pumpWidget(_buildScreen(blockPassphraseCopyPaste: false));
 
-    final fields = tester.widgetList<TextField>(find.byType(TextField)).toList();
-    expect(fields[1].enableInteractiveSelection, isNot(isFalse));
-    expect(fields[2].enableInteractiveSelection, isNot(isFalse));
+    final passphrase = tester.firstWidget<TextField>(
+      find.descendant(
+        of: find.widgetWithText(TextFormField, 'Master passphrase'),
+        matching: find.byType(TextField),
+      ),
+    );
+    final confirm = tester.firstWidget<TextField>(
+      find.descendant(
+        of: find.widgetWithText(TextFormField, 'Confirm passphrase'),
+        matching: find.byType(TextField),
+      ),
+    );
+    expect(passphrase.enableInteractiveSelection, isNot(isFalse));
+    expect(confirm.enableInteractiveSelection, isNot(isFalse));
   });
 
   testWidgets('passphrases match shows confirmation', (tester) async {
@@ -174,6 +198,10 @@ void main() {
       },
     ));
 
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Alias'), 'Test');
+    await tester.pump();
+
     const passphrase = 'correct horse battery staple one two three four';
     await tester.enterText(
         find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
@@ -182,6 +210,7 @@ void main() {
         find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
     await tester.pump();
 
+    await tester.ensureVisible(find.byType(SwitchListTile));
     await tester.tap(find.byType(SwitchListTile));
     await tester.pump();
 
@@ -212,6 +241,10 @@ void main() {
       onInitVaultWithYubikey: (a, pins, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async => called = true,
     ));
 
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Alias'), 'Test');
+    await tester.pump();
+
     const passphrase = 'correct horse battery staple one two three four';
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Master passphrase'),
@@ -224,6 +257,7 @@ void main() {
     );
     await tester.pump();
 
+    await tester.ensureVisible(find.byType(SwitchListTile));
     await tester.tap(find.byType(SwitchListTile));
     await tester.pump();
 
@@ -261,6 +295,10 @@ void main() {
       isAndroid: true,
       onInitVaultWithYubikey: onInitVaultWithYubikey,
     ));
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Alias'), 'Test',
+    );
+    await tester.pump();
     const passphrase = 'correct horse battery staple one two three four';
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Master passphrase'),
@@ -272,6 +310,7 @@ void main() {
       passphrase,
     );
     await tester.pump();
+    await tester.ensureVisible(find.byType(SwitchListTile));
     await tester.tap(find.byType(SwitchListTile));
     await tester.pump();
     await tester.enterText(
@@ -379,5 +418,65 @@ void main() {
     expect(backupGateReached, isTrue);
     expect(find.text('Continue'), findsNothing);
     expect(find.text('Touch your backup YubiKey'), findsOneWidget);
+  });
+
+  // ── Alias field ───────────────────────────────────────────────────────────
+
+  testWidgets('alias text field is present', (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    expect(find.widgetWithText(TextFormField, 'Alias'), findsOneWidget);
+  });
+
+  testWidgets('empty alias shows validation error on create vault', (tester) async {
+    await tester.pumpWidget(_buildScreen());
+
+    const passphrase = 'correct horse battery staple one two three four';
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
+    await tester.pump();
+
+    // Leave alias empty — tap Create vault to trigger validation
+    await tester.ensureVisible(find.text('Create vault'));
+    await tester.tap(find.text('Create vault'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Alias is required'), findsOneWidget);
+  });
+
+  testWidgets('onVaultCreated called with vault path and alias', (tester) async {
+    String? createdPath;
+    String? createdAlias;
+    await tester.pumpWidget(_buildScreen(
+      onInitVault: (_, _) async {},
+      onVaultCreated: (p, a) async {
+        createdPath = p;
+        createdAlias = a;
+      },
+    ));
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Alias'), 'My Vault');
+    await tester.pump();
+
+    const passphrase = 'correct horse battery staple one two three four';
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
+    await tester.pump();
+
+    await tester.ensureVisible(find.text('Create vault'));
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create vault'));
+      await Future.delayed(const Duration(milliseconds: 300));
+    });
+    await tester.pump();
+
+    expect(createdAlias, 'My Vault');
+    expect(createdPath, '/tmp/test.gabbro');
   });
 }

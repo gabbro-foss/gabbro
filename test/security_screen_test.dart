@@ -96,14 +96,16 @@ void main() {
 
     testWidgets('block passphrase copy/paste toggle is on by default', (tester) async {
       await tester.pumpWidget(_buildScreen());
-      final toggle = tester.widget<Switch>(find.byType(Switch).last);
-      expect(toggle.value, isTrue);
+      final tile = tester.widget<SwitchListTile>(
+        find.widgetWithText(SwitchListTile, 'Block copy/paste'),
+      );
+      expect(tile.value, isTrue);
     });
 
     testWidgets('tapping passphrase copy/paste toggle calls onUpdate with false', (tester) async {
       AppSettings? updated;
       await tester.pumpWidget(_buildScreen(onUpdate: (s) => updated = s));
-      await tester.tap(find.byType(Switch).last);
+      await tester.tap(find.widgetWithText(SwitchListTile, 'Block copy/paste'));
       await tester.pumpAndSettle();
       expect(updated?.blockPassphraseCopyPaste, isFalse);
     });
@@ -116,6 +118,36 @@ void main() {
       ));
       // The screen receives the setting — no exception thrown, renders cleanly.
       expect(find.text('1 min'), findsAtLeastNWidgets(1));
+    });
+  });
+
+  // ── showVaultList ─────────────────────────────────────────────────────────
+
+  group('showVaultList', () {
+    testWidgets('vault list section header is present', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      await tester.scrollUntilVisible(find.text('Vault list'), 300);
+      expect(find.text('Vault list'), findsOneWidget);
+    });
+
+    testWidgets('show vault list toggle is off by default', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Show vault list on login'), 300);
+      final tile = tester.widget<SwitchListTile>(
+        find.widgetWithText(SwitchListTile, 'Show vault list on login'),
+      );
+      expect(tile.value, isFalse);
+    });
+
+    testWidgets('tapping show vault list toggle calls onUpdate with true', (tester) async {
+      AppSettings? updated;
+      await tester.pumpWidget(_buildScreen(onUpdate: (s) => updated = s));
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Show vault list on login'), 300);
+      await tester.tap(find.widgetWithText(SwitchListTile, 'Show vault list on login'));
+      await tester.pumpAndSettle();
+      expect(updated?.showVaultList, isTrue);
     });
   });
 }

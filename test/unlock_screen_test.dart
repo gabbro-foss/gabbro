@@ -29,6 +29,8 @@ Widget _buildScreen({
       onUnlockWithYubikey,
   Future<void> Function(List<int>, List<YubikeyRecordData>, String, String, String)?
       onUnlockWithAnyYubikey,
+  String? vaultAlias,
+  VoidCallback? onSwitch,
 }) =>
     MaterialApp(
       home: UnlockScreen(
@@ -39,6 +41,8 @@ Widget _buildScreen({
         yubikeyRecords: yubikeyRecords ?? [],
         onUnlockWithYubikey: onUnlockWithYubikey ?? (a, b, c, d, e, f) async {},
         onUnlockWithAnyYubikey: onUnlockWithAnyYubikey ?? (a, b, c, d, e) async {},
+        vaultAlias: vaultAlias,
+        onSwitch: onSwitch,
       ),
     );
 
@@ -155,6 +159,36 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Could not unlock vault'), findsOneWidget);
+  });
+
+  // ── Vault alias + switch ──────────────────────────────────────────────────
+
+  testWidgets('shows vault alias below title when provided', (tester) async {
+    await tester.pumpWidget(_buildScreen(vaultAlias: 'Work'));
+    expect(find.text('Work'), findsOneWidget);
+  });
+
+  testWidgets('does not show alias text when vaultAlias is null', (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    expect(find.text('Work'), findsNothing);
+  });
+
+  testWidgets('shows switch icon when onSwitch is provided', (tester) async {
+    await tester.pumpWidget(_buildScreen(onSwitch: () {}));
+    expect(find.byIcon(Icons.swap_horiz), findsOneWidget);
+  });
+
+  testWidgets('does not show switch icon when onSwitch is null', (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    expect(find.byIcon(Icons.swap_horiz), findsNothing);
+  });
+
+  testWidgets('tapping switch icon calls onSwitch', (tester) async {
+    var called = false;
+    await tester.pumpWidget(_buildScreen(onSwitch: () => called = true));
+    await tester.tap(find.byIcon(Icons.swap_horiz));
+    await tester.pumpAndSettle();
+    expect(called, isTrue);
   });
 
   testWidgets('multi-key vault calls onUnlockWithAnyYubikey not onUnlockWithYubikey',

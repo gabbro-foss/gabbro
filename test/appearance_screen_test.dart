@@ -3,11 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
+import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 
 Widget _buildScreen({AppSettings settings = const AppSettings()}) => GabbroApp(
-  vaultPath: '/tmp/test.gabbro',
-  vaultExists: true,
+  registry: VaultRegistry([]),
+  vaultPath: null,
   settings: settings,
   initialScreen: const AppearanceScreen(),
 );

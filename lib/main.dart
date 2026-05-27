@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
+import 'package:gabbro/screens/vault_selector_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/frb_generated.dart';
+import 'package:gabbro/vault_registry.dart';
 import 'package:path_provider/path_provider.dart';
 
 @pragma('vm:entry-point')
@@ -49,14 +51,13 @@ Future<void> main() async {
     ));
   }
   await RustLib.init();
-  final dir = await getApplicationSupportDirectory();
-  final vaultPath = '${dir.path}/gabbro.gabbro';
-  final vaultExists = await File(vaultPath).exists();
+  final registry = await VaultRegistry.load();
+  final lastUsed = registry.lastUsed;
   final settings = await AppSettings.load();
   runApp(
     GabbroApp(
-      vaultPath: vaultPath,
-      vaultExists: vaultExists,
+      registry: registry,
+      vaultPath: lastUsed?.path,
       settings: settings,
     ),
   );
@@ -123,16 +124,20 @@ ThemeData gabbroDarkTheme({required bool highContrast}) {
 }
 
 class GabbroApp extends StatefulWidget {
-  final String vaultPath;
-  final bool vaultExists;
+  final VaultRegistry registry;
+
+  /// Last-used vault path from the registry. Null when registry is empty
+  /// (first-time user — routes to OnboardingScreen).
+  final String? vaultPath;
+
   final AppSettings settings;
 
   final Widget? initialScreen;
 
   const GabbroApp({
     super.key,
+    required this.registry,
     required this.vaultPath,
-    required this.vaultExists,
     required this.settings,
     this.initialScreen,
   });
@@ -154,6 +159,8 @@ class _GabbroAppState extends State<GabbroApp>
     with WidgetsBindingObserver
     implements GabbroAppState {
   late AppSettings _settings;
+  late VaultRegistry _registry;
+
   @override
   AppSettings get settings => _settings;
 
@@ -166,6 +173,7 @@ class _GabbroAppState extends State<GabbroApp>
   void initState() {
     super.initState();
     _settings = widget.settings;
+    _registry = widget.registry;
     WidgetsBinding.instance.addObserver(this);
     _resetForegroundTimer();
   }
@@ -245,16 +253,82 @@ class _GabbroAppState extends State<GabbroApp>
     try {
       lockVault();
     } catch (_) {}
-    if (!File(widget.vaultPath).existsSync()) return;
+    final lastUsed = _registry.lastUsed;
+    if (lastUsed == null || !File(lastUsed.path).existsSync()) return;
     _navigatorKey.currentState?.pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (_) => UnlockScreen(
-          vaultPath: widget.vaultPath,
-          blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
-        ),
+        builder: (_) => _buildUnlockScreen(lastUsed.path, lastUsed.alias),
       ),
       (_) => false,
     );
+  }
+
+  // ── Registry helpers ───────────────────────────────────────────────────────
+
+  Future<void> _onVaultCreated(String path, String alias) async {
+    final updated = _registry.add(VaultRecord(
+      path: path,
+      alias: alias,
+      lastUsedAt: DateTime.now(),
+    ));
+    await updated.save();
+    setState(() => _registry = updated);
+  }
+
+  void _navigateToSelector() {
+    _navigatorKey.currentState?.push(
+      MaterialPageRoute(
+        builder: (_) => VaultSelectorScreen(
+          registry: _registry,
+          showVaultList: _settings.showVaultList,
+          onVaultSelected: (path, alias) {
+            _navigatorKey.currentState?.pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => _buildUnlockScreen(path, alias),
+              ),
+            );
+          },
+          onAddVault: () {
+            _navigatorKey.currentState?.push(
+              MaterialPageRoute(
+                builder: (_) => OnboardingScreen(
+                  blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+                  onVaultCreated: _onVaultCreated,
+                ),
+              ),
+            );
+          },
+          onRename: (path, alias) async {
+            final updated = _registry.updateAlias(path, alias);
+            await updated.save();
+            setState(() => _registry = updated);
+          },
+          onRemove: (path) async {
+            final updated = _registry.remove(path);
+            await updated.save();
+            setState(() => _registry = updated);
+          },
+        ),
+      ),
+    );
+  }
+
+  UnlockScreen _buildUnlockScreen(String path, String alias) => UnlockScreen(
+    vaultPath: path,
+    vaultAlias: alias,
+    blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+    onSwitch: _navigateToSelector,
+  );
+
+  Widget _buildHome() {
+    final lastUsed = _registry.lastUsed;
+    if (lastUsed == null) {
+      return OnboardingScreen(
+        blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+        onVaultCreated: _onVaultCreated,
+      );
+    }
+    return _buildUnlockScreen(lastUsed.path, lastUsed.alias);
   }
 
   @override
@@ -294,15 +368,7 @@ class _GabbroAppState extends State<GabbroApp>
           themeMode: _themeMode,
           theme: gabbroLightTheme(highContrast: hc),
           darkTheme: gabbroDarkTheme(highContrast: hc),
-          home: widget.initialScreen ??
-              (widget.vaultExists
-                  ? UnlockScreen(
-                      vaultPath: widget.vaultPath,
-                      blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
-                    )
-                  : OnboardingScreen(
-                      blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
-                    )),
+          home: widget.initialScreen ?? _buildHome(),
         ),
       ),
     );

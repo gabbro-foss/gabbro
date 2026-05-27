@@ -239,6 +239,10 @@ class OnboardingScreen extends StatefulWidget {
   )
   onInitVaultWithYubikey;
 
+  /// Called after successful vault creation with the vault path and alias.
+  /// Use this to add the new vault to the registry.
+  final Future<void> Function(String path, String alias)? onVaultCreated;
+
   OnboardingScreen({
     super.key,
     this.initialPath,
@@ -249,6 +253,7 @@ class OnboardingScreen extends StatefulWidget {
     bool? showYubikey,
     bool? isAndroid,
     this.onInitVaultWithYubikey = _defaultInitVaultWithYubikey,
+    this.onVaultCreated,
   }) : showYubikey = showYubikey ?? (Platform.isAndroid || Platform.isLinux),
        isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -258,6 +263,7 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _aliasController = TextEditingController();
   final _passphraseController = TextEditingController();
   final _confirmController = TextEditingController();
   // One controller per key (index 0 = primary, 1 = backup, …)
@@ -299,6 +305,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   void dispose() {
+    _aliasController.dispose();
     _passphraseController.dispose();
     _confirmController.dispose();
     for (final c in _pinControllers) {
@@ -367,6 +374,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _vaultPath,
         );
       }
+      await widget.onVaultCreated?.call(_vaultPath, _aliasController.text.trim());
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -682,6 +690,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ],
                           const SizedBox(height: 40),
+                          const Text(
+                            'Vault name',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: _aliasController,
+                            decoration: const InputDecoration(
+                              labelText: 'Alias',
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Alias is required'
+                                : null,
+                          ),
+                          const SizedBox(height: 24),
                           Text(
                             widget.postDeletionMessage != null
                                 ? 'New vault location (same as before)'

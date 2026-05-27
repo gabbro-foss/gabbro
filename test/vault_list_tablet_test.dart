@@ -6,6 +6,7 @@ import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
+import 'package:gabbro/vault_registry.dart';
 
 // ---------------------------------------------------------------------------
 // Fake entry list — avoids hitting the Rust bridge in tests.
@@ -53,8 +54,8 @@ VaultEntryData _fakeLoginEntry() => VaultEntryData.login(
 // MaterialApp, which otherwise expands to fill the full test surface.
 // ---------------------------------------------------------------------------
 Widget _buildScreen() => GabbroApp(
-  vaultPath: '/tmp/test.gabbro',
-  vaultExists: false,
+  registry: VaultRegistry([]),
+  vaultPath: null,
   settings: const AppSettings(),
   initialScreen: VaultListScreen(
     vaultPath: '/tmp/test.gabbro',
@@ -134,8 +135,8 @@ void main() {
       _setWidth(tester, 700);
       await tester.pumpWidget(
         GabbroApp(
-          vaultPath: '/tmp/test.gabbro',
-          vaultExists: false,
+          registry: VaultRegistry([]),
+          vaultPath: null,
           settings: const AppSettings(),
           initialScreen: VaultListScreen(
             vaultPath: '/tmp/test.gabbro',
@@ -160,8 +161,8 @@ void main() {
       bool refreshCalled = false;
       await tester.pumpWidget(
         GabbroApp(
-          vaultPath: '/tmp/test.gabbro',
-          vaultExists: false,
+          registry: VaultRegistry([]),
+          vaultPath: null,
           settings: const AppSettings(),
           initialScreen: VaultListScreen(
             vaultPath: '/tmp/test.gabbro',
