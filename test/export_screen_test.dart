@@ -3,6 +3,30 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/export_screen.dart';
 
 void main() {
+  // ── sanitiseAlias unit tests ──────────────────────────────────────────────
+
+  group('sanitiseAlias', () {
+    test('replaces spaces with underscores', () {
+      expect(sanitiseAlias('My Work'), 'My_Work');
+    });
+
+    test('strips non-alphanum except hyphen and underscore', () {
+      expect(sanitiseAlias("Rob's Vault!"), 'Robs_Vault');
+    });
+
+    test('preserves hyphens and underscores', () {
+      expect(sanitiseAlias('A-B_C'), 'A-B_C');
+    });
+
+    test('returns vault fallback for null', () {
+      expect(sanitiseAlias(null), 'vault');
+    });
+
+    test('returns vault fallback for empty string', () {
+      expect(sanitiseAlias(''), 'vault');
+    });
+  });
+
   group('ExportScreen', () {
     testWidgets('shows export button', (tester) async {
       await tester.pumpWidget(
@@ -96,7 +120,27 @@ void main() {
       );
       await tester.tap(find.text('Export'));
       await tester.pump();
-      expect(exportedPath, '/storage/emulated/0/Documents/vault.gabbro');
+      expect(exportedPath, startsWith('/storage/emulated/0/Documents/vault_'));
+      expect(exportedPath, endsWith('.gabbro'));
+    });
+
+    testWidgets('android mode: export path uses sanitised alias', (tester) async {
+      String? exportedPath;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ExportScreen(
+            isAndroid: true,
+            initialPath: '/storage/emulated/0/Documents',
+            vaultAlias: 'My Work',
+            onExport: (path) async => exportedPath = path,
+            onExportJson: (path) async {},
+          ),
+        ),
+      );
+      await tester.tap(find.text('Export'));
+      await tester.pump();
+      expect(exportedPath, startsWith('/storage/emulated/0/Documents/My_Work_'));
+      expect(exportedPath, endsWith('.gabbro'));
     });
 
     // ── Format selector ──────────────────────────────────────────────────────
@@ -159,7 +203,8 @@ void main() {
       await tester.pump();
       await tester.tap(find.text('Export'));
       await tester.pump();
-      expect(jsonExportedPath, '/storage/emulated/0/Documents/vault.json');
+      expect(jsonExportedPath, startsWith('/storage/emulated/0/Documents/vault_'));
+      expect(jsonExportedPath, endsWith('.json'));
     });
 
     testWidgets('selecting JSON format calls onExportJson on linux',

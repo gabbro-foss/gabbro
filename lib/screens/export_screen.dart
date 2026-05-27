@@ -5,6 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
 
+/// Sanitises a vault alias for use in a filename.
+/// Spaces → `_`; non-alphanum except `-` and `_` are stripped.
+/// Falls back to `'vault'` if the result is empty.
+String sanitiseAlias(String? alias) {
+  if (alias == null || alias.isEmpty) return 'vault';
+  final sanitised = alias
+      .replaceAll(' ', '_')
+      .replaceAll(RegExp(r'[^a-zA-Z0-9\-_]'), '');
+  return sanitised.isEmpty ? 'vault' : sanitised;
+}
+
+String _defaultFilename(String? alias, bool isJson) {
+  final base = sanitiseAlias(alias);
+  final date = DateTime.now().toIso8601String().substring(0, 10);
+  return isJson ? '${base}_$date.json' : '${base}_$date.gabbro';
+}
+
 enum _ExportFormat { gabbroVault, json }
 
 Future<void> _defaultExport(String path) => exportVault(path: path);
@@ -12,6 +29,7 @@ Future<void> _defaultExportJson(String path) => exportVaultJson(path: path);
 
 class ExportScreen extends StatefulWidget {
   final String? initialPath;
+  final String? vaultAlias;
   final Future<void> Function(String path) onExport;
   final Future<void> Function(String path) onExportJson;
   final bool isAndroid;
@@ -19,6 +37,7 @@ class ExportScreen extends StatefulWidget {
   ExportScreen({
     super.key,
     this.initialPath,
+    this.vaultAlias,
     this.onExport = _defaultExport,
     this.onExportJson = _defaultExportJson,
     bool? isAndroid,
@@ -54,9 +73,11 @@ class _ExportScreenState extends State<ExportScreen> {
 
   String get _exportPath {
     if (widget.isAndroid) {
-      return _format == _ExportFormat.json
-          ? '$_path/vault.json'
-          : '$_path/vault.gabbro';
+      final filename = _defaultFilename(
+        widget.vaultAlias,
+        _format == _ExportFormat.json,
+      );
+      return '$_path/$filename';
     }
     return _path!;
   }
@@ -190,7 +211,7 @@ class _ExportScreenState extends State<ExportScreen> {
                   mode: PathFieldMode.save,
                   hint: isJson ? '/home/user/vault.json' : '/home/user/vault.gabbro',
                   allowedExtensions: isJson ? ['json'] : ['gabbro'],
-                  saveFileName: isJson ? 'vault.json' : 'vault.gabbro',
+                  saveFileName: _defaultFilename(widget.vaultAlias, isJson),
                   initialPath: _path,
                   onPathSelected: (p) => setState(() {
                     _path = p;

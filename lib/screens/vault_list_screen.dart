@@ -105,6 +105,7 @@ Future<void> _defaultConfirmAnyYubikey(
 
 class VaultListScreen extends StatefulWidget {
   final String vaultPath;
+  final String? vaultAlias;
   final List<EntrySummaryData> Function() listEntries;
   final List<String> Function()? listFolders;
   final Future<void> Function() deleteVault;
@@ -133,6 +134,7 @@ class VaultListScreen extends StatefulWidget {
   const VaultListScreen({
     super.key,
     required this.vaultPath,
+    this.vaultAlias,
     this.listEntries = listEntrySummaries,
     this.listFolders,
     this.deleteVault = _defaultDeleteVault,
@@ -440,9 +442,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
   }
 
   Future<void> _openExportScreen() async {
-    await Navigator.of(
-      context,
-    ).push<bool>(MaterialPageRoute(builder: (context) => ExportScreen()));
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => ExportScreen(vaultAlias: widget.vaultAlias),
+      ),
+    );
   }
 
   Future<void> _openImportScreen() async {

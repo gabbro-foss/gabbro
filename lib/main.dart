@@ -15,8 +15,15 @@ import 'package:path_provider/path_provider.dart';
 Future<void> autofillUnlockMain() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
-  final dir = await getApplicationSupportDirectory();
-  final vaultPath = '${dir.path}/gabbro.gabbro';
+  final registry = await VaultRegistry.load();
+  final lastUsed = registry.lastUsed;
+  final String vaultPath;
+  if (lastUsed != null) {
+    vaultPath = lastUsed.path;
+  } else {
+    final dir = await getApplicationSupportDirectory();
+    vaultPath = '${dir.path}/gabbro.gabbro';
+  }
   const channel = MethodChannel('app.gabbro.gabbro/autofill');
   final settings = await AppSettings.load();
   final hc = settings.highContrast;
