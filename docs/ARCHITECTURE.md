@@ -43,6 +43,7 @@ gabbro/
 │   ├── main.dart
 │   ├── screens/
 │   │   ├── unlock_screen.dart
+│   │   ├── vault_selector_screen.dart
 │   │   ├── export_screen.dart
 │   │   ├── import_screen.dart
 │   │   ├── csv_mapping_screen.dart
@@ -158,7 +159,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 375 | 0 |
+| Flutter (`flutter test`) | 400 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -169,7 +170,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Multiple Vaults — Phase 1 ✓ done; Phase 2 ✓ done; Phase 3 next
+### Multiple Vaults — Phase 1 ✓ done; Phase 2 ✓ done; Phase 3 ✓ done; Phase 4 next
 
 **Agreed design decisions:**
 - One vault active at a time (lock → switch → unlock). No Rust session refactor.
