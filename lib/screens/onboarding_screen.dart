@@ -243,6 +243,10 @@ class OnboardingScreen extends StatefulWidget {
   /// Use this to add the new vault to the registry.
   final Future<void> Function(String path, String alias)? onVaultCreated;
 
+  /// Forwarded to the VaultListScreen shown after creation so the switch
+  /// button stays available throughout the session.
+  final VoidCallback? onSwitch;
+
   OnboardingScreen({
     super.key,
     this.initialPath,
@@ -254,6 +258,7 @@ class OnboardingScreen extends StatefulWidget {
     bool? isAndroid,
     this.onInitVaultWithYubikey = _defaultInitVaultWithYubikey,
     this.onVaultCreated,
+    this.onSwitch,
   }) : showYubikey = showYubikey ?? (Platform.isAndroid || Platform.isLinux),
        isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -300,7 +305,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Future<void> _initDefaultPath() async {
     final dir = await getApplicationSupportDirectory();
-    setState(() => _vaultPath = '${dir.path}/gabbro.gabbro');
+    setState(() => _vaultPath = _firstFreeVaultPath(dir.path));
+  }
+
+  String _firstFreeVaultPath(String dirPath) {
+    if (!File('$dirPath/gabbro.gabbro').existsSync()) {
+      return '$dirPath/gabbro.gabbro';
+    }
+    for (var i = 2; ; i++) {
+      final p = '$dirPath/gabbro_$i.gabbro';
+      if (!File(p).existsSync()) return p;
+    }
   }
 
   @override
@@ -378,7 +393,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => VaultListScreen(vaultPath: _vaultPath),
+            builder: (context) => VaultListScreen(
+              vaultPath: _vaultPath,
+              vaultAlias: _aliasController.text.trim(),
+              onSwitch: widget.onSwitch,
+            ),
           ),
         );
       }

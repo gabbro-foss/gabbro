@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/main.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
@@ -307,11 +308,13 @@ class _UnlockScreenState extends State<UnlockScreen> {
         );
       }
       if (mounted) {
+        GabbroApp.maybeOf(context)?.touchVaultLastUsed(widget.vaultPath);
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => VaultListScreen(
               vaultPath: widget.vaultPath,
               vaultAlias: widget.vaultAlias,
+              onSwitch: widget.onSwitch,
             ),
           ),
         );

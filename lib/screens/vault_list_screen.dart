@@ -106,6 +106,7 @@ Future<void> _defaultConfirmAnyYubikey(
 class VaultListScreen extends StatefulWidget {
   final String vaultPath;
   final String? vaultAlias;
+  final VoidCallback? onSwitch;
   final List<EntrySummaryData> Function() listEntries;
   final List<String> Function()? listFolders;
   final Future<void> Function() deleteVault;
@@ -135,6 +136,7 @@ class VaultListScreen extends StatefulWidget {
     super.key,
     required this.vaultPath,
     this.vaultAlias,
+    this.onSwitch,
     this.listEntries = listEntrySummaries,
     this.listFolders,
     this.deleteVault = _defaultDeleteVault,
@@ -995,7 +997,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
       MaterialPageRoute(
         builder: (context) => UnlockScreen(
           vaultPath: widget.vaultPath,
+          vaultAlias: widget.vaultAlias,
           blockPassphraseCopyPaste: lockAppState.settings.blockPassphraseCopyPaste,
+          onSwitch: widget.onSwitch,
         ),
       ),
     );

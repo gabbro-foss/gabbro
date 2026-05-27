@@ -79,6 +79,9 @@ abstract class GabbroAppState {
   /// when the operation finishes (success or failure).
   void suspendForegroundLock();
   void resumeForegroundLock();
+  /// Mark [path] as the most-recently-used vault so the auto-lock timer
+  /// shows the correct unlock screen after a vault switch.
+  Future<void> touchVaultLastUsed(String path);
 }
 
 ThemeData gabbroLightTheme({required bool highContrast}) {
@@ -301,6 +304,7 @@ class _GabbroAppState extends State<GabbroApp>
                 builder: (_) => OnboardingScreen(
                   blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
                   onVaultCreated: _onVaultCreated,
+                  onSwitch: _navigateToSelector,
                 ),
               ),
             );
@@ -333,6 +337,7 @@ class _GabbroAppState extends State<GabbroApp>
       return OnboardingScreen(
         blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
         onVaultCreated: _onVaultCreated,
+        onSwitch: _navigateToSelector,
       );
     }
     return _buildUnlockScreen(lastUsed.path, lastUsed.alias);
@@ -343,6 +348,13 @@ class _GabbroAppState extends State<GabbroApp>
     await updated.save();
     setState(() => _settings = updated);
     _resetForegroundTimer();
+  }
+
+  @override
+  Future<void> touchVaultLastUsed(String path) async {
+    final updated = _registry.touchLastUsed(path);
+    await updated.save();
+    setState(() => _registry = updated);
   }
 
   ThemeMode get _themeMode => switch (_settings.theme) {
