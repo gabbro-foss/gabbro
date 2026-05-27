@@ -446,6 +446,40 @@ void main() {
     expect(find.text('Alias is required'), findsOneWidget);
   });
 
+  // ── Duplicate alias ───────────────────────────────────────────────────────
+
+  testWidgets('alias already in use shows validation error on create',
+      (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: OnboardingScreen(
+        initialPath: '/tmp/test.gabbro',
+        onInitVault: (_, _, _) async {},
+        onEstimateEntropy: _fakeStrongEntropy,
+        blockPassphraseCopyPaste: false,
+        showYubikey: false,
+        existingAliases: const {'Taken Vault'},
+      ),
+    ));
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Alias'), 'Taken Vault');
+    await tester.pump();
+
+    const passphrase = 'correct horse battery staple one two three four';
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
+    await tester.pump();
+
+    await tester.ensureVisible(find.text('Create vault'));
+    await tester.tap(find.text('Create vault'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('A vault named "Taken Vault" already exists'), findsOneWidget);
+  });
+
   // ── Cancel button ─────────────────────────────────────────────────────────
 
   group('cancel button', () {

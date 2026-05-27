@@ -3,7 +3,11 @@ import 'package:gabbro/vault_registry.dart';
 
 class _RenameDialog extends StatefulWidget {
   final String initialAlias;
-  const _RenameDialog({required this.initialAlias});
+  final Set<String> takenAliases;
+  const _RenameDialog({
+    required this.initialAlias,
+    required this.takenAliases,
+  });
 
   @override
   State<_RenameDialog> createState() => _RenameDialogState();
@@ -25,27 +29,48 @@ class _RenameDialogState extends State<_RenameDialog> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Rename vault'),
-    content: TextField(
-      controller: _controller,
-      autofocus: true,
-      decoration: const InputDecoration(labelText: 'Alias'),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.of(context).pop(null),
-        child: const Text('Cancel'),
+  Widget build(BuildContext context) {
+    final alias = _controller.text.trim();
+    final isTaken = widget.takenAliases.contains(alias);
+
+    return AlertDialog(
+      title: const Text('Rename vault'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: _controller,
+            autofocus: true,
+            decoration: const InputDecoration(labelText: 'Alias'),
+            onChanged: (_) => setState(() {}),
+          ),
+          if (isTaken && alias.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              'A vault named "$alias" already exists.',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ],
       ),
-      TextButton(
-        onPressed: () {
-          final alias = _controller.text.trim();
-          Navigator.of(context).pop(alias.isEmpty ? null : alias);
-        },
-        child: const Text('Save'),
-      ),
-    ],
-  );
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(null),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: (alias.isEmpty || isTaken)
+              ? null
+              : () => Navigator.of(context).pop(alias),
+          child: const Text('Save'),
+        ),
+      ],
+    );
+  }
 }
 
 class ManageVaultsScreen extends StatefulWidget {
@@ -78,9 +103,16 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
   }
 
   Future<void> _showRenameDialog(VaultRecord record) async {
+    final takenAliases = _registry.records
+        .where((r) => r.path != record.path)
+        .map((r) => r.alias)
+        .toSet();
     final String? newAlias = await showDialog<String>(
       context: context,
-      builder: (_) => _RenameDialog(initialAlias: record.alias),
+      builder: (_) => _RenameDialog(
+        initialAlias: record.alias,
+        takenAliases: takenAliases,
+      ),
     );
     if (newAlias != null) {
       setState(() => _registry = _registry.updateAlias(record.path, newAlias));

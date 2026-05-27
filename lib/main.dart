@@ -87,6 +87,10 @@ abstract class GabbroAppState {
   void switchToVault(String path, String alias);
   /// Push the ManageVaultsScreen onto the root navigator.
   void navigateToManageVaults();
+  /// Called after the active vault's file has been deleted (via VaultListScreen
+  /// menu). Removes the vault from the registry and navigates to the next
+  /// vault's unlock screen, or to OnboardingScreen if no vaults remain.
+  Future<void> onActiveVaultDeleted(String path);
 }
 
 ThemeData gabbroLightTheme({required bool highContrast}) {
@@ -340,6 +344,35 @@ class _GabbroAppState extends State<GabbroApp>
     );
   }
 
+  @override
+  Future<void> onActiveVaultDeleted(String path) async {
+    final updated = _registry.remove(path);
+    await updated.save();
+    setState(() => _registry = updated);
+    final lastUsed = updated.lastUsed;
+    if (lastUsed == null) {
+      _navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => OnboardingScreen(
+            initialPath: path,
+            postDeletionMessage:
+                'Your vault has been deleted. Create a new one to continue.',
+            blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+            onVaultCreated: _onVaultCreated,
+          ),
+        ),
+        (_) => false,
+      );
+    } else {
+      _navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => _buildUnlockScreen(lastUsed.path, lastUsed.alias),
+        ),
+        (_) => false,
+      );
+    }
+  }
+
   ManageVaultsScreen _buildManageVaultsScreen() => ManageVaultsScreen(
     registry: _registry,
     onRename: (path, alias) async {
@@ -383,6 +416,7 @@ class _GabbroAppState extends State<GabbroApp>
           builder: (_) => OnboardingScreen(
             blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
             onVaultCreated: _onVaultCreated,
+            existingAliases: _registry.records.map((r) => r.alias).toSet(),
           ),
         ),
       );

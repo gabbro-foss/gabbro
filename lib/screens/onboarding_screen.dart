@@ -260,6 +260,10 @@ class OnboardingScreen extends StatefulWidget {
   /// Use this to add the new vault to the registry.
   final Future<void> Function(String path, String alias)? onVaultCreated;
 
+  /// Aliases that are already in use by other vaults. The alias form field
+  /// will reject any value present in this set.
+  final Set<String> existingAliases;
+
   OnboardingScreen({
     super.key,
     this.initialPath,
@@ -271,6 +275,7 @@ class OnboardingScreen extends StatefulWidget {
     bool? isAndroid,
     this.onInitVaultWithYubikey = _defaultInitVaultWithYubikey,
     this.onVaultCreated,
+    this.existingAliases = const {},
   }) : showYubikey = showYubikey ?? (Platform.isAndroid || Platform.isLinux),
        isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -781,9 +786,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               labelText: 'Alias',
                               border: OutlineInputBorder(),
                             ),
-                            validator: (v) => (v == null || v.trim().isEmpty)
-                                ? 'Alias is required'
-                                : null,
+                            validator: (v) {
+                              if (v == null || v.trim().isEmpty) {
+                                return 'Alias is required';
+                              }
+                              final alias = v.trim();
+                              if (widget.existingAliases.contains(alias)) {
+                                return 'A vault named "$alias" already exists';
+                              }
+                              return null;
+                            },
                           ),
                           const SizedBox(height: 24),
                           Text(

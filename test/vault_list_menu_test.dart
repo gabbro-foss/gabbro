@@ -32,7 +32,7 @@ void main() {
       ));
       await _setNarrow(tester);
       await tester.pumpAndSettle();
-      expect(find.text('My Vault'), findsOneWidget);
+      expect(find.text('Gabbro - My Vault'), findsOneWidget);
     });
 
     testWidgets('shows Gabbro when no vaultAlias provided', (tester) async {

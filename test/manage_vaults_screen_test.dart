@@ -123,6 +123,29 @@ void main() {
       );
     });
 
+    testWidgets('save button disabled when alias matches another vault',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(registry: registry));
+      await tester.tap(find.byIcon(Icons.edit_outlined).first);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'Beta');
+      await tester.pumpAndSettle();
+      final saveButton = tester.widget<TextButton>(
+        find.widgetWithText(TextButton, 'Save'),
+      );
+      expect(saveButton.onPressed, isNull);
+    });
+
+    testWidgets('duplicate alias shows error text in rename dialog',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(registry: registry));
+      await tester.tap(find.byIcon(Icons.edit_outlined).first);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'Beta');
+      await tester.pumpAndSettle();
+      expect(find.textContaining('already exists'), findsOneWidget);
+    });
+
     testWidgets('confirming empty alias does not call onRename', (tester) async {
       var called = false;
       await tester.pumpWidget(_buildScreen(
@@ -132,6 +155,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.edit_outlined).first);
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), '');
+      await tester.pump();
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
       expect(called, isFalse);
@@ -151,6 +175,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.edit_outlined).first);
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), 'New Name');
+      await tester.pump();
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
       expect(renamedPath, '/tmp/a.gabbro');
@@ -165,6 +190,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.edit_outlined).first);
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), 'Renamed');
+      await tester.pump();
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
       expect(find.text('Renamed'), findsOneWidget);

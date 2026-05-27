@@ -976,18 +976,22 @@ class _VaultListScreenState extends State<VaultListScreen> {
     await widget.deleteVault();
     if (!mounted) return;
 
-    final obAppState = GabbroApp.maybeOf(context);
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => OnboardingScreen(
-          initialPath: widget.vaultPath,
-          postDeletionMessage:
-              'Your vault has been deleted. Create a new one to continue.',
-          blockPassphraseCopyPaste: obAppState?.settings.blockPassphraseCopyPaste ?? true,
+    final appState = GabbroApp.maybeOf(context);
+    if (appState != null) {
+      appState.onActiveVaultDeleted(widget.vaultPath);
+    } else {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => OnboardingScreen(
+            initialPath: widget.vaultPath,
+            postDeletionMessage:
+                'Your vault has been deleted. Create a new one to continue.',
+            blockPassphraseCopyPaste: true,
+          ),
         ),
-      ),
-      (_) => false,
-    );
+        (_) => false,
+      );
+    }
   }
 
   void _lockAndExit() {
@@ -1068,7 +1072,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
         title: Text(
           _isSelecting
               ? '${_selectedIds.length} selected'
-              : widget.vaultAlias ?? 'Gabbro',
+              : widget.vaultAlias != null
+                  ? 'Gabbro - ${widget.vaultAlias}'
+                  : 'Gabbro',
         ),
         actions: [
           if (_isImporting || _isSyncing)
