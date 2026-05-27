@@ -171,15 +171,16 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Multiple Vaults — fixes from hardware test round 2; re-test needed
+### Multiple Vaults — fixes from hardware test rounds 2, 3, 4; re-test needed
 
-**Bug fixes applied (round 2 + 3):**
+**Bug fixes applied (round 2 + 3 + 4):**
 - VaultListScreen AppBar shows `Gabbro - [alias]` (was hardcoded `'Gabbro'`).
 - ManageVaultsScreen delete: upgraded to 2-step confirmation matching VaultListScreen flow (Continue → type DELETE → Confirm).
 - ManageVaultsScreen delete active vault: `isActive` check now uses `_registry.lastUsed?.path` (was `_activeVaultPath` which could be stale); `_activeVaultPath` field removed.
 - OnboardingScreen: cancel/close button shown in top-left when pushed onto navigation stack; hidden at root (first-run) to avoid confusion.
 - VaultListScreen "Delete vault" menu: now calls `GabbroAppState.onActiveVaultDeleted` which removes from registry and routes to next vault's unlock screen (was always routing to OnboardingScreen).
 - Duplicate vault alias: OnboardingScreen and ManageVaultsScreen rename dialog both reject duplicate aliases.
+- `onActiveVaultDeleted` in `_GabbroAppState`: replaced `setState(() => _registry = updated)` with direct field mutation `_registry = updated` — the previous `setState` triggered a `_buildHome()` rebuild that provided an OnboardingScreen WITHOUT `postDeletionMessage` as MaterialApp's `home`, racing with the `pushAndRemoveUntil` route that had the message.
 
 **Agreed design decisions:** _(unchanged from round 1)_
 - One vault active at a time (lock → switch → unlock). No Rust session refactor.
@@ -188,12 +189,12 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - `showVaultList=true`: inline dropdown on login screen for quick vault switching.
 - ManageVaultsScreen (authenticated, Menu → Manage vaults): full CRUD — add (→ onboarding with cancel + duplicate-alias guard), rename alias (duplicate-alias guard), delete (2-step confirm → delete file + remove registry), switch to vault.
 
-#### Hardware re-test checklist (round 3)
+#### Hardware re-test checklist (round 4)
 1. VaultListScreen AppBar shows `Gabbro - [alias]`.
 2. Add vault: alias field rejects a name already used by another vault.
 3. Rename vault: rename dialog rejects alias already used by another vault.
 4. Delete vault via menu (non-active): → routes to next vault's unlock screen (not onboarding).
-5. Delete vault via menu (last vault): → routes to onboarding with post-deletion message.
+5. Delete vault via menu (last vault): → routes to onboarding WITH post-deletion message (was missing — round 4 fix).
 6. All previously passing items 1–8 from round 1 still pass.
 
 ---
