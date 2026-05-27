@@ -667,30 +667,43 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ── Accessibility shortcut — always above the headline ──────
-            Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                child: AnimatedOpacity(
-                  opacity: MediaQuery.of(context).viewInsets.bottom > 0
-                      ? 0.0
-                      : 1.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: OutlinedButton.icon(
-                    icon: Icon(
-                      Icons.accessibility_new,
-                      color: isAccessibilityOn
-                          ? Theme.of(context).colorScheme.primary
-                          : null,
-                    ),
-                    label: const Text('Accessibility'),
-                    onPressed: _toggleAccessibility,
-                    style: OutlinedButton.styleFrom(
-                      visualDensity: VisualDensity.compact,
+            // ── Top row: cancel (left, if nested) + accessibility (right) ──
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Row(
+                children: [
+                  if (Navigator.canPop(context))
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      tooltip: 'Cancel',
+                      onPressed: () => Navigator.of(context).pop(),
+                    )
+                  else
+                    const SizedBox(width: 48),
+                  const Spacer(),
+                  AnimatedOpacity(
+                    opacity: MediaQuery.of(context).viewInsets.bottom > 0
+                        ? 0.0
+                        : 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: OutlinedButton.icon(
+                        icon: Icon(
+                          Icons.accessibility_new,
+                          color: isAccessibilityOn
+                              ? Theme.of(context).colorScheme.primary
+                              : null,
+                        ),
+                        label: const Text('Accessibility'),
+                        onPressed: _toggleAccessibility,
+                        style: OutlinedButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
             // ── Main content ────────────────────────────────────────────

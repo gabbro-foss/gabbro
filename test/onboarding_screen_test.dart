@@ -446,6 +446,72 @@ void main() {
     expect(find.text('Alias is required'), findsOneWidget);
   });
 
+  // ── Cancel button ─────────────────────────────────────────────────────────
+
+  group('cancel button', () {
+    testWidgets('no cancel button shown as root screen', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      await tester.pumpAndSettle();
+      expect(find.byIcon(Icons.close), findsNothing);
+    });
+
+    testWidgets('cancel button shown when pushed onto a navigation stack',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (ctx) => ElevatedButton(
+              onPressed: () => Navigator.of(ctx).push(
+                MaterialPageRoute(
+                  builder: (_) => OnboardingScreen(
+                    initialPath: '/tmp/test.gabbro',
+                    onInitVault: (_, _, _) async {},
+                    onEstimateEntropy: _fakeStrongEntropy,
+                    blockPassphraseCopyPaste: false,
+                    showYubikey: false,
+                  ),
+                ),
+              ),
+              child: const Text('Push'),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Push'));
+      await tester.pumpAndSettle();
+      expect(find.byIcon(Icons.close), findsOneWidget);
+    });
+
+    testWidgets('tapping cancel button pops the screen', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (ctx) => ElevatedButton(
+              onPressed: () => Navigator.of(ctx).push(
+                MaterialPageRoute(
+                  builder: (_) => OnboardingScreen(
+                    initialPath: '/tmp/test.gabbro',
+                    onInitVault: (_, _, _) async {},
+                    onEstimateEntropy: _fakeStrongEntropy,
+                    blockPassphraseCopyPaste: false,
+                    showYubikey: false,
+                  ),
+                ),
+              ),
+              child: const Text('Push'),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('Push'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+      expect(find.text('Push'), findsOneWidget);
+      expect(find.byType(OnboardingScreen), findsNothing);
+    });
+  });
+
   testWidgets('onVaultCreated called with vault path and alias', (tester) async {
     String? createdPath;
     String? createdAlias;

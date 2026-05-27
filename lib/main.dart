@@ -175,7 +175,6 @@ class _GabbroAppState extends State<GabbroApp>
     implements GabbroAppState {
   late AppSettings _settings;
   late VaultRegistry _registry;
-  String? _activeVaultPath;
 
   @override
   AppSettings get settings => _settings;
@@ -322,7 +321,6 @@ class _GabbroAppState extends State<GabbroApp>
 
   @override
   Future<void> touchVaultLastUsed(String path) async {
-    _activeVaultPath = path;
     final updated = _registry.touchLastUsed(path);
     await updated.save();
     setState(() => _registry = updated);
@@ -350,14 +348,13 @@ class _GabbroAppState extends State<GabbroApp>
       setState(() => _registry = updated);
     },
     onDelete: (path) async {
-      final isActive = path == _activeVaultPath;
+      final isActive = path == _registry.lastUsed?.path;
       final file = File(path);
       if (file.existsSync()) await file.delete();
       final updated = _registry.remove(path);
       await updated.save();
       setState(() => _registry = updated);
       if (isActive) {
-        _activeVaultPath = null;
         try { lockVault(); } catch (_) {}
         final lastUsed = updated.lastUsed;
         if (lastUsed == null) {

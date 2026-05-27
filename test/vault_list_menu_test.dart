@@ -20,6 +20,29 @@ Future<void> _setNarrow(WidgetTester tester) async {
 }
 
 void main() {
+  group('AppBar title', () {
+    testWidgets('shows vault alias when vaultAlias is provided', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: VaultListScreen(
+          vaultPath: '/tmp/test.gabbro',
+          vaultAlias: 'My Vault',
+          listEntries: () => <EntrySummaryData>[],
+          deleteVault: () async {},
+        ),
+      ));
+      await _setNarrow(tester);
+      await tester.pumpAndSettle();
+      expect(find.text('My Vault'), findsOneWidget);
+    });
+
+    testWidgets('shows Gabbro when no vaultAlias provided', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      await _setNarrow(tester);
+      await tester.pumpAndSettle();
+      expect(find.text('Gabbro'), findsOneWidget);
+    });
+  });
+
   group('VaultListScreen menu items', () {
     testWidgets('all expected menu items are present', (tester) async {
       await tester.pumpWidget(_buildScreen());

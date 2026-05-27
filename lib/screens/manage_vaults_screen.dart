@@ -89,9 +89,10 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
   }
 
   Future<void> _showDeleteDialog(VaultRecord record) async {
-    final bool? confirmed = await showDialog<bool>(
+    // Step 1 — warning
+    final step1 = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Delete vault?'),
         content: Text(
           'This will permanently delete "${record.alias}" and all its data.\n\n'
@@ -99,23 +100,67 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.of(ctx).pop(true),
             style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(ctx).colorScheme.error,
             ),
-            child: const Text('Delete'),
+            child: const Text('Continue'),
           ),
         ],
       ),
     );
-    if (confirmed == true) {
-      setState(() => _registry = _registry.remove(record.path));
-      await widget.onDelete(record.path);
-    }
+    if (step1 != true) return;
+    if (!mounted) return;
+
+    // Step 2 — type DELETE to confirm
+    final confirmController = TextEditingController();
+    final step2 = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Are you sure?'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Type DELETE to confirm'),
+              const SizedBox(height: 12),
+              TextField(
+                key: const Key('delete_vault_confirm_field'),
+                controller: confirmController,
+                autofocus: true,
+                decoration: const InputDecoration(border: OutlineInputBorder()),
+                onChanged: (_) => setDialogState(() {}),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: confirmController.text == 'DELETE'
+                  ? () => Navigator.of(ctx).pop(true)
+                  : null,
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(ctx).colorScheme.error,
+              ),
+              child: const Text('Confirm'),
+            ),
+          ],
+        ),
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => confirmController.dispose());
+    if (step2 != true) return;
+
+    setState(() => _registry = _registry.remove(record.path));
+    await widget.onDelete(record.path);
   }
 
   @override

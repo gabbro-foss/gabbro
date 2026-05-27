@@ -172,7 +172,7 @@ void main() {
     });
   });
 
-  // ── Delete dialog ─────────────────────────────────────────────────────────
+  // ── Delete dialog (2-step) ────────────────────────────────────────────────
 
   group('delete dialog', () {
     testWidgets('delete icon present for each vault', (tester) async {
@@ -180,21 +180,23 @@ void main() {
       expect(find.byIcon(Icons.delete_outlined), findsNWidgets(2));
     });
 
-    testWidgets('tapping delete icon shows confirmation dialog', (tester) async {
+    testWidgets('tapping delete icon shows step 1 warning dialog', (tester) async {
       await tester.pumpWidget(_buildScreen(registry: registry));
       await tester.tap(find.byIcon(Icons.delete_outlined).first);
       await tester.pumpAndSettle();
       expect(find.text('Delete vault?'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
+      expect(find.text('Continue'), findsOneWidget);
     });
 
-    testWidgets('confirmation dialog mentions vault alias', (tester) async {
+    testWidgets('step 1 dialog mentions vault alias', (tester) async {
       await tester.pumpWidget(_buildScreen(registry: registry));
       await tester.tap(find.byIcon(Icons.delete_outlined).first);
       await tester.pumpAndSettle();
       expect(find.textContaining('Alpha'), findsWidgets);
     });
 
-    testWidgets('cancelling delete does not call onDelete', (tester) async {
+    testWidgets('cancelling step 1 does not call onDelete', (tester) async {
       var called = false;
       await tester.pumpWidget(_buildScreen(
         registry: registry,
@@ -207,7 +209,63 @@ void main() {
       expect(called, isFalse);
     });
 
-    testWidgets('confirming delete calls onDelete with correct path',
+    testWidgets('continuing step 1 shows step 2 confirm dialog', (tester) async {
+      await tester.pumpWidget(_buildScreen(registry: registry));
+      await tester.tap(find.byIcon(Icons.delete_outlined).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      expect(find.text('Are you sure?'), findsOneWidget);
+      expect(find.text('Type DELETE to confirm'), findsOneWidget);
+    });
+
+    testWidgets('step 2 confirm button disabled until DELETE is typed',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(registry: registry));
+      await tester.tap(find.byIcon(Icons.delete_outlined).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      final confirmButton = tester.widget<TextButton>(
+        find.widgetWithText(TextButton, 'Confirm'),
+      );
+      expect(confirmButton.onPressed, isNull);
+    });
+
+    testWidgets('step 2 confirm button enabled when DELETE is typed',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(registry: registry));
+      await tester.tap(find.byIcon(Icons.delete_outlined).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('delete_vault_confirm_field')),
+        'DELETE',
+      );
+      await tester.pumpAndSettle();
+      final confirmButton = tester.widget<TextButton>(
+        find.widgetWithText(TextButton, 'Confirm'),
+      );
+      expect(confirmButton.onPressed, isNotNull);
+    });
+
+    testWidgets('cancelling step 2 does not call onDelete', (tester) async {
+      var called = false;
+      await tester.pumpWidget(_buildScreen(
+        registry: registry,
+        onDelete: (_) async => called = true,
+      ));
+      await tester.tap(find.byIcon(Icons.delete_outlined).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(called, isFalse);
+    });
+
+    testWidgets('confirming step 2 calls onDelete with correct path',
         (tester) async {
       String? deletedPath;
       await tester.pumpWidget(_buildScreen(
@@ -216,12 +274,19 @@ void main() {
       ));
       await tester.tap(find.byIcon(Icons.delete_outlined).first);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Delete'));
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('delete_vault_confirm_field')),
+        'DELETE',
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Confirm'));
       await tester.pumpAndSettle();
       expect(deletedPath, '/tmp/a.gabbro');
     });
 
-    testWidgets('confirming delete removes vault from displayed list',
+    testWidgets('confirming step 2 removes vault from displayed list',
         (tester) async {
       await tester.pumpWidget(_buildScreen(
         registry: registry,
@@ -229,7 +294,14 @@ void main() {
       ));
       await tester.tap(find.byIcon(Icons.delete_outlined).first);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Delete'));
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('delete_vault_confirm_field')),
+        'DELETE',
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Confirm'));
       await tester.pumpAndSettle();
       expect(find.text('Alpha'), findsNothing);
       expect(find.text('Beta'), findsOneWidget);

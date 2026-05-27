@@ -1066,7 +1066,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _isSelecting ? '${_selectedIds.length} selected' : 'Gabbro',
+          _isSelecting
+              ? '${_selectedIds.length} selected'
+              : widget.vaultAlias ?? 'Gabbro',
         ),
         actions: [
           if (_isImporting || _isSyncing)
