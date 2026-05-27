@@ -159,7 +159,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 400 | 0 |
+| Flutter (`flutter test`) | 406 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -170,7 +170,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Multiple Vaults — Phase 1 ✓ done; Phase 2 ✓ done; Phase 3 ✓ done; Phase 4 next
+### Multiple Vaults — all phases done; hardware test checklist next
 
 **Agreed design decisions:**
 - One vault active at a time (lock → switch → unlock). No Rust session refactor.
@@ -179,44 +179,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 - Android: numbered app-storage paths (`gabbro_2.gabbro`, `gabbro_3.gabbro` …).
 - Must ship before app languages and before cross-layer integration tests.
 
-**Phase 1 done:** VERSION 5 format (`alias` field after YubiKey records, before `passphrase_blob`); `read_vault_header` bridge (alias + YubiKey records in one call); `set_vault_alias` (read-modify-write, ciphertext intact); `init_vault*` accept `alias: Option<String>`; VERSION 4 backward compat; `frb_generated.rs` updated for new `init_vault*` signatures.
-**Known Phase 1 limitation:** passphrase-only vault CRUD saves re-seal from scratch and write `alias: None`. Multi-key vaults are unaffected (`reseal_vault_body` preserves the header). Fix planned once `VaultRegistry` (Phase 2) is in place and session state carries the alias.
-
-**Phase 2 done:** `lib/vault_registry.dart` — `VaultRecord { path, alias, lastUsedAt }` + `VaultRegistry` (immutable; `load()`, `save()`, `add()`, `remove()`, `updateAlias()`, `touchLastUsed()`, `lastUsed` getter, JSONC serialisation, one-time migration from legacy `gabbro.gabbro`); `lib/settings.dart` — `showVaultList: bool` (default `false`) added with full `fromJson`/`toJson`/`copyWith`/JSONC support. 30 new tests.
-
----
-
-#### Phase 2 — Flutter: VaultRegistry + settings migration
-
-Files: `lib/vault_registry.dart` (new), `lib/settings.dart`
-
-- New `lib/vault_registry.dart`: `VaultRecord { path, alias, lastUsedAt }` + `VaultRegistry` with `load()`, `save()`, `add()`, `remove()`, `updateAlias()`, `touchLastUsed()`, `lastUsed` getter.
-- Storage: same directory as `settings.jsonc` → `vaults.jsonc`.
-- Migration (one-time in `load()`): if `vaults.jsonc` absent AND `gabbro.gabbro` exists → create registry with one entry `{path: gabbro.gabbro, alias: "Gabbro"}`.
-- `lib/settings.dart`: add `showVaultList: bool` (default `false`) to `AppSettings`.
-- TDD: load/save round-trip; migration; empty state; `lastUsed` ordering.
-
-#### Phase 3 — Flutter: Login + vault switching UI
-
-Files: `lib/main.dart`, `lib/screens/unlock_screen.dart`, `lib/screens/vault_selector_screen.dart` (new), `lib/screens/onboarding_screen.dart`, `lib/screens/security_screen.dart`
-
-- `main.dart`: load `VaultRegistry` at startup; route to `OnboardingScreen` if empty, else `UnlockScreen` with `lastUsed` vault.
-- `unlock_screen.dart`: show vault alias below app title; discreet "switch" icon in AppBar; replace `list_vault_yubikey_records` call with `read_vault_header` (returns alias + YubiKey records in one call).
-- `vault_selector_screen.dart` (new): if `showVaultList == true` shows alias list; always shows "Add vault" button → `OnboardingScreen`; allows removing from registry (no file delete); each vault row has an edit (pencil) icon that opens an inline rename dialog — pre-filled with current alias, empty-alias guard, calls `set_vault_alias` bridge then `VaultRegistry.updateAlias()`.
-- `onboarding_screen.dart`: add required alias text field; after creation call `VaultRegistry.add()`; Android path generation scans registry for first unused numbered path; pass alias to `init_vault*` bridge calls.
-- `security_screen.dart`: add "Show vault list on login" toggle (`showVaultList`).
-- TDD: `VaultSelectorScreen` list shown/hidden; `UnlockScreen` alias + switch link; `OnboardingScreen` alias field + empty-alias guard; rename dialog pre-fills alias, rejects empty input, updates registry and bridge.
-
-#### Phase 4 — Export + Android autofill
-
-Files: `lib/screens/export_screen.dart`, `android/.../GabbroAutofillService.kt`, `android/.../UnlockActivity.kt`
-
-- Export default filename: `{alias}_YYYY-MM-DD.gabbro` (sanitise alias: spaces → `_`, strip non-alphanum except `-_`).
-- Autofill service + UnlockActivity: read last-used vault path from registry (or via shared preferences set by Flutter on unlock) instead of hardcoded path.
-
----
-
-#### Hardware test checklist (after all phases)
+#### Hardware test checklist
 1. Existing vault migrates into registry on first launch; alias "Gabbro"; unlocks normally.
 2. Create second vault with alias "Work" → lands in registry; can unlock it.
 3. Switch vaults: lock "Work", switch to "Gabbro", unlock.
