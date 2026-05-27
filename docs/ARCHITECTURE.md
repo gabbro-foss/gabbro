@@ -43,7 +43,7 @@ gabbro/
 │   ├── main.dart
 │   ├── screens/
 │   │   ├── unlock_screen.dart
-│   │   ├── vault_selector_screen.dart
+│   │   ├── manage_vaults_screen.dart
 │   │   ├── export_screen.dart
 │   │   ├── import_screen.dart
 │   │   ├── csv_mapping_screen.dart
@@ -149,6 +149,7 @@ gabbro/
 - Copy/paste blocking on master passphrase fields (default on; user toggle in Settings → Security; keyboard inline paste is a platform limitation, documented in UI)
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
 - YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2); minimum-2-keys enforcement (ADR-010, VERSION 4 vault format); multi-key unlock, vault delete, and change_passphrase YubiKey wiring (CTAP2 one-tap any-key); manage YubiKeys screen (add, remove, alias edit); hardware-validated on Linux and Android (USB + NFC)
+- Multiple vaults: registry (`vaults.jsonc`); alias stored in VERSION 5 vault header; ManageVaultsScreen (add/rename/delete with file deletion + registry removal); `showVaultList=true` shows inline vault dropdown on login screen; `showVaultList=false` (default, high-security) shows only last-used vault with no switch UI; vault CRUD accessible post-authentication via Menu → Manage vaults
 
 **Not yet implemented (see Bikeshed):**
 - Autofill save requests (`onSaveRequest`)
@@ -159,7 +160,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 406 | 0 |
+| Flutter (`flutter test`) | 414 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -170,24 +171,26 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Multiple Vaults — all phases done; hardware test checklist next
+### Multiple Vaults — CRUD redesign done; hardware re-test needed
 
 **Agreed design decisions:**
 - One vault active at a time (lock → switch → unlock). No Rust session refactor.
 - Alias stored in the `.gabbro` plaintext header (VERSION 5 format bump). Also kept in Flutter registry. Alias travels with the file.
-- Login screen shows last-used vault + discreet "switch" link (coercion mode is the default — vault list hidden).
+- `showVaultList=false` (default, high-security): login screen shows only the last-used vault. No switch button. Vault management via Menu → Manage vaults (authenticated).
+- `showVaultList=true`: inline dropdown on the login screen lists all registered vaults for quick switching.
+- ManageVaultsScreen (authenticated, Menu → Manage vaults): full CRUD — add (→ onboarding), rename alias, delete (confirm → delete file + remove from registry), switch to another vault.
 - Android: numbered app-storage paths (`gabbro_2.gabbro`, `gabbro_3.gabbro` …).
-- Must ship before app languages and before cross-layer integration tests.
 
-#### Hardware test checklist
+#### Hardware re-test checklist
 1. Existing vault migrates into registry on first launch; alias "Gabbro"; unlocks normally.
-2. Create second vault with alias "Work" → lands in registry; can unlock it.
-3. Switch vaults: lock "Work", switch to "Gabbro", unlock.
-4. Rename alias via `set_vault_alias`; new alias shown on unlock screen.
-5. `showVaultList = false` (default): switch link present but list hidden.
-6. `showVaultList = true`: list shown in selector.
-7. Export filename contains alias.
-8. Open VERSION 4 vault on VERSION 5 build: unlocks; alias shows registry fallback.
+2. `showVaultList=false` (default): login screen shows only last-used vault, no switch button.
+3. Switch vaults (`showVaultList=false`): unlock → Menu → Manage vaults → tap vault → unlock screen → unlock.
+4. Switch vaults (`showVaultList=true`): dropdown visible on login screen; select other vault; unlock.
+5. Add vault: Menu → Manage vaults → Add vault → onboarding → vault appears in Manage vaults list.
+6. Rename alias: Menu → Manage vaults → edit icon → new alias shown on login screen.
+7. Delete vault: Menu → Manage vaults → delete icon → confirm → file deleted, removed from list.
+8. Export filename contains alias.
+9. Open VERSION 4 vault on VERSION 5 build: unlocks; alias shows registry fallback.
 
 ---
 
