@@ -61,6 +61,8 @@ gabbro/
 │   │   ├── segmented_row.dart
 │   │   ├── generator_widget.dart
 │   │   └── password_breakdown_sheet.dart
+│   ├── settings.dart
+│   ├── vault_registry.dart
 │   └── src/rust/               # Auto-generated bridge (do not edit)
 ├── rust/
 │   ├── src/
@@ -156,7 +158,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 340 | 0 |
+| Flutter (`flutter test`) | 375 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -167,7 +169,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Multiple Vaults — Phase 1 ✓ done; Phase 2 next
+### Multiple Vaults — Phase 1 ✓ done; Phase 2 ✓ done; Phase 3 next
 
 **Agreed design decisions:**
 - One vault active at a time (lock → switch → unlock). No Rust session refactor.
@@ -178,6 +180,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 **Phase 1 done:** VERSION 5 format (`alias` field after YubiKey records, before `passphrase_blob`); `read_vault_header` bridge (alias + YubiKey records in one call); `set_vault_alias` (read-modify-write, ciphertext intact); `init_vault*` accept `alias: Option<String>`; VERSION 4 backward compat; `frb_generated.rs` updated for new `init_vault*` signatures.
 **Known Phase 1 limitation:** passphrase-only vault CRUD saves re-seal from scratch and write `alias: None`. Multi-key vaults are unaffected (`reseal_vault_body` preserves the header). Fix planned once `VaultRegistry` (Phase 2) is in place and session state carries the alias.
+
+**Phase 2 done:** `lib/vault_registry.dart` — `VaultRecord { path, alias, lastUsedAt }` + `VaultRegistry` (immutable; `load()`, `save()`, `add()`, `remove()`, `updateAlias()`, `touchLastUsed()`, `lastUsed` getter, JSONC serialisation, one-time migration from legacy `gabbro.gabbro`); `lib/settings.dart` — `showVaultList: bool` (default `false`) added with full `fromJson`/`toJson`/`copyWith`/JSONC support. 30 new tests.
 
 ---
 
