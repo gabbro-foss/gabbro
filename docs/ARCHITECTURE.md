@@ -197,6 +197,19 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 5. Delete vault via menu (last vault): → routes to onboarding WITH post-deletion message (was missing — round 4 fix).
 6. All previously passing items 1–8 from round 1 still pass.
 
+Hardware test round 4 results:
+
+  1. pass
+  2. pass
+  3. pass
+  4. bad test again - delete an non active vault goes correctly back to active vault list screen -
+  remove this test
+  5. fail: what message do you expect? all I see is onboarding screen with "create your vault to get
+  started"
+
+  document this so that the next claude.code instance can continue. We're going to end this session
+  here.
+  
 ---
 
 ## Build Environment
