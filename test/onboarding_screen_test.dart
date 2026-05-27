@@ -16,23 +16,23 @@ EntropyResult _fakeStrongEntropy(String ignored) => EntropyResult(
 // ── Widget helper ─────────────────────────────────────────────────────────────
 
 Widget _buildScreen({
-  Future<void> Function(List<int>, String)? onInitVault,
+  Future<void> Function(List<int>, String, String?)? onInitVault,
   bool blockPassphraseCopyPaste = true,
   bool isAndroid = false,
   bool? showYubikey,
-  Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), String)? onInitVaultWithYubikey,
+  Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), String, String?)? onInitVaultWithYubikey,
   Future<void> Function(String path, String alias)? onVaultCreated,
 }) =>
     MaterialApp(
       home: OnboardingScreen(
         initialPath: '/tmp/test.gabbro',
-        onInitVault: onInitVault ?? (a, b) async {},
+        onInitVault: onInitVault ?? (a, b, c) async {},
         onEstimateEntropy: _fakeStrongEntropy,
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
         isAndroid: isAndroid,
         showYubikey: showYubikey ?? isAndroid,
         onInitVaultWithYubikey: onInitVaultWithYubikey ??
-            (a, b, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async {},
+            (a, b, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t, alias) async {},
         onVaultCreated: onVaultCreated,
       ),
     );
@@ -193,7 +193,7 @@ void main() {
     await tester.pumpWidget(_buildScreen(
       isAndroid: true,
       onInitVaultWithYubikey:
-          (a, pins, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async {
+          (a, pins, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t, alias) async {
         capturedPins = pins;
       },
     ));
@@ -238,7 +238,7 @@ void main() {
     bool called = false;
     await tester.pumpWidget(_buildScreen(
       isAndroid: true,
-      onInitVaultWithYubikey: (a, pins, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async => called = true,
+      onInitVaultWithYubikey: (a, pins, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t, alias) async => called = true,
     ));
 
     await tester.enterText(
@@ -289,7 +289,7 @@ void main() {
 
   Future<void> fillAndSubmitYubikey(
     WidgetTester tester,
-    Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), String) onInitVaultWithYubikey,
+    Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), String, String?) onInitVaultWithYubikey,
   ) async {
     await tester.pumpWidget(_buildScreen(
       isAndroid: true,
@@ -331,7 +331,7 @@ void main() {
     final hold = Completer<void>();
     await fillAndSubmitYubikey(
       tester,
-      (_, _, _, onStep2, onStep3, onAwaitBackupKey, onStep4, t) => hold.future,
+      (_, _, _, onStep2, onStep3, onAwaitBackupKey, onStep4, t, _) => hold.future,
     );
     await tester.runAsync(() async {
       await tester.tap(find.text('Create vault'));
@@ -349,7 +349,7 @@ void main() {
   testWidgets('step 2 indicator shown after onStep2 callback fires', (tester) async {
     await fillAndSubmitYubikey(
       tester,
-      (_, _, _, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async {
+      (_, _, _, onStep2, onStep3, onAwaitBackupKey, onStep4, t, _) async {
         onStep2();
         // Hold indefinitely so we can inspect the UI before navigation
         await Future<void>.delayed(const Duration(seconds: 30));
@@ -370,7 +370,7 @@ void main() {
   testWidgets('swap key step shown after onStep3 fires', (tester) async {
     await fillAndSubmitYubikey(
       tester,
-      (_, _, _, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async {
+      (_, _, _, onStep2, onStep3, onAwaitBackupKey, onStep4, t, _) async {
         onStep2();
         onStep3();
         await Completer<void>().future;
@@ -392,7 +392,7 @@ void main() {
     var backupGateReached = false;
     await fillAndSubmitYubikey(
       tester,
-      (_, _, _, onStep2, onStep3, onAwaitBackupKey, onStep4, t) async {
+      (_, _, _, onStep2, onStep3, onAwaitBackupKey, onStep4, t, _) async {
         onStep2();
         onStep3();
         await onAwaitBackupKey();
@@ -450,7 +450,7 @@ void main() {
     String? createdPath;
     String? createdAlias;
     await tester.pumpWidget(_buildScreen(
-      onInitVault: (_, _) async {},
+      onInitVault: (passphrase, path, alias) async {},
       onVaultCreated: (p, a) async {
         createdPath = p;
         createdAlias = a;

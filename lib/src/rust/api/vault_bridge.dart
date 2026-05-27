@@ -194,11 +194,15 @@ Future<void> unlockVaultWithYubikey({
 /// Create a new empty vault at `path`, sealed with `passphrase`.
 ///
 /// Called during onboarding. Async — runs Argon2id + encryption.
-Future<void> initVault({required List<int> passphrase, required String path}) =>
-    RustLib.instance.api.crateApiVaultBridgeInitVault(
-      passphrase: passphrase,
-      path: path,
-    );
+Future<void> initVault({
+  required List<int> passphrase,
+  required String path,
+  String? alias,
+}) => RustLib.instance.api.crateApiVaultBridgeInitVault(
+  passphrase: passphrase,
+  path: path,
+  alias: alias,
+);
 
 /// Create a new empty vault sealed with a passphrase and two or more YubiKeys.
 ///
@@ -209,10 +213,12 @@ Future<void> initVaultWithKeys({
   required List<int> passphrase,
   required List<YubiKeyInitData> keys,
   required String path,
+  String? alias,
 }) => RustLib.instance.api.crateApiVaultBridgeInitVaultWithKeys(
   passphrase: passphrase,
   keys: keys,
   path: path,
+  alias: alias,
 );
 
 /// Create a new empty vault at `path`, sealed with both passphrase and YubiKey.

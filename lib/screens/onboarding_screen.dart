@@ -26,10 +26,21 @@ Uint8List _fromHex(String hex) {
   return Uint8List.fromList(result);
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+String _sanitiseAlias(String alias) {
+  final s = alias.trim().toLowerCase().replaceAll(' ', '_');
+  final cleaned = s.replaceAll(RegExp(r'[^a-z0-9_\-]'), '');
+  return cleaned.isEmpty ? 'vault' : cleaned;
+}
+
 // ── Bridge defaults ───────────────────────────────────────────────────────────
 
-Future<void> _defaultInitVault(List<int> passphrase, String path) =>
-    initVault(passphrase: passphrase, path: path);
+Future<void> _defaultInitVault(
+  List<int> passphrase,
+  String path,
+  String? alias,
+) => initVault(passphrase: passphrase, path: path, alias: alias);
 
 EntropyResult _defaultEstimateEntropy(String password) =>
     estimateEntropy(password: password);
@@ -44,6 +55,7 @@ Future<void> _linuxInitVaultWithYubikey(
   void Function() onStep3,
   Future<void> Function() onAwaitBackupKey,
   void Function() onStep4,
+  String? alias,
 ) async {
   final primaryDevices = fidoListDevices();
   if (primaryDevices.isEmpty) {
@@ -107,6 +119,7 @@ Future<void> _linuxInitVaultWithYubikey(
       ),
     ],
     path: path,
+    alias: alias,
   );
 }
 
@@ -119,6 +132,7 @@ Future<void> _defaultInitVaultWithYubikey(
   Future<void> Function() onAwaitBackupKey,
   void Function() onStep4,
   String transport,
+  String? alias,
 ) async {
   if (Platform.isLinux) {
     return _linuxInitVaultWithYubikey(
@@ -129,6 +143,7 @@ Future<void> _defaultInitVaultWithYubikey(
       onStep3,
       onAwaitBackupKey,
       onStep4,
+      alias,
     );
   }
 
@@ -207,6 +222,7 @@ Future<void> _defaultInitVaultWithYubikey(
       ),
     ],
     path: path,
+    alias: alias,
   );
 }
 
@@ -215,7 +231,7 @@ Future<void> _defaultInitVaultWithYubikey(
 class OnboardingScreen extends StatefulWidget {
   final String? initialPath;
   final String? postDeletionMessage;
-  final Future<void> Function(List<int> passphrase, String path) onInitVault;
+  final Future<void> Function(List<int> passphrase, String path, String? alias) onInitVault;
   final EntropyResult Function(String password) onEstimateEntropy;
   final bool blockPassphraseCopyPaste;
 
@@ -236,6 +252,7 @@ class OnboardingScreen extends StatefulWidget {
     Future<void> Function() onAwaitBackupKey,
     void Function() onStep4,
     String transport,
+    String? alias,
   )
   onInitVaultWithYubikey;
 
@@ -277,6 +294,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     TextEditingController(),
   ];
   String _vaultPath = '';
+  String? _defaultDir;
+  bool _pathManuallySet = false;
 
   bool _passphraseObscured = true;
   bool _confirmObscured = true;
@@ -298,14 +317,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.initState();
     if (widget.initialPath != null) {
       _vaultPath = widget.initialPath!;
+      _pathManuallySet = true;
     } else {
       _initDefaultPath();
+    }
+    _aliasController.addListener(_onAliasChanged);
+  }
+
+  void _onAliasChanged() {
+    if (_pathManuallySet) return;
+    final dir = _defaultDir;
+    if (dir == null) return;
+    final alias = _aliasController.text.trim();
+    final newPath = alias.isEmpty
+        ? _firstFreeVaultPath(dir)
+        : _aliasBasedPath(dir, alias);
+    if (newPath != _vaultPath) {
+      setState(() => _vaultPath = newPath);
     }
   }
 
   Future<void> _initDefaultPath() async {
     final dir = await getApplicationSupportDirectory();
-    setState(() => _vaultPath = _firstFreeVaultPath(dir.path));
+    final alias = _aliasController.text.trim();
+    setState(() {
+      _defaultDir = dir.path;
+      _vaultPath = alias.isEmpty
+          ? _firstFreeVaultPath(dir.path)
+          : _aliasBasedPath(dir.path, alias);
+    });
   }
 
   String _firstFreeVaultPath(String dirPath) {
@@ -318,8 +358,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
+  String _aliasBasedPath(String dirPath, String alias) {
+    final base = _sanitiseAlias(alias);
+    final primary = '$dirPath/${base}_gabbro.gabbro';
+    if (!File(primary).existsSync()) return primary;
+    for (var i = 2; ; i++) {
+      final p = '$dirPath/${base}_${i}_gabbro.gabbro';
+      if (!File(p).existsSync()) return p;
+    }
+  }
+
   @override
   void dispose() {
+    _aliasController.removeListener(_onAliasChanged);
     _aliasController.dispose();
     _passphraseController.dispose();
     _confirmController.dispose();
@@ -366,6 +417,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     try {
       final file = File(_vaultPath);
       await file.parent.create(recursive: true);
+      final alias = _aliasController.text.trim();
       if (_useYubikey) {
         await widget.onInitVaultWithYubikey(
           _passphraseController.text.codeUnits,
@@ -382,11 +434,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             if (mounted) setState(() => _yubikeyStep = 5);
           },
           _transport,
+          alias.isEmpty ? null : alias,
         );
       } else {
         await widget.onInitVault(
           _passphraseController.text.codeUnits,
           _vaultPath,
+          alias.isEmpty ? null : alias,
         );
       }
       await widget.onVaultCreated?.call(_vaultPath, _aliasController.text.trim());
@@ -749,8 +803,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               saveFileName: _vaultPath.isEmpty
                                   ? 'gabbro.gabbro'
                                   : _vaultPath.split('/').last,
-                              onPathSelected: (path) =>
-                                  setState(() => _vaultPath = path),
+                              onPathSelected: (path) => setState(() {
+                                _pathManuallySet = true;
+                                _vaultPath = path;
+                              }),
                               validator: (v) => (v == null || v.isEmpty)
                                   ? 'Path is required'
                                   : null,

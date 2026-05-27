@@ -243,12 +243,14 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiVaultBridgeInitVault({
     required List<int> passphrase,
     required String path,
+    String? alias,
   });
 
   Future<void> crateApiVaultBridgeInitVaultWithKeys({
     required List<int> passphrase,
     required List<YubiKeyInitData> keys,
     required String path,
+    String? alias,
   });
 
   Future<void> crateApiVaultBridgeInitVaultWithYubikey({
@@ -1468,6 +1470,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<void> crateApiVaultBridgeInitVault({
     required List<int> passphrase,
     required String path,
+    String? alias,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -1475,6 +1478,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_list_prim_u_8_loose(passphrase, serializer);
           sse_encode_String(path, serializer);
+          sse_encode_opt_String(alias, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -1487,7 +1491,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_String,
         ),
         constMeta: kCrateApiVaultBridgeInitVaultConstMeta,
-        argValues: [passphrase, path],
+        argValues: [passphrase, path, alias],
         apiImpl: this,
       ),
     );
@@ -1496,7 +1500,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiVaultBridgeInitVaultConstMeta =>
       const TaskConstMeta(
         debugName: "init_vault",
-        argNames: ["passphrase", "path"],
+        argNames: ["passphrase", "path", "alias"],
       );
 
   @override
@@ -1504,6 +1508,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     required List<int> passphrase,
     required List<YubiKeyInitData> keys,
     required String path,
+    String? alias,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -1512,6 +1517,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           sse_encode_list_prim_u_8_loose(passphrase, serializer);
           sse_encode_list_yubi_key_init_data(keys, serializer);
           sse_encode_String(path, serializer);
+          sse_encode_opt_String(alias, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -1524,7 +1530,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_String,
         ),
         constMeta: kCrateApiVaultBridgeInitVaultWithKeysConstMeta,
-        argValues: [passphrase, keys, path],
+        argValues: [passphrase, keys, path, alias],
         apiImpl: this,
       ),
     );
@@ -1533,7 +1539,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiVaultBridgeInitVaultWithKeysConstMeta =>
       const TaskConstMeta(
         debugName: "init_vault_with_keys",
-        argNames: ["passphrase", "keys", "path"],
+        argNames: ["passphrase", "keys", "path", "alias"],
       );
 
   @override
