@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/vault_registry.dart';
 
 // ── Fake entropy ──────────────────────────────────────────────────────────────
 
@@ -19,9 +20,22 @@ YubikeyRecordData _fakeRecord() => YubikeyRecordData(
       salt: Uint8List(32),
     );
 
+// ── Registry helpers ──────────────────────────────────────────────────────────
+
+VaultRecord _vaultRecord({
+  required String path,
+  required String alias,
+}) =>
+    VaultRecord(
+      path: path,
+      alias: alias,
+      lastUsedAt: DateTime.fromMillisecondsSinceEpoch(0),
+    );
+
 // ── Widget helper ─────────────────────────────────────────────────────────────
 
 Widget _buildScreen({
+  String vaultPath = '/tmp/test.gabbro',
   Future<void> Function(List<int>, String)? onUnlock,
   bool blockPassphraseCopyPaste = true,
   List<YubikeyRecordData>? yubikeyRecords,
@@ -30,11 +44,13 @@ Widget _buildScreen({
   Future<void> Function(List<int>, List<YubikeyRecordData>, String, String, String)?
       onUnlockWithAnyYubikey,
   String? vaultAlias,
-  VoidCallback? onSwitch,
+  VaultRegistry? registry,
+  bool showVaultList = false,
+  void Function(String path, String alias)? onVaultSwitch,
 }) =>
     MaterialApp(
       home: UnlockScreen(
-        vaultPath: '/tmp/test.gabbro',
+        vaultPath: vaultPath,
         onUnlock: onUnlock ?? (a, b) async {},
         onEstimateEntropy: _fakeEntropy,
         blockPassphraseCopyPaste: blockPassphraseCopyPaste,
@@ -42,7 +58,9 @@ Widget _buildScreen({
         onUnlockWithYubikey: onUnlockWithYubikey ?? (a, b, c, d, e, f) async {},
         onUnlockWithAnyYubikey: onUnlockWithAnyYubikey ?? (a, b, c, d, e) async {},
         vaultAlias: vaultAlias,
-        onSwitch: onSwitch,
+        registry: registry,
+        showVaultList: showVaultList,
+        onVaultSwitch: onVaultSwitch,
       ),
     );
 
@@ -74,14 +92,16 @@ void main() {
     );
   });
 
-  testWidgets('passphrase field blocks selection when blockPassphraseCopyPaste is true', (tester) async {
+  testWidgets('passphrase field blocks selection when blockPassphraseCopyPaste is true',
+      (tester) async {
     await tester.pumpWidget(_buildScreen(blockPassphraseCopyPaste: true));
 
     final field = tester.widget<TextField>(find.byType(TextField));
     expect(field.enableInteractiveSelection, isFalse);
   });
 
-  testWidgets('passphrase field allows selection when blockPassphraseCopyPaste is false', (tester) async {
+  testWidgets('passphrase field allows selection when blockPassphraseCopyPaste is false',
+      (tester) async {
     await tester.pumpWidget(_buildScreen(blockPassphraseCopyPaste: false));
 
     final field = tester.widget<TextField>(find.byType(TextField));
@@ -101,7 +121,7 @@ void main() {
     expect(called, isTrue);
   });
 
-  // ── YubiKey mode ─────────────────────────────────────────────────────────────
+  // ── YubiKey mode ──────────────────────────────────────────────────────────
 
   testWidgets('passphrase-only mode when yubikey records are empty', (tester) async {
     await tester.pumpWidget(_buildScreen(yubikeyRecords: []));
@@ -132,7 +152,8 @@ void main() {
     expect(called, isTrue);
   });
 
-  testWidgets('unlock screen is scrollable in landscape-like viewport (yubikey mode)', (tester) async {
+  testWidgets('unlock screen is scrollable in landscape-like viewport (yubikey mode)',
+      (tester) async {
     tester.view.physicalSize = const Size(800, 400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.reset());
@@ -140,8 +161,6 @@ void main() {
     await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
     await tester.pumpAndSettle();
 
-    // Screen must wrap content in a SingleChildScrollView so the Unlock
-    // button is reachable in landscape / short-height viewports.
     expect(find.byType(SingleChildScrollView), findsOneWidget);
     expect(find.text('Unlock'), findsOneWidget);
   });
@@ -161,7 +180,7 @@ void main() {
     expect(find.textContaining('Could not unlock vault'), findsOneWidget);
   });
 
-  // ── Vault alias + switch ──────────────────────────────────────────────────
+  // ── Vault alias ───────────────────────────────────────────────────────────
 
   testWidgets('shows vault alias below title when provided', (tester) async {
     await tester.pumpWidget(_buildScreen(vaultAlias: 'Work'));
@@ -173,23 +192,14 @@ void main() {
     expect(find.text('Work'), findsNothing);
   });
 
-  testWidgets('shows switch icon when onSwitch is provided', (tester) async {
-    await tester.pumpWidget(_buildScreen(onSwitch: () {}));
-    expect(find.byIcon(Icons.swap_horiz), findsOneWidget);
-  });
+  // ── No switch icon ────────────────────────────────────────────────────────
 
-  testWidgets('does not show switch icon when onSwitch is null', (tester) async {
+  testWidgets('no switch icon shown (switch icon removed in new design)', (tester) async {
     await tester.pumpWidget(_buildScreen());
     expect(find.byIcon(Icons.swap_horiz), findsNothing);
   });
 
-  testWidgets('tapping switch icon calls onSwitch', (tester) async {
-    var called = false;
-    await tester.pumpWidget(_buildScreen(onSwitch: () => called = true));
-    await tester.tap(find.byIcon(Icons.swap_horiz));
-    await tester.pumpAndSettle();
-    expect(called, isTrue);
-  });
+  // ── Multi-key vault ───────────────────────────────────────────────────────
 
   testWidgets('multi-key vault calls onUnlockWithAnyYubikey not onUnlockWithYubikey',
       (tester) async {
@@ -209,5 +219,83 @@ void main() {
 
     expect(anyCalled, isTrue);
     expect(singleCalled, isFalse);
+  });
+
+  // ── Vault dropdown (showVaultList=true) ───────────────────────────────────
+
+  group('vault dropdown', () {
+    final twoVaultRegistry = VaultRegistry([
+      _vaultRecord(path: '/tmp/a.gabbro', alias: 'Alpha'),
+      _vaultRecord(path: '/tmp/b.gabbro', alias: 'Beta'),
+    ]);
+
+    testWidgets('shows dropdown when showVaultList=true and registry has 2+ vaults',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        vaultPath: '/tmp/a.gabbro',
+        vaultAlias: 'Alpha',
+        showVaultList: true,
+        registry: twoVaultRegistry,
+      ));
+      expect(find.byType(DropdownButton<String>), findsOneWidget);
+    });
+
+    testWidgets('no dropdown when showVaultList=false', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        vaultPath: '/tmp/a.gabbro',
+        showVaultList: false,
+        registry: twoVaultRegistry,
+      ));
+      expect(find.byType(DropdownButton<String>), findsNothing);
+    });
+
+    testWidgets('no dropdown when registry has only one vault', (tester) async {
+      final singleRegistry = VaultRegistry([
+        _vaultRecord(path: '/tmp/a.gabbro', alias: 'Alpha'),
+      ]);
+      await tester.pumpWidget(_buildScreen(
+        vaultPath: '/tmp/a.gabbro',
+        showVaultList: true,
+        registry: singleRegistry,
+      ));
+      expect(find.byType(DropdownButton<String>), findsNothing);
+    });
+
+    testWidgets('no dropdown when registry is null', (tester) async {
+      await tester.pumpWidget(_buildScreen(showVaultList: true, registry: null));
+      expect(find.byType(DropdownButton<String>), findsNothing);
+    });
+
+    testWidgets('dropdown shows all vault aliases', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        vaultPath: '/tmp/a.gabbro',
+        vaultAlias: 'Alpha',
+        showVaultList: true,
+        registry: twoVaultRegistry,
+      ));
+      // Current vault alias shown in collapsed dropdown
+      expect(find.text('Alpha'), findsWidgets);
+    });
+
+    testWidgets('selecting a different vault calls onVaultSwitch', (tester) async {
+      String? switchedPath;
+      String? switchedAlias;
+      await tester.pumpWidget(_buildScreen(
+        vaultPath: '/tmp/a.gabbro',
+        vaultAlias: 'Alpha',
+        showVaultList: true,
+        registry: twoVaultRegistry,
+        onVaultSwitch: (p, a) {
+          switchedPath = p;
+          switchedAlias = a;
+        },
+      ));
+      await tester.tap(find.byType(DropdownButton<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Beta').last);
+      await tester.pumpAndSettle();
+      expect(switchedPath, '/tmp/b.gabbro');
+      expect(switchedAlias, 'Beta');
+    });
   });
 }

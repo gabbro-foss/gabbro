@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
-import 'package:gabbro/screens/vault_selector_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/frb_generated.dart';
@@ -73,6 +73,7 @@ Future<void> main() async {
 /// Public interface for descendant widgets to read settings and push updates.
 abstract class GabbroAppState {
   AppSettings get settings;
+  VaultRegistry get registry;
   Future<void> updateSettings(AppSettings updated);
   /// Pause the foreground inactivity lock timer for the duration of a
   /// hardware operation (e.g. YubiKey tap).  Call [resumeForegroundLock]
@@ -82,6 +83,10 @@ abstract class GabbroAppState {
   /// Mark [path] as the most-recently-used vault so the auto-lock timer
   /// shows the correct unlock screen after a vault switch.
   Future<void> touchVaultLastUsed(String path);
+  /// Navigate the root navigator to the unlock screen for [path]/[alias].
+  void switchToVault(String path, String alias);
+  /// Push the ManageVaultsScreen onto the root navigator.
+  void navigateToManageVaults();
 }
 
 ThemeData gabbroLightTheme({required bool highContrast}) {
@@ -170,9 +175,13 @@ class _GabbroAppState extends State<GabbroApp>
     implements GabbroAppState {
   late AppSettings _settings;
   late VaultRegistry _registry;
+  String? _activeVaultPath;
 
   @override
   AppSettings get settings => _settings;
+
+  @override
+  VaultRegistry get registry => _registry;
 
   final _navigatorKey = GlobalKey<NavigatorState>();
 
@@ -285,50 +294,12 @@ class _GabbroAppState extends State<GabbroApp>
     setState(() => _registry = updated);
   }
 
-  void _navigateToSelector() {
-    _navigatorKey.currentState?.push(
-      MaterialPageRoute(
-        builder: (_) => VaultSelectorScreen(
-          registry: _registry,
-          showVaultList: _settings.showVaultList,
-          onVaultSelected: (path, alias) {
-            _navigatorKey.currentState?.pushReplacement(
-              MaterialPageRoute(
-                builder: (_) => _buildUnlockScreen(path, alias),
-              ),
-            );
-          },
-          onAddVault: () {
-            _navigatorKey.currentState?.push(
-              MaterialPageRoute(
-                builder: (_) => OnboardingScreen(
-                  blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
-                  onVaultCreated: _onVaultCreated,
-                  onSwitch: _navigateToSelector,
-                ),
-              ),
-            );
-          },
-          onRename: (path, alias) async {
-            final updated = _registry.updateAlias(path, alias);
-            await updated.save();
-            setState(() => _registry = updated);
-          },
-          onRemove: (path) async {
-            final updated = _registry.remove(path);
-            await updated.save();
-            setState(() => _registry = updated);
-          },
-        ),
-      ),
-    );
-  }
-
   UnlockScreen _buildUnlockScreen(String path, String alias) => UnlockScreen(
     vaultPath: path,
     vaultAlias: alias,
     blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
-    onSwitch: _navigateToSelector,
+    registry: _settings.showVaultList ? _registry : null,
+    showVaultList: _settings.showVaultList,
   );
 
   Widget _buildHome() {
@@ -337,7 +308,6 @@ class _GabbroAppState extends State<GabbroApp>
       return OnboardingScreen(
         blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
         onVaultCreated: _onVaultCreated,
-        onSwitch: _navigateToSelector,
       );
     }
     return _buildUnlockScreen(lastUsed.path, lastUsed.alias);
@@ -352,10 +322,80 @@ class _GabbroAppState extends State<GabbroApp>
 
   @override
   Future<void> touchVaultLastUsed(String path) async {
+    _activeVaultPath = path;
     final updated = _registry.touchLastUsed(path);
     await updated.save();
     setState(() => _registry = updated);
   }
+
+  @override
+  void switchToVault(String path, String alias) {
+    _navigatorKey.currentState?.pushReplacement(
+      MaterialPageRoute(builder: (_) => _buildUnlockScreen(path, alias)),
+    );
+  }
+
+  @override
+  void navigateToManageVaults() {
+    _navigatorKey.currentState?.push(
+      MaterialPageRoute(builder: (_) => _buildManageVaultsScreen()),
+    );
+  }
+
+  ManageVaultsScreen _buildManageVaultsScreen() => ManageVaultsScreen(
+    registry: _registry,
+    onRename: (path, alias) async {
+      final updated = _registry.updateAlias(path, alias);
+      await updated.save();
+      setState(() => _registry = updated);
+    },
+    onDelete: (path) async {
+      final isActive = path == _activeVaultPath;
+      final file = File(path);
+      if (file.existsSync()) await file.delete();
+      final updated = _registry.remove(path);
+      await updated.save();
+      setState(() => _registry = updated);
+      if (isActive) {
+        _activeVaultPath = null;
+        try { lockVault(); } catch (_) {}
+        final lastUsed = updated.lastUsed;
+        if (lastUsed == null) {
+          _navigatorKey.currentState?.pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (_) => OnboardingScreen(
+                blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+                onVaultCreated: _onVaultCreated,
+              ),
+            ),
+            (_) => false,
+          );
+        } else {
+          _navigatorKey.currentState?.pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (_) => _buildUnlockScreen(lastUsed.path, lastUsed.alias),
+            ),
+            (_) => false,
+          );
+        }
+      }
+    },
+    onAddVault: () {
+      _navigatorKey.currentState?.push(
+        MaterialPageRoute(
+          builder: (_) => OnboardingScreen(
+            blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+            onVaultCreated: _onVaultCreated,
+          ),
+        ),
+      );
+    },
+    onSwitchToVault: (path, alias) {
+      _navigatorKey.currentState?.pushReplacement(
+        MaterialPageRoute(builder: (_) => _buildUnlockScreen(path, alias)),
+      );
+    },
+  );
 
   ThemeMode get _themeMode => switch (_settings.theme) {
     ThemeChoice.system => ThemeMode.system,

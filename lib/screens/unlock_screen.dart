@@ -7,6 +7,7 @@ import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
+import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 
 // ── Hex helpers ───────────────────────────────────────────────────────────────
@@ -219,8 +220,16 @@ class UnlockScreen extends StatefulWidget {
   /// Vault alias shown below the app title. Null = no alias displayed.
   final String? vaultAlias;
 
-  /// Called when the user taps the vault-switch icon. Null = icon hidden.
-  final VoidCallback? onSwitch;
+  /// Registry used to populate the vault dropdown when [showVaultList] is true.
+  final VaultRegistry? registry;
+
+  /// When true and [registry] has 2+ vaults, shows an inline dropdown above
+  /// the passphrase field so the user can pick which vault to unlock.
+  final bool showVaultList;
+
+  /// Called when the user selects a different vault from the dropdown.
+  /// Null → falls back to GabbroApp.maybeOf(context)?.switchToVault(…).
+  final void Function(String path, String alias)? onVaultSwitch;
 
   const UnlockScreen({
     super.key,
@@ -232,7 +241,9 @@ class UnlockScreen extends StatefulWidget {
     this.onUnlockWithYubikey = _defaultUnlockWithYubikey,
     this.onUnlockWithAnyYubikey = _defaultUnlockWithAnyYubikey,
     this.vaultAlias,
-    this.onSwitch,
+    this.registry,
+    this.showVaultList = false,
+    this.onVaultSwitch,
   });
 
   @override
@@ -249,13 +260,20 @@ class _UnlockScreenState extends State<UnlockScreen> {
   String? _errorMessage;
   EntropyResult? _entropy;
   late final List<YubikeyRecordData> _yubikeyRecords;
+  late String _selectedPath;
 
   bool get _isYubikeyMode => _yubikeyRecords.isNotEmpty;
+
+  bool get _showDropdown =>
+      widget.showVaultList &&
+      widget.registry != null &&
+      widget.registry!.records.length > 1;
 
   @override
   void initState() {
     super.initState();
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
+    _selectedPath = widget.vaultPath;
   }
 
   List<YubikeyRecordData> _detectYubikeyRecords() {
@@ -271,6 +289,18 @@ class _UnlockScreenState extends State<UnlockScreen> {
     _passphraseController.dispose();
     _pinController.dispose();
     super.dispose();
+  }
+
+  void _onDropdownChanged(String? path) {
+    if (path == null || path == _selectedPath) return;
+    final record =
+        widget.registry!.records.firstWhere((r) => r.path == path);
+    setState(() => _selectedPath = path);
+    if (widget.onVaultSwitch != null) {
+      widget.onVaultSwitch!(record.path, record.alias);
+    } else {
+      GabbroApp.maybeOf(context)?.switchToVault(record.path, record.alias);
+    }
   }
 
   Future<void> _unlock() async {
@@ -314,7 +344,6 @@ class _UnlockScreenState extends State<UnlockScreen> {
             builder: (context) => VaultListScreen(
               vaultPath: widget.vaultPath,
               vaultAlias: widget.vaultAlias,
-              onSwitch: widget.onSwitch,
             ),
           ),
         );
@@ -357,17 +386,6 @@ class _UnlockScreenState extends State<UnlockScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: widget.onSwitch != null
-          ? AppBar(
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.swap_horiz),
-                  tooltip: 'Switch vault',
-                  onPressed: widget.onSwitch,
-                ),
-              ],
-            )
-          : null,
       body: LayoutBuilder(
         builder: (context, constraints) => SingleChildScrollView(
           child: ConstrainedBox(
@@ -404,6 +422,22 @@ class _UnlockScreenState extends State<UnlockScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 48),
+                    if (_showDropdown) ...[
+                      DropdownButton<String>(
+                        isExpanded: true,
+                        value: _selectedPath,
+                        items: widget.registry!.records
+                            .map(
+                              (r) => DropdownMenuItem(
+                                value: r.path,
+                                child: Text(r.alias),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: _onDropdownChanged,
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                     TextField(
                       controller: _passphraseController,
                       autofocus: true,

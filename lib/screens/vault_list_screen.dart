@@ -106,7 +106,6 @@ Future<void> _defaultConfirmAnyYubikey(
 class VaultListScreen extends StatefulWidget {
   final String vaultPath;
   final String? vaultAlias;
-  final VoidCallback? onSwitch;
   final List<EntrySummaryData> Function() listEntries;
   final List<String> Function()? listFolders;
   final Future<void> Function() deleteVault;
@@ -136,7 +135,6 @@ class VaultListScreen extends StatefulWidget {
     super.key,
     required this.vaultPath,
     this.vaultAlias,
-    this.onSwitch,
     this.listEntries = listEntrySummaries,
     this.listFolders,
     this.deleteVault = _defaultDeleteVault,
@@ -739,6 +737,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
             ),
           ),
         );
+      case 'manage_vaults':
+        GabbroApp.maybeOf(context)?.navigateToManageVaults();
       case 'vault_delete':
         _deleteWholeVault();
       case 'generator':
@@ -992,14 +992,16 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
   void _lockAndExit() {
     lockVault();
-    final lockAppState = GabbroApp.of(context);
+    final appState = GabbroApp.of(context);
+    final settings = appState.settings;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => UnlockScreen(
           vaultPath: widget.vaultPath,
           vaultAlias: widget.vaultAlias,
-          blockPassphraseCopyPaste: lockAppState.settings.blockPassphraseCopyPaste,
-          onSwitch: widget.onSwitch,
+          blockPassphraseCopyPaste: settings.blockPassphraseCopyPaste,
+          registry: settings.showVaultList ? appState.registry : null,
+          showVaultList: settings.showVaultList,
         ),
       ),
     );
@@ -1118,12 +1120,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 ),
                 const PopupMenuDivider(),
                 const PopupMenuItem(
-                  enabled: false,
-                  value: 'vault_add',
+                  value: 'manage_vaults',
                   child: Row(children: [
-                    Icon(Icons.add, size: 20),
+                    Icon(Icons.folder_special_outlined, size: 20),
                     SizedBox(width: 12),
-                    Text('Add vault'),
+                    Expanded(child: Text('Manage vaults')),
                   ]),
                 ),
                 PopupMenuItem(

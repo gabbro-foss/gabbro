@@ -260,10 +260,6 @@ class OnboardingScreen extends StatefulWidget {
   /// Use this to add the new vault to the registry.
   final Future<void> Function(String path, String alias)? onVaultCreated;
 
-  /// Forwarded to the VaultListScreen shown after creation so the switch
-  /// button stays available throughout the session.
-  final VoidCallback? onSwitch;
-
   OnboardingScreen({
     super.key,
     this.initialPath,
@@ -275,7 +271,6 @@ class OnboardingScreen extends StatefulWidget {
     bool? isAndroid,
     this.onInitVaultWithYubikey = _defaultInitVaultWithYubikey,
     this.onVaultCreated,
-    this.onSwitch,
   }) : showYubikey = showYubikey ?? (Platform.isAndroid || Platform.isLinux),
        isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -450,7 +445,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             builder: (context) => VaultListScreen(
               vaultPath: _vaultPath,
               vaultAlias: _aliasController.text.trim(),
-              onSwitch: widget.onSwitch,
             ),
           ),
         );

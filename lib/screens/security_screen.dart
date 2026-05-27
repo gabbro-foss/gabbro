@@ -137,7 +137,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
               SectionHeader(label: 'Vault list'),
               const SizedBox(height: 4),
               const Text(
-                'Show all vaults on the login screen instead of only the last-used one.',
+                'Show a dropdown of all vaults on the login screen so you can '
+                'pick which one to unlock without going to Manage vaults.',
                 style: TextStyle(fontSize: 12),
               ),
               const SizedBox(height: 8),
@@ -147,6 +148,14 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 onChanged: (v) =>
                     _update(_settings.copyWith(showVaultList: v)),
                 contentPadding: EdgeInsets.zero,
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'High-security note: when this is OFF, the login screen shows '
+                'only the last-used vault — no hint that other vaults exist. '
+                'Trade-off: to switch vaults you must first unlock, then go to '
+                'Menu → Manage vaults.',
+                style: TextStyle(fontSize: 11),
               ),
               const SizedBox(height: 32),
 
