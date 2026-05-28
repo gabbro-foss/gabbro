@@ -152,7 +152,8 @@ gabbro/
 - YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2); minimum-2-keys enforcement (ADR-010, VERSION 4 vault format); multi-key unlock, vault delete, and change_passphrase YubiKey wiring (CTAP2 one-tap any-key); manage YubiKeys screen (add, remove, alias edit); hardware-validated on Linux and Android (USB + NFC)
 - Multiple vaults: registry (`vaults.jsonc`); alias + `VaultType` (`passphrase` | `yubikey`) stored per record (backward-compatible, defaults to `passphrase`); alias stored in VERSION 5 vault header; ManageVaultsScreen (add/rename/delete); delete is a 3-step flow for YubiKey-secured vaults (warning → type DELETE → PIN + YubiKey tap authorization); passphrase vaults use 2-step delete; Cancel always enabled at all steps; "Delete vault" removed from VaultListScreen settings menu — ManageVaultsScreen is the single delete point; `showVaultList=true` shows inline vault dropdown on login screen; `showVaultList=false` (default, high-security) shows only last-used vault with no switch UI; vault CRUD accessible post-authentication via Menu → Manage vaults
 - PIN visibility toggle (eye icon) on all YubiKey PIN fields
-- `GabbroLogo` widget: theme-aware PNG asset selection (dark/light/hc × icon-only/with-text); wired into UnlockScreen, AboutScreen, and Android splash (`launch_background.xml`)
+- `GabbroLogo` widget: theme-aware PNG asset selection (dark/light/hc × icon-only/with-text); wired into UnlockScreen, OnboardingScreen, AboutScreen, and Android splash (`launch_background.xml`)
+- Android launcher icons: square transparent-background PNGs at all mipmap densities (mdpi→xxxhdpi), generated from `assets/images/source/ic_launcher_light.svg` via `rsvg-convert`
 
 **Not yet implemented (see Bikeshed):**
 - Autofill save requests (`onSaveRequest`)
@@ -174,18 +175,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: visual QA on device / emulator
+### Next task: Multiple app languages (v1: en, fr, de, it, es)
 
-`GabbroLogo` is implemented and all tests pass. Before the next feature, do a quick visual check:
-
-1. Run the app on Android or Linux and confirm:
-   - UnlockScreen shows the logo (with wordmark) above the passphrase field
-   - AboutScreen shows the logo (with wordmark) at the top of the content
-   - Android splash briefly shows the launcher icon centred on white
-
-2. **Wordmark font check:** the `_with_text_` PNGs were generated with DejaVu Sans Mono Bold (sandbox default), not FiraCode. If the wordmark looks visually inconsistent with the app's FiraCode branding, regenerate those 4 PNGs with FiraCode Bold in a dedicated session and replace the assets.
-
-After QA, pick the next item from Bikeshed.
+All logo / launcher-icon visual QA passed on Linux and Android. Next feature: add localisation support for the five v1 languages.
 
 
 ---
@@ -218,7 +210,6 @@ After QA, pick the next item from Bikeshed.
 - read https://drive.proton.me/urls/11VHB59C60#CVCj696Qxkxd to see if any learnings can be transferred to gabbro to increase security
 
 ### Features & UX
-- Multiple app languages (v1: en,fr,de,it,es) — after Multiple Vaults.
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
