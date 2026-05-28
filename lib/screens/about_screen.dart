@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Hard-coded version string — updated manually when pubspec.yaml version
@@ -29,13 +30,7 @@ class AboutScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ── App identity ────────────────────────────────────────────
-              Text(
-                'Gabbro',
-                style: textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              Center(child: GabbroLogo(withText: true, width: 200)),
               const SizedBox(height: 4),
               Text(
                 'Version $_kAppVersion',

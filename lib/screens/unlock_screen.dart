@@ -8,6 +8,7 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/vault_registry.dart';
+import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 
 // ── Hex helpers ───────────────────────────────────────────────────────────────
@@ -400,11 +401,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                    Text(
-                      'Gabbro',
-                      style: Theme.of(context).textTheme.headlineLarge,
-                      textAlign: TextAlign.center,
-                    ),
+                    Center(child: GabbroLogo(withText: true, width: 200)),
                     if (widget.vaultAlias != null) ...[
                       const SizedBox(height: 4),
                       Text(

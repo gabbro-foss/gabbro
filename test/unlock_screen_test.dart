@@ -5,6 +5,7 @@ import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/vault_registry.dart';
+import 'package:gabbro/widgets/gabbro_logo.dart';
 
 // ── Fake entropy ──────────────────────────────────────────────────────────────
 
@@ -70,7 +71,7 @@ void main() {
   testWidgets('unlock screen renders key elements', (tester) async {
     await tester.pumpWidget(_buildScreen());
 
-    expect(find.text('Gabbro'), findsOneWidget);
+    expect(find.byType(GabbroLogo), findsOneWidget);
     expect(find.text('Unlock'), findsOneWidget);
     expect(find.byType(TextField), findsOneWidget);
   });
@@ -146,6 +147,7 @@ void main() {
 
     await tester.enterText(find.byType(TextField).first, 'anypassphrase');
     await tester.enterText(find.byType(TextField).last, '123456');
+    await tester.ensureVisible(find.text('Unlock'));
     await tester.tap(find.text('Unlock'));
     await tester.pumpAndSettle();
 
@@ -174,6 +176,7 @@ void main() {
 
     await tester.enterText(find.byType(TextField).first, 'anypassphrase');
     await tester.enterText(find.byType(TextField).last, '000000');
+    await tester.ensureVisible(find.text('Unlock'));
     await tester.tap(find.text('Unlock'));
     await tester.pumpAndSettle();
 
@@ -214,6 +217,7 @@ void main() {
 
     await tester.enterText(find.byType(TextField).first, 'anypassphrase');
     await tester.enterText(find.byType(TextField).last, '123456');
+    await tester.ensureVisible(find.text('Unlock'));
     await tester.tap(find.text('Unlock'));
     await tester.pumpAndSettle();
 
