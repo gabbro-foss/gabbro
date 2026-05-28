@@ -39,6 +39,21 @@ void main() {
       final r = VaultRecord.fromJson({'path': '/tmp/a.gabbro'});
       expect(r.lastUsedAt, DateTime.fromMillisecondsSinceEpoch(0));
     });
+
+    test('parses yubikey type', () {
+      final r = VaultRecord.fromJson({'path': '/tmp/a.gabbro', 'type': 'yubikey'});
+      expect(r.type, VaultType.yubikey);
+    });
+
+    test('defaults type to passphrase when missing', () {
+      final r = VaultRecord.fromJson({'path': '/tmp/a.gabbro'});
+      expect(r.type, VaultType.passphrase);
+    });
+
+    test('defaults type to passphrase for unknown value', () {
+      final r = VaultRecord.fromJson({'path': '/tmp/a.gabbro', 'type': 'unknown'});
+      expect(r.type, VaultType.passphrase);
+    });
   });
 
   // ── VaultRecord.toJson ──────────────────────────────────────────────────────
@@ -53,15 +68,17 @@ void main() {
     });
 
     test('round-trips through fromJson', () {
-      final original = _record(
+      final original = VaultRecord(
         path: '/p',
         alias: 'A',
         lastUsedAt: DateTime.parse('2026-05-01T10:00:00.000'),
+        type: VaultType.yubikey,
       );
       final restored = VaultRecord.fromJson(original.toJson());
       expect(restored.path, original.path);
       expect(restored.alias, original.alias);
       expect(restored.lastUsedAt, original.lastUsedAt);
+      expect(restored.type, VaultType.yubikey);
     });
   });
 

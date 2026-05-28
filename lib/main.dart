@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
+import 'package:gabbro/screens/vault_list_screen.dart' show confirmYubikey, confirmAnyYubikey;
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/frb_generated.dart';
@@ -288,10 +289,13 @@ class _GabbroAppState extends State<GabbroApp>
   // ── Registry helpers ───────────────────────────────────────────────────────
 
   Future<void> _onVaultCreated(String path, String alias) async {
+    List<YubikeyRecordData> ykRecords = [];
+    try { ykRecords = listVaultYubikeyRecords(path: path); } catch (_) {}
     final updated = _registry.add(VaultRecord(
       path: path,
       alias: alias,
       lastUsedAt: DateTime.now(),
+      type: ykRecords.isEmpty ? VaultType.passphrase : VaultType.yubikey,
     ));
     await updated.save();
     setState(() => _registry = updated);
@@ -378,6 +382,8 @@ class _GabbroAppState extends State<GabbroApp>
 
   ManageVaultsScreen _buildManageVaultsScreen() => ManageVaultsScreen(
     registry: _registry,
+    onConfirmYubikey: confirmYubikey,
+    onConfirmAnyYubikey: confirmAnyYubikey,
     onRename: (path, alias) async {
       final updated = _registry.updateAlias(path, alias);
       await updated.save();
@@ -389,14 +395,18 @@ class _GabbroAppState extends State<GabbroApp>
       if (file.existsSync()) await file.delete();
       final updated = _registry.remove(path);
       await updated.save();
-      setState(() => _registry = updated);
       if (isActive) {
+        // Direct field mutation — same reason as onActiveVaultDeleted: avoid
+        // setState racing with pushAndRemoveUntil navigation.
+        _registry = updated;
         try { lockVault(); } catch (_) {}
         final lastUsed = updated.lastUsed;
         if (lastUsed == null) {
           _navigatorKey.currentState?.pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (_) => OnboardingScreen(
+                postDeletionMessage:
+                    'Your vault has been deleted. Create a new one to continue.',
                 blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
                 onVaultCreated: _onVaultCreated,
               ),
@@ -411,6 +421,8 @@ class _GabbroAppState extends State<GabbroApp>
             (_) => false,
           );
         }
+      } else {
+        setState(() => _registry = updated);
       }
     },
     onAddVault: () {

@@ -18,16 +18,13 @@ import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/screens/generator_screen.dart';
 import 'package:gabbro/screens/manage_folders_screen.dart';
 import 'package:gabbro/screens/manage_yubikeys_screen.dart';
-import 'package:gabbro/screens/onboarding_screen.dart';
+
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
-import 'package:gabbro/widgets/segmented_row.dart';
-
-Future<void> _defaultDeleteVault() => deleteWholeVault();
 List<String> _defaultListFolders() => listFolders();
 Future<MergeSummary> _defaultMergeVault(String path, List<int> passphrase) =>
     mergeVaultFromFile(path: path, passphrase: passphrase);
@@ -44,7 +41,7 @@ const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
 String _toHex(List<int> bytes) =>
     bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
 
-Future<void> _defaultConfirmYubikey(
+Future<void> confirmYubikey(
   List<int> credentialId,
   List<int> salt,
   String pin,
@@ -72,7 +69,7 @@ Future<void> _defaultConfirmYubikey(
   );
 }
 
-Future<void> _defaultConfirmAnyYubikey(
+Future<void> confirmAnyYubikey(
   List<YubikeyRecordData> records,
   String pin,
   String transport,
@@ -108,7 +105,6 @@ class VaultListScreen extends StatefulWidget {
   final String? vaultAlias;
   final List<EntrySummaryData> Function() listEntries;
   final List<String> Function()? listFolders;
-  final Future<void> Function() deleteVault;
   final Future<MergeSummary> Function(String path, List<int> passphrase) mergeVault;
   final Future<String?> Function() onPickSyncFile;
 
@@ -122,22 +118,12 @@ class VaultListScreen extends StatefulWidget {
   /// construction time. Pass `[]` to force passphrase-only mode (tests).
   final List<YubikeyRecordData>? yubikeyRecords;
 
-  /// Called before deleting a single-key YubiKey-protected vault.
-  final Future<void> Function(List<int> credentialId, List<int> salt, String pin, String transport)
-      onConfirmYubikey;
-
-  /// Called before deleting a multi-key (2+) YubiKey-protected vault.
-  /// Sends all records in one FIDO2 assertion — one tap regardless of which key is inserted.
-  final Future<void> Function(List<YubikeyRecordData> records, String pin, String transport)
-      onConfirmAnyYubikey;
-
   const VaultListScreen({
     super.key,
     required this.vaultPath,
     this.vaultAlias,
     this.listEntries = listEntrySummaries,
     this.listFolders,
-    this.deleteVault = _defaultDeleteVault,
     this.mergeVault = _defaultMergeVault,
     this.onPickSyncFile = _defaultPickSyncFile,
     this.getEntryFn,
@@ -146,8 +132,6 @@ class VaultListScreen extends StatefulWidget {
     this.alphabetBarPosition,
     this.onAssignFolderFn,
     this.yubikeyRecords,
-    this.onConfirmYubikey = _defaultConfirmYubikey,
-    this.onConfirmAnyYubikey = _defaultConfirmAnyYubikey,
   });
 
   @override
@@ -176,7 +160,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
   bool _isImporting = false;
   bool _isSyncing = false;
   bool get _isSelecting => _selectionMode || _selectedIds.isNotEmpty;
-  String _transport = 'usb';
+  final String _transport = 'usb';
   late final List<YubikeyRecordData> _yubikeyRecords;
   bool get _isYubikeyVault => _yubikeyRecords.isNotEmpty;
 
@@ -739,8 +723,6 @@ class _VaultListScreenState extends State<VaultListScreen> {
         );
       case 'manage_vaults':
         GabbroApp.maybeOf(context)?.navigateToManageVaults();
-      case 'vault_delete':
-        _deleteWholeVault();
       case 'generator':
         Navigator.of(context).push(
           MaterialPageRoute(builder: (context) => const GeneratorScreen()),
@@ -763,234 +745,6 @@ class _VaultListScreenState extends State<VaultListScreen> {
         Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (context) => const AboutScreen()));
-    }
-  }
-
-  Future<void> _deleteWholeVault() async {
-    // Step 1 — warning confirmation
-    final step1 = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete vault?'),
-        content: Text(
-          _isYubikeyVault
-              ? 'This will permanently delete all entries and remove the YubiKey binding. This cannot be undone.'
-              : 'This will permanently delete all entries. This cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(ctx).colorScheme.error,
-            ),
-            child: const Text('Continue'),
-          ),
-        ],
-      ),
-    );
-    if (step1 != true) return;
-    if (!mounted) return;
-
-    // Step 2 — type DELETE to confirm
-    final confirmController = TextEditingController();
-    final step2 = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setState) => AlertDialog(
-          title: const Text('Are you sure?'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Type DELETE to confirm'),
-              const SizedBox(height: 12),
-              TextField(
-                key: const Key('delete_vault_confirm_field'),
-                controller: confirmController,
-                autofocus: true,
-                decoration: const InputDecoration(border: OutlineInputBorder()),
-                onChanged: (_) => setState(() {}),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: confirmController.text == 'DELETE'
-                  ? () => Navigator.of(ctx).pop(true)
-                  : null,
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(ctx).colorScheme.error,
-              ),
-              child: const Text('Confirm'),
-            ),
-          ],
-        ),
-      ),
-    );
-    // Dispose after dialog is fully closed and removed from the tree.
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => confirmController.dispose(),
-    );
-    if (step2 != true) return;
-    if (!mounted) return;
-
-    // Step 3 — YubiKey tap authorization (YubiKey vaults only)
-    if (_isYubikeyVault) {
-      final pinController = TextEditingController();
-      bool isAuthorizing = false;
-      String? authError;
-      String dialogTransport = _transport;
-
-      final step3 = await showDialog<bool>(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctx) => StatefulBuilder(
-          builder: (ctx, setState) => AlertDialog(
-            title: const Text('Touch your YubiKey'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Enter your PIN and touch your YubiKey to authorize this deletion.',
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  key: const Key('delete_vault_yubikey_pin_field'),
-                  controller: pinController,
-                  obscureText: true,
-                  autofocus: true,
-                  decoration: const InputDecoration(
-                    labelText: 'YubiKey PIN',
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (_) => setState(() {}),
-                ),
-                if (!Platform.isLinux) ...[
-                  const SizedBox(height: 12),
-                  SegmentedRow<String>(
-                    values: const ['usb', 'nfc'],
-                    selected: dialogTransport,
-                    label: (v) => v.toUpperCase(),
-                    onSelected: (v) => setState(() => dialogTransport = v),
-                  ),
-                ],
-                if (isAuthorizing) ...[
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Tap your YubiKey now…',
-                    style: TextStyle(fontSize: 12),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-                if (authError != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    authError!,
-                    style: TextStyle(
-                      color: Theme.of(ctx).colorScheme.error,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: isAuthorizing
-                    ? null
-                    : () => Navigator.of(ctx).pop(false),
-                child: const Text('Cancel'),
-              ),
-              TextButton(
-                onPressed: (isAuthorizing || pinController.text.isEmpty)
-                    ? null
-                    : () async {
-                        setState(() {
-                          isAuthorizing = true;
-                          authError = null;
-                        });
-                        try {
-                          if (_yubikeyRecords.length == 1) {
-                            final record = _yubikeyRecords.first;
-                            await widget.onConfirmYubikey(
-                              record.credentialId,
-                              record.salt,
-                              pinController.text,
-                              dialogTransport,
-                            );
-                          } else {
-                            await widget.onConfirmAnyYubikey(
-                              _yubikeyRecords,
-                              pinController.text,
-                              dialogTransport,
-                            );
-                          }
-                          if (ctx.mounted) Navigator.of(ctx).pop(true);
-                        } catch (e) {
-                          if (ctx.mounted) {
-                            setState(() {
-                              isAuthorizing = false;
-                              authError = switch (e) {
-                                PlatformException(code: 'TRANSPORT_ERROR') =>
-                                  e.message ?? 'Transport error.',
-                                PlatformException(code: 'NO_FIDO2_DEVICE') =>
-                                  e.message ?? 'No FIDO2 device found. Insert your YubiKey and try again.',
-                                _ => 'Authorization failed — check your PIN and try again.',
-                              };
-                            });
-                          }
-                        }
-                      },
-                style: TextButton.styleFrom(
-                  foregroundColor: Theme.of(ctx).colorScheme.error,
-                ),
-                child: isAuthorizing
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Authorize'),
-              ),
-            ],
-          ),
-        ),
-      );
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => pinController.dispose(),
-      );
-      if (mounted) setState(() => _transport = dialogTransport);
-      if (step3 != true) return;
-      if (!mounted) return;
-    }
-
-    await widget.deleteVault();
-    if (!mounted) return;
-
-    final appState = GabbroApp.maybeOf(context);
-    if (appState != null) {
-      appState.onActiveVaultDeleted(widget.vaultPath);
-    } else {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => OnboardingScreen(
-            initialPath: widget.vaultPath,
-            postDeletionMessage:
-                'Your vault has been deleted. Create a new one to continue.',
-            blockPassphraseCopyPaste: true,
-          ),
-        ),
-        (_) => false,
-      );
     }
   }
 
@@ -1133,17 +887,6 @@ class _VaultListScreenState extends State<VaultListScreen> {
                     Icon(Icons.folder_special_outlined, size: 20),
                     SizedBox(width: 12),
                     Expanded(child: Text('Manage vaults')),
-                  ]),
-                ),
-                PopupMenuItem(
-                  value: 'vault_delete',
-                  child: Row(children: [
-                    Icon(Icons.delete_forever_outlined, size: 20,
-                        color: Theme.of(context).colorScheme.error),
-                    const SizedBox(width: 12),
-                    Text('Delete vault',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.error)),
                   ]),
                 ),
                 const PopupMenuDivider(),

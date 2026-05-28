@@ -1,15 +1,27 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/vault_registry.dart';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-VaultRecord _record({String path = '/tmp/test.gabbro', String alias = 'Test'}) =>
+VaultRecord _record({
+  String path = '/tmp/test.gabbro',
+  String alias = 'Test',
+  VaultType type = VaultType.passphrase,
+}) =>
     VaultRecord(
       path: path,
       alias: alias,
       lastUsedAt: DateTime.fromMillisecondsSinceEpoch(0),
+      type: type,
+    );
+
+YubikeyRecordData _fakeYkRecord() => YubikeyRecordData(
+      credentialId: Uint8List.fromList([1, 2, 3, 4]),
+      salt: Uint8List(32),
     );
 
 Widget _buildScreen({
@@ -18,6 +30,9 @@ Widget _buildScreen({
   Future<void> Function(String path)? onDelete,
   VoidCallback? onAddVault,
   void Function(String path, String alias)? onSwitchToVault,
+  Future<void> Function(List<int>, List<int>, String, String)? onConfirmYubikey,
+  Future<void> Function(List<YubikeyRecordData>, String, String)? onConfirmAnyYubikey,
+  List<YubikeyRecordData> Function(String path)? listYubikeyRecords,
 }) =>
     MaterialApp(
       home: ManageVaultsScreen(
@@ -26,6 +41,9 @@ Widget _buildScreen({
         onDelete: onDelete ?? (_) async {},
         onAddVault: onAddVault ?? () {},
         onSwitchToVault: onSwitchToVault ?? (_, _) {},
+        onConfirmYubikey: onConfirmYubikey ?? (_, _, _, _) async {},
+        onConfirmAnyYubikey: onConfirmAnyYubikey ?? (_, _, _) async {},
+        listYubikeyRecords: listYubikeyRecords ?? (_) => [],
       ),
     );
 
@@ -331,6 +349,129 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Alpha'), findsNothing);
       expect(find.text('Beta'), findsOneWidget);
+    });
+  });
+
+  // ── YubiKey delete flow ───────────────────────────────────────────────────
+
+  Future<void> throughStep2(WidgetTester tester) async {
+    await tester.tap(find.byIcon(Icons.delete_outlined).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('delete_vault_confirm_field')),
+      'DELETE',
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Confirm'));
+    await tester.pumpAndSettle();
+  }
+
+  group('YubiKey delete step 3', () {
+    final ykRegistry = VaultRegistry([
+      _record(path: '/tmp/a.gabbro', alias: 'Alpha', type: VaultType.yubikey),
+      _record(path: '/tmp/b.gabbro', alias: 'Beta'),
+    ]);
+
+    testWidgets('step 1 mentions YubiKey binding for YubiKey vault', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        registry: ykRegistry,
+        listYubikeyRecords: (_) => [_fakeYkRecord()],
+      ));
+      await tester.tap(find.byIcon(Icons.delete_outlined).first);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('YubiKey binding'), findsOneWidget);
+    });
+
+    testWidgets('step 1 does not mention YubiKey for passphrase vault', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        registry: ykRegistry,
+        listYubikeyRecords: (_) => [],
+      ));
+      await tester.tap(find.byIcon(Icons.delete_outlined).first);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('YubiKey'), findsNothing);
+    });
+
+    testWidgets('shows step 3 YubiKey dialog after step 2 for YubiKey vault', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        registry: ykRegistry,
+        listYubikeyRecords: (_) => [_fakeYkRecord()],
+      ));
+      await throughStep2(tester);
+      expect(find.text('Touch your YubiKey'), findsOneWidget);
+      expect(
+        find.text('Enter your PIN and touch your YubiKey to authorize this deletion.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('passphrase vault skips step 3', (tester) async {
+      var deleteCalled = false;
+      await tester.pumpWidget(_buildScreen(
+        registry: ykRegistry,
+        listYubikeyRecords: (_) => [],
+        onDelete: (_) async => deleteCalled = true,
+      ));
+      await throughStep2(tester);
+      expect(find.text('Touch your YubiKey'), findsNothing);
+      expect(deleteCalled, isTrue);
+    });
+
+    testWidgets('single-key: calls onConfirmYubikey then onDelete on authorize', (tester) async {
+      bool confirmCalled = false;
+      bool deleteCalled = false;
+      await tester.pumpWidget(_buildScreen(
+        registry: ykRegistry,
+        listYubikeyRecords: (_) => [_fakeYkRecord()],
+        onConfirmYubikey: (_, _, _, _) async => confirmCalled = true,
+        onDelete: (_) async => deleteCalled = true,
+      ));
+      await throughStep2(tester);
+      await tester.enterText(
+        find.byKey(const Key('delete_vault_yubikey_pin_field')),
+        '123456',
+      );
+      await tester.pump();
+      await tester.tap(find.widgetWithText(TextButton, 'Authorize'));
+      await tester.pumpAndSettle();
+      expect(confirmCalled, isTrue);
+      expect(deleteCalled, isTrue);
+    });
+
+    testWidgets('multi-key: calls onConfirmAnyYubikey then onDelete on authorize', (tester) async {
+      bool confirmAnyCalled = false;
+      bool deleteCalled = false;
+      await tester.pumpWidget(_buildScreen(
+        registry: ykRegistry,
+        listYubikeyRecords: (_) => [_fakeYkRecord(), _fakeYkRecord()],
+        onConfirmAnyYubikey: (_, _, _) async => confirmAnyCalled = true,
+        onDelete: (_) async => deleteCalled = true,
+      ));
+      await throughStep2(tester);
+      await tester.enterText(
+        find.byKey(const Key('delete_vault_yubikey_pin_field')),
+        '123456',
+      );
+      await tester.pump();
+      await tester.tap(find.widgetWithText(TextButton, 'Authorize'));
+      await tester.pumpAndSettle();
+      expect(confirmAnyCalled, isTrue);
+      expect(deleteCalled, isTrue);
+    });
+
+    testWidgets('cancelling step 3 does not call onDelete', (tester) async {
+      var deleteCalled = false;
+      await tester.pumpWidget(_buildScreen(
+        registry: ykRegistry,
+        listYubikeyRecords: (_) => [_fakeYkRecord()],
+        onDelete: (_) async => deleteCalled = true,
+      ));
+      await throughStep2(tester);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(deleteCalled, isFalse);
     });
   });
 }

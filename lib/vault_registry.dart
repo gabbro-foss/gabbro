@@ -2,28 +2,34 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
+enum VaultType { passphrase, yubikey }
+
 class VaultRecord {
   final String path;
   final String alias;
   final DateTime lastUsedAt;
+  final VaultType type;
 
   VaultRecord({
     required this.path,
     required this.alias,
     required this.lastUsedAt,
+    this.type = VaultType.passphrase,
   });
 
-  VaultRecord copyWith({String? path, String? alias, DateTime? lastUsedAt}) =>
+  VaultRecord copyWith({String? path, String? alias, DateTime? lastUsedAt, VaultType? type}) =>
       VaultRecord(
         path: path ?? this.path,
         alias: alias ?? this.alias,
         lastUsedAt: lastUsedAt ?? this.lastUsedAt,
+        type: type ?? this.type,
       );
 
   Map<String, dynamic> toJson() => {
     'path': path,
     'alias': alias,
     'last_used_at': lastUsedAt.toIso8601String(),
+    'type': type.name,
   };
 
   factory VaultRecord.fromJson(Map<String, dynamic> json) => VaultRecord(
@@ -32,6 +38,10 @@ class VaultRecord {
     lastUsedAt: json['last_used_at'] != null
         ? DateTime.parse(json['last_used_at'] as String)
         : DateTime.fromMillisecondsSinceEpoch(0),
+    type: VaultType.values.firstWhere(
+      (e) => e.name == (json['type'] as String? ?? ''),
+      orElse: () => VaultType.passphrase,
+    ),
   );
 }
 

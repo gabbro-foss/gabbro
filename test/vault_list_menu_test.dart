@@ -7,7 +7,6 @@ Widget _buildScreen() => MaterialApp(
       home: VaultListScreen(
         vaultPath: '/tmp/test.gabbro',
         listEntries: () => <EntrySummaryData>[],
-        deleteVault: () async {},
       ),
     );
 
@@ -27,8 +26,7 @@ void main() {
           vaultPath: '/tmp/test.gabbro',
           vaultAlias: 'My Vault',
           listEntries: () => <EntrySummaryData>[],
-          deleteVault: () async {},
-        ),
+          ),
       ));
       await _setNarrow(tester);
       await tester.pumpAndSettle();
@@ -56,7 +54,6 @@ void main() {
       expect(find.text('Import entries'), findsOneWidget);
       expect(find.text('Sync from file'), findsOneWidget);
       expect(find.text('Manage vaults'), findsOneWidget);
-      expect(find.text('Delete vault'), findsOneWidget);
       expect(find.text('Change passphrase'), findsOneWidget);
       expect(find.text('Manage YubiKeys'), findsOneWidget);
       expect(find.text('Appearance'), findsOneWidget);
@@ -88,7 +85,7 @@ void main() {
       }
     });
 
-    testWidgets('delete vault icon uses error colour', (tester) async {
+    testWidgets('Delete vault item is not present', (tester) async {
       await tester.pumpWidget(_buildScreen());
       await _setNarrow(tester);
       await tester.pumpAndSettle();
@@ -96,18 +93,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.menu));
       await tester.pumpAndSettle();
 
-      final deleteItem = find.ancestor(
-        of: find.text('Delete vault'),
-        matching: find.byType(PopupMenuItem<String>),
-      );
-      expect(deleteItem, findsOneWidget);
-
-      final icon = tester.widget<Icon>(
-        find.descendant(of: deleteItem, matching: find.byType(Icon)).first,
-      );
-      final expectedColor =
-          Theme.of(tester.element(deleteItem)).colorScheme.error;
-      expect(icon.color, expectedColor);
+      expect(find.text('Delete vault'), findsNothing);
     });
   });
 }

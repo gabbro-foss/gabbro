@@ -28,7 +28,6 @@ Widget _buildScreen({
       home: VaultListScreen(
         vaultPath: '/tmp/test.gabbro',
         listEntries: () => [],
-        deleteVault: () async {},
         yubikeyRecords: [],
         onPickSyncFile: () async => pickedPath,
         mergeVault: mergeVault,
