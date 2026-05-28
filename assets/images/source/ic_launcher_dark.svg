@@ -1,0 +1,13 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(0.8825,0,0,0.8825,18.23,5)">
+    <polygon points="0,40 24,40 24,96 10,102 0,90"         fill="#484844"/>
+    <polygon points="24,40 52,40 52,96 24,96"              fill="#5A5A56"/>
+    <polygon points="52,40 62,40 72,48 72,96 58,102 52,96" fill="#6C6860"/>
+    <polygon points="0,12 18,0 24,0 24,40 0,40"            fill="#3E6030"/>
+    <polygon points="24,0 52,0 52,40 24,40"                fill="#5C7A3E"/>
+    <polygon points="52,0 62,0 62,40 52,40"                fill="#8ABE64"/>
+    <line x1="24" y1="0" x2="24" y2="96" stroke="#2a2a28" stroke-width="0.9" opacity="0.6"/>
+    <line x1="52" y1="0" x2="52" y2="96" stroke="#888480" stroke-width="0.7" opacity="0.5"/>
+    <circle cx="38" cy="72" r="9" fill="none" stroke="#D4AA55" stroke-width="2.2"/><circle cx="38" cy="72" r="3.5" fill="#D4AA55"/>
+  </g>
+</svg>

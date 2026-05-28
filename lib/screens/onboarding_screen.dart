@@ -9,6 +9,7 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 import 'package:path_provider/path_provider.dart';
@@ -728,11 +729,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(
-                            'Gabbro',
-                            style: Theme.of(context).textTheme.headlineLarge,
-                            textAlign: TextAlign.center,
-                          ),
+                          Center(child: GabbroLogo(withText: true, width: 200)),
                           const SizedBox(height: 8),
                           if (widget.postDeletionMessage != null) ...[
                             Container(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
+import 'package:gabbro/widgets/gabbro_logo.dart';
 
 // ── Fake entropy ──────────────────────────────────────────────────────────────
 
@@ -43,7 +44,7 @@ void main() {
   testWidgets('onboarding screen renders key elements', (tester) async {
     await tester.pumpWidget(_buildScreen());
 
-    expect(find.text('Gabbro'), findsOneWidget);
+    expect(find.byType(GabbroLogo), findsOneWidget);
     expect(find.text('Create vault'), findsOneWidget);
   });
 
@@ -171,20 +172,22 @@ void main() {
     expect(find.widgetWithText(TextFormField, 'Primary key PIN'), findsNothing);
     expect(find.widgetWithText(TextFormField, 'Backup key PIN'), findsNothing);
 
+    await tester.ensureVisible(find.byType(SwitchListTile));
     await tester.tap(find.byType(SwitchListTile));
     await tester.pump();
 
-    expect(find.widgetWithText(TextFormField, 'Primary key PIN'), findsOneWidget);
-    expect(find.widgetWithText(TextFormField, 'Backup key PIN'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'Primary key PIN', skipOffstage: false), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'Backup key PIN', skipOffstage: false), findsOneWidget);
   });
 
   testWidgets('slow-vault warning shown when yubikey toggle enabled', (tester) async {
     await tester.pumpWidget(_buildScreen(isAndroid: true));
 
+    await tester.ensureVisible(find.byType(SwitchListTile));
     await tester.tap(find.byType(SwitchListTile));
     await tester.pump();
 
-    expect(find.textContaining('20'), findsOneWidget);
+    expect(find.textContaining('20', skipOffstage: false), findsOneWidget);
   });
 
   testWidgets('per-key pins are passed separately to onInitVaultWithYubikey',
