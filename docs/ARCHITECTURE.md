@@ -149,7 +149,8 @@ gabbro/
 - Copy/paste blocking on master passphrase fields (default on; user toggle in Settings → Security; keyboard inline paste is a platform limitation, documented in UI)
 - Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
 - YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2); minimum-2-keys enforcement (ADR-010, VERSION 4 vault format); multi-key unlock, vault delete, and change_passphrase YubiKey wiring (CTAP2 one-tap any-key); manage YubiKeys screen (add, remove, alias edit); hardware-validated on Linux and Android (USB + NFC)
-- Multiple vaults: registry (`vaults.jsonc`); alias stored in VERSION 5 vault header; ManageVaultsScreen (add/rename/delete with file deletion + registry removal); `showVaultList=true` shows inline vault dropdown on login screen; `showVaultList=false` (default, high-security) shows only last-used vault with no switch UI; vault CRUD accessible post-authentication via Menu → Manage vaults
+- Multiple vaults: registry (`vaults.jsonc`); alias + `VaultType` (`passphrase` | `yubikey`) stored per record (backward-compatible, defaults to `passphrase`); alias stored in VERSION 5 vault header; ManageVaultsScreen (add/rename/delete); delete is a 3-step flow for YubiKey-secured vaults (warning → type DELETE → PIN + YubiKey tap authorization); passphrase vaults use 2-step delete; Cancel always enabled at all steps; "Delete vault" removed from VaultListScreen settings menu — ManageVaultsScreen is the single delete point; `showVaultList=true` shows inline vault dropdown on login screen; `showVaultList=false` (default, high-security) shows only last-used vault with no switch UI; vault CRUD accessible post-authentication via Menu → Manage vaults
+- PIN visibility toggle (eye icon) on all YubiKey PIN fields
 
 **Not yet implemented (see Bikeshed):**
 - Autofill save requests (`onSaveRequest`)
@@ -160,7 +161,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 426 | 0 |
+| Flutter (`flutter test`) | 422 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -171,45 +172,32 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Multiple Vaults — fixes from hardware test rounds 2, 3, 4; re-test needed
+### Multiple Vaults — hardware test on Android (round 6)
 
-**Bug fixes applied (round 2 + 3 + 4):**
-- VaultListScreen AppBar shows `Gabbro - [alias]` (was hardcoded `'Gabbro'`).
-- ManageVaultsScreen delete: upgraded to 2-step confirmation matching VaultListScreen flow (Continue → type DELETE → Confirm).
-- ManageVaultsScreen delete active vault: `isActive` check now uses `_registry.lastUsed?.path` (was `_activeVaultPath` which could be stale); `_activeVaultPath` field removed.
-- OnboardingScreen: cancel/close button shown in top-left when pushed onto navigation stack; hidden at root (first-run) to avoid confusion.
-- VaultListScreen "Delete vault" menu: now calls `GabbroAppState.onActiveVaultDeleted` which removes from registry and routes to next vault's unlock screen (was always routing to OnboardingScreen).
-- Duplicate vault alias: OnboardingScreen and ManageVaultsScreen rename dialog both reject duplicate aliases.
-- `onActiveVaultDeleted` in `_GabbroAppState`: replaced `setState(() => _registry = updated)` with direct field mutation `_registry = updated` — the previous `setState` triggered a `_buildHome()` rebuild that provided an OnboardingScreen WITHOUT `postDeletionMessage` as MaterialApp's `home`, racing with the `pushAndRemoveUntil` route that had the message.
+**Changes applied since last hardware test:**
+- `VaultType` enum (`passphrase` | `yubikey`) added to `VaultRegistry` / `VaultRecord`; persisted as `type` field in `vaults.jsonc`; `fromJson` defaults to `passphrase` (backward-compatible).
+- "Delete vault" removed from `VaultListScreen` settings menu — vault deletion consolidated into `ManageVaultsScreen`.
+- `ManageVaultsScreen` delete: new step 3 for YubiKey-secured vaults — PIN entry (with visibility toggle) + USB/NFC selector (Android only) + YubiKey tap authorization; calls `onConfirmYubikey` (single key) or `onConfirmAnyYubikey` (multi-key).
+- Cancel always enabled at all steps of the delete flow (including during YubiKey authorization in-flight).
+- `confirmYubikey` / `confirmAnyYubikey` made top-level public in `vault_list_screen.dart`; imported via `show` in `main.dart`.
+- PIN visibility toggle (eye icon) added to all YubiKey PIN fields.
+- `_buildManageVaultsScreen().onDelete`: when deleted vault is active, uses direct field mutation (not `setState`) + passes `postDeletionMessage` to `OnboardingScreen` to avoid setState/navigation race.
 
-**Agreed design decisions:** _(unchanged from round 1)_
-- One vault active at a time (lock → switch → unlock). No Rust session refactor.
-- Alias stored in the `.gabbro` plaintext header (VERSION 5 format bump). Also kept in Flutter registry.
-- `showVaultList=false` (default, high-security): login screen shows only last-used vault. No switch button.
-- `showVaultList=true`: inline dropdown on login screen for quick vault switching.
-- ManageVaultsScreen (authenticated, Menu → Manage vaults): full CRUD — add (→ onboarding with cancel + duplicate-alias guard), rename alias (duplicate-alias guard), delete (2-step confirm → delete file + remove registry), switch to vault.
+#### Hardware re-test checklist (round 6)
+1. Delete last vault via Manage Vaults → Delete (2-step confirm): → OnboardingScreen shows deletion banner.
+2. Delete YubiKey-secured vault from Manage Vaults: step 3 appears; requires PIN + tap to authorize.
+3. Cancel at step 3 does not delete the vault.
+4. Wrong PIN at step 3 shows error and allows retry; vault not deleted.
+5. Delete passphrase-secured vault: step 3 is skipped; vault deleted as before.
+6. PIN visibility toggle works on step 3 YubiKey dialog.
+7. "Delete vault" option no longer appears in VaultListScreen settings menu.
+8. VaultListScreen AppBar shows `Gabbro - [alias]`.
+9. Add vault: alias field rejects a name already used by another vault.
+10. Rename vault: rename dialog rejects alias already used by another vault.
 
-#### Hardware re-test checklist (round 4)
-1. VaultListScreen AppBar shows `Gabbro - [alias]`.
-2. Add vault: alias field rejects a name already used by another vault.
-3. Rename vault: rename dialog rejects alias already used by another vault.
-4. Delete vault via menu (non-active): → routes to next vault's unlock screen (not onboarding).
-5. Delete vault via menu (last vault): → routes to onboarding WITH post-deletion message (was missing — round 4 fix).
-6. All previously passing items 1–8 from round 1 still pass.
+Hardware test round 6 results:
 
-Hardware test round 4 results:
 
-  1. pass
-  2. pass
-  3. pass
-  4. bad test again - delete an non active vault goes correctly back to active vault list screen -
-  remove this test
-  5. fail: what message do you expect? all I see is onboarding screen with "create your vault to get
-  started"
-
-  document this so that the next claude.code instance can continue. We're going to end this session
-  here.
-  
 ---
 
 ## Build Environment
