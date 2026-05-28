@@ -172,30 +172,18 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Multiple Vaults — hardware test on Android (round 6)
+### Hardware test round 6 results (2026-05-28, Android)
 
-**Changes applied since last hardware test:**
-- `VaultType` enum (`passphrase` | `yubikey`) added to `VaultRegistry` / `VaultRecord`; persisted as `type` field in `vaults.jsonc`; `fromJson` defaults to `passphrase` (backward-compatible).
-- "Delete vault" removed from `VaultListScreen` settings menu — vault deletion consolidated into `ManageVaultsScreen`.
-- `ManageVaultsScreen` delete: new step 3 for YubiKey-secured vaults — PIN entry (with visibility toggle) + USB/NFC selector (Android only) + YubiKey tap authorization; calls `onConfirmYubikey` (single key) or `onConfirmAnyYubikey` (multi-key).
-- Cancel always enabled at all steps of the delete flow (including during YubiKey authorization in-flight).
-- `confirmYubikey` / `confirmAnyYubikey` made top-level public in `vault_list_screen.dart`; imported via `show` in `main.dart`.
-- PIN visibility toggle (eye icon) added to all YubiKey PIN fields.
-- `_buildManageVaultsScreen().onDelete`: when deleted vault is active, uses direct field mutation (not `setState`) + passes `postDeletionMessage` to `OnboardingScreen` to avoid setState/navigation race.
+All 10 items passed.
 
-#### Hardware re-test checklist (round 6)
-1. Delete last vault via Manage Vaults → Delete (2-step confirm): → OnboardingScreen shows deletion banner.
-2. Delete YubiKey-secured vault from Manage Vaults: step 3 appears; requires PIN + tap to authorize.
-3. Cancel at step 3 does not delete the vault.
-4. Wrong PIN at step 3 shows error and allows retry; vault not deleted.
-5. Delete passphrase-secured vault: step 3 is skipped; vault deleted as before.
-6. PIN visibility toggle works on step 3 YubiKey dialog.
-7. "Delete vault" option no longer appears in VaultListScreen settings menu.
-8. VaultListScreen AppBar shows `Gabbro - [alias]`.
-9. Add vault: alias field rejects a name already used by another vault.
-10. Rename vault: rename dialog rejects alias already used by another vault.
+---
 
-Hardware test round 6 results:
+### Next task: App logo design
+
+Design an app logo for Gabbro (OnboardingScreen, UnlockScreen).
+- The logo should reflect the "hard, stable, enduring" identity of the rock.
+- Required sizes: launcher icon, notification icon, about screen graphic.
+- Defer implementation into Flutter until the design is signed off.
 
 
 ---
@@ -229,7 +217,6 @@ Hardware test round 6 results:
 
 ### Features & UX
 - Multiple app languages (v1: en,fr,de,it,es) — after Multiple Vaults.
-- App logo (OnboardingScreen, UnlockScreen) — defer until designed.
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
