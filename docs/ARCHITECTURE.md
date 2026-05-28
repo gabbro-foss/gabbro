@@ -172,18 +172,37 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Hardware test round 6 results (2026-05-28, Android)
+### Next task: GabbroLogo widget + splash screen
 
-All 10 items passed.
+Logo design is complete and signed off. Assets are committed. Next session implements the logo in Flutter.
 
----
+**What is done:**
+- All PNG assets committed to `assets/images/` (13 files)
+- SVG masters (source of truth) in `assets/images/source/` (4 files)
+- Android launcher icons replaced in `android/app/src/main/res/mipmap-*/ic_launcher.png`
+- `pubspec.yaml` updated: `assets/images/` declared
 
-### Next task: App logo design
+**What Claude Code needs to implement:**
 
-Design an app logo for Gabbro (OnboardingScreen, UnlockScreen).
-- The logo should reflect the "hard, stable, enduring" identity of the rock.
-- Required sizes: launcher icon, notification icon, about screen graphic.
-- Defer implementation into Flutter until the design is signed off.
+1. `GabbroLogo` widget (`lib/widgets/gabbro_logo.dart`)
+   - `Image.asset()` with variant selection
+   - Picks correct PNG based on `Theme.of(context).brightness` and `MediaQuery.of(context).highContrast`
+   - Two modes: `withText` (uses `_with_text_192.png`) and icon-only (uses `_192.png` or `_96.png`)
+   - Asset paths:
+     - `assets/images/logo_dark_with_text_192.png`
+     - `assets/images/logo_light_with_text_192.png`
+     - `assets/images/logo_hc_dark_with_text_192.png`
+     - `assets/images/logo_hc_light_with_text_192.png`
+     - `assets/images/logo_dark_192.png`
+     - `assets/images/logo_light_192.png`
+     - `assets/images/logo_hc_dark_192.png`
+     - `assets/images/logo_hc_light_192.png`
+
+2. Wire `GabbroLogo` into `UnlockScreen` and onboarding/about screens
+
+3. Update `android/app/src/main/res/drawable/launch_background.xml` to show Gabbro icon on splash
+
+**Note on wordmark font:** `_with_text_` PNGs use DejaVu Sans Mono Bold (sandbox default) not FiraCode. Check visually on device — if it looks off, regenerate with FiraCode in a dedicated session.
 
 
 ---
