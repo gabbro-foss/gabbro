@@ -61,6 +61,7 @@ gabbro/
 │   │   ├── path_field.dart
 │   │   ├── segmented_row.dart
 │   │   ├── generator_widget.dart
+│   │   ├── gabbro_logo.dart
 │   │   └── password_breakdown_sheet.dart
 │   ├── settings.dart
 │   ├── vault_registry.dart
@@ -151,6 +152,7 @@ gabbro/
 - YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2); minimum-2-keys enforcement (ADR-010, VERSION 4 vault format); multi-key unlock, vault delete, and change_passphrase YubiKey wiring (CTAP2 one-tap any-key); manage YubiKeys screen (add, remove, alias edit); hardware-validated on Linux and Android (USB + NFC)
 - Multiple vaults: registry (`vaults.jsonc`); alias + `VaultType` (`passphrase` | `yubikey`) stored per record (backward-compatible, defaults to `passphrase`); alias stored in VERSION 5 vault header; ManageVaultsScreen (add/rename/delete); delete is a 3-step flow for YubiKey-secured vaults (warning → type DELETE → PIN + YubiKey tap authorization); passphrase vaults use 2-step delete; Cancel always enabled at all steps; "Delete vault" removed from VaultListScreen settings menu — ManageVaultsScreen is the single delete point; `showVaultList=true` shows inline vault dropdown on login screen; `showVaultList=false` (default, high-security) shows only last-used vault with no switch UI; vault CRUD accessible post-authentication via Menu → Manage vaults
 - PIN visibility toggle (eye icon) on all YubiKey PIN fields
+- `GabbroLogo` widget: theme-aware PNG asset selection (dark/light/hc × icon-only/with-text); wired into UnlockScreen, AboutScreen, and Android splash (`launch_background.xml`)
 
 **Not yet implemented (see Bikeshed):**
 - Autofill save requests (`onSaveRequest`)
@@ -161,7 +163,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 422 | 0 |
+| Flutter (`flutter test`) | 437 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -172,37 +174,18 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: GabbroLogo widget + splash screen
+### Next task: visual QA on device / emulator
 
-Logo design is complete and signed off. Assets are committed. Next session implements the logo in Flutter.
+`GabbroLogo` is implemented and all tests pass. Before the next feature, do a quick visual check:
 
-**What is done:**
-- All PNG assets committed to `assets/images/` (13 files)
-- SVG masters (source of truth) in `assets/images/source/` (4 files)
-- Android launcher icons replaced in `android/app/src/main/res/mipmap-*/ic_launcher.png`
-- `pubspec.yaml` updated: `assets/images/` declared
+1. Run the app on Android or Linux and confirm:
+   - UnlockScreen shows the logo (with wordmark) above the passphrase field
+   - AboutScreen shows the logo (with wordmark) at the top of the content
+   - Android splash briefly shows the launcher icon centred on white
 
-**What Claude Code needs to implement:**
+2. **Wordmark font check:** the `_with_text_` PNGs were generated with DejaVu Sans Mono Bold (sandbox default), not FiraCode. If the wordmark looks visually inconsistent with the app's FiraCode branding, regenerate those 4 PNGs with FiraCode Bold in a dedicated session and replace the assets.
 
-1. `GabbroLogo` widget (`lib/widgets/gabbro_logo.dart`)
-   - `Image.asset()` with variant selection
-   - Picks correct PNG based on `Theme.of(context).brightness` and `MediaQuery.of(context).highContrast`
-   - Two modes: `withText` (uses `_with_text_192.png`) and icon-only (uses `_192.png` or `_96.png`)
-   - Asset paths:
-     - `assets/images/logo_dark_with_text_192.png`
-     - `assets/images/logo_light_with_text_192.png`
-     - `assets/images/logo_hc_dark_with_text_192.png`
-     - `assets/images/logo_hc_light_with_text_192.png`
-     - `assets/images/logo_dark_192.png`
-     - `assets/images/logo_light_192.png`
-     - `assets/images/logo_hc_dark_192.png`
-     - `assets/images/logo_hc_light_192.png`
-
-2. Wire `GabbroLogo` into `UnlockScreen` and onboarding/about screens
-
-3. Update `android/app/src/main/res/drawable/launch_background.xml` to show Gabbro icon on splash
-
-**Note on wordmark font:** `_with_text_` PNGs use DejaVu Sans Mono Bold (sandbox default) not FiraCode. Check visually on device — if it looks off, regenerate with FiraCode in a dedicated session.
+After QA, pick the next item from Bikeshed.
 
 
 ---
