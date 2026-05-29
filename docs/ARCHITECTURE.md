@@ -253,6 +253,7 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 
 ### Features & UX
 - Fix: Password detail view does not scale with text size, verify and fix. If working correctly, bumpy size up in detail view
+- Fix: yubico OTP NFC currently needs to be disabled to avoid opening demo.yubico/yk when using NFC, this needs fixing before a partnership with yubico can be sought
 - Add tutorial/onboarding: probably in the README as snapshots from linux/emulator
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
