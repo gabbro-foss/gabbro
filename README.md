@@ -4,7 +4,7 @@ A post-quantum password manager built with security as core DNA.
 
 > **Status: Rust backend complete — Flutter UI complete.**
 > All vault operations are implemented and tested in Rust (338 tests passing).
-> Flutter UI implemented (437 tests passing).
+> Flutter UI implemented (447 tests passing).
 
 ---
 
@@ -28,6 +28,7 @@ Named after the intrusive igneous rock — hard, stable, enduring.
   Rust; secrets never cross the Flutter/Rust bridge in plaintext
 - **Local-first** — your vault lives on your device; sync is your
   choice and your responsibility
+- **Localised** — UI available in English, French, German, Italian, and Spanish; follows system locale with in-app override
 - **FOSS** — GPL-3.0-only licensed
 
 ---

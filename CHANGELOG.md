@@ -28,5 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Security settings: foreground + background lock timeouts; copy/paste blocking on passphrase fields
 - Android screenshot prevention and app-switcher blur (`FLAG_SECURE`)
 - Dark and light mode; WCAG AA colour scheme
+- App localisation: UI in English, French, German, Italian, and Spanish; follows system locale with in-app language override (Settings → Appearance)
+- Locale-aware date formatting via `package:intl` `DateFormat`
 
 [Unreleased]: https://github.com/Zabamund/gabbro/compare/v0.1.0...HEAD

@@ -164,7 +164,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 447 | 0 | <!-- Phase 3 complete -->
+| Flutter (`flutter test`) | 447 | 0 | <!-- Phase 4 complete: all 4 languages translated -->
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -175,37 +175,28 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Multiple app languages (v1: en, fr, de, it, es) — Phase 4
+### Next task: Fix — YubiKey OTP NFC opens a browser tab during NFC unlock
 
-#### Implementation plan
+Each YubiKey ships with OTP slot 1 configured as an NDEF URI over NFC. When the Android NFC reader is active the key broadcasts this URI and Android opens a browser tab even while Gabbro is in the foreground. The workaround (`ykman config nfc --disable OTP`) is documented in ARCHITECTURE but is invisible to new users.
 
-- [x] **Phase 1 — Infrastructure** ✓
-  - `flutter_localizations` + `intl` in `pubspec.yaml`, `generate: true`
-  - `l10n.yaml` at project root
-  - `lib/l10n/app_en.arb` (~430 keys) + stub ARBs for fr/de/it/es
-  - Auto-generated `lib/l10n/app_localizations*.dart` committed
+**Goal:** surface this requirement inside the app so it cannot be missed.
 
-- [x] **Phase 2 — Settings integration** ✓
-  - `LanguageChoice` enum + `AppSettings.language` field (persisted)
-  - Language picker in `AppearanceScreen`
-  - `MaterialApp` in `main.dart` and `autofillUnlockMain()` wired to locale + delegates
+**Candidate approaches (decide at session start):**
+- Show a one-time instruction dialog when entering Add YubiKey on Android / NFC transport
+- Detect via yubikit `OtpSession` whether OTP-over-NFC is still active and block/warn
+- Fallback: prominent static note in the Add YubiKey screen (no detection, clear text only)
 
-- [x] **Phase 3 — String extraction** ✓ (all screens/widgets done, 447 tests pass)
+**Constraints:**
+- libfido2 and CTAP2 cannot query OTP slot state — requires management protocol or yubikit `OtpSession`
+- Android only (NFC is not available on Linux desktop)
 
-  All user-visible strings extracted to `app_en.arb`. Every screen and widget uses
-  `AppLocalizations.of(context)`. Remaining hardcoded strings are format identifiers
-  (`.gabbro`, `JSON`) and a numeric position index — intentionally not translated.
-
-- [ ] **Phase 4 — Translations**
-  - Provide fr/de/it/es translations for every extracted string (~430 keys each)
-  - Replace hand-rolled month array in `formatTimestamp()` with `package:intl` `DateFormat`
-    (removes this item from Bikeshed)
+---
 
 #### Adding a language after v1 (n+1 cost)
 
-Once Phases 1–3 are complete, adding a further language is cheap — **not** a full session:
+Adding a further language is cheap — **not** a full session:
 
-- One new `lib/l10n/app_XX.arb` file (~400–500 translated key-value pairs)
+- One new `lib/l10n/app_XX.arb` file (~430 translated key-value pairs)
 - 2 lines of code: add locale to `supportedLocales` and to the in-app picker list
 - Run `flutter gen-l10n` + `flutter test`
 - Estimated effort: **20–30 minutes per language** (Claude generates translations; user spot-checks)
@@ -220,7 +211,6 @@ Confidence varies by language family:
 | Hungarian, Finnish, Estonian      | Medium-Low  | Uralic grammar differs structurally; more likely to need review   |
 
 Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}}` syntax — no extra plumbing needed. Right-to-left languages (Arabic, Hebrew) would require additional layout-mirroring work and are out of scope for v1.
-
 
 ---
 
@@ -252,8 +242,6 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 - read https://drive.proton.me/urls/11VHB59C60#CVCj696Qxkxd to see if any learnings can be transferred to gabbro to increase security
 
 ### Features & UX
-- Fix: Password detail view does not scale with text size, verify and fix. If working correctly, bumpy size up in detail view
-- Fix: yubico OTP NFC currently needs to be disabled to avoid opening demo.yubico/yk when using NFC, this needs fixing before a partnership with yubico can be sought
 - Add tutorial/onboarding: probably in the README as snapshots from linux/emulator
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
@@ -279,7 +267,5 @@ Try `dart pub outdated` for more information.`
 - `docs/SECURITY.md` user-facing doc (encryption ELI5, local-first argument, comparison table, honest caveats).
 - No-telemetry verification guide (ripgrep scan, Wireshark, NetGuard, iOS caveat).
 - Support model (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
-- i18n: replace hand-rolled month array in `formatTimestamp()` with `package:intl` `DateFormat`.
 - Import: content-hash deduplication and entry-level merge.
 - Native app autofill matching by package name (v2).
-- ensure no webpage opens with yubico OTP enabled in `ykman info`
