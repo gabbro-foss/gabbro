@@ -2,9 +2,9 @@
 
 A post-quantum password manager built with security as core DNA.
 
-> **Status: Rust backend complete — Flutter UI not yet started.**
-> All vault operations are implemented and tested in Rust (112 tests passing).
-> The Flutter UI layer is the next milestone.
+> **Status: Rust backend complete — Flutter UI complete.**
+> All vault operations are implemented and tested in Rust (338 tests passing).
+> Flutter UI implemented (437 tests passing).
 
 ---
 
@@ -147,12 +147,25 @@ sudo usermod -aG flutter $USER
 # log out and back in
 ```
 
-### Build
+### Run locally
+
+from `gabbro` root folder:
 
 ```bash
 flutter pub get
 flutter run -d linux   # Linux desktop
 flutter run -d android # Android device/emulator
+```
+
+### Build
+
+from `gabbro` root folder:
+
+```bash
+flutter build linux --release   # Linux desktop
+./build/linux/x64/release/bundle/gabbro # Run on linux
+flutter build apk --release     # Android device
+adb install build/app/outputs/flutter-apk/app-release.apk # install on Android device
 ```
 
 ### Tests
