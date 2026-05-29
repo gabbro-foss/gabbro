@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
@@ -26,26 +27,22 @@ List<EntrySummaryData> _twoEntries() => [
 // tester.view.physicalSize so LayoutBuilder sees the correct constraint.
 
 Widget _buildScreen(List<EntrySummaryData> Function() listEntries) =>
-    MaterialApp(
-      home: VaultListScreen(
-        vaultPath: '/tmp/test.gabbro',
-        listEntries: listEntries,
-      ),
-    );
+    testApp(VaultListScreen(
+      vaultPath: '/tmp/test.gabbro',
+      listEntries: listEntries,
+    ));
 
 Widget _buildScreenWithFolders({
   required List<EntrySummaryData> Function() listEntries,
   required List<String> Function() listFolders,
   required Future<void> Function(List<String> ids, String folder) onAssignFolder,
 }) =>
-    MaterialApp(
-      home: VaultListScreen(
-        vaultPath: '/tmp/test.gabbro',
-        listEntries: listEntries,
-        listFolders: listFolders,
-        onAssignFolderFn: onAssignFolder,
-      ),
-    );
+    testApp(VaultListScreen(
+      vaultPath: '/tmp/test.gabbro',
+      listEntries: listEntries,
+      listFolders: listFolders,
+      onAssignFolderFn: onAssignFolder,
+    ));
 
 void _setNarrow(WidgetTester tester) {
   tester.view.physicalSize = const Size(390, 844);

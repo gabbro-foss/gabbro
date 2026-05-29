@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
@@ -7,21 +8,19 @@ import 'package:gabbro/src/rust/api/import.dart';
 void main() {
   group('ImportScreen', () {
     Widget buildScreen() {
-      return MaterialApp(
-        home: ImportScreen(
-          onImportEnpass: (_) async => ImportResult(
-            imported: BigInt.zero,
-            failures: [],
-            skipped: [],
-          ),
-          onImportBitwarden: (_) async => ImportResult(
-            imported: BigInt.zero,
-            failures: [],
-            skipped: [],
-          ),
-          onSniffCsv: (_) => CsvPreviewData(headers: [], rows: []),
+      return testApp(ImportScreen(
+        onImportEnpass: (_) async => ImportResult(
+          imported: BigInt.zero,
+          failures: [],
+          skipped: [],
         ),
-      );
+        onImportBitwarden: (_) async => ImportResult(
+          imported: BigInt.zero,
+          failures: [],
+          skipped: [],
+        ),
+        onSniffCsv: (_) => CsvPreviewData(headers: [], rows: []),
+      ));
     }
 
     testWidgets('shows duplicate warning banner', (tester) async {
@@ -33,22 +32,20 @@ void main() {
     });
 
     testWidgets('skipped dialog shows entry title and reason', (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Builder(
-          builder: (context) => TextButton(
-            onPressed: () => showSkippedEntriesDialog(
-              context,
-              [
-                SkippedEntryData(
-                  title: 'Dupe Entry',
-                  reason: 'UUID already exists',
-                ),
-              ],
-            ),
-            child: const Text('show'),
+      await tester.pumpWidget(testApp(Builder(
+        builder: (context) => TextButton(
+          onPressed: () => showSkippedEntriesDialog(
+            context,
+            [
+              SkippedEntryData(
+                title: 'Dupe Entry',
+                reason: 'UUID already exists',
+              ),
+            ],
           ),
+          child: const Text('show'),
         ),
-      ));
+      )));
       await tester.tap(find.text('show'));
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
@@ -58,20 +55,18 @@ void main() {
 
     testWidgets('skipped dialog shows correct entry count in title',
         (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Builder(
-          builder: (context) => TextButton(
-            onPressed: () => showSkippedEntriesDialog(
-              context,
-              [
-                SkippedEntryData(title: 'Entry A', reason: 'UUID already exists'),
-                SkippedEntryData(title: 'Entry B', reason: 'UUID already exists'),
-              ],
-            ),
-            child: const Text('show'),
+      await tester.pumpWidget(testApp(Builder(
+        builder: (context) => TextButton(
+          onPressed: () => showSkippedEntriesDialog(
+            context,
+            [
+              SkippedEntryData(title: 'Entry A', reason: 'UUID already exists'),
+              SkippedEntryData(title: 'Entry B', reason: 'UUID already exists'),
+            ],
           ),
+          child: const Text('show'),
         ),
-      ));
+      )));
       await tester.tap(find.text('show'));
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));

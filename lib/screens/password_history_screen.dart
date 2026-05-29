@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 
@@ -22,21 +23,27 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
   bool _currentObscured = true;
   bool _previousObscured = true;
 
+  String _prevMeta(AppLocalizations l, PreviousSecretData prev) {
+    final saved = l.historySavedOn(formatTimestamp(prev.savedAt));
+    if (prev.expiresAt != null && prev.expiresAt!.isNotEmpty) {
+      return l.historyExpiresAppend(saved, formatTimestamp(prev.expiresAt!));
+    }
+    return saved;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final prev = widget.entry.previousPassword;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Password history'),
-      ),
+      appBar: AppBar(title: Text(l.passwordHistoryTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ── Warning banner ─────────────────────────────────────────
               Container(
                 padding: const EdgeInsets.all(12),
                 margin: const EdgeInsets.only(bottom: 16),
@@ -48,8 +55,7 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  'Only 1 previous value is kept. '
-                  'History auto-purges based on your security settings.',
+                  l.historyWarning,
                   style: TextStyle(
                     fontSize: 13,
                     color: Theme.of(context).colorScheme.onErrorContainer,
@@ -57,24 +63,24 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
                 ),
               ),
 
-              // ── Current ────────────────────────────────────────────────
-              _sectionHeader('Current'),
+              _sectionHeader(l.historyCurrent),
               const SizedBox(height: 8),
               _historyRow(
-                meta: 'Saved ${formatTimestamp(widget.entry.updatedAt)}',
+                l: l,
+                meta: l.historySavedOn(formatTimestamp(widget.entry.updatedAt)),
                 value: widget.entry.password,
                 obscured: _currentObscured,
                 onToggle: () =>
                     setState(() => _currentObscured = !_currentObscured),
               ),
 
-              // ── Previous ───────────────────────────────────────────────
               if (prev != null) ...[
                 const SizedBox(height: 16),
-                _sectionHeader('Previous'),
+                _sectionHeader(l.historyPrevious),
                 const SizedBox(height: 8),
                 _historyRow(
-                  meta: _prevMeta(prev),
+                  l: l,
+                  meta: _prevMeta(l, prev),
                   value: prev.value,
                   obscured: _previousObscured,
                   onToggle: () =>
@@ -89,12 +95,12 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
                       color: Theme.of(context).colorScheme.error,
                     ),
                   ),
-                  child: const Text('Delete previous entry'),
+                  child: Text(l.deleteEntryFromHistoryLabel),
                 ),
                 const SizedBox(height: 8),
                 OutlinedButton(
                   onPressed: widget.onRevert,
-                  child: const Text('Revert'),
+                  child: Text(l.revert),
                 ),
               ],
             ],
@@ -104,23 +110,13 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
     );
   }
 
-  // ── Helpers ──────────────────────────────────────────────────────────────────
-
-  String _prevMeta(PreviousSecretData prev) {
-    final saved = 'Saved ${formatTimestamp(prev.savedAt)}';
-    if (prev.expiresAt != null && prev.expiresAt!.isNotEmpty) {
-      return '$saved · expires ${formatTimestamp(prev.expiresAt!)}';
-    }
-    return saved;
-  }
-
   Widget _sectionHeader(String label) => Text(
         label,
-        style:
-            const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
       );
 
   Widget _historyRow({
+    required AppLocalizations l,
     required String meta,
     required String value,
     required bool obscured,
@@ -164,7 +160,7 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
                   obscured ? Icons.visibility_off : Icons.visibility,
                   size: 18,
                 ),
-                tooltip: obscured ? 'Show' : 'Hide',
+                tooltip: obscured ? l.tooltipShow : l.tooltipHide,
                 onPressed: onToggle,
               ),
             ],

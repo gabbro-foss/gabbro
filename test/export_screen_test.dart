@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/export_screen.dart';
 
 void main() {
@@ -30,37 +31,31 @@ void main() {
   group('ExportScreen', () {
     testWidgets('shows export button', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ExportScreen(
+        testApp(ExportScreen(
             onExport: (path) async {},
             onExportJson: (path) async {},
-          ),
-        ),
+        )),
       );
       expect(find.text('Export'), findsOneWidget);
     });
 
     testWidgets('shows path field', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ExportScreen(
+        testApp(ExportScreen(
             onExport: (path) async {},
             onExportJson: (path) async {},
-          ),
-        ),
+        )),
       );
       expect(find.byIcon(Icons.folder_open), findsOneWidget);
     });
 
     testWidgets('export button disabled with no path on linux', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ExportScreen(
+        testApp(ExportScreen(
             isAndroid: false,
             onExport: (path) async {},
             onExportJson: (path) async {},
-          ),
-        ),
+        )),
       );
       final exportBtn = tester.widget<FilledButton>(
         find.widgetWithText(FilledButton, 'Export'),
@@ -72,13 +67,11 @@ void main() {
         (tester) async {
       String? exportedPath;
       await tester.pumpWidget(
-        MaterialApp(
-          home: ExportScreen(
+        testApp(ExportScreen(
             initialPath: '/home/user/vault.gabbro',
             onExport: (path) async => exportedPath = path,
             onExportJson: (path) async {},
-          ),
-        ),
+        )),
       );
       await tester.tap(find.text('Export'));
       await tester.pump();
@@ -88,13 +81,11 @@ void main() {
     testWidgets('android mode: shows Choose folder button, Export disabled',
         (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ExportScreen(
+        testApp(ExportScreen(
             isAndroid: true,
             onExport: (path) async {},
             onExportJson: (path) async {},
-          ),
-        ),
+        )),
       );
       expect(find.text('Choose folder'), findsOneWidget);
       expect(find.byIcon(Icons.folder_open), findsNothing);
@@ -109,14 +100,12 @@ void main() {
         (tester) async {
       String? exportedPath;
       await tester.pumpWidget(
-        MaterialApp(
-          home: ExportScreen(
+        testApp(ExportScreen(
             isAndroid: true,
             initialPath: '/storage/emulated/0/Documents',
             onExport: (path) async => exportedPath = path,
             onExportJson: (path) async {},
-          ),
-        ),
+        )),
       );
       await tester.tap(find.text('Export'));
       await tester.pump();
@@ -127,15 +116,13 @@ void main() {
     testWidgets('android mode: export path uses sanitised alias', (tester) async {
       String? exportedPath;
       await tester.pumpWidget(
-        MaterialApp(
-          home: ExportScreen(
+        testApp(ExportScreen(
             isAndroid: true,
             initialPath: '/storage/emulated/0/Documents',
             vaultAlias: 'My Work',
             onExport: (path) async => exportedPath = path,
             onExportJson: (path) async {},
-          ),
-        ),
+        )),
       );
       await tester.tap(find.text('Export'));
       await tester.pump();
@@ -148,12 +135,10 @@ void main() {
     testWidgets('shows format selector with Gabbro and JSON options',
         (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ExportScreen(
+        testApp(ExportScreen(
             onExport: (path) async {},
             onExportJson: (path) async {},
-          ),
-        ),
+        )),
       );
       expect(find.text('.gabbro'), findsOneWidget);
       expect(find.text('JSON'), findsOneWidget);
@@ -162,24 +147,20 @@ void main() {
     testWidgets('default format is gabbro — shows passphrase-only note',
         (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ExportScreen(
+        testApp(ExportScreen(
             onExport: (path) async {},
             onExportJson: (path) async {},
-          ),
-        ),
+        )),
       );
       expect(find.textContaining('passphrase only'), findsOneWidget);
     });
 
     testWidgets('selecting JSON format shows plaintext warning', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: ExportScreen(
+        testApp(ExportScreen(
             onExport: (path) async {},
             onExportJson: (path) async {},
-          ),
-        ),
+        )),
       );
       await tester.tap(find.text('JSON'));
       await tester.pump();
@@ -190,14 +171,12 @@ void main() {
         (tester) async {
       String? jsonExportedPath;
       await tester.pumpWidget(
-        MaterialApp(
-          home: ExportScreen(
+        testApp(ExportScreen(
             isAndroid: true,
             initialPath: '/storage/emulated/0/Documents',
             onExport: (path) async {},
             onExportJson: (path) async => jsonExportedPath = path,
-          ),
-        ),
+        )),
       );
       await tester.tap(find.text('JSON'));
       await tester.pump();
@@ -211,14 +190,12 @@ void main() {
         (tester) async {
       String? jsonExportedPath;
       await tester.pumpWidget(
-        MaterialApp(
-          home: ExportScreen(
+        testApp(ExportScreen(
             isAndroid: false,
             initialPath: '/home/user/vault.json',
             onExport: (path) async {},
             onExportJson: (path) async => jsonExportedPath = path,
-          ),
-        ),
+        )),
       );
       await tester.tap(find.text('JSON'));
       await tester.pump();

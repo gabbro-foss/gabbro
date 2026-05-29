@@ -309,6 +309,40 @@ void main() {
     });
   });
 
+  // ── LanguageChoice ────────────────────────────────────────────────────────
+
+  group('LanguageChoice', () {
+    test('defaults to system', () {
+      final s = AppSettings.fromJson({});
+      expect(s.language, LanguageChoice.system);
+    });
+
+    test('all values round-trip through fromJson', () {
+      for (final choice in LanguageChoice.values) {
+        final s = AppSettings.fromJson({'language': choice.name});
+        expect(s.language, choice);
+      }
+    });
+
+    test('serialises to toJson', () {
+      const s = AppSettings(language: LanguageChoice.de);
+      expect(s.toJson()['language'], 'de');
+    });
+
+    test('copyWith overrides language only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(language: LanguageChoice.fr);
+      expect(updated.language, LanguageChoice.fr);
+      expect(updated.theme, original.theme);
+      expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
+    });
+
+    test('missing key falls back to system', () {
+      final s = AppSettings.fromJson({'theme': 'dark'});
+      expect(s.language, LanguageChoice.system);
+    });
+  });
+
   // ── BackgroundLockTimeout ─────────────────────────────────────────────────
 
   group('BackgroundLockTimeout', () {

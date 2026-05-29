@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 
@@ -24,15 +25,13 @@ Widget _buildScreen({
   required Future<MergeSummary> Function(String, List<int>) mergeVault,
   String? pickedPath,
 }) =>
-    MaterialApp(
-      home: VaultListScreen(
-        vaultPath: '/tmp/test.gabbro',
-        listEntries: () => [],
-        yubikeyRecords: [],
-        onPickSyncFile: () async => pickedPath,
-        mergeVault: mergeVault,
-      ),
-    );
+    testApp(VaultListScreen(
+      vaultPath: '/tmp/test.gabbro',
+      listEntries: () => [],
+      yubikeyRecords: [],
+      onPickSyncFile: () async => pickedPath,
+      mergeVault: mergeVault,
+    ));
 
 Future<void> _openMenu(WidgetTester tester) async {
   tester.view.physicalSize = const Size(400, 800);

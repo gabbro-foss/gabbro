@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/widgets/generator_widget.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
@@ -8,6 +9,7 @@ class GeneratorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final timeout = GabbroApp.maybeOf(context)?.settings.clipboardClearTimeout
         ?? ClipboardClearTimeout.sixtySeconds;
     final duration = switch (timeout) {
@@ -17,7 +19,7 @@ class GeneratorScreen extends StatelessWidget {
       ClipboardClearTimeout.twoMinutes    => const Duration(minutes: 2),
     };
     return Scaffold(
-      appBar: AppBar(title: const Text('Password generator')),
+      appBar: AppBar(title: Text(l.generatorTitle)),
       body: GeneratorWidget(clipboardClearDuration: duration),
     );
   }

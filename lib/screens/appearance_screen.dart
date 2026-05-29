@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
@@ -26,11 +27,12 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Appearance')),
+      appBar: AppBar(title: Text(l.appearanceTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -39,37 +41,36 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ── Theme ──────────────────────────────────────────────────
-              SectionHeader(label: 'Theme'),
+              SectionHeader(label: l.sectionTheme),
               const SizedBox(height: 8),
               SegmentedRow<ThemeChoice>(
                 values: ThemeChoice.values,
                 selected: _settings.theme,
                 label: (v) => switch (v) {
-                  ThemeChoice.system => 'System',
-                  ThemeChoice.light => 'Light',
-                  ThemeChoice.dark => 'Dark',
+                  ThemeChoice.system => l.themeSystem,
+                  ThemeChoice.light => l.themeLight,
+                  ThemeChoice.dark => l.themeDark,
                 },
                 onSelected: (v) => _update(_settings.copyWith(theme: v)),
               ),
               const SizedBox(height: 32),
 
               // ── Text size ──────────────────────────────────────────────
-              SectionHeader(label: 'Text size'),
+              SectionHeader(label: l.sectionTextSize),
               const SizedBox(height: 8),
               SegmentedRow<TextSizeChoice>(
                 values: TextSizeChoice.values,
                 selected: _settings.textSize,
                 label: (v) => switch (v) {
-                  TextSizeChoice.small => 'Small',
-                  TextSizeChoice.regular => 'Regular',
-                  TextSizeChoice.large => 'Large',
-                  TextSizeChoice.extraLarge => 'XL',
-                  TextSizeChoice.xxLarge => 'XXL',
+                  TextSizeChoice.small => l.textSizeSmall,
+                  TextSizeChoice.regular => l.textSizeRegular,
+                  TextSizeChoice.large => l.textSizeLarge,
+                  TextSizeChoice.extraLarge => l.textSizeXL,
+                  TextSizeChoice.xxLarge => l.textSizeXXL,
                 },
                 onSelected: (v) => _update(_settings.copyWith(textSize: v)),
               ),
               const SizedBox(height: 12),
-              // Live preview so the user can see the effect immediately.
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -84,10 +85,10 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               const SizedBox(height: 32),
 
               // ── Alphabet bar position ──────────────────────────────────
-              SectionHeader(label: 'Alphabet bar position'),
+              SectionHeader(label: l.sectionAlphabetBar),
               const SizedBox(height: 4),
               Text(
-                'Phone layout only — tablet always uses left.',
+                l.alphabetBarNote,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -97,8 +98,8 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                 values: AlphabetBarPosition.values,
                 selected: _settings.alphabetBarPosition,
                 label: (v) => switch (v) {
-                  AlphabetBarPosition.left => 'Left',
-                  AlphabetBarPosition.right => 'Right',
+                  AlphabetBarPosition.left => l.alphabetBarLeft,
+                  AlphabetBarPosition.right => l.alphabetBarRight,
                 },
                 onSelected: (v) =>
                     _update(_settings.copyWith(alphabetBarPosition: v)),
@@ -106,19 +107,42 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               const SizedBox(height: 32),
 
               // ── High contrast ──────────────────────────────────────────
-              SectionHeader(label: 'Accessibility'),
+              SectionHeader(label: l.sectionAccessibility),
               const SizedBox(height: 8),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('High contrast'),
-                subtitle: const Text(
-                  'Increases contrast for better readability',
-                ),
+                title: Text(l.highContrastTitle),
+                subtitle: Text(l.highContrastSubtitle),
                 trailing: Switch(
                   value: _settings.highContrast,
                   onChanged: (v) =>
                       _update(_settings.copyWith(highContrast: v)),
                 ),
+              ),
+              const SizedBox(height: 32),
+
+              // ── Language ───────────────────────────────────────────────
+              SectionHeader(label: l.sectionLanguage),
+              const SizedBox(height: 4),
+              Text(
+                l.languageNote,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 8),
+              SegmentedRow<LanguageChoice>(
+                values: LanguageChoice.values,
+                selected: _settings.language,
+                label: (v) => switch (v) {
+                  LanguageChoice.system => l.langSystem,
+                  LanguageChoice.en => l.langEnglish,
+                  LanguageChoice.fr => l.langFrench,
+                  LanguageChoice.de => l.langGerman,
+                  LanguageChoice.it => l.langItalian,
+                  LanguageChoice.es => l.langSpanish,
+                },
+                onSelected: (v) => _update(_settings.copyWith(language: v)),
               ),
             ],
           ),

@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/review_changes_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -151,14 +152,12 @@ Widget _buildReviewScreen({
   required VaultEntryData updated,
   Future<void> Function(VaultEntryData, int?)? onSave,
 }) =>
-    MaterialApp(
-      home: ReviewChangesScreen(
-        original: original,
-        updated: updated,
-        expiryDays: 30,
-        onSave: onSave ?? _noOpSave,
-      ),
-    );
+    testApp(ReviewChangesScreen(
+      original: original,
+      updated: updated,
+      expiryDays: 30,
+      onSave: onSave ?? _noOpSave,
+    ));
 
 Future<void> _noOpSave(VaultEntryData entry, int? days) async {}
 

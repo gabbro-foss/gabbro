@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -19,14 +20,12 @@ LoginEntryData _loginEntry() => LoginEntryData(
       folder: 'Personal',
     );
 
-Widget _buildCardScreenWithPrefill(Map<String, String> prefill) => MaterialApp(
-      home: CreateEntryScreen(
-        entryType: 'Card',
-        prefill: prefill,
-        onCreateEntry: (_) async {},
-        onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
-      ),
-    );
+Widget _buildCardScreenWithPrefill(Map<String, String> prefill) => testApp(CreateEntryScreen(
+      entryType: 'Card',
+      prefill: prefill,
+      onCreateEntry: (_) async {},
+      onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
+    ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -84,13 +83,11 @@ void main() {
 
   testWidgets('card without prefill starts with empty fields', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: CreateEntryScreen(
-          entryType: 'Card',
-          onCreateEntry: (_) async {},
-          onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
-        ),
-      ),
+      testApp(CreateEntryScreen(
+        entryType: 'Card',
+        onCreateEntry: (_) async {},
+        onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
+      )),
     );
     final cardNumberField = tester.widget<TextFormField>(
       find.widgetWithText(TextFormField, 'Card number'),
@@ -116,15 +113,13 @@ void main() {
       pin: null,
     );
     await tester.pumpWidget(
-      MaterialApp(
-        home: CreateEntryScreen(
-          entryType: 'Card',
-          existing: VaultEntryData.card(card),
-          prefill: const {'card_number': 'should-not-appear'},
-          onCreateEntry: (_) async {},
-          onGetEntry: (_) => VaultEntryData.card(card),
-        ),
-      ),
+      testApp(CreateEntryScreen(
+        entryType: 'Card',
+        existing: VaultEntryData.card(card),
+        prefill: const {'card_number': 'should-not-appear'},
+        onCreateEntry: (_) async {},
+        onGetEntry: (_) => VaultEntryData.card(card),
+      )),
     );
     // The existing card number should be shown, not the prefill value
     expect(

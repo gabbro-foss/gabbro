@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/widgets/path_field.dart';
 
 void main() {
   group('PathField', () {
     testWidgets('displays hint text when no path selected', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PathField(
+        testApp(Scaffold(
+          body: PathField(
               mode: PathFieldMode.open,
               hint: 'Select a file',
               onPathSelected: (_) {},
@@ -21,9 +21,8 @@ void main() {
 
     testWidgets('displays selected path', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PathField(
+        testApp(Scaffold(
+          body: PathField(
               mode: PathFieldMode.open,
               hint: 'Select a file',
               initialPath: '/home/user/export.gabbro',
@@ -37,9 +36,8 @@ void main() {
 
     testWidgets('shows folder icon button', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: PathField(
+        testApp(Scaffold(
+          body: PathField(
               mode: PathFieldMode.open,
               hint: 'Select a file',
               onPathSelected: (_) {},

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 
 class ManageFoldersScreen extends StatefulWidget {
   const ManageFoldersScreen({
@@ -44,58 +45,61 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('Delete folder'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Delete "$folder"?'),
-              if (hasOthers) ...[
-                const SizedBox(height: 16),
-                CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Reassign entries to'),
-                  value: reassignTarget != null,
-                  onChanged: (v) => setState(() {
-                    reassignTarget = v == true ? otherFolders.first : null;
-                    if (v == true) clearToNone = false;
-                  }),
-                ),
-                if (reassignTarget != null)
-                  DropdownButton<String>(
-                    value: reassignTarget,
-                    items: otherFolders
-                        .map((f) => DropdownMenuItem(value: f, child: Text(f)))
-                        .toList(),
-                    onChanged: (v) => setState(() => reassignTarget = v),
+      builder: (context) {
+        final l = AppLocalizations.of(context);
+        return StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: Text(l.deleteFolderTitle),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l.deleteFolderConfirm(folder)),
+                if (hasOthers) ...[
+                  const SizedBox(height: 16),
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l.reassignEntriesTo),
+                    value: reassignTarget != null,
+                    onChanged: (v) => setState(() {
+                      reassignTarget = v == true ? otherFolders.first : null;
+                      if (v == true) clearToNone = false;
+                    }),
                   ),
-                const SizedBox(height: 8),
-                CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text('Clear to "None"'),
-                  value: clearToNone,
-                  onChanged: (v) => setState(() {
-                    clearToNone = v == true;
-                    if (v == true) reassignTarget = null;
-                  }),
-                ),
+                  if (reassignTarget != null)
+                    DropdownButton<String>(
+                      value: reassignTarget,
+                      items: otherFolders
+                          .map((f) => DropdownMenuItem(value: f, child: Text(f)))
+                          .toList(),
+                      onChanged: (v) => setState(() => reassignTarget = v),
+                    ),
+                  const SizedBox(height: 8),
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l.clearToNone),
+                    value: clearToNone,
+                    onChanged: (v) => setState(() {
+                      clearToNone = v == true;
+                      if (v == true) reassignTarget = null;
+                    }),
+                  ),
+                ],
               ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(l.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(l.delete),
+              ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete'),
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
     if (confirmed == true) {
       await widget.deleteFolder(folder, reassignTarget);
@@ -108,24 +112,25 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) {
+        final l = AppLocalizations.of(context);
         final controller = TextEditingController(text: folder);
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
-            title: const Text('Rename folder'),
+            title: Text(l.renameFolderTitle),
             content: TextFormField(
               controller: controller,
               autofocus: true,
-              decoration: const InputDecoration(labelText: 'Folder name'),
+              decoration: InputDecoration(labelText: l.folderName),
               onChanged: (v) => newName = v,
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('Cancel'),
+                child: Text(l.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('Save'),
+                child: Text(l.save),
               ),
             ],
           ),
@@ -142,24 +147,27 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
     String newName = '';
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add folder'),
-        content: TextFormField(
-          autofocus: true,
-          decoration: const InputDecoration(labelText: 'Folder name'),
-          onChanged: (v) => newName = v,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+      builder: (context) {
+        final l = AppLocalizations.of(context);
+        return AlertDialog(
+          title: Text(l.addFolderTitle),
+          content: TextFormField(
+            autofocus: true,
+            decoration: InputDecoration(labelText: l.folderName),
+            onChanged: (v) => newName = v,
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l.save),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed == true && newName.trim().isNotEmpty) {
       await widget.createFolder(newName.trim());
@@ -169,8 +177,9 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Manage folders')),
+      appBar: AppBar(title: Text(l.manageFoldersTitle)),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,
         child: const Icon(Icons.add),

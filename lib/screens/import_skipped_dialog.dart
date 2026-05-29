@@ -1,16 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 
-/// Informational dialog shown after an import when one or more entries were
-/// skipped because their UUID already exists in the vault.
-///
-/// The user acknowledges the list and dismisses. No action is required —
-/// the local version of each skipped entry is preserved as-is.
-///
-/// Usage:
-/// ```dart
-/// await showSkippedEntriesDialog(context, skipped);
-/// ```
 Future<void> showSkippedEntriesDialog(
   BuildContext context,
   List<SkippedEntryData> skipped,
@@ -28,6 +19,7 @@ class _SkippedEntriesDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -38,7 +30,7 @@ class _SkippedEntriesDialog extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              '${skipped.length} ${skipped.length == 1 ? 'entry' : 'entries'} skipped',
+              l.entriesSkipped(skipped.length),
               style: theme.textTheme.titleMedium,
             ),
           ),
@@ -51,7 +43,7 @@ class _SkippedEntriesDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'These entries already exist in your vault and were not overwritten:',
+              l.skippedEntriesNote,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
@@ -66,10 +58,7 @@ class _SkippedEntriesDialog extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        skipped[i].title,
-                        style: theme.textTheme.bodyMedium,
-                      ),
+                      Text(skipped[i].title, style: theme.textTheme.bodyMedium),
                       Text(
                         skipped[i].reason,
                         style: theme.textTheme.bodySmall?.copyWith(
@@ -87,7 +76,7 @@ class _SkippedEntriesDialog extends StatelessWidget {
       actions: [
         FilledButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('OK'),
+          child: Text(l.ok),
         ),
       ],
     );

@@ -1,0 +1,449 @@
+{
+  "@@locale": "en",
+
+  "appName": "Gabbro",
+
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "save": "Save",
+  "close": "Close",
+  "ok": "OK",
+  "edit": "Edit",
+  "add": "Add",
+  "remove": "Remove",
+  "rename": "Rename",
+  "confirm": "Confirm",
+  "continueAction": "Continue",
+  "dismiss": "Dismiss",
+  "authorize": "Authorize",
+  "register": "Register",
+  "sync": "Sync",
+  "assign": "Assign",
+  "unlock": "Unlock",
+  "generate": "Generate",
+  "import": "Import",
+  "export": "Export",
+  "openInBrowser": "Open in browser",
+  "useThisPassword": "Use this password",
+  "reviewArrow": "Review →",
+  "skip": "Skip",
+  "keep": "Keep",
+  "revert": "Revert",
+  "next": "Next: map columns",
+  "syncFromVault": "Sync from vault",
+  "createVault": "Create vault",
+  "pickFile": "Pick file",
+  "chooseFolder": "Choose folder",
+  "addCustomField": "Add custom field",
+  "exportFile": "Export file",
+  "addVault": "Add vault",
+  "addYubiKey": "Add YubiKey",
+  "noChangesToSave": "No changes to save.",
+
+  "appearanceTitle": "Appearance",
+  "securityTitle": "Security",
+  "aboutTitle": "About Gabbro",
+  "generatorTitle": "Password generator",
+  "importTitle": "Import entries",
+  "exportTitle": "Export vault",
+  "changePassphraseTitle": "Change passphrase",
+  "csvMappingTitle": "Map CSV columns",
+  "manageFoldersTitle": "Manage folders",
+  "manageVaultsTitle": "Manage vaults",
+  "manageYubiKeysTitle": "Manage YubiKeys",
+  "passwordHistoryTitle": "Password history",
+  "reviewChangesTitle": "Review changes",
+  "unlockGabbroTitle": "Unlock Gabbro",
+
+  "sectionTheme": "Theme",
+  "sectionTextSize": "Text size",
+  "sectionAlphabetBar": "Alphabet bar position",
+  "sectionAccessibility": "Accessibility",
+  "sectionLanguage": "Language",
+  "sectionForegroundLock": "Foreground lock",
+  "sectionBackgroundLock": "Background lock",
+  "sectionPasswordHistory": "Password history",
+  "sectionPassphraseCopyPaste": "Passphrase copy/paste",
+  "sectionVaultList": "Vault list",
+  "sectionClipboardClear": "Clipboard clear",
+  "sectionCharacterSets": "Character sets",
+  "sectionGeneratorLanguage": "Language",
+
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+
+  "textSizeSmall": "Small",
+  "textSizeRegular": "Regular",
+  "textSizeLarge": "Large",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Phone layout only — tablet always uses left.",
+  "alphabetBarLeft": "Left",
+  "alphabetBarRight": "Right",
+
+  "highContrastTitle": "High contrast",
+  "highContrastSubtitle": "Increases contrast for better readability",
+
+  "languageNote": "Overrides the system language. \"System\" follows your device locale.",
+  "langSystem": "System",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+
+  "foregroundLockDescription": "Lock after this much inactivity while the app is open.",
+  "backgroundLockDescription": "Lock after the app has been in the background for this long.",
+  "passwordHistoryDescription": "How long to keep a previous password after it is changed. \"Keep forever\" means history is only deleted manually.",
+  "passphraseCopyPasteDescription": "Block copy and paste on master passphrase fields. Recommended: prevents passphrase leaking via clipboard.",
+  "passphraseCopyPasteNote": "Note: this blocks the long-press context menu and text selection. Your keyboard's inline paste button may still work — this is a platform limitation that cannot be blocked.",
+  "blockCopyPasteTitle": "Block copy/paste",
+  "vaultListDescription": "Show a dropdown of all vaults on the login screen so you can pick which one to unlock without going to Manage vaults.",
+  "showVaultListTitle": "Show vault list on login",
+  "vaultListNote": "High-security note: when this is OFF, the login screen shows only the last-used vault — no hint that other vaults exist. Trade-off: to switch vaults you must first unlock, then go to Menu → Manage vaults.",
+  "clipboardClearDescription": "Clear the clipboard this long after copying a secret. Note: clipboard managers may retain a copy.",
+
+  "duration30s": "30s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60s",
+  "duration2min": "2 min",
+  "durationNever": "Never",
+  "duration7days": "7 days",
+  "duration30days": "30 days",
+  "duration90days": "90 days",
+  "durationKeepForever": "Keep forever",
+
+  "menuExportVault": "Export vault",
+  "menuImportEntries": "Import entries",
+  "menuSyncFromFile": "Sync from file",
+  "menuManageVaults": "Manage vaults",
+  "menuChangePassphrase": "Change passphrase",
+  "menuManageYubiKeys": "Manage YubiKeys",
+  "menuAppearance": "Appearance",
+  "menuSecurity": "Security",
+  "menuManageFolders": "Manage folders",
+  "menuPasswordGenerator": "Password generator",
+  "menuAbout": "About",
+
+  "tooltipSelectEntries": "Select entries",
+  "tooltipLockVault": "Lock vault",
+  "tooltipMenu": "Menu",
+  "tooltipCopy": "Copy",
+  "tooltipCopied": "Copied!",
+  "tooltipShow": "Show",
+  "tooltipHide": "Hide",
+  "tooltipBrowse": "Browse",
+  "tooltipEditAlias": "Edit alias",
+  "tooltipRemoveField": "Remove field",
+  "tooltipRename": "Rename",
+  "tooltipDeleteVault": "Delete vault",
+  "tooltipAssignToFolder": "Assign to folder",
+  "tooltipShowPin": "Show PIN",
+  "tooltipHidePin": "Hide PIN",
+  "tooltipShowValue": "Show value",
+  "tooltipHideValue": "Hide",
+  "tooltipCancel": "Cancel",
+  "tooltipOpenInBrowser": "Open in browser",
+
+  "allFolders": "All folders",
+  "noFolder": "None",
+  "selectFolder": "Select a folder",
+  "folderName": "Folder name",
+
+  "noEntriesMatch": "No entries match your search.",
+  "noVaultsRegistered": "No vaults registered.",
+  "noYubiKeysRegistered": "No YubiKeys registered",
+  "selectEntry": "Select an entry",
+  "errorPrefix": "Error: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Vault",
+  "navAppearance": "Appearance",
+  "navSecurity": "Security",
+  "navAbout": "About",
+
+  "deleteEntryTitle": "Delete entry?",
+  "cannotBeUndone": "This cannot be undone.",
+  "deleteEntryDialogTitle": "Delete entry?",
+  "deleteEntriesTitle": "{count, plural, one{Delete 1 entry?} other{Delete {count} entries?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Assign to folder",
+  "folderConflictTitle": "Folder conflict",
+  "syncFailedTitle": "Sync failed",
+  "syncFromFileTitle": "Sync from file",
+  "nothingToSync": "Nothing to sync — both vaults are already up to date.",
+
+  "importedEntries": "{count, plural, one{Imported 1 entry.} other{Imported {count} entries.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Export file",
+  "saveDecryptedFileTo": "Save decrypted file to:",
+  "exportPathLabel": "Export path",
+  "exportedToPath": "Exported to {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Export failed: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Open in browser?",
+  "couldNotOpen": "Could not open {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Delete previous entry",
+  "failedToClearHistory": "Failed to clear history: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Failed to revert password: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Rename folder",
+  "addFolderTitle": "Add folder",
+  "deleteFolderTitle": "Delete folder",
+  "deleteFolderConfirm": "Delete \"{folder}\"?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Reassign entries to",
+  "clearToNone": "Clear to \"None\"",
+
+  "renameVaultTitle": "Rename vault",
+  "deleteVaultTitle": "Delete vault?",
+  "deleteVaultConfirmTitle": "Are you sure?",
+  "typeDeleteToConfirm": "Type DELETE to confirm",
+  "touchYourYubiKey": "Touch your YubiKey",
+  "noVaultsRegisteredText": "No vaults registered.",
+
+  "addYubiKeyTitle": "Add YubiKey",
+  "enterYubiKeyPinTitle": "Enter YubiKey PIN",
+  "editAliasForKey": "Edit alias for key {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "This will leave only one registered YubiKey.",
+  "removeKeyConfirm": "Are you sure you want to remove this key?",
+  "removeKeyVaultConfirm": "Remove this YubiKey from the vault?",
+  "yubiKeyRemoved": "YubiKey removed",
+  "failedToRemoveKey": "Failed to remove key: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey added",
+  "failedToAddKey": "Failed to add key: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Failed to save alias: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "No FIDO2 device found. Insert your YubiKey and try again.",
+  "transportLabel": "Transport:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Passphrase",
+  "yubiKeyPinLabel": "YubiKey PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Current passphrase",
+  "newPassphraseLabel": "New passphrase",
+  "confirmPassphraseLabel": "Confirm new passphrase",
+  "vaultPassphraseLabel": "Vault passphrase",
+  "aliasLabel": "Alias",
+  "aliasHint": "e.g. Primary, Work key…",
+  "masterPassphraseLabel": "Master passphrase",
+  "confirmPassphraseLabelShort": "Confirm passphrase",
+
+  "fieldTitle": "Title",
+  "fieldContent": "Content",
+  "fieldFirstName": "First name",
+  "fieldLastName": "Last name",
+  "fieldEmail": "Email (optional)",
+  "fieldPhone": "Phone (optional)",
+  "fieldAddress": "Address (optional)",
+  "fieldCardLabel": "Card label (e.g. \"Visa Platinum\")",
+  "fieldCardholderName": "Cardholder name",
+  "fieldCardNumber": "Card number",
+  "fieldExpiry": "Expiry (MM/YY)",
+  "fieldCvv": "CVV (optional)",
+  "fieldCardPin": "PIN (optional)",
+  "fieldCreditLimit": "Credit limit (optional)",
+  "fieldAccountNumber": "Account number (optional)",
+  "fieldNotes": "Notes (optional)",
+  "fieldUrl": "URL (optional)",
+  "fieldUsername": "Username",
+  "fieldPassword": "Password",
+  "fieldSeparator": "Separator",
+  "fieldFolder": "Folder",
+  "fieldLabel": "Label",
+  "fieldValue": "Value",
+  "fieldCustomFields": "Custom fields",
+  "fieldLabelOptional": "{label} (optional)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Entry type not yet supported.",
+  "csvColumnNone": "(none)",
+  "csvPreviewLabel": "Preview",
+  "csvImportButton": "Import",
+
+  "gabbroVaultSection": "Gabbro vault",
+  "genericCsvSection": "Generic CSV",
+
+  "changePassphraseSuccess": "Passphrase changed successfully",
+  "changePassphraseButton": "Change passphrase",
+
+  "protectWithYubiKey": "Protect with YubiKey",
+  "accessibilityButton": "Accessibility",
+
+  "aboutProjectSection": "Project",
+  "aboutLicenceSection": "Licence",
+  "aboutOpenSourceSection": "Open source components",
+  "aboutAttributionSection": "Attribution",
+
+  "lengthLabel": "Length",
+  "wordsLabel": "Words",
+  "generateButton": "Generate",
+  "usePasswordButton": "Use this password",
+  "showHidePassword": "Show",
+
+  "deleteVaultPostDeletion": "Your vault has been deleted. Create a new one to continue.",
+
+  "syncFilePassphraseLabel": "Vault passphrase",
+
+  "historyWarning": "Only 1 previous value is kept. History auto-purges based on your security settings.",
+  "historyCurrent": "Current",
+  "historyPrevious": "Previous",
+  "historySavedOn": "Saved {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · expires {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Import issue ({index} of {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Type: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Edit to correct and save this entry, or skip to discard it.",
+
+  "entriesSkipped": "{count, plural, one{1 entry skipped} other{{count} entries skipped}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "These entries already exist in your vault and were not overwritten:",
+
+  "syncDeleteEntryContent": "The other device deleted '{title}'.\n\nDelete it here too, or keep it?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "'{title}' is in different folders on each device.\n\nThis device: {local}\nOther device: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Keep unfoldered",
+  "folderConflictKeepLocal": "Keep \"{folder}\"",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Move to unfoldered",
+  "folderConflictMoveIncoming": "Move to \"{folder}\"",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Vault synced — {added} added, {updated} updated, {deleted} deleted.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "This vault file uses a different passphrase. Sync is only supported between vaults that share a passphrase.",
+
+  "reviewSensitiveFields": "Sensitive fields",
+  "reviewOtherFields": "Other fields",
+  "reviewPasswordChanged": "Password changed",
+  "reviewCvvChanged": "CVV changed",
+  "reviewPinChanged": "PIN changed",
+  "reviewTransactionPasswordChanged": "Transaction password changed",
+  "tooltipShowValues": "Show values",
+  "reviewOld": "Old",
+  "reviewNew": "New",
+  "reviewEmpty": "(empty)"
+}

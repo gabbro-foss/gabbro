@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/settings.dart';
@@ -48,13 +49,11 @@ Widget _buildScreen(
   List<EntrySummaryData> Function() listEntries, {
   List<String> Function()? listFolders,
 }) =>
-    MaterialApp(
-      home: VaultListScreen(
-        vaultPath: '/tmp/test.gabbro',
-        listEntries: listEntries,
-        listFolders: listFolders,
-      ),
-    );
+    testApp(VaultListScreen(
+      vaultPath: '/tmp/test.gabbro',
+      listEntries: listEntries,
+      listFolders: listFolders,
+    ));
 
 void _setNarrow(WidgetTester tester) {
   tester.view.physicalSize = const Size(390, 844);
@@ -185,16 +184,14 @@ void main() {
       (tester) async {
     _setNarrow(tester);
     await tester.pumpWidget(
-      MaterialApp(
-        home: MediaQuery(
-          data: const MediaQueryData(size: Size(390, 844)),
-          child: VaultListScreen(
-            vaultPath: '/tmp/test.gabbro',
-            listEntries: _threeEntries,
-            alphabetBarPosition: AlphabetBarPosition.right,
-          ),
+      testApp(MediaQuery(
+        data: const MediaQueryData(size: Size(390, 844)),
+        child: VaultListScreen(
+          vaultPath: '/tmp/test.gabbro',
+          listEntries: _threeEntries,
+          alphabetBarPosition: AlphabetBarPosition.right,
         ),
-      ),
+      )),
     );
 
     final row = tester.widget<Row>(

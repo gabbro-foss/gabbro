@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 
@@ -23,16 +24,14 @@ Future<void> _pumpDialog(
   List<ImportFailureData> failures,
 ) async {
   await tester.pumpWidget(
-    MaterialApp(
-      home: Builder(
-        builder: (context) => Scaffold(
-          body: ElevatedButton(
-            onPressed: () => showImportFailuresDialog(context, failures),
-            child: const Text('Show'),
-          ),
+    testApp(Builder(
+      builder: (context) => Scaffold(
+        body: ElevatedButton(
+          onPressed: () => showImportFailuresDialog(context, failures),
+          child: const Text('Show'),
         ),
       ),
-    ),
+    )),
   );
   await tester.tap(find.text('Show'));
   await tester.pumpAndSettle();

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -28,17 +29,15 @@ Widget _buildScreen({
   Future<void> Function(List<int>, List<int>, String, String)? onConfirmYubikey,
   Future<void> Function(List<YubikeyRecordData>, String, String)? onConfirmAnyYubikey,
 }) =>
-    MaterialApp(
-      home: ChangePassphraseScreen(
-        vaultPath: '/tmp/test.gabbro',
-        onChangePassphrase: onChangePassphrase ?? (_, _) async {},
-        onEstimateEntropy: _fakeStrongEntropy,
-        blockPassphraseCopyPaste: blockPassphraseCopyPaste,
-        yubikeyRecords: yubikeyRecords ?? [],
-        onConfirmYubikey: onConfirmYubikey ?? (_, _, _, _) async {},
-        onConfirmAnyYubikey: onConfirmAnyYubikey ?? (_, _, _) async {},
-      ),
-    );
+    testApp(ChangePassphraseScreen(
+      vaultPath: '/tmp/test.gabbro',
+      onChangePassphrase: onChangePassphrase ?? (_, _) async {},
+      onEstimateEntropy: _fakeStrongEntropy,
+      blockPassphraseCopyPaste: blockPassphraseCopyPaste,
+      yubikeyRecords: yubikeyRecords ?? [],
+      onConfirmYubikey: onConfirmYubikey ?? (_, _, _, _) async {},
+      onConfirmAnyYubikey: onConfirmAnyYubikey ?? (_, _, _) async {},
+    ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 

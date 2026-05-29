@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
@@ -7,12 +8,10 @@ import 'package:gabbro/widgets/segmented_row.dart';
 Widget _buildScreen({
   AppSettings settings = const AppSettings(),
   void Function(AppSettings)? onUpdate,
-}) => MaterialApp(
-  home: SecurityScreen(
-    settings: settings,
-    onUpdate: onUpdate ?? (_) {},
-  ),
-);
+}) => testApp(SecurityScreen(
+  settings: settings,
+  onUpdate: onUpdate ?? (_) {},
+));
 
 void main() {
   group('SecurityScreen', () {
@@ -53,16 +52,14 @@ void main() {
 
     testWidgets('SegmentedRow uses Wrap not Row', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SegmentedRow<ForegroundLockTimeout>(
-              values: ForegroundLockTimeout.values,
-              selected: ForegroundLockTimeout.thirtySeconds,
-              label: (v) => v.name,
-              onSelected: (_) {},
-            ),
+        testApp(Scaffold(
+          body: SegmentedRow<ForegroundLockTimeout>(
+            values: ForegroundLockTimeout.values,
+            selected: ForegroundLockTimeout.thirtySeconds,
+            label: (v) => v.name,
+            onSelected: (_) {},
           ),
-        ),
+        )),
       );
       expect(find.byType(Wrap), findsOneWidget);
       expect(find.byType(Row), findsNothing);

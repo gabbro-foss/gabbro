@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
-Widget _buildScreen() => MaterialApp(
-      home: VaultListScreen(
-        vaultPath: '/tmp/test.gabbro',
-        listEntries: () => <EntrySummaryData>[],
-      ),
-    );
+Widget _buildScreen() => testApp(VaultListScreen(
+      vaultPath: '/tmp/test.gabbro',
+      listEntries: () => <EntrySummaryData>[],
+    ));
 
 Future<void> _setNarrow(WidgetTester tester) async {
   tester.view.physicalSize = const Size(400, 800);
@@ -21,13 +20,11 @@ Future<void> _setNarrow(WidgetTester tester) async {
 void main() {
   group('AppBar title', () {
     testWidgets('shows vault alias when vaultAlias is provided', (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: VaultListScreen(
-          vaultPath: '/tmp/test.gabbro',
-          vaultAlias: 'My Vault',
-          listEntries: () => <EntrySummaryData>[],
-          ),
-      ));
+      await tester.pumpWidget(testApp(VaultListScreen(
+        vaultPath: '/tmp/test.gabbro',
+        vaultAlias: 'My Vault',
+        listEntries: () => <EntrySummaryData>[],
+      )));
       await _setNarrow(tester);
       await tester.pumpAndSettle();
       expect(find.text('Gabbro - My Vault'), findsOneWidget);

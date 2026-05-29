@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
@@ -31,6 +32,11 @@ Future<void> autofillUnlockMain() async {
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: settings.language == LanguageChoice.system
+          ? null
+          : Locale(settings.language.name),
       themeMode: switch (settings.theme) {
         ThemeChoice.system => ThemeMode.system,
         ThemeChoice.light  => ThemeMode.light,
@@ -470,6 +476,11 @@ class _GabbroAppState extends State<GabbroApp>
           navigatorKey: _navigatorKey,
           title: 'Gabbro',
           debugShowCheckedModeBanner: false,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: _settings.language == LanguageChoice.system
+              ? null
+              : Locale(_settings.language.name),
           themeMode: _themeMode,
           theme: gabbroLightTheme(highContrast: hc),
           darkTheme: gabbroDarkTheme(highContrast: hc),

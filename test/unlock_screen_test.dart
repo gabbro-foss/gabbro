@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -49,21 +50,19 @@ Widget _buildScreen({
   bool showVaultList = false,
   void Function(String path, String alias)? onVaultSwitch,
 }) =>
-    MaterialApp(
-      home: UnlockScreen(
-        vaultPath: vaultPath,
-        onUnlock: onUnlock ?? (a, b) async {},
-        onEstimateEntropy: _fakeEntropy,
-        blockPassphraseCopyPaste: blockPassphraseCopyPaste,
-        yubikeyRecords: yubikeyRecords ?? [],
-        onUnlockWithYubikey: onUnlockWithYubikey ?? (a, b, c, d, e, f) async {},
-        onUnlockWithAnyYubikey: onUnlockWithAnyYubikey ?? (a, b, c, d, e) async {},
-        vaultAlias: vaultAlias,
-        registry: registry,
-        showVaultList: showVaultList,
-        onVaultSwitch: onVaultSwitch,
-      ),
-    );
+    testApp(UnlockScreen(
+      vaultPath: vaultPath,
+      onUnlock: onUnlock ?? (a, b) async {},
+      onEstimateEntropy: _fakeEntropy,
+      blockPassphraseCopyPaste: blockPassphraseCopyPaste,
+      yubikeyRecords: yubikeyRecords ?? [],
+      onUnlockWithYubikey: onUnlockWithYubikey ?? (a, b, c, d, e, f) async {},
+      onUnlockWithAnyYubikey: onUnlockWithAnyYubikey ?? (a, b, c, d, e) async {},
+      vaultAlias: vaultAlias,
+      registry: registry,
+      showVaultList: showVaultList,
+      onVaultSwitch: onVaultSwitch,
+    ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 

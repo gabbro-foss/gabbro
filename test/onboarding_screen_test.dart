@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
@@ -24,19 +25,17 @@ Widget _buildScreen({
   Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), String, String?)? onInitVaultWithYubikey,
   Future<void> Function(String path, String alias)? onVaultCreated,
 }) =>
-    MaterialApp(
-      home: OnboardingScreen(
-        initialPath: '/tmp/test.gabbro',
-        onInitVault: onInitVault ?? (a, b, c) async {},
-        onEstimateEntropy: _fakeStrongEntropy,
-        blockPassphraseCopyPaste: blockPassphraseCopyPaste,
-        isAndroid: isAndroid,
-        showYubikey: showYubikey ?? isAndroid,
-        onInitVaultWithYubikey: onInitVaultWithYubikey ??
-            (a, b, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t, alias) async {},
-        onVaultCreated: onVaultCreated,
-      ),
-    );
+    testApp(OnboardingScreen(
+      initialPath: '/tmp/test.gabbro',
+      onInitVault: onInitVault ?? (a, b, c) async {},
+      onEstimateEntropy: _fakeStrongEntropy,
+      blockPassphraseCopyPaste: blockPassphraseCopyPaste,
+      isAndroid: isAndroid,
+      showYubikey: showYubikey ?? isAndroid,
+      onInitVaultWithYubikey: onInitVaultWithYubikey ??
+          (a, b, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t, alias) async {},
+      onVaultCreated: onVaultCreated,
+    ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -453,16 +452,14 @@ void main() {
 
   testWidgets('alias already in use shows validation error on create',
       (tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: OnboardingScreen(
-        initialPath: '/tmp/test.gabbro',
-        onInitVault: (_, _, _) async {},
-        onEstimateEntropy: _fakeStrongEntropy,
-        blockPassphraseCopyPaste: false,
-        showYubikey: false,
-        existingAliases: const {'Taken Vault'},
-      ),
-    ));
+    await tester.pumpWidget(testApp(OnboardingScreen(
+      initialPath: '/tmp/test.gabbro',
+      onInitVault: (_, _, _) async {},
+      onEstimateEntropy: _fakeStrongEntropy,
+      blockPassphraseCopyPaste: false,
+      showYubikey: false,
+      existingAliases: const {'Taken Vault'},
+    )));
 
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Alias'), 'Taken Vault');
@@ -495,24 +492,22 @@ void main() {
     testWidgets('cancel button shown when pushed onto a navigation stack',
         (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Builder(
-            builder: (ctx) => ElevatedButton(
-              onPressed: () => Navigator.of(ctx).push(
-                MaterialPageRoute(
-                  builder: (_) => OnboardingScreen(
-                    initialPath: '/tmp/test.gabbro',
-                    onInitVault: (_, _, _) async {},
-                    onEstimateEntropy: _fakeStrongEntropy,
-                    blockPassphraseCopyPaste: false,
-                    showYubikey: false,
-                  ),
+        testApp(Builder(
+          builder: (ctx) => ElevatedButton(
+            onPressed: () => Navigator.of(ctx).push(
+              MaterialPageRoute(
+                builder: (_) => OnboardingScreen(
+                  initialPath: '/tmp/test.gabbro',
+                  onInitVault: (_, _, _) async {},
+                  onEstimateEntropy: _fakeStrongEntropy,
+                  blockPassphraseCopyPaste: false,
+                  showYubikey: false,
                 ),
               ),
-              child: const Text('Push'),
             ),
+            child: const Text('Push'),
           ),
-        ),
+        )),
       );
       await tester.tap(find.text('Push'));
       await tester.pumpAndSettle();
@@ -521,24 +516,22 @@ void main() {
 
     testWidgets('tapping cancel button pops the screen', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Builder(
-            builder: (ctx) => ElevatedButton(
-              onPressed: () => Navigator.of(ctx).push(
-                MaterialPageRoute(
-                  builder: (_) => OnboardingScreen(
-                    initialPath: '/tmp/test.gabbro',
-                    onInitVault: (_, _, _) async {},
-                    onEstimateEntropy: _fakeStrongEntropy,
-                    blockPassphraseCopyPaste: false,
-                    showYubikey: false,
-                  ),
+        testApp(Builder(
+          builder: (ctx) => ElevatedButton(
+            onPressed: () => Navigator.of(ctx).push(
+              MaterialPageRoute(
+                builder: (_) => OnboardingScreen(
+                  initialPath: '/tmp/test.gabbro',
+                  onInitVault: (_, _, _) async {},
+                  onEstimateEntropy: _fakeStrongEntropy,
+                  blockPassphraseCopyPaste: false,
+                  showYubikey: false,
                 ),
               ),
-              child: const Text('Push'),
             ),
+            child: const Text('Push'),
           ),
-        ),
+        )),
       );
       await tester.tap(find.text('Push'));
       await tester.pumpAndSettle();

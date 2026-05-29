@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
@@ -42,15 +43,13 @@ Widget _buildScreen(
       ClipboardClearTimeout.sixtySeconds,
   Future<void> Function(String url)? onLaunchUrl,
 }) =>
-    MaterialApp(
-      home: EntryDetailScreen(
-        entry: entry,
-        onDeleteEntry: onDeleteEntry ?? (_) async {},
-        onCopyToClipboard: onCopyToClipboard ?? (_) async {},
-        clipboardClearTimeout: clipboardClearTimeout,
-        onLaunchUrl: onLaunchUrl ?? (_) async {},
-      ),
-    );
+    testApp(EntryDetailScreen(
+      entry: entry,
+      onDeleteEntry: onDeleteEntry ?? (_) async {},
+      onCopyToClipboard: onCopyToClipboard ?? (_) async {},
+      clipboardClearTimeout: clipboardClearTimeout,
+      onLaunchUrl: onLaunchUrl ?? (_) async {},
+    ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -210,14 +209,12 @@ void main() {
     bool deletedCalled = false;
     bool deleteEntryCalled = false;
     await tester.pumpWidget(
-      MaterialApp(
-        home: EntryDetailScreen(
-          entry: VaultEntryData.login(_loginEntry()),
-          onDeleteEntry: (_) async { deleteEntryCalled = true; },
-          onCopyToClipboard: (_) async {},
-          onDeleted: () { deletedCalled = true; },
-        ),
-      ),
+      testApp(EntryDetailScreen(
+        entry: VaultEntryData.login(_loginEntry()),
+        onDeleteEntry: (_) async { deleteEntryCalled = true; },
+        onCopyToClipboard: (_) async {},
+        onDeleted: () { deletedCalled = true; },
+      )),
     );
 
     await tester.tap(find.byIcon(Icons.delete_outline));
@@ -234,25 +231,23 @@ void main() {
     bool deleteEntryCalled = false;
     bool popped = false;
     await tester.pumpWidget(
-      MaterialApp(
-        home: Builder(
-          builder: (context) => ElevatedButton(
-            onPressed: () async {
-              await Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => EntryDetailScreen(
-                    entry: VaultEntryData.login(_loginEntry()),
-                    onDeleteEntry: (_) async { deleteEntryCalled = true; },
-                    onCopyToClipboard: (_) async {},
-                  ),
+      testApp(Builder(
+        builder: (context) => ElevatedButton(
+          onPressed: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => EntryDetailScreen(
+                  entry: VaultEntryData.login(_loginEntry()),
+                  onDeleteEntry: (_) async { deleteEntryCalled = true; },
+                  onCopyToClipboard: (_) async {},
                 ),
-              );
-              popped = true;
-            },
-            child: const Text('Open'),
-          ),
+              ),
+            );
+            popped = true;
+          },
+          child: const Text('Open'),
         ),
-      ),
+      )),
     );
 
     await tester.tap(find.text('Open'));

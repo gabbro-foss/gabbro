@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/password_history_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 
@@ -44,13 +45,11 @@ Widget _buildHistoryScreen({
   Future<void> Function()? onDeleteHistory,
   Future<void> Function()? onRevert,
 }) =>
-    MaterialApp(
-      home: PasswordHistoryScreen(
-        entry: entry,
-        onDeleteHistory: onDeleteHistory ?? () async {},
-        onRevert: onRevert ?? () async {},
-      ),
-    );
+    testApp(PasswordHistoryScreen(
+      entry: entry,
+      onDeleteHistory: onDeleteHistory ?? () async {},
+      onRevert: onRevert ?? () async {},
+    ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 

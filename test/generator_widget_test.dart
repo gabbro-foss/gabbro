@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/widgets/generator_widget.dart';
 import 'package:gabbro/src/rust/api/password_generator.dart';
 import 'package:gabbro/src/rust/api/passphrase_generator.dart';
@@ -9,7 +10,7 @@ import 'package:gabbro/src/rust/api/passphrase_generator.dart';
 // should FAIL until the widget exists.
 // ---------------------------------------------------------------------------
 
-Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
+Widget _wrap(Widget child) => testApp(Scaffold(body: child));
 
 // Stub generator functions — no Rust FFI in tests.
 String _stubPassword(PasswordConfig config) => 'A' * config.length;

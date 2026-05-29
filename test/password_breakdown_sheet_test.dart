@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 
 void main() {
@@ -8,12 +9,10 @@ void main() {
       const password = 'Zx9#';
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: PasswordBreakdownSheet(password: password),
+        testApp(Scaffold(
+          body: PasswordBreakdownSheet(password: password),
           ),
-        ),
-      );
+        ));
 
       expect(find.text('Z'), findsOneWidget);
       expect(find.text('x'), findsOneWidget);
@@ -25,12 +24,10 @@ void main() {
       const password = 'Zx9#';
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: PasswordBreakdownSheet(password: password),
+        testApp(Scaffold(
+          body: PasswordBreakdownSheet(password: password),
           ),
-        ),
-      );
+        ));
 
       expect(find.text('0'), findsOneWidget);
       expect(find.text('1'), findsOneWidget);
@@ -42,12 +39,10 @@ void main() {
       const password = 'Ab1!';
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: PasswordBreakdownSheet(password: password),
+        testApp(Scaffold(
+          body: PasswordBreakdownSheet(password: password),
           ),
-        ),
-      );
+        ));
 
       expect(find.text('▲'), findsNWidgets(2));
       expect(find.text('▼'), findsNWidgets(2));
@@ -59,12 +54,10 @@ void main() {
       const password = 'Ab1!';
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: PasswordBreakdownSheet(password: password),
+        testApp(Scaffold(
+          body: PasswordBreakdownSheet(password: password),
           ),
-        ),
-      );
+        ));
 
       expect(find.text('Uppercase'), findsOneWidget);
       expect(find.text('Lowercase'), findsOneWidget);
@@ -77,9 +70,8 @@ void main() {
       const password = 'Abcdefgh1234!@#\$Abcdefgh1234!@#\$';
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
+        testApp(Scaffold(
+          body: SizedBox(
               width: 300,
               child: PasswordBreakdownSheet(password: password),
             ),
@@ -95,9 +87,8 @@ void main() {
       const password = 'Abcdefgh1234!@#\$Abcdefgh1234!@#\$';
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
+        testApp(Scaffold(
+          body: SizedBox(
               width: 300,
               child: PasswordBreakdownSheet(password: password),
             ),
@@ -123,9 +114,8 @@ void main() {
       const password = 'Abcdefgh1234!@#\$Abcdefgh1234!@#\$';
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
+        testApp(Scaffold(
+          body: SizedBox(
               width: 300,
               child: PasswordBreakdownSheet(password: password),
             ),
@@ -154,9 +144,8 @@ void main() {
       const password = 'Abcdefgh1234!@#\$Abcdefgh1234!@#\$';
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
+        testApp(Scaffold(
+          body: SizedBox(
               width: 300,
               child: PasswordBreakdownSheet(password: password),
             ),

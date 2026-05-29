@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -40,23 +41,19 @@ Widget _buildCreateScreen(
   Future<void> Function(VaultEntryData)? onCreateEntry,
   List<String> Function()? listFolders,
 }) =>
-    MaterialApp(
-      home: CreateEntryScreen(
-        entryType: entryType,
-        onCreateEntry: onCreateEntry ?? (_) async {},
-        onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
-        listFolders: listFolders ?? () => ['Work', 'Private'],
-      ),
-    );
+    testApp(CreateEntryScreen(
+      entryType: entryType,
+      onCreateEntry: onCreateEntry ?? (_) async {},
+      onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
+      listFolders: listFolders ?? () => ['Work', 'Private'],
+    ));
 
-Widget _buildEditScreen(VaultEntryData existing) => MaterialApp(
-      home: CreateEntryScreen(
-        entryType: 'Login',
-        existing: existing,
-        onCreateEntry: (_) async {},
-        onGetEntry: (_) => existing,
-      ),
-    );
+Widget _buildEditScreen(VaultEntryData existing) => testApp(CreateEntryScreen(
+      entryType: 'Login',
+      existing: existing,
+      onCreateEntry: (_) async {},
+      onGetEntry: (_) => existing,
+    ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -181,14 +178,12 @@ void main() {
 
   testWidgets('card PIN pre-populates in edit mode', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: CreateEntryScreen(
-          entryType: 'Card',
-          existing: VaultEntryData.card(_cardEntry(pin: '1234')),
-          onCreateEntry: (_) async {},
-          onGetEntry: (_) => VaultEntryData.card(_cardEntry(pin: '1234')),
-        ),
-      ),
+      testApp(CreateEntryScreen(
+        entryType: 'Card',
+        existing: VaultEntryData.card(_cardEntry(pin: '1234')),
+        onCreateEntry: (_) async {},
+        onGetEntry: (_) => VaultEntryData.card(_cardEntry(pin: '1234')),
+      )),
     );
     final pinField = tester.widget<TextFormField>(
       find.widgetWithText(TextFormField, 'PIN (optional)'),
@@ -276,14 +271,12 @@ void main() {
       folder: 'Personal',
     );
     await tester.pumpWidget(
-      MaterialApp(
-        home: CreateEntryScreen(
-          entryType: 'Login',
-          existing: VaultEntryData.login(entry),
-          onCreateEntry: (_) async {},
-          onGetEntry: (_) => VaultEntryData.login(entry),
-        ),
-      ),
+      testApp(CreateEntryScreen(
+        entryType: 'Login',
+        existing: VaultEntryData.login(entry),
+        onCreateEntry: (_) async {},
+        onGetEntry: (_) => VaultEntryData.login(entry),
+      )),
     );
     final notesField = tester.widget<TextFormField>(
       find.widgetWithText(TextFormField, 'remember to update this annually'),
@@ -309,14 +302,12 @@ void main() {
       folder: 'Personal',
     );
     await tester.pumpWidget(
-      MaterialApp(
-        home: CreateEntryScreen(
-          entryType: 'Login',
-          existing: VaultEntryData.login(entry),
-          onCreateEntry: (_) async {},
-          onGetEntry: (_) => VaultEntryData.login(entry),
-        ),
-      ),
+      testApp(CreateEntryScreen(
+        entryType: 'Login',
+        existing: VaultEntryData.login(entry),
+        onCreateEntry: (_) async {},
+        onGetEntry: (_) => VaultEntryData.login(entry),
+      )),
     );
     // Edit the title — notes field should be unaffected
     await tester.enterText(
@@ -524,15 +515,13 @@ void main() {
 
   testWidgets('edit mode pre-selects existing entry folder', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: CreateEntryScreen(
-          entryType: 'Login',
-          existing: VaultEntryData.login(_loginEntry()),
-          onCreateEntry: (_) async {},
-          onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
-          listFolders: () => ['Work', 'Personal', 'Private'],
-        ),
-      ),
+      testApp(CreateEntryScreen(
+        entryType: 'Login',
+        existing: VaultEntryData.login(_loginEntry()),
+        onCreateEntry: (_) async {},
+        onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
+        listFolders: () => ['Work', 'Personal', 'Private'],
+      )),
     );
 
     // _loginEntry() has folder: 'Personal' — should be pre-selected
@@ -544,15 +533,13 @@ void main() {
   testWidgets('editing card notes in edit mode reaches review screen',
       (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: CreateEntryScreen(
-          entryType: 'Card',
-          existing: VaultEntryData.card(_cardEntry()),
-          onCreateEntry: (_) async {},
-          onGetEntry: (_) => VaultEntryData.card(_cardEntry()),
-          listFolders: () => ['Personal'],
-        ),
-      ),
+      testApp(CreateEntryScreen(
+        entryType: 'Card',
+        existing: VaultEntryData.card(_cardEntry()),
+        onCreateEntry: (_) async {},
+        onGetEntry: (_) => VaultEntryData.card(_cardEntry()),
+        listFolders: () => ['Personal'],
+      )),
     );
 
     final notesField = find.widgetWithText(TextFormField, 'Notes (optional)').last;
@@ -639,14 +626,12 @@ void main() {
       folder: '',
     );
     await tester.pumpWidget(
-      MaterialApp(
-        home: CreateEntryScreen(
-          entryType: 'Note',
-          existing: VaultEntryData.note(entry),
-          onCreateEntry: (_) async {},
-          onGetEntry: (_) => VaultEntryData.note(entry),
-        ),
-      ),
+      testApp(CreateEntryScreen(
+        entryType: 'Note',
+        existing: VaultEntryData.note(entry),
+        onCreateEntry: (_) async {},
+        onGetEntry: (_) => VaultEntryData.note(entry),
+      )),
     );
 
     await tester.ensureVisible(find.widgetWithText(TextFormField, 'Pin'));

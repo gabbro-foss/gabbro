@@ -19,6 +19,7 @@ class AppSettings {
   final AlphabetBarPosition alphabetBarPosition;
   final bool blockPassphraseCopyPaste;
   final bool showVaultList;
+  final LanguageChoice language;
 
   const AppSettings({
     this.theme = ThemeChoice.system,
@@ -31,6 +32,7 @@ class AppSettings {
     this.alphabetBarPosition = AlphabetBarPosition.left,
     this.blockPassphraseCopyPaste = true,
     this.showVaultList = false,
+    this.language = LanguageChoice.system,
   });
 
   static AppSettings get defaults => const AppSettings();
@@ -48,6 +50,7 @@ class AppSettings {
     'alphabet_bar_position': alphabetBarPosition.name,
     'block_passphrase_copy_paste': blockPassphraseCopyPaste,
     'show_vault_list': showVaultList,
+    'language': language.name,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -74,6 +77,9 @@ class AppSettings {
       ),
       blockPassphraseCopyPaste: json['block_passphrase_copy_paste'] as bool? ?? true,
       showVaultList: json['show_vault_list'] as bool? ?? false,
+      language: LanguageChoice.values.byName(
+        json['language'] as String? ?? 'system',
+      ),
     );
   }
 
@@ -88,6 +94,7 @@ class AppSettings {
     AlphabetBarPosition? alphabetBarPosition,
     bool? blockPassphraseCopyPaste,
     bool? showVaultList,
+    LanguageChoice? language,
   }) => AppSettings(
     theme: theme ?? this.theme,
     textSize: textSize ?? this.textSize,
@@ -99,6 +106,7 @@ class AppSettings {
     alphabetBarPosition: alphabetBarPosition ?? this.alphabetBarPosition,
     blockPassphraseCopyPaste: blockPassphraseCopyPaste ?? this.blockPassphraseCopyPaste,
     showVaultList: showVaultList ?? this.showVaultList,
+    language: language ?? this.language,
   );
 
   // ── File I/O ───────────────────────────────────────────────────────────
@@ -185,7 +193,11 @@ class AppSettings {
 
   // Show vault list on the login screen instead of the last-used vault only.
   // Options: true | false
-  "show_vault_list": $showVaultList
+  "show_vault_list": $showVaultList,
+
+  // Override the system language for the app UI.
+  // Options: "system" | "en" | "fr" | "de" | "it" | "es"
+  "language": "${language.name}"
 }
 ''';
 
@@ -220,3 +232,5 @@ enum ClipboardClearTimeout { never, thirtySeconds, sixtySeconds, twoMinutes }
 enum PasswordHistoryExpiry { sevenDays, thirtyDays, ninetyDays, keepForever }
 
 enum AlphabetBarPosition { left, right }
+
+enum LanguageChoice { system, en, fr, de, it, es }

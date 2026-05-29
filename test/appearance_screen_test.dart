@@ -23,9 +23,24 @@ void main() {
 
     testWidgets('all theme buttons are present', (tester) async {
       await tester.pumpWidget(_buildScreen());
-      expect(find.text('System'), findsOneWidget);
+      // 'System' appears in both Theme and Language rows.
+      expect(find.text('System'), findsNWidgets(2));
       expect(find.text('Light'), findsOneWidget);
       expect(find.text('Dark'), findsOneWidget);
+    });
+
+    testWidgets('language section header is present', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      expect(find.text('Language'), findsOneWidget);
+    });
+
+    testWidgets('all language buttons are present', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      expect(find.text('English'), findsOneWidget);
+      expect(find.text('Français'), findsOneWidget);
+      expect(find.text('Deutsch'), findsOneWidget);
+      expect(find.text('Italiano'), findsOneWidget);
+      expect(find.text('Español'), findsOneWidget);
     });
 
     testWidgets('alphabet bar position section header is present', (tester) async {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/manage_folders_screen.dart';
 
 Widget _buildScreen({
@@ -9,14 +10,12 @@ Widget _buildScreen({
   Future<void> Function(String, String)? renameFolder,
   Future<void> Function(String, String?)? deleteFolder,
 }) {
-  return MaterialApp(
-    home: ManageFoldersScreen(
-      listFolders: listFolders ?? () async => folders,
-      createFolder: createFolder ?? (_) async {},
-      renameFolder: renameFolder ?? (a, b) async {},
-      deleteFolder: deleteFolder ?? (a, b) async {},
-    ),
-  );
+  return testApp(ManageFoldersScreen(
+    listFolders: listFolders ?? () async => folders,
+    createFolder: createFolder ?? (_) async {},
+    renameFolder: renameFolder ?? (a, b) async {},
+    deleteFolder: deleteFolder ?? (a, b) async {},
+  ));
 }
 
 void main() {

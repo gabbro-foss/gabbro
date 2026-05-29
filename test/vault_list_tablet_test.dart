@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
@@ -224,31 +225,29 @@ void main() {
       final grouped = <dynamic>['A', entries[0], 'B', entries[1]];
 
       Widget buildLayout(List<EntrySummaryData> filtered) =>
-          MaterialApp(
-            home: Scaffold(
-              body: TabletVaultLayout(
-                groupedEntries: filtered.isEmpty ? [] : grouped,
-                filteredEntries: filtered,
-                letterIndex: filtered.isEmpty ? {} : {'A': 0},
-                onLetterSelected: (_) {},
-                displayTitle: (e) => e.title,
-                displayType: (_) => 'Password',
-                entryTypeIcon: (_) => Icons.lock_outline,
-                searchBar: const SizedBox.shrink(),
-                filterChipRow: const SizedBox.shrink(),
-                searchActive: false,
-                onEntryTap: (_) {},
-                onRefresh: () {},
-                vaultPath: '/tmp/test.gabbro',
-                clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
-                getEntryFn: (_) => _fakeLoginEntry(),
-                onDeleteEntryFn: (_) async {},
-                selectionMode: false,
-                selectedIds: const {},
-                onToggleSelection: (_) {},
-              ),
+          testApp(Scaffold(
+            body: TabletVaultLayout(
+              groupedEntries: filtered.isEmpty ? [] : grouped,
+              filteredEntries: filtered,
+              letterIndex: filtered.isEmpty ? {} : {'A': 0},
+              onLetterSelected: (_) {},
+              displayTitle: (e) => e.title,
+              displayType: (_) => 'Password',
+              entryTypeIcon: (_) => Icons.lock_outline,
+              searchBar: const SizedBox.shrink(),
+              filterChipRow: const SizedBox.shrink(),
+              searchActive: false,
+              onEntryTap: (_) {},
+              onRefresh: () {},
+              vaultPath: '/tmp/test.gabbro',
+              clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
+              getEntryFn: (_) => _fakeLoginEntry(),
+              onDeleteEntryFn: (_) async {},
+              selectionMode: false,
+              selectedIds: const {},
+              onToggleSelection: (_) {},
             ),
-          );
+          ));
 
       // First render — two entries present.
       await tester.pumpWidget(buildLayout(entries));
@@ -299,31 +298,29 @@ void main() {
         List<EntrySummaryData> filtered,
         List<dynamic> groupedList,
       ) =>
-          MaterialApp(
-            home: Scaffold(
-              body: TabletVaultLayout(
-                groupedEntries: groupedList,
-                filteredEntries: filtered,
-                letterIndex: {'A': 0},
-                onLetterSelected: (_) {},
-                displayTitle: (e) => e.title,
-                displayType: (_) => 'Password',
-                entryTypeIcon: (_) => Icons.lock_outline,
-                searchBar: const SizedBox.shrink(),
-                filterChipRow: const SizedBox.shrink(),
-                searchActive: false,
-                onEntryTap: (_) {},
-                onRefresh: () {},
-                vaultPath: '/tmp/test.gabbro',
-                clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
-                getEntryFn: (_) => _fakeLoginEntry(),
-                onDeleteEntryFn: (_) async {},
-                selectionMode: false,
-                selectedIds: const {},
-                onToggleSelection: (_) {},
-              ),
+          testApp(Scaffold(
+            body: TabletVaultLayout(
+              groupedEntries: groupedList,
+              filteredEntries: filtered,
+              letterIndex: {'A': 0},
+              onLetterSelected: (_) {},
+              displayTitle: (e) => e.title,
+              displayType: (_) => 'Password',
+              entryTypeIcon: (_) => Icons.lock_outline,
+              searchBar: const SizedBox.shrink(),
+              filterChipRow: const SizedBox.shrink(),
+              searchActive: false,
+              onEntryTap: (_) {},
+              onRefresh: () {},
+              vaultPath: '/tmp/test.gabbro',
+              clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
+              getEntryFn: (_) => _fakeLoginEntry(),
+              onDeleteEntryFn: (_) async {},
+              selectionMode: false,
+              selectedIds: const {},
+              onToggleSelection: (_) {},
             ),
-          );
+          ));
 
       // Initial render — two entries.
       await tester.pumpWidget(buildLayout(originalEntries, grouped));

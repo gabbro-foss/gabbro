@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'test_helpers.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/vault_registry.dart';
@@ -34,18 +35,16 @@ Widget _buildScreen({
   Future<void> Function(List<YubikeyRecordData>, String, String)? onConfirmAnyYubikey,
   List<YubikeyRecordData> Function(String path)? listYubikeyRecords,
 }) =>
-    MaterialApp(
-      home: ManageVaultsScreen(
-        registry: registry,
-        onRename: onRename ?? (_, _) async {},
-        onDelete: onDelete ?? (_) async {},
-        onAddVault: onAddVault ?? () {},
-        onSwitchToVault: onSwitchToVault ?? (_, _) {},
-        onConfirmYubikey: onConfirmYubikey ?? (_, _, _, _) async {},
-        onConfirmAnyYubikey: onConfirmAnyYubikey ?? (_, _, _) async {},
-        listYubikeyRecords: listYubikeyRecords ?? (_) => [],
-      ),
-    );
+    testApp(ManageVaultsScreen(
+      registry: registry,
+      onRename: onRename ?? (_, _) async {},
+      onDelete: onDelete ?? (_) async {},
+      onAddVault: onAddVault ?? () {},
+      onSwitchToVault: onSwitchToVault ?? (_, _) {},
+      onConfirmYubikey: onConfirmYubikey ?? (_, _, _, _) async {},
+      onConfirmAnyYubikey: onConfirmAnyYubikey ?? (_, _, _) async {},
+      listYubikeyRecords: listYubikeyRecords ?? (_) => [],
+    ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 

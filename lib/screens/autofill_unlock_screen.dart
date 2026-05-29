@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 
-/// Shown by UnlockActivity when the vault is locked and an autofill request
-/// has arrived. The user enters their passphrase; on success a MethodChannel
-/// message is sent back to Kotlin with the matched credential.
 class AutofillUnlockScreen extends StatefulWidget {
   const AutofillUnlockScreen({super.key});
 
@@ -42,8 +40,9 @@ class _AutofillUnlockScreenState extends State<AutofillUnlockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Unlock Gabbro')),
+      appBar: AppBar(title: Text(l.unlockGabbroTitle)),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -54,7 +53,7 @@ class _AutofillUnlockScreenState extends State<AutofillUnlockScreen> {
               obscureText: _obscure,
               autofocus: true,
               decoration: InputDecoration(
-                labelText: 'Passphrase',
+                labelText: l.passphraseLabel,
                 errorText: _error,
                 suffixIcon: IconButton(
                   icon: Icon(_obscure ? Icons.visibility : Icons.visibility_off),
@@ -75,7 +74,7 @@ class _AutofillUnlockScreenState extends State<AutofillUnlockScreen> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Unlock'),
+                  : Text(l.unlock),
             ),
           ],
         ),

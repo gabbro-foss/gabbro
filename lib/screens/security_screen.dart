@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 
@@ -32,8 +33,10 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Security')),
+      appBar: AppBar(title: Text(l.securityTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -42,21 +45,18 @@ class _SecurityScreenState extends State<SecurityScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ── Foreground lock ────────────────────────────────────────
-              SectionHeader(label: 'Foreground lock'),
+              SectionHeader(label: l.sectionForegroundLock),
               const SizedBox(height: 4),
-              const Text(
-                'Lock after this much inactivity while the app is open.',
-                style: TextStyle(fontSize: 12),
-              ),
+              Text(l.foregroundLockDescription, style: const TextStyle(fontSize: 12)),
               const SizedBox(height: 8),
               SegmentedRow<ForegroundLockTimeout>(
                 values: ForegroundLockTimeout.values,
                 selected: _settings.foregroundLockTimeout,
                 label: (v) => switch (v) {
-                  ForegroundLockTimeout.thirtySeconds => '30s',
-                  ForegroundLockTimeout.oneMinute => '1 min',
-                  ForegroundLockTimeout.fiveMinutes => '5 min',
-                  ForegroundLockTimeout.never => 'Never',
+                  ForegroundLockTimeout.thirtySeconds => l.duration30s,
+                  ForegroundLockTimeout.oneMinute => l.duration1min,
+                  ForegroundLockTimeout.fiveMinutes => l.duration5min,
+                  ForegroundLockTimeout.never => l.durationNever,
                 },
                 onSelected: (v) =>
                     _update(_settings.copyWith(foregroundLockTimeout: v)),
@@ -64,21 +64,18 @@ class _SecurityScreenState extends State<SecurityScreen> {
               const SizedBox(height: 32),
 
               // ── Background lock ────────────────────────────────────────
-              SectionHeader(label: 'Background lock'),
+              SectionHeader(label: l.sectionBackgroundLock),
               const SizedBox(height: 4),
-              const Text(
-                'Lock after the app has been in the background for this long.',
-                style: TextStyle(fontSize: 12),
-              ),
+              Text(l.backgroundLockDescription, style: const TextStyle(fontSize: 12)),
               const SizedBox(height: 8),
               SegmentedRow<BackgroundLockTimeout>(
                 values: BackgroundLockTimeout.values,
                 selected: _settings.backgroundLockTimeout,
                 label: (v) => switch (v) {
-                  BackgroundLockTimeout.oneMinute => '1 min',
-                  BackgroundLockTimeout.fiveMinutes => '5 min',
-                  BackgroundLockTimeout.fifteenMinutes => '15 min',
-                  BackgroundLockTimeout.never => 'Never',
+                  BackgroundLockTimeout.oneMinute => l.duration1min,
+                  BackgroundLockTimeout.fiveMinutes => l.duration5min,
+                  BackgroundLockTimeout.fifteenMinutes => l.duration15min,
+                  BackgroundLockTimeout.never => l.durationNever,
                 },
                 onSelected: (v) =>
                     _update(_settings.copyWith(backgroundLockTimeout: v)),
@@ -86,22 +83,18 @@ class _SecurityScreenState extends State<SecurityScreen> {
               const SizedBox(height: 32),
 
               // ── Password history ───────────────────────────────────────
-              SectionHeader(label: 'Password history'),
+              SectionHeader(label: l.sectionPasswordHistory),
               const SizedBox(height: 4),
-              const Text(
-                'How long to keep a previous password after it is changed. '
-                '"Keep forever" means history is only deleted manually.',
-                style: TextStyle(fontSize: 12),
-              ),
+              Text(l.passwordHistoryDescription, style: const TextStyle(fontSize: 12)),
               const SizedBox(height: 8),
               SegmentedRow<PasswordHistoryExpiry>(
                 values: PasswordHistoryExpiry.values,
                 selected: _settings.passwordHistoryExpiry,
                 label: (v) => switch (v) {
-                  PasswordHistoryExpiry.sevenDays => '7 days',
-                  PasswordHistoryExpiry.thirtyDays => '30 days',
-                  PasswordHistoryExpiry.ninetyDays => '90 days',
-                  PasswordHistoryExpiry.keepForever => 'Keep forever',
+                  PasswordHistoryExpiry.sevenDays => l.duration7days,
+                  PasswordHistoryExpiry.thirtyDays => l.duration30days,
+                  PasswordHistoryExpiry.ninetyDays => l.duration90days,
+                  PasswordHistoryExpiry.keepForever => l.durationKeepForever,
                 },
                 onSelected: (v) =>
                     _update(_settings.copyWith(passwordHistoryExpiry: v)),
@@ -109,73 +102,50 @@ class _SecurityScreenState extends State<SecurityScreen> {
               const SizedBox(height: 32),
 
               // ── Passphrase copy/paste ──────────────────────────────────
-              SectionHeader(label: 'Passphrase copy/paste'),
+              SectionHeader(label: l.sectionPassphraseCopyPaste),
               const SizedBox(height: 4),
-              const Text(
-                'Block copy and paste on master passphrase fields. '
-                'Recommended: prevents passphrase leaking via clipboard.',
-                style: TextStyle(fontSize: 12),
-              ),
+              Text(l.passphraseCopyPasteDescription, style: const TextStyle(fontSize: 12)),
               const SizedBox(height: 8),
               SwitchListTile(
-                title: const Text('Block copy/paste'),
+                title: Text(l.blockCopyPasteTitle),
                 value: _settings.blockPassphraseCopyPaste,
                 onChanged: (v) =>
                     _update(_settings.copyWith(blockPassphraseCopyPaste: v)),
                 contentPadding: EdgeInsets.zero,
               ),
               const SizedBox(height: 4),
-              const Text(
-                'Note: this blocks the long-press context menu and text selection. '
-                'Your keyboard\'s inline paste button may still work — '
-                'this is a platform limitation that cannot be blocked.',
-                style: TextStyle(fontSize: 11),
-              ),
+              Text(l.passphraseCopyPasteNote, style: const TextStyle(fontSize: 11)),
               const SizedBox(height: 32),
 
               // ── Vault list ─────────────────────────────────────────────
-              SectionHeader(label: 'Vault list'),
+              SectionHeader(label: l.sectionVaultList),
               const SizedBox(height: 4),
-              const Text(
-                'Show a dropdown of all vaults on the login screen so you can '
-                'pick which one to unlock without going to Manage vaults.',
-                style: TextStyle(fontSize: 12),
-              ),
+              Text(l.vaultListDescription, style: const TextStyle(fontSize: 12)),
               const SizedBox(height: 8),
               SwitchListTile(
-                title: const Text('Show vault list on login'),
+                title: Text(l.showVaultListTitle),
                 value: _settings.showVaultList,
                 onChanged: (v) =>
                     _update(_settings.copyWith(showVaultList: v)),
                 contentPadding: EdgeInsets.zero,
               ),
               const SizedBox(height: 4),
-              const Text(
-                'High-security note: when this is OFF, the login screen shows '
-                'only the last-used vault — no hint that other vaults exist. '
-                'Trade-off: to switch vaults you must first unlock, then go to '
-                'Menu → Manage vaults.',
-                style: TextStyle(fontSize: 11),
-              ),
+              Text(l.vaultListNote, style: const TextStyle(fontSize: 11)),
               const SizedBox(height: 32),
 
               // ── Clipboard clear ────────────────────────────────────────
-              SectionHeader(label: 'Clipboard clear'),
+              SectionHeader(label: l.sectionClipboardClear),
               const SizedBox(height: 4),
-              const Text(
-                'Clear the clipboard this long after copying a secret. '
-                'Note: clipboard managers may retain a copy.',
-                style: TextStyle(fontSize: 12),
-              ),
+              Text(l.clipboardClearDescription, style: const TextStyle(fontSize: 12)),
               const SizedBox(height: 8),
               SegmentedRow<ClipboardClearTimeout>(
                 values: ClipboardClearTimeout.values,
                 selected: _settings.clipboardClearTimeout,
                 label: (v) => switch (v) {
-                  ClipboardClearTimeout.never => 'Never',
-                  ClipboardClearTimeout.thirtySeconds => '30s',
-                  ClipboardClearTimeout.sixtySeconds => '60s',
-                  ClipboardClearTimeout.twoMinutes => '2 min',
+                  ClipboardClearTimeout.never => l.durationNever,
+                  ClipboardClearTimeout.thirtySeconds => l.duration30s,
+                  ClipboardClearTimeout.sixtySeconds => l.duration60s,
+                  ClipboardClearTimeout.twoMinutes => l.duration2min,
                 },
                 onSelected: (v) =>
                     _update(_settings.copyWith(clipboardClearTimeout: v)),
