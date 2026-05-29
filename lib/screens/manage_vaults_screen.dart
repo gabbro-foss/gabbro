@@ -211,7 +211,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                 child: Text(l.cancel),
               ),
               TextButton(
-                onPressed: confirmController.text == 'DELETE'
+                onPressed: confirmController.text == l.typeDeleteWord
                     ? () => Navigator.of(ctx).pop(true)
                     : null,
                 style: TextButton.styleFrom(

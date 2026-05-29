@@ -661,6 +661,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get typeDeleteToConfirm => 'Type DELETE to confirm';
 
   @override
+  String get typeDeleteWord => 'DELETE';
+
+  @override
   String get touchYourYubiKey => 'Touch your YubiKey';
 
   @override

@@ -24,9 +24,12 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
   bool _previousObscured = true;
 
   String _prevMeta(AppLocalizations l, PreviousSecretData prev) {
-    final saved = l.historySavedOn(formatTimestamp(prev.savedAt));
+    final saved = l.historySavedOn(formatTimestamp(prev.savedAt, locale: l.localeName));
     if (prev.expiresAt != null && prev.expiresAt!.isNotEmpty) {
-      return l.historyExpiresAppend(saved, formatTimestamp(prev.expiresAt!));
+      return l.historyExpiresAppend(
+        saved,
+        formatTimestamp(prev.expiresAt!, locale: l.localeName),
+      );
     }
     return saved;
   }
@@ -67,7 +70,7 @@ class _PasswordHistoryScreenState extends State<PasswordHistoryScreen> {
               const SizedBox(height: 8),
               _historyRow(
                 l: l,
-                meta: l.historySavedOn(formatTimestamp(widget.entry.updatedAt)),
+                meta: l.historySavedOn(formatTimestamp(widget.entry.updatedAt, locale: l.localeName)),
                 value: widget.entry.password,
                 obscured: _currentObscured,
                 onToggle: () =>

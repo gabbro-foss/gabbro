@@ -1,4 +1,684 @@
 {
   "@@locale": "fr",
-  "appearanceTitle": "Apparence"
+
+  "appName": "Gabbro",
+
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "save": "Enregistrer",
+  "close": "Fermer",
+  "ok": "OK",
+  "edit": "Modifier",
+  "add": "Ajouter",
+  "remove": "Retirer",
+  "rename": "Renommer",
+  "confirm": "Confirmer",
+  "continueAction": "Continuer",
+  "dismiss": "Ignorer",
+  "authorize": "Autoriser",
+  "register": "Enregistrer",
+  "sync": "Synchroniser",
+  "assign": "Attribuer",
+  "unlock": "Déverrouiller",
+  "generate": "Générer",
+  "import": "Importer",
+  "export": "Exporter",
+  "openInBrowser": "Ouvrir dans le navigateur",
+  "useThisPassword": "Utiliser ce mot de passe",
+  "reviewArrow": "Vérifier →",
+  "skip": "Ignorer",
+  "keep": "Conserver",
+  "revert": "Restaurer",
+  "next": "Suivant : mapper les colonnes",
+  "syncFromVault": "Synchroniser depuis le coffre",
+  "createVault": "Créer un coffre",
+  "pickFile": "Choisir un fichier",
+  "noFileSelected": "Aucun fichier sélectionné",
+  "chooseFolder": "Choisir un dossier",
+  "addCustomField": "Ajouter un champ personnalisé",
+  "exportFile": "Exporter le fichier",
+  "addVault": "Ajouter un coffre",
+  "addYubiKey": "Ajouter une YubiKey",
+  "noChangesToSave": "Aucune modification à enregistrer.",
+
+  "appearanceTitle": "Apparence",
+  "securityTitle": "Sécurité",
+  "aboutTitle": "À propos de Gabbro",
+  "generatorTitle": "Générateur de mots de passe",
+  "importTitle": "Importer des entrées",
+  "exportTitle": "Exporter le coffre",
+  "changePassphraseTitle": "Changer le mot de passe principal",
+  "csvMappingTitle": "Mapper les colonnes CSV",
+  "manageFoldersTitle": "Gérer les dossiers",
+  "manageVaultsTitle": "Gérer les coffres",
+  "manageYubiKeysTitle": "Gérer les YubiKeys",
+  "passwordHistoryTitle": "Historique des mots de passe",
+  "reviewChangesTitle": "Vérifier les modifications",
+  "unlockGabbroTitle": "Déverrouiller Gabbro",
+
+  "sectionTheme": "Thème",
+  "sectionTextSize": "Taille du texte",
+  "sectionAlphabetBar": "Position de la barre alphabétique",
+  "sectionAccessibility": "Accessibilité",
+  "sectionLanguage": "Langue",
+  "sectionForegroundLock": "Verrouillage en avant-plan",
+  "sectionBackgroundLock": "Verrouillage en arrière-plan",
+  "sectionPasswordHistory": "Historique des mots de passe",
+  "sectionPassphraseCopyPaste": "Copier/coller le mot de passe principal",
+  "sectionVaultList": "Liste des coffres",
+  "sectionClipboardClear": "Effacement du presse-papiers",
+  "sectionCharacterSets": "Jeux de caractères",
+  "sectionGeneratorLanguage": "Langue",
+
+  "themeSystem": "Système",
+  "themeLight": "Clair",
+  "themeDark": "Sombre",
+
+  "textSizeSmall": "Petit",
+  "textSizeRegular": "Normal",
+  "textSizeLarge": "Grand",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Disposition téléphone uniquement — tablette toujours à gauche.",
+  "alphabetBarLeft": "Gauche",
+  "alphabetBarRight": "Droite",
+
+  "highContrastTitle": "Contraste élevé",
+  "highContrastSubtitle": "Augmente le contraste pour une meilleure lisibilité",
+
+  "languageNote": "Remplace la langue du système. « Système » suit les paramètres régionaux de l'appareil.",
+  "langSystem": "Système",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+
+  "foregroundLockDescription": "Verrouiller après cette période d'inactivité lorsque l'application est ouverte.",
+  "backgroundLockDescription": "Verrouiller après que l'application a été en arrière-plan pendant ce temps.",
+  "passwordHistoryDescription": "Durée de conservation d'un mot de passe précédent après modification. « Conserver indéfiniment » signifie que l'historique n'est supprimé que manuellement.",
+  "passphraseCopyPasteDescription": "Bloquer le copier-coller sur les champs de mot de passe principal. Recommandé : empêche la fuite du mot de passe via le presse-papiers.",
+  "passphraseCopyPasteNote": "Remarque : cela bloque le menu contextuel d'appui long et la sélection de texte. Le bouton de collage intégré du clavier peut encore fonctionner — il s'agit d'une limitation de la plateforme.",
+  "blockCopyPasteTitle": "Bloquer le copier/coller",
+  "vaultListDescription": "Afficher un menu déroulant de tous les coffres sur l'écran de connexion pour choisir lequel déverrouiller sans aller dans Gérer les coffres.",
+  "showVaultListTitle": "Afficher la liste des coffres à la connexion",
+  "vaultListNote": "Note de haute sécurité : lorsque cette option est DÉSACTIVÉE, l'écran de connexion n'affiche que le dernier coffre utilisé — aucun indice que d'autres coffres existent. Pour changer de coffre, déverrouillez d'abord, puis allez dans Menu → Gérer les coffres.",
+  "clipboardClearDescription": "Effacer le presse-papiers après ce délai lors de la copie d'un secret. Remarque : les gestionnaires de presse-papiers peuvent conserver une copie.",
+
+  "duration30s": "30s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60s",
+  "duration2min": "2 min",
+  "durationNever": "Jamais",
+  "duration7days": "7 jours",
+  "duration30days": "30 jours",
+  "duration90days": "90 jours",
+  "durationKeepForever": "Conserver indéfiniment",
+
+  "menuExportVault": "Exporter le coffre",
+  "menuImportEntries": "Importer des entrées",
+  "menuSyncFromFile": "Synchroniser depuis un fichier",
+  "menuManageVaults": "Gérer les coffres",
+  "menuChangePassphrase": "Changer le mot de passe principal",
+  "menuManageYubiKeys": "Gérer les YubiKeys",
+  "menuAppearance": "Apparence",
+  "menuSecurity": "Sécurité",
+  "menuManageFolders": "Gérer les dossiers",
+  "menuPasswordGenerator": "Générateur de mots de passe",
+  "menuAbout": "À propos",
+
+  "tooltipSelectEntries": "Sélectionner des entrées",
+  "tooltipLockVault": "Verrouiller le coffre",
+  "tooltipSelectAll": "Tout sélectionner",
+  "tooltipDeselectAll": "Tout désélectionner",
+  "tooltipMenu": "Menu",
+  "tooltipCopy": "Copier",
+  "tooltipCopied": "Copié !",
+  "tooltipShow": "Afficher",
+  "tooltipHide": "Masquer",
+  "tooltipBrowse": "Parcourir",
+  "tooltipEditAlias": "Modifier l'alias",
+  "tooltipRemoveField": "Supprimer le champ",
+  "tooltipRename": "Renommer",
+  "tooltipDeleteVault": "Supprimer le coffre",
+  "tooltipAssignToFolder": "Attribuer à un dossier",
+  "tooltipShowPin": "Afficher le PIN",
+  "tooltipHidePin": "Masquer le PIN",
+  "tooltipShowValue": "Afficher la valeur",
+  "tooltipHideValue": "Masquer",
+  "tooltipCancel": "Annuler",
+  "tooltipOpenInBrowser": "Ouvrir dans le navigateur",
+
+  "allFolders": "Tous les dossiers",
+  "noFolder": "Aucun",
+  "selectFolder": "Sélectionner un dossier",
+  "folderName": "Nom du dossier",
+
+  "noEntriesMatch": "Aucune entrée ne correspond à votre recherche.",
+  "noVaultsRegistered": "Aucun coffre enregistré.",
+  "noYubiKeysRegistered": "Aucune YubiKey enregistrée",
+  "selectEntry": "Sélectionner une entrée",
+  "newEntryTitle": "Nouvelle entrée",
+  "createEntryTitle": "Nouveau {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Modifier {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(pas d'URL)",
+  "noNameFallback": "(pas de nom)",
+  "untitledFallback": "(sans titre)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "{count} sélectionné(s)",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Rechercher dans tous les champs…",
+  "searchEntriesHint": "Rechercher des entrées…",
+  "searchAllFieldsTooltip": "Recherche dans tous les champs",
+  "searchByTitleTooltip": "Recherche par titre",
+  "entryTypeAll": "Tous",
+  "entryTypePassword": "Mot de passe",
+  "entryTypeNote": "Note",
+  "entryTypeCard": "Carte",
+  "entryTypeIdentity": "Identité",
+  "entryTypeFile": "Fichier",
+  "entryTypeCustom": "Personnalisé",
+  "errorPrefix": "Erreur : {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Coffre",
+  "navAppearance": "Apparence",
+  "navSecurity": "Sécurité",
+  "navAbout": "À propos",
+
+  "deleteEntryTitle": "Supprimer l'entrée ?",
+  "cannotBeUndone": "Cette action est irréversible.",
+  "deleteEntryDialogTitle": "Supprimer l'entrée ?",
+  "deleteEntriesTitle": "{count, plural, one{Supprimer 1 entrée ?} other{Supprimer {count} entrées ?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Attribuer à un dossier",
+  "folderConflictTitle": "Conflit de dossier",
+  "syncFailedTitle": "Échec de la synchronisation",
+  "syncFromFileTitle": "Synchroniser depuis un fichier",
+  "nothingToSync": "Rien à synchroniser — les deux coffres sont déjà à jour.",
+
+  "importedEntries": "{count, plural, one{1 entrée importée.} other{{count} entrées importées.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Exporter le fichier",
+  "saveDecryptedFileTo": "Enregistrer le fichier déchiffré dans :",
+  "exportPathLabel": "Chemin d'exportation",
+  "exportedToPath": "Exporté vers {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Échec de l'exportation : {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Ouvrir dans le navigateur ?",
+  "couldNotOpen": "Impossible d'ouvrir {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Supprimer l'entrée précédente",
+  "failedToClearHistory": "Échec de la suppression de l'historique : {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Échec de la restauration du mot de passe : {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Renommer le dossier",
+  "addFolderTitle": "Ajouter un dossier",
+  "deleteFolderTitle": "Supprimer le dossier",
+  "deleteFolderConfirm": "Supprimer « {folder} » ?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Réattribuer les entrées à",
+  "clearToNone": "Réinitialiser à « Aucun »",
+
+  "renameVaultTitle": "Renommer le coffre",
+  "deleteVaultTitle": "Supprimer le coffre ?",
+  "deleteVaultConfirmTitle": "Êtes-vous sûr ?",
+  "typeDeleteToConfirm": "Saisir DELETE pour confirmer",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Touchez votre YubiKey",
+  "noVaultsRegisteredText": "Aucun coffre enregistré.",
+
+  "addYubiKeyTitle": "Ajouter une YubiKey",
+  "enterYubiKeyPinTitle": "Entrer le PIN YubiKey",
+  "editAliasForKey": "Modifier l'alias de la clé {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Il ne restera plus qu'une seule YubiKey enregistrée.",
+  "removeKeyConfirm": "Voulez-vous vraiment retirer cette clé ?",
+  "removeKeyVaultConfirm": "Retirer cette YubiKey du coffre ?",
+  "yubiKeyRemoved": "YubiKey retirée",
+  "failedToRemoveKey": "Échec du retrait de la clé : {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey ajoutée",
+  "failedToAddKey": "Échec de l'ajout de la clé : {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Échec de l'enregistrement de l'alias : {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Aucun appareil FIDO2 trouvé. Insérez votre YubiKey et réessayez.",
+  "transportLabel": "Transport :",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Mot de passe principal",
+  "yubiKeyPinLabel": "PIN YubiKey",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Mot de passe principal actuel",
+  "newPassphraseLabel": "Nouveau mot de passe principal",
+  "confirmPassphraseLabel": "Confirmer le nouveau mot de passe principal",
+  "vaultPassphraseLabel": "Mot de passe du coffre",
+  "aliasLabel": "Alias",
+  "aliasHint": "ex. Principal, Clé professionnelle…",
+  "masterPassphraseLabel": "Mot de passe principal",
+  "confirmPassphraseLabelShort": "Confirmer le mot de passe principal",
+
+  "fieldTitle": "Titre",
+  "fieldContent": "Contenu",
+  "fieldFirstName": "Prénom",
+  "fieldLastName": "Nom de famille",
+  "fieldEmail": "E-mail (facultatif)",
+  "fieldPhone": "Téléphone (facultatif)",
+  "fieldAddress": "Adresse (facultatif)",
+  "fieldCardLabel": "Libellé de la carte (ex. « Visa Platinium »)",
+  "fieldCardholderName": "Nom du titulaire",
+  "fieldCardNumber": "Numéro de carte",
+  "fieldExpiry": "Expiration (MM/AA)",
+  "fieldCvv": "CVV (facultatif)",
+  "fieldCardPin": "PIN (facultatif)",
+  "fieldCreditLimit": "Plafond de crédit (facultatif)",
+  "fieldAccountNumber": "Numéro de compte (facultatif)",
+  "fieldNotes": "Notes (facultatif)",
+  "fieldUrl": "URL (facultatif)",
+  "fieldUsername": "Nom d'utilisateur",
+  "fieldPassword": "Mot de passe",
+  "fieldSeparator": "Séparateur",
+  "fieldFolder": "Dossier",
+  "fieldLabel": "Libellé",
+  "fieldValue": "Valeur",
+  "fieldCustomFields": "Champs personnalisés",
+  "fieldLabelOptional": "{label} (facultatif)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Type d'entrée pas encore pris en charge.",
+  "csvColumnNone": "(aucun)",
+  "csvPreviewLabel": "Aperçu",
+  "csvImportButton": "Importer",
+
+  "gabbroVaultSection": "Coffre Gabbro",
+  "genericCsvSection": "CSV générique",
+
+  "changePassphraseSuccess": "Mot de passe principal changé avec succès",
+  "changePassphraseButton": "Changer le mot de passe principal",
+
+  "continueLabel": "Continuer",
+  "protectWithYubiKey": "Protéger avec une YubiKey",
+  "yubiKeySubtitle": "Clé de sécurité matérielle (recommandée)",
+  "accessibilityButton": "Accessibilité",
+
+  "aboutProjectSection": "Projet",
+  "aboutLicenceSection": "Licence",
+  "aboutOpenSourceSection": "Composants open source",
+  "aboutAttributionSection": "Attribution",
+
+  "lengthLabel": "Longueur",
+  "wordsLabel": "Mots",
+  "generateButton": "Générer",
+  "usePasswordButton": "Utiliser ce mot de passe",
+  "showHidePassword": "Afficher",
+
+  "deleteVaultPostDeletion": "Votre coffre a été supprimé. Créez-en un nouveau pour continuer.",
+
+  "syncFilePassphraseLabel": "Mot de passe du coffre",
+
+  "historyWarning": "Seule 1 valeur précédente est conservée. L'historique est automatiquement purgé selon vos paramètres de sécurité.",
+  "historyCurrent": "Actuel",
+  "historyPrevious": "Précédent",
+  "historySavedOn": "Enregistré le {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · expire le {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Problème d'importation ({index} sur {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Type : {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Modifiez pour corriger et enregistrer cette entrée, ou ignorez pour la supprimer.",
+
+  "entriesSkipped": "{count, plural, one{1 entrée ignorée} other{{count} entrées ignorées}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Ces entrées existent déjà dans votre coffre et n'ont pas été écrasées :",
+
+  "syncDeleteEntryContent": "L'autre appareil a supprimé « {title} ».\n\nLe supprimer ici aussi, ou le conserver ?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "« {title} » est dans des dossiers différents sur chaque appareil.\n\nCet appareil : {local}\nAutre appareil : {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Conserver sans dossier",
+  "folderConflictKeepLocal": "Conserver « {folder} »",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Déplacer sans dossier",
+  "folderConflictMoveIncoming": "Déplacer vers « {folder} »",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Coffre synchronisé — {added} ajouté(s), {updated} mis à jour, {deleted} supprimé(s).",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Ce fichier de coffre utilise un mot de passe principal différent. La synchronisation n'est prise en charge qu'entre des coffres partageant le même mot de passe principal.",
+
+  "reviewSensitiveFields": "Champs sensibles",
+  "reviewOtherFields": "Autres champs",
+  "reviewPasswordChanged": "Mot de passe modifié",
+  "reviewCvvChanged": "CVV modifié",
+  "reviewPinChanged": "PIN modifié",
+  "reviewTransactionPasswordChanged": "Mot de passe de transaction modifié",
+  "tooltipShowValues": "Afficher les valeurs",
+  "reviewOld": "Ancien",
+  "reviewNew": "Nouveau",
+  "reviewEmpty": "(vide)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Notes",
+  "reviewFieldContent": "Contenu",
+  "reviewFieldEmail": "E-mail",
+  "reviewFieldPhone": "Téléphone",
+  "reviewFieldAddress": "Adresse",
+  "reviewFieldCardLabel": "Libellé de la carte",
+  "reviewFieldStatus": "Statut",
+  "reviewFieldCardholder": "Titulaire",
+  "reviewFieldExpiry": "Expiration",
+  "reviewFieldCreditLimit": "Plafond de crédit",
+  "reviewFieldAccountNumber": "Numéro de compte",
+  "reviewFieldNetwork": "Réseau",
+  "reviewFieldBank": "Banque",
+  "reviewFieldFilename": "Nom de fichier",
+  "reviewFieldSize": "Taille",
+  "reviewFieldCardNumber": "Numéro",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Mot de passe de transaction",
+  "timestampCreated": "Créé",
+  "timestampUpdated": "Modifié",
+  "timestampUnknown": "Inconnu",
+  "noTitleFallback": "(pas de titre)",
+  "tooltipExportFile": "Exporter le fichier",
+  "tooltipEditEntry": "Modifier l'entrée",
+  "tooltipDeleteEntry": "Supprimer l'entrée",
+  "exportLabel": "Exporter",
+  "customEntryFieldsHeader": "Champs",
+  "copiedNeverClears": "Copié — le presse-papiers n'est jamais effacé automatiquement",
+  "copiedClears30s": "Copié — le presse-papiers sera effacé dans 30s",
+  "copiedClears60s": "Copié — le presse-papiers sera effacé dans 60s",
+  "copiedClears2min": "Copié — le presse-papiers sera effacé dans 2 min",
+
+  "passwordBreakdownTitle": "Analyse du mot de passe",
+  "charTypeUppercase": "Majuscule",
+  "charTypeLowercase": "Minuscule",
+  "charTypeDigit": "Chiffre",
+  "charTypeSymbol": "Symbole",
+
+  "exportChooseFormat": "Choisissez un format d'exportation.",
+  "exportUnencryptedWarning": "Complètement non chiffré — tous les secrets seront écrits en texte brut. Stockez ce fichier en lieu sûr et supprimez-le après utilisation.",
+  "exportPassphraseOnlyNote": "Protégé par votre mot de passe principal uniquement. La YubiKey n'est pas requise pour l'importation.",
+  "exportChooseDestinationJson": "Choisissez une destination pour votre fichier JSON exporté.",
+  "exportChooseDestinationVault": "Choisissez une destination pour votre fichier de coffre exporté.",
+  "exportTwoFilesNote": "Deux fichiers seront créés : vault.gabbro et vault.gabbro.sha256",
+  "exportSelectDestination": "Sélectionnez une destination.",
+
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Un gestionnaire de mots de passe post-quantique",
+  "aboutSourceCode": "Code source",
+  "aboutReportIssue": "Signaler un problème",
+  "aboutSupportGabbro": "Soutenir Gabbro",
+  "aboutLicenceBody": "Gabbro est un logiciel libre et open source, distribué sous la licence GNU General Public License v3.0 uniquement (GPL-3.0-only).\n\nVous êtes libre d'utiliser, d'étudier et de redistribuer ce logiciel selon les termes de cette licence.",
+  "aboutOwnerRole": "Propriétaire du projet, architecte et développeur principal :",
+  "aboutAiPartner": "Partenaire de développement IA :",
+  "aboutNoTelemetry": "Gabbro n'effectue aucune connexion réseau sortante. Pas de télémétrie, pas d'analyses, pas de comptes.",
+
+  "strengthTierTerrible": "Terrible",
+  "strengthTierWeak": "Faible",
+  "strengthTierFair": "Moyen",
+  "strengthTierStrong": "Fort",
+  "strengthTierVeryStrong": "Très fort",
+  "strengthTierExcellent": "Excellent",
+  "yubiKeyProtectedNote": "Coffre protégé par YubiKey — votre liaison YubiKey sera préservée.",
+  "yubiKeyPinRequired": "Le PIN YubiKey est requis",
+  "tapYubiKeyNow": "Touchez votre YubiKey maintenant…",
+  "touchYubiKeyToAuthorize": "Touchez votre YubiKey pour autoriser cette modification.",
+  "currentPassphraseRequired": "Le mot de passe principal actuel est requis",
+  "newPassphraseRequired": "Un nouveau mot de passe principal est requis",
+  "passphraseTooWeak": "Le mot de passe principal est trop faible",
+  "confirmPassphraseRequired": "Veuillez confirmer votre nouveau mot de passe principal",
+  "passphrasesDoNotMatch": "Les mots de passe principaux ne correspondent pas",
+  "passphrasesMatch": "✓ Les mots de passe principaux correspondent",
+  "passphrasesNoMatch": "✗ Les mots de passe principaux ne correspondent pas",
+  "entropyDisplay": "{tier} · {bits} bits",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Erreur de transport.",
+  "authorizationFailed": "Autorisation échouée — vérifiez votre PIN et réessayez.",
+
+  "unlockEnterPassphraseAndPin": "Entrez votre mot de passe principal et le PIN YubiKey pour déverrouiller",
+  "unlockEnterPassphrase": "Entrez votre mot de passe principal pour déverrouiller",
+  "unlockEntropyDisplay": "{tier} · {bits} bits d'entropie",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Insérez votre YubiKey et touchez-la lorsqu'elle clignote",
+  "unlockErrorPassphrase": "Impossible de déverrouiller le coffre. Vérifiez votre mot de passe principal.",
+  "unlockErrorPassphraseAndPin": "Impossible de déverrouiller le coffre. Vérifiez votre mot de passe principal et le PIN YubiKey.",
+
+  "importSelectFile": "Sélectionnez un fichier.",
+  "importFileNotFound": "Fichier introuvable.",
+  "importEnterPassphrase": "Entrez le mot de passe principal de ce coffre.",
+  "importDuplicateWarning": "Les entrées dont l'UUID existe déjà dans votre coffre seront automatiquement ignorées. Un résumé vous sera présenté.",
+  "importGabbroSubtitle": "Synchroniser les entrées depuis un autre coffre Gabbro (fichier .gabbro)",
+  "importEnpassSubtitle": "Export JSON depuis Enpass (Outils → Exporter)",
+  "importBitwardenSubtitle": "Export JSON non chiffré depuis Bitwarden (Outils → Exporter le coffre)",
+  "importCsvSubtitle": "Export CSV depuis n'importe quel gestionnaire de mots de passe",
+
+  "vaultNameAlreadyExists": "Un coffre nommé « {alias} » existe déjà.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Cela supprimera définitivement « {alias} » et toutes ses données.\n\nFichier : {path}\n\nCette action est irréversible.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Cela supprimera définitivement « {alias} » et retirera sa liaison YubiKey.\n\nFichier : {path}\n\nCette action est irréversible.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Entrez votre PIN et touchez votre YubiKey pour autoriser cette suppression.",
+  "deleteVaultTooltip": "Supprimer le coffre",
+
+  "yubiKeySecurityWarning": "Avertissement de sécurité",
+  "removeYubiKeyTitle": "Retirer la YubiKey",
+  "yubiKeyLastKeyRiskWarning": "AVERTISSEMENT : si cette clé restante est perdue, endommagée ou volée, l'accès au coffre sera définitivement impossible. Il n'existe aucune procédure de récupération.",
+  "onlyOneKeyRegisteredWarning": "Une seule clé enregistrée. Si cette clé est perdue, l'accès au coffre est définitivement impossible.",
+  "tapRegisterNfc": "Approchez la clé du téléphone pour l'enregistrer",
+  "tapRegisterUsb": "Une fois connectée, touchez la clé pour l'enregistrer",
+  "tapActivateNfc": "Approchez à nouveau la clé du téléphone pour l'activer",
+  "tapActivateUsb": "Une fois connectée, touchez à nouveau la clé pour l'activer",
+  "failedToRegisterKey": "Échec de l'enregistrement de la clé : {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Échec de l'activation de la clé : {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Clé {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Touchez votre nouvelle YubiKey pour l'enregistrer…",
+  "tapYubiKeyToActivate": "Touchez à nouveau votre nouvelle YubiKey pour l'activer…",
+  "editAliasTooltip": "Modifier l'alias",
+  "cannotRemoveLastKey": "Impossible de retirer la dernière clé",
+  "removeKeyTooltip": "Retirer la clé",
+  "manageYubiKeysError": "Erreur : {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Classique",
+  "generatorModePassphrase": "Phrase de passe",
+  "charSetsHeader": "Jeux de caractères",
+  "languageHeader": "Langue",
+  "separatorLabel": "Séparateur",
+  "capitaliseWords": "Mettre les mots en majuscule",
+  "appendDigit": "Ajouter un chiffre",
+  "entropyBitsDisplay": "~{bits} bits d'entropie",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Sélectionnez au moins un jeu de caractères",
+  "passwordMinLengthNote": "Les mots de passe comportent au moins 32 caractères. Si un site a une limite plus courte, copiez les premiers caractères dont vous avez besoin.",
+  "excludeAmbiguousChars": "Exclure les caractères ambigus (0, O, l, 1, I)"
 }

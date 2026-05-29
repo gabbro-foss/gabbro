@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,21 +15,17 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 
-/// Formats an ISO 8601 UTC timestamp string into a human-readable form.
+/// Formats an ISO 8601 UTC timestamp string into a locale-aware human-readable form.
 /// Returns [unknownLabel] for empty or unparseable input.
-String formatTimestamp(String iso, {String unknownLabel = 'Unknown'}) {
+String formatTimestamp(
+  String iso, {
+  String unknownLabel = 'Unknown',
+  String locale = 'en',
+}) {
   if (iso.isEmpty) return unknownLabel;
   try {
     final dt = DateTime.parse(iso).toLocal();
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-    ];
-    final day = dt.day.toString().padLeft(2, '0');
-    final month = months[dt.month - 1];
-    final hour = dt.hour.toString().padLeft(2, '0');
-    final minute = dt.minute.toString().padLeft(2, '0');
-    return '$day $month ${dt.year}, $hour:$minute';
+    return DateFormat('d MMM yyyy, HH:mm', locale).format(dt);
   } catch (_) {
     return unknownLabel;
   }
@@ -858,7 +855,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                     ),
                     Text(
-                      formatTimestamp(createdAt, unknownLabel: l.timestampUnknown),
+                      formatTimestamp(createdAt, unknownLabel: l.timestampUnknown, locale: l.localeName),
                       style: const TextStyle(fontSize: 13),
                     ),
                   ],
@@ -873,7 +870,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                     ),
                     Text(
-                      formatTimestamp(updatedAt, unknownLabel: l.timestampUnknown),
+                      formatTimestamp(updatedAt, unknownLabel: l.timestampUnknown, locale: l.localeName),
                       style: const TextStyle(fontSize: 13),
                     ),
                   ],

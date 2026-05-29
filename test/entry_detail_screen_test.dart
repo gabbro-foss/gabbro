@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/settings.dart';
@@ -55,16 +57,11 @@ Widget _buildScreen(
 
 void main() {
   group('formatTimestamp', () {
+    setUpAll(() => initializeDateFormatting('en'));
+
     test('formats valid ISO 8601 UTC string', () {
       final dt = DateTime.parse('2025-04-21T14:32:07Z').toLocal();
-      const months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-      ];
-      final expected =
-          '21 ${months[dt.month - 1]} ${dt.year}, '
-          '${dt.hour.toString().padLeft(2, '0')}:'
-          '${dt.minute.toString().padLeft(2, '0')}';
+      final expected = DateFormat('d MMM yyyy, HH:mm', 'en').format(dt);
       expect(formatTimestamp('2025-04-21T14:32:07Z'), expected);
     });
 

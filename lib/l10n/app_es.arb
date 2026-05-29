@@ -1,4 +1,684 @@
 {
   "@@locale": "es",
-  "appearanceTitle": "Apariencia"
+
+  "appName": "Gabbro",
+
+  "cancel": "Cancelar",
+  "delete": "Eliminar",
+  "save": "Guardar",
+  "close": "Cerrar",
+  "ok": "OK",
+  "edit": "Editar",
+  "add": "Añadir",
+  "remove": "Quitar",
+  "rename": "Renombrar",
+  "confirm": "Confirmar",
+  "continueAction": "Continuar",
+  "dismiss": "Descartar",
+  "authorize": "Autorizar",
+  "register": "Registrar",
+  "sync": "Sincronizar",
+  "assign": "Asignar",
+  "unlock": "Desbloquear",
+  "generate": "Generar",
+  "import": "Importar",
+  "export": "Exportar",
+  "openInBrowser": "Abrir en el navegador",
+  "useThisPassword": "Usar esta contraseña",
+  "reviewArrow": "Revisar →",
+  "skip": "Omitir",
+  "keep": "Conservar",
+  "revert": "Restaurar",
+  "next": "Siguiente: asignar columnas",
+  "syncFromVault": "Sincronizar desde el almacén",
+  "createVault": "Crear almacén",
+  "pickFile": "Elegir archivo",
+  "noFileSelected": "Ningún archivo seleccionado",
+  "chooseFolder": "Elegir carpeta",
+  "addCustomField": "Añadir campo personalizado",
+  "exportFile": "Exportar archivo",
+  "addVault": "Añadir almacén",
+  "addYubiKey": "Añadir YubiKey",
+  "noChangesToSave": "No hay cambios que guardar.",
+
+  "appearanceTitle": "Apariencia",
+  "securityTitle": "Seguridad",
+  "aboutTitle": "Acerca de Gabbro",
+  "generatorTitle": "Generador de contraseñas",
+  "importTitle": "Importar entradas",
+  "exportTitle": "Exportar almacén",
+  "changePassphraseTitle": "Cambiar contraseña maestra",
+  "csvMappingTitle": "Asignar columnas CSV",
+  "manageFoldersTitle": "Gestionar carpetas",
+  "manageVaultsTitle": "Gestionar almacenes",
+  "manageYubiKeysTitle": "Gestionar YubiKeys",
+  "passwordHistoryTitle": "Historial de contraseñas",
+  "reviewChangesTitle": "Revisar cambios",
+  "unlockGabbroTitle": "Desbloquear Gabbro",
+
+  "sectionTheme": "Tema",
+  "sectionTextSize": "Tamaño de texto",
+  "sectionAlphabetBar": "Posición de la barra alfabética",
+  "sectionAccessibility": "Accesibilidad",
+  "sectionLanguage": "Idioma",
+  "sectionForegroundLock": "Bloqueo en primer plano",
+  "sectionBackgroundLock": "Bloqueo en segundo plano",
+  "sectionPasswordHistory": "Historial de contraseñas",
+  "sectionPassphraseCopyPaste": "Copiar/pegar contraseña maestra",
+  "sectionVaultList": "Lista de almacenes",
+  "sectionClipboardClear": "Borrado del portapapeles",
+  "sectionCharacterSets": "Juegos de caracteres",
+  "sectionGeneratorLanguage": "Idioma",
+
+  "themeSystem": "Sistema",
+  "themeLight": "Claro",
+  "themeDark": "Oscuro",
+
+  "textSizeSmall": "Pequeño",
+  "textSizeRegular": "Normal",
+  "textSizeLarge": "Grande",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Solo en diseño de teléfono — la tableta siempre usa la izquierda.",
+  "alphabetBarLeft": "Izquierda",
+  "alphabetBarRight": "Derecha",
+
+  "highContrastTitle": "Alto contraste",
+  "highContrastSubtitle": "Aumenta el contraste para mejor legibilidad",
+
+  "languageNote": "Reemplaza el idioma del sistema. «Sistema» sigue la configuración regional del dispositivo.",
+  "langSystem": "Sistema",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+
+  "foregroundLockDescription": "Bloquear tras este período de inactividad mientras la app está abierta.",
+  "backgroundLockDescription": "Bloquear después de que la app haya estado en segundo plano durante este tiempo.",
+  "passwordHistoryDescription": "Cuánto tiempo conservar una contraseña anterior tras cambiarla. «Conservar siempre» significa que el historial solo se elimina manualmente.",
+  "passphraseCopyPasteDescription": "Bloquear copiar y pegar en los campos de contraseña maestra. Recomendado: evita que la contraseña se filtre a través del portapapeles.",
+  "passphraseCopyPasteNote": "Nota: esto bloquea el menú contextual de pulsación larga y la selección de texto. El botón de pegado integrado del teclado puede seguir funcionando — es una limitación de la plataforma.",
+  "blockCopyPasteTitle": "Bloquear copiar/pegar",
+  "vaultListDescription": "Mostrar un desplegable con todos los almacenes en la pantalla de inicio para elegir cuál desbloquear sin ir a Gestionar almacenes.",
+  "showVaultListTitle": "Mostrar lista de almacenes al iniciar",
+  "vaultListNote": "Nota de alta seguridad: cuando esta opción está DESACTIVADA, la pantalla de inicio solo muestra el último almacén usado — sin pistas de que existan otros. Para cambiar de almacén hay que desbloquear primero y luego ir a Menú → Gestionar almacenes.",
+  "clipboardClearDescription": "Borrar el portapapeles tras este tiempo al copiar un secreto. Nota: los gestores de portapapeles pueden conservar una copia.",
+
+  "duration30s": "30s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60s",
+  "duration2min": "2 min",
+  "durationNever": "Nunca",
+  "duration7days": "7 días",
+  "duration30days": "30 días",
+  "duration90days": "90 días",
+  "durationKeepForever": "Conservar siempre",
+
+  "menuExportVault": "Exportar almacén",
+  "menuImportEntries": "Importar entradas",
+  "menuSyncFromFile": "Sincronizar desde archivo",
+  "menuManageVaults": "Gestionar almacenes",
+  "menuChangePassphrase": "Cambiar contraseña maestra",
+  "menuManageYubiKeys": "Gestionar YubiKeys",
+  "menuAppearance": "Apariencia",
+  "menuSecurity": "Seguridad",
+  "menuManageFolders": "Gestionar carpetas",
+  "menuPasswordGenerator": "Generador de contraseñas",
+  "menuAbout": "Acerca de",
+
+  "tooltipSelectEntries": "Seleccionar entradas",
+  "tooltipLockVault": "Bloquear almacén",
+  "tooltipSelectAll": "Seleccionar todo",
+  "tooltipDeselectAll": "Deseleccionar todo",
+  "tooltipMenu": "Menú",
+  "tooltipCopy": "Copiar",
+  "tooltipCopied": "¡Copiado!",
+  "tooltipShow": "Mostrar",
+  "tooltipHide": "Ocultar",
+  "tooltipBrowse": "Explorar",
+  "tooltipEditAlias": "Editar alias",
+  "tooltipRemoveField": "Eliminar campo",
+  "tooltipRename": "Renombrar",
+  "tooltipDeleteVault": "Eliminar almacén",
+  "tooltipAssignToFolder": "Asignar a carpeta",
+  "tooltipShowPin": "Mostrar PIN",
+  "tooltipHidePin": "Ocultar PIN",
+  "tooltipShowValue": "Mostrar valor",
+  "tooltipHideValue": "Ocultar",
+  "tooltipCancel": "Cancelar",
+  "tooltipOpenInBrowser": "Abrir en el navegador",
+
+  "allFolders": "Todas las carpetas",
+  "noFolder": "Ninguna",
+  "selectFolder": "Seleccionar una carpeta",
+  "folderName": "Nombre de carpeta",
+
+  "noEntriesMatch": "Ninguna entrada coincide con tu búsqueda.",
+  "noVaultsRegistered": "No hay almacenes registrados.",
+  "noYubiKeysRegistered": "No hay YubiKeys registradas",
+  "selectEntry": "Seleccionar una entrada",
+  "newEntryTitle": "Nueva entrada",
+  "createEntryTitle": "Nuevo {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Editar {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(sin URL)",
+  "noNameFallback": "(sin nombre)",
+  "untitledFallback": "(sin título)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "{count} seleccionado(s)",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Buscar en todos los campos…",
+  "searchEntriesHint": "Buscar entradas…",
+  "searchAllFieldsTooltip": "Buscando en todos los campos",
+  "searchByTitleTooltip": "Buscando por título",
+  "entryTypeAll": "Todos",
+  "entryTypePassword": "Contraseña",
+  "entryTypeNote": "Nota",
+  "entryTypeCard": "Tarjeta",
+  "entryTypeIdentity": "Identidad",
+  "entryTypeFile": "Archivo",
+  "entryTypeCustom": "Personalizado",
+  "errorPrefix": "Error: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Almacén",
+  "navAppearance": "Apariencia",
+  "navSecurity": "Seguridad",
+  "navAbout": "Acerca de",
+
+  "deleteEntryTitle": "¿Eliminar entrada?",
+  "cannotBeUndone": "Esta acción no se puede deshacer.",
+  "deleteEntryDialogTitle": "¿Eliminar entrada?",
+  "deleteEntriesTitle": "{count, plural, one{¿Eliminar 1 entrada?} other{¿Eliminar {count} entradas?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Asignar a carpeta",
+  "folderConflictTitle": "Conflicto de carpeta",
+  "syncFailedTitle": "Error de sincronización",
+  "syncFromFileTitle": "Sincronizar desde archivo",
+  "nothingToSync": "Nada que sincronizar — ambos almacenes ya están actualizados.",
+
+  "importedEntries": "{count, plural, one{1 entrada importada.} other{{count} entradas importadas.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Exportar archivo",
+  "saveDecryptedFileTo": "Guardar archivo descifrado en:",
+  "exportPathLabel": "Ruta de exportación",
+  "exportedToPath": "Exportado a {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Error al exportar: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "¿Abrir en el navegador?",
+  "couldNotOpen": "No se pudo abrir {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Eliminar entrada anterior",
+  "failedToClearHistory": "Error al borrar el historial: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Error al restaurar la contraseña: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Renombrar carpeta",
+  "addFolderTitle": "Añadir carpeta",
+  "deleteFolderTitle": "Eliminar carpeta",
+  "deleteFolderConfirm": "¿Eliminar «{folder}»?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Reasignar entradas a",
+  "clearToNone": "Restablecer a «Ninguna»",
+
+  "renameVaultTitle": "Renombrar almacén",
+  "deleteVaultTitle": "¿Eliminar almacén?",
+  "deleteVaultConfirmTitle": "¿Estás seguro?",
+  "typeDeleteToConfirm": "Escribir DELETE para confirmar",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Toca tu YubiKey",
+  "noVaultsRegisteredText": "No hay almacenes registrados.",
+
+  "addYubiKeyTitle": "Añadir YubiKey",
+  "enterYubiKeyPinTitle": "Introducir PIN de YubiKey",
+  "editAliasForKey": "Editar alias de la clave {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Solo quedará una YubiKey registrada.",
+  "removeKeyConfirm": "¿Eliminar esta clave?",
+  "removeKeyVaultConfirm": "¿Quitar esta YubiKey del almacén?",
+  "yubiKeyRemoved": "YubiKey eliminada",
+  "failedToRemoveKey": "Error al quitar la clave: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey añadida",
+  "failedToAddKey": "Error al añadir la clave: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Error al guardar el alias: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "No se encontró ningún dispositivo FIDO2. Inserta tu YubiKey e inténtalo de nuevo.",
+  "transportLabel": "Transporte:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Contraseña maestra",
+  "yubiKeyPinLabel": "PIN de YubiKey",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Contraseña maestra actual",
+  "newPassphraseLabel": "Nueva contraseña maestra",
+  "confirmPassphraseLabel": "Confirmar nueva contraseña maestra",
+  "vaultPassphraseLabel": "Contraseña del almacén",
+  "aliasLabel": "Alias",
+  "aliasHint": "p. ej. Principal, Clave del trabajo…",
+  "masterPassphraseLabel": "Contraseña maestra",
+  "confirmPassphraseLabelShort": "Confirmar contraseña maestra",
+
+  "fieldTitle": "Título",
+  "fieldContent": "Contenido",
+  "fieldFirstName": "Nombre",
+  "fieldLastName": "Apellidos",
+  "fieldEmail": "Correo electrónico (opcional)",
+  "fieldPhone": "Teléfono (opcional)",
+  "fieldAddress": "Dirección (opcional)",
+  "fieldCardLabel": "Etiqueta de la tarjeta (p. ej. «Visa Platinum»)",
+  "fieldCardholderName": "Nombre del titular",
+  "fieldCardNumber": "Número de tarjeta",
+  "fieldExpiry": "Caducidad (MM/AA)",
+  "fieldCvv": "CVV (opcional)",
+  "fieldCardPin": "PIN (opcional)",
+  "fieldCreditLimit": "Límite de crédito (opcional)",
+  "fieldAccountNumber": "Número de cuenta (opcional)",
+  "fieldNotes": "Notas (opcional)",
+  "fieldUrl": "URL (opcional)",
+  "fieldUsername": "Nombre de usuario",
+  "fieldPassword": "Contraseña",
+  "fieldSeparator": "Separador",
+  "fieldFolder": "Carpeta",
+  "fieldLabel": "Etiqueta",
+  "fieldValue": "Valor",
+  "fieldCustomFields": "Campos personalizados",
+  "fieldLabelOptional": "{label} (opcional)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Tipo de entrada aún no compatible.",
+  "csvColumnNone": "(ninguno)",
+  "csvPreviewLabel": "Vista previa",
+  "csvImportButton": "Importar",
+
+  "gabbroVaultSection": "Almacén Gabbro",
+  "genericCsvSection": "CSV genérico",
+
+  "changePassphraseSuccess": "Contraseña maestra cambiada con éxito",
+  "changePassphraseButton": "Cambiar contraseña maestra",
+
+  "continueLabel": "Continuar",
+  "protectWithYubiKey": "Proteger con YubiKey",
+  "yubiKeySubtitle": "Clave de seguridad por hardware (recomendada)",
+  "accessibilityButton": "Accesibilidad",
+
+  "aboutProjectSection": "Proyecto",
+  "aboutLicenceSection": "Licencia",
+  "aboutOpenSourceSection": "Componentes de código abierto",
+  "aboutAttributionSection": "Atribuciones",
+
+  "lengthLabel": "Longitud",
+  "wordsLabel": "Palabras",
+  "generateButton": "Generar",
+  "usePasswordButton": "Usar esta contraseña",
+  "showHidePassword": "Mostrar",
+
+  "deleteVaultPostDeletion": "Tu almacén ha sido eliminado. Crea uno nuevo para continuar.",
+
+  "syncFilePassphraseLabel": "Contraseña del almacén",
+
+  "historyWarning": "Solo se conserva 1 valor anterior. El historial se purga automáticamente según tu configuración de seguridad.",
+  "historyCurrent": "Actual",
+  "historyPrevious": "Anterior",
+  "historySavedOn": "Guardado el {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · vence el {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Problema de importación ({index} de {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Tipo: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Edita para corregir y guardar esta entrada, u omítela para descartarla.",
+
+  "entriesSkipped": "{count, plural, one{1 entrada omitida} other{{count} entradas omitidas}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Estas entradas ya existen en tu almacén y no fueron sobreescritas:",
+
+  "syncDeleteEntryContent": "El otro dispositivo eliminó «{title}».\n\n¿Eliminarlo aquí también o conservarlo?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}» está en carpetas distintas en cada dispositivo.\n\nEste dispositivo: {local}\nOtro dispositivo: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Conservar sin carpeta",
+  "folderConflictKeepLocal": "Conservar «{folder}»",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Mover sin carpeta",
+  "folderConflictMoveIncoming": "Mover a «{folder}»",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Almacén sincronizado — {added} añadido(s), {updated} actualizado(s), {deleted} eliminado(s).",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Este archivo de almacén usa una contraseña maestra diferente. La sincronización solo es compatible entre almacenes que comparten la misma contraseña maestra.",
+
+  "reviewSensitiveFields": "Campos sensibles",
+  "reviewOtherFields": "Otros campos",
+  "reviewPasswordChanged": "Contraseña cambiada",
+  "reviewCvvChanged": "CVV cambiado",
+  "reviewPinChanged": "PIN cambiado",
+  "reviewTransactionPasswordChanged": "Contraseña de transacción cambiada",
+  "tooltipShowValues": "Mostrar valores",
+  "reviewOld": "Anterior",
+  "reviewNew": "Nuevo",
+  "reviewEmpty": "(vacío)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Notas",
+  "reviewFieldContent": "Contenido",
+  "reviewFieldEmail": "Correo electrónico",
+  "reviewFieldPhone": "Teléfono",
+  "reviewFieldAddress": "Dirección",
+  "reviewFieldCardLabel": "Etiqueta de tarjeta",
+  "reviewFieldStatus": "Estado",
+  "reviewFieldCardholder": "Titular",
+  "reviewFieldExpiry": "Caducidad",
+  "reviewFieldCreditLimit": "Límite de crédito",
+  "reviewFieldAccountNumber": "Número de cuenta",
+  "reviewFieldNetwork": "Red",
+  "reviewFieldBank": "Banco",
+  "reviewFieldFilename": "Nombre de archivo",
+  "reviewFieldSize": "Tamaño",
+  "reviewFieldCardNumber": "Número",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Contraseña de transacción",
+  "timestampCreated": "Creado",
+  "timestampUpdated": "Actualizado",
+  "timestampUnknown": "Desconocido",
+  "noTitleFallback": "(sin título)",
+  "tooltipExportFile": "Exportar archivo",
+  "tooltipEditEntry": "Editar entrada",
+  "tooltipDeleteEntry": "Eliminar entrada",
+  "exportLabel": "Exportar",
+  "customEntryFieldsHeader": "Campos",
+  "copiedNeverClears": "Copiado — el portapapeles nunca se borra automáticamente",
+  "copiedClears30s": "Copiado — el portapapeles se borrará en 30s",
+  "copiedClears60s": "Copiado — el portapapeles se borrará en 60s",
+  "copiedClears2min": "Copiado — el portapapeles se borrará en 2 min",
+
+  "passwordBreakdownTitle": "Análisis de contraseña",
+  "charTypeUppercase": "Mayúscula",
+  "charTypeLowercase": "Minúscula",
+  "charTypeDigit": "Dígito",
+  "charTypeSymbol": "Símbolo",
+
+  "exportChooseFormat": "Elige un formato de exportación.",
+  "exportUnencryptedWarning": "Completamente sin cifrar — todos los secretos se escribirán en texto plano. Guarda este archivo de forma segura y elimínalo tras su uso.",
+  "exportPassphraseOnlyNote": "Protegido solo por tu contraseña maestra. La YubiKey no es necesaria para importar.",
+  "exportChooseDestinationJson": "Elige un destino para el archivo JSON exportado.",
+  "exportChooseDestinationVault": "Elige un destino para el archivo de almacén exportado.",
+  "exportTwoFilesNote": "Se crearán dos archivos: vault.gabbro y vault.gabbro.sha256",
+  "exportSelectDestination": "Selecciona un destino.",
+
+  "aboutVersion": "Versión {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Un gestor de contraseñas post-cuántico",
+  "aboutSourceCode": "Código fuente",
+  "aboutReportIssue": "Informar de un problema",
+  "aboutSupportGabbro": "Apoyar a Gabbro",
+  "aboutLicenceBody": "Gabbro es software libre y de código abierto, distribuido bajo la GNU General Public License v3.0 only (GPL-3.0-only).\n\nEres libre de usar, estudiar y redistribuir este software según los términos de dicha licencia.",
+  "aboutOwnerRole": "Propietario del proyecto, arquitecto y desarrollador principal:",
+  "aboutAiPartner": "Socio de desarrollo IA:",
+  "aboutNoTelemetry": "Gabbro no realiza ninguna conexión de red saliente. Sin telemetría, sin analíticas, sin cuentas.",
+
+  "strengthTierTerrible": "Terrible",
+  "strengthTierWeak": "Débil",
+  "strengthTierFair": "Aceptable",
+  "strengthTierStrong": "Fuerte",
+  "strengthTierVeryStrong": "Muy fuerte",
+  "strengthTierExcellent": "Excelente",
+  "yubiKeyProtectedNote": "Almacén protegido por YubiKey — el vínculo con la YubiKey se conservará.",
+  "yubiKeyPinRequired": "El PIN de YubiKey es obligatorio",
+  "tapYubiKeyNow": "Toca tu YubiKey ahora…",
+  "touchYubiKeyToAuthorize": "Toca tu YubiKey para autorizar este cambio.",
+  "currentPassphraseRequired": "La contraseña maestra actual es obligatoria",
+  "newPassphraseRequired": "Se requiere una nueva contraseña maestra",
+  "passphraseTooWeak": "La contraseña maestra es demasiado débil",
+  "confirmPassphraseRequired": "Confirma tu nueva contraseña maestra",
+  "passphrasesDoNotMatch": "Las contraseñas maestras no coinciden",
+  "passphrasesMatch": "✓ Las contraseñas maestras coinciden",
+  "passphrasesNoMatch": "✗ Las contraseñas maestras no coinciden",
+  "entropyDisplay": "{tier} · {bits} bits",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Error de transporte.",
+  "authorizationFailed": "Autorización fallida — comprueba tu PIN e inténtalo de nuevo.",
+
+  "unlockEnterPassphraseAndPin": "Introduce tu contraseña maestra y el PIN de YubiKey para desbloquear",
+  "unlockEnterPassphrase": "Introduce tu contraseña maestra para desbloquear",
+  "unlockEntropyDisplay": "{tier} · {bits} bits de entropía",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Inserta tu YubiKey y tócala cuando parpadee",
+  "unlockErrorPassphrase": "No se pudo desbloquear el almacén. Comprueba tu contraseña maestra.",
+  "unlockErrorPassphraseAndPin": "No se pudo desbloquear el almacén. Comprueba tu contraseña maestra y el PIN de YubiKey.",
+
+  "importSelectFile": "Selecciona un archivo.",
+  "importFileNotFound": "Archivo no encontrado.",
+  "importEnterPassphrase": "Introduce la contraseña maestra de este almacén.",
+  "importDuplicateWarning": "Las entradas cuyo UUID ya existe en tu almacén se omitirán automáticamente. Se te mostrará un resumen.",
+  "importGabbroSubtitle": "Sincronizar entradas desde otro almacén Gabbro (archivo .gabbro)",
+  "importEnpassSubtitle": "Exportación JSON desde Enpass (Herramientas → Exportar)",
+  "importBitwardenSubtitle": "Exportación JSON sin cifrar desde Bitwarden (Herramientas → Exportar almacén)",
+  "importCsvSubtitle": "Exportación CSV desde cualquier gestor de contraseñas",
+
+  "vaultNameAlreadyExists": "Ya existe un almacén llamado «{alias}».",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Esto eliminará permanentemente «{alias}» y todos sus datos.\n\nArchivo: {path}\n\nEsta acción no se puede deshacer.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Esto eliminará permanentemente «{alias}» y quitará su vínculo con la YubiKey.\n\nArchivo: {path}\n\nEsta acción no se puede deshacer.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Introduce tu PIN y toca tu YubiKey para autorizar esta eliminación.",
+  "deleteVaultTooltip": "Eliminar almacén",
+
+  "yubiKeySecurityWarning": "Aviso de seguridad",
+  "removeYubiKeyTitle": "Quitar YubiKey",
+  "yubiKeyLastKeyRiskWarning": "ADVERTENCIA: si esa clave restante se pierde, daña o roba, el acceso al almacén será permanentemente imposible. No existe ningún procedimiento de recuperación.",
+  "onlyOneKeyRegisteredWarning": "Solo hay una clave registrada. Si se pierde, el acceso al almacén es permanentemente imposible.",
+  "tapRegisterNfc": "Acerca la clave al teléfono para registrarla",
+  "tapRegisterUsb": "Una vez conectada, toca la clave para registrarla",
+  "tapActivateNfc": "Acerca la clave al teléfono de nuevo para activarla",
+  "tapActivateUsb": "Una vez conectada, toca la clave de nuevo para activarla",
+  "failedToRegisterKey": "Error al registrar la clave: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Error al activar la clave: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Clave {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Toca tu nueva YubiKey para registrarla…",
+  "tapYubiKeyToActivate": "Toca tu nueva YubiKey de nuevo para activarla…",
+  "editAliasTooltip": "Editar alias",
+  "cannotRemoveLastKey": "No se puede eliminar la última clave",
+  "removeKeyTooltip": "Quitar clave",
+  "manageYubiKeysError": "Error: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Clásico",
+  "generatorModePassphrase": "Contraseña maestra",
+  "charSetsHeader": "Juegos de caracteres",
+  "languageHeader": "Idioma",
+  "separatorLabel": "Separador",
+  "capitaliseWords": "Poner en mayúsculas las palabras",
+  "appendDigit": "Añadir un dígito",
+  "entropyBitsDisplay": "~{bits} bits de entropía",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Selecciona al menos un juego de caracteres",
+  "passwordMinLengthNote": "Las contraseñas tienen al menos 32 caracteres. Si un sitio tiene un límite más corto, copia los primeros caracteres que necesites.",
+  "excludeAmbiguousChars": "Excluir caracteres ambiguos (0, O, l, 1, I)"
 }

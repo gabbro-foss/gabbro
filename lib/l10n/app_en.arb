@@ -290,6 +290,7 @@
   "deleteVaultTitle": "Delete vault?",
   "deleteVaultConfirmTitle": "Are you sure?",
   "typeDeleteToConfirm": "Type DELETE to confirm",
+  "typeDeleteWord": "DELETE",
   "touchYourYubiKey": "Touch your YubiKey",
   "noVaultsRegisteredText": "No vaults registered.",
 

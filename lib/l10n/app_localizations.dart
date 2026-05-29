@@ -1310,6 +1310,12 @@ abstract class AppLocalizations {
   /// **'Type DELETE to confirm'**
   String get typeDeleteToConfirm;
 
+  /// No description provided for @typeDeleteWord.
+  ///
+  /// In en, this message translates to:
+  /// **'DELETE'**
+  String get typeDeleteWord;
+
   /// No description provided for @touchYourYubiKey.
   ///
   /// In en, this message translates to:

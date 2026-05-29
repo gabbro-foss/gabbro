@@ -12,214 +12,214 @@ class AppLocalizationsDe extends AppLocalizations {
   String get appName => 'Gabbro';
 
   @override
-  String get cancel => 'Cancel';
+  String get cancel => 'Abbrechen';
 
   @override
-  String get delete => 'Delete';
+  String get delete => 'Löschen';
 
   @override
-  String get save => 'Save';
+  String get save => 'Speichern';
 
   @override
-  String get close => 'Close';
+  String get close => 'Schließen';
 
   @override
   String get ok => 'OK';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'Bearbeiten';
 
   @override
-  String get add => 'Add';
+  String get add => 'Hinzufügen';
 
   @override
-  String get remove => 'Remove';
+  String get remove => 'Entfernen';
 
   @override
-  String get rename => 'Rename';
+  String get rename => 'Umbenennen';
 
   @override
-  String get confirm => 'Confirm';
+  String get confirm => 'Bestätigen';
 
   @override
-  String get continueAction => 'Continue';
+  String get continueAction => 'Weiter';
 
   @override
-  String get dismiss => 'Dismiss';
+  String get dismiss => 'Verwerfen';
 
   @override
-  String get authorize => 'Authorize';
+  String get authorize => 'Autorisieren';
 
   @override
-  String get register => 'Register';
+  String get register => 'Registrieren';
 
   @override
-  String get sync => 'Sync';
+  String get sync => 'Synchronisieren';
 
   @override
-  String get assign => 'Assign';
+  String get assign => 'Zuweisen';
 
   @override
-  String get unlock => 'Unlock';
+  String get unlock => 'Entsperren';
 
   @override
-  String get generate => 'Generate';
+  String get generate => 'Generieren';
 
   @override
-  String get import => 'Import';
+  String get import => 'Importieren';
 
   @override
-  String get export => 'Export';
+  String get export => 'Exportieren';
 
   @override
-  String get openInBrowser => 'Open in browser';
+  String get openInBrowser => 'Im Browser öffnen';
 
   @override
-  String get useThisPassword => 'Use this password';
+  String get useThisPassword => 'Dieses Passwort verwenden';
 
   @override
-  String get reviewArrow => 'Review →';
+  String get reviewArrow => 'Prüfen →';
 
   @override
-  String get skip => 'Skip';
+  String get skip => 'Überspringen';
 
   @override
-  String get keep => 'Keep';
+  String get keep => 'Behalten';
 
   @override
-  String get revert => 'Revert';
+  String get revert => 'Wiederherstellen';
 
   @override
-  String get next => 'Next: map columns';
+  String get next => 'Weiter: Spalten zuordnen';
 
   @override
-  String get syncFromVault => 'Sync from vault';
+  String get syncFromVault => 'Aus Tresor synchronisieren';
 
   @override
-  String get createVault => 'Create vault';
+  String get createVault => 'Tresor erstellen';
 
   @override
-  String get pickFile => 'Pick file';
+  String get pickFile => 'Datei auswählen';
 
   @override
-  String get noFileSelected => 'No file selected';
+  String get noFileSelected => 'Keine Datei ausgewählt';
 
   @override
-  String get chooseFolder => 'Choose folder';
+  String get chooseFolder => 'Ordner auswählen';
 
   @override
-  String get addCustomField => 'Add custom field';
+  String get addCustomField => 'Benutzerdefiniertes Feld hinzufügen';
 
   @override
-  String get exportFile => 'Export file';
+  String get exportFile => 'Datei exportieren';
 
   @override
-  String get addVault => 'Add vault';
+  String get addVault => 'Tresor hinzufügen';
 
   @override
-  String get addYubiKey => 'Add YubiKey';
+  String get addYubiKey => 'YubiKey hinzufügen';
 
   @override
-  String get noChangesToSave => 'No changes to save.';
+  String get noChangesToSave => 'Keine Änderungen zum Speichern.';
 
   @override
   String get appearanceTitle => 'Darstellung';
 
   @override
-  String get securityTitle => 'Security';
+  String get securityTitle => 'Sicherheit';
 
   @override
-  String get aboutTitle => 'About Gabbro';
+  String get aboutTitle => 'Über Gabbro';
 
   @override
-  String get generatorTitle => 'Password generator';
+  String get generatorTitle => 'Passwortgenerator';
 
   @override
-  String get importTitle => 'Import entries';
+  String get importTitle => 'Einträge importieren';
 
   @override
-  String get exportTitle => 'Export vault';
+  String get exportTitle => 'Tresor exportieren';
 
   @override
-  String get changePassphraseTitle => 'Change passphrase';
+  String get changePassphraseTitle => 'Passphrase ändern';
 
   @override
-  String get csvMappingTitle => 'Map CSV columns';
+  String get csvMappingTitle => 'CSV-Spalten zuordnen';
 
   @override
-  String get manageFoldersTitle => 'Manage folders';
+  String get manageFoldersTitle => 'Ordner verwalten';
 
   @override
-  String get manageVaultsTitle => 'Manage vaults';
+  String get manageVaultsTitle => 'Tresore verwalten';
 
   @override
-  String get manageYubiKeysTitle => 'Manage YubiKeys';
+  String get manageYubiKeysTitle => 'YubiKeys verwalten';
 
   @override
-  String get passwordHistoryTitle => 'Password history';
+  String get passwordHistoryTitle => 'Passwortverlauf';
 
   @override
-  String get reviewChangesTitle => 'Review changes';
+  String get reviewChangesTitle => 'Änderungen prüfen';
 
   @override
-  String get unlockGabbroTitle => 'Unlock Gabbro';
+  String get unlockGabbroTitle => 'Gabbro entsperren';
 
   @override
-  String get sectionTheme => 'Theme';
+  String get sectionTheme => 'Design';
 
   @override
-  String get sectionTextSize => 'Text size';
+  String get sectionTextSize => 'Textgröße';
 
   @override
-  String get sectionAlphabetBar => 'Alphabet bar position';
+  String get sectionAlphabetBar => 'Position der Alphabetleiste';
 
   @override
-  String get sectionAccessibility => 'Accessibility';
+  String get sectionAccessibility => 'Barrierefreiheit';
 
   @override
-  String get sectionLanguage => 'Language';
+  String get sectionLanguage => 'Sprache';
 
   @override
-  String get sectionForegroundLock => 'Foreground lock';
+  String get sectionForegroundLock => 'Vordergrundsperre';
 
   @override
-  String get sectionBackgroundLock => 'Background lock';
+  String get sectionBackgroundLock => 'Hintergrundsperre';
 
   @override
-  String get sectionPasswordHistory => 'Password history';
+  String get sectionPasswordHistory => 'Passwortverlauf';
 
   @override
-  String get sectionPassphraseCopyPaste => 'Passphrase copy/paste';
+  String get sectionPassphraseCopyPaste => 'Passphrase kopieren/einfügen';
 
   @override
-  String get sectionVaultList => 'Vault list';
+  String get sectionVaultList => 'Tresorliste';
 
   @override
-  String get sectionClipboardClear => 'Clipboard clear';
+  String get sectionClipboardClear => 'Zwischenablage leeren';
 
   @override
-  String get sectionCharacterSets => 'Character sets';
+  String get sectionCharacterSets => 'Zeichensätze';
 
   @override
-  String get sectionGeneratorLanguage => 'Language';
+  String get sectionGeneratorLanguage => 'Sprache';
 
   @override
   String get themeSystem => 'System';
 
   @override
-  String get themeLight => 'Light';
+  String get themeLight => 'Hell';
 
   @override
-  String get themeDark => 'Dark';
+  String get themeDark => 'Dunkel';
 
   @override
-  String get textSizeSmall => 'Small';
+  String get textSizeSmall => 'Klein';
 
   @override
-  String get textSizeRegular => 'Regular';
+  String get textSizeRegular => 'Normal';
 
   @override
-  String get textSizeLarge => 'Large';
+  String get textSizeLarge => 'Groß';
 
   @override
   String get textSizeXL => 'XL';
@@ -228,24 +228,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get textSizeXXL => 'XXL';
 
   @override
-  String get alphabetBarNote => 'Phone layout only — tablet always uses left.';
+  String get alphabetBarNote =>
+      'Nur für Telefonlayout — Tablet verwendet immer links.';
 
   @override
-  String get alphabetBarLeft => 'Left';
+  String get alphabetBarLeft => 'Links';
 
   @override
-  String get alphabetBarRight => 'Right';
+  String get alphabetBarRight => 'Rechts';
 
   @override
-  String get highContrastTitle => 'High contrast';
+  String get highContrastTitle => 'Hoher Kontrast';
 
   @override
   String get highContrastSubtitle =>
-      'Increases contrast for better readability';
+      'Erhöht den Kontrast für bessere Lesbarkeit';
 
   @override
   String get languageNote =>
-      'Overrides the system language. \"System\" follows your device locale.';
+      'Überschreibt die Systemsprache. «System» folgt den Gebietsschemaeinstellungen des Geräts.';
 
   @override
   String get langSystem => 'System';
@@ -267,216 +268,216 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get foregroundLockDescription =>
-      'Lock after this much inactivity while the app is open.';
+      'Nach dieser Inaktivitätsdauer sperren, während die App geöffnet ist.';
 
   @override
   String get backgroundLockDescription =>
-      'Lock after the app has been in the background for this long.';
+      'Sperren, nachdem die App so lange im Hintergrund war.';
 
   @override
   String get passwordHistoryDescription =>
-      'How long to keep a previous password after it is changed. \"Keep forever\" means history is only deleted manually.';
+      'Wie lange ein früheres Passwort nach einer Änderung aufbewahrt wird. «Für immer behalten» bedeutet, dass der Verlauf nur manuell gelöscht wird.';
 
   @override
   String get passphraseCopyPasteDescription =>
-      'Block copy and paste on master passphrase fields. Recommended: prevents passphrase leaking via clipboard.';
+      'Kopieren und Einfügen für Passphrase-Felder blockieren. Empfohlen: verhindert das Durchsickern der Passphrase über die Zwischenablage.';
 
   @override
   String get passphraseCopyPasteNote =>
-      'Note: this blocks the long-press context menu and text selection. Your keyboard\'s inline paste button may still work — this is a platform limitation that cannot be blocked.';
+      'Hinweis: Dies blockiert das Kontextmenü bei langem Drücken und die Textauswahl. Die integrierte Einfügen-Taste der Tastatur funktioniert möglicherweise noch — dies ist eine Plattformbeschränkung.';
 
   @override
-  String get blockCopyPasteTitle => 'Block copy/paste';
+  String get blockCopyPasteTitle => 'Kopieren/Einfügen blockieren';
 
   @override
   String get vaultListDescription =>
-      'Show a dropdown of all vaults on the login screen so you can pick which one to unlock without going to Manage vaults.';
+      'Auf dem Anmeldebildschirm eine Dropdown-Liste aller Tresore anzeigen, damit der richtige Tresor ohne Umweg über «Tresore verwalten» ausgewählt werden kann.';
 
   @override
-  String get showVaultListTitle => 'Show vault list on login';
+  String get showVaultListTitle => 'Tresorliste bei Anmeldung anzeigen';
 
   @override
   String get vaultListNote =>
-      'High-security note: when this is OFF, the login screen shows only the last-used vault — no hint that other vaults exist. Trade-off: to switch vaults you must first unlock, then go to Menu → Manage vaults.';
+      'Sicherheitshinweis: Wenn diese Option AUS ist, zeigt der Anmeldebildschirm nur den zuletzt verwendeten Tresor — kein Hinweis auf andere Tresore. Um den Tresor zu wechseln, erst entsperren, dann Menü → Tresore verwalten aufrufen.';
 
   @override
   String get clipboardClearDescription =>
-      'Clear the clipboard this long after copying a secret. Note: clipboard managers may retain a copy.';
+      'Die Zwischenablage nach diesem Zeitraum beim Kopieren eines Geheimnisses leeren. Hinweis: Zwischenablage-Manager behalten möglicherweise eine Kopie.';
 
   @override
   String get duration30s => '30s';
 
   @override
-  String get duration1min => '1 min';
+  String get duration1min => '1 Min.';
 
   @override
-  String get duration5min => '5 min';
+  String get duration5min => '5 Min.';
 
   @override
-  String get duration15min => '15 min';
+  String get duration15min => '15 Min.';
 
   @override
   String get duration60s => '60s';
 
   @override
-  String get duration2min => '2 min';
+  String get duration2min => '2 Min.';
 
   @override
-  String get durationNever => 'Never';
+  String get durationNever => 'Nie';
 
   @override
-  String get duration7days => '7 days';
+  String get duration7days => '7 Tage';
 
   @override
-  String get duration30days => '30 days';
+  String get duration30days => '30 Tage';
 
   @override
-  String get duration90days => '90 days';
+  String get duration90days => '90 Tage';
 
   @override
-  String get durationKeepForever => 'Keep forever';
+  String get durationKeepForever => 'Für immer behalten';
 
   @override
-  String get menuExportVault => 'Export vault';
+  String get menuExportVault => 'Tresor exportieren';
 
   @override
-  String get menuImportEntries => 'Import entries';
+  String get menuImportEntries => 'Einträge importieren';
 
   @override
-  String get menuSyncFromFile => 'Sync from file';
+  String get menuSyncFromFile => 'Aus Datei synchronisieren';
 
   @override
-  String get menuManageVaults => 'Manage vaults';
+  String get menuManageVaults => 'Tresore verwalten';
 
   @override
-  String get menuChangePassphrase => 'Change passphrase';
+  String get menuChangePassphrase => 'Passphrase ändern';
 
   @override
-  String get menuManageYubiKeys => 'Manage YubiKeys';
+  String get menuManageYubiKeys => 'YubiKeys verwalten';
 
   @override
-  String get menuAppearance => 'Appearance';
+  String get menuAppearance => 'Darstellung';
 
   @override
-  String get menuSecurity => 'Security';
+  String get menuSecurity => 'Sicherheit';
 
   @override
-  String get menuManageFolders => 'Manage folders';
+  String get menuManageFolders => 'Ordner verwalten';
 
   @override
-  String get menuPasswordGenerator => 'Password generator';
+  String get menuPasswordGenerator => 'Passwortgenerator';
 
   @override
-  String get menuAbout => 'About';
+  String get menuAbout => 'Über';
 
   @override
-  String get tooltipSelectEntries => 'Select entries';
+  String get tooltipSelectEntries => 'Einträge auswählen';
 
   @override
-  String get tooltipLockVault => 'Lock vault';
+  String get tooltipLockVault => 'Tresor sperren';
 
   @override
-  String get tooltipSelectAll => 'Select all';
+  String get tooltipSelectAll => 'Alle auswählen';
 
   @override
-  String get tooltipDeselectAll => 'Deselect all';
+  String get tooltipDeselectAll => 'Alle abwählen';
 
   @override
-  String get tooltipMenu => 'Menu';
+  String get tooltipMenu => 'Menü';
 
   @override
-  String get tooltipCopy => 'Copy';
+  String get tooltipCopy => 'Kopieren';
 
   @override
-  String get tooltipCopied => 'Copied!';
+  String get tooltipCopied => 'Kopiert!';
 
   @override
-  String get tooltipShow => 'Show';
+  String get tooltipShow => 'Anzeigen';
 
   @override
-  String get tooltipHide => 'Hide';
+  String get tooltipHide => 'Ausblenden';
 
   @override
-  String get tooltipBrowse => 'Browse';
+  String get tooltipBrowse => 'Durchsuchen';
 
   @override
-  String get tooltipEditAlias => 'Edit alias';
+  String get tooltipEditAlias => 'Alias bearbeiten';
 
   @override
-  String get tooltipRemoveField => 'Remove field';
+  String get tooltipRemoveField => 'Feld entfernen';
 
   @override
-  String get tooltipRename => 'Rename';
+  String get tooltipRename => 'Umbenennen';
 
   @override
-  String get tooltipDeleteVault => 'Delete vault';
+  String get tooltipDeleteVault => 'Tresor löschen';
 
   @override
-  String get tooltipAssignToFolder => 'Assign to folder';
+  String get tooltipAssignToFolder => 'Ordner zuweisen';
 
   @override
-  String get tooltipShowPin => 'Show PIN';
+  String get tooltipShowPin => 'PIN anzeigen';
 
   @override
-  String get tooltipHidePin => 'Hide PIN';
+  String get tooltipHidePin => 'PIN ausblenden';
 
   @override
-  String get tooltipShowValue => 'Show value';
+  String get tooltipShowValue => 'Wert anzeigen';
 
   @override
-  String get tooltipHideValue => 'Hide';
+  String get tooltipHideValue => 'Ausblenden';
 
   @override
-  String get tooltipCancel => 'Cancel';
+  String get tooltipCancel => 'Abbrechen';
 
   @override
-  String get tooltipOpenInBrowser => 'Open in browser';
+  String get tooltipOpenInBrowser => 'Im Browser öffnen';
 
   @override
-  String get allFolders => 'All folders';
+  String get allFolders => 'Alle Ordner';
 
   @override
-  String get noFolder => 'None';
+  String get noFolder => 'Kein';
 
   @override
-  String get selectFolder => 'Select a folder';
+  String get selectFolder => 'Ordner auswählen';
 
   @override
-  String get folderName => 'Folder name';
+  String get folderName => 'Ordnername';
 
   @override
-  String get noEntriesMatch => 'No entries match your search.';
+  String get noEntriesMatch => 'Keine Einträge entsprechen der Suche.';
 
   @override
-  String get noVaultsRegistered => 'No vaults registered.';
+  String get noVaultsRegistered => 'Keine Tresore registriert.';
 
   @override
-  String get noYubiKeysRegistered => 'No YubiKeys registered';
+  String get noYubiKeysRegistered => 'Keine YubiKeys registriert';
 
   @override
-  String get selectEntry => 'Select an entry';
+  String get selectEntry => 'Eintrag auswählen';
 
   @override
-  String get newEntryTitle => 'New entry';
+  String get newEntryTitle => 'Neuer Eintrag';
 
   @override
   String createEntryTitle(String type) {
-    return 'New $type';
+    return 'Neues $type';
   }
 
   @override
   String editEntryTitle(String type) {
-    return 'Edit $type';
+    return '$type bearbeiten';
   }
 
   @override
-  String get noUrlFallback => '(no URL)';
+  String get noUrlFallback => '(keine URL)';
 
   @override
-  String get noNameFallback => '(no name)';
+  String get noNameFallback => '(kein Name)';
 
   @override
-  String get untitledFallback => '(untitled)';
+  String get untitledFallback => '(ohne Titel)';
 
   @override
   String get gabbroTitle => 'Gabbro';
@@ -488,228 +489,232 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String selectedCount(int count) {
-    return '$count selected';
+    return '$count ausgewählt';
   }
 
   @override
-  String get searchAllFieldsHint => 'Search all fields…';
+  String get searchAllFieldsHint => 'In allen Feldern suchen…';
 
   @override
-  String get searchEntriesHint => 'Search entries…';
+  String get searchEntriesHint => 'Einträge suchen…';
 
   @override
-  String get searchAllFieldsTooltip => 'Searching all fields';
+  String get searchAllFieldsTooltip => 'Suche in allen Feldern';
 
   @override
-  String get searchByTitleTooltip => 'Searching by title';
+  String get searchByTitleTooltip => 'Suche nach Titel';
 
   @override
-  String get entryTypeAll => 'All';
+  String get entryTypeAll => 'Alle';
 
   @override
-  String get entryTypePassword => 'Password';
+  String get entryTypePassword => 'Passwort';
 
   @override
-  String get entryTypeNote => 'Note';
+  String get entryTypeNote => 'Notiz';
 
   @override
-  String get entryTypeCard => 'Card';
+  String get entryTypeCard => 'Karte';
 
   @override
-  String get entryTypeIdentity => 'Identity';
+  String get entryTypeIdentity => 'Identität';
 
   @override
-  String get entryTypeFile => 'File';
+  String get entryTypeFile => 'Datei';
 
   @override
-  String get entryTypeCustom => 'Custom';
+  String get entryTypeCustom => 'Benutzerdefiniert';
 
   @override
   String errorPrefix(String error) {
-    return 'Error: $error';
+    return 'Fehler: $error';
   }
 
   @override
-  String get navVault => 'Vault';
+  String get navVault => 'Tresor';
 
   @override
-  String get navAppearance => 'Appearance';
+  String get navAppearance => 'Darstellung';
 
   @override
-  String get navSecurity => 'Security';
+  String get navSecurity => 'Sicherheit';
 
   @override
-  String get navAbout => 'About';
+  String get navAbout => 'Über';
 
   @override
-  String get deleteEntryTitle => 'Delete entry?';
+  String get deleteEntryTitle => 'Eintrag löschen?';
 
   @override
-  String get cannotBeUndone => 'This cannot be undone.';
+  String get cannotBeUndone => 'Dies kann nicht rückgängig gemacht werden.';
 
   @override
-  String get deleteEntryDialogTitle => 'Delete entry?';
+  String get deleteEntryDialogTitle => 'Eintrag löschen?';
 
   @override
   String deleteEntriesTitle(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Delete $count entries?',
-      one: 'Delete 1 entry?',
+      other: '$count Einträge löschen?',
+      one: '1 Eintrag löschen?',
     );
     return '$_temp0';
   }
 
   @override
-  String get assignToFolderTitle => 'Assign to folder';
+  String get assignToFolderTitle => 'Ordner zuweisen';
 
   @override
-  String get folderConflictTitle => 'Folder conflict';
+  String get folderConflictTitle => 'Ordnerkonflikt';
 
   @override
-  String get syncFailedTitle => 'Sync failed';
+  String get syncFailedTitle => 'Synchronisierung fehlgeschlagen';
 
   @override
-  String get syncFromFileTitle => 'Sync from file';
+  String get syncFromFileTitle => 'Aus Datei synchronisieren';
 
   @override
   String get nothingToSync =>
-      'Nothing to sync — both vaults are already up to date.';
+      'Nichts zu synchronisieren — beide Tresore sind bereits aktuell.';
 
   @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Imported $count entries.',
-      one: 'Imported 1 entry.',
+      other: '$count Einträge importiert.',
+      one: '1 Eintrag importiert.',
     );
     return '$_temp0';
   }
 
   @override
-  String get exportFileTitle => 'Export file';
+  String get exportFileTitle => 'Datei exportieren';
 
   @override
-  String get saveDecryptedFileTo => 'Save decrypted file to:';
+  String get saveDecryptedFileTo => 'Entschlüsselte Datei speichern in:';
 
   @override
-  String get exportPathLabel => 'Export path';
+  String get exportPathLabel => 'Exportpfad';
 
   @override
   String exportedToPath(String path) {
-    return 'Exported to $path';
+    return 'Exportiert nach $path';
   }
 
   @override
   String exportFailed(String error) {
-    return 'Export failed: $error';
+    return 'Export fehlgeschlagen: $error';
   }
 
   @override
-  String get openInBrowserTitle => 'Open in browser?';
+  String get openInBrowserTitle => 'Im Browser öffnen?';
 
   @override
   String couldNotOpen(String url) {
-    return 'Could not open $url';
+    return '$url konnte nicht geöffnet werden';
   }
 
   @override
-  String get deleteEntryFromHistoryLabel => 'Delete previous entry';
+  String get deleteEntryFromHistoryLabel => 'Früheren Eintrag löschen';
 
   @override
   String failedToClearHistory(String error) {
-    return 'Failed to clear history: $error';
+    return 'Verlauf konnte nicht geleert werden: $error';
   }
 
   @override
   String failedToRevertPassword(String error) {
-    return 'Failed to revert password: $error';
+    return 'Passwort konnte nicht wiederhergestellt werden: $error';
   }
 
   @override
-  String get renameFolderTitle => 'Rename folder';
+  String get renameFolderTitle => 'Ordner umbenennen';
 
   @override
-  String get addFolderTitle => 'Add folder';
+  String get addFolderTitle => 'Ordner hinzufügen';
 
   @override
-  String get deleteFolderTitle => 'Delete folder';
+  String get deleteFolderTitle => 'Ordner löschen';
 
   @override
   String deleteFolderConfirm(String folder) {
-    return 'Delete \"$folder\"?';
+    return '«$folder» löschen?';
   }
 
   @override
-  String get reassignEntriesTo => 'Reassign entries to';
+  String get reassignEntriesTo => 'Einträge zuweisen zu';
 
   @override
-  String get clearToNone => 'Clear to \"None\"';
+  String get clearToNone => 'Auf «Kein» zurücksetzen';
 
   @override
-  String get renameVaultTitle => 'Rename vault';
+  String get renameVaultTitle => 'Tresor umbenennen';
 
   @override
-  String get deleteVaultTitle => 'Delete vault?';
+  String get deleteVaultTitle => 'Tresor löschen?';
 
   @override
-  String get deleteVaultConfirmTitle => 'Are you sure?';
+  String get deleteVaultConfirmTitle => 'Bist du sicher?';
 
   @override
-  String get typeDeleteToConfirm => 'Type DELETE to confirm';
+  String get typeDeleteToConfirm => 'DELETE eingeben, um zu bestätigen';
 
   @override
-  String get touchYourYubiKey => 'Touch your YubiKey';
+  String get typeDeleteWord => 'DELETE';
 
   @override
-  String get noVaultsRegisteredText => 'No vaults registered.';
+  String get touchYourYubiKey => 'YubiKey berühren';
 
   @override
-  String get addYubiKeyTitle => 'Add YubiKey';
+  String get noVaultsRegisteredText => 'Keine Tresore registriert.';
 
   @override
-  String get enterYubiKeyPinTitle => 'Enter YubiKey PIN';
+  String get addYubiKeyTitle => 'YubiKey hinzufügen';
+
+  @override
+  String get enterYubiKeyPinTitle => 'YubiKey-PIN eingeben';
 
   @override
   String editAliasForKey(int index) {
-    return 'Edit alias for key $index';
+    return 'Alias für Schlüssel $index bearbeiten';
   }
 
   @override
-  String get lastKeyWarning => 'This will leave only one registered YubiKey.';
+  String get lastKeyWarning =>
+      'Es bleibt nur noch eine registrierte YubiKey übrig.';
 
   @override
-  String get removeKeyConfirm => 'Are you sure you want to remove this key?';
+  String get removeKeyConfirm => 'Diesen Schlüssel wirklich entfernen?';
 
   @override
-  String get removeKeyVaultConfirm => 'Remove this YubiKey from the vault?';
+  String get removeKeyVaultConfirm => 'Diese YubiKey aus dem Tresor entfernen?';
 
   @override
-  String get yubiKeyRemoved => 'YubiKey removed';
+  String get yubiKeyRemoved => 'YubiKey entfernt';
 
   @override
   String failedToRemoveKey(String error) {
-    return 'Failed to remove key: $error';
+    return 'Schlüssel konnte nicht entfernt werden: $error';
   }
 
   @override
-  String get yubiKeyAdded => 'YubiKey added';
+  String get yubiKeyAdded => 'YubiKey hinzugefügt';
 
   @override
   String failedToAddKey(String error) {
-    return 'Failed to add key: $error';
+    return 'Schlüssel konnte nicht hinzugefügt werden: $error';
   }
 
   @override
   String failedToSaveAlias(String error) {
-    return 'Failed to save alias: $error';
+    return 'Alias konnte nicht gespeichert werden: $error';
   }
 
   @override
   String get noFidoDeviceFound =>
-      'No FIDO2 device found. Insert your YubiKey and try again.';
+      'Kein FIDO2-Gerät gefunden. YubiKey einstecken und erneut versuchen.';
 
   @override
   String get transportLabel => 'Transport:';
@@ -724,67 +729,67 @@ class AppLocalizationsDe extends AppLocalizations {
   String get passphraseLabel => 'Passphrase';
 
   @override
-  String get yubiKeyPinLabel => 'YubiKey PIN';
+  String get yubiKeyPinLabel => 'YubiKey-PIN';
 
   @override
   String get pinLabel => 'PIN';
 
   @override
-  String get currentPassphraseLabel => 'Current passphrase';
+  String get currentPassphraseLabel => 'Aktuelle Passphrase';
 
   @override
-  String get newPassphraseLabel => 'New passphrase';
+  String get newPassphraseLabel => 'Neue Passphrase';
 
   @override
-  String get confirmPassphraseLabel => 'Confirm new passphrase';
+  String get confirmPassphraseLabel => 'Neue Passphrase bestätigen';
 
   @override
-  String get vaultPassphraseLabel => 'Vault passphrase';
+  String get vaultPassphraseLabel => 'Tresor-Passphrase';
 
   @override
   String get aliasLabel => 'Alias';
 
   @override
-  String get aliasHint => 'e.g. Primary, Work key…';
+  String get aliasHint => 'z. B. Primär, Arbeitsschlüssel…';
 
   @override
-  String get masterPassphraseLabel => 'Master passphrase';
+  String get masterPassphraseLabel => 'Master-Passphrase';
 
   @override
-  String get confirmPassphraseLabelShort => 'Confirm passphrase';
+  String get confirmPassphraseLabelShort => 'Passphrase bestätigen';
 
   @override
-  String get fieldTitle => 'Title';
+  String get fieldTitle => 'Titel';
 
   @override
-  String get fieldContent => 'Content';
+  String get fieldContent => 'Inhalt';
 
   @override
-  String get fieldFirstName => 'First name';
+  String get fieldFirstName => 'Vorname';
 
   @override
-  String get fieldLastName => 'Last name';
+  String get fieldLastName => 'Nachname';
 
   @override
-  String get fieldEmail => 'Email (optional)';
+  String get fieldEmail => 'E-Mail (optional)';
 
   @override
-  String get fieldPhone => 'Phone (optional)';
+  String get fieldPhone => 'Telefon (optional)';
 
   @override
-  String get fieldAddress => 'Address (optional)';
+  String get fieldAddress => 'Adresse (optional)';
 
   @override
-  String get fieldCardLabel => 'Card label (e.g. \"Visa Platinum\")';
+  String get fieldCardLabel => 'Kartenbezeichnung (z. B. «Visa Platinum»)';
 
   @override
-  String get fieldCardholderName => 'Cardholder name';
+  String get fieldCardholderName => 'Name des Karteninhabers';
 
   @override
-  String get fieldCardNumber => 'Card number';
+  String get fieldCardNumber => 'Kartennummer';
 
   @override
-  String get fieldExpiry => 'Expiry (MM/YY)';
+  String get fieldExpiry => 'Ablaufdatum (MM/JJ)';
 
   @override
   String get fieldCvv => 'CVV (optional)';
@@ -793,37 +798,37 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fieldCardPin => 'PIN (optional)';
 
   @override
-  String get fieldCreditLimit => 'Credit limit (optional)';
+  String get fieldCreditLimit => 'Kreditlimit (optional)';
 
   @override
-  String get fieldAccountNumber => 'Account number (optional)';
+  String get fieldAccountNumber => 'Kontonummer (optional)';
 
   @override
-  String get fieldNotes => 'Notes (optional)';
+  String get fieldNotes => 'Notizen (optional)';
 
   @override
   String get fieldUrl => 'URL (optional)';
 
   @override
-  String get fieldUsername => 'Username';
+  String get fieldUsername => 'Benutzername';
 
   @override
-  String get fieldPassword => 'Password';
+  String get fieldPassword => 'Passwort';
 
   @override
-  String get fieldSeparator => 'Separator';
+  String get fieldSeparator => 'Trennzeichen';
 
   @override
-  String get fieldFolder => 'Folder';
+  String get fieldFolder => 'Ordner';
 
   @override
-  String get fieldLabel => 'Label';
+  String get fieldLabel => 'Bezeichnung';
 
   @override
-  String get fieldValue => 'Value';
+  String get fieldValue => 'Wert';
 
   @override
-  String get fieldCustomFields => 'Custom fields';
+  String get fieldCustomFields => 'Benutzerdefinierte Felder';
 
   @override
   String fieldLabelOptional(String label) {
@@ -831,326 +836,329 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get entryTypeNotSupported => 'Entry type not yet supported.';
+  String get entryTypeNotSupported =>
+      'Eintragstyp wird noch nicht unterstützt.';
 
   @override
-  String get csvColumnNone => '(none)';
+  String get csvColumnNone => '(keine)';
 
   @override
-  String get csvPreviewLabel => 'Preview';
+  String get csvPreviewLabel => 'Vorschau';
 
   @override
-  String get csvImportButton => 'Import';
+  String get csvImportButton => 'Importieren';
 
   @override
-  String get gabbroVaultSection => 'Gabbro vault';
+  String get gabbroVaultSection => 'Gabbro-Tresor';
 
   @override
-  String get genericCsvSection => 'Generic CSV';
+  String get genericCsvSection => 'Generisches CSV';
 
   @override
-  String get changePassphraseSuccess => 'Passphrase changed successfully';
+  String get changePassphraseSuccess => 'Passphrase erfolgreich geändert';
 
   @override
-  String get changePassphraseButton => 'Change passphrase';
+  String get changePassphraseButton => 'Passphrase ändern';
 
   @override
-  String get continueLabel => 'Continue';
+  String get continueLabel => 'Weiter';
 
   @override
-  String get protectWithYubiKey => 'Protect with YubiKey';
+  String get protectWithYubiKey => 'Mit YubiKey schützen';
 
   @override
-  String get yubiKeySubtitle => 'Hardware security key (recommended)';
+  String get yubiKeySubtitle => 'Hardware-Sicherheitsschlüssel (empfohlen)';
 
   @override
-  String get accessibilityButton => 'Accessibility';
+  String get accessibilityButton => 'Barrierefreiheit';
 
   @override
-  String get aboutProjectSection => 'Project';
+  String get aboutProjectSection => 'Projekt';
 
   @override
-  String get aboutLicenceSection => 'Licence';
+  String get aboutLicenceSection => 'Lizenz';
 
   @override
-  String get aboutOpenSourceSection => 'Open source components';
+  String get aboutOpenSourceSection => 'Open-Source-Komponenten';
 
   @override
-  String get aboutAttributionSection => 'Attribution';
+  String get aboutAttributionSection => 'Namensnennung';
 
   @override
-  String get lengthLabel => 'Length';
+  String get lengthLabel => 'Länge';
 
   @override
-  String get wordsLabel => 'Words';
+  String get wordsLabel => 'Wörter';
 
   @override
-  String get generateButton => 'Generate';
+  String get generateButton => 'Generieren';
 
   @override
-  String get usePasswordButton => 'Use this password';
+  String get usePasswordButton => 'Dieses Passwort verwenden';
 
   @override
-  String get showHidePassword => 'Show';
+  String get showHidePassword => 'Anzeigen';
 
   @override
   String get deleteVaultPostDeletion =>
-      'Your vault has been deleted. Create a new one to continue.';
+      'Dein Tresor wurde gelöscht. Erstelle einen neuen, um fortzufahren.';
 
   @override
-  String get syncFilePassphraseLabel => 'Vault passphrase';
+  String get syncFilePassphraseLabel => 'Tresor-Passphrase';
 
   @override
   String get historyWarning =>
-      'Only 1 previous value is kept. History auto-purges based on your security settings.';
+      'Es wird nur 1 früherer Wert aufbewahrt. Der Verlauf wird automatisch basierend auf den Sicherheitseinstellungen bereinigt.';
 
   @override
-  String get historyCurrent => 'Current';
+  String get historyCurrent => 'Aktuell';
 
   @override
-  String get historyPrevious => 'Previous';
+  String get historyPrevious => 'Vorherig';
 
   @override
   String historySavedOn(String date) {
-    return 'Saved $date';
+    return 'Gespeichert am $date';
   }
 
   @override
   String historyExpiresAppend(String saved, String expires) {
-    return '$saved · expires $expires';
+    return '$saved · läuft ab am $expires';
   }
 
   @override
   String importIssueTitle(int index, int total) {
-    return 'Import issue ($index of $total)';
+    return 'Importproblem ($index von $total)';
   }
 
   @override
   String importIssueType(String category) {
-    return 'Type: $category';
+    return 'Typ: $category';
   }
 
   @override
   String get importIssueHelp =>
-      'Edit to correct and save this entry, or skip to discard it.';
+      'Bearbeiten, um diesen Eintrag zu korrigieren und zu speichern, oder überspringen, um ihn zu verwerfen.';
 
   @override
   String entriesSkipped(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count entries skipped',
-      one: '1 entry skipped',
+      other: '$count Einträge übersprungen',
+      one: '1 Eintrag übersprungen',
     );
     return '$_temp0';
   }
 
   @override
   String get skippedEntriesNote =>
-      'These entries already exist in your vault and were not overwritten:';
+      'Diese Einträge existieren bereits im Tresor und wurden nicht überschrieben:';
 
   @override
   String syncDeleteEntryContent(String title) {
-    return 'The other device deleted \'$title\'.\n\nDelete it here too, or keep it?';
+    return 'Das andere Gerät hat «$title» gelöscht.\n\nHier auch löschen oder behalten?';
   }
 
   @override
   String folderConflictContent(String title, String local, String incoming) {
-    return '\'$title\' is in different folders on each device.\n\nThis device: $local\nOther device: $incoming';
+    return '«$title» befindet sich auf jedem Gerät in unterschiedlichen Ordnern.\n\nDieses Gerät: $local\nAnderes Gerät: $incoming';
   }
 
   @override
-  String get folderConflictKeepUnfoldered => 'Keep unfoldered';
+  String get folderConflictKeepUnfoldered => 'Ohne Ordner behalten';
 
   @override
   String folderConflictKeepLocal(String folder) {
-    return 'Keep \"$folder\"';
+    return '«$folder» behalten';
   }
 
   @override
-  String get folderConflictMoveUnfoldered => 'Move to unfoldered';
+  String get folderConflictMoveUnfoldered => 'Ohne Ordner verschieben';
 
   @override
   String folderConflictMoveIncoming(String folder) {
-    return 'Move to \"$folder\"';
+    return 'Nach «$folder» verschieben';
   }
 
   @override
   String vaultSynced(int added, int updated, int deleted) {
-    return 'Vault synced — $added added, $updated updated, $deleted deleted.';
+    return 'Tresor synchronisiert — $added hinzugefügt, $updated aktualisiert, $deleted gelöscht.';
   }
 
   @override
   String get syncPassphraseMismatch =>
-      'This vault file uses a different passphrase. Sync is only supported between vaults that share a passphrase.';
+      'Diese Tresordatei verwendet eine andere Passphrase. Die Synchronisierung wird nur zwischen Tresoren unterstützt, die dieselbe Passphrase teilen.';
 
   @override
-  String get reviewSensitiveFields => 'Sensitive fields';
+  String get reviewSensitiveFields => 'Sensible Felder';
 
   @override
-  String get reviewOtherFields => 'Other fields';
+  String get reviewOtherFields => 'Andere Felder';
 
   @override
-  String get reviewPasswordChanged => 'Password changed';
+  String get reviewPasswordChanged => 'Passwort geändert';
 
   @override
-  String get reviewCvvChanged => 'CVV changed';
+  String get reviewCvvChanged => 'CVV geändert';
 
   @override
-  String get reviewPinChanged => 'PIN changed';
+  String get reviewPinChanged => 'PIN geändert';
 
   @override
-  String get reviewTransactionPasswordChanged => 'Transaction password changed';
+  String get reviewTransactionPasswordChanged =>
+      'Transaktionspasswort geändert';
 
   @override
-  String get tooltipShowValues => 'Show values';
+  String get tooltipShowValues => 'Werte anzeigen';
 
   @override
-  String get reviewOld => 'Old';
+  String get reviewOld => 'Alt';
 
   @override
-  String get reviewNew => 'New';
+  String get reviewNew => 'Neu';
 
   @override
-  String get reviewEmpty => '(empty)';
+  String get reviewEmpty => '(leer)';
 
   @override
   String get reviewFieldUrl => 'URL';
 
   @override
-  String get reviewFieldNotes => 'Notes';
+  String get reviewFieldNotes => 'Notizen';
 
   @override
-  String get reviewFieldContent => 'Content';
+  String get reviewFieldContent => 'Inhalt';
 
   @override
-  String get reviewFieldEmail => 'Email';
+  String get reviewFieldEmail => 'E-Mail';
 
   @override
-  String get reviewFieldPhone => 'Phone';
+  String get reviewFieldPhone => 'Telefon';
 
   @override
-  String get reviewFieldAddress => 'Address';
+  String get reviewFieldAddress => 'Adresse';
 
   @override
-  String get reviewFieldCardLabel => 'Card label';
+  String get reviewFieldCardLabel => 'Kartenbezeichnung';
 
   @override
   String get reviewFieldStatus => 'Status';
 
   @override
-  String get reviewFieldCardholder => 'Cardholder';
+  String get reviewFieldCardholder => 'Karteninhaber';
 
   @override
-  String get reviewFieldExpiry => 'Expiry';
+  String get reviewFieldExpiry => 'Ablaufdatum';
 
   @override
-  String get reviewFieldCreditLimit => 'Credit limit';
+  String get reviewFieldCreditLimit => 'Kreditlimit';
 
   @override
-  String get reviewFieldAccountNumber => 'Account number';
+  String get reviewFieldAccountNumber => 'Kontonummer';
 
   @override
-  String get reviewFieldNetwork => 'Network';
+  String get reviewFieldNetwork => 'Netzwerk';
 
   @override
   String get reviewFieldBank => 'Bank';
 
   @override
-  String get reviewFieldFilename => 'Filename';
+  String get reviewFieldFilename => 'Dateiname';
 
   @override
-  String get reviewFieldSize => 'Size';
+  String get reviewFieldSize => 'Größe';
 
   @override
-  String get reviewFieldCardNumber => 'Number';
+  String get reviewFieldCardNumber => 'Nummer';
 
   @override
   String get reviewFieldCVV => 'CVV';
 
   @override
-  String get reviewFieldTransactionPassword => 'Transaction password';
+  String get reviewFieldTransactionPassword => 'Transaktionspasswort';
 
   @override
-  String get timestampCreated => 'Created';
+  String get timestampCreated => 'Erstellt';
 
   @override
-  String get timestampUpdated => 'Updated';
+  String get timestampUpdated => 'Aktualisiert';
 
   @override
-  String get timestampUnknown => 'Unknown';
+  String get timestampUnknown => 'Unbekannt';
 
   @override
-  String get noTitleFallback => '(no title)';
+  String get noTitleFallback => '(kein Titel)';
 
   @override
-  String get tooltipExportFile => 'Export file';
+  String get tooltipExportFile => 'Datei exportieren';
 
   @override
-  String get tooltipEditEntry => 'Edit entry';
+  String get tooltipEditEntry => 'Eintrag bearbeiten';
 
   @override
-  String get tooltipDeleteEntry => 'Delete entry';
+  String get tooltipDeleteEntry => 'Eintrag löschen';
 
   @override
-  String get exportLabel => 'Export';
+  String get exportLabel => 'Exportieren';
 
   @override
-  String get customEntryFieldsHeader => 'Fields';
+  String get customEntryFieldsHeader => 'Felder';
 
   @override
   String get copiedNeverClears =>
-      'Copied — clipboard never clears automatically';
+      'Kopiert — Zwischenablage wird nie automatisch geleert';
 
   @override
-  String get copiedClears30s => 'Copied — clipboard clears in 30s';
+  String get copiedClears30s => 'Kopiert — Zwischenablage wird in 30s geleert';
 
   @override
-  String get copiedClears60s => 'Copied — clipboard clears in 60s';
+  String get copiedClears60s => 'Kopiert — Zwischenablage wird in 60s geleert';
 
   @override
-  String get copiedClears2min => 'Copied — clipboard clears in 2 min';
+  String get copiedClears2min =>
+      'Kopiert — Zwischenablage wird in 2 Min. geleert';
 
   @override
-  String get passwordBreakdownTitle => 'Password breakdown';
+  String get passwordBreakdownTitle => 'Passwortanalyse';
 
   @override
-  String get charTypeUppercase => 'Uppercase';
+  String get charTypeUppercase => 'Großbuchstabe';
 
   @override
-  String get charTypeLowercase => 'Lowercase';
+  String get charTypeLowercase => 'Kleinbuchstabe';
 
   @override
-  String get charTypeDigit => 'Digit';
+  String get charTypeDigit => 'Ziffer';
 
   @override
   String get charTypeSymbol => 'Symbol';
 
   @override
-  String get exportChooseFormat => 'Choose an export format.';
+  String get exportChooseFormat => 'Exportformat wählen.';
 
   @override
   String get exportUnencryptedWarning =>
-      'Completely unencrypted — all secrets will be written in plain text. Store this file securely and delete it after use.';
+      'Vollständig unverschlüsselt — alle Geheimnisse werden im Klartext geschrieben. Diese Datei sicher aufbewahren und nach Verwendung löschen.';
 
   @override
   String get exportPassphraseOnlyNote =>
-      'Protected by your passphrase only. YubiKey is not required to import.';
+      'Nur durch die Passphrase geschützt. YubiKey ist für den Import nicht erforderlich.';
 
   @override
   String get exportChooseDestinationJson =>
-      'Choose a destination for your exported JSON file.';
+      'Ziel für die exportierte JSON-Datei wählen.';
 
   @override
   String get exportChooseDestinationVault =>
-      'Choose a destination for your exported vault file.';
+      'Ziel für die exportierte Tresordatei wählen.';
 
   @override
   String get exportTwoFilesNote =>
-      'Two files will be written: vault.gabbro and vault.gabbro.sha256';
+      'Zwei Dateien werden erstellt: vault.gabbro und vault.gabbro.sha256';
 
   @override
-  String get exportSelectDestination => 'Select a destination.';
+  String get exportSelectDestination => 'Ziel auswählen.';
 
   @override
   String aboutVersion(String version) {
@@ -1158,264 +1166,276 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get aboutTagline => 'A post-quantum password manager';
+  String get aboutTagline => 'Ein Post-Quanten-Passwortmanager';
 
   @override
-  String get aboutSourceCode => 'Source code';
+  String get aboutSourceCode => 'Quellcode';
 
   @override
-  String get aboutReportIssue => 'Report an issue';
+  String get aboutReportIssue => 'Problem melden';
 
   @override
-  String get aboutSupportGabbro => 'Support Gabbro';
+  String get aboutSupportGabbro => 'Gabbro unterstützen';
 
   @override
   String get aboutLicenceBody =>
-      'Gabbro is free and open source software, licensed under the GNU General Public License v3.0 only (GPL-3.0-only).\n\nYou are free to use, study, and redistribute this software under the terms of that licence.';
+      'Gabbro ist freie und quelloffene Software, lizenziert unter der GNU General Public License v3.0 only (GPL-3.0-only).\n\nDiese Software darf gemäß den Bedingungen dieser Lizenz frei genutzt, studiert und weitergegeben werden.';
 
   @override
-  String get aboutOwnerRole => 'Project owner, architect, and lead developer:';
+  String get aboutOwnerRole =>
+      'Projektinhaber, Architekt und leitender Entwickler:';
 
   @override
-  String get aboutAiPartner => 'AI development partner:';
+  String get aboutAiPartner => 'KI-Entwicklungspartner:';
 
   @override
   String get aboutNoTelemetry =>
-      'Gabbro makes no outbound network connections. No telemetry, no analytics, no accounts.';
+      'Gabbro stellt keine ausgehenden Netzwerkverbindungen her. Keine Telemetrie, keine Analysen, keine Konten.';
 
   @override
-  String get strengthTierTerrible => 'Terrible';
+  String get strengthTierTerrible => 'Schrecklich';
 
   @override
-  String get strengthTierWeak => 'Weak';
+  String get strengthTierWeak => 'Schwach';
 
   @override
-  String get strengthTierFair => 'Fair';
+  String get strengthTierFair => 'Akzeptabel';
 
   @override
-  String get strengthTierStrong => 'Strong';
+  String get strengthTierStrong => 'Stark';
 
   @override
-  String get strengthTierVeryStrong => 'Very strong';
+  String get strengthTierVeryStrong => 'Sehr stark';
 
   @override
-  String get strengthTierExcellent => 'Excellent';
+  String get strengthTierExcellent => 'Ausgezeichnet';
 
   @override
   String get yubiKeyProtectedNote =>
-      'YubiKey-protected vault — your YubiKey binding will be preserved.';
+      'YubiKey-geschützter Tresor — die YubiKey-Bindung wird beibehalten.';
 
   @override
-  String get yubiKeyPinRequired => 'YubiKey PIN is required';
+  String get yubiKeyPinRequired => 'YubiKey-PIN ist erforderlich';
 
   @override
-  String get tapYubiKeyNow => 'Tap your YubiKey now…';
+  String get tapYubiKeyNow => 'YubiKey jetzt berühren…';
 
   @override
   String get touchYubiKeyToAuthorize =>
-      'Touch your YubiKey to authorize this change.';
+      'YubiKey berühren, um diese Änderung zu autorisieren.';
 
   @override
-  String get currentPassphraseRequired => 'Current passphrase is required';
+  String get currentPassphraseRequired =>
+      'Aktuelle Passphrase ist erforderlich';
 
   @override
-  String get newPassphraseRequired => 'New passphrase is required';
+  String get newPassphraseRequired => 'Neue Passphrase ist erforderlich';
 
   @override
-  String get passphraseTooWeak => 'Passphrase is too weak';
+  String get passphraseTooWeak => 'Passphrase ist zu schwach';
 
   @override
-  String get confirmPassphraseRequired => 'Please confirm your new passphrase';
+  String get confirmPassphraseRequired => 'Bitte neue Passphrase bestätigen';
 
   @override
-  String get passphrasesDoNotMatch => 'Passphrases do not match';
+  String get passphrasesDoNotMatch => 'Passphrasen stimmen nicht überein';
 
   @override
-  String get passphrasesMatch => '✓ Passphrases match';
+  String get passphrasesMatch => '✓ Passphrasen stimmen überein';
 
   @override
-  String get passphrasesNoMatch => '✗ Passphrases do not match';
+  String get passphrasesNoMatch => '✗ Passphrasen stimmen nicht überein';
 
   @override
   String entropyDisplay(String tier, String bits) {
-    return '$tier · $bits bits';
+    return '$tier · $bits Bit';
   }
 
   @override
-  String get transportError => 'Transport error.';
+  String get transportError => 'Transportfehler.';
 
   @override
   String get authorizationFailed =>
-      'Authorization failed — check your PIN and try again.';
+      'Autorisierung fehlgeschlagen — PIN überprüfen und erneut versuchen.';
 
   @override
   String get unlockEnterPassphraseAndPin =>
-      'Enter your passphrase and YubiKey PIN to unlock';
+      'Passphrase und YubiKey-PIN eingeben, um zu entsperren';
 
   @override
-  String get unlockEnterPassphrase => 'Enter your passphrase to unlock';
+  String get unlockEnterPassphrase => 'Passphrase eingeben, um zu entsperren';
 
   @override
   String unlockEntropyDisplay(String tier, String bits) {
-    return '$tier · $bits bits of entropy';
+    return '$tier · $bits Bit Entropie';
   }
 
   @override
   String get insertYubiKeyAndTap =>
-      'Insert your YubiKey and tap when it flashes';
+      'YubiKey einstecken und beim Blinken berühren';
 
   @override
   String get unlockErrorPassphrase =>
-      'Could not unlock vault. Check your passphrase.';
+      'Tresor konnte nicht entsperrt werden. Passphrase überprüfen.';
 
   @override
   String get unlockErrorPassphraseAndPin =>
-      'Could not unlock vault. Check your passphrase and YubiKey PIN.';
+      'Tresor konnte nicht entsperrt werden. Passphrase und YubiKey-PIN überprüfen.';
 
   @override
-  String get importSelectFile => 'Select a file.';
+  String get importSelectFile => 'Datei auswählen.';
 
   @override
-  String get importFileNotFound => 'File not found.';
+  String get importFileNotFound => 'Datei nicht gefunden.';
 
   @override
-  String get importEnterPassphrase => 'Enter the passphrase for this vault.';
+  String get importEnterPassphrase => 'Passphrase für diesen Tresor eingeben.';
 
   @override
   String get importDuplicateWarning =>
-      'Entries whose UUID already exists in your vault will be skipped automatically. You will be shown a summary.';
+      'Einträge, deren UUID bereits im Tresor vorhanden ist, werden automatisch übersprungen. Eine Zusammenfassung wird angezeigt.';
 
   @override
   String get importGabbroSubtitle =>
-      'Sync entries from another Gabbro vault (.gabbro file)';
+      'Einträge aus einem anderen Gabbro-Tresor synchronisieren (.gabbro-Datei)';
 
   @override
-  String get importEnpassSubtitle => 'JSON export from Enpass (Tools → Export)';
+  String get importEnpassSubtitle =>
+      'JSON-Export aus Enpass (Werkzeuge → Exportieren)';
 
   @override
   String get importBitwardenSubtitle =>
-      'Unencrypted JSON export from Bitwarden (Tools → Export Vault)';
+      'Unverschlüsselter JSON-Export aus Bitwarden (Werkzeuge → Tresor exportieren)';
 
   @override
-  String get importCsvSubtitle => 'CSV export from any password manager';
+  String get importCsvSubtitle =>
+      'CSV-Export aus einem beliebigen Passwortmanager';
 
   @override
   String vaultNameAlreadyExists(String alias) {
-    return 'A vault named \"$alias\" already exists.';
+    return 'Ein Tresor namens «$alias» existiert bereits.';
   }
 
   @override
   String deleteVaultContent(String alias, String path) {
-    return 'This will permanently delete \"$alias\" and all its data.\n\nFile: $path\n\nThis cannot be undone.';
+    return 'Dies löscht «$alias» und alle zugehörigen Daten dauerhaft.\n\nDatei: $path\n\nDies kann nicht rückgängig gemacht werden.';
   }
 
   @override
   String deleteVaultYubikeyContent(String alias, String path) {
-    return 'This will permanently delete \"$alias\" and remove its YubiKey binding.\n\nFile: $path\n\nThis cannot be undone.';
+    return 'Dies löscht «$alias» dauerhaft und entfernt die YubiKey-Bindung.\n\nDatei: $path\n\nDies kann nicht rückgängig gemacht werden.';
   }
 
   @override
   String get yubiKeyAuthorizeDeletion =>
-      'Enter your PIN and touch your YubiKey to authorize this deletion.';
+      'PIN eingeben und YubiKey berühren, um diese Löschung zu autorisieren.';
 
   @override
-  String get deleteVaultTooltip => 'Delete vault';
+  String get deleteVaultTooltip => 'Tresor löschen';
 
   @override
-  String get yubiKeySecurityWarning => 'Security warning';
+  String get yubiKeySecurityWarning => 'Sicherheitswarnung';
 
   @override
-  String get removeYubiKeyTitle => 'Remove YubiKey';
+  String get removeYubiKeyTitle => 'YubiKey entfernen';
 
   @override
   String get yubiKeyLastKeyRiskWarning =>
-      'WARNING: if that remaining key is lost, damaged, or stolen, vault access will be permanently impossible. There is no recovery path.';
+      'WARNUNG: Wenn dieser verbleibende Schlüssel verloren geht, beschädigt oder gestohlen wird, ist der Zugang zum Tresor dauerhaft unmöglich. Es gibt keinen Wiederherstellungsweg.';
 
   @override
   String get onlyOneKeyRegisteredWarning =>
-      'Only one key registered. If this key is lost, vault access is permanently impossible.';
+      'Nur ein Schlüssel registriert. Wenn dieser Schlüssel verloren geht, ist der Zugang zum Tresor dauerhaft unmöglich.';
 
   @override
-  String get tapRegisterNfc => 'Hold key to phone to register';
+  String get tapRegisterNfc =>
+      'Schlüssel ans Telefon halten, um zu registrieren';
 
   @override
-  String get tapRegisterUsb => 'Once connected, tap the key to register';
+  String get tapRegisterUsb =>
+      'Nach dem Anschließen den Schlüssel berühren, um zu registrieren';
 
   @override
-  String get tapActivateNfc => 'Hold key to phone again to activate';
+  String get tapActivateNfc =>
+      'Schlüssel erneut ans Telefon halten, um zu aktivieren';
 
   @override
-  String get tapActivateUsb => 'Once connected, tap the key again to activate';
+  String get tapActivateUsb =>
+      'Nach dem Anschließen den Schlüssel erneut berühren, um zu aktivieren';
 
   @override
   String failedToRegisterKey(String error) {
-    return 'Failed to register key: $error';
+    return 'Schlüssel konnte nicht registriert werden: $error';
   }
 
   @override
   String failedToActivateKey(String error) {
-    return 'Failed to activate key: $error';
+    return 'Schlüssel konnte nicht aktiviert werden: $error';
   }
 
   @override
   String keyDefaultTitle(int index) {
-    return 'Key $index';
+    return 'Schlüssel $index';
   }
 
   @override
-  String get tapYubiKeyToRegister => 'Tap your new YubiKey to register…';
+  String get tapYubiKeyToRegister =>
+      'Neue YubiKey berühren, um sie zu registrieren…';
 
   @override
-  String get tapYubiKeyToActivate => 'Tap your new YubiKey again to activate…';
+  String get tapYubiKeyToActivate =>
+      'Neue YubiKey erneut berühren, um sie zu aktivieren…';
 
   @override
-  String get editAliasTooltip => 'Edit alias';
+  String get editAliasTooltip => 'Alias bearbeiten';
 
   @override
-  String get cannotRemoveLastKey => 'Cannot remove the last key';
+  String get cannotRemoveLastKey =>
+      'Letzter Schlüssel kann nicht entfernt werden';
 
   @override
-  String get removeKeyTooltip => 'Remove key';
+  String get removeKeyTooltip => 'Schlüssel entfernen';
 
   @override
   String manageYubiKeysError(String error) {
-    return 'Error: $error';
+    return 'Fehler: $error';
   }
 
   @override
-  String get generatorModeClassic => 'Classic';
+  String get generatorModeClassic => 'Klassisch';
 
   @override
   String get generatorModePassphrase => 'Passphrase';
 
   @override
-  String get charSetsHeader => 'Character sets';
+  String get charSetsHeader => 'Zeichensätze';
 
   @override
-  String get languageHeader => 'Language';
+  String get languageHeader => 'Sprache';
 
   @override
-  String get separatorLabel => 'Separator';
+  String get separatorLabel => 'Trennzeichen';
 
   @override
-  String get capitaliseWords => 'Capitalise words';
+  String get capitaliseWords => 'Wörter großschreiben';
 
   @override
-  String get appendDigit => 'Append a digit';
+  String get appendDigit => 'Ziffer anhängen';
 
   @override
   String entropyBitsDisplay(String bits) {
-    return '~$bits bits entropy';
+    return '~$bits Bit Entropie';
   }
 
   @override
-  String get selectAtLeastOneCharSet => 'Select at least one character set';
+  String get selectAtLeastOneCharSet =>
+      'Mindestens einen Zeichensatz auswählen';
 
   @override
   String get passwordMinLengthNote =>
-      'Passwords are at least 32 characters. If a site has a shorter limit, copy the first characters you need.';
+      'Passwörter haben mindestens 32 Zeichen. Wenn eine Website ein kürzeres Limit hat, die ersten benötigten Zeichen kopieren.';
 
   @override
   String get excludeAmbiguousChars =>
-      'Exclude ambiguous characters (0, O, l, 1, I)';
+      'Mehrdeutige Zeichen ausschließen (0, O, l, 1, I)';
 }
