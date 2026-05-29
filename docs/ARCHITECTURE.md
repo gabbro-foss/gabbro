@@ -164,7 +164,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 437 | 0 |
+| Flutter (`flutter test`) | 447 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -175,9 +175,79 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Multiple app languages (v1: en, fr, de, it, es)
+### Next task: Multiple app languages (v1: en, fr, de, it, es) — Phase 3 in progress
 
-All logo / launcher-icon visual QA passed on Linux and Android. Next feature: add localisation support for the five v1 languages.
+#### Implementation plan
+
+- [x] **Phase 1 — Infrastructure** ✓
+  - `flutter_localizations` + `intl` in `pubspec.yaml`, `generate: true`
+  - `l10n.yaml` at project root
+  - `lib/l10n/app_en.arb` (300+ keys) + stub ARBs for fr/de/it/es
+  - Auto-generated `lib/l10n/app_localizations*.dart` committed
+
+- [x] **Phase 2 — Settings integration** ✓
+  - `LanguageChoice` enum + `AppSettings.language` field (persisted)
+  - Language picker in `AppearanceScreen`
+  - `MaterialApp` in `main.dart` and `autofillUnlockMain()` wired to locale + delegates
+
+- [ ] **Phase 3 — String extraction** (in progress — test infra complete, 8 screens done)
+
+  **Test infrastructure (complete):**
+  - `test/test_helpers.dart` — `testApp()` helper with localisation delegates
+  - All test files migrated from bare `MaterialApp(home:)` to `testApp()` (447 tests pass)
+
+  **Screens/widgets localised:**
+  - `lib/screens/appearance_screen.dart` ✓
+  - `lib/screens/security_screen.dart` ✓
+  - `lib/screens/generator_screen.dart` ✓ (title only)
+  - `lib/screens/autofill_unlock_screen.dart` ✓
+  - `lib/screens/password_history_screen.dart` ✓
+  - `lib/screens/manage_folders_screen.dart` ✓
+  - `lib/screens/import_failures_dialog.dart` ✓
+  - `lib/screens/import_skipped_dialog.dart` ✓
+
+  **Screens/widgets still to localise:**
+  - `lib/screens/unlock_screen.dart`
+  - `lib/screens/vault_list_screen.dart`
+  - `lib/screens/entry_detail_screen.dart`
+  - `lib/screens/create_entry_screen.dart`
+  - `lib/screens/about_screen.dart`
+  - `lib/screens/onboarding_screen.dart`
+  - `lib/screens/change_passphrase_screen.dart`
+  - `lib/screens/export_screen.dart`
+  - `lib/screens/import_screen.dart`
+  - `lib/screens/manage_vaults_screen.dart`
+  - `lib/screens/manage_yubikeys_screen.dart`
+  - `lib/screens/review_changes_screen.dart`
+  - `lib/screens/tablet_vault_layout.dart`
+  - `lib/widgets/generator_widget.dart`
+  - `lib/widgets/password_breakdown_sheet.dart`
+  - `lib/widgets/path_field.dart`
+
+- [ ] **Phase 4 — Translations**
+  - Provide fr/de/it/es translations for every extracted string
+  - Replace hand-rolled month array in `formatTimestamp()` with `package:intl` `DateFormat`
+    (removes this item from Bikeshed)
+
+#### Adding a language after v1 (n+1 cost)
+
+Once Phases 1–3 are complete, adding a further language is cheap — **not** a full session:
+
+- One new `lib/l10n/app_XX.arb` file (~400–500 translated key-value pairs)
+- 2 lines of code: add locale to `supportedLocales` and to the in-app picker list
+- Run `flutter gen-l10n` + `flutter test`
+- Estimated effort: **20–30 minutes per language** (Claude generates translations; user spot-checks)
+
+Confidence varies by language family:
+
+| Language                          | Confidence  | Notes                                                             |
+|-----------------------------------|-------------|-------------------------------------------------------------------|
+| Norwegian (Bokmål), Swedish, Dutch| High        | Close to German/English; translations are reliable                |
+| Portuguese, Romanian              | High        | Close to Spanish/French                                           |
+| Polish, Czech, Slovak             | Medium      | Good training data; Slavic case system warrants native spot-check |
+| Hungarian, Finnish, Estonian      | Medium-Low  | Uralic grammar differs structurally; more likely to need review   |
+
+Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}}` syntax — no extra plumbing needed. Right-to-left languages (Arabic, Hebrew) would require additional layout-mirroring work and are out of scope for v1.
 
 
 ---
@@ -210,6 +280,7 @@ All logo / launcher-icon visual QA passed on Linux and Android. Next feature: ad
 - read https://drive.proton.me/urls/11VHB59C60#CVCj696Qxkxd to see if any learnings can be transferred to gabbro to increase security
 
 ### Features & UX
+- Fix: Password detail view does not scale with text size, verify and fix. If working correctly, bumpy size up in detail view
 - Add tutorial/onboarding: probably in the README as snapshots from linux/emulator
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
