@@ -164,7 +164,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 447 | 0 |
+| Flutter (`flutter test`) | 447 | 0 | <!-- Phase 3 complete -->
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -175,14 +175,14 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Multiple app languages (v1: en, fr, de, it, es) — Phase 3 in progress
+### Next task: Multiple app languages (v1: en, fr, de, it, es) — Phase 4
 
 #### Implementation plan
 
 - [x] **Phase 1 — Infrastructure** ✓
   - `flutter_localizations` + `intl` in `pubspec.yaml`, `generate: true`
   - `l10n.yaml` at project root
-  - `lib/l10n/app_en.arb` (300+ keys) + stub ARBs for fr/de/it/es
+  - `lib/l10n/app_en.arb` (~430 keys) + stub ARBs for fr/de/it/es
   - Auto-generated `lib/l10n/app_localizations*.dart` committed
 
 - [x] **Phase 2 — Settings integration** ✓
@@ -190,42 +190,14 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
   - Language picker in `AppearanceScreen`
   - `MaterialApp` in `main.dart` and `autofillUnlockMain()` wired to locale + delegates
 
-- [ ] **Phase 3 — String extraction** (in progress — test infra complete, 8 screens done)
+- [x] **Phase 3 — String extraction** ✓ (all screens/widgets done, 447 tests pass)
 
-  **Test infrastructure (complete):**
-  - `test/test_helpers.dart` — `testApp()` helper with localisation delegates
-  - All test files migrated from bare `MaterialApp(home:)` to `testApp()` (447 tests pass)
-
-  **Screens/widgets localised:**
-  - `lib/screens/appearance_screen.dart` ✓
-  - `lib/screens/security_screen.dart` ✓
-  - `lib/screens/generator_screen.dart` ✓ (title only)
-  - `lib/screens/autofill_unlock_screen.dart` ✓
-  - `lib/screens/password_history_screen.dart` ✓
-  - `lib/screens/manage_folders_screen.dart` ✓
-  - `lib/screens/import_failures_dialog.dart` ✓
-  - `lib/screens/import_skipped_dialog.dart` ✓
-
-  **Screens/widgets still to localise:**
-  - `lib/screens/unlock_screen.dart`
-  - `lib/screens/vault_list_screen.dart`
-  - `lib/screens/entry_detail_screen.dart`
-  - `lib/screens/create_entry_screen.dart`
-  - `lib/screens/about_screen.dart`
-  - `lib/screens/onboarding_screen.dart`
-  - `lib/screens/change_passphrase_screen.dart`
-  - `lib/screens/export_screen.dart`
-  - `lib/screens/import_screen.dart`
-  - `lib/screens/manage_vaults_screen.dart`
-  - `lib/screens/manage_yubikeys_screen.dart`
-  - `lib/screens/review_changes_screen.dart`
-  - `lib/screens/tablet_vault_layout.dart`
-  - `lib/widgets/generator_widget.dart`
-  - `lib/widgets/password_breakdown_sheet.dart`
-  - `lib/widgets/path_field.dart`
+  All user-visible strings extracted to `app_en.arb`. Every screen and widget uses
+  `AppLocalizations.of(context)`. Remaining hardcoded strings are format identifiers
+  (`.gabbro`, `JSON`) and a numeric position index — intentionally not translated.
 
 - [ ] **Phase 4 — Translations**
-  - Provide fr/de/it/es translations for every extracted string
+  - Provide fr/de/it/es translations for every extracted string (~430 keys each)
   - Replace hand-rolled month array in `formatTimestamp()` with `package:intl` `DateFormat`
     (removes this item from Bikeshed)
 
