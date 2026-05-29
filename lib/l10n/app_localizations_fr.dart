@@ -102,6 +102,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pickFile => 'Pick file';
 
   @override
+  String get noFileSelected => 'No file selected';
+
+  @override
   String get chooseFolder => 'Choose folder';
 
   @override
@@ -373,6 +376,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tooltipLockVault => 'Lock vault';
 
   @override
+  String get tooltipSelectAll => 'Select all';
+
+  @override
+  String get tooltipDeselectAll => 'Deselect all';
+
+  @override
   String get tooltipMenu => 'Menu';
 
   @override
@@ -446,6 +455,74 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get selectEntry => 'Select an entry';
+
+  @override
+  String get newEntryTitle => 'New entry';
+
+  @override
+  String createEntryTitle(String type) {
+    return 'New $type';
+  }
+
+  @override
+  String editEntryTitle(String type) {
+    return 'Edit $type';
+  }
+
+  @override
+  String get noUrlFallback => '(no URL)';
+
+  @override
+  String get noNameFallback => '(no name)';
+
+  @override
+  String get untitledFallback => '(untitled)';
+
+  @override
+  String get gabbroTitle => 'Gabbro';
+
+  @override
+  String gabbroVaultTitle(String alias) {
+    return 'Gabbro - $alias';
+  }
+
+  @override
+  String selectedCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get searchAllFieldsHint => 'Search all fields…';
+
+  @override
+  String get searchEntriesHint => 'Search entries…';
+
+  @override
+  String get searchAllFieldsTooltip => 'Searching all fields';
+
+  @override
+  String get searchByTitleTooltip => 'Searching by title';
+
+  @override
+  String get entryTypeAll => 'All';
+
+  @override
+  String get entryTypePassword => 'Password';
+
+  @override
+  String get entryTypeNote => 'Note';
+
+  @override
+  String get entryTypeCard => 'Card';
+
+  @override
+  String get entryTypeIdentity => 'Identity';
+
+  @override
+  String get entryTypeFile => 'File';
+
+  @override
+  String get entryTypeCustom => 'Custom';
 
   @override
   String errorPrefix(String error) {
@@ -778,7 +855,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get changePassphraseButton => 'Change passphrase';
 
   @override
+  String get continueLabel => 'Continue';
+
+  @override
   String get protectWithYubiKey => 'Protect with YubiKey';
+
+  @override
+  String get yubiKeySubtitle => 'Hardware security key (recommended)';
 
   @override
   String get accessibilityButton => 'Accessibility';
@@ -930,4 +1013,409 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reviewEmpty => '(empty)';
+
+  @override
+  String get reviewFieldUrl => 'URL';
+
+  @override
+  String get reviewFieldNotes => 'Notes';
+
+  @override
+  String get reviewFieldContent => 'Content';
+
+  @override
+  String get reviewFieldEmail => 'Email';
+
+  @override
+  String get reviewFieldPhone => 'Phone';
+
+  @override
+  String get reviewFieldAddress => 'Address';
+
+  @override
+  String get reviewFieldCardLabel => 'Card label';
+
+  @override
+  String get reviewFieldStatus => 'Status';
+
+  @override
+  String get reviewFieldCardholder => 'Cardholder';
+
+  @override
+  String get reviewFieldExpiry => 'Expiry';
+
+  @override
+  String get reviewFieldCreditLimit => 'Credit limit';
+
+  @override
+  String get reviewFieldAccountNumber => 'Account number';
+
+  @override
+  String get reviewFieldNetwork => 'Network';
+
+  @override
+  String get reviewFieldBank => 'Bank';
+
+  @override
+  String get reviewFieldFilename => 'Filename';
+
+  @override
+  String get reviewFieldSize => 'Size';
+
+  @override
+  String get reviewFieldCardNumber => 'Number';
+
+  @override
+  String get reviewFieldCVV => 'CVV';
+
+  @override
+  String get reviewFieldTransactionPassword => 'Transaction password';
+
+  @override
+  String get timestampCreated => 'Created';
+
+  @override
+  String get timestampUpdated => 'Updated';
+
+  @override
+  String get timestampUnknown => 'Unknown';
+
+  @override
+  String get noTitleFallback => '(no title)';
+
+  @override
+  String get tooltipExportFile => 'Export file';
+
+  @override
+  String get tooltipEditEntry => 'Edit entry';
+
+  @override
+  String get tooltipDeleteEntry => 'Delete entry';
+
+  @override
+  String get exportLabel => 'Export';
+
+  @override
+  String get customEntryFieldsHeader => 'Fields';
+
+  @override
+  String get copiedNeverClears =>
+      'Copied — clipboard never clears automatically';
+
+  @override
+  String get copiedClears30s => 'Copied — clipboard clears in 30s';
+
+  @override
+  String get copiedClears60s => 'Copied — clipboard clears in 60s';
+
+  @override
+  String get copiedClears2min => 'Copied — clipboard clears in 2 min';
+
+  @override
+  String get passwordBreakdownTitle => 'Password breakdown';
+
+  @override
+  String get charTypeUppercase => 'Uppercase';
+
+  @override
+  String get charTypeLowercase => 'Lowercase';
+
+  @override
+  String get charTypeDigit => 'Digit';
+
+  @override
+  String get charTypeSymbol => 'Symbol';
+
+  @override
+  String get exportChooseFormat => 'Choose an export format.';
+
+  @override
+  String get exportUnencryptedWarning =>
+      'Completely unencrypted — all secrets will be written in plain text. Store this file securely and delete it after use.';
+
+  @override
+  String get exportPassphraseOnlyNote =>
+      'Protected by your passphrase only. YubiKey is not required to import.';
+
+  @override
+  String get exportChooseDestinationJson =>
+      'Choose a destination for your exported JSON file.';
+
+  @override
+  String get exportChooseDestinationVault =>
+      'Choose a destination for your exported vault file.';
+
+  @override
+  String get exportTwoFilesNote =>
+      'Two files will be written: vault.gabbro and vault.gabbro.sha256';
+
+  @override
+  String get exportSelectDestination => 'Select a destination.';
+
+  @override
+  String aboutVersion(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get aboutTagline => 'A post-quantum password manager';
+
+  @override
+  String get aboutSourceCode => 'Source code';
+
+  @override
+  String get aboutReportIssue => 'Report an issue';
+
+  @override
+  String get aboutSupportGabbro => 'Support Gabbro';
+
+  @override
+  String get aboutLicenceBody =>
+      'Gabbro is free and open source software, licensed under the GNU General Public License v3.0 only (GPL-3.0-only).\n\nYou are free to use, study, and redistribute this software under the terms of that licence.';
+
+  @override
+  String get aboutOwnerRole => 'Project owner, architect, and lead developer:';
+
+  @override
+  String get aboutAiPartner => 'AI development partner:';
+
+  @override
+  String get aboutNoTelemetry =>
+      'Gabbro makes no outbound network connections. No telemetry, no analytics, no accounts.';
+
+  @override
+  String get strengthTierTerrible => 'Terrible';
+
+  @override
+  String get strengthTierWeak => 'Weak';
+
+  @override
+  String get strengthTierFair => 'Fair';
+
+  @override
+  String get strengthTierStrong => 'Strong';
+
+  @override
+  String get strengthTierVeryStrong => 'Very strong';
+
+  @override
+  String get strengthTierExcellent => 'Excellent';
+
+  @override
+  String get yubiKeyProtectedNote =>
+      'YubiKey-protected vault — your YubiKey binding will be preserved.';
+
+  @override
+  String get yubiKeyPinRequired => 'YubiKey PIN is required';
+
+  @override
+  String get tapYubiKeyNow => 'Tap your YubiKey now…';
+
+  @override
+  String get touchYubiKeyToAuthorize =>
+      'Touch your YubiKey to authorize this change.';
+
+  @override
+  String get currentPassphraseRequired => 'Current passphrase is required';
+
+  @override
+  String get newPassphraseRequired => 'New passphrase is required';
+
+  @override
+  String get passphraseTooWeak => 'Passphrase is too weak';
+
+  @override
+  String get confirmPassphraseRequired => 'Please confirm your new passphrase';
+
+  @override
+  String get passphrasesDoNotMatch => 'Passphrases do not match';
+
+  @override
+  String get passphrasesMatch => '✓ Passphrases match';
+
+  @override
+  String get passphrasesNoMatch => '✗ Passphrases do not match';
+
+  @override
+  String entropyDisplay(String tier, String bits) {
+    return '$tier · $bits bits';
+  }
+
+  @override
+  String get transportError => 'Transport error.';
+
+  @override
+  String get authorizationFailed =>
+      'Authorization failed — check your PIN and try again.';
+
+  @override
+  String get unlockEnterPassphraseAndPin =>
+      'Enter your passphrase and YubiKey PIN to unlock';
+
+  @override
+  String get unlockEnterPassphrase => 'Enter your passphrase to unlock';
+
+  @override
+  String unlockEntropyDisplay(String tier, String bits) {
+    return '$tier · $bits bits of entropy';
+  }
+
+  @override
+  String get insertYubiKeyAndTap =>
+      'Insert your YubiKey and tap when it flashes';
+
+  @override
+  String get unlockErrorPassphrase =>
+      'Could not unlock vault. Check your passphrase.';
+
+  @override
+  String get unlockErrorPassphraseAndPin =>
+      'Could not unlock vault. Check your passphrase and YubiKey PIN.';
+
+  @override
+  String get importSelectFile => 'Select a file.';
+
+  @override
+  String get importFileNotFound => 'File not found.';
+
+  @override
+  String get importEnterPassphrase => 'Enter the passphrase for this vault.';
+
+  @override
+  String get importDuplicateWarning =>
+      'Entries whose UUID already exists in your vault will be skipped automatically. You will be shown a summary.';
+
+  @override
+  String get importGabbroSubtitle =>
+      'Sync entries from another Gabbro vault (.gabbro file)';
+
+  @override
+  String get importEnpassSubtitle => 'JSON export from Enpass (Tools → Export)';
+
+  @override
+  String get importBitwardenSubtitle =>
+      'Unencrypted JSON export from Bitwarden (Tools → Export Vault)';
+
+  @override
+  String get importCsvSubtitle => 'CSV export from any password manager';
+
+  @override
+  String vaultNameAlreadyExists(String alias) {
+    return 'A vault named \"$alias\" already exists.';
+  }
+
+  @override
+  String deleteVaultContent(String alias, String path) {
+    return 'This will permanently delete \"$alias\" and all its data.\n\nFile: $path\n\nThis cannot be undone.';
+  }
+
+  @override
+  String deleteVaultYubikeyContent(String alias, String path) {
+    return 'This will permanently delete \"$alias\" and remove its YubiKey binding.\n\nFile: $path\n\nThis cannot be undone.';
+  }
+
+  @override
+  String get yubiKeyAuthorizeDeletion =>
+      'Enter your PIN and touch your YubiKey to authorize this deletion.';
+
+  @override
+  String get deleteVaultTooltip => 'Delete vault';
+
+  @override
+  String get yubiKeySecurityWarning => 'Security warning';
+
+  @override
+  String get removeYubiKeyTitle => 'Remove YubiKey';
+
+  @override
+  String get yubiKeyLastKeyRiskWarning =>
+      'WARNING: if that remaining key is lost, damaged, or stolen, vault access will be permanently impossible. There is no recovery path.';
+
+  @override
+  String get onlyOneKeyRegisteredWarning =>
+      'Only one key registered. If this key is lost, vault access is permanently impossible.';
+
+  @override
+  String get tapRegisterNfc => 'Hold key to phone to register';
+
+  @override
+  String get tapRegisterUsb => 'Once connected, tap the key to register';
+
+  @override
+  String get tapActivateNfc => 'Hold key to phone again to activate';
+
+  @override
+  String get tapActivateUsb => 'Once connected, tap the key again to activate';
+
+  @override
+  String failedToRegisterKey(String error) {
+    return 'Failed to register key: $error';
+  }
+
+  @override
+  String failedToActivateKey(String error) {
+    return 'Failed to activate key: $error';
+  }
+
+  @override
+  String keyDefaultTitle(int index) {
+    return 'Key $index';
+  }
+
+  @override
+  String get tapYubiKeyToRegister => 'Tap your new YubiKey to register…';
+
+  @override
+  String get tapYubiKeyToActivate => 'Tap your new YubiKey again to activate…';
+
+  @override
+  String get editAliasTooltip => 'Edit alias';
+
+  @override
+  String get cannotRemoveLastKey => 'Cannot remove the last key';
+
+  @override
+  String get removeKeyTooltip => 'Remove key';
+
+  @override
+  String manageYubiKeysError(String error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get generatorModeClassic => 'Classic';
+
+  @override
+  String get generatorModePassphrase => 'Passphrase';
+
+  @override
+  String get charSetsHeader => 'Character sets';
+
+  @override
+  String get languageHeader => 'Language';
+
+  @override
+  String get separatorLabel => 'Separator';
+
+  @override
+  String get capitaliseWords => 'Capitalise words';
+
+  @override
+  String get appendDigit => 'Append a digit';
+
+  @override
+  String entropyBitsDisplay(String bits) {
+    return '~$bits bits entropy';
+  }
+
+  @override
+  String get selectAtLeastOneCharSet => 'Select at least one character set';
+
+  @override
+  String get passwordMinLengthNote =>
+      'Passwords are at least 32 characters. If a site has a shorter limit, copy the first characters you need.';
+
+  @override
+  String get excludeAmbiguousChars =>
+      'Exclude ambiguous characters (0, O, l, 1, I)';
 }

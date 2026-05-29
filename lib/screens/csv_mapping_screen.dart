@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 
 Future<ImportResult> _defaultImportCsv(String input, CsvImportConfigData config) =>
@@ -80,15 +81,16 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final headers = widget.preview.headers;
     // Dropdown items: a "(none)" option + all headers
     final items = [
-      const DropdownMenuItem<String>(value: null, child: Text('(none)')),
+      DropdownMenuItem<String>(value: null, child: Text(l.csvColumnNone)),
       ...headers.map((h) => DropdownMenuItem(value: h, child: Text(h))),
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Map CSV columns')),
+      appBar: AppBar(title: Text(l.csvMappingTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -97,7 +99,7 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ── Preview table ─────────────────────────────────────────────
-              Text('Preview', style: Theme.of(context).textTheme.titleSmall),
+              Text(l.csvPreviewLabel, style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: 8),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -206,7 +208,7 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Import'),
+                    : Text(l.import),
               ),
             ],
           ),

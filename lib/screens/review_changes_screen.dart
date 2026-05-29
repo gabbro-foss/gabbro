@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 class ReviewChangesScreen extends StatefulWidget {
@@ -55,17 +56,18 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final sensitiveChanges = _buildSensitiveChanges();
-    final fieldDiffs = _buildFieldDiffs();
+    final l = AppLocalizations.of(context);
+    final sensitiveChanges = _buildSensitiveChanges(l);
+    final fieldDiffs = _buildFieldDiffs(l);
 
     return Scaffold(
       appBar: AppBar(
         leading: TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l.cancel),
         ),
         leadingWidth: 80,
-        title: const Text('Review changes'),
+        title: Text(l.reviewChangesTitle),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -74,13 +76,13 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (sensitiveChanges.isNotEmpty) ...[
-                _sectionHeader('Sensitive fields'),
+                _sectionHeader(l.reviewSensitiveFields),
                 const SizedBox(height: 8),
                 ...sensitiveChanges,
                 const SizedBox(height: 16),
               ],
               if (fieldDiffs.isNotEmpty) ...[
-                _sectionHeader('Other fields'),
+                _sectionHeader(l.reviewOtherFields),
                 const SizedBox(height: 8),
                 ...fieldDiffs,
                 const SizedBox(height: 16),
@@ -100,7 +102,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Cancel'),
+                      child: Text(l.cancel),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -113,7 +115,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
                               width: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Save'),
+                          : Text(l.save),
                     ),
                   ),
                 ],
@@ -127,14 +129,14 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
 
   // ── Diff builders ────────────────────────────────────────────────────────────
 
-  List<Widget> _buildSensitiveChanges() {
+  List<Widget> _buildSensitiveChanges(AppLocalizations l) {
     final changes = <Widget>[];
     switch ((widget.original, widget.updated)) {
       case (VaultEntryData_Login(:final field0),
             VaultEntryData_Login(field0: final u)):
         if (field0.password != u.password) {
           changes.add(_sensitiveRow(
-            label: 'Password changed',
+            label: l.reviewPasswordChanged,
             obscured: _passwordObscured,
             onToggle: () =>
                 setState(() => _passwordObscured = !_passwordObscured),
@@ -146,7 +148,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
             VaultEntryData_Card(field0: final u)):
         if (field0.cvv != u.cvv) {
           changes.add(_sensitiveRow(
-            label: 'CVV changed',
+            label: l.reviewCvvChanged,
             obscured: _cvvObscured,
             onToggle: () => setState(() => _cvvObscured = !_cvvObscured),
             oldValue: field0.cvv,
@@ -155,7 +157,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         }
         if (field0.pin != u.pin) {
           changes.add(_sensitiveRow(
-            label: 'PIN changed',
+            label: l.reviewPinChanged,
             obscured: _pinObscured,
             onToggle: () => setState(() => _pinObscured = !_pinObscured),
             oldValue: field0.pin ?? '',
@@ -164,7 +166,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         }
         if (field0.transactionPassword != u.transactionPassword) {
           changes.add(_sensitiveRow(
-            label: 'Transaction password changed',
+            label: l.reviewTransactionPasswordChanged,
             obscured: _transactionPasswordObscured,
             onToggle: () => setState(
               () => _transactionPasswordObscured = !_transactionPasswordObscured,
@@ -179,16 +181,16 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
     return changes;
   }
 
-  List<Widget> _buildFieldDiffs() {
+  List<Widget> _buildFieldDiffs(AppLocalizations l) {
     final diffs = <Widget>[];
     switch ((widget.original, widget.updated)) {
       case (VaultEntryData_Login(:final field0),
             VaultEntryData_Login(field0: final u)):
-        _addDiff(diffs, 'Title', field0.title, u.title);
-        _addDiff(diffs, 'URL', field0.url, u.url);
-        _addDiff(diffs, 'Username', field0.username, u.username);
-        _addDiff(diffs, 'Notes', field0.notes ?? '', u.notes ?? '');
-        _addDiff(diffs, 'Folder', field0.folder, u.folder);
+        _addDiff(diffs, l.fieldTitle, field0.title, u.title);
+        _addDiff(diffs, l.reviewFieldUrl, field0.url, u.url);
+        _addDiff(diffs, l.fieldUsername, field0.username, u.username);
+        _addDiff(diffs, l.reviewFieldNotes, field0.notes ?? '', u.notes ?? '');
+        _addDiff(diffs, l.fieldFolder, field0.folder, u.folder);
         final loginLen = field0.customFields.length > u.customFields.length
             ? field0.customFields.length
             : u.customFields.length;
@@ -202,9 +204,9 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         }
       case (VaultEntryData_Note(:final field0),
             VaultEntryData_Note(field0: final u)):
-        _addDiff(diffs, 'Title', field0.title, u.title);
-        _addDiff(diffs, 'Content', field0.content, u.content);
-        _addDiff(diffs, 'Folder', field0.folder, u.folder);
+        _addDiff(diffs, l.fieldTitle, field0.title, u.title);
+        _addDiff(diffs, l.reviewFieldContent, field0.content, u.content);
+        _addDiff(diffs, l.fieldFolder, field0.folder, u.folder);
         final noteLen = field0.customFields.length > u.customFields.length
             ? field0.customFields.length
             : u.customFields.length;
@@ -218,17 +220,17 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         }
       case (VaultEntryData_Card(:final field0),
             VaultEntryData_Card(field0: final u)):
-        _addDiff(diffs, 'Card label', field0.cardName ?? '', u.cardName ?? '');
-        _addDiff(diffs, 'Status', field0.status, u.status);
-        _addDiff(diffs, 'Cardholder', field0.cardholderName, u.cardholderName);
-        _addDiff(diffs, 'Card number', field0.cardNumber, u.cardNumber);
-        _addDiff(diffs, 'Expiry', field0.expiry, u.expiry);
-        _addDiff(diffs, 'Credit limit', field0.creditLimit ?? '', u.creditLimit ?? '');
-        _addDiff(diffs, 'Account number', field0.cardAccountNumber ?? '', u.cardAccountNumber ?? '');
-        _addDiff(diffs, 'Network', field0.paymentNetwork ?? '', u.paymentNetwork ?? '');
-        _addDiff(diffs, 'Bank', field0.bankName ?? '', u.bankName ?? '');
-        _addDiff(diffs, 'Notes', field0.notes ?? '', u.notes ?? '');
-        _addDiff(diffs, 'Folder', field0.folder, u.folder);
+        _addDiff(diffs, l.reviewFieldCardLabel, field0.cardName ?? '', u.cardName ?? '');
+        _addDiff(diffs, l.reviewFieldStatus, field0.status, u.status);
+        _addDiff(diffs, l.reviewFieldCardholder, field0.cardholderName, u.cardholderName);
+        _addDiff(diffs, l.fieldCardNumber, field0.cardNumber, u.cardNumber);
+        _addDiff(diffs, l.reviewFieldExpiry, field0.expiry, u.expiry);
+        _addDiff(diffs, l.reviewFieldCreditLimit, field0.creditLimit ?? '', u.creditLimit ?? '');
+        _addDiff(diffs, l.reviewFieldAccountNumber, field0.cardAccountNumber ?? '', u.cardAccountNumber ?? '');
+        _addDiff(diffs, l.reviewFieldNetwork, field0.paymentNetwork ?? '', u.paymentNetwork ?? '');
+        _addDiff(diffs, l.reviewFieldBank, field0.bankName ?? '', u.bankName ?? '');
+        _addDiff(diffs, l.reviewFieldNotes, field0.notes ?? '', u.notes ?? '');
+        _addDiff(diffs, l.fieldFolder, field0.folder, u.folder);
         final cardLen = field0.customFields.length > u.customFields.length
             ? field0.customFields.length
             : u.customFields.length;
@@ -242,12 +244,12 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         }
       case (VaultEntryData_Identity(:final field0),
             VaultEntryData_Identity(field0: final u)):
-        _addDiff(diffs, 'First name', field0.firstName, u.firstName);
-        _addDiff(diffs, 'Last name', field0.lastName, u.lastName);
-        _addDiff(diffs, 'Email', field0.email, u.email);
-        _addDiff(diffs, 'Phone', field0.phone ?? '', u.phone ?? '');
-        _addDiff(diffs, 'Address', field0.address ?? '', u.address ?? '');
-        _addDiff(diffs, 'Folder', field0.folder, u.folder);
+        _addDiff(diffs, l.fieldFirstName, field0.firstName, u.firstName);
+        _addDiff(diffs, l.fieldLastName, field0.lastName, u.lastName);
+        _addDiff(diffs, l.reviewFieldEmail, field0.email, u.email);
+        _addDiff(diffs, l.reviewFieldPhone, field0.phone ?? '', u.phone ?? '');
+        _addDiff(diffs, l.reviewFieldAddress, field0.address ?? '', u.address ?? '');
+        _addDiff(diffs, l.fieldFolder, field0.folder, u.folder);
         final identityLen = field0.customFields.length > u.customFields.length
             ? field0.customFields.length
             : u.customFields.length;
@@ -261,8 +263,8 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         }
       case (VaultEntryData_Custom(:final field0),
             VaultEntryData_Custom(field0: final u)):
-        _addDiff(diffs, 'Title', field0.title, u.title);
-        _addDiff(diffs, 'Folder', field0.folder, u.folder);
+        _addDiff(diffs, l.fieldTitle, field0.title, u.title);
+        _addDiff(diffs, l.fieldFolder, field0.folder, u.folder);
         final customLen = field0.fields.length > u.fields.length
             ? field0.fields.length
             : u.fields.length;
@@ -276,12 +278,12 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         }
       case (VaultEntryData_File(:final field0),
             VaultEntryData_File(field0: final u)):
-        _addDiff(diffs, 'Filename', field0.filename, u.filename);
+        _addDiff(diffs, l.reviewFieldFilename, field0.filename, u.filename);
         if (field0.data.length != u.data.length) {
-          _addDiff(diffs, 'Size', '${field0.data.length} bytes', '${u.data.length} bytes');
+          _addDiff(diffs, l.reviewFieldSize, '${field0.data.length} bytes', '${u.data.length} bytes');
         }
-        _addDiff(diffs, 'Notes', field0.notes ?? '', u.notes ?? '');
-        _addDiff(diffs, 'Folder', field0.folder, u.folder);
+        _addDiff(diffs, l.reviewFieldNotes, field0.notes ?? '', u.notes ?? '');
+        _addDiff(diffs, l.fieldFolder, field0.folder, u.folder);
         final fileLen = field0.customFields.length > u.customFields.length
             ? field0.customFields.length
             : u.customFields.length;
@@ -351,7 +353,9 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
                   obscured ? Icons.visibility_off : Icons.visibility,
                   size: 18,
                 ),
-                tooltip: obscured ? 'Show values' : 'Hide',
+                tooltip: obscured
+                    ? AppLocalizations.of(context).tooltipShowValues
+                    : AppLocalizations.of(context).tooltipHide,
                 onPressed: onToggle,
               ),
             ],
@@ -365,7 +369,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Old',
+                        AppLocalizations.of(context).reviewOld,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -374,7 +378,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        oldValue.isEmpty ? '(empty)' : oldValue,
+                        oldValue.isEmpty ? AppLocalizations.of(context).reviewEmpty : oldValue,
                         style: TextStyle(
                           fontSize: 13,
                           fontFamily: 'monospace',
@@ -395,7 +399,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'New',
+                        AppLocalizations.of(context).reviewNew,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -404,7 +408,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        newValue.isEmpty ? '(empty)' : newValue,
+                        newValue.isEmpty ? AppLocalizations.of(context).reviewEmpty : newValue,
                         style: TextStyle(
                           fontSize: 13,
                           fontFamily: 'monospace',
@@ -446,7 +450,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  before.isEmpty ? '(empty)' : before,
+                  before.isEmpty ? AppLocalizations.of(context).reviewEmpty : before,
                   style: TextStyle(
                     fontSize: 13,
                     color: colorScheme.onSurfaceVariant,
@@ -466,7 +470,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  after.isEmpty ? '(empty)' : after,
+                  after.isEmpty ? AppLocalizations.of(context).reviewEmpty : after,
                   style: TextStyle(
                     fontSize: 13,
                     color: colorScheme.onPrimaryContainer,

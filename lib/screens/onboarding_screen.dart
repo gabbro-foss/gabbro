@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/settings.dart';
@@ -629,7 +630,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 alignment: Alignment.centerLeft,
                 child: FilledButton.tonal(
                   onPressed: _onContinueWithBackupKey,
-                  child: const Text('Continue'),
+                  child: Text(AppLocalizations.of(context).continueLabel),
                 ),
               ),
             ),
@@ -701,7 +702,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ? Theme.of(context).colorScheme.primary
                               : null,
                         ),
-                        label: const Text('Accessibility'),
+                        label: Text(AppLocalizations.of(context).accessibilityButton),
                         onPressed: _toggleAccessibility,
                         style: OutlinedButton.styleFrom(
                           visualDensity: VisualDensity.compact,
@@ -946,9 +947,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             const SizedBox(height: 16),
                             const Divider(),
                             SwitchListTile(
-                              title: const Text('Protect with YubiKey'),
-                              subtitle: const Text(
-                                'Hardware security key (recommended)',
+                              title: Text(AppLocalizations.of(context).protectWithYubiKey),
+                              subtitle: Text(
+                                AppLocalizations.of(context).yubiKeySubtitle,
                               ),
                               value: _useYubikey,
                               onChanged: (v) => setState(() => _useYubikey = v),
@@ -1050,7 +1051,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text('Create vault'),
+                                : Text(AppLocalizations.of(context).createVault),
                           ),
                         ],
                       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,11 +18,12 @@ class AboutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('About Gabbro')),
+      appBar: AppBar(title: Text(l.aboutTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -33,53 +35,50 @@ class AboutScreen extends StatelessWidget {
               Center(child: GabbroLogo(withText: true, width: 200)),
               const SizedBox(height: 4),
               Text(
-                'Version $_kAppVersion',
+                l.aboutVersion(_kAppVersion),
                 style: textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 4),
               Text(
-                'A post-quantum password manager',
+                l.aboutTagline,
                 style: textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
 
               // ── Links ────────────────────────────────────────────────────
-              _SectionHeader(label: 'Project'),
+              _SectionHeader(label: l.aboutProjectSection),
               _LinkTile(
                 icon: Icons.code,
-                label: 'Source code',
+                label: l.aboutSourceCode,
                 url: _kGitHubUrl,
               ),
               _LinkTile(
                 icon: Icons.bug_report_outlined,
-                label: 'Report an issue',
+                label: l.aboutReportIssue,
                 url: _kIssuesUrl,
               ),
               _LinkTile(
                 icon: Icons.favorite_outline,
-                label: 'Support Gabbro',
+                label: l.aboutSupportGabbro,
                 url: _kDonateUrl,
               ),
               const SizedBox(height: 24),
 
               // ── Licence ──────────────────────────────────────────────────
-              _SectionHeader(label: 'Licence'),
+              _SectionHeader(label: l.aboutLicenceSection),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
-                  'Gabbro is free and open source software, licensed under '
-                  'the GNU General Public License v3.0 only (GPL-3.0-only).\n\n'
-                  'You are free to use, study, and redistribute this software '
-                  'under the terms of that licence.',
+                  l.aboutLicenceBody,
                   style: textTheme.bodyMedium,
                 ),
               ),
               const SizedBox(height: 24),
 
               // ── Open source components ───────────────────────────────────
-              _SectionHeader(label: 'Open source components'),
+              _SectionHeader(label: l.aboutOpenSourceSection),
               ..._kComponents.map(
                 (c) => _ComponentTile(
                   name: c.name,
@@ -90,11 +89,11 @@ class AboutScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
               // ── Attribution ──────────────────────────────────────────────
-              _SectionHeader(label: 'Attribution'),
+              _SectionHeader(label: l.aboutAttributionSection),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Text(
-                  'Project owner, architect, and lead developer:',
+                  l.aboutOwnerRole,
                   style: textTheme.bodyMedium,
                 ),
               ),
@@ -106,7 +105,7 @@ class AboutScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Text(
-                  'AI development partner:',
+                  l.aboutAiPartner,
                   style: textTheme.bodyMedium,
                 ),
               ),
@@ -135,8 +134,7 @@ class AboutScreen extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Gabbro makes no outbound network connections. '
-                        'No telemetry, no analytics, no accounts.',
+                        l.aboutNoTelemetry,
                         style: textTheme.bodySmall,
                       ),
                     ),
@@ -192,33 +190,36 @@ class _LinkTile extends StatelessWidget {
   Future<void> _showUrl(BuildContext context) async {
     await showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(label),
-        content: SelectableText(url),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-          FilledButton.icon(
-            icon: const Icon(Icons.open_in_new, size: 16),
-            label: const Text('Open in browser'),
-            onPressed: () async {
-              final uri = Uri.parse(url);
-              final launched = await launchUrl(
-                uri,
-                mode: LaunchMode.externalApplication,
-              );
-              if (!launched && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Could not open $url')),
+      builder: (context) {
+        final l = AppLocalizations.of(context);
+        return AlertDialog(
+          title: Text(label),
+          content: SelectableText(url),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l.close),
+            ),
+            FilledButton.icon(
+              icon: const Icon(Icons.open_in_new, size: 16),
+              label: Text(l.openInBrowser),
+              onPressed: () async {
+                final uri = Uri.parse(url);
+                final launched = await launchUrl(
+                  uri,
+                  mode: LaunchMode.externalApplication,
                 );
-              }
-              if (context.mounted) Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
+                if (!launched && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(AppLocalizations.of(context).couldNotOpen(url))),
+                  );
+                }
+                if (context.mounted) Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -265,33 +266,36 @@ class _ComponentTile extends StatelessWidget {
       ),
       onTap: () => showDialog<void>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text(name),
-          content: SelectableText(url),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
-            ),
-            FilledButton.icon(
-              icon: const Icon(Icons.open_in_new, size: 16),
-              label: const Text('Open in browser'),
-              onPressed: () async {
-                final uri = Uri.parse(url);
-                final launched = await launchUrl(
-                  uri,
-                  mode: LaunchMode.externalApplication,
-                );
-                if (!launched && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Could not open $url')),
+        builder: (context) {
+          final l = AppLocalizations.of(context);
+          return AlertDialog(
+            title: Text(name),
+            content: SelectableText(url),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(l.close),
+              ),
+              FilledButton.icon(
+                icon: const Icon(Icons.open_in_new, size: 16),
+                label: Text(l.openInBrowser),
+                onPressed: () async {
+                  final uri = Uri.parse(url);
+                  final launched = await launchUrl(
+                    uri,
+                    mode: LaunchMode.externalApplication,
                   );
-                }
-                if (context.mounted) Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
+                  if (!launched && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(AppLocalizations.of(context).couldNotOpen(url))),
+                    );
+                  }
+                  if (context.mounted) Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
       ),
     );
   }

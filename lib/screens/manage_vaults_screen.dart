@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
@@ -37,8 +38,9 @@ class _RenameDialogState extends State<_RenameDialog> {
     final alias = _controller.text.trim();
     final isTaken = widget.takenAliases.contains(alias);
 
+    final l = AppLocalizations.of(context);
     return AlertDialog(
-      title: const Text('Rename vault'),
+      title: Text(l.renameVaultTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,13 +48,13 @@ class _RenameDialogState extends State<_RenameDialog> {
           TextField(
             controller: _controller,
             autofocus: true,
-            decoration: const InputDecoration(labelText: 'Alias'),
+            decoration: InputDecoration(labelText: l.aliasLabel),
             onChanged: (_) => setState(() {}),
           ),
           if (isTaken && alias.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
-              'A vault named "$alias" already exists.',
+              l.vaultNameAlreadyExists(alias),
               style: TextStyle(
                 color: Theme.of(context).colorScheme.error,
                 fontSize: 12,
@@ -64,13 +66,13 @@ class _RenameDialogState extends State<_RenameDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(null),
-          child: const Text('Cancel'),
+          child: Text(l.cancel),
         ),
         TextButton(
           onPressed: (alias.isEmpty || isTaken)
               ? null
               : () => Navigator.of(context).pop(alias),
-          child: const Text('Save'),
+          child: Text(l.save),
         ),
       ],
     );
@@ -151,29 +153,30 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
     // Step 1 — warning
     final step1 = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Delete vault?'),
-        content: Text(
-          isYubikey
-              ? 'This will permanently delete "${record.alias}" and remove its YubiKey binding.\n\n'
-                'File: ${record.path}\n\nThis cannot be undone.'
-              : 'This will permanently delete "${record.alias}" and all its data.\n\n'
-                'File: ${record.path}\n\nThis cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+      builder: (ctx) {
+        final l = AppLocalizations.of(ctx);
+        return AlertDialog(
+          title: Text(l.deleteVaultTitle),
+          content: Text(
+            isYubikey
+                ? l.deleteVaultYubikeyContent(record.alias, record.path)
+                : l.deleteVaultContent(record.alias, record.path),
           ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(ctx).colorScheme.error,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(l.cancel),
             ),
-            child: const Text('Continue'),
-          ),
-        ],
-      ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(ctx).colorScheme.error,
+              ),
+              child: Text(l.continueAction),
+            ),
+          ],
+        );
+      },
     );
     if (step1 != true) return;
     if (!mounted) return;
@@ -183,39 +186,42 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
     final step2 = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Are you sure?'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Type DELETE to confirm'),
-              const SizedBox(height: 12),
-              TextField(
-                key: const Key('delete_vault_confirm_field'),
-                controller: confirmController,
-                autofocus: true,
-                decoration: const InputDecoration(border: OutlineInputBorder()),
-                onChanged: (_) => setDialogState(() {}),
+        builder: (ctx, setDialogState) {
+          final l = AppLocalizations.of(ctx);
+          return AlertDialog(
+            title: Text(l.deleteVaultConfirmTitle),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l.typeDeleteToConfirm),
+                const SizedBox(height: 12),
+                TextField(
+                  key: const Key('delete_vault_confirm_field'),
+                  controller: confirmController,
+                  autofocus: true,
+                  decoration: const InputDecoration(border: OutlineInputBorder()),
+                  onChanged: (_) => setDialogState(() {}),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: Text(l.cancel),
+              ),
+              TextButton(
+                onPressed: confirmController.text == 'DELETE'
+                    ? () => Navigator.of(ctx).pop(true)
+                    : null,
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(ctx).colorScheme.error,
+                ),
+                child: Text(l.confirm),
               ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: confirmController.text == 'DELETE'
-                  ? () => Navigator.of(ctx).pop(true)
-                  : null,
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(ctx).colorScheme.error,
-              ),
-              child: const Text('Confirm'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) => confirmController.dispose());
@@ -234,120 +240,121 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
         context: context,
         barrierDismissible: false,
         builder: (ctx) => StatefulBuilder(
-          builder: (ctx, setDialogState) => AlertDialog(
-            title: const Text('Touch your YubiKey'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Enter your PIN and touch your YubiKey to authorize this deletion.',
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  key: const Key('delete_vault_yubikey_pin_field'),
-                  controller: pinController,
-                  obscureText: obscurePin,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    labelText: 'YubiKey PIN',
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        obscurePin ? Icons.visibility_off : Icons.visibility,
-                      ),
-                      onPressed: () => setDialogState(() => obscurePin = !obscurePin),
-                    ),
-                  ),
-                  onChanged: (_) => setDialogState(() {}),
-                ),
-                if (!Platform.isLinux) ...[
+          builder: (ctx, setDialogState) {
+            final l = AppLocalizations.of(ctx);
+            return AlertDialog(
+              title: Text(l.touchYourYubiKey),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l.yubiKeyAuthorizeDeletion),
                   const SizedBox(height: 12),
-                  SegmentedRow<String>(
-                    values: const ['usb', 'nfc'],
-                    selected: dialogTransport,
-                    label: (v) => v.toUpperCase(),
-                    onSelected: (v) => setDialogState(() => dialogTransport = v),
-                  ),
-                ],
-                if (isAuthorizing) ...[
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Tap your YubiKey now…',
-                    style: TextStyle(fontSize: 12),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-                if (authError != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    authError!,
-                    style: TextStyle(
-                      color: Theme.of(ctx).colorScheme.error,
-                      fontSize: 12,
+                  TextField(
+                    key: const Key('delete_vault_yubikey_pin_field'),
+                    controller: pinController,
+                    obscureText: obscurePin,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: l.yubiKeyPinLabel,
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          obscurePin ? Icons.visibility_off : Icons.visibility,
+                        ),
+                        onPressed: () => setDialogState(() => obscurePin = !obscurePin),
+                      ),
                     ),
+                    onChanged: (_) => setDialogState(() {}),
                   ),
+                  if (!Platform.isLinux) ...[
+                    const SizedBox(height: 12),
+                    SegmentedRow<String>(
+                      values: const ['usb', 'nfc'],
+                      selected: dialogTransport,
+                      label: (v) => v.toUpperCase(),
+                      onSelected: (v) => setDialogState(() => dialogTransport = v),
+                    ),
+                  ],
+                  if (isAuthorizing) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      l.tapYubiKeyNow,
+                      style: const TextStyle(fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                  if (authError != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      authError!,
+                      style: TextStyle(
+                        color: Theme.of(ctx).colorScheme.error,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ],
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text('Cancel'),
               ),
-              TextButton(
-                onPressed: (isAuthorizing || pinController.text.isEmpty)
-                    ? null
-                    : () async {
-                        setDialogState(() {
-                          isAuthorizing = true;
-                          authError = null;
-                        });
-                        try {
-                          if (ykRecords.length == 1) {
-                            final r = ykRecords.first;
-                            await widget.onConfirmYubikey(
-                              r.credentialId,
-                              r.salt,
-                              pinController.text,
-                              dialogTransport,
-                            );
-                          } else {
-                            await widget.onConfirmAnyYubikey(
-                              ykRecords,
-                              pinController.text,
-                              dialogTransport,
-                            );
-                          }
-                          if (ctx.mounted) Navigator.of(ctx).pop(true);
-                        } catch (e) {
-                          if (ctx.mounted) {
-                            setDialogState(() {
-                              isAuthorizing = false;
-                              authError = switch (e) {
-                                PlatformException(code: 'TRANSPORT_ERROR') =>
-                                  e.message ?? 'Transport error.',
-                                PlatformException(code: 'NO_FIDO2_DEVICE') =>
-                                  e.message ?? 'No FIDO2 device found. Insert your YubiKey and try again.',
-                                _ => 'Authorization failed — check your PIN and try again.',
-                              };
-                            });
-                          }
-                        }
-                      },
-                style: TextButton.styleFrom(
-                  foregroundColor: Theme.of(ctx).colorScheme.error,
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                  child: Text(l.cancel),
                 ),
-                child: isAuthorizing
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Text('Authorize'),
-              ),
-            ],
-          ),
+                TextButton(
+                  onPressed: (isAuthorizing || pinController.text.isEmpty)
+                      ? null
+                      : () async {
+                          setDialogState(() {
+                            isAuthorizing = true;
+                            authError = null;
+                          });
+                          try {
+                            if (ykRecords.length == 1) {
+                              final r = ykRecords.first;
+                              await widget.onConfirmYubikey(
+                                r.credentialId,
+                                r.salt,
+                                pinController.text,
+                                dialogTransport,
+                              );
+                            } else {
+                              await widget.onConfirmAnyYubikey(
+                                ykRecords,
+                                pinController.text,
+                                dialogTransport,
+                              );
+                            }
+                            if (ctx.mounted) Navigator.of(ctx).pop(true);
+                          } catch (e) {
+                            if (ctx.mounted) {
+                              setDialogState(() {
+                                isAuthorizing = false;
+                                authError = switch (e) {
+                                  PlatformException(code: 'TRANSPORT_ERROR') =>
+                                    e.message ?? l.transportError,
+                                  PlatformException(code: 'NO_FIDO2_DEVICE') =>
+                                    e.message ?? l.noFidoDeviceFound,
+                                  _ => l.authorizationFailed,
+                                };
+                              });
+                            }
+                          }
+                        },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(ctx).colorScheme.error,
+                  ),
+                  child: isAuthorizing
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(l.authorize),
+                ),
+              ],
+            );
+          },
         ),
       );
       WidgetsBinding.instance.addPostFrameCallback((_) => pinController.dispose());
@@ -362,15 +369,16 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Manage vaults')),
+      appBar: AppBar(title: Text(l.manageVaultsTitle)),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
               child: _registry.records.isEmpty
-                  ? const Center(child: Text('No vaults registered.'))
+                  ? Center(child: Text(l.noVaultsRegisteredText))
                   : ListView.builder(
                       itemCount: _registry.records.length,
                       itemBuilder: (_, i) {
@@ -390,7 +398,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.edit_outlined),
-                                tooltip: 'Rename',
+                                tooltip: l.rename,
                                 onPressed: () => _showRenameDialog(record),
                               ),
                               IconButton(
@@ -398,7 +406,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                                   Icons.delete_outlined,
                                   color: Theme.of(context).colorScheme.error,
                                 ),
-                                tooltip: 'Delete vault',
+                                tooltip: l.deleteVaultTooltip,
                                 onPressed: () => _showDeleteDialog(record),
                               ),
                             ],
@@ -412,7 +420,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
               child: FilledButton.icon(
                 onPressed: widget.onAddVault,
                 icon: const Icon(Icons.add),
-                label: const Text('Add vault'),
+                label: Text(l.addVault),
               ),
             ),
           ],

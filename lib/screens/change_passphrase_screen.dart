@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -180,13 +181,13 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
     StrengthTier.centuries => Colors.green.shade800,
   };
 
-  String _tierLabel(StrengthTier tier) => switch (tier) {
-    StrengthTier.terrible => 'Terrible',
-    StrengthTier.weak => 'Weak',
-    StrengthTier.fair => 'Fair',
-    StrengthTier.strong => 'Strong',
-    StrengthTier.veryStrong => 'Very strong',
-    StrengthTier.centuries => 'Excellent',
+  String _tierLabel(StrengthTier tier, AppLocalizations l) => switch (tier) {
+    StrengthTier.terrible => l.strengthTierTerrible,
+    StrengthTier.weak => l.strengthTierWeak,
+    StrengthTier.fair => l.strengthTierFair,
+    StrengthTier.strong => l.strengthTierStrong,
+    StrengthTier.veryStrong => l.strengthTierVeryStrong,
+    StrengthTier.centuries => l.strengthTierExcellent,
   };
 
   Future<void> _changePassphrase() async {
@@ -215,13 +216,14 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
           }
         } catch (e) {
           if (mounted) {
+            final l = AppLocalizations.of(context);
             setState(() {
               _error = switch (e) {
                 PlatformException(code: 'TRANSPORT_ERROR') =>
-                  e.message ?? 'Transport error.',
+                  e.message ?? l.transportError,
                 PlatformException(code: 'NO_FIDO2_DEVICE') =>
-                  e.message ?? 'No FIDO2 device found. Insert your YubiKey and try again.',
-                _ => 'Authorization failed — check your PIN and try again.',
+                  e.message ?? l.noFidoDeviceFound,
+                _ => l.authorizationFailed,
               };
             });
           }
@@ -234,7 +236,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Passphrase changed successfully')),
+          SnackBar(content: Text(AppLocalizations.of(context).changePassphraseSuccess)),
         );
         Navigator.of(context).pop();
       }
@@ -247,8 +249,9 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Change passphrase')),
+      appBar: AppBar(title: Text(l.changePassphraseTitle)),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 480),
@@ -280,7 +283,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'YubiKey-protected vault — your YubiKey binding will be preserved.',
+                              l.yubiKeyProtectedNote,
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ),
@@ -292,7 +295,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                       controller: _pinController,
                       obscureText: _pinObscured,
                       decoration: InputDecoration(
-                        labelText: 'YubiKey PIN',
+                        labelText: l.yubiKeyPinLabel,
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -305,7 +308,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                         ),
                       ),
                       validator: (v) => (v == null || v.isEmpty)
-                          ? 'YubiKey PIN is required'
+                          ? l.yubiKeyPinRequired
                           : null,
                     ),
                     if (!Platform.isLinux) ...[
@@ -319,9 +322,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                     ],
                     const SizedBox(height: 8),
                     Text(
-                      _isChanging
-                          ? 'Tap your YubiKey now…'
-                          : 'Touch your YubiKey to authorize this change.',
+                      _isChanging ? l.tapYubiKeyNow : l.touchYubiKeyToAuthorize,
                       style: Theme.of(context).textTheme.bodySmall,
                       textAlign: TextAlign.center,
                     ),
@@ -332,7 +333,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                     obscureText: _oldObscured,
                     enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
                     decoration: InputDecoration(
-                      labelText: 'Current passphrase',
+                      labelText: l.currentPassphraseLabel,
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -345,7 +346,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                       ),
                     ),
                     validator: (v) => (v == null || v.isEmpty)
-                        ? 'Current passphrase is required'
+                        ? l.currentPassphraseRequired
                         : null,
                   ),
                   const SizedBox(height: 24),
@@ -355,7 +356,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                     enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
                     onChanged: _onNewPassphraseChanged,
                     decoration: InputDecoration(
-                      labelText: 'New passphrase',
+                      labelText: l.newPassphraseLabel,
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -368,10 +369,8 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) {
-                        return 'New passphrase is required';
-                      }
-                      if (!_strongEnough) return 'Passphrase is too weak';
+                      if (v == null || v.isEmpty) return l.newPassphraseRequired;
+                      if (!_strongEnough) return l.passphraseTooWeak;
                       return null;
                     },
                   ),
@@ -391,7 +390,10 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${_tierLabel(_entropy!.tier)} · ${_entropy!.bits.toStringAsFixed(1)} bits',
+                      l.entropyDisplay(
+                        _tierLabel(_entropy!.tier, l),
+                        _entropy!.bits.toStringAsFixed(1),
+                      ),
                       style: TextStyle(
                         fontSize: 12,
                         color: _tierColor(_entropy!.tier),
@@ -412,7 +414,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                       );
                     },
                     decoration: InputDecoration(
-                      labelText: 'Confirm new passphrase',
+                      labelText: l.confirmPassphraseLabel,
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -426,21 +428,15 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                       ),
                     ),
                     validator: (v) {
-                      if (v == null || v.isEmpty) {
-                        return 'Please confirm your new passphrase';
-                      }
-                      if (v != _newController.text) {
-                        return 'Passphrases do not match';
-                      }
+                      if (v == null || v.isEmpty) return l.confirmPassphraseRequired;
+                      if (v != _newController.text) return l.passphrasesDoNotMatch;
                       return null;
                     },
                   ),
                   if (_confirmMatches != null) ...[
                     const SizedBox(height: 4),
                     Text(
-                      _confirmMatches!
-                          ? '✓ Passphrases match'
-                          : '✗ Passphrases do not match',
+                      _confirmMatches! ? l.passphrasesMatch : l.passphrasesNoMatch,
                       style: TextStyle(
                         fontSize: 12,
                         color: _confirmMatches!
@@ -470,7 +466,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('Change passphrase'),
+                        : Text(l.changePassphraseButton),
                   ),
                 ],
               ),

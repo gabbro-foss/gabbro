@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
@@ -259,35 +260,43 @@ class _VaultListScreenState extends State<VaultListScreen> {
     _ => Icons.tune,
   };
 
-  String _displayType(String entryType) {
-    switch (entryType) {
-      case 'Login':
-        return 'Password';
-      case 'Note':
-        return 'Note';
-      case 'Identity':
-        return 'Identity';
-      case 'Card':
-        return 'Card';
-      case 'File':
-        return 'File';
-      case 'Custom':
-        return 'Custom';
-      default:
-        return entryType;
-    }
+  String _displayType(String entryType, AppLocalizations l) => switch (entryType) {
+    'Login' => l.entryTypePassword,
+    'Note' => l.entryTypeNote,
+    'Identity' => l.entryTypeIdentity,
+    'Card' => l.entryTypeCard,
+    'File' => l.entryTypeFile,
+    'Custom' => l.entryTypeCustom,
+    _ => entryType,
+  };
+
+  // Used internally for sort/group/search — English fallbacks are fine here.
+  String _displayTitle(EntrySummaryData entry) {
+    return switch (entry.entryType) {
+      'Login' => entry.title.isNotEmpty ? entry.title : '(no URL)',
+      'Identity' => entry.title.isNotEmpty ? entry.title : '(no name)',
+      _ => entry.title.isNotEmpty ? entry.title : '(untitled)',
+    };
   }
 
-  String _displayTitle(EntrySummaryData entry) {
-    switch (entry.entryType) {
-      case 'Login':
-        return entry.title.isNotEmpty ? entry.title : '(no URL)';
-      case 'Identity':
-        return entry.title.isNotEmpty ? entry.title : '(no name)';
-      default:
-        return entry.title.isNotEmpty ? entry.title : '(untitled)';
-    }
-  }
+  // Used for display in build() — returns localized fallbacks.
+  String _localizedDisplayTitle(EntrySummaryData entry, AppLocalizations l) =>
+      switch (entry.entryType) {
+        'Login' => entry.title.isNotEmpty ? entry.title : l.noUrlFallback,
+        'Identity' => entry.title.isNotEmpty ? entry.title : l.noNameFallback,
+        _ => entry.title.isNotEmpty ? entry.title : l.untitledFallback,
+      };
+
+  String _filterLabel(String f, AppLocalizations l) => switch (f) {
+    'All' => l.entryTypeAll,
+    'Password' => l.entryTypePassword,
+    'Note' => l.entryTypeNote,
+    'Card' => l.entryTypeCard,
+    'Identity' => l.entryTypeIdentity,
+    'File' => l.entryTypeFile,
+    'Custom' => l.entryTypeCustom,
+    _ => f,
+  };
 
   List<EntrySummaryData> get _filteredEntries {
     final typeFiltered = _selectedFilter == 'All'
@@ -376,13 +385,14 @@ class _VaultListScreenState extends State<VaultListScreen> {
   }
 
   Future<void> _showTypePicker() async {
+    final l = AppLocalizations.of(context);
     final types = [
-      ('Login', 'Password'),
-      ('Note', 'Note'),
-      ('Identity', 'Identity'),
-      ('Card', 'Card'),
-      ('File', 'File'),
-      ('Custom', 'Custom'),
+      ('Login', l.entryTypePassword),
+      ('Note', l.entryTypeNote),
+      ('Identity', l.entryTypeIdentity),
+      ('Card', l.entryTypeCard),
+      ('File', l.entryTypeFile),
+      ('Custom', l.entryTypeCustom),
     ];
     final selected = await showModalBottomSheet<String>(
       context: context,
@@ -391,11 +401,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Padding(
-                padding: EdgeInsets.all(16),
+              Padding(
+                padding: const EdgeInsets.all(16),
                 child: Text(
-                  'New entry',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  AppLocalizations.of(context).newEntryTitle,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
               ...types.map(
@@ -443,7 +453,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
       if (count != null && count > 0) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Imported $count entries.')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).importedEntries(count))));
         _loadEntries();
       }
     }
@@ -455,30 +465,33 @@ class _VaultListScreenState extends State<VaultListScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setState) => AlertDialog(
-          title: const Text('Assign to folder'),
-          content: DropdownButton<String>(
-            isExpanded: true,
-            value: selected,
-            hint: const Text('Select a folder'),
-            items: _folders
-                .map((f) => DropdownMenuItem(value: f, child: Text(f)))
-                .toList(),
-            onChanged: (v) => setState(() => selected = v),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Cancel'),
+        builder: (ctx, setLocal) {
+          final l = AppLocalizations.of(ctx);
+          return AlertDialog(
+            title: Text(l.assignToFolderTitle),
+            content: DropdownButton<String>(
+              isExpanded: true,
+              value: selected,
+              hint: Text(l.selectFolder),
+              items: _folders
+                  .map((f) => DropdownMenuItem(value: f, child: Text(f)))
+                  .toList(),
+              onChanged: (v) => setLocal(() => selected = v),
             ),
-            TextButton(
-              onPressed: selected == null
-                  ? null
-                  : () => Navigator.of(ctx).pop(true),
-              child: const Text('Assign'),
-            ),
-          ],
-        ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(false),
+                child: Text(l.cancel),
+              ),
+              TextButton(
+                onPressed: selected == null
+                    ? null
+                    : () => Navigator.of(ctx).pop(true),
+                child: Text(l.assign),
+              ),
+            ],
+          );
+        },
       ),
     );
     if (confirmed != true || selected == null) return;
@@ -499,23 +512,26 @@ class _VaultListScreenState extends State<VaultListScreen> {
     final count = ids.length;
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Delete $count ${count == 1 ? 'entry' : 'entries'}?'),
-        content: const Text('This cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(ctx).colorScheme.error,
+      builder: (ctx) {
+        final l = AppLocalizations.of(ctx);
+        return AlertDialog(
+          title: Text(l.deleteEntriesTitle(count)),
+          content: Text(l.cannotBeUndone),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(l.cancel),
             ),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(ctx).colorScheme.error,
+              ),
+              child: Text(l.delete),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed != true) return;
     setState(() => _isDeleting = true);
@@ -552,9 +568,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
         if (isIdentical) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content:
-                  Text('Nothing to sync — both vaults are already up to date.'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context).nothingToSync),
             ),
           );
           return;
@@ -569,25 +584,26 @@ class _VaultListScreenState extends State<VaultListScreen> {
           final confirmed = await showDialog<bool>(
             context: context,
             barrierDismissible: false,
-            builder: (ctx) => AlertDialog(
-              title: const Text('Delete entry?'),
-              content: Text(
-                "The other device deleted '${item.title}'.\n\nDelete it here too, or keep it?",
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(false),
-                  child: const Text('Keep'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(true),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(ctx).colorScheme.error,
+            builder: (ctx) {
+              final l = AppLocalizations.of(ctx);
+              return AlertDialog(
+                title: Text(l.deleteEntryTitle),
+                content: Text(l.syncDeleteEntryContent(item.title)),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(false),
+                    child: Text(l.keep),
                   ),
-                  child: const Text('Delete'),
-                ),
-              ],
-            ),
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(true),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(ctx).colorScheme.error,
+                    ),
+                    child: Text(l.delete),
+                  ),
+                ],
+              );
+            },
           );
           if (confirmed == true) {
             await deleteEntry(id: item.id);
@@ -602,34 +618,32 @@ class _VaultListScreenState extends State<VaultListScreen> {
           final chosenFolder = await showDialog<String>(
             context: context,
             barrierDismissible: false,
-            builder: (ctx) => AlertDialog(
-              title: const Text('Folder conflict'),
-              content: Text(
-                "'${conflict.title}' is in different folders on each device.\n\n"
-                'This device: ${conflict.localFolder.isEmpty ? '(none)' : conflict.localFolder}\n'
-                'Other device: ${conflict.incomingFolder.isEmpty ? '(none)' : conflict.incomingFolder}',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () =>
-                      Navigator.of(ctx).pop(conflict.localFolder),
-                  child: Text(
-                    conflict.localFolder.isEmpty
-                        ? 'Keep unfoldered'
-                        : 'Keep "${conflict.localFolder}"',
+            builder: (ctx) {
+              final l = AppLocalizations.of(ctx);
+              final noFolder = l.noFolder;
+              return AlertDialog(
+                title: Text(l.folderConflictTitle),
+                content: Text(l.folderConflictContent(
+                  conflict.title,
+                  conflict.localFolder.isEmpty ? noFolder : conflict.localFolder,
+                  conflict.incomingFolder.isEmpty ? noFolder : conflict.incomingFolder,
+                )),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(conflict.localFolder),
+                    child: Text(conflict.localFolder.isEmpty
+                        ? l.folderConflictKeepUnfoldered
+                        : l.folderConflictKeepLocal(conflict.localFolder)),
                   ),
-                ),
-                TextButton(
-                  onPressed: () =>
-                      Navigator.of(ctx).pop(conflict.incomingFolder),
-                  child: Text(
-                    conflict.incomingFolder.isEmpty
-                        ? 'Move to unfoldered'
-                        : 'Move to "${conflict.incomingFolder}"',
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(conflict.incomingFolder),
+                    child: Text(conflict.incomingFolder.isEmpty
+                        ? l.folderConflictMoveUnfoldered
+                        : l.folderConflictMoveIncoming(conflict.incomingFolder)),
                   ),
-                ),
-              ],
-            ),
+                ],
+              );
+            },
           );
           if (chosenFolder != null) {
             await assignFolderToEntries(
@@ -645,12 +659,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                'Vault synced — '
-                '${summary.added} added, '
-                '${summary.updated + folderChangedCount} updated, '
-                '$deletedCount deleted.',
-              ),
+              content: Text(AppLocalizations.of(context).vaultSynced(
+                summary.added,
+                summary.updated + folderChangedCount,
+                deletedCount,
+              )),
             ),
           );
         }
@@ -660,20 +673,21 @@ class _VaultListScreenState extends State<VaultListScreen> {
         final isPassphraseMismatch = msg.contains('decryption failed');
         await showDialog<void>(
           context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Sync failed'),
-            content: Text(
-              isPassphraseMismatch
-                  ? 'This vault file uses a different passphrase. Sync is only supported between vaults that share a passphrase.'
-                  : msg,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Dismiss'),
+          builder: (ctx) {
+            final l = AppLocalizations.of(ctx);
+            return AlertDialog(
+              title: Text(l.syncFailedTitle),
+              content: Text(
+                isPassphraseMismatch ? l.syncPassphraseMismatch : msg,
               ),
-            ],
-          ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(l.dismiss),
+                ),
+              ],
+            );
+          },
         );
       } finally {
         if (mounted) setState(() => _isSyncing = false);
@@ -766,6 +780,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
   }
 
   Widget _buildFilterChipRow() {
+    final l = AppLocalizations.of(context);
     return Stack(
       alignment: Alignment.centerRight,
       children: [
@@ -784,7 +799,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
                     (f) => Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: FilterChip(
-                        label: Text(f),
+                        label: Text(_filterLabel(f, l)),
                         selected: _selectedFilter == f,
                         onSelected: (_) =>
                             setState(() => _selectedFilter = f),
@@ -817,18 +832,19 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     if (_error != null) {
-      return Scaffold(body: Center(child: Text('Error: $_error')));
+      return Scaffold(body: Center(child: Text(l.errorPrefix(_error!))));
     }
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           _isSelecting
-              ? '${_selectedIds.length} selected'
+              ? l.selectedCount(_selectedIds.length)
               : widget.vaultAlias != null
-                  ? 'Gabbro - ${widget.vaultAlias}'
-                  : 'Gabbro',
+                  ? l.gabbroVaultTitle(widget.vaultAlias!)
+                  : l.gabbroTitle,
         ),
         actions: [
           if (_isImporting || _isSyncing)
@@ -843,113 +859,116 @@ class _VaultListScreenState extends State<VaultListScreen> {
           if (!_isSelecting) ...[
             IconButton(
               icon: const Icon(Icons.checklist),
-              tooltip: 'Select entries',
+              tooltip: l.tooltipSelectEntries,
               onPressed: () => setState(() => _selectionMode = true),
             ),
             IconButton(
               icon: const Icon(Icons.lock_outline),
-              tooltip: 'Lock vault',
+              tooltip: l.tooltipLockVault,
               onPressed: _lockAndExit,
             ),
             PopupMenuButton<String>(
               icon: const Icon(Icons.menu),
-              tooltip: 'Menu',
+              tooltip: l.tooltipMenu,
               onSelected: _onMenuSelected,
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'export',
-                  child: Row(children: [
-                    Icon(Icons.upload_outlined, size: 20),
-                    SizedBox(width: 12),
-                    Expanded(child: Text('Export vault')),
-                  ]),
-                ),
-                const PopupMenuItem(
-                  value: 'import',
-                  child: Row(children: [
-                    Icon(Icons.download_outlined, size: 20),
-                    SizedBox(width: 12),
-                    Expanded(child: Text('Import entries')),
-                  ]),
-                ),
-                const PopupMenuItem(
-                  value: 'sync',
-                  child: Row(children: [
-                    Icon(Icons.sync, size: 20),
-                    SizedBox(width: 12),
-                    Expanded(child: Text('Sync from file')),
-                  ]),
-                ),
-                const PopupMenuDivider(),
-                const PopupMenuItem(
-                  value: 'manage_vaults',
-                  child: Row(children: [
-                    Icon(Icons.folder_special_outlined, size: 20),
-                    SizedBox(width: 12),
-                    Expanded(child: Text('Manage vaults')),
-                  ]),
-                ),
-                const PopupMenuDivider(),
-                const PopupMenuItem(
-                  value: 'change_passphrase',
-                  child: Row(children: [
-                    Icon(Icons.key_outlined, size: 20),
-                    SizedBox(width: 12),
-                    Expanded(child: Text('Change passphrase')),
-                  ]),
-                ),
-                PopupMenuItem(
-                  enabled: _isYubikeyVault,
-                  value: 'yubikeys',
-                  child: Row(children: [
-                    Icon(Icons.security_outlined, size: 20),
-                    SizedBox(width: 12),
-                    Text('Manage YubiKeys'),
-                  ]),
-                ),
-                const PopupMenuDivider(),
-                const PopupMenuItem(
-                  value: 'appearance',
-                  child: Row(children: [
-                    Icon(Icons.palette_outlined, size: 20),
-                    SizedBox(width: 12),
-                    Text('Appearance'),
-                  ]),
-                ),
-                const PopupMenuItem(
-                  value: 'security',
-                  child: Row(children: [
-                    Icon(Icons.shield_outlined, size: 20),
-                    SizedBox(width: 12),
-                    Text('Security'),
-                  ]),
-                ),
-                const PopupMenuItem(
-                  value: 'manage_folders',
-                  child: Row(children: [
-                    Icon(Icons.folder_outlined, size: 20),
-                    SizedBox(width: 12),
-                    Expanded(child: Text('Manage folders')),
-                  ]),
-                ),
-                const PopupMenuItem(
-                  value: 'generator',
-                  child: Row(children: [
-                    Icon(Icons.casino_outlined, size: 20),
-                    SizedBox(width: 12),
-                    Expanded(child: Text('Password generator')),
-                  ]),
-                ),
-                const PopupMenuDivider(),
-                const PopupMenuItem(
-                  value: 'about',
-                  child: Row(children: [
-                    Icon(Icons.info_outline, size: 20),
-                    SizedBox(width: 12),
-                    Text('About'),
-                  ]),
-                ),
-              ],
+              itemBuilder: (context) {
+                final ml = AppLocalizations.of(context);
+                return [
+                  PopupMenuItem(
+                    value: 'export',
+                    child: Row(children: [
+                      const Icon(Icons.upload_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(ml.menuExportVault)),
+                    ]),
+                  ),
+                  PopupMenuItem(
+                    value: 'import',
+                    child: Row(children: [
+                      const Icon(Icons.download_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(ml.menuImportEntries)),
+                    ]),
+                  ),
+                  PopupMenuItem(
+                    value: 'sync',
+                    child: Row(children: [
+                      const Icon(Icons.sync, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(ml.menuSyncFromFile)),
+                    ]),
+                  ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'manage_vaults',
+                    child: Row(children: [
+                      const Icon(Icons.folder_special_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(ml.menuManageVaults)),
+                    ]),
+                  ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'change_passphrase',
+                    child: Row(children: [
+                      const Icon(Icons.key_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(ml.menuChangePassphrase)),
+                    ]),
+                  ),
+                  PopupMenuItem(
+                    enabled: _isYubikeyVault,
+                    value: 'yubikeys',
+                    child: Row(children: [
+                      const Icon(Icons.security_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Text(ml.menuManageYubiKeys),
+                    ]),
+                  ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'appearance',
+                    child: Row(children: [
+                      const Icon(Icons.palette_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Text(ml.menuAppearance),
+                    ]),
+                  ),
+                  PopupMenuItem(
+                    value: 'security',
+                    child: Row(children: [
+                      const Icon(Icons.shield_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Text(ml.menuSecurity),
+                    ]),
+                  ),
+                  PopupMenuItem(
+                    value: 'manage_folders',
+                    child: Row(children: [
+                      const Icon(Icons.folder_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(ml.menuManageFolders)),
+                    ]),
+                  ),
+                  PopupMenuItem(
+                    value: 'generator',
+                    child: Row(children: [
+                      const Icon(Icons.casino_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(ml.menuPasswordGenerator)),
+                    ]),
+                  ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'about',
+                    child: Row(children: [
+                      const Icon(Icons.info_outline, size: 20),
+                      const SizedBox(width: 12),
+                      Text(ml.menuAbout),
+                    ]),
+                  ),
+                ];
+              },
             ),
           ],
           if (_isDeleting) ...[
@@ -969,8 +988,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
                     : Icons.select_all,
               ),
               tooltip: _selectedIds.length == _filteredEntries.length
-                  ? 'Deselect all'
-                  : 'Select all',
+                  ? l.tooltipDeselectAll
+                  : l.tooltipSelectAll,
               onPressed: () => setState(() {
                 if (_selectedIds.length == _filteredEntries.length) {
                   _selectedIds.clear();
@@ -982,7 +1001,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
             if (_folders.isNotEmpty)
               IconButton(
                 icon: const Icon(Icons.folder_outlined),
-                tooltip: 'Assign to folder',
+                tooltip: l.tooltipAssignToFolder,
                 onPressed: _selectedIds.isEmpty
                     ? null
                     : () => _confirmAssignFolder(_selectedIds),
@@ -1017,8 +1036,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
               filteredEntries: _filteredEntries,
               letterIndex: _letterIndex,
               onLetterSelected: _scrollToLetter,
-              displayTitle: _displayTitle,
-              displayType: _displayType,
+              displayTitle: (e) => _localizedDisplayTitle(e, l),
+              displayType: (t) => _displayType(t, l),
               entryTypeIcon: _entryTypeIcon,
               searchBar: Padding(
                 padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
@@ -1026,15 +1045,15 @@ class _VaultListScreenState extends State<VaultListScreen> {
                   controller: _searchController,
                   decoration: InputDecoration(
                     hintText: _fullTextSearch
-                        ? 'Search all fields…'
-                        : 'Search entries…',
+                        ? l.searchAllFieldsHint
+                        : l.searchEntriesHint,
                     prefixIcon: IconButton(
                       icon: Icon(_fullTextSearch
                           ? Icons.manage_search
                           : Icons.search),
                       tooltip: _fullTextSearch
-                          ? 'Searching all fields'
-                          : 'Searching by title',
+                          ? l.searchAllFieldsTooltip
+                          : l.searchByTitleTooltip,
                       onPressed: () =>
                           setState(() => _fullTextSearch = !_fullTextSearch),
                     ),
@@ -1068,9 +1087,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
                         onChanged: (value) =>
                             setState(() => _selectedFolder = value ?? ''),
                         items: [
-                          const DropdownMenuItem(
+                          DropdownMenuItem(
                             value: '',
-                            child: Text('All folders'),
+                            child: Text(l.allFolders),
                           ),
                           ..._folders.map(
                             (f) =>
@@ -1112,15 +1131,15 @@ class _VaultListScreenState extends State<VaultListScreen> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: _fullTextSearch
-                          ? 'Search all fields…'
-                          : 'Search entries…',
+                          ? l.searchAllFieldsHint
+                          : l.searchEntriesHint,
                       prefixIcon: IconButton(
                         icon: Icon(_fullTextSearch
                             ? Icons.manage_search
                             : Icons.search),
                         tooltip: _fullTextSearch
-                            ? 'Searching all fields'
-                            : 'Searching by title',
+                            ? l.searchAllFieldsTooltip
+                            : l.searchByTitleTooltip,
                         onPressed: () =>
                             setState(() => _fullTextSearch = !_fullTextSearch),
                       ),
@@ -1151,9 +1170,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
                       onChanged: (value) =>
                           setState(() => _selectedFolder = value ?? ''),
                       items: [
-                        const DropdownMenuItem(
+                        DropdownMenuItem(
                           value: '',
-                          child: Text('All folders'),
+                          child: Text(l.allFolders),
                         ),
                         ..._folders.map(
                           (f) => DropdownMenuItem(value: f, child: Text(f)),
@@ -1164,9 +1183,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 _buildFilterChipRow(),
                 Expanded(
                   child: _groupedEntries.isEmpty
-                      ? const Center(
-                          child: Text('No entries match your search.'),
-                        )
+                      ? Center(child: Text(l.noEntriesMatch))
                       : Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -1214,6 +1231,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                       );
                                     }
                                     final entry = item as EntrySummaryData;
+                                    final el = AppLocalizations.of(context);
                                     return ListTile(
                                       dense: true,
                                       leading: _isSelecting
@@ -1243,12 +1261,12 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                                 context,
                                               ).colorScheme.primary,
                                               semanticLabel: _displayType(
-                                                entry.entryType,
+                                                entry.entryType, el,
                                               ),
                                             ),
-                                      title: Text(_displayTitle(entry)),
+                                      title: Text(_localizedDisplayTitle(entry, el)),
                                       subtitle: Text(
-                                        _displayType(entry.entryType),
+                                        _displayType(entry.entryType, el),
                                       ),
                                       onLongPress: () => setState(() {
                                         _selectionMode = true;
@@ -1335,43 +1353,46 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-        title: const Text('Sync from file'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.filePath,
-              style: Theme.of(context).textTheme.bodySmall,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _ctrl,
-              obscureText: !_showPass,
-              decoration: InputDecoration(
-                labelText: 'Vault passphrase',
-                border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: Icon(_showPass ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() => _showPass = !_showPass),
-                ),
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(l.syncFromFileTitle),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.filePath,
+            style: Theme.of(context).textTheme.bodySmall,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _ctrl,
+            obscureText: !_showPass,
+            decoration: InputDecoration(
+              labelText: l.vaultPassphraseLabel,
+              border: const OutlineInputBorder(),
+              suffixIcon: IconButton(
+                icon: Icon(_showPass ? Icons.visibility_off : Icons.visibility),
+                onPressed: () => setState(() => _showPass = !_showPass),
               ),
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(_ctrl.text),
-            child: const Text('Sync'),
           ),
         ],
-      );
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l.cancel),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(_ctrl.text),
+          child: Text(l.sync),
+        ),
+      ],
+    );
+  }
 }
 
 class _ChipRowFadeEdge extends StatelessWidget {

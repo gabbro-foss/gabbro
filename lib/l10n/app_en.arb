@@ -33,6 +33,7 @@
   "syncFromVault": "Sync from vault",
   "createVault": "Create vault",
   "pickFile": "Pick file",
+  "noFileSelected": "No file selected",
   "chooseFolder": "Choose folder",
   "addCustomField": "Add custom field",
   "exportFile": "Export file",
@@ -131,6 +132,8 @@
 
   "tooltipSelectEntries": "Select entries",
   "tooltipLockVault": "Lock vault",
+  "tooltipSelectAll": "Select all",
+  "tooltipDeselectAll": "Deselect all",
   "tooltipMenu": "Menu",
   "tooltipCopy": "Copy",
   "tooltipCopied": "Copied!",
@@ -158,6 +161,46 @@
   "noVaultsRegistered": "No vaults registered.",
   "noYubiKeysRegistered": "No YubiKeys registered",
   "selectEntry": "Select an entry",
+  "newEntryTitle": "New entry",
+  "createEntryTitle": "New {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Edit {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(no URL)",
+  "noNameFallback": "(no name)",
+  "untitledFallback": "(untitled)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "{count} selected",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Search all fields…",
+  "searchEntriesHint": "Search entries…",
+  "searchAllFieldsTooltip": "Searching all fields",
+  "searchByTitleTooltip": "Searching by title",
+  "entryTypeAll": "All",
+  "entryTypePassword": "Password",
+  "entryTypeNote": "Note",
+  "entryTypeCard": "Card",
+  "entryTypeIdentity": "Identity",
+  "entryTypeFile": "File",
+  "entryTypeCustom": "Custom",
   "errorPrefix": "Error: {error}",
   "@errorPrefix": {
     "placeholders": {
@@ -340,7 +383,9 @@
   "changePassphraseSuccess": "Passphrase changed successfully",
   "changePassphraseButton": "Change passphrase",
 
+  "continueLabel": "Continue",
   "protectWithYubiKey": "Protect with YubiKey",
+  "yubiKeySubtitle": "Hardware security key (recommended)",
   "accessibilityButton": "Accessibility",
 
   "aboutProjectSection": "Project",
@@ -445,5 +490,200 @@
   "tooltipShowValues": "Show values",
   "reviewOld": "Old",
   "reviewNew": "New",
-  "reviewEmpty": "(empty)"
+  "reviewEmpty": "(empty)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Notes",
+  "reviewFieldContent": "Content",
+  "reviewFieldEmail": "Email",
+  "reviewFieldPhone": "Phone",
+  "reviewFieldAddress": "Address",
+  "reviewFieldCardLabel": "Card label",
+  "reviewFieldStatus": "Status",
+  "reviewFieldCardholder": "Cardholder",
+  "reviewFieldExpiry": "Expiry",
+  "reviewFieldCreditLimit": "Credit limit",
+  "reviewFieldAccountNumber": "Account number",
+  "reviewFieldNetwork": "Network",
+  "reviewFieldBank": "Bank",
+  "reviewFieldFilename": "Filename",
+  "reviewFieldSize": "Size",
+  "reviewFieldCardNumber": "Number",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Transaction password",
+  "timestampCreated": "Created",
+  "timestampUpdated": "Updated",
+  "timestampUnknown": "Unknown",
+  "noTitleFallback": "(no title)",
+  "tooltipExportFile": "Export file",
+  "tooltipEditEntry": "Edit entry",
+  "tooltipDeleteEntry": "Delete entry",
+  "exportLabel": "Export",
+  "customEntryFieldsHeader": "Fields",
+  "copiedNeverClears": "Copied — clipboard never clears automatically",
+  "copiedClears30s": "Copied — clipboard clears in 30s",
+  "copiedClears60s": "Copied — clipboard clears in 60s",
+  "copiedClears2min": "Copied — clipboard clears in 2 min",
+
+  "passwordBreakdownTitle": "Password breakdown",
+  "charTypeUppercase": "Uppercase",
+  "charTypeLowercase": "Lowercase",
+  "charTypeDigit": "Digit",
+  "charTypeSymbol": "Symbol",
+
+  "exportChooseFormat": "Choose an export format.",
+  "exportUnencryptedWarning": "Completely unencrypted — all secrets will be written in plain text. Store this file securely and delete it after use.",
+  "exportPassphraseOnlyNote": "Protected by your passphrase only. YubiKey is not required to import.",
+  "exportChooseDestinationJson": "Choose a destination for your exported JSON file.",
+  "exportChooseDestinationVault": "Choose a destination for your exported vault file.",
+  "exportTwoFilesNote": "Two files will be written: vault.gabbro and vault.gabbro.sha256",
+  "exportSelectDestination": "Select a destination.",
+
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "A post-quantum password manager",
+  "aboutSourceCode": "Source code",
+  "aboutReportIssue": "Report an issue",
+  "aboutSupportGabbro": "Support Gabbro",
+  "aboutLicenceBody": "Gabbro is free and open source software, licensed under the GNU General Public License v3.0 only (GPL-3.0-only).\n\nYou are free to use, study, and redistribute this software under the terms of that licence.",
+  "aboutOwnerRole": "Project owner, architect, and lead developer:",
+  "aboutAiPartner": "AI development partner:",
+  "aboutNoTelemetry": "Gabbro makes no outbound network connections. No telemetry, no analytics, no accounts.",
+
+  "strengthTierTerrible": "Terrible",
+  "strengthTierWeak": "Weak",
+  "strengthTierFair": "Fair",
+  "strengthTierStrong": "Strong",
+  "strengthTierVeryStrong": "Very strong",
+  "strengthTierExcellent": "Excellent",
+  "yubiKeyProtectedNote": "YubiKey-protected vault — your YubiKey binding will be preserved.",
+  "yubiKeyPinRequired": "YubiKey PIN is required",
+  "tapYubiKeyNow": "Tap your YubiKey now…",
+  "touchYubiKeyToAuthorize": "Touch your YubiKey to authorize this change.",
+  "currentPassphraseRequired": "Current passphrase is required",
+  "newPassphraseRequired": "New passphrase is required",
+  "passphraseTooWeak": "Passphrase is too weak",
+  "confirmPassphraseRequired": "Please confirm your new passphrase",
+  "passphrasesDoNotMatch": "Passphrases do not match",
+  "passphrasesMatch": "✓ Passphrases match",
+  "passphrasesNoMatch": "✗ Passphrases do not match",
+  "entropyDisplay": "{tier} · {bits} bits",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Transport error.",
+  "authorizationFailed": "Authorization failed — check your PIN and try again.",
+
+  "unlockEnterPassphraseAndPin": "Enter your passphrase and YubiKey PIN to unlock",
+  "unlockEnterPassphrase": "Enter your passphrase to unlock",
+  "unlockEntropyDisplay": "{tier} · {bits} bits of entropy",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Insert your YubiKey and tap when it flashes",
+  "unlockErrorPassphrase": "Could not unlock vault. Check your passphrase.",
+  "unlockErrorPassphraseAndPin": "Could not unlock vault. Check your passphrase and YubiKey PIN.",
+
+  "importSelectFile": "Select a file.",
+  "importFileNotFound": "File not found.",
+  "importEnterPassphrase": "Enter the passphrase for this vault.",
+  "importDuplicateWarning": "Entries whose UUID already exists in your vault will be skipped automatically. You will be shown a summary.",
+  "importGabbroSubtitle": "Sync entries from another Gabbro vault (.gabbro file)",
+  "importEnpassSubtitle": "JSON export from Enpass (Tools → Export)",
+  "importBitwardenSubtitle": "Unencrypted JSON export from Bitwarden (Tools → Export Vault)",
+  "importCsvSubtitle": "CSV export from any password manager",
+
+  "vaultNameAlreadyExists": "A vault named \"{alias}\" already exists.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "This will permanently delete \"{alias}\" and all its data.\n\nFile: {path}\n\nThis cannot be undone.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "This will permanently delete \"{alias}\" and remove its YubiKey binding.\n\nFile: {path}\n\nThis cannot be undone.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Enter your PIN and touch your YubiKey to authorize this deletion.",
+  "deleteVaultTooltip": "Delete vault",
+
+  "navVault": "Vault",
+  "navAbout": "About",
+
+  "yubiKeySecurityWarning": "Security warning",
+  "removeYubiKeyTitle": "Remove YubiKey",
+  "yubiKeyLastKeyRiskWarning": "WARNING: if that remaining key is lost, damaged, or stolen, vault access will be permanently impossible. There is no recovery path.",
+  "onlyOneKeyRegisteredWarning": "Only one key registered. If this key is lost, vault access is permanently impossible.",
+  "tapRegisterNfc": "Hold key to phone to register",
+  "tapRegisterUsb": "Once connected, tap the key to register",
+  "tapActivateNfc": "Hold key to phone again to activate",
+  "tapActivateUsb": "Once connected, tap the key again to activate",
+  "failedToRegisterKey": "Failed to register key: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Failed to activate key: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Key {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Tap your new YubiKey to register…",
+  "tapYubiKeyToActivate": "Tap your new YubiKey again to activate…",
+  "editAliasTooltip": "Edit alias",
+  "cannotRemoveLastKey": "Cannot remove the last key",
+  "removeKeyTooltip": "Remove key",
+  "manageYubiKeysError": "Error: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Classic",
+  "generatorModePassphrase": "Passphrase",
+  "charSetsHeader": "Character sets",
+  "languageHeader": "Language",
+  "separatorLabel": "Separator",
+  "capitaliseWords": "Capitalise words",
+  "appendDigit": "Append a digit",
+  "entropyBitsDisplay": "~{bits} bits entropy",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Select at least one character set",
+  "passwordMinLengthNote": "Passwords are at least 32 characters. If a site has a shorter limit, copy the first characters you need.",
+  "tooltipShow": "Show",
+  "tooltipCopied": "Copied!",
+  "tooltipCopy": "Copy",
+  "excludeAmbiguousChars": "Exclude ambiguous characters (0, O, l, 1, I)"
 }

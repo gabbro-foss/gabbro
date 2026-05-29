@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
 
@@ -84,7 +85,7 @@ class _ExportScreenState extends State<ExportScreen> {
 
   Future<void> _export() async {
     if (_path == null || _path!.isEmpty) {
-      setState(() => _error = 'Select a destination.');
+      setState(() => _error = AppLocalizations.of(context).exportSelectDestination);
       return;
     }
     setState(() {
@@ -108,11 +109,12 @@ class _ExportScreenState extends State<ExportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final isJson = _format == _ExportFormat.json;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Export vault')),
+      appBar: AppBar(title: Text(l.exportTitle)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -121,7 +123,7 @@ class _ExportScreenState extends State<ExportScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Choose an export format.',
+                l.exportChooseFormat,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 12),
@@ -160,8 +162,7 @@ class _ExportScreenState extends State<ExportScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Completely unencrypted — all secrets will be written in plain text. '
-                          'Store this file securely and delete it after use.',
+                          l.exportUnencryptedWarning,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: colorScheme.onErrorContainer,
                               ),
@@ -172,21 +173,18 @@ class _ExportScreenState extends State<ExportScreen> {
                 )
               else
                 Text(
-                  'Protected by your passphrase only. '
-                  'YubiKey is not required to import.',
+                  l.exportPassphraseOnlyNote,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               const SizedBox(height: 12),
               Text(
-                isJson
-                    ? 'Choose a destination for your exported JSON file.'
-                    : 'Choose a destination for your exported vault file.',
+                isJson ? l.exportChooseDestinationJson : l.exportChooseDestinationVault,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               if (!isJson) ...[
                 const SizedBox(height: 4),
                 Text(
-                  'Two files will be written: vault.gabbro and vault.gabbro.sha256',
+                  l.exportTwoFilesNote,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
@@ -195,7 +193,7 @@ class _ExportScreenState extends State<ExportScreen> {
                 OutlinedButton.icon(
                   onPressed: _pickDirectory,
                   icon: const Icon(Icons.folder),
-                  label: const Text('Choose folder'),
+                  label: Text(l.chooseFolder),
                 ),
                 if (_path != null) ...[
                   const SizedBox(height: 8),
@@ -237,7 +235,7 @@ class _ExportScreenState extends State<ExportScreen> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Export'),
+                    : Text(l.export),
               ),
             ],
           ),

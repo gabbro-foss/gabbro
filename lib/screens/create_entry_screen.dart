@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/review_changes_screen.dart';
 import 'package:gabbro/settings.dart';
@@ -415,7 +416,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('No changes to save.')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).noChangesToSave)));
       }
       return;
     }
@@ -865,12 +866,13 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(_screenTitle()),
+        title: Text(_screenTitle(l)),
         actions: [
           if (_isEditing)
-            TextButton(onPressed: _review, child: const Text('Review →')),
+            TextButton(onPressed: _review, child: Text(l.reviewArrow)),
         ],
       ),
       body: SafeArea(
@@ -882,7 +884,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                ..._buildFields(),
+                ..._buildFields(l),
                 const SizedBox(height: 16),
                 if (_error != null)
                   Padding(
@@ -903,7 +905,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                             width: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('Save'),
+                        : Text(l.save),
                   ),
               ],
             ),
@@ -913,35 +915,34 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     );
   }
 
-  String _screenTitle() {
-    final action = _isEditing ? 'Edit' : 'New';
-    final label = switch (widget.entryType) {
-      'Login' => 'Password',
-      'Note' => 'Note',
-      'Identity' => 'Identity',
-      'Card' => 'Card',
-      'File' => 'File',
-      'Custom' => 'Custom',
+  String _screenTitle(AppLocalizations l) {
+    final type = switch (widget.entryType) {
+      'Login' => l.entryTypePassword,
+      'Note' => l.entryTypeNote,
+      'Identity' => l.entryTypeIdentity,
+      'Card' => l.entryTypeCard,
+      'File' => l.entryTypeFile,
+      'Custom' => l.entryTypeCustom,
       _ => widget.entryType,
     };
-    return '$action $label';
+    return _isEditing ? l.editEntryTitle(type) : l.createEntryTitle(type);
   }
 
-  List<Widget> _buildFields() {
+  List<Widget> _buildFields(AppLocalizations l) {
     return switch (widget.entryType) {
-      'Login' => _loginFields(),
-      'Note' => _noteFields(),
-      'Identity' => _identityFields(),
-      'Card' => _cardFields(),
-      'File' => _fileFields(),
-      'Custom' => _customEntryFields(),
-      _ => [const Text('Entry type not yet supported.')],
+      'Login' => _loginFields(l),
+      'Note' => _noteFields(l),
+      'Identity' => _identityFields(l),
+      'Card' => _cardFields(l),
+      'File' => _fileFields(l),
+      'Custom' => _customEntryFields(l),
+      _ => [Text(l.entryTypeNotSupported)],
     };
   }
 
   // ── Login fields ─────────────────────────────────────────────────────────────
 
-  List<Widget> _loginFields() => [
+  List<Widget> _loginFields(AppLocalizations l) => [
     _folderPicker(),
     const SizedBox(height: 12),
     TextFormField(
@@ -1006,7 +1007,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       child: TextButton.icon(
         key: const Key('open_generator_button'),
         icon: const Icon(Icons.auto_fix_high, size: 18),
-        label: const Text('Generate'),
+        label: Text(l.generate),
         onPressed: () async {
           final settings = GabbroApp.of(context).settings;
           final duration = switch (settings.clipboardClearTimeout) {
@@ -1017,8 +1018,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
           };
           await Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => Scaffold(
-                appBar: AppBar(title: const Text('Password generator')),
+              builder: (ctx) => Scaffold(
+                appBar: AppBar(title: Text(AppLocalizations.of(ctx).generatorTitle)),
                 body: GeneratorWidget(
                   clipboardClearDuration: duration,
                   onUsePassword: (value) {
@@ -1056,7 +1057,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   // ── Note fields ──────────────────────────────────────────────────────────────
 
-  List<Widget> _noteFields() => [
+  List<Widget> _noteFields(AppLocalizations l) => [
     _folderPicker(),
     const SizedBox(height: 12),
     TextFormField(
@@ -1099,7 +1100,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   // ── Identity fields ──────────────────────────────────────────────────────────
 
-  List<Widget> _identityFields() => [
+  List<Widget> _identityFields(AppLocalizations l) => [
     _folderPicker(),
     const SizedBox(height: 12),
     TextFormField(
@@ -1178,7 +1179,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   // ── Card fields ──────────────────────────────────────────────────────────────
 
-  List<Widget> _cardFields() => [
+  List<Widget> _cardFields(AppLocalizations l) => [
     _folderPicker(),
     const SizedBox(height: 12),
     TextFormField(
@@ -1385,7 +1386,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   // ── File fields ──────────────────────────────────────────────────────────────
 
-  List<Widget> _fileFields() => [
+  List<Widget> _fileFields(AppLocalizations l) => [
     _folderPicker(),
     const SizedBox(height: 12),
     if (_pickedFilename != null)
@@ -1407,17 +1408,17 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         ),
       ),
     if (_pickedFileBytes == null)
-      const Padding(
-        padding: EdgeInsets.only(bottom: 12),
+      Padding(
+        padding: const EdgeInsets.only(bottom: 12),
         child: Text(
-          'No file selected',
-          style: TextStyle(fontStyle: FontStyle.italic),
+          l.noFileSelected,
+          style: const TextStyle(fontStyle: FontStyle.italic),
         ),
       ),
     OutlinedButton.icon(
       onPressed: _pickFile,
       icon: const Icon(Icons.folder_open_outlined),
-      label: const Text('Pick file'),
+      label: Text(l.pickFile),
     ),
     const SizedBox(height: 12),
     _optionalTextField(_fileNotesController, 'Notes', maxLines: 3),
@@ -1449,7 +1450,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   // ── Custom entry fields ──────────────────────────────────────────────────────
 
-  List<Widget> _customEntryFields() => [
+  List<Widget> _customEntryFields(AppLocalizations l) => [
     _folderPicker(),
     const SizedBox(height: 12),
     TextFormField(
@@ -1484,11 +1485,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     required void Function(int) onRemove,
     required void Function(int) onToggleHidden,
   }) {
+    final l = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (fields.isNotEmpty)
-          Text('Custom fields', style: Theme.of(context).textTheme.titleSmall),
+          Text(l.fieldCustomFields, style: Theme.of(context).textTheme.titleSmall),
         if (fields.isNotEmpty) const SizedBox(height: 8),
         ...List.generate(fields.length, (i) {
           final f = fields[i];
@@ -1541,7 +1543,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         TextButton.icon(
           onPressed: onAdd,
           icon: const Icon(Icons.add),
-          label: const Text('Add custom field'),
+          label: Text(l.addCustomField),
         ),
       ],
     );
@@ -1550,18 +1552,19 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   // ── Field helpers ────────────────────────────────────────────────────────────
 
   Widget _folderPicker() {
+    final l = AppLocalizations.of(context);
     // Build a deduplicated items list that always contains the current value.
     final folderSet = <String>{..._folders};
     if (_selectedFolder.isNotEmpty) folderSet.add(_selectedFolder);
     final folderItems = folderSet.toList()..sort();
     return DropdownButtonFormField<String>(
       initialValue: _selectedFolder,
-      decoration: const InputDecoration(
-        labelText: 'Folder',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldFolder,
+        border: const OutlineInputBorder(),
       ),
       items: [
-        const DropdownMenuItem(value: '', child: Text('None')),
+        DropdownMenuItem(value: '', child: Text(l.noFolder)),
         ...folderItems.map((f) => DropdownMenuItem(value: f, child: Text(f))),
       ],
       onChanged: (v) => setState(() => _selectedFolder = v ?? ''),

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -305,6 +306,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
   }
 
   Future<void> _unlock() async {
+    final l = AppLocalizations.of(context);
     setState(() {
       _isUnlocking = true;
       _errorMessage = null;
@@ -350,19 +352,20 @@ class _UnlockScreenState extends State<UnlockScreen> {
         );
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage = switch (e) {
           PlatformException(code: 'TRANSPORT_ERROR') =>
-            e.message ?? 'Transport error.',
+            e.message ?? l.transportError,
           PlatformException(code: 'NO_FIDO2_DEVICE') =>
-            e.message ?? 'No FIDO2 device found. Insert your YubiKey and try again.',
+            e.message ?? l.noFidoDeviceFound,
           _ => _isYubikeyMode
-              ? 'Could not unlock vault. Check your passphrase and YubiKey PIN.'
-              : 'Could not unlock vault. Check your passphrase.',
+              ? l.unlockErrorPassphraseAndPin
+              : l.unlockErrorPassphrase,
         };
       });
     } finally {
-      setState(() => _isUnlocking = false);
+      if (mounted) setState(() => _isUnlocking = false);
     }
   }
 
@@ -375,17 +378,18 @@ class _UnlockScreenState extends State<UnlockScreen> {
         StrengthTier.centuries => Colors.green.shade800,
       };
 
-  String _tierLabel(StrengthTier tier) => switch (tier) {
-        StrengthTier.terrible => 'Terrible',
-        StrengthTier.weak => 'Weak',
-        StrengthTier.fair => 'Fair',
-        StrengthTier.strong => 'Strong',
-        StrengthTier.veryStrong => 'Very strong',
-        StrengthTier.centuries => 'Excellent',
+  String _tierLabel(StrengthTier tier, AppLocalizations l) => switch (tier) {
+        StrengthTier.terrible => l.strengthTierTerrible,
+        StrengthTier.weak => l.strengthTierWeak,
+        StrengthTier.fair => l.strengthTierFair,
+        StrengthTier.strong => l.strengthTierStrong,
+        StrengthTier.veryStrong => l.strengthTierVeryStrong,
+        StrengthTier.centuries => l.strengthTierExcellent,
       };
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) => SingleChildScrollView(
@@ -413,8 +417,8 @@ class _UnlockScreenState extends State<UnlockScreen> {
                     const SizedBox(height: 8),
                     Text(
                       _isYubikeyMode
-                          ? 'Enter your passphrase and YubiKey PIN to unlock'
-                          : 'Enter your passphrase to unlock',
+                          ? l.unlockEnterPassphraseAndPin
+                          : l.unlockEnterPassphrase,
                       style: Theme.of(context).textTheme.bodyMedium,
                       textAlign: TextAlign.center,
                     ),
@@ -446,7 +450,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
                         () => _entropy = widget.onEstimateEntropy(v),
                       ),
                       decoration: InputDecoration(
-                        labelText: 'Passphrase',
+                        labelText: l.passphraseLabel,
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -475,7 +479,10 @@ class _UnlockScreenState extends State<UnlockScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '${_tierLabel(_entropy!.tier)} · ${_entropy!.bits.toStringAsFixed(1)} bits of entropy',
+                        l.unlockEntropyDisplay(
+                          _tierLabel(_entropy!.tier, l),
+                          _entropy!.bits.toStringAsFixed(1),
+                        ),
                         style: TextStyle(
                           fontSize: 12,
                           color: _tierColor(_entropy!.tier),
@@ -490,7 +497,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
                         enableInteractiveSelection:
                             !widget.blockPassphraseCopyPaste,
                         decoration: InputDecoration(
-                          labelText: 'YubiKey PIN',
+                          labelText: l.yubiKeyPinLabel,
                           border: const OutlineInputBorder(),
                           suffixIcon: IconButton(
                             icon: Icon(
@@ -514,7 +521,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
                       ],
                       const SizedBox(height: 8),
                       Text(
-                        'Insert your YubiKey and tap when it flashes',
+                        l.insertYubiKeyAndTap,
                         style: Theme.of(context).textTheme.bodySmall,
                         textAlign: TextAlign.center,
                       ),
@@ -538,7 +545,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
                               child:
                                   CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Unlock'),
+                          : Text(l.unlock),
                     ),
                     ],
                   ),

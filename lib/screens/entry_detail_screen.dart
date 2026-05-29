@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/password_history_screen.dart';
@@ -14,9 +15,9 @@ import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 
 /// Formats an ISO 8601 UTC timestamp string into a human-readable form.
-/// Returns 'Unknown' for empty or unparseable input.
-String formatTimestamp(String iso) {
-  if (iso.isEmpty) return 'Unknown';
+/// Returns [unknownLabel] for empty or unparseable input.
+String formatTimestamp(String iso, {String unknownLabel = 'Unknown'}) {
+  if (iso.isEmpty) return unknownLabel;
   try {
     final dt = DateTime.parse(iso).toLocal();
     const months = [
@@ -29,7 +30,7 @@ String formatTimestamp(String iso) {
     final minute = dt.minute.toString().padLeft(2, '0');
     return '$day $month ${dt.year}, $hour:$minute';
   } catch (_) {
-    return 'Unknown';
+    return unknownLabel;
   }
 }
 
@@ -118,23 +119,26 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   Future<void> _confirmDelete(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete entry?'),
-        content: const Text('This cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
+      builder: (ctx) {
+        final l = AppLocalizations.of(ctx);
+        return AlertDialog(
+          title: Text(l.deleteEntryTitle),
+          content: Text(l.cannotBeUndone),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(l.cancel),
             ),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(ctx).colorScheme.error,
+              ),
+              child: Text(l.delete),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed != true) return;
     await widget.onDeleteEntry(_entryId());
@@ -153,54 +157,57 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     );
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Export file'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Save decrypted file to:'),
-            const SizedBox(height: 12),
-            TextField(
-              controller: pathController,
-              autofocus: true,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                labelText: 'Export path',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.folder_open),
-                  tooltip: 'Browse',
-                  onPressed: () async {
-                    String? picked;
-                    if (Platform.isAndroid) {
-                      final dir = await FilePicker.getDirectoryPath();
-                      if (dir != null) picked = '$dir/${e.filename}';
-                    } else {
-                      picked = await FilePicker.saveFile(
-                        fileName: e.filename,
-                      );
-                    }
-                    if (picked != null) {
-                      pathController.text = picked;
-                    }
-                  },
+      builder: (ctx) {
+        final dl = AppLocalizations.of(ctx);
+        return AlertDialog(
+          title: Text(dl.exportFileTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(dl.saveDecryptedFileTo),
+              const SizedBox(height: 12),
+              TextField(
+                controller: pathController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: dl.exportPathLabel,
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.folder_open),
+                    tooltip: dl.tooltipBrowse,
+                    onPressed: () async {
+                      String? picked;
+                      if (Platform.isAndroid) {
+                        final dir = await FilePicker.getDirectoryPath();
+                        if (dir != null) picked = '$dir/${e.filename}';
+                      } else {
+                        picked = await FilePicker.saveFile(
+                          fileName: e.filename,
+                        );
+                      }
+                      if (picked != null) {
+                        pathController.text = picked;
+                      }
+                    },
+                  ),
                 ),
+                onSubmitted: (_) => Navigator.of(ctx).pop(true),
               ),
-              onSubmitted: (_) => Navigator.of(context).pop(true),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(dl.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(dl.exportLabel),
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Export'),
-          ),
-        ],
-      ),
+        );
+      },
     );
     if (confirmed != true) return;
     final path = pathController.text.trim();
@@ -212,13 +219,13 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Exported to $path')));
+        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).exportedToPath(path))));
       }
     } catch (err) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Export failed: $err'),
+            content: Text(AppLocalizations.of(context).exportFailed(err.toString())),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -228,20 +235,21 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(_title()),
+        title: Text(_title(l)),
         actions: [
           // File export button — only shown for File entries
           if (_entry case VaultEntryData_File(:final field0))
             IconButton(
               icon: const Icon(Icons.download_outlined),
-              tooltip: 'Export file',
+              tooltip: l.tooltipExportFile,
               onPressed: () => _exportFile(field0),
             ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            tooltip: 'Edit entry',
+            tooltip: l.tooltipEditEntry,
             onPressed: () async {
               final entryType = switch (_entry) {
                 VaultEntryData_Login() => 'Login',
@@ -265,7 +273,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
-            tooltip: 'Delete entry',
+            tooltip: l.tooltipDeleteEntry,
             onPressed: () => _confirmDelete(context),
           ),
         ],
@@ -273,19 +281,19 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          child: _buildBody(),
+          child: _buildBody(l),
         ),
       ),
     );
   }
 
-  String _title() => switch (_entry) {
+  String _title(AppLocalizations l) => switch (_entry) {
     VaultEntryData_Login(:final field0) =>
       field0.title.isNotEmpty
           ? field0.title
           : field0.url.isNotEmpty
           ? field0.url
-          : '(no title)',
+          : l.noTitleFallback,
     VaultEntryData_Note(:final field0) => field0.title,
     VaultEntryData_Identity(:final field0) =>
       '${field0.firstName} ${field0.lastName}',
@@ -295,26 +303,26 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     VaultEntryData_Custom(:final field0) => field0.title,
   };
 
-  Widget _buildBody() => switch (_entry) {
-    VaultEntryData_Login(:final field0) => _loginView(field0),
-    VaultEntryData_Note(:final field0) => _noteView(field0),
-    VaultEntryData_Identity(:final field0) => _identityView(field0),
-    VaultEntryData_Card(:final field0) => _cardView(field0),
-    VaultEntryData_File(:final field0) => _fileView(field0),
-    VaultEntryData_Custom(:final field0) => _customView(field0),
+  Widget _buildBody(AppLocalizations l) => switch (_entry) {
+    VaultEntryData_Login(:final field0) => _loginView(field0, l),
+    VaultEntryData_Note(:final field0) => _noteView(field0, l),
+    VaultEntryData_Identity(:final field0) => _identityView(field0, l),
+    VaultEntryData_Card(:final field0) => _cardView(field0, l),
+    VaultEntryData_File(:final field0) => _fileView(field0, l),
+    VaultEntryData_Custom(:final field0) => _customView(field0, l),
   };
 
   // ── Entry type views ─────────────────────────────────────────────────────────
 
-  Widget _loginView(LoginEntryData e) {
+  Widget _loginView(LoginEntryData e, AppLocalizations l) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _field('Title', e.title),
-        _urlField(e.url),
-        _field('Username', e.username),
+        _field(l.fieldTitle, e.title, l),
+        _urlField(e.url, l),
+        _field(l.fieldUsername, e.username, l),
         _toggleField(
-          label: 'Password',
+          label: l.fieldPassword,
           value: e.password,
           obscured: _passwordObscured,
           onToggle: () =>
@@ -323,12 +331,13 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             context: context,
             builder: (_) => PasswordBreakdownSheet(password: e.password),
           ),
+          l: l,
         ),
         ListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text(
-            'Password history',
-            style: TextStyle(fontSize: 14),
+          title: Text(
+            l.passwordHistoryTitle,
+            style: const TextStyle(fontSize: 14),
           ),
           trailing: const Icon(Icons.chevron_right, size: 18),
           onTap: () => Navigator.of(context).push(
@@ -377,10 +386,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             ),
           ),
         ),
-        if (e.notes != null) _field('Notes', e.notes!),
+        if (e.notes != null) _field(l.reviewFieldNotes, e.notes!, l),
         if (e.customFields.isNotEmpty) ...[
           const SizedBox(height: 8),
-          _sectionHeader('Custom fields'),
+          _sectionHeader(l.fieldCustomFields),
           ...e.customFields.map(
             (f) => f.hidden
                 ? _toggleField(
@@ -394,24 +403,25 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                         _revealedFields.add(f.label);
                       }
                     }),
+                    l: l,
                   )
-                : _field(f.label, f.value),
+                : _field(f.label, f.value, l),
           ),
         ],
-        _timestampsRow(e.createdAt, e.updatedAt, e.folder),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
       ],
     );
   }
 
-  Widget _noteView(NoteEntryData e) {
+  Widget _noteView(NoteEntryData e, AppLocalizations l) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _field('Title', e.title),
-        _field('Content', e.content),
+        _field(l.fieldTitle, e.title, l),
+        _field(l.reviewFieldContent, e.content, l),
         if (e.customFields.isNotEmpty) ...[
           const SizedBox(height: 8),
-          _sectionHeader('Custom fields'),
+          _sectionHeader(l.fieldCustomFields),
           ...e.customFields.map(
             (f) => f.hidden
                 ? _toggleField(
@@ -425,27 +435,28 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                         _revealedFields.add(f.label);
                       }
                     }),
+                    l: l,
                   )
-                : _field(f.label, f.value),
+                : _field(f.label, f.value, l),
           ),
         ],
-        _timestampsRow(e.createdAt, e.updatedAt, e.folder),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
       ],
     );
   }
 
-  Widget _identityView(IdentityEntryData e) {
+  Widget _identityView(IdentityEntryData e, AppLocalizations l) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _field('First name', e.firstName),
-        _field('Last name', e.lastName),
-        if (e.email.isNotEmpty) _field('Email', e.email),
-        if (e.phone != null) _field('Phone', e.phone!),
-        if (e.address != null) _field('Address', e.address!),
+        _field(l.fieldFirstName, e.firstName, l),
+        _field(l.fieldLastName, e.lastName, l),
+        if (e.email.isNotEmpty) _field(l.reviewFieldEmail, e.email, l),
+        if (e.phone != null) _field(l.reviewFieldPhone, e.phone!, l),
+        if (e.address != null) _field(l.reviewFieldAddress, e.address!, l),
         if (e.customFields.isNotEmpty) ...[
           const SizedBox(height: 8),
-          _sectionHeader('Custom fields'),
+          _sectionHeader(l.fieldCustomFields),
           ...e.customFields.map(
             (f) => f.hidden
                 ? _toggleField(
@@ -459,41 +470,44 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                         _revealedFields.add(f.label);
                       }
                     }),
+                    l: l,
                   )
-                : _field(f.label, f.value),
+                : _field(f.label, f.value, l),
           ),
         ],
-        _timestampsRow(e.createdAt, e.updatedAt, e.folder),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
       ],
     );
   }
 
-  Widget _cardView(CardEntryData e) {
+  Widget _cardView(CardEntryData e, AppLocalizations l) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (e.cardName != null) _field('Card label', e.cardName!),
-        _field('Status', e.status),
+        if (e.cardName != null) _field(l.reviewFieldCardLabel, e.cardName!, l),
+        _field(l.reviewFieldStatus, e.status, l),
         if (e.paymentNetwork != null)
-          _field('Payment network', e.paymentNetwork!),
-        _field('Cardholder', e.cardholderName),
+          _field(l.reviewFieldNetwork, e.paymentNetwork!, l),
+        _field(l.reviewFieldCardholder, e.cardholderName, l),
         _toggleField(
-          label: 'Number',
+          label: l.reviewFieldCardNumber,
           value: e.cardNumber,
           obscured: _cardNumberObscured,
           onToggle: () =>
               setState(() => _cardNumberObscured = !_cardNumberObscured),
+          l: l,
         ),
-        _field('Expiry', e.expiry),
+        _field(l.reviewFieldExpiry, e.expiry, l),
         _toggleField(
-          label: 'CVV',
+          label: l.reviewFieldCVV,
           value: e.cvv,
           obscured: _cvvObscured,
           onToggle: () => setState(() => _cvvObscured = !_cvvObscured),
+          l: l,
         ),
         if (e.pin != null)
           _toggleField(
-            label: 'PIN',
+            label: l.pinLabel,
             value: e.pin!,
             obscured: !_revealedFields.contains('pin'),
             onToggle: () => setState(() {
@@ -503,14 +517,15 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 _revealedFields.add('pin');
               }
             }),
+            l: l,
           ),
-        if (e.creditLimit != null) _field('Credit limit', e.creditLimit!),
+        if (e.creditLimit != null) _field(l.reviewFieldCreditLimit, e.creditLimit!, l),
         if (e.cardAccountNumber != null)
-          _field('Account number', e.cardAccountNumber!),
-        if (e.bankName != null) _field('Bank', e.bankName!),
+          _field(l.reviewFieldAccountNumber, e.cardAccountNumber!, l),
+        if (e.bankName != null) _field(l.reviewFieldBank, e.bankName!, l),
         if (e.transactionPassword != null)
           _toggleField(
-            label: 'Transaction password',
+            label: l.reviewFieldTransactionPassword,
             value: e.transactionPassword!,
             obscured: !_revealedFields.contains('transaction_password'),
             onToggle: () => setState(() {
@@ -520,11 +535,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 _revealedFields.add('transaction_password');
               }
             }),
+            l: l,
           ),
-        if (e.notes != null) _field('Notes', e.notes!),
+        if (e.notes != null) _field(l.reviewFieldNotes, e.notes!, l),
         if (e.customFields.isNotEmpty) ...[
           const SizedBox(height: 8),
-          _sectionHeader('Custom fields'),
+          _sectionHeader(l.fieldCustomFields),
           ...e.customFields.map(
             (f) => f.hidden
                 ? _toggleField(
@@ -538,25 +554,26 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                         _revealedFields.add(f.label);
                       }
                     }),
+                    l: l,
                   )
-                : _field(f.label, f.value),
+                : _field(f.label, f.value, l),
           ),
         ],
-        _timestampsRow(e.createdAt, e.updatedAt, e.folder),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
       ],
     );
   }
 
-  Widget _fileView(FileEntryData e) {
+  Widget _fileView(FileEntryData e, AppLocalizations l) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _field('Filename', e.filename),
-        _field('Size', _formatBytes(e.data.length)),
-        if (e.notes != null) _field('Notes', e.notes!),
+        _field(l.reviewFieldFilename, e.filename, l),
+        _field(l.reviewFieldSize, _formatBytes(e.data.length), l),
+        if (e.notes != null) _field(l.reviewFieldNotes, e.notes!, l),
         if (e.customFields.isNotEmpty) ...[
           const SizedBox(height: 8),
-          _sectionHeader('Custom fields'),
+          _sectionHeader(l.fieldCustomFields),
           ...e.customFields.map(
             (f) => f.hidden
                 ? _toggleField(
@@ -570,29 +587,30 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                         _revealedFields.add(f.label);
                       }
                     }),
+                    l: l,
                   )
-                : _field(f.label, f.value),
+                : _field(f.label, f.value, l),
           ),
         ],
         const SizedBox(height: 16),
         OutlinedButton.icon(
           onPressed: () => _exportFile(e),
           icon: const Icon(Icons.download_outlined),
-          label: const Text('Export file'),
+          label: Text(l.exportFileTitle),
         ),
-        _timestampsRow(e.createdAt, e.updatedAt, e.folder),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
       ],
     );
   }
 
-  Widget _customView(CustomEntryData e) {
+  Widget _customView(CustomEntryData e, AppLocalizations l) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _field('Title', e.title),
+        _field(l.fieldTitle, e.title, l),
         if (e.fields.isNotEmpty) ...[
           const SizedBox(height: 8),
-          _sectionHeader('Fields'),
+          _sectionHeader(l.customEntryFieldsHeader),
           ...e.fields.map(
             (f) => f.hidden
                 ? _toggleField(
@@ -606,11 +624,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                         _revealedFields.add(f.label);
                       }
                     }),
+                    l: l,
                   )
-                : _field(f.label, f.value),
+                : _field(f.label, f.value, l),
           ),
         ],
-        _timestampsRow(e.createdAt, e.updatedAt, e.folder),
+        _timestampsRow(e.createdAt, e.updatedAt, e.folder, l),
       ],
     );
   }
@@ -622,35 +641,38 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     if (uri == null || url.isEmpty) return;
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Open in browser?'),
-        content: Text(url),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Open in browser'),
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        final l = AppLocalizations.of(ctx);
+        return AlertDialog(
+          title: Text(l.openInBrowserTitle),
+          content: Text(url),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(l.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(l.openInBrowser),
+            ),
+          ],
+        );
+      },
     );
     if (confirmed != true) return;
     await widget.onLaunchUrl(url);
   }
 
-  Widget _urlField(String url) {
+  Widget _urlField(String url, AppLocalizations l) {
     if (url.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'URL',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+          Text(
+            l.reviewFieldUrl,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 4),
           Row(
@@ -660,12 +682,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.open_in_browser_outlined, size: 18),
-                tooltip: 'Open in browser',
+                tooltip: l.openInBrowser,
                 onPressed: () => _launchUrl(context, url),
               ),
               IconButton(
                 icon: const Icon(Icons.copy_outlined, size: 18),
-                tooltip: 'Copy',
+                tooltip: l.tooltipCopy,
                 onPressed: () => _copyToClipboard(url),
               ),
             ],
@@ -695,11 +717,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     }
 
     if (mounted) {
+      final l = AppLocalizations.of(context);
       final label = switch (timeout) {
-        ClipboardClearTimeout.never => 'Copied — clipboard never clears automatically',
-        ClipboardClearTimeout.thirtySeconds => 'Copied — clipboard clears in 30s',
-        ClipboardClearTimeout.sixtySeconds => 'Copied — clipboard clears in 60s',
-        ClipboardClearTimeout.twoMinutes => 'Copied — clipboard clears in 2 min',
+        ClipboardClearTimeout.never => l.copiedNeverClears,
+        ClipboardClearTimeout.thirtySeconds => l.copiedClears30s,
+        ClipboardClearTimeout.sixtySeconds => l.copiedClears60s,
+        ClipboardClearTimeout.twoMinutes => l.copiedClears2min,
       };
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -720,7 +743,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     );
   }
 
-  Widget _field(String label, String value, {bool obscure = false}) {
+  Widget _field(String label, String value, AppLocalizations l, {bool obscure = false}) {
     if (value.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -742,7 +765,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.copy_outlined, size: 18),
-                tooltip: 'Copy',
+                tooltip: l.tooltipCopy,
                 onPressed: () => _copyToClipboard(value),
               ),
             ],
@@ -758,6 +781,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     required String value,
     required bool obscured,
     required VoidCallback onToggle,
+    required AppLocalizations l,
     VoidCallback? onLongPress,
   }) {
     if (value.isEmpty) return const SizedBox.shrink();
@@ -784,7 +808,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.copy_outlined, size: 18),
-                tooltip: 'Copy',
+                tooltip: l.tooltipCopy,
                 onPressed: () => _copyToClipboard(value),
               ),
               IconButton(
@@ -792,7 +816,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                   obscured ? Icons.visibility_off : Icons.visibility,
                   size: 18,
                 ),
-                tooltip: obscured ? 'Show' : 'Hide',
+                tooltip: obscured ? l.tooltipShow : l.tooltipHide,
                 onPressed: onToggle,
               ),
             ],
@@ -803,8 +827,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     );
   }
 
-  Widget _timestampsRow(String createdAt, String updatedAt, String folder) {
-    final folderLabel = folder.isEmpty ? 'None' : folder;
+  Widget _timestampsRow(String createdAt, String updatedAt, String folder, AppLocalizations l) {
+    final folderLabel = folder.isEmpty ? l.noFolder : folder;
     return Padding(
       padding: const EdgeInsets.only(top: 16),
       child: Column(
@@ -815,9 +839,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Folder',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                Text(
+                  l.fieldFolder,
+                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                 ),
                 Text(folderLabel, style: const TextStyle(fontSize: 13)),
               ],
@@ -829,12 +853,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Created',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                    Text(
+                      l.timestampCreated,
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                     ),
                     Text(
-                      formatTimestamp(createdAt),
+                      formatTimestamp(createdAt, unknownLabel: l.timestampUnknown),
                       style: const TextStyle(fontSize: 13),
                     ),
                   ],
@@ -844,12 +868,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Updated',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                    Text(
+                      l.timestampUpdated,
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                     ),
                     Text(
-                      formatTimestamp(updatedAt),
+                      formatTimestamp(updatedAt, unknownLabel: l.timestampUnknown),
                       style: const TextStyle(fontSize: 13),
                     ),
                   ],

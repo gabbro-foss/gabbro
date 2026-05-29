@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
@@ -158,22 +159,23 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
         .then((_) => setState(() => _railIndex = 0));
   }
 
-  Widget _buildEmptyState() {
-    return const Center(
+  Widget _buildEmptyState(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.lock_outline, size: 48),
-          SizedBox(height: 12),
-          Text('Select an entry'),
+          const Icon(Icons.lock_outline, size: 48),
+          const SizedBox(height: 12),
+          Text(l.selectEntry),
         ],
       ),
     );
   }
 
-  Widget _buildDetailPane() {
+  Widget _buildDetailPane(BuildContext context) {
     if (_selectedEntryId == null || widget.filteredEntries.isEmpty) {
-      return _buildEmptyState();
+      return _buildEmptyState(context);
     }
     // ValueKey forces Flutter to rebuild EntryDetailScreen whenever the
     // selected id changes — this is how we refresh after an edit without
@@ -199,7 +201,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
         widget.filterChipRow,
         Expanded(
           child: widget.groupedEntries.isEmpty
-              ? const Center(child: Text('No entries match your search.'))
+              ? Center(child: Text(AppLocalizations.of(context).noEntriesMatch))
               : Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -315,6 +317,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Row(
       children: [
         // ── Navigation rail ────────────────────────────────────────────────
@@ -322,26 +325,26 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
           selectedIndex: _railIndex,
           onDestinationSelected: _onRailDestinationSelected,
           labelType: NavigationRailLabelType.all,
-          destinations: const [
+          destinations: [
             NavigationRailDestination(
-              icon: Icon(Icons.lock_outline),
-              selectedIcon: Icon(Icons.lock),
-              label: Text('Vault'),
+              icon: const Icon(Icons.lock_outline),
+              selectedIcon: const Icon(Icons.lock),
+              label: Text(l.navVault),
             ),
             NavigationRailDestination(
-              icon: Icon(Icons.palette_outlined),
-              selectedIcon: Icon(Icons.palette),
-              label: Text('Appearance'),
+              icon: const Icon(Icons.palette_outlined),
+              selectedIcon: const Icon(Icons.palette),
+              label: Text(l.appearanceTitle),
             ),
             NavigationRailDestination(
-              icon: Icon(Icons.security_outlined),
-              selectedIcon: Icon(Icons.security),
-              label: Text('Security'),
+              icon: const Icon(Icons.security_outlined),
+              selectedIcon: const Icon(Icons.security),
+              label: Text(l.securityTitle),
             ),
             NavigationRailDestination(
-              icon: Icon(Icons.info_outline),
-              selectedIcon: Icon(Icons.info),
-              label: Text('About'),
+              icon: const Icon(Icons.info_outline),
+              selectedIcon: const Icon(Icons.info),
+              label: Text(l.navAbout),
             ),
           ],
         ),
@@ -353,7 +356,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
         ),
         const VerticalDivider(width: 1),
         // ── Detail pane (flex) ─────────────────────────────────────────────
-        Expanded(child: _buildDetailPane()),
+        Expanded(child: _buildDetailPane(context)),
       ],
     );
   }

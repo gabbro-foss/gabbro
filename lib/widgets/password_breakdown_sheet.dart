@@ -1,6 +1,7 @@
 import 'dart:ui' show PointerDeviceKind;
 
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 
 enum _CharType { uppercase, lowercase, digit, symbol }
 
@@ -18,11 +19,11 @@ const _kSymbol = {
   _CharType.symbol: '■',
 };
 
-const _kLabel = {
-  _CharType.uppercase: 'Uppercase',
-  _CharType.lowercase: 'Lowercase',
-  _CharType.digit: 'Digit',
-  _CharType.symbol: 'Symbol',
+String _labelFor(_CharType t, AppLocalizations l) => switch (t) {
+  _CharType.uppercase => l.charTypeUppercase,
+  _CharType.lowercase => l.charTypeLowercase,
+  _CharType.digit     => l.charTypeDigit,
+  _CharType.symbol    => l.charTypeSymbol,
 };
 
 const _kExample = {
@@ -121,6 +122,7 @@ class _PasswordBreakdownSheetState extends State<PasswordBreakdownSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final cs = Theme.of(context).colorScheme;
     final brightness = Theme.of(context).brightness;
     final muted = cs.onSurfaceVariant;
@@ -144,7 +146,7 @@ class _PasswordBreakdownSheetState extends State<PasswordBreakdownSheet> {
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: Text(
-            'Password breakdown',
+            l.passwordBreakdownTitle,
             style: TextStyle(fontSize: 13, color: muted),
           ),
         ),
@@ -282,6 +284,7 @@ class _LegendItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final color = _colorFor(type, brightness);
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -291,7 +294,7 @@ class _LegendItem extends StatelessWidget {
         Text(_kExample[type]!,
             style: _kFiraCode.copyWith(fontSize: 12, color: color)),
         const SizedBox(width: 4),
-        Text(_kLabel[type]!, style: const TextStyle(fontSize: 11)),
+        Text(_labelFor(type, l), style: const TextStyle(fontSize: 11)),
       ],
     );
   }

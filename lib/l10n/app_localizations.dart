@@ -290,6 +290,12 @@ abstract class AppLocalizations {
   /// **'Pick file'**
   String get pickFile;
 
+  /// No description provided for @noFileSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No file selected'**
+  String get noFileSelected;
+
   /// No description provided for @chooseFolder.
   ///
   /// In en, this message translates to:
@@ -812,6 +818,18 @@ abstract class AppLocalizations {
   /// **'Lock vault'**
   String get tooltipLockVault;
 
+  /// No description provided for @tooltipSelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get tooltipSelectAll;
+
+  /// No description provided for @tooltipDeselectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect all'**
+  String get tooltipDeselectAll;
+
   /// No description provided for @tooltipMenu.
   ///
   /// In en, this message translates to:
@@ -961,6 +979,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select an entry'**
   String get selectEntry;
+
+  /// No description provided for @newEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New entry'**
+  String get newEntryTitle;
+
+  /// No description provided for @createEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New {type}'**
+  String createEntryTitle(String type);
+
+  /// No description provided for @editEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {type}'**
+  String editEntryTitle(String type);
+
+  /// No description provided for @noUrlFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'(no URL)'**
+  String get noUrlFallback;
+
+  /// No description provided for @noNameFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'(no name)'**
+  String get noNameFallback;
+
+  /// No description provided for @untitledFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'(untitled)'**
+  String get untitledFallback;
+
+  /// No description provided for @gabbroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gabbro'**
+  String get gabbroTitle;
+
+  /// No description provided for @gabbroVaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gabbro - {alias}'**
+  String gabbroVaultTitle(String alias);
+
+  /// No description provided for @selectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String selectedCount(int count);
+
+  /// No description provided for @searchAllFieldsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search all fields…'**
+  String get searchAllFieldsHint;
+
+  /// No description provided for @searchEntriesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search entries…'**
+  String get searchEntriesHint;
+
+  /// No description provided for @searchAllFieldsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching all fields'**
+  String get searchAllFieldsTooltip;
+
+  /// No description provided for @searchByTitleTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching by title'**
+  String get searchByTitleTooltip;
+
+  /// No description provided for @entryTypeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get entryTypeAll;
+
+  /// No description provided for @entryTypePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get entryTypePassword;
+
+  /// No description provided for @entryTypeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get entryTypeNote;
+
+  /// No description provided for @entryTypeCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Card'**
+  String get entryTypeCard;
+
+  /// No description provided for @entryTypeIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity'**
+  String get entryTypeIdentity;
+
+  /// No description provided for @entryTypeFile.
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get entryTypeFile;
+
+  /// No description provided for @entryTypeCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get entryTypeCustom;
 
   /// No description provided for @errorPrefix.
   ///
@@ -1538,11 +1676,23 @@ abstract class AppLocalizations {
   /// **'Change passphrase'**
   String get changePassphraseButton;
 
+  /// No description provided for @continueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueLabel;
+
   /// No description provided for @protectWithYubiKey.
   ///
   /// In en, this message translates to:
   /// **'Protect with YubiKey'**
   String get protectWithYubiKey;
+
+  /// No description provided for @yubiKeySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hardware security key (recommended)'**
+  String get yubiKeySubtitle;
 
   /// No description provided for @accessibilityButton.
   ///
@@ -1783,6 +1933,726 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'(empty)'**
   String get reviewEmpty;
+
+  /// No description provided for @reviewFieldUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'URL'**
+  String get reviewFieldUrl;
+
+  /// No description provided for @reviewFieldNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get reviewFieldNotes;
+
+  /// No description provided for @reviewFieldContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get reviewFieldContent;
+
+  /// No description provided for @reviewFieldEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get reviewFieldEmail;
+
+  /// No description provided for @reviewFieldPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get reviewFieldPhone;
+
+  /// No description provided for @reviewFieldAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get reviewFieldAddress;
+
+  /// No description provided for @reviewFieldCardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Card label'**
+  String get reviewFieldCardLabel;
+
+  /// No description provided for @reviewFieldStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get reviewFieldStatus;
+
+  /// No description provided for @reviewFieldCardholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardholder'**
+  String get reviewFieldCardholder;
+
+  /// No description provided for @reviewFieldExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry'**
+  String get reviewFieldExpiry;
+
+  /// No description provided for @reviewFieldCreditLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit limit'**
+  String get reviewFieldCreditLimit;
+
+  /// No description provided for @reviewFieldAccountNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Account number'**
+  String get reviewFieldAccountNumber;
+
+  /// No description provided for @reviewFieldNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get reviewFieldNetwork;
+
+  /// No description provided for @reviewFieldBank.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank'**
+  String get reviewFieldBank;
+
+  /// No description provided for @reviewFieldFilename.
+  ///
+  /// In en, this message translates to:
+  /// **'Filename'**
+  String get reviewFieldFilename;
+
+  /// No description provided for @reviewFieldSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get reviewFieldSize;
+
+  /// No description provided for @reviewFieldCardNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Number'**
+  String get reviewFieldCardNumber;
+
+  /// No description provided for @reviewFieldCVV.
+  ///
+  /// In en, this message translates to:
+  /// **'CVV'**
+  String get reviewFieldCVV;
+
+  /// No description provided for @reviewFieldTransactionPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction password'**
+  String get reviewFieldTransactionPassword;
+
+  /// No description provided for @timestampCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get timestampCreated;
+
+  /// No description provided for @timestampUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated'**
+  String get timestampUpdated;
+
+  /// No description provided for @timestampUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get timestampUnknown;
+
+  /// No description provided for @noTitleFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'(no title)'**
+  String get noTitleFallback;
+
+  /// No description provided for @tooltipExportFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Export file'**
+  String get tooltipExportFile;
+
+  /// No description provided for @tooltipEditEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit entry'**
+  String get tooltipEditEntry;
+
+  /// No description provided for @tooltipDeleteEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete entry'**
+  String get tooltipDeleteEntry;
+
+  /// No description provided for @exportLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get exportLabel;
+
+  /// No description provided for @customEntryFieldsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Fields'**
+  String get customEntryFieldsHeader;
+
+  /// No description provided for @copiedNeverClears.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied — clipboard never clears automatically'**
+  String get copiedNeverClears;
+
+  /// No description provided for @copiedClears30s.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied — clipboard clears in 30s'**
+  String get copiedClears30s;
+
+  /// No description provided for @copiedClears60s.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied — clipboard clears in 60s'**
+  String get copiedClears60s;
+
+  /// No description provided for @copiedClears2min.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied — clipboard clears in 2 min'**
+  String get copiedClears2min;
+
+  /// No description provided for @passwordBreakdownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Password breakdown'**
+  String get passwordBreakdownTitle;
+
+  /// No description provided for @charTypeUppercase.
+  ///
+  /// In en, this message translates to:
+  /// **'Uppercase'**
+  String get charTypeUppercase;
+
+  /// No description provided for @charTypeLowercase.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowercase'**
+  String get charTypeLowercase;
+
+  /// No description provided for @charTypeDigit.
+  ///
+  /// In en, this message translates to:
+  /// **'Digit'**
+  String get charTypeDigit;
+
+  /// No description provided for @charTypeSymbol.
+  ///
+  /// In en, this message translates to:
+  /// **'Symbol'**
+  String get charTypeSymbol;
+
+  /// No description provided for @exportChooseFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an export format.'**
+  String get exportChooseFormat;
+
+  /// No description provided for @exportUnencryptedWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Completely unencrypted — all secrets will be written in plain text. Store this file securely and delete it after use.'**
+  String get exportUnencryptedWarning;
+
+  /// No description provided for @exportPassphraseOnlyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected by your passphrase only. YubiKey is not required to import.'**
+  String get exportPassphraseOnlyNote;
+
+  /// No description provided for @exportChooseDestinationJson.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a destination for your exported JSON file.'**
+  String get exportChooseDestinationJson;
+
+  /// No description provided for @exportChooseDestinationVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a destination for your exported vault file.'**
+  String get exportChooseDestinationVault;
+
+  /// No description provided for @exportTwoFilesNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Two files will be written: vault.gabbro and vault.gabbro.sha256'**
+  String get exportTwoFilesNote;
+
+  /// No description provided for @exportSelectDestination.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a destination.'**
+  String get exportSelectDestination;
+
+  /// No description provided for @aboutVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String aboutVersion(String version);
+
+  /// No description provided for @aboutTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'A post-quantum password manager'**
+  String get aboutTagline;
+
+  /// No description provided for @aboutSourceCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Source code'**
+  String get aboutSourceCode;
+
+  /// No description provided for @aboutReportIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Report an issue'**
+  String get aboutReportIssue;
+
+  /// No description provided for @aboutSupportGabbro.
+  ///
+  /// In en, this message translates to:
+  /// **'Support Gabbro'**
+  String get aboutSupportGabbro;
+
+  /// No description provided for @aboutLicenceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Gabbro is free and open source software, licensed under the GNU General Public License v3.0 only (GPL-3.0-only).\n\nYou are free to use, study, and redistribute this software under the terms of that licence.'**
+  String get aboutLicenceBody;
+
+  /// No description provided for @aboutOwnerRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Project owner, architect, and lead developer:'**
+  String get aboutOwnerRole;
+
+  /// No description provided for @aboutAiPartner.
+  ///
+  /// In en, this message translates to:
+  /// **'AI development partner:'**
+  String get aboutAiPartner;
+
+  /// No description provided for @aboutNoTelemetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Gabbro makes no outbound network connections. No telemetry, no analytics, no accounts.'**
+  String get aboutNoTelemetry;
+
+  /// No description provided for @strengthTierTerrible.
+  ///
+  /// In en, this message translates to:
+  /// **'Terrible'**
+  String get strengthTierTerrible;
+
+  /// No description provided for @strengthTierWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak'**
+  String get strengthTierWeak;
+
+  /// No description provided for @strengthTierFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get strengthTierFair;
+
+  /// No description provided for @strengthTierStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get strengthTierStrong;
+
+  /// No description provided for @strengthTierVeryStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Very strong'**
+  String get strengthTierVeryStrong;
+
+  /// No description provided for @strengthTierExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get strengthTierExcellent;
+
+  /// No description provided for @yubiKeyProtectedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'YubiKey-protected vault — your YubiKey binding will be preserved.'**
+  String get yubiKeyProtectedNote;
+
+  /// No description provided for @yubiKeyPinRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'YubiKey PIN is required'**
+  String get yubiKeyPinRequired;
+
+  /// No description provided for @tapYubiKeyNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap your YubiKey now…'**
+  String get tapYubiKeyNow;
+
+  /// No description provided for @touchYubiKeyToAuthorize.
+  ///
+  /// In en, this message translates to:
+  /// **'Touch your YubiKey to authorize this change.'**
+  String get touchYubiKeyToAuthorize;
+
+  /// No description provided for @currentPassphraseRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Current passphrase is required'**
+  String get currentPassphraseRequired;
+
+  /// No description provided for @newPassphraseRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'New passphrase is required'**
+  String get newPassphraseRequired;
+
+  /// No description provided for @passphraseTooWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Passphrase is too weak'**
+  String get passphraseTooWeak;
+
+  /// No description provided for @confirmPassphraseRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your new passphrase'**
+  String get confirmPassphraseRequired;
+
+  /// No description provided for @passphrasesDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passphrases do not match'**
+  String get passphrasesDoNotMatch;
+
+  /// No description provided for @passphrasesMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'✓ Passphrases match'**
+  String get passphrasesMatch;
+
+  /// No description provided for @passphrasesNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'✗ Passphrases do not match'**
+  String get passphrasesNoMatch;
+
+  /// No description provided for @entropyDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'{tier} · {bits} bits'**
+  String entropyDisplay(String tier, String bits);
+
+  /// No description provided for @transportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport error.'**
+  String get transportError;
+
+  /// No description provided for @authorizationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Authorization failed — check your PIN and try again.'**
+  String get authorizationFailed;
+
+  /// No description provided for @unlockEnterPassphraseAndPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your passphrase and YubiKey PIN to unlock'**
+  String get unlockEnterPassphraseAndPin;
+
+  /// No description provided for @unlockEnterPassphrase.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your passphrase to unlock'**
+  String get unlockEnterPassphrase;
+
+  /// No description provided for @unlockEntropyDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'{tier} · {bits} bits of entropy'**
+  String unlockEntropyDisplay(String tier, String bits);
+
+  /// No description provided for @insertYubiKeyAndTap.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert your YubiKey and tap when it flashes'**
+  String get insertYubiKeyAndTap;
+
+  /// No description provided for @unlockErrorPassphrase.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not unlock vault. Check your passphrase.'**
+  String get unlockErrorPassphrase;
+
+  /// No description provided for @unlockErrorPassphraseAndPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not unlock vault. Check your passphrase and YubiKey PIN.'**
+  String get unlockErrorPassphraseAndPin;
+
+  /// No description provided for @importSelectFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a file.'**
+  String get importSelectFile;
+
+  /// No description provided for @importFileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'File not found.'**
+  String get importFileNotFound;
+
+  /// No description provided for @importEnterPassphrase.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the passphrase for this vault.'**
+  String get importEnterPassphrase;
+
+  /// No description provided for @importDuplicateWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Entries whose UUID already exists in your vault will be skipped automatically. You will be shown a summary.'**
+  String get importDuplicateWarning;
+
+  /// No description provided for @importGabbroSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync entries from another Gabbro vault (.gabbro file)'**
+  String get importGabbroSubtitle;
+
+  /// No description provided for @importEnpassSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'JSON export from Enpass (Tools → Export)'**
+  String get importEnpassSubtitle;
+
+  /// No description provided for @importBitwardenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unencrypted JSON export from Bitwarden (Tools → Export Vault)'**
+  String get importBitwardenSubtitle;
+
+  /// No description provided for @importCsvSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV export from any password manager'**
+  String get importCsvSubtitle;
+
+  /// No description provided for @vaultNameAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'A vault named \"{alias}\" already exists.'**
+  String vaultNameAlreadyExists(String alias);
+
+  /// No description provided for @deleteVaultContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete \"{alias}\" and all its data.\n\nFile: {path}\n\nThis cannot be undone.'**
+  String deleteVaultContent(String alias, String path);
+
+  /// No description provided for @deleteVaultYubikeyContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete \"{alias}\" and remove its YubiKey binding.\n\nFile: {path}\n\nThis cannot be undone.'**
+  String deleteVaultYubikeyContent(String alias, String path);
+
+  /// No description provided for @yubiKeyAuthorizeDeletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your PIN and touch your YubiKey to authorize this deletion.'**
+  String get yubiKeyAuthorizeDeletion;
+
+  /// No description provided for @deleteVaultTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete vault'**
+  String get deleteVaultTooltip;
+
+  /// No description provided for @yubiKeySecurityWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Security warning'**
+  String get yubiKeySecurityWarning;
+
+  /// No description provided for @removeYubiKeyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove YubiKey'**
+  String get removeYubiKeyTitle;
+
+  /// No description provided for @yubiKeyLastKeyRiskWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'WARNING: if that remaining key is lost, damaged, or stolen, vault access will be permanently impossible. There is no recovery path.'**
+  String get yubiKeyLastKeyRiskWarning;
+
+  /// No description provided for @onlyOneKeyRegisteredWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Only one key registered. If this key is lost, vault access is permanently impossible.'**
+  String get onlyOneKeyRegisteredWarning;
+
+  /// No description provided for @tapRegisterNfc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold key to phone to register'**
+  String get tapRegisterNfc;
+
+  /// No description provided for @tapRegisterUsb.
+  ///
+  /// In en, this message translates to:
+  /// **'Once connected, tap the key to register'**
+  String get tapRegisterUsb;
+
+  /// No description provided for @tapActivateNfc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold key to phone again to activate'**
+  String get tapActivateNfc;
+
+  /// No description provided for @tapActivateUsb.
+  ///
+  /// In en, this message translates to:
+  /// **'Once connected, tap the key again to activate'**
+  String get tapActivateUsb;
+
+  /// No description provided for @failedToRegisterKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to register key: {error}'**
+  String failedToRegisterKey(String error);
+
+  /// No description provided for @failedToActivateKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to activate key: {error}'**
+  String failedToActivateKey(String error);
+
+  /// No description provided for @keyDefaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Key {index}'**
+  String keyDefaultTitle(int index);
+
+  /// No description provided for @tapYubiKeyToRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap your new YubiKey to register…'**
+  String get tapYubiKeyToRegister;
+
+  /// No description provided for @tapYubiKeyToActivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap your new YubiKey again to activate…'**
+  String get tapYubiKeyToActivate;
+
+  /// No description provided for @editAliasTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit alias'**
+  String get editAliasTooltip;
+
+  /// No description provided for @cannotRemoveLastKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot remove the last key'**
+  String get cannotRemoveLastKey;
+
+  /// No description provided for @removeKeyTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove key'**
+  String get removeKeyTooltip;
+
+  /// No description provided for @manageYubiKeysError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String manageYubiKeysError(String error);
+
+  /// No description provided for @generatorModeClassic.
+  ///
+  /// In en, this message translates to:
+  /// **'Classic'**
+  String get generatorModeClassic;
+
+  /// No description provided for @generatorModePassphrase.
+  ///
+  /// In en, this message translates to:
+  /// **'Passphrase'**
+  String get generatorModePassphrase;
+
+  /// No description provided for @charSetsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Character sets'**
+  String get charSetsHeader;
+
+  /// No description provided for @languageHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get languageHeader;
+
+  /// No description provided for @separatorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Separator'**
+  String get separatorLabel;
+
+  /// No description provided for @capitaliseWords.
+  ///
+  /// In en, this message translates to:
+  /// **'Capitalise words'**
+  String get capitaliseWords;
+
+  /// No description provided for @appendDigit.
+  ///
+  /// In en, this message translates to:
+  /// **'Append a digit'**
+  String get appendDigit;
+
+  /// No description provided for @entropyBitsDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'~{bits} bits entropy'**
+  String entropyBitsDisplay(String bits);
+
+  /// No description provided for @selectAtLeastOneCharSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one character set'**
+  String get selectAtLeastOneCharSet;
+
+  /// No description provided for @passwordMinLengthNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords are at least 32 characters. If a site has a shorter limit, copy the first characters you need.'**
+  String get passwordMinLengthNote;
+
+  /// No description provided for @excludeAmbiguousChars.
+  ///
+  /// In en, this message translates to:
+  /// **'Exclude ambiguous characters (0, O, l, 1, I)'**
+  String get excludeAmbiguousChars;
 }
 
 class _AppLocalizationsDelegate

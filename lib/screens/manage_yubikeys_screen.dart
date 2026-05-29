@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -81,27 +82,28 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
   Future<void> _editAlias(YubikeyRecordData record, int index) async {
     final hex = _toHex(record.credentialId);
     final controller = TextEditingController(text: _aliases[hex] ?? '');
+    final l = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Edit alias for key ${index + 1}'),
+        title: Text(l.editAliasForKey(index + 1)),
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Alias',
-            hintText: 'e.g. Primary, Work key…',
+          decoration: InputDecoration(
+            labelText: l.aliasLabel,
+            hintText: l.aliasHint,
           ),
           onSubmitted: (_) => Navigator.of(ctx).pop(true),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Save'),
+            child: Text(l.save),
           ),
         ],
       ),
@@ -116,7 +118,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Failed to save alias: $e')));
+              .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).failedToSaveAlias(e.toString()))));
         }
       }
     }
@@ -124,6 +126,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
   }
 
   Future<void> _removeKey(YubikeyRecordData record, int index) async {
+    final l = AppLocalizations.of(context);
     final isSecondToLast = _records.length == 2;
 
     final Widget warningContent = isSecondToLast
@@ -131,39 +134,37 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('This will leave only one registered YubiKey.'),
+              Text(l.lastKeyWarning),
               const SizedBox(height: 12),
               Text(
-                'WARNING: if that remaining key is lost, damaged, or stolen, '
-                'vault access will be permanently impossible. '
-                'There is no recovery path.',
+                l.yubiKeyLastKeyRiskWarning,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.error,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text('Are you sure you want to remove this key?'),
+              Text(l.removeKeyConfirm),
             ],
           )
-        : const Text('Remove this YubiKey from the vault?');
+        : Text(l.removeKeyVaultConfirm);
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(isSecondToLast ? 'Security warning' : 'Remove YubiKey'),
+        title: Text(isSecondToLast ? l.yubiKeySecurityWarning : l.removeYubiKeyTitle),
         content: warningContent,
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+            child: Text(l.cancel),
           ),
           TextButton(
             style: TextButton.styleFrom(
               foregroundColor: Theme.of(ctx).colorScheme.error,
             ),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Remove'),
+            child: Text(l.remove),
           ),
         ],
       ),
@@ -175,12 +176,12 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
         await _load();
         if (mounted) {
           ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text('YubiKey removed')));
+              .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).yubiKeyRemoved)));
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Failed to remove key: $e')));
+              .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).failedToRemoveKey(e.toString()))));
         }
       }
     }
@@ -201,12 +202,12 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
   }
 
   Future<void> _addKeyLinux() async {
+    final l = AppLocalizations.of(context);
     final devices = fidoListDevices();
     if (devices.isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('No FIDO2 device found. Insert your YubiKey and try again.')),
+        SnackBar(content: Text(l.noFidoDeviceFound)),
       );
       return;
     }
@@ -214,13 +215,13 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     if (pin == null || !mounted) return;
 
     final devicePath = devices.first;
-    _showLinuxProgress('Tap your new YubiKey to register…');
+    _showLinuxProgress(l.tapYubiKeyToRegister);
     try {
       final cred = await fidoRegister(devicePath: devicePath, pin: pin);
       if (!mounted) return;
       Navigator.of(context).pop();
 
-      _showLinuxProgress('Tap your new YubiKey again to activate…');
+      _showLinuxProgress(AppLocalizations.of(context).tapYubiKeyToActivate);
       final hmac = await fidoGetHmacSecret(
         devicePath: devicePath,
         credentialId: cred.credentialId,
@@ -238,7 +239,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
       await _load();
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('YubiKey added')));
+            .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).yubiKeyAdded)));
       }
     } catch (e) {
       if (mounted) {
@@ -246,7 +247,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
           Navigator.of(context).pop();
         } catch (_) {}
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Failed to add key: $e')));
+            .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).failedToAddKey(e.toString()))));
       }
     }
   }
@@ -270,40 +271,39 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
       barrierDismissible: false,
       builder: (ctx) => ValueListenableBuilder<int>(
         valueListenable: stepNotifier,
-        builder: (ctx, step, _) => AlertDialog(
-          title: const Text('Add YubiKey'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _stepRow(
-                ctx,
-                label: isNfc
-                    ? 'Hold key to phone to register'
-                    : 'Once connected, tap the key to register',
-                done: step >= 1,
-                active: step == 0,
-              ),
-              const SizedBox(height: 16),
-              _stepRow(
-                ctx,
-                label: isNfc
-                    ? 'Hold key to phone again to activate'
-                    : 'Once connected, tap the key again to activate',
-                done: false,
-                active: step == 1,
+        builder: (ctx, step, _) {
+          final dl = AppLocalizations.of(ctx);
+          return AlertDialog(
+            title: Text(dl.addYubiKeyTitle),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _stepRow(
+                  ctx,
+                  label: isNfc ? dl.tapRegisterNfc : dl.tapRegisterUsb,
+                  done: step >= 1,
+                  active: step == 0,
+                ),
+                const SizedBox(height: 16),
+                _stepRow(
+                  ctx,
+                  label: isNfc ? dl.tapActivateNfc : dl.tapActivateUsb,
+                  done: false,
+                  active: step == 1,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  _progressShown = false;
+                  Navigator.of(ctx).pop();
+                },
+                child: Text(dl.cancel),
               ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                _progressShown = false;
-                Navigator.of(ctx).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     ).then((_) => _progressShown = false);
 
@@ -345,7 +345,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
       await _silentRefresh();
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('YubiKey added')));
+            .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).yubiKeyAdded)));
       }
     } catch (e) {
       if (mounted) {
@@ -355,10 +355,11 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
           } catch (_) {}
           _progressShown = false;
         }
+        final al = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(credIdHex == null
-              ? 'Failed to register key: $e'
-              : 'Failed to activate key: $e'),
+              ? al.failedToRegisterKey(e.toString())
+              : al.failedToActivateKey(e.toString())),
         ));
       }
     } finally {
@@ -447,32 +448,35 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     final pin = await showDialog<String>(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setLocal) => AlertDialog(
-          title: const Text('Enter YubiKey PIN'),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            obscureText: obscure,
-            decoration: InputDecoration(
-              labelText: 'PIN',
-              suffixIcon: IconButton(
-                icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
-                onPressed: () => setLocal(() => obscure = !obscure),
+        builder: (ctx, setLocal) {
+          final l = AppLocalizations.of(ctx);
+          return AlertDialog(
+            title: Text(l.enterYubiKeyPinTitle),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              obscureText: obscure,
+              decoration: InputDecoration(
+                labelText: l.pinLabel,
+                suffixIcon: IconButton(
+                  icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () => setLocal(() => obscure = !obscure),
+                ),
               ),
+              onSubmitted: (_) => Navigator.of(ctx).pop(controller.text),
             ),
-            onSubmitted: (_) => Navigator.of(ctx).pop(controller.text),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(controller.text),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(l.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(controller.text),
+                child: Text(l.ok),
+              ),
+            ],
+          );
+        },
       ),
     );
     controller.dispose();
@@ -486,65 +490,68 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     final result = await showDialog<Map<String, String>>(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setLocal) => AlertDialog(
-          title: const Text('Add YubiKey'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Transport:'),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  ChoiceChip(
-                    label: const Text('USB'),
-                    selected: selectedTransport == 'usb',
-                    onSelected: (_) =>
-                        setLocal(() => selectedTransport = 'usb'),
-                  ),
-                  const SizedBox(width: 8),
-                  ChoiceChip(
-                    label: const Text('NFC'),
-                    selected: selectedTransport == 'nfc',
-                    onSelected: (_) =>
-                        setLocal(() => selectedTransport = 'nfc'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: controller,
-                autofocus: true,
-                obscureText: obscure,
-                decoration: InputDecoration(
-                  labelText: 'PIN',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                        obscure ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () => setLocal(() => obscure = !obscure),
-                  ),
+        builder: (ctx, setLocal) {
+          final l = AppLocalizations.of(ctx);
+          return AlertDialog(
+            title: Text(l.addYubiKeyTitle),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l.transportLabel),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    ChoiceChip(
+                      label: Text(l.transportUsb),
+                      selected: selectedTransport == 'usb',
+                      onSelected: (_) =>
+                          setLocal(() => selectedTransport = 'usb'),
+                    ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: Text(l.transportNfc),
+                      selected: selectedTransport == 'nfc',
+                      onSelected: (_) =>
+                          setLocal(() => selectedTransport = 'nfc'),
+                    ),
+                  ],
                 ),
-                onSubmitted: (_) => Navigator.of(ctx).pop({
+                const SizedBox(height: 16),
+                TextField(
+                  controller: controller,
+                  autofocus: true,
+                  obscureText: obscure,
+                  decoration: InputDecoration(
+                    labelText: l.pinLabel,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                          obscure ? Icons.visibility_off : Icons.visibility),
+                      onPressed: () => setLocal(() => obscure = !obscure),
+                    ),
+                  ),
+                  onSubmitted: (_) => Navigator.of(ctx).pop({
+                    'pin': controller.text,
+                    'transport': selectedTransport,
+                  }),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(l.cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop({
                   'pin': controller.text,
                   'transport': selectedTransport,
                 }),
+                child: Text(l.register),
               ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop({
-                'pin': controller.text,
-                'transport': selectedTransport,
-              }),
-              child: const Text('Register'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
     controller.dispose();
@@ -554,9 +561,10 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage YubiKeys'),
+        title: Text(l.manageYubiKeysTitle),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(
@@ -568,9 +576,9 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Center(child: Text('Error: $_error'))
+              ? Center(child: Text(l.manageYubiKeysError(_error!)))
               : _records.isEmpty
-                  ? const Center(child: Text('No YubiKeys registered'))
+                  ? Center(child: Text(l.noYubiKeysRegistered))
                   : Column(
                       children: [
                         if (_records.length == 1)
@@ -588,8 +596,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    'Only one key registered. '
-                                    'If this key is lost, vault access is permanently impossible.',
+                                    l.onlyOneKeyRegisteredWarning,
                                     style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
@@ -610,10 +617,11 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
                               final hex = _toHex(record.credentialId);
                               final alias = _aliases[hex] ?? '';
                               final isOnly = _records.length == 1;
+                              final bl = AppLocalizations.of(context);
                               return ListTile(
                                 leading: const Icon(Icons.security),
                                 title: Text(
-                                    alias.isEmpty ? 'Key ${i + 1}' : alias),
+                                    alias.isEmpty ? bl.keyDefaultTitle(i + 1) : alias),
                                 subtitle:
                                     Text(_credHint(record.credentialId)),
                                 trailing: Row(
@@ -622,7 +630,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
                                     IconButton(
                                       icon:
                                           const Icon(Icons.edit_outlined),
-                                      tooltip: 'Edit alias',
+                                      tooltip: bl.editAliasTooltip,
                                       onPressed: () =>
                                           _editAlias(record, i),
                                     ),
@@ -636,8 +644,8 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
                                                 .error,
                                       ),
                                       tooltip: isOnly
-                                          ? 'Cannot remove the last key'
-                                          : 'Remove key',
+                                          ? bl.cannotRemoveLastKey
+                                          : bl.removeKeyTooltip,
                                       onPressed: isOnly
                                           ? null
                                           : () => _removeKey(record, i),
@@ -654,7 +662,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
           ? FloatingActionButton.extended(
               onPressed: _addKey,
               icon: const Icon(Icons.add),
-              label: const Text('Add YubiKey'),
+              label: Text(l.addYubiKey),
             )
           : null,
     );

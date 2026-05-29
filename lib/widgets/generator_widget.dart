@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/password_generator.dart';
 import 'package:gabbro/src/rust/api/passphrase_generator.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
@@ -186,6 +187,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
@@ -201,8 +203,9 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
           SegmentedRow<_GeneratorMode>(
             values: _GeneratorMode.values,
             selected: _mode,
-            label: (m) =>
-                m == _GeneratorMode.classic ? 'Classic' : 'Passphrase',
+            label: (m) => m == _GeneratorMode.classic
+                ? l.generatorModeClassic
+                : l.generatorModePassphrase,
             onSelected: (m) {
               setState(() => _mode = m);
               _generate();
@@ -211,7 +214,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
           const SizedBox(height: 20),
 
           // Generated value card
-          _buildValueCard(colorScheme),
+          _buildValueCard(colorScheme, l),
           const SizedBox(height: 8),
 
           // Entropy display
@@ -220,8 +223,8 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
             child: Text(
               key: const Key('entropy_display'),
               _entropyBits > 0
-                  ? '~${_entropyBits.toStringAsFixed(1)} bits entropy'
-                  : 'Select at least one character set',
+                  ? l.entropyBitsDisplay(_entropyBits.toStringAsFixed(1))
+                  : l.selectAtLeastOneCharSet,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -230,16 +233,15 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
           const SizedBox(height: 20),
 
           // Mode-specific controls
-          if (_mode == _GeneratorMode.classic) ..._classicControls(),
-          if (_mode == _GeneratorMode.passphrase) ..._passphraseControls(),
+          if (_mode == _GeneratorMode.classic) ..._classicControls(l),
+          if (_mode == _GeneratorMode.passphrase) ..._passphraseControls(l),
           const SizedBox(height: 24),
 
           // Minimum length info
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
-              'Passwords are at least 32 characters. If a site has a shorter '
-              'limit, copy the first characters you need.',
+              l.passwordMinLengthNote,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -251,7 +253,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
             key: const Key('generate_button'),
             onPressed: _generate,
             icon: const Icon(Icons.refresh),
-            label: const Text('Generate'),
+            label: Text(l.generate),
           ),
 
           // Use this password button (only when callback provided)
@@ -262,7 +264,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
               onPressed: _generated.isNotEmpty
                   ? () => widget.onUsePassword!(_generated)
                   : null,
-              child: const Text('Use this password'),
+              child: Text(l.useThisPassword),
             ),
           ],
         ],
@@ -270,7 +272,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
     );
   }
 
-  Widget _buildValueCard(ColorScheme colorScheme) {
+  Widget _buildValueCard(ColorScheme colorScheme, AppLocalizations l) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
@@ -309,14 +311,14 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
           IconButton(
             key: const Key('visibility_toggle'),
             icon: Icon(_obscured ? Icons.visibility_off : Icons.visibility),
-            tooltip: _obscured ? 'Show' : 'Hide',
+            tooltip: _obscured ? l.tooltipShow : l.tooltipHide,
             onPressed: () => setState(() => _obscured = !_obscured),
           ),
           // Copy button
           IconButton(
             key: const Key('copy_button'),
             icon: Icon(_copied ? Icons.check : Icons.copy_outlined),
-            tooltip: _copied ? 'Copied!' : 'Copy',
+            tooltip: _copied ? l.tooltipCopied : l.tooltipCopy,
             onPressed: _copy,
           ),
         ],
@@ -326,11 +328,11 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
 
   // ── Classic controls ──────────────────────────────────────────────────────
 
-  List<Widget> _classicControls() => [
+  List<Widget> _classicControls(AppLocalizations l) => [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Length'),
+            Text(l.lengthLabel),
             Text('${_length.round()}'),
           ],
         ),
@@ -347,7 +349,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
           },
         ),
         const SizedBox(height: 8),
-        const SectionHeader(label: 'Character sets'),
+        SectionHeader(label: l.charSetsHeader),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -394,7 +396,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
         const SizedBox(height: 12),
         _switchRow(
           key: const Key('toggle_exclude_ambiguous'),
-          label: 'Exclude ambiguous characters (0, O, l, 1, I)',
+          label: l.excludeAmbiguousChars,
           value: _excludeAmbiguous,
           onChanged: (v) {
             setState(() => _excludeAmbiguous = v);
@@ -405,11 +407,11 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
 
   // ── Passphrase controls ───────────────────────────────────────────────────
 
-  List<Widget> _passphraseControls() => [
+  List<Widget> _passphraseControls(AppLocalizations l) => [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Words'),
+            Text(l.wordsLabel),
             Text('${_wordCount.round()}'),
           ],
         ),
@@ -426,30 +428,30 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
           },
         ),
         const SizedBox(height: 8),
-        const SectionHeader(label: 'Language'),
+        SectionHeader(label: l.languageHeader),
         const SizedBox(height: 8),
         SegmentedRow<Language>(
           key: const Key('language_selector'),
           values: Language.values,
           selected: _language,
-          label: (l) => switch (l) {
+          label: (lang) => switch (lang) {
             Language.english => 'EN',
             Language.french => 'FR',
             Language.german => 'DE',
             Language.spanish => 'ES',
             Language.italian => 'IT',
           },
-          onSelected: (l) {
-            setState(() => _language = l);
+          onSelected: (lang) {
+            setState(() => _language = lang);
             _generatePassphrase();
           },
         ),
         const SizedBox(height: 12),
         TextFormField(
           initialValue: _separator,
-          decoration: const InputDecoration(
-            labelText: 'Separator',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: l.separatorLabel,
+            border: const OutlineInputBorder(),
           ),
           maxLength: 3,
           onChanged: (v) {
@@ -460,7 +462,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
         const SizedBox(height: 8),
         _switchRow(
           key: const Key('toggle_capitalise'),
-          label: 'Capitalise words',
+          label: l.capitaliseWords,
           value: _capitalise,
           onChanged: (v) {
             setState(() => _capitalise = v);
@@ -469,7 +471,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
         ),
         _switchRow(
           key: const Key('toggle_append_number'),
-          label: 'Append a digit',
+          label: l.appendDigit,
           value: _appendNumber,
           onChanged: (v) {
             setState(() => _appendNumber = v);

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
@@ -66,12 +67,12 @@ class _ImportScreenState extends State<ImportScreen> {
   Future<void> _importEnpass() async {
     final path = _enpassPath;
     if (path == null || path.isEmpty) {
-      setState(() => _enpassError = 'Select a file.');
+      setState(() => _enpassError = AppLocalizations.of(context).importSelectFile);
       return;
     }
     final file = File(path);
     if (!file.existsSync()) {
-      setState(() => _enpassError = 'File not found.');
+      setState(() => _enpassError = AppLocalizations.of(context).importFileNotFound);
       return;
     }
     setState(() {
@@ -101,12 +102,12 @@ class _ImportScreenState extends State<ImportScreen> {
   Future<void> _importBitwarden() async {
     final path = _bitwardenPath;
     if (path == null || path.isEmpty) {
-      setState(() => _bitwardenError = 'Select a file.');
+      setState(() => _bitwardenError = AppLocalizations.of(context).importSelectFile);
       return;
     }
     final file = File(path);
     if (!file.existsSync()) {
-      setState(() => _bitwardenError = 'File not found.');
+      setState(() => _bitwardenError = AppLocalizations.of(context).importFileNotFound);
       return;
     }
     setState(() {
@@ -134,19 +135,20 @@ class _ImportScreenState extends State<ImportScreen> {
   // ── Gabbro ───────────────────────────────────────────────────────────────
 
   Future<void> _importGabbro() async {
+    final l = AppLocalizations.of(context);
     final path = _gabbroPath;
     if (path == null || path.isEmpty) {
-      setState(() => _gabbroError = 'Select a file.');
+      setState(() => _gabbroError = l.importSelectFile);
       return;
     }
     final file = File(path);
     if (!file.existsSync()) {
-      setState(() => _gabbroError = 'File not found.');
+      setState(() => _gabbroError = l.importFileNotFound);
       return;
     }
     final passphrase = _passphraseController.text;
     if (passphrase.isEmpty) {
-      setState(() => _gabbroError = 'Enter the passphrase for this vault.');
+      setState(() => _gabbroError = l.importEnterPassphrase);
       return;
     }
     setState(() {
@@ -170,14 +172,15 @@ class _ImportScreenState extends State<ImportScreen> {
   // ── CSV ──────────────────────────────────────────────────────────────────
 
   Future<void> _sniffAndPushCsvMapping() async {
+    final l = AppLocalizations.of(context);
     final path = _csvPath;
     if (path == null || path.isEmpty) {
-      setState(() => _csvError = 'Select a file.');
+      setState(() => _csvError = l.importSelectFile);
       return;
     }
     final file = File(path);
     if (!file.existsSync()) {
-      setState(() => _csvError = 'File not found.');
+      setState(() => _csvError = l.importFileNotFound);
       return;
     }
     setState(() {
@@ -205,6 +208,7 @@ class _ImportScreenState extends State<ImportScreen> {
   // ── Warning banner ───────────────────────────────────────────────────────
 
   Widget _duplicateWarningBanner(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Card(
       color: Theme.of(context).colorScheme.secondaryContainer,
       margin: EdgeInsets.zero,
@@ -221,8 +225,7 @@ class _ImportScreenState extends State<ImportScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Entries whose UUID already exists in your vault will be '
-                'skipped automatically. You will be shown a summary.',
+                l.importDuplicateWarning,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: Theme.of(context).colorScheme.onSecondaryContainer,
                 ),
@@ -238,8 +241,9 @@ class _ImportScreenState extends State<ImportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Import entries')),
+      appBar: AppBar(title: Text(l.importTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -249,37 +253,38 @@ class _ImportScreenState extends State<ImportScreen> {
             children: [
               _duplicateWarningBanner(context),
               const SizedBox(height: 20),
-              _gabbroSection(),
+              _gabbroSection(l),
               const SizedBox(height: 24),
               const Divider(),
               const SizedBox(height: 24),
-              _csvSection(),
+              _csvSection(l),
               const SizedBox(height: 24),
               const Divider(),
               const SizedBox(height: 24),
               _importSection(
                 title: 'Enpass',
-                subtitle: 'JSON export from Enpass (Tools → Export)',
+                subtitle: l.importEnpassSubtitle,
                 hint: '/home/user/enpass_export.json',
                 allowedExtensions: ['json'],
                 onPathSelected: (p) => setState(() => _enpassPath = p),
                 isLoading: _isImportingEnpass,
                 error: _enpassError,
                 onImport: _importEnpass,
+                importLabel: l.import,
               ),
               const SizedBox(height: 24),
               const Divider(),
               const SizedBox(height: 24),
               _importSection(
                 title: 'Bitwarden',
-                subtitle:
-                    'Unencrypted JSON export from Bitwarden (Tools → Export Vault)',
+                subtitle: l.importBitwardenSubtitle,
                 hint: '/home/user/bitwarden_export.json',
                 allowedExtensions: ['json'],
                 onPathSelected: (p) => setState(() => _bitwardenPath = p),
                 isLoading: _isImportingBitwarden,
                 error: _bitwardenError,
                 onImport: _importBitwarden,
+                importLabel: l.import,
               ),
             ],
           ),
@@ -288,14 +293,14 @@ class _ImportScreenState extends State<ImportScreen> {
     );
   }
 
-  Widget _gabbroSection() {
+  Widget _gabbroSection(AppLocalizations l) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Gabbro vault', style: Theme.of(context).textTheme.titleMedium),
+        Text(l.gabbroVaultSection, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 4),
         Text(
-          'Sync entries from another Gabbro vault (.gabbro file)',
+          l.importGabbroSubtitle,
           style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 12),
@@ -310,7 +315,7 @@ class _ImportScreenState extends State<ImportScreen> {
           controller: _passphraseController,
           obscureText: !_showPassphrase,
           decoration: InputDecoration(
-            labelText: 'Vault passphrase',
+            labelText: l.vaultPassphraseLabel,
             border: const OutlineInputBorder(),
             suffixIcon: IconButton(
               icon: Icon(
@@ -340,7 +345,7 @@ class _ImportScreenState extends State<ImportScreen> {
                   width: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Sync from vault'),
+              : Text(l.syncFromVault),
         ),
       ],
     );
@@ -355,6 +360,7 @@ class _ImportScreenState extends State<ImportScreen> {
     required bool isLoading,
     required String? error,
     required VoidCallback onImport,
+    required String importLabel,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -388,20 +394,20 @@ class _ImportScreenState extends State<ImportScreen> {
                   width: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Import'),
+              : Text(importLabel),
         ),
       ],
     );
   }
 
-  Widget _csvSection() {
+  Widget _csvSection(AppLocalizations l) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Generic CSV', style: Theme.of(context).textTheme.titleMedium),
+        Text(l.genericCsvSection, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 4),
         Text(
-          'CSV export from any password manager',
+          l.importCsvSubtitle,
           style: Theme.of(context).textTheme.bodySmall,
         ),
         const SizedBox(height: 12),
@@ -430,7 +436,7 @@ class _ImportScreenState extends State<ImportScreen> {
                   width: 20,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Next: map columns'),
+              : Text(l.next),
         ),
       ],
     );
