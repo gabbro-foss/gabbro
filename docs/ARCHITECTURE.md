@@ -210,6 +210,7 @@ All logo / launcher-icon visual QA passed on Linux and Android. Next feature: ad
 - read https://drive.proton.me/urls/11VHB59C60#CVCj696Qxkxd to see if any learnings can be transferred to gabbro to increase security
 
 ### Features & UX
+- Add tutorial/onboarding: probably in the README as snapshots from linux/emulator
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
