@@ -65,7 +65,7 @@ object YubiKeyManager {
             return
         }
         val manager = YubiKitManager(activity).also { nfcManager = it }
-        manager.startNfcDiscovery(NfcConfiguration(), activity) { device ->
+        manager.startNfcDiscovery(NfcConfiguration().skipNdefCheck(true), activity) { device ->
             device.requestConnection(SmartCardConnection::class.java) { result ->
                 try {
                     onConnected(result.getValue())

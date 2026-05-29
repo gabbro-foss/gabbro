@@ -244,8 +244,21 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun stopDiscovery(transport: String) = when (transport) {
-        "nfc" -> YubiKeyManager.stopNfcDiscovery(this)
-        else  -> YubiKeyManager.stopUsbDiscovery()
+        "nfc" -> {
+            YubiKeyManager.stopNfcDiscovery(this)
+            // Reader mode is now off; re-arm foreground dispatch so any stray NDEF
+            // intents (OTP URL still on key) route to onNewIntent, not the browser.
+            nfcAdapter?.let { adapter ->
+                val flags = if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_MUTABLE else 0
+                val pi = PendingIntent.getActivity(
+                    this, 0,
+                    Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                    flags,
+                )
+                adapter.enableForegroundDispatch(this, pi, null, null)
+            }
+        }
+        else -> YubiKeyManager.stopUsbDiscovery()
     }
 
     private fun ByteArray.toHex(): String = joinToString("") { "%02x".format(it) }
