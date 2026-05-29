@@ -17,7 +17,7 @@ FOSS, GPL-3.0-only. Potential Yubico partnership.
 
 **Authentication (app access):** Mandatory FIDO2/WebAuthn hardware key (YubiKey). v1 uses Ed25519 (hardware constraint); target ML-DSA-44 once Yubico ships PQ-capable hardware (ADR-005). Min 2 keys (primary + backup), max 4. Biometric replaces passphrase entry only, never YubiKey tap. Auto-lock: 30s default, configurable.
 
-**YubiKey NFC prerequisite — NDEF OTP:** YubiKeys ship with OTP slot 1 configured as an NDEF URI (`https://my.yubico.com/yk/...`). When the Android NFC reader is active, the key broadcasts this URI and Android opens a browser tab — even foreground-dispatch and manifest intent-filter mitigations cannot suppress it, because yubikit's `enableReaderMode` owns the NFC stack. **Workaround (one-time, per key):** run `ykman config nfc --disable OTP`. This disables the OTP application over NFC only; FIDO2/CTAP2 over NFC and all USB functions are unaffected. See LEARNINGS.md for full collateral-effects analysis.
+**YubiKey NFC / NDEF OTP:** YubiKeys ship with OTP slot 1 as an NDEF URI over NFC (`https://my.yubico.com/yk/...`). Without mitigation, Android opens a browser tab when the key is tapped. Gabbro suppresses this via `NfcConfiguration().skipNdefCheck(true)` (prevents NDEF being read during the CTAP2 session) and by re-arming foreground dispatch after `stopNfcDiscovery` (routes any post-session NDEF intents to `onNewIntent` rather than the browser). OTP slot 1 may remain enabled — no `ykman` workaround is needed. See LEARNINGS.md for the full diagnosis and collateral-effects table.
 
 **Vault file format:** `.gabbro` binary. Plaintext header (magic, version, Argon2id params + salt, HKDF salt, nonce, ML-KEM ciphertext, X25519 ephemeral pubkey) + AES-256-GCM encrypted body (JSON-serialised entries). Self-contained; auth tag detects tampering.
 
@@ -175,20 +175,19 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Fix — YubiKey OTP NFC opens a browser tab during NFC unlock
+### Next task: fix — dart dependency constraints blocking 14 package updates
 
-Each YubiKey ships with OTP slot 1 configured as an NDEF URI over NFC. When the Android NFC reader is active the key broadcasts this URI and Android opens a browser tab even while Gabbro is in the foreground. The workaround (`ykman config nfc --disable OTP`) is documented in ARCHITECTURE but is invisible to new users.
+`flutter pub get` (and every build) prints:
 
-**Goal:** surface this requirement inside the app so it cannot be missed.
+    14 packages have newer versions incompatible with dependency constraints.
+    Try `dart pub outdated` for more information.
 
-**Candidate approaches (decide at session start):**
-- Show a one-time instruction dialog when entering Add YubiKey on Android / NFC transport
-- Detect via yubikit `OtpSession` whether OTP-over-NFC is still active and block/warn
-- Fallback: prominent static note in the Add YubiKey screen (no detection, clear text only)
+**Goal:** run `dart pub outdated`, understand which constraints block which packages, and update `pubspec.yaml` (and `pubspec.lock`) so the app builds against current package versions. Verify all 447 Flutter tests still pass after the update.
 
-**Constraints:**
-- libfido2 and CTAP2 cannot query OTP slot state — requires management protocol or yubikit `OtpSession`
-- Android only (NFC is not available on Linux desktop)
+**Constraints / risks:**
+- "Incompatible with dependency constraints" means major-version bumps — check breaking changes in each package's changelog before updating.
+- `flutter_rust_bridge` is the most sensitive dependency; updating it may require regenerating the bridge (`flutter_rust_bridge_codegen generate`).
+- Android build (`flutter build apk --release`) must be verified after, not just `flutter test`.
 
 ---
 
@@ -249,8 +248,6 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 
 ### Code Quality
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
-- fix: `14 packages have newer versions incompatible with dependency constraints.
-Try `dart pub outdated` for more information.`
 
 ### V2+ / Defer
 - Data breach alerts / HaveIBeenPwned integration.

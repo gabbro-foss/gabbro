@@ -3069,39 +3069,43 @@ These fixes prevent the crash but do not resolve the underlying two-touch issue.
 
 ---
 
-## YubiKey NFC — disabling OTP over NFC to fix the NDEF browser-opening bug
+## YubiKey NFC — suppressing the NDEF browser-opening bug in-app
 
 **The bug:** Every time Gabbro activated the NFC reader, Android opened a browser tab to
 `https://my.yubico.com/yk/...`. The YubiKey broadcasts its OTP slot 1 as an NDEF URI over
 NFC; Android's browser (Chrome) is registered for `NDEF_DISCOVERED` on https and wins as the
-default handler. Three in-code mitigations (foreground dispatch, manifest intent filters,
-combination) all failed because yubikit's `enableReaderMode` suppresses foreground dispatch
-internally, and the system browser still wins.
+default handler.
 
-**The fix:** Disable the OTP application over NFC on the YubiKey itself:
+**Why foreground dispatch alone did not work:** yubikit's `startNfcDiscovery` calls
+`NfcAdapter.enableReaderMode`, which automatically suspends any active foreground dispatch.
+After `stopNfcDiscovery` calls `disableReaderMode`, foreground dispatch is *not*
+automatically re-enabled — Android requires an explicit `enableForegroundDispatch` call.
+This left a window after every CTAP2 operation where NDEF could still reach the browser.
 
-```bash
-ykman config nfc --disable OTP
-```
+**The fix (app-side, no `ykman` required):**
 
-Run once per YubiKey. Verified: onboarding, unlock, change passphrase, and delete vault all
-work correctly after the change; FIDO2/CTAP2 over NFC is unaffected.
+1. `NfcConfiguration().skipNdefCheck(true)` — sets `FLAG_READER_SKIP_NDEF_CHECK` on the
+   reader mode session so Android never reads NDEF during the CTAP2 exchange.
+2. Re-arm `enableForegroundDispatch` in `stopDiscovery("nfc")` immediately after
+   `stopNfcDiscovery` — routes any post-session NDEF intents to `onNewIntent` (which
+   drops them) rather than the system browser.
 
-**Collateral effects — what is disabled:**
-- Yubico OTP (slot 1) over NFC — the NDEF URI source.
-- HOTP / static password (slot 2) over NFC.
-- Challenge-response (slot 2) over NFC (already USB-only in practice).
+OTP slot 1 may remain enabled on the key. Verified: unlock, registration, change passphrase,
+and delete vault all work correctly; the browser no longer opens in any scenario while the
+app is foreground.
 
-**What is not affected:**
-- OTP over USB — short/long press still emits codes; GitHub via USB confirmed working.
-- FIDO2/WebAuthn over NFC — separate application; Gabbro's CTAP2 flow unaffected.
-- FIDO2/WebAuthn over USB — separate application; unaffected.
-- OATH TOTP/HOTP (Yubico Authenticator) — uses the OATH application, not OTP; NFC still works.
-- PIV and OpenPGP over NFC — separate applications; unaffected.
+**Collateral-effects reference — if `ykman config nfc --disable OTP` is run anyway:**
 
-**Real-world breakage risk:** very low. The only scenario that breaks is a service that uses
-legacy Yubico OTP *and* requires NFC delivery specifically (not USB). No mainstream service
-imposes this combination.
+| Affected | Not affected |
+|---|---|
+| Yubico OTP (slot 1) over NFC — the NDEF URI source | OTP over USB (short/long press) |
+| HOTP / static password (slot 2) over NFC | FIDO2/WebAuthn over NFC and USB |
+| Challenge-response (slot 2) over NFC | OATH TOTP/HOTP (Yubico Authenticator) via NFC |
+| | PIV and OpenPGP over NFC |
+
+Real-world breakage risk of disabling OTP-over-NFC: very low. The only scenario that breaks
+is a service that uses legacy Yubico OTP *and* requires NFC delivery specifically (not USB).
+No mainstream service imposes this combination.
 
 ---
 

@@ -31,4 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - App localisation: UI in English, French, German, Italian, and Spanish; follows system locale with in-app language override (Settings → Appearance)
 - Locale-aware date formatting via `package:intl` `DateFormat`
 
+### Fixed
+- YubiKey OTP NDEF URI no longer opens a browser tab during NFC unlock; `skipNdefCheck` and re-armed foreground dispatch suppress NDEF dispatch while the app is foreground — `ykman config nfc --disable OTP` is no longer required
+
 [Unreleased]: https://github.com/Zabamund/gabbro/compare/v0.1.0...HEAD
