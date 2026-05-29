@@ -227,7 +227,122 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 
 ---
 
-## Bikeshed / Backlog
+## Release Process
+
+**Tag format:** `v0.1.0-alpha.N` (not `v0.1.0`) until the pre-v1 security gates in Bikeshed are cleared. This is honest with testers: the crypto review has not happened.
+
+**Distribution model (current):** repo is private. Debian collaborator accesses releases via GitHub. Other testers receive the artifact directly (email / transfer).
+
+---
+
+### Pre-flight checklist
+
+1. Move `[Unreleased]` block in `CHANGELOG.md` to `[0.1.0-alpha.N] – YYYY-MM-DD`.
+2. Bump `version` in `pubspec.yaml` to match.
+3. Resolve the 14 blocked packages (`dart pub outdated`) if not already done — not a hard blocker for a test release, but note it in the release description.
+4. Run `flutter test` (447 passing) and `cargo clippy -- -D warnings`.
+5. Commit, then tag: `git tag -a v0.1.0-alpha.1 -m "v0.1.0-alpha.1"` and `git push origin v0.1.0-alpha.1`.
+
+---
+
+### Linux build
+
+```bash
+flutter build linux --release
+```
+
+Output lands in `build/linux/x64/release/bundle/`. That directory is self-contained (exe + Flutter libs + data assets).
+
+**Packaging as tar.gz (Arch):**
+```bash
+tar -czf gabbro-v0.1.0-alpha.1-linux-x86_64.tar.gz \
+    -C build/linux/x64/release bundle
+```
+
+**Debian compatibility caveat:** the bundle links dynamically against the *host* glibc. Arch ships a newer glibc than Debian stable (bookworm = 2.36). If the binary refuses to run on Debian, the fix is to build inside a Debian bookworm container:
+```bash
+docker run --rm -v "$PWD":/app -w /app debian:bookworm \
+    bash -c "apt-get update && apt-get install -y flutter ... && flutter build linux --release"
+```
+Worth testing the Arch-built tar.gz on the Debian machine first — it may work fine if no glibc symbols above 2.36 are used. If it fails, add a Debian-build step here.
+
+---
+
+### Android build
+
+**Signing keystore (one-time setup — do this before the first release build):**
+
+```bash
+# Generate the keystore — keep this file safe and backed up; losing it means
+# you can never publish an update to the same Play Store listing.
+keytool -genkey -v \
+  -keystore android/app/gabbro-upload.jks \
+  -alias gabbro \
+  -keyalg RSA -keysize 2048 \
+  -validity 10000
+```
+
+Create `android/key.properties` (already in `.gitignore` — do not commit this):
+```
+storePassword=<your-store-password>
+keyPassword=<your-key-password>
+keyAlias=gabbro
+storeFile=gabbro-upload.jks
+```
+
+In `android/app/build.gradle.kts`, add before `android {`:
+```kotlin
+val keyPropertiesFile = rootProject.file("key.properties")
+val keyProperties = Properties()
+keyProperties.load(keyPropertiesFile.inputStream())
+```
+
+And inside `android { ... }` replace / add the signing config:
+```kotlin
+signingConfigs {
+    create("release") {
+        keyAlias = keyProperties["keyAlias"] as String
+        keyPassword = keyProperties["keyPassword"] as String
+        storeFile = file(keyProperties["storeFile"] as String)
+        storePassword = keyProperties["storePassword"] as String
+    }
+}
+buildTypes {
+    release {
+        signingConfig = signingConfigs.getByName("release")
+    }
+}
+```
+
+**Build:**
+```bash
+flutter build apk --release
+# output: build/app/outputs/flutter-apk/app-release.apk
+```
+
+Rename before attaching: `gabbro-v0.1.0-alpha.1-android.apk`.
+
+**Testers must enable "Install from unknown sources"** on their Android device. Send the APK directly (email / file transfer) — no Play Store needed for test distribution.
+
+---
+
+### GitHub Release
+
+```bash
+gh release create v0.1.0-alpha.1 \
+  gabbro-v0.1.0-alpha.1-linux-x86_64.tar.gz \
+  gabbro-v0.1.0-alpha.1-android.apk \
+  --title "Gabbro v0.1.0-alpha.1" \
+  --notes "$(cat CHANGELOG.md | sed -n '/## \[0.1.0-alpha.1\]/,/## \[/p' | head -n -1)" \
+  --prerelease
+```
+
+Or create via the GitHub web UI and attach the two files manually.
+
+Add a disclaimer in the release notes:
+> **Alpha release — for invited testers only.** The cryptographic implementation has not yet undergone external review. Do not store passwords you cannot afford to lose.
+
+---
 
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
