@@ -356,7 +356,9 @@ Add a disclaimer in the release notes:
 - read https://drive.proton.me/urls/11VHB59C60#CVCj696Qxkxd to see if any learnings can be transferred to gabbro to increase security
 
 ### Features & UX
+- add l10n button on onboarding screen, move l10n option out of `appearance` settings into a `language` setting OR rename `appearance` to `customisations` <- or something like this
 - fix: in login screen with yubikey-mode active, the `unlock` button is partially hidden by the android bar since the logo was added
+- add option in vault export to exclude date in filename -> for file sync with rsync
 - Add tutorial/onboarding: probably in the README as snapshots from linux/emulator
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
