@@ -164,7 +164,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 447 | 0 | <!-- Phase 4 complete: all 4 languages translated -->
+| Flutter (`flutter test`) | 448 | 0 | <!-- Phase 4 complete: all 4 languages translated -->
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -175,16 +175,19 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: fix — unlock button partially hidden by Android nav bar in YubiKey login screen
+### Next task: feat — l10n / language settings
 
-Since the `GabbroLogo` widget was added to `UnlockScreen`, the **Unlock** button is clipped by the Android system navigation bar when the vault is in YubiKey mode.
+Move language selection out of Appearance settings into a dedicated surface, and add a language button on the onboarding screen so first-time users can set their language before any vault is created.
 
-**Goal:** ensure the Unlock button is fully visible and tappable on Android in YubiKey mode, without breaking the passphrase-mode layout or the Linux layout.
+**Goal:** improve language discoverability. Options (pick one or combine):
+- Rename Appearance → Customisations and add a Language sub-section, OR
+- Add a standalone Language settings screen reachable from Settings menu.
+- Add a locale-picker button to `OnboardingScreen` (top-right or below the logo).
 
 **Constraints / risks:**
-- Layout fix must work on both phones (small screens) and tablets.
-- Test both YubiKey mode and passphrase mode on Android emulator/device after the fix.
-- Linux layout must be verified unchanged (`flutter build linux --release` or visual check).
+- All existing l10n strings and ARB files are unchanged — this is purely a navigation/settings structure change.
+- Must not break the 447 passing Flutter tests; update or add tests for any new settings routing.
+- The in-app locale picker must call `setLocaleOverride` (or equivalent) and survive hot-restart — check how the current Appearance screen persists settings.
 
 ---
 
@@ -353,7 +356,6 @@ Add a disclaimer in the release notes:
 - read https://drive.proton.me/urls/11VHB59C60#CVCj696Qxkxd to see if any learnings can be transferred to gabbro to increase security
 
 ### Features & UX
-- add l10n button on onboarding screen, move l10n option out of `appearance` settings into a `language` setting OR rename `appearance` to `customisations` <- or something like this
 - add option in vault export to exclude date in filename -> for file sync with rsync
 - Add tutorial/onboarding: probably in the README as snapshots from linux/emulator
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
