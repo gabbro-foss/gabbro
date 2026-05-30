@@ -680,5 +680,37 @@
   },
   "selectAtLeastOneCharSet": "Seleziona almeno un set di caratteri",
   "passwordMinLengthNote": "Le password hanno almeno 32 caratteri. Se un sito ha un limite più breve, copia i primi caratteri necessari.",
-  "excludeAmbiguousChars": "Escludi caratteri ambigui (0, O, l, 1, I)"
+  "excludeAmbiguousChars": "Escludi caratteri ambigui (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Crea il tuo vault per iniziare.",
+  "onboardingVaultName": "Nome del vault",
+  "onboardingAliasRequired": "L'alias è richiesto",
+  "onboardingNewVaultLocation": "Nuova posizione del vault (stessa di prima)",
+  "onboardingVaultLocation": "Posizione del vault",
+  "onboardingLoadingPath": "Caricamento…",
+  "onboardingPathHint": "Percorso al file vault",
+  "onboardingPathRequired": "Il percorso è richiesto",
+  "onboardingReusePassphraseHint": "Scegli una nuova passphrase principale, o riutilizza quella precedente se preferisci.",
+  "onboardingPassphraseRequired": "La passphrase è richiesta",
+  "onboardingConfirmRequired": "Conferma la tua passphrase",
+  "onboardingPrimaryKeyPin": "PIN della chiave principale",
+  "onboardingBackupKeyPin": "PIN della chiave di backup",
+  "onboardingKeyNPin": "PIN della chiave {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Dovrai toccare ciascun YubiKey due volte (4 tocchi in totale). Tra le due chiavi, ti verrà chiesto di cambiarle.",
+  "onboardingYubikeySlowNote": "La creazione del vault con YubiKey richiede 20–30 secondi. L'app potrebbe sembrare bloccata — è normale.",
+  "onboardingStep1Label": "Registra la chiave principale",
+  "onboardingStep1Hint": "Tocca il tuo YubiKey ora",
+  "onboardingStep2Label": "Attiva la chiave principale",
+  "onboardingStep2Hint": "Tocca di nuovo il tuo YubiKey",
+  "onboardingStep3Label": "Passa alla chiave di backup",
+  "onboardingStep3Hint": "Rimuovi la chiave principale, poi collega il tuo YubiKey di backup",
+  "onboardingStep4Label": "Registra la chiave di backup",
+  "onboardingStep4Hint": "Tocca il tuo YubiKey di backup",
+  "onboardingStep5Label": "Attiva la chiave di backup",
+  "onboardingStep5Hint": "Tocca il tuo YubiKey di backup un'ultima volta"
 }

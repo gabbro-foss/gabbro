@@ -484,7 +484,7 @@ void main() {
     await tester.tap(find.text('Create vault'));
     await tester.pumpAndSettle();
 
-    expect(find.text('A vault named "Taken Vault" already exists'), findsOneWidget);
+    expect(find.text('A vault named "Taken Vault" already exists.'), findsOneWidget);
   });
 
   // ── Cancel button ─────────────────────────────────────────────────────────

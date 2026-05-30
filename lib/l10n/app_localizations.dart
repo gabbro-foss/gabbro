@@ -2659,6 +2659,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Exclude ambiguous characters (0, O, l, 1, I)'**
   String get excludeAmbiguousChars;
+
+  /// No description provided for @onboardingGetStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your vault to get started.'**
+  String get onboardingGetStarted;
+
+  /// No description provided for @onboardingVaultName.
+  ///
+  /// In en, this message translates to:
+  /// **'Vault name'**
+  String get onboardingVaultName;
+
+  /// No description provided for @onboardingAliasRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Alias is required'**
+  String get onboardingAliasRequired;
+
+  /// No description provided for @onboardingNewVaultLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'New vault location (same as before)'**
+  String get onboardingNewVaultLocation;
+
+  /// No description provided for @onboardingVaultLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Vault location'**
+  String get onboardingVaultLocation;
+
+  /// No description provided for @onboardingLoadingPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading…'**
+  String get onboardingLoadingPath;
+
+  /// No description provided for @onboardingPathHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Path to vault file'**
+  String get onboardingPathHint;
+
+  /// No description provided for @onboardingPathRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Path is required'**
+  String get onboardingPathRequired;
+
+  /// No description provided for @onboardingReusePassphraseHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a new master passphrase, or re-use your previous one if you prefer.'**
+  String get onboardingReusePassphraseHint;
+
+  /// No description provided for @onboardingPassphraseRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Passphrase is required'**
+  String get onboardingPassphraseRequired;
+
+  /// No description provided for @onboardingConfirmRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your passphrase'**
+  String get onboardingConfirmRequired;
+
+  /// No description provided for @onboardingPrimaryKeyPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary key PIN'**
+  String get onboardingPrimaryKeyPin;
+
+  /// No description provided for @onboardingBackupKeyPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup key PIN'**
+  String get onboardingBackupKeyPin;
+
+  /// No description provided for @onboardingKeyNPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Key {n} PIN'**
+  String onboardingKeyNPin(int n);
+
+  /// No description provided for @onboardingYubikeyTapInstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'You will tap each YubiKey twice (4 taps total). Between the two keys, you will be prompted to swap.'**
+  String get onboardingYubikeyTapInstruction;
+
+  /// No description provided for @onboardingYubikeySlowNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Vault creation with YubiKey takes 20–30 seconds. The app may appear unresponsive — this is normal.'**
+  String get onboardingYubikeySlowNote;
+
+  /// No description provided for @onboardingStep1Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Register primary key'**
+  String get onboardingStep1Label;
+
+  /// No description provided for @onboardingStep1Hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Touch your YubiKey now'**
+  String get onboardingStep1Hint;
+
+  /// No description provided for @onboardingStep2Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate primary key'**
+  String get onboardingStep2Label;
+
+  /// No description provided for @onboardingStep2Hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Touch your YubiKey again'**
+  String get onboardingStep2Hint;
+
+  /// No description provided for @onboardingStep3Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Swap to backup key'**
+  String get onboardingStep3Label;
+
+  /// No description provided for @onboardingStep3Hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove your primary key, then connect your backup YubiKey'**
+  String get onboardingStep3Hint;
+
+  /// No description provided for @onboardingStep4Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Register backup key'**
+  String get onboardingStep4Label;
+
+  /// No description provided for @onboardingStep4Hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Touch your backup YubiKey'**
+  String get onboardingStep4Hint;
+
+  /// No description provided for @onboardingStep5Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate backup key'**
+  String get onboardingStep5Label;
+
+  /// No description provided for @onboardingStep5Hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Touch your backup YubiKey one final time'**
+  String get onboardingStep5Hint;
 }
 
 class _AppLocalizationsDelegate

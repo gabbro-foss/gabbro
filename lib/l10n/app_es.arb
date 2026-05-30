@@ -680,5 +680,37 @@
   },
   "selectAtLeastOneCharSet": "Selecciona al menos un juego de caracteres",
   "passwordMinLengthNote": "Las contraseñas tienen al menos 32 caracteres. Si un sitio tiene un límite más corto, copia los primeros caracteres que necesites.",
-  "excludeAmbiguousChars": "Excluir caracteres ambiguos (0, O, l, 1, I)"
+  "excludeAmbiguousChars": "Excluir caracteres ambiguos (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Crea tu vault para empezar.",
+  "onboardingVaultName": "Nombre del vault",
+  "onboardingAliasRequired": "El alias es obligatorio",
+  "onboardingNewVaultLocation": "Nueva ubicación del vault (igual que antes)",
+  "onboardingVaultLocation": "Ubicación del vault",
+  "onboardingLoadingPath": "Cargando…",
+  "onboardingPathHint": "Ruta al archivo vault",
+  "onboardingPathRequired": "La ruta es obligatoria",
+  "onboardingReusePassphraseHint": "Elija una nueva frase de contraseña maestra, o reutilice la anterior si lo prefiere.",
+  "onboardingPassphraseRequired": "La frase de contraseña es obligatoria",
+  "onboardingConfirmRequired": "Por favor confirme su frase de contraseña",
+  "onboardingPrimaryKeyPin": "PIN de la clave principal",
+  "onboardingBackupKeyPin": "PIN de la clave de respaldo",
+  "onboardingKeyNPin": "PIN de la clave {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Tocará cada YubiKey dos veces (4 toques en total). Entre las dos llaves, se le pedirá que las intercambie.",
+  "onboardingYubikeySlowNote": "La creación del vault con YubiKey tarda 20–30 segundos. La aplicación puede parecer no responder — esto es normal.",
+  "onboardingStep1Label": "Registrar la clave principal",
+  "onboardingStep1Hint": "Toque su YubiKey ahora",
+  "onboardingStep2Label": "Activar la clave principal",
+  "onboardingStep2Hint": "Toque su YubiKey de nuevo",
+  "onboardingStep3Label": "Cambiar a la clave de respaldo",
+  "onboardingStep3Hint": "Retire su clave principal, luego conecte su YubiKey de respaldo",
+  "onboardingStep4Label": "Registrar la clave de respaldo",
+  "onboardingStep4Hint": "Toque su YubiKey de respaldo",
+  "onboardingStep5Label": "Activar la clave de respaldo",
+  "onboardingStep5Hint": "Toque su YubiKey de respaldo por última vez"
 }

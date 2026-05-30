@@ -1438,4 +1438,92 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get excludeAmbiguousChars =>
       'Excluir caracteres ambiguos (0, O, l, 1, I)';
+
+  @override
+  String get onboardingGetStarted => 'Crea tu vault para empezar.';
+
+  @override
+  String get onboardingVaultName => 'Nombre del vault';
+
+  @override
+  String get onboardingAliasRequired => 'El alias es obligatorio';
+
+  @override
+  String get onboardingNewVaultLocation =>
+      'Nueva ubicación del vault (igual que antes)';
+
+  @override
+  String get onboardingVaultLocation => 'Ubicación del vault';
+
+  @override
+  String get onboardingLoadingPath => 'Cargando…';
+
+  @override
+  String get onboardingPathHint => 'Ruta al archivo vault';
+
+  @override
+  String get onboardingPathRequired => 'La ruta es obligatoria';
+
+  @override
+  String get onboardingReusePassphraseHint =>
+      'Elija una nueva frase de contraseña maestra, o reutilice la anterior si lo prefiere.';
+
+  @override
+  String get onboardingPassphraseRequired =>
+      'La frase de contraseña es obligatoria';
+
+  @override
+  String get onboardingConfirmRequired =>
+      'Por favor confirme su frase de contraseña';
+
+  @override
+  String get onboardingPrimaryKeyPin => 'PIN de la clave principal';
+
+  @override
+  String get onboardingBackupKeyPin => 'PIN de la clave de respaldo';
+
+  @override
+  String onboardingKeyNPin(int n) {
+    return 'PIN de la clave $n';
+  }
+
+  @override
+  String get onboardingYubikeyTapInstruction =>
+      'Tocará cada YubiKey dos veces (4 toques en total). Entre las dos llaves, se le pedirá que las intercambie.';
+
+  @override
+  String get onboardingYubikeySlowNote =>
+      'La creación del vault con YubiKey tarda 20–30 segundos. La aplicación puede parecer no responder — esto es normal.';
+
+  @override
+  String get onboardingStep1Label => 'Registrar la clave principal';
+
+  @override
+  String get onboardingStep1Hint => 'Toque su YubiKey ahora';
+
+  @override
+  String get onboardingStep2Label => 'Activar la clave principal';
+
+  @override
+  String get onboardingStep2Hint => 'Toque su YubiKey de nuevo';
+
+  @override
+  String get onboardingStep3Label => 'Cambiar a la clave de respaldo';
+
+  @override
+  String get onboardingStep3Hint =>
+      'Retire su clave principal, luego conecte su YubiKey de respaldo';
+
+  @override
+  String get onboardingStep4Label => 'Registrar la clave de respaldo';
+
+  @override
+  String get onboardingStep4Hint => 'Toque su YubiKey de respaldo';
+
+  @override
+  String get onboardingStep5Label => 'Activar la clave de respaldo';
+
+  @override
+  String get onboardingStep5Hint =>
+      'Toque su YubiKey de respaldo por última vez';
 }

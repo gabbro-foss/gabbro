@@ -680,5 +680,37 @@
   },
   "selectAtLeastOneCharSet": "Mindestens einen Zeichensatz auswählen",
   "passwordMinLengthNote": "Passwörter haben mindestens 32 Zeichen. Wenn eine Website ein kürzeres Limit hat, die ersten benötigten Zeichen kopieren.",
-  "excludeAmbiguousChars": "Mehrdeutige Zeichen ausschließen (0, O, l, 1, I)"
+  "excludeAmbiguousChars": "Mehrdeutige Zeichen ausschließen (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Erstellen Sie Ihren Tresor, um zu beginnen.",
+  "onboardingVaultName": "Tresorname",
+  "onboardingAliasRequired": "Alias ist erforderlich",
+  "onboardingNewVaultLocation": "Neuer Tresorpfad (wie zuvor)",
+  "onboardingVaultLocation": "Tresorpfad",
+  "onboardingLoadingPath": "Laden…",
+  "onboardingPathHint": "Pfad zur Tresordatei",
+  "onboardingPathRequired": "Pfad ist erforderlich",
+  "onboardingReusePassphraseHint": "Wählen Sie eine neue Hauptpassphrase oder verwenden Sie die vorherige wieder.",
+  "onboardingPassphraseRequired": "Passphrase ist erforderlich",
+  "onboardingConfirmRequired": "Bitte bestätigen Sie Ihre Passphrase",
+  "onboardingPrimaryKeyPin": "PIN des primären Schlüssels",
+  "onboardingBackupKeyPin": "PIN des Sicherungsschlüssels",
+  "onboardingKeyNPin": "PIN des Schlüssels {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Sie berühren jeden YubiKey zweimal (insgesamt 4 Mal). Zwischen den beiden Schlüsseln werden Sie aufgefordert zu wechseln.",
+  "onboardingYubikeySlowNote": "Die Tresorderstellung mit YubiKey dauert 20–30 Sekunden. Die App kann kurzzeitig eingefroren wirken — das ist normal.",
+  "onboardingStep1Label": "Primärschlüssel registrieren",
+  "onboardingStep1Hint": "Berühren Sie jetzt Ihren YubiKey",
+  "onboardingStep2Label": "Primärschlüssel aktivieren",
+  "onboardingStep2Hint": "Berühren Sie Ihren YubiKey erneut",
+  "onboardingStep3Label": "Zum Sicherungsschlüssel wechseln",
+  "onboardingStep3Hint": "Entfernen Sie Ihren Primärschlüssel und verbinden Sie Ihren Sicherungs-YubiKey",
+  "onboardingStep4Label": "Sicherungsschlüssel registrieren",
+  "onboardingStep4Hint": "Berühren Sie Ihren Sicherungs-YubiKey",
+  "onboardingStep5Label": "Sicherungsschlüssel aktivieren",
+  "onboardingStep5Hint": "Berühren Sie Ihren Sicherungs-YubiKey ein letztes Mal"
 }

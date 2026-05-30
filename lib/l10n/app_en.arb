@@ -686,5 +686,37 @@
   "tooltipShow": "Show",
   "tooltipCopied": "Copied!",
   "tooltipCopy": "Copy",
-  "excludeAmbiguousChars": "Exclude ambiguous characters (0, O, l, 1, I)"
+  "excludeAmbiguousChars": "Exclude ambiguous characters (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Create your vault to get started.",
+  "onboardingVaultName": "Vault name",
+  "onboardingAliasRequired": "Alias is required",
+  "onboardingNewVaultLocation": "New vault location (same as before)",
+  "onboardingVaultLocation": "Vault location",
+  "onboardingLoadingPath": "Loading…",
+  "onboardingPathHint": "Path to vault file",
+  "onboardingPathRequired": "Path is required",
+  "onboardingReusePassphraseHint": "Choose a new master passphrase, or re-use your previous one if you prefer.",
+  "onboardingPassphraseRequired": "Passphrase is required",
+  "onboardingConfirmRequired": "Please confirm your passphrase",
+  "onboardingPrimaryKeyPin": "Primary key PIN",
+  "onboardingBackupKeyPin": "Backup key PIN",
+  "onboardingKeyNPin": "Key {n} PIN",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "You will tap each YubiKey twice (4 taps total). Between the two keys, you will be prompted to swap.",
+  "onboardingYubikeySlowNote": "Vault creation with YubiKey takes 20–30 seconds. The app may appear unresponsive — this is normal.",
+  "onboardingStep1Label": "Register primary key",
+  "onboardingStep1Hint": "Touch your YubiKey now",
+  "onboardingStep2Label": "Activate primary key",
+  "onboardingStep2Hint": "Touch your YubiKey again",
+  "onboardingStep3Label": "Swap to backup key",
+  "onboardingStep3Hint": "Remove your primary key, then connect your backup YubiKey",
+  "onboardingStep4Label": "Register backup key",
+  "onboardingStep4Hint": "Touch your backup YubiKey",
+  "onboardingStep5Label": "Activate backup key",
+  "onboardingStep5Hint": "Touch your backup YubiKey one final time"
 }

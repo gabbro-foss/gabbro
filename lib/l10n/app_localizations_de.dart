@@ -1438,4 +1438,91 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get excludeAmbiguousChars =>
       'Mehrdeutige Zeichen ausschließen (0, O, l, 1, I)';
+
+  @override
+  String get onboardingGetStarted =>
+      'Erstellen Sie Ihren Tresor, um zu beginnen.';
+
+  @override
+  String get onboardingVaultName => 'Tresorname';
+
+  @override
+  String get onboardingAliasRequired => 'Alias ist erforderlich';
+
+  @override
+  String get onboardingNewVaultLocation => 'Neuer Tresorpfad (wie zuvor)';
+
+  @override
+  String get onboardingVaultLocation => 'Tresorpfad';
+
+  @override
+  String get onboardingLoadingPath => 'Laden…';
+
+  @override
+  String get onboardingPathHint => 'Pfad zur Tresordatei';
+
+  @override
+  String get onboardingPathRequired => 'Pfad ist erforderlich';
+
+  @override
+  String get onboardingReusePassphraseHint =>
+      'Wählen Sie eine neue Hauptpassphrase oder verwenden Sie die vorherige wieder.';
+
+  @override
+  String get onboardingPassphraseRequired => 'Passphrase ist erforderlich';
+
+  @override
+  String get onboardingConfirmRequired =>
+      'Bitte bestätigen Sie Ihre Passphrase';
+
+  @override
+  String get onboardingPrimaryKeyPin => 'PIN des primären Schlüssels';
+
+  @override
+  String get onboardingBackupKeyPin => 'PIN des Sicherungsschlüssels';
+
+  @override
+  String onboardingKeyNPin(int n) {
+    return 'PIN des Schlüssels $n';
+  }
+
+  @override
+  String get onboardingYubikeyTapInstruction =>
+      'Sie berühren jeden YubiKey zweimal (insgesamt 4 Mal). Zwischen den beiden Schlüsseln werden Sie aufgefordert zu wechseln.';
+
+  @override
+  String get onboardingYubikeySlowNote =>
+      'Die Tresorderstellung mit YubiKey dauert 20–30 Sekunden. Die App kann kurzzeitig eingefroren wirken — das ist normal.';
+
+  @override
+  String get onboardingStep1Label => 'Primärschlüssel registrieren';
+
+  @override
+  String get onboardingStep1Hint => 'Berühren Sie jetzt Ihren YubiKey';
+
+  @override
+  String get onboardingStep2Label => 'Primärschlüssel aktivieren';
+
+  @override
+  String get onboardingStep2Hint => 'Berühren Sie Ihren YubiKey erneut';
+
+  @override
+  String get onboardingStep3Label => 'Zum Sicherungsschlüssel wechseln';
+
+  @override
+  String get onboardingStep3Hint =>
+      'Entfernen Sie Ihren Primärschlüssel und verbinden Sie Ihren Sicherungs-YubiKey';
+
+  @override
+  String get onboardingStep4Label => 'Sicherungsschlüssel registrieren';
+
+  @override
+  String get onboardingStep4Hint => 'Berühren Sie Ihren Sicherungs-YubiKey';
+
+  @override
+  String get onboardingStep5Label => 'Sicherungsschlüssel aktivieren';
+
+  @override
+  String get onboardingStep5Hint =>
+      'Berühren Sie Ihren Sicherungs-YubiKey ein letztes Mal';
 }

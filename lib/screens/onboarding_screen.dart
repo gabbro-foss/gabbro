@@ -398,10 +398,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     c.complete();
   }
 
-  String _pinLabel(int index) => switch (index) {
-    0 => 'Primary key PIN',
-    1 => 'Backup key PIN',
-    _ => 'Key ${index + 1} PIN',
+  String _pinLabel(int index, AppLocalizations l) => switch (index) {
+    0 => l.onboardingPrimaryKeyPin,
+    1 => l.onboardingBackupKeyPin,
+    _ => l.onboardingKeyNPin(index + 1),
   };
 
   void _onPassphraseChanged(String value) {
@@ -479,13 +479,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     StrengthTier.centuries => Colors.green.shade800,
   };
 
-  String _tierLabel(StrengthTier tier) => switch (tier) {
-    StrengthTier.terrible => 'Terrible',
-    StrengthTier.weak => 'Weak',
-    StrengthTier.fair => 'Fair',
-    StrengthTier.strong => 'Strong',
-    StrengthTier.veryStrong => 'Very strong',
-    StrengthTier.centuries => 'Excellent',
+  String _tierLabel(StrengthTier tier, AppLocalizations l) => switch (tier) {
+    StrengthTier.terrible => l.strengthTierTerrible,
+    StrengthTier.weak => l.strengthTierWeak,
+    StrengthTier.fair => l.strengthTierFair,
+    StrengthTier.strong => l.strengthTierStrong,
+    StrengthTier.veryStrong => l.strengthTierVeryStrong,
+    StrengthTier.centuries => l.strengthTierExcellent,
   };
 
   bool get _strongEnough =>
@@ -607,6 +607,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _buildYubikeyCreationSteps(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final cs = Theme.of(context).colorScheme;
 
     Widget connector(bool done) => Padding(
@@ -631,8 +632,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _buildStepRow(
             context,
             number: 1,
-            label: 'Register primary key',
-            hint: 'Touch your YubiKey now',
+            label: l.onboardingStep1Label,
+            hint: l.onboardingStep1Hint,
             done: _yubikeyStep >= 2,
             active: _yubikeyStep == 1,
           ),
@@ -640,8 +641,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _buildStepRow(
             context,
             number: 2,
-            label: 'Activate primary key',
-            hint: 'Touch your YubiKey again',
+            label: l.onboardingStep2Label,
+            hint: l.onboardingStep2Hint,
             done: _yubikeyStep >= 3,
             active: _yubikeyStep == 2,
           ),
@@ -649,8 +650,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _buildStepRow(
             context,
             number: 3,
-            label: 'Swap to backup key',
-            hint: 'Remove your primary key, then connect your backup YubiKey',
+            label: l.onboardingStep3Label,
+            hint: l.onboardingStep3Hint,
             done: _yubikeyStep >= 4,
             active: _yubikeyStep == 3,
           ),
@@ -671,8 +672,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _buildStepRow(
             context,
             number: 4,
-            label: 'Register backup key',
-            hint: 'Touch your backup YubiKey',
+            label: l.onboardingStep4Label,
+            hint: l.onboardingStep4Hint,
             done: _yubikeyStep >= 5,
             active: _yubikeyStep == 4,
           ),
@@ -680,8 +681,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _buildStepRow(
             context,
             number: 5,
-            label: 'Activate backup key',
-            hint: 'Touch your backup YubiKey one final time',
+            label: l.onboardingStep5Label,
+            hint: l.onboardingStep5Hint,
             done: false,
             active: _yubikeyStep == 5,
           ),
@@ -694,6 +695,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final app = GabbroApp.maybeOf(context);
     final isAccessibilityOn =
         app != null &&
@@ -714,7 +716,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   if (Navigator.canPop(context))
                     IconButton(
                       icon: const Icon(Icons.close),
-                      tooltip: 'Cancel',
+                      tooltip: l.tooltipCancel,
                       onPressed: () => Navigator.of(context).pop(),
                     )
                   else
@@ -803,30 +805,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ] else ...[
                             Text(
-                              'Create your vault to get started.',
+                              l.onboardingGetStarted,
                               style: Theme.of(context).textTheme.bodyMedium,
                               textAlign: TextAlign.center,
                             ),
                           ],
                           const SizedBox(height: 40),
-                          const Text(
-                            'Vault name',
-                            style: TextStyle(fontWeight: FontWeight.w600),
+                          Text(
+                            l.onboardingVaultName,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(height: 8),
                           TextFormField(
                             controller: _aliasController,
-                            decoration: const InputDecoration(
-                              labelText: 'Alias',
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l.aliasLabel,
+                              border: const OutlineInputBorder(),
                             ),
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
-                                return 'Alias is required';
+                                return l.onboardingAliasRequired;
                               }
                               final alias = v.trim();
                               if (widget.existingAliases.contains(alias)) {
-                                return 'A vault named "$alias" already exists';
+                                return l.vaultNameAlreadyExists(alias);
                               }
                               return null;
                             },
@@ -834,21 +836,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           const SizedBox(height: 24),
                           Text(
                             widget.postDeletionMessage != null
-                                ? 'New vault location (same as before)'
-                                : 'Vault location',
+                                ? l.onboardingNewVaultLocation
+                                : l.onboardingVaultLocation,
                             style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(height: 8),
                           if (widget.isAndroid)
                             Text(
-                              _vaultPath.isEmpty ? 'Loading…' : _vaultPath,
+                              _vaultPath.isEmpty ? l.onboardingLoadingPath : _vaultPath,
                               style: Theme.of(context).textTheme.bodySmall,
                             )
                           else
                             PathField(
                               key: Key(_vaultPath),
                               mode: PathFieldMode.save,
-                              hint: 'Path to vault file',
+                              hint: l.onboardingPathHint,
                               initialPath: _vaultPath.isEmpty
                                   ? null
                                   : _vaultPath,
@@ -861,13 +863,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 _vaultPath = path;
                               }),
                               validator: (v) => (v == null || v.isEmpty)
-                                  ? 'Path is required'
+                                  ? l.onboardingPathRequired
                                   : null,
                             ),
                           if (widget.postDeletionMessage != null) ...[
                             const SizedBox(height: 8),
                             Text(
-                              'Choose a new master passphrase, or re-use your previous one if you prefer.',
+                              l.onboardingReusePassphraseHint,
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ],
@@ -879,7 +881,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 !widget.blockPassphraseCopyPaste,
                             onChanged: _onPassphraseChanged,
                             decoration: InputDecoration(
-                              labelText: 'Master passphrase',
+                              labelText: l.masterPassphraseLabel,
                               border: const OutlineInputBorder(),
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -895,10 +897,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                             validator: (v) {
                               if (v == null || v.isEmpty) {
-                                return 'Passphrase is required';
+                                return l.onboardingPassphraseRequired;
                               }
                               if (!_strongEnough) {
-                                return 'Passphrase is too weak';
+                                return l.passphraseTooWeak;
                               }
                               return null;
                             },
@@ -919,7 +921,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${_tierLabel(_entropy!.tier)} · ${_entropy!.bits.toStringAsFixed(1)} bits of entropy',
+                              l.unlockEntropyDisplay(
+                                _tierLabel(_entropy!.tier, l),
+                                _entropy!.bits.toStringAsFixed(1),
+                              ),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: _tierColor(_entropy!.tier),
@@ -941,7 +946,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               );
                             },
                             decoration: InputDecoration(
-                              labelText: 'Confirm passphrase',
+                              labelText: l.confirmPassphraseLabelShort,
                               border: const OutlineInputBorder(),
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -956,10 +961,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                             validator: (v) {
                               if (v == null || v.isEmpty) {
-                                return 'Please confirm your passphrase';
+                                return l.onboardingConfirmRequired;
                               }
                               if (v != _passphraseController.text) {
-                                return 'Passphrases do not match';
+                                return l.passphrasesDoNotMatch;
                               }
                               return null;
                             },
@@ -968,8 +973,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             const SizedBox(height: 4),
                             Text(
                               _confirmMatches!
-                                  ? '✓ Passphrases match'
-                                  : '✗ Passphrases do not match',
+                                  ? l.passphrasesMatch
+                                  : l.passphrasesNoMatch,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: _confirmMatches!
@@ -1002,7 +1007,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   controller: _pinControllers[i],
                                   obscureText: _pinObscured[i],
                                   decoration: InputDecoration(
-                                    labelText: _pinLabel(i),
+                                    labelText: _pinLabel(i, l),
                                     border: const OutlineInputBorder(),
                                     suffixIcon: IconButton(
                                       icon: Icon(
@@ -1017,7 +1022,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     ),
                                   ),
                                   validator: (v) => (v == null || v.isEmpty)
-                                      ? '${_pinLabel(i)} is required'
+                                      ? l.yubiKeyPinRequired
                                       : null,
                                 ),
                               ],
@@ -1036,7 +1041,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 _buildYubikeyCreationSteps(context)
                               else ...[
                                 Text(
-                                  'You will tap each YubiKey twice (4 taps total). Between the two keys, you will be prompted to swap.',
+                                  l.onboardingYubikeyTapInstruction,
                                   style: Theme.of(context).textTheme.bodySmall,
                                   textAlign: TextAlign.center,
                                 ),
@@ -1054,7 +1059,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    'Vault creation with YubiKey takes 20–30 seconds. The app may appear unresponsive — this is normal.',
+                                    l.onboardingYubikeySlowNote,
                                     style: Theme.of(
                                       context,
                                     ).textTheme.bodySmall,

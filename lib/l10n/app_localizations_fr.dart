@@ -1450,4 +1450,91 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get excludeAmbiguousChars =>
       'Exclure les caractères ambigus (0, O, l, 1, I)';
+
+  @override
+  String get onboardingGetStarted => 'Créez votre coffre pour commencer.';
+
+  @override
+  String get onboardingVaultName => 'Nom du coffre';
+
+  @override
+  String get onboardingAliasRequired => 'L\'alias est requis';
+
+  @override
+  String get onboardingNewVaultLocation =>
+      'Nouvel emplacement du coffre (identique à l\'ancien)';
+
+  @override
+  String get onboardingVaultLocation => 'Emplacement du coffre';
+
+  @override
+  String get onboardingLoadingPath => 'Chargement…';
+
+  @override
+  String get onboardingPathHint => 'Chemin vers le fichier coffre';
+
+  @override
+  String get onboardingPathRequired => 'Le chemin est requis';
+
+  @override
+  String get onboardingReusePassphraseHint =>
+      'Choisissez une nouvelle phrase secrète principale, ou réutilisez l\'ancienne si vous préférez.';
+
+  @override
+  String get onboardingPassphraseRequired => 'La phrase secrète est requise';
+
+  @override
+  String get onboardingConfirmRequired =>
+      'Veuillez confirmer votre phrase secrète';
+
+  @override
+  String get onboardingPrimaryKeyPin => 'PIN de la clé principale';
+
+  @override
+  String get onboardingBackupKeyPin => 'PIN de la clé de sauvegarde';
+
+  @override
+  String onboardingKeyNPin(int n) {
+    return 'PIN de la clé $n';
+  }
+
+  @override
+  String get onboardingYubikeyTapInstruction =>
+      'Vous devrez appuyer deux fois sur chaque YubiKey (4 appuis au total). Entre les deux clés, vous serez invité à les échanger.';
+
+  @override
+  String get onboardingYubikeySlowNote =>
+      'La création du coffre avec YubiKey prend 20 à 30 secondes. L\'application peut sembler bloquée — c\'est normal.';
+
+  @override
+  String get onboardingStep1Label => 'Enregistrer la clé principale';
+
+  @override
+  String get onboardingStep1Hint => 'Appuyez maintenant sur votre YubiKey';
+
+  @override
+  String get onboardingStep2Label => 'Activer la clé principale';
+
+  @override
+  String get onboardingStep2Hint => 'Appuyez à nouveau sur votre YubiKey';
+
+  @override
+  String get onboardingStep3Label => 'Passer à la clé de sauvegarde';
+
+  @override
+  String get onboardingStep3Hint =>
+      'Retirez votre clé principale, puis connectez votre YubiKey de sauvegarde';
+
+  @override
+  String get onboardingStep4Label => 'Enregistrer la clé de sauvegarde';
+
+  @override
+  String get onboardingStep4Hint => 'Appuyez sur votre YubiKey de sauvegarde';
+
+  @override
+  String get onboardingStep5Label => 'Activer la clé de sauvegarde';
+
+  @override
+  String get onboardingStep5Hint =>
+      'Appuyez une dernière fois sur votre YubiKey de sauvegarde';
 }

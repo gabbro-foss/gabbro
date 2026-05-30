@@ -680,5 +680,37 @@
   },
   "selectAtLeastOneCharSet": "Sélectionnez au moins un jeu de caractères",
   "passwordMinLengthNote": "Les mots de passe comportent au moins 32 caractères. Si un site a une limite plus courte, copiez les premiers caractères dont vous avez besoin.",
-  "excludeAmbiguousChars": "Exclure les caractères ambigus (0, O, l, 1, I)"
+  "excludeAmbiguousChars": "Exclure les caractères ambigus (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Créez votre coffre pour commencer.",
+  "onboardingVaultName": "Nom du coffre",
+  "onboardingAliasRequired": "L'alias est requis",
+  "onboardingNewVaultLocation": "Nouvel emplacement du coffre (identique à l'ancien)",
+  "onboardingVaultLocation": "Emplacement du coffre",
+  "onboardingLoadingPath": "Chargement…",
+  "onboardingPathHint": "Chemin vers le fichier coffre",
+  "onboardingPathRequired": "Le chemin est requis",
+  "onboardingReusePassphraseHint": "Choisissez une nouvelle phrase secrète principale, ou réutilisez l'ancienne si vous préférez.",
+  "onboardingPassphraseRequired": "La phrase secrète est requise",
+  "onboardingConfirmRequired": "Veuillez confirmer votre phrase secrète",
+  "onboardingPrimaryKeyPin": "PIN de la clé principale",
+  "onboardingBackupKeyPin": "PIN de la clé de sauvegarde",
+  "onboardingKeyNPin": "PIN de la clé {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Vous devrez appuyer deux fois sur chaque YubiKey (4 appuis au total). Entre les deux clés, vous serez invité à les échanger.",
+  "onboardingYubikeySlowNote": "La création du coffre avec YubiKey prend 20 à 30 secondes. L'application peut sembler bloquée — c'est normal.",
+  "onboardingStep1Label": "Enregistrer la clé principale",
+  "onboardingStep1Hint": "Appuyez maintenant sur votre YubiKey",
+  "onboardingStep2Label": "Activer la clé principale",
+  "onboardingStep2Hint": "Appuyez à nouveau sur votre YubiKey",
+  "onboardingStep3Label": "Passer à la clé de sauvegarde",
+  "onboardingStep3Hint": "Retirez votre clé principale, puis connectez votre YubiKey de sauvegarde",
+  "onboardingStep4Label": "Enregistrer la clé de sauvegarde",
+  "onboardingStep4Hint": "Appuyez sur votre YubiKey de sauvegarde",
+  "onboardingStep5Label": "Activer la clé de sauvegarde",
+  "onboardingStep5Hint": "Appuyez une dernière fois sur votre YubiKey de sauvegarde"
 }
