@@ -50,3 +50,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Release artifacts (ephemeral — upload to GitHub releases then delete)
+*.tar.gz
+*.apk
