@@ -54,6 +54,7 @@ void main() {
       expect(find.text('Change passphrase'), findsOneWidget);
       expect(find.text('Manage YubiKeys'), findsOneWidget);
       expect(find.text('Appearance'), findsOneWidget);
+      expect(find.text('Language'), findsOneWidget);
       expect(find.text('Security'), findsOneWidget);
       expect(find.text('Password generator'), findsOneWidget);
       expect(find.text('About'), findsOneWidget);

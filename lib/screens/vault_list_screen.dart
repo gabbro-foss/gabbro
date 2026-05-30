@@ -13,6 +13,7 @@ import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/screens/export_screen.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
+import 'package:gabbro/screens/language_screen.dart';
 import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/change_passphrase_screen.dart';
@@ -716,6 +717,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
         Navigator.of(context).push(
           MaterialPageRoute(builder: (context) => const AppearanceScreen()),
         );
+      case 'language':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const LanguageScreen()),
+        );
       case 'security':
         final appState = GabbroApp.of(context);
         Navigator.of(context).push(
@@ -932,6 +937,14 @@ class _VaultListScreenState extends State<VaultListScreen> {
                       const Icon(Icons.palette_outlined, size: 20),
                       const SizedBox(width: 12),
                       Text(ml.menuAppearance),
+                    ]),
+                  ),
+                  PopupMenuItem(
+                    value: 'language',
+                    child: Row(children: [
+                      const Icon(Icons.language_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Text(ml.sectionLanguage),
                     ]),
                   ),
                   PopupMenuItem(

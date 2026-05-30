@@ -508,6 +508,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  void _showLanguagePicker() {
+    final app = GabbroApp.maybeOf(context);
+    if (app == null) return;
+    final l = AppLocalizations.of(context);
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final lang in LanguageChoice.values)
+              ListTile(
+                title: Text(switch (lang) {
+                  LanguageChoice.system => l.langSystem,
+                  LanguageChoice.en => l.langEnglish,
+                  LanguageChoice.fr => l.langFrench,
+                  LanguageChoice.de => l.langGerman,
+                  LanguageChoice.it => l.langItalian,
+                  LanguageChoice.es => l.langSpanish,
+                }),
+                selected: app.settings.language == lang,
+                onTap: () {
+                  app.updateSettings(app.settings.copyWith(language: lang));
+                  Navigator.of(ctx).pop();
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildStepRow(
     BuildContext context, {
     required int number,
@@ -686,7 +718,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       onPressed: () => Navigator.of(context).pop(),
                     )
                   else
-                    const SizedBox(width: 48),
+                    IconButton(
+                      icon: const Icon(Icons.language),
+                      tooltip: AppLocalizations.of(context).sectionLanguage,
+                      onPressed: _showLanguagePicker,
+                    ),
                   const Spacer(),
                   AnimatedOpacity(
                     opacity: MediaQuery.of(context).viewInsets.bottom > 0

@@ -47,6 +47,13 @@ void main() {
     expect(find.text('Create vault'), findsOneWidget);
   });
 
+  // ── Language button ────────────────────────────────────────────────────────
+
+  testWidgets('language button shown on first launch (cannot pop)', (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    expect(find.byIcon(Icons.language), findsOneWidget);
+  });
+
   testWidgets('path field is pre-populated from initialPath', (tester) async {
     await tester.pumpWidget(_buildScreen());
 

@@ -119,31 +119,6 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                       _update(_settings.copyWith(highContrast: v)),
                 ),
               ),
-              const SizedBox(height: 32),
-
-              // ── Language ───────────────────────────────────────────────
-              SectionHeader(label: l.sectionLanguage),
-              const SizedBox(height: 4),
-              Text(
-                l.languageNote,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 8),
-              SegmentedRow<LanguageChoice>(
-                values: LanguageChoice.values,
-                selected: _settings.language,
-                label: (v) => switch (v) {
-                  LanguageChoice.system => l.langSystem,
-                  LanguageChoice.en => l.langEnglish,
-                  LanguageChoice.fr => l.langFrench,
-                  LanguageChoice.de => l.langGerman,
-                  LanguageChoice.it => l.langItalian,
-                  LanguageChoice.es => l.langSpanish,
-                },
-                onSelected: (v) => _update(_settings.copyWith(language: v)),
-              ),
             ],
           ),
         ),
