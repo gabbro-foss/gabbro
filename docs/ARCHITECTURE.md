@@ -175,19 +175,16 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: fix — dart dependency constraints blocking 14 package updates
+### Next task: fix — unlock button partially hidden by Android nav bar in YubiKey login screen
 
-`flutter pub get` (and every build) prints:
+Since the `GabbroLogo` widget was added to `UnlockScreen`, the **Unlock** button is clipped by the Android system navigation bar when the vault is in YubiKey mode.
 
-    14 packages have newer versions incompatible with dependency constraints.
-    Try `dart pub outdated` for more information.
-
-**Goal:** run `dart pub outdated`, understand which constraints block which packages, and update `pubspec.yaml` (and `pubspec.lock`) so the app builds against current package versions. Verify all 447 Flutter tests still pass after the update.
+**Goal:** ensure the Unlock button is fully visible and tappable on Android in YubiKey mode, without breaking the passphrase-mode layout or the Linux layout.
 
 **Constraints / risks:**
-- "Incompatible with dependency constraints" means major-version bumps — check breaking changes in each package's changelog before updating.
-- `flutter_rust_bridge` is the most sensitive dependency; updating it may require regenerating the bridge (`flutter_rust_bridge_codegen generate`).
-- Android build (`flutter build apk --release`) must be verified after, not just `flutter test`.
+- Layout fix must work on both phones (small screens) and tablets.
+- Test both YubiKey mode and passphrase mode on Android emulator/device after the fix.
+- Linux layout must be verified unchanged (`flutter build linux --release` or visual check).
 
 ---
 
@@ -357,7 +354,6 @@ Add a disclaimer in the release notes:
 
 ### Features & UX
 - add l10n button on onboarding screen, move l10n option out of `appearance` settings into a `language` setting OR rename `appearance` to `customisations` <- or something like this
-- fix: in login screen with yubikey-mode active, the `unlock` button is partially hidden by the android bar since the logo was added
 - add option in vault export to exclude date in filename -> for file sync with rsync
 - Add tutorial/onboarding: probably in the README as snapshots from linux/emulator
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
@@ -366,6 +362,7 @@ Add a disclaimer in the release notes:
 
 ### Code Quality
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
+- KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer
 - Data breach alerts / HaveIBeenPwned integration.
