@@ -181,6 +181,16 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 Run Claude Opus over `rust/src/crypto/` and `rust/src/vault/` — full file reads, looking for: timing side-channels, nonce reuse risk, incorrect use of authenticated encryption, KDF parameter choices, secret zeroization, and anything surprising in the hybrid ML-KEM + X25519 construction. Goal is a findings report; remediation is a separate session.
 
+AI security audit must meet the following **minimum requirements** but is expected to go much further:
+- provide a AI_SECURITY_AUDIT file listing all completed checks
+- no private keys or other sensitive information exposed on github or any such thing allowing a takeover of the repo
+- up-to-date packages/crates and supply chain components used and no AI hallucination using deprecated code
+- fits NIST recommendations
+- check against published security audits to see if any learnings can be transferred to gabbro to increase security, **non-exhaustive set** of examples below:
+  - Example: read https://drive.proton.me/urls/11VHB59C60#CVCj696Qxkxd
+  - Example: read https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html
+  - Example: https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines
+
 **Previous task completed (2026-05-30):** v0.1.0-alpha.1 shipped. Linux tar.gz (glibc ≤ 2.34 — runs on Arch, Debian trixie, Mint) and signed Android APK both released. Android signing keystore set up (one-time, keystore at `android/app/gabbro-upload.jks`).
 
 ---
@@ -342,11 +352,15 @@ Add a disclaimer in the release notes:
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
 - Supply-chain audit: `cargo audit`, `flutter pub audit`, IDE extension review, pin CI Actions to commit SHAs when CI is added.
 - Verify Android storage permissions hold on Android 11+ (app-private storage + SAF — no `MANAGE_EXTERNAL_STORAGE`).
+- Add an encrypted `vault.gabbro` file on the public github containing: a 256 char passphrase, a note stating that if anyone decrypts the file, they will be gifted two yubikeys if they send proof (the 256 char passsphrase) and their crack to gabbro.app@gmail.com -> include a "vault not cracked for n days" counter on github if possible
 - Test on de-Googled Android (GrapheneOS/CalyxOS) before v1 — find a willing community tester, don't buy hardware.
 - test/measure code test coverage before launch
-- read https://drive.proton.me/urls/11VHB59C60#CVCj696Qxkxd to see if any learnings can be transferred to gabbro to increase security
 
 ### Features & UX
+- bug: in android, cannot move the cursor in text fields, can position it but not drag it
+- l10n bug: example text in font size (`appearance_screen.dart`) is hard-coded in English
+- l10n bugs: many entry field tooltips are still hard-coded in English (examples: card state, custom fields label and value) -> audit all entries for hard-coded text and apply l10n
+- l10n bug: default folder names are hard-coded in English
 - add option in vault export to exclude date in filename -> for file sync with rsync
 - Add tutorial/onboarding: probably in the README as snapshots from linux/emulator
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
@@ -356,6 +370,7 @@ Add a disclaimer in the release notes:
 ### Code Quality
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
+- Explain if this project can be defined as "vide-coding" or not, and why, especially in the light of things like this: "vibe-coded cryptography software" in https://blogs.gentoo.org/mgorny/2026/05/28/why-gentoo/#more-2634
 
 ### V2+ / Defer
 - Data breach alerts / HaveIBeenPwned integration.
