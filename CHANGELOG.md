@@ -25,10 +25,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Import validation failures surfaced via dialog (Skip / Edit)
 - Android autofill service (fill path; eTLD+1 domain matching; Chromium/Brave compatible)
 - Appearance settings: theme (system/light/dark), text size, high-contrast, alphabet bar position
+- Language settings: dedicated Language screen (Settings → Language); language picker on onboarding screen for first-time users; overrides system locale
 - Security settings: foreground + background lock timeouts; copy/paste blocking on passphrase fields
 - Android screenshot prevention and app-switcher blur (`FLAG_SECURE`)
 - Dark and light mode; WCAG AA colour scheme
-- App localisation: UI in English, French, German, Italian, and Spanish; follows system locale with in-app language override (Settings → Appearance)
+- App localisation: UI in English, French, German, Italian, and Spanish; follows system locale by default
 - Locale-aware date formatting via `package:intl` `DateFormat`
 
 ### Fixed

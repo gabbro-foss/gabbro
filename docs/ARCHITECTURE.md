@@ -50,6 +50,7 @@ gabbro/
 │   │   ├── change_passphrase_screen.dart
 │   │   ├── about_screen.dart
 │   │   ├── appearance_screen.dart
+│   │   ├── language_screen.dart
 │   │   ├── generator_screen.dart
 │   │   ├── security_screen.dart
 │   │   ├── review_changes_screen.dart
@@ -145,6 +146,7 @@ gabbro/
 - Folder changes shown in review screen diff (all entry types)
 - Enpass import: entries correctly land in "None" folder (category name was incorrectly used as folder name)
 - Appearance: theme (system/light/dark), text size, high-contrast, alphabet bar position
+- Language: dedicated Language screen (Settings menu); language picker button on OnboardingScreen for first-time users; RadioGroup-based list (System / EN / FR / DE / IT / ES)
 - Security: foreground + background lock timeouts
 - Android screenshot prevention + app switcher blur (`FLAG_SECURE` on `MainActivity` and `UnlockActivity`)
 - Copy/paste blocking on master passphrase fields (default on; user toggle in Settings → Security; keyboard inline paste is a platform limitation, documented in UI)
@@ -164,7 +166,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 448 | 0 | <!-- Phase 4 complete: all 4 languages translated -->
+| Flutter (`flutter test`) | 450 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -175,19 +177,19 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: feat — l10n / language settings
+### Next task: release — v0.1.0-alpha.1 pre-flight
 
-Move language selection out of Appearance settings into a dedicated surface, and add a language button on the onboarding screen so first-time users can set their language before any vault is created.
-
-**Goal:** improve language discoverability. Options (pick one or combine):
-- Rename Appearance → Customisations and add a Language sub-section, OR
-- Add a standalone Language settings screen reachable from Settings menu.
-- Add a locale-picker button to `OnboardingScreen` (top-right or below the logo).
+Work through the pre-flight checklist in `## Release Process`:
+1. Move `[Unreleased]` block in `CHANGELOG.md` to `[0.1.0-alpha.1] – YYYY-MM-DD`.
+2. Bump `version` in `pubspec.yaml` (confirm it matches the tag).
+3. Run `flutter test` (450 passing) and `cargo clippy -- -D warnings`.
+4. Build Linux tar.gz and Android APK.
+5. Commit, tag `v0.1.0-alpha.1`, push tag.
+6. Create GitHub release with both artifacts.
 
 **Constraints / risks:**
-- All existing l10n strings and ARB files are unchanged — this is purely a navigation/settings structure change.
-- Must not break the 447 passing Flutter tests; update or add tests for any new settings routing.
-- The in-app locale picker must call `setLocaleOverride` (or equivalent) and survive hot-restart — check how the current Appearance screen persists settings.
+- Android signing keystore not yet set up — first-time setup required before APK release build (steps in `## Release Process`).
+- Debian compatibility: Arch-built Linux bundle links against Arch glibc — test on Debian machine first; may need a Docker build step.
 
 ---
 
