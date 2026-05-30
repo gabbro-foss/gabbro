@@ -121,6 +121,14 @@ void main() {
     expect(called, isTrue);
   });
 
+  // ── Safe area ─────────────────────────────────────────────────────────────
+
+  testWidgets('body uses SafeArea to avoid system navigation bar overlap',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+    expect(find.byType(SafeArea), findsOneWidget);
+  });
+
   // ── YubiKey mode ──────────────────────────────────────────────────────────
 
   testWidgets('passphrase-only mode when yubikey records are empty', (tester) async {

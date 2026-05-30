@@ -391,8 +391,9 @@ class _UnlockScreenState extends State<UnlockScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: Center(
@@ -554,6 +555,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
             ),
           ),
         ),
+      ),
       ),
     );
   }
