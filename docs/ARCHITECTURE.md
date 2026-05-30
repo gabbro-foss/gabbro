@@ -242,7 +242,7 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 1. Move `[Unreleased]` block in `CHANGELOG.md` to `[0.1.0-alpha.N] – YYYY-MM-DD`.
 2. Bump `version` in `pubspec.yaml` to match.
 3. Resolve the 14 blocked packages (`dart pub outdated`) if not already done — not a hard blocker for a test release, but note it in the release description.
-4. Run `flutter test` (447 passing) and `cargo clippy -- -D warnings`.
+4. Run `flutter test` (450 passing) and `cargo clippy -- -D warnings`.
 5. Commit, then tag: `git tag -a v0.1.0-alpha.1 -m "v0.1.0-alpha.1"` and `git push origin v0.1.0-alpha.1`.
 
 ---
