@@ -177,19 +177,11 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: release — v0.1.0-alpha.1 pre-flight
+### Next task: AI-assisted security review of crypto and vault modules
 
-Work through the pre-flight checklist in `## Release Process`:
-1. Move `[Unreleased]` block in `CHANGELOG.md` to `[0.1.0-alpha.1] – YYYY-MM-DD`.
-2. Bump `version` in `pubspec.yaml` (confirm it matches the tag).
-3. Run `flutter test` (450 passing) and `cargo clippy -- -D warnings`.
-4. Build Linux tar.gz and Android APK.
-5. Commit, tag `v0.1.0-alpha.1`, push tag.
-6. Create GitHub release with both artifacts.
+Run Claude Opus over `rust/src/crypto/` and `rust/src/vault/` — full file reads, looking for: timing side-channels, nonce reuse risk, incorrect use of authenticated encryption, KDF parameter choices, secret zeroization, and anything surprising in the hybrid ML-KEM + X25519 construction. Goal is a findings report; remediation is a separate session.
 
-**Constraints / risks:**
-- Android signing keystore not yet set up — first-time setup required before APK release build (steps in `## Release Process`).
-- Debian compatibility: Arch-built Linux bundle links against Arch glibc — test on Debian machine first; may need a Docker build step.
+**Previous task completed (2026-05-30):** v0.1.0-alpha.1 shipped. Linux tar.gz (glibc ≤ 2.34 — runs on Arch, Debian trixie, Mint) and signed Android APK both released. Android signing keystore set up (one-time, keystore at `android/app/gabbro-upload.jks`).
 
 ---
 
@@ -241,9 +233,8 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 
 1. Move `[Unreleased]` block in `CHANGELOG.md` to `[0.1.0-alpha.N] – YYYY-MM-DD`.
 2. Bump `version` in `pubspec.yaml` to match.
-3. Resolve the 14 blocked packages (`dart pub outdated`) if not already done — not a hard blocker for a test release, but note it in the release description.
-4. Run `flutter test` (450 passing) and `cargo clippy -- -D warnings`.
-5. Commit, then tag: `git tag -a v0.1.0-alpha.1 -m "v0.1.0-alpha.1"` and `git push origin v0.1.0-alpha.1`.
+3. Run `flutter test` (450 passing) and `cargo clippy -- -D warnings`.
+4. Commit, then tag: `git tag -a v0.1.0-alpha.N -m "v0.1.0-alpha.N"` and `git push origin v0.1.0-alpha.N`.
 
 ---
 
@@ -261,12 +252,11 @@ tar -czf gabbro-v0.1.0-alpha.1-linux-x86_64.tar.gz \
     -C build/linux/x64/release bundle
 ```
 
-**Debian compatibility caveat:** the bundle links dynamically against the *host* glibc. Arch ships a newer glibc than Debian stable (bookworm = 2.36). If the binary refuses to run on Debian, the fix is to build inside a Debian bookworm container:
+**Debian compatibility:** verified for v0.1.0-alpha.1 — the Arch-built bundle requires glibc ≤ 2.34 (confirmed via `objdump -T`), well below Debian trixie (stable, 2.41) and Linux Mint (2.42). No Docker build needed. If a future release raises the requirement above 2.41, build inside a Debian trixie container:
 ```bash
-docker run --rm -v "$PWD":/app -w /app debian:bookworm \
+docker run --rm -v "$PWD":/app -w /app debian:trixie \
     bash -c "apt-get update && apt-get install -y flutter ... && flutter build linux --release"
 ```
-Worth testing the Arch-built tar.gz on the Debian machine first — it may work fine if no glibc symbols above 2.36 are used. If it fails, add a Debian-build step here.
 
 ---
 
@@ -349,7 +339,6 @@ Add a disclaimer in the release notes:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Security (pre-v1 gates)
-- AI-assisted security review of `rust/src/crypto/` and `rust/src/vault/` using Claude Opus before public release.
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
 - Supply-chain audit: `cargo audit`, `flutter pub audit`, IDE extension review, pin CI Actions to commit SHAs when CI is added.
 - Verify Android storage permissions hold on Android 11+ (app-private storage + SAF — no `MANAGE_EXTERNAL_STORAGE`).

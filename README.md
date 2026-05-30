@@ -2,9 +2,9 @@
 
 A post-quantum password manager built with security as core DNA.
 
-> **Status: Rust backend complete — Flutter UI complete.**
-> All vault operations are implemented and tested in Rust (338 tests passing).
-> Flutter UI implemented (447 tests passing).
+> **Status: Alpha — v0.1.0-alpha.1 released 2026-05-30 (invited testers only).**
+> All vault operations are implemented and tested in Rust.
+> Flutter UI implemented (450 tests passing).
 
 ---
 
@@ -124,11 +124,34 @@ Full details in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Installation
 
-> **Not yet available.** Gabbro is in early development and has no
-> releases yet. Installation instructions will be added here when
-> the first usable version is ready.
->
-> Watch this repo or check back later.
+> **Alpha release — for invited testers only.** The cryptographic
+> implementation has not yet undergone external review. Do not store
+> passwords you cannot afford to lose.
+
+Download the latest release from the
+[Releases](https://github.com/Zabamund/gabbro/releases) page,
+or receive the artifact directly from the project owner.
+
+### Linux (Arch, Debian trixie, Linux Mint)
+
+Requires glibc ≥ 2.34 — satisfied by all current Arch, Debian stable,
+and Mint installations.
+
+```bash
+tar -xzf gabbro-v0.1.0-alpha.1-linux-x86_64.tar.gz
+./bundle/gabbro
+```
+
+You can place the `bundle/` directory anywhere; the app is self-contained.
+
+### Android
+
+1. Enable **Install from unknown sources** on your device:
+   - Android 8+: Settings → Apps → Special app access → Install unknown apps → select your file manager → Allow
+2. Transfer `gabbro-v0.1.0-alpha.1-android.apk` to your device (USB, email, or file transfer).
+3. Tap the APK file in your file manager to install.
+
+Tested on Android 11+. YubiKey authentication requires a YubiKey 5 series key (USB-A/C for all devices; NFC where supported).
 
 ---
 
