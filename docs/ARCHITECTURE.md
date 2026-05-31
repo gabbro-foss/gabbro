@@ -182,6 +182,14 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 The AI security review (Claude Opus 4.7, 2026-05-31) identified 10 findings across `rust/src/crypto/` and `rust/src/vault/` — all rated Low or Info, none exploitable under the in-scope threat model. Plus 6 cross-cutting lessons drawn from the Recurity Labs Proton Pass audit (526.2501). Remediation is split into two rounds by file-format impact.
 
+**Model selection (self-check before coding — switch via `/model` if mismatched):**
+
+- **Round 1 (F-04, F-06, F-07, F-08, F-09):** Sonnet 4.6 is fine. Mechanical changes with clear pass/fail criteria; strict TDD covers the F-08 atomic-write footgun.
+- **Round 2 F-01 (AES-GCM AAD over header):** Sonnet 4.6 acceptable with TDD-first — write `tampered_<field>_fails_to_open` tests before plumbing AAD.
+- **Round 2 F-02 (FIPS 203 ML-KEM KeyGen alignment):** prefer **Opus 4.7**, or defer until after the human crypto review. Wrong KeyGen produces silently-different keypairs from the same passphrase; no unit test catches this without FIPS test vectors.
+- **Round 2 F-03 (X-Wing combiner):** defer to the human crypto review — implementing pre-emptively risks re-work.
+- **Recommended order:** ship Round 1 now; hold Round 2 until after the academic / RustCrypto pre-v1 gate clears, because the reviewer's opinion may change the spec.
+
 **Round 1 — non-breaking hygiene (no `.gabbro` VERSION bump):**
 
 - **F-04** Memory hygiene typing — change `VaultSession.passphrase` to `Zeroizing<Vec<u8>>` and `YubikeyMaterial.hmac_secret` to `Zeroizing<[u8; 32]>` so abnormal-exit paths still zeroize (panics, SIGKILL, OOM kill). `vault_key_master` and `wrapping_key` are already correctly typed — match them.
