@@ -204,15 +204,22 @@ class _GabbroAppState extends State<GabbroApp>
     _settings = widget.settings;
     _registry = widget.registry;
     WidgetsBinding.instance.addObserver(this);
+    HardwareKeyboard.instance.addHandler(_onKeyEvent);
     _resetForegroundTimer();
   }
 
   @override
   void dispose() {
+    HardwareKeyboard.instance.removeHandler(_onKeyEvent);
     WidgetsBinding.instance.removeObserver(this);
     _backgroundTimer?.cancel();
     _foregroundTimer?.cancel();
     super.dispose();
+  }
+
+  bool _onKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent) _resetForegroundTimer();
+    return false;
   }
 
   // ── Foreground inactivity timer ───────────────────────────────────────────
@@ -259,6 +266,7 @@ class _GabbroAppState extends State<GabbroApp>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
         _foregroundTimer?.cancel();
         final duration = _backgroundDuration;
         if (duration != null) {
