@@ -167,7 +167,7 @@ gabbro/
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 338 | 8 |
-| Flutter (`flutter test`) | 450 | 0 |
+| Flutter (`flutter test`) | 454 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -179,6 +179,11 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 > Update at the end of each session. First thing to read at the start of the next.
 
 ### Next task: implement remediations from `docs/AI_SECURITY_AUDIT.md`
+
+**Previous task completed (2026-05-31):** Fixed two Linux lock-timer bugs:
+1. Foreground lock fired while typing — `GestureDetector` only reset the timer on pointer events; keyboard events were ignored. Fixed by adding `HardwareKeyboard.instance.addHandler` in `initState`/`dispose` to call `_resetForegroundTimer()` on `KeyDownEvent`.
+2. Background lock didn't fire on Qtile (Arch) — `didChangeAppLifecycleState` only handled `AppLifecycleState.paused`; desktop Linux emits `AppLifecycleState.hidden` (window minimised / workspace switch). Fixed by fall-through: `case AppLifecycleState.paused: case AppLifecycleState.hidden:`.
+
 
 The AI security review (Claude Opus 4.7, 2026-05-31) identified 10 findings across `rust/src/crypto/` and `rust/src/vault/` — all rated Low or Info, none exploitable under the in-scope threat model. Plus 6 cross-cutting lessons drawn from the Recurity Labs Proton Pass audit (526.2501). Remediation is split into two rounds by file-format impact.
 
