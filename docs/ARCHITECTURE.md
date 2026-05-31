@@ -113,6 +113,7 @@ gabbro/
 │   ├── ARCHITECTURE.md         # This file
 │   ├── LEARNINGS.md
 │   ├── AI_AUTHORSHIP_AND_IP.md
+│   ├── AI_SECURITY_AUDIT.md    # AI-assisted security review (2026-05-31)
 │   ├── artefacts/
 │   └── decisions/              # ADR documents
 ├── test/                       # Flutter unit/widget tests
@@ -177,21 +178,34 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: AI-assisted security review of crypto and vault modules
+### Next task: implement remediations from `docs/AI_SECURITY_AUDIT.md`
 
-Run Claude Opus over `rust/src/crypto/` and `rust/src/vault/` — full file reads, looking for: timing side-channels, nonce reuse risk, incorrect use of authenticated encryption, KDF parameter choices, secret zeroization, and anything surprising in the hybrid ML-KEM + X25519 construction. Goal is a findings report; remediation is a separate session.
+The AI security review (Claude Opus 4.7, 2026-05-31) identified 10 findings across `rust/src/crypto/` and `rust/src/vault/` — all rated Low or Info, none exploitable under the in-scope threat model. Plus 6 cross-cutting lessons drawn from the Recurity Labs Proton Pass audit (526.2501). Remediation is split into two rounds by file-format impact.
 
-AI security audit must meet the following **minimum requirements** but is expected to go much further:
-- provide a AI_SECURITY_AUDIT file listing all completed checks
-- no private keys or other sensitive information exposed on github or any such thing allowing a takeover of the repo
-- up-to-date packages/crates and supply chain components used and no AI hallucination using deprecated code
-- fits NIST recommendations
-- check against published security audits to see if any learnings can be transferred to gabbro to increase security, **non-exhaustive set** of examples below:
-  - Example: read https://drive.proton.me/urls/11VHB59C60#CVCj696Qxkxd
-  - Example: read https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html
-  - Example: https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines
+**Round 1 — non-breaking hygiene (no `.gabbro` VERSION bump):**
 
-**Previous task completed (2026-05-30):** v0.1.0-alpha.1 shipped. Linux tar.gz (glibc ≤ 2.34 — runs on Arch, Debian trixie, Mint) and signed Android APK both released. Android signing keystore set up (one-time, keystore at `android/app/gabbro-upload.jks`).
+- **F-04** Memory hygiene typing — change `VaultSession.passphrase` to `Zeroizing<Vec<u8>>` and `YubikeyMaterial.hmac_secret` to `Zeroizing<[u8; 32]>` so abnormal-exit paths still zeroize (panics, SIGKILL, OOM kill). `vault_key_master` and `wrapping_key` are already correctly typed — match them.
+- **F-06** Replace the three bounded `.unwrap()` calls in `rust/src/crypto/vault_crypto.rs` (lines 423, 440, 592) with `.expect("length checked above")` to satisfy the CLAUDE.md "no `unwrap()` in non-test code" rule.
+- **F-07** Fix doc-comment drift in `rust/src/crypto/kdf.rs:33-37` — describe what the implementation actually does (32-byte seed via `StdRng`, bytes [64..96] reserved/unused).
+- **F-08** Atomic 0600-mode writes — replace bare `fs::write` in `rust/src/vault/io.rs:20`, `rust/src/api/vault.rs:815,836`, and `rust/src/vault/session.rs:696` with an `OpenOptions { mode: 0o600 }` + temp-file + atomic rename pattern (unix-only `cfg`; Windows path keeps `fs::write`).
+- **F-09** Symlink validation — call `std::fs::symlink_metadata` before opening a vault path for read or write; refuse with a clear error when `.is_symlink()`.
+
+**Round 2 — design-level (may require `.gabbro` file-format bump to VERSION 6):**
+
+- **F-01** Bind the plaintext `.gabbro` header to the AES-GCM auth tag via AAD. Pass the serialised header (everything before the body length prefix) as AAD to `aes_gcm::encrypt` / `decrypt`. Detects tampering with `alias`, YubiKey `credential_id`, and any other plaintext metadata. **VERSION 6 bump** with read-only backward compat for VERSION 2–5.
+- **F-02** Align ML-KEM-1024 KeyGen with FIPS 203 — use `(d, z) ∈ {0,1}^256 × {0,1}^256` directly from KDF bytes `[32..64]` and `[64..96]`, removing the `StdRng` indirection and the dead-bytes range. Requires verifying that `ml-kem` 0.3.x exposes a path to `KeyGen(d, z)`; otherwise stay on the PRNG path but shorten the KDF output to 64 bytes and document the deviation. **Changes derived keypair under same passphrase** → either gated behind VERSION 6 with old vaults still readable via the legacy path, or one-shot migrate-on-open.
+- **F-03** Hybrid combiner — discuss with the human cryptographer (pre-v1 gate) whether to migrate to an X-Wing-style transcript-binding combiner (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). May or may not warrant a VERSION bump on its own; preferable to bundle with F-01 + F-02 into a single VERSION 6 release if pursued.
+
+**Deferred from remediation scope:**
+
+- **F-05** Plaintext JSON export — by design, Flutter-side warning already surfaced. No action.
+- **F-10** eTLD+1 autofill matching — UX tradeoff, candidate for a post-v1 "Strict FQDN" toggle. Move to Bikeshed when starting work.
+- **L-3** iOS Keychain protection class — pinned for the V2+ iOS port (already in Bikeshed via "iOS, Windows, macOS support").
+- **L-6** `gcore` memory-forensics test of an unlocked gabbro process — Bikeshed candidate; ideally before the human-expert crypto review.
+
+After Round 1 ships, run `flutter test` + `cargo test -q` + `cargo clippy -- -D warnings` to confirm no regression. Round 2 work is gated behind a separate session and a `.gabbro` VERSION 6 spec.
+
+**Previous task completed (2026-05-31):** AI-assisted security review (Claude Opus 4.7) of `rust/src/crypto/` and `rust/src/vault/` — see [`docs/AI_SECURITY_AUDIT.md`](AI_SECURITY_AUDIT.md). 0 CVEs across 211 crates, 0 secrets in git history, 0 `unsafe`/`transmute`/`asm!` in scope, 0 hardcoded credentials, 10 findings (all Low or Info), and the full Recurity Labs Proton Pass audit mapped to gabbro's posture.
 
 ---
 
