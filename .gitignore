@@ -54,3 +54,7 @@ app.*.map.json
 # Release artifacts (ephemeral — upload to GitHub releases then delete)
 *.tar.gz
 *.apk
+
+# Third-party audit PDFs (e.g. Recurity Labs Proton Pass report) — referenced by
+# docs/AI_SECURITY_AUDIT.md but not redistributed in the repo. Keep local only.
+docs/artefacts/*.pdf
