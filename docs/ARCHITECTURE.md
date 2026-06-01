@@ -149,7 +149,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 Make the codebase honestly defensible, then go public so experts can correct it (Cunningham's Law). Do the phases in order.
 
-1. **Supply-chain audit.** Run `cargo audit` and `flutter pub audit`; review installed IDE extensions; record results. Plan to pin CI Actions to commit SHAs once CI exists. Low effort, verifiable.
+1. ~~**Supply-chain audit.**~~ **Done 2026-06-01.** `cargo audit` (4 warnings, none exploitable), `flutter pub outdated` (all direct deps current), VS Code extensions (3 official — dart-code × 2, rust-lang), CI Actions (none yet — pin-to-SHA note added to Bikeshed). Full results in `AI_SECURITY_AUDIT.md § Supply-chain audit — Track A Phase 1`.
 2. **`docs/SECURITY.md`.** User-facing security doc: encryption ELI5, local-first argument, threat model, a comparison table, and honest caveats — explicitly "**NOT externally reviewed**", with the open questions named (F-01 header integrity, F-03 hybrid combiner). Cite the concrete evidence now available: the passing `gcore` memory-forensics self-test and FIPS-203 keygen.
 3. **Crack-me vault challenge.** Publish an encrypted `vault.gabbro` on the (public) GitHub repo containing a 256-char passphrase plus a note: decrypt it → gifted two YubiKeys; send proof (the passphrase) and method to gabbro.app@gmail.com. Add a "not cracked for N days" counter if feasible. This operationalises the get-corrected-by-experts strategy.
 
@@ -233,6 +233,7 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 - Verify Android storage permissions hold on Android 11+ (app-private storage + SAF — no `MANAGE_EXTERNAL_STORAGE`).
 - Test on de-Googled Android (GrapheneOS/CalyxOS) before v1 — find a willing community tester, don't buy hardware.
 - test/measure code test coverage before launch
+- Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
 - bug: in android, cannot move the cursor in text fields, can position it but not drag it

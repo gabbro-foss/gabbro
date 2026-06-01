@@ -376,6 +376,57 @@ The Proton report scored **8 findings** (1 medium, 7 low) and recorded **6 unsco
 
 ---
 
+## Supply-chain audit — Track A Phase 1 (2026-06-01)
+
+**Performed by:** Claude Sonnet 4.6  
+**Scope:** dependency trees, IDE extensions, CI configuration.
+
+### Rust — `cargo audit`
+
+Re-run against current Cargo.lock (211 crates, advisory DB 1100 advisories). **No new findings since 2026-05-31.** Same 4 warnings:
+
+| ID                 | Crate              | Class        | Exploitable in gabbro? | Action                                                    |
+|--------------------|--------------------|--------------|------------------------|-----------------------------------------------------------|
+| RUSTSEC-2025-0056  | `adler 1.0.2`      | unmaintained | No                     | Transitive via `miniz_oxide → backtrace → tokio`. Upstream fix.   |
+| RUSTSEC-2026-0097  | `rand 0.8.5`       | unsound      | No                     | Triggered only by a custom logger calling `rand::rng()` / `thread_rng()` during panic. Gabbro uses no custom logger. Gabbro uses `OsRng` for all crypto material; `thread_rng()` is used only in password/passphrase generators and FIDO client-data-hash generation — non-exploitable. Clear by upgrading to `rand 0.9` when `flutter_rust_bridge` allows. |
+| RUSTSEC-2025-0023  | `tokio 1.34.0`     | unsound      | No                     | Broadcast channel `Sync` unsoundness. Gabbro does not use `tokio::sync::broadcast`. Transitive via `flutter_rust_bridge 2.12.0`; fix gated on FRB upgrade. |
+| —                  | `futures-util 0.3.29` | yanked    | No                     | Still functional. Transitive via `serial_test` (dev) + `flutter_rust_bridge`. |
+
+**Correction to original Appendix A:** that entry stated "Gabbro uses `OsRng` directly — not affected" for RUSTSEC-2026-0097. This was incomplete: `rand::thread_rng()` is also called in `password_generator.rs:65`, `passphrase_generator.rs:72`, and `fido/device.rs:34,125,155,270`. The assessment (not exploitable without a custom logger) stands; the description is updated above.
+
+### Flutter/Dart — dependency audit
+
+`flutter pub audit` and `dart pub audit` do not exist. No Pub-side equivalent of `cargo audit` or `npm audit` is available in the Dart SDK as of 2026-06-01. Checked instead with:
+
+- `flutter pub outdated`: all **direct** and **dev** dependencies up-to-date. Five transitive deps (code_assets, hooks, meta, vector_math, win32) have minor version bumps available; none have known security advisories.
+- OSV Scanner (`osv-scanner`) not installed. Install and run against `pubspec.lock` before v1 if a Pub-side vulnerability is reported.
+
+**Recommendation:** add `osv-scanner --lockfile pubspec.lock` to the pre-release checklist once CI exists.
+
+### IDE extensions
+
+Three extensions installed in VS Code:
+
+| Extension ID                | Publisher         | Purpose                 | Trust |
+|-----------------------------|-------------------|-------------------------|-------|
+| `dart-code.dart-code`       | Dart Code team    | Dart language support   | ✓ Official |
+| `dart-code.flutter`         | Dart Code team    | Flutter tooling         | ✓ Official |
+| `rust-lang.rust-analyzer`   | rust-lang org     | Rust language server    | ✓ Official |
+
+All three are maintained by their respective official organisations. No third-party or community extensions in the IDE that could intercept secrets or inject build steps. **No action required.**
+
+### CI GitHub Actions — SHA pinning
+
+No CI workflows exist yet (`.github/` contains only `FUNDING.yml`). When CI is added:
+
+- Pin every `uses: owner/action@version` to a full commit SHA (`uses: owner/action@<sha>`) and keep the tag as a comment.
+- Example: `uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2`
+- Add `cargo audit` and `osv-scanner` steps to the CI matrix.
+
+**Add to Bikeshed:** "Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner` steps (once CI exists)."
+
+---
+
 ## NIST alignment
 
 | Component                | Standard                  | Conformance                                              |
