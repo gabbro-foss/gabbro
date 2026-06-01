@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - Vault file format **VERSION 6**: the ML-KEM-1024 keypair is now derived via FIPS 203 `ML-KEM.KeyGen(d, z)` directly from the KDF output (`d = bytes[32..64]`, `z = bytes[64..96]`), replacing the `StdRng`-seeded indirection that consumed only 32 of the 64 ML-KEM seed bytes (audit findings F-02 and F-07). New vaults are written as VERSION 6.
 - Backward compatible: existing VERSION 2–5 vaults remain fully readable. The keygen is dispatched on the file's version byte (legacy `StdRng` path for ≤5, FIPS path for 6), so no re-import is required.
+- Cleartext residue fix: decrypted and serialized vault-body buffers are now held in `Zeroizing<Vec<u8>>`, so entry secrets are scrubbed from memory rather than left in freed heap after a vault is locked. Found by a new `gcore` memory-forensics self-test (`rust/scripts/mem_forensics.sh` + `--features forensics` harness; audit L-6) that confirms both the master passphrase and entry passwords are absent from a core dump taken after lock.
+- Vault files are now written with user-only `0600` permissions via an atomic temp-file-and-rename, and symlinks at the vault path are rejected on read and write (audit F-08, F-09).
+- Long-lived in-memory session secrets (master passphrase, YubiKey hmac-secret, derived keys) are now `Zeroizing`, so they are scrubbed on drop as well as on explicit lock (audit F-04).
 
 ## [0.1.0-alpha.2] – 2026-05-31
 
@@ -20,32 +23,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0-alpha.1] – 2026-05-30
 
 ### Added
-- Post-quantum vault encryption: Argon2id KDF → X25519 + ML-KEM-1024 hybrid → HKDF-SHA256 → AES-256-GCM
+- Post-quantum vault encryption: Argon2id KDF → X25519 + ML-KEM-1024 hybrid → HKDF-SHA256 → AES-256-GCM (`.gabbro` binary format)
+- Vault lifecycle: create, unlock, lock, change passphrase
 - 6 entry types: Login (Password), Note, Identity, Card, File, Custom; all with custom fields
 - Entry create, edit, delete with safe-edit diff review and password history / revert
-- FIDO2/WebAuthn authentication via YubiKey: Android (USB + NFC) and Linux (USB via libfido2)
-- Minimum-2-keys enforcement; manage YubiKeys screen (add, remove, alias)
-- Password generator: classic (32–256 chars) and passphrase (4–20 words, 5 languages, EFF wordlists)
-- Password breakdown sheet (colour + symbol encoding per ADR-003)
+- FIDO2/WebAuthn authentication via YubiKey: Android (USB + NFC via yubikit) and Linux (USB via libfido2); hardware-validated on both
+- Minimum-2-keys enforcement (ADR-010); multi-key unlock, vault delete, and change-passphrase wiring (CTAP2 one-tap, any registered key); manage YubiKeys screen (add, remove, alias); PIN visibility toggle on PIN fields
+- Multiple vaults: registry (`vaults.jsonc`) with per-vault alias and type (passphrase | yubikey); ManageVaultsScreen (add / rename / delete); tiered delete (2-step passphrase, 3-step YubiKey with PIN + tap); high-security login hides the vault list by default
+- Password generator: classic (32–256 chars) and passphrase (4–20 words, 5 languages, EFF wordlists); password breakdown sheet (colour + symbol encoding per ADR-003)
 - Vault list search: title-only (default) or full-field toggle
-- Alphabet index bar (height-adaptive, configurable left/right)
-- Tablet two-pane layout (≥600dp): NavigationRail + list + detail pane
-- Folder management: create, rename, delete, reassign; folder filter on vault list
-- Multi-select assign-to-folder on vault list
-- Export: `.gabbro` + `.gabbro.sha256`; plaintext JSON with unencrypted warning
-- Import: Gabbro vault, Enpass JSON, Bitwarden JSON, generic CSV (with column-mapping UI)
-- Import validation failures surfaced via dialog (Skip / Edit)
+- Folders: create, rename, delete, reassign; folder filter on vault list; folder picker on create/detail screens; multi-select assign-to-folder; folder changes shown in the review-diff
+- Alphabet index bar (height-adaptive, configurable left/right); tablet two-pane layout (≥600dp): NavigationRail + list + detail pane
+- Export: `.gabbro` + `.gabbro.sha256`; plaintext JSON with unencrypted warning; file-entry export via native picker
+- Import: Gabbro vault, Enpass JSON, Bitwarden JSON, generic CSV (column-mapping UI); validation failures surfaced via dialog (Skip / Edit)
 - Android autofill service (fill path; eTLD+1 domain matching; Chromium/Brave compatible)
 - Appearance settings: theme (system/light/dark), text size, high-contrast, alphabet bar position
-- Language settings: dedicated Language screen (Settings → Language); language picker on onboarding screen for first-time users; overrides system locale
-- Security settings: foreground + background lock timeouts; copy/paste blocking on passphrase fields
-- Android screenshot prevention and app-switcher blur (`FLAG_SECURE`)
-- Dark and light mode; WCAG AA colour scheme
-- App localisation: UI in English, French, German, Italian, and Spanish; follows system locale by default
-- Locale-aware date formatting via `package:intl` `DateFormat`
+- Language settings: dedicated Language screen + onboarding picker; UI localised in EN/FR/DE/IT/ES; follows system locale by default; locale-aware dates via `package:intl`
+- Security settings: foreground + background lock timeouts; copy/paste blocking on passphrase fields; Android screenshot prevention + app-switcher blur (`FLAG_SECURE`)
+- Branding: theme-aware `GabbroLogo` widget (wired into unlock / onboarding / about / splash); Android launcher icons at all mipmap densities
+- Dark and light mode; WCAG AA colour scheme (olivine green `#5C7A3E`)
 
 ### Fixed
 - YubiKey OTP NDEF URI no longer opens a browser tab during NFC unlock; `skipNdefCheck` and re-armed foreground dispatch suppress NDEF dispatch while the app is foreground — `ykman config nfc --disable OTP` is no longer required
+- Enpass import: entries land in the "None" folder (the category name was incorrectly used as the folder name)
 
 [Unreleased]: https://github.com/Zabamund/gabbro/compare/v0.1.0-alpha.1...HEAD
 [0.1.0-alpha.1]: https://github.com/Zabamund/gabbro/releases/tag/v0.1.0-alpha.1

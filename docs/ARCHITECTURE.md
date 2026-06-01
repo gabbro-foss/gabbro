@@ -98,8 +98,11 @@ gabbro/
 │   │   ├── import/
 │   │   │   ├── enpass.rs
 │   │   │   └── csv.rs
-│   │   ├── bin/bench_kdf.rs
+│   │   ├── bin/
+│   │   │   ├── bench_kdf.rs
+│   │   │   └── mem_forensics.rs    # memory-forensics self-test (--features forensics)
 │   │   └── lib.rs
+│   └── scripts/mem_forensics.sh    # gcore memory-forensics driver (audit L-6)
 ├── android/app/src/main/
 │   └── kotlin/app/gabbro/gabbro/
 │       ├── GabbroAutofillService.kt
@@ -124,43 +127,7 @@ gabbro/
 
 ## Features
 
-**Implemented:**
-- Vault create, unlock, lock, change passphrase
-- 6 entry types: Login (Password), Note, Identity, Card, File, Custom
-- Entry create, edit, delete with safe-edit diff review
-- Password history with revert
-- Vault list search: title-only (default) or full-field toggle (`Icons.search` / `Icons.manage_search` prefix button); full-field searches username, URL, notes, custom field labels/values (non-hidden) via `search_blob` built in Rust at list time
-- Alphabet index bar (height-adaptive, windowed, left/right configurable)
-- Tablet two-pane layout (≥600dp): NavigationRail + list pane + detail pane
-- Password/passphrase generator (screen + inline widget)
-- Password breakdown sheet (long-press revealed password; colour + symbol encoding per ADR-003)
-- Export: `.gabbro` + `.gabbro.sha256`; JSON (plaintext) with prominent unencrypted warning and format selector; file entry export uses native file picker (folder picker on Android, save dialog on Linux)
-- Import: Gabbro vault, Enpass JSON, Bitwarden JSON, generic CSV (with column-mapping UI)
-  - All importers: validation failures surfaced via ImportFailuresDialog (Skip/Edit)
-  - UUID dedup for Gabbro/Enpass/Bitwarden; fresh UUIDs for CSV
-- Android autofill service (fill path; eTLD+1 domain matching; Chromium/Brave compatible)
-- Folder display in entry detail (alongside timestamps; shows "None" when unfoldered)
-- Folder filter dropdown on vault list screen (independent of type filter chips; unfoldered entries hidden when a folder is active)
-- Folder picker on CreateEntryScreen and EntryDetailScreen (injected `listFolders` DI pattern; edit mode pre-selects existing folder)
-- Manage folders screen: add, rename, delete folders; delete offers reassign to another folder or clear to "None"; accessible from settings menu
-- Multi-select assign to folder: select entries in vault list, assign all to a folder in one operation
-- Folder changes shown in review screen diff (all entry types)
-- Enpass import: entries correctly land in "None" folder (category name was incorrectly used as folder name)
-- Appearance: theme (system/light/dark), text size, high-contrast, alphabet bar position
-- Language: dedicated Language screen (Settings menu); language picker button on OnboardingScreen for first-time users; RadioGroup-based list (System / EN / FR / DE / IT / ES)
-- Security: foreground + background lock timeouts
-- Android screenshot prevention + app switcher blur (`FLAG_SECURE` on `MainActivity` and `UnlockActivity`)
-- Copy/paste blocking on master passphrase fields (default on; user toggle in Settings → Security; keyboard inline paste is a platform limitation, documented in UI)
-- Dark + light mode, WCAG AA colour scheme (olivine green `#5C7A3E`)
-- YubiKey / FIDO2 authentication: Android (USB + NFC via yubikit) and Linux (USB via libfido2); minimum-2-keys enforcement (ADR-010, VERSION 4 vault format); multi-key unlock, vault delete, and change_passphrase YubiKey wiring (CTAP2 one-tap any-key); manage YubiKeys screen (add, remove, alias edit); hardware-validated on Linux and Android (USB + NFC)
-- Multiple vaults: registry (`vaults.jsonc`); alias + `VaultType` (`passphrase` | `yubikey`) stored per record (backward-compatible, defaults to `passphrase`); alias stored in VERSION 5 vault header; ManageVaultsScreen (add/rename/delete); delete is a 3-step flow for YubiKey-secured vaults (warning → type DELETE → PIN + YubiKey tap authorization); passphrase vaults use 2-step delete; Cancel always enabled at all steps; "Delete vault" removed from VaultListScreen settings menu — ManageVaultsScreen is the single delete point; `showVaultList=true` shows inline vault dropdown on login screen; `showVaultList=false` (default, high-security) shows only last-used vault with no switch UI; vault CRUD accessible post-authentication via Menu → Manage vaults
-- PIN visibility toggle (eye icon) on all YubiKey PIN fields
-- `GabbroLogo` widget: theme-aware PNG asset selection (dark/light/hc × icon-only/with-text); wired into UnlockScreen, OnboardingScreen, AboutScreen, and Android splash (`launch_background.xml`)
-- Android launcher icons: square transparent-background PNGs at all mipmap densities (mdpi→xxxhdpi), generated from `assets/images/source/ic_launcher_light.svg` via `rsvg-convert`
-
-**Not yet implemented (see Bikeshed):**
-- Autofill save requests (`onSaveRequest`)
-- Passkey support, breach alerts, vault sync
+Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives in the Bikeshed at the end of this file.
 
 ## Testing
 
@@ -178,26 +145,26 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: confirm with [user]
+### Next task: Pre-public security hardening (Track A, 3 phases)
 
-Candidates: the **"Header integrity + rename-requires-login"** feature (Bikeshed → Security — this is where reclassified F-01 now lives), or resume feature/UX work. F-03 stays parked until a human cryptographer is available.
+Make the codebase honestly defensible, then go public so experts can correct it (Cunningham's Law). Do the phases in order.
 
-**Shipped 2026-06-01 — VERSION 6 vault format (F-02 + F-07):**
+1. **Supply-chain audit.** Run `cargo audit` and `flutter pub audit`; review installed IDE extensions; record results. Plan to pin CI Actions to commit SHAs once CI exists. Low effort, verifiable.
+2. **`docs/SECURITY.md`.** User-facing security doc: encryption ELI5, local-first argument, threat model, a comparison table, and honest caveats — explicitly "**NOT externally reviewed**", with the open questions named (F-01 header integrity, F-03 hybrid combiner). Cite the concrete evidence now available: the passing `gcore` memory-forensics self-test and FIPS-203 keygen.
+3. **Crack-me vault challenge.** Publish an encrypted `vault.gabbro` on the (public) GitHub repo containing a 256-char passphrase plus a note: decrypt it → gifted two YubiKeys; send proof (the passphrase) and method to gabbro.app@gmail.com. Add a "not cracked for N days" counter if feasible. This operationalises the get-corrected-by-experts strategy.
 
-ML-KEM-1024 KeyGen now uses FIPS 203 `ML-KEM.KeyGen(d, z)` directly from KDF bytes (`d = [32..64]`, `z = [64..96]`), via `ml-kem`'s `deterministic` feature (no version bump, no `rand` migration). Removes the `StdRng` indirection and the dead-bytes range; `kdf.rs` doc-comment corrected (F-07). New vaults are VERSION 6; VERSION 2–5 stay readable via a version-dispatched legacy keygen (`ml_kem_keypair_for_version`), so no re-import is needed. X25519's analogous `StdRng` indirection was deliberately left untouched — it is not a FIPS conformance gap and changing it would add keypair-migration risk for zero benefit. Proceeded without the human-crypto gate because the change aligns to a published standard and is verified by tests (determinism, `z`-byte consumption, FIPS≠legacy, and a legacy-V5-vault-still-opens regression).
+Parked: F-01 header-integrity feature (VERSION 7; low severity, big cross-stack lift); F-03 X-Wing combiner (needs a human cryptographer).
 
-**Reclassified — F-01 (header authentication):** the audit's recommended fix (bind the whole plaintext header to the AES-GCM **body** tag via AAD) is **architecturally incompatible** with Gabbro and was NOT implemented. `set_vault_alias` (`vault_bridge.rs`) rewrites the alias with no passphrase/key and no body reseal; `add_key_to_sealed` / `remove_key_from_sealed` / `change_vault_passphrase_with_keys` mutate the header without re-encrypting the body. Every field AAD could safely bind is *already* self-protecting (it feeds key derivation → tamper fails closed), and every field that needs protection (alias, YubiKey metadata) is changed without the unlock secret → unbindable. The viable path is the Bikeshed feature below (gate rename behind login so the session's cached `vault_key_master` can re-seal the body). See AI_SECURITY_AUDIT.md F-01 for the full write-up.
+### Open from the security audit
 
-**Still gated on human crypto review:**
+Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 
-- **F-03** X-Wing transcript-binding combiner — defer to a human cryptographer; no single verifiable-against-spec answer. Brief in AI_SECURITY_AUDIT.md.
+- **F-01** — reclassified (header-as-AAD is architecturally incompatible here); the viable path is the **Header integrity + rename-requires-login** Bikeshed feature (VERSION 7).
+- **F-03** — X-Wing transcript-binding combiner; gated on a human cryptographer (no verifiable-against-spec answer).
+- **F-10** — eTLD+1 autofill matching; post-v1 "Strict FQDN" toggle.
+- **L-3** — iOS Keychain protection class; V2+ iOS port.
 
-**Deferred (unchanged):**
-
-- **F-05** Plaintext JSON export — by design, Flutter-side warning already surfaced. No action.
-- **F-10** eTLD+1 autofill matching — UX tradeoff, candidate for a post-v1 "Strict FQDN" toggle.
-- **L-3** iOS Keychain protection class — pinned for the V2+ iOS port.
-- **L-6** `gcore` memory-forensics test of an unlocked gabbro process — Bikeshed candidate.
+Everything else (F-02, F-04–F-09, F-11, L-6) is done — see the audit doc.
 
 ---
 
@@ -239,118 +206,23 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 
 ## Release Process
 
-**Tag format:** `v0.1.0-alpha.N` (not `v0.1.0`) until the pre-v1 security gates in Bikeshed are cleared. This is honest with testers: the crypto review has not happened.
+**Tag format:** `v0.1.0-alpha.N` until the pre-v1 security gates (Bikeshed) clear — honest with testers that no external crypto review has happened yet. Repo is private; the Debian collaborator pulls releases from GitHub, other testers receive artifacts directly.
 
-**Distribution model (current):** repo is private. Debian collaborator accesses releases via GitHub. Other testers receive the artifact directly (email / transfer).
-
----
-
-### Pre-flight checklist
-
-1. Move `[Unreleased]` block in `CHANGELOG.md` to `[0.1.0-alpha.N] – YYYY-MM-DD`.
+**Pre-flight:**
+1. Move the `[Unreleased]` block in `CHANGELOG.md` to `[0.1.0-alpha.N] – YYYY-MM-DD`.
 2. Bump `version` in `pubspec.yaml` to match.
-3. Run `flutter test` (450 passing) and `cargo clippy -- -D warnings`.
-4. Commit, then tag: `git tag -a v0.1.0-alpha.N -m "v0.1.0-alpha.N"` and `git push origin v0.1.0-alpha.N`.
-
----
-
-### Linux build
-
-```bash
-flutter build linux --release
-```
-
-Output lands in `build/linux/x64/release/bundle/`. That directory is self-contained (exe + Flutter libs + data assets).
-
-**Packaging as tar.gz (Arch):**
-```bash
-tar -czf gabbro-v0.1.0-alpha.1-linux-x86_64.tar.gz \
-    -C build/linux/x64/release bundle
-```
-
-**Debian compatibility:** verified for v0.1.0-alpha.1 — the Arch-built bundle requires glibc ≤ 2.34 (confirmed via `objdump -T`), well below Debian trixie (stable, 2.41) and Linux Mint (2.42). No Docker build needed. If a future release raises the requirement above 2.41, build inside a Debian trixie container:
-```bash
-docker run --rm -v "$PWD":/app -w /app debian:trixie \
-    bash -c "apt-get update && apt-get install -y flutter ... && flutter build linux --release"
-```
-
----
-
-### Android build
-
-**Signing keystore (one-time setup — do this before the first release build):**
-
-```bash
-# Generate the keystore — keep this file safe and backed up; losing it means
-# you can never publish an update to the same Play Store listing.
-keytool -genkey -v \
-  -keystore android/app/gabbro-upload.jks \
-  -alias gabbro \
-  -keyalg RSA -keysize 2048 \
-  -validity 10000
-```
-
-Create `android/key.properties` (already in `.gitignore` — do not commit this):
-```
-storePassword=<your-store-password>
-keyPassword=<your-key-password>
-keyAlias=gabbro
-storeFile=gabbro-upload.jks
-```
-
-In `android/app/build.gradle.kts`, add before `android {`:
-```kotlin
-val keyPropertiesFile = rootProject.file("key.properties")
-val keyProperties = Properties()
-keyProperties.load(keyPropertiesFile.inputStream())
-```
-
-And inside `android { ... }` replace / add the signing config:
-```kotlin
-signingConfigs {
-    create("release") {
-        keyAlias = keyProperties["keyAlias"] as String
-        keyPassword = keyProperties["keyPassword"] as String
-        storeFile = file(keyProperties["storeFile"] as String)
-        storePassword = keyProperties["storePassword"] as String
-    }
-}
-buildTypes {
-    release {
-        signingConfig = signingConfigs.getByName("release")
-    }
-}
-```
+3. `flutter test` + `cargo test -q` + `cargo clippy -- -D warnings` all green.
+4. Commit, then `git tag -a v0.1.0-alpha.N -m "v0.1.0-alpha.N" && git push origin v0.1.0-alpha.N`.
 
 **Build:**
-```bash
-flutter build apk --release
-# output: build/app/outputs/flutter-apk/app-release.apk
-```
+- **Linux:** `flutter build linux --release` → self-contained bundle in `build/linux/x64/release/bundle/`; package with `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.)
+- **Android:** `flutter build apk --release` → `build/app/outputs/flutter-apk/app-release.apk`; rename to `gabbro-<ver>-android.apk`. The signing keystore (`android/app/gabbro-upload.jks`) and `android/key.properties` are already configured and gitignored.
 
-Rename before attaching: `gabbro-v0.1.0-alpha.1-android.apk`.
-
-**Testers must enable "Install from unknown sources"** on their Android device. Send the APK directly (email / file transfer) — no Play Store needed for test distribution.
+**Publish:** `gh release create v0.1.0-alpha.N <linux.tar.gz> <android.apk> --title "Gabbro v0.1.0-alpha.N" --prerelease`, with the disclaimer: *"Alpha — for invited testers only. The cryptographic implementation has not undergone external review. Do not store passwords you cannot afford to lose."*
 
 ---
 
-### GitHub Release
-
-```bash
-gh release create v0.1.0-alpha.1 \
-  gabbro-v0.1.0-alpha.1-linux-x86_64.tar.gz \
-  gabbro-v0.1.0-alpha.1-android.apk \
-  --title "Gabbro v0.1.0-alpha.1" \
-  --notes "$(cat CHANGELOG.md | sed -n '/## \[0.1.0-alpha.1\]/,/## \[/p' | head -n -1)" \
-  --prerelease
-```
-
-Or create via the GitHub web UI and attach the two files manually.
-
-Add a disclaimer in the release notes:
-> **Alpha release — for invited testers only.** The cryptographic implementation has not yet undergone external review. Do not store passwords you cannot afford to lose.
-
----
+## Bikeshed / Backlog
 
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
@@ -358,9 +230,7 @@ Add a disclaimer in the release notes:
 - **Header integrity + rename-requires-login** (reclassified audit F-01). Goal: make plaintext-header tampering (alias, YubiKey `credential_id`, record order) detectable. The naive "header-as-AAD on the body tag" fix is incompatible with Gabbro because several ops mutate the header without re-encrypting the body and without the unlock secret. Viable design: (1) make vault rename require an unlocked session, like delete — `set_vault_alias` takes the session; (2) re-seal the body on every header-mutating op (rename, add/remove key, change passphrase) using the session's cached `vault_key_master`; (3) bind the stable header fields to the body's AES-GCM tag as AAD (`SealedVault::header_aad()` + `aes_gcm::*_with_aad`, to be re-added). Cross-stack (Flutter rename flow + `vault_bridge` + `vault_crypto` + `aes_gcm`); a VERSION 7 bump. Note: alias must stay plaintext-in-header so the login screen can show vault aliases pre-unlock.
 - **F-03 X-Wing combiner** — migrate the hybrid KEM combiner to a transcript-binding (X-Wing-style) construction (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). No single verifiable-against-spec answer → genuinely needs the human cryptographer's judgement. VERSION 7 (bundle with the header-integrity feature if both land together).
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
-- Supply-chain audit: `cargo audit`, `flutter pub audit`, IDE extension review, pin CI Actions to commit SHAs when CI is added.
 - Verify Android storage permissions hold on Android 11+ (app-private storage + SAF — no `MANAGE_EXTERNAL_STORAGE`).
-- Add an encrypted `vault.gabbro` file on the public github containing: a 256 char passphrase, a note stating that if anyone decrypts the file, they will be gifted two yubikeys if they send proof (the 256 char passsphrase) and their crack to gabbro.app@gmail.com -> include a "vault not cracked for n days" counter on github if possible
 - Test on de-Googled Android (GrapheneOS/CalyxOS) before v1 — find a willing community tester, don't buy hardware.
 - test/measure code test coverage before launch
 
@@ -374,6 +244,7 @@ Add a disclaimer in the release notes:
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
+- Add import from Google Password Manager functionality
 
 ### Code Quality
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
@@ -381,6 +252,9 @@ Add a disclaimer in the release notes:
 - Explain if this project can be defined as "vide-coding" or not, and why, especially in the light of things like this: "vibe-coded cryptography software" in https://blogs.gentoo.org/mgorny/2026/05/28/why-gentoo/#more-2634
 
 ### V2+ / Defer
+- Passkey (WebAuthn discoverable credential) support.
+- Vault sync across devices.
+- Autofill save requests (`onSaveRequest`) — see also Features & UX above.
 - Data breach alerts / HaveIBeenPwned integration.
 - Panic button / app hiding on mobile.
 - Remote app / vault deletion.
@@ -392,7 +266,6 @@ Add a disclaimer in the release notes:
 - Yubico partnership.
 - Destination Linux podcast outreach (when approaching public release).
 - Donation/sustainability model (GitHub Sponsors + Liberapay + Monero — dedicated session near release).
-- `docs/SECURITY.md` user-facing doc (encryption ELI5, local-first argument, comparison table, honest caveats).
 - No-telemetry verification guide (ripgrep scan, Wireshark, NetGuard, iOS caveat).
 - Support model (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
 - Import: content-hash deduplication and entry-level merge.

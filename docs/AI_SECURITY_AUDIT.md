@@ -9,7 +9,32 @@
 
 ---
 
+## Remediation status (updated 2026-06-01)
+
+The Executive summary and findings below are the **original 2026-05-31 pass**, kept as a historical record. Current status of each finding:
+
+| Finding | Sev. | Status |
+|---------|------|--------|
+| **F-01** header not AEAD-authenticated | Low | **Reclassified** — body-AAD is architecturally incompatible here; viable path is the "Header integrity + rename-requires-login" feature (VERSION 7). |
+| **F-02** ML-KEM KeyGen vs FIPS 203 | Low | **Fixed** 2026-06-01 (VERSION 6, `generate_deterministic(d,z)`). |
+| **F-03** hybrid combiner not transcript-binding | Low | **Open** — gated on human crypto review (X-Wing). |
+| **F-04** session secrets not `Zeroizing` | Low | **Fixed** (Round 1). |
+| **F-05** plaintext JSON export | Info | By design; no action. |
+| **F-06** `unwrap` on length-checked slices | Info | **Fixed** (Round 1). |
+| **F-07** kdf.rs doc drift | Info | **Fixed** (Round 1; realigned 2026-06-01 with F-02). |
+| **F-08** vault files not `0600` | Low | **Fixed** (Round 1). |
+| **F-09** no symlink validation | Low | **Fixed** (Round 1). |
+| **F-10** eTLD+1 autofill matching | Info | **Open** — post-v1 "Strict FQDN" toggle. |
+| **F-11** decrypted body not zeroized | Low | **Fixed** 2026-06-01 (found by the memory-forensics self-test). |
+| **L-6** memory-forensics test | — | **Done** 2026-06-01 (`scripts/mem_forensics.sh`). |
+
+**Still open:** F-01 (→ feature), F-03 (→ human crypto review), F-10 (→ post-v1). Everything else is fixed or by-design.
+
+---
+
 ## Executive summary
+
+> Reflects the original 2026-05-31 pass. See **Remediation status** above for what has since changed.
 
 | Category                       | Result                                                    |
 |--------------------------------|-----------------------------------------------------------|
@@ -297,6 +322,18 @@ The temp-file-then-rename pattern from F-08 already mitigates the write-time rac
 
 ---
 
+### F-11 (Low) — Decrypted/serialized vault body lingered in non-zeroized heap
+
+**Status — FIXED (2026-06-01).** Surfaced by the new memory-forensics self-test (Appendix C item 6), not by static review — a worked example of why dynamic testing complements code review.
+
+**Where:** `rust/src/api/vault.rs` — `load_vault` / `load_vault_with_yubikey` / `load_vault_with_key_record` (decrypt → `Vec<u8>` plaintext JSON → deserialize) and the five `serialize_vault_body` save sites.
+
+**Detail.** `open_vault*` returns the decrypted vault body as a plain `Vec<u8>` holding every entry's password in cleartext JSON. Although each `VaultEntry` is `ZeroizeOnDrop` (so the parsed copy is scrubbed by `lock_vault`'s `entries.clear()`), the raw decrypted-JSON buffer was dropped without zeroizing. A `gcore` dump taken *after* lock still contained an entry password on 12/12 runs, while the master passphrase — `Zeroizing` end-to-end — was correctly absent.
+
+**Fix.** Wrap the decrypted/serialized body in `Zeroizing<Vec<u8>>` at all load and save sites so it is scrubbed on drop. Verified empirically: post-fix, 12/12 `gcore` runs show both the passphrase and the entry password absent from the locked dump.
+
+---
+
 ## Lessons from Proton Pass audit (Recurity Labs 526.2501)
 
 This section maps each finding in the **Recurity Labs Proton Pass Security Assessment & Retests** (project 526.2501, v1.1, 2026-05-07, 57 pages — available at `docs/artefacts/526.2501-Recurity_Labs-Report-Proton_Pass-v1.pdf`) to gabbro's posture. Proton Pass is a fundamentally different stack (Electron / V8 / backend API / multi-account / SQLite-on-Android) so many findings don't apply directly — but the lessons generalise.
@@ -335,7 +372,7 @@ The Proton report scored **8 findings** (1 medium, 7 low) and recorded **6 unsco
 - **L-3 (from 301):** For the iOS port (V2+), use `kSecAttrAccessibleWhenUnlockedThisDeviceOnly` for any Keychain-stored secret. Add to ARCHITECTURE.md Bikeshed when iOS work starts.
 - **L-4 (from 102):** Gabbro's choice of a single binary `.gabbro` file (no SQLite, no WAL) avoids an entire class of "deleted user data lingers" bugs. Worth keeping in `LEARNINGS.md` as a *positive* architectural decision that paid off.
 - **L-5 (from 901):** Gabbro's "no backend, no sync server" choice avoids the entire TLS-cipher-suite review surface. Also worth a `LEARNINGS.md` note.
-- **L-6 (general):** Recurity Labs' methodology was code-review + dynamic testing + memory forensics (Frida, Burp, MobSF, core-dump parsing). When the pre-v1 human security gate is engaged, gabbro should specifically request **memory-forensics testing** (`gcore` of an unlocked vault, parse for plaintext) — it's the test that surfaced 906/907 in Proton and gabbro has not run it yet.
+- **L-6 (general):** Recurity Labs' methodology was code-review + dynamic testing + memory forensics (Frida, Burp, MobSF, core-dump parsing). Gabbro now runs a `gcore` memory-forensics self-test (Appendix C item 6) — it immediately surfaced F-11, vindicating the "dynamic testing finds what code review misses" lesson. Extending it (YubiKey path, GUI process) remains a pre-v1 task.
 
 ---
 
@@ -423,7 +460,7 @@ This AI audit is informational. The Bikeshed pre-v1 gate still requires:
 3. **Formal model** of the multi-key vault state machine (`seal_vault_with_keys`, `add_key_to_sealed`, `remove_key_from_sealed`, `change_vault_passphrase_with_keys`) to verify the invariant "any single registered key unlocks; passphrase change does not invalidate any key_blob".
 4. **External cryptographic audit** as listed in ARCHITECTURE.md → Bikeshed → "Security (pre-v1 gates)".
 5. **Hardware-attested testing** on de-Googled Android (GrapheneOS / CalyxOS) for the FIDO2 hmac-secret path. Out of scope of this static review.
-6. **Memory-forensics testing of gabbro itself** — Recurity Labs' Proton audit surfaced its most consequential findings (526.2501.906–909) only after running `gcore` against the unlocked process and parsing the dump for base64 strings. Gabbro has not been subjected to this test. Recommend running `gcore` against `gabbro` after unlock and grepping the dump for known vault contents to validate `Zeroize` coverage in practice, before v1.
+6. **Memory-forensics testing of gabbro itself** — **DONE (2026-06-01).** Implemented as a reproducible self-test: `rust/scripts/mem_forensics.sh` + the `--features forensics` harness (`rust/src/bin/mem_forensics.rs`). It seals a vault with two distinct high-entropy canaries (master passphrase + a Login entry's password), takes a `gcore` dump while unlocked (canaries present) and after lock (must be absent), and reports PASS/FAIL. The first run surfaced **F-11** (entry password lingered in the decrypted-body buffer); after the fix, 12/12 runs PASS. Reviewers can reproduce it. Still recommended before v1: extend to the YubiKey-unlock path and run under the real GUI process.
 
 ---
 
