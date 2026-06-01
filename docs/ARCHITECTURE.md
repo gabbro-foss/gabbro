@@ -166,7 +166,7 @@ gabbro/
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 338 | 8 |
+| Rust (`cargo test -q`) | 349 | 8 |
 | Flutter (`flutter test`) | 454 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
@@ -178,28 +178,26 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Round 2 security remediations (F-01, F-02, F-03) — gated on human crypto review
+### Next task: confirm with [user]
 
-Round 1 remediations (F-04, F-06, F-07, F-08, F-09) shipped 2026-06-01. Round 2 requires a `.gabbro` file-format bump to VERSION 6 and should not start until the human cryptographer / RustCrypto pre-v1 gate clears, because the reviewer's opinion may change the spec.
+Candidates: the **"Header integrity + rename-requires-login"** feature (Bikeshed → Security — this is where reclassified F-01 now lives), or resume feature/UX work. F-03 stays parked until a human cryptographer is available.
 
-**Round 2 — design-level (require `.gabbro` file-format bump to VERSION 6):**
+**Shipped 2026-06-01 — VERSION 6 vault format (F-02 + F-07):**
 
-- **F-01** Bind the plaintext `.gabbro` header to the AES-GCM auth tag via AAD. Pass the serialised header (everything before the body length prefix) as AAD to `aes_gcm::encrypt` / `decrypt`. Detects tampering with `alias`, YubiKey `credential_id`, and any other plaintext metadata. **VERSION 6 bump** with read-only backward compat for VERSION 2–5.
-- **F-02** Align ML-KEM-1024 KeyGen with FIPS 203 — use `(d, z) ∈ {0,1}^256 × {0,1}^256` directly from KDF bytes `[32..64]` and `[64..96]`, removing the `StdRng` indirection and the dead-bytes range. Requires verifying that `ml-kem` 0.3.x exposes a path to `KeyGen(d, z)`; otherwise stay on the PRNG path but shorten the KDF output to 64 bytes and document the deviation. **Changes derived keypair under same passphrase** → either gated behind VERSION 6 with old vaults still readable via the legacy path, or one-shot migrate-on-open. **Prefer Opus 4.7 or later** for this task.
-- **F-03** Hybrid combiner — discuss with the human cryptographer whether to migrate to an X-Wing-style transcript-binding combiner (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). Preferable to bundle with F-01 + F-02 into a single VERSION 6 release.
+ML-KEM-1024 KeyGen now uses FIPS 203 `ML-KEM.KeyGen(d, z)` directly from KDF bytes (`d = [32..64]`, `z = [64..96]`), via `ml-kem`'s `deterministic` feature (no version bump, no `rand` migration). Removes the `StdRng` indirection and the dead-bytes range; `kdf.rs` doc-comment corrected (F-07). New vaults are VERSION 6; VERSION 2–5 stay readable via a version-dispatched legacy keygen (`ml_kem_keypair_for_version`), so no re-import is needed. X25519's analogous `StdRng` indirection was deliberately left untouched — it is not a FIPS conformance gap and changing it would add keypair-migration risk for zero benefit. Proceeded without the human-crypto gate because the change aligns to a published standard and is verified by tests (determinism, `z`-byte consumption, FIPS≠legacy, and a legacy-V5-vault-still-opens regression).
 
-**Deferred from remediation scope:**
+**Reclassified — F-01 (header authentication):** the audit's recommended fix (bind the whole plaintext header to the AES-GCM **body** tag via AAD) is **architecturally incompatible** with Gabbro and was NOT implemented. `set_vault_alias` (`vault_bridge.rs`) rewrites the alias with no passphrase/key and no body reseal; `add_key_to_sealed` / `remove_key_from_sealed` / `change_vault_passphrase_with_keys` mutate the header without re-encrypting the body. Every field AAD could safely bind is *already* self-protecting (it feeds key derivation → tamper fails closed), and every field that needs protection (alias, YubiKey metadata) is changed without the unlock secret → unbindable. The viable path is the Bikeshed feature below (gate rename behind login so the session's cached `vault_key_master` can re-seal the body). See AI_SECURITY_AUDIT.md F-01 for the full write-up.
+
+**Still gated on human crypto review:**
+
+- **F-03** X-Wing transcript-binding combiner — defer to a human cryptographer; no single verifiable-against-spec answer. Brief in AI_SECURITY_AUDIT.md.
+
+**Deferred (unchanged):**
 
 - **F-05** Plaintext JSON export — by design, Flutter-side warning already surfaced. No action.
-- **F-10** eTLD+1 autofill matching — UX tradeoff, candidate for a post-v1 "Strict FQDN" toggle. Move to Bikeshed when starting work.
-- **L-3** iOS Keychain protection class — pinned for the V2+ iOS port (already in Bikeshed via "iOS, Windows, macOS support").
-- **L-6** `gcore` memory-forensics test of an unlocked gabbro process — Bikeshed candidate; ideally before the human-expert crypto review.
-
-**Model selection for Round 2 (self-check before coding — switch via `/model` if mismatched):**
-
-- **F-01 (AES-GCM AAD over header):** Sonnet 4.6 acceptable with TDD-first.
-- **F-02 (FIPS 203 ML-KEM KeyGen alignment):** prefer **Opus 4.7 or later** — wrong KeyGen silently changes keypairs.
-- **F-03 (X-Wing combiner):** defer to human crypto review.
+- **F-10** eTLD+1 autofill matching — UX tradeoff, candidate for a post-v1 "Strict FQDN" toggle.
+- **L-3** iOS Keychain protection class — pinned for the V2+ iOS port.
+- **L-6** `gcore` memory-forensics test of an unlocked gabbro process — Bikeshed candidate.
 
 ---
 
@@ -357,6 +355,8 @@ Add a disclaimer in the release notes:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Security (pre-v1 gates)
+- **Header integrity + rename-requires-login** (reclassified audit F-01). Goal: make plaintext-header tampering (alias, YubiKey `credential_id`, record order) detectable. The naive "header-as-AAD on the body tag" fix is incompatible with Gabbro because several ops mutate the header without re-encrypting the body and without the unlock secret. Viable design: (1) make vault rename require an unlocked session, like delete — `set_vault_alias` takes the session; (2) re-seal the body on every header-mutating op (rename, add/remove key, change passphrase) using the session's cached `vault_key_master`; (3) bind the stable header fields to the body's AES-GCM tag as AAD (`SealedVault::header_aad()` + `aes_gcm::*_with_aad`, to be re-added). Cross-stack (Flutter rename flow + `vault_bridge` + `vault_crypto` + `aes_gcm`); a VERSION 7 bump. Note: alias must stay plaintext-in-header so the login screen can show vault aliases pre-unlock.
+- **F-03 X-Wing combiner** — migrate the hybrid KEM combiner to a transcript-binding (X-Wing-style) construction (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). No single verifiable-against-spec answer → genuinely needs the human cryptographer's judgement. VERSION 7 (bundle with the header-integrity feature if both land together).
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
 - Supply-chain audit: `cargo audit`, `flutter pub audit`, IDE extension review, pin CI Actions to commit SHAs when CI is added.
 - Verify Android storage permissions hold on Android 11+ (app-private storage + SAF — no `MANAGE_EXTERNAL_STORAGE`).

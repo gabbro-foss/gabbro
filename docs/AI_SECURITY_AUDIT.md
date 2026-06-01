@@ -88,6 +88,8 @@ Severity scale: **High** = immediate exploitable defect | **Medium** = realistic
 
 ### F-01 (Low) — AES-GCM does not authenticate the vault header (no AAD)
 
+**Status — RECLASSIFIED (2026-06-01); NOT implemented as recommended.** The recommended fix (pass the serialised header as AAD to the **body** `encrypt`/`decrypt`) is architecturally incompatible with Gabbro. Tracing the code: `set_vault_alias` (`api/vault_bridge.rs:619`) rewrites the alias with no passphrase, no key, and no body reseal; `add_key_to_sealed` / `remove_key_from_sealed` / `change_vault_passphrase_with_keys` mutate the header without re-encrypting the body (and the passphrase-change path has no `vault_key_master` to reseal with). So any field AAD could *safely* bind is one that no header-mutating op changes without a body reseal — and those (Argon2 params, salts, ML-KEM ct, ephemeral pubkey, nonce) are **already self-protecting**: they feed key derivation, so tampering yields the wrong key and decryption fails closed. The fields that actually need protection — `alias`, YubiKey `credential_id`, record order — are exactly the ones changed *without* the unlock secret, so they cannot be bound to a tag that requires that secret to recompute. Net: header-as-body-AAD adds zero protection over the status quo and breaks the rename/key-management features. Reclassified to the ARCHITECTURE.md Bikeshed feature **"Header integrity + rename-requires-login"**, whose first step (rename requires an unlocked session, like delete) is the precondition that makes header authentication achievable. **For the human reviewer:** decide whether that VERSION 7 feature is worth it versus accepting `alias` as documented plaintext metadata (this finding's own assessment: "pure metadata; no credential compromise").
+
 **Where:** `rust/src/crypto/aes_gcm.rs:27` (`cipher.encrypt(nonce, plaintext)`), `:44` (`cipher.decrypt(nonce, ciphertext)`)
 
 **Detail.** Every AEAD call passes raw plaintext / ciphertext with no AAD. The plaintext `.gabbro` header — magic, version, Argon2 params, both salts, both nonces, ML-KEM ciphertext, X25519 ephemeral pubkey, YubiKey records, alias, `passphrase_blob` — is therefore outside the GCM authentication scope.
@@ -104,6 +106,8 @@ Severity scale: **High** = immediate exploitable defect | **Medium** = realistic
 ---
 
 ### F-02 (Low) — ML-KEM-1024 KeyGen deviates from FIPS 203 (uses ChaCha-PRNG indirection)
+
+**Status — REMEDIATED (2026-06-01, VERSION 6).** Implemented recommendation (a): `ml-kem` 0.2.3 already exposes `KemCore::generate_deterministic(d, z)` behind its no-dependency `deterministic` feature, so **no version bump of `ml-kem` and no `rand` migration were needed**. `MlKemKeypair::from_kdf_output_fips` now feeds `d = kdf[32..64]`, `z = kdf[64..96]` directly into FIPS 203 §7.1 KeyGen, consuming all 64 bytes. The legacy `StdRng` path is retained as `from_kdf_output_legacy` for VERSION ≤5 vaults and dispatched on the file's version byte (`ml_kem_keypair_for_version` in `vault_crypto.rs`). The X25519 sibling observation below was deliberately **not** changed — clamping a uniform seed is standard, not a FIPS conformance gap. Verified by `crypto::ml_kem` tests (determinism, `z`-byte consumption, FIPS≠legacy) and a `legacy_version_5_vault_still_opens` regression.
 
 **Where:** `rust/src/crypto/ml_kem.rs:23–34`
 
@@ -210,6 +214,8 @@ Each of these is preceded by an explicit `len == 60` (or similar) length check, 
 ---
 
 ### F-07 (Info) — Documentation drift between `kdf.rs` comment and `ml_kem.rs` implementation
+
+**Status — FIXED (2026-06-01).** The `kdf.rs` doc-comment now states `[32..64] = d`, `[64..96] = z` for the FIPS path and explicitly documents the legacy path's dead-bytes behaviour. Fixed together with F-02.
 
 **Where:** `rust/src/crypto/kdf.rs:33–37` (doc-comment) vs `rust/src/crypto/ml_kem.rs:23–35` (implementation).
 
@@ -341,7 +347,7 @@ The Proton report scored **8 findings** (1 medium, 7 low) and recorded **6 unsco
 | Argon2id                 | RFC 9106, OWASP           | ✓ Exceeds recommended minimums (m=64 MiB / t=25 / p=4). |
 | HKDF-SHA256              | RFC 5869 / NIST SP 800-56C | ✓ Standard salt + info usage; domain separation present. |
 | X25519                   | RFC 7748, FIPS 186-5      | ✓ Standard ECDH; ephemeral on sealer side.              |
-| ML-KEM-1024              | FIPS 203                  | ⚠ Conformance gap on KeyGen (see F-02).                  |
+| ML-KEM-1024              | FIPS 203                  | ✓ `KeyGen(d, z)` as of VERSION 6 (F-02 remediated 2026-06-01); legacy path retained to read VERSION ≤5 vaults. |
 | Hybrid combiner          | (no FIPS, IETF drafts)    | ⚠ Concat-then-KDF — see F-03.                            |
 | FIDO2 / hmac-secret      | CTAP 2.1, FIDO Alliance   | ✓ Out of scope for this audit (see ADR-010).             |
 | RBG / RNG                | NIST SP 800-90A           | ✓ `OsRng` for all fresh material (Linux `getrandom`).    |
