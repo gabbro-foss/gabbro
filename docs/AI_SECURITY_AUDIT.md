@@ -436,7 +436,7 @@ No CI workflows exist yet (`.github/` contains only `FUNDING.yml`). When CI is a
 | HKDF-SHA256              | RFC 5869 / NIST SP 800-56C | ✓ Standard salt + info usage; domain separation present. |
 | X25519                   | RFC 7748, FIPS 186-5      | ✓ Standard ECDH; ephemeral on sealer side.              |
 | ML-KEM-1024              | FIPS 203                  | ✓ `KeyGen(d, z)` as of VERSION 6 (F-02 remediated 2026-06-01); legacy path retained to read VERSION ≤5 vaults. |
-| Hybrid combiner          | (no FIPS, IETF drafts)    | ⚠ Concat-then-KDF — see F-03.                            |
+| Hybrid combiner          | (no FIPS, IETF drafts)    | ⚠ Two-step: Phase 1 `HKDF(hkdf_salt, ml_kem_ss ∥ x25519_ss, "gabbro-hybrid-kex-v1")` → `intermediate_key`; YubiKey mode adds Phase 2 `HKDF(yubikey_salt, intermediate_key ∥ hmac_secret, "gabbro-yubikey-v1")` → `vault_key`. Phase 1 is a concat-then-KDF without transcript binding — see F-03. |
 | FIDO2 / hmac-secret      | CTAP 2.1, FIDO Alliance   | ✓ Out of scope for this audit (see ADR-010).             |
 | RBG / RNG                | NIST SP 800-90A           | ✓ `OsRng` for all fresh material (Linux `getrandom`).    |
 

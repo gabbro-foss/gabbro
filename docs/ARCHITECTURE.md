@@ -15,7 +15,7 @@ FOSS, GPL-3.0-only. Potential Yubico partnership.
 
 **Encryption (at rest):** Argon2id KDF → X25519 + ML-KEM-1024 hybrid key exchange → HKDF-SHA256 combiner → AES-256-GCM. Post-quantum: belt and suspenders.
 
-**Authentication (app access):** Mandatory FIDO2/WebAuthn hardware key (YubiKey). v1 uses Ed25519 (hardware constraint); target ML-DSA-44 once Yubico ships PQ-capable hardware (ADR-005). Min 2 keys (primary + backup), max 4. Biometric replaces passphrase entry only, never YubiKey tap. Auto-lock: 30s default, configurable.
+**Authentication (app access):** Mandatory FIDO2/WebAuthn hardware key (YubiKey). v1 uses Ed25519 (hardware constraint); target ML-DSA-44 once Yubico ships PQ-capable hardware (ADR-005). Min 2 keys (primary + backup), max 4. Auto-lock: 30s default, configurable.
 
 **YubiKey NFC / NDEF OTP:** YubiKeys ship with OTP slot 1 as an NDEF URI over NFC (`https://my.yubico.com/yk/...`). Without mitigation, Android opens a browser tab when the key is tapped. Gabbro suppresses this via `NfcConfiguration().skipNdefCheck(true)` (prevents NDEF being read during the CTAP2 session) and by re-arming foreground dispatch after `stopNfcDiscovery` (routes any post-session NDEF intents to `onNewIntent` rather than the browser). OTP slot 1 may remain enabled — no `ykman` workaround is needed. See LEARNINGS.md for the full diagnosis and collateral-effects table.
 
@@ -115,6 +115,7 @@ gabbro/
 ├── docs/
 │   ├── ARCHITECTURE.md         # This file
 │   ├── LEARNINGS.md
+│   ├── SECURITY.md             # User-facing security overview (Track A Phase 2)
 │   ├── AI_AUTHORSHIP_AND_IP.md
 │   ├── AI_SECURITY_AUDIT.md    # AI-assisted security review (2026-05-31)
 │   ├── artefacts/
@@ -150,7 +151,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 Make the codebase honestly defensible, then go public so experts can correct it (Cunningham's Law). Do the phases in order.
 
 1. ~~**Supply-chain audit.**~~ **Done 2026-06-01.** `cargo audit` (4 warnings, none exploitable), `flutter pub outdated` (all direct deps current), VS Code extensions (3 official — dart-code × 2, rust-lang), CI Actions (none yet — pin-to-SHA note added to Bikeshed). Full results in `AI_SECURITY_AUDIT.md § Supply-chain audit — Track A Phase 1`.
-2. **`docs/SECURITY.md`.** User-facing security doc: encryption ELI5, local-first argument, threat model, a comparison table, and honest caveats — explicitly "**NOT externally reviewed**", with the open questions named (F-01 header integrity, F-03 hybrid combiner). Cite the concrete evidence now available: the passing `gcore` memory-forensics self-test and FIPS-203 keygen.
+2. ~~**`docs/SECURITY.md`.**~~ **Done 2026-06-01.** User-facing security doc written: encryption ELI5 + technical table, local-first argument, threat model, two comparison tables (vs other managers; vs crypto alternatives), verified claims, known limitations (F-01, F-03), expert-review checklist. Explicitly "NOT externally reviewed".
 3. **Crack-me vault challenge.** Publish an encrypted `vault.gabbro` on the (public) GitHub repo containing a 256-char passphrase plus a note: decrypt it → gifted two YubiKeys; send proof (the passphrase) and method to gabbro.app@gmail.com. Add a "not cracked for N days" counter if feasible. This operationalises the get-corrected-by-experts strategy.
 
 Parked: F-01 header-integrity feature (VERSION 7; low severity, big cross-stack lift); F-03 X-Wing combiner (needs a human cryptographer).
@@ -236,6 +237,7 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
+- Biometric unlock (Android): use `BiometricPrompt` to replace passphrase *entry* only — the YubiKey tap must still be required. Never store the master passphrase in the biometric-protected keystore; use it only to gate the passphrase input UI.
 - bug: in android, cannot move the cursor in text fields, can position it but not drag it
 - l10n bug: example text in font size (`appearance_screen.dart`) is hard-coded in English
 - l10n bugs: many entry field tooltips are still hard-coded in English (examples: card state, custom fields label and value) -> audit all entries for hard-coded text and apply l10n
@@ -251,6 +253,7 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 - Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 - Explain if this project can be defined as "vide-coding" or not, and why, especially in the light of things like this: "vibe-coded cryptography software" in https://blogs.gentoo.org/mgorny/2026/05/28/why-gentoo/#more-2634
+- verify that the artefact files are still valid (ammend or remove as required)
 
 ### V2+ / Defer
 - Passkey (WebAuthn discoverable credential) support.
