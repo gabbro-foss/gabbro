@@ -30,9 +30,13 @@
 //!
 //! VERSION 2 (legacy single-key): records have no key_blob fields; no passphrase_blob.
 //! VERSION 3 (deprecated multi-key): records include key_blob_len + key_blob; no passphrase_blob.
-//! VERSION 4 (current multi-key): adds passphrase_blob for single-tap passphrase change.
-//! VERSION 5 (current): adds alias field (after YubiKey records, before passphrase_blob).
-//! Reads v2+; always writes VERSION 5.
+//! VERSION 4 (multi-key): adds passphrase_blob for single-tap passphrase change.
+//! VERSION 5: adds alias field (after YubiKey records, before passphrase_blob).
+//! VERSION 6 (current): identical header LAYOUT to VERSION 5; the only change is
+//!   that the ML-KEM keypair is derived via FIPS 203 `ML-KEM.KeyGen(d, z)`
+//!   instead of the legacy `StdRng`-seeded path (audit F-02). The version byte is
+//!   the only on-disk difference from VERSION 5 and selects the keygen on open.
+//! Reads v2–6; always writes VERSION 6.
 
 use crate::crypto::kdf::Argon2idParams;
 
@@ -52,7 +56,7 @@ pub struct YubiKeyRecord {
 pub const MAGIC: &[u8; 6] = b"GABBRO";
 
 /// Current file format version (written by this build).
-pub const VERSION: u8 = 5;
+pub const VERSION: u8 = 6;
 
 /// Oldest version this build can still read.
 const VERSION_MIN_READABLE: u8 = 2;
@@ -63,6 +67,12 @@ const ML_KEM_CIPHERTEXT_LEN: usize = 1568;
 /// The complete contents of a sealed vault file.
 #[derive(Debug, Clone, PartialEq)]
 pub struct SealedVault {
+    /// File-format version this vault was sealed with.
+    ///
+    /// Set to the parsed version on read and to [`VERSION`] for freshly sealed
+    /// vaults. The crypto layer dispatches the ML-KEM keygen on it: VERSION 6
+    /// uses FIPS 203 `KeyGen(d, z)`; VERSION 2–5 use the legacy `StdRng` path.
+    pub version: u8,
     pub params: Argon2idParams,
     pub argon2_salt: [u8; 32],
     pub hkdf_salt: [u8; 32],
@@ -90,9 +100,10 @@ impl SealedVault {
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut out = Vec::new();
 
-        // Header identity
+        // Header identity — write self.version (not the const) so a vault read
+        // as VERSION 5 round-trips as VERSION 5 until explicitly migrated.
         out.extend_from_slice(MAGIC);
-        out.push(VERSION);
+        out.push(self.version);
 
         // Argon2id parameters — each u32 written as 4 big-endian bytes
         out.extend_from_slice(&self.params.m_cost.to_be_bytes());
@@ -314,6 +325,7 @@ impl SealedVault {
         let ciphertext = data[pos..pos + body_len].to_vec();
 
         Ok(SealedVault {
+            version,
             params: Argon2idParams {
                 m_cost,
                 t_cost,
@@ -339,6 +351,7 @@ mod tests {
 
     fn test_vault() -> SealedVault {
         SealedVault {
+            version: VERSION,
             params: Argon2idParams {
                 m_cost: 65536,
                 t_cost: 25,
@@ -534,6 +547,28 @@ mod tests {
         let recovered = SealedVault::from_bytes(&bytes).unwrap();
         assert_eq!(recovered.alias, None);
         assert_eq!(recovered.ciphertext, vec![6u8; 64]);
+    }
+
+    #[test]
+    fn fresh_vault_is_version_6() {
+        assert_eq!(VERSION, 6);
+        assert_eq!(test_vault().version, 6);
+    }
+
+    #[test]
+    fn version_5_layout_still_readable_and_version_preserved() {
+        // VERSION 6 header layout is identical to VERSION 5, so a V6 byte stream
+        // with the version byte patched to 5 must still parse, and re-serialise
+        // back as VERSION 5 (lazy migration: old vaults are not silently bumped).
+        let mut bytes = test_vault().to_bytes();
+        bytes[6] = 5; // version byte offset = 6 (after 6 magic bytes)
+        let recovered = SealedVault::from_bytes(&bytes).unwrap();
+        assert_eq!(recovered.version, 5);
+        assert_eq!(
+            recovered.to_bytes()[6],
+            5,
+            "re-serialise preserves version 5"
+        );
     }
 
     #[test]

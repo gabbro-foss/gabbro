@@ -18,7 +18,24 @@ use crate::crypto::hkdf::{combine_yubikey, derive_vault_key};
 use crate::crypto::kdf::{derive_key, Argon2idParams};
 use crate::crypto::keypair::X25519Keypair;
 use crate::crypto::ml_kem::MlKemKeypair;
-use crate::vault::file_format::{SealedVault, YubiKeyRecord};
+use crate::vault::file_format::{SealedVault, YubiKeyRecord, VERSION};
+
+/// First file-format version that derives the ML-KEM keypair with FIPS 203
+/// `ML-KEM.KeyGen(d, z)`. Vaults below this use the legacy `StdRng`-seeded
+/// keygen and must keep doing so to remain readable (audit F-02).
+const FIPS_KEYGEN_MIN_VERSION: u8 = 6;
+
+/// Derives the ML-KEM keypair using the path that matches a vault's file
+/// version: VERSION 6+ uses FIPS keygen, VERSION 2–5 use the legacy path so
+/// vaults sealed by older builds still open. Seal paths pass [`VERSION`] (new
+/// vaults are always current); open paths pass the parsed `sealed.version`.
+fn ml_kem_keypair_for_version(version: u8, kdf_output: &[u8; 96]) -> MlKemKeypair {
+    if version >= FIPS_KEYGEN_MIN_VERSION {
+        MlKemKeypair::from_kdf_output_fips(kdf_output)
+    } else {
+        MlKemKeypair::from_kdf_output_legacy(kdf_output)
+    }
+}
 
 /// Encrypts plaintext under the given passphrase.
 pub fn seal_vault(passphrase: &[u8], plaintext: &[u8]) -> Result<SealedVault, String> {
@@ -31,7 +48,7 @@ pub fn seal_vault(passphrase: &[u8], plaintext: &[u8]) -> Result<SealedVault, St
     // Step 2: derive keypairs from passphrase
     let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
     let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
-    let ml_kem_keypair = MlKemKeypair::from_kdf_output(&kdf_output);
+    let ml_kem_keypair = ml_kem_keypair_for_version(VERSION, &kdf_output);
 
     // Step 3: ML-KEM encapsulate → shared secret A
     let mut encap_rng = OsRng;
@@ -64,6 +81,7 @@ pub fn seal_vault(passphrase: &[u8], plaintext: &[u8]) -> Result<SealedVault, St
     let (ciphertext, nonce) = aes_gcm::encrypt(&vault_key, plaintext)?;
 
     Ok(SealedVault {
+        version: VERSION,
         params,
         argon2_salt,
         ml_kem_ciphertext: ml_kem_ciphertext.to_vec(),
@@ -82,7 +100,7 @@ pub fn open_vault(passphrase: &[u8], sealed: &SealedVault) -> Result<Vec<u8>, St
     // Step 1: re-derive keypairs from passphrase
     let kdf_output = Zeroizing::new(derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?);
     let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
-    let ml_kem_keypair = MlKemKeypair::from_kdf_output(&kdf_output);
+    let ml_kem_keypair = ml_kem_keypair_for_version(sealed.version, &kdf_output);
 
     // Step 2: ML-KEM decapsulate → shared secret A
     let ml_kem_ct_bytes: &[u8; 1568] = sealed
@@ -137,7 +155,7 @@ pub fn seal_vault_with_yubikey(
 
     let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
     let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
-    let ml_kem_keypair = MlKemKeypair::from_kdf_output(&kdf_output);
+    let ml_kem_keypair = ml_kem_keypair_for_version(VERSION, &kdf_output);
 
     let mut encap_rng = OsRng;
     let (ml_kem_ciphertext, ml_kem_secret) = ml_kem_keypair
@@ -171,6 +189,7 @@ pub fn seal_vault_with_yubikey(
     let (ciphertext, nonce) = aes_gcm::encrypt(&vault_key, plaintext)?;
 
     Ok(SealedVault {
+        version: VERSION,
         params,
         argon2_salt,
         ml_kem_ciphertext: ml_kem_ciphertext.to_vec(),
@@ -199,7 +218,7 @@ pub fn open_vault_with_yubikey(
 ) -> Result<Vec<u8>, String> {
     let kdf_output = Zeroizing::new(derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?);
     let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
-    let ml_kem_keypair = MlKemKeypair::from_kdf_output(&kdf_output);
+    let ml_kem_keypair = ml_kem_keypair_for_version(sealed.version, &kdf_output);
 
     let ml_kem_ct_bytes: &[u8; 1568] = sealed
         .ml_kem_ciphertext
@@ -267,7 +286,7 @@ pub fn seal_vault_with_keys(
 
     let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params)?);
     let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
-    let ml_kem_keypair = MlKemKeypair::from_kdf_output(&kdf_output);
+    let ml_kem_keypair = ml_kem_keypair_for_version(VERSION, &kdf_output);
 
     let mut encap_rng = OsRng;
     let (ml_kem_ciphertext, ml_kem_secret) = ml_kem_keypair
@@ -332,6 +351,7 @@ pub fn seal_vault_with_keys(
     let (ciphertext, nonce) = aes_gcm::encrypt(&vault_key_master, plaintext)?;
 
     Ok(SealedVault {
+        version: VERSION,
         params,
         argon2_salt,
         hkdf_salt,
@@ -366,7 +386,7 @@ pub fn open_vault_with_key_record(
 ) -> Result<(Vec<u8>, Zeroizing<[u8; 32]>, Option<Zeroizing<[u8; 32]>>), String> {
     let kdf_output = Zeroizing::new(derive_key(passphrase, &sealed.argon2_salt, &sealed.params)?);
     let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
-    let ml_kem_keypair = MlKemKeypair::from_kdf_output(&kdf_output);
+    let ml_kem_keypair = ml_kem_keypair_for_version(sealed.version, &kdf_output);
 
     let ml_kem_ct_bytes: &[u8; 1568] = sealed
         .ml_kem_ciphertext
@@ -557,7 +577,7 @@ pub fn change_vault_passphrase_with_keys(
         &sealed.params,
     )?);
     let old_x25519 = X25519Keypair::from_kdf_output(&old_kdf);
-    let old_ml_kem = MlKemKeypair::from_kdf_output(&old_kdf);
+    let old_ml_kem = ml_kem_keypair_for_version(sealed.version, &old_kdf);
 
     let ml_kem_ct_bytes: &[u8; 1568] = sealed
         .ml_kem_ciphertext
@@ -613,7 +633,7 @@ pub fn change_vault_passphrase_with_keys(
 
     let new_kdf = Zeroizing::new(derive_key(new_passphrase, &new_argon2_salt, &new_params)?);
     let new_x25519 = X25519Keypair::from_kdf_output(&new_kdf);
-    let new_ml_kem = MlKemKeypair::from_kdf_output(&new_kdf);
+    let new_ml_kem = ml_kem_keypair_for_version(sealed.version, &new_kdf);
 
     let mut encap_rng = OsRng;
     let (new_ml_kem_ct, new_ml_kem_secret) = new_ml_kem
@@ -649,6 +669,7 @@ pub fn change_vault_passphrase_with_keys(
     // Step 5: Return new SealedVault with fresh PQ material and passphrase_blob.
     // key_blobs, body, and alias are unchanged — vault_key_master is stable.
     Ok(SealedVault {
+        version: sealed.version,
         params: new_params,
         argon2_salt: new_argon2_salt,
         hkdf_salt: new_hkdf_salt,
@@ -711,6 +732,78 @@ mod tests {
             .expect("open_vault should succeed after roundtrip through bytes");
 
         assert_eq!(recovered_plaintext, plaintext);
+    }
+
+    #[test]
+    fn seal_vault_produces_version_6() {
+        let sealed = seal_vault(b"pass", b"data").unwrap();
+        assert_eq!(
+            sealed.version, 6,
+            "new vaults are sealed as VERSION 6 (FIPS)"
+        );
+    }
+
+    /// A vault sealed by a pre-FIPS build (legacy `StdRng` keygen, VERSION 5)
+    /// must still open: `open_vault` dispatches the keygen on `sealed.version`.
+    /// This is the backward-compatibility guarantee for existing on-disk vaults
+    /// (audit F-02) — without it, every old vault would be bricked.
+    #[test]
+    fn legacy_version_5_vault_still_opens() {
+        let passphrase = b"existing vault passphrase";
+        let plaintext = b"data written by the old build";
+
+        // Reproduce an old-build seal: legacy keygen, tagged VERSION 5.
+        let params = Argon2idParams::default();
+        let mut argon2_salt = [0u8; 32];
+        OsRng.fill_bytes(&mut argon2_salt);
+        let kdf_output = Zeroizing::new(derive_key(passphrase, &argon2_salt, &params).unwrap());
+        let x25519_keypair = X25519Keypair::from_kdf_output(&kdf_output);
+        let ml_kem_keypair = MlKemKeypair::from_kdf_output_legacy(&kdf_output);
+
+        let mut encap_rng = OsRng;
+        let (ml_kem_ciphertext, ml_kem_secret) = ml_kem_keypair
+            .encapsulation_key
+            .encapsulate(&mut encap_rng)
+            .unwrap();
+        let ephemeral_secret = EphemeralSecret::random_from_rng(OsRng);
+        let ephemeral_public = X25519PublicKey::from(&ephemeral_secret);
+        let x25519_secret = ephemeral_secret.diffie_hellman(&x25519_keypair.public);
+        let mut hkdf_salt = [0u8; 32];
+        OsRng.fill_bytes(&mut hkdf_salt);
+        let ml_kem_secret_bytes: Zeroizing<[u8; 32]> =
+            Zeroizing::new((*ml_kem_secret).try_into().unwrap());
+        let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
+        let vault_key = Zeroizing::new(derive_vault_key(
+            &ml_kem_secret_bytes,
+            &x25519_secret_bytes,
+            &hkdf_salt,
+        ));
+        let (ciphertext, nonce) = aes_gcm::encrypt(&vault_key, plaintext).unwrap();
+
+        let sealed = SealedVault {
+            version: 5, // pre-FIPS on-disk vault
+            params,
+            argon2_salt,
+            ml_kem_ciphertext: ml_kem_ciphertext.to_vec(),
+            x25519_ephemeral_public: *ephemeral_public.as_bytes(),
+            hkdf_salt,
+            nonce,
+            ciphertext,
+            yubikey_records: vec![],
+            alias: None,
+            passphrase_blob: vec![],
+        };
+
+        // VERSION 5 → open_vault dispatches to the legacy keygen and decrypts.
+        let recovered = open_vault(passphrase, &sealed).unwrap();
+        assert_eq!(recovered, plaintext);
+
+        // Proof the dispatch is what matters: the very same bytes tagged
+        // VERSION 6 would use FIPS keygen → a different keypair → decapsulation
+        // yields the wrong shared secret → decryption fails.
+        let mut as_v6 = sealed.clone();
+        as_v6.version = 6;
+        assert!(open_vault(passphrase, &as_v6).is_err());
     }
 
     // ── YubiKey variants ──────────────────────────────────────────────────────

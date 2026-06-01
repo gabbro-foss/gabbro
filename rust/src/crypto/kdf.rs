@@ -31,9 +31,14 @@ impl Argon2idParams {
 /// Derives 96 bytes of key material from a passphrase and salt.
 ///
 /// The output is split by the caller:
-///   bytes [0..32]  → X25519 private-key seed (routed through StdRng to derive the keypair)
-///   bytes [32..64] → ML-KEM-1024 seed (routed through StdRng; used as the 32-byte RNG seed)
-///   bytes [64..96] → reserved; currently unused
+///   bytes [0..32]  → X25519 private-key seed (routed through StdRng, then clamped)
+///   bytes [32..64] → ML-KEM-1024 `d` (KeyGen seed for the PKE keypair)
+///   bytes [64..96] → ML-KEM-1024 `z` (KeyGen implicit-rejection secret)
+///
+/// VERSION 6+ vaults feed `d` and `z` directly into FIPS 203
+/// `ML-KEM.KeyGen(d, z)`, consuming all three ranges. Legacy VERSION 2–5 vaults
+/// instead seed `StdRng` with bytes [32..64] and ignore [64..96]; that path is
+/// retained only to read older vaults (see crypto::ml_kem for both paths).
 ///
 /// The salt must be exactly 32 bytes. Use a cryptographically random
 /// salt generated fresh for each new vault.

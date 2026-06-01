@@ -11,7 +11,7 @@ aes-gcm = "0.10.3"
 argon2 = "0.5.3"
 flutter_rust_bridge = "=2.12.0"
 hkdf = "0.13.0"
-ml-kem = "0.2.3"
+ml-kem = { version = "0.2.3", features = ["deterministic"] }
 rand = "0.8"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
