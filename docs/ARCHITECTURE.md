@@ -120,6 +120,10 @@ gabbro/
 │   ├── AI_SECURITY_AUDIT.md    # AI-assisted security review (2026-05-31)
 │   ├── artefacts/
 │   └── decisions/              # ADR documents
+├── challenge/
+│   ├── README.md               # Crack-me challenge rules and reward
+│   ├── decryptMe_2026-06-01.gabbro        # Sealed vault (passphrase + YubiKey; body unreadable without hardware)
+│   └── decryptMe_2026-06-01.gabbro.sha256
 ├── test/                       # Flutter unit/widget tests
 ├── integration_test/
 ├── CHANGELOG.md
@@ -146,13 +150,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Pre-public security hardening (Track A, 3 phases)
+### Next task: Features & UX (Bikeshed)
 
-Make the codebase honestly defensible, then go public so experts can correct it (Cunningham's Law). Do the phases in order.
-
-1. ~~**Supply-chain audit.**~~ **Done 2026-06-01.** `cargo audit` (4 warnings, none exploitable), `flutter pub outdated` (all direct deps current), VS Code extensions (3 official — dart-code × 2, rust-lang), CI Actions (none yet — pin-to-SHA note added to Bikeshed). Full results in `AI_SECURITY_AUDIT.md § Supply-chain audit — Track A Phase 1`.
-2. ~~**`docs/SECURITY.md`.**~~ **Done 2026-06-01.** User-facing security doc written: encryption ELI5 + technical table, local-first argument, threat model, two comparison tables (vs other managers; vs crypto alternatives), verified claims, known limitations (F-01, F-03), expert-review checklist. Explicitly "NOT externally reviewed".
-3. **Crack-me vault challenge.** Publish an encrypted `vault.gabbro` on the (public) GitHub repo containing a 256-char passphrase plus a note: decrypt it → gifted two YubiKeys; send proof (the passphrase) and method to gabbro.app@gmail.com. Add a "not cracked for N days" counter if feasible. This operationalises the get-corrected-by-experts strategy.
+Track A (pre-public security hardening) completed 2026-06-01. Next session: pick a specific task from the Features & UX section of the Bikeshed.
 
 Parked: F-01 header-integrity feature (VERSION 7; low severity, big cross-stack lift); F-03 X-Wing combiner (needs a human cryptographer).
 
