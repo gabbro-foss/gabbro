@@ -6,7 +6,9 @@
 //! computes a pool size, and returns an estimated entropy in bits using the
 //! standard formula:
 //!
-//!     entropy = length × log₂(pool_size)
+//! ```text
+//! entropy = length × log₂(pool_size)
+//! ```
 //!
 //! # Important caveat
 //!
@@ -92,7 +94,9 @@ pub struct EntropyResult {
 /// Detects which character classes are present in `password`, builds a pool
 /// size from those classes, then applies:
 ///
-///     entropy = length × log₂(pool_size)
+/// ```text
+/// entropy = length × log₂(pool_size)
+/// ```
 ///
 /// Returns `EntropyResult { bits: 0.0, tier: Terrible }` for an empty string.
 #[flutter_rust_bridge::frb(sync)]
