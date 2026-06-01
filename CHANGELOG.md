@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Crack-me vault challenge: `challenge/decryptMe_2026-06-01.gabbro` — a real vault sealed with a 256-char random passphrase and two YubiKeys, published for public security testing. Proof of crack = vault note contents + passphrase + method; reward is two YubiKey keys. See `challenge/README.md`.
+- `docs/SECURITY.md`: user-facing security overview covering both auth modes, encryption scheme, local-first argument, verified claims, known limitations (F-01, F-03), threat model, and two comparison tables.
+- Supply-chain audit (Track A Phase 1): `cargo audit` (4 warnings, none exploitable), `flutter pub outdated` (all direct deps current), VS Code extensions reviewed (3 official). Results recorded in `docs/AI_SECURITY_AUDIT.md`.
+
+### Fixed
+- Doctest parse errors in `rust/src/api/entropy.rs`: bare indented code blocks containing Unicode characters (`×`, `₂`) were compiled by rustdoc and failed to parse. Wrapped with ` ```text ` fences.
+
 ### Security
 - Vault file format **VERSION 6**: the ML-KEM-1024 keypair is now derived via FIPS 203 `ML-KEM.KeyGen(d, z)` directly from the KDF output (`d = bytes[32..64]`, `z = bytes[64..96]`), replacing the `StdRng`-seeded indirection that consumed only 32 of the 64 ML-KEM seed bytes (audit findings F-02 and F-07). New vaults are written as VERSION 6.
 - Backward compatible: existing VERSION 2–5 vaults remain fully readable. The keygen is dispatched on the file's version byte (legacy `StdRng` path for ≤5, FIPS path for 6), so no re-import is required.

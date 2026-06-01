@@ -3257,4 +3257,48 @@ completes (see the earlier entry on controller disposal). Using a `StatefulWidge
 for the dialog (`_SyncPassphraseDialog`) is both the correct lifecycle fix
 *and* the fix that prevents the use-after-dispose crash — but the cursor blink
 timer still runs during the exit animation, so `pumpAndSettle` is still fragile
+
+---
+
+## Rust — Unicode in bare doc-comment code blocks causes rustdoc compile errors
+
+Bare indented code blocks in doc comments (4-space indent) are compiled by
+rustdoc as Rust code. If the block contains Unicode characters (e.g. `×` for
+multiplication, `₂` for subscript), rustdoc fails with "unknown start of token".
+
+**Fix:** wrap the block with ` ```text ` and ` ``` ` fences so rustdoc treats
+it as plain text and skips compilation.
+
+```rust
+// Wrong — rustdoc tries to compile this:
+//
+//     entropy = length × log₂(pool_size)
+
+// Correct:
+//
+// ```text
+// entropy = length × log₂(pool_size)
+// ```
+```
+
+Affects `cargo test --doc`. Caught by running the full test suite.
+
+---
+
+## Crypto — `passphrase_blob` is a passphrase oracle in YubiKey vaults
+
+In Gabbro's multi-key vault format, the header contains a `passphrase_blob`
+field: `AES-GCM(intermediate_key, wrapping_key)`, where `intermediate_key` is
+derived from the passphrase via Argon2id + hybrid KEM. An attacker who has the
+vault file can verify whether a candidate passphrase is correct by checking if
+AES-GCM decryption of `passphrase_blob` authenticates — no YubiKey needed.
+
+**Implication for the crack-me challenge:** finding the passphrase is verifiable
+without hardware, but the vault body (the note) remains inaccessible without the
+YubiKey's HMAC-secret. With a 256-char random passphrase this oracle is useless
+in practice, but it is a subtle property of the format worth documenting.
+
+**Design note:** the YubiKey layer is a *second* HKDF pass
+(`HKDF(yubikey_salt, intermediate_key ∥ hmac_secret, "gabbro-yubikey-v1")`),
+entirely separate from the hybrid KEM combiner. The two steps are independent.
 in tests that chain two dialogs.
