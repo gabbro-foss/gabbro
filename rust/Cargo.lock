@@ -1257,6 +1257,7 @@ dependencies = [
  "flutter_rust_bridge",
  "hkdf",
  "jni",
+ "libc",
  "libfido2-sys",
  "ml-kem",
  "once_cell",

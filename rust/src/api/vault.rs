@@ -807,7 +807,7 @@ pub fn change_passphrase(
 /// The `.sha256` file is written alongside it automatically.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn export_vault(body: &VaultBody, passphrase: &[u8], export_path: &Path) -> Result<(), String> {
-    let plaintext = serialize_vault_body(body)?;
+    let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
     let sealed = seal_vault(passphrase, &plaintext)?;
     let vault_bytes = sealed.to_bytes();
 
@@ -845,7 +845,7 @@ pub fn export_vault(body: &VaultBody, passphrase: &[u8], export_path: &Path) -> 
 /// Entries → JSON → AES-256-GCM encrypted → .gabbro file on disk.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn save_vault(body: &VaultBody, passphrase: &[u8], path: &Path) -> Result<(), String> {
-    let plaintext = serialize_vault_body(body)?;
+    let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
     let sealed = seal_vault(passphrase, &plaintext)?;
     write_vault(&sealed, path)
 }
@@ -857,7 +857,7 @@ pub fn save_vault(body: &VaultBody, passphrase: &[u8], path: &Path) -> Result<()
 #[flutter_rust_bridge::frb(ignore)]
 pub fn load_vault(passphrase: &[u8], path: &Path) -> Result<VaultBody, String> {
     let sealed = read_vault(path)?;
-    let plaintext = open_vault(passphrase, &sealed)?;
+    let plaintext = zeroize::Zeroizing::new(open_vault(passphrase, &sealed)?);
     deserialize_vault_body(&plaintext)
 }
 
@@ -871,7 +871,7 @@ pub fn save_vault_with_yubikey(
     yubikey_salt: [u8; 32],
     path: &Path,
 ) -> Result<(), String> {
-    let plaintext = serialize_vault_body(body)?;
+    let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
     let sealed = seal_vault_with_yubikey(
         passphrase,
         hmac_secret,
@@ -891,7 +891,12 @@ pub fn load_vault_with_yubikey(
     path: &Path,
 ) -> Result<VaultBody, String> {
     let sealed = read_vault(path)?;
-    let plaintext = open_vault_with_yubikey(passphrase, hmac_secret, yubikey_salt, &sealed)?;
+    let plaintext = zeroize::Zeroizing::new(open_vault_with_yubikey(
+        passphrase,
+        hmac_secret,
+        yubikey_salt,
+        &sealed,
+    )?);
     deserialize_vault_body(&plaintext)
 }
 
@@ -904,7 +909,7 @@ pub fn save_vault_with_keys(
     keys: &[crate::crypto::vault_crypto::YubiKeyRegistration],
     path: &Path,
 ) -> Result<(), String> {
-    let plaintext = serialize_vault_body(body)?;
+    let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
     let sealed = crate::crypto::vault_crypto::seal_vault_with_keys(passphrase, keys, &plaintext)?;
     write_vault(&sealed, path)
 }
@@ -935,6 +940,7 @@ pub fn load_vault_with_key_record(
             credential_id,
             &sealed,
         )?;
+    let plaintext = zeroize::Zeroizing::new(plaintext);
     let body = deserialize_vault_body(&plaintext)?;
     Ok((body, master, wrapping_key))
 }
@@ -979,7 +985,7 @@ pub fn reseal_vault_body(
 ) -> Result<(), String> {
     use crate::vault::io::read_vault;
     let mut sealed = read_vault(path)?;
-    let plaintext = serialize_vault_body(body)?;
+    let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
     crate::crypto::vault_crypto::reseal_vault_body(&mut sealed, vault_key_master, &plaintext)?;
     write_vault(&sealed, path)
 }
