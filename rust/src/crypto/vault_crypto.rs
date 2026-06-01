@@ -420,7 +420,9 @@ pub fn open_vault_with_key_record(
             sealed.passphrase_blob.len()
         ));
     }
-    let pb_nonce: [u8; 12] = sealed.passphrase_blob[..12].try_into().unwrap();
+    let pb_nonce: [u8; 12] = sealed.passphrase_blob[..12]
+        .try_into()
+        .expect("length checked above");
     let pb_ct = &sealed.passphrase_blob[12..];
     let wrapping_key_bytes = aes_gcm::decrypt(&intermediate_key, pb_ct, &pb_nonce)
         .map_err(|_| "decryption failed: wrong passphrase or corrupted vault".to_string())?;
@@ -437,7 +439,9 @@ pub fn open_vault_with_key_record(
             record.key_blob.len()
         ));
     }
-    let blob_nonce: [u8; 12] = record.key_blob[..12].try_into().unwrap();
+    let blob_nonce: [u8; 12] = record.key_blob[..12]
+        .try_into()
+        .expect("length checked above");
     let blob_ct = &record.key_blob[12..];
 
     let wrap_key = Zeroizing::new(combine_yubikey(&wrapping_key, hmac_secret, &record.salt));
@@ -589,7 +593,9 @@ pub fn change_vault_passphrase_with_keys(
                 .to_string(),
         );
     }
-    let pb_nonce: [u8; 12] = sealed.passphrase_blob[..12].try_into().unwrap();
+    let pb_nonce: [u8; 12] = sealed.passphrase_blob[..12]
+        .try_into()
+        .expect("length checked above");
     let pb_ct = &sealed.passphrase_blob[12..];
     let wrapping_key_bytes = aes_gcm::decrypt(&old_intermediate_key, pb_ct, &pb_nonce)
         .map_err(|_| "wrong passphrase".to_string())?;

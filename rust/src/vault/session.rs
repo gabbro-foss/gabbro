@@ -21,7 +21,7 @@ use crate::vault::serialization::{DeletedEntry, VaultBody};
 
 // Extracted YubiKey quad: (hmac_secret, credential_id, hkdf_salt, vault_key_master?).
 type YubikeyTriple = Option<(
-    Zeroizing<Vec<u8>>,
+    Zeroizing<[u8; 32]>,
     Vec<u8>,
     [u8; 32],
     Option<Zeroizing<[u8; 32]>>,
@@ -38,7 +38,7 @@ type YubikeyTriple = Option<(
 /// For legacy VERSION 2 single-key vaults both are None; saves use the old
 /// `save_vault_with_yubikey` path which re-derives with the cached hmac_secret.
 pub struct YubikeyMaterial {
-    pub hmac_secret: Vec<u8>, // 32 bytes; zeroized in lock_vault
+    pub hmac_secret: Zeroizing<[u8; 32]>, // zeroized on drop and in lock_vault
     pub hkdf_salt: [u8; 32],
     pub credential_id: Vec<u8>,
     /// Cached master key for CRUD re-seals (VERSION 4 multi-key vaults only).
@@ -51,7 +51,7 @@ pub struct VaultSession {
     pub folders: Vec<String>,
     pub entries: Vec<VaultEntry>,
     pub path: PathBuf,
-    pub passphrase: Vec<u8>,
+    pub passphrase: Zeroizing<Vec<u8>>,
     pub yubikey: Option<YubikeyMaterial>,
     /// User-defined aliases for registered YubiKeys, keyed by credential_id hex string.
     /// Stored in the encrypted vault body for portability across devices.
@@ -77,7 +77,7 @@ pub fn unlock_vault(passphrase: &[u8], path: PathBuf) -> Result<(), String> {
         yubikey_aliases: body.yubikey_aliases,
         deleted_ids: body.deleted_ids,
         path,
-        passphrase: passphrase.to_vec(),
+        passphrase: Zeroizing::new(passphrase.to_vec()),
         yubikey: None,
     });
     Ok(())
@@ -100,9 +100,9 @@ pub fn unlock_vault_with_yubikey(
         yubikey_aliases: body.yubikey_aliases,
         deleted_ids: body.deleted_ids,
         path,
-        passphrase: passphrase.to_vec(),
+        passphrase: Zeroizing::new(passphrase.to_vec()),
         yubikey: Some(YubikeyMaterial {
-            hmac_secret: hmac_secret.to_vec(),
+            hmac_secret: Zeroizing::new(*hmac_secret),
             hkdf_salt: *yubikey_salt,
             vault_key_master: None,
             wrapping_key: None,
@@ -133,9 +133,9 @@ pub fn unlock_vault_with_key_record(
         yubikey_aliases: body.yubikey_aliases,
         deleted_ids: body.deleted_ids,
         path,
-        passphrase: passphrase.to_vec(),
+        passphrase: Zeroizing::new(passphrase.to_vec()),
         yubikey: Some(YubikeyMaterial {
-            hmac_secret: hmac_secret.to_vec(),
+            hmac_secret: Zeroizing::new(*hmac_secret),
             hkdf_salt: *yubikey_salt,
             credential_id,
             vault_key_master: Some(master),
@@ -193,7 +193,7 @@ fn build_body(session: &VaultSession) -> VaultBody {
 fn extract_yubikey(session: &VaultSession) -> YubikeyTriple {
     session.yubikey.as_ref().map(|yk| {
         (
-            Zeroizing::new(yk.hmac_secret.clone()),
+            yk.hmac_secret.clone(),
             yk.credential_id.clone(),
             yk.hkdf_salt,
             yk.vault_key_master.as_ref().map(|m| Zeroizing::new(**m)),
@@ -217,13 +217,14 @@ fn do_save(
         Some((_, _, _, Some(ref vault_key_master))) => {
             reseal_vault_body(body, vault_key_master, path)
         }
-        Some((hmac_secret, credential_id, hkdf_salt, None)) => {
-            let secret: [u8; 32] = hmac_secret
-                .as_slice()
-                .try_into()
-                .map_err(|_| "invalid cached hmac_secret length".to_string())?;
-            save_vault_with_yubikey(body, passphrase, &secret, credential_id, hkdf_salt, path)
-        }
+        Some((hmac_secret, credential_id, hkdf_salt, None)) => save_vault_with_yubikey(
+            body,
+            passphrase,
+            &hmac_secret,
+            credential_id,
+            hkdf_salt,
+            path,
+        ),
         None => save_vault(body, passphrase, path),
     }
 }
@@ -452,7 +453,7 @@ pub fn session_save() -> Result<(), String> {
         let yubikey = extract_yubikey(session);
         (
             body,
-            Zeroizing::new(session.passphrase.clone()),
+            session.passphrase.clone(),
             session.path.clone(),
             yubikey,
         )
@@ -475,7 +476,7 @@ pub fn session_create_entry(entry: VaultEntry) -> Result<EntrySummaryData, Strin
         let yubikey = extract_yubikey(session);
         (
             body,
-            Zeroizing::new(session.passphrase.clone()),
+            session.passphrase.clone(),
             session.path.clone(),
             yubikey,
         )
@@ -496,7 +497,7 @@ pub fn session_update_entry(updated: VaultEntry, expiry_days: Option<u32>) -> Re
         let yubikey = extract_yubikey(session);
         (
             body,
-            Zeroizing::new(session.passphrase.clone()),
+            session.passphrase.clone(),
             session.path.clone(),
             yubikey,
         )
@@ -521,7 +522,7 @@ pub fn session_delete_entry(id: &str) -> Result<(), String> {
         let yubikey = extract_yubikey(session);
         (
             body,
-            Zeroizing::new(session.passphrase.clone()),
+            session.passphrase.clone(),
             session.path.clone(),
             yubikey,
         )
@@ -563,11 +564,7 @@ pub fn session_change_passphrase(
         change_passphrase_with_keys(old_passphrase, new_passphrase, &path)?;
     } else if let Some(ref yk) = session.yubikey {
         // Legacy VERSION 2 single-key vault
-        let secret: [u8; 32] = yk
-            .hmac_secret
-            .as_slice()
-            .try_into()
-            .map_err(|_| "invalid cached hmac_secret length".to_string())?;
+        let secret: [u8; 32] = *yk.hmac_secret;
         let hkdf_salt = yk.hkdf_salt;
         let credential_id = yk.credential_id.clone();
         load_vault_with_yubikey(old_passphrase, &secret, &hkdf_salt, &path)?;
@@ -586,7 +583,7 @@ pub fn session_change_passphrase(
         save_vault(&body, new_passphrase, &path)?;
     }
 
-    session.passphrase = new_passphrase.to_vec();
+    session.passphrase = Zeroizing::new(new_passphrase.to_vec());
     Ok(())
 }
 
@@ -614,7 +611,7 @@ pub fn session_clear_password_history(id: &str) -> Result<(), String> {
         let yubikey = extract_yubikey(session);
         (
             body,
-            Zeroizing::new(session.passphrase.clone()),
+            session.passphrase.clone(),
             session.path.clone(),
             yubikey,
         )
@@ -651,7 +648,7 @@ pub fn session_revert_password(id: &str) -> Result<(), String> {
         let yubikey = extract_yubikey(session);
         (
             body,
-            Zeroizing::new(session.passphrase.clone()),
+            session.passphrase.clone(),
             session.path.clone(),
             yubikey,
         )
@@ -693,7 +690,7 @@ pub fn session_export_vault_json(export_path: PathBuf) -> Result<(), String> {
     };
 
     let json = serde_json::to_string_pretty(&export).map_err(|e| e.to_string())?;
-    std::fs::write(&export_path, json.as_bytes()).map_err(|e| e.to_string())?;
+    crate::vault::io::atomic_write_0600(&export_path, json.as_bytes())?;
     Ok(())
 }
 
@@ -825,7 +822,7 @@ pub fn session_rename_folder(old_name: String, new_name: String) -> Result<(), S
         let yubikey = extract_yubikey(session);
         (
             body,
-            Zeroizing::new(session.passphrase.clone()),
+            session.passphrase.clone(),
             session.path.clone(),
             yubikey,
         )
@@ -871,7 +868,7 @@ pub fn session_delete_folder(name: String, reassign_to: Option<String>) -> Resul
         let yubikey = extract_yubikey(session);
         (
             body,
-            Zeroizing::new(session.passphrase.clone()),
+            session.passphrase.clone(),
             session.path.clone(),
             yubikey,
         )
@@ -909,7 +906,7 @@ pub fn session_assign_folder_to_entries(ids: &[String], folder: String) -> Resul
         let yubikey = extract_yubikey(session);
         (
             body,
-            Zeroizing::new(session.passphrase.clone()),
+            session.passphrase.clone(),
             session.path.clone(),
             yubikey,
         )
@@ -937,7 +934,7 @@ pub fn session_create_folder(name: String) -> Result<(), String> {
         let yubikey = extract_yubikey(session);
         (
             body,
-            Zeroizing::new(session.passphrase.clone()),
+            session.passphrase.clone(),
             session.path.clone(),
             yubikey,
         )
@@ -1019,7 +1016,7 @@ pub fn session_set_yubikey_alias(credential_id_hex: String, alias: String) -> Re
         let yubikey = extract_yubikey(session);
         (
             body,
-            Zeroizing::new(session.passphrase.clone()),
+            session.passphrase.clone(),
             session.path.clone(),
             yubikey,
         )
@@ -1217,7 +1214,7 @@ pub fn session_merge_vault_from_body(incoming: VaultBody) -> Result<MergeSummary
         let yubikey = extract_yubikey(session);
         (
             body,
-            Zeroizing::new(session.passphrase.clone()),
+            session.passphrase.clone(),
             session.path.clone(),
             yubikey,
             summary,

@@ -31,8 +31,9 @@ impl Argon2idParams {
 /// Derives 96 bytes of key material from a passphrase and salt.
 ///
 /// The output is split by the caller:
-///   bytes [0..32]  → X25519 private key
-///   bytes [32..96] → ML-KEM-1024 private key seed
+///   bytes [0..32]  → X25519 private-key seed (routed through StdRng to derive the keypair)
+///   bytes [32..64] → ML-KEM-1024 seed (routed through StdRng; used as the 32-byte RNG seed)
+///   bytes [64..96] → reserved; currently unused
 ///
 /// The salt must be exactly 32 bytes. Use a cryptographically random
 /// salt generated fresh for each new vault.

@@ -14,7 +14,7 @@ use crate::vault::entry::{
     CardEntry, CustomEntry, CustomField, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
     NoteEntry, VaultEntry,
 };
-use crate::vault::io::{read_vault, write_vault};
+use crate::vault::io::{atomic_write_0600, read_vault, write_vault};
 use crate::vault::serialization::{deserialize_vault_body, serialize_vault_body, VaultBody};
 use uuid::Uuid;
 
@@ -812,8 +812,7 @@ pub fn export_vault(body: &VaultBody, passphrase: &[u8], export_path: &Path) -> 
     let vault_bytes = sealed.to_bytes();
 
     // Write the .gabbro file
-    std::fs::write(export_path, &vault_bytes)
-        .map_err(|e| format!("Failed to write export file: {e}"))?;
+    atomic_write_0600(export_path, &vault_bytes)?;
 
     // Compute SHA-256 over the vault bytes
     let mut hasher = Sha256::new();
@@ -833,7 +832,7 @@ pub fn export_vault(body: &VaultBody, passphrase: &[u8], export_path: &Path) -> 
 
     // Write the .sha256 companion file
     let hash_path = export_path.with_extension("gabbro.sha256");
-    std::fs::write(&hash_path, hash_hex).map_err(|e| format!("Failed to write hash file: {e}"))?;
+    atomic_write_0600(&hash_path, hash_hex.as_bytes())?;
 
     Ok(())
 }
