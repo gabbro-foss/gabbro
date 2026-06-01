@@ -178,36 +178,15 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: implement remediations from `docs/AI_SECURITY_AUDIT.md`
+### Next task: Round 2 security remediations (F-01, F-02, F-03) — gated on human crypto review
 
-**Previous task completed (2026-05-31):** Fixed two Linux lock-timer bugs:
-1. Foreground lock fired while typing — `GestureDetector` only reset the timer on pointer events; keyboard events were ignored. Fixed by adding `HardwareKeyboard.instance.addHandler` in `initState`/`dispose` to call `_resetForegroundTimer()` on `KeyDownEvent`.
-2. Background lock didn't fire on Qtile (Arch) — `didChangeAppLifecycleState` only handled `AppLifecycleState.paused`; desktop Linux emits `AppLifecycleState.hidden` (window minimised / workspace switch). Fixed by fall-through: `case AppLifecycleState.paused: case AppLifecycleState.hidden:`.
+Round 1 remediations (F-04, F-06, F-07, F-08, F-09) shipped 2026-06-01. Round 2 requires a `.gabbro` file-format bump to VERSION 6 and should not start until the human cryptographer / RustCrypto pre-v1 gate clears, because the reviewer's opinion may change the spec.
 
-
-The AI security review (Claude Opus 4.7, 2026-05-31) identified 10 findings across `rust/src/crypto/` and `rust/src/vault/` — all rated Low or Info, none exploitable under the in-scope threat model. Plus 6 cross-cutting lessons drawn from the Recurity Labs Proton Pass audit (526.2501). Remediation is split into two rounds by file-format impact.
-
-**Model selection (self-check before coding — switch via `/model` if mismatched):**
-
-- **Round 1 (F-04, F-06, F-07, F-08, F-09):** Sonnet 4.6 is fine. Mechanical changes with clear pass/fail criteria; strict TDD covers the F-08 atomic-write footgun.
-- **Round 2 F-01 (AES-GCM AAD over header):** Sonnet 4.6 acceptable with TDD-first — write `tampered_<field>_fails_to_open` tests before plumbing AAD.
-- **Round 2 F-02 (FIPS 203 ML-KEM KeyGen alignment):** prefer **Opus 4.7**, or defer until after the human crypto review. Wrong KeyGen produces silently-different keypairs from the same passphrase; no unit test catches this without FIPS test vectors.
-- **Round 2 F-03 (X-Wing combiner):** defer to the human crypto review — implementing pre-emptively risks re-work.
-- **Recommended order:** ship Round 1 now; hold Round 2 until after the academic / RustCrypto pre-v1 gate clears, because the reviewer's opinion may change the spec.
-
-**Round 1 — non-breaking hygiene (no `.gabbro` VERSION bump):**
-
-- **F-04** Memory hygiene typing — change `VaultSession.passphrase` to `Zeroizing<Vec<u8>>` and `YubikeyMaterial.hmac_secret` to `Zeroizing<[u8; 32]>` so abnormal-exit paths still zeroize (panics, SIGKILL, OOM kill). `vault_key_master` and `wrapping_key` are already correctly typed — match them.
-- **F-06** Replace the three bounded `.unwrap()` calls in `rust/src/crypto/vault_crypto.rs` (lines 423, 440, 592) with `.expect("length checked above")` to satisfy the CLAUDE.md "no `unwrap()` in non-test code" rule.
-- **F-07** Fix doc-comment drift in `rust/src/crypto/kdf.rs:33-37` — describe what the implementation actually does (32-byte seed via `StdRng`, bytes [64..96] reserved/unused).
-- **F-08** Atomic 0600-mode writes — replace bare `fs::write` in `rust/src/vault/io.rs:20`, `rust/src/api/vault.rs:815,836`, and `rust/src/vault/session.rs:696` with an `OpenOptions { mode: 0o600 }` + temp-file + atomic rename pattern (unix-only `cfg`; Windows path keeps `fs::write`).
-- **F-09** Symlink validation — call `std::fs::symlink_metadata` before opening a vault path for read or write; refuse with a clear error when `.is_symlink()`.
-
-**Round 2 — design-level (may require `.gabbro` file-format bump to VERSION 6):**
+**Round 2 — design-level (require `.gabbro` file-format bump to VERSION 6):**
 
 - **F-01** Bind the plaintext `.gabbro` header to the AES-GCM auth tag via AAD. Pass the serialised header (everything before the body length prefix) as AAD to `aes_gcm::encrypt` / `decrypt`. Detects tampering with `alias`, YubiKey `credential_id`, and any other plaintext metadata. **VERSION 6 bump** with read-only backward compat for VERSION 2–5.
-- **F-02** Align ML-KEM-1024 KeyGen with FIPS 203 — use `(d, z) ∈ {0,1}^256 × {0,1}^256` directly from KDF bytes `[32..64]` and `[64..96]`, removing the `StdRng` indirection and the dead-bytes range. Requires verifying that `ml-kem` 0.3.x exposes a path to `KeyGen(d, z)`; otherwise stay on the PRNG path but shorten the KDF output to 64 bytes and document the deviation. **Changes derived keypair under same passphrase** → either gated behind VERSION 6 with old vaults still readable via the legacy path, or one-shot migrate-on-open.
-- **F-03** Hybrid combiner — discuss with the human cryptographer (pre-v1 gate) whether to migrate to an X-Wing-style transcript-binding combiner (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). May or may not warrant a VERSION bump on its own; preferable to bundle with F-01 + F-02 into a single VERSION 6 release if pursued.
+- **F-02** Align ML-KEM-1024 KeyGen with FIPS 203 — use `(d, z) ∈ {0,1}^256 × {0,1}^256` directly from KDF bytes `[32..64]` and `[64..96]`, removing the `StdRng` indirection and the dead-bytes range. Requires verifying that `ml-kem` 0.3.x exposes a path to `KeyGen(d, z)`; otherwise stay on the PRNG path but shorten the KDF output to 64 bytes and document the deviation. **Changes derived keypair under same passphrase** → either gated behind VERSION 6 with old vaults still readable via the legacy path, or one-shot migrate-on-open. **Prefer Opus 4.7 or later** for this task.
+- **F-03** Hybrid combiner — discuss with the human cryptographer whether to migrate to an X-Wing-style transcript-binding combiner (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). Preferable to bundle with F-01 + F-02 into a single VERSION 6 release.
 
 **Deferred from remediation scope:**
 
@@ -216,9 +195,11 @@ The AI security review (Claude Opus 4.7, 2026-05-31) identified 10 findings acro
 - **L-3** iOS Keychain protection class — pinned for the V2+ iOS port (already in Bikeshed via "iOS, Windows, macOS support").
 - **L-6** `gcore` memory-forensics test of an unlocked gabbro process — Bikeshed candidate; ideally before the human-expert crypto review.
 
-After Round 1 ships, run `flutter test` + `cargo test -q` + `cargo clippy -- -D warnings` to confirm no regression. Round 2 work is gated behind a separate session and a `.gabbro` VERSION 6 spec.
+**Model selection for Round 2 (self-check before coding — switch via `/model` if mismatched):**
 
-**Previous task completed (2026-05-31):** AI-assisted security review (Claude Opus 4.7) of `rust/src/crypto/` and `rust/src/vault/` — see [`docs/AI_SECURITY_AUDIT.md`](AI_SECURITY_AUDIT.md). 0 CVEs across 211 crates, 0 secrets in git history, 0 `unsafe`/`transmute`/`asm!` in scope, 0 hardcoded credentials, 10 findings (all Low or Info), and the full Recurity Labs Proton Pass audit mapped to gabbro's posture.
+- **F-01 (AES-GCM AAD over header):** Sonnet 4.6 acceptable with TDD-first.
+- **F-02 (FIPS 203 ML-KEM KeyGen alignment):** prefer **Opus 4.7 or later** — wrong KeyGen silently changes keypairs.
+- **F-03 (X-Wing combiner):** defer to human crypto review.
 
 ---
 
