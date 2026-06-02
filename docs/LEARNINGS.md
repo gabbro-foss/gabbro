@@ -3285,6 +3285,113 @@ Affects `cargo test --doc`. Caught by running the full test suite.
 
 ---
 
+## Flutter — `GestureDetector` vs `Listener` for inactivity timers
+
+An app-wide inactivity timer is commonly implemented by wrapping `MaterialApp` in a
+`GestureDetector` with `HitTestBehavior.translucent` and resetting the timer on
+`onTap` / `onPanDown`. This works for taps but breaks cursor dragging: Flutter's
+gesture arena pits the parent `PanGestureRecognizer` (from `onPanDown`) against the
+text-handle's own `PanGestureRecognizer` — the parent wins and the handle becomes
+unresponsive.
+
+**Fix:** replace `GestureDetector` with `Listener` for the inactivity wrapper:
+
+```dart
+// Before — PanGestureRecognizer competes with text-handle recognizer
+child: GestureDetector(
+  behavior: HitTestBehavior.translucent,
+  onTap: _resetForegroundTimer,
+  onPanDown: (_) => _resetForegroundTimer(),
+  child: MaterialApp(...),
+),
+
+// After — raw pointer events, no gesture arena participation
+child: Listener(
+  behavior: HitTestBehavior.translucent,
+  onPointerDown: (_) => _resetForegroundTimer(),
+  child: MaterialApp(...),
+),
+```
+
+`Listener` receives raw pointer events before the gesture arena runs, so it never
+blocks downstream recognizers. Timer-reset semantics are preserved; cursor dragging
+and text selection are unaffected.
+
+Note: passphrase fields may still have cursor dragging disabled intentionally via
+`enableInteractiveSelection: false` when "Block copy/paste" is on — that is a
+separate, deliberate security constraint unrelated to this fix.
+
+---
+
+## Flutter l10n — stable identifiers, translate at display time
+
+When a value is stored in the vault (e.g. card status: `'active'`, `'lapsed'`,
+`'inactive'`), it must remain a stable English identifier — never a translated
+string. If translated strings were stored, switching locale or changing a translation
+would silently corrupt stored data.
+
+Pattern: store the identifier; translate only at display time with a helper:
+
+```dart
+String _localizeCardStatus(String status, AppLocalizations l) => switch (status) {
+  'active'   => l.cardStatusActive,
+  'lapsed'   => l.cardStatusLapsed,
+  'inactive' => l.cardStatusInactive,
+  _          => status,  // unknown identifier — pass through unchanged
+};
+```
+
+In dropdown forms, separate the stored identifier from the display label:
+
+```dart
+DropdownButtonFormField<String>(
+  value: _cardStatusController.text,          // stored identifier
+  items: _cardStatuses.map((s) => DropdownMenuItem<String>(
+    value: s,                                 // persisted value
+    child: Text(_localizeCardStatus(s, l)),   // display label
+  )).toList(),
+  onChanged: (v) => setState(() => _cardStatusController.text = v ?? 'active'),
+),
+```
+
+The same helper must be applied in every screen that displays the field
+(both `create_entry_screen.dart` and `entry_detail_screen.dart`).
+
+---
+
+## Flutter l10n — removing `const` when switching to localizations
+
+`const InputDecoration(labelText: 'Title')` must become
+`InputDecoration(labelText: l.fieldTitle)` when adopting ARB-based localizations.
+The `const` keyword requires all arguments to be compile-time constants;
+`l` (an `AppLocalizations` instance) is a runtime value — so `const` must be removed.
+
+The same applies to any widget that previously had hard-coded string arguments in a
+`const` constructor: validators, tooltip text, hint text. The fix is mechanical — drop
+`const` and replace the literal with the ARB lookup.
+
+---
+
+## Flutter — `ValueKey` tuple for compound widget state
+
+When a stateful child widget's default content depends on two independent pieces of
+parent state, use a tuple as its `ValueKey` so Flutter recreates it whenever either
+value changes:
+
+```dart
+PathField(
+  key: ValueKey((_format, _includeDate)),   // tuple key — rebuilds on either change
+  saveFileName: _defaultFilename(vaultAlias, isJson, includeDate: _includeDate),
+  ...
+),
+```
+
+With `ValueKey(_format)` alone, toggling `_includeDate` would not rebuild the widget,
+so the `saveFileName` pre-fill would remain stale. Dart's record-based tuple equality
+compares both fields, so `(a, b) == (a, b)` is true only when both match.
+
+---
+
 ## Crypto — `passphrase_blob` is a passphrase oracle in YubiKey vaults
 
 In Gabbro's multi-key vault format, the header contains a `passphrase_blob`
