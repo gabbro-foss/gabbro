@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.3] – 2026-06-02
+
 ### Fixed
 - Android: cursor handle (teardrop) could not be dragged in any text field. Root cause: the app-wide inactivity-timer `GestureDetector` registered a `PanGestureRecognizer` that competed in Flutter's gesture arena against the text-handle's own recognizer and won. Replaced with a `Listener` (raw pointer events, no arena participation); `onPointerDown` preserves the same timer-reset semantics.
 - l10n: font-size preview text in Appearance screen is now translated (was hard-coded English in all locales).
@@ -14,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - l10n: CSV-imported entries no longer land in a hard-coded English "Personal" folder — they are now unfoldered.
 
 ### Added
+- Export screen: "Include date in filename" toggle. When off, the exported filename is `alias.gabbro` / `alias.json` (stable name for rsync/file-sync workflows). Default: on. Available on both Linux and Android.
 - Crack-me vault challenge: `challenge/decryptMe_2026-06-01.gabbro` — a real vault sealed with a 256-char random passphrase and two YubiKeys, published for public security testing. Proof of crack = vault note contents + passphrase + method; reward is two YubiKey keys. See `challenge/README.md`.
 - `docs/SECURITY.md`: user-facing security overview covering both auth modes, encryption scheme, local-first argument, verified claims, known limitations (F-01, F-03), threat model, and two comparison tables.
 - Supply-chain audit (Track A Phase 1): `cargo audit` (4 warnings, none exploitable), `flutter pub outdated` (all direct deps current), VS Code extensions reviewed (3 official). Results recorded in `docs/AI_SECURITY_AUDIT.md`.

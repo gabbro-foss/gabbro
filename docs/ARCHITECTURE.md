@@ -139,7 +139,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 349 | 8 |
-| Flutter (`flutter test`) | 454 | 0 |
+| Flutter (`flutter test`) | 457 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -150,9 +150,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: export filename date toggle
+### Next task: Features & UX (Bikeshed)
 
-Add an option in the vault export screen to omit the date from the exported filename — enables stable filenames for rsync/file-sync workflows.
+v0.1.0-alpha.3 released 2026-06-02. Next session: pick a specific task from the Features & UX section of the Bikeshed.
 
 Parked: F-01 header-integrity feature (VERSION 7; low severity, big cross-stack lift); F-03 X-Wing combiner (needs a human cryptographer).
 
