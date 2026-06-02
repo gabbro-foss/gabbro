@@ -476,10 +476,9 @@ class _GabbroAppState extends State<GabbroApp>
     final hc = _settings.highContrast;
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(_textScale)),
-      child: GestureDetector(
+      child: Listener(
         behavior: HitTestBehavior.translucent,
-        onTap: _resetForegroundTimer,
-        onPanDown: (_) => _resetForegroundTimer(),
+        onPointerDown: (_) => _resetForegroundTimer(),
         child: MaterialApp(
           navigatorKey: _navigatorKey,
           title: 'Gabbro',
