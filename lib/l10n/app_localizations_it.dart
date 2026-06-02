@@ -1134,6 +1134,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get charTypeSymbol => 'Simbolo';
 
   @override
+  String get exportIncludeDate => 'Includi la data nel nome del file';
+
+  @override
   String get exportChooseFormat => 'Scegli un formato di esportazione.';
 
   @override

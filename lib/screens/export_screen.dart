@@ -17,10 +17,13 @@ String sanitiseAlias(String? alias) {
   return sanitised.isEmpty ? 'vault' : sanitised;
 }
 
-String _defaultFilename(String? alias, bool isJson) {
+String _defaultFilename(String? alias, bool isJson, {bool includeDate = true}) {
   final base = sanitiseAlias(alias);
-  final date = DateTime.now().toIso8601String().substring(0, 10);
-  return isJson ? '${base}_$date.json' : '${base}_$date.gabbro';
+  if (includeDate) {
+    final date = DateTime.now().toIso8601String().substring(0, 10);
+    return isJson ? '${base}_$date.json' : '${base}_$date.gabbro';
+  }
+  return isJson ? '$base.json' : '$base.gabbro';
 }
 
 enum _ExportFormat { gabbroVault, json }
@@ -53,6 +56,7 @@ class _ExportScreenState extends State<ExportScreen> {
   // On Linux:   stores the full file path including filename.
   String? _path;
   _ExportFormat _format = _ExportFormat.gabbroVault;
+  bool _includeDate = true;
   bool _isExporting = false;
   String? _error;
 
@@ -77,6 +81,7 @@ class _ExportScreenState extends State<ExportScreen> {
       final filename = _defaultFilename(
         widget.vaultAlias,
         _format == _ExportFormat.json,
+        includeDate: _includeDate,
       );
       return '$_path/$filename';
     }
@@ -176,7 +181,12 @@ class _ExportScreenState extends State<ExportScreen> {
                   l.exportPassphraseOnlyNote,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
-              const SizedBox(height: 12),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(l.exportIncludeDate),
+                value: _includeDate,
+                onChanged: (v) => setState(() => _includeDate = v),
+              ),
               Text(
                 isJson ? l.exportChooseDestinationJson : l.exportChooseDestinationVault,
                 style: Theme.of(context).textTheme.bodyMedium,
@@ -205,11 +215,11 @@ class _ExportScreenState extends State<ExportScreen> {
                 ],
               ] else
                 PathField(
-                  key: ValueKey(_format),
+                  key: ValueKey((_format, _includeDate)),
                   mode: PathFieldMode.save,
                   hint: isJson ? '/home/user/vault.json' : '/home/user/vault.gabbro',
                   allowedExtensions: isJson ? ['json'] : ['gabbro'],
-                  saveFileName: _defaultFilename(widget.vaultAlias, isJson),
+                  saveFileName: _defaultFilename(widget.vaultAlias, isJson, includeDate: _includeDate),
                   initialPath: _path,
                   onPathSelected: (p) => setState(() {
                     _path = p;

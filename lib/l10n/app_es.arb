@@ -532,6 +532,7 @@
   "charTypeDigit": "Dígito",
   "charTypeSymbol": "Símbolo",
 
+  "exportIncludeDate": "Incluir fecha en el nombre de archivo",
   "exportChooseFormat": "Elige un formato de exportación.",
   "exportUnencryptedWarning": "Completamente sin cifrar — todos los secretos se escribirán en texto plano. Guarda este archivo de forma segura y elimínalo tras su uso.",
   "exportPassphraseOnlyNote": "Protegido solo por tu contraseña maestra. La YubiKey no es necesaria para importar.",

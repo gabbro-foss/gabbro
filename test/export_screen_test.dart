@@ -130,6 +130,57 @@ void main() {
       expect(exportedPath, endsWith('.gabbro'));
     });
 
+    // ── Include date toggle ──────────────────────────────────────────────────
+
+    testWidgets('include date toggle is ON by default', (tester) async {
+      await tester.pumpWidget(
+        testApp(ExportScreen(
+            isAndroid: true,
+            onExport: (path) async {},
+            onExportJson: (path) async {},
+        )),
+      );
+      final toggle = tester.widget<SwitchListTile>(find.byType(SwitchListTile));
+      expect(toggle.value, isTrue);
+    });
+
+    testWidgets('android: toggle off omits date from exported path',
+        (tester) async {
+      String? exportedPath;
+      await tester.pumpWidget(
+        testApp(ExportScreen(
+            isAndroid: true,
+            initialPath: '/storage/emulated/0/Documents',
+            vaultAlias: 'My Work',
+            onExport: (path) async => exportedPath = path,
+            onExportJson: (path) async {},
+        )),
+      );
+      await tester.tap(find.byType(SwitchListTile));
+      await tester.pump();
+      await tester.tap(find.text('Export'));
+      await tester.pump();
+      expect(exportedPath, '/storage/emulated/0/Documents/My_Work.gabbro');
+    });
+
+    testWidgets('android: toggle on includes date in exported path',
+        (tester) async {
+      String? exportedPath;
+      await tester.pumpWidget(
+        testApp(ExportScreen(
+            isAndroid: true,
+            initialPath: '/storage/emulated/0/Documents',
+            vaultAlias: 'My Work',
+            onExport: (path) async => exportedPath = path,
+            onExportJson: (path) async {},
+        )),
+      );
+      await tester.tap(find.text('Export'));
+      await tester.pump();
+      expect(exportedPath, startsWith('/storage/emulated/0/Documents/My_Work_'));
+      expect(exportedPath, endsWith('.gabbro'));
+    });
+
     // ── Format selector ──────────────────────────────────────────────────────
 
     testWidgets('shows format selector with Gabbro and JSON options',

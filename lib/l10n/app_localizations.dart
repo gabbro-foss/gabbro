@@ -2162,6 +2162,12 @@ abstract class AppLocalizations {
   /// **'Symbol'**
   String get charTypeSymbol;
 
+  /// No description provided for @exportIncludeDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Include date in filename'**
+  String get exportIncludeDate;
+
   /// No description provided for @exportChooseFormat.
   ///
   /// In en, this message translates to:
