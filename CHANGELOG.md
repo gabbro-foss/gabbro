@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Android: cursor handle (teardrop) could not be dragged in any text field. Root cause: the app-wide inactivity-timer `GestureDetector` registered a `PanGestureRecognizer` that competed in Flutter's gesture arena against the text-handle's own recognizer and won. Replaced with a `Listener` (raw pointer events, no arena participation); `onPointerDown` preserves the same timer-reset semantics.
 - l10n: font-size preview text in Appearance screen is now translated (was hard-coded English in all locales).
 - l10n: all entry-form field labels, validator messages, and tooltips in the create/edit screen now use ARB keys (17 new keys across 5 locales). Card status ('active'/'lapsed'/'inactive') is stored as a stable English identifier and translated at display time.
 - l10n: CSV-imported entries no longer land in a hard-coded English "Personal" folder — they are now unfoldered.
