@@ -712,5 +712,31 @@
   "onboardingStep4Label": "Sicherungsschlüssel registrieren",
   "onboardingStep4Hint": "Berühren Sie Ihren Sicherungs-YubiKey",
   "onboardingStep5Label": "Sicherungsschlüssel aktivieren",
-  "onboardingStep5Hint": "Berühren Sie Ihren Sicherungs-YubiKey ein letztes Mal"
+  "onboardingStep5Hint": "Berühren Sie Ihren Sicherungs-YubiKey ein letztes Mal",
+
+  "textSizePreview": "Gabbro ist ein intrusives magmatisches Gestein, das reich an Mg und Fe ist und eine grobe Körnung aufweist.",
+
+  "fieldCardStatus": "Status",
+  "fieldPaymentNetwork": "Zahlungsnetzwerk",
+
+  "cardStatusActive": "Aktiv",
+  "cardStatusLapsed": "Abgelaufen",
+  "cardStatusInactive": "Inaktiv",
+
+  "validatorTitleRequired": "Titel ist erforderlich",
+  "validatorUsernameRequired": "Benutzername ist erforderlich",
+  "validatorPasswordRequired": "Passwort ist erforderlich",
+  "validatorContentRequired": "Inhalt ist erforderlich",
+  "validatorFirstNameRequired": "Vorname ist erforderlich",
+  "validatorLastNameRequired": "Nachname ist erforderlich",
+  "validatorCardLabelRequired": "Kartenbezeichnung ist erforderlich",
+  "validatorCardholderRequired": "Karteninhabername ist erforderlich",
+  "validatorCardNumberRequired": "Kartennummer ist erforderlich",
+  "validatorCardNumberLength": "Kartennummer muss 6–19 Ziffern haben",
+  "validatorExpiryRequired": "Ablaufdatum ist erforderlich",
+  "validatorExpiryFormat": "Format MM/JJ verwenden",
+  "validatorExpiryMonth": "Monat muss zwischen 01 und 12 liegen",
+  "validatorCvvLength": "CVV muss 3 oder 4 Ziffern haben",
+  "validatorLabelRequired": "Bezeichnung ist erforderlich",
+  "validatorStatusRequired": "Status ist erforderlich"
 }

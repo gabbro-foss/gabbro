@@ -78,7 +78,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  'Gabbro is an intrusive igneous rock that is  Mg- and Fe-rich and coarse-grained.',
+                  l.textSizePreview,
                   style: textTheme.bodyMedium,
                 ),
               ),

@@ -102,7 +102,7 @@ pub async fn import_from_csv(
                 id: Uuid::new_v4().to_string(),
                 created_at: now.clone(),
                 updated_at: now,
-                folder: String::from("Personal"),
+                folder: String::new(),
             },
             title: csv_entry.title,
             url: csv_entry.url,

@@ -712,5 +712,31 @@
   "onboardingStep4Label": "Registrar la clave de respaldo",
   "onboardingStep4Hint": "Toque su YubiKey de respaldo",
   "onboardingStep5Label": "Activar la clave de respaldo",
-  "onboardingStep5Hint": "Toque su YubiKey de respaldo por última vez"
+  "onboardingStep5Hint": "Toque su YubiKey de respaldo por última vez",
+
+  "textSizePreview": "El gabro es una roca ígnea intrusiva, rica en Mg y Fe, de grano grueso.",
+
+  "fieldCardStatus": "Estado",
+  "fieldPaymentNetwork": "Red de pago",
+
+  "cardStatusActive": "Activo",
+  "cardStatusLapsed": "Vencido",
+  "cardStatusInactive": "Inactivo",
+
+  "validatorTitleRequired": "El título es obligatorio",
+  "validatorUsernameRequired": "El nombre de usuario es obligatorio",
+  "validatorPasswordRequired": "La contraseña es obligatoria",
+  "validatorContentRequired": "El contenido es obligatorio",
+  "validatorFirstNameRequired": "El nombre es obligatorio",
+  "validatorLastNameRequired": "Los apellidos son obligatorios",
+  "validatorCardLabelRequired": "La etiqueta de la tarjeta es obligatoria",
+  "validatorCardholderRequired": "El nombre del titular es obligatorio",
+  "validatorCardNumberRequired": "El número de tarjeta es obligatorio",
+  "validatorCardNumberLength": "El número de tarjeta debe tener entre 6 y 19 dígitos",
+  "validatorExpiryRequired": "La fecha de vencimiento es obligatoria",
+  "validatorExpiryFormat": "Usar el formato MM/AA",
+  "validatorExpiryMonth": "El mes debe estar entre 01 y 12",
+  "validatorCvvLength": "El CVV debe tener 3 o 4 dígitos",
+  "validatorLabelRequired": "La etiqueta es obligatoria",
+  "validatorStatusRequired": "El estado es obligatorio"
 }

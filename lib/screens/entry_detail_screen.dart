@@ -15,6 +15,13 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 
+String _localizeCardStatus(String status, AppLocalizations l) => switch (status) {
+  'active' => l.cardStatusActive,
+  'lapsed' => l.cardStatusLapsed,
+  'inactive' => l.cardStatusInactive,
+  _ => status,
+};
+
 /// Formats an ISO 8601 UTC timestamp string into a locale-aware human-readable form.
 /// Returns [unknownLabel] for empty or unparseable input.
 String formatTimestamp(
@@ -352,7 +359,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Failed to clear history: $err'),
+                          content: Text(AppLocalizations.of(context).failedToClearHistory(err.toString())),
                           backgroundColor:
                               Theme.of(context).colorScheme.error,
                         ),
@@ -371,7 +378,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Failed to revert password: $err'),
+                          content: Text(AppLocalizations.of(context).failedToRevertPassword(err.toString())),
                           backgroundColor:
                               Theme.of(context).colorScheme.error,
                         ),
@@ -482,7 +489,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (e.cardName != null) _field(l.reviewFieldCardLabel, e.cardName!, l),
-        _field(l.reviewFieldStatus, e.status, l),
+        _field(l.reviewFieldStatus, _localizeCardStatus(e.status, l), l),
         if (e.paymentNetwork != null)
           _field(l.reviewFieldNetwork, e.paymentNetwork!, l),
         _field(l.reviewFieldCardholder, e.cardholderName, l),

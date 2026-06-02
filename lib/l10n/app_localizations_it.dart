@@ -1521,4 +1521,75 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get onboardingStep5Hint =>
       'Tocca il tuo YubiKey di backup un\'ultima volta';
+
+  @override
+  String get textSizePreview =>
+      'Il gabbro è una roccia ignea intrusiva, ricca di Mg e Fe, a grana grossa.';
+
+  @override
+  String get fieldCardStatus => 'Stato';
+
+  @override
+  String get fieldPaymentNetwork => 'Circuito di pagamento';
+
+  @override
+  String get cardStatusActive => 'Attivo';
+
+  @override
+  String get cardStatusLapsed => 'Scaduto';
+
+  @override
+  String get cardStatusInactive => 'Inattivo';
+
+  @override
+  String get validatorTitleRequired => 'Il titolo è obbligatorio';
+
+  @override
+  String get validatorUsernameRequired => 'Il nome utente è obbligatorio';
+
+  @override
+  String get validatorPasswordRequired => 'La password è obbligatoria';
+
+  @override
+  String get validatorContentRequired => 'Il contenuto è obbligatorio';
+
+  @override
+  String get validatorFirstNameRequired => 'Il nome è obbligatorio';
+
+  @override
+  String get validatorLastNameRequired => 'Il cognome è obbligatorio';
+
+  @override
+  String get validatorCardLabelRequired =>
+      'L\'etichetta della carta è obbligatoria';
+
+  @override
+  String get validatorCardholderRequired =>
+      'Il nome del titolare è obbligatorio';
+
+  @override
+  String get validatorCardNumberRequired =>
+      'Il numero della carta è obbligatorio';
+
+  @override
+  String get validatorCardNumberLength =>
+      'Il numero della carta deve avere da 6 a 19 cifre';
+
+  @override
+  String get validatorExpiryRequired => 'La scadenza è obbligatoria';
+
+  @override
+  String get validatorExpiryFormat => 'Usare il formato MM/AA';
+
+  @override
+  String get validatorExpiryMonth => 'Il mese deve essere compreso tra 01 e 12';
+
+  @override
+  String get validatorCvvLength => 'Il CVV deve avere 3 o 4 cifre';
+
+  @override
+  String get validatorLabelRequired => 'L\'etichetta è obbligatoria';
+
+  @override
+  String get validatorStatusRequired => 'Lo stato è obbligatorio';
 }

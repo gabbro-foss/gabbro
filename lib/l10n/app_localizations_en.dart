@@ -1506,4 +1506,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingStep5Hint => 'Touch your backup YubiKey one final time';
+
+  @override
+  String get textSizePreview =>
+      'Gabbro is an intrusive igneous rock that is Mg- and Fe-rich and coarse-grained.';
+
+  @override
+  String get fieldCardStatus => 'Status';
+
+  @override
+  String get fieldPaymentNetwork => 'Payment network';
+
+  @override
+  String get cardStatusActive => 'Active';
+
+  @override
+  String get cardStatusLapsed => 'Lapsed';
+
+  @override
+  String get cardStatusInactive => 'Inactive';
+
+  @override
+  String get validatorTitleRequired => 'Title is required';
+
+  @override
+  String get validatorUsernameRequired => 'Username is required';
+
+  @override
+  String get validatorPasswordRequired => 'Password is required';
+
+  @override
+  String get validatorContentRequired => 'Content is required';
+
+  @override
+  String get validatorFirstNameRequired => 'First name is required';
+
+  @override
+  String get validatorLastNameRequired => 'Last name is required';
+
+  @override
+  String get validatorCardLabelRequired => 'Card label is required';
+
+  @override
+  String get validatorCardholderRequired => 'Cardholder name is required';
+
+  @override
+  String get validatorCardNumberRequired => 'Card number is required';
+
+  @override
+  String get validatorCardNumberLength => 'Card number must be 6–19 digits';
+
+  @override
+  String get validatorExpiryRequired => 'Expiry is required';
+
+  @override
+  String get validatorExpiryFormat => 'Use MM/YY format';
+
+  @override
+  String get validatorExpiryMonth => 'Month must be 01–12';
+
+  @override
+  String get validatorCvvLength => 'CVV must be 3 or 4 digits';
+
+  @override
+  String get validatorLabelRequired => 'Label required';
+
+  @override
+  String get validatorStatusRequired => 'Status is required';
 }

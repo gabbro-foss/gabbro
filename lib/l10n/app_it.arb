@@ -712,5 +712,31 @@
   "onboardingStep4Label": "Registra la chiave di backup",
   "onboardingStep4Hint": "Tocca il tuo YubiKey di backup",
   "onboardingStep5Label": "Attiva la chiave di backup",
-  "onboardingStep5Hint": "Tocca il tuo YubiKey di backup un'ultima volta"
+  "onboardingStep5Hint": "Tocca il tuo YubiKey di backup un'ultima volta",
+
+  "textSizePreview": "Il gabbro è una roccia ignea intrusiva, ricca di Mg e Fe, a grana grossa.",
+
+  "fieldCardStatus": "Stato",
+  "fieldPaymentNetwork": "Circuito di pagamento",
+
+  "cardStatusActive": "Attivo",
+  "cardStatusLapsed": "Scaduto",
+  "cardStatusInactive": "Inattivo",
+
+  "validatorTitleRequired": "Il titolo è obbligatorio",
+  "validatorUsernameRequired": "Il nome utente è obbligatorio",
+  "validatorPasswordRequired": "La password è obbligatoria",
+  "validatorContentRequired": "Il contenuto è obbligatorio",
+  "validatorFirstNameRequired": "Il nome è obbligatorio",
+  "validatorLastNameRequired": "Il cognome è obbligatorio",
+  "validatorCardLabelRequired": "L'etichetta della carta è obbligatoria",
+  "validatorCardholderRequired": "Il nome del titolare è obbligatorio",
+  "validatorCardNumberRequired": "Il numero della carta è obbligatorio",
+  "validatorCardNumberLength": "Il numero della carta deve avere da 6 a 19 cifre",
+  "validatorExpiryRequired": "La scadenza è obbligatoria",
+  "validatorExpiryFormat": "Usare il formato MM/AA",
+  "validatorExpiryMonth": "Il mese deve essere compreso tra 01 e 12",
+  "validatorCvvLength": "Il CVV deve avere 3 o 4 cifre",
+  "validatorLabelRequired": "L'etichetta è obbligatoria",
+  "validatorStatusRequired": "Lo stato è obbligatorio"
 }

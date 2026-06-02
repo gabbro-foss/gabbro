@@ -1526,4 +1526,76 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get onboardingStep5Hint =>
       'Toque su YubiKey de respaldo por última vez';
+
+  @override
+  String get textSizePreview =>
+      'El gabro es una roca ígnea intrusiva, rica en Mg y Fe, de grano grueso.';
+
+  @override
+  String get fieldCardStatus => 'Estado';
+
+  @override
+  String get fieldPaymentNetwork => 'Red de pago';
+
+  @override
+  String get cardStatusActive => 'Activo';
+
+  @override
+  String get cardStatusLapsed => 'Vencido';
+
+  @override
+  String get cardStatusInactive => 'Inactivo';
+
+  @override
+  String get validatorTitleRequired => 'El título es obligatorio';
+
+  @override
+  String get validatorUsernameRequired => 'El nombre de usuario es obligatorio';
+
+  @override
+  String get validatorPasswordRequired => 'La contraseña es obligatoria';
+
+  @override
+  String get validatorContentRequired => 'El contenido es obligatorio';
+
+  @override
+  String get validatorFirstNameRequired => 'El nombre es obligatorio';
+
+  @override
+  String get validatorLastNameRequired => 'Los apellidos son obligatorios';
+
+  @override
+  String get validatorCardLabelRequired =>
+      'La etiqueta de la tarjeta es obligatoria';
+
+  @override
+  String get validatorCardholderRequired =>
+      'El nombre del titular es obligatorio';
+
+  @override
+  String get validatorCardNumberRequired =>
+      'El número de tarjeta es obligatorio';
+
+  @override
+  String get validatorCardNumberLength =>
+      'El número de tarjeta debe tener entre 6 y 19 dígitos';
+
+  @override
+  String get validatorExpiryRequired =>
+      'La fecha de vencimiento es obligatoria';
+
+  @override
+  String get validatorExpiryFormat => 'Usar el formato MM/AA';
+
+  @override
+  String get validatorExpiryMonth => 'El mes debe estar entre 01 y 12';
+
+  @override
+  String get validatorCvvLength => 'El CVV debe tener 3 o 4 dígitos';
+
+  @override
+  String get validatorLabelRequired => 'La etiqueta es obligatoria';
+
+  @override
+  String get validatorStatusRequired => 'El estado es obligatorio';
 }

@@ -949,20 +949,20 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       controller: _loginTitleController,
       focusNode: _loginTitleFocus,
       autofocus: true,
-      decoration: const InputDecoration(
-        labelText: 'Title',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldTitle,
+        border: const OutlineInputBorder(),
       ),
-      validator: (v) => (v == null || v.isEmpty) ? 'Title is required' : null,
+      validator: (v) => (v == null || v.isEmpty) ? l.validatorTitleRequired : null,
       onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_urlFocus),
     ),
     const SizedBox(height: 12),
     TextFormField(
       controller: _urlController,
       focusNode: _urlFocus,
-      decoration: const InputDecoration(
-        labelText: 'URL (optional)',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldUrl,
+        border: const OutlineInputBorder(),
       ),
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_usernameFocus),
@@ -971,12 +971,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     TextFormField(
       controller: _usernameController,
       focusNode: _usernameFocus,
-      decoration: const InputDecoration(
-        labelText: 'Username',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldUsername,
+        border: const OutlineInputBorder(),
       ),
       validator: (v) =>
-          (v == null || v.isEmpty) ? 'Username is required' : null,
+          (v == null || v.isEmpty) ? l.validatorUsernameRequired : null,
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_passwordFocus),
     ),
@@ -987,7 +987,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       obscureText: _passwordObscured,
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
-        labelText: 'Password',
+        labelText: l.fieldPassword,
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
           icon: Icon(
@@ -998,7 +998,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         ),
       ),
       validator: (v) =>
-          (v == null || v.isEmpty) ? 'Password is required' : null,
+          (v == null || v.isEmpty) ? l.validatorPasswordRequired : null,
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_loginNotesFocus),
     ),
@@ -1036,7 +1036,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     const SizedBox(height: 12),
     _optionalTextField(
       _loginNotesController,
-      'Notes',
+      l.fieldNotes,
       focusNode: _loginNotesFocus,
       maxLines: 3,
     ),
@@ -1064,11 +1064,11 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       controller: _titleController,
       focusNode: _noteTitleFocus,
       autofocus: true,
-      decoration: const InputDecoration(
-        labelText: 'Title',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldTitle,
+        border: const OutlineInputBorder(),
       ),
-      validator: (v) => (v == null || v.isEmpty) ? 'Title is required' : null,
+      validator: (v) => (v == null || v.isEmpty) ? l.validatorTitleRequired : null,
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_noteContentFocus),
     ),
@@ -1077,11 +1077,11 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       controller: _contentController,
       focusNode: _noteContentFocus,
       maxLines: 6,
-      decoration: const InputDecoration(
-        labelText: 'Content',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldContent,
+        border: const OutlineInputBorder(),
       ),
-      validator: (v) => (v == null || v.isEmpty) ? 'Content is required' : null,
+      validator: (v) => (v == null || v.isEmpty) ? l.validatorContentRequired : null,
     ),
     const SizedBox(height: 16),
     _customFieldsSection(
@@ -1107,12 +1107,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       controller: _firstNameController,
       focusNode: _firstNameFocus,
       autofocus: true,
-      decoration: const InputDecoration(
-        labelText: 'First name',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldFirstName,
+        border: const OutlineInputBorder(),
       ),
       validator: (v) =>
-          (v == null || v.isEmpty) ? 'First name is required' : null,
+          (v == null || v.isEmpty) ? l.validatorFirstNameRequired : null,
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_lastNameFocus),
     ),
@@ -1120,12 +1120,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     TextFormField(
       controller: _lastNameController,
       focusNode: _lastNameFocus,
-      decoration: const InputDecoration(
-        labelText: 'Last name',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldLastName,
+        border: const OutlineInputBorder(),
       ),
       validator: (v) =>
-          (v == null || v.isEmpty) ? 'Last name is required' : null,
+          (v == null || v.isEmpty) ? l.validatorLastNameRequired : null,
       onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocus),
     ),
     const SizedBox(height: 12),
@@ -1133,9 +1133,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       controller: _emailController,
       focusNode: _emailFocus,
       keyboardType: TextInputType.emailAddress,
-      decoration: const InputDecoration(
-        labelText: 'Email (optional)',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldEmail,
+        border: const OutlineInputBorder(),
       ),
       onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_phoneFocus),
     ),
@@ -1144,9 +1144,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       controller: _phoneController,
       focusNode: _phoneFocus,
       keyboardType: TextInputType.phone,
-      decoration: const InputDecoration(
-        labelText: 'Phone (optional)',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldPhone,
+        border: const OutlineInputBorder(),
       ),
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_addressFocus),
@@ -1156,9 +1156,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       controller: _addressController,
       focusNode: _addressFocus,
       maxLines: 3,
-      decoration: const InputDecoration(
-        labelText: 'Address (optional)',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldAddress,
+        border: const OutlineInputBorder(),
       ),
     ),
     const SizedBox(height: 16),
@@ -1186,41 +1186,49 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       controller: _cardNameController,
       focusNode: _cardNameFocus,
       autofocus: true,
-      decoration: const InputDecoration(
-        labelText: 'Card label (e.g. "Visa Platinum")',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldCardLabel,
+        border: const OutlineInputBorder(),
       ),
       validator: (v) =>
-          (v == null || v.isEmpty) ? 'Card label is required' : null,
+          (v == null || v.isEmpty) ? l.validatorCardLabelRequired : null,
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_cardholderNameFocus),
     ),
     const SizedBox(height: 12),
-    _dropdownField(
-      label: 'Status',
+    DropdownButtonFormField<String>(
       initialValue: _cardStatuses.contains(_cardStatusController.text)
           ? _cardStatusController.text
           : 'active',
-      items: _cardStatuses,
+      decoration: InputDecoration(
+        labelText: l.fieldCardStatus,
+        border: const OutlineInputBorder(),
+      ),
+      items: _cardStatuses.map((s) => DropdownMenuItem<String>(
+        value: s,
+        child: Text(_localizeCardStatus(s, l)),
+      )).toList(),
       onChanged: (v) =>
           setState(() => _cardStatusController.text = v ?? 'active'),
+      validator: (v) =>
+          (v == null || v.isEmpty) ? l.validatorStatusRequired : null,
     ),
     const SizedBox(height: 12),
     TextFormField(
       controller: _cardholderNameController,
       focusNode: _cardholderNameFocus,
-      decoration: const InputDecoration(
-        labelText: 'Cardholder name',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldCardholderName,
+        border: const OutlineInputBorder(),
       ),
       validator: (v) =>
-          (v == null || v.isEmpty) ? 'Cardholder name is required' : null,
+          (v == null || v.isEmpty) ? l.validatorCardholderRequired : null,
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_cardNumberFocus),
     ),
     const SizedBox(height: 12),
     _dropdownField(
-      label: 'Payment network',
+      label: l.fieldPaymentNetwork,
       initialValue: _paymentNetworks.contains(_paymentNetworkController.text)
           ? _paymentNetworkController.text
           : null,
@@ -1235,14 +1243,14 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       focusNode: _cardNumberFocus,
       keyboardType: TextInputType.number,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-      decoration: const InputDecoration(
-        labelText: 'Card number',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldCardNumber,
+        border: const OutlineInputBorder(),
       ),
       validator: (v) {
-        if (v == null || v.isEmpty) return 'Card number is required';
+        if (v == null || v.isEmpty) return l.validatorCardNumberRequired;
         if (v.length < 6 || v.length > 19) {
-          return 'Card number must be 6–19 digits';
+          return l.validatorCardNumberLength;
         }
         return null;
       },
@@ -1262,17 +1270,17 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               LengthLimitingTextInputFormatter(4),
               _ExpiryInputFormatter(),
             ],
-            decoration: const InputDecoration(
-              labelText: 'Expiry (MM/YY)',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: l.fieldExpiry,
+              border: const OutlineInputBorder(),
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return 'Expiry is required';
+              if (v == null || v.isEmpty) return l.validatorExpiryRequired;
               final pattern = RegExp(r'^\d{2}/\d{2}$');
-              if (!pattern.hasMatch(v)) return 'Use MM/YY format';
+              if (!pattern.hasMatch(v)) return l.validatorExpiryFormat;
               final month = int.tryParse(v.substring(0, 2));
               if (month == null || month < 1 || month > 12) {
-                return 'Month must be 01–12';
+                return l.validatorExpiryMonth;
               }
               return null;
             },
@@ -1293,7 +1301,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               LengthLimitingTextInputFormatter(4),
             ],
             decoration: InputDecoration(
-              labelText: 'CVV (optional)',
+              labelText: l.fieldCvv,
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
                 icon: Icon(
@@ -1304,7 +1312,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             ),
             validator: (v) {
               if (v != null && v.isNotEmpty && (v.length < 3 || v.length > 4)) {
-                return 'CVV must be 3 or 4 digits';
+                return l.validatorCvvLength;
               }
               return null;
             },
@@ -1325,13 +1333,13 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         LengthLimitingTextInputFormatter(16),
       ],
       decoration: InputDecoration(
-        labelText: 'PIN (optional)',
+        labelText: l.fieldCardPin,
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
           icon: Icon(
             _pinObscured ? Icons.visibility_off : Icons.visibility,
           ),
-          tooltip: _pinObscured ? 'Show PIN' : 'Hide PIN',
+          tooltip: _pinObscured ? l.tooltipShowPin : l.tooltipHidePin,
           onPressed: () => setState(() => _pinObscured = !_pinObscured),
         ),
       ),
@@ -1343,9 +1351,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       controller: _creditLimitController,
       focusNode: _creditLimitFocus,
       keyboardType: TextInputType.number,
-      decoration: const InputDecoration(
-        labelText: 'Credit limit (optional)',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldCreditLimit,
+        border: const OutlineInputBorder(),
       ),
       onFieldSubmitted: (_) =>
           FocusScope.of(context).requestFocus(_cardAccountNumberFocus),
@@ -1354,9 +1362,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     TextFormField(
       controller: _cardAccountNumberController,
       focusNode: _cardAccountNumberFocus,
-      decoration: const InputDecoration(
-        labelText: 'Account number (optional)',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldAccountNumber,
+        border: const OutlineInputBorder(),
       ),
       onFieldSubmitted: (_) => _save(),
     ),
@@ -1364,9 +1372,9 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     TextFormField(
       controller: _cardNotesController,
       maxLines: 3,
-      decoration: const InputDecoration(
-        labelText: 'Notes (optional)',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldNotes,
+        border: const OutlineInputBorder(),
       ),
     ),
     const SizedBox(height: 16),
@@ -1421,7 +1429,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       label: Text(l.pickFile),
     ),
     const SizedBox(height: 12),
-    _optionalTextField(_fileNotesController, 'Notes', maxLines: 3),
+    _optionalTextField(_fileNotesController, l.fieldNotes, maxLines: 3),
     const SizedBox(height: 16),
     _customFieldsSection(
       fields: _fileCustomFields,
@@ -1457,11 +1465,11 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       controller: _customTitleController,
       focusNode: _customTitleFocus,
       autofocus: true,
-      decoration: const InputDecoration(
-        labelText: 'Title',
-        border: OutlineInputBorder(),
+      decoration: InputDecoration(
+        labelText: l.fieldTitle,
+        border: const OutlineInputBorder(),
       ),
-      validator: (v) => (v == null || v.isEmpty) ? 'Title is required' : null,
+      validator: (v) => (v == null || v.isEmpty) ? l.validatorTitleRequired : null,
       onFieldSubmitted: (_) => _save(),
     ),
     const SizedBox(height: 16),
@@ -1503,12 +1511,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   flex: 2,
                   child: TextFormField(
                     controller: f.labelController,
-                    decoration: const InputDecoration(
-                      labelText: 'Label',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l.fieldLabel,
+                      border: const OutlineInputBorder(),
                     ),
                     validator: (v) =>
-                        (v == null || v.isEmpty) ? 'Label required' : null,
+                        (v == null || v.isEmpty) ? l.validatorLabelRequired : null,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -1518,13 +1526,13 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                     controller: f.valueController,
                     obscureText: f.hidden,
                     decoration: InputDecoration(
-                      labelText: 'Value',
+                      labelText: l.fieldValue,
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
                         icon: Icon(
                           f.hidden ? Icons.visibility_off : Icons.visibility,
                         ),
-                        tooltip: f.hidden ? 'Show value' : 'Hide value',
+                        tooltip: f.hidden ? l.tooltipShowValue : l.tooltipHideValue,
                         onPressed: () => onToggleHidden(i),
                       ),
                     ),
@@ -1533,7 +1541,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                 const SizedBox(width: 4),
                 IconButton(
                   icon: const Icon(Icons.remove_circle_outline),
-                  tooltip: 'Remove field',
+                  tooltip: l.tooltipRemoveField,
                   onPressed: () => onRemove(i),
                 ),
               ],
@@ -1584,7 +1592,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       maxLines: maxLines,
       keyboardType: keyboardType,
       decoration: InputDecoration(
-        labelText: '$label (optional)',
+        labelText: label,
         border: const OutlineInputBorder(),
       ),
     );
@@ -1613,6 +1621,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     );
   }
 }
+
+// ── Card status localization ─────────────────────────────────────────────────
+
+String _localizeCardStatus(String status, AppLocalizations l) => switch (status) {
+  'active' => l.cardStatusActive,
+  'lapsed' => l.cardStatusLapsed,
+  'inactive' => l.cardStatusInactive,
+  _ => status,
+};
 
 // ── Custom field state helper ────────────────────────────────────────────────
 

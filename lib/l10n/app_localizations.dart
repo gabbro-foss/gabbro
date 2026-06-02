@@ -2815,6 +2815,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Touch your backup YubiKey one final time'**
   String get onboardingStep5Hint;
+
+  /// No description provided for @textSizePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Gabbro is an intrusive igneous rock that is Mg- and Fe-rich and coarse-grained.'**
+  String get textSizePreview;
+
+  /// No description provided for @fieldCardStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get fieldCardStatus;
+
+  /// No description provided for @fieldPaymentNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment network'**
+  String get fieldPaymentNetwork;
+
+  /// No description provided for @cardStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get cardStatusActive;
+
+  /// No description provided for @cardStatusLapsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Lapsed'**
+  String get cardStatusLapsed;
+
+  /// No description provided for @cardStatusInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get cardStatusInactive;
+
+  /// No description provided for @validatorTitleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Title is required'**
+  String get validatorTitleRequired;
+
+  /// No description provided for @validatorUsernameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Username is required'**
+  String get validatorUsernameRequired;
+
+  /// No description provided for @validatorPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get validatorPasswordRequired;
+
+  /// No description provided for @validatorContentRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Content is required'**
+  String get validatorContentRequired;
+
+  /// No description provided for @validatorFirstNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'First name is required'**
+  String get validatorFirstNameRequired;
+
+  /// No description provided for @validatorLastNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name is required'**
+  String get validatorLastNameRequired;
+
+  /// No description provided for @validatorCardLabelRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Card label is required'**
+  String get validatorCardLabelRequired;
+
+  /// No description provided for @validatorCardholderRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardholder name is required'**
+  String get validatorCardholderRequired;
+
+  /// No description provided for @validatorCardNumberRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Card number is required'**
+  String get validatorCardNumberRequired;
+
+  /// No description provided for @validatorCardNumberLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Card number must be 6–19 digits'**
+  String get validatorCardNumberLength;
+
+  /// No description provided for @validatorExpiryRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry is required'**
+  String get validatorExpiryRequired;
+
+  /// No description provided for @validatorExpiryFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Use MM/YY format'**
+  String get validatorExpiryFormat;
+
+  /// No description provided for @validatorExpiryMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Month must be 01–12'**
+  String get validatorExpiryMonth;
+
+  /// No description provided for @validatorCvvLength.
+  ///
+  /// In en, this message translates to:
+  /// **'CVV must be 3 or 4 digits'**
+  String get validatorCvvLength;
+
+  /// No description provided for @validatorLabelRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Label required'**
+  String get validatorLabelRequired;
+
+  /// No description provided for @validatorStatusRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Status is required'**
+  String get validatorStatusRequired;
 }
 
 class _AppLocalizationsDelegate

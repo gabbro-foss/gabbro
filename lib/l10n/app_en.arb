@@ -718,5 +718,31 @@
   "onboardingStep4Label": "Register backup key",
   "onboardingStep4Hint": "Touch your backup YubiKey",
   "onboardingStep5Label": "Activate backup key",
-  "onboardingStep5Hint": "Touch your backup YubiKey one final time"
+  "onboardingStep5Hint": "Touch your backup YubiKey one final time",
+
+  "textSizePreview": "Gabbro is an intrusive igneous rock that is Mg- and Fe-rich and coarse-grained.",
+
+  "fieldCardStatus": "Status",
+  "fieldPaymentNetwork": "Payment network",
+
+  "cardStatusActive": "Active",
+  "cardStatusLapsed": "Lapsed",
+  "cardStatusInactive": "Inactive",
+
+  "validatorTitleRequired": "Title is required",
+  "validatorUsernameRequired": "Username is required",
+  "validatorPasswordRequired": "Password is required",
+  "validatorContentRequired": "Content is required",
+  "validatorFirstNameRequired": "First name is required",
+  "validatorLastNameRequired": "Last name is required",
+  "validatorCardLabelRequired": "Card label is required",
+  "validatorCardholderRequired": "Cardholder name is required",
+  "validatorCardNumberRequired": "Card number is required",
+  "validatorCardNumberLength": "Card number must be 6–19 digits",
+  "validatorExpiryRequired": "Expiry is required",
+  "validatorExpiryFormat": "Use MM/YY format",
+  "validatorExpiryMonth": "Month must be 01–12",
+  "validatorCvvLength": "CVV must be 3 or 4 digits",
+  "validatorLabelRequired": "Label required",
+  "validatorStatusRequired": "Status is required"
 }

@@ -1525,4 +1525,73 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get onboardingStep5Hint =>
       'Berühren Sie Ihren Sicherungs-YubiKey ein letztes Mal';
+
+  @override
+  String get textSizePreview =>
+      'Gabbro ist ein intrusives magmatisches Gestein, das reich an Mg und Fe ist und eine grobe Körnung aufweist.';
+
+  @override
+  String get fieldCardStatus => 'Status';
+
+  @override
+  String get fieldPaymentNetwork => 'Zahlungsnetzwerk';
+
+  @override
+  String get cardStatusActive => 'Aktiv';
+
+  @override
+  String get cardStatusLapsed => 'Abgelaufen';
+
+  @override
+  String get cardStatusInactive => 'Inaktiv';
+
+  @override
+  String get validatorTitleRequired => 'Titel ist erforderlich';
+
+  @override
+  String get validatorUsernameRequired => 'Benutzername ist erforderlich';
+
+  @override
+  String get validatorPasswordRequired => 'Passwort ist erforderlich';
+
+  @override
+  String get validatorContentRequired => 'Inhalt ist erforderlich';
+
+  @override
+  String get validatorFirstNameRequired => 'Vorname ist erforderlich';
+
+  @override
+  String get validatorLastNameRequired => 'Nachname ist erforderlich';
+
+  @override
+  String get validatorCardLabelRequired => 'Kartenbezeichnung ist erforderlich';
+
+  @override
+  String get validatorCardholderRequired =>
+      'Karteninhabername ist erforderlich';
+
+  @override
+  String get validatorCardNumberRequired => 'Kartennummer ist erforderlich';
+
+  @override
+  String get validatorCardNumberLength =>
+      'Kartennummer muss 6–19 Ziffern haben';
+
+  @override
+  String get validatorExpiryRequired => 'Ablaufdatum ist erforderlich';
+
+  @override
+  String get validatorExpiryFormat => 'Format MM/JJ verwenden';
+
+  @override
+  String get validatorExpiryMonth => 'Monat muss zwischen 01 und 12 liegen';
+
+  @override
+  String get validatorCvvLength => 'CVV muss 3 oder 4 Ziffern haben';
+
+  @override
+  String get validatorLabelRequired => 'Bezeichnung ist erforderlich';
+
+  @override
+  String get validatorStatusRequired => 'Status ist erforderlich';
 }

@@ -1537,4 +1537,72 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get onboardingStep5Hint =>
       'Appuyez une dernière fois sur votre YubiKey de sauvegarde';
+
+  @override
+  String get textSizePreview =>
+      'Le gabbro est une roche magmatique intrusive, riche en Mg et Fe, à grain grossier.';
+
+  @override
+  String get fieldCardStatus => 'Statut';
+
+  @override
+  String get fieldPaymentNetwork => 'Réseau de paiement';
+
+  @override
+  String get cardStatusActive => 'Actif';
+
+  @override
+  String get cardStatusLapsed => 'Expiré';
+
+  @override
+  String get cardStatusInactive => 'Inactif';
+
+  @override
+  String get validatorTitleRequired => 'Le titre est requis';
+
+  @override
+  String get validatorUsernameRequired => 'Le nom d\'utilisateur est requis';
+
+  @override
+  String get validatorPasswordRequired => 'Le mot de passe est requis';
+
+  @override
+  String get validatorContentRequired => 'Le contenu est requis';
+
+  @override
+  String get validatorFirstNameRequired => 'Le prénom est requis';
+
+  @override
+  String get validatorLastNameRequired => 'Le nom de famille est requis';
+
+  @override
+  String get validatorCardLabelRequired => 'L\'intitulé de la carte est requis';
+
+  @override
+  String get validatorCardholderRequired => 'Le nom du titulaire est requis';
+
+  @override
+  String get validatorCardNumberRequired => 'Le numéro de carte est requis';
+
+  @override
+  String get validatorCardNumberLength =>
+      'Le numéro de carte doit comporter 6 à 19 chiffres';
+
+  @override
+  String get validatorExpiryRequired => 'La date d\'expiration est requise';
+
+  @override
+  String get validatorExpiryFormat => 'Utiliser le format MM/AA';
+
+  @override
+  String get validatorExpiryMonth => 'Le mois doit être compris entre 01 et 12';
+
+  @override
+  String get validatorCvvLength => 'Le CVV doit comporter 3 ou 4 chiffres';
+
+  @override
+  String get validatorLabelRequired => 'L\'étiquette est requise';
+
+  @override
+  String get validatorStatusRequired => 'Le statut est requis';
 }

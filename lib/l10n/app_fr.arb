@@ -712,5 +712,31 @@
   "onboardingStep4Label": "Enregistrer la clé de sauvegarde",
   "onboardingStep4Hint": "Appuyez sur votre YubiKey de sauvegarde",
   "onboardingStep5Label": "Activer la clé de sauvegarde",
-  "onboardingStep5Hint": "Appuyez une dernière fois sur votre YubiKey de sauvegarde"
+  "onboardingStep5Hint": "Appuyez une dernière fois sur votre YubiKey de sauvegarde",
+
+  "textSizePreview": "Le gabbro est une roche magmatique intrusive, riche en Mg et Fe, à grain grossier.",
+
+  "fieldCardStatus": "Statut",
+  "fieldPaymentNetwork": "Réseau de paiement",
+
+  "cardStatusActive": "Actif",
+  "cardStatusLapsed": "Expiré",
+  "cardStatusInactive": "Inactif",
+
+  "validatorTitleRequired": "Le titre est requis",
+  "validatorUsernameRequired": "Le nom d'utilisateur est requis",
+  "validatorPasswordRequired": "Le mot de passe est requis",
+  "validatorContentRequired": "Le contenu est requis",
+  "validatorFirstNameRequired": "Le prénom est requis",
+  "validatorLastNameRequired": "Le nom de famille est requis",
+  "validatorCardLabelRequired": "L'intitulé de la carte est requis",
+  "validatorCardholderRequired": "Le nom du titulaire est requis",
+  "validatorCardNumberRequired": "Le numéro de carte est requis",
+  "validatorCardNumberLength": "Le numéro de carte doit comporter 6 à 19 chiffres",
+  "validatorExpiryRequired": "La date d'expiration est requise",
+  "validatorExpiryFormat": "Utiliser le format MM/AA",
+  "validatorExpiryMonth": "Le mois doit être compris entre 01 et 12",
+  "validatorCvvLength": "Le CVV doit comporter 3 ou 4 chiffres",
+  "validatorLabelRequired": "L'étiquette est requise",
+  "validatorStatusRequired": "Le statut est requis"
 }
