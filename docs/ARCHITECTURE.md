@@ -150,9 +150,11 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Features & UX (Bikeshed)
+### Next task: Biometric unlock (Android)
 
-v0.1.0-alpha.3 released 2026-06-02. Next session: pick a specific task from the Features & UX section of the Bikeshed.
+v0.1.0-alpha.3 released 2026-06-02.
+
+Use `BiometricPrompt` to gate the passphrase *entry* UI on Android — the YubiKey tap remains mandatory. Never store the master passphrase in the biometric keystore; biometrics only replace typing it in. Pure Flutter/Kotlin unlock-flow change; no new Rust bridge functions needed.
 
 Parked: F-01 header-integrity feature (VERSION 7; low severity, big cross-stack lift); F-03 X-Wing combiner (needs a human cryptographer).
 
@@ -237,7 +239,6 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
-- Biometric unlock (Android): use `BiometricPrompt` to replace passphrase *entry* only — the YubiKey tap must still be required. Never store the master passphrase in the biometric-protected keystore; use it only to gate the passphrase input UI.
 - Add tutorial/onboarding: probably in the README as snapshots from linux/emulator
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
