@@ -150,6 +150,13 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
+### Completed 2026-06-02: all l10n bugs
+
+Three Bikeshed l10n bugs fixed:
+1. `appearance_screen.dart` font-size preview text now uses `l.textSizePreview` (all 5 locales).
+2. All entry-form field labels, validators, and tooltips in `create_entry_screen.dart` and `entry_detail_screen.dart` now use ARB keys — 17 new keys added. Card status ('active'/'lapsed'/'inactive') stays stored as English identifier; displayed through `_localizeCardStatus()` helper.
+3. CSV import no longer assigns imported entries to a hard-coded "Personal" folder — they are now unfoldered (`""`).
+
 ### Next task: Features & UX (Bikeshed)
 
 Track A (pre-public security hardening) completed 2026-06-01. Next session: pick a specific task from the Features & UX section of the Bikeshed.
@@ -239,9 +246,6 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 ### Features & UX
 - Biometric unlock (Android): use `BiometricPrompt` to replace passphrase *entry* only — the YubiKey tap must still be required. Never store the master passphrase in the biometric-protected keystore; use it only to gate the passphrase input UI.
 - bug: in android, cannot move the cursor in text fields, can position it but not drag it
-- l10n bug: example text in font size (`appearance_screen.dart`) is hard-coded in English
-- l10n bugs: many entry field tooltips are still hard-coded in English (examples: card state, custom fields label and value) -> audit all entries for hard-coded text and apply l10n
-- l10n bug: default folder names are hard-coded in English
 - add option in vault export to exclude date in filename -> for file sync with rsync
 - Add tutorial/onboarding: probably in the README as snapshots from linux/emulator
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.

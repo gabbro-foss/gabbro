@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- l10n: font-size preview text in Appearance screen is now translated (was hard-coded English in all locales).
+- l10n: all entry-form field labels, validator messages, and tooltips in the create/edit screen now use ARB keys (17 new keys across 5 locales). Card status ('active'/'lapsed'/'inactive') is stored as a stable English identifier and translated at display time.
+- l10n: CSV-imported entries no longer land in a hard-coded English "Personal" folder — they are now unfoldered.
+
 ### Added
 - Crack-me vault challenge: `challenge/decryptMe_2026-06-01.gabbro` — a real vault sealed with a 256-char random passphrase and two YubiKeys, published for public security testing. Proof of crack = vault note contents + passphrase + method; reward is two YubiKey keys. See `challenge/README.md`.
 - `docs/SECURITY.md`: user-facing security overview covering both auth modes, encryption scheme, local-first argument, verified claims, known limitations (F-01, F-03), threat model, and two comparison tables.
