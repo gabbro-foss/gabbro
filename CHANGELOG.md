@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Passphrase generator: digit insertion now picks from valid UTF-8 char-boundary offsets, preventing `insert_str` panics on multi-byte codepoints in non-English wordlists (FR/DE/ES/IT).
+- Tests: three passphrase tests were flaky because four words in `wordlist_en.txt` contain hyphens (`drop-down`, `felt-tip`, `t-shirt`, `yo-yo`). Tests that split on `"-"` or asserted its absence hit these words ~10 % of the time over 50 iterations. Fixed by using `"|"` as the test separator and dropping the unreliable token-count assertion from `test_append_number`.
+
 ## [0.1.0-alpha.3] – 2026-06-02
 
 ### Fixed
