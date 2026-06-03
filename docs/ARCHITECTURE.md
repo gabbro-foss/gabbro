@@ -152,18 +152,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Release v0.1.0-alpha.4
+### Next task: TBD
 
-Biometric unlock (Android, ADR-011) shipped 2026-06-03. Hardware-tested and committed.
-
-Release steps:
-1. Move `[Unreleased]` CHANGELOG block to `[0.1.0-alpha.4] – 2026-06-03`
-2. Bump `version` in `pubspec.yaml` to `0.1.0-alpha.4+4`
-3. `flutter test` + `cargo clippy -- -D warnings` green
-4. `flutter build linux --release` + `flutter build apk --release`
-5. Commit (docs + pubspec), tag `v0.1.0-alpha.4`, push, `gh release create`
-
-Parked: F-01 header-integrity feature (VERSION 7; low severity, big cross-stack lift); F-03 X-Wing combiner (needs a human cryptographer).
+v0.1.0-alpha.4 released 2026-06-03. Tag pushed, GitHub release published with Linux and Android artifacts.
 
 ### Open from the security audit
 
