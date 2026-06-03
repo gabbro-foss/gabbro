@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- Background lock is now reliable on Android (Doze mode) and Linux with any WM or display server (X11/Wayland). The previous `dart:async Timer`-based background lock was replaced with a dual strategy:
+  - **Timestamp approach** (Android + Linux workspace-switch): record the time the app backgrounds (`hidden`/`paused` on Android; `inactive` on desktop); on `resumed`, lock if the elapsed time exceeds the configured timeout. Reliable regardless of OS process scheduling.
+  - **Timer approach** (Linux focus-switch, app still visible): when `inactive` fires on desktop the process is still alive, so a real `Timer` is also started. This locks the vault after the timeout even if the user never returns focus to Gabbro — preventing the vault from staying visibly unlocked on a tiling WM while another window is active.
+
 ### Fixed
 - Passphrase generator: digit insertion now picks from valid UTF-8 char-boundary offsets, preventing `insert_str` panics on multi-byte codepoints in non-English wordlists (FR/DE/ES/IT).
 - Tests: three passphrase tests were flaky because four words in `wordlist_en.txt` contain hyphens (`drop-down`, `felt-tip`, `t-shirt`, `yo-yo`). Tests that split on `"-"` or asserted its absence hit these words ~10 % of the time over 50 iterations. Fixed by using `"|"` as the test separator and dropping the unreliable token-count assertion from `test_append_number`.

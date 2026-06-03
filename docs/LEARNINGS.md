@@ -268,12 +268,45 @@ Register with `WidgetsBinding.instance.addObserver(this)` in `initState`,
 deregister in `dispose`. Override `didChangeAppLifecycleState` to react
 to state changes.
 
-### AppLifecycleState
-Key states for auto-lock:
-- `paused` — app fully backgrounded or screen off. Start the background timer here.
-- `resumed` — app returned to foreground. Cancel the background timer, restart the foreground timer.
-- `detached` — app process being torn down. Lock immediately, no timer needed.
-- `inactive` — brief focus loss (notification shade, etc.). Ignored for locking — too aggressive.
+### AppLifecycleState — platform differences
+The same user action fires different states depending on platform and WM type:
+
+| User action | Android | Linux tiling WM (e.g. Qtile) | Linux floating WM |
+|-------------|---------|------------------------------|-------------------|
+| Focus lost (another window active) | `inactive` (transient — ignore) | `inactive` | `inactive` |
+| App invisible (workspace switch / minimize) | `hidden` → `paused` | `inactive` only | `inactive` → `hidden` |
+| App returns to foreground | `resumed` | `resumed` | `resumed` |
+| Engine detaches | `detached` | `detached` | `detached` |
+
+On Android, `inactive` is transient (task switcher, incoming call) and must
+**not** start background-lock timing. On Linux, `inactive` is the primary
+signal — tiling WMs fire only `inactive` for workspace switches, never `hidden`.
+X11 and Wayland produce identical lifecycle events via Flutter's GTK embedder;
+no platform distinction is needed in code.
+
+### Background lock — two complementary strategies
+
+**Timestamp approach** (covers Android and Linux workspace-switch):
+1. Record `_backgroundedAt = clock()` when the app backgrounds
+   (`hidden`/`paused` on Android; `inactive` on desktop).
+2. On `resumed`, compute elapsed time; call `_lock()` if it exceeds the timeout.
+
+Rationale: `dart:async Timer` is unreliable on Android Doze — the OS suspends
+the process and the callback may never fire. The timestamp is read only on
+`resumed`, when the process is guaranteed to be running again.
+
+`??=` semantics keep the **earliest** timestamp: Android fires `hidden` before
+`paused`; the first write sets `_backgroundedAt`, the second is a no-op.
+
+**Timer approach** (covers Linux focus-switch while app stays visible):
+On a tiling WM, Gabbro may stay visible on screen while another window holds
+focus — the vault stays exposed. `resumed` only fires when the user switches
+back. Because the process is still running (the GTK event loop is live), a
+`dart:async Timer` fires reliably. When `inactive` fires on desktop, start a
+`Timer(_backgroundDuration, _lock)` in addition to recording `_backgroundedAt`.
+
+`_lock()` cancels both timers and sets `_backgroundedAt = null`. This prevents
+a double-lock if the timer fires first and then `resumed` arrives later.
 
 ### GlobalKey<NavigatorState>
 When navigation must happen from outside the widget tree (e.g. a timer
@@ -285,11 +318,45 @@ removes all routes — correct for a lock event where returning to the
 previous screen would bypass security.
 
 ### Foreground inactivity detection
-Wrap the entire `MaterialApp` in a `GestureDetector` with
-`HitTestBehavior.translucent` so it receives events without blocking
-child widgets. Reset the foreground timer on `onTap` and `onPanDown`.
-This catches taps and scrolls without needing to instrument individual
-screens.
+Wrap the entire `MaterialApp` in a `Listener` with
+`HitTestBehavior.translucent` so it receives raw pointer events without
+entering Flutter's gesture arena. A `GestureDetector` registers a
+`PanGestureRecognizer` that wins the arena against text-cursor drag
+handles, breaking cursor dragging in text fields. `Listener.onPointerDown`
+gives the same inactivity-reset semantics without arena participation.
+Also add `HardwareKeyboard.instance.addHandler` to reset on key events.
+
+### Clock injection for deterministic background-lock tests
+`GabbroApp` accepts a `DateTime Function() clock` parameter defaulting to
+`DateTime.now`. Tests pass a fake implementation:
+
+```dart
+var now = DateTime(2025);
+final app = GabbroApp(clock: () => now, ...);
+final advance = (Duration d) => now = now.add(d);
+```
+
+Advancing `now` before sending `AppLifecycleState.resumed` simulates
+time passing in the background without pumping the real timer loop.
+Note: `fakeAsync` / `tester.pump(Duration)` controls `dart:async Timer`
+scheduling, but does **not** override `DateTime.now()` — clock injection
+is the only reliable way to control the timestamp comparison.
+
+### Frame-rendering caveat in lifecycle tests
+`hidden`, `paused`, and `detached` call Flutter's internal
+`_setFramesEnabled(false)`. Navigation scheduled while frames are
+disabled is queued but not rendered. Tests that assert on the widget
+tree after a background-triggered lock must:
+1. Send `AppLifecycleState.resumed` (re-enables frames via `_setFramesEnabled(true)`, which calls `scheduleFrame()`).
+2. `await tester.pump()` — no-duration, consumes `hasScheduledFrame` and builds dirty elements.
+3. `await tester.pump(const Duration(milliseconds: 500))` — runs the route animation.
+
+For timer-triggered locks (desktop `inactive` case), `tester.pump(duration)`
+fires the timer even while frames are disabled; `_lock()` queues the
+navigation. The same three-step pattern then renders it on `resumed`.
+
+`inactive` alone does **not** disable frames, so timer-fires-while-visible
+tests can pump directly without the `resumed` trick.
 
 ### Timer in Dart
 `dart:async` `Timer` fires a callback once after a duration.
