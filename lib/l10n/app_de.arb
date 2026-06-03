@@ -739,5 +739,22 @@
   "validatorExpiryMonth": "Monat muss zwischen 01 und 12 liegen",
   "validatorCvvLength": "CVV muss 3 oder 4 Ziffern haben",
   "validatorLabelRequired": "Bezeichnung ist erforderlich",
-  "validatorStatusRequired": "Status ist erforderlich"
+  "validatorStatusRequired": "Status ist erforderlich",
+
+  "sectionBiometricUnlock": "Biometrische Entsperrung",
+  "biometricUnlockDescription": "Entsperren Sie den Tresor mit Fingerabdruck oder Gesichtserkennung statt Ihres Passworts.",
+  "biometricUnlockTitle": "Biometrische Entsperrung aktivieren",
+  "biometricUnlockNote": "Alle auf diesem Gerät registrierten biometrischen Daten funktionieren — nicht nur das bei der Einrichtung verwendete.",
+  "biometricUnavailable": "Biometrische Entsperrung ist auf diesem Gerät nicht verfügbar. Kein biometrischer Sensor gefunden oder keine Biometrie in den Systemeinstellungen registriert.",
+  "biometricDialogTitle": "Über biometrische Entsperrung",
+  "biometricDialogBody": "Wenn aktiviert, verschlüsselt Gabbro Ihr Master-Passwort und speichert es auf diesem Gerät, geschützt durch Ihre Biometrie. Das Passwort wird nur im Entsperrmoment entschlüsselt.\n\nIhre Fingerabdruck- oder Gesichtsdaten werden von Gabbro niemals gespeichert — sie verbleiben im sicheren Chip Ihres Telefons.",
+  "biometricDialogAllBiometrics": "Alle derzeit auf diesem Gerät registrierten biometrischen Daten können Gabbro entsperren — Sie können es nicht auf einen bestimmten Fingerabdruck beschränken.",
+  "biometricDialogInvalidation": "Wenn ein neues biometrisches Merkmal auf diesem Gerät hinzugefügt wird (einschließlich eines zweiten Fingerabdrucks), wird diese Einstellung automatisch deaktiviert und muss neu eingerichtet werden.",
+  "biometricDialogRecommendation": "Empfehlung: Lassen Sie diese Option deaktiviert, wenn Sie ein hohes Bedrohungsmodell haben oder das Gerät teilen.",
+  "biometricInvalidated": "Die biometrische Entsperrung wurde deaktiviert, weil sich die Biometrie auf diesem Gerät geändert hat (ein neuer Fingerabdruck oder Gesicht wurde in den Systemeinstellungen hinzugefügt). Dies ist eine Sicherheitsmaßnahme. Bitte geben Sie Ihr Passwort ein und aktivieren Sie die biometrische Entsperrung erneut, wenn Sie diese Funktion weiterhin nutzen möchten.",
+  "useBiometrics": "Biometrie verwenden",
+  "biometricCancelled": "Biometrische Authentifizierung wurde nicht abgeschlossen. Geben Sie Ihr Passwort zum Entsperren ein.",
+  "biometricEnrollTitle": "Passwort eingeben",
+  "biometricEnrollDescription": "Geben Sie Ihr Master-Passwort ein, um die biometrische Entsperrung zu aktivieren.",
+  "biometricYubikeyHint": "Geben Sie Ihre YubiKey-PIN ein, tippen Sie dann auf Biometrie verwenden und anschließend auf Ihren YubiKey."
 }

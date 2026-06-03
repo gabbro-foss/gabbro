@@ -22,7 +22,7 @@ Named after the intrusive igneous rock — hard, stable, enduring.
 - **Post-quantum cryptography** — ML-KEM (NIST standard) alongside
   AES-256-GCM; belt and suspenders against both classical and quantum
   threats
-- **Hardware key required** — FIDO2/YubiKey authentication; minimum
+- **Hardware key required** (optional but recommended) — FIDO2/YubiKey authentication; minimum
   two keys (primary + backup)
 - **Rust for all secrets** — every cryptographic operation lives in
   Rust; secrets never cross the Flutter/Rust bridge in plaintext

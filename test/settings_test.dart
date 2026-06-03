@@ -343,6 +343,43 @@ void main() {
     });
   });
 
+  // ── biometricUnlock ───────────────────────────────────────────────────────
+
+  group('biometricUnlock', () {
+    test('defaults to false', () {
+      final s = AppSettings.fromJson({});
+      expect(s.biometricUnlock, isFalse);
+    });
+
+    test('round-trips true through fromJson', () {
+      final s = AppSettings.fromJson({'biometric_unlock': true});
+      expect(s.biometricUnlock, isTrue);
+    });
+
+    test('round-trips false through fromJson', () {
+      final s = AppSettings.fromJson({'biometric_unlock': false});
+      expect(s.biometricUnlock, isFalse);
+    });
+
+    test('serialises to toJson', () {
+      const s = AppSettings(biometricUnlock: true);
+      expect(s.toJson()['biometric_unlock'], isTrue);
+    });
+
+    test('copyWith overrides biometricUnlock only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(biometricUnlock: true);
+      expect(updated.biometricUnlock, isTrue);
+      expect(updated.theme, original.theme);
+      expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
+    });
+
+    test('missing key falls back to false', () {
+      final s = AppSettings.fromJson({'theme': 'dark'});
+      expect(s.biometricUnlock, isFalse);
+    });
+  });
+
   // ── BackgroundLockTimeout ─────────────────────────────────────────────────
 
   group('BackgroundLockTimeout', () {

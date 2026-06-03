@@ -745,5 +745,22 @@
   "validatorExpiryMonth": "Month must be 01–12",
   "validatorCvvLength": "CVV must be 3 or 4 digits",
   "validatorLabelRequired": "Label required",
-  "validatorStatusRequired": "Status is required"
+  "validatorStatusRequired": "Status is required",
+
+  "sectionBiometricUnlock": "Biometric unlock",
+  "biometricUnlockDescription": "Use your fingerprint or face to unlock the vault instead of typing your passphrase.",
+  "biometricUnlockTitle": "Enable biometric unlock",
+  "biometricUnlockNote": "All biometrics enrolled on this device will work — not just the one used to enrol.",
+  "biometricUnavailable": "Biometric unlock is not available on this device. No biometric sensor was found or no biometrics are enrolled in system settings.",
+  "biometricDialogTitle": "About biometric unlock",
+  "biometricDialogBody": "When enabled, Gabbro encrypts your master passphrase and stores it on this device, protected by your biometrics. Your passphrase is decrypted only at the moment of unlock.\n\nYour fingerprint or face data is never stored by Gabbro — it stays in your phone's secure chip.",
+  "biometricDialogAllBiometrics": "All biometrics currently enrolled on this device will be able to unlock Gabbro — you cannot restrict it to a specific fingerprint.",
+  "biometricDialogInvalidation": "If any new biometric is added to this phone (including a second fingerprint), this setting will be automatically disabled and you will need to set it up again.",
+  "biometricDialogRecommendation": "Recommendation: keep this disabled if you have a high threat model or share this device.",
+  "biometricInvalidated": "Biometric unlock was disabled because the biometrics on this device changed (a new fingerprint or face was added in system settings). This is a security measure. Please re-enter your passphrase and enable biometric unlock again if you wish to continue using this feature.",
+  "useBiometrics": "Use biometrics",
+  "biometricCancelled": "Biometric authentication was not completed. Enter your passphrase to unlock.",
+  "biometricEnrollTitle": "Enter your passphrase",
+  "biometricEnrollDescription": "Enter your master passphrase to enable biometric unlock.",
+  "biometricYubikeyHint": "Enter your YubiKey PIN below, then tap Use biometrics, then tap your YubiKey."
 }

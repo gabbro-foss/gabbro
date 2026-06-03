@@ -49,6 +49,10 @@ Widget _buildScreen({
   VaultRegistry? registry,
   bool showVaultList = false,
   void Function(String path, String alias)? onVaultSwitch,
+  bool biometricEnabled = false,
+  Future<bool> Function(String)? onBiometricIsEnrolled,
+  Future<List<int>?> Function(String)? onBiometricAuthenticate,
+  void Function()? onBiometricInvalidated,
 }) =>
     testApp(UnlockScreen(
       vaultPath: vaultPath,
@@ -62,6 +66,10 @@ Widget _buildScreen({
       registry: registry,
       showVaultList: showVaultList,
       onVaultSwitch: onVaultSwitch,
+      biometricEnabled: biometricEnabled,
+      onBiometricIsEnrolled: onBiometricIsEnrolled ?? (_) async => false,
+      onBiometricAuthenticate: onBiometricAuthenticate ?? (_) async => null,
+      onBiometricInvalidated: onBiometricInvalidated,
     ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -233,6 +241,72 @@ void main() {
   });
 
   // ── Vault dropdown (showVaultList=true) ───────────────────────────────────
+
+  // ── biometric button ──────────────────────────────────────────────────────
+
+  group('biometric button', () {
+    testWidgets('not shown when biometricEnabled is false', (tester) async {
+      await tester.pumpWidget(_buildScreen(biometricEnabled: false));
+      expect(find.text('Use biometrics'), findsNothing);
+    });
+
+    testWidgets('not shown when biometricEnabled true but not enrolled', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        biometricEnabled: true,
+        onBiometricIsEnrolled: (_) async => false,
+      ));
+      await tester.pump(); // allow initState async to settle
+      expect(find.text('Use biometrics'), findsNothing);
+    });
+
+    testWidgets('shown when biometricEnabled true and enrolled', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        biometricEnabled: true,
+        onBiometricIsEnrolled: (_) async => true,
+      ));
+      await tester.pump();
+      expect(find.text('Use biometrics'), findsOneWidget);
+    });
+
+    testWidgets('passphrase field always present alongside biometric button', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        biometricEnabled: true,
+        onBiometricIsEnrolled: (_) async => true,
+      ));
+      await tester.pump();
+      expect(find.text('Use biometrics'), findsOneWidget);
+      expect(find.byType(TextField), findsAtLeastNWidgets(1));
+    });
+
+    testWidgets('tapping biometric button calls onBiometricAuthenticate', (tester) async {
+      bool called = false;
+      await tester.pumpWidget(_buildScreen(
+        biometricEnabled: true,
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async { called = true; return null; },
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+      expect(called, isTrue);
+    });
+
+    testWidgets('biometric cancelled shows hint message', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        biometricEnabled: true,
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async => null,
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text('Biometric authentication was not completed.'
+            ' Enter your passphrase to unlock.'),
+        findsOneWidget,
+      );
+    });
+  });
 
   group('vault dropdown', () {
     final twoVaultRegistry = VaultRegistry([

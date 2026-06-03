@@ -739,5 +739,22 @@
   "validatorExpiryMonth": "Il mese deve essere compreso tra 01 e 12",
   "validatorCvvLength": "Il CVV deve avere 3 o 4 cifre",
   "validatorLabelRequired": "L'etichetta è obbligatoria",
-  "validatorStatusRequired": "Lo stato è obbligatorio"
+  "validatorStatusRequired": "Lo stato è obbligatorio",
+
+  "sectionBiometricUnlock": "Sblocco biometrico",
+  "biometricUnlockDescription": "Sblocca il caveau con l'impronta digitale o il riconoscimento facciale invece di digitare la frase d'accesso.",
+  "biometricUnlockTitle": "Attiva sblocco biometrico",
+  "biometricUnlockNote": "Tutti i dati biometrici registrati su questo dispositivo funzioneranno, non solo quelli usati durante l'attivazione.",
+  "biometricUnavailable": "Lo sblocco biometrico non è disponibile su questo dispositivo. Nessun sensore biometrico trovato o nessuna biometria registrata nelle impostazioni di sistema.",
+  "biometricDialogTitle": "Informazioni sullo sblocco biometrico",
+  "biometricDialogBody": "Quando attivato, Gabbro cifra la tua frase d'accesso principale e la memorizza su questo dispositivo, protetta dalla tua biometria. La frase d'accesso viene decifrata solo al momento dello sblocco.\n\nI tuoi dati di impronta digitale o facciali non vengono mai memorizzati da Gabbro — rimangono nel chip sicuro del tuo telefono.",
+  "biometricDialogAllBiometrics": "Tutti i dati biometrici attualmente registrati su questo dispositivo potranno sbloccare Gabbro — non puoi limitarlo a un'impronta digitale specifica.",
+  "biometricDialogInvalidation": "Se un nuovo dato biometrico viene aggiunto a questo telefono (inclusa una seconda impronta digitale), questa impostazione verrà disattivata automaticamente e dovrai riconfigurarla.",
+  "biometricDialogRecommendation": "Raccomandazione: mantieni questa opzione disattivata se hai un modello di minaccia elevato o condividi questo dispositivo.",
+  "biometricInvalidated": "Lo sblocco biometrico è stato disattivato perché i dati biometrici di questo dispositivo sono cambiati (una nuova impronta digitale o volto è stato aggiunto nelle impostazioni di sistema). Questa è una misura di sicurezza. Inserisci la tua frase d'accesso e riattiva lo sblocco biometrico se desideri continuare a utilizzare questa funzione.",
+  "useBiometrics": "Usa la biometria",
+  "biometricCancelled": "L'autenticazione biometrica non è stata completata. Inserisci la tua frase d'accesso per sbloccare.",
+  "biometricEnrollTitle": "Inserisci la tua frase d'accesso",
+  "biometricEnrollDescription": "Inserisci la tua frase d'accesso principale per attivare lo sblocco biometrico.",
+  "biometricYubikeyHint": "Inserisci il PIN del tuo YubiKey qui sotto, poi tocca Usa la biometria, quindi tocca il tuo YubiKey."
 }

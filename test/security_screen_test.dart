@@ -8,9 +8,21 @@ import 'package:gabbro/widgets/segmented_row.dart';
 Widget _buildScreen({
   AppSettings settings = const AppSettings(),
   void Function(AppSettings)? onUpdate,
+  bool isAndroid = false,
+  Future<bool> Function(String)? onBiometricIsEnrolled,
+  Future<bool> Function()? onBiometricAvailable,
+  Future<void> Function(List<int>, String)? onBiometricEnroll,
+  Future<void> Function()? onBiometricUnenroll,
+  String? vaultPath,
 }) => testApp(SecurityScreen(
   settings: settings,
   onUpdate: onUpdate ?? (_) {},
+  isAndroid: isAndroid,
+  vaultPath: vaultPath,
+  onBiometricIsEnrolled: onBiometricIsEnrolled ?? (_) async => false,
+  onBiometricAvailable: onBiometricAvailable ?? () async => false,
+  onBiometricEnroll: onBiometricEnroll ?? (_, _) async {},
+  onBiometricUnenroll: onBiometricUnenroll ?? () async {},
 ));
 
 void main() {
@@ -115,6 +127,129 @@ void main() {
       ));
       // The screen receives the setting — no exception thrown, renders cleanly.
       expect(find.text('1 min'), findsAtLeastNWidgets(1));
+    });
+  });
+
+  // ── biometricUnlock ───────────────────────────────────────────────────────
+
+  group('biometricUnlock', () {
+    testWidgets('biometric section hidden when isAndroid is false', (tester) async {
+      await tester.pumpWidget(_buildScreen(isAndroid: false));
+      expect(find.text('Biometric unlock'), findsNothing);
+    });
+
+    testWidgets('biometric section shown when isAndroid is true', (tester) async {
+      await tester.pumpWidget(_buildScreen(isAndroid: true));
+      await tester.scrollUntilVisible(find.text('Biometric unlock'), 300);
+      expect(find.text('Biometric unlock'), findsOneWidget);
+    });
+
+    testWidgets('biometric toggle is off by default', (tester) async {
+      await tester.pumpWidget(_buildScreen(isAndroid: true));
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      final tile = tester.widget<SwitchListTile>(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'),
+      );
+      expect(tile.value, isFalse);
+    });
+
+    testWidgets('biometric toggle ON when isEnrolled returns true for this vault', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        vaultPath: '/vault/a.gabbro',
+        onBiometricIsEnrolled: (_) async => true,
+      ));
+      await tester.pump(); // allow initState async to settle
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      final tile = tester.widget<SwitchListTile>(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'),
+      );
+      expect(tile.value, isTrue);
+    });
+
+    testWidgets('biometric toggle OFF when isEnrolled returns false even if setting is true',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        vaultPath: '/vault/b.gabbro',
+        settings: const AppSettings(biometricUnlock: true),
+        onBiometricIsEnrolled: (_) async => false,
+      ));
+      await tester.pump();
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      final tile = tester.widget<SwitchListTile>(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'),
+      );
+      expect(tile.value, isFalse);
+    });
+
+    testWidgets('tapping toggle OFF calls unenroll and calls onUpdate with false', (tester) async {
+      bool unenrolled = false;
+      AppSettings? updated;
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        vaultPath: '/vault/a.gabbro',
+        settings: const AppSettings(biometricUnlock: true),
+        onUpdate: (s) => updated = s,
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricUnenroll: () async { unenrolled = true; },
+      ));
+      await tester.pump(); // let initState isEnrolled resolve
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      await tester.tap(find.widgetWithText(SwitchListTile, 'Enable biometric unlock'));
+      await tester.pumpAndSettle();
+      expect(unenrolled, isTrue);
+      expect(updated?.biometricUnlock, isFalse);
+    });
+
+    testWidgets('tapping toggle ON when unavailable shows error and does not update setting',
+        (tester) async {
+      AppSettings? updated;
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        onUpdate: (s) => updated = s,
+        onBiometricAvailable: () async => false,
+      ));
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      await tester.tap(find.widgetWithText(SwitchListTile, 'Enable biometric unlock'));
+      await tester.pumpAndSettle();
+      expect(updated, isNull);
+      expect(find.text('Biometric unlock is not available on this device.'
+          ' No biometric sensor was found or no biometrics are enrolled in system settings.'),
+          findsOneWidget);
+    });
+
+    testWidgets('tapping toggle ON when available shows explanation dialog', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        onBiometricAvailable: () async => true,
+      ));
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      await tester.tap(find.widgetWithText(SwitchListTile, 'Enable biometric unlock'));
+      await tester.pumpAndSettle();
+      expect(find.text('About biometric unlock'), findsOneWidget);
+    });
+
+    testWidgets('cancelling explanation dialog does not update setting', (tester) async {
+      AppSettings? updated;
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        onUpdate: (s) => updated = s,
+        onBiometricAvailable: () async => true,
+      ));
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      await tester.tap(find.widgetWithText(SwitchListTile, 'Enable biometric unlock'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(updated, isNull);
     });
   });
 

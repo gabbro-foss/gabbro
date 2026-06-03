@@ -1601,4 +1601,63 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get validatorStatusRequired => 'El estado es obligatorio';
+
+  @override
+  String get sectionBiometricUnlock => 'Desbloqueo biométrico';
+
+  @override
+  String get biometricUnlockDescription =>
+      'Desbloquee el cofre con su huella dactilar o reconocimiento facial en lugar de escribir su frase de contraseña.';
+
+  @override
+  String get biometricUnlockTitle => 'Activar desbloqueo biométrico';
+
+  @override
+  String get biometricUnlockNote =>
+      'Todos los datos biométricos registrados en este dispositivo funcionarán, no solo los usados durante la activación.';
+
+  @override
+  String get biometricUnavailable =>
+      'El desbloqueo biométrico no está disponible en este dispositivo. No se encontró sensor biométrico o no hay biometría registrada en la configuración del sistema.';
+
+  @override
+  String get biometricDialogTitle => 'Sobre el desbloqueo biométrico';
+
+  @override
+  String get biometricDialogBody =>
+      'Cuando está activado, Gabbro cifra su frase de contraseña maestra y la almacena en este dispositivo, protegida por su biometría. La frase de contraseña solo se descifra en el momento del desbloqueo.\n\nSus datos de huella dactilar o faciales nunca son almacenados por Gabbro — permanecen en el chip seguro de su teléfono.';
+
+  @override
+  String get biometricDialogAllBiometrics =>
+      'Todos los datos biométricos actualmente registrados en este dispositivo podrán desbloquear Gabbro — no puede restringirlo a una huella dactilar específica.';
+
+  @override
+  String get biometricDialogInvalidation =>
+      'Si se agrega algún nuevo dato biométrico a este teléfono (incluida una segunda huella dactilar), esta configuración se desactivará automáticamente y deberá configurarla de nuevo.';
+
+  @override
+  String get biometricDialogRecommendation =>
+      'Recomendación: mantenga esta opción desactivada si tiene un modelo de amenaza alto o comparte este dispositivo.';
+
+  @override
+  String get biometricInvalidated =>
+      'El desbloqueo biométrico fue desactivado porque los datos biométricos de este dispositivo cambiaron (se agregó una nueva huella dactilar o rostro en la configuración del sistema). Esto es una medida de seguridad. Por favor, ingrese su frase de contraseña y vuelva a activar el desbloqueo biométrico si desea continuar usando esta función.';
+
+  @override
+  String get useBiometrics => 'Usar biometría';
+
+  @override
+  String get biometricCancelled =>
+      'La autenticación biométrica no se completó. Ingrese su frase de contraseña para desbloquear.';
+
+  @override
+  String get biometricEnrollTitle => 'Ingrese su frase de contraseña';
+
+  @override
+  String get biometricEnrollDescription =>
+      'Ingrese su frase de contraseña maestra para activar el desbloqueo biométrico.';
+
+  @override
+  String get biometricYubikeyHint =>
+      'Ingrese su PIN de YubiKey abajo, luego toque Usar biometría y después toque su YubiKey.';
 }

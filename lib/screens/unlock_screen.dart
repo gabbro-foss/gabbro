@@ -34,6 +34,32 @@ EntropyResult _defaultEstimateEntropy(String password) =>
     estimateEntropy(password: password);
 
 const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
+const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');
+
+Future<bool> _defaultBiometricIsEnrolled(String vaultPath) async {
+  if (!Platform.isAndroid) return false;
+  try {
+    return await _biometricChannel.invokeMethod<bool>(
+          'isEnrolled', {'vaultPath': vaultPath}) ??
+        false;
+  } catch (_) {
+    return false;
+  }
+}
+
+Future<List<int>?> _defaultBiometricAuthenticate(String vaultPath) async {
+  try {
+    final bytes = await _biometricChannel.invokeMethod<Uint8List>(
+      'authenticate', {'vaultPath': vaultPath},
+    );
+    return bytes?.toList();
+  } on PlatformException catch (e) {
+    if (e.code == 'BIOMETRIC_INVALIDATED') rethrow;
+    return null;
+  } catch (_) {
+    return null;
+  }
+}
 
 Future<void> _linuxUnlockWithYubikey(
   List<int> passphrase,
@@ -233,6 +259,21 @@ class UnlockScreen extends StatefulWidget {
   /// Null → falls back to GabbroApp.maybeOf(context)?.switchToVault(…).
   final void Function(String path, String alias)? onVaultSwitch;
 
+  /// Whether biometric unlock is enabled in settings (from AppSettings.biometricUnlock).
+  final bool biometricEnabled;
+
+  /// Returns true if a biometric credential is stored for [vaultPath].
+  final Future<bool> Function(String vaultPath) onBiometricIsEnrolled;
+
+  /// Performs biometric authentication and returns the decrypted passphrase
+  /// bytes for [vaultPath], or null if cancelled. Throws PlatformException
+  /// with code 'BIOMETRIC_INVALIDATED' if the Keystore key was invalidated.
+  final Future<List<int>?> Function(String vaultPath) onBiometricAuthenticate;
+
+  /// Called when a BIOMETRIC_INVALIDATED error is received so the parent can
+  /// save biometricUnlock: false to settings.
+  final void Function()? onBiometricInvalidated;
+
   const UnlockScreen({
     super.key,
     required this.vaultPath,
@@ -246,6 +287,10 @@ class UnlockScreen extends StatefulWidget {
     this.registry,
     this.showVaultList = false,
     this.onVaultSwitch,
+    this.biometricEnabled = false,
+    this.onBiometricIsEnrolled = _defaultBiometricIsEnrolled,
+    this.onBiometricAuthenticate = _defaultBiometricAuthenticate,
+    this.onBiometricInvalidated,
   });
 
   @override
@@ -263,6 +308,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
   EntropyResult? _entropy;
   late final List<YubikeyRecordData> _yubikeyRecords;
   late String _selectedPath;
+  bool _biometricEnrolled = false;
 
   bool get _isYubikeyMode => _yubikeyRecords.isNotEmpty;
 
@@ -276,6 +322,11 @@ class _UnlockScreenState extends State<UnlockScreen> {
     super.initState();
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
     _selectedPath = widget.vaultPath;
+    if (widget.biometricEnabled) {
+      widget.onBiometricIsEnrolled(widget.vaultPath).then((enrolled) {
+        if (mounted) setState(() => _biometricEnrolled = enrolled);
+      });
+    }
   }
 
   List<YubikeyRecordData> _detectYubikeyRecords() {
@@ -297,7 +348,12 @@ class _UnlockScreenState extends State<UnlockScreen> {
     if (path == null || path == _selectedPath) return;
     final record =
         widget.registry!.records.firstWhere((r) => r.path == path);
-    setState(() => _selectedPath = path);
+    // Biometric is enrolled for the original vault's passphrase only.
+    // Hide the button when the user switches to a different vault.
+    setState(() {
+      _selectedPath = path;
+      _biometricEnrolled = false;
+    });
     if (widget.onVaultSwitch != null) {
       widget.onVaultSwitch!(record.path, record.alias);
     } else {
@@ -306,18 +362,50 @@ class _UnlockScreenState extends State<UnlockScreen> {
   }
 
   Future<void> _unlock() async {
+    setState(() { _isUnlocking = true; _errorMessage = null; });
+    try {
+      await _doUnlock(_passphraseController.text.codeUnits);
+    } finally {
+      if (mounted) setState(() => _isUnlocking = false);
+    }
+  }
+
+  Future<void> _unlockWithBiometrics() async {
     final l = AppLocalizations.of(context);
-    setState(() {
-      _isUnlocking = true;
-      _errorMessage = null;
-    });
+    setState(() { _isUnlocking = true; _errorMessage = null; });
+    try {
+      final passphrase = await widget.onBiometricAuthenticate(widget.vaultPath);
+      if (!mounted) return;
+      if (passphrase == null) {
+        setState(() => _errorMessage = l.biometricCancelled);
+        return;
+      }
+      await _doUnlock(passphrase);
+    } on PlatformException catch (e) {
+      if (!mounted) return;
+      if (e.code == 'BIOMETRIC_INVALIDATED') {
+        setState(() {
+          _biometricEnrolled = false;
+          _errorMessage = l.biometricInvalidated;
+        });
+        widget.onBiometricInvalidated?.call();
+      } else {
+        setState(() => _errorMessage = l.biometricCancelled);
+      }
+    } finally {
+      if (mounted) setState(() => _isUnlocking = false);
+    }
+  }
+
+  Future<void> _doUnlock(List<int> passphrase) async {
+    final l = AppLocalizations.of(context);
     try {
       if (_isYubikeyMode) {
         if (_yubikeyRecords.length == 1) {
           // Single-key path: one credential ID, one tap.
           final record = _yubikeyRecords.first;
           await widget.onUnlockWithYubikey(
-            _passphraseController.text.codeUnits,
+            passphrase,
             record.credentialId,
             record.salt,
             _pinController.text,
@@ -327,7 +415,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
         } else {
           // Multi-key path: all records in one FIDO2 assertion, one tap.
           await widget.onUnlockWithAnyYubikey(
-            _passphraseController.text.codeUnits,
+            passphrase,
             _yubikeyRecords,
             _pinController.text,
             widget.vaultPath,
@@ -335,10 +423,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
           );
         }
       } else {
-        await widget.onUnlock(
-          _passphraseController.text.codeUnits,
-          widget.vaultPath,
-        );
+        await widget.onUnlock(passphrase, widget.vaultPath);
       }
       if (mounted) {
         GabbroApp.maybeOf(context)?.touchVaultLastUsed(widget.vaultPath);
@@ -364,8 +449,6 @@ class _UnlockScreenState extends State<UnlockScreen> {
               : l.unlockErrorPassphrase,
         };
       });
-    } finally {
-      if (mounted) setState(() => _isUnlocking = false);
     }
   }
 
@@ -424,6 +507,23 @@ class _UnlockScreenState extends State<UnlockScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 48),
+                    if (_biometricEnrolled) ...[
+                      if (_isYubikeyMode)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            AppLocalizations.of(context).biometricYubikeyHint,
+                            style: Theme.of(context).textTheme.bodySmall,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      OutlinedButton.icon(
+                        onPressed: _isUnlocking ? null : _unlockWithBiometrics,
+                        icon: const Icon(Icons.fingerprint),
+                        label: Text(AppLocalizations.of(context).useBiometrics),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                     if (_showDropdown) ...[
                       DropdownButton<String>(
                         isExpanded: true,

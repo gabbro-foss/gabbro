@@ -20,6 +20,7 @@ class AppSettings {
   final bool blockPassphraseCopyPaste;
   final bool showVaultList;
   final LanguageChoice language;
+  final bool biometricUnlock;
 
   const AppSettings({
     this.theme = ThemeChoice.system,
@@ -33,6 +34,7 @@ class AppSettings {
     this.blockPassphraseCopyPaste = true,
     this.showVaultList = false,
     this.language = LanguageChoice.system,
+    this.biometricUnlock = false,
   });
 
   static AppSettings get defaults => const AppSettings();
@@ -51,6 +53,7 @@ class AppSettings {
     'block_passphrase_copy_paste': blockPassphraseCopyPaste,
     'show_vault_list': showVaultList,
     'language': language.name,
+    'biometric_unlock': biometricUnlock,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -80,6 +83,7 @@ class AppSettings {
       language: LanguageChoice.values.byName(
         json['language'] as String? ?? 'system',
       ),
+      biometricUnlock: json['biometric_unlock'] as bool? ?? false,
     );
   }
 
@@ -95,6 +99,7 @@ class AppSettings {
     bool? blockPassphraseCopyPaste,
     bool? showVaultList,
     LanguageChoice? language,
+    bool? biometricUnlock,
   }) => AppSettings(
     theme: theme ?? this.theme,
     textSize: textSize ?? this.textSize,
@@ -107,6 +112,7 @@ class AppSettings {
     blockPassphraseCopyPaste: blockPassphraseCopyPaste ?? this.blockPassphraseCopyPaste,
     showVaultList: showVaultList ?? this.showVaultList,
     language: language ?? this.language,
+    biometricUnlock: biometricUnlock ?? this.biometricUnlock,
   );
 
   // ── File I/O ───────────────────────────────────────────────────────────
@@ -197,7 +203,12 @@ class AppSettings {
 
   // Override the system language for the app UI.
   // Options: "system" | "en" | "fr" | "de" | "it" | "es"
-  "language": "${language.name}"
+  "language": "${language.name}",
+
+  // Use biometrics (fingerprint/face) to unlock instead of typing the passphrase.
+  // Android only. Stores the passphrase encrypted on-device. Default: false.
+  // Options: true | false
+  "biometric_unlock": $biometricUnlock
 }
 ''';
 

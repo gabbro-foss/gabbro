@@ -2953,6 +2953,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Status is required'**
   String get validatorStatusRequired;
+
+  /// No description provided for @sectionBiometricUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric unlock'**
+  String get sectionBiometricUnlock;
+
+  /// No description provided for @biometricUnlockDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your fingerprint or face to unlock the vault instead of typing your passphrase.'**
+  String get biometricUnlockDescription;
+
+  /// No description provided for @biometricUnlockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable biometric unlock'**
+  String get biometricUnlockTitle;
+
+  /// No description provided for @biometricUnlockNote.
+  ///
+  /// In en, this message translates to:
+  /// **'All biometrics enrolled on this device will work — not just the one used to enrol.'**
+  String get biometricUnlockNote;
+
+  /// No description provided for @biometricUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric unlock is not available on this device. No biometric sensor was found or no biometrics are enrolled in system settings.'**
+  String get biometricUnavailable;
+
+  /// No description provided for @biometricDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About biometric unlock'**
+  String get biometricDialogTitle;
+
+  /// No description provided for @biometricDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'When enabled, Gabbro encrypts your master passphrase and stores it on this device, protected by your biometrics. Your passphrase is decrypted only at the moment of unlock.\n\nYour fingerprint or face data is never stored by Gabbro — it stays in your phone\'s secure chip.'**
+  String get biometricDialogBody;
+
+  /// No description provided for @biometricDialogAllBiometrics.
+  ///
+  /// In en, this message translates to:
+  /// **'All biometrics currently enrolled on this device will be able to unlock Gabbro — you cannot restrict it to a specific fingerprint.'**
+  String get biometricDialogAllBiometrics;
+
+  /// No description provided for @biometricDialogInvalidation.
+  ///
+  /// In en, this message translates to:
+  /// **'If any new biometric is added to this phone (including a second fingerprint), this setting will be automatically disabled and you will need to set it up again.'**
+  String get biometricDialogInvalidation;
+
+  /// No description provided for @biometricDialogRecommendation.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendation: keep this disabled if you have a high threat model or share this device.'**
+  String get biometricDialogRecommendation;
+
+  /// No description provided for @biometricInvalidated.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric unlock was disabled because the biometrics on this device changed (a new fingerprint or face was added in system settings). This is a security measure. Please re-enter your passphrase and enable biometric unlock again if you wish to continue using this feature.'**
+  String get biometricInvalidated;
+
+  /// No description provided for @useBiometrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Use biometrics'**
+  String get useBiometrics;
+
+  /// No description provided for @biometricCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric authentication was not completed. Enter your passphrase to unlock.'**
+  String get biometricCancelled;
+
+  /// No description provided for @biometricEnrollTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your passphrase'**
+  String get biometricEnrollTitle;
+
+  /// No description provided for @biometricEnrollDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your master passphrase to enable biometric unlock.'**
+  String get biometricEnrollDescription;
+
+  /// No description provided for @biometricYubikeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your YubiKey PIN below, then tap Use biometrics, then tap your YubiKey.'**
+  String get biometricYubikeyHint;
 }
 
 class _AppLocalizationsDelegate

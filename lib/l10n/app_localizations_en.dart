@@ -1576,4 +1576,63 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get validatorStatusRequired => 'Status is required';
+
+  @override
+  String get sectionBiometricUnlock => 'Biometric unlock';
+
+  @override
+  String get biometricUnlockDescription =>
+      'Use your fingerprint or face to unlock the vault instead of typing your passphrase.';
+
+  @override
+  String get biometricUnlockTitle => 'Enable biometric unlock';
+
+  @override
+  String get biometricUnlockNote =>
+      'All biometrics enrolled on this device will work — not just the one used to enrol.';
+
+  @override
+  String get biometricUnavailable =>
+      'Biometric unlock is not available on this device. No biometric sensor was found or no biometrics are enrolled in system settings.';
+
+  @override
+  String get biometricDialogTitle => 'About biometric unlock';
+
+  @override
+  String get biometricDialogBody =>
+      'When enabled, Gabbro encrypts your master passphrase and stores it on this device, protected by your biometrics. Your passphrase is decrypted only at the moment of unlock.\n\nYour fingerprint or face data is never stored by Gabbro — it stays in your phone\'s secure chip.';
+
+  @override
+  String get biometricDialogAllBiometrics =>
+      'All biometrics currently enrolled on this device will be able to unlock Gabbro — you cannot restrict it to a specific fingerprint.';
+
+  @override
+  String get biometricDialogInvalidation =>
+      'If any new biometric is added to this phone (including a second fingerprint), this setting will be automatically disabled and you will need to set it up again.';
+
+  @override
+  String get biometricDialogRecommendation =>
+      'Recommendation: keep this disabled if you have a high threat model or share this device.';
+
+  @override
+  String get biometricInvalidated =>
+      'Biometric unlock was disabled because the biometrics on this device changed (a new fingerprint or face was added in system settings). This is a security measure. Please re-enter your passphrase and enable biometric unlock again if you wish to continue using this feature.';
+
+  @override
+  String get useBiometrics => 'Use biometrics';
+
+  @override
+  String get biometricCancelled =>
+      'Biometric authentication was not completed. Enter your passphrase to unlock.';
+
+  @override
+  String get biometricEnrollTitle => 'Enter your passphrase';
+
+  @override
+  String get biometricEnrollDescription =>
+      'Enter your master passphrase to enable biometric unlock.';
+
+  @override
+  String get biometricYubikeyHint =>
+      'Enter your YubiKey PIN below, then tap Use biometrics, then tap your YubiKey.';
 }

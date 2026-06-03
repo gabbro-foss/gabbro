@@ -1,17 +1,77 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
+
+const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');
+
+Future<bool> _defaultBiometricIsEnrolled(String vaultPath) async {
+  if (!Platform.isAndroid) return false;
+  try {
+    return await _biometricChannel.invokeMethod<bool>(
+          'isEnrolled', {'vaultPath': vaultPath}) ??
+        false;
+  } catch (_) {
+    return false;
+  }
+}
+
+Future<bool> _defaultBiometricAvailable() async {
+  if (!Platform.isAndroid) return false;
+  try {
+    return await _biometricChannel.invokeMethod<bool>('isAvailable') ?? false;
+  } catch (_) {
+    return false;
+  }
+}
+
+Future<void> _defaultBiometricEnroll(
+    List<int> passphrase, String vaultPath) async {
+  if (!Platform.isAndroid) return;
+  await _biometricChannel.invokeMethod<void>('enroll', {
+    'passphrase': passphrase
+        .map((b) => b.toRadixString(16).padLeft(2, '0'))
+        .join(),
+    'vaultPath': vaultPath,
+  });
+}
+
+Future<void> _defaultBiometricUnenroll() async {
+  if (!Platform.isAndroid) return;
+  try {
+    await _biometricChannel.invokeMethod<void>('unenroll');
+  } catch (_) {}
+}
 
 class SecurityScreen extends StatefulWidget {
   final AppSettings settings;
   final void Function(AppSettings) onUpdate;
 
-  const SecurityScreen({
+  /// Injected for testing; production code uses [Platform.isAndroid].
+  final bool isAndroid;
+
+  final Future<bool> Function() onBiometricAvailable;
+  /// Vault path the passphrase is being enrolled for (null only in tests that
+  /// don't need vault-scoped biometrics).
+  final String? vaultPath;
+  final Future<bool> Function(String vaultPath) onBiometricIsEnrolled;
+  final Future<void> Function(List<int> passphrase, String vaultPath) onBiometricEnroll;
+  final Future<void> Function() onBiometricUnenroll;
+
+  SecurityScreen({
     super.key,
     required this.settings,
     required this.onUpdate,
-  });
+    bool? isAndroid,
+    this.vaultPath,
+    this.onBiometricIsEnrolled = _defaultBiometricIsEnrolled,
+    this.onBiometricAvailable = _defaultBiometricAvailable,
+    this.onBiometricEnroll = _defaultBiometricEnroll,
+    this.onBiometricUnenroll = _defaultBiometricUnenroll,
+  }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
   @override
   State<SecurityScreen> createState() => _SecurityScreenState();
@@ -19,16 +79,145 @@ class SecurityScreen extends StatefulWidget {
 
 class _SecurityScreenState extends State<SecurityScreen> {
   late AppSettings _settings;
+  bool _biometricEnrolled = false;
 
   @override
   void initState() {
     super.initState();
     _settings = widget.settings;
+    if (widget.isAndroid && widget.vaultPath != null) {
+      widget.onBiometricIsEnrolled(widget.vaultPath!).then((enrolled) {
+        if (mounted) setState(() => _biometricEnrolled = enrolled);
+      });
+    }
   }
 
   void _update(AppSettings updated) {
     widget.onUpdate(updated);
     setState(() => _settings = updated);
+  }
+
+  Future<void> _handleBiometricToggle(bool enable, AppLocalizations l) async {
+    if (!enable) {
+      await widget.onBiometricUnenroll();
+      setState(() => _biometricEnrolled = false);
+      _update(_settings.copyWith(biometricUnlock: false));
+      return;
+    }
+
+    final available = await widget.onBiometricAvailable();
+    if (!mounted) return;
+    if (!available) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l.biometricUnavailable)),
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.biometricDialogTitle),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l.biometricDialogBody),
+              const SizedBox(height: 12),
+              Text(
+                l.biometricDialogAllBiometrics,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(l.biometricDialogInvalidation),
+              const SizedBox(height: 8),
+              Text(
+                l.biometricDialogRecommendation,
+                style: const TextStyle(fontStyle: FontStyle.italic),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l.continueAction),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || confirmed != true) return;
+
+    final passphrase = await _promptPassphrase(l);
+    if (!mounted || passphrase == null) return;
+
+    try {
+      await widget.onBiometricEnroll(passphrase, widget.vaultPath ?? '');
+      if (mounted) {
+        setState(() => _biometricEnrolled = true);
+        _update(_settings.copyWith(biometricUnlock: true));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
+  Future<List<int>?> _promptPassphrase(AppLocalizations l) async {
+    final controller = TextEditingController();
+    // obscured lives outside the StatefulBuilder so it survives rebuilds.
+    bool obscured = true;
+    final result = await showDialog<List<int>>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx2, setDialogState) => AlertDialog(
+          title: Text(l.biometricEnrollTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l.biometricEnrollDescription),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                obscureText: obscured,
+                autofocus: true,
+                decoration: InputDecoration(
+                  labelText: l.passphraseLabel,
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscured ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () => setDialogState(() => obscured = !obscured),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx2).pop(null),
+              child: Text(l.cancel),
+            ),
+            FilledButton(
+              onPressed: () =>
+                  Navigator.of(ctx2).pop(controller.text.codeUnits),
+              child: Text(l.confirm),
+            ),
+          ],
+        ),
+      ),
+    );
+    controller.dispose();
+    return result;
   }
 
   @override
@@ -132,6 +321,25 @@ class _SecurityScreenState extends State<SecurityScreen> {
               const SizedBox(height: 4),
               Text(l.vaultListNote, style: const TextStyle(fontSize: 11)),
               const SizedBox(height: 32),
+
+              // ── Biometric unlock (Android only) ───────────────────────
+              if (widget.isAndroid) ...[
+                SectionHeader(label: l.sectionBiometricUnlock),
+                const SizedBox(height: 4),
+                Text(l.biometricUnlockDescription,
+                    style: const TextStyle(fontSize: 12)),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  title: Text(l.biometricUnlockTitle),
+                  value: _biometricEnrolled,
+                  onChanged: (v) => _handleBiometricToggle(v, l),
+                  contentPadding: EdgeInsets.zero,
+                ),
+                const SizedBox(height: 4),
+                Text(l.biometricUnlockNote,
+                    style: const TextStyle(fontSize: 11)),
+                const SizedBox(height: 32),
+              ],
 
               // ── Clipboard clear ────────────────────────────────────────
               SectionHeader(label: l.sectionClipboardClear),

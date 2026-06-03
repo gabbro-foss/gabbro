@@ -1597,4 +1597,63 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get validatorStatusRequired => 'Status ist erforderlich';
+
+  @override
+  String get sectionBiometricUnlock => 'Biometrische Entsperrung';
+
+  @override
+  String get biometricUnlockDescription =>
+      'Entsperren Sie den Tresor mit Fingerabdruck oder Gesichtserkennung statt Ihres Passworts.';
+
+  @override
+  String get biometricUnlockTitle => 'Biometrische Entsperrung aktivieren';
+
+  @override
+  String get biometricUnlockNote =>
+      'Alle auf diesem Gerät registrierten biometrischen Daten funktionieren — nicht nur das bei der Einrichtung verwendete.';
+
+  @override
+  String get biometricUnavailable =>
+      'Biometrische Entsperrung ist auf diesem Gerät nicht verfügbar. Kein biometrischer Sensor gefunden oder keine Biometrie in den Systemeinstellungen registriert.';
+
+  @override
+  String get biometricDialogTitle => 'Über biometrische Entsperrung';
+
+  @override
+  String get biometricDialogBody =>
+      'Wenn aktiviert, verschlüsselt Gabbro Ihr Master-Passwort und speichert es auf diesem Gerät, geschützt durch Ihre Biometrie. Das Passwort wird nur im Entsperrmoment entschlüsselt.\n\nIhre Fingerabdruck- oder Gesichtsdaten werden von Gabbro niemals gespeichert — sie verbleiben im sicheren Chip Ihres Telefons.';
+
+  @override
+  String get biometricDialogAllBiometrics =>
+      'Alle derzeit auf diesem Gerät registrierten biometrischen Daten können Gabbro entsperren — Sie können es nicht auf einen bestimmten Fingerabdruck beschränken.';
+
+  @override
+  String get biometricDialogInvalidation =>
+      'Wenn ein neues biometrisches Merkmal auf diesem Gerät hinzugefügt wird (einschließlich eines zweiten Fingerabdrucks), wird diese Einstellung automatisch deaktiviert und muss neu eingerichtet werden.';
+
+  @override
+  String get biometricDialogRecommendation =>
+      'Empfehlung: Lassen Sie diese Option deaktiviert, wenn Sie ein hohes Bedrohungsmodell haben oder das Gerät teilen.';
+
+  @override
+  String get biometricInvalidated =>
+      'Die biometrische Entsperrung wurde deaktiviert, weil sich die Biometrie auf diesem Gerät geändert hat (ein neuer Fingerabdruck oder Gesicht wurde in den Systemeinstellungen hinzugefügt). Dies ist eine Sicherheitsmaßnahme. Bitte geben Sie Ihr Passwort ein und aktivieren Sie die biometrische Entsperrung erneut, wenn Sie diese Funktion weiterhin nutzen möchten.';
+
+  @override
+  String get useBiometrics => 'Biometrie verwenden';
+
+  @override
+  String get biometricCancelled =>
+      'Biometrische Authentifizierung wurde nicht abgeschlossen. Geben Sie Ihr Passwort zum Entsperren ein.';
+
+  @override
+  String get biometricEnrollTitle => 'Passwort eingeben';
+
+  @override
+  String get biometricEnrollDescription =>
+      'Geben Sie Ihr Master-Passwort ein, um die biometrische Entsperrung zu aktivieren.';
+
+  @override
+  String get biometricYubikeyHint =>
+      'Geben Sie Ihre YubiKey-PIN ein, tippen Sie dann auf Biometrie verwenden und anschließend auf Ihren YubiKey.';
 }

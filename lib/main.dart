@@ -366,6 +366,10 @@ class _GabbroAppState extends State<GabbroApp>
     blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
     registry: _settings.showVaultList ? _registry : null,
     showVaultList: _settings.showVaultList,
+    biometricEnabled: _settings.biometricUnlock,
+    onBiometricInvalidated: () => updateSettings(
+      _settings.copyWith(biometricUnlock: false),
+    ),
   );
 
   Widget _buildHome() {

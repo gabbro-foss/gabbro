@@ -55,4 +55,5 @@ flutter {
 dependencies {
     implementation("com.yubico.yubikit:android:3.1.0")
     implementation("com.yubico.yubikit:fido:3.1.0")
+    implementation("androidx.biometric:biometric-ktx:1.2.0-alpha05")
 }

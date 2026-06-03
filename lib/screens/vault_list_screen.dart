@@ -728,6 +728,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
             builder: (context) => SecurityScreen(
               settings: appState.settings,
               onUpdate: (updated) => appState.updateSettings(updated),
+              vaultPath: widget.vaultPath,
             ),
           ),
         );
@@ -779,6 +780,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
           blockPassphraseCopyPaste: settings.blockPassphraseCopyPaste,
           registry: settings.showVaultList ? appState.registry : null,
           showVaultList: settings.showVaultList,
+          biometricEnabled: settings.biometricUnlock,
+          onBiometricInvalidated: () => appState.updateSettings(
+            settings.copyWith(biometricUnlock: false),
+          ),
         ),
       ),
     );

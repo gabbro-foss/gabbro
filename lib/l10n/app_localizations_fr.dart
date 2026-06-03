@@ -1608,4 +1608,63 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get validatorStatusRequired => 'Le statut est requis';
+
+  @override
+  String get sectionBiometricUnlock => 'Déverrouillage biométrique';
+
+  @override
+  String get biometricUnlockDescription =>
+      'Déverrouillez le coffre avec votre empreinte ou reconnaissance faciale plutôt qu\'en saisissant votre phrase de passe.';
+
+  @override
+  String get biometricUnlockTitle => 'Activer le déverrouillage biométrique';
+
+  @override
+  String get biometricUnlockNote =>
+      'Toutes les données biométriques enregistrées sur cet appareil fonctionneront — pas uniquement celles utilisées lors de l\'activation.';
+
+  @override
+  String get biometricUnavailable =>
+      'Le déverrouillage biométrique n\'est pas disponible sur cet appareil. Aucun capteur biométrique trouvé ou aucune biométrie enregistrée dans les paramètres système.';
+
+  @override
+  String get biometricDialogTitle => 'À propos du déverrouillage biométrique';
+
+  @override
+  String get biometricDialogBody =>
+      'Lorsqu\'il est activé, Gabbro chiffre votre phrase de passe maître et la stocke sur cet appareil, protégée par vos données biométriques. La phrase de passe n\'est déchiffrée qu\'au moment du déverrouillage.\n\nVos données d\'empreinte digitale ou faciales ne sont jamais stockées par Gabbro — elles restent dans la puce sécurisée de votre téléphone.';
+
+  @override
+  String get biometricDialogAllBiometrics =>
+      'Toutes les données biométriques actuellement enregistrées sur cet appareil pourront déverrouiller Gabbro — vous ne pouvez pas le restreindre à une empreinte spécifique.';
+
+  @override
+  String get biometricDialogInvalidation =>
+      'Si une nouvelle donnée biométrique est ajoutée à ce téléphone (y compris une seconde empreinte digitale), ce paramètre sera automatiquement désactivé et vous devrez le reconfigurer.';
+
+  @override
+  String get biometricDialogRecommendation =>
+      'Recommandation : laissez cette option désactivée si vous avez un profil de menace élevé ou partagez cet appareil.';
+
+  @override
+  String get biometricInvalidated =>
+      'Le déverrouillage biométrique a été désactivé car les données biométriques de cet appareil ont changé (une nouvelle empreinte ou un visage a été ajouté dans les paramètres système). Il s\'agit d\'une mesure de sécurité. Veuillez saisir votre phrase de passe et réactiver le déverrouillage biométrique si vous souhaitez continuer à utiliser cette fonctionnalité.';
+
+  @override
+  String get useBiometrics => 'Utiliser la biométrie';
+
+  @override
+  String get biometricCancelled =>
+      'L\'authentification biométrique n\'a pas été effectuée. Saisissez votre phrase de passe pour déverrouiller.';
+
+  @override
+  String get biometricEnrollTitle => 'Saisir votre phrase de passe';
+
+  @override
+  String get biometricEnrollDescription =>
+      'Saisissez votre phrase de passe maître pour activer le déverrouillage biométrique.';
+
+  @override
+  String get biometricYubikeyHint =>
+      'Saisissez votre code PIN YubiKey ci-dessous, appuyez sur Utiliser la biométrie, puis appuyez sur votre YubiKey.';
 }

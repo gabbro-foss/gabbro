@@ -739,5 +739,22 @@
   "validatorExpiryMonth": "El mes debe estar entre 01 y 12",
   "validatorCvvLength": "El CVV debe tener 3 o 4 dígitos",
   "validatorLabelRequired": "La etiqueta es obligatoria",
-  "validatorStatusRequired": "El estado es obligatorio"
+  "validatorStatusRequired": "El estado es obligatorio",
+
+  "sectionBiometricUnlock": "Desbloqueo biométrico",
+  "biometricUnlockDescription": "Desbloquee el cofre con su huella dactilar o reconocimiento facial en lugar de escribir su frase de contraseña.",
+  "biometricUnlockTitle": "Activar desbloqueo biométrico",
+  "biometricUnlockNote": "Todos los datos biométricos registrados en este dispositivo funcionarán, no solo los usados durante la activación.",
+  "biometricUnavailable": "El desbloqueo biométrico no está disponible en este dispositivo. No se encontró sensor biométrico o no hay biometría registrada en la configuración del sistema.",
+  "biometricDialogTitle": "Sobre el desbloqueo biométrico",
+  "biometricDialogBody": "Cuando está activado, Gabbro cifra su frase de contraseña maestra y la almacena en este dispositivo, protegida por su biometría. La frase de contraseña solo se descifra en el momento del desbloqueo.\n\nSus datos de huella dactilar o faciales nunca son almacenados por Gabbro — permanecen en el chip seguro de su teléfono.",
+  "biometricDialogAllBiometrics": "Todos los datos biométricos actualmente registrados en este dispositivo podrán desbloquear Gabbro — no puede restringirlo a una huella dactilar específica.",
+  "biometricDialogInvalidation": "Si se agrega algún nuevo dato biométrico a este teléfono (incluida una segunda huella dactilar), esta configuración se desactivará automáticamente y deberá configurarla de nuevo.",
+  "biometricDialogRecommendation": "Recomendación: mantenga esta opción desactivada si tiene un modelo de amenaza alto o comparte este dispositivo.",
+  "biometricInvalidated": "El desbloqueo biométrico fue desactivado porque los datos biométricos de este dispositivo cambiaron (se agregó una nueva huella dactilar o rostro en la configuración del sistema). Esto es una medida de seguridad. Por favor, ingrese su frase de contraseña y vuelva a activar el desbloqueo biométrico si desea continuar usando esta función.",
+  "useBiometrics": "Usar biometría",
+  "biometricCancelled": "La autenticación biométrica no se completó. Ingrese su frase de contraseña para desbloquear.",
+  "biometricEnrollTitle": "Ingrese su frase de contraseña",
+  "biometricEnrollDescription": "Ingrese su frase de contraseña maestra para activar el desbloqueo biométrico.",
+  "biometricYubikeyHint": "Ingrese su PIN de YubiKey abajo, luego toque Usar biometría y después toque su YubiKey."
 }

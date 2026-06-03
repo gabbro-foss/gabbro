@@ -8,14 +8,15 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import com.yubico.yubikit.core.YubiKeyConnection
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-class MainActivity : FlutterActivity() {
+class MainActivity : FlutterFragmentActivity() {
 
     private companion object {
         const val CHANNEL = "app.gabbro.gabbro/yubikey"
+        const val BIOMETRIC_CHANNEL = "app.gabbro.gabbro/biometric"
     }
 
     private var nfcAdapter: NfcAdapter? = null
@@ -56,6 +57,59 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, BIOMETRIC_CHANNEL)
+            .setMethodCallHandler { call, result ->
+                val title = call.argument<String>("title")
+                    ?: applicationInfo.loadLabel(packageManager).toString()
+                val subtitle = call.argument<String>("subtitle") ?: ""
+                val vaultPath = call.argument<String>("vaultPath") ?: ""
+                when (call.method) {
+                    "isAvailable" ->
+                        result.success(BiometricHelper.isAvailable(this))
+                    "isEnrolled" ->
+                        result.success(BiometricHelper.isEnrolled(this, vaultPath))
+                    "enroll" -> {
+                        val passphraseHex = call.argument<String>("passphrase")
+                        if (passphraseHex == null) {
+                            result.error("BAD_ARGS", "passphrase required", null)
+                            return@setMethodCallHandler
+                        }
+                        val passphrase = passphraseHex.fromHex()
+                        BiometricHelper.enroll(
+                            activity = this,
+                            vaultPath = vaultPath,
+                            passphrase = passphrase,
+                            promptTitle = title,
+                            promptSubtitle = subtitle,
+                            onSuccess = { result.success(null) },
+                            onError = { msg -> result.error("BIOMETRIC_ERROR", msg, null) },
+                        )
+                    }
+                    "authenticate" ->
+                        BiometricHelper.authenticate(
+                            activity = this,
+                            vaultPath = vaultPath,
+                            promptTitle = title,
+                            promptSubtitle = subtitle,
+                            onSuccess = { passphrase ->
+                                result.success(passphrase)
+                                passphrase.fill(0)
+                            },
+                            onError = { msg ->
+                                val code = if (msg == "KEY_INVALIDATED") "BIOMETRIC_INVALIDATED"
+                                           else "BIOMETRIC_ERROR"
+                                result.error(code, msg, null)
+                            },
+                        )
+                    "unenroll" -> {
+                        BiometricHelper.unenroll(this)
+                        result.success(null)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
+
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
             .setMethodCallHandler { call, result ->
                 val pin = call.argument<String>("pin")?.toCharArray()
