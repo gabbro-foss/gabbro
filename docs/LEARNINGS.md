@@ -1864,6 +1864,138 @@ This is a Flutter-specific safety idiom with no direct Python equivalent —
 it arises because Flutter's widget lifecycle and async operations run
 concurrently.
 
+### Android — `FlutterActivity` vs `FlutterFragmentActivity`
+`FlutterActivity` (the default Flutter embedding) does **not** extend
+`FragmentActivity`. `BiometricPrompt` requires a `FragmentActivity` —
+passing a plain `Activity` or `FlutterActivity` as its constructor
+argument produces a compile-time type mismatch.
+
+Fix: change `MainActivity` to extend `FlutterFragmentActivity` instead:
+
+```kotlin
+import io.flutter.embedding.android.FlutterFragmentActivity
+class MainActivity : FlutterFragmentActivity() { ... }
+```
+
+`FlutterFragmentActivity` extends `AppCompatActivity` which extends
+`FragmentActivity`, so it satisfies the `BiometricPrompt` constructor.
+Everything else (NFC, platform channels) works identically — it is a
+drop-in replacement for `FlutterActivity` in all current Gabbro code.
+
+---
+
+### Android — AndroidKeyStore + BiometricPrompt (CryptoObject pattern)
+The standard way to tie biometric authentication to an actual
+cryptographic operation (encrypt/decrypt) on Android:
+
+1. **Generate a key** in `AndroidKeyStore` with
+   `setUserAuthenticationRequired(true)` and
+   `setInvalidatedByBiometricEnrollment(true)`.
+2. **Create a `Cipher`** in `ENCRYPT_MODE` (for enrolment) or
+   `DECRYPT_MODE` with the stored IV (for authentication).
+3. **Pass the `Cipher` as a `CryptoObject`** to `BiometricPrompt.authenticate()`.
+4. In `onAuthenticationSucceeded`, the result contains the same
+   `Cipher`, now cryptographically unlocked. Call `.doFinal()` to
+   encrypt or decrypt.
+
+Key properties of the AES-256-GCM Keystore key used in Gabbro:
+- `setUserAuthenticationRequired(true)` — key cannot be used without a
+  biometric authentication event.
+- `setInvalidatedByBiometricEnrollment(true)` — any new biometric
+  enrolled on the device (including a second fingerprint added by the
+  legitimate user) permanently invalidates the key. On next
+  authentication attempt, `KeyPermanentlyInvalidatedException` is thrown
+  at `Cipher.init()`. Gabbro catches this, calls `unenroll()`, and
+  reports `KEY_INVALIDATED` to Flutter.
+- The encrypted ciphertext + IV (nonce) are stored in plain
+  `SharedPreferences` as Base64 strings. They are safe there because
+  the ciphertext is useless without the Keystore key, and the Keystore
+  key requires biometric auth. `EncryptedSharedPreferences` would be
+  redundant double-encryption.
+
+**All OS-enrolled biometrics work — not just the one used to enrol.**
+`BiometricPrompt` accepts any biometric currently registered with the
+OS (all fingerprints, face unlock). There is no API to restrict to a
+specific fingerprint. This is a platform constraint, not a Gabbro
+choice; it must be disclosed to users upfront.
+
+---
+
+### Android — per-vault biometric enrollment scoping
+Biometric enrollment stores one passphrase (one vault). If the app
+supports multiple vaults with different passphrases, enrollment must be
+scoped to a vault path — otherwise biometric auth for Vault A would
+silently fail (wrong decrypted passphrase) when Vault B is selected.
+
+Pattern:
+- Store `vaultPath` alongside the ciphertext in `SharedPreferences`.
+- `isEnrolled(vaultPath)` checks both that ciphertext exists *and* that
+  the stored path matches.
+- `authenticate(vaultPath)` returns `NOT_ENROLLED` if paths don't match.
+- `enroll(vaultPath, passphrase, ...)` stores the path with the ciphertext.
+- Pass `vaultPath` through the Flutter `MethodChannel` call arguments.
+
+The Security settings screen also needs to query `isEnrolled(vaultPath)`
+on load (not just read `settings.biometricUnlock`) so the toggle reflects
+the actual enrollment state for the currently-open vault. A global
+`biometricUnlock: true` setting from Vault A must not show the toggle as
+ON when the user opens Security settings inside Vault B.
+
+---
+
+### Flutter — `StatefulBuilder` for dialog-local mutable state
+`showDialog` builds the dialog with a plain `builder` closure. If the
+dialog needs local mutable state (e.g. toggling password visibility),
+wrapping with `StatefulBuilder` gives a `setState` scoped to the dialog.
+
+**Critical:** declare the mutable variable *outside* the `builder` closure,
+not inside it. Variables declared inside `builder` reset to their initial
+value on every rebuild triggered by `setDialogState(...)`:
+
+```dart
+// CORRECT — obscured survives rebuilds
+bool obscured = true;
+showDialog(
+  builder: (ctx) => StatefulBuilder(
+    builder: (ctx, setDialogState) => TextField(
+      obscureText: obscured,
+      suffixIcon: IconButton(
+        onPressed: () => setDialogState(() => obscured = !obscured),
+      ),
+    ),
+  ),
+);
+
+// WRONG — obscured resets to true on every rebuild
+showDialog(
+  builder: (ctx) => StatefulBuilder(
+    builder: (ctx, setDialogState) {
+      bool obscured = true;  // ← declared inside; reset each rebuild
+      return TextField(...);
+    },
+  ),
+);
+```
+
+---
+
+### Cargo test output — what the two trailing "running 0 tests" are
+A standard `cargo test -q` run on a crate with one lib target and one
+`src/bin/` binary produces three test-runner invocations:
+
+1. **Library** (`src/lib.rs` + all modules) — the main test suite
+2. **Each `src/bin/` binary** — Cargo compiles and runs each binary
+   as a separate test target. Binaries with no `#[test]` functions
+   report "running 0 tests". In Gabbro: `bench_kdf.rs`
+3. **Doc tests** — a separate binary that runs any ` ```rust ` code
+   blocks in `///` doc comments. With none present, reports "running 0 tests".
+
+Binary targets declared with `required-features = ["forensics"]` (like
+`mem_forensics`) are skipped entirely when the feature is not enabled —
+they do not appear in the output at all.
+
+---
+
 ### `#[ignore]` — skipping Rust tests by default
 The `#[ignore]` attribute marks a test so it is skipped during a normal
 `cargo test` run. It only executes when explicitly requested with the

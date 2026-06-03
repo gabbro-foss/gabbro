@@ -108,10 +108,12 @@ gabbro/
 │       ├── GabbroAutofillService.kt
 │       ├── UnlockActivity.kt
 │       ├── RustBridge.kt
-│       └── YubiKeyManager.kt      # USB FIDO2 hmac-secret (register + getHmacSecret)
+│       ├── YubiKeyManager.kt      # USB FIDO2 hmac-secret (register + getHmacSecret)
+│       └── BiometricHelper.kt     # AndroidKeyStore + BiometricPrompt enrol/auth/unenrol
 ├── android/app/src/test/
 │   └── kotlin/app/gabbro/gabbro/
-│       └── YubiKeyManagerTest.kt
+│       ├── YubiKeyManagerTest.kt
+│       └── BiometricHelperTest.kt
 ├── docs/
 │   ├── ARCHITECTURE.md         # This file
 │   ├── LEARNINGS.md
@@ -139,8 +141,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 349 | 8 |
-| Flutter (`flutter test`) | 471 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 0 | 10 |
+| Flutter (`flutter test`) | 491 | 0 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
 
@@ -150,11 +152,16 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Biometric unlock (Android)
+### Next task: Release v0.1.0-alpha.4
 
-v0.1.0-alpha.3 released 2026-06-02.
+Biometric unlock (Android, ADR-011) shipped 2026-06-03. Hardware-tested and committed.
 
-Use `BiometricPrompt` to gate the passphrase *entry* UI on Android — the YubiKey tap remains mandatory. Never store the master passphrase in the biometric keystore; biometrics only replace typing it in. Pure Flutter/Kotlin unlock-flow change; no new Rust bridge functions needed.
+Release steps:
+1. Move `[Unreleased]` CHANGELOG block to `[0.1.0-alpha.4] – 2026-06-03`
+2. Bump `version` in `pubspec.yaml` to `0.1.0+4`
+3. `flutter test` + `cargo clippy -- -D warnings` green
+4. `flutter build linux --release` + `flutter build apk --release`
+5. Commit (docs + pubspec), tag `v0.1.0-alpha.4`, push, `gh release create`
 
 Parked: F-01 header-integrity feature (VERSION 7; low severity, big cross-stack lift); F-03 X-Wing combiner (needs a human cryptographer).
 

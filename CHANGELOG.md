@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.4] – 2026-06-03
+
+### Added
+- Biometric unlock on Android (ADR-011, opt-in, default off):
+  - Toggle in Settings → Security (Android only; hidden on Linux)
+  - Passphrase encrypted with AndroidKeyStore AES-256-GCM key (`setUserAuthenticationRequired(true)`, `setInvalidatedByBiometricEnrollment(true)`); decrypted transiently at unlock, never held in Dart memory
+  - Enrollment is per-vault: biometric enrolled for Vault A does not appear on Vault B's unlock screen
+  - Key auto-invalidated and setting auto-disabled if any new biometric (including a second fingerprint) is enrolled at OS level
+  - Passphrase field always co-present — biometrics are an option, not the only path
+  - Clear user-facing dialogs explain what is stored, the all-enrolled-biometrics constraint, and the invalidation behaviour
+  - 16 new l10n keys across 5 languages; 492 Flutter tests (+21); 8 new Kotlin tests (all `@Ignore`, hardware-required)
+
 ### Security
 - Background lock is now reliable on Android (Doze mode) and Linux with any WM or display server (X11/Wayland). The previous `dart:async Timer`-based background lock was replaced with a dual strategy:
   - **Timestamp approach** (Android + Linux workspace-switch): record the time the app backgrounds (`hidden`/`paused` on Android; `inactive` on desktop); on `resumed`, lock if the elapsed time exceeds the configured timeout. Reliable regardless of OS process scheduling.
