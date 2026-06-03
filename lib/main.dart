@@ -160,12 +160,16 @@ class GabbroApp extends StatefulWidget {
 
   final Widget? initialScreen;
 
+  /// Overridable clock; defaults to [DateTime.now]. Pass a fake clock in tests.
+  final DateTime Function() clock;
+
   const GabbroApp({
     super.key,
     required this.registry,
     required this.vaultPath,
     required this.settings,
     this.initialScreen,
+    this.clock = DateTime.now,
   });
 
   @override
@@ -195,8 +199,9 @@ class _GabbroAppState extends State<GabbroApp>
 
   final _navigatorKey = GlobalKey<NavigatorState>();
 
-  Timer? _backgroundTimer;
   Timer? _foregroundTimer;
+  Timer? _backgroundTimer;
+  DateTime? _backgroundedAt;
 
   @override
   void initState() {
@@ -212,8 +217,8 @@ class _GabbroAppState extends State<GabbroApp>
   void dispose() {
     HardwareKeyboard.instance.removeHandler(_onKeyEvent);
     WidgetsBinding.instance.removeObserver(this);
-    _backgroundTimer?.cancel();
     _foregroundTimer?.cancel();
+    _backgroundTimer?.cancel();
     super.dispose();
   }
 
@@ -253,7 +258,13 @@ class _GabbroAppState extends State<GabbroApp>
     _resetForegroundTimer();
   }
 
-  // ── Background timer ──────────────────────────────────────────────────────
+  // ── Background lock ───────────────────────────────────────────────────────
+  //
+  // Rather than a timer that must fire while the OS may have suspended the
+  // Dart isolate, we record a timestamp when the app backgrounds and compare
+  // elapsed time on resume. This is reliable across Android Doze, Linux WM
+  // workspace switches, and any other scenario where background timers are
+  // throttled or never fire.
 
   Duration? get _backgroundDuration => switch (_settings.backgroundLockTimeout) {
     BackgroundLockTimeout.oneMinute      => const Duration(minutes: 1),
@@ -262,31 +273,65 @@ class _GabbroAppState extends State<GabbroApp>
     BackgroundLockTimeout.never          => null,
   };
 
+  // Used on desktop only: fires _lock() if the app stays visible but unfocused
+  // (tiling WM focus-switch). The process is still running, so timers are reliable.
+  void _startBackgroundTimer() {
+    _backgroundTimer?.cancel();
+    final duration = _backgroundDuration;
+    if (duration == null) return;
+    _backgroundTimer = Timer(duration, _lock);
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
+      case AppLifecycleState.inactive:
+        // On Linux/macOS/Windows, switching workspaces or losing window focus
+        // fires inactive — hidden/paused are not sent. Record the backgrounding
+        // timestamp so the elapsed check on resumed works.
+        // On Android/iOS, inactive is a brief transition state (task switcher,
+        // incoming call) that must NOT trigger background-lock timing.
+        if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+          _foregroundTimer?.cancel();
+          _backgroundedAt ??= widget.clock();
+          // Start a real timer: app is still visible/running, so it will fire.
+          // Covers the tiling-WM focus-switch case where resumed may come late.
+          _startBackgroundTimer();
+        }
       case AppLifecycleState.paused:
       case AppLifecycleState.hidden:
         _foregroundTimer?.cancel();
-        final duration = _backgroundDuration;
-        if (duration != null) {
-          _backgroundTimer = Timer(duration, _lock);
-        }
+        // ??= keeps the earliest timestamp (hidden fires before paused on Android).
+        _backgroundedAt ??= widget.clock();
       case AppLifecycleState.detached:
         _lock();
       case AppLifecycleState.resumed:
         _backgroundTimer?.cancel();
-        _resetForegroundTimer();
-      default:
-        break;
+        if (!_checkBackgroundTimeout()) _resetForegroundTimer();
     }
+  }
+
+  /// Returns true (and calls [_lock]) if the app was backgrounded for longer
+  /// than the configured timeout. Clears [_backgroundedAt] in all cases.
+  bool _checkBackgroundTimeout() {
+    final backgroundedAt = _backgroundedAt;
+    _backgroundedAt = null;
+    if (backgroundedAt == null) return false;
+    final duration = _backgroundDuration;
+    if (duration == null) return false;
+    if (widget.clock().difference(backgroundedAt) >= duration) {
+      _lock();
+      return true;
+    }
+    return false;
   }
 
   // ── Lock ──────────────────────────────────────────────────────────────────
 
   void _lock() {
-    _backgroundTimer?.cancel();
     _foregroundTimer?.cancel();
+    _backgroundTimer?.cancel();
+    _backgroundedAt = null;
     try {
       lockVault();
     } catch (_) {}
