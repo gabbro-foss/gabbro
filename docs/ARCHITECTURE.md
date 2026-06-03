@@ -158,7 +158,7 @@ Biometric unlock (Android, ADR-011) shipped 2026-06-03. Hardware-tested and comm
 
 Release steps:
 1. Move `[Unreleased]` CHANGELOG block to `[0.1.0-alpha.4] – 2026-06-03`
-2. Bump `version` in `pubspec.yaml` to `0.1.0+4`
+2. Bump `version` in `pubspec.yaml` to `0.1.0-alpha.4+4`
 3. `flutter test` + `cargo clippy -- -D warnings` green
 4. `flutter build linux --release` + `flutter build apk --release`
 5. Commit (docs + pubspec), tag `v0.1.0-alpha.4`, push, `gh release create`
