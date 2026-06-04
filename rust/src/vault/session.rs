@@ -7,8 +7,7 @@
 use std::path::PathBuf;
 use zeroize::{Zeroize, Zeroizing};
 
-use once_cell::sync::Lazy;
-use std::sync::Mutex;
+use std::sync::{LazyLock, Mutex};
 
 use crate::api::vault::{
     add_yubikey_to_vault, change_passphrase_with_keys, load_vault, load_vault_with_key_record,
@@ -60,7 +59,7 @@ pub struct VaultSession {
     pub deleted_ids: Vec<DeletedEntry>,
 }
 
-static VAULT_SESSION: Lazy<Mutex<Option<VaultSession>>> = Lazy::new(|| Mutex::new(None));
+static VAULT_SESSION: LazyLock<Mutex<Option<VaultSession>>> = LazyLock::new(|| Mutex::new(None));
 
 // ── Session API ───────────────────────────────────────────────────────────────
 

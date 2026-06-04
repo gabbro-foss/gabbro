@@ -371,11 +371,6 @@ const _kComponents = [
     url: 'https://github.com/RustCrypto/KEMs',
   ),
   _Component(
-    name: 'once_cell',
-    licence: 'Apache-2.0 / MIT',
-    url: 'https://github.com/matklad/once_cell',
-  ),
-  _Component(
     name: 'path_provider',
     licence: 'BSD-3-Clause',
     url: 'https://github.com/flutter/packages',
