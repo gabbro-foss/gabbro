@@ -366,6 +366,21 @@ const _kComponents = [
     url: 'https://github.com/RustCrypto/KDFs',
   ),
   _Component(
+    name: 'intl',
+    licence: 'BSD-3-Clause',
+    url: 'https://github.com/dart-lang/i18n',
+  ),
+  _Component(
+    name: 'jni',
+    licence: 'MIT',
+    url: 'https://github.com/jni-rs/jni-rs',
+  ),
+  _Component(
+    name: 'libfido2-sys',
+    licence: 'BSD-2-Clause',
+    url: 'https://github.com/Yubico/libfido2',
+  ),
+  _Component(
     name: 'ml-kem',
     licence: 'Apache-2.0 / MIT',
     url: 'https://github.com/RustCrypto/KEMs',
