@@ -48,6 +48,7 @@ gabbro/
 │   │   ├── import_screen.dart
 │   │   ├── csv_mapping_screen.dart
 │   │   ├── change_passphrase_screen.dart
+│   │   ├── help_screen.dart
 │   │   ├── about_screen.dart
 │   │   ├── appearance_screen.dart
 │   │   ├── language_screen.dart
@@ -122,6 +123,10 @@ gabbro/
 │   ├── AI_SECURITY_AUDIT.md    # AI-assisted security review (2026-05-31)
 │   ├── artefacts/
 │   └── decisions/              # ADR documents
+├── assets/
+│   ├── fonts/
+│   ├── images/
+│   └── help/                       # 12 annotated screenshots for the in-app help carousel
 ├── challenge/
 │   ├── README.md               # Crack-me challenge rules and reward
 │   ├── decryptMe_2026-06-01.gabbro        # Sealed vault (passphrase + YubiKey; body unreadable without hardware)
@@ -152,9 +157,24 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: TBD
+### Next tasks (three phases)
 
 v0.1.0-alpha.4 released 2026-06-03. Tag pushed, GitHub release published with Linux and Android artifacts.
+
+In-app help carousel shipped (post-alpha.4, unreleased). 12 annotated screenshots, fully localised, accessible via Menu → Help.
+
+**Phase 1 — Dependency surface audit**
+Run `cargo tree`; remove any crate that can be replaced with `std` before v1. Reduces attack surface and simplifies the licence audit that follows.
+
+**Phase 2 — Dependency licence audit**
+Audit `_kComponents` in `about_screen.dart` against the actual `Cargo.toml` + `pubspec.yaml` at that point. Add missing entries, remove stale ones.
+
+**Phase 3 — Header integrity + rename-requires-login (F-01)**
+Make plaintext-header tampering detectable. Design already specified in Bikeshed:
+- `set_vault_alias` requires an unlocked session (like delete)
+- Re-seal body on every header-mutating op using the session's cached `vault_key_master`
+- Bind stable header fields to the AES-GCM tag as AAD (`SealedVault::header_aad()` + `aes_gcm::*_with_aad`)
+- VERSION 7 bump. Cross-stack: Flutter rename flow + `vault_bridge` + `vault_crypto` + `aes_gcm`.
 
 ### Open from the security audit
 
@@ -228,7 +248,6 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Security (pre-v1 gates)
-- **Header integrity + rename-requires-login** (reclassified audit F-01). Goal: make plaintext-header tampering (alias, YubiKey `credential_id`, record order) detectable. The naive "header-as-AAD on the body tag" fix is incompatible with Gabbro because several ops mutate the header without re-encrypting the body and without the unlock secret. Viable design: (1) make vault rename require an unlocked session, like delete — `set_vault_alias` takes the session; (2) re-seal the body on every header-mutating op (rename, add/remove key, change passphrase) using the session's cached `vault_key_master`; (3) bind the stable header fields to the body's AES-GCM tag as AAD (`SealedVault::header_aad()` + `aes_gcm::*_with_aad`, to be re-added). Cross-stack (Flutter rename flow + `vault_bridge` + `vault_crypto` + `aes_gcm`); a VERSION 7 bump. Note: alias must stay plaintext-in-header so the login screen can show vault aliases pre-unlock.
 - **F-03 X-Wing combiner** — migrate the hybrid KEM combiner to a transcript-binding (X-Wing-style) construction (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). No single verifiable-against-spec answer → genuinely needs the human cryptographer's judgement. VERSION 7 (bundle with the header-integrity feature if both land together).
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
 - Verify Android storage permissions hold on Android 11+ (app-private storage + SAF — no `MANAGE_EXTERNAL_STORAGE`).
@@ -237,14 +256,11 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
-- Add tutorial/onboarding: probably in the README as snapshots from linux/emulator
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
-- Dependency licence audit for About screen (`_kComponents`) against actual Cargo.toml + pubspec.yaml at release time.
 - Add import from Google Password Manager functionality
 
 ### Code Quality
-- Dependency surface audit: remove any crate that can be replaced with `std` before v1 (`cargo tree`).
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 - Explain if this project can be defined as "vide-coding" or not, and why, especially in the light of things like this: "vibe-coded cryptography software" in https://blogs.gentoo.org/mgorny/2026/05/28/why-gentoo/#more-2634
 - verify that the artefact files are still valid (ammend or remove as required)
