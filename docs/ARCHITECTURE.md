@@ -163,11 +163,11 @@ v0.1.0-alpha.4 released 2026-06-03. Tag pushed, GitHub release published with Li
 
 In-app help carousel shipped (post-alpha.4, unreleased). 12 annotated screenshots, fully localised, accessible via Menu → Help.
 
-**Phase 1 — Dependency surface audit**
-Run `cargo tree`; remove any crate that can be replaced with `std` before v1. Reduces attack surface and simplifies the licence audit that follows.
+**Phase 1 — Dependency surface audit** ✓ done 2026-06-04
+`once_cell` removed — replaced with `std::sync::LazyLock` (Rust 1.80+) in `vault/session.rs`. All other direct deps are genuinely irreplaceable (crypto, FFI, serialisation). `once_cell` remains in the transitive graph via `flutter_rust_bridge`.
 
 **Phase 2 — Dependency licence audit**
-Audit `_kComponents` in `about_screen.dart` against the actual `Cargo.toml` + `pubspec.yaml` at that point. Add missing entries, remove stale ones.
+Before auditing: run `cargo outdated` and `flutter pub outdated` to identify stale versions; decide what is safe to bump (major-version bumps need API review; `flutter_rust_bridge` is exact-pinned for a reason). Then audit `_kComponents` in `about_screen.dart` against the actual `Cargo.toml` + `pubspec.yaml`. Add missing entries, remove stale ones.
 
 **Phase 3 — Header integrity + rename-requires-login (F-01)**
 Make plaintext-header tampering detectable. Design already specified in Bikeshed:

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Dependency surface audit (Phase 1): replaced `once_cell::sync::Lazy` with `std::sync::LazyLock` (stabilised in Rust 1.80) in `vault/session.rs`; removed `once_cell` as a direct dependency.
+
 ### Added
 - In-app help screen: carousel of 12 annotated screenshots accessible from the main menu (Menu → Help). Swipeable `PageView` with per-slide localised captions and dot-indicator navigation. All 14 l10n keys translated across 5 languages (EN/DE/ES/FR/IT). Help images normalised: Flameshot border artefacts trimmed, uniform 8 px `#5C7A3E` padding applied to all 12 assets.
 
