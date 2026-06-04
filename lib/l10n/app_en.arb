@@ -762,5 +762,20 @@
   "biometricCancelled": "Biometric authentication was not completed. Enter your passphrase to unlock.",
   "biometricEnrollTitle": "Enter your passphrase",
   "biometricEnrollDescription": "Enter your master passphrase to enable biometric unlock.",
-  "biometricYubikeyHint": "Enter your YubiKey PIN below, then tap Use biometrics, then tap your YubiKey."
+  "biometricYubikeyHint": "Enter your YubiKey PIN below, then tap Use biometrics, then tap your YubiKey.",
+
+  "helpTitle": "Help",
+  "menuHelp": "Help",
+  "helpCaptionCreate": "Create a vault: enter a name, passphrase, and optionally protect it with a YubiKey",
+  "helpCaptionEmpty": "Tap + to add your first entry",
+  "helpCaptionDetail": "Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown",
+  "helpCaptionTitleSearch": "By default, the search bar searches entry titles only",
+  "helpCaptionFullSearch": "Tap the magnifying glass to switch to full-field search; tap again to return to title-only",
+  "helpCaptionFilter": "Use the filter chips to show only entries of a specific type",
+  "helpCaptionFolders": "Use the folder picker to filter entries by folder",
+  "helpCaptionSelect": "Long-tap an entry to enter select mode; add more items, then assign to a folder or delete. Tap X to exit.",
+  "helpCaptionJumpToLetter": "Tap a letter on the index bar to jump to that section",
+  "helpCaptionBreakdown": "Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown",
+  "helpCaptionManageVaults": "In Manage vaults, rename or delete vaults, or add a new one",
+  "helpCaptionUnlock": "Enter your passphrase to unlock your vault"
 }

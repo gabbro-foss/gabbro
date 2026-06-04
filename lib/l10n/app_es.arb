@@ -756,5 +756,20 @@
   "biometricCancelled": "La autenticación biométrica no se completó. Ingrese su frase de contraseña para desbloquear.",
   "biometricEnrollTitle": "Ingrese su frase de contraseña",
   "biometricEnrollDescription": "Ingrese su frase de contraseña maestra para activar el desbloqueo biométrico.",
-  "biometricYubikeyHint": "Ingrese su PIN de YubiKey abajo, luego toque Usar biometría y después toque su YubiKey."
+  "biometricYubikeyHint": "Ingrese su PIN de YubiKey abajo, luego toque Usar biometría y después toque su YubiKey.",
+
+  "helpTitle": "Ayuda",
+  "menuHelp": "Ayuda",
+  "helpCaptionCreate": "Crea un cofre: introduce un nombre, una frase de contraseña y protégelo opcionalmente con un YubiKey",
+  "helpCaptionEmpty": "Toca + para añadir tu primera entrada",
+  "helpCaptionDetail": "Toca el icono de ojo para revelar una contraseña, luego mantenla pulsada para ver un desglose detallado de caracteres",
+  "helpCaptionTitleSearch": "Por defecto, la barra de búsqueda busca solo en los títulos de las entradas",
+  "helpCaptionFullSearch": "Toca la lupa para buscar en todos los campos; tócala de nuevo para volver a la búsqueda por título",
+  "helpCaptionFilter": "Usa los filtros para mostrar solo entradas de un tipo específico",
+  "helpCaptionFolders": "Usa el selector de carpetas para filtrar entradas por carpeta",
+  "helpCaptionSelect": "Mantén pulsada una entrada para entrar en modo selección; añade más elementos, luego asígnalos a una carpeta o elimínalos. Toca X para salir.",
+  "helpCaptionJumpToLetter": "Toca una letra en la barra de índice para saltar a esa sección",
+  "helpCaptionBreakdown": "Toca el icono de ojo para revelar una contraseña, luego mantenla pulsada para ver un desglose detallado de caracteres",
+  "helpCaptionManageVaults": "En Gestionar cofres, puedes renombrar o eliminar cofres, o añadir uno nuevo",
+  "helpCaptionUnlock": "Introduce tu frase de contraseña para desbloquear tu cofre"
 }

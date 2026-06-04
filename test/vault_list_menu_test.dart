@@ -57,6 +57,7 @@ void main() {
       expect(find.text('Language'), findsOneWidget);
       expect(find.text('Security'), findsOneWidget);
       expect(find.text('Password generator'), findsOneWidget);
+      expect(find.text('Help'), findsOneWidget);
       expect(find.text('About'), findsOneWidget);
       expect(find.text('Manage folders'), findsOneWidget);
     });

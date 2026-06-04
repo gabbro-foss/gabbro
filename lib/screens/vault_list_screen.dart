@@ -11,6 +11,7 @@ import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/screens/about_screen.dart';
+import 'package:gabbro/screens/help_screen.dart';
 import 'package:gabbro/screens/export_screen.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/language_screen.dart';
@@ -761,6 +762,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
           ),
         );
         if (mounted) _loadEntries();
+      case 'help':
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const HelpScreen()),
+        );
       case 'about':
         Navigator.of(
           context,
@@ -977,6 +982,14 @@ class _VaultListScreenState extends State<VaultListScreen> {
                     ]),
                   ),
                   const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'help',
+                    child: Row(children: [
+                      const Icon(Icons.help_outline, size: 20),
+                      const SizedBox(width: 12),
+                      Text(ml.menuHelp),
+                    ]),
+                  ),
                   PopupMenuItem(
                     value: 'about',
                     child: Row(children: [

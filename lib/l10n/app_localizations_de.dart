@@ -1656,4 +1656,58 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get biometricYubikeyHint =>
       'Geben Sie Ihre YubiKey-PIN ein, tippen Sie dann auf Biometrie verwenden und anschließend auf Ihren YubiKey.';
+
+  @override
+  String get helpTitle => 'Hilfe';
+
+  @override
+  String get menuHelp => 'Hilfe';
+
+  @override
+  String get helpCaptionCreate =>
+      'Tresor erstellen: Name und Passphrase eingeben, optional mit YubiKey schützen';
+
+  @override
+  String get helpCaptionEmpty =>
+      'Tippe auf +, um deinen ersten Eintrag hinzuzufügen';
+
+  @override
+  String get helpCaptionDetail =>
+      'Tippe auf das Augensymbol, um ein Passwort anzuzeigen, dann lange drücken für eine detaillierte Zeichenaufschlüsselung';
+
+  @override
+  String get helpCaptionTitleSearch =>
+      'Standardmäßig durchsucht die Suchleiste nur die Titel der Einträge';
+
+  @override
+  String get helpCaptionFullSearch =>
+      'Tippe auf die Lupe, um alle Felder zu durchsuchen; erneut tippen für Nur-Titel-Suche';
+
+  @override
+  String get helpCaptionFilter =>
+      'Verwende die Filterchips, um nur Einträge eines bestimmten Typs anzuzeigen';
+
+  @override
+  String get helpCaptionFolders =>
+      'Verwende die Ordnerauswahl, um Einträge nach Ordner zu filtern';
+
+  @override
+  String get helpCaptionSelect =>
+      'Lang auf einen Eintrag tippen, um den Auswahlmodus zu starten; weitere hinzufügen, dann in Ordner verschieben oder löschen. Auf X tippen zum Beenden.';
+
+  @override
+  String get helpCaptionJumpToLetter =>
+      'Tippe auf einen Buchstaben in der Indexleiste, um zu diesem Abschnitt zu springen';
+
+  @override
+  String get helpCaptionBreakdown =>
+      'Tippe auf das Augensymbol, um ein Passwort anzuzeigen, dann lange drücken für eine detaillierte Zeichenaufschlüsselung';
+
+  @override
+  String get helpCaptionManageVaults =>
+      'Unter Tresore verwalten kannst du Tresore umbenennen, löschen oder neue hinzufügen';
+
+  @override
+  String get helpCaptionUnlock =>
+      'Gib deine Passphrase ein, um deinen Tresor zu entsperren';
 }

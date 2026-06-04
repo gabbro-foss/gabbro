@@ -756,5 +756,20 @@
   "biometricCancelled": "L'authentification biométrique n'a pas été effectuée. Saisissez votre phrase de passe pour déverrouiller.",
   "biometricEnrollTitle": "Saisir votre phrase de passe",
   "biometricEnrollDescription": "Saisissez votre phrase de passe maître pour activer le déverrouillage biométrique.",
-  "biometricYubikeyHint": "Saisissez votre code PIN YubiKey ci-dessous, appuyez sur Utiliser la biométrie, puis appuyez sur votre YubiKey."
+  "biometricYubikeyHint": "Saisissez votre code PIN YubiKey ci-dessous, appuyez sur Utiliser la biométrie, puis appuyez sur votre YubiKey.",
+
+  "helpTitle": "Aide",
+  "menuHelp": "Aide",
+  "helpCaptionCreate": "Créez un coffre : saisissez un nom, une phrase secrète et protégez-le optionnellement avec un YubiKey",
+  "helpCaptionEmpty": "Appuyez sur + pour ajouter votre première entrée",
+  "helpCaptionDetail": "Appuyez sur l'icône œil pour afficher un mot de passe, puis appuyez longuement pour voir une décomposition détaillée des caractères",
+  "helpCaptionTitleSearch": "Par défaut, la barre de recherche ne cherche que dans les titres des entrées",
+  "helpCaptionFullSearch": "Appuyez sur la loupe pour chercher dans tous les champs ; appuyez à nouveau pour revenir à la recherche par titre",
+  "helpCaptionFilter": "Utilisez les filtres pour afficher uniquement les entrées d'un type spécifique",
+  "helpCaptionFolders": "Utilisez le sélecteur de dossiers pour filtrer les entrées par dossier",
+  "helpCaptionSelect": "Appuyez longuement sur une entrée pour entrer en mode sélection ; ajoutez d'autres éléments, puis assignez-les à un dossier ou supprimez-les. Appuyez sur X pour quitter.",
+  "helpCaptionJumpToLetter": "Appuyez sur une lettre dans la barre d'index pour accéder à cette section",
+  "helpCaptionBreakdown": "Appuyez sur l'icône œil pour afficher un mot de passe, puis appuyez longuement pour voir une décomposition détaillée des caractères",
+  "helpCaptionManageVaults": "Dans Gérer les coffres, renommez ou supprimez des coffres, ou ajoutez-en un nouveau",
+  "helpCaptionUnlock": "Saisissez votre phrase secrète pour déverrouiller votre coffre"
 }

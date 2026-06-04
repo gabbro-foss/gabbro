@@ -1667,4 +1667,58 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get biometricYubikeyHint =>
       'Saisissez votre code PIN YubiKey ci-dessous, appuyez sur Utiliser la biométrie, puis appuyez sur votre YubiKey.';
+
+  @override
+  String get helpTitle => 'Aide';
+
+  @override
+  String get menuHelp => 'Aide';
+
+  @override
+  String get helpCaptionCreate =>
+      'Créez un coffre : saisissez un nom, une phrase secrète et protégez-le optionnellement avec un YubiKey';
+
+  @override
+  String get helpCaptionEmpty =>
+      'Appuyez sur + pour ajouter votre première entrée';
+
+  @override
+  String get helpCaptionDetail =>
+      'Appuyez sur l\'icône œil pour afficher un mot de passe, puis appuyez longuement pour voir une décomposition détaillée des caractères';
+
+  @override
+  String get helpCaptionTitleSearch =>
+      'Par défaut, la barre de recherche ne cherche que dans les titres des entrées';
+
+  @override
+  String get helpCaptionFullSearch =>
+      'Appuyez sur la loupe pour chercher dans tous les champs ; appuyez à nouveau pour revenir à la recherche par titre';
+
+  @override
+  String get helpCaptionFilter =>
+      'Utilisez les filtres pour afficher uniquement les entrées d\'un type spécifique';
+
+  @override
+  String get helpCaptionFolders =>
+      'Utilisez le sélecteur de dossiers pour filtrer les entrées par dossier';
+
+  @override
+  String get helpCaptionSelect =>
+      'Appuyez longuement sur une entrée pour entrer en mode sélection ; ajoutez d\'autres éléments, puis assignez-les à un dossier ou supprimez-les. Appuyez sur X pour quitter.';
+
+  @override
+  String get helpCaptionJumpToLetter =>
+      'Appuyez sur une lettre dans la barre d\'index pour accéder à cette section';
+
+  @override
+  String get helpCaptionBreakdown =>
+      'Appuyez sur l\'icône œil pour afficher un mot de passe, puis appuyez longuement pour voir une décomposition détaillée des caractères';
+
+  @override
+  String get helpCaptionManageVaults =>
+      'Dans Gérer les coffres, renommez ou supprimez des coffres, ou ajoutez-en un nouveau';
+
+  @override
+  String get helpCaptionUnlock =>
+      'Saisissez votre phrase secrète pour déverrouiller votre coffre';
 }

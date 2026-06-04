@@ -756,5 +756,20 @@
   "biometricCancelled": "Biometrische Authentifizierung wurde nicht abgeschlossen. Geben Sie Ihr Passwort zum Entsperren ein.",
   "biometricEnrollTitle": "Passwort eingeben",
   "biometricEnrollDescription": "Geben Sie Ihr Master-Passwort ein, um die biometrische Entsperrung zu aktivieren.",
-  "biometricYubikeyHint": "Geben Sie Ihre YubiKey-PIN ein, tippen Sie dann auf Biometrie verwenden und anschließend auf Ihren YubiKey."
+  "biometricYubikeyHint": "Geben Sie Ihre YubiKey-PIN ein, tippen Sie dann auf Biometrie verwenden und anschließend auf Ihren YubiKey.",
+
+  "helpTitle": "Hilfe",
+  "menuHelp": "Hilfe",
+  "helpCaptionCreate": "Tresor erstellen: Name und Passphrase eingeben, optional mit YubiKey schützen",
+  "helpCaptionEmpty": "Tippe auf +, um deinen ersten Eintrag hinzuzufügen",
+  "helpCaptionDetail": "Tippe auf das Augensymbol, um ein Passwort anzuzeigen, dann lange drücken für eine detaillierte Zeichenaufschlüsselung",
+  "helpCaptionTitleSearch": "Standardmäßig durchsucht die Suchleiste nur die Titel der Einträge",
+  "helpCaptionFullSearch": "Tippe auf die Lupe, um alle Felder zu durchsuchen; erneut tippen für Nur-Titel-Suche",
+  "helpCaptionFilter": "Verwende die Filterchips, um nur Einträge eines bestimmten Typs anzuzeigen",
+  "helpCaptionFolders": "Verwende die Ordnerauswahl, um Einträge nach Ordner zu filtern",
+  "helpCaptionSelect": "Lang auf einen Eintrag tippen, um den Auswahlmodus zu starten; weitere hinzufügen, dann in Ordner verschieben oder löschen. Auf X tippen zum Beenden.",
+  "helpCaptionJumpToLetter": "Tippe auf einen Buchstaben in der Indexleiste, um zu diesem Abschnitt zu springen",
+  "helpCaptionBreakdown": "Tippe auf das Augensymbol, um ein Passwort anzuzeigen, dann lange drücken für eine detaillierte Zeichenaufschlüsselung",
+  "helpCaptionManageVaults": "Unter Tresore verwalten kannst du Tresore umbenennen, löschen oder neue hinzufügen",
+  "helpCaptionUnlock": "Gib deine Passphrase ein, um deinen Tresor zu entsperren"
 }

@@ -3049,6 +3049,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter your YubiKey PIN below, then tap Use biometrics, then tap your YubiKey.'**
   String get biometricYubikeyHint;
+
+  /// No description provided for @helpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get helpTitle;
+
+  /// No description provided for @menuHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get menuHelp;
+
+  /// No description provided for @helpCaptionCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a vault: enter a name, passphrase, and optionally protect it with a YubiKey'**
+  String get helpCaptionCreate;
+
+  /// No description provided for @helpCaptionEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to add your first entry'**
+  String get helpCaptionEmpty;
+
+  /// No description provided for @helpCaptionDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown'**
+  String get helpCaptionDetail;
+
+  /// No description provided for @helpCaptionTitleSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'By default, the search bar searches entry titles only'**
+  String get helpCaptionTitleSearch;
+
+  /// No description provided for @helpCaptionFullSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the magnifying glass to switch to full-field search; tap again to return to title-only'**
+  String get helpCaptionFullSearch;
+
+  /// No description provided for @helpCaptionFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the filter chips to show only entries of a specific type'**
+  String get helpCaptionFilter;
+
+  /// No description provided for @helpCaptionFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the folder picker to filter entries by folder'**
+  String get helpCaptionFolders;
+
+  /// No description provided for @helpCaptionSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-tap an entry to enter select mode; add more items, then assign to a folder or delete. Tap X to exit.'**
+  String get helpCaptionSelect;
+
+  /// No description provided for @helpCaptionJumpToLetter.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a letter on the index bar to jump to that section'**
+  String get helpCaptionJumpToLetter;
+
+  /// No description provided for @helpCaptionBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown'**
+  String get helpCaptionBreakdown;
+
+  /// No description provided for @helpCaptionManageVaults.
+  ///
+  /// In en, this message translates to:
+  /// **'In Manage vaults, rename or delete vaults, or add a new one'**
+  String get helpCaptionManageVaults;
+
+  /// No description provided for @helpCaptionUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your passphrase to unlock your vault'**
+  String get helpCaptionUnlock;
 }
 
 class _AppLocalizationsDelegate

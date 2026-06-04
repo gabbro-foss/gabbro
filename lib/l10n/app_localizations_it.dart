@@ -1654,4 +1654,57 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get biometricYubikeyHint =>
       'Inserisci il PIN del tuo YubiKey qui sotto, poi tocca Usa la biometria, quindi tocca il tuo YubiKey.';
+
+  @override
+  String get helpTitle => 'Aiuto';
+
+  @override
+  String get menuHelp => 'Aiuto';
+
+  @override
+  String get helpCaptionCreate =>
+      'Crea un vault: inserisci un nome, una passphrase e proteggilo facoltativamente con un YubiKey';
+
+  @override
+  String get helpCaptionEmpty => 'Tocca + per aggiungere la tua prima voce';
+
+  @override
+  String get helpCaptionDetail =>
+      'Tocca l\'icona occhio per rivelare una password, poi tieni premuto per vedere una scomposizione dettagliata dei caratteri';
+
+  @override
+  String get helpCaptionTitleSearch =>
+      'Per impostazione predefinita, la barra di ricerca cerca solo nei titoli delle voci';
+
+  @override
+  String get helpCaptionFullSearch =>
+      'Tocca la lente di ingrandimento per cercare in tutti i campi; tocca di nuovo per tornare alla ricerca per titolo';
+
+  @override
+  String get helpCaptionFilter =>
+      'Usa i filtri per mostrare solo le voci di un tipo specifico';
+
+  @override
+  String get helpCaptionFolders =>
+      'Usa il selettore di cartelle per filtrare le voci per cartella';
+
+  @override
+  String get helpCaptionSelect =>
+      'Premi a lungo su una voce per entrare in modalità selezione; aggiungi altri elementi, poi assegnali a una cartella o eliminali. Tocca X per uscire.';
+
+  @override
+  String get helpCaptionJumpToLetter =>
+      'Tocca una lettera nella barra dell\'indice per passare a quella sezione';
+
+  @override
+  String get helpCaptionBreakdown =>
+      'Tocca l\'icona occhio per rivelare una password, poi tieni premuto per vedere una scomposizione dettagliata dei caratteri';
+
+  @override
+  String get helpCaptionManageVaults =>
+      'In Gestisci vault, puoi rinominare o eliminare vault, o aggiungerne uno nuovo';
+
+  @override
+  String get helpCaptionUnlock =>
+      'Inserisci la tua passphrase per sbloccare il vault';
 }

@@ -1635,4 +1635,56 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get biometricYubikeyHint =>
       'Enter your YubiKey PIN below, then tap Use biometrics, then tap your YubiKey.';
+
+  @override
+  String get helpTitle => 'Help';
+
+  @override
+  String get menuHelp => 'Help';
+
+  @override
+  String get helpCaptionCreate =>
+      'Create a vault: enter a name, passphrase, and optionally protect it with a YubiKey';
+
+  @override
+  String get helpCaptionEmpty => 'Tap + to add your first entry';
+
+  @override
+  String get helpCaptionDetail =>
+      'Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown';
+
+  @override
+  String get helpCaptionTitleSearch =>
+      'By default, the search bar searches entry titles only';
+
+  @override
+  String get helpCaptionFullSearch =>
+      'Tap the magnifying glass to switch to full-field search; tap again to return to title-only';
+
+  @override
+  String get helpCaptionFilter =>
+      'Use the filter chips to show only entries of a specific type';
+
+  @override
+  String get helpCaptionFolders =>
+      'Use the folder picker to filter entries by folder';
+
+  @override
+  String get helpCaptionSelect =>
+      'Long-tap an entry to enter select mode; add more items, then assign to a folder or delete. Tap X to exit.';
+
+  @override
+  String get helpCaptionJumpToLetter =>
+      'Tap a letter on the index bar to jump to that section';
+
+  @override
+  String get helpCaptionBreakdown =>
+      'Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown';
+
+  @override
+  String get helpCaptionManageVaults =>
+      'In Manage vaults, rename or delete vaults, or add a new one';
+
+  @override
+  String get helpCaptionUnlock => 'Enter your passphrase to unlock your vault';
 }

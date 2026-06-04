@@ -1660,4 +1660,57 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get biometricYubikeyHint =>
       'Ingrese su PIN de YubiKey abajo, luego toque Usar biometría y después toque su YubiKey.';
+
+  @override
+  String get helpTitle => 'Ayuda';
+
+  @override
+  String get menuHelp => 'Ayuda';
+
+  @override
+  String get helpCaptionCreate =>
+      'Crea un cofre: introduce un nombre, una frase de contraseña y protégelo opcionalmente con un YubiKey';
+
+  @override
+  String get helpCaptionEmpty => 'Toca + para añadir tu primera entrada';
+
+  @override
+  String get helpCaptionDetail =>
+      'Toca el icono de ojo para revelar una contraseña, luego mantenla pulsada para ver un desglose detallado de caracteres';
+
+  @override
+  String get helpCaptionTitleSearch =>
+      'Por defecto, la barra de búsqueda busca solo en los títulos de las entradas';
+
+  @override
+  String get helpCaptionFullSearch =>
+      'Toca la lupa para buscar en todos los campos; tócala de nuevo para volver a la búsqueda por título';
+
+  @override
+  String get helpCaptionFilter =>
+      'Usa los filtros para mostrar solo entradas de un tipo específico';
+
+  @override
+  String get helpCaptionFolders =>
+      'Usa el selector de carpetas para filtrar entradas por carpeta';
+
+  @override
+  String get helpCaptionSelect =>
+      'Mantén pulsada una entrada para entrar en modo selección; añade más elementos, luego asígnalos a una carpeta o elimínalos. Toca X para salir.';
+
+  @override
+  String get helpCaptionJumpToLetter =>
+      'Toca una letra en la barra de índice para saltar a esa sección';
+
+  @override
+  String get helpCaptionBreakdown =>
+      'Toca el icono de ojo para revelar una contraseña, luego mantenla pulsada para ver un desglose detallado de caracteres';
+
+  @override
+  String get helpCaptionManageVaults =>
+      'En Gestionar cofres, puedes renombrar o eliminar cofres, o añadir uno nuevo';
+
+  @override
+  String get helpCaptionUnlock =>
+      'Introduce tu frase de contraseña para desbloquear tu cofre';
 }

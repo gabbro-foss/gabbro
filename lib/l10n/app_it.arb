@@ -756,5 +756,20 @@
   "biometricCancelled": "L'autenticazione biometrica non è stata completata. Inserisci la tua frase d'accesso per sbloccare.",
   "biometricEnrollTitle": "Inserisci la tua frase d'accesso",
   "biometricEnrollDescription": "Inserisci la tua frase d'accesso principale per attivare lo sblocco biometrico.",
-  "biometricYubikeyHint": "Inserisci il PIN del tuo YubiKey qui sotto, poi tocca Usa la biometria, quindi tocca il tuo YubiKey."
+  "biometricYubikeyHint": "Inserisci il PIN del tuo YubiKey qui sotto, poi tocca Usa la biometria, quindi tocca il tuo YubiKey.",
+
+  "helpTitle": "Aiuto",
+  "menuHelp": "Aiuto",
+  "helpCaptionCreate": "Crea un vault: inserisci un nome, una passphrase e proteggilo facoltativamente con un YubiKey",
+  "helpCaptionEmpty": "Tocca + per aggiungere la tua prima voce",
+  "helpCaptionDetail": "Tocca l'icona occhio per rivelare una password, poi tieni premuto per vedere una scomposizione dettagliata dei caratteri",
+  "helpCaptionTitleSearch": "Per impostazione predefinita, la barra di ricerca cerca solo nei titoli delle voci",
+  "helpCaptionFullSearch": "Tocca la lente di ingrandimento per cercare in tutti i campi; tocca di nuovo per tornare alla ricerca per titolo",
+  "helpCaptionFilter": "Usa i filtri per mostrare solo le voci di un tipo specifico",
+  "helpCaptionFolders": "Usa il selettore di cartelle per filtrare le voci per cartella",
+  "helpCaptionSelect": "Premi a lungo su una voce per entrare in modalità selezione; aggiungi altri elementi, poi assegnali a una cartella o eliminali. Tocca X per uscire.",
+  "helpCaptionJumpToLetter": "Tocca una lettera nella barra dell'indice per passare a quella sezione",
+  "helpCaptionBreakdown": "Tocca l'icona occhio per rivelare una password, poi tieni premuto per vedere una scomposizione dettagliata dei caratteri",
+  "helpCaptionManageVaults": "In Gestisci vault, puoi rinominare o eliminare vault, o aggiungerne uno nuovo",
+  "helpCaptionUnlock": "Inserisci la tua passphrase per sbloccare il vault"
 }
