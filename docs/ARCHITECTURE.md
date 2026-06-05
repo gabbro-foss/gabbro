@@ -161,7 +161,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 Next tasks (in order):
 
-1. **Multi-language expansion** — language picker UI refactor (chips → scrollable list / dropdown) then 26 new ARB files; Flutter-only. See § Multi-language expansion below.
+1. **Multi-language expansion — Step 2 (cont.)** — 13 ARB files still to write: `sk`, `hr`, `sl`, `sr_Latn` + `sr` (fallback), `el`, `ja`, `ko`, `zh_CN`, `zh_TW` + `zh` (fallback), `kk`, `eu`, `yo`. Run `flutter gen-l10n` + `flutter test` after completion. See § Multi-language expansion below.
 2. **Release v0.1.0-alpha.5** — full `cargo test -q` + `flutter test` gate (both green), then tag + artifacts. Bundles: in-app help carousel, Phases 1–3 (dependency audit, licence audit, header integrity / VERSION 7), multi-language expansion.
 
 ### Open from the security audit
@@ -178,51 +178,44 @@ Everything else (F-01, F-02, F-04–F-09, F-11, L-6) is done — see the audit d
 
 ### Multi-language expansion
 
-**Current 5:** EN · DE · ES · FR · IT
+**Step 1 — UI prerequisite: DONE.** Scrollable sorted language picker replaces chip row in both `language_screen.dart` and `onboarding_screen.dart`. Single source of truth via `languageChoiceLabel()` and `sortedLanguageChoices()`.
 
-**Target: 26 new locales — Flutter-only (Steps 1–2)**
+**Step 2 — ARB files + wiring: IN PROGRESS (22 of 35 done).**
 
-#### Step 1 — UI prerequisite (Flutter)
+`LanguageChoice` enum now has 34 user-facing values + `system` (= 35 total). `_localeFor()` in `main.dart` handles complex BCP-47 tags.
 
-The current chip / segmented-row language picker does not scale beyond ~6 options. Replace with a scrollable list or dropdown **before** adding new locales. Affected:
+| Locale | Language | Done | Notes |
+|--------|----------|------|-------|
+| `pt_PT` | Portuguese (European) | ✓ | |
+| `pt_BR` | Portuguese (Brazilian) | ✓ | Fallback `app_pt.arb` = pt_BR content |
+| `da` | Danish | ✓ | |
+| `nb` | Norwegian Bokmål | ✓ | |
+| `nn` | Norwegian Nynorsk | ✓ | |
+| `sv` | Swedish | ✓ | |
+| `fi` | Finnish | ✓ | |
+| `et` | Estonian | ✓ | |
+| `hu` | Hungarian | ✓ | |
+| `lt` | Lithuanian | ✓ | |
+| `lv` | Latvian | ✓ | |
+| `ru` | Russian | ✓ | |
+| `uk` | Ukrainian | ✓ | |
+| `bg` | Bulgarian | ✓ | |
+| `pl` | Polish | ✓ | |
+| `cs` | Czech | ✓ | |
+| `sk` | Slovak | — | Next session |
+| `hr` | Croatian | — | Next session |
+| `sl` | Slovenian | — | Next session |
+| `sr_Latn` | Serbian (Latin) | — | Needs `app_sr.arb` fallback too |
+| `el` | Greek | — | Next session |
+| `ja` | Japanese | — | Next session |
+| `ko` | Korean | — | Next session |
+| `zh_CN` | Chinese Simplified | — | Needs `app_zh.arb` fallback too |
+| `zh_TW` | Chinese Traditional | — | Next session |
+| `kk` | Kazakh | — | Native reviewer requested before commit |
+| `eu` | Basque | — | Next session |
+| `yo` | Yoruba | — | Next session |
 
-- `lib/screens/language_screen.dart` (Settings → Language)
-- Any first-run language selection in the unlock / onboarding flow
-
-#### Step 2 — ARB files + wiring (Flutter-only)
-
-For each locale: one `lib/l10n/app_XX.arb` (~430 key-value pairs) + 1 entry in `supportedLocales` + 1 entry in the language picker. Run `flutter gen-l10n` + `flutter test` after each batch.
-
-| Locale | Language | Confidence | Notes |
-|--------|----------|------------|-------|
-| `pt_PT` | Portuguese (European) | High | |
-| `pt_BR` | Portuguese (Brazilian) | High | Separate ARB; distinct vocab from PT |
-| `da` | Danish | High | |
-| `nb` | Norwegian Bokmål | High | |
-| `nn` | Norwegian Nynorsk | Medium-High | Watch for Bokmål creep |
-| `sv` | Swedish | High | |
-| `fi` | Finnish | Medium | Strings may run long |
-| `et` | Estonian | Medium | Finnic/Uralic; close to Finnish |
-| `hu` | Hungarian | Medium-Low | Complex case system |
-| `lt` | Lithuanian | Medium | |
-| `lv` | Latvian | Medium | |
-| `ru` | Russian | Medium-High | Cyrillic |
-| `uk` | Ukrainian | Medium-High | Cyrillic |
-| `bg` | Bulgarian | Medium-High | Cyrillic; EU official |
-| `pl` | Polish | Medium | |
-| `cs` | Czech | Medium | |
-| `sk` | Slovak | Medium | |
-| `hr` | Croatian | Medium | |
-| `sl` | Slovenian | Medium | EU official |
-| `sr_Latn` | Serbian (Latin) | Medium | Latin script; politically neutral across BCS region |
-| `el` | Greek | High | |
-| `ja` | Japanese | High | Strings typically more compact |
-| `ko` | Korean | High | |
-| `zh_CN` | Chinese Simplified | High | Mainland China, Singapore |
-| `zh_TW` | Chinese Traditional | High | Taiwan, HK, Macau |
-| `kk` | Kazakh | Medium-Low | Cyrillic; native reviewer to check before commit |
-
-**Deferred:** Hebrew (RTL layout work required), Scottish Gaelic (low resource), Basque (low resource), Yoruba (low resource), Arabic (RTL).
+**Deferred:** Hebrew (RTL layout work required), Scottish Gaelic (low resource), Arabic (RTL).
 
 Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}}` syntax — no extra plumbing needed.
 
