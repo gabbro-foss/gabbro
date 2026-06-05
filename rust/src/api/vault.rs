@@ -808,7 +808,8 @@ pub fn change_passphrase(
 #[flutter_rust_bridge::frb(ignore)]
 pub fn export_vault(body: &VaultBody, passphrase: &[u8], export_path: &Path) -> Result<(), String> {
     let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
-    let sealed = seal_vault(passphrase, &plaintext)?;
+    // Export preserves no alias — the exported file is a standalone copy.
+    let sealed = seal_vault(passphrase, &plaintext, None)?;
     let vault_bytes = sealed.to_bytes();
 
     // Write the .gabbro file
@@ -845,8 +846,11 @@ pub fn export_vault(body: &VaultBody, passphrase: &[u8], export_path: &Path) -> 
 /// Entries → JSON → AES-256-GCM encrypted → .gabbro file on disk.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn save_vault(body: &VaultBody, passphrase: &[u8], path: &Path) -> Result<(), String> {
+    // Preserve the alias from the existing on-disk vault so CRUD saves do not
+    // silently clear an alias that was set at creation or via set_vault_alias.
+    let existing_alias = read_vault(path).ok().and_then(|v| v.alias);
     let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
-    let sealed = seal_vault(passphrase, &plaintext)?;
+    let sealed = seal_vault(passphrase, &plaintext, existing_alias)?;
     write_vault(&sealed, path)
 }
 
@@ -871,6 +875,7 @@ pub fn save_vault_with_yubikey(
     yubikey_salt: [u8; 32],
     path: &Path,
 ) -> Result<(), String> {
+    let existing_alias = read_vault(path).ok().and_then(|v| v.alias);
     let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
     let sealed = seal_vault_with_yubikey(
         passphrase,
@@ -878,6 +883,7 @@ pub fn save_vault_with_yubikey(
         credential_id,
         yubikey_salt,
         &plaintext,
+        existing_alias,
     )?;
     write_vault(&sealed, path)
 }
@@ -909,8 +915,14 @@ pub fn save_vault_with_keys(
     keys: &[crate::crypto::vault_crypto::YubiKeyRegistration],
     path: &Path,
 ) -> Result<(), String> {
+    let existing_alias = read_vault(path).ok().and_then(|v| v.alias);
     let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
-    let sealed = crate::crypto::vault_crypto::seal_vault_with_keys(passphrase, keys, &plaintext)?;
+    let sealed = crate::crypto::vault_crypto::seal_vault_with_keys(
+        passphrase,
+        keys,
+        &plaintext,
+        existing_alias,
+    )?;
     write_vault(&sealed, path)
 }
 
@@ -945,9 +957,11 @@ pub fn load_vault_with_key_record(
     Ok((body, master, wrapping_key))
 }
 
-/// Add a new YubiKey record to a VERSION 4 vault on disk, without re-sealing the body.
+/// Add a new YubiKey record to a VERSION 4 vault on disk and re-seal the body
+/// so the new header (with the additional record) is bound to the ciphertext.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn add_yubikey_to_vault(
+    body_plaintext: &[u8],
     wrapping_key: &[u8; 32],
     vault_key_master: &[u8; 32],
     new_cred_id: Vec<u8>,
@@ -956,7 +970,7 @@ pub fn add_yubikey_to_vault(
     path: &Path,
 ) -> Result<(), String> {
     let sealed = read_vault(path)?;
-    let new_sealed = crate::crypto::vault_crypto::add_key_to_sealed(
+    let mut new_sealed = crate::crypto::vault_crypto::add_key_to_sealed(
         &sealed,
         new_cred_id,
         new_hmac,
@@ -964,14 +978,30 @@ pub fn add_yubikey_to_vault(
         wrapping_key,
         vault_key_master,
     )?;
+    crate::crypto::vault_crypto::reseal_vault_body(
+        &mut new_sealed,
+        vault_key_master,
+        body_plaintext,
+    )?;
     write_vault(&new_sealed, path)
 }
 
-/// Remove a YubiKey record from a vault on disk, without re-sealing the body.
+/// Remove a YubiKey record from a vault on disk and re-seal the body so the
+/// updated header (fewer records) is bound to the ciphertext.
 #[flutter_rust_bridge::frb(ignore)]
-pub fn remove_yubikey_from_vault(cred_id: &[u8], path: &Path) -> Result<(), String> {
+pub fn remove_yubikey_from_vault(
+    body_plaintext: &[u8],
+    vault_key_master: &[u8; 32],
+    cred_id: &[u8],
+    path: &Path,
+) -> Result<(), String> {
     let sealed = read_vault(path)?;
-    let new_sealed = crate::crypto::vault_crypto::remove_key_from_sealed(&sealed, cred_id)?;
+    let mut new_sealed = crate::crypto::vault_crypto::remove_key_from_sealed(&sealed, cred_id)?;
+    crate::crypto::vault_crypto::reseal_vault_body(
+        &mut new_sealed,
+        vault_key_master,
+        body_plaintext,
+    )?;
     write_vault(&new_sealed, path)
 }
 
@@ -994,19 +1024,27 @@ pub fn reseal_vault_body(
 ///
 /// Reads the vault from disk, verifies the old passphrase via `passphrase_blob`,
 /// generates fresh PQ material for the new passphrase, re-encrypts `wrapping_key`
-/// as the new `passphrase_blob`, and writes back.  All `key_blob`s and the vault
-/// body are unchanged — any single registered key continues to work.
+/// as the new `passphrase_blob`, then re-seals the body so the updated header
+/// (new argon2_salt, hkdf_salt, ml_kem_ciphertext, passphrase_blob) is committed
+/// as AES-GCM AAD for VERSION 7+ vaults.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn change_passphrase_with_keys(
     old_passphrase: &[u8],
     new_passphrase: &[u8],
+    vault_key_master: &[u8; 32],
+    body_plaintext: &[u8],
     path: &Path,
 ) -> Result<(), String> {
     let sealed = read_vault(path)?;
-    let new_sealed = crate::crypto::vault_crypto::change_vault_passphrase_with_keys(
+    let mut new_sealed = crate::crypto::vault_crypto::change_vault_passphrase_with_keys(
         &sealed,
         old_passphrase,
         new_passphrase,
+    )?;
+    crate::crypto::vault_crypto::reseal_vault_body(
+        &mut new_sealed,
+        vault_key_master,
+        body_plaintext,
     )?;
     write_vault(&new_sealed, path)
 }

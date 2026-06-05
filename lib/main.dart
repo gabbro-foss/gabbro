@@ -448,6 +448,11 @@ class _GabbroAppState extends State<GabbroApp>
     onConfirmYubikey: confirmYubikey,
     onConfirmAnyYubikey: confirmAnyYubikey,
     onRename: (path, alias) async {
+      // Update the file header alias only for the currently unlocked vault so
+      // the body can be re-sealed with the new alias as AES-GCM AAD (Phase 3).
+      if (path == _registry.lastUsed?.path) {
+        await setVaultAlias(alias: alias);
+      }
       final updated = _registry.updateAlias(path, alias);
       await updated.save();
       setState(() => _registry = updated);

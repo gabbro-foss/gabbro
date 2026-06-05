@@ -560,7 +560,23 @@ pub fn session_change_passphrase(
     let path = session.path.clone();
 
     if is_v4_multi_key {
-        change_passphrase_with_keys(old_passphrase, new_passphrase, &path)?;
+        let master = session
+            .yubikey
+            .as_ref()
+            .and_then(|yk| yk.vault_key_master.as_ref())
+            .ok_or("vault_key_master not available")?;
+        let vault_key_master = Zeroizing::new(**master);
+        let body = build_body(session);
+        let plaintext = Zeroizing::new(
+            crate::vault::serialization::serialize_vault_body(&body).map_err(|e| e.to_string())?,
+        );
+        change_passphrase_with_keys(
+            old_passphrase,
+            new_passphrase,
+            &vault_key_master,
+            &plaintext,
+            &path,
+        )?;
     } else if let Some(ref yk) = session.yubikey {
         // Legacy VERSION 2 single-key vault
         let secret: [u8; 32] = *yk.hmac_secret;
@@ -944,17 +960,17 @@ pub fn session_create_folder(name: String) -> Result<(), String> {
 
 // ── YubiKey key-management ────────────────────────────────────────────────────
 
-/// Add a new YubiKey to the vault header.
+/// Add a new YubiKey to the vault header and re-seal the body.
 ///
-/// Requires a VERSION 4 vault (`wrapping_key` must be cached from unlock).
-/// Returns an error for legacy VERSION 2 single-key vaults.
-/// Enforces a maximum of 4 registered keys.
+/// Requires a VERSION 4 vault (`wrapping_key` and `vault_key_master` cached
+/// from unlock). Re-seals the body so the updated header (new YubiKey record)
+/// is committed as AES-GCM AAD for VERSION 7+ vaults.
 pub fn session_add_yubikey(
     new_cred_id: Vec<u8>,
     new_hmac_secret: Vec<u8>,
     new_salt: Vec<u8>,
 ) -> Result<(), String> {
-    let (path, wrapping_key, vault_key_master) = {
+    let (body, path, wrapping_key, vault_key_master) = {
         let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_ref().ok_or("Vault is locked")?;
         let yk = session.yubikey.as_ref().ok_or("Not a YubiKey vault")?;
@@ -967,6 +983,7 @@ pub fn session_add_yubikey(
             .as_ref()
             .ok_or("Adding a YubiKey requires a VERSION 4 vault")?;
         (
+            build_body(session),
             session.path.clone(),
             Zeroizing::new(**wk),
             Zeroizing::new(**master),
@@ -980,7 +997,11 @@ pub fn session_add_yubikey(
         .as_slice()
         .try_into()
         .map_err(|_| "new_salt must be 32 bytes".to_string())?;
+    let plaintext = Zeroizing::new(
+        crate::vault::serialization::serialize_vault_body(&body).map_err(|e| e.to_string())?,
+    );
     add_yubikey_to_vault(
+        &plaintext,
         &wrapping_key,
         &vault_key_master,
         new_cred_id,
@@ -990,16 +1011,88 @@ pub fn session_add_yubikey(
     )
 }
 
-/// Remove a YubiKey record from the vault header by its credential ID.
+/// Remove a YubiKey record from the vault header by its credential ID and
+/// re-seal the body so the updated header is committed as AES-GCM AAD.
 ///
 /// Enforces a minimum of 1 key (removing the last key returns an error).
 pub fn session_remove_yubikey(cred_id: Vec<u8>) -> Result<(), String> {
-    let path = {
+    let (body, path, vault_key_master) = {
         let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_ref().ok_or("Vault is locked")?;
-        session.path.clone()
+        let yk = session.yubikey.as_ref().ok_or("Not a YubiKey vault")?;
+        let master = yk
+            .vault_key_master
+            .as_ref()
+            .ok_or("Removing a YubiKey requires a VERSION 4 vault")?;
+        (
+            build_body(session),
+            session.path.clone(),
+            Zeroizing::new(**master),
+        )
     };
-    remove_yubikey_from_vault(&cred_id, &path)
+    let plaintext = Zeroizing::new(
+        crate::vault::serialization::serialize_vault_body(&body).map_err(|e| e.to_string())?,
+    );
+    remove_yubikey_from_vault(&plaintext, &vault_key_master, &cred_id, &path)
+}
+
+/// Rename the vault and re-seal the body bound to the updated header.
+///
+/// Requires an unlocked session — the cached key material is used to re-seal
+/// the body so the new alias is committed as AES-GCM AAD for VERSION 7+ vaults.
+/// Passing an empty string clears the alias.
+pub fn session_set_vault_alias(alias: String) -> Result<(), String> {
+    let (body, passphrase, path, yubikey) = {
+        let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_ref().ok_or("Vault is locked")?;
+        let body = build_body(session);
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            session.passphrase.clone(),
+            session.path.clone(),
+            yubikey,
+        )
+    };
+
+    let new_alias = if alias.is_empty() { None } else { Some(alias) };
+    let plaintext = Zeroizing::new(
+        crate::vault::serialization::serialize_vault_body(&body).map_err(|e| e.to_string())?,
+    );
+
+    match yubikey {
+        Some((_, _, _, Some(ref vault_key_master))) => {
+            use crate::vault::io::{read_vault, write_vault};
+            let mut sealed = read_vault(&path)?;
+            sealed.alias = new_alias;
+            crate::crypto::vault_crypto::reseal_vault_body(
+                &mut sealed,
+                vault_key_master,
+                &plaintext,
+            )?;
+            write_vault(&sealed, &path)
+        }
+        Some((ref hmac_secret, ref credential_id, hkdf_salt, None)) => {
+            // Legacy single-key: full re-seal with alias bound to body via AAD.
+            use crate::vault::io::write_vault;
+            let sealed = crate::crypto::vault_crypto::seal_vault_with_yubikey(
+                &passphrase,
+                hmac_secret,
+                credential_id.clone(),
+                hkdf_salt,
+                &plaintext,
+                new_alias,
+            )?;
+            write_vault(&sealed, &path)
+        }
+        None => {
+            // Passphrase-only: full re-seal with alias bound to body via AAD.
+            use crate::vault::io::write_vault;
+            let sealed =
+                crate::crypto::vault_crypto::seal_vault(&passphrase, &plaintext, new_alias)?;
+            write_vault(&sealed, &path)
+        }
+    }
 }
 
 /// Set or update the display alias for a registered YubiKey.

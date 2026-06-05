@@ -32,11 +32,17 @@
 //! VERSION 3 (deprecated multi-key): records include key_blob_len + key_blob; no passphrase_blob.
 //! VERSION 4 (multi-key): adds passphrase_blob for single-tap passphrase change.
 //! VERSION 5: adds alias field (after YubiKey records, before passphrase_blob).
-//! VERSION 6 (current): identical header LAYOUT to VERSION 5; the only change is
-//!   that the ML-KEM keypair is derived via FIPS 203 `ML-KEM.KeyGen(d, z)`
-//!   instead of the legacy `StdRng`-seeded path (audit F-02). The version byte is
-//!   the only on-disk difference from VERSION 5 and selects the keygen on open.
-//! Reads v2–6; always writes VERSION 6.
+//! VERSION 6: identical header LAYOUT to VERSION 5; the only change is that the
+//!   ML-KEM keypair is derived via FIPS 203 `ML-KEM.KeyGen(d, z)` instead of
+//!   the legacy `StdRng`-seeded path (audit F-02).
+//! VERSION 7 (current): identical header LAYOUT to VERSION 6; the AES-256-GCM
+//!   body is now sealed with the serialised header as AAD, binding every
+//!   plaintext header field to the authenticated ciphertext tag. Any modification
+//!   to the plaintext header (alias, YubiKey records, Argon2id params, etc.) causes
+//!   body decryption to fail with an authentication error (F-01 / header integrity).
+//!   `set_vault_alias` and all other header-mutating operations now require an
+//!   active session so the body can be re-sealed with the updated AAD.
+//! Reads v2–7; always writes VERSION 7.
 
 use crate::crypto::kdf::Argon2idParams;
 
@@ -56,7 +62,7 @@ pub struct YubiKeyRecord {
 pub const MAGIC: &[u8; 6] = b"GABBRO";
 
 /// Current file format version (written by this build).
-pub const VERSION: u8 = 6;
+pub const VERSION: u8 = 7;
 
 /// Oldest version this build can still read.
 const VERSION_MIN_READABLE: u8 = 2;
@@ -96,6 +102,51 @@ pub struct SealedVault {
 }
 
 impl SealedVault {
+    /// Canonical header bytes used as AES-256-GCM AAD (VERSION 7+).
+    ///
+    /// Covers every field in the plaintext header that should be tamper-evident:
+    /// magic, version, Argon2id parameters, salts, ML-KEM ciphertext, X25519
+    /// ephemeral public key, YubiKey records, alias, and passphrase_blob.
+    ///
+    /// The AES-GCM nonce is excluded — AES-GCM authenticates the nonce implicitly
+    /// (a modified nonce produces a different keystream whose GCM tag fails).
+    /// The ciphertext and body-length prefix are excluded because they ARE the
+    /// encrypted body being sealed.
+    ///
+    /// At seal time this is computed on a partial `SealedVault` with an empty
+    /// ciphertext placeholder; at open time it is computed from the full struct.
+    /// Both produce identical bytes because the ciphertext field is excluded.
+    pub fn header_aad(&self) -> Vec<u8> {
+        let mut out = Vec::new();
+        out.extend_from_slice(MAGIC);
+        out.push(self.version);
+        out.extend_from_slice(&self.params.m_cost.to_be_bytes());
+        out.extend_from_slice(&self.params.t_cost.to_be_bytes());
+        out.extend_from_slice(&self.params.p_cost.to_be_bytes());
+        out.extend_from_slice(&self.argon2_salt);
+        out.extend_from_slice(&self.hkdf_salt);
+        // nonce excluded — authenticated implicitly by AES-GCM
+        out.extend_from_slice(&self.ml_kem_ciphertext);
+        out.extend_from_slice(&self.x25519_ephemeral_public);
+        out.push(self.yubikey_records.len() as u8);
+        for record in &self.yubikey_records {
+            let id_len = record.credential_id.len() as u16;
+            out.extend_from_slice(&id_len.to_be_bytes());
+            out.extend_from_slice(&record.credential_id);
+            out.extend_from_slice(&record.salt);
+            let kb_len = record.key_blob.len() as u16;
+            out.extend_from_slice(&kb_len.to_be_bytes());
+            out.extend_from_slice(&record.key_blob);
+        }
+        let alias_bytes = self.alias.as_deref().unwrap_or("").as_bytes();
+        out.extend_from_slice(&(alias_bytes.len() as u16).to_be_bytes());
+        out.extend_from_slice(alias_bytes);
+        let pb_len = self.passphrase_blob.len() as u16;
+        out.extend_from_slice(&pb_len.to_be_bytes());
+        out.extend_from_slice(&self.passphrase_blob);
+        out
+    }
+
     /// Serialize the vault to a flat byte vector for writing to disk.
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut out = Vec::new();
@@ -351,7 +402,7 @@ mod tests {
 
     fn test_vault() -> SealedVault {
         SealedVault {
-            version: VERSION,
+            version: VERSION, // 7
             params: Argon2idParams {
                 m_cost: 65536,
                 t_cost: 25,
@@ -550,14 +601,14 @@ mod tests {
     }
 
     #[test]
-    fn fresh_vault_is_version_6() {
-        assert_eq!(VERSION, 6);
-        assert_eq!(test_vault().version, 6);
+    fn fresh_vault_is_version_7() {
+        assert_eq!(VERSION, 7);
+        assert_eq!(test_vault().version, 7);
     }
 
     #[test]
     fn version_5_layout_still_readable_and_version_preserved() {
-        // VERSION 6 header layout is identical to VERSION 5, so a V6 byte stream
+        // VERSION 7 header layout is identical to VERSION 5, so a V7 byte stream
         // with the version byte patched to 5 must still parse, and re-serialise
         // back as VERSION 5 (lazy migration: old vaults are not silently bumped).
         let mut bytes = test_vault().to_bytes();
@@ -569,6 +620,73 @@ mod tests {
             5,
             "re-serialise preserves version 5"
         );
+    }
+
+    #[test]
+    fn version_6_layout_still_readable_and_version_preserved() {
+        let mut bytes = test_vault().to_bytes();
+        bytes[6] = 6;
+        let recovered = SealedVault::from_bytes(&bytes).unwrap();
+        assert_eq!(recovered.version, 6);
+        assert_eq!(
+            recovered.to_bytes()[6],
+            6,
+            "re-serialise preserves version 6"
+        );
+    }
+
+    // ── header_aad tests ──────────────────────────────────────────────────────
+
+    #[test]
+    fn header_aad_does_not_include_nonce() {
+        let vault = test_vault();
+        let aad = vault.header_aad();
+        // The nonce is 12 bytes of [3u8; 12] in test_vault().
+        // It must not appear as a contiguous block in the AAD.
+        let nonce = [3u8; 12];
+        let found = aad.windows(12).any(|w| w == nonce);
+        assert!(!found, "nonce must be excluded from header_aad");
+    }
+
+    #[test]
+    fn header_aad_stable_across_ciphertext_changes() {
+        let mut a = test_vault();
+        let mut b = test_vault();
+        b.ciphertext = vec![0xFFu8; 128]; // different ciphertext
+        b.nonce = [0xEEu8; 12]; // different nonce
+        assert_eq!(
+            a.header_aad(),
+            b.header_aad(),
+            "header_aad must be identical regardless of ciphertext or nonce"
+        );
+        a.ciphertext = vec![];
+        assert_eq!(
+            a.header_aad(),
+            b.header_aad(),
+            "empty ciphertext placeholder must yield the same AAD"
+        );
+    }
+
+    #[test]
+    fn header_aad_changes_when_alias_changes() {
+        let mut vault = test_vault();
+        let aad_no_alias = vault.header_aad();
+        vault.alias = Some("Work".to_string());
+        let aad_with_alias = vault.header_aad();
+        assert_ne!(aad_no_alias, aad_with_alias);
+    }
+
+    #[test]
+    fn header_aad_changes_when_yubikey_records_change() {
+        let mut vault = test_vault();
+        let aad_before = vault.header_aad();
+        vault.yubikey_records.push(YubiKeyRecord {
+            credential_id: vec![0xAAu8; 32],
+            salt: [0xBBu8; 32],
+            key_blob: vec![],
+        });
+        let aad_after = vault.header_aad();
+        assert_ne!(aad_before, aad_after);
     }
 
     #[test]

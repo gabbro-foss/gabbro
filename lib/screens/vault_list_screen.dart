@@ -262,6 +262,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
     _ => Icons.tune,
   };
 
+  /// Returns the current vault alias, preferring the live registry value over
+  /// the frozen prop so renames are reflected without a lock/unlock cycle.
+  String? _currentAlias(BuildContext context) =>
+      GabbroApp.maybeOf(context)?.registry.lastUsed?.alias ?? widget.vaultAlias;
+
   String _displayType(String entryType, AppLocalizations l) => switch (entryType) {
     'Login' => l.entryTypePassword,
     'Note' => l.entryTypeNote,
@@ -857,8 +862,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
         title: Text(
           _isSelecting
               ? l.selectedCount(_selectedIds.length)
-              : widget.vaultAlias != null
-                  ? l.gabbroVaultTitle(widget.vaultAlias!)
+              : _currentAlias(context) != null
+                  ? l.gabbroVaultTitle(_currentAlias(context)!)
                   : l.gabbroTitle,
         ),
         actions: [

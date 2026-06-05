@@ -230,6 +230,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   VaultEntryData dco_decode_vault_entry_data(dynamic raw);
 
   @protected
+  VaultHeaderData dco_decode_vault_header_data(dynamic raw);
+
+  @protected
   YubiKeyInitData dco_decode_yubi_key_init_data(dynamic raw);
 
   @protected
@@ -499,6 +502,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   VaultEntryData sse_decode_vault_entry_data(SseDeserializer deserializer);
+
+  @protected
+  VaultHeaderData sse_decode_vault_header_data(SseDeserializer deserializer);
 
   @protected
   YubiKeyInitData sse_decode_yubi_key_init_data(SseDeserializer deserializer);
@@ -838,6 +844,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_vault_entry_data(
     VaultEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_vault_header_data(
+    VaultHeaderData self,
     SseSerializer serializer,
   );
 

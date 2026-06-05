@@ -25,6 +25,12 @@ use crate::vault::file_format::{SealedVault, YubiKeyRecord, VERSION};
 /// keygen and must keep doing so to remain readable (audit F-02).
 const FIPS_KEYGEN_MIN_VERSION: u8 = 6;
 
+/// First file-format version that binds the plaintext header to the encrypted
+/// body via AES-256-GCM additional authenticated data (AAD).  Any modification
+/// to the plaintext header of a VERSION 7+ vault causes body decryption to fail
+/// with an authentication error.
+const AAD_MIN_VERSION: u8 = 7;
+
 /// Derives the ML-KEM keypair using the path that matches a vault's file
 /// version: VERSION 6+ uses FIPS keygen, VERSION 2–5 use the legacy path so
 /// vaults sealed by older builds still open. Seal paths pass [`VERSION`] (new
@@ -38,7 +44,15 @@ fn ml_kem_keypair_for_version(version: u8, kdf_output: &[u8; 96]) -> MlKemKeypai
 }
 
 /// Encrypts plaintext under the given passphrase.
-pub fn seal_vault(passphrase: &[u8], plaintext: &[u8]) -> Result<SealedVault, String> {
+///
+/// `alias` is stored in the plaintext header and bound to the body via AAD —
+/// it must be the final alias so that the file written to disk is immediately
+/// self-consistent.  Pass `None` if no alias is required.
+pub fn seal_vault(
+    passphrase: &[u8],
+    plaintext: &[u8],
+    alias: Option<String>,
+) -> Result<SealedVault, String> {
     let params = Argon2idParams::default();
 
     // Step 1: random salt for Argon2id
@@ -77,22 +91,30 @@ pub fn seal_vault(passphrase: &[u8], plaintext: &[u8]) -> Result<SealedVault, St
         &hkdf_salt,
     ));
 
-    // Step 6: AES-256-GCM encrypt
-    let (ciphertext, nonce) = aes_gcm::encrypt(&vault_key, plaintext)?;
-
-    Ok(SealedVault {
+    // Step 6: AES-256-GCM encrypt, binding the plaintext header as AAD for V7+.
+    // Build the partial SealedVault first (empty ciphertext) so we can compute
+    // header_aad() before the body is encrypted.
+    let mut sealed = SealedVault {
         version: VERSION,
         params,
         argon2_salt,
         ml_kem_ciphertext: ml_kem_ciphertext.to_vec(),
         x25519_ephemeral_public: *ephemeral_public.as_bytes(),
         hkdf_salt,
-        nonce,
-        ciphertext,
+        nonce: [0u8; 12],   // placeholder — updated below
+        ciphertext: vec![], // placeholder — updated below
         yubikey_records: vec![],
-        alias: None,
+        alias, // bound to body via AAD — must be the final alias
         passphrase_blob: vec![],
-    })
+    };
+    let (ciphertext, nonce) = if VERSION >= AAD_MIN_VERSION {
+        aes_gcm::encrypt_with_aad(&vault_key, plaintext, &sealed.header_aad())?
+    } else {
+        aes_gcm::encrypt(&vault_key, plaintext)?
+    };
+    sealed.ciphertext = ciphertext;
+    sealed.nonce = nonce;
+    Ok(sealed)
 }
 
 /// Decrypts a sealed vault using the given passphrase.
@@ -132,8 +154,17 @@ pub fn open_vault(passphrase: &[u8], sealed: &SealedVault) -> Result<Vec<u8>, St
         &sealed.hkdf_salt,
     ));
 
-    // Step 5: AES-256-GCM decrypt
-    aes_gcm::decrypt(&vault_key, &sealed.ciphertext, &sealed.nonce)
+    // Step 5: AES-256-GCM decrypt — V7+ verifies header integrity via AAD.
+    if sealed.version >= AAD_MIN_VERSION {
+        aes_gcm::decrypt_with_aad(
+            &vault_key,
+            &sealed.ciphertext,
+            &sealed.nonce,
+            &sealed.header_aad(),
+        )
+    } else {
+        aes_gcm::decrypt(&vault_key, &sealed.ciphertext, &sealed.nonce)
+    }
 }
 
 /// Encrypts plaintext under the given passphrase and YubiKey hmac-secret.
@@ -147,6 +178,7 @@ pub fn seal_vault_with_yubikey(
     credential_id: Vec<u8>,
     yubikey_salt: [u8; 32],
     plaintext: &[u8],
+    alias: Option<String>,
 ) -> Result<SealedVault, String> {
     let params = Argon2idParams::default();
 
@@ -186,25 +218,31 @@ pub fn seal_vault_with_yubikey(
         &yubikey_salt,
     ));
 
-    let (ciphertext, nonce) = aes_gcm::encrypt(&vault_key, plaintext)?;
-
-    Ok(SealedVault {
+    let mut sealed = SealedVault {
         version: VERSION,
         params,
         argon2_salt,
         ml_kem_ciphertext: ml_kem_ciphertext.to_vec(),
         x25519_ephemeral_public: *ephemeral_public.as_bytes(),
         hkdf_salt,
-        nonce,
-        ciphertext,
+        nonce: [0u8; 12],
+        ciphertext: vec![],
         yubikey_records: vec![YubiKeyRecord {
             credential_id,
             salt: yubikey_salt,
             key_blob: vec![],
         }],
-        alias: None,
+        alias,
         passphrase_blob: vec![],
-    })
+    };
+    let (ciphertext, nonce) = if VERSION >= AAD_MIN_VERSION {
+        aes_gcm::encrypt_with_aad(&vault_key, plaintext, &sealed.header_aad())?
+    } else {
+        aes_gcm::encrypt(&vault_key, plaintext)?
+    };
+    sealed.ciphertext = ciphertext;
+    sealed.nonce = nonce;
+    Ok(sealed)
 }
 
 /// Decrypts a sealed vault using the given passphrase and YubiKey hmac-secret.
@@ -252,7 +290,16 @@ pub fn open_vault_with_yubikey(
         yubikey_salt,
     ));
 
-    aes_gcm::decrypt(&vault_key, &sealed.ciphertext, &sealed.nonce)
+    if sealed.version >= AAD_MIN_VERSION {
+        aes_gcm::decrypt_with_aad(
+            &vault_key,
+            &sealed.ciphertext,
+            &sealed.nonce,
+            &sealed.header_aad(),
+        )
+    } else {
+        aes_gcm::decrypt(&vault_key, &sealed.ciphertext, &sealed.nonce)
+    }
 }
 
 // ── Multi-key vault (VERSION 3, minimum 2 keys) ───────────────────────────────
@@ -275,6 +322,7 @@ pub fn seal_vault_with_keys(
     passphrase: &[u8],
     keys: &[YubiKeyRegistration],
     plaintext: &[u8],
+    alias: Option<String>,
 ) -> Result<SealedVault, String> {
     if keys.len() < 2 {
         return Err(format!("at least 2 YubiKeys required; got {}", keys.len()));
@@ -348,21 +396,27 @@ pub fn seal_vault_with_keys(
         })
         .collect::<Result<Vec<_>, String>>()?;
 
-    let (ciphertext, nonce) = aes_gcm::encrypt(&vault_key_master, plaintext)?;
-
-    Ok(SealedVault {
+    let mut sealed = SealedVault {
         version: VERSION,
         params,
         argon2_salt,
         hkdf_salt,
-        nonce,
+        nonce: [0u8; 12],
         ml_kem_ciphertext: ml_kem_ciphertext.to_vec(),
         x25519_ephemeral_public: *ephemeral_public.as_bytes(),
-        ciphertext,
+        ciphertext: vec![],
         yubikey_records,
-        alias: None,
+        alias,
         passphrase_blob,
-    })
+    };
+    let (ciphertext, nonce) = if VERSION >= AAD_MIN_VERSION {
+        aes_gcm::encrypt_with_aad(&vault_key_master, plaintext, &sealed.header_aad())?
+    } else {
+        aes_gcm::encrypt(&vault_key_master, plaintext)?
+    };
+    sealed.ciphertext = ciphertext;
+    sealed.nonce = nonce;
+    Ok(sealed)
 }
 
 /// Decrypts a multi-key vault using the passphrase and one registered YubiKey.
@@ -428,7 +482,16 @@ pub fn open_vault_with_key_record(
             hmac_secret,
             &record.salt,
         ));
-        let plaintext = aes_gcm::decrypt(&wrap_key, &sealed.ciphertext, &sealed.nonce)?;
+        let plaintext = if sealed.version >= AAD_MIN_VERSION {
+            aes_gcm::decrypt_with_aad(
+                &wrap_key,
+                &sealed.ciphertext,
+                &sealed.nonce,
+                &sealed.header_aad(),
+            )?
+        } else {
+            aes_gcm::decrypt(&wrap_key, &sealed.ciphertext, &sealed.nonce)?
+        };
         // V2 has no separate wrapping_key — key add/remove not supported on legacy vaults.
         return Ok((plaintext, wrap_key, None));
     }
@@ -473,7 +536,16 @@ pub fn open_vault_with_key_record(
             .map_err(|_| "vault_key_master must be 32 bytes".to_string())?,
     );
 
-    let plaintext = aes_gcm::decrypt(&vault_key_master, &sealed.ciphertext, &sealed.nonce)?;
+    let plaintext = if sealed.version >= AAD_MIN_VERSION {
+        aes_gcm::decrypt_with_aad(
+            &vault_key_master,
+            &sealed.ciphertext,
+            &sealed.nonce,
+            &sealed.header_aad(),
+        )?
+    } else {
+        aes_gcm::decrypt(&vault_key_master, &sealed.ciphertext, &sealed.nonce)?
+    };
     Ok((plaintext, vault_key_master, Some(wrapping_key)))
 }
 
@@ -546,14 +618,17 @@ pub fn remove_key_from_sealed(sealed: &SealedVault, cred_id: &[u8]) -> Result<Se
 
 /// Re-seals a vault body using a cached `vault_key_master` and the existing header.
 ///
-/// Used for CRUD saves in a multi-key session: the header (including all
-/// `key_blob`s) stays unchanged; only the body and nonce are refreshed.
+/// Migrates the vault to the current VERSION on every re-seal: old vaults
+/// (V2–V6) are transparently upgraded to V7 (AAD-bound body) the first time
+/// a CRUD save, YubiKey add/remove, alias change, or passphrase change runs.
 pub fn reseal_vault_body(
     sealed: &mut SealedVault,
     vault_key_master: &[u8; 32],
     plaintext: &[u8],
 ) -> Result<(), String> {
-    let (new_ciphertext, new_nonce) = aes_gcm::encrypt(vault_key_master, plaintext)?;
+    sealed.version = VERSION; // migrate to current version; header_aad reflects this
+    let aad = sealed.header_aad();
+    let (new_ciphertext, new_nonce) = aes_gcm::encrypt_with_aad(vault_key_master, plaintext, &aad)?;
     sealed.ciphertext = new_ciphertext;
     sealed.nonce = new_nonce;
     Ok(())
@@ -691,14 +766,14 @@ mod tests {
     fn seal_and_open_roundtrip() {
         let passphrase = b"correct horse battery staple";
         let plaintext = b"my secret vault contents";
-        let sealed = seal_vault(passphrase, plaintext).unwrap();
+        let sealed = seal_vault(passphrase, plaintext, None).unwrap();
         let recovered = open_vault(passphrase, &sealed).unwrap();
         assert_eq!(recovered, plaintext);
     }
 
     #[test]
     fn wrong_passphrase_fails_to_open() {
-        let sealed = seal_vault(b"correct passphrase", b"secret").unwrap();
+        let sealed = seal_vault(b"correct passphrase", b"secret", None).unwrap();
         let result = open_vault(b"wrong passphrase", &sealed);
         assert!(result.is_err());
     }
@@ -707,8 +782,8 @@ mod tests {
     fn seal_produces_different_ciphertext_each_time() {
         let passphrase = b"passphrase";
         let plaintext = b"same plaintext";
-        let a = seal_vault(passphrase, plaintext).unwrap();
-        let b = seal_vault(passphrase, plaintext).unwrap();
+        let a = seal_vault(passphrase, plaintext, None).unwrap();
+        let b = seal_vault(passphrase, plaintext, None).unwrap();
         assert_ne!(a.ciphertext, b.ciphertext);
     }
 
@@ -718,7 +793,7 @@ mod tests {
         let plaintext = b"end-to-end vault file roundtrip";
 
         // Seal -> real crypto, real ciphertext
-        let sealed = seal_vault(passphrase, plaintext).unwrap();
+        let sealed = seal_vault(passphrase, plaintext, None).unwrap();
 
         // Serialize -> flat bytes, as written to disk
         let bytes = sealed.to_bytes();
@@ -735,11 +810,11 @@ mod tests {
     }
 
     #[test]
-    fn seal_vault_produces_version_6() {
-        let sealed = seal_vault(b"pass", b"data").unwrap();
+    fn seal_vault_produces_version_7() {
+        let sealed = seal_vault(b"pass", b"data", None).unwrap();
         assert_eq!(
-            sealed.version, 6,
-            "new vaults are sealed as VERSION 6 (FIPS)"
+            sealed.version, 7,
+            "new vaults are sealed as VERSION 7 (FIPS + AAD)"
         );
     }
 
@@ -799,11 +874,14 @@ mod tests {
         assert_eq!(recovered, plaintext);
 
         // Proof the dispatch is what matters: the very same bytes tagged
-        // VERSION 6 would use FIPS keygen → a different keypair → decapsulation
+        // VERSION 6 or 7 would use FIPS keygen → a different keypair → decapsulation
         // yields the wrong shared secret → decryption fails.
         let mut as_v6 = sealed.clone();
         as_v6.version = 6;
         assert!(open_vault(passphrase, &as_v6).is_err());
+        let mut as_v7 = sealed.clone();
+        as_v7.version = 7;
+        assert!(open_vault(passphrase, &as_v7).is_err());
     }
 
     // ── YubiKey variants ──────────────────────────────────────────────────────
@@ -822,6 +900,7 @@ mod tests {
             credential_id,
             yubikey_salt,
             plaintext,
+            None,
         )
         .unwrap();
         let recovered =
@@ -844,6 +923,7 @@ mod tests {
             credential_id,
             yubikey_salt,
             plaintext,
+            None,
         )
         .unwrap();
         let result = open_vault_with_yubikey(passphrase, &wrong_hmac, &yubikey_salt, &sealed);
@@ -863,6 +943,7 @@ mod tests {
             credential_id,
             yubikey_salt,
             plaintext,
+            None,
         )
         .unwrap();
         let result = open_vault_with_yubikey(b"wrong", &hmac_secret, &yubikey_salt, &sealed);
@@ -884,6 +965,7 @@ mod tests {
             credential_id,
             yubikey_salt,
             plaintext,
+            None,
         )
         .unwrap();
         let result = open_vault_with_yubikey(passphrase, &hmac_secret, &wrong_salt, &sealed);
@@ -901,6 +983,7 @@ mod tests {
             credential_id.clone(),
             yubikey_salt,
             b"data",
+            None,
         )
         .unwrap();
 
@@ -923,6 +1006,7 @@ mod tests {
             credential_id,
             yubikey_salt,
             plaintext,
+            None,
         )
         .unwrap();
         let bytes = sealed.to_bytes();
@@ -947,6 +1031,7 @@ mod tests {
             credential_id,
             yubikey_salt,
             plaintext,
+            None,
         )
         .unwrap();
         let result = open_vault(passphrase, &sealed);
@@ -972,7 +1057,7 @@ mod tests {
 
     #[test]
     fn seal_with_zero_keys_fails() {
-        let result = seal_vault_with_keys(b"pass", &[], b"data");
+        let result = seal_vault_with_keys(b"pass", &[], b"data", None);
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("at least 2"));
     }
@@ -984,7 +1069,7 @@ mod tests {
             hmac_secret: [0x11u8; 32],
             salt: [0x22u8; 32],
         };
-        let result = seal_vault_with_keys(b"pass", &[key], b"data");
+        let result = seal_vault_with_keys(b"pass", &[key], b"data", None);
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("at least 2"));
     }
@@ -992,7 +1077,7 @@ mod tests {
     #[test]
     fn seal_with_two_keys_stores_two_records_with_key_blobs() {
         let keys = two_test_keys();
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"plaintext").unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"plaintext", None).unwrap();
         assert_eq!(sealed.yubikey_records.len(), 2);
         assert_eq!(sealed.yubikey_records[0].key_blob.len(), 60);
         assert_eq!(sealed.yubikey_records[1].key_blob.len(), 60);
@@ -1010,7 +1095,7 @@ mod tests {
     fn open_with_first_key_succeeds() {
         let keys = two_test_keys();
         let plaintext = b"my secret vault data";
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext, None).unwrap();
         let (recovered, _master, _wk) = open_vault_with_key_record(
             b"passphrase",
             &keys[0].hmac_secret,
@@ -1025,7 +1110,7 @@ mod tests {
     fn open_with_second_key_succeeds() {
         let keys = two_test_keys();
         let plaintext = b"my secret vault data";
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext, None).unwrap();
         let (recovered, _master, _wk) = open_vault_with_key_record(
             b"passphrase",
             &keys[1].hmac_secret,
@@ -1039,7 +1124,7 @@ mod tests {
     #[test]
     fn open_with_wrong_hmac_fails() {
         let keys = two_test_keys();
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data", None).unwrap();
         let result = open_vault_with_key_record(
             b"passphrase",
             &[0xFFu8; 32],
@@ -1052,7 +1137,7 @@ mod tests {
     #[test]
     fn open_with_unknown_credential_fails() {
         let keys = two_test_keys();
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data", None).unwrap();
         let result = open_vault_with_key_record(b"passphrase", &[0x11u8; 32], &[0xFF; 32], &sealed);
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("no YubiKey record"));
@@ -1061,7 +1146,7 @@ mod tests {
     #[test]
     fn open_with_wrong_passphrase_fails() {
         let keys = two_test_keys();
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data", None).unwrap();
         let result = open_vault_with_key_record(
             b"wrong-passphrase",
             &keys[0].hmac_secret,
@@ -1075,7 +1160,7 @@ mod tests {
     fn both_keys_produce_same_plaintext() {
         let keys = two_test_keys();
         let plaintext = b"consistent decryption";
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext, None).unwrap();
         let (pt1, _, _) = open_vault_with_key_record(
             b"passphrase",
             &keys[0].hmac_secret,
@@ -1098,7 +1183,7 @@ mod tests {
     fn multi_key_roundtrip_through_bytes() {
         let keys = two_test_keys();
         let plaintext = b"roundtrip with two keys";
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext, None).unwrap();
         let bytes = sealed.to_bytes();
         let recovered_sealed = SealedVault::from_bytes(&bytes).unwrap();
         let (pt, _, _) = open_vault_with_key_record(
@@ -1114,7 +1199,7 @@ mod tests {
     #[test]
     fn seal_with_keys_produces_passphrase_blob() {
         let keys = two_test_keys();
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data", None).unwrap();
         assert_eq!(sealed.passphrase_blob.len(), 60);
     }
 
@@ -1123,7 +1208,7 @@ mod tests {
         let keys = two_test_keys();
         let plaintext = b"initial body";
         let new_plaintext = b"updated body after CRUD";
-        let mut sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
+        let mut sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext, None).unwrap();
         let (_, master, _) = open_vault_with_key_record(
             b"passphrase",
             &keys[0].hmac_secret,
@@ -1147,7 +1232,7 @@ mod tests {
     #[test]
     fn change_passphrase_with_keys_key_blobs_unchanged() {
         let keys = two_test_keys();
-        let sealed = seal_vault_with_keys(b"old-pass", &keys, b"data").unwrap();
+        let sealed = seal_vault_with_keys(b"old-pass", &keys, b"data", None).unwrap();
         let old_blobs: Vec<_> = sealed
             .yubikey_records
             .iter()
@@ -1176,7 +1261,7 @@ mod tests {
     fn change_passphrase_with_keys_old_passphrase_no_longer_opens() {
         let keys = two_test_keys();
         let plaintext = b"secret";
-        let sealed = seal_vault_with_keys(b"old-pass", &keys, plaintext).unwrap();
+        let sealed = seal_vault_with_keys(b"old-pass", &keys, plaintext, None).unwrap();
         let new_sealed =
             change_vault_passphrase_with_keys(&sealed, b"old-pass", b"new-pass").unwrap();
 
@@ -1196,9 +1281,23 @@ mod tests {
     fn change_passphrase_with_keys_new_passphrase_opens_with_any_key() {
         let keys = two_test_keys();
         let plaintext = b"my vault data";
-        let sealed = seal_vault_with_keys(b"old-pass", &keys, plaintext).unwrap();
-        let new_sealed =
+        let sealed = seal_vault_with_keys(b"old-pass", &keys, plaintext, None).unwrap();
+
+        // Extract vault_key_master so we can re-seal the body after rotating PQ material.
+        let (_, master, _) = open_vault_with_key_record(
+            b"old-pass",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+
+        let mut new_sealed =
             change_vault_passphrase_with_keys(&sealed, b"old-pass", b"new-pass").unwrap();
+
+        // Re-seal body so the new header (new argon2_salt, hkdf_salt, etc.) is
+        // committed as AAD — mirrors what api::vault::change_passphrase_with_keys does.
+        reseal_vault_body(&mut new_sealed, &master, plaintext).unwrap();
 
         let (pt0, _, _) = open_vault_with_key_record(
             b"new-pass",
@@ -1222,7 +1321,7 @@ mod tests {
     #[test]
     fn change_passphrase_wrong_old_passphrase_fails() {
         let keys = two_test_keys();
-        let sealed = seal_vault_with_keys(b"correct", &keys, b"data").unwrap();
+        let sealed = seal_vault_with_keys(b"correct", &keys, b"data", None).unwrap();
         let result = change_vault_passphrase_with_keys(&sealed, b"wrong", b"new-pass");
         assert!(result.is_err());
     }
@@ -1231,8 +1330,18 @@ mod tests {
     fn change_passphrase_roundtrip_through_bytes() {
         let keys = two_test_keys();
         let plaintext = b"roundtrip after passphrase change";
-        let sealed = seal_vault_with_keys(b"old", &keys, plaintext).unwrap();
-        let new_sealed = change_vault_passphrase_with_keys(&sealed, b"old", b"new").unwrap();
+        let sealed = seal_vault_with_keys(b"old", &keys, plaintext, None).unwrap();
+
+        let (_, master, _) = open_vault_with_key_record(
+            b"old",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+
+        let mut new_sealed = change_vault_passphrase_with_keys(&sealed, b"old", b"new").unwrap();
+        reseal_vault_body(&mut new_sealed, &master, plaintext).unwrap();
 
         // Serialize and deserialize the new sealed vault
         let bytes = new_sealed.to_bytes();
@@ -1254,7 +1363,7 @@ mod tests {
     fn add_key_to_sealed_adds_third_record() {
         let keys = two_test_keys();
         let plaintext = b"vault body";
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext, None).unwrap();
 
         let (_, master, wk) = open_vault_with_key_record(
             b"passphrase",
@@ -1288,7 +1397,7 @@ mod tests {
     fn added_key_can_decrypt_vault_body() {
         let keys = two_test_keys();
         let plaintext = b"decryptable by new key";
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext, None).unwrap();
 
         let (_, master, wk) = open_vault_with_key_record(
             b"passphrase",
@@ -1322,7 +1431,7 @@ mod tests {
     #[test]
     fn add_key_rejects_duplicate_credential_id() {
         let keys = two_test_keys();
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data", None).unwrap();
         let (_, master, wk) = open_vault_with_key_record(
             b"passphrase",
             &keys[0].hmac_secret,
@@ -1348,7 +1457,7 @@ mod tests {
     fn add_key_rejects_when_at_max_four() {
         // Build a vault with 4 keys by adding them one at a time.
         let keys = two_test_keys();
-        let sealed0 = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        let sealed0 = seal_vault_with_keys(b"passphrase", &keys, b"data", None).unwrap();
         let (_, master, wk) = open_vault_with_key_record(
             b"passphrase",
             &keys[0].hmac_secret,
@@ -1393,7 +1502,7 @@ mod tests {
     #[test]
     fn remove_key_from_sealed_removes_correct_record() {
         let keys = two_test_keys();
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data", None).unwrap();
 
         let new_sealed = remove_key_from_sealed(&sealed, &keys[0].credential_id).unwrap();
 
@@ -1407,7 +1516,7 @@ mod tests {
     #[test]
     fn remove_key_rejects_last_key() {
         let keys = two_test_keys();
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data", None).unwrap();
         let one_key = remove_key_from_sealed(&sealed, &keys[0].credential_id).unwrap();
 
         let result = remove_key_from_sealed(&one_key, &keys[1].credential_id);
@@ -1418,18 +1527,95 @@ mod tests {
     #[test]
     fn remove_key_rejects_unknown_credential_id() {
         let keys = two_test_keys();
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data").unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, b"data", None).unwrap();
 
         let result = remove_key_from_sealed(&sealed, &[0xFFu8; 32]);
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("not found"));
     }
 
+    // ── VERSION 7 AAD / header-integrity tests ────────────────────────────────
+
+    #[test]
+    fn seal_vault_v7_header_tamper_detected() {
+        let passphrase = b"integrity test";
+        let plaintext = b"secret vault body";
+        let sealed = seal_vault(passphrase, plaintext, None).unwrap();
+        assert_eq!(sealed.version, 7, "new vaults are VERSION 7");
+
+        // Tamper with the alias in the serialised vault bytes.
+        let mut bytes = sealed.to_bytes();
+        // Find the alias length prefix (2 bytes of 0x0000 for None alias) after the
+        // passphrase_blob section and flip its length to inject a fake alias byte.
+        // Easier: just flip a bit in the argon2_salt (bytes 7..39).
+        bytes[10] ^= 0x01;
+        let tampered = crate::vault::file_format::SealedVault::from_bytes(&bytes).unwrap();
+        assert!(
+            open_vault(passphrase, &tampered).is_err(),
+            "tampered argon2_salt must cause decryption failure via AAD mismatch"
+        );
+    }
+
+    #[test]
+    fn open_vault_v6_no_aad_still_opens() {
+        // Build a V6 sealed vault (legacy path, no AAD).
+        use crate::crypto::hkdf::derive_vault_key;
+        use crate::crypto::kdf::Argon2idParams;
+        use crate::crypto::ml_kem::MlKemKeypair;
+        use crate::vault::file_format::SealedVault;
+        use zeroize::Zeroizing;
+
+        let passphrase = b"v6 passphrase";
+        let plaintext = b"v6 vault body";
+        let params = Argon2idParams::default();
+        let mut argon2_salt = [0u8; 32];
+        OsRng.fill_bytes(&mut argon2_salt);
+        let kdf_output = Zeroizing::new(
+            crate::crypto::kdf::derive_key(passphrase, &argon2_salt, &params).unwrap(),
+        );
+        let x25519_keypair = crate::crypto::keypair::X25519Keypair::from_kdf_output(&kdf_output);
+        let ml_kem_keypair = MlKemKeypair::from_kdf_output_fips(&kdf_output);
+        let (ml_kem_ct, ml_kem_secret) = ml_kem_keypair
+            .encapsulation_key
+            .encapsulate(&mut OsRng)
+            .unwrap();
+        let ephemeral_secret = x25519_dalek::EphemeralSecret::random_from_rng(OsRng);
+        let ephemeral_public = x25519_dalek::PublicKey::from(&ephemeral_secret);
+        let x25519_secret = ephemeral_secret.diffie_hellman(&x25519_keypair.public);
+        let mut hkdf_salt = [0u8; 32];
+        OsRng.fill_bytes(&mut hkdf_salt);
+        let ml_kem_secret_bytes: Zeroizing<[u8; 32]> =
+            Zeroizing::new((*ml_kem_secret).try_into().unwrap());
+        let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
+        let vault_key = Zeroizing::new(derive_vault_key(
+            &ml_kem_secret_bytes,
+            &x25519_secret_bytes,
+            &hkdf_salt,
+        ));
+        let (ciphertext, nonce) = aes_gcm::encrypt(&vault_key, plaintext).unwrap();
+
+        let sealed = SealedVault {
+            version: 6,
+            params,
+            argon2_salt,
+            ml_kem_ciphertext: ml_kem_ct.to_vec(),
+            x25519_ephemeral_public: *ephemeral_public.as_bytes(),
+            hkdf_salt,
+            nonce,
+            ciphertext,
+            yubikey_records: vec![],
+            alias: None,
+            passphrase_blob: vec![],
+        };
+        let recovered = open_vault(passphrase, &sealed).unwrap();
+        assert_eq!(recovered, plaintext, "V6 vault must open without AAD");
+    }
+
     #[test]
     fn remaining_key_still_decrypts_after_removal() {
         let keys = two_test_keys();
         let plaintext = b"still readable after removal";
-        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext).unwrap();
+        let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext, None).unwrap();
         let new_sealed = remove_key_from_sealed(&sealed, &keys[0].credential_id).unwrap();
 
         let (recovered, _, _) = open_vault_with_key_record(

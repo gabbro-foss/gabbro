@@ -610,18 +610,14 @@ pub fn read_vault_header(path: String) -> Result<VaultHeaderData, String> {
     })
 }
 
-/// Patch the alias stored in the vault file header at `path`.
+/// Rename the active vault: updates the alias in the file header and re-seals
+/// the body so the new alias is bound to the ciphertext via AES-GCM AAD.
 ///
-/// Reads the existing sealed vault, updates `alias`, and writes back.
-/// The body ciphertext is never decrypted — all key_blobs and the encrypted
-/// body are preserved exactly as-is. Passing an empty string clears the alias.
-/// Async — file I/O.
-pub async fn set_vault_alias(path: String, alias: String) -> Result<(), String> {
-    use crate::vault::io::{read_vault, write_vault};
-    let vault_path = PathBuf::from(&path);
-    let mut sealed = read_vault(&vault_path)?;
-    sealed.alias = if alias.is_empty() { None } else { Some(alias) };
-    write_vault(&sealed, &vault_path)
+/// Requires an unlocked session — returns `Err("Vault is locked")` if called
+/// without an active session. Passing an empty string clears the alias.
+/// Async — file I/O + re-seal.
+pub async fn set_vault_alias(alias: String) -> Result<(), String> {
+    session::session_set_vault_alias(alias)
 }
 
 /// Decrypt the vault at `path` using both passphrase and YubiKey hmac-secret.
@@ -669,8 +665,7 @@ pub async fn init_vault(
     use crate::vault::serialization::{serialize_vault_body, VaultBody};
     let vault_path = PathBuf::from(&path);
     let plaintext = serialize_vault_body(&VaultBody::empty())?;
-    let mut sealed = seal_vault(&passphrase, &plaintext)?;
-    sealed.alias = alias;
+    let sealed = seal_vault(&passphrase, &plaintext, alias)?;
     write_vault(&sealed, &vault_path)?;
     session::unlock_vault(&passphrase, vault_path)
 }
@@ -725,8 +720,7 @@ pub async fn init_vault_with_keys(
 
     let vault_path = PathBuf::from(&path);
     let plaintext = serialize_vault_body(&VaultBody::empty())?;
-    let mut sealed = seal_vault_with_keys(&passphrase, &registrations, &plaintext)?;
-    sealed.alias = alias;
+    let sealed = seal_vault_with_keys(&passphrase, &registrations, &plaintext, alias)?;
     write_vault(&sealed, &vault_path)?;
 
     // Unlock into session using the first key's material
@@ -776,14 +770,14 @@ pub async fn init_vault_with_yubikey(
         .map_err(|_| "hkdf_salt must be exactly 32 bytes".to_string())?;
     let vault_path = PathBuf::from(&path);
     let plaintext = serialize_vault_body(&VaultBody::empty())?;
-    let mut sealed = seal_vault_with_yubikey(
+    let sealed = seal_vault_with_yubikey(
         &passphrase,
         &secret,
         credential_id.clone(),
         salt,
         &plaintext,
+        alias,
     )?;
-    sealed.alias = alias;
     write_vault(&sealed, &vault_path)?;
     session::unlock_vault_with_yubikey(&passphrase, &secret, credential_id, &salt, vault_path)
 }
@@ -1407,12 +1401,19 @@ mod tests {
         )
         .unwrap();
 
-        // Patch alias in after creation to test reading it back
-        run(set_vault_alias(
+        // set_vault_alias requires an unlocked session (Phase 3).
+        run(unlock_vault_with_yubikey(
+            pass.to_vec(),
+            hmac_secret.to_vec(),
+            credential_id.clone(),
+            hkdf_salt.to_vec(),
             path.to_str().unwrap().to_string(),
-            String::from("Test Vault"),
         ))
         .unwrap();
+
+        run(set_vault_alias(String::from("Test Vault"))).unwrap();
+
+        lock_vault().unwrap();
 
         let header = read_vault_header(path.to_str().unwrap().to_string()).unwrap();
         assert_eq!(header.alias, Some(String::from("Test Vault")));
@@ -1424,30 +1425,68 @@ mod tests {
 
     #[test]
     #[serial]
-    fn set_vault_alias_leaves_ciphertext_intact() {
+    fn set_vault_alias_rebinds_body_and_vault_still_opens() {
         use crate::api::vault::save_vault;
         use crate::vault::io::read_vault;
         use std::env::temp_dir;
 
         let mut path = temp_dir();
-        path.push("gabbro_bridge_set_alias_test.gabbro");
-        let pass = b"alias-integrity-pass";
+        path.push("gabbro_bridge_set_alias_rebind_test.gabbro");
+        let pass = b"alias-rebind-pass";
 
         save_vault(&VaultBody::empty(), pass, &path).unwrap();
 
-        // Capture ciphertext before alias change
+        // Capture ciphertext before alias change.
         let ciphertext_before = read_vault(&path).unwrap().ciphertext.clone();
 
-        run(set_vault_alias(
+        // set_vault_alias now requires an active session.
+        run(unlock_vault(
+            pass.to_vec(),
             path.to_str().unwrap().to_string(),
-            String::from("My Vault"),
         ))
         .unwrap();
 
-        // Ciphertext must be identical after alias patch
+        run(set_vault_alias(String::from("My Vault"))).unwrap();
+
+        lock_vault().unwrap();
+
         let sealed_after = read_vault(&path).unwrap();
-        assert_eq!(sealed_after.ciphertext, ciphertext_before);
+        // Alias must be written to the header.
         assert_eq!(sealed_after.alias, Some(String::from("My Vault")));
+        // Body must be re-sealed (fresh nonce → different ciphertext).
+        assert_ne!(
+            sealed_after.ciphertext, ciphertext_before,
+            "ciphertext must be refreshed after alias re-seal"
+        );
+        // Vault must still open with the original passphrase.
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+        lock_vault().unwrap();
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn set_vault_alias_requires_unlocked_session() {
+        use crate::api::vault::save_vault;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_alias_locked_test.gabbro");
+        let pass = b"alias-locked-pass";
+
+        save_vault(&VaultBody::empty(), pass, &path).unwrap();
+        lock_vault().ok(); // ensure locked
+
+        let result = run(set_vault_alias(String::from("Sneaky")));
+        assert!(
+            result.is_err(),
+            "set_vault_alias must fail when vault is locked"
+        );
 
         let _ = std::fs::remove_file(&path);
     }

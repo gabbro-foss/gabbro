@@ -14,7 +14,9 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 /// Detects which character classes are present in `password`, builds a pool
 /// size from those classes, then applies:
 ///
-///     entropy = length × log₂(pool_size)
+/// ```text
+/// entropy = length × log₂(pool_size)
+/// ```
 ///
 /// Returns `EntropyResult { bits: 0.0, tier: Terrible }` for an empty string.
 EntropyResult estimateEntropy({required String password}) =>

@@ -168,6 +168,24 @@ Future<void> exportVaultJson({required String path}) =>
 List<YubikeyRecordData> listVaultYubikeyRecords({required String path}) =>
     RustLib.instance.api.crateApiVaultBridgeListVaultYubikeyRecords(path: path);
 
+/// Read the vault header at `path` and return alias + YubiKey records.
+///
+/// Does **not** decrypt the vault body — safe to call before passphrase entry.
+/// Replaces `list_vault_yubikey_records` for the unlock screen so alias and
+/// YubiKey records are fetched in one call.
+/// Sync — file I/O + header parse, no crypto.
+VaultHeaderData readVaultHeader({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeReadVaultHeader(path: path);
+
+/// Rename the active vault: updates the alias in the file header and re-seals
+/// the body so the new alias is bound to the ciphertext via AES-GCM AAD.
+///
+/// Requires an unlocked session — returns `Err("Vault is locked")` if called
+/// without an active session. Passing an empty string clears the alias.
+/// Async — file I/O + re-seal.
+Future<void> setVaultAlias({required String alias}) =>
+    RustLib.instance.api.crateApiVaultBridgeSetVaultAlias(alias: alias);
+
 /// Decrypt the vault at `path` using both passphrase and YubiKey hmac-secret.
 ///
 /// Handles both VERSION 2 (legacy single-key) and VERSION 3 (multi-key) vaults.
@@ -193,6 +211,7 @@ Future<void> unlockVaultWithYubikey({
 
 /// Create a new empty vault at `path`, sealed with `passphrase`.
 ///
+/// `alias` is stored in the VERSION 5 plaintext header and travels with the file.
 /// Called during onboarding. Async — runs Argon2id + encryption.
 Future<void> initVault({
   required List<int> passphrase,
@@ -207,6 +226,7 @@ Future<void> initVault({
 /// Create a new empty vault sealed with a passphrase and two or more YubiKeys.
 ///
 /// Enforces ADR-010: minimum 2 registered keys at vault creation.
+/// `alias` is stored in the VERSION 5 plaintext header and travels with the file.
 /// After creation, unlocks into session immediately using the first key.
 /// Async — runs Argon2id + encryption.
 Future<void> initVaultWithKeys({
@@ -223,6 +243,7 @@ Future<void> initVaultWithKeys({
 
 /// Create a new empty vault at `path`, sealed with both passphrase and YubiKey.
 ///
+/// `alias` is stored in the VERSION 5 plaintext header and travels with the file.
 /// Called during onboarding when the user opts in to YubiKey protection.
 /// After creation, unlocks into session immediately.
 /// `hmac_secret` must be exactly 32 bytes. `hkdf_salt` must be exactly 32 bytes.
@@ -233,12 +254,14 @@ Future<void> initVaultWithYubikey({
   required List<int> credentialId,
   required List<int> hkdfSalt,
   required String path,
+  String? alias,
 }) => RustLib.instance.api.crateApiVaultBridgeInitVaultWithYubikey(
   passphrase: passphrase,
   hmacSecret: hmacSecret,
   credentialId: credentialId,
   hkdfSalt: hkdfSalt,
   path: path,
+  alias: alias,
 );
 
 /// Return all YubiKey aliases stored in the current session.
@@ -353,6 +376,28 @@ sealed class VaultEntryData with _$VaultEntryData {
   const factory VaultEntryData.file(FileEntryData field0) = VaultEntryData_File;
   const factory VaultEntryData.custom(CustomEntryData field0) =
       VaultEntryData_Custom;
+}
+
+/// Vault header data returned by `read_vault_header`.
+///
+/// Contains the alias and YubiKey records from the plaintext header.
+/// Safe to read before the user enters their passphrase.
+class VaultHeaderData {
+  final String? alias;
+  final List<YubikeyRecordData> yubikeyRecords;
+
+  const VaultHeaderData({this.alias, required this.yubikeyRecords});
+
+  @override
+  int get hashCode => alias.hashCode ^ yubikeyRecords.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is VaultHeaderData &&
+          runtimeType == other.runtimeType &&
+          alias == other.alias &&
+          yubikeyRecords == other.yubikeyRecords;
 }
 
 /// Key material for one YubiKey, supplied during multi-key vault creation.
