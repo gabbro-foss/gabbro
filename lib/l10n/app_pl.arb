@@ -1,0 +1,809 @@
+{
+  "@@locale": "pl",
+
+  "appName": "Gabbro",
+
+  "cancel": "Anuluj",
+  "delete": "Usuń",
+  "save": "Zapisz",
+  "close": "Zamknij",
+  "ok": "OK",
+  "edit": "Edytuj",
+  "add": "Dodaj",
+  "remove": "Usuń",
+  "rename": "Zmień nazwę",
+  "confirm": "Potwierdź",
+  "continueAction": "Kontynuuj",
+  "dismiss": "Odrzuć",
+  "authorize": "Autoryzuj",
+  "register": "Zarejestruj",
+  "sync": "Synchronizuj",
+  "assign": "Przypisz",
+  "unlock": "Odblokuj",
+  "generate": "Generuj",
+  "import": "Importuj",
+  "export": "Eksportuj",
+  "openInBrowser": "Otwórz w przeglądarce",
+  "useThisPassword": "Użyj tego hasła",
+  "reviewArrow": "Sprawdź →",
+  "skip": "Pomiń",
+  "keep": "Zachowaj",
+  "revert": "Przywróć",
+  "next": "Dalej: mapuj kolumny",
+  "syncFromVault": "Synchronizuj ze skarbca",
+  "createVault": "Utwórz skarbiec",
+  "pickFile": "Wybierz plik",
+  "noFileSelected": "Nie wybrano pliku",
+  "chooseFolder": "Wybierz folder",
+  "addCustomField": "Dodaj pole niestandardowe",
+  "exportFile": "Eksportuj plik",
+  "addVault": "Dodaj skarbiec",
+  "addYubiKey": "Dodaj YubiKey",
+  "noChangesToSave": "Brak zmian do zapisania.",
+
+  "appearanceTitle": "Wygląd",
+  "securityTitle": "Bezpieczeństwo",
+  "aboutTitle": "O Gabbro",
+  "generatorTitle": "Generator haseł",
+  "importTitle": "Importuj wpisy",
+  "exportTitle": "Eksportuj skarbiec",
+  "changePassphraseTitle": "Zmień hasło główne",
+  "csvMappingTitle": "Mapowanie kolumn CSV",
+  "manageFoldersTitle": "Zarządzaj folderami",
+  "manageVaultsTitle": "Zarządzaj skarbcami",
+  "manageYubiKeysTitle": "Zarządzaj kluczami YubiKey",
+  "passwordHistoryTitle": "Historia haseł",
+  "reviewChangesTitle": "Sprawdź zmiany",
+  "unlockGabbroTitle": "Odblokuj Gabbro",
+
+  "sectionTheme": "Motyw",
+  "sectionTextSize": "Rozmiar tekstu",
+  "sectionAlphabetBar": "Pozycja paska alfabetycznego",
+  "sectionAccessibility": "Dostępność",
+  "sectionLanguage": "Język",
+  "sectionForegroundLock": "Blokada na pierwszym planie",
+  "sectionBackgroundLock": "Blokada w tle",
+  "sectionPasswordHistory": "Historia haseł",
+  "sectionPassphraseCopyPaste": "Kopiowanie/wklejanie hasła głównego",
+  "sectionVaultList": "Lista skarbców",
+  "sectionClipboardClear": "Czyszczenie schowka",
+  "sectionCharacterSets": "Zestawy znaków",
+  "sectionGeneratorLanguage": "Język",
+
+  "themeSystem": "Systemowy",
+  "themeLight": "Jasny",
+  "themeDark": "Ciemny",
+
+  "textSizeSmall": "Mały",
+  "textSizeRegular": "Normalny",
+  "textSizeLarge": "Duży",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Tylko na telefonie — tablet zawsze używa lewej strony.",
+  "alphabetBarLeft": "Lewa",
+  "alphabetBarRight": "Prawa",
+
+  "highContrastTitle": "Wysoki kontrast",
+  "highContrastSubtitle": "Zwiększa kontrast dla lepszej czytelności",
+
+  "languageNote": "Zastępuje język systemowy. «Systemowy» podąża za ustawieniami regionalnymi urządzenia.",
+  "langSystem": "Systemowy",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Blokuj po tym czasie bezczynności, gdy aplikacja jest otwarta.",
+  "backgroundLockDescription": "Blokuj po tym czasie przebywania aplikacji w tle.",
+  "passwordHistoryDescription": "Jak długo przechowywać poprzednie hasło po zmianie. «Zachowaj zawsze» oznacza, że historia jest usuwana tylko ręcznie.",
+  "passphraseCopyPasteDescription": "Blokuj kopiowanie i wklejanie w polach hasła głównego. Zalecane: zapobiega wyciekowi hasła przez schowek.",
+  "passphraseCopyPasteNote": "Uwaga: to blokuje menu kontekstowe przy długim naciśnięciu i zaznaczanie tekstu. Wbudowany przycisk wklejania klawiatury może nadal działać — to ograniczenie platformy.",
+  "blockCopyPasteTitle": "Blokuj kopiowanie/wklejanie",
+  "vaultListDescription": "Pokaż listę wszystkich skarbców na ekranie logowania, aby móc wybrać, który odblokować, bez przechodzenia do «Zarządzaj skarbcami».",
+  "showVaultListTitle": "Pokaż listę skarbców przy logowaniu",
+  "vaultListNote": "Uwaga bezpieczeństwa: gdy to jest WYŁĄCZONE, ekran logowania pokazuje tylko ostatnio używany skarbiec — bez wskazówki o istnieniu innych. Kompromis: aby zmienić skarbiec, najpierw odblokuj, potem przejdź do Menu → Zarządzaj skarbcami.",
+  "clipboardClearDescription": "Czyść schowek po skopiowaniu sekretu. Uwaga: menedżery schowka mogą zachować kopię.",
+
+  "duration30s": "30 s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60 s",
+  "duration2min": "2 min",
+  "durationNever": "Nigdy",
+  "duration7days": "7 dni",
+  "duration30days": "30 dni",
+  "duration90days": "90 dni",
+  "durationKeepForever": "Zachowaj zawsze",
+
+  "menuExportVault": "Eksportuj skarbiec",
+  "menuImportEntries": "Importuj wpisy",
+  "menuSyncFromFile": "Synchronizuj z pliku",
+  "menuManageVaults": "Zarządzaj skarbcami",
+  "menuChangePassphrase": "Zmień hasło główne",
+  "menuManageYubiKeys": "Zarządzaj kluczami YubiKey",
+  "menuAppearance": "Wygląd",
+  "menuSecurity": "Bezpieczeństwo",
+  "menuManageFolders": "Zarządzaj folderami",
+  "menuPasswordGenerator": "Generator haseł",
+  "menuAbout": "O aplikacji",
+
+  "tooltipSelectEntries": "Zaznacz wpisy",
+  "tooltipLockVault": "Zablokuj skarbiec",
+  "tooltipSelectAll": "Zaznacz wszystkie",
+  "tooltipDeselectAll": "Odznacz wszystkie",
+  "tooltipMenu": "Menu",
+  "tooltipCopy": "Kopiuj",
+  "tooltipCopied": "Skopiowano!",
+  "tooltipShow": "Pokaż",
+  "tooltipHide": "Ukryj",
+  "tooltipBrowse": "Przeglądaj",
+  "tooltipEditAlias": "Edytuj alias",
+  "tooltipRemoveField": "Usuń pole",
+  "tooltipRename": "Zmień nazwę",
+  "tooltipDeleteVault": "Usuń skarbiec",
+  "tooltipAssignToFolder": "Przypisz do folderu",
+  "tooltipShowPin": "Pokaż PIN",
+  "tooltipHidePin": "Ukryj PIN",
+  "tooltipShowValue": "Pokaż wartość",
+  "tooltipHideValue": "Ukryj",
+  "tooltipCancel": "Anuluj",
+  "tooltipOpenInBrowser": "Otwórz w przeglądarce",
+
+  "allFolders": "Wszystkie foldery",
+  "noFolder": "Brak",
+  "selectFolder": "Wybierz folder",
+  "folderName": "Nazwa folderu",
+
+  "noEntriesMatch": "Brak wpisów pasujących do wyszukiwania.",
+  "noVaultsRegistered": "Brak zarejestrowanych skarbców.",
+  "noYubiKeysRegistered": "Brak zarejestrowanych kluczy YubiKey",
+  "selectEntry": "Wybierz wpis",
+  "newEntryTitle": "Nowy wpis",
+  "createEntryTitle": "Nowy(-a) {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Edytuj: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(brak URL)",
+  "noNameFallback": "(brak nazwy)",
+  "untitledFallback": "(bez tytułu)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "Zaznaczono: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Szukaj we wszystkich polach…",
+  "searchEntriesHint": "Szukaj wpisów…",
+  "searchAllFieldsTooltip": "Szuka we wszystkich polach",
+  "searchByTitleTooltip": "Szuka po tytule",
+  "entryTypeAll": "Wszystkie",
+  "entryTypePassword": "Hasło",
+  "entryTypeNote": "Notatka",
+  "entryTypeCard": "Karta",
+  "entryTypeIdentity": "Tożsamość",
+  "entryTypeFile": "Plik",
+  "entryTypeCustom": "Niestandardowy",
+  "errorPrefix": "Błąd: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Skarbiec",
+  "navAppearance": "Wygląd",
+  "navSecurity": "Bezpieczeństwo",
+  "navAbout": "O aplikacji",
+
+  "deleteEntryTitle": "Usunąć wpis?",
+  "cannotBeUndone": "Tej operacji nie można cofnąć.",
+  "deleteEntryDialogTitle": "Usunąć wpis?",
+  "deleteEntriesTitle": "{count, plural, one{Usunąć 1 wpis?} few{Usunąć {count} wpisy?} other{Usunąć {count} wpisów?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Przypisz do folderu",
+  "folderConflictTitle": "Konflikt folderów",
+  "syncFailedTitle": "Synchronizacja nie powiodła się",
+  "syncFromFileTitle": "Synchronizuj z pliku",
+  "nothingToSync": "Nie ma nic do synchronizowania — oba skarbce są już aktualne.",
+
+  "importedEntries": "{count, plural, one{Zaimportowano 1 wpis.} few{Zaimportowano {count} wpisy.} other{Zaimportowano {count} wpisów.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Eksportuj plik",
+  "saveDecryptedFileTo": "Zapisz odszyfrowany plik do:",
+  "exportPathLabel": "Ścieżka eksportu",
+  "exportedToPath": "Wyeksportowano do {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Eksport nie powiódł się: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Otworzyć w przeglądarce?",
+  "couldNotOpen": "Nie można otworzyć {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Usuń poprzedni wpis",
+  "failedToClearHistory": "Nie udało się wyczyścić historii: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Nie udało się przywrócić hasła: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Zmień nazwę folderu",
+  "addFolderTitle": "Dodaj folder",
+  "deleteFolderTitle": "Usuń folder",
+  "deleteFolderConfirm": "Usunąć «{folder}»?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Przenieś wpisy do",
+  "clearToNone": "Przenieś do «Brak»",
+
+  "renameVaultTitle": "Zmień nazwę skarbca",
+  "deleteVaultTitle": "Usunąć skarbiec?",
+  "deleteVaultConfirmTitle": "Jesteś pewny(-a)?",
+  "typeDeleteToConfirm": "Wpisz DELETE, aby potwierdzić",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Dotknij swojego klucza YubiKey",
+  "noVaultsRegisteredText": "Brak zarejestrowanych skarbców.",
+
+  "addYubiKeyTitle": "Dodaj YubiKey",
+  "enterYubiKeyPinTitle": "Wprowadź PIN YubiKey",
+  "editAliasForKey": "Edytuj alias klucza {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Pozostanie tylko jeden zarejestrowany klucz YubiKey.",
+  "removeKeyConfirm": "Na pewno chcesz usunąć ten klucz?",
+  "removeKeyVaultConfirm": "Usunąć ten klucz YubiKey ze skarbca?",
+  "yubiKeyRemoved": "YubiKey usunięty",
+  "failedToRemoveKey": "Nie udało się usunąć klucza: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey dodany",
+  "failedToAddKey": "Nie udało się dodać klucza: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Nie udało się zapisać aliasu: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Nie znaleziono urządzenia FIDO2. Włóż klucz YubiKey i spróbuj ponownie.",
+  "transportLabel": "Transport:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Hasło główne",
+  "yubiKeyPinLabel": "PIN YubiKey",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Bieżące hasło główne",
+  "newPassphraseLabel": "Nowe hasło główne",
+  "confirmPassphraseLabel": "Potwierdź nowe hasło główne",
+  "vaultPassphraseLabel": "Hasło główne skarbca",
+  "aliasLabel": "Alias",
+  "aliasHint": "np. Główny, Klucz pracy…",
+  "masterPassphraseLabel": "Główne hasło dostępu",
+  "confirmPassphraseLabelShort": "Potwierdź hasło główne",
+
+  "fieldTitle": "Tytuł",
+  "fieldContent": "Treść",
+  "fieldFirstName": "Imię",
+  "fieldLastName": "Nazwisko",
+  "fieldEmail": "E-mail (opcjonalnie)",
+  "fieldPhone": "Telefon (opcjonalnie)",
+  "fieldAddress": "Adres (opcjonalnie)",
+  "fieldCardLabel": "Nazwa karty (np. «Visa Platinum»)",
+  "fieldCardholderName": "Imię i nazwisko właściciela",
+  "fieldCardNumber": "Numer karty",
+  "fieldExpiry": "Ważność (MM/RR)",
+  "fieldCvv": "CVV (opcjonalnie)",
+  "fieldCardPin": "PIN (opcjonalnie)",
+  "fieldCreditLimit": "Limit kredytowy (opcjonalnie)",
+  "fieldAccountNumber": "Numer konta (opcjonalnie)",
+  "fieldNotes": "Notatki (opcjonalnie)",
+  "fieldUrl": "URL (opcjonalnie)",
+  "fieldUsername": "Nazwa użytkownika",
+  "fieldPassword": "Hasło",
+  "fieldSeparator": "Separator",
+  "fieldFolder": "Folder",
+  "fieldLabel": "Etykieta",
+  "fieldValue": "Wartość",
+  "fieldCustomFields": "Pola niestandardowe",
+  "fieldLabelOptional": "{label} (opcjonalnie)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Ten typ wpisu nie jest jeszcze obsługiwany.",
+  "csvColumnNone": "(brak)",
+  "csvPreviewLabel": "Podgląd",
+  "csvImportButton": "Importuj",
+
+  "gabbroVaultSection": "Skarbiec Gabbro",
+  "genericCsvSection": "Ogólny CSV",
+
+  "changePassphraseSuccess": "Hasło główne zostało zmienione",
+  "changePassphraseButton": "Zmień hasło główne",
+
+  "continueLabel": "Kontynuuj",
+  "protectWithYubiKey": "Chroń za pomocą YubiKey",
+  "yubiKeySubtitle": "Sprzętowy klucz bezpieczeństwa (zalecane)",
+  "accessibilityButton": "Dostępność",
+
+  "aboutProjectSection": "Projekt",
+  "aboutLicenceSection": "Licencja",
+  "aboutOpenSourceSection": "Komponenty open source",
+  "aboutAttributionSection": "Podziękowania",
+
+  "lengthLabel": "Długość",
+  "wordsLabel": "Słowa",
+  "generateButton": "Generuj",
+  "usePasswordButton": "Użyj tego hasła",
+  "showHidePassword": "Pokaż",
+
+  "deleteVaultPostDeletion": "Twój skarbiec został usunięty. Utwórz nowy, aby kontynuować.",
+
+  "syncFilePassphraseLabel": "Hasło główne skarbca",
+
+  "historyWarning": "Przechowywana jest tylko 1 poprzednia wartość. Historia jest automatycznie czyszczona na podstawie ustawień bezpieczeństwa.",
+  "historyCurrent": "Aktualne",
+  "historyPrevious": "Poprzednie",
+  "historySavedOn": "Zapisano {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · wygasa {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Problem importu ({index} z {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Typ: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Edytuj, popraw i zapisz ten wpis, lub pomiń, aby go odrzucić.",
+
+  "entriesSkipped": "{count, plural, one{1 wpis pominięty} few{{count} wpisy pominięte} other{{count} wpisów pominiętych}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Te wpisy już istnieją w Twoim skarbcu i nie zostały nadpisane:",
+
+  "syncDeleteEntryContent": "Inne urządzenie usunęło «{title}».\n\nUsunąć tutaj też, czy zachować?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}» znajduje się w różnych folderach na dwóch urządzeniach.\n\nTo urządzenie: {local}\nInne urządzenie: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Zachowaj bez folderu",
+  "folderConflictKeepLocal": "Zachowaj «{folder}»",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Przenieś bez folderu",
+  "folderConflictMoveIncoming": "Przenieś do «{folder}»",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Skarbiec zsynchronizowany — dodano: {added}, zaktualizowano: {updated}, usunięto: {deleted}.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Ten plik skarbca używa innego hasła głównego. Synchronizacja jest obsługiwana tylko między skarbcami z tym samym hasłem.",
+
+  "reviewSensitiveFields": "Pola poufne",
+  "reviewOtherFields": "Inne pola",
+  "reviewPasswordChanged": "Hasło zmienione",
+  "reviewCvvChanged": "CVV zmieniony",
+  "reviewPinChanged": "PIN zmieniony",
+  "reviewTransactionPasswordChanged": "Hasło transakcji zmienione",
+  "tooltipShowValues": "Pokaż wartości",
+  "reviewOld": "Stare",
+  "reviewNew": "Nowe",
+  "reviewEmpty": "(puste)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Notatki",
+  "reviewFieldContent": "Treść",
+  "reviewFieldEmail": "E-mail",
+  "reviewFieldPhone": "Telefon",
+  "reviewFieldAddress": "Adres",
+  "reviewFieldCardLabel": "Nazwa karty",
+  "reviewFieldStatus": "Status",
+  "reviewFieldCardholder": "Właściciel karty",
+  "reviewFieldExpiry": "Ważność",
+  "reviewFieldCreditLimit": "Limit kredytowy",
+  "reviewFieldAccountNumber": "Numer konta",
+  "reviewFieldNetwork": "Sieć",
+  "reviewFieldBank": "Bank",
+  "reviewFieldFilename": "Nazwa pliku",
+  "reviewFieldSize": "Rozmiar",
+  "reviewFieldCardNumber": "Numer",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Hasło transakcji",
+  "timestampCreated": "Utworzono",
+  "timestampUpdated": "Zaktualizowano",
+  "timestampUnknown": "Nieznane",
+  "noTitleFallback": "(brak tytułu)",
+  "tooltipExportFile": "Eksportuj plik",
+  "tooltipEditEntry": "Edytuj wpis",
+  "tooltipDeleteEntry": "Usuń wpis",
+  "exportLabel": "Eksport",
+  "customEntryFieldsHeader": "Pola",
+  "copiedNeverClears": "Skopiowano — schowek nigdy nie jest czyszczony automatycznie",
+  "copiedClears30s": "Skopiowano — schowek zostanie wyczyszczony za 30 s",
+  "copiedClears60s": "Skopiowano — schowek zostanie wyczyszczony za 60 s",
+  "copiedClears2min": "Skopiowano — schowek zostanie wyczyszczony za 2 min",
+
+  "passwordBreakdownTitle": "Analiza hasła",
+  "charTypeUppercase": "Wielkie litery",
+  "charTypeLowercase": "Małe litery",
+  "charTypeDigit": "Cyfra",
+  "charTypeSymbol": "Symbol",
+
+  "exportIncludeDate": "Dołącz datę do nazwy pliku",
+  "exportChooseFormat": "Wybierz format eksportu.",
+  "exportUnencryptedWarning": "Całkowicie niezaszyfrowane — wszystkie sekrety zostaną zapisane jako tekst jawny. Przechowuj plik bezpiecznie i usuń go po użyciu.",
+  "exportPassphraseOnlyNote": "Chronione tylko hasłem głównym. YubiKey nie jest potrzebny do importu.",
+  "exportChooseDestinationJson": "Wybierz miejsce docelowe dla eksportowanego pliku JSON.",
+  "exportChooseDestinationVault": "Wybierz miejsce docelowe dla eksportowanego pliku skarbca.",
+  "exportTwoFilesNote": "Zostaną utworzone dwa pliki: vault.gabbro i vault.gabbro.sha256",
+  "exportSelectDestination": "Wybierz miejsce docelowe.",
+
+  "aboutVersion": "Wersja {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Postkvantowy menedżer haseł",
+  "aboutSourceCode": "Kod źródłowy",
+  "aboutReportIssue": "Zgłoś problem",
+  "aboutSupportGabbro": "Wesprzyj Gabbro",
+  "aboutLicenceBody": "Gabbro to wolne oprogramowanie z otwartym kodem źródłowym, licencjonowane na zasadach GNU General Public License v3.0 only (GPL-3.0-only).\n\nMasz swobodę używania, studiowania i rozpowszechniania tego oprogramowania na warunkach tej licencji.",
+  "aboutOwnerRole": "Właściciel projektu, architekt i główny deweloper:",
+  "aboutAiPartner": "Partner AI ds. rozwoju:",
+  "aboutNoTelemetry": "Gabbro nie nawiązuje żadnych wychodzących połączeń sieciowych. Brak telemetrii, analityki i kont.",
+
+  "strengthTierTerrible": "Tragiczne",
+  "strengthTierWeak": "Słabe",
+  "strengthTierFair": "Akceptowalne",
+  "strengthTierStrong": "Silne",
+  "strengthTierVeryStrong": "Bardzo silne",
+  "strengthTierExcellent": "Doskonałe",
+  "yubiKeyProtectedNote": "Skarbiec chroniony przez YubiKey — powiązanie z kluczem zostanie zachowane.",
+  "yubiKeyPinRequired": "Wymagany jest PIN YubiKey",
+  "tapYubiKeyNow": "Dotknij teraz swojego klucza YubiKey…",
+  "touchYubiKeyToAuthorize": "Dotknij swojego klucza YubiKey, aby autoryzować tę zmianę.",
+  "currentPassphraseRequired": "Wymagane jest bieżące hasło główne",
+  "newPassphraseRequired": "Wymagane jest nowe hasło główne",
+  "passphraseTooWeak": "Hasło główne jest zbyt słabe",
+  "confirmPassphraseRequired": "Potwierdź nowe hasło główne",
+  "passphrasesDoNotMatch": "Hasła główne nie są zgodne",
+  "passphrasesMatch": "✓ Hasła główne są zgodne",
+  "passphrasesNoMatch": "✗ Hasła główne nie są zgodne",
+  "entropyDisplay": "{tier} · {bits} bitów",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Błąd transportu.",
+  "authorizationFailed": "Autoryzacja nie powiodła się — sprawdź PIN i spróbuj ponownie.",
+
+  "unlockEnterPassphraseAndPin": "Wprowadź hasło główne i PIN YubiKey, aby odblokować",
+  "unlockEnterPassphrase": "Wprowadź hasło główne, aby odblokować",
+  "unlockEntropyDisplay": "{tier} · {bits} bitów entropii",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Włóż klucz YubiKey i dotknij go, gdy zacznie migać",
+  "unlockErrorPassphrase": "Nie można odblokować skarbca. Sprawdź hasło główne.",
+  "unlockErrorPassphraseAndPin": "Nie można odblokować skarbca. Sprawdź hasło główne i PIN YubiKey.",
+
+  "importSelectFile": "Wybierz plik.",
+  "importFileNotFound": "Plik nie znaleziony.",
+  "importEnterPassphrase": "Wprowadź hasło główne dla tego skarbca.",
+  "importDuplicateWarning": "Wpisy, których UUID już istnieje w Twoim skarbcu, zostaną automatycznie pominięte. Zobaczysz podsumowanie.",
+  "importGabbroSubtitle": "Synchronizuj wpisy z innego skarbca Gabbro (plik .gabbro)",
+  "importEnpassSubtitle": "Eksport JSON z Enpass (Narzędzia → Eksportuj)",
+  "importBitwardenSubtitle": "Niezaszyfrowany eksport JSON z Bitwarden (Narzędzia → Eksportuj skarbiec)",
+  "importCsvSubtitle": "Eksport CSV z dowolnego menedżera haseł",
+
+  "vaultNameAlreadyExists": "Skarbiec o nazwie «{alias}» już istnieje.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Spowoduje to trwałe usunięcie «{alias}» i wszystkich jego danych.\n\nPlik: {path}\n\nTej operacji nie można cofnąć.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Spowoduje to trwałe usunięcie «{alias}» i powiązania z kluczem YubiKey.\n\nPlik: {path}\n\nTej operacji nie można cofnąć.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Wprowadź PIN i dotknij klucza YubiKey, aby autoryzować usunięcie.",
+  "deleteVaultTooltip": "Usuń skarbiec",
+
+  "navVault": "Skarbiec",
+  "navAbout": "O aplikacji",
+
+  "yubiKeySecurityWarning": "Ostrzeżenie bezpieczeństwa",
+  "removeYubiKeyTitle": "Usuń YubiKey",
+  "yubiKeyLastKeyRiskWarning": "OSTRZEŻENIE: jeśli pozostały klucz zostanie zgubiony, uszkodzony lub skradziony, dostęp do skarbca stanie się na zawsze niemożliwy. Nie ma możliwości odzyskania.",
+  "onlyOneKeyRegisteredWarning": "Zarejestrowany jest tylko jeden klucz. Jeśli ten klucz zostanie zgubiony, dostęp do skarbca stanie się na zawsze niemożliwy.",
+  "tapRegisterNfc": "Przyłóż klucz do telefonu, aby zarejestrować",
+  "tapRegisterUsb": "Po podłączeniu dotknij klucza, aby zarejestrować",
+  "tapActivateNfc": "Ponownie przyłóż klucz do telefonu, aby aktywować",
+  "tapActivateUsb": "Po podłączeniu ponownie dotknij klucza, aby aktywować",
+  "failedToRegisterKey": "Nie udało się zarejestrować klucza: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Nie udało się aktywować klucza: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Klucz {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Dotknij nowego klucza YubiKey, aby zarejestrować…",
+  "tapYubiKeyToActivate": "Ponownie dotknij nowego klucza YubiKey, aby aktywować…",
+  "editAliasTooltip": "Edytuj alias",
+  "cannotRemoveLastKey": "Nie można usunąć ostatniego klucza",
+  "removeKeyTooltip": "Usuń klucz",
+  "manageYubiKeysError": "Błąd: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klasyczny",
+  "generatorModePassphrase": "Hasło główne",
+  "charSetsHeader": "Zestawy znaków",
+  "languageHeader": "Język",
+  "separatorLabel": "Separator",
+  "capitaliseWords": "Wielkie litery w słowach",
+  "appendDigit": "Dodaj cyfrę",
+  "entropyBitsDisplay": "~{bits} bitów entropii",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Wybierz co najmniej jeden zestaw znaków",
+  "passwordMinLengthNote": "Hasła mają co najmniej 32 znaki. Jeśli strona ma krótszy limit, skopiuj wymaganą liczbę pierwszych znaków.",
+  "tooltipShow": "Pokaż",
+  "tooltipCopied": "Skopiowano!",
+  "tooltipCopy": "Kopiuj",
+  "excludeAmbiguousChars": "Wyklucz niejednoznaczne znaki (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Utwórz skarbiec, aby rozpocząć.",
+  "onboardingVaultName": "Nazwa skarbca",
+  "onboardingAliasRequired": "Alias jest wymagany",
+  "onboardingNewVaultLocation": "Lokalizacja nowego skarbca (taka sama jak poprzednio)",
+  "onboardingVaultLocation": "Lokalizacja skarbca",
+  "onboardingLoadingPath": "Ładowanie…",
+  "onboardingPathHint": "Ścieżka do pliku skarbca",
+  "onboardingPathRequired": "Ścieżka jest wymagana",
+  "onboardingReusePassphraseHint": "Wybierz nowe hasło główne lub ponownie użyj poprzedniego.",
+  "onboardingPassphraseRequired": "Hasło główne jest wymagane",
+  "onboardingConfirmRequired": "Potwierdź hasło główne",
+  "onboardingPrimaryKeyPin": "PIN klucza głównego",
+  "onboardingBackupKeyPin": "PIN klucza zapasowego",
+  "onboardingKeyNPin": "PIN klucza {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Dotkniesz każdego klucza YubiKey dwa razy (łącznie 4 dotknięcia). Między dwoma kluczami zostaniesz poproszony o zamianę.",
+  "onboardingYubikeySlowNote": "Tworzenie skarbca z YubiKey zajmuje 20–30 sekund. Aplikacja może wydawać się nieresponsywna — to normalne.",
+  "onboardingStep1Label": "Zarejestruj klucz główny",
+  "onboardingStep1Hint": "Dotknij teraz swojego klucza YubiKey",
+  "onboardingStep2Label": "Aktywuj klucz główny",
+  "onboardingStep2Hint": "Ponownie dotknij swojego klucza YubiKey",
+  "onboardingStep3Label": "Przełącz na klucz zapasowy",
+  "onboardingStep3Hint": "Wyjmij klucz główny, następnie podłącz zapasowy YubiKey",
+  "onboardingStep4Label": "Zarejestruj klucz zapasowy",
+  "onboardingStep4Hint": "Dotknij zapasowego klucza YubiKey",
+  "onboardingStep5Label": "Aktywuj klucz zapasowy",
+  "onboardingStep5Hint": "Dotknij zapasowego klucza YubiKey po raz ostatni",
+
+  "textSizePreview": "Gabro to intruzywna skała magmowa bogata w Mg i Fe, gruboziarnista.",
+
+  "fieldCardStatus": "Status",
+  "fieldPaymentNetwork": "Sieć płatnicza",
+
+  "cardStatusActive": "Aktywna",
+  "cardStatusLapsed": "Wygasła",
+  "cardStatusInactive": "Nieaktywna",
+
+  "validatorTitleRequired": "Tytuł jest wymagany",
+  "validatorUsernameRequired": "Nazwa użytkownika jest wymagana",
+  "validatorPasswordRequired": "Hasło jest wymagane",
+  "validatorContentRequired": "Treść jest wymagana",
+  "validatorFirstNameRequired": "Imię jest wymagane",
+  "validatorLastNameRequired": "Nazwisko jest wymagane",
+  "validatorCardLabelRequired": "Nazwa karty jest wymagana",
+  "validatorCardholderRequired": "Imię i nazwisko właściciela jest wymagane",
+  "validatorCardNumberRequired": "Numer karty jest wymagany",
+  "validatorCardNumberLength": "Numer karty musi mieć 6–19 cyfr",
+  "validatorExpiryRequired": "Data ważności jest wymagana",
+  "validatorExpiryFormat": "Użyj formatu MM/RR",
+  "validatorExpiryMonth": "Miesiąc musi być od 01 do 12",
+  "validatorCvvLength": "CVV musi mieć 3 lub 4 cyfry",
+  "validatorLabelRequired": "Etykieta jest wymagana",
+  "validatorStatusRequired": "Status jest wymagany",
+
+  "sectionBiometricUnlock": "Odblokowywanie biometryczne",
+  "biometricUnlockDescription": "Używaj odcisku palca lub twarzy do odblokowywania skarbca zamiast wpisywania hasła głównego.",
+  "biometricUnlockTitle": "Włącz odblokowywanie biometryczne",
+  "biometricUnlockNote": "Będą działać wszystkie dane biometryczne zarejestrowane na tym urządzeniu — nie tylko te użyte podczas rejestracji.",
+  "biometricUnavailable": "Odblokowywanie biometryczne jest niedostępne na tym urządzeniu. Nie znaleziono czytnika biometrycznego lub nie zarejestrowano danych biometrycznych w ustawieniach systemu.",
+  "biometricDialogTitle": "O odblokowywaniu biometrycznym",
+  "biometricDialogBody": "Po włączeniu Gabbro szyfruje główne hasło i przechowuje je na tym urządzeniu, chronione danymi biometrycznymi. Hasło jest odszyfrowywane tylko w momencie odblokowania.\n\nGabbro nigdy nie przechowuje danych odcisków palców ani twarzy — pozostają one w bezpiecznym chipie telefonu.",
+  "biometricDialogAllBiometrics": "Wszystkie dane biometryczne zarejestrowane na tym urządzeniu będą mogły odblokować Gabbro — nie można ograniczyć do konkretnego odcisku palca.",
+  "biometricDialogInvalidation": "Jeśli do tego telefonu zostaną dodane nowe dane biometryczne (w tym drugi odcisk palca), to ustawienie zostanie automatycznie wyłączone i będzie wymagało ponownej konfiguracji.",
+  "biometricDialogRecommendation": "Zalecenie: pozostaw wyłączone, jeśli masz wysoki model zagrożeń lub dzielisz to urządzenie.",
+  "biometricInvalidated": "Odblokowywanie biometryczne zostało wyłączone, ponieważ dane biometryczne na tym urządzeniu uległy zmianie (w ustawieniach systemu dodano nowy odcisk palca lub twarz). Jest to środek bezpieczeństwa. Wprowadź ponownie hasło główne i włącz odblokowywanie biometryczne ponownie.",
+  "useBiometrics": "Użyj biometrii",
+  "biometricCancelled": "Uwierzytelnianie biometryczne nie zostało ukończone. Wprowadź hasło główne, aby odblokować.",
+  "biometricEnrollTitle": "Wprowadź hasło główne",
+  "biometricEnrollDescription": "Wprowadź główne hasło, aby włączyć odblokowywanie biometryczne.",
+  "biometricYubikeyHint": "Poniżej wprowadź PIN YubiKey, następnie dotknij «Użyj biometrii», następnie dotknij klucza YubiKey.",
+
+  "helpTitle": "Pomoc",
+  "menuHelp": "Pomoc",
+  "helpCaptionCreate": "Utwórz skarbiec: wprowadź nazwę, hasło główne i opcjonalnie chroń kluczem YubiKey",
+  "helpCaptionEmpty": "Dotknij +, aby dodać pierwszy wpis",
+  "helpCaptionDetail": "Dotknij ikony oka, aby wyświetlić hasło, następnie naciśnij i przytrzymaj, aby zobaczyć szczegółową analizę znaków",
+  "helpCaptionTitleSearch": "Domyślnie pasek wyszukiwania przeszukuje tylko tytuły wpisów",
+  "helpCaptionFullSearch": "Dotknij lupy, aby przełączyć na wyszukiwanie we wszystkich polach; dotknij ponownie, aby wrócić do wyszukiwania po tytule",
+  "helpCaptionFilter": "Użyj przycisków filtrowania, aby wyświetlać tylko wpisy określonego typu",
+  "helpCaptionFolders": "Użyj selektora folderu, aby filtrować wpisy według folderu",
+  "helpCaptionSelect": "Naciśnij i przytrzymaj wpis, aby wejść w tryb zaznaczania; dodaj więcej elementów, następnie przypisz do folderu lub usuń. Dotknij X, aby wyjść.",
+  "helpCaptionJumpToLetter": "Dotknij litery na pasku indeksu, aby przeskoczyć do tej sekcji",
+  "helpCaptionBreakdown": "Dotknij ikony oka, aby wyświetlić hasło, następnie naciśnij i przytrzymaj, aby zobaczyć szczegółową analizę znaków",
+  "helpCaptionManageVaults": "W «Zarządzaj skarbcami» możesz zmienić nazwę lub usunąć skarbce, a także dodać nowy",
+  "helpCaptionUnlock": "Wprowadź hasło główne, aby odblokować skarbiec"
+}

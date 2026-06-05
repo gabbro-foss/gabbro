@@ -1,0 +1,809 @@
+{
+  "@@locale": "lt",
+
+  "appName": "Gabbro",
+
+  "cancel": "Atšaukti",
+  "delete": "Ištrinti",
+  "save": "Išsaugoti",
+  "close": "Uždaryti",
+  "ok": "Gerai",
+  "edit": "Redaguoti",
+  "add": "Pridėti",
+  "remove": "Pašalinti",
+  "rename": "Pervadinti",
+  "confirm": "Patvirtinti",
+  "continueAction": "Tęsti",
+  "dismiss": "Atmesti",
+  "authorize": "Leisti",
+  "register": "Registruoti",
+  "sync": "Sinchronizuoti",
+  "assign": "Priskirti",
+  "unlock": "Atrakinti",
+  "generate": "Generuoti",
+  "import": "Importuoti",
+  "export": "Eksportuoti",
+  "openInBrowser": "Atidaryti naršyklėje",
+  "useThisPassword": "Naudoti šį slaptažodį",
+  "reviewArrow": "Peržiūrėti →",
+  "skip": "Praleisti",
+  "keep": "Palikti",
+  "revert": "Atkurti",
+  "next": "Kitas: susieti stulpelius",
+  "syncFromVault": "Sinchronizuoti iš saugyklos",
+  "createVault": "Kurti saugyklą",
+  "pickFile": "Pasirinkti failą",
+  "noFileSelected": "Nepasirinktas failas",
+  "chooseFolder": "Pasirinkti aplanką",
+  "addCustomField": "Pridėti pasirinktinį lauką",
+  "exportFile": "Eksportuoti failą",
+  "addVault": "Pridėti saugyklą",
+  "addYubiKey": "Pridėti YubiKey",
+  "noChangesToSave": "Nėra pakeitimų, kuriuos reikėtų išsaugoti.",
+
+  "appearanceTitle": "Išvaizda",
+  "securityTitle": "Saugumas",
+  "aboutTitle": "Apie Gabbro",
+  "generatorTitle": "Slaptažodžių generatorius",
+  "importTitle": "Importuoti įrašus",
+  "exportTitle": "Eksportuoti saugyklą",
+  "changePassphraseTitle": "Keisti slaptafrazę",
+  "csvMappingTitle": "Susieti CSV stulpelius",
+  "manageFoldersTitle": "Tvarkyti aplankus",
+  "manageVaultsTitle": "Tvarkyti saugyklas",
+  "manageYubiKeysTitle": "Tvarkyti YubiKey raktus",
+  "passwordHistoryTitle": "Slaptažodžių istorija",
+  "reviewChangesTitle": "Peržiūrėti pakeitimus",
+  "unlockGabbroTitle": "Atrakinti Gabbro",
+
+  "sectionTheme": "Tema",
+  "sectionTextSize": "Teksto dydis",
+  "sectionAlphabetBar": "Abėcėlės juostos padėtis",
+  "sectionAccessibility": "Pritaikymas neįgaliesiems",
+  "sectionLanguage": "Kalba",
+  "sectionForegroundLock": "Užraktas priekiniame plane",
+  "sectionBackgroundLock": "Užraktas fone",
+  "sectionPasswordHistory": "Slaptažodžių istorija",
+  "sectionPassphraseCopyPaste": "Slaptafrazės kopijavimas / įklijavimas",
+  "sectionVaultList": "Saugyklų sąrašas",
+  "sectionClipboardClear": "Išvalyti iškarpinę",
+  "sectionCharacterSets": "Simbolių rinkiniai",
+  "sectionGeneratorLanguage": "Kalba",
+
+  "themeSystem": "Sistemos",
+  "themeLight": "Šviesi",
+  "themeDark": "Tamsus",
+
+  "textSizeSmall": "Mažas",
+  "textSizeRegular": "Įprastas",
+  "textSizeLarge": "Didelis",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Tik telefone — planšetiniame kompiuteryje visada kairėje.",
+  "alphabetBarLeft": "Kairėje",
+  "alphabetBarRight": "Dešinėje",
+
+  "highContrastTitle": "Didelis kontrastas",
+  "highContrastSubtitle": "Padidina kontrastą, kad būtų lengviau skaityti",
+
+  "languageNote": "Pakeičia sistemos kalbą. «Sistema» seka įrenginio regioninius nustatymus.",
+  "langSystem": "Sistema",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Užrakinti po tokio neveiklumo laiko, kai programa yra atidaryta.",
+  "backgroundLockDescription": "Užrakinti, kai programa buvo fone tiek laiko.",
+  "passwordHistoryDescription": "Kiek laiko saugoti ankstesnį slaptažodį po pakeitimo. «Laikyti visada» reiškia, kad istorija ištriname tik rankiniu būdu.",
+  "passphraseCopyPasteDescription": "Blokuoti kopijavimą ir įklijavimą slaptafrazės laukuose. Rekomenduojama: neleidžia slaptafrazei nutekėti per iškarpinę.",
+  "passphraseCopyPasteNote": "Pastaba: tai blokuoja kontekstinį meniu ilgu paspaudimu ir teksto žymėjimą. Klaviatūros įmontuotas įklijavimo mygtukas vis tiek gali veikti — tai platformos apribojimas.",
+  "blockCopyPasteTitle": "Blokuoti kopijavimą / įklijavimą",
+  "vaultListDescription": "Rodyti visų saugyklų sąrašą prisijungimo ekrane, kad galėtumėte pasirinkti, kurią atrakinti, neeidami į Tvarkyti saugyklas.",
+  "showVaultListTitle": "Rodyti saugyklų sąrašą prisijungiant",
+  "vaultListNote": "Saugumo pastaba: kai tai IŠJUNGTA, prisijungimo ekranas rodo tik paskutinę naudotą saugyklą — jokio užuominos apie kitas saugyklas. Kompromisas: norint perjungti saugyklą, pirmiausia reikia atrakinti, tada eiti į Meniu → Tvarkyti saugyklas.",
+  "clipboardClearDescription": "Išvalyti iškarpinę nukopijus paslaptį. Pastaba: iškarpinės tvarkyklės gali išlaikyti kopiją.",
+
+  "duration30s": "30 s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60 s",
+  "duration2min": "2 min",
+  "durationNever": "Niekada",
+  "duration7days": "7 dienos",
+  "duration30days": "30 dienų",
+  "duration90days": "90 dienų",
+  "durationKeepForever": "Laikyti visada",
+
+  "menuExportVault": "Eksportuoti saugyklą",
+  "menuImportEntries": "Importuoti įrašus",
+  "menuSyncFromFile": "Sinchronizuoti iš failo",
+  "menuManageVaults": "Tvarkyti saugyklas",
+  "menuChangePassphrase": "Keisti slaptafrazę",
+  "menuManageYubiKeys": "Tvarkyti YubiKey raktus",
+  "menuAppearance": "Išvaizda",
+  "menuSecurity": "Saugumas",
+  "menuManageFolders": "Tvarkyti aplankus",
+  "menuPasswordGenerator": "Slaptažodžių generatorius",
+  "menuAbout": "Apie",
+
+  "tooltipSelectEntries": "Pasirinkti įrašus",
+  "tooltipLockVault": "Užrakinti saugyklą",
+  "tooltipSelectAll": "Pasirinkti visus",
+  "tooltipDeselectAll": "Atšaukti visus pasirinkimus",
+  "tooltipMenu": "Meniu",
+  "tooltipCopy": "Kopijuoti",
+  "tooltipCopied": "Nukopijuota!",
+  "tooltipShow": "Rodyti",
+  "tooltipHide": "Slėpti",
+  "tooltipBrowse": "Naršyti",
+  "tooltipEditAlias": "Redaguoti slapyvardį",
+  "tooltipRemoveField": "Pašalinti lauką",
+  "tooltipRename": "Pervadinti",
+  "tooltipDeleteVault": "Ištrinti saugyklą",
+  "tooltipAssignToFolder": "Priskirti aplanką",
+  "tooltipShowPin": "Rodyti PIN",
+  "tooltipHidePin": "Slėpti PIN",
+  "tooltipShowValue": "Rodyti reikšmę",
+  "tooltipHideValue": "Slėpti",
+  "tooltipCancel": "Atšaukti",
+  "tooltipOpenInBrowser": "Atidaryti naršyklėje",
+
+  "allFolders": "Visi aplankai",
+  "noFolder": "Nėra",
+  "selectFolder": "Pasirinkti aplanką",
+  "folderName": "Aplanko pavadinimas",
+
+  "noEntriesMatch": "Nė vienas įrašas neatitinka paieškos.",
+  "noVaultsRegistered": "Nėra registruotų saugyklų.",
+  "noYubiKeysRegistered": "Nėra registruotų YubiKey raktų",
+  "selectEntry": "Pasirinkti įrašą",
+  "newEntryTitle": "Naujas įrašas",
+  "createEntryTitle": "Naujas: {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Redaguoti: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(nėra URL)",
+  "noNameFallback": "(nėra pavadinimo)",
+  "untitledFallback": "(be pavadinimo)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "Pasirinkta: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Ieškoti visuose laukuose…",
+  "searchEntriesHint": "Ieškoti įrašų…",
+  "searchAllFieldsTooltip": "Ieško visuose laukuose",
+  "searchByTitleTooltip": "Ieško pagal pavadinimą",
+  "entryTypeAll": "Visi",
+  "entryTypePassword": "Slaptažodis",
+  "entryTypeNote": "Pastaba",
+  "entryTypeCard": "Kortelė",
+  "entryTypeIdentity": "Tapatybė",
+  "entryTypeFile": "Failas",
+  "entryTypeCustom": "Pasirinktinis",
+  "errorPrefix": "Klaida: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Saugykla",
+  "navAppearance": "Išvaizda",
+  "navSecurity": "Saugumas",
+  "navAbout": "Apie",
+
+  "deleteEntryTitle": "Ištrinti įrašą?",
+  "cannotBeUndone": "Šio veiksmo negalima atšaukti.",
+  "deleteEntryDialogTitle": "Ištrinti įrašą?",
+  "deleteEntriesTitle": "{count, plural, one{Ištrinti 1 įrašą?} other{Ištrinti {count} įrašus?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Priskirti aplanką",
+  "folderConflictTitle": "Aplankų konfliktas",
+  "syncFailedTitle": "Sinchronizavimas nepavyko",
+  "syncFromFileTitle": "Sinchronizuoti iš failo",
+  "nothingToSync": "Nėra ko sinchronizuoti — abi saugyklos jau atnaujintos.",
+
+  "importedEntries": "{count, plural, one{1 įrašas importuotas.} other{{count} įrašai importuoti.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Eksportuoti failą",
+  "saveDecryptedFileTo": "Išsaugoti iššifruotą failą į:",
+  "exportPathLabel": "Eksportavimo kelias",
+  "exportedToPath": "Eksportuota į {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Eksportavimas nepavyko: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Atidaryti naršyklėje?",
+  "couldNotOpen": "Nepavyko atidaryti {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Ištrinti ankstesnį įrašą",
+  "failedToClearHistory": "Nepavyko išvalyti istorijos: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Nepavyko atkurti slaptažodžio: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Pervadinti aplanką",
+  "addFolderTitle": "Pridėti aplanką",
+  "deleteFolderTitle": "Ištrinti aplanką",
+  "deleteFolderConfirm": "Ištrinti «{folder}»?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Perkelti įrašus į",
+  "clearToNone": "Perkelti į «Nėra»",
+
+  "renameVaultTitle": "Pervadinti saugyklą",
+  "deleteVaultTitle": "Ištrinti saugyklą?",
+  "deleteVaultConfirmTitle": "Ar tikrai?",
+  "typeDeleteToConfirm": "Įveskite DELETE patvirtinimui",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Palieskite YubiKey raktą",
+  "noVaultsRegisteredText": "Nėra registruotų saugyklų.",
+
+  "addYubiKeyTitle": "Pridėti YubiKey",
+  "enterYubiKeyPinTitle": "Įvesti YubiKey PIN",
+  "editAliasForKey": "Redaguoti {index} rakto slapyvardį",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Liks tik vienas registruotas YubiKey raktas.",
+  "removeKeyConfirm": "Ar tikrai norite pašalinti šį raktą?",
+  "removeKeyVaultConfirm": "Pašalinti šį YubiKey raktą iš saugyklos?",
+  "yubiKeyRemoved": "YubiKey pašalintas",
+  "failedToRemoveKey": "Nepavyko pašalinti rakto: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey pridėtas",
+  "failedToAddKey": "Nepavyko pridėti rakto: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Nepavyko išsaugoti slapyvardžio: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "FIDO2 įrenginys nerastas. Įkiškite YubiKey raktą ir bandykite dar kartą.",
+  "transportLabel": "Perdavimas:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Slaptafrazė",
+  "yubiKeyPinLabel": "YubiKey PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Dabartinė slaptafrazė",
+  "newPassphraseLabel": "Nauja slaptafrazė",
+  "confirmPassphraseLabel": "Patvirtinti naują slaptafrazę",
+  "vaultPassphraseLabel": "Saugyklos slaptafrazė",
+  "aliasLabel": "Slapyvardis",
+  "aliasHint": "pvz., Pagrindinis, Darbo raktas…",
+  "masterPassphraseLabel": "Pagrindinė slaptafrazė",
+  "confirmPassphraseLabelShort": "Patvirtinti slaptafrazę",
+
+  "fieldTitle": "Pavadinimas",
+  "fieldContent": "Turinys",
+  "fieldFirstName": "Vardas",
+  "fieldLastName": "Pavardė",
+  "fieldEmail": "El. paštas (nebūtinas)",
+  "fieldPhone": "Telefonas (nebūtinas)",
+  "fieldAddress": "Adresas (nebūtinas)",
+  "fieldCardLabel": "Kortelės pavadinimas (pvz., «Visa Platinum»)",
+  "fieldCardholderName": "Kortelės turėtojo vardas",
+  "fieldCardNumber": "Kortelės numeris",
+  "fieldExpiry": "Galiojimo laikas (MM/MM)",
+  "fieldCvv": "CVV (nebūtinas)",
+  "fieldCardPin": "PIN (nebūtinas)",
+  "fieldCreditLimit": "Kredito limitas (nebūtinas)",
+  "fieldAccountNumber": "Sąskaitos numeris (nebūtinas)",
+  "fieldNotes": "Pastabos (nebūtinos)",
+  "fieldUrl": "URL (nebūtinas)",
+  "fieldUsername": "Vartotojo vardas",
+  "fieldPassword": "Slaptažodis",
+  "fieldSeparator": "Skyriklis",
+  "fieldFolder": "Aplankas",
+  "fieldLabel": "Žyma",
+  "fieldValue": "Reikšmė",
+  "fieldCustomFields": "Pasirinktiniai laukai",
+  "fieldLabelOptional": "{label} (nebūtinas)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Šis įrašo tipas dar nepalaikomas.",
+  "csvColumnNone": "(nėra)",
+  "csvPreviewLabel": "Peržiūra",
+  "csvImportButton": "Importuoti",
+
+  "gabbroVaultSection": "Gabbro saugykla",
+  "genericCsvSection": "Bendrasis CSV",
+
+  "changePassphraseSuccess": "Slaptafrazė pakeista",
+  "changePassphraseButton": "Keisti slaptafrazę",
+
+  "continueLabel": "Tęsti",
+  "protectWithYubiKey": "Apsaugoti su YubiKey",
+  "yubiKeySubtitle": "Aparatinės įrangos saugos raktas (rekomenduojama)",
+  "accessibilityButton": "Pritaikymas neįgaliesiems",
+
+  "aboutProjectSection": "Projektas",
+  "aboutLicenceSection": "Licencija",
+  "aboutOpenSourceSection": "Atvirojo kodo komponentai",
+  "aboutAttributionSection": "Priskyrimai",
+
+  "lengthLabel": "Ilgis",
+  "wordsLabel": "Žodžiai",
+  "generateButton": "Generuoti",
+  "usePasswordButton": "Naudoti šį slaptažodį",
+  "showHidePassword": "Rodyti",
+
+  "deleteVaultPostDeletion": "Jūsų saugykla buvo ištrinta. Sukurkite naują, kad galėtumėte tęsti.",
+
+  "syncFilePassphraseLabel": "Saugyklos slaptafrazė",
+
+  "historyWarning": "Saugoma tik 1 ankstesnė reikšmė. Istorija automatiškai valoma pagal saugumo nustatymus.",
+  "historyCurrent": "Dabartinis",
+  "historyPrevious": "Ankstesnis",
+  "historySavedOn": "Išsaugota {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · baigiasi {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Importavimo problema ({index} iš {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Tipas: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Redaguokite, ištaisykite ir išsaugokite šį įrašą arba praleiskite, kad jį atmestumėte.",
+
+  "entriesSkipped": "{count, plural, one{1 įrašas praleistas} other{{count} įrašai praleisti}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Šie įrašai jau yra jūsų saugykloje ir nebuvo perrašyti:",
+
+  "syncDeleteEntryContent": "Kitas įrenginys ištrynė «{title}».\n\nIštrinti čia taip pat, ar palikti?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}» yra skirtinguose aplankuose dviejuose įrenginiuose.\n\nŠis įrenginys: {local}\nKitas įrenginys: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Palikti be aplanko",
+  "folderConflictKeepLocal": "Palikti «{folder}»",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Perkelti be aplanko",
+  "folderConflictMoveIncoming": "Perkelti į «{folder}»",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Saugykla sinchronizuota — {added} pridėta, {updated} atnaujinta, {deleted} ištrinta.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Šis saugyklos failas naudoja kitą slaptafrazę. Sinchronizavimas palaikomas tik tarp saugyklų, kurios dalijasi ta pačia slaptafraze.",
+
+  "reviewSensitiveFields": "Slaptieji laukai",
+  "reviewOtherFields": "Kiti laukai",
+  "reviewPasswordChanged": "Slaptažodis pakeistas",
+  "reviewCvvChanged": "CVV pakeistas",
+  "reviewPinChanged": "PIN pakeistas",
+  "reviewTransactionPasswordChanged": "Operacijos slaptažodis pakeistas",
+  "tooltipShowValues": "Rodyti reikšmes",
+  "reviewOld": "Senas",
+  "reviewNew": "Naujas",
+  "reviewEmpty": "(tuščia)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Pastabos",
+  "reviewFieldContent": "Turinys",
+  "reviewFieldEmail": "El. paštas",
+  "reviewFieldPhone": "Telefonas",
+  "reviewFieldAddress": "Adresas",
+  "reviewFieldCardLabel": "Kortelės pavadinimas",
+  "reviewFieldStatus": "Būsena",
+  "reviewFieldCardholder": "Kortelės turėtojas",
+  "reviewFieldExpiry": "Galiojimo laikas",
+  "reviewFieldCreditLimit": "Kredito limitas",
+  "reviewFieldAccountNumber": "Sąskaitos numeris",
+  "reviewFieldNetwork": "Tinklas",
+  "reviewFieldBank": "Bankas",
+  "reviewFieldFilename": "Failo pavadinimas",
+  "reviewFieldSize": "Dydis",
+  "reviewFieldCardNumber": "Numeris",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Operacijos slaptažodis",
+  "timestampCreated": "Sukurta",
+  "timestampUpdated": "Atnaujinta",
+  "timestampUnknown": "Nežinoma",
+  "noTitleFallback": "(nėra pavadinimo)",
+  "tooltipExportFile": "Eksportuoti failą",
+  "tooltipEditEntry": "Redaguoti įrašą",
+  "tooltipDeleteEntry": "Ištrinti įrašą",
+  "exportLabel": "Eksportuoti",
+  "customEntryFieldsHeader": "Laukai",
+  "copiedNeverClears": "Nukopijuota — iškarpinė niekada automatiškai nevaloma",
+  "copiedClears30s": "Nukopijuota — iškarpinė bus išvalyta po 30 s",
+  "copiedClears60s": "Nukopijuota — iškarpinė bus išvalyta po 60 s",
+  "copiedClears2min": "Nukopijuota — iškarpinė bus išvalyta po 2 min",
+
+  "passwordBreakdownTitle": "Slaptažodžio analizė",
+  "charTypeUppercase": "Didžiosios raidės",
+  "charTypeLowercase": "Mažosios raidės",
+  "charTypeDigit": "Skaitmuo",
+  "charTypeSymbol": "Simbolis",
+
+  "exportIncludeDate": "Įtraukti datą į failo pavadinimą",
+  "exportChooseFormat": "Pasirinkite eksportavimo formatą.",
+  "exportUnencryptedWarning": "Visiškai nešifruota — visi slaptieji duomenys bus parašyti paprastu tekstu. Saugokite failą saugiai ir ištrinkite jį po naudojimo.",
+  "exportPassphraseOnlyNote": "Apsaugota tik slaptafrazė. YubiKey neReikalingas importuoti.",
+  "exportChooseDestinationJson": "Pasirinkite eksportuoto JSON failo paskirties vietą.",
+  "exportChooseDestinationVault": "Pasirinkite eksportuoto saugyklos failo paskirties vietą.",
+  "exportTwoFilesNote": "Bus sukurti du failai: vault.gabbro ir vault.gabbro.sha256",
+  "exportSelectDestination": "Pasirinkite paskirties vietą.",
+
+  "aboutVersion": "{version} versija",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Postkvantinis slaptažodžių tvarkyklė",
+  "aboutSourceCode": "Šaltinio kodas",
+  "aboutReportIssue": "Pranešti apie problemą",
+  "aboutSupportGabbro": "Remti Gabbro",
+  "aboutLicenceBody": "Gabbro yra nemokama atvirojo kodo programinė įranga, licencijuota pagal GNU General Public License v3.0 only (GPL-3.0-only).\n\nJūs galite laisvai naudoti, tyrinėti ir platinti šią programinę įrangą pagal tos licencijos sąlygas.",
+  "aboutOwnerRole": "Projekto savininkas, architektas ir pagrindinis kūrėjas:",
+  "aboutAiPartner": "DI kūrimo partneris:",
+  "aboutNoTelemetry": "Gabbro neatlieka jokių išeinančių tinklo jungčių. Jokios telemetrijos, jokios analitikos, jokių paskyrų.",
+
+  "strengthTierTerrible": "Siaubingas",
+  "strengthTierWeak": "Silpnas",
+  "strengthTierFair": "Patenkinamas",
+  "strengthTierStrong": "Stiprus",
+  "strengthTierVeryStrong": "Labai stiprus",
+  "strengthTierExcellent": "Puikus",
+  "yubiKeyProtectedNote": "YubiKey apsaugota saugykla — jūsų YubiKey ryšys bus išsaugotas.",
+  "yubiKeyPinRequired": "Reikalingas YubiKey PIN",
+  "tapYubiKeyNow": "Dabar palieskite YubiKey raktą…",
+  "touchYubiKeyToAuthorize": "Palieskite YubiKey raktą, kad patvirtintumėte šį pakeitimą.",
+  "currentPassphraseRequired": "Reikalinga dabartinė slaptafrazė",
+  "newPassphraseRequired": "Reikalinga nauja slaptafrazė",
+  "passphraseTooWeak": "Slaptafrazė per silpna",
+  "confirmPassphraseRequired": "Patvirtinkite naują slaptafrazę",
+  "passphrasesDoNotMatch": "Slaptafrazės nesutampa",
+  "passphrasesMatch": "✓ Slaptafrazės sutampa",
+  "passphrasesNoMatch": "✗ Slaptafrazės nesutampa",
+  "entropyDisplay": "{tier} · {bits} bitų",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Perdavimo klaida.",
+  "authorizationFailed": "Leidimas nepavyko — patikrinkite PIN ir bandykite dar kartą.",
+
+  "unlockEnterPassphraseAndPin": "Įveskite slaptafrazę ir YubiKey PIN, kad atrakintumėte",
+  "unlockEnterPassphrase": "Įveskite slaptafrazę, kad atrakintumėte",
+  "unlockEntropyDisplay": "{tier} · {bits} bitų entropijos",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Įkiškite YubiKey raktą ir palieskite, kai jis mirksi",
+  "unlockErrorPassphrase": "Nepavyko atrakinti saugyklos. Patikrinkite slaptafrazę.",
+  "unlockErrorPassphraseAndPin": "Nepavyko atrakinti saugyklos. Patikrinkite slaptafrazę ir YubiKey PIN.",
+
+  "importSelectFile": "Pasirinkite failą.",
+  "importFileNotFound": "Failas nerastas.",
+  "importEnterPassphrase": "Įveskite šios saugyklos slaptafrazę.",
+  "importDuplicateWarning": "Įrašai, kurių UUID jau yra jūsų saugykloje, bus automatiškai praleisti. Bus parodytas suvestinė.",
+  "importGabbroSubtitle": "Sinchronizuoti įrašus iš kitos Gabbro saugyklos (.gabbro failas)",
+  "importEnpassSubtitle": "JSON eksportas iš Enpass (Įrankiai → Eksportuoti)",
+  "importBitwardenSubtitle": "Nešifruotas JSON eksportas iš Bitwarden (Įrankiai → Eksportuoti saugyklą)",
+  "importCsvSubtitle": "CSV eksportas iš bet kurios slaptažodžių tvarkyklės",
+
+  "vaultNameAlreadyExists": "Saugykla pavadinimu «{alias}» jau egzistuoja.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Tai visam laikui ištrintų «{alias}» ir visus jos duomenis.\n\nFailas: {path}\n\nŠio veiksmo negalima atšaukti.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Tai visam laikui ištrintų «{alias}» ir pašalintų jos YubiKey ryšį.\n\nFailas: {path}\n\nŠio veiksmo negalima atšaukti.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Įveskite PIN ir palieskite YubiKey raktą, kad patvirtintumėte šį trynimą.",
+  "deleteVaultTooltip": "Ištrinti saugyklą",
+
+  "navVault": "Saugykla",
+  "navAbout": "Apie",
+
+  "yubiKeySecurityWarning": "Saugumo įspėjimas",
+  "removeYubiKeyTitle": "Pašalinti YubiKey",
+  "yubiKeyLastKeyRiskWarning": "ĮSPĖJIMAS: Jei likęs raktas bus pamestą, sugadintas ar pavogtas, prieiga prie saugyklos taps visam laikui neįmanoma. Atkūrimo būdo nėra.",
+  "onlyOneKeyRegisteredWarning": "Registruotas tik vienas raktas. Jei šis raktas bus pamestas, prieiga prie saugyklos taps visam laikui neįmanoma.",
+  "tapRegisterNfc": "Pridėkite raktą prie telefono registracijai",
+  "tapRegisterUsb": "Kai prijungtas, palieskite raktą registracijai",
+  "tapActivateNfc": "Vėl pridėkite raktą prie telefono aktyvavimui",
+  "tapActivateUsb": "Kai prijungtas, palieskite raktą dar kartą aktyvavimui",
+  "failedToRegisterKey": "Nepavyko registruoti rakto: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Nepavyko aktyvuoti rakto: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "{index} raktas",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Palieskite naują YubiKey raktą, kad jį registruotumėte…",
+  "tapYubiKeyToActivate": "Palieskite naują YubiKey raktą dar kartą, kad jį aktyvuotumėte…",
+  "editAliasTooltip": "Redaguoti slapyvardį",
+  "cannotRemoveLastKey": "Negalima pašalinti paskutinio rakto",
+  "removeKeyTooltip": "Pašalinti raktą",
+  "manageYubiKeysError": "Klaida: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klasikinis",
+  "generatorModePassphrase": "Slaptafrazė",
+  "charSetsHeader": "Simbolių rinkiniai",
+  "languageHeader": "Kalba",
+  "separatorLabel": "Skyriklis",
+  "capitaliseWords": "Rašyti žodžius didžiosiomis",
+  "appendDigit": "Pridėti skaitmenį",
+  "entropyBitsDisplay": "~{bits} bitų entropija",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Pasirinkite bent vieną simbolių rinkinį",
+  "passwordMinLengthNote": "Slaptažodžiai turi mažiausiai 32 simbolius. Jei svetainė turi trumpesnę ribą, nukopijuokite pirmuosius reikiamus simbolius.",
+  "tooltipShow": "Rodyti",
+  "tooltipCopied": "Nukopijuota!",
+  "tooltipCopy": "Kopijuoti",
+  "excludeAmbiguousChars": "Neįtraukti dviprasmiškų simbolių (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Sukurkite saugyklą, kad pradėtumėte.",
+  "onboardingVaultName": "Saugyklos pavadinimas",
+  "onboardingAliasRequired": "Slapyvardis yra privalomas",
+  "onboardingNewVaultLocation": "Naujos saugyklos vieta (tokia pati kaip anksčiau)",
+  "onboardingVaultLocation": "Saugyklos vieta",
+  "onboardingLoadingPath": "Kraunama…",
+  "onboardingPathHint": "Kelias į saugyklos failą",
+  "onboardingPathRequired": "Kelias yra privalomas",
+  "onboardingReusePassphraseHint": "Pasirinkite naują pagrindinę slaptafrazę arba pakartotinai naudokite ankstesnę, jei norite.",
+  "onboardingPassphraseRequired": "Slaptafrazė yra privaloma",
+  "onboardingConfirmRequired": "Patvirtinkite slaptafrazę",
+  "onboardingPrimaryKeyPin": "Pagrindinio rakto PIN",
+  "onboardingBackupKeyPin": "Atsarginio rakto PIN",
+  "onboardingKeyNPin": "{n} rakto PIN",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Kiekvieną YubiKey raktą paliesite du kartus (iš viso 4 palietimai). Tarp dviejų raktų būsite paprašyti juos pakeisti.",
+  "onboardingYubikeySlowNote": "Saugyklos kūrimas su YubiKey užtrunka 20–30 sekundžių. Programa gali atrodyti nereaguojanti — tai normalu.",
+  "onboardingStep1Label": "Registruoti pagrindinį raktą",
+  "onboardingStep1Hint": "Dabar palieskite YubiKey raktą",
+  "onboardingStep2Label": "Aktyvuoti pagrindinį raktą",
+  "onboardingStep2Hint": "Dar kartą palieskite YubiKey raktą",
+  "onboardingStep3Label": "Pereiti prie atsarginio rakto",
+  "onboardingStep3Hint": "Ištraukite pagrindinį raktą, tada prijunkite atsarginį YubiKey",
+  "onboardingStep4Label": "Registruoti atsarginį raktą",
+  "onboardingStep4Hint": "Palieskite atsarginį YubiKey raktą",
+  "onboardingStep5Label": "Aktyvuoti atsarginį raktą",
+  "onboardingStep5Hint": "Paskutinį kartą palieskite atsarginį YubiKey raktą",
+
+  "textSizePreview": "Gabbras yra intruzinė magminė uoliena, turtinga Mg ir Fe, stambiagrūdė.",
+
+  "fieldCardStatus": "Būsena",
+  "fieldPaymentNetwork": "Mokėjimo tinklas",
+
+  "cardStatusActive": "Aktyvus",
+  "cardStatusLapsed": "Pasibaigęs",
+  "cardStatusInactive": "Neaktyvus",
+
+  "validatorTitleRequired": "Pavadinimas yra privalomas",
+  "validatorUsernameRequired": "Vartotojo vardas yra privalomas",
+  "validatorPasswordRequired": "Slaptažodis yra privalomas",
+  "validatorContentRequired": "Turinys yra privalomas",
+  "validatorFirstNameRequired": "Vardas yra privalomas",
+  "validatorLastNameRequired": "Pavardė yra privaloma",
+  "validatorCardLabelRequired": "Kortelės pavadinimas yra privalomas",
+  "validatorCardholderRequired": "Kortelės turėtojo vardas yra privalomas",
+  "validatorCardNumberRequired": "Kortelės numeris yra privalomas",
+  "validatorCardNumberLength": "Kortelės numeris turi būti 6–19 skaitmenų",
+  "validatorExpiryRequired": "Galiojimo laikas yra privalomas",
+  "validatorExpiryFormat": "Naudokite MM/MM formatą",
+  "validatorExpiryMonth": "Mėnuo turi būti nuo 01 iki 12",
+  "validatorCvvLength": "CVV turi būti 3 arba 4 skaitmenys",
+  "validatorLabelRequired": "Žyma yra privaloma",
+  "validatorStatusRequired": "Būsena yra privaloma",
+
+  "sectionBiometricUnlock": "Biometrinis atrakinimas",
+  "biometricUnlockDescription": "Naudokite pirštų atspaudą arba veidą saugyklos atrakinimui vietoj slaptafrazės įvedimo.",
+  "biometricUnlockTitle": "Įjungti biometrinį atrakinimą",
+  "biometricUnlockNote": "Visi biometriniai duomenys, registruoti šiame įrenginyje, veiks — ne tik tie, kurie naudoti registruojant.",
+  "biometricUnavailable": "Biometrinis atrakinimas nepasiekiamas šiame įrenginyje. Biometrinis jutiklis nerastas arba sistemoje neregistruoti biometriniai duomenys.",
+  "biometricDialogTitle": "Apie biometrinį atrakinimą",
+  "biometricDialogBody": "Kai įjungta, Gabbro užšifruoja pagrindinę slaptafrazę ir saugo ją šiame įrenginyje, apsaugotą biometriniais duomenimis. Slaptafrazė iššifruojama tik atrakinimo momentu.\n\nGabbro niekada nesaugo pirštų atspaudų ar veido duomenų — jie lieka įrenginio saugiame čipe.",
+  "biometricDialogAllBiometrics": "Visi biometriniai duomenys, registruoti šiame įrenginyje, galės atrakinti Gabbro — negalite apriboti iki konkretaus pirštų atspaudo.",
+  "biometricDialogInvalidation": "Jei prie šio telefono pridedama nauja biometrika (įskaitant antrą pirštų atspaudą), šis nustatymas bus automatiškai išjungtas ir turėsite jį vėl sukonfigūruoti.",
+  "biometricDialogRecommendation": "Rekomendacija: palikite išjungtą, jei turite aukštą grėsmių modelį arba dalijatės šiuo įrenginiu.",
+  "biometricInvalidated": "Biometrinis atrakinimas buvo išjungtas, nes biometriniai duomenys šiame įrenginyje pasikeitė (sistemoje pridėtas naujas pirštų atspaudas ar veidas). Tai yra saugumo priemonė. Iš naujo įveskite slaptafrazę ir vėl įjunkite biometrinį atrakinimą.",
+  "useBiometrics": "Naudoti biometriją",
+  "biometricCancelled": "Biometrinis autentifikavimas nebaigtas. Įveskite slaptafrazę, kad atrakintumėte.",
+  "biometricEnrollTitle": "Įvesti slaptafrazę",
+  "biometricEnrollDescription": "Įveskite pagrindinę slaptafrazę, kad įjungtumėte biometrinį atrakinimą.",
+  "biometricYubikeyHint": "Žemiau įveskite YubiKey PIN, tada bakstelėkite Naudoti biometriją, tada palieskite YubiKey raktą.",
+
+  "helpTitle": "Pagalba",
+  "menuHelp": "Pagalba",
+  "helpCaptionCreate": "Kurkite saugyklą: įveskite pavadinimą, slaptafrazę ir, jei norite, apsaugokite YubiKey",
+  "helpCaptionEmpty": "Bakstelėkite +, kad pridėtumėte pirmą įrašą",
+  "helpCaptionDetail": "Bakstelėkite akies piktogramą, kad atskleistumėte slaptažodį, tada ilgai paspauskite, kad matytumėte išsamią simbolių struktūrą",
+  "helpCaptionTitleSearch": "Pagal numatytuosius nustatymus paieška ieško tik įrašų pavadinimuose",
+  "helpCaptionFullSearch": "Bakstelėkite didinamąjį stiklą, kad persijungtumėte į visų laukų paiešką; bakstelėkite vėl, kad grįžtumėte prie pavadinimų paieškos",
+  "helpCaptionFilter": "Naudokite filtravimo mygtukus, kad rodytumėte tik tam tikro tipo įrašus",
+  "helpCaptionFolders": "Naudokite aplanko pasirinkiklį, kad filtruotumėte įrašus pagal aplanką",
+  "helpCaptionSelect": "Ilgai paspauskite įrašą, kad įjungtumėte pasirinkimo režimą; pridėkite daugiau elementų, tada priskirkite aplanką arba ištrinkite. Bakstelėkite X, kad išeitumėte.",
+  "helpCaptionJumpToLetter": "Bakstelėkite abėcėlės juostoje esančią raidę, kad peršoktumėte į tą skyrių",
+  "helpCaptionBreakdown": "Bakstelėkite akies piktogramą, kad atskleistumėte slaptažodį, tada ilgai paspauskite, kad matytumėte išsamią simbolių struktūrą",
+  "helpCaptionManageVaults": "Saugyklų valdyme galite pervadinti arba ištrinti saugyklas arba pridėti naują",
+  "helpCaptionUnlock": "Įveskite slaptafrazę, kad atrakintumėte saugyklą"
+}

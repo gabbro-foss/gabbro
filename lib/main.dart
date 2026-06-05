@@ -13,6 +13,23 @@ import 'package:gabbro/src/rust/frb_generated.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:path_provider/path_provider.dart';
 
+/// Maps a non-system [LanguageChoice] to the correct [Locale].
+///
+/// Most locales use a single BCP-47 language tag that matches the enum name.
+/// The five complex locales (pt_PT, pt_BR, sr_Latn, zh_CN, zh_TW) need a
+/// country or script subtag and are handled explicitly.
+Locale _localeFor(LanguageChoice choice) {
+  assert(choice != LanguageChoice.system);
+  return switch (choice) {
+    LanguageChoice.ptPt   => const Locale('pt', 'PT'),
+    LanguageChoice.ptBr   => const Locale('pt', 'BR'),
+    LanguageChoice.srLatn => Locale.fromSubtags(languageCode: 'sr', scriptCode: 'Latn'),
+    LanguageChoice.zhCn   => const Locale('zh', 'CN'),
+    LanguageChoice.zhTw   => const Locale('zh', 'TW'),
+    _                     => Locale(choice.name),
+  };
+}
+
 @pragma('vm:entry-point')
 Future<void> autofillUnlockMain() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +53,7 @@ Future<void> autofillUnlockMain() async {
       supportedLocales: AppLocalizations.supportedLocales,
       locale: settings.language == LanguageChoice.system
           ? null
-          : Locale(settings.language.name),
+          : _localeFor(settings.language),
       themeMode: switch (settings.theme) {
         ThemeChoice.system => ThemeMode.system,
         ThemeChoice.light  => ThemeMode.light,
@@ -541,7 +558,7 @@ class _GabbroAppState extends State<GabbroApp>
           supportedLocales: AppLocalizations.supportedLocales,
           locale: _settings.language == LanguageChoice.system
               ? null
-              : Locale(_settings.language.name),
+              : _localeFor(_settings.language),
           themeMode: _themeMode,
           theme: gabbroLightTheme(highContrast: hc),
           darkTheme: gabbroDarkTheme(highContrast: hc),

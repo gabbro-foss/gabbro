@@ -1,0 +1,809 @@
+{
+  "@@locale": "cs",
+
+  "appName": "Gabbro",
+
+  "cancel": "Zrušit",
+  "delete": "Smazat",
+  "save": "Uložit",
+  "close": "Zavřít",
+  "ok": "OK",
+  "edit": "Upravit",
+  "add": "Přidat",
+  "remove": "Odebrat",
+  "rename": "Přejmenovat",
+  "confirm": "Potvrdit",
+  "continueAction": "Pokračovat",
+  "dismiss": "Zavřít",
+  "authorize": "Autorizovat",
+  "register": "Zaregistrovat",
+  "sync": "Synchronizovat",
+  "assign": "Přiřadit",
+  "unlock": "Odemknout",
+  "generate": "Generovat",
+  "import": "Importovat",
+  "export": "Exportovat",
+  "openInBrowser": "Otevřít v prohlížeči",
+  "useThisPassword": "Použít toto heslo",
+  "reviewArrow": "Zkontrolovat →",
+  "skip": "Přeskočit",
+  "keep": "Ponechat",
+  "revert": "Obnovit",
+  "next": "Dále: namapovat sloupce",
+  "syncFromVault": "Synchronizovat z trezoru",
+  "createVault": "Vytvořit trezor",
+  "pickFile": "Vybrat soubor",
+  "noFileSelected": "Není vybrán žádný soubor",
+  "chooseFolder": "Vybrat složku",
+  "addCustomField": "Přidat vlastní pole",
+  "exportFile": "Exportovat soubor",
+  "addVault": "Přidat trezor",
+  "addYubiKey": "Přidat YubiKey",
+  "noChangesToSave": "Žádné změny k uložení.",
+
+  "appearanceTitle": "Vzhled",
+  "securityTitle": "Zabezpečení",
+  "aboutTitle": "O aplikaci Gabbro",
+  "generatorTitle": "Generátor hesel",
+  "importTitle": "Importovat záznamy",
+  "exportTitle": "Exportovat trezor",
+  "changePassphraseTitle": "Změnit přístupovou frázi",
+  "csvMappingTitle": "Mapování sloupců CSV",
+  "manageFoldersTitle": "Správa složek",
+  "manageVaultsTitle": "Správa trezorů",
+  "manageYubiKeysTitle": "Správa klíčů YubiKey",
+  "passwordHistoryTitle": "Historie hesel",
+  "reviewChangesTitle": "Zkontrolovat změny",
+  "unlockGabbroTitle": "Odemknout Gabbro",
+
+  "sectionTheme": "Motiv",
+  "sectionTextSize": "Velikost textu",
+  "sectionAlphabetBar": "Poloha abecedního panelu",
+  "sectionAccessibility": "Přístupnost",
+  "sectionLanguage": "Jazyk",
+  "sectionForegroundLock": "Zamykání v popředí",
+  "sectionBackgroundLock": "Zamykání na pozadí",
+  "sectionPasswordHistory": "Historie hesel",
+  "sectionPassphraseCopyPaste": "Kopírování/vkládání přístupové fráze",
+  "sectionVaultList": "Seznam trezorů",
+  "sectionClipboardClear": "Vymazání schránky",
+  "sectionCharacterSets": "Sady znaků",
+  "sectionGeneratorLanguage": "Jazyk",
+
+  "themeSystem": "Systémový",
+  "themeLight": "Světlý",
+  "themeDark": "Tmavý",
+
+  "textSizeSmall": "Malý",
+  "textSizeRegular": "Normální",
+  "textSizeLarge": "Velký",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Pouze na telefonu — tablet vždy používá levou stranu.",
+  "alphabetBarLeft": "Vlevo",
+  "alphabetBarRight": "Vpravo",
+
+  "highContrastTitle": "Vysoký kontrast",
+  "highContrastSubtitle": "Zvyšuje kontrast pro lepší čitelnost",
+
+  "languageNote": "Přepíše systémový jazyk. «Systémový» sleduje regionální nastavení zařízení.",
+  "langSystem": "Systémový",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Zamknout po tomto čase nečinnosti, když je aplikace otevřená.",
+  "backgroundLockDescription": "Zamknout po tom, co aplikace je na pozadí po tuto dobu.",
+  "passwordHistoryDescription": "Jak dlouho uchovávat předchozí heslo po změně. «Uchovávat vždy» znamená, že historie se maže pouze ručně.",
+  "passphraseCopyPasteDescription": "Blokovat kopírování a vkládání v polích přístupové fráze. Doporučeno: zabrání úniku fráze přes schránku.",
+  "passphraseCopyPasteNote": "Poznámka: toto blokuje kontextové menu při dlouhém stisknutí a výběr textu. Vestavěné tlačítko vložení klávesnice může stále fungovat — to je omezení platformy.",
+  "blockCopyPasteTitle": "Blokovat kopírování/vkládání",
+  "vaultListDescription": "Zobrazit seznam všech trezorů na přihlašovací obrazovce, abyste mohli vybrat, který odemknout, aniž byste přecházeli do «Správy trezorů».",
+  "showVaultListTitle": "Zobrazit seznam trezorů při přihlášení",
+  "vaultListNote": "Bezpečnostní poznámka: když je toto VYPNUTO, přihlašovací obrazovka zobrazuje pouze naposledy použitý trezor — bez náznaku existence jiných. Kompromis: pro změnu trezoru musíte nejprve odemknout a poté přejít do Menu → Správa trezorů.",
+  "clipboardClearDescription": "Vymazat schránku po zkopírování tajemství. Poznámka: správci schránky mohou kopii uchovávat.",
+
+  "duration30s": "30 s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60 s",
+  "duration2min": "2 min",
+  "durationNever": "Nikdy",
+  "duration7days": "7 dní",
+  "duration30days": "30 dní",
+  "duration90days": "90 dní",
+  "durationKeepForever": "Uchovávat vždy",
+
+  "menuExportVault": "Exportovat trezor",
+  "menuImportEntries": "Importovat záznamy",
+  "menuSyncFromFile": "Synchronizovat ze souboru",
+  "menuManageVaults": "Správa trezorů",
+  "menuChangePassphrase": "Změnit přístupovou frázi",
+  "menuManageYubiKeys": "Správa klíčů YubiKey",
+  "menuAppearance": "Vzhled",
+  "menuSecurity": "Zabezpečení",
+  "menuManageFolders": "Správa složek",
+  "menuPasswordGenerator": "Generátor hesel",
+  "menuAbout": "O aplikaci",
+
+  "tooltipSelectEntries": "Vybrat záznamy",
+  "tooltipLockVault": "Zamknout trezor",
+  "tooltipSelectAll": "Vybrat vše",
+  "tooltipDeselectAll": "Zrušit výběr",
+  "tooltipMenu": "Nabídka",
+  "tooltipCopy": "Kopírovat",
+  "tooltipCopied": "Zkopírováno!",
+  "tooltipShow": "Zobrazit",
+  "tooltipHide": "Skrýt",
+  "tooltipBrowse": "Procházet",
+  "tooltipEditAlias": "Upravit alias",
+  "tooltipRemoveField": "Odebrat pole",
+  "tooltipRename": "Přejmenovat",
+  "tooltipDeleteVault": "Smazat trezor",
+  "tooltipAssignToFolder": "Přiřadit ke složce",
+  "tooltipShowPin": "Zobrazit PIN",
+  "tooltipHidePin": "Skrýt PIN",
+  "tooltipShowValue": "Zobrazit hodnotu",
+  "tooltipHideValue": "Skrýt",
+  "tooltipCancel": "Zrušit",
+  "tooltipOpenInBrowser": "Otevřít v prohlížeči",
+
+  "allFolders": "Všechny složky",
+  "noFolder": "Žádná",
+  "selectFolder": "Vybrat složku",
+  "folderName": "Název složky",
+
+  "noEntriesMatch": "Žádné záznamy neodpovídají hledání.",
+  "noVaultsRegistered": "Žádné zaregistrované trezory.",
+  "noYubiKeysRegistered": "Žádné zaregistrované klíče YubiKey",
+  "selectEntry": "Vybrat záznam",
+  "newEntryTitle": "Nový záznam",
+  "createEntryTitle": "Nový(-á) {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Upravit: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(bez URL)",
+  "noNameFallback": "(bez názvu)",
+  "untitledFallback": "(bez nadpisu)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "Vybráno: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Hledat ve všech polích…",
+  "searchEntriesHint": "Hledat záznamy…",
+  "searchAllFieldsTooltip": "Hledá ve všech polích",
+  "searchByTitleTooltip": "Hledá podle názvu",
+  "entryTypeAll": "Vše",
+  "entryTypePassword": "Heslo",
+  "entryTypeNote": "Poznámka",
+  "entryTypeCard": "Karta",
+  "entryTypeIdentity": "Identita",
+  "entryTypeFile": "Soubor",
+  "entryTypeCustom": "Vlastní",
+  "errorPrefix": "Chyba: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Trezor",
+  "navAppearance": "Vzhled",
+  "navSecurity": "Zabezpečení",
+  "navAbout": "O aplikaci",
+
+  "deleteEntryTitle": "Smazat záznam?",
+  "cannotBeUndone": "Tuto akci nelze vrátit.",
+  "deleteEntryDialogTitle": "Smazat záznam?",
+  "deleteEntriesTitle": "{count, plural, one{Smazat 1 záznam?} few{Smazat {count} záznamy?} other{Smazat {count} záznamů?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Přiřadit ke složce",
+  "folderConflictTitle": "Konflikt složek",
+  "syncFailedTitle": "Synchronizace selhala",
+  "syncFromFileTitle": "Synchronizovat ze souboru",
+  "nothingToSync": "Není co synchronizovat — oba trezory jsou již aktuální.",
+
+  "importedEntries": "{count, plural, one{Importován 1 záznam.} few{Importovány {count} záznamy.} other{Importováno {count} záznamů.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Exportovat soubor",
+  "saveDecryptedFileTo": "Uložit dešifrovaný soubor do:",
+  "exportPathLabel": "Cesta exportu",
+  "exportedToPath": "Exportováno do {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Export selhal: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Otevřít v prohlížeči?",
+  "couldNotOpen": "Nelze otevřít {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Smazat předchozí záznam",
+  "failedToClearHistory": "Nepodařilo se vymazat historii: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Nepodařilo se obnovit heslo: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Přejmenovat složku",
+  "addFolderTitle": "Přidat složku",
+  "deleteFolderTitle": "Smazat složku",
+  "deleteFolderConfirm": "Smazat «{folder}»?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Přesunout záznamy do",
+  "clearToNone": "Přesunout do «Žádná»",
+
+  "renameVaultTitle": "Přejmenovat trezor",
+  "deleteVaultTitle": "Smazat trezor?",
+  "deleteVaultConfirmTitle": "Jste si jistý(-á)?",
+  "typeDeleteToConfirm": "Zadejte DELETE pro potvrzení",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Dotkněte se svého klíče YubiKey",
+  "noVaultsRegisteredText": "Žádné zaregistrované trezory.",
+
+  "addYubiKeyTitle": "Přidat YubiKey",
+  "enterYubiKeyPinTitle": "Zadat PIN YubiKey",
+  "editAliasForKey": "Upravit alias klíče {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Zbyde jen jeden zaregistrovaný klíč YubiKey.",
+  "removeKeyConfirm": "Opravdu chcete odebrat tento klíč?",
+  "removeKeyVaultConfirm": "Odebrat tento klíč YubiKey z trezoru?",
+  "yubiKeyRemoved": "YubiKey odebrán",
+  "failedToRemoveKey": "Nepodařilo se odebrat klíč: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey přidán",
+  "failedToAddKey": "Nepodařilo se přidat klíč: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Nepodařilo se uložit alias: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Nebylo nalezeno žádné zařízení FIDO2. Vložte klíč YubiKey a zkuste to znovu.",
+  "transportLabel": "Přenos:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Přístupová fráze",
+  "yubiKeyPinLabel": "PIN YubiKey",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Aktuální přístupová fráze",
+  "newPassphraseLabel": "Nová přístupová fráze",
+  "confirmPassphraseLabel": "Potvrdit novou přístupovou frázi",
+  "vaultPassphraseLabel": "Přístupová fráze trezoru",
+  "aliasLabel": "Alias",
+  "aliasHint": "např. Hlavní, Pracovní klíč…",
+  "masterPassphraseLabel": "Hlavní přístupová fráze",
+  "confirmPassphraseLabelShort": "Potvrdit přístupovou frázi",
+
+  "fieldTitle": "Název",
+  "fieldContent": "Obsah",
+  "fieldFirstName": "Křestní jméno",
+  "fieldLastName": "Příjmení",
+  "fieldEmail": "E-mail (volitelné)",
+  "fieldPhone": "Telefon (volitelné)",
+  "fieldAddress": "Adresa (volitelné)",
+  "fieldCardLabel": "Název karty (např. «Visa Platinum»)",
+  "fieldCardholderName": "Jméno držitele karty",
+  "fieldCardNumber": "Číslo karty",
+  "fieldExpiry": "Platnost (MM/RR)",
+  "fieldCvv": "CVV (volitelné)",
+  "fieldCardPin": "PIN (volitelné)",
+  "fieldCreditLimit": "Úvěrový limit (volitelné)",
+  "fieldAccountNumber": "Číslo účtu (volitelné)",
+  "fieldNotes": "Poznámky (volitelné)",
+  "fieldUrl": "URL (volitelné)",
+  "fieldUsername": "Uživatelské jméno",
+  "fieldPassword": "Heslo",
+  "fieldSeparator": "Oddělovač",
+  "fieldFolder": "Složka",
+  "fieldLabel": "Štítek",
+  "fieldValue": "Hodnota",
+  "fieldCustomFields": "Vlastní pole",
+  "fieldLabelOptional": "{label} (volitelné)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Tento typ záznamu zatím není podporován.",
+  "csvColumnNone": "(žádný)",
+  "csvPreviewLabel": "Náhled",
+  "csvImportButton": "Importovat",
+
+  "gabbroVaultSection": "Trezor Gabbro",
+  "genericCsvSection": "Obecný CSV",
+
+  "changePassphraseSuccess": "Přístupová fráze změněna",
+  "changePassphraseButton": "Změnit přístupovou frázi",
+
+  "continueLabel": "Pokračovat",
+  "protectWithYubiKey": "Chránit pomocí YubiKey",
+  "yubiKeySubtitle": "Hardwarový bezpečnostní klíč (doporučeno)",
+  "accessibilityButton": "Přístupnost",
+
+  "aboutProjectSection": "Projekt",
+  "aboutLicenceSection": "Licence",
+  "aboutOpenSourceSection": "Komponenty s otevřeným zdrojovým kódem",
+  "aboutAttributionSection": "Poděkování",
+
+  "lengthLabel": "Délka",
+  "wordsLabel": "Slova",
+  "generateButton": "Generovat",
+  "usePasswordButton": "Použít toto heslo",
+  "showHidePassword": "Zobrazit",
+
+  "deleteVaultPostDeletion": "Váš trezor byl smazán. Vytvořte nový pro pokračování.",
+
+  "syncFilePassphraseLabel": "Přístupová fráze trezoru",
+
+  "historyWarning": "Je uchována pouze 1 předchozí hodnota. Historie se automaticky maže na základě nastavení zabezpečení.",
+  "historyCurrent": "Aktuální",
+  "historyPrevious": "Předchozí",
+  "historySavedOn": "Uloženo {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · vyprší {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Problém s importem ({index} z {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Typ: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Upravte, opravte a uložte tento záznam, nebo přeskočte, abyste ho odmítli.",
+
+  "entriesSkipped": "{count, plural, one{1 záznam přeskočen} few{{count} záznamy přeskočeny} other{{count} záznamů přeskočeno}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Tyto záznamy již existují ve vašem trezoru a nebyly přepsány:",
+
+  "syncDeleteEntryContent": "Druhé zařízení smazalo «{title}».\n\nSmazat i zde, nebo ponechat?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}» je v různých složkách na dvou zařízeních.\n\nToto zařízení: {local}\nDruhé zařízení: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Ponechat bez složky",
+  "folderConflictKeepLocal": "Ponechat «{folder}»",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Přesunout bez složky",
+  "folderConflictMoveIncoming": "Přesunout do «{folder}»",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Trezor synchronizován — přidáno: {added}, aktualizováno: {updated}, smazáno: {deleted}.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Tento soubor trezoru používá jinou přístupovou frázi. Synchronizace je podporována pouze mezi trezory se stejnou přístupovou frází.",
+
+  "reviewSensitiveFields": "Citlivá pole",
+  "reviewOtherFields": "Ostatní pole",
+  "reviewPasswordChanged": "Heslo změněno",
+  "reviewCvvChanged": "CVV změněno",
+  "reviewPinChanged": "PIN změněn",
+  "reviewTransactionPasswordChanged": "Transakční heslo změněno",
+  "tooltipShowValues": "Zobrazit hodnoty",
+  "reviewOld": "Staré",
+  "reviewNew": "Nové",
+  "reviewEmpty": "(prázdné)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Poznámky",
+  "reviewFieldContent": "Obsah",
+  "reviewFieldEmail": "E-mail",
+  "reviewFieldPhone": "Telefon",
+  "reviewFieldAddress": "Adresa",
+  "reviewFieldCardLabel": "Název karty",
+  "reviewFieldStatus": "Stav",
+  "reviewFieldCardholder": "Držitel karty",
+  "reviewFieldExpiry": "Platnost",
+  "reviewFieldCreditLimit": "Úvěrový limit",
+  "reviewFieldAccountNumber": "Číslo účtu",
+  "reviewFieldNetwork": "Síť",
+  "reviewFieldBank": "Banka",
+  "reviewFieldFilename": "Název souboru",
+  "reviewFieldSize": "Velikost",
+  "reviewFieldCardNumber": "Číslo",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Transakční heslo",
+  "timestampCreated": "Vytvořeno",
+  "timestampUpdated": "Aktualizováno",
+  "timestampUnknown": "Neznámé",
+  "noTitleFallback": "(bez názvu)",
+  "tooltipExportFile": "Exportovat soubor",
+  "tooltipEditEntry": "Upravit záznam",
+  "tooltipDeleteEntry": "Smazat záznam",
+  "exportLabel": "Export",
+  "customEntryFieldsHeader": "Pole",
+  "copiedNeverClears": "Zkopírováno — schránka se nikdy automaticky nevymaže",
+  "copiedClears30s": "Zkopírováno — schránka se vymaže za 30 s",
+  "copiedClears60s": "Zkopírováno — schránka se vymaže za 60 s",
+  "copiedClears2min": "Zkopírováno — schránka se vymaže za 2 min",
+
+  "passwordBreakdownTitle": "Analýza hesla",
+  "charTypeUppercase": "Velká písmena",
+  "charTypeLowercase": "Malá písmena",
+  "charTypeDigit": "Číslice",
+  "charTypeSymbol": "Symbol",
+
+  "exportIncludeDate": "Zahrnout datum do názvu souboru",
+  "exportChooseFormat": "Zvolte formát exportu.",
+  "exportUnencryptedWarning": "Zcela nešifrováno — všechna tajemství budou zapsána jako prostý text. Soubor bezpečně uschovejte a po použití smažte.",
+  "exportPassphraseOnlyNote": "Chráněno pouze přístupovou frází. YubiKey není pro import potřeba.",
+  "exportChooseDestinationJson": "Zvolte cíl pro exportovaný soubor JSON.",
+  "exportChooseDestinationVault": "Zvolte cíl pro exportovaný soubor trezoru.",
+  "exportTwoFilesNote": "Budou vytvořeny dva soubory: vault.gabbro a vault.gabbro.sha256",
+  "exportSelectDestination": "Zvolte cíl.",
+
+  "aboutVersion": "Verze {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Postkvantový správce hesel",
+  "aboutSourceCode": "Zdrojový kód",
+  "aboutReportIssue": "Nahlásit problém",
+  "aboutSupportGabbro": "Podpořit Gabbro",
+  "aboutLicenceBody": "Gabbro je svobodný software s otevřeným zdrojovým kódem, licencovaný pod GNU General Public License v3.0 only (GPL-3.0-only).\n\nMáte svobodu tuto aplikaci používat, studovat a šířit za podmínek dané licence.",
+  "aboutOwnerRole": "Vlastník projektu, architekt a hlavní vývojář:",
+  "aboutAiPartner": "AI vývojový partner:",
+  "aboutNoTelemetry": "Gabbro nevytváří žádná odchozí síťová připojení. Žádná telemetrie, analýzy ani účty.",
+
+  "strengthTierTerrible": "Hrozné",
+  "strengthTierWeak": "Slabé",
+  "strengthTierFair": "Přijatelné",
+  "strengthTierStrong": "Silné",
+  "strengthTierVeryStrong": "Velmi silné",
+  "strengthTierExcellent": "Vynikající",
+  "yubiKeyProtectedNote": "Trezor chráněný YubiKey — vazba na klíč bude zachována.",
+  "yubiKeyPinRequired": "Vyžaduje se PIN YubiKey",
+  "tapYubiKeyNow": "Nyní se dotkněte svého klíče YubiKey…",
+  "touchYubiKeyToAuthorize": "Dotkněte se klíče YubiKey pro autorizaci této změny.",
+  "currentPassphraseRequired": "Vyžaduje se aktuální přístupová fráze",
+  "newPassphraseRequired": "Vyžaduje se nová přístupová fráze",
+  "passphraseTooWeak": "Přístupová fráze je příliš slabá",
+  "confirmPassphraseRequired": "Potvrďte novou přístupovou frázi",
+  "passphrasesDoNotMatch": "Přístupové fráze se neshodují",
+  "passphrasesMatch": "✓ Přístupové fráze se shodují",
+  "passphrasesNoMatch": "✗ Přístupové fráze se neshodují",
+  "entropyDisplay": "{tier} · {bits} bitů",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Chyba přenosu.",
+  "authorizationFailed": "Autorizace selhala — zkontrolujte PIN a zkuste to znovu.",
+
+  "unlockEnterPassphraseAndPin": "Zadejte přístupovou frázi a PIN YubiKey pro odemknutí",
+  "unlockEnterPassphrase": "Zadejte přístupovou frázi pro odemknutí",
+  "unlockEntropyDisplay": "{tier} · {bits} bitů entropie",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Vložte klíč YubiKey a dotkněte se ho, když zabliká",
+  "unlockErrorPassphrase": "Trezor se nepodařilo odemknout. Zkontrolujte přístupovou frázi.",
+  "unlockErrorPassphraseAndPin": "Trezor se nepodařilo odemknout. Zkontrolujte přístupovou frázi a PIN YubiKey.",
+
+  "importSelectFile": "Vyberte soubor.",
+  "importFileNotFound": "Soubor nenalezen.",
+  "importEnterPassphrase": "Zadejte přístupovou frázi pro tento trezor.",
+  "importDuplicateWarning": "Záznamy, jejichž UUID již existuje ve vašem trezoru, budou automaticky přeskočeny. Zobrazí se přehled.",
+  "importGabbroSubtitle": "Synchronizovat záznamy z jiného trezoru Gabbro (soubor .gabbro)",
+  "importEnpassSubtitle": "JSON export z Enpass (Nástroje → Exportovat)",
+  "importBitwardenSubtitle": "Nešifrovaný JSON export z Bitwarden (Nástroje → Exportovat trezor)",
+  "importCsvSubtitle": "CSV export z libovolného správce hesel",
+
+  "vaultNameAlreadyExists": "Trezor s názvem «{alias}» již existuje.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Tím trvale smažete «{alias}» a všechna jeho data.\n\nSoubor: {path}\n\nTuto akci nelze vrátit.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Tím trvale smažete «{alias}» a odstraníte jeho vazbu na YubiKey.\n\nSoubor: {path}\n\nTuto akci nelze vrátit.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Zadejte PIN a dotkněte se klíče YubiKey pro autorizaci smazání.",
+  "deleteVaultTooltip": "Smazat trezor",
+
+  "navVault": "Trezor",
+  "navAbout": "O aplikaci",
+
+  "yubiKeySecurityWarning": "Bezpečnostní varování",
+  "removeYubiKeyTitle": "Odebrat YubiKey",
+  "yubiKeyLastKeyRiskWarning": "VAROVÁNÍ: pokud zbývající klíč bude ztracen, poškozen nebo odcizen, přístup k trezoru bude trvale znemožněn. Neexistuje žádná možnost obnovy.",
+  "onlyOneKeyRegisteredWarning": "Zaregistrován je pouze jeden klíč. Pokud bude tento klíč ztracen, přístup k trezoru bude trvale znemožněn.",
+  "tapRegisterNfc": "Přiložte klíč k telefonu pro registraci",
+  "tapRegisterUsb": "Po připojení se dotkněte klíče pro registraci",
+  "tapActivateNfc": "Znovu přiložte klíč k telefonu pro aktivaci",
+  "tapActivateUsb": "Po připojení se znovu dotkněte klíče pro aktivaci",
+  "failedToRegisterKey": "Nepodařilo se zaregistrovat klíč: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Nepodařilo se aktivovat klíč: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Klíč {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Dotkněte se nového klíče YubiKey pro registraci…",
+  "tapYubiKeyToActivate": "Znovu se dotkněte nového klíče YubiKey pro aktivaci…",
+  "editAliasTooltip": "Upravit alias",
+  "cannotRemoveLastKey": "Poslední klíč nelze odebrat",
+  "removeKeyTooltip": "Odebrat klíč",
+  "manageYubiKeysError": "Chyba: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klasický",
+  "generatorModePassphrase": "Přístupová fráze",
+  "charSetsHeader": "Sady znaků",
+  "languageHeader": "Jazyk",
+  "separatorLabel": "Oddělovač",
+  "capitaliseWords": "Velká písmena ve slovech",
+  "appendDigit": "Přidat číslici",
+  "entropyBitsDisplay": "~{bits} bitů entropie",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Vyberte alespoň jednu sadu znaků",
+  "passwordMinLengthNote": "Hesla mají alespoň 32 znaků. Pokud má web kratší limit, zkopírujte potřebný počet prvních znaků.",
+  "tooltipShow": "Zobrazit",
+  "tooltipCopied": "Zkopírováno!",
+  "tooltipCopy": "Kopírovat",
+  "excludeAmbiguousChars": "Vyloučit nejednoznačné znaky (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Vytvořte svůj trezor pro začátek.",
+  "onboardingVaultName": "Název trezoru",
+  "onboardingAliasRequired": "Alias je povinný",
+  "onboardingNewVaultLocation": "Umístění nového trezoru (stejné jako dříve)",
+  "onboardingVaultLocation": "Umístění trezoru",
+  "onboardingLoadingPath": "Načítání…",
+  "onboardingPathHint": "Cesta k souboru trezoru",
+  "onboardingPathRequired": "Cesta je povinná",
+  "onboardingReusePassphraseHint": "Zvolte novou hlavní přístupovou frázi nebo znovu použijte předchozí.",
+  "onboardingPassphraseRequired": "Přístupová fráze je povinná",
+  "onboardingConfirmRequired": "Potvrďte přístupovou frázi",
+  "onboardingPrimaryKeyPin": "PIN hlavního klíče",
+  "onboardingBackupKeyPin": "PIN záložního klíče",
+  "onboardingKeyNPin": "PIN klíče {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Každého klíče YubiKey se dotknete dvakrát (celkem 4 doteky). Mezi oběma klíči budete vyzváni k jejich výměně.",
+  "onboardingYubikeySlowNote": "Vytvoření trezoru s klíčem YubiKey trvá 20–30 sekund. Aplikace může vypadat nereagující — to je normální.",
+  "onboardingStep1Label": "Zaregistrovat hlavní klíč",
+  "onboardingStep1Hint": "Nyní se dotkněte klíče YubiKey",
+  "onboardingStep2Label": "Aktivovat hlavní klíč",
+  "onboardingStep2Hint": "Znovu se dotkněte klíče YubiKey",
+  "onboardingStep3Label": "Přepnout na záložní klíč",
+  "onboardingStep3Hint": "Vyjměte hlavní klíč a poté zapojte záložní YubiKey",
+  "onboardingStep4Label": "Zaregistrovat záložní klíč",
+  "onboardingStep4Hint": "Dotkněte se záložního klíče YubiKey",
+  "onboardingStep5Label": "Aktivovat záložní klíč",
+  "onboardingStep5Hint": "Naposledy se dotkněte záložního klíče YubiKey",
+
+  "textSizePreview": "Gabbro je intruzivní vyvřelá hornina bohatá na Mg a Fe s hrubozrnnou strukturou.",
+
+  "fieldCardStatus": "Stav",
+  "fieldPaymentNetwork": "Platební síť",
+
+  "cardStatusActive": "Aktivní",
+  "cardStatusLapsed": "Prošlá",
+  "cardStatusInactive": "Neaktivní",
+
+  "validatorTitleRequired": "Název je povinný",
+  "validatorUsernameRequired": "Uživatelské jméno je povinné",
+  "validatorPasswordRequired": "Heslo je povinné",
+  "validatorContentRequired": "Obsah je povinný",
+  "validatorFirstNameRequired": "Křestní jméno je povinné",
+  "validatorLastNameRequired": "Příjmení je povinné",
+  "validatorCardLabelRequired": "Název karty je povinný",
+  "validatorCardholderRequired": "Jméno držitele karty je povinné",
+  "validatorCardNumberRequired": "Číslo karty je povinné",
+  "validatorCardNumberLength": "Číslo karty musí mít 6–19 číslic",
+  "validatorExpiryRequired": "Datum platnosti je povinné",
+  "validatorExpiryFormat": "Použijte formát MM/RR",
+  "validatorExpiryMonth": "Měsíc musí být 01–12",
+  "validatorCvvLength": "CVV musí mít 3 nebo 4 číslice",
+  "validatorLabelRequired": "Štítek je povinný",
+  "validatorStatusRequired": "Stav je povinný",
+
+  "sectionBiometricUnlock": "Biometrické odemknutí",
+  "biometricUnlockDescription": "Používejte otisk prstu nebo obličej k odemknutí trezoru místo zadávání přístupové fráze.",
+  "biometricUnlockTitle": "Povolit biometrické odemknutí",
+  "biometricUnlockNote": "Fungovat budou všechna biometrická data zaregistrovaná na tomto zařízení — nejen ta použitá při registraci.",
+  "biometricUnavailable": "Biometrické odemknutí není na tomto zařízení dostupné. Nebyl nalezen biometrický snímač nebo v systémových nastaveních nejsou zaregistrována žádná biometrická data.",
+  "biometricDialogTitle": "O biometrickém odemknutí",
+  "biometricDialogBody": "Když je povoleno, Gabbro zašifruje hlavní přístupovou frázi a uloží ji na toto zařízení, chráněnou vašimi biometrickými daty. Fráze je dešifrována pouze v okamžiku odemknutí.\n\nGabbro nikdy neukládá data vašich otisků prstů ani obličeje — zůstávají v zabezpečeném čipu telefonu.",
+  "biometricDialogAllBiometrics": "Všechna biometrická data zaregistrovaná na tomto zařízení budou moci odemknout Gabbro — nelze to omezit na konkrétní otisk prstu.",
+  "biometricDialogInvalidation": "Pokud budou k tomuto telefonu přidána nová biometrická data (včetně druhého otisku prstu), toto nastavení bude automaticky deaktivováno a bude třeba ho znovu nakonfigurovat.",
+  "biometricDialogRecommendation": "Doporučení: ponechte deaktivované, pokud máte vysoký model hrozeb nebo sdílíte toto zařízení.",
+  "biometricInvalidated": "Biometrické odemknutí bylo deaktivováno, protože biometrická data na tomto zařízení se změnila (v systémových nastaveních byl přidán nový otisk prstu nebo obličej). Jedná se o bezpečnostní opatření. Znovu zadejte přístupovou frázi a znovu aktivujte biometrické odemknutí.",
+  "useBiometrics": "Použít biometrii",
+  "biometricCancelled": "Biometrické ověření nebylo dokončeno. Zadejte přístupovou frázi pro odemknutí.",
+  "biometricEnrollTitle": "Zadat přístupovou frázi",
+  "biometricEnrollDescription": "Zadejte hlavní přístupovou frázi pro povolení biometrického odemknutí.",
+  "biometricYubikeyHint": "Níže zadejte PIN YubiKey, poté klepněte na «Použít biometrii», poté se dotkněte klíče YubiKey.",
+
+  "helpTitle": "Nápověda",
+  "menuHelp": "Nápověda",
+  "helpCaptionCreate": "Vytvořte trezor: zadejte název, přístupovou frázi a volitelně chraňte klíčem YubiKey",
+  "helpCaptionEmpty": "Klepnutím na + přidejte první záznam",
+  "helpCaptionDetail": "Klepnutím na ikonu oka zobrazíte heslo, poté podržte pro zobrazení podrobné analýzy znaků",
+  "helpCaptionTitleSearch": "Výchozí nastavení: panel hledání prohledává pouze názvy záznamů",
+  "helpCaptionFullSearch": "Klepnutím na lupu přepnete na hledání ve všech polích; klepnutím znovu se vrátíte na hledání podle názvu",
+  "helpCaptionFilter": "Použijte tlačítka filtrování pro zobrazení pouze záznamů určitého typu",
+  "helpCaptionFolders": "Použijte výběr složky pro filtrování záznamů podle složky",
+  "helpCaptionSelect": "Podržením záznamu přejdete do režimu výběru; přidejte další položky, poté přiřaďte ke složce nebo smažte. Klepnutím X opustíte.",
+  "helpCaptionJumpToLetter": "Klepnutím na písmeno v indexovém panelu přejdete na danou sekci",
+  "helpCaptionBreakdown": "Klepnutím na ikonu oka zobrazíte heslo, poté podržte pro zobrazení podrobné analýzy znaků",
+  "helpCaptionManageVaults": "Ve «Správě trezorů» můžete přejmenovat nebo smazat trezory, nebo přidat nový",
+  "helpCaptionUnlock": "Zadejte přístupovou frázi pro odemknutí trezoru"
+}

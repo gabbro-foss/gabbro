@@ -5,11 +5,26 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_bg.dart';
+import 'app_localizations_cs.dart';
+import 'app_localizations_da.dart';
 import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
+import 'app_localizations_et.dart';
+import 'app_localizations_fi.dart';
 import 'app_localizations_fr.dart';
+import 'app_localizations_hu.dart';
 import 'app_localizations_it.dart';
+import 'app_localizations_lt.dart';
+import 'app_localizations_lv.dart';
+import 'app_localizations_nb.dart';
+import 'app_localizations_nn.dart';
+import 'app_localizations_pl.dart';
+import 'app_localizations_pt.dart';
+import 'app_localizations_ru.dart';
+import 'app_localizations_sv.dart';
+import 'app_localizations_uk.dart';
 
 // ignore_for_file: type=lint
 
@@ -97,11 +112,28 @@ abstract class AppLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('bg'),
+    Locale('cs'),
+    Locale('da'),
     Locale('de'),
     Locale('en'),
     Locale('es'),
+    Locale('et'),
+    Locale('fi'),
     Locale('fr'),
+    Locale('hu'),
     Locale('it'),
+    Locale('lt'),
+    Locale('lv'),
+    Locale('nb'),
+    Locale('nn'),
+    Locale('pl'),
+    Locale('pt'),
+    Locale('pt', 'BR'),
+    Locale('pt', 'PT'),
+    Locale('ru'),
+    Locale('sv'),
+    Locale('uk'),
   ];
 
   /// No description provided for @appName.
@@ -613,6 +645,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Español'**
   String get langSpanish;
+
+  /// No description provided for @langBulgarian.
+  ///
+  /// In en, this message translates to:
+  /// **'Български'**
+  String get langBulgarian;
+
+  /// No description provided for @langCzech.
+  ///
+  /// In en, this message translates to:
+  /// **'Čeština'**
+  String get langCzech;
+
+  /// No description provided for @langDanish.
+  ///
+  /// In en, this message translates to:
+  /// **'Dansk'**
+  String get langDanish;
+
+  /// No description provided for @langGreek.
+  ///
+  /// In en, this message translates to:
+  /// **'Ελληνικά'**
+  String get langGreek;
+
+  /// No description provided for @langEstonian.
+  ///
+  /// In en, this message translates to:
+  /// **'Eesti'**
+  String get langEstonian;
+
+  /// No description provided for @langFinnish.
+  ///
+  /// In en, this message translates to:
+  /// **'Suomi'**
+  String get langFinnish;
+
+  /// No description provided for @langCroatian.
+  ///
+  /// In en, this message translates to:
+  /// **'Hrvatski'**
+  String get langCroatian;
+
+  /// No description provided for @langHungarian.
+  ///
+  /// In en, this message translates to:
+  /// **'Magyar'**
+  String get langHungarian;
+
+  /// No description provided for @langJapanese.
+  ///
+  /// In en, this message translates to:
+  /// **'日本語'**
+  String get langJapanese;
+
+  /// No description provided for @langKazakh.
+  ///
+  /// In en, this message translates to:
+  /// **'Қазақша'**
+  String get langKazakh;
+
+  /// No description provided for @langKorean.
+  ///
+  /// In en, this message translates to:
+  /// **'한국어'**
+  String get langKorean;
+
+  /// No description provided for @langLithuanian.
+  ///
+  /// In en, this message translates to:
+  /// **'Lietuvių'**
+  String get langLithuanian;
+
+  /// No description provided for @langLatvian.
+  ///
+  /// In en, this message translates to:
+  /// **'Latviešu'**
+  String get langLatvian;
+
+  /// No description provided for @langNorwegianBokmal.
+  ///
+  /// In en, this message translates to:
+  /// **'Norsk bokmål'**
+  String get langNorwegianBokmal;
+
+  /// No description provided for @langNorwegianNynorsk.
+  ///
+  /// In en, this message translates to:
+  /// **'Norsk nynorsk'**
+  String get langNorwegianNynorsk;
+
+  /// No description provided for @langPolish.
+  ///
+  /// In en, this message translates to:
+  /// **'Polski'**
+  String get langPolish;
+
+  /// No description provided for @langPortugueseBr.
+  ///
+  /// In en, this message translates to:
+  /// **'Português (BR)'**
+  String get langPortugueseBr;
+
+  /// No description provided for @langPortuguesePt.
+  ///
+  /// In en, this message translates to:
+  /// **'Português (PT)'**
+  String get langPortuguesePt;
+
+  /// No description provided for @langRussian.
+  ///
+  /// In en, this message translates to:
+  /// **'Русский'**
+  String get langRussian;
+
+  /// No description provided for @langSlovak.
+  ///
+  /// In en, this message translates to:
+  /// **'Slovenčina'**
+  String get langSlovak;
+
+  /// No description provided for @langSlovenian.
+  ///
+  /// In en, this message translates to:
+  /// **'Slovenščina'**
+  String get langSlovenian;
+
+  /// No description provided for @langSerbianLatin.
+  ///
+  /// In en, this message translates to:
+  /// **'Srpski'**
+  String get langSerbianLatin;
+
+  /// No description provided for @langSwedish.
+  ///
+  /// In en, this message translates to:
+  /// **'Svenska'**
+  String get langSwedish;
+
+  /// No description provided for @langUkrainian.
+  ///
+  /// In en, this message translates to:
+  /// **'Українська'**
+  String get langUkrainian;
+
+  /// No description provided for @langBasque.
+  ///
+  /// In en, this message translates to:
+  /// **'Euskara'**
+  String get langBasque;
+
+  /// No description provided for @langYoruba.
+  ///
+  /// In en, this message translates to:
+  /// **'Yorùbá'**
+  String get langYoruba;
+
+  /// No description provided for @langChineseSimplified.
+  ///
+  /// In en, this message translates to:
+  /// **'中文（简体）'**
+  String get langChineseSimplified;
+
+  /// No description provided for @langChineseTraditional.
+  ///
+  /// In en, this message translates to:
+  /// **'中文（繁體）'**
+  String get langChineseTraditional;
 
   /// No description provided for @foregroundLockDescription.
   ///
@@ -3145,26 +3345,90 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['de', 'en', 'es', 'fr', 'it'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'bg',
+    'cs',
+    'da',
+    'de',
+    'en',
+    'es',
+    'et',
+    'fi',
+    'fr',
+    'hu',
+    'it',
+    'lt',
+    'lv',
+    'nb',
+    'nn',
+    'pl',
+    'pt',
+    'ru',
+    'sv',
+    'uk',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+  // Lookup logic when language+country codes are specified.
+  switch (locale.languageCode) {
+    case 'pt':
+      {
+        switch (locale.countryCode) {
+          case 'BR':
+            return AppLocalizationsPtBr();
+          case 'PT':
+            return AppLocalizationsPtPt();
+        }
+        break;
+      }
+  }
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'bg':
+      return AppLocalizationsBg();
+    case 'cs':
+      return AppLocalizationsCs();
+    case 'da':
+      return AppLocalizationsDa();
     case 'de':
       return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
     case 'es':
       return AppLocalizationsEs();
+    case 'et':
+      return AppLocalizationsEt();
+    case 'fi':
+      return AppLocalizationsFi();
     case 'fr':
       return AppLocalizationsFr();
+    case 'hu':
+      return AppLocalizationsHu();
     case 'it':
       return AppLocalizationsIt();
+    case 'lt':
+      return AppLocalizationsLt();
+    case 'lv':
+      return AppLocalizationsLv();
+    case 'nb':
+      return AppLocalizationsNb();
+    case 'nn':
+      return AppLocalizationsNn();
+    case 'pl':
+      return AppLocalizationsPl();
+    case 'pt':
+      return AppLocalizationsPt();
+    case 'ru':
+      return AppLocalizationsRu();
+    case 'sv':
+      return AppLocalizationsSv();
+    case 'uk':
+      return AppLocalizationsUk();
   }
 
   throw FlutterError(

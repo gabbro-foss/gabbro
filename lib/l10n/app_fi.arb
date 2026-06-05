@@ -1,0 +1,809 @@
+{
+  "@@locale": "fi",
+
+  "appName": "Gabbro",
+
+  "cancel": "Peruuta",
+  "delete": "Poista",
+  "save": "Tallenna",
+  "close": "Sulje",
+  "ok": "OK",
+  "edit": "Muokkaa",
+  "add": "Lisää",
+  "remove": "Poista",
+  "rename": "Nimeä uudelleen",
+  "confirm": "Vahvista",
+  "continueAction": "Jatka",
+  "dismiss": "Hylkää",
+  "authorize": "Valtuuta",
+  "register": "Rekisteröi",
+  "sync": "Synkronoi",
+  "assign": "Määritä",
+  "unlock": "Avaa lukitus",
+  "generate": "Luo",
+  "import": "Tuo",
+  "export": "Vie",
+  "openInBrowser": "Avaa selaimessa",
+  "useThisPassword": "Käytä tätä salasanaa",
+  "reviewArrow": "Tarkista →",
+  "skip": "Ohita",
+  "keep": "Säilytä",
+  "revert": "Palauta",
+  "next": "Seuraava: kartoita sarakkeet",
+  "syncFromVault": "Synkronoi holvista",
+  "createVault": "Luo holvi",
+  "pickFile": "Valitse tiedosto",
+  "noFileSelected": "Ei tiedostoa valittu",
+  "chooseFolder": "Valitse kansio",
+  "addCustomField": "Lisää mukautettu kenttä",
+  "exportFile": "Vie tiedosto",
+  "addVault": "Lisää holvi",
+  "addYubiKey": "Lisää YubiKey",
+  "noChangesToSave": "Ei tallennettavia muutoksia.",
+
+  "appearanceTitle": "Ulkoasu",
+  "securityTitle": "Tietoturva",
+  "aboutTitle": "Tietoja Gabbrosta",
+  "generatorTitle": "Salasanageneraattori",
+  "importTitle": "Tuo merkintöjä",
+  "exportTitle": "Vie holvi",
+  "changePassphraseTitle": "Vaihda salauslause",
+  "csvMappingTitle": "Kartoita CSV-sarakkeet",
+  "manageFoldersTitle": "Hallinnoi kansioita",
+  "manageVaultsTitle": "Hallinnoi holveja",
+  "manageYubiKeysTitle": "Hallinnoi YubiKey-avaimia",
+  "passwordHistoryTitle": "Salasanahistoria",
+  "reviewChangesTitle": "Tarkista muutokset",
+  "unlockGabbroTitle": "Avaa Gabbro",
+
+  "sectionTheme": "Teema",
+  "sectionTextSize": "Tekstikoko",
+  "sectionAlphabetBar": "Aakkosvälikkeen sijainti",
+  "sectionAccessibility": "Esteettömyys",
+  "sectionLanguage": "Kieli",
+  "sectionForegroundLock": "Etualueen lukitus",
+  "sectionBackgroundLock": "Taustan lukitus",
+  "sectionPasswordHistory": "Salasanahistoria",
+  "sectionPassphraseCopyPaste": "Salauslauseen kopiointi/liittäminen",
+  "sectionVaultList": "Holvilista",
+  "sectionClipboardClear": "Tyhjennä leikepöytä",
+  "sectionCharacterSets": "Merkistöt",
+  "sectionGeneratorLanguage": "Kieli",
+
+  "themeSystem": "Järjestelmä",
+  "themeLight": "Vaalea",
+  "themeDark": "Tumma",
+
+  "textSizeSmall": "Pieni",
+  "textSizeRegular": "Normaali",
+  "textSizeLarge": "Suuri",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Vain puhelimessa — tabletti käyttää aina vasenta.",
+  "alphabetBarLeft": "Vasen",
+  "alphabetBarRight": "Oikea",
+
+  "highContrastTitle": "Korkea kontrasti",
+  "highContrastSubtitle": "Lisää kontrastia paremman luettavuuden vuoksi",
+
+  "languageNote": "Ohittaa järjestelmäkielen. «Järjestelmä» noudattaa laitteen aluekohtaisia asetuksia.",
+  "langSystem": "Järjestelmä",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Lukitse tämän käyttämättömyysajan jälkeen, kun sovellus on auki.",
+  "backgroundLockDescription": "Lukitse, kun sovellus on ollut taustalla tämän ajan.",
+  "passwordHistoryDescription": "Kuinka kauan vanhaa salasanaa säilytetään muutoksen jälkeen. «Säilytä aina» tarkoittaa, että historia poistetaan vain manuaalisesti.",
+  "passphraseCopyPasteDescription": "Estä kopiointi ja liittäminen salauslausekentissä. Suositeltu: estää salauslauseen vuotamisen leikepöydän kautta.",
+  "passphraseCopyPasteNote": "Huom.: Tämä estää pikavalikon pitkällä painalluksella ja tekstin valinnan. Näppäimistön sisäänrakennettu liitä-painike saattaa silti toimia — tämä on alustan rajoitus.",
+  "blockCopyPasteTitle": "Estä kopiointi/liittäminen",
+  "vaultListDescription": "Näytä luettelo kaikista holveista kirjautumisnäytöllä, jotta voit valita avattavan holvin ilman siirtymistä Hallinnoi holveja -näyttöön.",
+  "showVaultListTitle": "Näytä holvilista kirjautumisessa",
+  "vaultListNote": "Turvallisuushuomio: Kun tämä on POIS, kirjautumisnäyttö näyttää vain viimeksi käytetyn holvin — ei vihjettä muiden holvien olemassaolosta. Kompromissi: Holvin vaihtamiseksi on ensin avattava lukitus ja siirryttävä Valikko → Hallinnoi holveja.",
+  "clipboardClearDescription": "Tyhjennä leikepöytä salaisuuden kopioinnin jälkeen. Huom.: Leikepöytäohjelmat saattavat säilyttää kopion.",
+
+  "duration30s": "30 s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60 s",
+  "duration2min": "2 min",
+  "durationNever": "Ei koskaan",
+  "duration7days": "7 päivää",
+  "duration30days": "30 päivää",
+  "duration90days": "90 päivää",
+  "durationKeepForever": "Säilytä aina",
+
+  "menuExportVault": "Vie holvi",
+  "menuImportEntries": "Tuo merkintöjä",
+  "menuSyncFromFile": "Synkronoi tiedostosta",
+  "menuManageVaults": "Hallinnoi holveja",
+  "menuChangePassphrase": "Vaihda salauslause",
+  "menuManageYubiKeys": "Hallinnoi YubiKey-avaimia",
+  "menuAppearance": "Ulkoasu",
+  "menuSecurity": "Tietoturva",
+  "menuManageFolders": "Hallinnoi kansioita",
+  "menuPasswordGenerator": "Salasanageneraattori",
+  "menuAbout": "Tietoja",
+
+  "tooltipSelectEntries": "Valitse merkintöjä",
+  "tooltipLockVault": "Lukitse holvi",
+  "tooltipSelectAll": "Valitse kaikki",
+  "tooltipDeselectAll": "Poista kaikkien valinta",
+  "tooltipMenu": "Valikko",
+  "tooltipCopy": "Kopioi",
+  "tooltipCopied": "Kopioitu!",
+  "tooltipShow": "Näytä",
+  "tooltipHide": "Piilota",
+  "tooltipBrowse": "Selaa",
+  "tooltipEditAlias": "Muokkaa aliasta",
+  "tooltipRemoveField": "Poista kenttä",
+  "tooltipRename": "Nimeä uudelleen",
+  "tooltipDeleteVault": "Poista holvi",
+  "tooltipAssignToFolder": "Määritä kansioon",
+  "tooltipShowPin": "Näytä PIN",
+  "tooltipHidePin": "Piilota PIN",
+  "tooltipShowValue": "Näytä arvo",
+  "tooltipHideValue": "Piilota",
+  "tooltipCancel": "Peruuta",
+  "tooltipOpenInBrowser": "Avaa selaimessa",
+
+  "allFolders": "Kaikki kansiot",
+  "noFolder": "Ei mitään",
+  "selectFolder": "Valitse kansio",
+  "folderName": "Kansion nimi",
+
+  "noEntriesMatch": "Mikään merkintä ei vastaa hakuasi.",
+  "noVaultsRegistered": "Ei rekisteröityjä holveja.",
+  "noYubiKeysRegistered": "Ei rekisteröityjä YubiKey-avaimia",
+  "selectEntry": "Valitse merkintä",
+  "newEntryTitle": "Uusi merkintä",
+  "createEntryTitle": "Uusi {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Muokkaa: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(ei URL-osoitetta)",
+  "noNameFallback": "(ei nimeä)",
+  "untitledFallback": "(nimetön)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "{count} valittu",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Hae kaikista kentistä…",
+  "searchEntriesHint": "Hae merkintöjä…",
+  "searchAllFieldsTooltip": "Hakee kaikista kentistä",
+  "searchByTitleTooltip": "Hakee otsikolla",
+  "entryTypeAll": "Kaikki",
+  "entryTypePassword": "Salasana",
+  "entryTypeNote": "Muistiinpano",
+  "entryTypeCard": "Kortti",
+  "entryTypeIdentity": "Henkilöllisyys",
+  "entryTypeFile": "Tiedosto",
+  "entryTypeCustom": "Mukautettu",
+  "errorPrefix": "Virhe: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Holvi",
+  "navAppearance": "Ulkoasu",
+  "navSecurity": "Tietoturva",
+  "navAbout": "Tietoja",
+
+  "deleteEntryTitle": "Poistetaanko merkintä?",
+  "cannotBeUndone": "Tätä ei voi kumota.",
+  "deleteEntryDialogTitle": "Poistetaanko merkintä?",
+  "deleteEntriesTitle": "{count, plural, one{Poistetaanko 1 merkintä?} other{Poistetaanko {count} merkintää?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Määritä kansioon",
+  "folderConflictTitle": "Kansioristiriita",
+  "syncFailedTitle": "Synkronointi epäonnistui",
+  "syncFromFileTitle": "Synkronoi tiedostosta",
+  "nothingToSync": "Ei synkronoitavaa — molemmat holvit ovat jo ajan tasalla.",
+
+  "importedEntries": "{count, plural, one{1 merkintä tuotu.} other{{count} merkintää tuotu.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Vie tiedosto",
+  "saveDecryptedFileTo": "Tallenna purettu tiedosto kohteeseen:",
+  "exportPathLabel": "Vientikohde",
+  "exportedToPath": "Viety kohteeseen {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Vienti epäonnistui: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Avataan selaimessa?",
+  "couldNotOpen": "Ei voitu avata {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Poista aiempi merkintä",
+  "failedToClearHistory": "Historian tyhjentäminen epäonnistui: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Salasanan palauttaminen epäonnistui: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Nimeä kansio uudelleen",
+  "addFolderTitle": "Lisää kansio",
+  "deleteFolderTitle": "Poista kansio",
+  "deleteFolderConfirm": "Poistetaanko \"{folder}\"?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Uudelleenmääritä merkinnät kohteeseen",
+  "clearToNone": "Siirrä «Ei mitään» -kansioon",
+
+  "renameVaultTitle": "Nimeä holvi uudelleen",
+  "deleteVaultTitle": "Poistetaanko holvi?",
+  "deleteVaultConfirmTitle": "Oletko varma?",
+  "typeDeleteToConfirm": "Kirjoita DELETE vahvistaaksesi",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Kosketa YubiKey-avaintasi",
+  "noVaultsRegisteredText": "Ei rekisteröityjä holveja.",
+
+  "addYubiKeyTitle": "Lisää YubiKey",
+  "enterYubiKeyPinTitle": "Syötä YubiKey-PIN",
+  "editAliasForKey": "Muokkaa avaimen {index} aliasta",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Jäljelle jää vain yksi rekisteröity YubiKey.",
+  "removeKeyConfirm": "Haluatko varmasti poistaa tämän avaimen?",
+  "removeKeyVaultConfirm": "Poistetaanko tämä YubiKey holvista?",
+  "yubiKeyRemoved": "YubiKey poistettu",
+  "failedToRemoveKey": "Avaimen poistaminen epäonnistui: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey lisätty",
+  "failedToAddKey": "Avaimen lisääminen epäonnistui: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Aliaksen tallentaminen epäonnistui: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "FIDO2-laitetta ei löydy. Aseta YubiKey-avain paikalleen ja yritä uudelleen.",
+  "transportLabel": "Siirtomuoto:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Salauslause",
+  "yubiKeyPinLabel": "YubiKey-PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Nykyinen salauslause",
+  "newPassphraseLabel": "Uusi salauslause",
+  "confirmPassphraseLabel": "Vahvista uusi salauslause",
+  "vaultPassphraseLabel": "Holvin salauslause",
+  "aliasLabel": "Alias",
+  "aliasHint": "esim. Ensisijainen, Työn avain…",
+  "masterPassphraseLabel": "Pääsalauslause",
+  "confirmPassphraseLabelShort": "Vahvista salauslause",
+
+  "fieldTitle": "Otsikko",
+  "fieldContent": "Sisältö",
+  "fieldFirstName": "Etunimi",
+  "fieldLastName": "Sukunimi",
+  "fieldEmail": "Sähköposti (valinnainen)",
+  "fieldPhone": "Puhelin (valinnainen)",
+  "fieldAddress": "Osoite (valinnainen)",
+  "fieldCardLabel": "Kortin nimi (esim. «Visa Platinum»)",
+  "fieldCardholderName": "Kortinhaltijan nimi",
+  "fieldCardNumber": "Kortin numero",
+  "fieldExpiry": "Voimassaolo (KK/VV)",
+  "fieldCvv": "CVV (valinnainen)",
+  "fieldCardPin": "PIN (valinnainen)",
+  "fieldCreditLimit": "Luottoraja (valinnainen)",
+  "fieldAccountNumber": "Tilinumero (valinnainen)",
+  "fieldNotes": "Muistiinpanot (valinnainen)",
+  "fieldUrl": "URL (valinnainen)",
+  "fieldUsername": "Käyttäjänimi",
+  "fieldPassword": "Salasana",
+  "fieldSeparator": "Erotin",
+  "fieldFolder": "Kansio",
+  "fieldLabel": "Tunniste",
+  "fieldValue": "Arvo",
+  "fieldCustomFields": "Mukautetut kentät",
+  "fieldLabelOptional": "{label} (valinnainen)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Merkintätyyppiä ei vielä tueta.",
+  "csvColumnNone": "(ei mitään)",
+  "csvPreviewLabel": "Esikatselu",
+  "csvImportButton": "Tuo",
+
+  "gabbroVaultSection": "Gabbro-holvi",
+  "genericCsvSection": "Yleinen CSV",
+
+  "changePassphraseSuccess": "Salauslause vaihdettu",
+  "changePassphraseButton": "Vaihda salauslause",
+
+  "continueLabel": "Jatka",
+  "protectWithYubiKey": "Suojaa YubiKey-avaimella",
+  "yubiKeySubtitle": "Laitteistopohjainen turva-avain (suositeltu)",
+  "accessibilityButton": "Esteettömyys",
+
+  "aboutProjectSection": "Projekti",
+  "aboutLicenceSection": "Lisenssi",
+  "aboutOpenSourceSection": "Avoimen lähdekoodin komponentit",
+  "aboutAttributionSection": "Tekijätiedot",
+
+  "lengthLabel": "Pituus",
+  "wordsLabel": "Sanat",
+  "generateButton": "Luo",
+  "usePasswordButton": "Käytä tätä salasanaa",
+  "showHidePassword": "Näytä",
+
+  "deleteVaultPostDeletion": "Holvisi on poistettu. Luo uusi jatkaaksesi.",
+
+  "syncFilePassphraseLabel": "Holvin salauslause",
+
+  "historyWarning": "Vain 1 aiempi arvo säilytetään. Historia tyhjennetään automaattisesti tietoturva-asetusten mukaan.",
+  "historyCurrent": "Nykyinen",
+  "historyPrevious": "Aiempi",
+  "historySavedOn": "Tallennettu {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · vanhenee {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Tuontiongelma ({index}/{total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Tyyppi: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Muokkaa, korjaa ja tallenna tämä merkintä tai ohita se hylätäksesi sen.",
+
+  "entriesSkipped": "{count, plural, one{1 merkintä ohitettu} other{{count} merkintää ohitettu}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Nämä merkinnät ovat jo holvissasi eikä niitä korvattu:",
+
+  "syncDeleteEntryContent": "Toinen laite poisti '{title}'.\n\nPoistetaanko se myös täältä vai säilytetäänkö?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "'{title}' on eri kansioissa kahdella laitteella.\n\nTämä laite: {local}\nToinen laite: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Säilytä ilman kansiota",
+  "folderConflictKeepLocal": "Säilytä \"{folder}\"",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Siirrä ilman kansiota",
+  "folderConflictMoveIncoming": "Siirrä kansioon \"{folder}\"",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Holvi synkronoitu — {added} lisätty, {updated} päivitetty, {deleted} poistettu.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Tämä holvitiedosto käyttää eri salauslausetta. Synkronointi on tuettu vain holvien välillä, joilla on sama salauslause.",
+
+  "reviewSensitiveFields": "Arkaluonteiset kentät",
+  "reviewOtherFields": "Muut kentät",
+  "reviewPasswordChanged": "Salasana muutettu",
+  "reviewCvvChanged": "CVV muutettu",
+  "reviewPinChanged": "PIN muutettu",
+  "reviewTransactionPasswordChanged": "Tapahtumasalasana muutettu",
+  "tooltipShowValues": "Näytä arvot",
+  "reviewOld": "Vanha",
+  "reviewNew": "Uusi",
+  "reviewEmpty": "(tyhjä)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Muistiinpanot",
+  "reviewFieldContent": "Sisältö",
+  "reviewFieldEmail": "Sähköposti",
+  "reviewFieldPhone": "Puhelin",
+  "reviewFieldAddress": "Osoite",
+  "reviewFieldCardLabel": "Kortin nimi",
+  "reviewFieldStatus": "Tila",
+  "reviewFieldCardholder": "Kortinhaltija",
+  "reviewFieldExpiry": "Voimassaolo",
+  "reviewFieldCreditLimit": "Luottoraja",
+  "reviewFieldAccountNumber": "Tilinumero",
+  "reviewFieldNetwork": "Verkko",
+  "reviewFieldBank": "Pankki",
+  "reviewFieldFilename": "Tiedostonimi",
+  "reviewFieldSize": "Koko",
+  "reviewFieldCardNumber": "Numero",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Tapahtumasalasana",
+  "timestampCreated": "Luotu",
+  "timestampUpdated": "Päivitetty",
+  "timestampUnknown": "Tuntematon",
+  "noTitleFallback": "(ei otsikkoa)",
+  "tooltipExportFile": "Vie tiedosto",
+  "tooltipEditEntry": "Muokkaa merkintää",
+  "tooltipDeleteEntry": "Poista merkintä",
+  "exportLabel": "Vie",
+  "customEntryFieldsHeader": "Kentät",
+  "copiedNeverClears": "Kopioitu — leikepöytää ei koskaan tyhjennetä automaattisesti",
+  "copiedClears30s": "Kopioitu — leikepöytä tyhjennetään 30 s:n kuluttua",
+  "copiedClears60s": "Kopioitu — leikepöytä tyhjennetään 60 s:n kuluttua",
+  "copiedClears2min": "Kopioitu — leikepöytä tyhjennetään 2 min:n kuluttua",
+
+  "passwordBreakdownTitle": "Salasana-analyysi",
+  "charTypeUppercase": "Isot kirjaimet",
+  "charTypeLowercase": "Pienet kirjaimet",
+  "charTypeDigit": "Numero",
+  "charTypeSymbol": "Symboli",
+
+  "exportIncludeDate": "Sisällytä päivämäärä tiedostonimeen",
+  "exportChooseFormat": "Valitse vientiformaatti.",
+  "exportUnencryptedWarning": "Täysin salaamaton — kaikki salaisuudet kirjoitetaan selkokielenä. Tallenna tiedosto turvallisesti ja poista se käytön jälkeen.",
+  "exportPassphraseOnlyNote": "Suojattu vain salauslauseella. YubiKey-avain ei ole tarpeen tuonnissa.",
+  "exportChooseDestinationJson": "Valitse kohde viedylle JSON-tiedostolle.",
+  "exportChooseDestinationVault": "Valitse kohde viedylle holvitiedostolle.",
+  "exportTwoFilesNote": "Luodaan kaksi tiedostoa: vault.gabbro ja vault.gabbro.sha256",
+  "exportSelectDestination": "Valitse kohde.",
+
+  "aboutVersion": "Versio {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Kvanttijälkeinen salasanahallinta",
+  "aboutSourceCode": "Lähdekoodi",
+  "aboutReportIssue": "Ilmoita ongelmasta",
+  "aboutSupportGabbro": "Tue Gabbroa",
+  "aboutLicenceBody": "Gabbro on vapaa ja avoimen lähdekoodin ohjelmisto, lisensoitu GNU General Public License v3.0 only (GPL-3.0-only) -lisenssillä.\n\nVoit vapaasti käyttää, tutkia ja jakaa tätä ohjelmistoa kyseisen lisenssin ehtojen mukaisesti.",
+  "aboutOwnerRole": "Projektin omistaja, arkkitehti ja pääkehittäjä:",
+  "aboutAiPartner": "Tekoälykehityskumppani:",
+  "aboutNoTelemetry": "Gabbro ei tee lähtevisiä verkkoyhteyksiä. Ei telemetriaa, ei analytiikkaa, ei tilejä.",
+
+  "strengthTierTerrible": "Surkea",
+  "strengthTierWeak": "Heikko",
+  "strengthTierFair": "Kohtalainen",
+  "strengthTierStrong": "Vahva",
+  "strengthTierVeryStrong": "Erittäin vahva",
+  "strengthTierExcellent": "Erinomainen",
+  "yubiKeyProtectedNote": "YubiKey-suojattu holvi — YubiKey-sidoksesi säilytetään.",
+  "yubiKeyPinRequired": "YubiKey-PIN vaaditaan",
+  "tapYubiKeyNow": "Kosketa YubiKey-avaintasi nyt…",
+  "touchYubiKeyToAuthorize": "Kosketa YubiKey-avaintasi valtuuttaaksesi tämän muutoksen.",
+  "currentPassphraseRequired": "Nykyinen salauslause vaaditaan",
+  "newPassphraseRequired": "Uusi salauslause vaaditaan",
+  "passphraseTooWeak": "Salauslause on liian heikko",
+  "confirmPassphraseRequired": "Vahvista uusi salauslause",
+  "passphrasesDoNotMatch": "Salauslauseet eivät täsmää",
+  "passphrasesMatch": "✓ Salauslauseet täsmäävät",
+  "passphrasesNoMatch": "✗ Salauslauseet eivät täsmää",
+  "entropyDisplay": "{tier} · {bits} bittiä",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Siirtovirhe.",
+  "authorizationFailed": "Valtuutus epäonnistui — tarkista PIN ja yritä uudelleen.",
+
+  "unlockEnterPassphraseAndPin": "Syötä salauslause ja YubiKey-PIN avataksesi",
+  "unlockEnterPassphrase": "Syötä salauslause avataksesi",
+  "unlockEntropyDisplay": "{tier} · {bits} bittiä entropiaa",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Aseta YubiKey paikalleen ja kosketa sitä sen vilkkuessa",
+  "unlockErrorPassphrase": "Holvia ei voitu avata. Tarkista salauslause.",
+  "unlockErrorPassphraseAndPin": "Holvia ei voitu avata. Tarkista salauslause ja YubiKey-PIN.",
+
+  "importSelectFile": "Valitse tiedosto.",
+  "importFileNotFound": "Tiedostoa ei löydy.",
+  "importEnterPassphrase": "Syötä tämän holvin salauslause.",
+  "importDuplicateWarning": "Merkinnät, joiden UUID on jo holvissa, ohitetaan automaattisesti. Näet yhteenvedon.",
+  "importGabbroSubtitle": "Synkronoi merkintöjä toisesta Gabbro-holvista (.gabbro-tiedosto)",
+  "importEnpassSubtitle": "JSON-vienti Enpassista (Työkalut → Vie)",
+  "importBitwardenSubtitle": "Salaamaton JSON-vienti Bitwardenista (Työkalut → Vie holvi)",
+  "importCsvSubtitle": "CSV-vienti mistä tahansa salasanahallinnasta",
+
+  "vaultNameAlreadyExists": "Holvi nimeltä \"{alias}\" on jo olemassa.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Tämä poistaa pysyvästi \"{alias}\" ja kaikki sen tiedot.\n\nTiedosto: {path}\n\nTätä ei voi kumota.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Tämä poistaa pysyvästi \"{alias}\" ja sen YubiKey-sidoksen.\n\nTiedosto: {path}\n\nTätä ei voi kumota.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Syötä PIN ja kosketa YubiKey-avaintasi valtuuttaaksesi poiston.",
+  "deleteVaultTooltip": "Poista holvi",
+
+  "navVault": "Holvi",
+  "navAbout": "Tietoja",
+
+  "yubiKeySecurityWarning": "Turvallisuusvaroitus",
+  "removeYubiKeyTitle": "Poista YubiKey",
+  "yubiKeyLastKeyRiskWarning": "VAROITUS: Jos jäljellä oleva avain katoaa, vahingoittuu tai varastetaan, holvin käyttö on pysyvästi mahdotonta. Palautusmahdollisuutta ei ole.",
+  "onlyOneKeyRegisteredWarning": "Vain yksi avain rekisteröity. Jos tämä avain katoaa, holvin käyttö on pysyvästi mahdotonta.",
+  "tapRegisterNfc": "Pidä avain puhelinta vasten rekisteröidäksesi",
+  "tapRegisterUsb": "Kun yhdistetty, kosketa avainta rekisteröidäksesi",
+  "tapActivateNfc": "Pidä avain puhelinta vasten uudelleen aktivoidaksesi",
+  "tapActivateUsb": "Kun yhdistetty, kosketa avainta uudelleen aktivoidaksesi",
+  "failedToRegisterKey": "Avaimen rekisteröinti epäonnistui: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Avaimen aktivointi epäonnistui: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Avain {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Kosketa uutta YubiKey-avaintasi rekisteröidäksesi…",
+  "tapYubiKeyToActivate": "Kosketa uutta YubiKey-avaintasi uudelleen aktivoidaksesi…",
+  "editAliasTooltip": "Muokkaa aliasta",
+  "cannotRemoveLastKey": "Viimeistä avainta ei voi poistaa",
+  "removeKeyTooltip": "Poista avain",
+  "manageYubiKeysError": "Virhe: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klassinen",
+  "generatorModePassphrase": "Salauslause",
+  "charSetsHeader": "Merkistöt",
+  "languageHeader": "Kieli",
+  "separatorLabel": "Erotin",
+  "capitaliseWords": "Isota sanat",
+  "appendDigit": "Lisää numero",
+  "entropyBitsDisplay": "~{bits} bittiä entropiaa",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Valitse vähintään yksi merkistö",
+  "passwordMinLengthNote": "Salasanat ovat vähintään 32 merkkiä. Jos sivustolla on lyhyempi raja, kopioi tarvittavat ensimmäiset merkit.",
+  "tooltipShow": "Näytä",
+  "tooltipCopied": "Kopioitu!",
+  "tooltipCopy": "Kopioi",
+  "excludeAmbiguousChars": "Sulje pois epäselvät merkit (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Luo holvisi aloittaaksesi.",
+  "onboardingVaultName": "Holvin nimi",
+  "onboardingAliasRequired": "Alias vaaditaan",
+  "onboardingNewVaultLocation": "Uusi holvisijainti (sama kuin ennen)",
+  "onboardingVaultLocation": "Holvisijainti",
+  "onboardingLoadingPath": "Ladataan…",
+  "onboardingPathHint": "Polku holvitiedostoon",
+  "onboardingPathRequired": "Polku vaaditaan",
+  "onboardingReusePassphraseHint": "Valitse uusi pääsalauslause tai käytä edellistä uudelleen.",
+  "onboardingPassphraseRequired": "Salauslause vaaditaan",
+  "onboardingConfirmRequired": "Vahvista salauslause",
+  "onboardingPrimaryKeyPin": "Ensisijaisen avaimen PIN",
+  "onboardingBackupKeyPin": "Varaavaimen PIN",
+  "onboardingKeyNPin": "Avaimen {n} PIN",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Kosketat kutakin YubiKey-avainta kahdesti (yhteensä 4 kosketusta). Avainten välillä sinua pyydetään vaihtamaan avain.",
+  "onboardingYubikeySlowNote": "Holvin luominen YubiKey-avaimella kestää 20–30 sekuntia. Sovellus saattaa vaikuttaa reagoimattomalta — se on normaalia.",
+  "onboardingStep1Label": "Rekisteröi ensisijainen avain",
+  "onboardingStep1Hint": "Kosketa YubiKey-avaintasi nyt",
+  "onboardingStep2Label": "Aktivoi ensisijainen avain",
+  "onboardingStep2Hint": "Kosketa YubiKey-avaintasi uudelleen",
+  "onboardingStep3Label": "Vaihda vara-avaimeen",
+  "onboardingStep3Hint": "Poista ensisijainen avain ja liitä vara-YubiKey",
+  "onboardingStep4Label": "Rekisteröi vara-avain",
+  "onboardingStep4Hint": "Kosketa vara-YubiKey-avaintasi",
+  "onboardingStep5Label": "Aktivoi vara-avain",
+  "onboardingStep5Hint": "Kosketa vara-YubiKey-avaintasi viimeisen kerran",
+
+  "textSizePreview": "Gabbro on tunkeutuva magmainen kivilaji, joka on rikasta magnesiumia ja rautaa sisältävää ja karkearakeista.",
+
+  "fieldCardStatus": "Tila",
+  "fieldPaymentNetwork": "Maksuverkko",
+
+  "cardStatusActive": "Aktiivinen",
+  "cardStatusLapsed": "Vanhentunut",
+  "cardStatusInactive": "Ei käytössä",
+
+  "validatorTitleRequired": "Otsikko vaaditaan",
+  "validatorUsernameRequired": "Käyttäjänimi vaaditaan",
+  "validatorPasswordRequired": "Salasana vaaditaan",
+  "validatorContentRequired": "Sisältö vaaditaan",
+  "validatorFirstNameRequired": "Etunimi vaaditaan",
+  "validatorLastNameRequired": "Sukunimi vaaditaan",
+  "validatorCardLabelRequired": "Kortin nimi vaaditaan",
+  "validatorCardholderRequired": "Kortinhaltijan nimi vaaditaan",
+  "validatorCardNumberRequired": "Kortin numero vaaditaan",
+  "validatorCardNumberLength": "Kortin numeron tulee olla 6–19 numeroa",
+  "validatorExpiryRequired": "Voimassaoloaika vaaditaan",
+  "validatorExpiryFormat": "Käytä KK/VV-muotoa",
+  "validatorExpiryMonth": "Kuukauden tulee olla 01–12",
+  "validatorCvvLength": "CVV:n tulee olla 3 tai 4 numeroa",
+  "validatorLabelRequired": "Tunniste vaaditaan",
+  "validatorStatusRequired": "Tila vaaditaan",
+
+  "sectionBiometricUnlock": "Biometrinen avaaminen",
+  "biometricUnlockDescription": "Käytä sormenjälkeä tai kasvoja holvin avaamiseen salauslauseen kirjoittamisen sijaan.",
+  "biometricUnlockTitle": "Ota biometrinen avaaminen käyttöön",
+  "biometricUnlockNote": "Kaikki laitteeseen rekisteröidyt biometriset tunnisteet toimivat — ei vain rekisteröinnissä käytetty.",
+  "biometricUnavailable": "Biometrinen avaaminen ei ole käytettävissä tällä laitteella. Biometrinen tunnistin puuttuu tai biometristä tunnistautumista ei ole otettu käyttöön järjestelmäasetuksissa.",
+  "biometricDialogTitle": "Tietoja biometrisestä avaamisesta",
+  "biometricDialogBody": "Kun käytössä, Gabbro salaa pääsalauslauseen ja tallentaa sen tälle laitteelle biometristen tunnisteidesi suojaamana. Salauslause puretaan vain avauksen hetkellä.\n\nGabbro ei koskaan tallenna sormenjälki- tai kasvotietojasi — ne pysyvät laitteen suojatussa sirussa.",
+  "biometricDialogAllBiometrics": "Kaikki laitteeseen rekisteröidyt biometriset tunnisteet voivat avata Gabbron — et voi rajoittaa sitä tiettyyn sormenjälkeen.",
+  "biometricDialogInvalidation": "Jos tähän puhelimeen lisätään uusi biometrinen tunniste (myös toinen sormenjälki), tämä asetus poistetaan automaattisesti käytöstä ja se on määritettävä uudelleen.",
+  "biometricDialogRecommendation": "Suositus: pidä poissa käytöstä, jos sinulla on korkea uhkamalli tai jaat laitteen.",
+  "biometricInvalidated": "Biometrinen avaaminen poistettiin käytöstä, koska tämän laitteen biometriset tunnisteet muuttuivat (järjestelmäasetuksissa lisättiin uusi sormenjälki tai kasvot). Tämä on turvatoimenpide. Syötä salauslause uudelleen ja ota biometrinen avaaminen uudelleen käyttöön.",
+  "useBiometrics": "Käytä biometriikkaa",
+  "biometricCancelled": "Biometrinen todennus ei onnistunut. Syötä salauslause avataksesi.",
+  "biometricEnrollTitle": "Syötä salauslause",
+  "biometricEnrollDescription": "Syötä pääsalauslause ottaaksesi biometrisen avaamisen käyttöön.",
+  "biometricYubikeyHint": "Syötä YubiKey-PIN alla, kosketa sitten Käytä biometriikkaa, kosketa sitten YubiKey-avaintasi.",
+
+  "helpTitle": "Ohje",
+  "menuHelp": "Ohje",
+  "helpCaptionCreate": "Luo holvi: syötä nimi, salauslause ja suojaa tarvittaessa YubiKey-avaimella",
+  "helpCaptionEmpty": "Kosketa + lisätäksesi ensimmäisen merkinnän",
+  "helpCaptionDetail": "Kosketa silmäkuvaketta paljastaaksesi salasanan, paina sitten pitkään nähdäksesi yksityiskohtaisen merkkirakennelman",
+  "helpCaptionTitleSearch": "Oletusarvoisesti hakupalkki hakee vain merkintöjen otsikkoja",
+  "helpCaptionFullSearch": "Kosketa suurennuslasia vaihtaaksesi kaikkien kenttien hakuun; kosketa uudelleen palataksesi otsikkohakuun",
+  "helpCaptionFilter": "Käytä suodatinpainikkeita näyttääksesi vain tietyn tyyppiset merkinnät",
+  "helpCaptionFolders": "Käytä kansionvalitsinta suodattaaksesi merkinnät kansion mukaan",
+  "helpCaptionSelect": "Paina pitkään merkintää siirtyäksesi valintatilaan; lisää kohteita ja määritä kansioon tai poista. Kosketa X poistuaksesi.",
+  "helpCaptionJumpToLetter": "Kosketa hakemistopalkissa olevaa kirjainta hypätäksesi kyseiseen osioon",
+  "helpCaptionBreakdown": "Kosketa silmäkuvaketta paljastaaksesi salasanan, paina sitten pitkään nähdäksesi yksityiskohtaisen merkkirakennelman",
+  "helpCaptionManageVaults": "Hallinnoi holveja -kohdassa voit nimetä tai poistaa holveja tai lisätä uuden",
+  "helpCaptionUnlock": "Syötä salauslause avataksesi holvin"
+}

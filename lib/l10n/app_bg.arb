@@ -1,0 +1,809 @@
+{
+  "@@locale": "bg",
+
+  "appName": "Gabbro",
+
+  "cancel": "Откажи",
+  "delete": "Изтрий",
+  "save": "Запази",
+  "close": "Затвори",
+  "ok": "OK",
+  "edit": "Редактирай",
+  "add": "Добави",
+  "remove": "Премахни",
+  "rename": "Преименувай",
+  "confirm": "Потвърди",
+  "continueAction": "Продължи",
+  "dismiss": "Отхвърли",
+  "authorize": "Разреши",
+  "register": "Регистрирай",
+  "sync": "Синхронизирай",
+  "assign": "Назначи",
+  "unlock": "Отключи",
+  "generate": "Генерирай",
+  "import": "Импортирай",
+  "export": "Експортирай",
+  "openInBrowser": "Отвори в браузър",
+  "useThisPassword": "Използвай тази парола",
+  "reviewArrow": "Преглед →",
+  "skip": "Пропусни",
+  "keep": "Запази",
+  "revert": "Възстанови",
+  "next": "Напред: съпоставяне на колони",
+  "syncFromVault": "Синхронизирай от трезора",
+  "createVault": "Създай трезор",
+  "pickFile": "Избери файл",
+  "noFileSelected": "Не е избран файл",
+  "chooseFolder": "Избери папка",
+  "addCustomField": "Добави персонализирано поле",
+  "exportFile": "Експортирай файл",
+  "addVault": "Добави трезор",
+  "addYubiKey": "Добави YubiKey",
+  "noChangesToSave": "Няма промени за запазване.",
+
+  "appearanceTitle": "Изглед",
+  "securityTitle": "Сигурност",
+  "aboutTitle": "За Gabbro",
+  "generatorTitle": "Генератор на пароли",
+  "importTitle": "Импортиране на записи",
+  "exportTitle": "Експортиране на трезор",
+  "changePassphraseTitle": "Промени паролна фраза",
+  "csvMappingTitle": "Съпоставяне на CSV колони",
+  "manageFoldersTitle": "Управление на папки",
+  "manageVaultsTitle": "Управление на трезори",
+  "manageYubiKeysTitle": "Управление на YubiKey ключове",
+  "passwordHistoryTitle": "История на паролите",
+  "reviewChangesTitle": "Преглед на промените",
+  "unlockGabbroTitle": "Отключи Gabbro",
+
+  "sectionTheme": "Тема",
+  "sectionTextSize": "Размер на текста",
+  "sectionAlphabetBar": "Позиция на азбучната лента",
+  "sectionAccessibility": "Достъпност",
+  "sectionLanguage": "Език",
+  "sectionForegroundLock": "Заключване на преден план",
+  "sectionBackgroundLock": "Заключване на заден план",
+  "sectionPasswordHistory": "История на паролите",
+  "sectionPassphraseCopyPaste": "Копиране/поставяне на паролна фраза",
+  "sectionVaultList": "Списък с трезори",
+  "sectionClipboardClear": "Изчистване на клипборд",
+  "sectionCharacterSets": "Набори символи",
+  "sectionGeneratorLanguage": "Език",
+
+  "themeSystem": "Системна",
+  "themeLight": "Светла",
+  "themeDark": "Тъмна",
+
+  "textSizeSmall": "Малък",
+  "textSizeRegular": "Обичаен",
+  "textSizeLarge": "Голям",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Само на телефон — таблетът винаги използва ляво.",
+  "alphabetBarLeft": "Вляво",
+  "alphabetBarRight": "Вдясно",
+
+  "highContrastTitle": "Висок контраст",
+  "highContrastSubtitle": "Увеличава контраста за по-добра четливост",
+
+  "languageNote": "Отменя системния език. «Системен» следва регионалните настройки на устройството.",
+  "langSystem": "Системен",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Заключи след този период на неактивност, докато приложението е отворено.",
+  "backgroundLockDescription": "Заключи след като приложението е било на заден план за толкова дълго.",
+  "passwordHistoryDescription": "Колко дълго да се пази предишната парола след промяна. «Запази завинаги» означава, че историята се изтрива само ръчно.",
+  "passphraseCopyPasteDescription": "Блокирай копирането и поставянето в полетата за паролна фраза. Препоръчва се: предотвратява изтичане на паролната фраза чрез клипборд.",
+  "passphraseCopyPasteNote": "Забележка: това блокира контекстното меню при дълго натискане и избора на текст. Вграденият бутон за поставяне на клавиатурата може все още да работи — това е ограничение на платформата.",
+  "blockCopyPasteTitle": "Блокирай копиране/поставяне",
+  "vaultListDescription": "Показвай списък с всички трезори на екрана за вход, за да можеш да избереш кой да отключиш, без да отиваш в «Управление на трезори».",
+  "showVaultListTitle": "Покажи списък с трезори при вход",
+  "vaultListNote": "Бележка за сигурност: когато е ИЗКЛЮЧЕНО, екранът за вход показва само последно използвания трезор — без намек за съществуването на други. Компромис: за смяна на трезора трябва първо да отключиш, след което да отидеш в Меню → Управление на трезори.",
+  "clipboardClearDescription": "Изчисти клипборда след копиране на тайна. Забележка: мениджърите на клипборд може да запазят копие.",
+
+  "duration30s": "30 с",
+  "duration1min": "1 мин",
+  "duration5min": "5 мин",
+  "duration15min": "15 мин",
+  "duration60s": "60 с",
+  "duration2min": "2 мин",
+  "durationNever": "Никога",
+  "duration7days": "7 дни",
+  "duration30days": "30 дни",
+  "duration90days": "90 дни",
+  "durationKeepForever": "Запази завинаги",
+
+  "menuExportVault": "Експортирай трезор",
+  "menuImportEntries": "Импортирай записи",
+  "menuSyncFromFile": "Синхронизирай от файл",
+  "menuManageVaults": "Управление на трезори",
+  "menuChangePassphrase": "Промени паролна фраза",
+  "menuManageYubiKeys": "Управление на YubiKey ключове",
+  "menuAppearance": "Изглед",
+  "menuSecurity": "Сигурност",
+  "menuManageFolders": "Управление на папки",
+  "menuPasswordGenerator": "Генератор на пароли",
+  "menuAbout": "За",
+
+  "tooltipSelectEntries": "Избери записи",
+  "tooltipLockVault": "Заключи трезора",
+  "tooltipSelectAll": "Избери всички",
+  "tooltipDeselectAll": "Премахни всички избирания",
+  "tooltipMenu": "Меню",
+  "tooltipCopy": "Копирай",
+  "tooltipCopied": "Копирано!",
+  "tooltipShow": "Покажи",
+  "tooltipHide": "Скрий",
+  "tooltipBrowse": "Преглед",
+  "tooltipEditAlias": "Редактирай псевдоним",
+  "tooltipRemoveField": "Премахни поле",
+  "tooltipRename": "Преименувай",
+  "tooltipDeleteVault": "Изтрий трезор",
+  "tooltipAssignToFolder": "Назначи в папка",
+  "tooltipShowPin": "Покажи PIN",
+  "tooltipHidePin": "Скрий PIN",
+  "tooltipShowValue": "Покажи стойност",
+  "tooltipHideValue": "Скрий",
+  "tooltipCancel": "Откажи",
+  "tooltipOpenInBrowser": "Отвори в браузър",
+
+  "allFolders": "Всички папки",
+  "noFolder": "Няма",
+  "selectFolder": "Избери папка",
+  "folderName": "Име на папката",
+
+  "noEntriesMatch": "Няма записи, съответстващи на търсенето.",
+  "noVaultsRegistered": "Няма регистрирани трезори.",
+  "noYubiKeysRegistered": "Няма регистрирани YubiKey ключове",
+  "selectEntry": "Избери запис",
+  "newEntryTitle": "Нов запис",
+  "createEntryTitle": "Нов(а) {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Редактирай {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(няма URL)",
+  "noNameFallback": "(няма име)",
+  "untitledFallback": "(без заглавие)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "Избрани: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Търси във всички полета…",
+  "searchEntriesHint": "Търси записи…",
+  "searchAllFieldsTooltip": "Търси във всички полета",
+  "searchByTitleTooltip": "Търси по заглавие",
+  "entryTypeAll": "Всички",
+  "entryTypePassword": "Парола",
+  "entryTypeNote": "Бележка",
+  "entryTypeCard": "Карта",
+  "entryTypeIdentity": "Самоличност",
+  "entryTypeFile": "Файл",
+  "entryTypeCustom": "Персонализиран",
+  "errorPrefix": "Грешка: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Трезор",
+  "navAppearance": "Изглед",
+  "navSecurity": "Сигурност",
+  "navAbout": "За",
+
+  "deleteEntryTitle": "Изтрий запис?",
+  "cannotBeUndone": "Това действие не може да бъде отменено.",
+  "deleteEntryDialogTitle": "Изтрий запис?",
+  "deleteEntriesTitle": "{count, plural, one{Изтрий 1 запис?} other{Изтрий {count} записа?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Назначи в папка",
+  "folderConflictTitle": "Конфликт на папки",
+  "syncFailedTitle": "Синхронизацията не успя",
+  "syncFromFileTitle": "Синхронизирай от файл",
+  "nothingToSync": "Няма какво да се синхронизира — и двата трезора вече са актуализирани.",
+
+  "importedEntries": "{count, plural, one{Импортиран 1 запис.} other{Импортирани {count} записа.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Експортирай файл",
+  "saveDecryptedFileTo": "Запази дешифрирания файл в:",
+  "exportPathLabel": "Път за експорт",
+  "exportedToPath": "Експортирано в {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Експортирането не успя: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Отвори в браузър?",
+  "couldNotOpen": "Не можа да се отвори {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Изтрий предишен запис",
+  "failedToClearHistory": "Неуспешно изчистване на историята: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Неуспешно възстановяване на паролата: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Преименувай папка",
+  "addFolderTitle": "Добави папка",
+  "deleteFolderTitle": "Изтрий папка",
+  "deleteFolderConfirm": "Изтрий «{folder}»?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Преназначи записи в",
+  "clearToNone": "Премести в «Няма»",
+
+  "renameVaultTitle": "Преименувай трезор",
+  "deleteVaultTitle": "Изтрий трезор?",
+  "deleteVaultConfirmTitle": "Сигурен ли си?",
+  "typeDeleteToConfirm": "Въведи DELETE за потвърждение",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Докосни своя YubiKey",
+  "noVaultsRegisteredText": "Няма регистрирани трезори.",
+
+  "addYubiKeyTitle": "Добави YubiKey",
+  "enterYubiKeyPinTitle": "Въведи YubiKey PIN",
+  "editAliasForKey": "Редактирай псевдонима на ключ {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Ще остане само един регистриран YubiKey ключ.",
+  "removeKeyConfirm": "Сигурен ли си, че искаш да премахнеш този ключ?",
+  "removeKeyVaultConfirm": "Да се премахне ли този YubiKey от трезора?",
+  "yubiKeyRemoved": "YubiKey е премахнат",
+  "failedToRemoveKey": "Неуспешно премахване на ключ: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey е добавен",
+  "failedToAddKey": "Неуспешно добавяне на ключ: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Неуспешно запазване на псевдоним: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Не е намерено FIDO2 устройство. Постави своя YubiKey и опитай отново.",
+  "transportLabel": "Транспорт:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Паролна фраза",
+  "yubiKeyPinLabel": "YubiKey PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Текуща паролна фраза",
+  "newPassphraseLabel": "Нова паролна фраза",
+  "confirmPassphraseLabel": "Потвърди новата паролна фраза",
+  "vaultPassphraseLabel": "Паролна фраза на трезора",
+  "aliasLabel": "Псевдоним",
+  "aliasHint": "напр., Основен, Работен ключ…",
+  "masterPassphraseLabel": "Главна паролна фраза",
+  "confirmPassphraseLabelShort": "Потвърди паролна фраза",
+
+  "fieldTitle": "Заглавие",
+  "fieldContent": "Съдържание",
+  "fieldFirstName": "Собствено име",
+  "fieldLastName": "Фамилия",
+  "fieldEmail": "Имейл (незадължително)",
+  "fieldPhone": "Телефон (незадължително)",
+  "fieldAddress": "Адрес (незадължително)",
+  "fieldCardLabel": "Название на картата (напр., «Visa Platinum»)",
+  "fieldCardholderName": "Името на притежателя",
+  "fieldCardNumber": "Номер на картата",
+  "fieldExpiry": "Валидност (ММ/ГГ)",
+  "fieldCvv": "CVV (незадължително)",
+  "fieldCardPin": "PIN (незадължително)",
+  "fieldCreditLimit": "Кредитен лимит (незадължително)",
+  "fieldAccountNumber": "Номер на сметка (незадължително)",
+  "fieldNotes": "Бележки (незадължително)",
+  "fieldUrl": "URL (незадължително)",
+  "fieldUsername": "Потребителско ime",
+  "fieldPassword": "Парола",
+  "fieldSeparator": "Разделител",
+  "fieldFolder": "Папка",
+  "fieldLabel": "Етикет",
+  "fieldValue": "Стойност",
+  "fieldCustomFields": "Персонализирани полета",
+  "fieldLabelOptional": "{label} (незадължително)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Този тип запис все още не се поддържа.",
+  "csvColumnNone": "(няма)",
+  "csvPreviewLabel": "Преглед",
+  "csvImportButton": "Импортирай",
+
+  "gabbroVaultSection": "Трезор Gabbro",
+  "genericCsvSection": "Общ CSV",
+
+  "changePassphraseSuccess": "Паролната фраза е променена",
+  "changePassphraseButton": "Промени паролна фраза",
+
+  "continueLabel": "Продължи",
+  "protectWithYubiKey": "Защити с YubiKey",
+  "yubiKeySubtitle": "Хардуерен ключ за сигурност (препоръчително)",
+  "accessibilityButton": "Достъпност",
+
+  "aboutProjectSection": "Проект",
+  "aboutLicenceSection": "Лиценз",
+  "aboutOpenSourceSection": "Компоненти с отворен код",
+  "aboutAttributionSection": "Признания",
+
+  "lengthLabel": "Дължина",
+  "wordsLabel": "Думи",
+  "generateButton": "Генерирай",
+  "usePasswordButton": "Използвай тази парола",
+  "showHidePassword": "Покажи",
+
+  "deleteVaultPostDeletion": "Твоят трезор е изтрит. Създай нов, за да продължиш.",
+
+  "syncFilePassphraseLabel": "Паролна фраза на трезора",
+
+  "historyWarning": "Запазва се само 1 предишна стойност. Историята се изчиства автоматично въз основа на настройките за сигурност.",
+  "historyCurrent": "Текуща",
+  "historyPrevious": "Предишна",
+  "historySavedOn": "Запазено на {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · изтича на {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Проблем с импортирането ({index} от {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Тип: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Редактирай, поправи и запази този запис или го пропусни, за да го отхвърлиш.",
+
+  "entriesSkipped": "{count, plural, one{1 запис е пропуснат} other{{count} записа са пропуснати}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Тези записи вече съществуват в твоя трезор и не са бивали презаписани:",
+
+  "syncDeleteEntryContent": "Другото устройство изтри «{title}».\n\nДа се изтрие ли и тук, или да се запази?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}» е в различни папки на двете устройства.\n\nТова устройство: {local}\nДругото устройство: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Запази без папка",
+  "folderConflictKeepLocal": "Запази «{folder}»",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Премести без папка",
+  "folderConflictMoveIncoming": "Премести в «{folder}»",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Трезорът е синхронизиран — добавени: {added}, актуализирани: {updated}, изтрити: {deleted}.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Този файл на трезор използва различна паролна фраза. Синхронизацията се поддържа само между трезори, споделящи една паролна фраза.",
+
+  "reviewSensitiveFields": "Чувствителни полета",
+  "reviewOtherFields": "Други полета",
+  "reviewPasswordChanged": "Паролата е променена",
+  "reviewCvvChanged": "CVV е променен",
+  "reviewPinChanged": "PIN е променен",
+  "reviewTransactionPasswordChanged": "Паролата за транзакция е променена",
+  "tooltipShowValues": "Покажи стойности",
+  "reviewOld": "Стара",
+  "reviewNew": "Нова",
+  "reviewEmpty": "(празно)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Бележки",
+  "reviewFieldContent": "Съдържание",
+  "reviewFieldEmail": "Имейл",
+  "reviewFieldPhone": "Телефон",
+  "reviewFieldAddress": "Адрес",
+  "reviewFieldCardLabel": "Название на картата",
+  "reviewFieldStatus": "Статус",
+  "reviewFieldCardholder": "Притежател на картата",
+  "reviewFieldExpiry": "Валидност",
+  "reviewFieldCreditLimit": "Кредитен лимит",
+  "reviewFieldAccountNumber": "Номер на сметка",
+  "reviewFieldNetwork": "Мрежа",
+  "reviewFieldBank": "Банка",
+  "reviewFieldFilename": "Име на файл",
+  "reviewFieldSize": "Размер",
+  "reviewFieldCardNumber": "Номер",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Парола за транзакция",
+  "timestampCreated": "Създаден",
+  "timestampUpdated": "Актуализиран",
+  "timestampUnknown": "Неизвестен",
+  "noTitleFallback": "(без заглавие)",
+  "tooltipExportFile": "Експортирай файл",
+  "tooltipEditEntry": "Редактирай запис",
+  "tooltipDeleteEntry": "Изтрий запис",
+  "exportLabel": "Експорт",
+  "customEntryFieldsHeader": "Полета",
+  "copiedNeverClears": "Копирано — клипбордът никога не се изчиства автоматично",
+  "copiedClears30s": "Копирано — клипбордът ще се изчисти след 30 с",
+  "copiedClears60s": "Копирано — клипбордът ще се изчисти след 60 с",
+  "copiedClears2min": "Копирано — клипбордът ще се изчисти след 2 мин",
+
+  "passwordBreakdownTitle": "Анализ на парола",
+  "charTypeUppercase": "Главни букви",
+  "charTypeLowercase": "Малки букви",
+  "charTypeDigit": "Цифра",
+  "charTypeSymbol": "Символ",
+
+  "exportIncludeDate": "Включи дата в името на файла",
+  "exportChooseFormat": "Избери формат за експортиране.",
+  "exportUnencryptedWarning": "Напълно нешифровано — всички тайни ще бъдат записани в обикновен текст. Съхранявай файла сигурно и го изтрий след употреба.",
+  "exportPassphraseOnlyNote": "Защитено само с паролна фраза. YubiKey не е необходим за импортиране.",
+  "exportChooseDestinationJson": "Избери местоназначение за експортирания JSON файл.",
+  "exportChooseDestinationVault": "Избери местоназначение за експортирания файл на трезора.",
+  "exportTwoFilesNote": "Ще бъдат създадени два файла: vault.gabbro и vault.gabbro.sha256",
+  "exportSelectDestination": "Избери местоназначение.",
+
+  "aboutVersion": "Версия {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Постквантов мениджър на пароли",
+  "aboutSourceCode": "Изходен код",
+  "aboutReportIssue": "Докладвай проблем",
+  "aboutSupportGabbro": "Подкрепи Gabbro",
+  "aboutLicenceBody": "Gabbro е свободен и отворен код програмен продукт, лицензиран под GNU General Public License v3.0 only (GPL-3.0-only).\n\nИмаш свободата да използваш, изучаваш и разпространяваш този програмен продукт при условията на посочения лиценз.",
+  "aboutOwnerRole": "Собственик на проекта, архитект и водещ разработчик:",
+  "aboutAiPartner": "Партньор за разработка с ИИ:",
+  "aboutNoTelemetry": "Gabbro не осъществява изходящи мрежови връзки. Без телеметрия, без аналитика, без акаунти.",
+
+  "strengthTierTerrible": "Ужасна",
+  "strengthTierWeak": "Слаба",
+  "strengthTierFair": "Приемлива",
+  "strengthTierStrong": "Силна",
+  "strengthTierVeryStrong": "Много силна",
+  "strengthTierExcellent": "Отлична",
+  "yubiKeyProtectedNote": "Трезорът е защитен с YubiKey — твоята YubiKey връзка ще бъде запазена.",
+  "yubiKeyPinRequired": "Необходим е YubiKey PIN",
+  "tapYubiKeyNow": "Докосни своя YubiKey сега…",
+  "touchYubiKeyToAuthorize": "Докосни своя YubiKey, за да разрешиш тази промяна.",
+  "currentPassphraseRequired": "Необходима е текущата паролна фраза",
+  "newPassphraseRequired": "Необходима е нова паролна фраза",
+  "passphraseTooWeak": "Паролната фраза е твърде слаба",
+  "confirmPassphraseRequired": "Моля, потвърди новата паролна фраза",
+  "passphrasesDoNotMatch": "Паролните фрази не съвпадат",
+  "passphrasesMatch": "✓ Паролните фрази съвпадат",
+  "passphrasesNoMatch": "✗ Паролните фрази не съвпадат",
+  "entropyDisplay": "{tier} · {bits} бита",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Грешка при транспорта.",
+  "authorizationFailed": "Разрешаването не успя — провери PIN-а и опитай отново.",
+
+  "unlockEnterPassphraseAndPin": "Въведи паролна фраза и YubiKey PIN за отключване",
+  "unlockEnterPassphrase": "Въведи паролна фраза за отключване",
+  "unlockEntropyDisplay": "{tier} · {bits} бита ентропия",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Постави YubiKey и го докосни, когато мига",
+  "unlockErrorPassphrase": "Трезорът не можа да бъде отключен. Провери паролната фраза.",
+  "unlockErrorPassphraseAndPin": "Трезорът не можа да бъде отключен. Провери паролната фраза и YubiKey PIN.",
+
+  "importSelectFile": "Избери файл.",
+  "importFileNotFound": "Файлът не е намерен.",
+  "importEnterPassphrase": "Въведи паролната фраза за този трезор.",
+  "importDuplicateWarning": "Записи, чийто UUID вече съществува в твоя трезор, ще бъдат автоматично пропуснати. Ще видиш обобщение.",
+  "importGabbroSubtitle": "Синхронизирай записи от друг трезор Gabbro (.gabbro файл)",
+  "importEnpassSubtitle": "JSON експорт от Enpass (Инструменти → Експортирай)",
+  "importBitwardenSubtitle": "Нешифрован JSON експорт от Bitwarden (Инструменти → Експортирай хранилище)",
+  "importCsvSubtitle": "CSV експорт от всеки мениджър на пароли",
+
+  "vaultNameAlreadyExists": "Вече съществува трезор с името «{alias}».",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Това ще изтрие завинаги «{alias}» и всичките му данни.\n\nФайл: {path}\n\nТова действие не може да бъде отменено.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Това ще изтрие завинаги «{alias}» и ще премахне YubiKey връзката му.\n\nФайл: {path}\n\nТова действие не може да бъде отменено.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Въведи PIN и докосни своя YubiKey, за да разрешиш това изтриване.",
+  "deleteVaultTooltip": "Изтрий трезор",
+
+  "navVault": "Трезор",
+  "navAbout": "За",
+
+  "yubiKeySecurityWarning": "Предупреждение за сигурност",
+  "removeYubiKeyTitle": "Премахни YubiKey",
+  "yubiKeyLastKeyRiskWarning": "ПРЕДУПРЕЖДЕНИЕ: ако оставащият ключ бъде изгубен, повреден или откраднат, достъпът до трезора ще стане постоянно невъзможен. Няма начин за възстановяване.",
+  "onlyOneKeyRegisteredWarning": "Регистриран е само един ключ. Ако този ключ бъде изгубен, достъпът до трезора ще стане постоянно невъзможен.",
+  "tapRegisterNfc": "Допри ключа до телефона за регистрация",
+  "tapRegisterUsb": "След свързване докосни ключа за регистрация",
+  "tapActivateNfc": "Допри ключа до телефона отново за активиране",
+  "tapActivateUsb": "След свързване докосни ключа отново за активиране",
+  "failedToRegisterKey": "Неуспешна регистрация на ключ: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Неуспешно активиране на ключ: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Ключ {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Докосни новия YubiKey за регистрация…",
+  "tapYubiKeyToActivate": "Докосни новия YubiKey отново за активиране…",
+  "editAliasTooltip": "Редактирай псевдоним",
+  "cannotRemoveLastKey": "Последният ключ не може да бъде премахнат",
+  "removeKeyTooltip": "Премахни ключ",
+  "manageYubiKeysError": "Грешка: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Класически",
+  "generatorModePassphrase": "Паролна фраза",
+  "charSetsHeader": "Набори символи",
+  "languageHeader": "Език",
+  "separatorLabel": "Разделител",
+  "capitaliseWords": "Главни букви в думите",
+  "appendDigit": "Добави цифра",
+  "entropyBitsDisplay": "~{bits} бита ентропия",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Избери поне един набор символи",
+  "passwordMinLengthNote": "Паролите съдържат поне 32 символа. Ако даден сайт има по-кратко ограничение, копирай необходимите първи символи.",
+  "tooltipShow": "Покажи",
+  "tooltipCopied": "Копирано!",
+  "tooltipCopy": "Копирай",
+  "excludeAmbiguousChars": "Изключи двусмислени символи (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Създай своя трезор, за да започнеш.",
+  "onboardingVaultName": "Името на трезора",
+  "onboardingAliasRequired": "Псевдонимът е задължителен",
+  "onboardingNewVaultLocation": "Местоположение на новия трезор (същото като преди)",
+  "onboardingVaultLocation": "Местоположение на трезора",
+  "onboardingLoadingPath": "Зареждане…",
+  "onboardingPathHint": "Път до файла на трезора",
+  "onboardingPathRequired": "Пътят е задължителен",
+  "onboardingReusePassphraseHint": "Избери нова главна паролна фраза или повторно използвай предишната.",
+  "onboardingPassphraseRequired": "Паролната фраза е задължителна",
+  "onboardingConfirmRequired": "Моля, потвърди паролната фраза",
+  "onboardingPrimaryKeyPin": "PIN на основния ключ",
+  "onboardingBackupKeyPin": "PIN на резервния ключ",
+  "onboardingKeyNPin": "PIN на ключ {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Ще докоснеш всеки YubiKey два пъти (общо 4 докосвания). Между двата ключа ще бъдеш помолен да ги смениш.",
+  "onboardingYubikeySlowNote": "Създаването на трезор с YubiKey отнема 20–30 секунди. Приложението може да изглежда неотзивчиво — това е нормално.",
+  "onboardingStep1Label": "Регистрирай основния ключ",
+  "onboardingStep1Hint": "Докосни своя YubiKey сега",
+  "onboardingStep2Label": "Активирай основния ключ",
+  "onboardingStep2Hint": "Докосни своя YubiKey отново",
+  "onboardingStep3Label": "Премини към резервния ключ",
+  "onboardingStep3Hint": "Извади основния ключ, след което свържи резервния YubiKey",
+  "onboardingStep4Label": "Регистрирай резервния ключ",
+  "onboardingStep4Hint": "Докосни резервния YubiKey",
+  "onboardingStep5Label": "Активирай резервния ключ",
+  "onboardingStep5Hint": "Докосни резервния YubiKey за последен път",
+
+  "textSizePreview": "Габрото е интрузивна магмена скала, богата на Mg и Fe, с едрозърнеста структура.",
+
+  "fieldCardStatus": "Статус",
+  "fieldPaymentNetwork": "Платежна мрежа",
+
+  "cardStatusActive": "Активна",
+  "cardStatusLapsed": "Изтекла",
+  "cardStatusInactive": "Неактивна",
+
+  "validatorTitleRequired": "Заглавието е задължително",
+  "validatorUsernameRequired": "Потребителското ime е задължително",
+  "validatorPasswordRequired": "Паролата е задължителна",
+  "validatorContentRequired": "Съдържанието е задължително",
+  "validatorFirstNameRequired": "Собственото ime е задължително",
+  "validatorLastNameRequired": "Фамилията е задължителна",
+  "validatorCardLabelRequired": "Названието на картата е задължително",
+  "validatorCardholderRequired": "Името на притежателя е задължително",
+  "validatorCardNumberRequired": "Номерът на картата е задължителен",
+  "validatorCardNumberLength": "Номерът на картата трябва да е с 6–19 цифри",
+  "validatorExpiryRequired": "Валидността е задължителна",
+  "validatorExpiryFormat": "Използвай формат ММ/ГГ",
+  "validatorExpiryMonth": "Месецът трябва да е между 01 и 12",
+  "validatorCvvLength": "CVV трябва да е с 3 или 4 цифри",
+  "validatorLabelRequired": "Етикетът е задължителен",
+  "validatorStatusRequired": "Статусът е задължителен",
+
+  "sectionBiometricUnlock": "Биометрично отключване",
+  "biometricUnlockDescription": "Използвай пръстов отпечатък или лице за отключване на трезора вместо въвеждане на паролна фраза.",
+  "biometricUnlockTitle": "Включи биометрично отключване",
+  "biometricUnlockNote": "Всички биометрични данни, регистрирани на това устройство, ще работят — не само тези, използвани при регистрацията.",
+  "biometricUnavailable": "Биометричното отключване не е налично на това устройство. Не е намерен биометричен сензор или не са регистрирани биометрични данни в системните настройки.",
+  "biometricDialogTitle": "За биометричното отключване",
+  "biometricDialogBody": "Когато е включено, Gabbro шифрова главната паролна фраза и я съхранява на това устройство, защитена с твоите биометрични данни. Паролната фраза се дешифрира само в момента на отключване.\n\nGabbro никога не съхранява твоите данни за пръстов отпечатък или лице — те остават в защития чип на телефона.",
+  "biometricDialogAllBiometrics": "Всички биометрични данни, регистрирани на това устройство, ще могат да отключат Gabbro — не можеш да го ограничиш до конкретен пръстов отпечатък.",
+  "biometricDialogInvalidation": "Ако към този телефон бъдат добавени нови биометрични данни (включително втори пръстов отпечатък), тази настройка ще бъде автоматично деактивирана и ще трябва да бъде конфигурирана отново.",
+  "biometricDialogRecommendation": "Препоръка: оставяй деактивирана, ако имаш висок модел на заплахи или споделяш устройството.",
+  "biometricInvalidated": "Биометричното отключване беше деактивирано, защото биометричните данни на това устройство се промениха (в системните настройки беше добавен нов пръстов отпечатък или лице). Това е мярка за сигурност. Въведи отново паролната фраза и активирай биометричното отключване отново.",
+  "useBiometrics": "Използвай биометрия",
+  "biometricCancelled": "Биометричното удостоверяване не беше завършено. Въведи паролна фраза за отключване.",
+  "biometricEnrollTitle": "Въведи паролна фраза",
+  "biometricEnrollDescription": "Въведи главната паролна фраза, за да включиш биометричното отключване.",
+  "biometricYubikeyHint": "Въведи YubiKey PIN по-долу, след това докосни «Използвай биометрия», след това докосни своя YubiKey.",
+
+  "helpTitle": "Помощ",
+  "menuHelp": "Помощ",
+  "helpCaptionCreate": "Създай трезор: въведи ime, паролна фраза и по желание защити с YubiKey",
+  "helpCaptionEmpty": "Докосни +, за да добавиш първия запис",
+  "helpCaptionDetail": "Докосни иконата с окото, за да разкриеш парола, след това задръж за подробен анализ на символите",
+  "helpCaptionTitleSearch": "По подразбиране лентата за търсене търси само в заглавията на записите",
+  "helpCaptionFullSearch": "Докосни лупата, за да превключиш към търсене във всички полета; докосни отново, за да се върнеш към търсене по заглавие",
+  "helpCaptionFilter": "Използвай бутоните за филтриране, за да покажеш само записи от определен тип",
+  "helpCaptionFolders": "Използвай избора на папка, за да филтрираш записите по папка",
+  "helpCaptionSelect": "Задръж запис, за да влезеш в режим на избор; добави още елементи, след това назначи в папка или изтрий. Докосни X за изход.",
+  "helpCaptionJumpToLetter": "Докосни буква в индексната лента, за да прескочиш към тази секция",
+  "helpCaptionBreakdown": "Докосни иконата с окото, за да разкриеш парола, след това задръж за подробен анализ на символите",
+  "helpCaptionManageVaults": "В «Управление на трезори» можеш да преименуваш или изтриеш трезори, или да добавиш нов",
+  "helpCaptionUnlock": "Въведи паролна фраза за отключване на трезора"
+}

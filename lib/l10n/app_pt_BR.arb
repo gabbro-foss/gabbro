@@ -1,0 +1,809 @@
+{
+  "@@locale": "pt_BR",
+
+  "appName": "Gabbro",
+
+  "cancel": "Cancelar",
+  "delete": "Excluir",
+  "save": "Salvar",
+  "close": "Fechar",
+  "ok": "OK",
+  "edit": "Editar",
+  "add": "Adicionar",
+  "remove": "Remover",
+  "rename": "Renomear",
+  "confirm": "Confirmar",
+  "continueAction": "Continuar",
+  "dismiss": "Dispensar",
+  "authorize": "Autorizar",
+  "register": "Registrar",
+  "sync": "Sincronizar",
+  "assign": "Atribuir",
+  "unlock": "Desbloquear",
+  "generate": "Gerar",
+  "import": "Importar",
+  "export": "Exportar",
+  "openInBrowser": "Abrir no navegador",
+  "useThisPassword": "Usar esta senha",
+  "reviewArrow": "Revisar →",
+  "skip": "Pular",
+  "keep": "Manter",
+  "revert": "Reverter",
+  "next": "Próximo: mapear colunas",
+  "syncFromVault": "Sincronizar do cofre",
+  "createVault": "Criar cofre",
+  "pickFile": "Escolher arquivo",
+  "noFileSelected": "Nenhum arquivo selecionado",
+  "chooseFolder": "Escolher pasta",
+  "addCustomField": "Adicionar campo personalizado",
+  "exportFile": "Exportar arquivo",
+  "addVault": "Adicionar cofre",
+  "addYubiKey": "Adicionar YubiKey",
+  "noChangesToSave": "Sem alterações para salvar.",
+
+  "appearanceTitle": "Aparência",
+  "securityTitle": "Segurança",
+  "aboutTitle": "Sobre o Gabbro",
+  "generatorTitle": "Gerador de senhas",
+  "importTitle": "Importar entradas",
+  "exportTitle": "Exportar cofre",
+  "changePassphraseTitle": "Alterar frase secreta",
+  "csvMappingTitle": "Mapear colunas CSV",
+  "manageFoldersTitle": "Gerenciar pastas",
+  "manageVaultsTitle": "Gerenciar cofres",
+  "manageYubiKeysTitle": "Gerenciar YubiKeys",
+  "passwordHistoryTitle": "Histórico de senhas",
+  "reviewChangesTitle": "Revisar alterações",
+  "unlockGabbroTitle": "Desbloquear Gabbro",
+
+  "sectionTheme": "Tema",
+  "sectionTextSize": "Tamanho do texto",
+  "sectionAlphabetBar": "Posição da barra alfabética",
+  "sectionAccessibility": "Acessibilidade",
+  "sectionLanguage": "Idioma",
+  "sectionForegroundLock": "Bloqueio em primeiro plano",
+  "sectionBackgroundLock": "Bloqueio em segundo plano",
+  "sectionPasswordHistory": "Histórico de senhas",
+  "sectionPassphraseCopyPaste": "Copiar/colar frase secreta",
+  "sectionVaultList": "Lista de cofres",
+  "sectionClipboardClear": "Limpar área de transferência",
+  "sectionCharacterSets": "Conjuntos de caracteres",
+  "sectionGeneratorLanguage": "Idioma",
+
+  "themeSystem": "Sistema",
+  "themeLight": "Claro",
+  "themeDark": "Escuro",
+
+  "textSizeSmall": "Pequeno",
+  "textSizeRegular": "Normal",
+  "textSizeLarge": "Grande",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Apenas em celular — tablet sempre usa a esquerda.",
+  "alphabetBarLeft": "Esquerda",
+  "alphabetBarRight": "Direita",
+
+  "highContrastTitle": "Alto contraste",
+  "highContrastSubtitle": "Aumenta o contraste para melhor legibilidade",
+
+  "languageNote": "Substitui o idioma do sistema. «Sistema» segue as configurações regionais do dispositivo.",
+  "langSystem": "Sistema",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Bloquear após este tempo de inatividade com o aplicativo aberto.",
+  "backgroundLockDescription": "Bloquear após o aplicativo ficar em segundo plano por este tempo.",
+  "passwordHistoryDescription": "Por quanto tempo manter uma senha anterior após ser alterada. «Manter sempre» significa que o histórico só é excluído manualmente.",
+  "passphraseCopyPasteDescription": "Bloquear copiar e colar nos campos da frase secreta principal. Recomendado: evita o vazamento da frase secreta pela área de transferência.",
+  "passphraseCopyPasteNote": "Nota: isso bloqueia o menu de contexto de pressão longa e a seleção de texto. O botão de colar inline do teclado pode ainda funcionar — é uma limitação da plataforma que não pode ser bloqueada.",
+  "blockCopyPasteTitle": "Bloquear copiar/colar",
+  "vaultListDescription": "Mostrar uma lista suspensa de todos os cofres na tela de login para escolher qual desbloquear sem ir a Gerenciar cofres.",
+  "showVaultListTitle": "Mostrar lista de cofres no login",
+  "vaultListNote": "Nota de segurança: quando está DESATIVADO, a tela de login mostra apenas o último cofre usado — sem indicação de que existem outros cofres. Contrapartida: para trocar de cofre é necessário primeiro desbloquear e depois ir a Menu → Gerenciar cofres.",
+  "clipboardClearDescription": "Limpar a área de transferência após copiar um segredo. Nota: gerenciadores de área de transferência podem manter uma cópia.",
+
+  "duration30s": "30s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60s",
+  "duration2min": "2 min",
+  "durationNever": "Nunca",
+  "duration7days": "7 dias",
+  "duration30days": "30 dias",
+  "duration90days": "90 dias",
+  "durationKeepForever": "Manter sempre",
+
+  "menuExportVault": "Exportar cofre",
+  "menuImportEntries": "Importar entradas",
+  "menuSyncFromFile": "Sincronizar de arquivo",
+  "menuManageVaults": "Gerenciar cofres",
+  "menuChangePassphrase": "Alterar frase secreta",
+  "menuManageYubiKeys": "Gerenciar YubiKeys",
+  "menuAppearance": "Aparência",
+  "menuSecurity": "Segurança",
+  "menuManageFolders": "Gerenciar pastas",
+  "menuPasswordGenerator": "Gerador de senhas",
+  "menuAbout": "Sobre",
+
+  "tooltipSelectEntries": "Selecionar entradas",
+  "tooltipLockVault": "Bloquear cofre",
+  "tooltipSelectAll": "Selecionar tudo",
+  "tooltipDeselectAll": "Desselecionar tudo",
+  "tooltipMenu": "Menu",
+  "tooltipCopy": "Copiar",
+  "tooltipCopied": "Copiado!",
+  "tooltipShow": "Mostrar",
+  "tooltipHide": "Ocultar",
+  "tooltipBrowse": "Navegar",
+  "tooltipEditAlias": "Editar apelido",
+  "tooltipRemoveField": "Remover campo",
+  "tooltipRename": "Renomear",
+  "tooltipDeleteVault": "Excluir cofre",
+  "tooltipAssignToFolder": "Atribuir a pasta",
+  "tooltipShowPin": "Mostrar PIN",
+  "tooltipHidePin": "Ocultar PIN",
+  "tooltipShowValue": "Mostrar valor",
+  "tooltipHideValue": "Ocultar",
+  "tooltipCancel": "Cancelar",
+  "tooltipOpenInBrowser": "Abrir no navegador",
+
+  "allFolders": "Todas as pastas",
+  "noFolder": "Nenhuma",
+  "selectFolder": "Selecionar uma pasta",
+  "folderName": "Nome da pasta",
+
+  "noEntriesMatch": "Nenhuma entrada corresponde à pesquisa.",
+  "noVaultsRegistered": "Nenhum cofre cadastrado.",
+  "noYubiKeysRegistered": "Nenhuma YubiKey cadastrada",
+  "selectEntry": "Selecionar uma entrada",
+  "newEntryTitle": "Nova entrada",
+  "createEntryTitle": "Novo(a) {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Editar {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(sem URL)",
+  "noNameFallback": "(sem nome)",
+  "untitledFallback": "(sem título)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "{count} selecionado(s)",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Pesquisar todos os campos…",
+  "searchEntriesHint": "Pesquisar entradas…",
+  "searchAllFieldsTooltip": "Pesquisando todos os campos",
+  "searchByTitleTooltip": "Pesquisando por título",
+  "entryTypeAll": "Todos",
+  "entryTypePassword": "Senha",
+  "entryTypeNote": "Nota",
+  "entryTypeCard": "Cartão",
+  "entryTypeIdentity": "Identidade",
+  "entryTypeFile": "Arquivo",
+  "entryTypeCustom": "Personalizado",
+  "errorPrefix": "Erro: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Cofre",
+  "navAppearance": "Aparência",
+  "navSecurity": "Segurança",
+  "navAbout": "Sobre",
+
+  "deleteEntryTitle": "Excluir entrada?",
+  "cannotBeUndone": "Esta ação não pode ser desfeita.",
+  "deleteEntryDialogTitle": "Excluir entrada?",
+  "deleteEntriesTitle": "{count, plural, one{Excluir 1 entrada?} other{Excluir {count} entradas?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Atribuir a pasta",
+  "folderConflictTitle": "Conflito de pasta",
+  "syncFailedTitle": "Sincronização falhou",
+  "syncFromFileTitle": "Sincronizar de arquivo",
+  "nothingToSync": "Nada a sincronizar — ambos os cofres já estão atualizados.",
+
+  "importedEntries": "{count, plural, one{1 entrada importada.} other{{count} entradas importadas.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Exportar arquivo",
+  "saveDecryptedFileTo": "Salvar arquivo descriptografado em:",
+  "exportPathLabel": "Caminho de exportação",
+  "exportedToPath": "Exportado para {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Exportação falhou: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Abrir no navegador?",
+  "couldNotOpen": "Não foi possível abrir {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Excluir entrada anterior",
+  "failedToClearHistory": "Falha ao limpar histórico: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Falha ao reverter senha: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Renomear pasta",
+  "addFolderTitle": "Adicionar pasta",
+  "deleteFolderTitle": "Excluir pasta",
+  "deleteFolderConfirm": "Excluir \"{folder}\"?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Reatribuir entradas a",
+  "clearToNone": "Mover para «Nenhuma»",
+
+  "renameVaultTitle": "Renomear cofre",
+  "deleteVaultTitle": "Excluir cofre?",
+  "deleteVaultConfirmTitle": "Tem certeza?",
+  "typeDeleteToConfirm": "Digite DELETE para confirmar",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Toque na sua YubiKey",
+  "noVaultsRegisteredText": "Nenhum cofre cadastrado.",
+
+  "addYubiKeyTitle": "Adicionar YubiKey",
+  "enterYubiKeyPinTitle": "Inserir PIN da YubiKey",
+  "editAliasForKey": "Editar apelido da chave {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Ficará apenas uma YubiKey cadastrada.",
+  "removeKeyConfirm": "Tem certeza que quer remover esta chave?",
+  "removeKeyVaultConfirm": "Remover esta YubiKey do cofre?",
+  "yubiKeyRemoved": "YubiKey removida",
+  "failedToRemoveKey": "Falha ao remover chave: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey adicionada",
+  "failedToAddKey": "Falha ao adicionar chave: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Falha ao salvar apelido: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Nenhum dispositivo FIDO2 encontrado. Insira sua YubiKey e tente novamente.",
+  "transportLabel": "Transporte:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Frase secreta",
+  "yubiKeyPinLabel": "PIN da YubiKey",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Frase secreta atual",
+  "newPassphraseLabel": "Nova frase secreta",
+  "confirmPassphraseLabel": "Confirmar nova frase secreta",
+  "vaultPassphraseLabel": "Frase secreta do cofre",
+  "aliasLabel": "Apelido",
+  "aliasHint": "ex. Principal, Chave do trabalho…",
+  "masterPassphraseLabel": "Frase secreta principal",
+  "confirmPassphraseLabelShort": "Confirmar frase secreta",
+
+  "fieldTitle": "Título",
+  "fieldContent": "Conteúdo",
+  "fieldFirstName": "Nome",
+  "fieldLastName": "Sobrenome",
+  "fieldEmail": "E-mail (opcional)",
+  "fieldPhone": "Telefone (opcional)",
+  "fieldAddress": "Endereço (opcional)",
+  "fieldCardLabel": "Nome do cartão (ex. «Visa Platinum»)",
+  "fieldCardholderName": "Nome do titular",
+  "fieldCardNumber": "Número do cartão",
+  "fieldExpiry": "Validade (MM/AA)",
+  "fieldCvv": "CVV (opcional)",
+  "fieldCardPin": "PIN (opcional)",
+  "fieldCreditLimit": "Limite de crédito (opcional)",
+  "fieldAccountNumber": "Número de conta (opcional)",
+  "fieldNotes": "Notas (opcional)",
+  "fieldUrl": "URL (opcional)",
+  "fieldUsername": "Usuário",
+  "fieldPassword": "Senha",
+  "fieldSeparator": "Separador",
+  "fieldFolder": "Pasta",
+  "fieldLabel": "Rótulo",
+  "fieldValue": "Valor",
+  "fieldCustomFields": "Campos personalizados",
+  "fieldLabelOptional": "{label} (opcional)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Tipo de entrada ainda não suportado.",
+  "csvColumnNone": "(nenhum)",
+  "csvPreviewLabel": "Prévia",
+  "csvImportButton": "Importar",
+
+  "gabbroVaultSection": "Cofre Gabbro",
+  "genericCsvSection": "CSV genérico",
+
+  "changePassphraseSuccess": "Frase secreta alterada com sucesso",
+  "changePassphraseButton": "Alterar frase secreta",
+
+  "continueLabel": "Continuar",
+  "protectWithYubiKey": "Proteger com YubiKey",
+  "yubiKeySubtitle": "Chave de segurança de hardware (recomendado)",
+  "accessibilityButton": "Acessibilidade",
+
+  "aboutProjectSection": "Projeto",
+  "aboutLicenceSection": "Licença",
+  "aboutOpenSourceSection": "Componentes de código aberto",
+  "aboutAttributionSection": "Atribuições",
+
+  "lengthLabel": "Comprimento",
+  "wordsLabel": "Palavras",
+  "generateButton": "Gerar",
+  "usePasswordButton": "Usar esta senha",
+  "showHidePassword": "Mostrar",
+
+  "deleteVaultPostDeletion": "O cofre foi excluído. Crie um novo para continuar.",
+
+  "syncFilePassphraseLabel": "Frase secreta do cofre",
+
+  "historyWarning": "Apenas 1 valor anterior é mantido. O histórico é excluído automaticamente com base nas configurações de segurança.",
+  "historyCurrent": "Atual",
+  "historyPrevious": "Anterior",
+  "historySavedOn": "Salvo em {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · expira em {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Problema de importação ({index} de {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Tipo: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Edite para corrigir e salvar esta entrada, ou pule para descartá-la.",
+
+  "entriesSkipped": "{count, plural, one{1 entrada pulada} other{{count} entradas puladas}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Estas entradas já existem no cofre e não foram substituídas:",
+
+  "syncDeleteEntryContent": "O outro dispositivo excluiu '{title}'.\n\nExcluir aqui também, ou manter?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "'{title}' está em pastas diferentes em cada dispositivo.\n\nEste dispositivo: {local}\nOutro dispositivo: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Manter sem pasta",
+  "folderConflictKeepLocal": "Manter \"{folder}\"",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Mover para sem pasta",
+  "folderConflictMoveIncoming": "Mover para \"{folder}\"",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Cofre sincronizado — {added} adicionado(s), {updated} atualizado(s), {deleted} excluído(s).",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Este arquivo de cofre usa uma frase secreta diferente. A sincronização só é suportada entre cofres que compartilham a mesma frase secreta.",
+
+  "reviewSensitiveFields": "Campos sensíveis",
+  "reviewOtherFields": "Outros campos",
+  "reviewPasswordChanged": "Senha alterada",
+  "reviewCvvChanged": "CVV alterado",
+  "reviewPinChanged": "PIN alterado",
+  "reviewTransactionPasswordChanged": "Senha de transação alterada",
+  "tooltipShowValues": "Mostrar valores",
+  "reviewOld": "Anterior",
+  "reviewNew": "Novo",
+  "reviewEmpty": "(vazio)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Notas",
+  "reviewFieldContent": "Conteúdo",
+  "reviewFieldEmail": "E-mail",
+  "reviewFieldPhone": "Telefone",
+  "reviewFieldAddress": "Endereço",
+  "reviewFieldCardLabel": "Nome do cartão",
+  "reviewFieldStatus": "Status",
+  "reviewFieldCardholder": "Titular",
+  "reviewFieldExpiry": "Validade",
+  "reviewFieldCreditLimit": "Limite de crédito",
+  "reviewFieldAccountNumber": "Número de conta",
+  "reviewFieldNetwork": "Rede",
+  "reviewFieldBank": "Banco",
+  "reviewFieldFilename": "Nome do arquivo",
+  "reviewFieldSize": "Tamanho",
+  "reviewFieldCardNumber": "Número",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Senha de transação",
+  "timestampCreated": "Criado",
+  "timestampUpdated": "Atualizado",
+  "timestampUnknown": "Desconhecido",
+  "noTitleFallback": "(sem título)",
+  "tooltipExportFile": "Exportar arquivo",
+  "tooltipEditEntry": "Editar entrada",
+  "tooltipDeleteEntry": "Excluir entrada",
+  "exportLabel": "Exportar",
+  "customEntryFieldsHeader": "Campos",
+  "copiedNeverClears": "Copiado — a área de transferência nunca é limpa automaticamente",
+  "copiedClears30s": "Copiado — a área de transferência é limpa em 30s",
+  "copiedClears60s": "Copiado — a área de transferência é limpa em 60s",
+  "copiedClears2min": "Copiado — a área de transferência é limpa em 2 min",
+
+  "passwordBreakdownTitle": "Análise da senha",
+  "charTypeUppercase": "Maiúsculas",
+  "charTypeLowercase": "Minúsculas",
+  "charTypeDigit": "Dígito",
+  "charTypeSymbol": "Símbolo",
+
+  "exportIncludeDate": "Incluir data no nome do arquivo",
+  "exportChooseFormat": "Escolha um formato de exportação.",
+  "exportUnencryptedWarning": "Completamente descriptografado — todos os segredos serão escritos em texto simples. Guarde este arquivo de forma segura e exclua-o após o uso.",
+  "exportPassphraseOnlyNote": "Protegido apenas pela frase secreta. A YubiKey não é necessária para importar.",
+  "exportChooseDestinationJson": "Escolha um destino para o arquivo JSON exportado.",
+  "exportChooseDestinationVault": "Escolha um destino para o arquivo de cofre exportado.",
+  "exportTwoFilesNote": "Dois arquivos serão criados: vault.gabbro e vault.gabbro.sha256",
+  "exportSelectDestination": "Selecione um destino.",
+
+  "aboutVersion": "Versão {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Um gerenciador de senhas pós-quântico",
+  "aboutSourceCode": "Código fonte",
+  "aboutReportIssue": "Reportar problema",
+  "aboutSupportGabbro": "Apoiar o Gabbro",
+  "aboutLicenceBody": "O Gabbro é software livre e de código aberto, licenciado sob a GNU General Public License v3.0 only (GPL-3.0-only).\n\nVocê tem a liberdade de usar, estudar e redistribuir este software nos termos dessa licença.",
+  "aboutOwnerRole": "Proprietário do projeto, arquiteto e desenvolvedor principal:",
+  "aboutAiPartner": "Parceiro de desenvolvimento IA:",
+  "aboutNoTelemetry": "O Gabbro não faz conexões de rede de saída. Sem telemetria, sem análises, sem contas.",
+
+  "strengthTierTerrible": "Terrível",
+  "strengthTierWeak": "Fraca",
+  "strengthTierFair": "Razoável",
+  "strengthTierStrong": "Forte",
+  "strengthTierVeryStrong": "Muito forte",
+  "strengthTierExcellent": "Excelente",
+  "yubiKeyProtectedNote": "Cofre protegido por YubiKey — o vínculo com a YubiKey será preservado.",
+  "yubiKeyPinRequired": "O PIN da YubiKey é obrigatório",
+  "tapYubiKeyNow": "Toque na sua YubiKey agora…",
+  "touchYubiKeyToAuthorize": "Toque na sua YubiKey para autorizar esta alteração.",
+  "currentPassphraseRequired": "A frase secreta atual é obrigatória",
+  "newPassphraseRequired": "A nova frase secreta é obrigatória",
+  "passphraseTooWeak": "A frase secreta é muito fraca",
+  "confirmPassphraseRequired": "Por favor confirme a nova frase secreta",
+  "passphrasesDoNotMatch": "As frases secretas não coincidem",
+  "passphrasesMatch": "✓ As frases secretas coincidem",
+  "passphrasesNoMatch": "✗ As frases secretas não coincidem",
+  "entropyDisplay": "{tier} · {bits} bits",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Erro de transporte.",
+  "authorizationFailed": "Autorização falhou — verifique o PIN e tente novamente.",
+
+  "unlockEnterPassphraseAndPin": "Insira a frase secreta e o PIN da YubiKey para desbloquear",
+  "unlockEnterPassphrase": "Insira a frase secreta para desbloquear",
+  "unlockEntropyDisplay": "{tier} · {bits} bits de entropia",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Insira a YubiKey e toque quando piscar",
+  "unlockErrorPassphrase": "Não foi possível desbloquear o cofre. Verifique a frase secreta.",
+  "unlockErrorPassphraseAndPin": "Não foi possível desbloquear o cofre. Verifique a frase secreta e o PIN da YubiKey.",
+
+  "importSelectFile": "Selecione um arquivo.",
+  "importFileNotFound": "Arquivo não encontrado.",
+  "importEnterPassphrase": "Insira a frase secreta deste cofre.",
+  "importDuplicateWarning": "Entradas cujo UUID já existe no cofre serão puladas automaticamente. Será exibido um resumo.",
+  "importGabbroSubtitle": "Sincronizar entradas de outro cofre Gabbro (arquivo .gabbro)",
+  "importEnpassSubtitle": "Exportação JSON do Enpass (Ferramentas → Exportar)",
+  "importBitwardenSubtitle": "Exportação JSON não criptografada do Bitwarden (Ferramentas → Exportar Cofre)",
+  "importCsvSubtitle": "Exportação CSV de qualquer gerenciador de senhas",
+
+  "vaultNameAlreadyExists": "Já existe um cofre com o nome \"{alias}\".",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Isso irá excluir permanentemente \"{alias}\" e todos os seus dados.\n\nArquivo: {path}\n\nEsta ação não pode ser desfeita.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Isso irá excluir permanentemente \"{alias}\" e remover o vínculo com a YubiKey.\n\nArquivo: {path}\n\nEsta ação não pode ser desfeita.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Insira o PIN e toque na YubiKey para autorizar esta exclusão.",
+  "deleteVaultTooltip": "Excluir cofre",
+
+  "navVault": "Cofre",
+  "navAbout": "Sobre",
+
+  "yubiKeySecurityWarning": "Aviso de segurança",
+  "removeYubiKeyTitle": "Remover YubiKey",
+  "yubiKeyLastKeyRiskWarning": "AVISO: se a chave restante for perdida, danificada ou roubada, o acesso ao cofre ficará permanentemente impossível. Não existe caminho de recuperação.",
+  "onlyOneKeyRegisteredWarning": "Apenas uma chave cadastrada. Se esta chave for perdida, o acesso ao cofre fica permanentemente impossível.",
+  "tapRegisterNfc": "Aproxime a chave do celular para cadastrar",
+  "tapRegisterUsb": "Após conectar, toque na chave para cadastrar",
+  "tapActivateNfc": "Aproxime a chave do celular novamente para ativar",
+  "tapActivateUsb": "Após conectar, toque na chave novamente para ativar",
+  "failedToRegisterKey": "Falha ao cadastrar chave: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Falha ao ativar chave: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Chave {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Toque na nova YubiKey para cadastrar…",
+  "tapYubiKeyToActivate": "Toque na nova YubiKey novamente para ativar…",
+  "editAliasTooltip": "Editar apelido",
+  "cannotRemoveLastKey": "Não é possível remover a última chave",
+  "removeKeyTooltip": "Remover chave",
+  "manageYubiKeysError": "Erro: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Clássico",
+  "generatorModePassphrase": "Frase secreta",
+  "charSetsHeader": "Conjuntos de caracteres",
+  "languageHeader": "Idioma",
+  "separatorLabel": "Separador",
+  "capitaliseWords": "Capitalizar palavras",
+  "appendDigit": "Adicionar um dígito",
+  "entropyBitsDisplay": "~{bits} bits de entropia",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Selecione pelo menos um conjunto de caracteres",
+  "passwordMinLengthNote": "As senhas têm pelo menos 32 caracteres. Se um site tiver um limite menor, copie os primeiros caracteres necessários.",
+  "tooltipShow": "Mostrar",
+  "tooltipCopied": "Copiado!",
+  "tooltipCopy": "Copiar",
+  "excludeAmbiguousChars": "Excluir caracteres ambíguos (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Crie seu cofre para começar.",
+  "onboardingVaultName": "Nome do cofre",
+  "onboardingAliasRequired": "O apelido é obrigatório",
+  "onboardingNewVaultLocation": "Localização do novo cofre (igual ao anterior)",
+  "onboardingVaultLocation": "Localização do cofre",
+  "onboardingLoadingPath": "Carregando…",
+  "onboardingPathHint": "Caminho para o arquivo de cofre",
+  "onboardingPathRequired": "O caminho é obrigatório",
+  "onboardingReusePassphraseHint": "Escolha uma nova frase secreta principal, ou reutilize a anterior se preferir.",
+  "onboardingPassphraseRequired": "A frase secreta é obrigatória",
+  "onboardingConfirmRequired": "Por favor confirme a frase secreta",
+  "onboardingPrimaryKeyPin": "PIN da chave principal",
+  "onboardingBackupKeyPin": "PIN da chave reserva",
+  "onboardingKeyNPin": "PIN da chave {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Você irá tocar em cada YubiKey duas vezes (4 toques no total). Entre as duas chaves, você será solicitado a trocar.",
+  "onboardingYubikeySlowNote": "A criação de cofre com YubiKey leva 20–30 segundos. O aplicativo pode parecer sem resposta — é normal.",
+  "onboardingStep1Label": "Cadastrar chave principal",
+  "onboardingStep1Hint": "Toque na YubiKey agora",
+  "onboardingStep2Label": "Ativar chave principal",
+  "onboardingStep2Hint": "Toque novamente na YubiKey",
+  "onboardingStep3Label": "Trocar para chave reserva",
+  "onboardingStep3Hint": "Remova a chave principal e conecte a YubiKey reserva",
+  "onboardingStep4Label": "Cadastrar chave reserva",
+  "onboardingStep4Hint": "Toque na YubiKey reserva",
+  "onboardingStep5Label": "Ativar chave reserva",
+  "onboardingStep5Hint": "Toque na YubiKey reserva uma última vez",
+
+  "textSizePreview": "O Gabbro é uma rocha ígnea intrusiva rica em Mg e Fe e de grão grosso.",
+
+  "fieldCardStatus": "Status",
+  "fieldPaymentNetwork": "Rede de pagamento",
+
+  "cardStatusActive": "Ativo",
+  "cardStatusLapsed": "Expirado",
+  "cardStatusInactive": "Inativo",
+
+  "validatorTitleRequired": "O título é obrigatório",
+  "validatorUsernameRequired": "O usuário é obrigatório",
+  "validatorPasswordRequired": "A senha é obrigatória",
+  "validatorContentRequired": "O conteúdo é obrigatório",
+  "validatorFirstNameRequired": "O nome é obrigatório",
+  "validatorLastNameRequired": "O sobrenome é obrigatório",
+  "validatorCardLabelRequired": "O nome do cartão é obrigatório",
+  "validatorCardholderRequired": "O nome do titular é obrigatório",
+  "validatorCardNumberRequired": "O número do cartão é obrigatório",
+  "validatorCardNumberLength": "O número do cartão deve ter 6–19 dígitos",
+  "validatorExpiryRequired": "A validade é obrigatória",
+  "validatorExpiryFormat": "Use o formato MM/AA",
+  "validatorExpiryMonth": "O mês deve ser 01–12",
+  "validatorCvvLength": "O CVV deve ter 3 ou 4 dígitos",
+  "validatorLabelRequired": "O rótulo é obrigatório",
+  "validatorStatusRequired": "O status é obrigatório",
+
+  "sectionBiometricUnlock": "Desbloqueio biométrico",
+  "biometricUnlockDescription": "Use sua impressão digital ou rosto para desbloquear o cofre em vez de digitar a frase secreta.",
+  "biometricUnlockTitle": "Ativar desbloqueio biométrico",
+  "biometricUnlockNote": "Todas as biometrias cadastradas neste dispositivo funcionarão — não apenas a usada no cadastro.",
+  "biometricUnavailable": "O desbloqueio biométrico não está disponível neste dispositivo. Nenhum sensor biométrico foi encontrado ou nenhuma biometria está cadastrada nas configurações do sistema.",
+  "biometricDialogTitle": "Sobre o desbloqueio biométrico",
+  "biometricDialogBody": "Quando ativado, o Gabbro criptografa a frase secreta principal e a armazena neste dispositivo, protegida por suas biometrias. A frase secreta é descriptografada apenas no momento do desbloqueio.\n\nSeus dados de impressão digital ou rosto nunca são armazenados pelo Gabbro — ficam no chip seguro do celular.",
+  "biometricDialogAllBiometrics": "Todas as biometrias cadastradas neste dispositivo poderão desbloquear o Gabbro — não é possível restringir a uma impressão digital específica.",
+  "biometricDialogInvalidation": "Se uma nova biometria for adicionada a este celular (incluindo uma segunda impressão digital), esta configuração será automaticamente desativada e você precisará configurá-la novamente.",
+  "biometricDialogRecommendation": "Recomendação: mantenha desativado se você tiver um modelo de ameaça alto ou compartilhar este dispositivo.",
+  "biometricInvalidated": "O desbloqueio biométrico foi desativado porque as biometrias neste dispositivo mudaram (uma nova impressão digital ou rosto foi adicionado nas configurações do sistema). Esta é uma medida de segurança. Reinsira a frase secreta e ative o desbloqueio biométrico novamente se desejar continuar usando este recurso.",
+  "useBiometrics": "Usar biometria",
+  "biometricCancelled": "A autenticação biométrica não foi concluída. Insira a frase secreta para desbloquear.",
+  "biometricEnrollTitle": "Inserir frase secreta",
+  "biometricEnrollDescription": "Insira a frase secreta principal para ativar o desbloqueio biométrico.",
+  "biometricYubikeyHint": "Insira o PIN da YubiKey abaixo, depois toque em Usar biometria, depois toque na YubiKey.",
+
+  "helpTitle": "Ajuda",
+  "menuHelp": "Ajuda",
+  "helpCaptionCreate": "Criar um cofre: insira um nome, frase secreta e opcionalmente proteja com uma YubiKey",
+  "helpCaptionEmpty": "Toque em + para adicionar a primeira entrada",
+  "helpCaptionDetail": "Toque no ícone de olho para revelar uma senha, depois pressione longamente para ver uma análise detalhada dos caracteres",
+  "helpCaptionTitleSearch": "Por padrão, a barra de pesquisa pesquisa apenas títulos de entradas",
+  "helpCaptionFullSearch": "Toque na lupa para mudar para pesquisa de campo completo; toque novamente para voltar à pesquisa por título",
+  "helpCaptionFilter": "Use os filtros para mostrar apenas entradas de um tipo específico",
+  "helpCaptionFolders": "Use o seletor de pasta para filtrar entradas por pasta",
+  "helpCaptionSelect": "Pressione longamente uma entrada para entrar no modo de seleção; adicione mais itens, depois atribua a uma pasta ou exclua. Toque em X para sair.",
+  "helpCaptionJumpToLetter": "Toque em uma letra na barra de índice para pular para aquela seção",
+  "helpCaptionBreakdown": "Toque no ícone de olho para revelar uma senha, depois pressione longamente para ver uma análise detalhada dos caracteres",
+  "helpCaptionManageVaults": "Em Gerenciar cofres, renomeie ou exclua cofres, ou adicione um novo",
+  "helpCaptionUnlock": "Insira a frase secreta para desbloquear o cofre"
+}

@@ -1,0 +1,809 @@
+{
+  "@@locale": "ru",
+
+  "appName": "Gabbro",
+
+  "cancel": "Отмена",
+  "delete": "Удалить",
+  "save": "Сохранить",
+  "close": "Закрыть",
+  "ok": "ОК",
+  "edit": "Изменить",
+  "add": "Добавить",
+  "remove": "Удалить",
+  "rename": "Переименовать",
+  "confirm": "Подтвердить",
+  "continueAction": "Продолжить",
+  "dismiss": "Отклонить",
+  "authorize": "Разрешить",
+  "register": "Зарегистрировать",
+  "sync": "Синхронизировать",
+  "assign": "Назначить",
+  "unlock": "Разблокировать",
+  "generate": "Создать",
+  "import": "Импортировать",
+  "export": "Экспортировать",
+  "openInBrowser": "Открыть в браузере",
+  "useThisPassword": "Использовать этот пароль",
+  "reviewArrow": "Просмотр →",
+  "skip": "Пропустить",
+  "keep": "Оставить",
+  "revert": "Восстановить",
+  "next": "Далее: сопоставить столбцы",
+  "syncFromVault": "Синхронизировать из хранилища",
+  "createVault": "Создать хранилище",
+  "pickFile": "Выбрать файл",
+  "noFileSelected": "Файл не выбран",
+  "chooseFolder": "Выбрать папку",
+  "addCustomField": "Добавить пользовательское поле",
+  "exportFile": "Экспортировать файл",
+  "addVault": "Добавить хранилище",
+  "addYubiKey": "Добавить YubiKey",
+  "noChangesToSave": "Нет изменений для сохранения.",
+
+  "appearanceTitle": "Внешний вид",
+  "securityTitle": "Безопасность",
+  "aboutTitle": "О Gabbro",
+  "generatorTitle": "Генератор паролей",
+  "importTitle": "Импорт записей",
+  "exportTitle": "Экспорт хранилища",
+  "changePassphraseTitle": "Изменить кодовую фразу",
+  "csvMappingTitle": "Сопоставление столбцов CSV",
+  "manageFoldersTitle": "Управление папками",
+  "manageVaultsTitle": "Управление хранилищами",
+  "manageYubiKeysTitle": "Управление ключами YubiKey",
+  "passwordHistoryTitle": "История паролей",
+  "reviewChangesTitle": "Просмотр изменений",
+  "unlockGabbroTitle": "Разблокировать Gabbro",
+
+  "sectionTheme": "Тема",
+  "sectionTextSize": "Размер текста",
+  "sectionAlphabetBar": "Положение алфавитной панели",
+  "sectionAccessibility": "Специальные возможности",
+  "sectionLanguage": "Язык",
+  "sectionForegroundLock": "Блокировка при активном использовании",
+  "sectionBackgroundLock": "Блокировка в фоне",
+  "sectionPasswordHistory": "История паролей",
+  "sectionPassphraseCopyPaste": "Копирование/вставка кодовой фразы",
+  "sectionVaultList": "Список хранилищ",
+  "sectionClipboardClear": "Очистка буфера обмена",
+  "sectionCharacterSets": "Наборы символов",
+  "sectionGeneratorLanguage": "Язык",
+
+  "themeSystem": "Системная",
+  "themeLight": "Светлая",
+  "themeDark": "Тёмная",
+
+  "textSizeSmall": "Маленький",
+  "textSizeRegular": "Обычный",
+  "textSizeLarge": "Большой",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Только на телефоне — планшет всегда использует левую сторону.",
+  "alphabetBarLeft": "Слева",
+  "alphabetBarRight": "Справа",
+
+  "highContrastTitle": "Высокий контраст",
+  "highContrastSubtitle": "Увеличивает контраст для улучшения читаемости",
+
+  "languageNote": "Переопределяет системный язык. «Системный» следует региональным настройкам устройства.",
+  "langSystem": "Системный",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Блокировать после этого периода бездействия, пока приложение открыто.",
+  "backgroundLockDescription": "Блокировать после нахождения приложения в фоне в течение этого времени.",
+  "passwordHistoryDescription": "Как долго хранить предыдущий пароль после изменения. «Хранить всегда» означает, что история удаляется только вручную.",
+  "passphraseCopyPasteDescription": "Блокировать копирование и вставку в полях кодовой фразы. Рекомендуется: предотвращает утечку кодовой фразы через буфер обмена.",
+  "passphraseCopyPasteNote": "Примечание: это блокирует контекстное меню при долгом нажатии и выделение текста. Встроенная кнопка вставки клавиатуры может по-прежнему работать — это ограничение платформы.",
+  "blockCopyPasteTitle": "Блокировать копирование/вставку",
+  "vaultListDescription": "Показывать список всех хранилищ на экране входа, чтобы можно было выбрать, какое разблокировать, не заходя в «Управление хранилищами».",
+  "showVaultListTitle": "Показывать список хранилищ при входе",
+  "vaultListNote": "Примечание по безопасности: когда это ОТКЛЮЧЕНО, экран входа показывает только последнее использованное хранилище — без намёков на существование других. Компромисс: для смены хранилища нужно сначала разблокировать, затем перейти в Меню → Управление хранилищами.",
+  "clipboardClearDescription": "Очищать буфер обмена после копирования секрета. Примечание: менеджеры буфера обмена могут сохранять копию.",
+
+  "duration30s": "30 с",
+  "duration1min": "1 мин",
+  "duration5min": "5 мин",
+  "duration15min": "15 мин",
+  "duration60s": "60 с",
+  "duration2min": "2 мин",
+  "durationNever": "Никогда",
+  "duration7days": "7 дней",
+  "duration30days": "30 дней",
+  "duration90days": "90 дней",
+  "durationKeepForever": "Хранить всегда",
+
+  "menuExportVault": "Экспортировать хранилище",
+  "menuImportEntries": "Импортировать записи",
+  "menuSyncFromFile": "Синхронизировать из файла",
+  "menuManageVaults": "Управление хранилищами",
+  "menuChangePassphrase": "Изменить кодовую фразу",
+  "menuManageYubiKeys": "Управление ключами YubiKey",
+  "menuAppearance": "Внешний вид",
+  "menuSecurity": "Безопасность",
+  "menuManageFolders": "Управление папками",
+  "menuPasswordGenerator": "Генератор паролей",
+  "menuAbout": "О программе",
+
+  "tooltipSelectEntries": "Выбрать записи",
+  "tooltipLockVault": "Заблокировать хранилище",
+  "tooltipSelectAll": "Выбрать все",
+  "tooltipDeselectAll": "Снять все выделения",
+  "tooltipMenu": "Меню",
+  "tooltipCopy": "Копировать",
+  "tooltipCopied": "Скопировано!",
+  "tooltipShow": "Показать",
+  "tooltipHide": "Скрыть",
+  "tooltipBrowse": "Обзор",
+  "tooltipEditAlias": "Изменить псевдоним",
+  "tooltipRemoveField": "Удалить поле",
+  "tooltipRename": "Переименовать",
+  "tooltipDeleteVault": "Удалить хранилище",
+  "tooltipAssignToFolder": "Назначить папку",
+  "tooltipShowPin": "Показать PIN",
+  "tooltipHidePin": "Скрыть PIN",
+  "tooltipShowValue": "Показать значение",
+  "tooltipHideValue": "Скрыть",
+  "tooltipCancel": "Отмена",
+  "tooltipOpenInBrowser": "Открыть в браузере",
+
+  "allFolders": "Все папки",
+  "noFolder": "Нет",
+  "selectFolder": "Выбрать папку",
+  "folderName": "Название папки",
+
+  "noEntriesMatch": "Нет записей, соответствующих поиску.",
+  "noVaultsRegistered": "Нет зарегистрированных хранилищ.",
+  "noYubiKeysRegistered": "Нет зарегистрированных ключей YubiKey",
+  "selectEntry": "Выбрать запись",
+  "newEntryTitle": "Новая запись",
+  "createEntryTitle": "Новый(-ая) {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Изменить: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(нет URL)",
+  "noNameFallback": "(нет имени)",
+  "untitledFallback": "(без названия)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "Выбрано: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Поиск по всем полям…",
+  "searchEntriesHint": "Поиск записей…",
+  "searchAllFieldsTooltip": "Поиск по всем полям",
+  "searchByTitleTooltip": "Поиск по названию",
+  "entryTypeAll": "Все",
+  "entryTypePassword": "Пароль",
+  "entryTypeNote": "Заметка",
+  "entryTypeCard": "Карта",
+  "entryTypeIdentity": "Личность",
+  "entryTypeFile": "Файл",
+  "entryTypeCustom": "Пользовательский",
+  "errorPrefix": "Ошибка: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Хранилище",
+  "navAppearance": "Внешний вид",
+  "navSecurity": "Безопасность",
+  "navAbout": "О программе",
+
+  "deleteEntryTitle": "Удалить запись?",
+  "cannotBeUndone": "Это действие нельзя отменить.",
+  "deleteEntryDialogTitle": "Удалить запись?",
+  "deleteEntriesTitle": "{count, plural, one{Удалить 1 запись?} few{Удалить {count} записи?} other{Удалить {count} записей?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Назначить папку",
+  "folderConflictTitle": "Конфликт папок",
+  "syncFailedTitle": "Синхронизация не удалась",
+  "syncFromFileTitle": "Синхронизировать из файла",
+  "nothingToSync": "Нечего синхронизировать — оба хранилища уже актуальны.",
+
+  "importedEntries": "{count, plural, one{Импортирована 1 запись.} few{Импортированы {count} записи.} other{Импортировано {count} записей.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Экспортировать файл",
+  "saveDecryptedFileTo": "Сохранить расшифрованный файл в:",
+  "exportPathLabel": "Путь экспорта",
+  "exportedToPath": "Экспортировано в {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Экспорт не удался: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Открыть в браузере?",
+  "couldNotOpen": "Не удалось открыть {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Удалить предыдущую запись",
+  "failedToClearHistory": "Не удалось очистить историю: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Не удалось восстановить пароль: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Переименовать папку",
+  "addFolderTitle": "Добавить папку",
+  "deleteFolderTitle": "Удалить папку",
+  "deleteFolderConfirm": "Удалить «{folder}»?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Переместить записи в",
+  "clearToNone": "Переместить в «Нет»",
+
+  "renameVaultTitle": "Переименовать хранилище",
+  "deleteVaultTitle": "Удалить хранилище?",
+  "deleteVaultConfirmTitle": "Вы уверены?",
+  "typeDeleteToConfirm": "Введите DELETE для подтверждения",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Прикоснитесь к вашему YubiKey",
+  "noVaultsRegisteredText": "Нет зарегистрированных хранилищ.",
+
+  "addYubiKeyTitle": "Добавить YubiKey",
+  "enterYubiKeyPinTitle": "Введите PIN YubiKey",
+  "editAliasForKey": "Изменить псевдоним ключа {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Останется только один зарегистрированный ключ YubiKey.",
+  "removeKeyConfirm": "Вы уверены, что хотите удалить этот ключ?",
+  "removeKeyVaultConfirm": "Удалить этот ключ YubiKey из хранилища?",
+  "yubiKeyRemoved": "YubiKey удалён",
+  "failedToRemoveKey": "Не удалось удалить ключ: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey добавлен",
+  "failedToAddKey": "Не удалось добавить ключ: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Не удалось сохранить псевдоним: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Устройство FIDO2 не найдено. Вставьте ключ YubiKey и повторите попытку.",
+  "transportLabel": "Интерфейс:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Кодовая фраза",
+  "yubiKeyPinLabel": "PIN YubiKey",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Текущая кодовая фраза",
+  "newPassphraseLabel": "Новая кодовая фраза",
+  "confirmPassphraseLabel": "Подтвердить новую кодовую фразу",
+  "vaultPassphraseLabel": "Кодовая фраза хранилища",
+  "aliasLabel": "Псевдоним",
+  "aliasHint": "напр., Основной, Рабочий ключ…",
+  "masterPassphraseLabel": "Главная кодовая фраза",
+  "confirmPassphraseLabelShort": "Подтвердить кодовую фразу",
+
+  "fieldTitle": "Название",
+  "fieldContent": "Содержимое",
+  "fieldFirstName": "Имя",
+  "fieldLastName": "Фамилия",
+  "fieldEmail": "Эл. почта (необязательно)",
+  "fieldPhone": "Телефон (необязательно)",
+  "fieldAddress": "Адрес (необязательно)",
+  "fieldCardLabel": "Название карты (напр., «Visa Platinum»)",
+  "fieldCardholderName": "Имя держателя карты",
+  "fieldCardNumber": "Номер карты",
+  "fieldExpiry": "Срок действия (ММ/ГГ)",
+  "fieldCvv": "CVV (необязательно)",
+  "fieldCardPin": "PIN (необязательно)",
+  "fieldCreditLimit": "Кредитный лимит (необязательно)",
+  "fieldAccountNumber": "Номер счёта (необязательно)",
+  "fieldNotes": "Заметки (необязательно)",
+  "fieldUrl": "URL (необязательно)",
+  "fieldUsername": "Имя пользователя",
+  "fieldPassword": "Пароль",
+  "fieldSeparator": "Разделитель",
+  "fieldFolder": "Папка",
+  "fieldLabel": "Метка",
+  "fieldValue": "Значение",
+  "fieldCustomFields": "Пользовательские поля",
+  "fieldLabelOptional": "{label} (необязательно)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Этот тип записи пока не поддерживается.",
+  "csvColumnNone": "(нет)",
+  "csvPreviewLabel": "Предпросмотр",
+  "csvImportButton": "Импортировать",
+
+  "gabbroVaultSection": "Хранилище Gabbro",
+  "genericCsvSection": "Обычный CSV",
+
+  "changePassphraseSuccess": "Кодовая фраза изменена",
+  "changePassphraseButton": "Изменить кодовую фразу",
+
+  "continueLabel": "Продолжить",
+  "protectWithYubiKey": "Защитить с помощью YubiKey",
+  "yubiKeySubtitle": "Аппаратный ключ безопасности (рекомендуется)",
+  "accessibilityButton": "Специальные возможности",
+
+  "aboutProjectSection": "Проект",
+  "aboutLicenceSection": "Лицензия",
+  "aboutOpenSourceSection": "Компоненты с открытым исходным кодом",
+  "aboutAttributionSection": "Благодарности",
+
+  "lengthLabel": "Длина",
+  "wordsLabel": "Слова",
+  "generateButton": "Создать",
+  "usePasswordButton": "Использовать этот пароль",
+  "showHidePassword": "Показать",
+
+  "deleteVaultPostDeletion": "Ваше хранилище удалено. Создайте новое для продолжения.",
+
+  "syncFilePassphraseLabel": "Кодовая фраза хранилища",
+
+  "historyWarning": "Хранится только 1 предыдущее значение. История автоматически очищается в соответствии с настройками безопасности.",
+  "historyCurrent": "Текущий",
+  "historyPrevious": "Предыдущий",
+  "historySavedOn": "Сохранено {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · истекает {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Проблема импорта ({index} из {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Тип: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Отредактируйте, исправьте и сохраните эту запись или пропустите, чтобы отклонить её.",
+
+  "entriesSkipped": "{count, plural, one{1 запись пропущена} few{{count} записи пропущены} other{{count} записей пропущено}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Эти записи уже существуют в вашем хранилище и не были перезаписаны:",
+
+  "syncDeleteEntryContent": "Другое устройство удалило «{title}».\n\nУдалить здесь тоже или оставить?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}» находится в разных папках на двух устройствах.\n\nЭто устройство: {local}\nДругое устройство: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Оставить без папки",
+  "folderConflictKeepLocal": "Оставить «{folder}»",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Переместить без папки",
+  "folderConflictMoveIncoming": "Переместить в «{folder}»",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Хранилище синхронизировано — добавлено: {added}, обновлено: {updated}, удалено: {deleted}.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Этот файл хранилища использует другую кодовую фразу. Синхронизация поддерживается только между хранилищами с одинаковой кодовой фразой.",
+
+  "reviewSensitiveFields": "Конфиденциальные поля",
+  "reviewOtherFields": "Другие поля",
+  "reviewPasswordChanged": "Пароль изменён",
+  "reviewCvvChanged": "CVV изменён",
+  "reviewPinChanged": "PIN изменён",
+  "reviewTransactionPasswordChanged": "Пароль транзакции изменён",
+  "tooltipShowValues": "Показать значения",
+  "reviewOld": "Старый",
+  "reviewNew": "Новый",
+  "reviewEmpty": "(пусто)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Заметки",
+  "reviewFieldContent": "Содержимое",
+  "reviewFieldEmail": "Эл. почта",
+  "reviewFieldPhone": "Телефон",
+  "reviewFieldAddress": "Адрес",
+  "reviewFieldCardLabel": "Название карты",
+  "reviewFieldStatus": "Статус",
+  "reviewFieldCardholder": "Держатель карты",
+  "reviewFieldExpiry": "Срок действия",
+  "reviewFieldCreditLimit": "Кредитный лимит",
+  "reviewFieldAccountNumber": "Номер счёта",
+  "reviewFieldNetwork": "Платёжная сеть",
+  "reviewFieldBank": "Банк",
+  "reviewFieldFilename": "Имя файла",
+  "reviewFieldSize": "Размер",
+  "reviewFieldCardNumber": "Номер",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Пароль транзакции",
+  "timestampCreated": "Создано",
+  "timestampUpdated": "Обновлено",
+  "timestampUnknown": "Неизвестно",
+  "noTitleFallback": "(нет названия)",
+  "tooltipExportFile": "Экспортировать файл",
+  "tooltipEditEntry": "Изменить запись",
+  "tooltipDeleteEntry": "Удалить запись",
+  "exportLabel": "Экспорт",
+  "customEntryFieldsHeader": "Поля",
+  "copiedNeverClears": "Скопировано — буфер обмена никогда не очищается автоматически",
+  "copiedClears30s": "Скопировано — буфер очистится через 30 с",
+  "copiedClears60s": "Скопировано — буфер очистится через 60 с",
+  "copiedClears2min": "Скопировано — буфер очистится через 2 мин",
+
+  "passwordBreakdownTitle": "Анализ пароля",
+  "charTypeUppercase": "Заглавные буквы",
+  "charTypeLowercase": "Строчные буквы",
+  "charTypeDigit": "Цифра",
+  "charTypeSymbol": "Символ",
+
+  "exportIncludeDate": "Включить дату в имя файла",
+  "exportChooseFormat": "Выберите формат экспорта.",
+  "exportUnencryptedWarning": "Полностью незашифровано — все секреты будут записаны в открытом виде. Храните файл в безопасном месте и удалите после использования.",
+  "exportPassphraseOnlyNote": "Защищено только кодовой фразой. YubiKey не требуется для импорта.",
+  "exportChooseDestinationJson": "Выберите место назначения для экспортированного файла JSON.",
+  "exportChooseDestinationVault": "Выберите место назначения для экспортированного файла хранилища.",
+  "exportTwoFilesNote": "Будут созданы два файла: vault.gabbro и vault.gabbro.sha256",
+  "exportSelectDestination": "Выберите место назначения.",
+
+  "aboutVersion": "Версия {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Постквантовый менеджер паролей",
+  "aboutSourceCode": "Исходный код",
+  "aboutReportIssue": "Сообщить о проблеме",
+  "aboutSupportGabbro": "Поддержать Gabbro",
+  "aboutLicenceBody": "Gabbro — это свободное программное обеспечение с открытым исходным кодом, лицензированное по GNU General Public License v3.0 only (GPL-3.0-only).\n\nВы можете свободно использовать, изучать и распространять это программное обеспечение в соответствии с условиями этой лицензии.",
+  "aboutOwnerRole": "Владелец проекта, архитектор и ведущий разработчик:",
+  "aboutAiPartner": "ИИ-партнёр по разработке:",
+  "aboutNoTelemetry": "Gabbro не устанавливает исходящих сетевых соединений. Никакой телеметрии, аналитики и аккаунтов.",
+
+  "strengthTierTerrible": "Ужасный",
+  "strengthTierWeak": "Слабый",
+  "strengthTierFair": "Приемлемый",
+  "strengthTierStrong": "Надёжный",
+  "strengthTierVeryStrong": "Очень надёжный",
+  "strengthTierExcellent": "Отличный",
+  "yubiKeyProtectedNote": "Хранилище защищено YubiKey — привязка к ключу будет сохранена.",
+  "yubiKeyPinRequired": "Требуется PIN YubiKey",
+  "tapYubiKeyNow": "Прикоснитесь к вашему YubiKey сейчас…",
+  "touchYubiKeyToAuthorize": "Прикоснитесь к вашему YubiKey для подтверждения изменения.",
+  "currentPassphraseRequired": "Требуется текущая кодовая фраза",
+  "newPassphraseRequired": "Требуется новая кодовая фраза",
+  "passphraseTooWeak": "Кодовая фраза слишком слабая",
+  "confirmPassphraseRequired": "Пожалуйста, подтвердите новую кодовую фразу",
+  "passphrasesDoNotMatch": "Кодовые фразы не совпадают",
+  "passphrasesMatch": "✓ Кодовые фразы совпадают",
+  "passphrasesNoMatch": "✗ Кодовые фразы не совпадают",
+  "entropyDisplay": "{tier} · {bits} бит",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Ошибка транспорта.",
+  "authorizationFailed": "Авторизация не удалась — проверьте PIN и повторите попытку.",
+
+  "unlockEnterPassphraseAndPin": "Введите кодовую фразу и PIN YubiKey для разблокировки",
+  "unlockEnterPassphrase": "Введите кодовую фразу для разблокировки",
+  "unlockEntropyDisplay": "{tier} · {bits} бит энтропии",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Вставьте YubiKey и прикоснитесь к нему, когда он замигает",
+  "unlockErrorPassphrase": "Не удалось разблокировать хранилище. Проверьте кодовую фразу.",
+  "unlockErrorPassphraseAndPin": "Не удалось разблокировать хранилище. Проверьте кодовую фразу и PIN YubiKey.",
+
+  "importSelectFile": "Выберите файл.",
+  "importFileNotFound": "Файл не найден.",
+  "importEnterPassphrase": "Введите кодовую фразу для этого хранилища.",
+  "importDuplicateWarning": "Записи, UUID которых уже существует в вашем хранилище, будут автоматически пропущены. Вы увидите сводку.",
+  "importGabbroSubtitle": "Синхронизировать записи из другого хранилища Gabbro (файл .gabbro)",
+  "importEnpassSubtitle": "JSON-экспорт из Enpass (Инструменты → Экспорт)",
+  "importBitwardenSubtitle": "Незашифрованный JSON-экспорт из Bitwarden (Инструменты → Экспорт хранилища)",
+  "importCsvSubtitle": "CSV-экспорт из любого менеджера паролей",
+
+  "vaultNameAlreadyExists": "Хранилище с именем «{alias}» уже существует.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Это безвозвратно удалит «{alias}» и все его данные.\n\nФайл: {path}\n\nЭто действие нельзя отменить.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Это безвозвратно удалит «{alias}» и его привязку к YubiKey.\n\nФайл: {path}\n\nЭто действие нельзя отменить.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Введите PIN и прикоснитесь к вашему YubiKey для подтверждения удаления.",
+  "deleteVaultTooltip": "Удалить хранилище",
+
+  "navVault": "Хранилище",
+  "navAbout": "О программе",
+
+  "yubiKeySecurityWarning": "Предупреждение безопасности",
+  "removeYubiKeyTitle": "Удалить YubiKey",
+  "yubiKeyLastKeyRiskWarning": "ПРЕДУПРЕЖДЕНИЕ: если оставшийся ключ будет утерян, повреждён или похищен, доступ к хранилищу будет безвозвратно невозможен. Восстановление невозможно.",
+  "onlyOneKeyRegisteredWarning": "Зарегистрирован только один ключ. Если этот ключ будет утерян, доступ к хранилищу будет безвозвратно невозможен.",
+  "tapRegisterNfc": "Приложите ключ к телефону для регистрации",
+  "tapRegisterUsb": "После подключения прикоснитесь к ключу для регистрации",
+  "tapActivateNfc": "Снова приложите ключ к телефону для активации",
+  "tapActivateUsb": "После подключения снова прикоснитесь к ключу для активации",
+  "failedToRegisterKey": "Не удалось зарегистрировать ключ: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Не удалось активировать ключ: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Ключ {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Прикоснитесь к новому YubiKey для регистрации…",
+  "tapYubiKeyToActivate": "Снова прикоснитесь к новому YubiKey для активации…",
+  "editAliasTooltip": "Изменить псевдоним",
+  "cannotRemoveLastKey": "Нельзя удалить последний ключ",
+  "removeKeyTooltip": "Удалить ключ",
+  "manageYubiKeysError": "Ошибка: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Классический",
+  "generatorModePassphrase": "Кодовая фраза",
+  "charSetsHeader": "Наборы символов",
+  "languageHeader": "Язык",
+  "separatorLabel": "Разделитель",
+  "capitaliseWords": "Слова с заглавной буквы",
+  "appendDigit": "Добавить цифру",
+  "entropyBitsDisplay": "~{bits} бит энтропии",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Выберите хотя бы один набор символов",
+  "passwordMinLengthNote": "Пароли содержат не менее 32 символов. Если сайт имеет более короткое ограничение, скопируйте нужное количество первых символов.",
+  "tooltipShow": "Показать",
+  "tooltipCopied": "Скопировано!",
+  "tooltipCopy": "Копировать",
+  "excludeAmbiguousChars": "Исключить неоднозначные символы (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Создайте хранилище, чтобы начать.",
+  "onboardingVaultName": "Название хранилища",
+  "onboardingAliasRequired": "Псевдоним обязателен",
+  "onboardingNewVaultLocation": "Расположение нового хранилища (то же, что и раньше)",
+  "onboardingVaultLocation": "Расположение хранилища",
+  "onboardingLoadingPath": "Загрузка…",
+  "onboardingPathHint": "Путь к файлу хранилища",
+  "onboardingPathRequired": "Путь обязателен",
+  "onboardingReusePassphraseHint": "Выберите новую главную кодовую фразу или повторно используйте предыдущую.",
+  "onboardingPassphraseRequired": "Кодовая фраза обязательна",
+  "onboardingConfirmRequired": "Пожалуйста, подтвердите кодовую фразу",
+  "onboardingPrimaryKeyPin": "PIN основного ключа",
+  "onboardingBackupKeyPin": "PIN резервного ключа",
+  "onboardingKeyNPin": "PIN ключа {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Вы дважды прикоснётесь к каждому ключу YubiKey (всего 4 прикосновения). Между двумя ключами вас попросят поменять их местами.",
+  "onboardingYubikeySlowNote": "Создание хранилища с YubiKey занимает 20–30 секунд. Приложение может не реагировать — это нормально.",
+  "onboardingStep1Label": "Зарегистрировать основной ключ",
+  "onboardingStep1Hint": "Прикоснитесь к вашему YubiKey сейчас",
+  "onboardingStep2Label": "Активировать основной ключ",
+  "onboardingStep2Hint": "Снова прикоснитесь к вашему YubiKey",
+  "onboardingStep3Label": "Перейти к резервному ключу",
+  "onboardingStep3Hint": "Извлеките основной ключ, затем подключите резервный YubiKey",
+  "onboardingStep4Label": "Зарегистрировать резервный ключ",
+  "onboardingStep4Hint": "Прикоснитесь к резервному YubiKey",
+  "onboardingStep5Label": "Активировать резервный ключ",
+  "onboardingStep5Hint": "Прикоснитесь к резервному YubiKey в последний раз",
+
+  "textSizePreview": "Габбро — интрузивная магматическая порода, богатая магнием и железом, крупнозернистая.",
+
+  "fieldCardStatus": "Статус",
+  "fieldPaymentNetwork": "Платёжная сеть",
+
+  "cardStatusActive": "Активна",
+  "cardStatusLapsed": "Истекла",
+  "cardStatusInactive": "Неактивна",
+
+  "validatorTitleRequired": "Название обязательно",
+  "validatorUsernameRequired": "Имя пользователя обязательно",
+  "validatorPasswordRequired": "Пароль обязателен",
+  "validatorContentRequired": "Содержимое обязательно",
+  "validatorFirstNameRequired": "Имя обязательно",
+  "validatorLastNameRequired": "Фамилия обязательна",
+  "validatorCardLabelRequired": "Название карты обязательно",
+  "validatorCardholderRequired": "Имя держателя карты обязательно",
+  "validatorCardNumberRequired": "Номер карты обязателен",
+  "validatorCardNumberLength": "Номер карты должен содержать 6–19 цифр",
+  "validatorExpiryRequired": "Срок действия обязателен",
+  "validatorExpiryFormat": "Используйте формат ММ/ГГ",
+  "validatorExpiryMonth": "Месяц должен быть от 01 до 12",
+  "validatorCvvLength": "CVV должен содержать 3 или 4 цифры",
+  "validatorLabelRequired": "Метка обязательна",
+  "validatorStatusRequired": "Статус обязателен",
+
+  "sectionBiometricUnlock": "Биометрическая разблокировка",
+  "biometricUnlockDescription": "Использовать отпечаток пальца или лицо для разблокировки хранилища вместо ввода кодовой фразы.",
+  "biometricUnlockTitle": "Включить биометрическую разблокировку",
+  "biometricUnlockNote": "Будут работать все биометрические данные, зарегистрированные на этом устройстве — не только те, что использовались при регистрации.",
+  "biometricUnavailable": "Биометрическая разблокировка недоступна на этом устройстве. Биометрический датчик не найден или биометрия не зарегистрирована в настройках системы.",
+  "biometricDialogTitle": "О биометрической разблокировке",
+  "biometricDialogBody": "При включении Gabbro шифрует главную кодовую фразу и сохраняет её на этом устройстве под защитой биометрических данных. Кодовая фраза расшифровывается только в момент разблокировки.\n\nGabbro никогда не хранит ваши данные об отпечатках пальцев или лице — они остаются в защищённом чипе телефона.",
+  "biometricDialogAllBiometrics": "Все биометрические данные, зарегистрированные на этом устройстве, смогут разблокировать Gabbro — ограничить конкретным отпечатком пальца невозможно.",
+  "biometricDialogInvalidation": "Если на этот телефон будут добавлены новые биометрические данные (включая второй отпечаток пальца), этот параметр будет автоматически отключён и потребует повторной настройки.",
+  "biometricDialogRecommendation": "Рекомендация: оставьте отключённым, если у вас высокая модель угроз или вы делитесь устройством.",
+  "biometricInvalidated": "Биометрическая разблокировка была отключена, так как биометрические данные на этом устройстве изменились (в настройках системы добавлены новый отпечаток пальца или лицо). Это мера безопасности. Повторно введите кодовую фразу и включите биометрическую разблокировку снова.",
+  "useBiometrics": "Использовать биометрию",
+  "biometricCancelled": "Биометрическая аутентификация не завершена. Введите кодовую фразу для разблокировки.",
+  "biometricEnrollTitle": "Введите кодовую фразу",
+  "biometricEnrollDescription": "Введите главную кодовую фразу для включения биометрической разблокировки.",
+  "biometricYubikeyHint": "Введите PIN YubiKey ниже, затем нажмите «Использовать биометрию», затем прикоснитесь к вашему YubiKey.",
+
+  "helpTitle": "Справка",
+  "menuHelp": "Справка",
+  "helpCaptionCreate": "Создайте хранилище: введите название, кодовую фразу и при желании защитите ключом YubiKey",
+  "helpCaptionEmpty": "Нажмите +, чтобы добавить первую запись",
+  "helpCaptionDetail": "Нажмите на значок глаза, чтобы показать пароль, затем удерживайте для просмотра детального анализа символов",
+  "helpCaptionTitleSearch": "По умолчанию строка поиска ищет только по названиям записей",
+  "helpCaptionFullSearch": "Нажмите на лупу для переключения на поиск по всем полям; нажмите снова для возврата к поиску по названию",
+  "helpCaptionFilter": "Используйте кнопки фильтрации для отображения только записей определённого типа",
+  "helpCaptionFolders": "Используйте выбор папки для фильтрации записей по папке",
+  "helpCaptionSelect": "Удерживайте запись для входа в режим выбора; добавляйте элементы, затем назначьте папку или удалите. Нажмите X для выхода.",
+  "helpCaptionJumpToLetter": "Нажмите на букву в индексной панели для перехода к этому разделу",
+  "helpCaptionBreakdown": "Нажмите на значок глаза, чтобы показать пароль, затем удерживайте для просмотра детального анализа символов",
+  "helpCaptionManageVaults": "В разделе «Управление хранилищами» можно переименовать или удалить хранилища, а также добавить новое",
+  "helpCaptionUnlock": "Введите кодовую фразу для разблокировки хранилища"
+}

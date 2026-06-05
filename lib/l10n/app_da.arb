@@ -1,0 +1,809 @@
+{
+  "@@locale": "da",
+
+  "appName": "Gabbro",
+
+  "cancel": "Annuller",
+  "delete": "Slet",
+  "save": "Gem",
+  "close": "Luk",
+  "ok": "OK",
+  "edit": "Rediger",
+  "add": "Tilføj",
+  "remove": "Fjern",
+  "rename": "Omdøb",
+  "confirm": "Bekræft",
+  "continueAction": "Fortsæt",
+  "dismiss": "Afvis",
+  "authorize": "Autorisér",
+  "register": "Registrér",
+  "sync": "Synkronisér",
+  "assign": "Tildel",
+  "unlock": "Lås op",
+  "generate": "Generér",
+  "import": "Importér",
+  "export": "Eksportér",
+  "openInBrowser": "Åbn i browser",
+  "useThisPassword": "Brug denne adgangskode",
+  "reviewArrow": "Gennemgå →",
+  "skip": "Spring over",
+  "keep": "Behold",
+  "revert": "Gendan",
+  "next": "Næste: kortlæg kolonner",
+  "syncFromVault": "Synkronisér fra hvælving",
+  "createVault": "Opret hvælving",
+  "pickFile": "Vælg fil",
+  "noFileSelected": "Ingen fil valgt",
+  "chooseFolder": "Vælg mappe",
+  "addCustomField": "Tilføj brugerdefineret felt",
+  "exportFile": "Eksportér fil",
+  "addVault": "Tilføj hvælving",
+  "addYubiKey": "Tilføj YubiKey",
+  "noChangesToSave": "Ingen ændringer at gemme.",
+
+  "appearanceTitle": "Udseende",
+  "securityTitle": "Sikkerhed",
+  "aboutTitle": "Om Gabbro",
+  "generatorTitle": "Adgangskodegenerator",
+  "importTitle": "Importér poster",
+  "exportTitle": "Eksportér hvælving",
+  "changePassphraseTitle": "Skift adgangssætning",
+  "csvMappingTitle": "Kortlæg CSV-kolonner",
+  "manageFoldersTitle": "Administrér mapper",
+  "manageVaultsTitle": "Administrér hvælvinger",
+  "manageYubiKeysTitle": "Administrér YubiKeys",
+  "passwordHistoryTitle": "Adgangskodehistorik",
+  "reviewChangesTitle": "Gennemgå ændringer",
+  "unlockGabbroTitle": "Lås Gabbro op",
+
+  "sectionTheme": "Tema",
+  "sectionTextSize": "Tekststørrelse",
+  "sectionAlphabetBar": "Position for alfabetbjælke",
+  "sectionAccessibility": "Tilgængelighed",
+  "sectionLanguage": "Sprog",
+  "sectionForegroundLock": "Forgrundslås",
+  "sectionBackgroundLock": "Baggrundslås",
+  "sectionPasswordHistory": "Adgangskodehistorik",
+  "sectionPassphraseCopyPaste": "Kopiér/indsæt adgangssætning",
+  "sectionVaultList": "Hvælvingliste",
+  "sectionClipboardClear": "Ryd udklipsholder",
+  "sectionCharacterSets": "Tegnsæt",
+  "sectionGeneratorLanguage": "Sprog",
+
+  "themeSystem": "System",
+  "themeLight": "Lyst",
+  "themeDark": "Mørkt",
+
+  "textSizeSmall": "Lille",
+  "textSizeRegular": "Normal",
+  "textSizeLarge": "Stor",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Kun på telefon — tablet bruger altid venstre.",
+  "alphabetBarLeft": "Venstre",
+  "alphabetBarRight": "Højre",
+
+  "highContrastTitle": "Høj kontrast",
+  "highContrastSubtitle": "Øger kontrasten for bedre læsbarhed",
+
+  "languageNote": "Tilsidesætter systemsproget. «System» følger enhedens regionale indstillinger.",
+  "langSystem": "System",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Lås efter denne inaktivitetsperiode, mens appen er åben.",
+  "backgroundLockDescription": "Lås efter at appen har været i baggrunden i denne periode.",
+  "passwordHistoryDescription": "Hvor længe en tidligere adgangskode bevares efter ændring. «Behold altid» betyder, at historikken kun slettes manuelt.",
+  "passphraseCopyPasteDescription": "Bloker kopiér og indsæt på adgangssætningsfelter. Anbefalet: forhindrer lækage af adgangssætningen via udklipsholderen.",
+  "passphraseCopyPasteNote": "Bemærk: Dette blokerer kontekstmenuen ved langt tryk og tekstmarkering. Tastaturets inline-indsætknap virker muligvis stadig — dette er en platformsbegrænsning.",
+  "blockCopyPasteTitle": "Bloker kopiér/indsæt",
+  "vaultListDescription": "Vis en liste over alle hvælvinger på loginskærmen, så du kan vælge hvilken du vil låse op uden at gå til Administrér hvælvinger.",
+  "showVaultListTitle": "Vis hvælvingliste ved login",
+  "vaultListNote": "Sikkerhedsbemærkning: Når dette er SLÅET FRA, viser loginskærmen kun den senest brugte hvælving — ingen indikation af at andre hvælvinger findes. Kompromis: For at skifte hvælving skal du først låse op og derefter gå til Menu → Administrér hvælvinger.",
+  "clipboardClearDescription": "Ryd udklipsholderen efter kopiering af en hemmelighed. Bemærk: Udklipsholderadministratorer kan beholde en kopi.",
+
+  "duration30s": "30 s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60 s",
+  "duration2min": "2 min",
+  "durationNever": "Aldrig",
+  "duration7days": "7 dage",
+  "duration30days": "30 dage",
+  "duration90days": "90 dage",
+  "durationKeepForever": "Behold altid",
+
+  "menuExportVault": "Eksportér hvælving",
+  "menuImportEntries": "Importér poster",
+  "menuSyncFromFile": "Synkronisér fra fil",
+  "menuManageVaults": "Administrér hvælvinger",
+  "menuChangePassphrase": "Skift adgangssætning",
+  "menuManageYubiKeys": "Administrér YubiKeys",
+  "menuAppearance": "Udseende",
+  "menuSecurity": "Sikkerhed",
+  "menuManageFolders": "Administrér mapper",
+  "menuPasswordGenerator": "Adgangskodegenerator",
+  "menuAbout": "Om",
+
+  "tooltipSelectEntries": "Vælg poster",
+  "tooltipLockVault": "Lås hvælving",
+  "tooltipSelectAll": "Vælg alle",
+  "tooltipDeselectAll": "Fravælg alle",
+  "tooltipMenu": "Menu",
+  "tooltipCopy": "Kopiér",
+  "tooltipCopied": "Kopieret!",
+  "tooltipShow": "Vis",
+  "tooltipHide": "Skjul",
+  "tooltipBrowse": "Gennemse",
+  "tooltipEditAlias": "Rediger alias",
+  "tooltipRemoveField": "Fjern felt",
+  "tooltipRename": "Omdøb",
+  "tooltipDeleteVault": "Slet hvælving",
+  "tooltipAssignToFolder": "Tildel til mappe",
+  "tooltipShowPin": "Vis PIN",
+  "tooltipHidePin": "Skjul PIN",
+  "tooltipShowValue": "Vis værdi",
+  "tooltipHideValue": "Skjul",
+  "tooltipCancel": "Annuller",
+  "tooltipOpenInBrowser": "Åbn i browser",
+
+  "allFolders": "Alle mapper",
+  "noFolder": "Ingen",
+  "selectFolder": "Vælg en mappe",
+  "folderName": "Mappenavn",
+
+  "noEntriesMatch": "Ingen poster matcher din søgning.",
+  "noVaultsRegistered": "Ingen hvælvinger registreret.",
+  "noYubiKeysRegistered": "Ingen YubiKeys registreret",
+  "selectEntry": "Vælg en post",
+  "newEntryTitle": "Ny post",
+  "createEntryTitle": "Ny {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Rediger {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(ingen URL)",
+  "noNameFallback": "(intet navn)",
+  "untitledFallback": "(uden titel)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "{count} valgt",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Søg i alle felter…",
+  "searchEntriesHint": "Søg i poster…",
+  "searchAllFieldsTooltip": "Søger i alle felter",
+  "searchByTitleTooltip": "Søger efter titel",
+  "entryTypeAll": "Alle",
+  "entryTypePassword": "Adgangskode",
+  "entryTypeNote": "Note",
+  "entryTypeCard": "Kort",
+  "entryTypeIdentity": "Identitet",
+  "entryTypeFile": "Fil",
+  "entryTypeCustom": "Brugerdefineret",
+  "errorPrefix": "Fejl: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Hvælving",
+  "navAppearance": "Udseende",
+  "navSecurity": "Sikkerhed",
+  "navAbout": "Om",
+
+  "deleteEntryTitle": "Slet post?",
+  "cannotBeUndone": "Dette kan ikke fortrydes.",
+  "deleteEntryDialogTitle": "Slet post?",
+  "deleteEntriesTitle": "{count, plural, one{Slet 1 post?} other{Slet {count} poster?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Tildel til mappe",
+  "folderConflictTitle": "Mappekonflikt",
+  "syncFailedTitle": "Synkronisering mislykkedes",
+  "syncFromFileTitle": "Synkronisér fra fil",
+  "nothingToSync": "Intet at synkronisere — begge hvælvinger er allerede opdaterede.",
+
+  "importedEntries": "{count, plural, one{1 post importeret.} other{{count} poster importeret.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Eksportér fil",
+  "saveDecryptedFileTo": "Gem dekrypteret fil til:",
+  "exportPathLabel": "Eksportsti",
+  "exportedToPath": "Eksporteret til {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Eksport mislykkedes: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Åbn i browser?",
+  "couldNotOpen": "Kunne ikke åbne {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Slet tidligere post",
+  "failedToClearHistory": "Kunne ikke rydde historik: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Kunne ikke gendanne adgangskode: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Omdøb mappe",
+  "addFolderTitle": "Tilføj mappe",
+  "deleteFolderTitle": "Slet mappe",
+  "deleteFolderConfirm": "Slet \"{folder}\"?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Gentildel poster til",
+  "clearToNone": "Flyt til «Ingen»",
+
+  "renameVaultTitle": "Omdøb hvælving",
+  "deleteVaultTitle": "Slet hvælving?",
+  "deleteVaultConfirmTitle": "Er du sikker?",
+  "typeDeleteToConfirm": "Skriv DELETE for at bekræfte",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Rør ved din YubiKey",
+  "noVaultsRegisteredText": "Ingen hvælvinger registreret.",
+
+  "addYubiKeyTitle": "Tilføj YubiKey",
+  "enterYubiKeyPinTitle": "Indtast YubiKey-PIN",
+  "editAliasForKey": "Rediger alias for nøgle {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Der vil kun være én registreret YubiKey tilbage.",
+  "removeKeyConfirm": "Er du sikker på, at du vil fjerne denne nøgle?",
+  "removeKeyVaultConfirm": "Fjern denne YubiKey fra hvælvingen?",
+  "yubiKeyRemoved": "YubiKey fjernet",
+  "failedToRemoveKey": "Kunne ikke fjerne nøgle: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey tilføjet",
+  "failedToAddKey": "Kunne ikke tilføje nøgle: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Kunne ikke gemme alias: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Ingen FIDO2-enhed fundet. Isæt din YubiKey og prøv igen.",
+  "transportLabel": "Transport:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Adgangssætning",
+  "yubiKeyPinLabel": "YubiKey-PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Nuværende adgangssætning",
+  "newPassphraseLabel": "Ny adgangssætning",
+  "confirmPassphraseLabel": "Bekræft ny adgangssætning",
+  "vaultPassphraseLabel": "Hvælvingens adgangssætning",
+  "aliasLabel": "Alias",
+  "aliasHint": "f.eks. Primær, Arbejdsnøgle…",
+  "masterPassphraseLabel": "Hovedadgangssætning",
+  "confirmPassphraseLabelShort": "Bekræft adgangssætning",
+
+  "fieldTitle": "Titel",
+  "fieldContent": "Indhold",
+  "fieldFirstName": "Fornavn",
+  "fieldLastName": "Efternavn",
+  "fieldEmail": "E-mail (valgfrit)",
+  "fieldPhone": "Telefon (valgfrit)",
+  "fieldAddress": "Adresse (valgfrit)",
+  "fieldCardLabel": "Kortetiket (f.eks. «Visa Platinum»)",
+  "fieldCardholderName": "Kortholders navn",
+  "fieldCardNumber": "Kortnummer",
+  "fieldExpiry": "Udløb (MM/ÅÅ)",
+  "fieldCvv": "CVV (valgfrit)",
+  "fieldCardPin": "PIN (valgfrit)",
+  "fieldCreditLimit": "Kreditgrænse (valgfrit)",
+  "fieldAccountNumber": "Kontonummer (valgfrit)",
+  "fieldNotes": "Noter (valgfrit)",
+  "fieldUrl": "URL (valgfrit)",
+  "fieldUsername": "Brugernavn",
+  "fieldPassword": "Adgangskode",
+  "fieldSeparator": "Adskiller",
+  "fieldFolder": "Mappe",
+  "fieldLabel": "Etiket",
+  "fieldValue": "Værdi",
+  "fieldCustomFields": "Brugerdefinerede felter",
+  "fieldLabelOptional": "{label} (valgfrit)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Posttype understøttes endnu ikke.",
+  "csvColumnNone": "(ingen)",
+  "csvPreviewLabel": "Forhåndsvisning",
+  "csvImportButton": "Importér",
+
+  "gabbroVaultSection": "Gabbro-hvælving",
+  "genericCsvSection": "Generisk CSV",
+
+  "changePassphraseSuccess": "Adgangssætning ændret",
+  "changePassphraseButton": "Skift adgangssætning",
+
+  "continueLabel": "Fortsæt",
+  "protectWithYubiKey": "Beskyt med YubiKey",
+  "yubiKeySubtitle": "Hardware-sikkerhedsnøgle (anbefalet)",
+  "accessibilityButton": "Tilgængelighed",
+
+  "aboutProjectSection": "Projekt",
+  "aboutLicenceSection": "Licens",
+  "aboutOpenSourceSection": "Open source-komponenter",
+  "aboutAttributionSection": "Tilskrivning",
+
+  "lengthLabel": "Længde",
+  "wordsLabel": "Ord",
+  "generateButton": "Generér",
+  "usePasswordButton": "Brug denne adgangskode",
+  "showHidePassword": "Vis",
+
+  "deleteVaultPostDeletion": "Din hvælving er slettet. Opret en ny for at fortsætte.",
+
+  "syncFilePassphraseLabel": "Hvælvingens adgangssætning",
+
+  "historyWarning": "Kun 1 tidligere værdi bevares. Historikken ryddes automatisk baseret på dine sikkerhedsindstillinger.",
+  "historyCurrent": "Nuværende",
+  "historyPrevious": "Tidligere",
+  "historySavedOn": "Gemt {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · udløber {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Importproblem ({index} af {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Type: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Rediger for at rette og gem denne post, eller spring over for at kassere den.",
+
+  "entriesSkipped": "{count, plural, one{1 post sprunget over} other{{count} poster sprunget over}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Disse poster findes allerede i din hvælving og blev ikke overskrevet:",
+
+  "syncDeleteEntryContent": "Den anden enhed slettede '{title}'.\n\nSlet den her også, eller behold den?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "'{title}' er i forskellige mapper på de to enheder.\n\nDenne enhed: {local}\nAnden enhed: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Behold uden mappe",
+  "folderConflictKeepLocal": "Behold \"{folder}\"",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Flyt til ingen mappe",
+  "folderConflictMoveIncoming": "Flyt til \"{folder}\"",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Hvælving synkroniseret — {added} tilføjet, {updated} opdateret, {deleted} slettet.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Denne hvælvingsfil bruger en anden adgangssætning. Synkronisering understøttes kun mellem hvælvinger der deler adgangssætning.",
+
+  "reviewSensitiveFields": "Følsomme felter",
+  "reviewOtherFields": "Andre felter",
+  "reviewPasswordChanged": "Adgangskode ændret",
+  "reviewCvvChanged": "CVV ændret",
+  "reviewPinChanged": "PIN ændret",
+  "reviewTransactionPasswordChanged": "Transaktionsadgangskode ændret",
+  "tooltipShowValues": "Vis værdier",
+  "reviewOld": "Gammel",
+  "reviewNew": "Ny",
+  "reviewEmpty": "(tom)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Noter",
+  "reviewFieldContent": "Indhold",
+  "reviewFieldEmail": "E-mail",
+  "reviewFieldPhone": "Telefon",
+  "reviewFieldAddress": "Adresse",
+  "reviewFieldCardLabel": "Kortetiket",
+  "reviewFieldStatus": "Status",
+  "reviewFieldCardholder": "Kortholder",
+  "reviewFieldExpiry": "Udløb",
+  "reviewFieldCreditLimit": "Kreditgrænse",
+  "reviewFieldAccountNumber": "Kontonummer",
+  "reviewFieldNetwork": "Netværk",
+  "reviewFieldBank": "Bank",
+  "reviewFieldFilename": "Filnavn",
+  "reviewFieldSize": "Størrelse",
+  "reviewFieldCardNumber": "Nummer",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Transaktionsadgangskode",
+  "timestampCreated": "Oprettet",
+  "timestampUpdated": "Opdateret",
+  "timestampUnknown": "Ukendt",
+  "noTitleFallback": "(ingen titel)",
+  "tooltipExportFile": "Eksportér fil",
+  "tooltipEditEntry": "Rediger post",
+  "tooltipDeleteEntry": "Slet post",
+  "exportLabel": "Eksportér",
+  "customEntryFieldsHeader": "Felter",
+  "copiedNeverClears": "Kopieret — udklipsholderen ryddes aldrig automatisk",
+  "copiedClears30s": "Kopieret — udklipsholderen ryddes om 30 s",
+  "copiedClears60s": "Kopieret — udklipsholderen ryddes om 60 s",
+  "copiedClears2min": "Kopieret — udklipsholderen ryddes om 2 min",
+
+  "passwordBreakdownTitle": "Adgangskodeanalyse",
+  "charTypeUppercase": "Store bogstaver",
+  "charTypeLowercase": "Små bogstaver",
+  "charTypeDigit": "Ciffer",
+  "charTypeSymbol": "Symbol",
+
+  "exportIncludeDate": "Inkludér dato i filnavn",
+  "exportChooseFormat": "Vælg et eksportformat.",
+  "exportUnencryptedWarning": "Fuldstændigt ukrypteret — alle hemmeligheder skrives i klartekst. Gem filen sikkert og slet den efter brug.",
+  "exportPassphraseOnlyNote": "Beskyttet af din adgangssætning alene. YubiKey kræves ikke for import.",
+  "exportChooseDestinationJson": "Vælg en destination for din eksporterede JSON-fil.",
+  "exportChooseDestinationVault": "Vælg en destination for din eksporterede hvælvingsfil.",
+  "exportTwoFilesNote": "To filer oprettes: vault.gabbro og vault.gabbro.sha256",
+  "exportSelectDestination": "Vælg en destination.",
+
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "En post-kvanteadgangskodeadministrator",
+  "aboutSourceCode": "Kildekode",
+  "aboutReportIssue": "Rapportér problem",
+  "aboutSupportGabbro": "Støt Gabbro",
+  "aboutLicenceBody": "Gabbro er fri og open source-software, licenseret under GNU General Public License v3.0 only (GPL-3.0-only).\n\nDu er fri til at bruge, studere og redistribuere denne software under betingelserne i den pågældende licens.",
+  "aboutOwnerRole": "Projektejer, arkitekt og ledende udvikler:",
+  "aboutAiPartner": "AI-udviklingspartner:",
+  "aboutNoTelemetry": "Gabbro foretager ingen udgående netværksforbindelser. Ingen telemetri, ingen analyser, ingen konti.",
+
+  "strengthTierTerrible": "Forfærdelig",
+  "strengthTierWeak": "Svag",
+  "strengthTierFair": "Rimelig",
+  "strengthTierStrong": "Stærk",
+  "strengthTierVeryStrong": "Meget stærk",
+  "strengthTierExcellent": "Fremragende",
+  "yubiKeyProtectedNote": "YubiKey-beskyttet hvælving — din YubiKey-binding bevares.",
+  "yubiKeyPinRequired": "YubiKey-PIN er påkrævet",
+  "tapYubiKeyNow": "Rør ved din YubiKey nu…",
+  "touchYubiKeyToAuthorize": "Rør ved din YubiKey for at autorisere denne ændring.",
+  "currentPassphraseRequired": "Nuværende adgangssætning er påkrævet",
+  "newPassphraseRequired": "Ny adgangssætning er påkrævet",
+  "passphraseTooWeak": "Adgangssætningen er for svag",
+  "confirmPassphraseRequired": "Bekræft venligst din nye adgangssætning",
+  "passphrasesDoNotMatch": "Adgangssætningerne stemmer ikke overens",
+  "passphrasesMatch": "✓ Adgangssætningerne stemmer overens",
+  "passphrasesNoMatch": "✗ Adgangssætningerne stemmer ikke overens",
+  "entropyDisplay": "{tier} · {bits} bit",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Transportfejl.",
+  "authorizationFailed": "Autorisering mislykkedes — tjek din PIN og prøv igen.",
+
+  "unlockEnterPassphraseAndPin": "Indtast din adgangssætning og YubiKey-PIN for at låse op",
+  "unlockEnterPassphrase": "Indtast din adgangssætning for at låse op",
+  "unlockEntropyDisplay": "{tier} · {bits} bit entropi",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Isæt din YubiKey og rør ved den, når den blinker",
+  "unlockErrorPassphrase": "Kunne ikke låse hvælvingen op. Tjek din adgangssætning.",
+  "unlockErrorPassphraseAndPin": "Kunne ikke låse hvælvingen op. Tjek din adgangssætning og YubiKey-PIN.",
+
+  "importSelectFile": "Vælg en fil.",
+  "importFileNotFound": "Fil ikke fundet.",
+  "importEnterPassphrase": "Indtast adgangssætningen til denne hvælving.",
+  "importDuplicateWarning": "Poster hvis UUID allerede findes i din hvælving springes automatisk over. Du vil se et resumé.",
+  "importGabbroSubtitle": "Synkronisér poster fra en anden Gabbro-hvælving (.gabbro-fil)",
+  "importEnpassSubtitle": "JSON-eksport fra Enpass (Funktioner → Eksportér)",
+  "importBitwardenSubtitle": "Ukrypteret JSON-eksport fra Bitwarden (Funktioner → Eksportér boks)",
+  "importCsvSubtitle": "CSV-eksport fra enhver adgangskodeadministrator",
+
+  "vaultNameAlreadyExists": "En hvælving med navnet \"{alias}\" findes allerede.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Dette vil permanent slette \"{alias}\" og alle dens data.\n\nFil: {path}\n\nDette kan ikke fortrydes.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Dette vil permanent slette \"{alias}\" og fjerne dens YubiKey-binding.\n\nFil: {path}\n\nDette kan ikke fortrydes.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Indtast din PIN og rør ved din YubiKey for at autorisere denne sletning.",
+  "deleteVaultTooltip": "Slet hvælving",
+
+  "navVault": "Hvælving",
+  "navAbout": "Om",
+
+  "yubiKeySecurityWarning": "Sikkerhedsadvarsel",
+  "removeYubiKeyTitle": "Fjern YubiKey",
+  "yubiKeyLastKeyRiskWarning": "ADVARSEL: Hvis den resterende nøgle mistes, beskadiges eller stjæles, er adgang til hvælvingen permanent umulig. Der er ingen gendannelsesmulighed.",
+  "onlyOneKeyRegisteredWarning": "Kun én nøgle registreret. Hvis denne nøgle mistes, er adgang til hvælvingen permanent umulig.",
+  "tapRegisterNfc": "Hold nøglen mod telefonen for at registrere",
+  "tapRegisterUsb": "Når tilsluttet, rør ved nøglen for at registrere",
+  "tapActivateNfc": "Hold nøglen mod telefonen igen for at aktivere",
+  "tapActivateUsb": "Når tilsluttet, rør ved nøglen igen for at aktivere",
+  "failedToRegisterKey": "Kunne ikke registrere nøgle: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Kunne ikke aktivere nøgle: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Nøgle {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Rør ved din nye YubiKey for at registrere…",
+  "tapYubiKeyToActivate": "Rør ved din nye YubiKey igen for at aktivere…",
+  "editAliasTooltip": "Rediger alias",
+  "cannotRemoveLastKey": "Kan ikke fjerne den sidste nøgle",
+  "removeKeyTooltip": "Fjern nøgle",
+  "manageYubiKeysError": "Fejl: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klassisk",
+  "generatorModePassphrase": "Adgangssætning",
+  "charSetsHeader": "Tegnsæt",
+  "languageHeader": "Sprog",
+  "separatorLabel": "Adskiller",
+  "capitaliseWords": "Gør ord med stort",
+  "appendDigit": "Tilføj et ciffer",
+  "entropyBitsDisplay": "~{bits} bit entropi",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Vælg mindst ét tegnsæt",
+  "passwordMinLengthNote": "Adgangskoder er mindst 32 tegn. Hvis et websted har en kortere grænse, kopiér de første nødvendige tegn.",
+  "tooltipShow": "Vis",
+  "tooltipCopied": "Kopieret!",
+  "tooltipCopy": "Kopiér",
+  "excludeAmbiguousChars": "Udeluk tvetydige tegn (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Opret din hvælving for at komme i gang.",
+  "onboardingVaultName": "Hvælvingnavn",
+  "onboardingAliasRequired": "Alias er påkrævet",
+  "onboardingNewVaultLocation": "Ny hvælvingplacering (samme som før)",
+  "onboardingVaultLocation": "Hvælvingplacering",
+  "onboardingLoadingPath": "Indlæser…",
+  "onboardingPathHint": "Sti til hvælvingsfil",
+  "onboardingPathRequired": "Sti er påkrævet",
+  "onboardingReusePassphraseHint": "Vælg en ny hovedadgangssætning, eller genbruge din tidligere, hvis du foretrækker det.",
+  "onboardingPassphraseRequired": "Adgangssætning er påkrævet",
+  "onboardingConfirmRequired": "Bekræft venligst din adgangssætning",
+  "onboardingPrimaryKeyPin": "Primær nøgle-PIN",
+  "onboardingBackupKeyPin": "Backup-nøgle-PIN",
+  "onboardingKeyNPin": "Nøgle {n} PIN",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Du vil røre ved hver YubiKey to gange (4 berøringer i alt). Mellem de to nøgler vil du blive bedt om at skifte.",
+  "onboardingYubikeySlowNote": "Oprettelse af hvælving med YubiKey tager 20–30 sekunder. Appen kan virke uresponsiv — det er normalt.",
+  "onboardingStep1Label": "Registrér primær nøgle",
+  "onboardingStep1Hint": "Rør ved din YubiKey nu",
+  "onboardingStep2Label": "Aktivér primær nøgle",
+  "onboardingStep2Hint": "Rør ved din YubiKey igen",
+  "onboardingStep3Label": "Skift til backup-nøgle",
+  "onboardingStep3Hint": "Fjern din primære nøgle, tilslut derefter din backup-YubiKey",
+  "onboardingStep4Label": "Registrér backup-nøgle",
+  "onboardingStep4Hint": "Rør ved din backup-YubiKey",
+  "onboardingStep5Label": "Aktivér backup-nøgle",
+  "onboardingStep5Hint": "Rør ved din backup-YubiKey en sidste gang",
+
+  "textSizePreview": "Gabbro er en intrusiv magmatisk bjergart, der er rig på Mg og Fe og grovkornet.",
+
+  "fieldCardStatus": "Status",
+  "fieldPaymentNetwork": "Betalingsnetværk",
+
+  "cardStatusActive": "Aktiv",
+  "cardStatusLapsed": "Udløbet",
+  "cardStatusInactive": "Inaktiv",
+
+  "validatorTitleRequired": "Titel er påkrævet",
+  "validatorUsernameRequired": "Brugernavn er påkrævet",
+  "validatorPasswordRequired": "Adgangskode er påkrævet",
+  "validatorContentRequired": "Indhold er påkrævet",
+  "validatorFirstNameRequired": "Fornavn er påkrævet",
+  "validatorLastNameRequired": "Efternavn er påkrævet",
+  "validatorCardLabelRequired": "Kortetiket er påkrævet",
+  "validatorCardholderRequired": "Kortholders navn er påkrævet",
+  "validatorCardNumberRequired": "Kortnummer er påkrævet",
+  "validatorCardNumberLength": "Kortnummer skal have 6–19 cifre",
+  "validatorExpiryRequired": "Udløbsdato er påkrævet",
+  "validatorExpiryFormat": "Brug MM/ÅÅ-format",
+  "validatorExpiryMonth": "Måned skal være 01–12",
+  "validatorCvvLength": "CVV skal have 3 eller 4 cifre",
+  "validatorLabelRequired": "Etiket er påkrævet",
+  "validatorStatusRequired": "Status er påkrævet",
+
+  "sectionBiometricUnlock": "Biometrisk oplåsning",
+  "biometricUnlockDescription": "Brug dit fingeraftryk eller ansigt til at låse hvælvingen op i stedet for at indtaste din adgangssætning.",
+  "biometricUnlockTitle": "Aktivér biometrisk oplåsning",
+  "biometricUnlockNote": "Alle biometrikker tilmeldt på denne enhed vil virke — ikke kun den brugt ved tilmelding.",
+  "biometricUnavailable": "Biometrisk oplåsning er ikke tilgængelig på denne enhed. Ingen biometrisk sensor fundet eller ingen biometrikker er tilmeldt i systemindstillingerne.",
+  "biometricDialogTitle": "Om biometrisk oplåsning",
+  "biometricDialogBody": "Når aktiveret krypterer Gabbro din hovedadgangssætning og gemmer den på denne enhed, beskyttet af dine biometrikker. Din adgangssætning dekrypteres kun i det øjeblik du låser op.\n\nDine fingeraftryks- eller ansigtdata gemmes aldrig af Gabbro — de forbliver i enhedens sikre chip.",
+  "biometricDialogAllBiometrics": "Alle biometrikker tilmeldt på denne enhed vil kunne låse Gabbro op — du kan ikke begrænse det til et specifikt fingeraftryk.",
+  "biometricDialogInvalidation": "Hvis en ny biometrik tilføjes til denne telefon (inklusive et andet fingeraftryk), deaktiveres denne indstilling automatisk og du skal konfigurere den igen.",
+  "biometricDialogRecommendation": "Anbefaling: hold deaktiveret hvis du har en høj trusselsmodel eller deler denne enhed.",
+  "biometricInvalidated": "Biometrisk oplåsning blev deaktiveret fordi biometrikkerne på denne enhed ændrede sig (et nyt fingeraftryk eller ansigt blev tilføjet i systemindstillingerne). Dette er en sikkerhedsforanstaltning. Genindtast din adgangssætning og aktivér biometrisk oplåsning igen, hvis du ønsker at fortsætte med at bruge denne funktion.",
+  "useBiometrics": "Brug biometri",
+  "biometricCancelled": "Biometrisk godkendelse blev ikke gennemført. Indtast din adgangssætning for at låse op.",
+  "biometricEnrollTitle": "Indtast adgangssætning",
+  "biometricEnrollDescription": "Indtast din hovedadgangssætning for at aktivere biometrisk oplåsning.",
+  "biometricYubikeyHint": "Indtast din YubiKey-PIN nedenfor, tryk derefter på Brug biometri, tryk derefter på din YubiKey.",
+
+  "helpTitle": "Hjælp",
+  "menuHelp": "Hjælp",
+  "helpCaptionCreate": "Opret en hvælving: indtast et navn, adgangssætning og beskyt eventuelt med en YubiKey",
+  "helpCaptionEmpty": "Tryk på + for at tilføje din første post",
+  "helpCaptionDetail": "Tryk på øjeikonet for at afsløre en adgangskode, hold derefter nede for at se en detaljeret tegnanalyse",
+  "helpCaptionTitleSearch": "Som standard søger søgefeltet kun i posttitler",
+  "helpCaptionFullSearch": "Tryk på forstørrelsesglasset for at skifte til søgning i alle felter; tryk igen for at vende tilbage til titelsøgning",
+  "helpCaptionFilter": "Brug filtreringsknapperne til kun at vise poster af en bestemt type",
+  "helpCaptionFolders": "Brug mappevælgeren til at filtrere poster efter mappe",
+  "helpCaptionSelect": "Hold nede på en post for at aktivere valgtilstand; tilføj flere elementer, tildel derefter til en mappe eller slet. Tryk X for at afslutte.",
+  "helpCaptionJumpToLetter": "Tryk på et bogstav på indeksbjælken for at hoppe til det afsnit",
+  "helpCaptionBreakdown": "Tryk på øjeikonet for at afsløre en adgangskode, hold derefter nede for at se en detaljeret tegnanalyse",
+  "helpCaptionManageVaults": "I Administrér hvælvinger kan du omdøbe eller slette hvælvinger eller tilføje en ny",
+  "helpCaptionUnlock": "Indtast din adgangssætning for at låse hvælvingen op"
+}

@@ -1,0 +1,809 @@
+{
+  "@@locale": "hu",
+
+  "appName": "Gabbro",
+
+  "cancel": "Mégse",
+  "delete": "Törlés",
+  "save": "Mentés",
+  "close": "Bezárás",
+  "ok": "OK",
+  "edit": "Szerkesztés",
+  "add": "Hozzáadás",
+  "remove": "Eltávolítás",
+  "rename": "Átnevezés",
+  "confirm": "Megerősítés",
+  "continueAction": "Folytatás",
+  "dismiss": "Elvetés",
+  "authorize": "Engedélyezés",
+  "register": "Regisztrálás",
+  "sync": "Szinkronizálás",
+  "assign": "Hozzárendelés",
+  "unlock": "Feloldás",
+  "generate": "Generálás",
+  "import": "Importálás",
+  "export": "Exportálás",
+  "openInBrowser": "Megnyitás böngészőben",
+  "useThisPassword": "Ez a jelszó használata",
+  "reviewArrow": "Áttekintés →",
+  "skip": "Kihagyás",
+  "keep": "Megtartás",
+  "revert": "Visszaállítás",
+  "next": "Következő: oszlopok hozzárendelése",
+  "syncFromVault": "Szinkronizálás széfből",
+  "createVault": "Széf létrehozása",
+  "pickFile": "Fájl kiválasztása",
+  "noFileSelected": "Nincs fájl kiválasztva",
+  "chooseFolder": "Mappa kiválasztása",
+  "addCustomField": "Egyéni mező hozzáadása",
+  "exportFile": "Fájl exportálása",
+  "addVault": "Széf hozzáadása",
+  "addYubiKey": "YubiKey hozzáadása",
+  "noChangesToSave": "Nincsenek mentendő változtatások.",
+
+  "appearanceTitle": "Megjelenés",
+  "securityTitle": "Biztonság",
+  "aboutTitle": "A Gabbróról",
+  "generatorTitle": "Jelszógenerátor",
+  "importTitle": "Bejegyzések importálása",
+  "exportTitle": "Széf exportálása",
+  "changePassphraseTitle": "Jelmondat módosítása",
+  "csvMappingTitle": "CSV-oszlopok hozzárendelése",
+  "manageFoldersTitle": "Mappák kezelése",
+  "manageVaultsTitle": "Széfek kezelése",
+  "manageYubiKeysTitle": "YubiKey-ek kezelése",
+  "passwordHistoryTitle": "Jelszóelőzmények",
+  "reviewChangesTitle": "Változtatások áttekintése",
+  "unlockGabbroTitle": "Gabbro feloldása",
+
+  "sectionTheme": "Téma",
+  "sectionTextSize": "Szövegméret",
+  "sectionAlphabetBar": "Ábécésor pozíciója",
+  "sectionAccessibility": "Akadálymentesítés",
+  "sectionLanguage": "Nyelv",
+  "sectionForegroundLock": "Előtérzár",
+  "sectionBackgroundLock": "Háttérzár",
+  "sectionPasswordHistory": "Jelszóelőzmények",
+  "sectionPassphraseCopyPaste": "Jelmondat másolása/beillesztése",
+  "sectionVaultList": "Széflista",
+  "sectionClipboardClear": "Vágólap törlése",
+  "sectionCharacterSets": "Karakterkészletek",
+  "sectionGeneratorLanguage": "Nyelv",
+
+  "themeSystem": "Rendszer",
+  "themeLight": "Világos",
+  "themeDark": "Sötét",
+
+  "textSizeSmall": "Kicsi",
+  "textSizeRegular": "Normál",
+  "textSizeLarge": "Nagy",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Csak telefonon — táblagépen mindig bal.",
+  "alphabetBarLeft": "Bal",
+  "alphabetBarRight": "Jobb",
+
+  "highContrastTitle": "Nagy kontraszt",
+  "highContrastSubtitle": "Növeli a kontrasztot a jobb olvashatóság érdekében",
+
+  "languageNote": "Felülírja a rendszer nyelvét. «Rendszer» az eszköz területi beállításait követi.",
+  "langSystem": "Rendszer",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Zárolás ennyi inaktivitás után, amíg az alkalmazás nyitva van.",
+  "backgroundLockDescription": "Zárolás, miután az alkalmazás ennyi ideig háttérben volt.",
+  "passwordHistoryDescription": "Mennyi ideig tároljuk az előző jelszót módosítás után. A «Mindig megőrzi» azt jelenti, hogy az előzmények csak manuálisan törölhetők.",
+  "passphraseCopyPasteDescription": "Másolás és beillesztés tiltása a jelmondat mezőkben. Ajánlott: megakadályozza a jelmondat vágólapon keresztüli kiszivárgását.",
+  "passphraseCopyPasteNote": "Megjegyzés: ez blokkolja a hosszú érintés helyi menüjét és a szövegkijelölést. A billentyűzet beépített beillesztés gombja esetleg még működik — ez platformkorlátozás.",
+  "blockCopyPasteTitle": "Másolás/beillesztés tiltása",
+  "vaultListDescription": "Az összes széf listájának megjelenítése a bejelentkezési képernyőn, hogy anélkül választhass, melyiket nyisd fel, hogy a Széfek kezelése menübe kellene menned.",
+  "showVaultListTitle": "Széflista megjelenítése bejelentkezéskor",
+  "vaultListNote": "Biztonsági megjegyzés: ha ez KI van kapcsolva, a bejelentkezési képernyő csak az utoljára használt széfet mutatja — nincs utalás más széfek létezésére. Kompromisszum: a széf váltásához először fel kell oldani a zárolást, majd a Menü → Széfek kezelése menübe kell menni.",
+  "clipboardClearDescription": "A vágólap törlése titok másolása után. Megjegyzés: a vágólap-kezelők megtarthatnak egy másolatot.",
+
+  "duration30s": "30 mp",
+  "duration1min": "1 perc",
+  "duration5min": "5 perc",
+  "duration15min": "15 perc",
+  "duration60s": "60 mp",
+  "duration2min": "2 perc",
+  "durationNever": "Soha",
+  "duration7days": "7 nap",
+  "duration30days": "30 nap",
+  "duration90days": "90 nap",
+  "durationKeepForever": "Mindig megőrzi",
+
+  "menuExportVault": "Széf exportálása",
+  "menuImportEntries": "Bejegyzések importálása",
+  "menuSyncFromFile": "Szinkronizálás fájlból",
+  "menuManageVaults": "Széfek kezelése",
+  "menuChangePassphrase": "Jelmondat módosítása",
+  "menuManageYubiKeys": "YubiKey-ek kezelése",
+  "menuAppearance": "Megjelenés",
+  "menuSecurity": "Biztonság",
+  "menuManageFolders": "Mappák kezelése",
+  "menuPasswordGenerator": "Jelszógenerátor",
+  "menuAbout": "Névjegy",
+
+  "tooltipSelectEntries": "Bejegyzések kijelölése",
+  "tooltipLockVault": "Széf zárolása",
+  "tooltipSelectAll": "Összes kijelölése",
+  "tooltipDeselectAll": "Összes kijelölés megszüntetése",
+  "tooltipMenu": "Menü",
+  "tooltipCopy": "Másolás",
+  "tooltipCopied": "Másolva!",
+  "tooltipShow": "Megjelenítés",
+  "tooltipHide": "Elrejtés",
+  "tooltipBrowse": "Böngészés",
+  "tooltipEditAlias": "Alias szerkesztése",
+  "tooltipRemoveField": "Mező eltávolítása",
+  "tooltipRename": "Átnevezés",
+  "tooltipDeleteVault": "Széf törlése",
+  "tooltipAssignToFolder": "Hozzárendelés mappához",
+  "tooltipShowPin": "PIN megjelenítése",
+  "tooltipHidePin": "PIN elrejtése",
+  "tooltipShowValue": "Érték megjelenítése",
+  "tooltipHideValue": "Elrejtés",
+  "tooltipCancel": "Mégse",
+  "tooltipOpenInBrowser": "Megnyitás böngészőben",
+
+  "allFolders": "Összes mappa",
+  "noFolder": "Nincs",
+  "selectFolder": "Mappa kiválasztása",
+  "folderName": "Mappa neve",
+
+  "noEntriesMatch": "Nincs a keresésnek megfelelő bejegyzés.",
+  "noVaultsRegistered": "Nincs regisztrált széf.",
+  "noYubiKeysRegistered": "Nincs regisztrált YubiKey",
+  "selectEntry": "Bejegyzés kiválasztása",
+  "newEntryTitle": "Új bejegyzés",
+  "createEntryTitle": "Új {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "{type} szerkesztése",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(nincs URL)",
+  "noNameFallback": "(nincs név)",
+  "untitledFallback": "(névtelen)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "{count} kijelölve",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Keresés az összes mezőben…",
+  "searchEntriesHint": "Bejegyzések keresése…",
+  "searchAllFieldsTooltip": "Az összes mezőben keres",
+  "searchByTitleTooltip": "Cím szerint keres",
+  "entryTypeAll": "Összes",
+  "entryTypePassword": "Jelszó",
+  "entryTypeNote": "Megjegyzés",
+  "entryTypeCard": "Kártya",
+  "entryTypeIdentity": "Személyazonosság",
+  "entryTypeFile": "Fájl",
+  "entryTypeCustom": "Egyéni",
+  "errorPrefix": "Hiba: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Széf",
+  "navAppearance": "Megjelenés",
+  "navSecurity": "Biztonság",
+  "navAbout": "Névjegy",
+
+  "deleteEntryTitle": "Bejegyzés törlése?",
+  "cannotBeUndone": "Ez a művelet nem vonható vissza.",
+  "deleteEntryDialogTitle": "Bejegyzés törlése?",
+  "deleteEntriesTitle": "{count, plural, one{1 bejegyzés törlése?} other{{count} bejegyzés törlése?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Hozzárendelés mappához",
+  "folderConflictTitle": "Mappaütközés",
+  "syncFailedTitle": "Szinkronizálás sikertelen",
+  "syncFromFileTitle": "Szinkronizálás fájlból",
+  "nothingToSync": "Nincs szinkronizálnivaló — mindkét széf már naprakész.",
+
+  "importedEntries": "{count, plural, one{1 bejegyzés importálva.} other{{count} bejegyzés importálva.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Fájl exportálása",
+  "saveDecryptedFileTo": "Visszafejtett fájl mentése ide:",
+  "exportPathLabel": "Exportálás helye",
+  "exportedToPath": "Exportálva ide: {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Exportálás sikertelen: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Megnyitás böngészőben?",
+  "couldNotOpen": "Nem sikerült megnyitni: {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Korábbi bejegyzés törlése",
+  "failedToClearHistory": "Az előzmények törlése sikertelen: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "A jelszó visszaállítása sikertelen: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Mappa átnevezése",
+  "addFolderTitle": "Mappa hozzáadása",
+  "deleteFolderTitle": "Mappa törlése",
+  "deleteFolderConfirm": "«{folder}» törlése?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Bejegyzések újbóli hozzárendelése ide:",
+  "clearToNone": "Áthelyezés «Nincs» mappába",
+
+  "renameVaultTitle": "Széf átnevezése",
+  "deleteVaultTitle": "Széf törlése?",
+  "deleteVaultConfirmTitle": "Biztos vagy benne?",
+  "typeDeleteToConfirm": "Írd be a DELETE szót a megerősítéshez",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Érintsd meg a YubiKey-edet",
+  "noVaultsRegisteredText": "Nincs regisztrált széf.",
+
+  "addYubiKeyTitle": "YubiKey hozzáadása",
+  "enterYubiKeyPinTitle": "YubiKey PIN megadása",
+  "editAliasForKey": "{index}. kulcs aliasának szerkesztése",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Csak egy regisztrált YubiKey marad.",
+  "removeKeyConfirm": "Biztosan el szeretnéd távolítani ezt a kulcsot?",
+  "removeKeyVaultConfirm": "Eltávolítja ezt a YubiKey-t a széfből?",
+  "yubiKeyRemoved": "YubiKey eltávolítva",
+  "failedToRemoveKey": "A kulcs eltávolítása sikertelen: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey hozzáadva",
+  "failedToAddKey": "A kulcs hozzáadása sikertelen: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Az alias mentése sikertelen: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Nem található FIDO2-eszköz. Csatlakoztasd a YubiKey-edet és próbáld újra.",
+  "transportLabel": "Átvitel:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Jelmondat",
+  "yubiKeyPinLabel": "YubiKey PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Jelenlegi jelmondat",
+  "newPassphraseLabel": "Új jelmondat",
+  "confirmPassphraseLabel": "Új jelmondat megerősítése",
+  "vaultPassphraseLabel": "Széf jelmondatja",
+  "aliasLabel": "Alias",
+  "aliasHint": "pl. Elsődleges, Munkakulcs…",
+  "masterPassphraseLabel": "Fő jelmondat",
+  "confirmPassphraseLabelShort": "Jelmondat megerősítése",
+
+  "fieldTitle": "Cím",
+  "fieldContent": "Tartalom",
+  "fieldFirstName": "Keresztnév",
+  "fieldLastName": "Vezetéknév",
+  "fieldEmail": "E-mail (opcionális)",
+  "fieldPhone": "Telefon (opcionális)",
+  "fieldAddress": "Cím (opcionális)",
+  "fieldCardLabel": "Kártya neve (pl. «Visa Platinum»)",
+  "fieldCardholderName": "Kártyabirtokos neve",
+  "fieldCardNumber": "Kártyaszám",
+  "fieldExpiry": "Lejárat (HH/ÉÉ)",
+  "fieldCvv": "CVV (opcionális)",
+  "fieldCardPin": "PIN (opcionális)",
+  "fieldCreditLimit": "Hitelkeret (opcionális)",
+  "fieldAccountNumber": "Számlaszám (opcionális)",
+  "fieldNotes": "Megjegyzések (opcionális)",
+  "fieldUrl": "URL (opcionális)",
+  "fieldUsername": "Felhasználónév",
+  "fieldPassword": "Jelszó",
+  "fieldSeparator": "Elválasztó",
+  "fieldFolder": "Mappa",
+  "fieldLabel": "Felirat",
+  "fieldValue": "Érték",
+  "fieldCustomFields": "Egyéni mezők",
+  "fieldLabelOptional": "{label} (opcionális)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Ez a bejegyzéstípus még nem támogatott.",
+  "csvColumnNone": "(nincs)",
+  "csvPreviewLabel": "Előnézet",
+  "csvImportButton": "Importálás",
+
+  "gabbroVaultSection": "Gabbro széf",
+  "genericCsvSection": "Általános CSV",
+
+  "changePassphraseSuccess": "Jelmondat módosítva",
+  "changePassphraseButton": "Jelmondat módosítása",
+
+  "continueLabel": "Folytatás",
+  "protectWithYubiKey": "Védelem YubiKey-jel",
+  "yubiKeySubtitle": "Hardveres biztonsági kulcs (ajánlott)",
+  "accessibilityButton": "Akadálymentesítés",
+
+  "aboutProjectSection": "Projekt",
+  "aboutLicenceSection": "Licenc",
+  "aboutOpenSourceSection": "Nyílt forráskódú komponensek",
+  "aboutAttributionSection": "Köszönetnyilvánítások",
+
+  "lengthLabel": "Hossz",
+  "wordsLabel": "Szavak",
+  "generateButton": "Generálás",
+  "usePasswordButton": "Ez a jelszó használata",
+  "showHidePassword": "Megjelenítés",
+
+  "deleteVaultPostDeletion": "A széfed törölve lett. Hozz létre egy újat a folytatáshoz.",
+
+  "syncFilePassphraseLabel": "Széf jelmondatja",
+
+  "historyWarning": "Csak 1 korábbi érték kerül megőrzésre. Az előzmények automatikusan törlődnek a biztonsági beállítások alapján.",
+  "historyCurrent": "Jelenlegi",
+  "historyPrevious": "Korábbi",
+  "historySavedOn": "Mentve: {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · lejár: {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Importálási probléma ({index}/{total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Típus: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Szerkeszd, javítsd és mentsd el ezt a bejegyzést, vagy hagyd ki az elvetéséhez.",
+
+  "entriesSkipped": "{count, plural, one{1 bejegyzés kihagyva} other{{count} bejegyzés kihagyva}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Ezek a bejegyzések már léteznek a széfedben, és nem lettek felülírva:",
+
+  "syncDeleteEntryContent": "A másik eszköz törölte a(z) '{title}' bejegyzést.\n\nTöröld itt is, vagy tartsd meg?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "A(z) '{title}' különböző mappákban van a két eszközön.\n\nEz az eszköz: {local}\nMásik eszköz: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Tartás mappa nélkül",
+  "folderConflictKeepLocal": "«{folder}» megtartása",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Áthelyezés mappa nélkülire",
+  "folderConflictMoveIncoming": "Áthelyezés ide: «{folder}»",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Széf szinkronizálva — {added} hozzáadva, {updated} frissítve, {deleted} törölve.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Ez a széffájl más jelmondatot használ. A szinkronizálás csak az azonos jelmondatot használó széfek között támogatott.",
+
+  "reviewSensitiveFields": "Érzékeny mezők",
+  "reviewOtherFields": "Egyéb mezők",
+  "reviewPasswordChanged": "Jelszó módosítva",
+  "reviewCvvChanged": "CVV módosítva",
+  "reviewPinChanged": "PIN módosítva",
+  "reviewTransactionPasswordChanged": "Tranzakciós jelszó módosítva",
+  "tooltipShowValues": "Értékek megjelenítése",
+  "reviewOld": "Régi",
+  "reviewNew": "Új",
+  "reviewEmpty": "(üres)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Megjegyzések",
+  "reviewFieldContent": "Tartalom",
+  "reviewFieldEmail": "E-mail",
+  "reviewFieldPhone": "Telefon",
+  "reviewFieldAddress": "Cím",
+  "reviewFieldCardLabel": "Kártya neve",
+  "reviewFieldStatus": "Állapot",
+  "reviewFieldCardholder": "Kártyabirtokos",
+  "reviewFieldExpiry": "Lejárat",
+  "reviewFieldCreditLimit": "Hitelkeret",
+  "reviewFieldAccountNumber": "Számlaszám",
+  "reviewFieldNetwork": "Hálózat",
+  "reviewFieldBank": "Bank",
+  "reviewFieldFilename": "Fájlnév",
+  "reviewFieldSize": "Méret",
+  "reviewFieldCardNumber": "Szám",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Tranzakciós jelszó",
+  "timestampCreated": "Létrehozva",
+  "timestampUpdated": "Frissítve",
+  "timestampUnknown": "Ismeretlen",
+  "noTitleFallback": "(nincs cím)",
+  "tooltipExportFile": "Fájl exportálása",
+  "tooltipEditEntry": "Bejegyzés szerkesztése",
+  "tooltipDeleteEntry": "Bejegyzés törlése",
+  "exportLabel": "Exportálás",
+  "customEntryFieldsHeader": "Mezők",
+  "copiedNeverClears": "Másolva — a vágólap soha nem törlődik automatikusan",
+  "copiedClears30s": "Másolva — a vágólap 30 mp múlva törlődik",
+  "copiedClears60s": "Másolva — a vágólap 60 mp múlva törlődik",
+  "copiedClears2min": "Másolva — a vágólap 2 perc múlva törlődik",
+
+  "passwordBreakdownTitle": "Jelszóelemzés",
+  "charTypeUppercase": "Nagybetűk",
+  "charTypeLowercase": "Kisbetűk",
+  "charTypeDigit": "Számjegy",
+  "charTypeSymbol": "Szimbólum",
+
+  "exportIncludeDate": "Dátum belefoglalása a fájlnévbe",
+  "exportChooseFormat": "Válassz exportálási formátumot.",
+  "exportUnencryptedWarning": "Teljesen titkosítatlan — minden titok egyszerű szövegként kerül kiírásra. Tárold a fájlt biztonságosan, és töröld használat után.",
+  "exportPassphraseOnlyNote": "Csak a jelmondat védi. Az importáláshoz nem szükséges YubiKey.",
+  "exportChooseDestinationJson": "Válassz célhelyet az exportált JSON-fájlhoz.",
+  "exportChooseDestinationVault": "Válassz célhelyet az exportált széffájlhoz.",
+  "exportTwoFilesNote": "Két fájl jön létre: vault.gabbro és vault.gabbro.sha256",
+  "exportSelectDestination": "Válassz célhelyet.",
+
+  "aboutVersion": "{version} verzió",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Kvantum utáni jelszókezelő",
+  "aboutSourceCode": "Forráskód",
+  "aboutReportIssue": "Hiba bejelentése",
+  "aboutSupportGabbro": "Gabbro támogatása",
+  "aboutLicenceBody": "A Gabbro szabad és nyílt forráskódú szoftver, a GNU General Public License v3.0 only (GPL-3.0-only) licence alatt.\n\nSzabadon felhasználhatod, tanulmányozhatod és terjesztheted ezt a szoftvert az adott licenc feltételei szerint.",
+  "aboutOwnerRole": "Projekttulajdonos, tervező és vezető fejlesztő:",
+  "aboutAiPartner": "MI fejlesztési partner:",
+  "aboutNoTelemetry": "A Gabbro nem hoz létre kimenő hálózati kapcsolatokat. Nincs telemetria, nincs analitika, nincs fiók.",
+
+  "strengthTierTerrible": "Borzalmas",
+  "strengthTierWeak": "Gyenge",
+  "strengthTierFair": "Elfogadható",
+  "strengthTierStrong": "Erős",
+  "strengthTierVeryStrong": "Nagyon erős",
+  "strengthTierExcellent": "Kiváló",
+  "yubiKeyProtectedNote": "YubiKey-jel védett széf — a YubiKey-kötésed megmarad.",
+  "yubiKeyPinRequired": "YubiKey PIN szükséges",
+  "tapYubiKeyNow": "Érintsd meg a YubiKey-edet most…",
+  "touchYubiKeyToAuthorize": "Érintsd meg a YubiKey-edet a változtatás engedélyezéséhez.",
+  "currentPassphraseRequired": "A jelenlegi jelmondat kötelező",
+  "newPassphraseRequired": "Az új jelmondat kötelező",
+  "passphraseTooWeak": "A jelmondat túl gyenge",
+  "confirmPassphraseRequired": "Erősítsd meg az új jelmondatot",
+  "passphrasesDoNotMatch": "A jelmondatok nem egyeznek",
+  "passphrasesMatch": "✓ A jelmondatok egyeznek",
+  "passphrasesNoMatch": "✗ A jelmondatok nem egyeznek",
+  "entropyDisplay": "{tier} · {bits} bit",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Átviteli hiba.",
+  "authorizationFailed": "Engedélyezés sikertelen — ellenőrizd a PIN-t és próbáld újra.",
+
+  "unlockEnterPassphraseAndPin": "Add meg a jelmondatot és a YubiKey PIN-t a feloldáshoz",
+  "unlockEnterPassphrase": "Add meg a jelmondatot a feloldáshoz",
+  "unlockEntropyDisplay": "{tier} · {bits} bit entrópia",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Csatlakoztasd a YubiKey-edet, és érintsd meg, amikor villog",
+  "unlockErrorPassphrase": "Nem sikerült feloldani a széfet. Ellenőrizd a jelmondatot.",
+  "unlockErrorPassphraseAndPin": "Nem sikerült feloldani a széfet. Ellenőrizd a jelmondatot és a YubiKey PIN-t.",
+
+  "importSelectFile": "Válassz fájlt.",
+  "importFileNotFound": "A fájl nem található.",
+  "importEnterPassphrase": "Add meg ennek a széfnek a jelmondatát.",
+  "importDuplicateWarning": "Az olyan bejegyzések, amelyek UUID-je már létezik a széfedben, automatikusan kimaradnak. Látni fogsz egy összefoglalót.",
+  "importGabbroSubtitle": "Bejegyzések szinkronizálása másik Gabbro széfből (.gabbro fájl)",
+  "importEnpassSubtitle": "JSON-exportálás az Enpassból (Eszközök → Exportálás)",
+  "importBitwardenSubtitle": "Titkosítatlan JSON-exportálás a Bitwardenből (Eszközök → Széf exportálása)",
+  "importCsvSubtitle": "CSV-exportálás bármely jelszókezelőből",
+
+  "vaultNameAlreadyExists": "Már létezik «{alias}» nevű széf.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Ez véglegesen törli a(z) «{alias}» széfet és összes adatát.\n\nFájl: {path}\n\nEz a művelet nem vonható vissza.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Ez véglegesen törli a(z) «{alias}» széfet és eltávolítja a YubiKey-kötését.\n\nFájl: {path}\n\nEz a művelet nem vonható vissza.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Add meg a PIN-t és érintsd meg a YubiKey-edet a törlés engedélyezéséhez.",
+  "deleteVaultTooltip": "Széf törlése",
+
+  "navVault": "Széf",
+  "navAbout": "Névjegy",
+
+  "yubiKeySecurityWarning": "Biztonsági figyelmeztetés",
+  "removeYubiKeyTitle": "YubiKey eltávolítása",
+  "yubiKeyLastKeyRiskWarning": "FIGYELMEZTETÉS: Ha a maradék kulcs elveszik, megsérül vagy ellopják, a széfhez való hozzáférés véglegesen lehetetlenné válik. Nincs visszaállítási lehetőség.",
+  "onlyOneKeyRegisteredWarning": "Csak egy kulcs van regisztrálva. Ha ez a kulcs elvész, a széfhez való hozzáférés véglegesen lehetetlenné válik.",
+  "tapRegisterNfc": "Tartsd a kulcsot a telefon közelébe a regisztráláshoz",
+  "tapRegisterUsb": "Csatlakoztatás után érintsd meg a kulcsot a regisztráláshoz",
+  "tapActivateNfc": "Tartsd a kulcsot újra a telefon közelébe az aktiváláshoz",
+  "tapActivateUsb": "Csatlakoztatás után érintsd meg a kulcsot újra az aktiváláshoz",
+  "failedToRegisterKey": "A kulcs regisztrálása sikertelen: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "A kulcs aktiválása sikertelen: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "{index}. kulcs",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Érintsd meg az új YubiKey-t a regisztráláshoz…",
+  "tapYubiKeyToActivate": "Érintsd meg az új YubiKey-t újra az aktiváláshoz…",
+  "editAliasTooltip": "Alias szerkesztése",
+  "cannotRemoveLastKey": "Az utolsó kulcs nem távolítható el",
+  "removeKeyTooltip": "Kulcs eltávolítása",
+  "manageYubiKeysError": "Hiba: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klasszikus",
+  "generatorModePassphrase": "Jelmondat",
+  "charSetsHeader": "Karakterkészletek",
+  "languageHeader": "Nyelv",
+  "separatorLabel": "Elválasztó",
+  "capitaliseWords": "Szavak nagybetűsítése",
+  "appendDigit": "Szám hozzáfűzése",
+  "entropyBitsDisplay": "~{bits} bit entrópia",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Válassz legalább egy karakterkészletet",
+  "passwordMinLengthNote": "A jelszavak legalább 32 karakteresek. Ha egy webhelyen rövidebb korlát érvényes, másold az első szükséges karaktereket.",
+  "tooltipShow": "Megjelenítés",
+  "tooltipCopied": "Másolva!",
+  "tooltipCopy": "Másolás",
+  "excludeAmbiguousChars": "Félreérthető karakterek kizárása (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Hozd létre a széfedet a kezdéshez.",
+  "onboardingVaultName": "Széf neve",
+  "onboardingAliasRequired": "Az alias kötelező",
+  "onboardingNewVaultLocation": "Új széf helye (ugyanaz, mint korábban)",
+  "onboardingVaultLocation": "Széf helye",
+  "onboardingLoadingPath": "Betöltés…",
+  "onboardingPathHint": "Útvonal a széffájlhoz",
+  "onboardingPathRequired": "Az útvonal kötelező",
+  "onboardingReusePassphraseHint": "Válassz új fő jelmondatot, vagy használd újra az előzőt, ha preferálod.",
+  "onboardingPassphraseRequired": "A jelmondat kötelező",
+  "onboardingConfirmRequired": "Erősítsd meg a jelmondatot",
+  "onboardingPrimaryKeyPin": "Elsődleges kulcs PIN-je",
+  "onboardingBackupKeyPin": "Biztonsági másolat kulcs PIN-je",
+  "onboardingKeyNPin": "{n}. kulcs PIN-je",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Minden YubiKey-t kétszer fogsz megérinteni (összesen 4 érintés). A két kulcs között a program felkér a csere elvégzésére.",
+  "onboardingYubikeySlowNote": "A széf YubiKey-jel való létrehozása 20–30 másodpercet vesz igénybe. Az alkalmazás reagálatlannak tűnhet — ez normális.",
+  "onboardingStep1Label": "Elsődleges kulcs regisztrálása",
+  "onboardingStep1Hint": "Érintsd meg a YubiKey-edet most",
+  "onboardingStep2Label": "Elsődleges kulcs aktiválása",
+  "onboardingStep2Hint": "Érintsd meg a YubiKey-edet újra",
+  "onboardingStep3Label": "Váltás biztonsági kulcsra",
+  "onboardingStep3Hint": "Távolítsd el az elsődleges kulcsot, majd csatlakoztasd a biztonsági YubiKey-t",
+  "onboardingStep4Label": "Biztonsági kulcs regisztrálása",
+  "onboardingStep4Hint": "Érintsd meg a biztonsági YubiKey-edet",
+  "onboardingStep5Label": "Biztonsági kulcs aktiválása",
+  "onboardingStep5Hint": "Érintsd meg a biztonsági YubiKey-edet utoljára",
+
+  "textSizePreview": "A gabbró egy mafikus intrusív magmás kőzet, amely durva szemcsés és gazdag Mg-ban és Fe-ben.",
+
+  "fieldCardStatus": "Állapot",
+  "fieldPaymentNetwork": "Fizetési hálózat",
+
+  "cardStatusActive": "Aktív",
+  "cardStatusLapsed": "Lejárt",
+  "cardStatusInactive": "Inaktív",
+
+  "validatorTitleRequired": "A cím kötelező",
+  "validatorUsernameRequired": "A felhasználónév kötelező",
+  "validatorPasswordRequired": "A jelszó kötelező",
+  "validatorContentRequired": "A tartalom kötelező",
+  "validatorFirstNameRequired": "A keresztnév kötelező",
+  "validatorLastNameRequired": "A vezetéknév kötelező",
+  "validatorCardLabelRequired": "A kártya neve kötelező",
+  "validatorCardholderRequired": "A kártyabirtokos neve kötelező",
+  "validatorCardNumberRequired": "A kártyaszám kötelező",
+  "validatorCardNumberLength": "A kártyaszámnak 6–19 számjegyből kell állnia",
+  "validatorExpiryRequired": "A lejárati dátum kötelező",
+  "validatorExpiryFormat": "HH/ÉÉ formátumot használj",
+  "validatorExpiryMonth": "A hónapnak 01–12 között kell lennie",
+  "validatorCvvLength": "A CVV-nek 3 vagy 4 számjegyből kell állnia",
+  "validatorLabelRequired": "A felirat kötelező",
+  "validatorStatusRequired": "Az állapot kötelező",
+
+  "sectionBiometricUnlock": "Biometrikus feloldás",
+  "biometricUnlockDescription": "Ujjlenyomattal vagy arccal oldja fel a széfet a jelmondat begépelése helyett.",
+  "biometricUnlockTitle": "Biometrikus feloldás engedélyezése",
+  "biometricUnlockNote": "Az erre az eszközre regisztrált összes biometrikus azonosító működni fog — nem csak a regisztráláshoz használt.",
+  "biometricUnavailable": "A biometrikus feloldás nem elérhető ezen az eszközön. Nem találtak biometrikus érzékelőt, vagy a rendszerbeállításokban nem regisztráltak biometrikus azonosítót.",
+  "biometricDialogTitle": "A biometrikus feloldásról",
+  "biometricDialogBody": "Ha engedélyezve van, a Gabbro titkosítja a fő jelmondatot, és ezen az eszközön tárolja, biometrikus azonosítókkal védve. A jelmondat csak feloldáskor kerül visszafejtésre.\n\nA Gabbro soha nem tárolja az ujjlenyomat- vagy arcadatokat — ezek a telefon biztonságos chipjén maradnak.",
+  "biometricDialogAllBiometrics": "Az erre az eszközre regisztrált összes biometrikus azonosító fel tudja oldani a Gabrót — nem korlátozhatod egy adott ujjlenyomatra.",
+  "biometricDialogInvalidation": "Ha új biometrikus azonosítót adnak hozzá ehhez a telefonhoz (beleértve egy második ujjlenyomatot is), ez a beállítás automatikusan letiltódik, és újra kell konfigurálni.",
+  "biometricDialogRecommendation": "Javaslat: hagyd letiltva, ha magas fenyegetési modellel rendelkezel, vagy megosztod ezt az eszközt.",
+  "biometricInvalidated": "A biometrikus feloldás le lett tiltva, mert az ezen az eszközön lévő biometrikus azonosítók megváltoztak (új ujjlenyomatot vagy arcot adtak hozzá a rendszerbeállításokban). Ez egy biztonsági intézkedés. Add meg újra a jelmondatot, és engedélyezd újra a biometrikus feloldást, ha folytatni szeretnéd ennek a funkciónak a használatát.",
+  "useBiometrics": "Biometria használata",
+  "biometricCancelled": "A biometrikus hitelesítés nem fejeződött be. Add meg a jelmondatot a feloldáshoz.",
+  "biometricEnrollTitle": "Jelmondat megadása",
+  "biometricEnrollDescription": "Add meg a fő jelmondatot a biometrikus feloldás engedélyezéséhez.",
+  "biometricYubikeyHint": "Add meg alul a YubiKey PIN-t, majd érintsd meg a Biometria használata gombot, majd érintsd meg a YubiKey-edet.",
+
+  "helpTitle": "Súgó",
+  "menuHelp": "Súgó",
+  "helpCaptionCreate": "Széf létrehozása: add meg a nevet, jelmondatot, és opcionálisan védd YubiKey-jel",
+  "helpCaptionEmpty": "Koppints a + gombra az első bejegyzés hozzáadásához",
+  "helpCaptionDetail": "Koppints a szem ikonra a jelszó felfedéséhez, majd nyomj hosszan a részletes karakterelemzés megtekintéséhez",
+  "helpCaptionTitleSearch": "Alapértelmezés szerint a keresősáv csak a bejegyzések címeiben keres",
+  "helpCaptionFullSearch": "Koppints a nagyítóra az összes mezőben való keresésre való váltáshoz; koppints újra a cím szerinti kereséshez való visszatéréshez",
+  "helpCaptionFilter": "Használd a szűrőgombokat, hogy csak egy adott típusú bejegyzéseket jelenítsd meg",
+  "helpCaptionFolders": "Használd a mappaválasztót a bejegyzések mappa szerinti szűréséhez",
+  "helpCaptionSelect": "Nyomj hosszan egy bejegyzésre a kijelölési módba való lépéshez; adj hozzá több elemet, majd rendeld hozzá mappához vagy töröld. Koppints X-re a kilépéshez.",
+  "helpCaptionJumpToLetter": "Koppints az indexsávon egy betűre az adott szakaszhoz való ugráshoz",
+  "helpCaptionBreakdown": "Koppints a szem ikonra a jelszó felfedéséhez, majd nyomj hosszan a részletes karakterelemzés megtekintéséhez",
+  "helpCaptionManageVaults": "A Széfek kezelése részben átnevezhetsz vagy törölhetsz széfeket, illetve hozzáadhatsz egy újat",
+  "helpCaptionUnlock": "Add meg a jelmondatot a széf feloldásához"
+}

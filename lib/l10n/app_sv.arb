@@ -1,0 +1,809 @@
+{
+  "@@locale": "sv",
+
+  "appName": "Gabbro",
+
+  "cancel": "Avbryt",
+  "delete": "Ta bort",
+  "save": "Spara",
+  "close": "Stäng",
+  "ok": "OK",
+  "edit": "Redigera",
+  "add": "Lägg till",
+  "remove": "Ta bort",
+  "rename": "Byt namn",
+  "confirm": "Bekräfta",
+  "continueAction": "Fortsätt",
+  "dismiss": "Avfärda",
+  "authorize": "Auktorisera",
+  "register": "Registrera",
+  "sync": "Synkronisera",
+  "assign": "Tilldela",
+  "unlock": "Lås upp",
+  "generate": "Generera",
+  "import": "Importera",
+  "export": "Exportera",
+  "openInBrowser": "Öppna i webbläsare",
+  "useThisPassword": "Använd det här lösenordet",
+  "reviewArrow": "Granska →",
+  "skip": "Hoppa över",
+  "keep": "Behåll",
+  "revert": "Återställ",
+  "next": "Nästa: kartlägg kolumner",
+  "syncFromVault": "Synkronisera från valv",
+  "createVault": "Skapa valv",
+  "pickFile": "Välj fil",
+  "noFileSelected": "Ingen fil vald",
+  "chooseFolder": "Välj mapp",
+  "addCustomField": "Lägg till anpassat fält",
+  "exportFile": "Exportera fil",
+  "addVault": "Lägg till valv",
+  "addYubiKey": "Lägg till YubiKey",
+  "noChangesToSave": "Inga ändringar att spara.",
+
+  "appearanceTitle": "Utseende",
+  "securityTitle": "Säkerhet",
+  "aboutTitle": "Om Gabbro",
+  "generatorTitle": "Lösenordsgenerator",
+  "importTitle": "Importera poster",
+  "exportTitle": "Exportera valv",
+  "changePassphraseTitle": "Byt lösenfras",
+  "csvMappingTitle": "Kartlägg CSV-kolumner",
+  "manageFoldersTitle": "Hantera mappar",
+  "manageVaultsTitle": "Hantera valv",
+  "manageYubiKeysTitle": "Hantera YubiKeys",
+  "passwordHistoryTitle": "Lösenordshistorik",
+  "reviewChangesTitle": "Granska ändringar",
+  "unlockGabbroTitle": "Lås upp Gabbro",
+
+  "sectionTheme": "Tema",
+  "sectionTextSize": "Textstorlek",
+  "sectionAlphabetBar": "Position för alfabetsfält",
+  "sectionAccessibility": "Tillgänglighet",
+  "sectionLanguage": "Språk",
+  "sectionForegroundLock": "Förgrundsläsning",
+  "sectionBackgroundLock": "Bakgrundslås",
+  "sectionPasswordHistory": "Lösenordshistorik",
+  "sectionPassphraseCopyPaste": "Kopiera/klistra lösenfras",
+  "sectionVaultList": "Valvlista",
+  "sectionClipboardClear": "Rensa urklipp",
+  "sectionCharacterSets": "Teckenuppsättningar",
+  "sectionGeneratorLanguage": "Språk",
+
+  "themeSystem": "System",
+  "themeLight": "Ljust",
+  "themeDark": "Mörkt",
+
+  "textSizeSmall": "Liten",
+  "textSizeRegular": "Normal",
+  "textSizeLarge": "Stor",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Endast på telefon — surfplatta använder alltid vänster.",
+  "alphabetBarLeft": "Vänster",
+  "alphabetBarRight": "Höger",
+
+  "highContrastTitle": "Hög kontrast",
+  "highContrastSubtitle": "Ökar kontrasten för bättre läsbarhet",
+
+  "languageNote": "Åsidosätter systemspråket. «System» följer enhetens regionala inställningar.",
+  "langSystem": "System",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Lås efter denna inaktivitetsperiod medan appen är öppen.",
+  "backgroundLockDescription": "Lås efter att appen har varit i bakgrunden under denna tid.",
+  "passwordHistoryDescription": "Hur länge ett tidigare lösenord behålls efter ändring. «Behåll alltid» innebär att historiken bara raderas manuellt.",
+  "passphraseCopyPasteDescription": "Blockera kopiering och inklistring i lösenfrasfält. Rekommenderas: förhindrar läckage av lösenfras via urklipp.",
+  "passphraseCopyPasteNote": "Obs: Detta blockerar snabbmenyn vid långt tryck och textmarkering. Tangentbordets inbyggda klista-knapp kan fortfarande fungera — detta är en plattformsbegränsning.",
+  "blockCopyPasteTitle": "Blockera kopiera/klistra",
+  "vaultListDescription": "Visa en lista över alla valv på inloggningsskärmen så att du kan välja vilket du vill låsa upp utan att gå till Hantera valv.",
+  "showVaultListTitle": "Visa valvlista vid inloggning",
+  "vaultListNote": "Säkerhetsnotering: När detta är AV visar inloggningsskärmen bara det senast använda valvet — ingen indikation på att andra valv finns. Avvägning: För att byta valv måste du först låsa upp och sedan gå till Meny → Hantera valv.",
+  "clipboardClearDescription": "Rensa urklipp efter kopiering av en hemlighet. Obs: Urklippshanterare kan behålla en kopia.",
+
+  "duration30s": "30 s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60 s",
+  "duration2min": "2 min",
+  "durationNever": "Aldrig",
+  "duration7days": "7 dagar",
+  "duration30days": "30 dagar",
+  "duration90days": "90 dagar",
+  "durationKeepForever": "Behåll alltid",
+
+  "menuExportVault": "Exportera valv",
+  "menuImportEntries": "Importera poster",
+  "menuSyncFromFile": "Synkronisera från fil",
+  "menuManageVaults": "Hantera valv",
+  "menuChangePassphrase": "Byt lösenfras",
+  "menuManageYubiKeys": "Hantera YubiKeys",
+  "menuAppearance": "Utseende",
+  "menuSecurity": "Säkerhet",
+  "menuManageFolders": "Hantera mappar",
+  "menuPasswordGenerator": "Lösenordsgenerator",
+  "menuAbout": "Om",
+
+  "tooltipSelectEntries": "Välj poster",
+  "tooltipLockVault": "Lås valv",
+  "tooltipSelectAll": "Välj alla",
+  "tooltipDeselectAll": "Avmarkera alla",
+  "tooltipMenu": "Meny",
+  "tooltipCopy": "Kopiera",
+  "tooltipCopied": "Kopierat!",
+  "tooltipShow": "Visa",
+  "tooltipHide": "Dölj",
+  "tooltipBrowse": "Bläddra",
+  "tooltipEditAlias": "Redigera alias",
+  "tooltipRemoveField": "Ta bort fält",
+  "tooltipRename": "Byt namn",
+  "tooltipDeleteVault": "Ta bort valv",
+  "tooltipAssignToFolder": "Tilldela till mapp",
+  "tooltipShowPin": "Visa PIN",
+  "tooltipHidePin": "Dölj PIN",
+  "tooltipShowValue": "Visa värde",
+  "tooltipHideValue": "Dölj",
+  "tooltipCancel": "Avbryt",
+  "tooltipOpenInBrowser": "Öppna i webbläsare",
+
+  "allFolders": "Alla mappar",
+  "noFolder": "Ingen",
+  "selectFolder": "Välj en mapp",
+  "folderName": "Mappnamn",
+
+  "noEntriesMatch": "Inga poster matchar din sökning.",
+  "noVaultsRegistered": "Inga valv registrerade.",
+  "noYubiKeysRegistered": "Inga YubiKeys registrerade",
+  "selectEntry": "Välj en post",
+  "newEntryTitle": "Ny post",
+  "createEntryTitle": "Ny {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Redigera {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(ingen URL)",
+  "noNameFallback": "(inget namn)",
+  "untitledFallback": "(utan titel)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "{count} valda",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Sök i alla fält…",
+  "searchEntriesHint": "Sök i poster…",
+  "searchAllFieldsTooltip": "Söker i alla fält",
+  "searchByTitleTooltip": "Söker efter titel",
+  "entryTypeAll": "Alla",
+  "entryTypePassword": "Lösenord",
+  "entryTypeNote": "Anteckning",
+  "entryTypeCard": "Kort",
+  "entryTypeIdentity": "Identitet",
+  "entryTypeFile": "Fil",
+  "entryTypeCustom": "Anpassad",
+  "errorPrefix": "Fel: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Valv",
+  "navAppearance": "Utseende",
+  "navSecurity": "Säkerhet",
+  "navAbout": "Om",
+
+  "deleteEntryTitle": "Ta bort post?",
+  "cannotBeUndone": "Detta kan inte ångras.",
+  "deleteEntryDialogTitle": "Ta bort post?",
+  "deleteEntriesTitle": "{count, plural, one{Ta bort 1 post?} other{Ta bort {count} poster?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Tilldela till mapp",
+  "folderConflictTitle": "Mappkonflikt",
+  "syncFailedTitle": "Synkronisering misslyckades",
+  "syncFromFileTitle": "Synkronisera från fil",
+  "nothingToSync": "Inget att synkronisera — båda valven är redan uppdaterade.",
+
+  "importedEntries": "{count, plural, one{1 post importerad.} other{{count} poster importerade.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Exportera fil",
+  "saveDecryptedFileTo": "Spara dekrypterad fil till:",
+  "exportPathLabel": "Exportsökväg",
+  "exportedToPath": "Exporterad till {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Export misslyckades: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Öppna i webbläsare?",
+  "couldNotOpen": "Kunde inte öppna {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Ta bort tidigare post",
+  "failedToClearHistory": "Kunde inte rensa historik: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Kunde inte återställa lösenord: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Byt namn på mapp",
+  "addFolderTitle": "Lägg till mapp",
+  "deleteFolderTitle": "Ta bort mapp",
+  "deleteFolderConfirm": "Ta bort \"{folder}\"?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Tilldela om poster till",
+  "clearToNone": "Flytta till «Ingen»",
+
+  "renameVaultTitle": "Byt namn på valv",
+  "deleteVaultTitle": "Ta bort valv?",
+  "deleteVaultConfirmTitle": "Är du säker?",
+  "typeDeleteToConfirm": "Skriv DELETE för att bekräfta",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Rör vid din YubiKey",
+  "noVaultsRegisteredText": "Inga valv registrerade.",
+
+  "addYubiKeyTitle": "Lägg till YubiKey",
+  "enterYubiKeyPinTitle": "Ange YubiKey-PIN",
+  "editAliasForKey": "Redigera alias för nyckel {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Det kommer bara finnas en registrerad YubiKey kvar.",
+  "removeKeyConfirm": "Är du säker på att du vill ta bort den här nyckeln?",
+  "removeKeyVaultConfirm": "Ta bort den här YubiKey från valvet?",
+  "yubiKeyRemoved": "YubiKey borttagen",
+  "failedToRemoveKey": "Kunde inte ta bort nyckel: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey tillagd",
+  "failedToAddKey": "Kunde inte lägga till nyckel: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Kunde inte spara alias: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Ingen FIDO2-enhet hittades. Sätt in din YubiKey och försök igen.",
+  "transportLabel": "Transport:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Lösenfras",
+  "yubiKeyPinLabel": "YubiKey-PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Nuvarande lösenfras",
+  "newPassphraseLabel": "Ny lösenfras",
+  "confirmPassphraseLabel": "Bekräfta ny lösenfras",
+  "vaultPassphraseLabel": "Valvets lösenfras",
+  "aliasLabel": "Alias",
+  "aliasHint": "t.ex. Primär, Arbetsnyckel…",
+  "masterPassphraseLabel": "Huvud­lösenfras",
+  "confirmPassphraseLabelShort": "Bekräfta lösenfras",
+
+  "fieldTitle": "Titel",
+  "fieldContent": "Innehåll",
+  "fieldFirstName": "Förnamn",
+  "fieldLastName": "Efternamn",
+  "fieldEmail": "E-post (valfritt)",
+  "fieldPhone": "Telefon (valfritt)",
+  "fieldAddress": "Adress (valfritt)",
+  "fieldCardLabel": "Kortetikett (t.ex. «Visa Platinum»)",
+  "fieldCardholderName": "Kortinnehavarens namn",
+  "fieldCardNumber": "Kortnummer",
+  "fieldExpiry": "Giltighetstid (MM/ÅÅ)",
+  "fieldCvv": "CVV (valfritt)",
+  "fieldCardPin": "PIN (valfritt)",
+  "fieldCreditLimit": "Kreditgräns (valfritt)",
+  "fieldAccountNumber": "Kontonummer (valfritt)",
+  "fieldNotes": "Anteckningar (valfritt)",
+  "fieldUrl": "URL (valfritt)",
+  "fieldUsername": "Användarnamn",
+  "fieldPassword": "Lösenord",
+  "fieldSeparator": "Avgränsare",
+  "fieldFolder": "Mapp",
+  "fieldLabel": "Etikett",
+  "fieldValue": "Värde",
+  "fieldCustomFields": "Anpassade fält",
+  "fieldLabelOptional": "{label} (valfritt)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Posttypen stöds inte ännu.",
+  "csvColumnNone": "(ingen)",
+  "csvPreviewLabel": "Förhandsgranskning",
+  "csvImportButton": "Importera",
+
+  "gabbroVaultSection": "Gabbro-valv",
+  "genericCsvSection": "Generisk CSV",
+
+  "changePassphraseSuccess": "Lösenfras ändrad",
+  "changePassphraseButton": "Byt lösenfras",
+
+  "continueLabel": "Fortsätt",
+  "protectWithYubiKey": "Skydda med YubiKey",
+  "yubiKeySubtitle": "Maskinvarusäkerhetsnyckel (rekommenderas)",
+  "accessibilityButton": "Tillgänglighet",
+
+  "aboutProjectSection": "Projekt",
+  "aboutLicenceSection": "Licens",
+  "aboutOpenSourceSection": "Öppen källkod-komponenter",
+  "aboutAttributionSection": "Tillskrivningar",
+
+  "lengthLabel": "Längd",
+  "wordsLabel": "Ord",
+  "generateButton": "Generera",
+  "usePasswordButton": "Använd det här lösenordet",
+  "showHidePassword": "Visa",
+
+  "deleteVaultPostDeletion": "Ditt valv har tagits bort. Skapa ett nytt för att fortsätta.",
+
+  "syncFilePassphraseLabel": "Valvets lösenfras",
+
+  "historyWarning": "Bara 1 tidigare värde behålls. Historiken rensas automatiskt baserat på dina säkerhetsinställningar.",
+  "historyCurrent": "Aktuell",
+  "historyPrevious": "Tidigare",
+  "historySavedOn": "Sparad {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · upphör {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Importproblem ({index} av {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Typ: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Redigera för att rätta och spara den här posten, eller hoppa över för att kassera den.",
+
+  "entriesSkipped": "{count, plural, one{1 post överhoppad} other{{count} poster överhoppade}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Dessa poster finns redan i ditt valv och skrevs inte över:",
+
+  "syncDeleteEntryContent": "Den andra enheten raderade '{title}'.\n\nRadera den här också, eller behåll den?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "'{title}' finns i olika mappar på de två enheterna.\n\nDen här enheten: {local}\nAnnan enhet: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Behåll utan mapp",
+  "folderConflictKeepLocal": "Behåll \"{folder}\"",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Flytta till ingen mapp",
+  "folderConflictMoveIncoming": "Flytta till \"{folder}\"",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Valv synkroniserat — {added} tillagda, {updated} uppdaterade, {deleted} borttagna.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Den här valvfilen använder en annan lösenfras. Synkronisering stöds bara mellan valv som delar lösenfras.",
+
+  "reviewSensitiveFields": "Känsliga fält",
+  "reviewOtherFields": "Andra fält",
+  "reviewPasswordChanged": "Lösenord ändrat",
+  "reviewCvvChanged": "CVV ändrat",
+  "reviewPinChanged": "PIN ändrat",
+  "reviewTransactionPasswordChanged": "Transaktionslösenord ändrat",
+  "tooltipShowValues": "Visa värden",
+  "reviewOld": "Gammalt",
+  "reviewNew": "Nytt",
+  "reviewEmpty": "(tomt)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Anteckningar",
+  "reviewFieldContent": "Innehåll",
+  "reviewFieldEmail": "E-post",
+  "reviewFieldPhone": "Telefon",
+  "reviewFieldAddress": "Adress",
+  "reviewFieldCardLabel": "Kortetikett",
+  "reviewFieldStatus": "Status",
+  "reviewFieldCardholder": "Kortinnehavare",
+  "reviewFieldExpiry": "Giltighetstid",
+  "reviewFieldCreditLimit": "Kreditgräns",
+  "reviewFieldAccountNumber": "Kontonummer",
+  "reviewFieldNetwork": "Nätverk",
+  "reviewFieldBank": "Bank",
+  "reviewFieldFilename": "Filnamn",
+  "reviewFieldSize": "Storlek",
+  "reviewFieldCardNumber": "Nummer",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Transaktionslösenord",
+  "timestampCreated": "Skapad",
+  "timestampUpdated": "Uppdaterad",
+  "timestampUnknown": "Okänd",
+  "noTitleFallback": "(ingen titel)",
+  "tooltipExportFile": "Exportera fil",
+  "tooltipEditEntry": "Redigera post",
+  "tooltipDeleteEntry": "Ta bort post",
+  "exportLabel": "Exportera",
+  "customEntryFieldsHeader": "Fält",
+  "copiedNeverClears": "Kopierat — urklipp rensas aldrig automatiskt",
+  "copiedClears30s": "Kopierat — urklipp rensas om 30 s",
+  "copiedClears60s": "Kopierat — urklipp rensas om 60 s",
+  "copiedClears2min": "Kopierat — urklipp rensas om 2 min",
+
+  "passwordBreakdownTitle": "Lösenordsanalys",
+  "charTypeUppercase": "Versaler",
+  "charTypeLowercase": "Gemener",
+  "charTypeDigit": "Siffra",
+  "charTypeSymbol": "Symbol",
+
+  "exportIncludeDate": "Inkludera datum i filnamn",
+  "exportChooseFormat": "Välj ett exportformat.",
+  "exportUnencryptedWarning": "Helt okrypterat — alla hemligheter skrivs i klartext. Lagra filen säkert och radera den efter användning.",
+  "exportPassphraseOnlyNote": "Skyddad av din lösenfras enbart. YubiKey krävs inte för import.",
+  "exportChooseDestinationJson": "Välj en destination för din exporterade JSON-fil.",
+  "exportChooseDestinationVault": "Välj en destination för din exporterade valvfil.",
+  "exportTwoFilesNote": "Två filer skapas: vault.gabbro och vault.gabbro.sha256",
+  "exportSelectDestination": "Välj en destination.",
+
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "En post-kvantumlösenordshanterare",
+  "aboutSourceCode": "Källkod",
+  "aboutReportIssue": "Rapportera problem",
+  "aboutSupportGabbro": "Stöd Gabbro",
+  "aboutLicenceBody": "Gabbro är fri och öppen källkod-programvara, licensierad under GNU General Public License v3.0 only (GPL-3.0-only).\n\nDu är fri att använda, studera och distribuera denna programvara under villkoren i den licensen.",
+  "aboutOwnerRole": "Projektägare, arkitekt och ledande utvecklare:",
+  "aboutAiPartner": "AI-utvecklingspartner:",
+  "aboutNoTelemetry": "Gabbro gör inga utgående nätverksanslutningar. Ingen telemetri, ingen analys, inga konton.",
+
+  "strengthTierTerrible": "Fruktansvärt",
+  "strengthTierWeak": "Svagt",
+  "strengthTierFair": "Godkänt",
+  "strengthTierStrong": "Starkt",
+  "strengthTierVeryStrong": "Mycket starkt",
+  "strengthTierExcellent": "Utmärkt",
+  "yubiKeyProtectedNote": "YubiKey-skyddat valv — din YubiKey-bindning bevaras.",
+  "yubiKeyPinRequired": "YubiKey-PIN krävs",
+  "tapYubiKeyNow": "Rör vid din YubiKey nu…",
+  "touchYubiKeyToAuthorize": "Rör vid din YubiKey för att auktorisera den här ändringen.",
+  "currentPassphraseRequired": "Nuvarande lösenfras krävs",
+  "newPassphraseRequired": "Ny lösenfras krävs",
+  "passphraseTooWeak": "Lösenfransen är för svag",
+  "confirmPassphraseRequired": "Bekräfta din nya lösenfras",
+  "passphrasesDoNotMatch": "Lösenfraser matchar inte",
+  "passphrasesMatch": "✓ Lösenfraser matchar",
+  "passphrasesNoMatch": "✗ Lösenfraser matchar inte",
+  "entropyDisplay": "{tier} · {bits} bitar",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Transportfel.",
+  "authorizationFailed": "Auktorisering misslyckades — kontrollera din PIN och försök igen.",
+
+  "unlockEnterPassphraseAndPin": "Ange lösenfras och YubiKey-PIN för att låsa upp",
+  "unlockEnterPassphrase": "Ange lösenfras för att låsa upp",
+  "unlockEntropyDisplay": "{tier} · {bits} bitar entropi",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Sätt i din YubiKey och rör vid den när den blinkar",
+  "unlockErrorPassphrase": "Kunde inte låsa upp valvet. Kontrollera din lösenfras.",
+  "unlockErrorPassphraseAndPin": "Kunde inte låsa upp valvet. Kontrollera din lösenfras och YubiKey-PIN.",
+
+  "importSelectFile": "Välj en fil.",
+  "importFileNotFound": "Fil hittades inte.",
+  "importEnterPassphrase": "Ange lösenfransen för det här valvet.",
+  "importDuplicateWarning": "Poster vars UUID redan finns i ditt valv hoppas över automatiskt. Du kommer se en sammanfattning.",
+  "importGabbroSubtitle": "Synkronisera poster från ett annat Gabbro-valv (.gabbro-fil)",
+  "importEnpassSubtitle": "JSON-export från Enpass (Verktyg → Exportera)",
+  "importBitwardenSubtitle": "Okrypterad JSON-export från Bitwarden (Verktyg → Exportera valv)",
+  "importCsvSubtitle": "CSV-export från valfri lösenordshanterare",
+
+  "vaultNameAlreadyExists": "Ett valv med namnet \"{alias}\" finns redan.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Detta tar permanent bort \"{alias}\" och all dess data.\n\nFil: {path}\n\nDetta kan inte ångras.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Detta tar permanent bort \"{alias}\" och tar bort dess YubiKey-bindning.\n\nFil: {path}\n\nDetta kan inte ångras.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Ange din PIN och rör vid din YubiKey för att auktorisera borttagningen.",
+  "deleteVaultTooltip": "Ta bort valv",
+
+  "navVault": "Valv",
+  "navAbout": "Om",
+
+  "yubiKeySecurityWarning": "Säkerhetsvarning",
+  "removeYubiKeyTitle": "Ta bort YubiKey",
+  "yubiKeyLastKeyRiskWarning": "VARNING: Om den kvarvarande nyckeln förloras, skadas eller stjäls är åtkomst till valvet permanent omöjlig. Det finns ingen återhämtningsväg.",
+  "onlyOneKeyRegisteredWarning": "Bara en nyckel registrerad. Om den här nyckeln förloras är åtkomst till valvet permanent omöjlig.",
+  "tapRegisterNfc": "Håll nyckeln mot telefonen för att registrera",
+  "tapRegisterUsb": "När ansluten, rör vid nyckeln för att registrera",
+  "tapActivateNfc": "Håll nyckeln mot telefonen igen för att aktivera",
+  "tapActivateUsb": "När ansluten, rör vid nyckeln igen för att aktivera",
+  "failedToRegisterKey": "Kunde inte registrera nyckel: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Kunde inte aktivera nyckel: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Nyckel {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Rör vid din nya YubiKey för att registrera…",
+  "tapYubiKeyToActivate": "Rör vid din nya YubiKey igen för att aktivera…",
+  "editAliasTooltip": "Redigera alias",
+  "cannotRemoveLastKey": "Kan inte ta bort den sista nyckeln",
+  "removeKeyTooltip": "Ta bort nyckel",
+  "manageYubiKeysError": "Fel: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klassisk",
+  "generatorModePassphrase": "Lösenfras",
+  "charSetsHeader": "Teckenuppsättningar",
+  "languageHeader": "Språk",
+  "separatorLabel": "Avgränsare",
+  "capitaliseWords": "Versalisera ord",
+  "appendDigit": "Lägg till en siffra",
+  "entropyBitsDisplay": "~{bits} bitar entropi",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Välj minst en teckenuppsättning",
+  "passwordMinLengthNote": "Lösenord är minst 32 tecken. Om en webbplats har en kortare gräns, kopiera de första nödvändiga tecknen.",
+  "tooltipShow": "Visa",
+  "tooltipCopied": "Kopierat!",
+  "tooltipCopy": "Kopiera",
+  "excludeAmbiguousChars": "Uteslut tvetydiga tecken (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Skapa ditt valv för att komma igång.",
+  "onboardingVaultName": "Valvnamn",
+  "onboardingAliasRequired": "Alias krävs",
+  "onboardingNewVaultLocation": "Ny valvplats (samma som tidigare)",
+  "onboardingVaultLocation": "Valvplats",
+  "onboardingLoadingPath": "Läser in…",
+  "onboardingPathHint": "Sökväg till valvfil",
+  "onboardingPathRequired": "Sökväg krävs",
+  "onboardingReusePassphraseHint": "Välj en ny huvud­lösenfras, eller återanvänd din tidigare om du föredrar det.",
+  "onboardingPassphraseRequired": "Lösenfras krävs",
+  "onboardingConfirmRequired": "Bekräfta din lösenfras",
+  "onboardingPrimaryKeyPin": "Primärnyckel-PIN",
+  "onboardingBackupKeyPin": "Reservnyckel-PIN",
+  "onboardingKeyNPin": "Nyckel {n} PIN",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Du rör vid varje YubiKey två gånger (4 tryckningar totalt). Mellan de två nycklarna uppmanas du att byta.",
+  "onboardingYubikeySlowNote": "Att skapa valv med YubiKey tar 20–30 sekunder. Appen kan verka ovanlig — det är normalt.",
+  "onboardingStep1Label": "Registrera primärnyckel",
+  "onboardingStep1Hint": "Rör vid din YubiKey nu",
+  "onboardingStep2Label": "Aktivera primärnyckel",
+  "onboardingStep2Hint": "Rör vid din YubiKey igen",
+  "onboardingStep3Label": "Byt till reservnyckel",
+  "onboardingStep3Hint": "Ta bort primärnyckeln, anslut sedan din reserv-YubiKey",
+  "onboardingStep4Label": "Registrera reservnyckel",
+  "onboardingStep4Hint": "Rör vid din reserv-YubiKey",
+  "onboardingStep5Label": "Aktivera reservnyckel",
+  "onboardingStep5Hint": "Rör vid din reserv-YubiKey en sista gång",
+
+  "textSizePreview": "Gabbro är en intrusiv magmatisk bergart som är rik på Mg och Fe och grovkornig.",
+
+  "fieldCardStatus": "Status",
+  "fieldPaymentNetwork": "Betalnätverk",
+
+  "cardStatusActive": "Aktiv",
+  "cardStatusLapsed": "Utgången",
+  "cardStatusInactive": "Inaktiv",
+
+  "validatorTitleRequired": "Titel krävs",
+  "validatorUsernameRequired": "Användarnamn krävs",
+  "validatorPasswordRequired": "Lösenord krävs",
+  "validatorContentRequired": "Innehåll krävs",
+  "validatorFirstNameRequired": "Förnamn krävs",
+  "validatorLastNameRequired": "Efternamn krävs",
+  "validatorCardLabelRequired": "Kortetikett krävs",
+  "validatorCardholderRequired": "Kortinnehavarens namn krävs",
+  "validatorCardNumberRequired": "Kortnummer krävs",
+  "validatorCardNumberLength": "Kortnummer måste ha 6–19 siffror",
+  "validatorExpiryRequired": "Giltighetstid krävs",
+  "validatorExpiryFormat": "Använd MM/ÅÅ-format",
+  "validatorExpiryMonth": "Månad måste vara 01–12",
+  "validatorCvvLength": "CVV måste ha 3 eller 4 siffror",
+  "validatorLabelRequired": "Etikett krävs",
+  "validatorStatusRequired": "Status krävs",
+
+  "sectionBiometricUnlock": "Biometrisk upplåsning",
+  "biometricUnlockDescription": "Använd ditt fingeravtryck eller ansikte för att låsa upp valvet istället för att skriva lösenfransen.",
+  "biometricUnlockTitle": "Aktivera biometrisk upplåsning",
+  "biometricUnlockNote": "Alla biometrier registrerade på den här enheten fungerar — inte bara den som användes vid registreringen.",
+  "biometricUnavailable": "Biometrisk upplåsning är inte tillgänglig på den här enheten. Ingen biometrisk sensor hittades eller inga biometrier är registrerade i systeminställningarna.",
+  "biometricDialogTitle": "Om biometrisk upplåsning",
+  "biometricDialogBody": "När aktiverat krypterar Gabbro din huvud­lösenfras och lagrar den på den här enheten, skyddad av dina biometrier. Din lösenfras dekrypteras bara i det ögonblick du låser upp.\n\nDina fingeravtrycks- eller ansiktsdata lagras aldrig av Gabbro — de stannar i enhetens säkra chip.",
+  "biometricDialogAllBiometrics": "Alla biometrier registrerade på den här enheten kan låsa upp Gabbro — du kan inte begränsa det till ett specifikt fingeravtryck.",
+  "biometricDialogInvalidation": "Om en ny biometri läggs till den här telefonen (inklusive ett annat fingeravtryck) inaktiveras den här inställningen automatiskt och du måste konfigurera den på nytt.",
+  "biometricDialogRecommendation": "Rekommendation: håll inaktiverat om du har en hög hotmodell eller delar den här enheten.",
+  "biometricInvalidated": "Biometrisk upplåsning inaktiverades eftersom biometrierna på den här enheten ändrades (ett nytt fingeravtryck eller ansikte lades till i systeminställningarna). Detta är en säkerhetsåtgärd. Ange lösenfransen igen och aktivera biometrisk upplåsning igen om du vill fortsätta använda den här funktionen.",
+  "useBiometrics": "Använd biometri",
+  "biometricCancelled": "Biometrisk autentisering slutfördes inte. Ange lösenfransen för att låsa upp.",
+  "biometricEnrollTitle": "Ange lösenfras",
+  "biometricEnrollDescription": "Ange din huvud­lösenfras för att aktivera biometrisk upplåsning.",
+  "biometricYubikeyHint": "Ange din YubiKey-PIN nedan, tryck sedan Använd biometri, rör sedan vid din YubiKey.",
+
+  "helpTitle": "Hjälp",
+  "menuHelp": "Hjälp",
+  "helpCaptionCreate": "Skapa ett valv: ange ett namn, lösenfras och skydda eventuellt med en YubiKey",
+  "helpCaptionEmpty": "Tryck på + för att lägga till din första post",
+  "helpCaptionDetail": "Tryck på ögon­ikonen för att visa ett lösenord, håll sedan inne för att se en detaljerad teckenanalys",
+  "helpCaptionTitleSearch": "Som standard söker sökfältet bara i posttitlar",
+  "helpCaptionFullSearch": "Tryck på förstoringsglaset för att växla till sökning i alla fält; tryck igen för att återgå till titelsökning",
+  "helpCaptionFilter": "Använd filterknapparna för att bara visa poster av en viss typ",
+  "helpCaptionFolders": "Använd mappväljaren för att filtrera poster efter mapp",
+  "helpCaptionSelect": "Håll inne på en post för att aktivera valläge; lägg till fler objekt, tilldela sedan till en mapp eller ta bort. Tryck X för att avsluta.",
+  "helpCaptionJumpToLetter": "Tryck på en bokstav i indexfältet för att hoppa till det avsnittet",
+  "helpCaptionBreakdown": "Tryck på ögon­ikonen för att visa ett lösenord, håll sedan inne för att se en detaljerad teckenanalys",
+  "helpCaptionManageVaults": "I Hantera valv kan du byta namn på eller ta bort valv, eller lägga till ett nytt",
+  "helpCaptionUnlock": "Ange din lösenfras för att låsa upp valvet"
+}

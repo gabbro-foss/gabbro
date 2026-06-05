@@ -1,0 +1,809 @@
+{
+  "@@locale": "uk",
+
+  "appName": "Gabbro",
+
+  "cancel": "Скасувати",
+  "delete": "Видалити",
+  "save": "Зберегти",
+  "close": "Закрити",
+  "ok": "OK",
+  "edit": "Редагувати",
+  "add": "Додати",
+  "remove": "Видалити",
+  "rename": "Перейменувати",
+  "confirm": "Підтвердити",
+  "continueAction": "Продовжити",
+  "dismiss": "Відхилити",
+  "authorize": "Дозволити",
+  "register": "Зареєструвати",
+  "sync": "Синхронізувати",
+  "assign": "Призначити",
+  "unlock": "Розблокувати",
+  "generate": "Згенерувати",
+  "import": "Імпортувати",
+  "export": "Експортувати",
+  "openInBrowser": "Відкрити в браузері",
+  "useThisPassword": "Використати цей пароль",
+  "reviewArrow": "Перегляд →",
+  "skip": "Пропустити",
+  "keep": "Залишити",
+  "revert": "Відновити",
+  "next": "Далі: зіставити стовпці",
+  "syncFromVault": "Синхронізувати зі сховища",
+  "createVault": "Створити сховище",
+  "pickFile": "Вибрати файл",
+  "noFileSelected": "Файл не вибрано",
+  "chooseFolder": "Вибрати папку",
+  "addCustomField": "Додати власне поле",
+  "exportFile": "Експортувати файл",
+  "addVault": "Додати сховище",
+  "addYubiKey": "Додати YubiKey",
+  "noChangesToSave": "Немає змін для збереження.",
+
+  "appearanceTitle": "Зовнішній вигляд",
+  "securityTitle": "Безпека",
+  "aboutTitle": "Про Gabbro",
+  "generatorTitle": "Генератор паролів",
+  "importTitle": "Імпорт записів",
+  "exportTitle": "Експорт сховища",
+  "changePassphraseTitle": "Змінити кодову фразу",
+  "csvMappingTitle": "Зіставлення стовпців CSV",
+  "manageFoldersTitle": "Керування папками",
+  "manageVaultsTitle": "Керування сховищами",
+  "manageYubiKeysTitle": "Керування ключами YubiKey",
+  "passwordHistoryTitle": "Історія паролів",
+  "reviewChangesTitle": "Перегляд змін",
+  "unlockGabbroTitle": "Розблокувати Gabbro",
+
+  "sectionTheme": "Тема",
+  "sectionTextSize": "Розмір тексту",
+  "sectionAlphabetBar": "Положення алфавітної панелі",
+  "sectionAccessibility": "Спеціальні можливості",
+  "sectionLanguage": "Мова",
+  "sectionForegroundLock": "Блокування при активному використанні",
+  "sectionBackgroundLock": "Блокування у фоні",
+  "sectionPasswordHistory": "Історія паролів",
+  "sectionPassphraseCopyPaste": "Копіювання/вставлення кодової фрази",
+  "sectionVaultList": "Список сховищ",
+  "sectionClipboardClear": "Очищення буфера обміну",
+  "sectionCharacterSets": "Набори символів",
+  "sectionGeneratorLanguage": "Мова",
+
+  "themeSystem": "Системна",
+  "themeLight": "Світла",
+  "themeDark": "Темна",
+
+  "textSizeSmall": "Малий",
+  "textSizeRegular": "Звичайний",
+  "textSizeLarge": "Великий",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Лише на телефоні — планшет завжди використовує ліву сторону.",
+  "alphabetBarLeft": "Зліва",
+  "alphabetBarRight": "Справа",
+
+  "highContrastTitle": "Високий контраст",
+  "highContrastSubtitle": "Збільшує контраст для покращення читабельності",
+
+  "languageNote": "Перевизначає системну мову. «Системна» дотримується регіональних налаштувань пристрою.",
+  "langSystem": "Системна",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Блокувати після цього часу бездіяльності, поки програма відкрита.",
+  "backgroundLockDescription": "Блокувати після перебування програми у фоні протягом цього часу.",
+  "passwordHistoryDescription": "Як довго зберігати попередній пароль після зміни. «Зберігати завжди» означає, що історія видаляється лише вручну.",
+  "passphraseCopyPasteDescription": "Блокувати копіювання та вставлення в полях кодової фрази. Рекомендовано: запобігає витоку кодової фрази через буфер обміну.",
+  "passphraseCopyPasteNote": "Примітка: це блокує контекстне меню при довгому натисканні та виділення тексту. Вбудована кнопка вставлення клавіатури може і надалі працювати — це обмеження платформи.",
+  "blockCopyPasteTitle": "Блокувати копіювання/вставлення",
+  "vaultListDescription": "Показувати список усіх сховищ на екрані входу, щоб можна було вибрати, яке розблокувати, не переходячи до «Керування сховищами».",
+  "showVaultListTitle": "Показувати список сховищ при вході",
+  "vaultListNote": "Примітка з безпеки: коли це ВИМКНЕНО, екран входу показує лише останнє використане сховище — без натяків на існування інших. Компроміс: для зміни сховища потрібно спочатку розблокувати, потім перейти до Меню → Керування сховищами.",
+  "clipboardClearDescription": "Очищати буфер обміну після копіювання секрету. Примітка: менеджери буфера обміну можуть зберігати копію.",
+
+  "duration30s": "30 с",
+  "duration1min": "1 хв",
+  "duration5min": "5 хв",
+  "duration15min": "15 хв",
+  "duration60s": "60 с",
+  "duration2min": "2 хв",
+  "durationNever": "Ніколи",
+  "duration7days": "7 днів",
+  "duration30days": "30 днів",
+  "duration90days": "90 днів",
+  "durationKeepForever": "Зберігати завжди",
+
+  "menuExportVault": "Експортувати сховище",
+  "menuImportEntries": "Імпортувати записи",
+  "menuSyncFromFile": "Синхронізувати з файлу",
+  "menuManageVaults": "Керування сховищами",
+  "menuChangePassphrase": "Змінити кодову фразу",
+  "menuManageYubiKeys": "Керування ключами YubiKey",
+  "menuAppearance": "Зовнішній вигляд",
+  "menuSecurity": "Безпека",
+  "menuManageFolders": "Керування папками",
+  "menuPasswordGenerator": "Генератор паролів",
+  "menuAbout": "Про програму",
+
+  "tooltipSelectEntries": "Вибрати записи",
+  "tooltipLockVault": "Заблокувати сховище",
+  "tooltipSelectAll": "Вибрати всі",
+  "tooltipDeselectAll": "Зняти всі позначки",
+  "tooltipMenu": "Меню",
+  "tooltipCopy": "Копіювати",
+  "tooltipCopied": "Скопійовано!",
+  "tooltipShow": "Показати",
+  "tooltipHide": "Приховати",
+  "tooltipBrowse": "Огляд",
+  "tooltipEditAlias": "Змінити псевдонім",
+  "tooltipRemoveField": "Видалити поле",
+  "tooltipRename": "Перейменувати",
+  "tooltipDeleteVault": "Видалити сховище",
+  "tooltipAssignToFolder": "Призначити папку",
+  "tooltipShowPin": "Показати PIN",
+  "tooltipHidePin": "Приховати PIN",
+  "tooltipShowValue": "Показати значення",
+  "tooltipHideValue": "Приховати",
+  "tooltipCancel": "Скасувати",
+  "tooltipOpenInBrowser": "Відкрити в браузері",
+
+  "allFolders": "Всі папки",
+  "noFolder": "Немає",
+  "selectFolder": "Вибрати папку",
+  "folderName": "Назва папки",
+
+  "noEntriesMatch": "Немає записів, що відповідають пошуку.",
+  "noVaultsRegistered": "Немає зареєстрованих сховищ.",
+  "noYubiKeysRegistered": "Немає зареєстрованих ключів YubiKey",
+  "selectEntry": "Вибрати запис",
+  "newEntryTitle": "Новий запис",
+  "createEntryTitle": "Нов{type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Змінити: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(немає URL)",
+  "noNameFallback": "(немає імені)",
+  "untitledFallback": "(без назви)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "Вибрано: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Пошук у всіх полях…",
+  "searchEntriesHint": "Пошук записів…",
+  "searchAllFieldsTooltip": "Пошук у всіх полях",
+  "searchByTitleTooltip": "Пошук за назвою",
+  "entryTypeAll": "Всі",
+  "entryTypePassword": "Пароль",
+  "entryTypeNote": "Нотатка",
+  "entryTypeCard": "Картка",
+  "entryTypeIdentity": "Особистість",
+  "entryTypeFile": "Файл",
+  "entryTypeCustom": "Власний",
+  "errorPrefix": "Помилка: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Сховище",
+  "navAppearance": "Вигляд",
+  "navSecurity": "Безпека",
+  "navAbout": "Про програму",
+
+  "deleteEntryTitle": "Видалити запис?",
+  "cannotBeUndone": "Цю дію неможливо скасувати.",
+  "deleteEntryDialogTitle": "Видалити запис?",
+  "deleteEntriesTitle": "{count, plural, one{Видалити 1 запис?} few{Видалити {count} записи?} other{Видалити {count} записів?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Призначити папку",
+  "folderConflictTitle": "Конфлікт папок",
+  "syncFailedTitle": "Синхронізація не вдалася",
+  "syncFromFileTitle": "Синхронізувати з файлу",
+  "nothingToSync": "Нічого синхронізувати — обидва сховища вже актуальні.",
+
+  "importedEntries": "{count, plural, one{Імпортовано 1 запис.} few{Імпортовано {count} записи.} other{Імпортовано {count} записів.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Експортувати файл",
+  "saveDecryptedFileTo": "Зберегти розшифрований файл до:",
+  "exportPathLabel": "Шлях експорту",
+  "exportedToPath": "Експортовано до {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Експорт не вдався: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Відкрити в браузері?",
+  "couldNotOpen": "Не вдалося відкрити {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Видалити попередній запис",
+  "failedToClearHistory": "Не вдалося очистити історію: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Не вдалося відновити пароль: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Перейменувати папку",
+  "addFolderTitle": "Додати папку",
+  "deleteFolderTitle": "Видалити папку",
+  "deleteFolderConfirm": "Видалити «{folder}»?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Перемістити записи до",
+  "clearToNone": "Перемістити до «Немає»",
+
+  "renameVaultTitle": "Перейменувати сховище",
+  "deleteVaultTitle": "Видалити сховище?",
+  "deleteVaultConfirmTitle": "Ви впевнені?",
+  "typeDeleteToConfirm": "Введіть DELETE для підтвердження",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Торкніться вашого YubiKey",
+  "noVaultsRegisteredText": "Немає зареєстрованих сховищ.",
+
+  "addYubiKeyTitle": "Додати YubiKey",
+  "enterYubiKeyPinTitle": "Введіть PIN YubiKey",
+  "editAliasForKey": "Змінити псевдонім ключа {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Залишиться лише один зареєстрований ключ YubiKey.",
+  "removeKeyConfirm": "Ви впевнені, що хочете видалити цей ключ?",
+  "removeKeyVaultConfirm": "Видалити цей ключ YubiKey зі сховища?",
+  "yubiKeyRemoved": "YubiKey видалено",
+  "failedToRemoveKey": "Не вдалося видалити ключ: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey додано",
+  "failedToAddKey": "Не вдалося додати ключ: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Не вдалося зберегти псевдонім: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Пристрій FIDO2 не знайдено. Вставте ключ YubiKey і спробуйте знову.",
+  "transportLabel": "Інтерфейс:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Кодова фраза",
+  "yubiKeyPinLabel": "PIN YubiKey",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Поточна кодова фраза",
+  "newPassphraseLabel": "Нова кодова фраза",
+  "confirmPassphraseLabel": "Підтвердити нову кодову фразу",
+  "vaultPassphraseLabel": "Кодова фраза сховища",
+  "aliasLabel": "Псевдонім",
+  "aliasHint": "напр., Основний, Робочий ключ…",
+  "masterPassphraseLabel": "Головна кодова фраза",
+  "confirmPassphraseLabelShort": "Підтвердити кодову фразу",
+
+  "fieldTitle": "Назва",
+  "fieldContent": "Вміст",
+  "fieldFirstName": "Ім'я",
+  "fieldLastName": "Прізвище",
+  "fieldEmail": "Ел. пошта (необов'язково)",
+  "fieldPhone": "Телефон (необов'язково)",
+  "fieldAddress": "Адреса (необов'язково)",
+  "fieldCardLabel": "Назва картки (напр., «Visa Platinum»)",
+  "fieldCardholderName": "Ім'я власника картки",
+  "fieldCardNumber": "Номер картки",
+  "fieldExpiry": "Термін дії (ММ/РР)",
+  "fieldCvv": "CVV (необов'язково)",
+  "fieldCardPin": "PIN (необов'язково)",
+  "fieldCreditLimit": "Кредитний ліміт (необов'язково)",
+  "fieldAccountNumber": "Номер рахунку (необов'язково)",
+  "fieldNotes": "Нотатки (необов'язково)",
+  "fieldUrl": "URL (необов'язково)",
+  "fieldUsername": "Ім'я користувача",
+  "fieldPassword": "Пароль",
+  "fieldSeparator": "Роздільник",
+  "fieldFolder": "Папка",
+  "fieldLabel": "Мітка",
+  "fieldValue": "Значення",
+  "fieldCustomFields": "Власні поля",
+  "fieldLabelOptional": "{label} (необов'язково)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Цей тип запису поки не підтримується.",
+  "csvColumnNone": "(немає)",
+  "csvPreviewLabel": "Попередній перегляд",
+  "csvImportButton": "Імпортувати",
+
+  "gabbroVaultSection": "Сховище Gabbro",
+  "genericCsvSection": "Звичайний CSV",
+
+  "changePassphraseSuccess": "Кодову фразу змінено",
+  "changePassphraseButton": "Змінити кодову фразу",
+
+  "continueLabel": "Продовжити",
+  "protectWithYubiKey": "Захистити за допомогою YubiKey",
+  "yubiKeySubtitle": "Апаратний ключ безпеки (рекомендується)",
+  "accessibilityButton": "Спеціальні можливості",
+
+  "aboutProjectSection": "Проєкт",
+  "aboutLicenceSection": "Ліцензія",
+  "aboutOpenSourceSection": "Компоненти з відкритим вихідним кодом",
+  "aboutAttributionSection": "Подяки",
+
+  "lengthLabel": "Довжина",
+  "wordsLabel": "Слова",
+  "generateButton": "Згенерувати",
+  "usePasswordButton": "Використати цей пароль",
+  "showHidePassword": "Показати",
+
+  "deleteVaultPostDeletion": "Ваше сховище видалено. Створіть нове для продовження.",
+
+  "syncFilePassphraseLabel": "Кодова фраза сховища",
+
+  "historyWarning": "Зберігається лише 1 попереднє значення. Історія автоматично очищається відповідно до налаштувань безпеки.",
+  "historyCurrent": "Поточний",
+  "historyPrevious": "Попередній",
+  "historySavedOn": "Збережено {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · закінчується {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Проблема імпорту ({index} з {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Тип: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Відредагуйте, виправте та збережіть цей запис або пропустіть, щоб відхилити його.",
+
+  "entriesSkipped": "{count, plural, one{1 запис пропущено} few{{count} записи пропущено} other{{count} записів пропущено}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Ці записи вже існують у вашому сховищі та не були перезаписані:",
+
+  "syncDeleteEntryContent": "Інший пристрій видалив «{title}».\n\nВидалити тут теж або залишити?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}» знаходиться в різних папках на двох пристроях.\n\nЦей пристрій: {local}\nІнший пристрій: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Залишити без папки",
+  "folderConflictKeepLocal": "Залишити «{folder}»",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Перемістити без папки",
+  "folderConflictMoveIncoming": "Перемістити до «{folder}»",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Сховище синхронізовано — додано: {added}, оновлено: {updated}, видалено: {deleted}.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Цей файл сховища використовує іншу кодову фразу. Синхронізація підтримується лише між сховищами з однаковою кодовою фразою.",
+
+  "reviewSensitiveFields": "Конфіденційні поля",
+  "reviewOtherFields": "Інші поля",
+  "reviewPasswordChanged": "Пароль змінено",
+  "reviewCvvChanged": "CVV змінено",
+  "reviewPinChanged": "PIN змінено",
+  "reviewTransactionPasswordChanged": "Пароль транзакції змінено",
+  "tooltipShowValues": "Показати значення",
+  "reviewOld": "Старий",
+  "reviewNew": "Новий",
+  "reviewEmpty": "(порожньо)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Нотатки",
+  "reviewFieldContent": "Вміст",
+  "reviewFieldEmail": "Ел. пошта",
+  "reviewFieldPhone": "Телефон",
+  "reviewFieldAddress": "Адреса",
+  "reviewFieldCardLabel": "Назва картки",
+  "reviewFieldStatus": "Статус",
+  "reviewFieldCardholder": "Власник картки",
+  "reviewFieldExpiry": "Термін дії",
+  "reviewFieldCreditLimit": "Кредитний ліміт",
+  "reviewFieldAccountNumber": "Номер рахунку",
+  "reviewFieldNetwork": "Платіжна мережа",
+  "reviewFieldBank": "Банк",
+  "reviewFieldFilename": "Ім'я файлу",
+  "reviewFieldSize": "Розмір",
+  "reviewFieldCardNumber": "Номер",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Пароль транзакції",
+  "timestampCreated": "Створено",
+  "timestampUpdated": "Оновлено",
+  "timestampUnknown": "Невідомо",
+  "noTitleFallback": "(немає назви)",
+  "tooltipExportFile": "Експортувати файл",
+  "tooltipEditEntry": "Змінити запис",
+  "tooltipDeleteEntry": "Видалити запис",
+  "exportLabel": "Експорт",
+  "customEntryFieldsHeader": "Поля",
+  "copiedNeverClears": "Скопійовано — буфер обміну ніколи не очищається автоматично",
+  "copiedClears30s": "Скопійовано — буфер очиститься через 30 с",
+  "copiedClears60s": "Скопійовано — буфер очиститься через 60 с",
+  "copiedClears2min": "Скопійовано — буфер очиститься через 2 хв",
+
+  "passwordBreakdownTitle": "Аналіз пароля",
+  "charTypeUppercase": "Великі літери",
+  "charTypeLowercase": "Малі літери",
+  "charTypeDigit": "Цифра",
+  "charTypeSymbol": "Символ",
+
+  "exportIncludeDate": "Включити дату в ім'я файлу",
+  "exportChooseFormat": "Виберіть формат експорту.",
+  "exportUnencryptedWarning": "Повністю незашифровано — всі секрети будуть записані у відкритому вигляді. Зберігайте файл у безпечному місці та видаліть після використання.",
+  "exportPassphraseOnlyNote": "Захищено лише кодовою фразою. YubiKey не потрібен для імпорту.",
+  "exportChooseDestinationJson": "Виберіть місце призначення для експортованого файлу JSON.",
+  "exportChooseDestinationVault": "Виберіть місце призначення для експортованого файлу сховища.",
+  "exportTwoFilesNote": "Буде створено два файли: vault.gabbro та vault.gabbro.sha256",
+  "exportSelectDestination": "Виберіть місце призначення.",
+
+  "aboutVersion": "Версія {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Постквантовий менеджер паролів",
+  "aboutSourceCode": "Вихідний код",
+  "aboutReportIssue": "Повідомити про проблему",
+  "aboutSupportGabbro": "Підтримати Gabbro",
+  "aboutLicenceBody": "Gabbro — це вільне програмне забезпечення з відкритим вихідним кодом, ліцензоване за GNU General Public License v3.0 only (GPL-3.0-only).\n\nВи можете вільно використовувати, вивчати та розповсюджувати це програмне забезпечення відповідно до умов цієї ліцензії.",
+  "aboutOwnerRole": "Власник проєкту, архітектор і провідний розробник:",
+  "aboutAiPartner": "Партнер зі штучного інтелекту:",
+  "aboutNoTelemetry": "Gabbro не встановлює вихідних мережевих з'єднань. Жодної телеметрії, аналітики та облікових записів.",
+
+  "strengthTierTerrible": "Жахливий",
+  "strengthTierWeak": "Слабкий",
+  "strengthTierFair": "Прийнятний",
+  "strengthTierStrong": "Надійний",
+  "strengthTierVeryStrong": "Дуже надійний",
+  "strengthTierExcellent": "Відмінний",
+  "yubiKeyProtectedNote": "Сховище захищено YubiKey — прив'язка до ключа буде збережена.",
+  "yubiKeyPinRequired": "Потрібен PIN YubiKey",
+  "tapYubiKeyNow": "Торкніться вашого YubiKey зараз…",
+  "touchYubiKeyToAuthorize": "Торкніться вашого YubiKey для підтвердження зміни.",
+  "currentPassphraseRequired": "Потрібна поточна кодова фраза",
+  "newPassphraseRequired": "Потрібна нова кодова фраза",
+  "passphraseTooWeak": "Кодова фраза занадто слабка",
+  "confirmPassphraseRequired": "Будь ласка, підтвердіть нову кодову фразу",
+  "passphrasesDoNotMatch": "Кодові фрази не збігаються",
+  "passphrasesMatch": "✓ Кодові фрази збігаються",
+  "passphrasesNoMatch": "✗ Кодові фрази не збігаються",
+  "entropyDisplay": "{tier} · {bits} біт",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Помилка транспорту.",
+  "authorizationFailed": "Авторизація не вдалася — перевірте PIN і спробуйте знову.",
+
+  "unlockEnterPassphraseAndPin": "Введіть кодову фразу та PIN YubiKey для розблокування",
+  "unlockEnterPassphrase": "Введіть кодову фразу для розблокування",
+  "unlockEntropyDisplay": "{tier} · {bits} біт ентропії",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Вставте YubiKey та торкніться його, коли він замиготить",
+  "unlockErrorPassphrase": "Не вдалося розблокувати сховище. Перевірте кодову фразу.",
+  "unlockErrorPassphraseAndPin": "Не вдалося розблокувати сховище. Перевірте кодову фразу та PIN YubiKey.",
+
+  "importSelectFile": "Виберіть файл.",
+  "importFileNotFound": "Файл не знайдено.",
+  "importEnterPassphrase": "Введіть кодову фразу для цього сховища.",
+  "importDuplicateWarning": "Записи, UUID яких вже існує у вашому сховищі, будуть автоматично пропущені. Ви побачите зведення.",
+  "importGabbroSubtitle": "Синхронізувати записи з іншого сховища Gabbro (файл .gabbro)",
+  "importEnpassSubtitle": "JSON-експорт з Enpass (Інструменти → Експорт)",
+  "importBitwardenSubtitle": "Незашифрований JSON-експорт з Bitwarden (Інструменти → Експорт сховища)",
+  "importCsvSubtitle": "CSV-експорт з будь-якого менеджера паролів",
+
+  "vaultNameAlreadyExists": "Сховище з назвою «{alias}» вже існує.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Це безповоротно видалить «{alias}» та всі його дані.\n\nФайл: {path}\n\nЦю дію неможливо скасувати.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Це безповоротно видалить «{alias}» та його прив'язку до YubiKey.\n\nФайл: {path}\n\nЦю дію неможливо скасувати.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Введіть PIN та торкніться вашого YubiKey для підтвердження видалення.",
+  "deleteVaultTooltip": "Видалити сховище",
+
+  "navVault": "Сховище",
+  "navAbout": "Про програму",
+
+  "yubiKeySecurityWarning": "Попередження безпеки",
+  "removeYubiKeyTitle": "Видалити YubiKey",
+  "yubiKeyLastKeyRiskWarning": "ПОПЕРЕДЖЕННЯ: якщо ключ, що залишився, буде втрачено, пошкоджено або викрадено, доступ до сховища стане безповоротно неможливим. Відновлення неможливе.",
+  "onlyOneKeyRegisteredWarning": "Зареєстровано лише один ключ. Якщо цей ключ буде втрачено, доступ до сховища стане безповоротно неможливим.",
+  "tapRegisterNfc": "Прикладіть ключ до телефону для реєстрації",
+  "tapRegisterUsb": "Після підключення торкніться ключа для реєстрації",
+  "tapActivateNfc": "Знову прикладіть ключ до телефону для активації",
+  "tapActivateUsb": "Після підключення знову торкніться ключа для активації",
+  "failedToRegisterKey": "Не вдалося зареєструвати ключ: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Не вдалося активувати ключ: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Ключ {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Торкніться нового YubiKey для реєстрації…",
+  "tapYubiKeyToActivate": "Знову торкніться нового YubiKey для активації…",
+  "editAliasTooltip": "Змінити псевдонім",
+  "cannotRemoveLastKey": "Неможливо видалити останній ключ",
+  "removeKeyTooltip": "Видалити ключ",
+  "manageYubiKeysError": "Помилка: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Класичний",
+  "generatorModePassphrase": "Кодова фраза",
+  "charSetsHeader": "Набори символів",
+  "languageHeader": "Мова",
+  "separatorLabel": "Роздільник",
+  "capitaliseWords": "Слова з великої літери",
+  "appendDigit": "Додати цифру",
+  "entropyBitsDisplay": "~{bits} біт ентропії",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Виберіть хоча б один набір символів",
+  "passwordMinLengthNote": "Паролі містять не менше 32 символів. Якщо сайт має коротше обмеження, скопіюйте потрібну кількість перших символів.",
+  "tooltipShow": "Показати",
+  "tooltipCopied": "Скопійовано!",
+  "tooltipCopy": "Копіювати",
+  "excludeAmbiguousChars": "Виключити неоднозначні символи (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Створіть сховище, щоб почати.",
+  "onboardingVaultName": "Назва сховища",
+  "onboardingAliasRequired": "Псевдонім обов'язковий",
+  "onboardingNewVaultLocation": "Розташування нового сховища (те саме, що й раніше)",
+  "onboardingVaultLocation": "Розташування сховища",
+  "onboardingLoadingPath": "Завантаження…",
+  "onboardingPathHint": "Шлях до файлу сховища",
+  "onboardingPathRequired": "Шлях обов'язковий",
+  "onboardingReusePassphraseHint": "Виберіть нову головну кодову фразу або повторно використайте попередню.",
+  "onboardingPassphraseRequired": "Кодова фраза обов'язкова",
+  "onboardingConfirmRequired": "Будь ласка, підтвердіть кодову фразу",
+  "onboardingPrimaryKeyPin": "PIN основного ключа",
+  "onboardingBackupKeyPin": "PIN резервного ключа",
+  "onboardingKeyNPin": "PIN ключа {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Ви двічі торкнетеся кожного ключа YubiKey (всього 4 дотики). Між двома ключами вас попросять поміняти їх місцями.",
+  "onboardingYubikeySlowNote": "Створення сховища з YubiKey займає 20–30 секунд. Програма може не відповідати — це нормально.",
+  "onboardingStep1Label": "Зареєструвати основний ключ",
+  "onboardingStep1Hint": "Торкніться вашого YubiKey зараз",
+  "onboardingStep2Label": "Активувати основний ключ",
+  "onboardingStep2Hint": "Знову торкніться вашого YubiKey",
+  "onboardingStep3Label": "Перейти до резервного ключа",
+  "onboardingStep3Hint": "Вийміть основний ключ, потім підключіть резервний YubiKey",
+  "onboardingStep4Label": "Зареєструвати резервний ключ",
+  "onboardingStep4Hint": "Торкніться резервного YubiKey",
+  "onboardingStep5Label": "Активувати резервний ключ",
+  "onboardingStep5Hint": "Торкніться резервного YubiKey востаннє",
+
+  "textSizePreview": "Габро — інтрузивна магматична порода, багата на магній і залізо, крупнозерниста.",
+
+  "fieldCardStatus": "Статус",
+  "fieldPaymentNetwork": "Платіжна мережа",
+
+  "cardStatusActive": "Активна",
+  "cardStatusLapsed": "Прострочена",
+  "cardStatusInactive": "Неактивна",
+
+  "validatorTitleRequired": "Назва обов'язкова",
+  "validatorUsernameRequired": "Ім'я користувача обов'язкове",
+  "validatorPasswordRequired": "Пароль обов'язковий",
+  "validatorContentRequired": "Вміст обов'язковий",
+  "validatorFirstNameRequired": "Ім'я обов'язкове",
+  "validatorLastNameRequired": "Прізвище обов'язкове",
+  "validatorCardLabelRequired": "Назва картки обов'язкова",
+  "validatorCardholderRequired": "Ім'я власника картки обов'язкове",
+  "validatorCardNumberRequired": "Номер картки обов'язковий",
+  "validatorCardNumberLength": "Номер картки повинен містити 6–19 цифр",
+  "validatorExpiryRequired": "Термін дії обов'язковий",
+  "validatorExpiryFormat": "Використовуйте формат ММ/РР",
+  "validatorExpiryMonth": "Місяць повинен бути від 01 до 12",
+  "validatorCvvLength": "CVV повинен містити 3 або 4 цифри",
+  "validatorLabelRequired": "Мітка обов'язкова",
+  "validatorStatusRequired": "Статус обов'язковий",
+
+  "sectionBiometricUnlock": "Біометричне розблокування",
+  "biometricUnlockDescription": "Використовувати відбиток пальця або обличчя для розблокування сховища замість введення кодової фрази.",
+  "biometricUnlockTitle": "Увімкнути біометричне розблокування",
+  "biometricUnlockNote": "Будуть працювати всі біометричні дані, зареєстровані на цьому пристрої — не лише ті, що використовувалися під час реєстрації.",
+  "biometricUnavailable": "Біометричне розблокування недоступне на цьому пристрої. Біометричний датчик не знайдено або біометрія не зареєстрована в системних налаштуваннях.",
+  "biometricDialogTitle": "Про біометричне розблокування",
+  "biometricDialogBody": "При увімкненні Gabbro шифрує головну кодову фразу та зберігає її на цьому пристрої під захистом біометричних даних. Кодова фраза розшифровується лише в момент розблокування.\n\nGabbro ніколи не зберігає ваші дані про відбитки пальців або обличчя — вони залишаються в захищеному чипі телефону.",
+  "biometricDialogAllBiometrics": "Всі біометричні дані, зареєстровані на цьому пристрої, зможуть розблокувати Gabbro — обмежити конкретним відбитком пальця неможливо.",
+  "biometricDialogInvalidation": "Якщо на цей телефон будуть додані нові біометричні дані (включаючи другий відбиток пальця), цей параметр буде автоматично вимкнено і потребуватиме повторного налаштування.",
+  "biometricDialogRecommendation": "Рекомендація: залиште вимкненим, якщо у вас висока модель загроз або ви ділитеся пристроєм.",
+  "biometricInvalidated": "Біометричне розблокування було вимкнено, оскільки біометричні дані на цьому пристрої змінилися (у системних налаштуваннях додано новий відбиток пальця або обличчя). Це захисний захід. Повторно введіть кодову фразу та увімкніть біометричне розблокування знову.",
+  "useBiometrics": "Використати біометрію",
+  "biometricCancelled": "Біометрична автентифікація не завершена. Введіть кодову фразу для розблокування.",
+  "biometricEnrollTitle": "Введіть кодову фразу",
+  "biometricEnrollDescription": "Введіть головну кодову фразу для увімкнення біометричного розблокування.",
+  "biometricYubikeyHint": "Введіть PIN YubiKey нижче, потім натисніть «Використати біометрію», потім торкніться вашого YubiKey.",
+
+  "helpTitle": "Довідка",
+  "menuHelp": "Довідка",
+  "helpCaptionCreate": "Створіть сховище: введіть назву, кодову фразу та за бажанням захистіть ключем YubiKey",
+  "helpCaptionEmpty": "Натисніть +, щоб додати перший запис",
+  "helpCaptionDetail": "Натисніть на значок ока, щоб показати пароль, потім утримуйте для перегляду детального аналізу символів",
+  "helpCaptionTitleSearch": "За замовчуванням рядок пошуку шукає лише за назвами записів",
+  "helpCaptionFullSearch": "Натисніть на лупу для переключення на пошук по всіх полях; натисніть знову для повернення до пошуку за назвою",
+  "helpCaptionFilter": "Використовуйте кнопки фільтрації для відображення лише записів певного типу",
+  "helpCaptionFolders": "Використовуйте вибір папки для фільтрації записів за папкою",
+  "helpCaptionSelect": "Утримуйте запис для входу в режим вибору; додайте елементи, потім призначте папку або видаліть. Натисніть X для виходу.",
+  "helpCaptionJumpToLetter": "Натисніть на букву в індексній панелі для переходу до цього розділу",
+  "helpCaptionBreakdown": "Натисніть на значок ока, щоб показати пароль, потім утримуйте для перегляду детального аналізу символів",
+  "helpCaptionManageVaults": "У розділі «Керування сховищами» можна перейменувати або видалити сховища, а також додати нове",
+  "helpCaptionUnlock": "Введіть кодову фразу для розблокування сховища"
+}

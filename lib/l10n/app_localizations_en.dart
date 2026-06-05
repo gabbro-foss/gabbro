@@ -266,6 +266,90 @@ class AppLocalizationsEn extends AppLocalizations {
   String get langSpanish => 'Español';
 
   @override
+  String get langBulgarian => 'Български';
+
+  @override
+  String get langCzech => 'Čeština';
+
+  @override
+  String get langDanish => 'Dansk';
+
+  @override
+  String get langGreek => 'Ελληνικά';
+
+  @override
+  String get langEstonian => 'Eesti';
+
+  @override
+  String get langFinnish => 'Suomi';
+
+  @override
+  String get langCroatian => 'Hrvatski';
+
+  @override
+  String get langHungarian => 'Magyar';
+
+  @override
+  String get langJapanese => '日本語';
+
+  @override
+  String get langKazakh => 'Қазақша';
+
+  @override
+  String get langKorean => '한국어';
+
+  @override
+  String get langLithuanian => 'Lietuvių';
+
+  @override
+  String get langLatvian => 'Latviešu';
+
+  @override
+  String get langNorwegianBokmal => 'Norsk bokmål';
+
+  @override
+  String get langNorwegianNynorsk => 'Norsk nynorsk';
+
+  @override
+  String get langPolish => 'Polski';
+
+  @override
+  String get langPortugueseBr => 'Português (BR)';
+
+  @override
+  String get langPortuguesePt => 'Português (PT)';
+
+  @override
+  String get langRussian => 'Русский';
+
+  @override
+  String get langSlovak => 'Slovenčina';
+
+  @override
+  String get langSlovenian => 'Slovenščina';
+
+  @override
+  String get langSerbianLatin => 'Srpski';
+
+  @override
+  String get langSwedish => 'Svenska';
+
+  @override
+  String get langUkrainian => 'Українська';
+
+  @override
+  String get langBasque => 'Euskara';
+
+  @override
+  String get langYoruba => 'Yorùbá';
+
+  @override
+  String get langChineseSimplified => '中文（简体）';
+
+  @override
+  String get langChineseTraditional => '中文（繁體）';
+
+  @override
   String get foregroundLockDescription =>
       'Lock after this much inactivity while the app is open.';
 

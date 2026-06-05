@@ -1,0 +1,809 @@
+{
+  "@@locale": "nn",
+
+  "appName": "Gabbro",
+
+  "cancel": "Avbryt",
+  "delete": "Slett",
+  "save": "Lagre",
+  "close": "Lukk",
+  "ok": "OK",
+  "edit": "Rediger",
+  "add": "Legg til",
+  "remove": "Fjern",
+  "rename": "Endre namn",
+  "confirm": "Stadfest",
+  "continueAction": "Hald fram",
+  "dismiss": "Avvis",
+  "authorize": "Autoriser",
+  "register": "Registrer",
+  "sync": "Synkroniser",
+  "assign": "Tildel",
+  "unlock": "Lås opp",
+  "generate": "Generer",
+  "import": "Importer",
+  "export": "Eksporter",
+  "openInBrowser": "Opne i nettlesar",
+  "useThisPassword": "Bruk dette passordet",
+  "reviewArrow": "Gå gjennom →",
+  "skip": "Hopp over",
+  "keep": "Behold",
+  "revert": "Gjenopprett",
+  "next": "Neste: kart kolonnar",
+  "syncFromVault": "Synkroniser frå kvelv",
+  "createVault": "Opprett kvelv",
+  "pickFile": "Vel fil",
+  "noFileSelected": "Ingen fil vald",
+  "chooseFolder": "Vel mappe",
+  "addCustomField": "Legg til eigendefinert felt",
+  "exportFile": "Eksporter fil",
+  "addVault": "Legg til kvelv",
+  "addYubiKey": "Legg til YubiKey",
+  "noChangesToSave": "Ingen endringar å lagre.",
+
+  "appearanceTitle": "Utsjånad",
+  "securityTitle": "Tryggleik",
+  "aboutTitle": "Om Gabbro",
+  "generatorTitle": "Passordgenerator",
+  "importTitle": "Importer oppføringer",
+  "exportTitle": "Eksporter kvelv",
+  "changePassphraseTitle": "Byt passfrase",
+  "csvMappingTitle": "Kart CSV-kolonnar",
+  "manageFoldersTitle": "Administrer mapper",
+  "manageVaultsTitle": "Administrer kvelv",
+  "manageYubiKeysTitle": "Administrer YubiKeys",
+  "passwordHistoryTitle": "Passordhistorikk",
+  "reviewChangesTitle": "Gå gjennom endringar",
+  "unlockGabbroTitle": "Lås opp Gabbro",
+
+  "sectionTheme": "Tema",
+  "sectionTextSize": "Tekststorleik",
+  "sectionAlphabetBar": "Posisjon for alfabetlinje",
+  "sectionAccessibility": "Tilgjengelegheit",
+  "sectionLanguage": "Språk",
+  "sectionForegroundLock": "Forgrunns­lås",
+  "sectionBackgroundLock": "Bakgrunns­lås",
+  "sectionPasswordHistory": "Passordhistorikk",
+  "sectionPassphraseCopyPaste": "Kopier/lim passfrase",
+  "sectionVaultList": "Kvelvliste",
+  "sectionClipboardClear": "Tøm utklippstavle",
+  "sectionCharacterSets": "Teiknsett",
+  "sectionGeneratorLanguage": "Språk",
+
+  "themeSystem": "System",
+  "themeLight": "Lyst",
+  "themeDark": "Mørkt",
+
+  "textSizeSmall": "Liten",
+  "textSizeRegular": "Normal",
+  "textSizeLarge": "Stor",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Berre på telefon — nettbrett brukar alltid venstre.",
+  "alphabetBarLeft": "Venstre",
+  "alphabetBarRight": "Høgre",
+
+  "highContrastTitle": "Høg kontrast",
+  "highContrastSubtitle": "Aukar kontrasten for betre leselegheit",
+
+  "languageNote": "Overstyrer systemspråket. «System» følgjer dei regionale innstillingane til eininga.",
+  "langSystem": "System",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Lås etter denne inaktivitetsperioden medan appen er open.",
+  "backgroundLockDescription": "Lås etter at appen har vore i bakgrunnen i denne perioden.",
+  "passwordHistoryDescription": "Kor lenge eit tidlegare passord vert behaldt etter endring. «Behold alltid» tyder at historikken berre vert sletta manuelt.",
+  "passphraseCopyPasteDescription": "Blokker kopiering og innliming på passfrasefelt. Tilrådd: hindrar lekkasje av passfrase via utklippstavla.",
+  "passphraseCopyPasteNote": "Merk: Dette blokkerer kontekstmenyen ved langt trykk og tekstval. Tastaturet sin innebygde lim-knapp kan framleis fungere — dette er ei plattformbegrensing.",
+  "blockCopyPasteTitle": "Blokker kopier/lim",
+  "vaultListDescription": "Vis ei liste over alle kvelv på innloggingsskjermen slik at du kan velje kva du vil låse opp utan å gå til Administrer kvelv.",
+  "showVaultListTitle": "Vis kvelvliste ved innlogging",
+  "vaultListNote": "Tryggleiksnotat: Når dette er AV, viser innloggingsskjermen berre det sist brukte kvelvet — ingen indikasjon på at andre kvelv finst. Kompromiss: For å bytte kvelv må du først låse opp og deretter gå til Meny → Administrer kvelv.",
+  "clipboardClearDescription": "Tøm utklippstavla etter kopiering av ei hemelegheit. Merk: Utklippstavle­administratorar kan halde på ein kopi.",
+
+  "duration30s": "30 s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60 s",
+  "duration2min": "2 min",
+  "durationNever": "Aldri",
+  "duration7days": "7 dagar",
+  "duration30days": "30 dagar",
+  "duration90days": "90 dagar",
+  "durationKeepForever": "Behold alltid",
+
+  "menuExportVault": "Eksporter kvelv",
+  "menuImportEntries": "Importer oppføringer",
+  "menuSyncFromFile": "Synkroniser frå fil",
+  "menuManageVaults": "Administrer kvelv",
+  "menuChangePassphrase": "Byt passfrase",
+  "menuManageYubiKeys": "Administrer YubiKeys",
+  "menuAppearance": "Utsjånad",
+  "menuSecurity": "Tryggleik",
+  "menuManageFolders": "Administrer mapper",
+  "menuPasswordGenerator": "Passordgenerator",
+  "menuAbout": "Om",
+
+  "tooltipSelectEntries": "Vel oppføringer",
+  "tooltipLockVault": "Lås kvelv",
+  "tooltipSelectAll": "Vel alle",
+  "tooltipDeselectAll": "Fjern alle val",
+  "tooltipMenu": "Meny",
+  "tooltipCopy": "Kopier",
+  "tooltipCopied": "Kopiert!",
+  "tooltipShow": "Vis",
+  "tooltipHide": "Gøym",
+  "tooltipBrowse": "Bla gjennom",
+  "tooltipEditAlias": "Rediger alias",
+  "tooltipRemoveField": "Fjern felt",
+  "tooltipRename": "Endre namn",
+  "tooltipDeleteVault": "Slett kvelv",
+  "tooltipAssignToFolder": "Tildel til mappe",
+  "tooltipShowPin": "Vis PIN",
+  "tooltipHidePin": "Gøym PIN",
+  "tooltipShowValue": "Vis verdi",
+  "tooltipHideValue": "Gøym",
+  "tooltipCancel": "Avbryt",
+  "tooltipOpenInBrowser": "Opne i nettlesar",
+
+  "allFolders": "Alle mapper",
+  "noFolder": "Ingen",
+  "selectFolder": "Vel ei mappe",
+  "folderName": "Mappenamn",
+
+  "noEntriesMatch": "Ingen oppføringer samsvarar med søket.",
+  "noVaultsRegistered": "Ingen kvelv registrerte.",
+  "noYubiKeysRegistered": "Ingen YubiKeys registrerte",
+  "selectEntry": "Vel ei oppføring",
+  "newEntryTitle": "Ny oppføring",
+  "createEntryTitle": "Ny {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Rediger {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(ingen URL)",
+  "noNameFallback": "(inkje namn)",
+  "untitledFallback": "(utan tittel)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "{count} vald",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Søk i alle felt…",
+  "searchEntriesHint": "Søk i oppføringer…",
+  "searchAllFieldsTooltip": "Søkjer i alle felt",
+  "searchByTitleTooltip": "Søkjer etter tittel",
+  "entryTypeAll": "Alle",
+  "entryTypePassword": "Passord",
+  "entryTypeNote": "Notat",
+  "entryTypeCard": "Kort",
+  "entryTypeIdentity": "Identitet",
+  "entryTypeFile": "Fil",
+  "entryTypeCustom": "Eigendefinert",
+  "errorPrefix": "Feil: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Kvelv",
+  "navAppearance": "Utsjånad",
+  "navSecurity": "Tryggleik",
+  "navAbout": "Om",
+
+  "deleteEntryTitle": "Slett oppføring?",
+  "cannotBeUndone": "Dette kan ikkje angrast.",
+  "deleteEntryDialogTitle": "Slett oppføring?",
+  "deleteEntriesTitle": "{count, plural, one{Slett 1 oppføring?} other{Slett {count} oppføringer?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Tildel til mappe",
+  "folderConflictTitle": "Mappekonflikt",
+  "syncFailedTitle": "Synkronisering mislukkast",
+  "syncFromFileTitle": "Synkroniser frå fil",
+  "nothingToSync": "Inkje å synkronisere — begge kvelva er allereie oppdaterte.",
+
+  "importedEntries": "{count, plural, one{1 oppføring importert.} other{{count} oppføringer importerte.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Eksporter fil",
+  "saveDecryptedFileTo": "Lagre dekryptert fil til:",
+  "exportPathLabel": "Eksportsti",
+  "exportedToPath": "Eksportert til {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Eksport mislukkast: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Opne i nettlesar?",
+  "couldNotOpen": "Klarte ikkje opne {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Slett tidlegare oppføring",
+  "failedToClearHistory": "Klarte ikkje tøme historikk: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Klarte ikkje gjenopprette passord: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Endre namn på mappe",
+  "addFolderTitle": "Legg til mappe",
+  "deleteFolderTitle": "Slett mappe",
+  "deleteFolderConfirm": "Slett \"{folder}\"?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Tildel oppføringer til",
+  "clearToNone": "Flytt til «Ingen»",
+
+  "renameVaultTitle": "Endre namn på kvelv",
+  "deleteVaultTitle": "Slett kvelv?",
+  "deleteVaultConfirmTitle": "Er du sikker?",
+  "typeDeleteToConfirm": "Skriv DELETE for å stadfeste",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Trykk på YubiKey-en din",
+  "noVaultsRegisteredText": "Ingen kvelv registrerte.",
+
+  "addYubiKeyTitle": "Legg til YubiKey",
+  "enterYubiKeyPinTitle": "Angi YubiKey-PIN",
+  "editAliasForKey": "Rediger alias for nøkkel {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Det vil berre gjenstå éin registrert YubiKey.",
+  "removeKeyConfirm": "Er du sikker på at du vil fjerne denne nøkkelen?",
+  "removeKeyVaultConfirm": "Fjern denne YubiKey-en frå kvelvet?",
+  "yubiKeyRemoved": "YubiKey fjerna",
+  "failedToRemoveKey": "Klarte ikkje fjerne nøkkel: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey lagt til",
+  "failedToAddKey": "Klarte ikkje leggje til nøkkel: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Klarte ikkje lagre alias: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Ingen FIDO2-eining funnen. Set inn YubiKey-en din og prøv igjen.",
+  "transportLabel": "Transport:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Passfrase",
+  "yubiKeyPinLabel": "YubiKey-PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Gjeldande passfrase",
+  "newPassphraseLabel": "Ny passfrase",
+  "confirmPassphraseLabel": "Stadfest ny passfrase",
+  "vaultPassphraseLabel": "Kvelvet sin passfrase",
+  "aliasLabel": "Alias",
+  "aliasHint": "t.d. Primær, Arbeidsnøkkel…",
+  "masterPassphraseLabel": "Hovud­passfrase",
+  "confirmPassphraseLabelShort": "Stadfest passfrase",
+
+  "fieldTitle": "Tittel",
+  "fieldContent": "Innhald",
+  "fieldFirstName": "Fornamn",
+  "fieldLastName": "Etternamn",
+  "fieldEmail": "E-post (valfritt)",
+  "fieldPhone": "Telefon (valfritt)",
+  "fieldAddress": "Adresse (valfritt)",
+  "fieldCardLabel": "Kortetikett (t.d. «Visa Platinum»)",
+  "fieldCardholderName": "Kortinnehavar sitt namn",
+  "fieldCardNumber": "Kortnummer",
+  "fieldExpiry": "Utløp (MM/ÅÅ)",
+  "fieldCvv": "CVV (valfritt)",
+  "fieldCardPin": "PIN (valfritt)",
+  "fieldCreditLimit": "Kredittgrense (valfritt)",
+  "fieldAccountNumber": "Kontonummer (valfritt)",
+  "fieldNotes": "Notat (valfritt)",
+  "fieldUrl": "URL (valfritt)",
+  "fieldUsername": "Brukarnamn",
+  "fieldPassword": "Passord",
+  "fieldSeparator": "Skilje­teikn",
+  "fieldFolder": "Mappe",
+  "fieldLabel": "Etikett",
+  "fieldValue": "Verdi",
+  "fieldCustomFields": "Eigendefinerte felt",
+  "fieldLabelOptional": "{label} (valfritt)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Oppføringstype er enno ikkje støtta.",
+  "csvColumnNone": "(ingen)",
+  "csvPreviewLabel": "Førehandsvisning",
+  "csvImportButton": "Importer",
+
+  "gabbroVaultSection": "Gabbro-kvelv",
+  "genericCsvSection": "Generisk CSV",
+
+  "changePassphraseSuccess": "Passfrase endra",
+  "changePassphraseButton": "Byt passfrase",
+
+  "continueLabel": "Hald fram",
+  "protectWithYubiKey": "Beskytt med YubiKey",
+  "yubiKeySubtitle": "Maskinvare­tryggleiksnøkkel (tilrådd)",
+  "accessibilityButton": "Tilgjengelegheit",
+
+  "aboutProjectSection": "Prosjekt",
+  "aboutLicenceSection": "Lisens",
+  "aboutOpenSourceSection": "Open kjeldekode-komponentar",
+  "aboutAttributionSection": "Attribusjonar",
+
+  "lengthLabel": "Lengde",
+  "wordsLabel": "Ord",
+  "generateButton": "Generer",
+  "usePasswordButton": "Bruk dette passordet",
+  "showHidePassword": "Vis",
+
+  "deleteVaultPostDeletion": "Kvelvet ditt er sletta. Opprett eit nytt for å halde fram.",
+
+  "syncFilePassphraseLabel": "Kvelvet sin passfrase",
+
+  "historyWarning": "Berre 1 tidlegare verdi vert behaldt. Historikken vert tømt automatisk basert på tryggleiksinnstillingane dine.",
+  "historyCurrent": "Gjeldande",
+  "historyPrevious": "Tidlegare",
+  "historySavedOn": "Lagra {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · utløper {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Importproblem ({index} av {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Type: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Rediger for å rette og lagre denne oppføringa, eller hopp over for å forkaste ho.",
+
+  "entriesSkipped": "{count, plural, one{1 oppføring hoppa over} other{{count} oppføringer hoppa over}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Desse oppføringane finst allereie i kvelvet ditt og vart ikkje overskrivne:",
+
+  "syncDeleteEntryContent": "Den andre eininga sletta '{title}'.\n\nSlett ho her òg, eller behald ho?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "'{title}' er i ulike mapper på dei to einingane.\n\nDenne eininga: {local}\nAnna eining: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Behald utan mappe",
+  "folderConflictKeepLocal": "Behald \"{folder}\"",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Flytt til ingen mappe",
+  "folderConflictMoveIncoming": "Flytt til \"{folder}\"",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Kvelv synkronisert — {added} lagde til, {updated} oppdaterte, {deleted} sletta.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Denne kvelvfila brukar ei anna passfrase. Synkronisering er berre støtta mellom kvelv som deler passfrase.",
+
+  "reviewSensitiveFields": "Sensitive felt",
+  "reviewOtherFields": "Andre felt",
+  "reviewPasswordChanged": "Passord endra",
+  "reviewCvvChanged": "CVV endra",
+  "reviewPinChanged": "PIN endra",
+  "reviewTransactionPasswordChanged": "Transaksjonspassord endra",
+  "tooltipShowValues": "Vis verdiar",
+  "reviewOld": "Gammalt",
+  "reviewNew": "Nytt",
+  "reviewEmpty": "(tomt)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Notat",
+  "reviewFieldContent": "Innhald",
+  "reviewFieldEmail": "E-post",
+  "reviewFieldPhone": "Telefon",
+  "reviewFieldAddress": "Adresse",
+  "reviewFieldCardLabel": "Kortetikett",
+  "reviewFieldStatus": "Status",
+  "reviewFieldCardholder": "Kortinnehavar",
+  "reviewFieldExpiry": "Utløp",
+  "reviewFieldCreditLimit": "Kredittgrense",
+  "reviewFieldAccountNumber": "Kontonummer",
+  "reviewFieldNetwork": "Nettverk",
+  "reviewFieldBank": "Bank",
+  "reviewFieldFilename": "Filnamn",
+  "reviewFieldSize": "Storleik",
+  "reviewFieldCardNumber": "Nummer",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Transaksjonspassord",
+  "timestampCreated": "Oppretta",
+  "timestampUpdated": "Oppdatert",
+  "timestampUnknown": "Ukjend",
+  "noTitleFallback": "(ingen tittel)",
+  "tooltipExportFile": "Eksporter fil",
+  "tooltipEditEntry": "Rediger oppføring",
+  "tooltipDeleteEntry": "Slett oppføring",
+  "exportLabel": "Eksporter",
+  "customEntryFieldsHeader": "Felt",
+  "copiedNeverClears": "Kopiert — utklippstavla vert aldri tømd automatisk",
+  "copiedClears30s": "Kopiert — utklippstavla vert tømd om 30 s",
+  "copiedClears60s": "Kopiert — utklippstavla vert tømd om 60 s",
+  "copiedClears2min": "Kopiert — utklippstavla vert tømd om 2 min",
+
+  "passwordBreakdownTitle": "Passordanalyse",
+  "charTypeUppercase": "Store bokstavar",
+  "charTypeLowercase": "Små bokstavar",
+  "charTypeDigit": "Siffer",
+  "charTypeSymbol": "Symbol",
+
+  "exportIncludeDate": "Inkluder dato i filnamn",
+  "exportChooseFormat": "Vel eit eksportformat.",
+  "exportUnencryptedWarning": "Fullstendig ukryptert — alle hemelegheiter vert skrivne i klartekst. Lagre fila trygt og slett ho etter bruk.",
+  "exportPassphraseOnlyNote": "Beskytta av passfrasen din åleine. YubiKey er ikkje nødvendig for import.",
+  "exportChooseDestinationJson": "Vel eit mål for den eksporterte JSON-fila.",
+  "exportChooseDestinationVault": "Vel eit mål for den eksporterte kvelvfila.",
+  "exportTwoFilesNote": "To filer vert oppretta: vault.gabbro og vault.gabbro.sha256",
+  "exportSelectDestination": "Vel eit mål.",
+
+  "aboutVersion": "Versjon {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Ein post-kvantepassordhandsamar",
+  "aboutSourceCode": "Kjeldekode",
+  "aboutReportIssue": "Rapporter problem",
+  "aboutSupportGabbro": "Støtt Gabbro",
+  "aboutLicenceBody": "Gabbro er fri og open kjeldekode-programvare, lisensiert under GNU General Public License v3.0 only (GPL-3.0-only).\n\nDu kan fritt bruke, studere og redistribuere denne programvara under vilkåra i den lisensen.",
+  "aboutOwnerRole": "Prosjekteigar, arkitekt og hovudutviklar:",
+  "aboutAiPartner": "KI-utviklingspartnar:",
+  "aboutNoTelemetry": "Gabbro gjer ingen utgåande nettverkstilkoplingar. Ingen telemetri, ingen analysar, ingen kontoar.",
+
+  "strengthTierTerrible": "Forferdeleg",
+  "strengthTierWeak": "Svak",
+  "strengthTierFair": "Greieleg",
+  "strengthTierStrong": "Sterk",
+  "strengthTierVeryStrong": "Svært sterk",
+  "strengthTierExcellent": "Framifrå",
+  "yubiKeyProtectedNote": "YubiKey-beskytta kvelv — YubiKey-bindinga di vert behaldt.",
+  "yubiKeyPinRequired": "YubiKey-PIN er påkravd",
+  "tapYubiKeyNow": "Trykk på YubiKey-en din no…",
+  "touchYubiKeyToAuthorize": "Trykk på YubiKey-en din for å autorisere denne endringa.",
+  "currentPassphraseRequired": "Gjeldande passfrase er påkravd",
+  "newPassphraseRequired": "Ny passfrase er påkravd",
+  "passphraseTooWeak": "Passfrasen er for svak",
+  "confirmPassphraseRequired": "Stadfest den nye passfrasen",
+  "passphrasesDoNotMatch": "Passfraser samsvarar ikkje",
+  "passphrasesMatch": "✓ Passfraser samsvarar",
+  "passphrasesNoMatch": "✗ Passfraser samsvarar ikkje",
+  "entropyDisplay": "{tier} · {bits} bit",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Transportfeil.",
+  "authorizationFailed": "Autorisering mislukkast — sjekk PIN-en din og prøv igjen.",
+
+  "unlockEnterPassphraseAndPin": "Angi passfrase og YubiKey-PIN for å låse opp",
+  "unlockEnterPassphrase": "Angi passfrase for å låse opp",
+  "unlockEntropyDisplay": "{tier} · {bits} bit entropi",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Set inn YubiKey-en din og trykk når han blinkar",
+  "unlockErrorPassphrase": "Klarte ikkje låse opp kvelvet. Sjekk passfrasen din.",
+  "unlockErrorPassphraseAndPin": "Klarte ikkje låse opp kvelvet. Sjekk passfrasen og YubiKey-PIN-en din.",
+
+  "importSelectFile": "Vel ei fil.",
+  "importFileNotFound": "Fil ikkje funnen.",
+  "importEnterPassphrase": "Angi passfrasen for dette kvelvet.",
+  "importDuplicateWarning": "Oppføringer der UUID allereie finst i kvelvet vert automatisk hoppa over. Du vil sjå eit samandrag.",
+  "importGabbroSubtitle": "Synkroniser oppføringer frå eit anna Gabbro-kvelv (.gabbro-fil)",
+  "importEnpassSubtitle": "JSON-eksport frå Enpass (Verktøy → Eksporter)",
+  "importBitwardenSubtitle": "Ukryptert JSON-eksport frå Bitwarden (Verktøy → Eksporter kvelv)",
+  "importCsvSubtitle": "CSV-eksport frå kva som helst passordhandsamar",
+
+  "vaultNameAlreadyExists": "Eit kvelv med namnet \"{alias}\" finst allereie.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Dette vil permanent slette \"{alias}\" og alle data i det.\n\nFil: {path}\n\nDette kan ikkje angrast.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Dette vil permanent slette \"{alias}\" og fjerne YubiKey-bindinga.\n\nFil: {path}\n\nDette kan ikkje angrast.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Angi PIN-en din og trykk på YubiKey-en din for å autorisere slettinga.",
+  "deleteVaultTooltip": "Slett kvelv",
+
+  "navVault": "Kvelv",
+  "navAbout": "Om",
+
+  "yubiKeySecurityWarning": "Tryggleiksåtvaring",
+  "removeYubiKeyTitle": "Fjern YubiKey",
+  "yubiKeyLastKeyRiskWarning": "ÅTVARING: Viss den attverande nøkkelen vert mista, skadd eller stolen, er tilgang til kvelvet permanent umogleg. Det finst ingen gjenopprettingsveg.",
+  "onlyOneKeyRegisteredWarning": "Berre éin nøkkel registrert. Viss denne nøkkelen vert mista, er tilgang til kvelvet permanent umogleg.",
+  "tapRegisterNfc": "Hald nøkkelen mot telefonen for å registrere",
+  "tapRegisterUsb": "Når tilkopla, trykk på nøkkelen for å registrere",
+  "tapActivateNfc": "Hald nøkkelen mot telefonen igjen for å aktivere",
+  "tapActivateUsb": "Når tilkopla, trykk på nøkkelen igjen for å aktivere",
+  "failedToRegisterKey": "Klarte ikkje registrere nøkkel: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Klarte ikkje aktivere nøkkel: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Nøkkel {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Trykk på den nye YubiKey-en for å registrere…",
+  "tapYubiKeyToActivate": "Trykk på den nye YubiKey-en igjen for å aktivere…",
+  "editAliasTooltip": "Rediger alias",
+  "cannotRemoveLastKey": "Kan ikkje fjerne den siste nøkkelen",
+  "removeKeyTooltip": "Fjern nøkkel",
+  "manageYubiKeysError": "Feil: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klassisk",
+  "generatorModePassphrase": "Passfrase",
+  "charSetsHeader": "Teiknsett",
+  "languageHeader": "Språk",
+  "separatorLabel": "Skilje­teikn",
+  "capitaliseWords": "Bruk store forbokstavar",
+  "appendDigit": "Legg til eit siffer",
+  "entropyBitsDisplay": "~{bits} bit entropi",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Vel minst eitt teiknsett",
+  "passwordMinLengthNote": "Passord er minst 32 teikn. Viss ei nettside har ei kortare grense, kopier dei første nødvendige teikna.",
+  "tooltipShow": "Vis",
+  "tooltipCopied": "Kopiert!",
+  "tooltipCopy": "Kopier",
+  "excludeAmbiguousChars": "Utelat tvetydige teikn (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Opprett kvelvet ditt for å kome i gang.",
+  "onboardingVaultName": "Kvelvnamn",
+  "onboardingAliasRequired": "Alias er påkravd",
+  "onboardingNewVaultLocation": "Ny kvelvplassering (same som før)",
+  "onboardingVaultLocation": "Kvelvplassering",
+  "onboardingLoadingPath": "Lastar…",
+  "onboardingPathHint": "Sti til kvelvfil",
+  "onboardingPathRequired": "Sti er påkravd",
+  "onboardingReusePassphraseHint": "Vel ei ny hovud­passfrase, eller bruk den førre på nytt om du vil.",
+  "onboardingPassphraseRequired": "Passfrase er påkravd",
+  "onboardingConfirmRequired": "Stadfest passfrasen din",
+  "onboardingPrimaryKeyPin": "Primærnøkkel-PIN",
+  "onboardingBackupKeyPin": "Reservenøkkel-PIN",
+  "onboardingKeyNPin": "Nøkkel {n} PIN",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Du vil trykke på kvar YubiKey to gonger (4 trykk totalt). Mellom dei to nøklane vil du bli bede om å byte.",
+  "onboardingYubikeySlowNote": "Oppretting av kvelv med YubiKey tek 20–30 sekund. Appen kan verke uresponsiv — det er normalt.",
+  "onboardingStep1Label": "Registrer primærnøkkel",
+  "onboardingStep1Hint": "Trykk på YubiKey-en din no",
+  "onboardingStep2Label": "Aktiver primærnøkkel",
+  "onboardingStep2Hint": "Trykk på YubiKey-en din igjen",
+  "onboardingStep3Label": "Byt til reservenøkkel",
+  "onboardingStep3Hint": "Fjern primærnøkkelen, kopl deretter til reserve-YubiKey-en",
+  "onboardingStep4Label": "Registrer reservenøkkel",
+  "onboardingStep4Hint": "Trykk på reserve-YubiKey-en din",
+  "onboardingStep5Label": "Aktiver reservenøkkel",
+  "onboardingStep5Hint": "Trykk på reserve-YubiKey-en din ein siste gong",
+
+  "textSizePreview": "Gabbro er ein intrusiv magmatisk bergart som er rik på Mg og Fe og grovkorna.",
+
+  "fieldCardStatus": "Status",
+  "fieldPaymentNetwork": "Betalingsnettverk",
+
+  "cardStatusActive": "Aktiv",
+  "cardStatusLapsed": "Utløpt",
+  "cardStatusInactive": "Inaktiv",
+
+  "validatorTitleRequired": "Tittel er påkravd",
+  "validatorUsernameRequired": "Brukarnamn er påkravd",
+  "validatorPasswordRequired": "Passord er påkravd",
+  "validatorContentRequired": "Innhald er påkravd",
+  "validatorFirstNameRequired": "Fornamn er påkravd",
+  "validatorLastNameRequired": "Etternamn er påkravd",
+  "validatorCardLabelRequired": "Kortetikett er påkravd",
+  "validatorCardholderRequired": "Kortinnehavar sitt namn er påkravd",
+  "validatorCardNumberRequired": "Kortnummer er påkravd",
+  "validatorCardNumberLength": "Kortnummer må ha 6–19 siffer",
+  "validatorExpiryRequired": "Utløpsdato er påkravd",
+  "validatorExpiryFormat": "Bruk MM/ÅÅ-format",
+  "validatorExpiryMonth": "Månad må vere 01–12",
+  "validatorCvvLength": "CVV må ha 3 eller 4 siffer",
+  "validatorLabelRequired": "Etikett er påkravd",
+  "validatorStatusRequired": "Status er påkravd",
+
+  "sectionBiometricUnlock": "Biometrisk opplåsing",
+  "biometricUnlockDescription": "Bruk fingeravtrykket eller andletet ditt til å låse opp kvelvet i staden for å skrive passfrasen.",
+  "biometricUnlockTitle": "Aktiver biometrisk opplåsing",
+  "biometricUnlockNote": "Alle biometrikkar registrerte på denne eininga vil fungere — ikkje berre den som vart brukt ved registrering.",
+  "biometricUnavailable": "Biometrisk opplåsing er ikkje tilgjengeleg på denne eininga. Ingen biometrisk sensor vart funnen eller ingen biometrikkar er registrerte i systeminnstillingane.",
+  "biometricDialogTitle": "Om biometrisk opplåsing",
+  "biometricDialogBody": "Når aktivert krypterer Gabbro hovud­passfrasen din og lagrar han på denne eininga, beskytta av biometrikkane dine. Passfrasen vert berre dekryptert i det augeblinket du låser opp.\n\nFingeravtrykks- eller andletsdataene dine vert aldri lagra av Gabbro — dei vert verande i einingane sin sikre brikke.",
+  "biometricDialogAllBiometrics": "Alle biometrikkar registrerte på denne eininga vil kunne låse opp Gabbro — du kan ikkje avgrense det til eit spesifikt fingeravtrykk.",
+  "biometricDialogInvalidation": "Viss ein ny biometrikk vert lagd til denne telefonen (inkludert eit anna fingeravtrykk), vert denne innstillinga automatisk deaktivert og du må konfigurere ho på nytt.",
+  "biometricDialogRecommendation": "Tilråding: hald deaktivert viss du har ein høg trusselmodell eller deler denne eininga.",
+  "biometricInvalidated": "Biometrisk opplåsing vart deaktivert fordi biometrikkane på denne eininga endra seg (eit nytt fingeravtrykk eller andlet vart lagt til i systeminnstillingane). Dette er eit tryggleikstiltak. Angi passfrasen på nytt og aktiver biometrisk opplåsing igjen viss du ønskjer å halde fram med å bruke denne funksjonen.",
+  "useBiometrics": "Bruk biometri",
+  "biometricCancelled": "Biometrisk godkjenning vart ikkje fullført. Angi passfrasen for å låse opp.",
+  "biometricEnrollTitle": "Angi passfrase",
+  "biometricEnrollDescription": "Angi hovud­passfrasen din for å aktivere biometrisk opplåsing.",
+  "biometricYubikeyHint": "Angi YubiKey-PIN nedanfor, trykk deretter Bruk biometri, trykk deretter på YubiKey-en din.",
+
+  "helpTitle": "Hjelp",
+  "menuHelp": "Hjelp",
+  "helpCaptionCreate": "Opprett eit kvelv: angi eit namn, passfrase og beskytt eventuelt med ein YubiKey",
+  "helpCaptionEmpty": "Trykk på + for å leggje til di første oppføring",
+  "helpCaptionDetail": "Trykk på augeikon for å avsløre eit passord, hald deretter inne for å sjå ei detaljert teikn­analyse",
+  "helpCaptionTitleSearch": "Som standard søkjer søkefeltet berre i oppføringstitlar",
+  "helpCaptionFullSearch": "Trykk på forstørringsglaset for å byte til søk i alle felt; trykk igjen for å gå tilbake til tittel­søk",
+  "helpCaptionFilter": "Bruk filterknappane til berre å vise oppføringer av ein bestemt type",
+  "helpCaptionFolders": "Bruk mappevelgaren til å filtrere oppføringer etter mappe",
+  "helpCaptionSelect": "Hald inne på ei oppføring for å gå inn i valmodus; legg til fleire element, tildel deretter til ei mappe eller slett. Trykk X for å avslutte.",
+  "helpCaptionJumpToLetter": "Trykk på ein bokstav på indekslinjen for å hoppe til den delen",
+  "helpCaptionBreakdown": "Trykk på augeikonet for å avsløre eit passord, hald deretter inne for å sjå ei detaljert teiknanalyse",
+  "helpCaptionManageVaults": "I Administrer kvelv kan du endre namn på eller slette kvelv, eller leggje til eit nytt",
+  "helpCaptionUnlock": "Angi passfrasen din for å låse opp kvelvet"
+}

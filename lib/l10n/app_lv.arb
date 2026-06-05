@@ -1,0 +1,809 @@
+{
+  "@@locale": "lv",
+
+  "appName": "Gabbro",
+
+  "cancel": "Atcelt",
+  "delete": "Dzēst",
+  "save": "Saglabāt",
+  "close": "Aizvērt",
+  "ok": "Labi",
+  "edit": "Rediģēt",
+  "add": "Pievienot",
+  "remove": "Noņemt",
+  "rename": "Pārdēvēt",
+  "confirm": "Apstiprināt",
+  "continueAction": "Turpināt",
+  "dismiss": "Noraidīt",
+  "authorize": "Atļaut",
+  "register": "Reģistrēt",
+  "sync": "Sinhronizēt",
+  "assign": "Piešķirt",
+  "unlock": "Atbloķēt",
+  "generate": "Ģenerēt",
+  "import": "Importēt",
+  "export": "Eksportēt",
+  "openInBrowser": "Atvērt pārlūkā",
+  "useThisPassword": "Izmantot šo paroli",
+  "reviewArrow": "Pārskatīt →",
+  "skip": "Izlaist",
+  "keep": "Paturēt",
+  "revert": "Atjaunot",
+  "next": "Tālāk: kartēt kolonnas",
+  "syncFromVault": "Sinhronizēt no seifa",
+  "createVault": "Izveidot seifu",
+  "pickFile": "Izvēlēties failu",
+  "noFileSelected": "Nav izvēlēts neviens fails",
+  "chooseFolder": "Izvēlēties mapi",
+  "addCustomField": "Pievienot pielāgotu lauku",
+  "exportFile": "Eksportēt failu",
+  "addVault": "Pievienot seifu",
+  "addYubiKey": "Pievienot YubiKey",
+  "noChangesToSave": "Nav izmaiņu, ko saglabāt.",
+
+  "appearanceTitle": "Izskats",
+  "securityTitle": "Drošība",
+  "aboutTitle": "Par Gabbro",
+  "generatorTitle": "Paroļu ģenerators",
+  "importTitle": "Importēt ierakstus",
+  "exportTitle": "Eksportēt seifu",
+  "changePassphraseTitle": "Mainīt ieejas frāzi",
+  "csvMappingTitle": "Kartēt CSV kolonnas",
+  "manageFoldersTitle": "Pārvaldīt mapes",
+  "manageVaultsTitle": "Pārvaldīt seifus",
+  "manageYubiKeysTitle": "Pārvaldīt YubiKey atslēgas",
+  "passwordHistoryTitle": "Paroļu vēsture",
+  "reviewChangesTitle": "Pārskatīt izmaiņas",
+  "unlockGabbroTitle": "Atbloķēt Gabbro",
+
+  "sectionTheme": "Motīvs",
+  "sectionTextSize": "Teksta izmērs",
+  "sectionAlphabetBar": "Alfabētiskās joslas pozīcija",
+  "sectionAccessibility": "Pieejamība",
+  "sectionLanguage": "Valoda",
+  "sectionForegroundLock": "Priekšplāna bloķēšana",
+  "sectionBackgroundLock": "Fona bloķēšana",
+  "sectionPasswordHistory": "Paroļu vēsture",
+  "sectionPassphraseCopyPaste": "Ieejas frāzes kopēšana/ielīmēšana",
+  "sectionVaultList": "Seifu saraksts",
+  "sectionClipboardClear": "Notīrīt starpliktuvi",
+  "sectionCharacterSets": "Rakstzīmju kopas",
+  "sectionGeneratorLanguage": "Valoda",
+
+  "themeSystem": "Sistēma",
+  "themeLight": "Gaiša",
+  "themeDark": "Tumša",
+
+  "textSizeSmall": "Mazs",
+  "textSizeRegular": "Parasts",
+  "textSizeLarge": "Liels",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Tikai tālrunī — planšetdatorā vienmēr kreisajā pusē.",
+  "alphabetBarLeft": "Pa kreisi",
+  "alphabetBarRight": "Pa labi",
+
+  "highContrastTitle": "Augsts kontrasts",
+  "highContrastSubtitle": "Palielina kontrastu labākai lasāmībai",
+
+  "languageNote": "Pārraksta sistēmas valodu. «Sistēma» seko ierīces reģionālajiem iestatījumiem.",
+  "langSystem": "Sistēma",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Bloķēt pēc šī neaktivitātes laika, kamēr lietotne ir atvērta.",
+  "backgroundLockDescription": "Bloķēt pēc tam, kad lietotne ir bijusi fonā šādu laiku.",
+  "passwordHistoryDescription": "Cik ilgi glabāt iepriekšējo paroli pēc maiņas. «Vienmēr paturēt» nozīmē, ka vēsture tiek dzēsta tikai manuāli.",
+  "passphraseCopyPasteDescription": "Bloķēt kopēšanu un ielīmēšanu ieejas frāzes laukos. Ieteicams: novērš ieejas frāzes noplūdi caur starpliktuvi.",
+  "passphraseCopyPasteNote": "Piezīme: tas bloķē konteksta izvēlni ar ilgu pieskārienu un teksta atlasi. Tastatūras iebūvētā ielīmēšanas poga joprojām var darboties — tā ir platformas ierobežojums.",
+  "blockCopyPasteTitle": "Bloķēt kopēšanu/ielīmēšanu",
+  "vaultListDescription": "Rādīt visu seifu sarakstu pieteikšanās ekrānā, lai varētu izvēlēties, kuru atbloķēt, neejot uz Pārvaldīt seifus.",
+  "showVaultListTitle": "Rādīt seifu sarakstu pieteikšanās laikā",
+  "vaultListNote": "Drošības piezīme: ja tas ir IZSLĒGTS, pieteikšanās ekrānā tiek rādīts tikai pēdējais izmantotais seifs — nav norādes par citu seifu esamību. Kompromiss: lai mainītu seifu, vispirms jāatbloķē, tad jādodas uz Izvēlne → Pārvaldīt seifus.",
+  "clipboardClearDescription": "Notīrīt starpliktuvi pēc noslēpuma kopēšanas. Piezīme: starpliktuvju pārvaldnieki var saglabāt kopiju.",
+
+  "duration30s": "30 s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60 s",
+  "duration2min": "2 min",
+  "durationNever": "Nekad",
+  "duration7days": "7 dienas",
+  "duration30days": "30 dienas",
+  "duration90days": "90 dienas",
+  "durationKeepForever": "Vienmēr paturēt",
+
+  "menuExportVault": "Eksportēt seifu",
+  "menuImportEntries": "Importēt ierakstus",
+  "menuSyncFromFile": "Sinhronizēt no faila",
+  "menuManageVaults": "Pārvaldīt seifus",
+  "menuChangePassphrase": "Mainīt ieejas frāzi",
+  "menuManageYubiKeys": "Pārvaldīt YubiKey atslēgas",
+  "menuAppearance": "Izskats",
+  "menuSecurity": "Drošība",
+  "menuManageFolders": "Pārvaldīt mapes",
+  "menuPasswordGenerator": "Paroļu ģenerators",
+  "menuAbout": "Par",
+
+  "tooltipSelectEntries": "Atlasīt ierakstus",
+  "tooltipLockVault": "Bloķēt seifu",
+  "tooltipSelectAll": "Atlasīt visus",
+  "tooltipDeselectAll": "Noņemt visu atlasi",
+  "tooltipMenu": "Izvēlne",
+  "tooltipCopy": "Kopēt",
+  "tooltipCopied": "Nokopēts!",
+  "tooltipShow": "Rādīt",
+  "tooltipHide": "Slēpt",
+  "tooltipBrowse": "Pārlūkot",
+  "tooltipEditAlias": "Rediģēt aizstājvārdu",
+  "tooltipRemoveField": "Noņemt lauku",
+  "tooltipRename": "Pārdēvēt",
+  "tooltipDeleteVault": "Dzēst seifu",
+  "tooltipAssignToFolder": "Piešķirt mapei",
+  "tooltipShowPin": "Rādīt PIN",
+  "tooltipHidePin": "Slēpt PIN",
+  "tooltipShowValue": "Rādīt vērtību",
+  "tooltipHideValue": "Slēpt",
+  "tooltipCancel": "Atcelt",
+  "tooltipOpenInBrowser": "Atvērt pārlūkā",
+
+  "allFolders": "Visas mapes",
+  "noFolder": "Nav",
+  "selectFolder": "Izvēlēties mapi",
+  "folderName": "Mapes nosaukums",
+
+  "noEntriesMatch": "Neviens ieraksts neatbilst meklēšanai.",
+  "noVaultsRegistered": "Nav reģistrētu seifu.",
+  "noYubiKeysRegistered": "Nav reģistrētu YubiKey atslēgu",
+  "selectEntry": "Izvēlēties ierakstu",
+  "newEntryTitle": "Jauns ieraksts",
+  "createEntryTitle": "Jauns {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Rediģēt {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(nav URL)",
+  "noNameFallback": "(nav nosaukuma)",
+  "untitledFallback": "(bez nosaukuma)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "Atlasīts: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Meklēt visos laukos…",
+  "searchEntriesHint": "Meklēt ierakstus…",
+  "searchAllFieldsTooltip": "Meklē visos laukos",
+  "searchByTitleTooltip": "Meklē pēc nosaukuma",
+  "entryTypeAll": "Visi",
+  "entryTypePassword": "Parole",
+  "entryTypeNote": "Piezīme",
+  "entryTypeCard": "Karte",
+  "entryTypeIdentity": "Identitāte",
+  "entryTypeFile": "Fails",
+  "entryTypeCustom": "Pielāgots",
+  "errorPrefix": "Kļūda: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Seifs",
+  "navAppearance": "Izskats",
+  "navSecurity": "Drošība",
+  "navAbout": "Par",
+
+  "deleteEntryTitle": "Dzēst ierakstu?",
+  "cannotBeUndone": "Šo darbību nevar atsaukt.",
+  "deleteEntryDialogTitle": "Dzēst ierakstu?",
+  "deleteEntriesTitle": "{count, plural, one{Dzēst 1 ierakstu?} other{Dzēst {count} ierakstus?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Piešķirt mapei",
+  "folderConflictTitle": "Mapju konflikts",
+  "syncFailedTitle": "Sinhronizācija neizdevās",
+  "syncFromFileTitle": "Sinhronizēt no faila",
+  "nothingToSync": "Nav ko sinhronizēt — abi seifi jau ir atjaunināti.",
+
+  "importedEntries": "{count, plural, one{1 ieraksts importēts.} other{{count} ieraksti importēti.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Eksportēt failu",
+  "saveDecryptedFileTo": "Saglabāt atšifrēto failu:",
+  "exportPathLabel": "Eksportēšanas ceļš",
+  "exportedToPath": "Eksportēts uz {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Eksportēšana neizdevās: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Atvērt pārlūkā?",
+  "couldNotOpen": "Nevarēja atvērt {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Dzēst iepriekšējo ierakstu",
+  "failedToClearHistory": "Neizdevās notīrīt vēsturi: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Neizdevās atjaunot paroli: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Pārdēvēt mapi",
+  "addFolderTitle": "Pievienot mapi",
+  "deleteFolderTitle": "Dzēst mapi",
+  "deleteFolderConfirm": "Dzēst \"{folder}\"?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Pārpiešķirt ierakstus uz",
+  "clearToNone": "Pārvietot uz «Nav»",
+
+  "renameVaultTitle": "Pārdēvēt seifu",
+  "deleteVaultTitle": "Dzēst seifu?",
+  "deleteVaultConfirmTitle": "Vai esat pārliecināts?",
+  "typeDeleteToConfirm": "Ierakstiet DELETE apstiprināšanai",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Pieskarieties YubiKey atslēgai",
+  "noVaultsRegisteredText": "Nav reģistrētu seifu.",
+
+  "addYubiKeyTitle": "Pievienot YubiKey",
+  "enterYubiKeyPinTitle": "Ievadīt YubiKey PIN",
+  "editAliasForKey": "Rediģēt {index}. atslēgas aizstājvārdu",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Paliks tikai viena reģistrēta YubiKey.",
+  "removeKeyConfirm": "Vai tiešām vēlaties noņemt šo atslēgu?",
+  "removeKeyVaultConfirm": "Noņemt šo YubiKey no seifa?",
+  "yubiKeyRemoved": "YubiKey noņemts",
+  "failedToRemoveKey": "Neizdevās noņemt atslēgu: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey pievienots",
+  "failedToAddKey": "Neizdevās pievienot atslēgu: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Neizdevās saglabāt aizstājvārdu: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "FIDO2 ierīce nav atrasta. Ievietojiet YubiKey un mēģiniet vēlreiz.",
+  "transportLabel": "Pārsūtīšana:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Ieejas frāze",
+  "yubiKeyPinLabel": "YubiKey PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Pašreizējā ieejas frāze",
+  "newPassphraseLabel": "Jaunā ieejas frāze",
+  "confirmPassphraseLabel": "Apstiprināt jauno ieejas frāzi",
+  "vaultPassphraseLabel": "Seifa ieejas frāze",
+  "aliasLabel": "Aizstājvārds",
+  "aliasHint": "piem., Galvenā, Darba atslēga…",
+  "masterPassphraseLabel": "Galvenā ieejas frāze",
+  "confirmPassphraseLabelShort": "Apstiprināt ieejas frāzi",
+
+  "fieldTitle": "Nosaukums",
+  "fieldContent": "Saturs",
+  "fieldFirstName": "Vārds",
+  "fieldLastName": "Uzvārds",
+  "fieldEmail": "E-pasts (neobligāts)",
+  "fieldPhone": "Tālrunis (neobligāts)",
+  "fieldAddress": "Adrese (neobligāta)",
+  "fieldCardLabel": "Kartes nosaukums (piem., «Visa Platinum»)",
+  "fieldCardholderName": "Kartes turētāja vārds",
+  "fieldCardNumber": "Kartes numurs",
+  "fieldExpiry": "Derīguma termiņš (MM/GG)",
+  "fieldCvv": "CVV (neobligāts)",
+  "fieldCardPin": "PIN (neobligāts)",
+  "fieldCreditLimit": "Kredītlimits (neobligāts)",
+  "fieldAccountNumber": "Konta numurs (neobligāts)",
+  "fieldNotes": "Piezīmes (neobligātas)",
+  "fieldUrl": "URL (neobligāts)",
+  "fieldUsername": "Lietotājvārds",
+  "fieldPassword": "Parole",
+  "fieldSeparator": "Atdalītājs",
+  "fieldFolder": "Mape",
+  "fieldLabel": "Etiķete",
+  "fieldValue": "Vērtība",
+  "fieldCustomFields": "Pielāgotie lauki",
+  "fieldLabelOptional": "{label} (neobligāts)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Šis ieraksta tips vēl netiek atbalstīts.",
+  "csvColumnNone": "(nav)",
+  "csvPreviewLabel": "Priekšskatījums",
+  "csvImportButton": "Importēt",
+
+  "gabbroVaultSection": "Gabbro seifs",
+  "genericCsvSection": "Vispārīgs CSV",
+
+  "changePassphraseSuccess": "Ieejas frāze nomainīta",
+  "changePassphraseButton": "Mainīt ieejas frāzi",
+
+  "continueLabel": "Turpināt",
+  "protectWithYubiKey": "Aizsargāt ar YubiKey",
+  "yubiKeySubtitle": "Aparatūras drošības atslēga (ieteicama)",
+  "accessibilityButton": "Pieejamība",
+
+  "aboutProjectSection": "Projekts",
+  "aboutLicenceSection": "Licence",
+  "aboutOpenSourceSection": "Atvērtā pirmkoda komponenti",
+  "aboutAttributionSection": "Autortiesību norādes",
+
+  "lengthLabel": "Garums",
+  "wordsLabel": "Vārdi",
+  "generateButton": "Ģenerēt",
+  "usePasswordButton": "Izmantot šo paroli",
+  "showHidePassword": "Rādīt",
+
+  "deleteVaultPostDeletion": "Jūsu seifs ir dzēsts. Izveidojiet jaunu, lai turpinātu.",
+
+  "syncFilePassphraseLabel": "Seifa ieejas frāze",
+
+  "historyWarning": "Tiek glabāta tikai 1 iepriekšējā vērtība. Vēsture tiek automātiski dzēsta, pamatojoties uz drošības iestatījumiem.",
+  "historyCurrent": "Pašreizējā",
+  "historyPrevious": "Iepriekšējā",
+  "historySavedOn": "Saglabāts {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · beidzas {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Importēšanas problēma ({index} no {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Tips: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Rediģējiet, labojiet un saglabājiet šo ierakstu vai izlaidiet, lai to atmestų.",
+
+  "entriesSkipped": "{count, plural, one{1 ieraksts izlaists} other{{count} ieraksti izlaisti}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Šie ieraksti jau pastāv jūsu seifā un netika pārrakstīti:",
+
+  "syncDeleteEntryContent": "Otra ierīce izdzēsa '{title}'.\n\nDzēst arī šeit, vai paturēt?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "'{title}' atrodas dažādās mapēs divās ierīcēs.\n\nŠī ierīce: {local}\nCita ierīce: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Paturēt bez mapes",
+  "folderConflictKeepLocal": "Paturēt \"{folder}\"",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Pārvietot bez mapes",
+  "folderConflictMoveIncoming": "Pārvietot uz \"{folder}\"",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Seifs sinhronizēts — {added} pievienoti, {updated} atjaunināti, {deleted} dzēsti.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Šis seifa fails izmanto citu ieejas frāzi. Sinhronizācija tiek atbalstīta tikai starp seifiem, kas izmanto vienu ieejas frāzi.",
+
+  "reviewSensitiveFields": "Sensitīvie lauki",
+  "reviewOtherFields": "Citi lauki",
+  "reviewPasswordChanged": "Parole mainīta",
+  "reviewCvvChanged": "CVV mainīts",
+  "reviewPinChanged": "PIN mainīts",
+  "reviewTransactionPasswordChanged": "Darījuma parole mainīta",
+  "tooltipShowValues": "Rādīt vērtības",
+  "reviewOld": "Vecā",
+  "reviewNew": "Jaunā",
+  "reviewEmpty": "(tukšs)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Piezīmes",
+  "reviewFieldContent": "Saturs",
+  "reviewFieldEmail": "E-pasts",
+  "reviewFieldPhone": "Tālrunis",
+  "reviewFieldAddress": "Adrese",
+  "reviewFieldCardLabel": "Kartes nosaukums",
+  "reviewFieldStatus": "Statuss",
+  "reviewFieldCardholder": "Kartes turētājs",
+  "reviewFieldExpiry": "Derīguma termiņš",
+  "reviewFieldCreditLimit": "Kredītlimits",
+  "reviewFieldAccountNumber": "Konta numurs",
+  "reviewFieldNetwork": "Tīkls",
+  "reviewFieldBank": "Banka",
+  "reviewFieldFilename": "Faila nosaukums",
+  "reviewFieldSize": "Izmērs",
+  "reviewFieldCardNumber": "Numurs",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Darījuma parole",
+  "timestampCreated": "Izveidots",
+  "timestampUpdated": "Atjaunināts",
+  "timestampUnknown": "Nezināms",
+  "noTitleFallback": "(nav nosaukuma)",
+  "tooltipExportFile": "Eksportēt failu",
+  "tooltipEditEntry": "Rediģēt ierakstu",
+  "tooltipDeleteEntry": "Dzēst ierakstu",
+  "exportLabel": "Eksportēt",
+  "customEntryFieldsHeader": "Lauki",
+  "copiedNeverClears": "Nokopēts — starpliktuve nekad netiek notīrīta automātiski",
+  "copiedClears30s": "Nokopēts — starpliktuve tiks notīrīta pēc 30 s",
+  "copiedClears60s": "Nokopēts — starpliktuve tiks notīrīta pēc 60 s",
+  "copiedClears2min": "Nokopēts — starpliktuve tiks notīrīta pēc 2 min",
+
+  "passwordBreakdownTitle": "Paroles analīze",
+  "charTypeUppercase": "Lielie burti",
+  "charTypeLowercase": "Mazie burti",
+  "charTypeDigit": "Cipars",
+  "charTypeSymbol": "Simbols",
+
+  "exportIncludeDate": "Iekļaut datumu faila nosaukumā",
+  "exportChooseFormat": "Izvēlieties eksportēšanas formātu.",
+  "exportUnencryptedWarning": "Pilnīgi nešifrēts — visi noslēpumi tiks rakstīti vienkārtā tekstā. Glabājiet failu droši un dzēsiet to pēc lietošanas.",
+  "exportPassphraseOnlyNote": "Aizsargāts tikai ar ieejas frāzi. YubiKey nav nepieciešams importēšanai.",
+  "exportChooseDestinationJson": "Izvēlieties eksportētā JSON faila galamērķi.",
+  "exportChooseDestinationVault": "Izvēlieties eksportētā seifa faila galamērķi.",
+  "exportTwoFilesNote": "Tiks izveidoti divi faili: vault.gabbro un vault.gabbro.sha256",
+  "exportSelectDestination": "Izvēlieties galamērķi.",
+
+  "aboutVersion": "Versija {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Pēckvantumu paroļu pārvaldnieks",
+  "aboutSourceCode": "Pirmkods",
+  "aboutReportIssue": "Ziņot par problēmu",
+  "aboutSupportGabbro": "Atbalstīt Gabbro",
+  "aboutLicenceBody": "Gabbro ir bezmaksas atvērtā pirmkoda programmatūra, licencēta ar GNU General Public License v3.0 only (GPL-3.0-only).\n\nJūs varat brīvi izmantot, pētīt un izplatīt šo programmatūru saskaņā ar šīs licences nosacījumiem.",
+  "aboutOwnerRole": "Projekta īpašnieks, arhitekts un galvenais izstrādātājs:",
+  "aboutAiPartner": "MI izstrādes partneris:",
+  "aboutNoTelemetry": "Gabbro neveic nekādus izejošos tīkla savienojumus. Bez telemetrijas, bez analītikas, bez kontiem.",
+
+  "strengthTierTerrible": "Briesmīga",
+  "strengthTierWeak": "Vāja",
+  "strengthTierFair": "Apmierinoša",
+  "strengthTierStrong": "Stipra",
+  "strengthTierVeryStrong": "Ļoti stipra",
+  "strengthTierExcellent": "Izcila",
+  "yubiKeyProtectedNote": "YubiKey aizsargāts seifs — jūsu YubiKey saistījums tiks saglabāts.",
+  "yubiKeyPinRequired": "YubiKey PIN ir nepieciešams",
+  "tapYubiKeyNow": "Tagad pieskarieties YubiKey atslēgai…",
+  "touchYubiKeyToAuthorize": "Pieskarieties YubiKey atslēgai, lai atļautu šo izmaiņu.",
+  "currentPassphraseRequired": "Pašreizējā ieejas frāze ir nepieciešama",
+  "newPassphraseRequired": "Jaunā ieejas frāze ir nepieciešama",
+  "passphraseTooWeak": "Ieejas frāze ir pārāk vāja",
+  "confirmPassphraseRequired": "Apstipriniet jauno ieejas frāzi",
+  "passphrasesDoNotMatch": "Ieejas frāzes nesakrīt",
+  "passphrasesMatch": "✓ Ieejas frāzes sakrīt",
+  "passphrasesNoMatch": "✗ Ieejas frāzes nesakrīt",
+  "entropyDisplay": "{tier} · {bits} biti",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Pārsūtīšanas kļūda.",
+  "authorizationFailed": "Autorizācija neizdevās — pārbaudiet PIN un mēģiniet vēlreiz.",
+
+  "unlockEnterPassphraseAndPin": "Ievadiet ieejas frāzi un YubiKey PIN, lai atbloķētu",
+  "unlockEnterPassphrase": "Ievadiet ieejas frāzi, lai atbloķētu",
+  "unlockEntropyDisplay": "{tier} · {bits} bitu entropija",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Ievietojiet YubiKey un pieskarieties tam, kad tas mirgo",
+  "unlockErrorPassphrase": "Nevarēja atbloķēt seifu. Pārbaudiet ieejas frāzi.",
+  "unlockErrorPassphraseAndPin": "Nevarēja atbloķēt seifu. Pārbaudiet ieejas frāzi un YubiKey PIN.",
+
+  "importSelectFile": "Izvēlieties failu.",
+  "importFileNotFound": "Fails nav atrasts.",
+  "importEnterPassphrase": "Ievadiet šī seifa ieejas frāzi.",
+  "importDuplicateWarning": "Ieraksti, kuru UUID jau pastāv jūsu seifā, tiks automātiski izlaisti. Tiks parādīts kopsavilkums.",
+  "importGabbroSubtitle": "Sinhronizēt ierakstus no cita Gabbro seifa (.gabbro fails)",
+  "importEnpassSubtitle": "JSON eksports no Enpass (Rīki → Eksportēt)",
+  "importBitwardenSubtitle": "Nešifrēts JSON eksports no Bitwarden (Rīki → Eksportēt seifa datus)",
+  "importCsvSubtitle": "CSV eksports no jebkura paroļu pārvaldnieka",
+
+  "vaultNameAlreadyExists": "Seifs ar nosaukumu \"{alias}\" jau pastāv.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Tas neatgriezeniski izdzēsīs \"{alias}\" un visus tā datus.\n\nFails: {path}\n\nŠo darbību nevar atsaukt.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Tas neatgriezeniski izdzēsīs \"{alias}\" un noņems tā YubiKey saistījumu.\n\nFails: {path}\n\nŠo darbību nevar atsaukt.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Ievadiet PIN un pieskarieties YubiKey, lai atļautu dzēšanu.",
+  "deleteVaultTooltip": "Dzēst seifu",
+
+  "navVault": "Seifs",
+  "navAbout": "Par",
+
+  "yubiKeySecurityWarning": "Drošības brīdinājums",
+  "removeYubiKeyTitle": "Noņemt YubiKey",
+  "yubiKeyLastKeyRiskWarning": "BRĪDINĀJUMS: ja atlikušā atslēga tiek pazaudēta, bojāta vai nozagta, piekļuve seifam kļūst neatgriezeniski neiespējama. Nav atjaunošanas ceļa.",
+  "onlyOneKeyRegisteredWarning": "Reģistrēta tikai viena atslēga. Ja šī atslēga tiek pazaudēta, piekļuve seifam kļūst neatgriezeniski neiespējama.",
+  "tapRegisterNfc": "Turiet atslēgu pie tālruņa reģistrēšanai",
+  "tapRegisterUsb": "Pievienojot pieskarieties atslēgai reģistrēšanai",
+  "tapActivateNfc": "Vēlreiz turiet atslēgu pie tālruņa aktivizēšanai",
+  "tapActivateUsb": "Pievienojot pieskarieties atslēgai vēlreiz aktivizēšanai",
+  "failedToRegisterKey": "Neizdevās reģistrēt atslēgu: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Neizdevās aktivizēt atslēgu: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Atslēga {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Pieskarieties jaunajai YubiKey atslēgai reģistrēšanai…",
+  "tapYubiKeyToActivate": "Pieskarieties jaunajai YubiKey atslēgai vēlreiz aktivizēšanai…",
+  "editAliasTooltip": "Rediģēt aizstājvārdu",
+  "cannotRemoveLastKey": "Pēdējo atslēgu nevar noņemt",
+  "removeKeyTooltip": "Noņemt atslēgu",
+  "manageYubiKeysError": "Kļūda: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klasiskais",
+  "generatorModePassphrase": "Ieejas frāze",
+  "charSetsHeader": "Rakstzīmju kopas",
+  "languageHeader": "Valoda",
+  "separatorLabel": "Atdalītājs",
+  "capitaliseWords": "Rakstīt vārdus ar lielo burtu",
+  "appendDigit": "Pievienot ciparu",
+  "entropyBitsDisplay": "~{bits} bitu entropija",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Izvēlieties vismaz vienu rakstzīmju kopu",
+  "passwordMinLengthNote": "Paroles ir vismaz 32 rakstzīmes garas. Ja vietnei ir īsāks ierobežojums, nokopējiet nepieciešamās pirmās rakstzīmes.",
+  "tooltipShow": "Rādīt",
+  "tooltipCopied": "Nokopēts!",
+  "tooltipCopy": "Kopēt",
+  "excludeAmbiguousChars": "Izlaist neviennozīmīgas rakstzīmes (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Izveidojiet seifu, lai sāktu.",
+  "onboardingVaultName": "Seifa nosaukums",
+  "onboardingAliasRequired": "Aizstājvārds ir nepieciešams",
+  "onboardingNewVaultLocation": "Jaunā seifa atrašanās vieta (tāda pati kā iepriekš)",
+  "onboardingVaultLocation": "Seifa atrašanās vieta",
+  "onboardingLoadingPath": "Ielāde…",
+  "onboardingPathHint": "Ceļš uz seifa failu",
+  "onboardingPathRequired": "Ceļš ir nepieciešams",
+  "onboardingReusePassphraseHint": "Izvēlieties jaunu galveno ieejas frāzi vai atkārtoti izmantojiet iepriekšējo, ja vēlaties.",
+  "onboardingPassphraseRequired": "Ieejas frāze ir nepieciešama",
+  "onboardingConfirmRequired": "Apstipriniet ieejas frāzi",
+  "onboardingPrimaryKeyPin": "Primārās atslēgas PIN",
+  "onboardingBackupKeyPin": "Rezerves atslēgas PIN",
+  "onboardingKeyNPin": "{n}. atslēgas PIN",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Jūs pieskarīsieties katrai YubiKey divreiz (kopā 4 pieskārieni). Starp divām atslēgām jums tiks lūgts tās nomainīt.",
+  "onboardingYubikeySlowNote": "Seifa izveidošana ar YubiKey aizņem 20–30 sekundes. Lietotne var šķist nereaģējoša — tas ir normāli.",
+  "onboardingStep1Label": "Reģistrēt primāro atslēgu",
+  "onboardingStep1Hint": "Tagad pieskarieties YubiKey atslēgai",
+  "onboardingStep2Label": "Aktivizēt primāro atslēgu",
+  "onboardingStep2Hint": "Vēlreiz pieskarieties YubiKey atslēgai",
+  "onboardingStep3Label": "Pārslēgties uz rezerves atslēgu",
+  "onboardingStep3Hint": "Izņemiet primāro atslēgu, pēc tam pievienojiet rezerves YubiKey",
+  "onboardingStep4Label": "Reģistrēt rezerves atslēgu",
+  "onboardingStep4Hint": "Pieskarieties rezerves YubiKey atslēgai",
+  "onboardingStep5Label": "Aktivizēt rezerves atslēgu",
+  "onboardingStep5Hint": "Pieskarieties rezerves YubiKey atslēgai pēdējo reizi",
+
+  "textSizePreview": "Gabbro ir uzmākusies magnētiskā iezis, kas ir bagāta ar Mg un Fe un rupjgraudaina.",
+
+  "fieldCardStatus": "Statuss",
+  "fieldPaymentNetwork": "Maksājumu tīkls",
+
+  "cardStatusActive": "Aktīva",
+  "cardStatusLapsed": "Beigusies",
+  "cardStatusInactive": "Neaktīva",
+
+  "validatorTitleRequired": "Nosaukums ir nepieciešams",
+  "validatorUsernameRequired": "Lietotājvārds ir nepieciešams",
+  "validatorPasswordRequired": "Parole ir nepieciešama",
+  "validatorContentRequired": "Saturs ir nepieciešams",
+  "validatorFirstNameRequired": "Vārds ir nepieciešams",
+  "validatorLastNameRequired": "Uzvārds ir nepieciešams",
+  "validatorCardLabelRequired": "Kartes nosaukums ir nepieciešams",
+  "validatorCardholderRequired": "Kartes turētāja vārds ir nepieciešams",
+  "validatorCardNumberRequired": "Kartes numurs ir nepieciešams",
+  "validatorCardNumberLength": "Kartes numuram jābūt 6–19 ciparu garam",
+  "validatorExpiryRequired": "Derīguma termiņš ir nepieciešams",
+  "validatorExpiryFormat": "Izmantojiet MM/GG formātu",
+  "validatorExpiryMonth": "Mēnesim jābūt 01–12",
+  "validatorCvvLength": "CVV jābūt 3 vai 4 ciparus garam",
+  "validatorLabelRequired": "Etiķete ir nepieciešama",
+  "validatorStatusRequired": "Statuss ir nepieciešams",
+
+  "sectionBiometricUnlock": "Biometriskā atbloķēšana",
+  "biometricUnlockDescription": "Izmantojiet pirkstu nospiedumu vai seju seifa atbloķēšanai, nevis ievadiet ieejas frāzi.",
+  "biometricUnlockTitle": "Iespējot biometrisko atbloķēšanu",
+  "biometricUnlockNote": "Visi biometriskie dati, kas reģistrēti šajā ierīcē, darbosies — ne tikai tie, kas izmantoti reģistrācijā.",
+  "biometricUnavailable": "Biometriskā atbloķēšana nav pieejama šajā ierīcē. Biometriskais sensors nav atrasts vai sistēmas iestatījumos nav reģistrēti biometriskie dati.",
+  "biometricDialogTitle": "Par biometrisko atbloķēšanu",
+  "biometricDialogBody": "Ja iespējots, Gabbro šifrē galveno ieejas frāzi un saglabā to šajā ierīcē, aizsargātu ar jūsu biometriskajiem datiem. Ieejas frāze tiek atšifrēta tikai atbloķēšanas brīdī.\n\nGabbro nekad neglabā jūsu pirkstu nospiedumu vai sejas datus — tie paliek ierīces drošajā mikroshēmā.",
+  "biometricDialogAllBiometrics": "Visi biometriskie dati, kas reģistrēti šajā ierīcē, varēs atbloķēt Gabbro — jūs nevarat to ierobežot līdz konkrētam pirkstu nospiedumam.",
+  "biometricDialogInvalidation": "Ja šim tālrunim tiek pievienoti jauni biometriskie dati (ieskaitot otru pirkstu nospiedumu), šis iestatījums tiks automātiski atspējots un jums tas jākonfigurē atkārtoti.",
+  "biometricDialogRecommendation": "Ieteikums: atstājiet atspējotu, ja jums ir augsts draudu modelis vai koplietojat šo ierīci.",
+  "biometricInvalidated": "Biometriskā atbloķēšana tika atspējota, jo šajā ierīcē mainījās biometriskie dati (sistēmas iestatījumos tika pievienots jauns pirkstu nospiedums vai seja). Šis ir drošības pasākums. Ievadiet ieejas frāzi atkārtoti un vēlreiz iespējojiet biometrisko atbloķēšanu.",
+  "useBiometrics": "Izmantot biometriju",
+  "biometricCancelled": "Biometriskā autentifikācija netika pabeigta. Ievadiet ieejas frāzi, lai atbloķētu.",
+  "biometricEnrollTitle": "Ievadīt ieejas frāzi",
+  "biometricEnrollDescription": "Ievadiet galveno ieejas frāzi, lai iespējotu biometrisko atbloķēšanu.",
+  "biometricYubikeyHint": "Zemāk ievadiet YubiKey PIN, pēc tam pieskarieties Izmantot biometriju, pēc tam pieskarieties YubiKey atslēgai.",
+
+  "helpTitle": "Palīdzība",
+  "menuHelp": "Palīdzība",
+  "helpCaptionCreate": "Izveidojiet seifu: ievadiet nosaukumu, ieejas frāzi un pēc izvēles aizsargājiet ar YubiKey",
+  "helpCaptionEmpty": "Pieskarieties +, lai pievienotu pirmo ierakstu",
+  "helpCaptionDetail": "Pieskarieties acu ikonai, lai atklātu paroli, pēc tam turiet, lai skatītu detalizētu rakstzīmju sadalījumu",
+  "helpCaptionTitleSearch": "Pēc noklusējuma meklēšanas josla meklē tikai ierakstu nosaukumos",
+  "helpCaptionFullSearch": "Pieskarieties palielinošajam stiklam, lai pārslēgtos uz visu lauku meklēšanu; pieskarieties vēlreiz, lai atgrieztos pie nosaukumu meklēšanas",
+  "helpCaptionFilter": "Izmantojiet filtrēšanas pogas, lai rādītu tikai noteikta veida ierakstus",
+  "helpCaptionFolders": "Izmantojiet mapju atlasītāju, lai filtrētu ierakstus pēc mapes",
+  "helpCaptionSelect": "Turiet ierakstu, lai ievadītu atlases režīmu; pievienojiet vairāk vienumu, pēc tam piešķiriet mapei vai dzēsiet. Pieskarieties X, lai izietu.",
+  "helpCaptionJumpToLetter": "Pieskarieties indeksa joslā esošajam burtam, lai pārietu uz šo sadaļu",
+  "helpCaptionBreakdown": "Pieskarieties acu ikonai, lai atklātu paroli, pēc tam turiet, lai skatītu detalizētu rakstzīmju sadalījumu",
+  "helpCaptionManageVaults": "Seifa pārvaldībā varat pārdēvēt vai dzēst seifus, vai pievienot jaunu",
+  "helpCaptionUnlock": "Ievadiet ieejas frāzi, lai atbloķētu seifu"
+}

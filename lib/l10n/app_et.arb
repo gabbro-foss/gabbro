@@ -1,0 +1,809 @@
+{
+  "@@locale": "et",
+
+  "appName": "Gabbro",
+
+  "cancel": "Tühista",
+  "delete": "Kustuta",
+  "save": "Salvesta",
+  "close": "Sulge",
+  "ok": "OK",
+  "edit": "Muuda",
+  "add": "Lisa",
+  "remove": "Eemalda",
+  "rename": "Nimeta ümber",
+  "confirm": "Kinnita",
+  "continueAction": "Jätka",
+  "dismiss": "Loobu",
+  "authorize": "Autoriseeri",
+  "register": "Registreeri",
+  "sync": "Sünkrooni",
+  "assign": "Määra",
+  "unlock": "Ava",
+  "generate": "Genereeri",
+  "import": "Impordi",
+  "export": "Ekspordi",
+  "openInBrowser": "Ava brauseris",
+  "useThisPassword": "Kasuta seda parooli",
+  "reviewArrow": "Vaata üle →",
+  "skip": "Jäta vahele",
+  "keep": "Hoia alles",
+  "revert": "Taasta",
+  "next": "Järgmine: kaardista veerud",
+  "syncFromVault": "Sünkrooni seifist",
+  "createVault": "Loo seif",
+  "pickFile": "Vali fail",
+  "noFileSelected": "Ühtegi faili pole valitud",
+  "chooseFolder": "Vali kaust",
+  "addCustomField": "Lisa kohandatud väli",
+  "exportFile": "Ekspordi fail",
+  "addVault": "Lisa seif",
+  "addYubiKey": "Lisa YubiKey",
+  "noChangesToSave": "Salvestatavaid muudatusi pole.",
+
+  "appearanceTitle": "Välimus",
+  "securityTitle": "Turvalisus",
+  "aboutTitle": "Teave Gabbro kohta",
+  "generatorTitle": "Parooligeneraator",
+  "importTitle": "Impordi kirjeid",
+  "exportTitle": "Ekspordi seif",
+  "changePassphraseTitle": "Muuda pääsulauset",
+  "csvMappingTitle": "Kaardista CSV-veerud",
+  "manageFoldersTitle": "Halda kaustu",
+  "manageVaultsTitle": "Halda seife",
+  "manageYubiKeysTitle": "Halda YubiKey'sid",
+  "passwordHistoryTitle": "Paroolide ajalugu",
+  "reviewChangesTitle": "Vaata muudatused üle",
+  "unlockGabbroTitle": "Ava Gabbro",
+
+  "sectionTheme": "Teema",
+  "sectionTextSize": "Teksti suurus",
+  "sectionAlphabetBar": "Tähestikuriba asukoht",
+  "sectionAccessibility": "Juurdepääsetavus",
+  "sectionLanguage": "Keel",
+  "sectionForegroundLock": "Esiplaani lukustus",
+  "sectionBackgroundLock": "Taustarakenduse lukustus",
+  "sectionPasswordHistory": "Paroolide ajalugu",
+  "sectionPassphraseCopyPaste": "Pääsulause kopeerimine/kleepimine",
+  "sectionVaultList": "Seifide loend",
+  "sectionClipboardClear": "Tühjenda lõikelaud",
+  "sectionCharacterSets": "Märgistikud",
+  "sectionGeneratorLanguage": "Keel",
+
+  "themeSystem": "Süsteem",
+  "themeLight": "Hele",
+  "themeDark": "Tume",
+
+  "textSizeSmall": "Väike",
+  "textSizeRegular": "Tavaline",
+  "textSizeLarge": "Suur",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Ainult telefonil — tahvelarvutil kasutatakse alati vasakut.",
+  "alphabetBarLeft": "Vasak",
+  "alphabetBarRight": "Parem",
+
+  "highContrastTitle": "Kõrge kontrast",
+  "highContrastSubtitle": "Suurendab kontrasti parema loetavuse jaoks",
+
+  "languageNote": "Alistab süsteemi keele. «Süsteem» järgib seadme piirkonna sätteid.",
+  "langSystem": "Süsteem",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Lukusta pärast seda kasutamata aega, kui rakendus on avatud.",
+  "backgroundLockDescription": "Lukusta pärast seda, kui rakendus on olnud taustal selle aja.",
+  "passwordHistoryDescription": "Kui kaua säilitatakse eelmist parooli pärast muutmist. «Hoia alati» tähendab, et ajalugu kustutatakse ainult käsitsi.",
+  "passphraseCopyPasteDescription": "Blokeeri kopeerimine ja kleepimine pääsulause väljades. Soovitatav: takistab pääsulause leket lõikelaua kaudu.",
+  "passphraseCopyPasteNote": "Märkus: see blokeerib pika vajutuse kontekstimenüü ja teksti valimise. Klaviatuuri sisseehitatud kleepimise nupp võib endiselt töötada — see on platvormi piirang.",
+  "blockCopyPasteTitle": "Blokeeri kopeerimine/kleepimine",
+  "vaultListDescription": "Kuva kõigi seifide loend sisselogimisekraanil, et saaksid valida avatava seifi ilma Halda seife juurde minekuta.",
+  "showVaultListTitle": "Kuva seifide loend sisselogimisel",
+  "vaultListNote": "Turvalisuse märkus: kui see on VÄLJAS, kuvatakse sisselogimisekraanil ainult viimati kasutatud seif — vihjeid teiste seifide olemasolust pole. Kompromiss: seifi vahetamiseks tuleb esmalt lukustus avada ja seejärel minna Menüü → Halda seife.",
+  "clipboardClearDescription": "Tühjenda lõikelaud pärast saladuse kopeerimist. Märkus: lõikelaua haldurid võivad koopia säilitada.",
+
+  "duration30s": "30 s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60 s",
+  "duration2min": "2 min",
+  "durationNever": "Mitte kunagi",
+  "duration7days": "7 päeva",
+  "duration30days": "30 päeva",
+  "duration90days": "90 päeva",
+  "durationKeepForever": "Hoia alati",
+
+  "menuExportVault": "Ekspordi seif",
+  "menuImportEntries": "Impordi kirjeid",
+  "menuSyncFromFile": "Sünkrooni failist",
+  "menuManageVaults": "Halda seife",
+  "menuChangePassphrase": "Muuda pääsulauset",
+  "menuManageYubiKeys": "Halda YubiKey'sid",
+  "menuAppearance": "Välimus",
+  "menuSecurity": "Turvalisus",
+  "menuManageFolders": "Halda kaustu",
+  "menuPasswordGenerator": "Parooligeneraator",
+  "menuAbout": "Teave",
+
+  "tooltipSelectEntries": "Vali kirjeid",
+  "tooltipLockVault": "Lukusta seif",
+  "tooltipSelectAll": "Vali kõik",
+  "tooltipDeselectAll": "Tühista kõigi valik",
+  "tooltipMenu": "Menüü",
+  "tooltipCopy": "Kopeeri",
+  "tooltipCopied": "Kopeeritud!",
+  "tooltipShow": "Kuva",
+  "tooltipHide": "Peida",
+  "tooltipBrowse": "Sirvi",
+  "tooltipEditAlias": "Muuda aliast",
+  "tooltipRemoveField": "Eemalda väli",
+  "tooltipRename": "Nimeta ümber",
+  "tooltipDeleteVault": "Kustuta seif",
+  "tooltipAssignToFolder": "Määra kausta",
+  "tooltipShowPin": "Kuva PIN",
+  "tooltipHidePin": "Peida PIN",
+  "tooltipShowValue": "Kuva väärtus",
+  "tooltipHideValue": "Peida",
+  "tooltipCancel": "Tühista",
+  "tooltipOpenInBrowser": "Ava brauseris",
+
+  "allFolders": "Kõik kaustad",
+  "noFolder": "Puudub",
+  "selectFolder": "Vali kaust",
+  "folderName": "Kausta nimi",
+
+  "noEntriesMatch": "Ükski kirje ei vasta otsingule.",
+  "noVaultsRegistered": "Ühtegi seifi pole registreeritud.",
+  "noYubiKeysRegistered": "Ühtegi YubiKey't pole registreeritud",
+  "selectEntry": "Vali kirje",
+  "newEntryTitle": "Uus kirje",
+  "createEntryTitle": "Uus {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Muuda: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(URL puudub)",
+  "noNameFallback": "(nimi puudub)",
+  "untitledFallback": "(pealkirjata)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "{count} valitud",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Otsi kõigist väljadest…",
+  "searchEntriesHint": "Otsi kirjeid…",
+  "searchAllFieldsTooltip": "Otsib kõigist väljadest",
+  "searchByTitleTooltip": "Otsib pealkirja järgi",
+  "entryTypeAll": "Kõik",
+  "entryTypePassword": "Parool",
+  "entryTypeNote": "Märkus",
+  "entryTypeCard": "Kaart",
+  "entryTypeIdentity": "Isik",
+  "entryTypeFile": "Fail",
+  "entryTypeCustom": "Kohandatud",
+  "errorPrefix": "Viga: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Seif",
+  "navAppearance": "Välimus",
+  "navSecurity": "Turvalisus",
+  "navAbout": "Teave",
+
+  "deleteEntryTitle": "Kustuta kirje?",
+  "cannotBeUndone": "Seda toimingut ei saa tagasi võtta.",
+  "deleteEntryDialogTitle": "Kustuta kirje?",
+  "deleteEntriesTitle": "{count, plural, one{Kustuta 1 kirje?} other{Kustuta {count} kirjet?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Määra kausta",
+  "folderConflictTitle": "Kaustade konflikt",
+  "syncFailedTitle": "Sünkroonimine ebaõnnestus",
+  "syncFromFileTitle": "Sünkrooni failist",
+  "nothingToSync": "Midagi ei ole sünkroonida — mõlemad seifid on juba ajakohased.",
+
+  "importedEntries": "{count, plural, one{1 kirje imporditud.} other{{count} kirjet imporditud.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Ekspordi fail",
+  "saveDecryptedFileTo": "Salvesta dekrüpteeritud fail:",
+  "exportPathLabel": "Ekspordi asukoht",
+  "exportedToPath": "Eksporditud asukohta {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Eksportimine ebaõnnestus: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Ava brauseris?",
+  "couldNotOpen": "Ei saanud avada {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Kustuta eelmine kirje",
+  "failedToClearHistory": "Ajaloo tühjendamine ebaõnnestus: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Parooli taastamine ebaõnnestus: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Nimeta kaust ümber",
+  "addFolderTitle": "Lisa kaust",
+  "deleteFolderTitle": "Kustuta kaust",
+  "deleteFolderConfirm": "Kustuta \"{folder}\"?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Määra kirjed uuesti kausta",
+  "clearToNone": "Liiguta «Puudub»-kausta",
+
+  "renameVaultTitle": "Nimeta seif ümber",
+  "deleteVaultTitle": "Kustuta seif?",
+  "deleteVaultConfirmTitle": "Oled kindel?",
+  "typeDeleteToConfirm": "Kinnita kirjutades DELETE",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Puuduta oma YubiKey't",
+  "noVaultsRegisteredText": "Ühtegi seifi pole registreeritud.",
+
+  "addYubiKeyTitle": "Lisa YubiKey",
+  "enterYubiKeyPinTitle": "Sisesta YubiKey PIN",
+  "editAliasForKey": "Muuda võtme {index} aliast",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Järele jääb ainult üks registreeritud YubiKey.",
+  "removeKeyConfirm": "Kas oled kindel, et soovid selle võtme eemaldada?",
+  "removeKeyVaultConfirm": "Eemaldada see YubiKey seifist?",
+  "yubiKeyRemoved": "YubiKey eemaldatud",
+  "failedToRemoveKey": "Võtme eemaldamine ebaõnnestus: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey lisatud",
+  "failedToAddKey": "Võtme lisamine ebaõnnestus: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Aliase salvestamine ebaõnnestus: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "FIDO2-seadet ei leitud. Sisesta YubiKey ja proovi uuesti.",
+  "transportLabel": "Transport:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Pääslause",
+  "yubiKeyPinLabel": "YubiKey PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Praegune pääslause",
+  "newPassphraseLabel": "Uus pääslause",
+  "confirmPassphraseLabel": "Kinnita uus pääslause",
+  "vaultPassphraseLabel": "Seifi pääslause",
+  "aliasLabel": "Alias",
+  "aliasHint": "nt. Peamine, Töövõti…",
+  "masterPassphraseLabel": "Peamine pääslause",
+  "confirmPassphraseLabelShort": "Kinnita pääslause",
+
+  "fieldTitle": "Pealkiri",
+  "fieldContent": "Sisu",
+  "fieldFirstName": "Eesnimi",
+  "fieldLastName": "Perekonnanimi",
+  "fieldEmail": "E-post (valikuline)",
+  "fieldPhone": "Telefon (valikuline)",
+  "fieldAddress": "Aadress (valikuline)",
+  "fieldCardLabel": "Kaardi nimi (nt «Visa Platinum»)",
+  "fieldCardholderName": "Kaardihoidja nimi",
+  "fieldCardNumber": "Kaardi number",
+  "fieldExpiry": "Kehtivusaeg (KK/AA)",
+  "fieldCvv": "CVV (valikuline)",
+  "fieldCardPin": "PIN (valikuline)",
+  "fieldCreditLimit": "Krediidilimiit (valikuline)",
+  "fieldAccountNumber": "Kontonumber (valikuline)",
+  "fieldNotes": "Märkused (valikuline)",
+  "fieldUrl": "URL (valikuline)",
+  "fieldUsername": "Kasutajanimi",
+  "fieldPassword": "Parool",
+  "fieldSeparator": "Eraldaja",
+  "fieldFolder": "Kaust",
+  "fieldLabel": "Silt",
+  "fieldValue": "Väärtus",
+  "fieldCustomFields": "Kohandatud väljad",
+  "fieldLabelOptional": "{label} (valikuline)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Seda kirje tüüpi ei toetata veel.",
+  "csvColumnNone": "(puudub)",
+  "csvPreviewLabel": "Eelvaade",
+  "csvImportButton": "Impordi",
+
+  "gabbroVaultSection": "Gabbro seif",
+  "genericCsvSection": "Üldine CSV",
+
+  "changePassphraseSuccess": "Pääslause muudetud",
+  "changePassphraseButton": "Muuda pääsulauset",
+
+  "continueLabel": "Jätka",
+  "protectWithYubiKey": "Kaitse YubiKey'ga",
+  "yubiKeySubtitle": "Riistvara turvavõti (soovitatav)",
+  "accessibilityButton": "Juurdepääsetavus",
+
+  "aboutProjectSection": "Projekt",
+  "aboutLicenceSection": "Litsents",
+  "aboutOpenSourceSection": "Avatud lähtekoodiga komponendid",
+  "aboutAttributionSection": "Autoriõigused",
+
+  "lengthLabel": "Pikkus",
+  "wordsLabel": "Sõnad",
+  "generateButton": "Genereeri",
+  "usePasswordButton": "Kasuta seda parooli",
+  "showHidePassword": "Kuva",
+
+  "deleteVaultPostDeletion": "Sinu seif on kustutatud. Loo uus jätkamiseks.",
+
+  "syncFilePassphraseLabel": "Seifi pääslause",
+
+  "historyWarning": "Säilitatakse ainult 1 eelmine väärtus. Ajalugu tühjendatakse automaatselt turvalisuse sätete alusel.",
+  "historyCurrent": "Praegune",
+  "historyPrevious": "Eelmine",
+  "historySavedOn": "Salvestatud {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · aegub {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Impordiprobleem ({index}/{total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Tüüp: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Muuda, paranda ja salvesta see kirje või jäta see vahele, et see hüljata.",
+
+  "entriesSkipped": "{count, plural, one{1 kirje vahele jäetud} other{{count} kirjet vahele jäetud}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Need kirjed on juba sinu seifis ja neid ei kirjutatud üle:",
+
+  "syncDeleteEntryContent": "Teine seade kustutas kirje '{title}'.\n\nKustuta ka siit, või hoia alles?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "'{title}' on kahe seadme erinevates kaustades.\n\nSee seade: {local}\nTeine seade: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Hoia ilma kaustata",
+  "folderConflictKeepLocal": "Hoia \"{folder}\"",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Liiguta kaustata jätta",
+  "folderConflictMoveIncoming": "Liiguta kausta \"{folder}\"",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Seif sünkroonitud — {added} lisatud, {updated} uuendatud, {deleted} kustutatud.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "See seififail kasutab teistsugust pääsulauset. Sünkroonimine on toetatud ainult seifide vahel, mis jagavad sama pääsulauset.",
+
+  "reviewSensitiveFields": "Tundlikud väljad",
+  "reviewOtherFields": "Muud väljad",
+  "reviewPasswordChanged": "Parool muudetud",
+  "reviewCvvChanged": "CVV muudetud",
+  "reviewPinChanged": "PIN muudetud",
+  "reviewTransactionPasswordChanged": "Tehinguparool muudetud",
+  "tooltipShowValues": "Kuva väärtused",
+  "reviewOld": "Vana",
+  "reviewNew": "Uus",
+  "reviewEmpty": "(tühi)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Märkused",
+  "reviewFieldContent": "Sisu",
+  "reviewFieldEmail": "E-post",
+  "reviewFieldPhone": "Telefon",
+  "reviewFieldAddress": "Aadress",
+  "reviewFieldCardLabel": "Kaardi nimi",
+  "reviewFieldStatus": "Olek",
+  "reviewFieldCardholder": "Kaardihoidja",
+  "reviewFieldExpiry": "Kehtivusaeg",
+  "reviewFieldCreditLimit": "Krediidilimiit",
+  "reviewFieldAccountNumber": "Kontonumber",
+  "reviewFieldNetwork": "Võrk",
+  "reviewFieldBank": "Pank",
+  "reviewFieldFilename": "Faili nimi",
+  "reviewFieldSize": "Suurus",
+  "reviewFieldCardNumber": "Number",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Tehinguparool",
+  "timestampCreated": "Loodud",
+  "timestampUpdated": "Uuendatud",
+  "timestampUnknown": "Tundmatu",
+  "noTitleFallback": "(pealkiri puudub)",
+  "tooltipExportFile": "Ekspordi fail",
+  "tooltipEditEntry": "Muuda kirjet",
+  "tooltipDeleteEntry": "Kustuta kirje",
+  "exportLabel": "Ekspordi",
+  "customEntryFieldsHeader": "Väljad",
+  "copiedNeverClears": "Kopeeritud — lõikelaua ei tühjendata kunagi automaatselt",
+  "copiedClears30s": "Kopeeritud — lõikelaud tühjendatakse 30 s pärast",
+  "copiedClears60s": "Kopeeritud — lõikelaud tühjendatakse 60 s pärast",
+  "copiedClears2min": "Kopeeritud — lõikelaud tühjendatakse 2 min pärast",
+
+  "passwordBreakdownTitle": "Parooli ülevaade",
+  "charTypeUppercase": "Suurtähed",
+  "charTypeLowercase": "Väiketähed",
+  "charTypeDigit": "Number",
+  "charTypeSymbol": "Sümbol",
+
+  "exportIncludeDate": "Lisa kuupäev faili nimesse",
+  "exportChooseFormat": "Vali ekspordiformaat.",
+  "exportUnencryptedWarning": "Täiesti krüpteerimata — kõik saladused kirjutatakse lihttekstina. Salvesta fail turvaliselt ja kustuta see pärast kasutamist.",
+  "exportPassphraseOnlyNote": "Kaitstud ainult pääslausega. YubiKey ei ole importimiseks vajalik.",
+  "exportChooseDestinationJson": "Vali eksporditud JSON-faili sihtkoht.",
+  "exportChooseDestinationVault": "Vali eksporditud seififaili sihtkoht.",
+  "exportTwoFilesNote": "Luuakse kaks faili: vault.gabbro ja vault.gabbro.sha256",
+  "exportSelectDestination": "Vali sihtkoht.",
+
+  "aboutVersion": "Versioon {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Kvantjärgne paroolihaldur",
+  "aboutSourceCode": "Lähtekood",
+  "aboutReportIssue": "Teavita probleemist",
+  "aboutSupportGabbro": "Toeta Gabrot",
+  "aboutLicenceBody": "Gabbro on vaba ja avatud lähtekoodiga tarkvara, litsentseeritud GNU General Public License v3.0 only (GPL-3.0-only) alusel.\n\nSa võid seda tarkvara vabalt kasutada, uurida ja levitada selle litsentsi tingimuste kohaselt.",
+  "aboutOwnerRole": "Projekti omanik, arhitekt ja peaaren daja:",
+  "aboutAiPartner": "Tehisintellekti arenduspartner:",
+  "aboutNoTelemetry": "Gabbro ei tee ühtegi väljuvat võrguühendust. Telemetria puudub, analüütika puudub, kontod puuduvad.",
+
+  "strengthTierTerrible": "Kohutav",
+  "strengthTierWeak": "Nõrk",
+  "strengthTierFair": "Rahuldav",
+  "strengthTierStrong": "Tugev",
+  "strengthTierVeryStrong": "Väga tugev",
+  "strengthTierExcellent": "Suurepärane",
+  "yubiKeyProtectedNote": "YubiKey-kaitstud seif — sinu YubiKey sidumine säilitatakse.",
+  "yubiKeyPinRequired": "YubiKey PIN on nõutav",
+  "tapYubiKeyNow": "Puuduta oma YubiKey't kohe…",
+  "touchYubiKeyToAuthorize": "Puuduta oma YubiKey't selle muudatuse autoriseerimiseks.",
+  "currentPassphraseRequired": "Praegune pääslause on nõutav",
+  "newPassphraseRequired": "Uus pääslause on nõutav",
+  "passphraseTooWeak": "Pääslause on liiga nõrk",
+  "confirmPassphraseRequired": "Kinnita uus pääslause",
+  "passphrasesDoNotMatch": "Pääslaused ei kattu",
+  "passphrasesMatch": "✓ Pääslaused kattuvad",
+  "passphrasesNoMatch": "✗ Pääslaused ei kattu",
+  "entropyDisplay": "{tier} · {bits} bitti",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Transpordiviga.",
+  "authorizationFailed": "Autoriseerimine ebaõnnestus — kontrolli PIN-i ja proovi uuesti.",
+
+  "unlockEnterPassphraseAndPin": "Sisesta pääslause ja YubiKey PIN avamiseks",
+  "unlockEnterPassphrase": "Sisesta pääslause avamiseks",
+  "unlockEntropyDisplay": "{tier} · {bits} bitti entroopiat",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Sisesta YubiKey ja puuduta seda, kui see vilgub",
+  "unlockErrorPassphrase": "Seifi ei saanud avada. Kontrolli pääslauset.",
+  "unlockErrorPassphraseAndPin": "Seifi ei saanud avada. Kontrolli pääslauset ja YubiKey PIN-i.",
+
+  "importSelectFile": "Vali fail.",
+  "importFileNotFound": "Faili ei leitud.",
+  "importEnterPassphrase": "Sisesta selle seifi pääslause.",
+  "importDuplicateWarning": "Kirjed, mille UUID on juba seifis olemas, jäetakse automaatselt vahele. Kuvatakse kokkuvõte.",
+  "importGabbroSubtitle": "Sünkrooni kirjeid teisest Gabbro seifist (.gabbro fail)",
+  "importEnpassSubtitle": "JSON-eksport Enpassist (Tööriistad → Ekspordi)",
+  "importBitwardenSubtitle": "Krüpteerimata JSON-eksport Bitwardenist (Tööriistad → Ekspordi seif)",
+  "importCsvSubtitle": "CSV-eksport mis tahes paroolihaldurilt",
+
+  "vaultNameAlreadyExists": "Seif nimega \"{alias}\" on juba olemas.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "See kustutab jäädavalt \"{alias}\" ja kõik selle andmed.\n\nFail: {path}\n\nSeda toimingut ei saa tagasi võtta.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "See kustutab jäädavalt \"{alias}\" ja eemaldab selle YubiKey sidumise.\n\nFail: {path}\n\nSeda toimingut ei saa tagasi võtta.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Sisesta PIN ja puuduta YubiKey't selle kustutamise autoriseerimiseks.",
+  "deleteVaultTooltip": "Kustuta seif",
+
+  "navVault": "Seif",
+  "navAbout": "Teave",
+
+  "yubiKeySecurityWarning": "Turvahoiatus",
+  "removeYubiKeyTitle": "Eemalda YubiKey",
+  "yubiKeyLastKeyRiskWarning": "HOIATUS: Kui järelejäänud võti kaob, saab kahjustada või varastatakse, on seifi kasutamine jäädavalt võimatu. Taastemeetod puudub.",
+  "onlyOneKeyRegisteredWarning": "Registreeritud on ainult üks võti. Kui see võti kaob, on seifi kasutamine jäädavalt võimatu.",
+  "tapRegisterNfc": "Hoia võtit telefoni lähedal registreerimiseks",
+  "tapRegisterUsb": "Ühendamisel puuduta võtit registreerimiseks",
+  "tapActivateNfc": "Hoia võtit uuesti telefoni lähedal aktiveerimiseks",
+  "tapActivateUsb": "Ühendamisel puuduta võtit uuesti aktiveerimiseks",
+  "failedToRegisterKey": "Võtme registreerimine ebaõnnestus: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Võtme aktiveerimine ebaõnnestus: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Võti {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Puuduta uut YubiKey't registreerimiseks…",
+  "tapYubiKeyToActivate": "Puuduta uut YubiKey't uuesti aktiveerimiseks…",
+  "editAliasTooltip": "Muuda aliast",
+  "cannotRemoveLastKey": "Viimast võtit ei saa eemaldada",
+  "removeKeyTooltip": "Eemalda võti",
+  "manageYubiKeysError": "Viga: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klassikaline",
+  "generatorModePassphrase": "Pääslause",
+  "charSetsHeader": "Märgistikud",
+  "languageHeader": "Keel",
+  "separatorLabel": "Eraldaja",
+  "capitaliseWords": "Suurtähestaesimene täht",
+  "appendDigit": "Lisa number",
+  "entropyBitsDisplay": "~{bits} bitti entroopiat",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Vali vähemalt üks märgistik",
+  "passwordMinLengthNote": "Paroolid on vähemalt 32 tähemärki pikad. Kui saidil on lühem limiit, kopeeri vajalikud esimesed tähemärgid.",
+  "tooltipShow": "Kuva",
+  "tooltipCopied": "Kopeeritud!",
+  "tooltipCopy": "Kopeeri",
+  "excludeAmbiguousChars": "Jäta välja ebaselged tähemärgid (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Loo oma seif alustamiseks.",
+  "onboardingVaultName": "Seifi nimi",
+  "onboardingAliasRequired": "Alias on nõutav",
+  "onboardingNewVaultLocation": "Uue seifi asukoht (sama kui varem)",
+  "onboardingVaultLocation": "Seifi asukoht",
+  "onboardingLoadingPath": "Laadimine…",
+  "onboardingPathHint": "Tee seififailini",
+  "onboardingPathRequired": "Tee on nõutav",
+  "onboardingReusePassphraseHint": "Vali uus peamine pääslause või kasuta eelmist uuesti, kui eelistad.",
+  "onboardingPassphraseRequired": "Pääslause on nõutav",
+  "onboardingConfirmRequired": "Kinnita pääslause",
+  "onboardingPrimaryKeyPin": "Peamise võtme PIN",
+  "onboardingBackupKeyPin": "Varuvõtme PIN",
+  "onboardingKeyNPin": "Võtme {n} PIN",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Puudutad kumbagi YubiKey't kaks korda (kokku 4 puudutust). Kahe võtme vahel palutakse sul võtit vahetada.",
+  "onboardingYubikeySlowNote": "Seifi loomine YubiKey'ga võtab 20–30 sekundit. Rakendus võib tunduda reageerimatu — see on normaalne.",
+  "onboardingStep1Label": "Registreeri peamine võti",
+  "onboardingStep1Hint": "Puuduta oma YubiKey't kohe",
+  "onboardingStep2Label": "Aktiveeri peamine võti",
+  "onboardingStep2Hint": "Puuduta oma YubiKey't uuesti",
+  "onboardingStep3Label": "Vaheta varuvõtmele",
+  "onboardingStep3Hint": "Eemalda peamine võti, seejärel ühenda varu-YubiKey",
+  "onboardingStep4Label": "Registreeri varuvõti",
+  "onboardingStep4Hint": "Puuduta oma varu-YubiKey't",
+  "onboardingStep5Label": "Aktiveeri varuvõti",
+  "onboardingStep5Hint": "Puuduta oma varu-YubiKey't viimast korda",
+
+  "textSizePreview": "Gabbro on intrusiivsest magmakivimist koosnev rikas Mg- ja Fe-sisaldav jämeteraline kivim.",
+
+  "fieldCardStatus": "Olek",
+  "fieldPaymentNetwork": "Maksevõrk",
+
+  "cardStatusActive": "Aktiivne",
+  "cardStatusLapsed": "Aegunud",
+  "cardStatusInactive": "Mitteaktiivne",
+
+  "validatorTitleRequired": "Pealkiri on nõutav",
+  "validatorUsernameRequired": "Kasutajanimi on nõutav",
+  "validatorPasswordRequired": "Parool on nõutav",
+  "validatorContentRequired": "Sisu on nõutav",
+  "validatorFirstNameRequired": "Eesnimi on nõutav",
+  "validatorLastNameRequired": "Perekonnanimi on nõutav",
+  "validatorCardLabelRequired": "Kaardi nimi on nõutav",
+  "validatorCardholderRequired": "Kaardihoidja nimi on nõutav",
+  "validatorCardNumberRequired": "Kaardi number on nõutav",
+  "validatorCardNumberLength": "Kaardi number peab olema 6–19 numbrit",
+  "validatorExpiryRequired": "Kehtivusaeg on nõutav",
+  "validatorExpiryFormat": "Kasuta vormingut KK/AA",
+  "validatorExpiryMonth": "Kuu peab olema 01–12",
+  "validatorCvvLength": "CVV peab olema 3 või 4 numbrit",
+  "validatorLabelRequired": "Silt on nõutav",
+  "validatorStatusRequired": "Olek on nõutav",
+
+  "sectionBiometricUnlock": "Biomeetriline avamine",
+  "biometricUnlockDescription": "Kasuta seifi avamiseks sõrmejälge või nägu, mitte pääslause sisestamist.",
+  "biometricUnlockTitle": "Luba biomeetriline avamine",
+  "biometricUnlockNote": "Kõik sellesse seadmesse registreeritud biomeetrilised tunnused töötavad — mitte ainult registreerimisel kasutatu.",
+  "biometricUnavailable": "Biomeetriline avamine pole selles seadmes saadaval. Biomeetrilist sensorit ei leitud või biomeetriat pole süsteemisätetes registreeritud.",
+  "biometricDialogTitle": "Biomeetrilise avamise kohta",
+  "biometricDialogBody": "Kui lubatud, krüpteerib Gabbro sinu peamise pääslause ja salvestab selle sellesse seadmesse, kaitstuna sinu biomeetriliste tunnustega. Pääslause dekrüpteeritakse ainult avamise hetkel.\n\nGabbro ei salvesta kunagi sinu sõrmejälgede ega näo andmeid — need jäävad seadme turvalisse kiipi.",
+  "biometricDialogAllBiometrics": "Kõik sellesse seadmesse registreeritud biomeetrilised tunnused saavad Gabro avada — sa ei saa seda piirata konkreetse sõrmejäljega.",
+  "biometricDialogInvalidation": "Kui sellesse telefoni lisatakse uus biomeetriline tunnus (sh teine sõrmejälg), keelatakse see säte automaatselt ja sa pead selle uuesti seadistama.",
+  "biometricDialogRecommendation": "Soovitus: hoia keelatuna, kui sul on kõrge ohumudel või jagad seda seadet.",
+  "biometricInvalidated": "Biomeetriline avamine keelati, kuna selles seadmes muutusid biomeetrilised tunnused (süsteemisätetes lisati uus sõrmejälg või nägu). See on turvameede. Sisesta pääslause uuesti ja luba biomeetriline avamine uuesti, kui soovid seda funktsiooni jätkuvalt kasutada.",
+  "useBiometrics": "Kasuta biomeetriat",
+  "biometricCancelled": "Biomeetriline autentimine ei lõpetanud. Sisesta pääslause avamiseks.",
+  "biometricEnrollTitle": "Sisesta pääslause",
+  "biometricEnrollDescription": "Sisesta oma peamine pääslause biomeetrilise avamise lubamiseks.",
+  "biometricYubikeyHint": "Sisesta allpool YubiKey PIN, seejärel puuduta Kasuta biomeetriat, seejärel puuduta oma YubiKey't.",
+
+  "helpTitle": "Abi",
+  "menuHelp": "Abi",
+  "helpCaptionCreate": "Loo seif: sisesta nimi, pääslause ja kaitse soovi korral YubiKey'ga",
+  "helpCaptionEmpty": "Puuduta +, et lisada oma esimene kirje",
+  "helpCaptionDetail": "Puuduta silmaikooni parooli nägemiseks, seejärel hoia pikalt, et näha üksikasjalikku tähemärkide jaotust",
+  "helpCaptionTitleSearch": "Vaikimisi otsib otsinguriba ainult kirjete pealkirju",
+  "helpCaptionFullSearch": "Puuduta luupi, et lülituda kõigi väljade otsimisele; puuduta uuesti pealkirjaotsimisele naasmiseks",
+  "helpCaptionFilter": "Kasuta filtreerimisnuppe, et kuvada ainult teatud tüüpi kirjeid",
+  "helpCaptionFolders": "Kasuta kaustavaliku, et filtreerida kirjeid kausta järgi",
+  "helpCaptionSelect": "Hoia kirjel pikalt, et siseneda valikurežiimi; lisa rohkem üksusi, seejärel määra kausta või kustuta. Puuduta X väljumiseks.",
+  "helpCaptionJumpToLetter": "Puuduta registriribal tähte, et hüpata sellele jaotisele",
+  "helpCaptionBreakdown": "Puuduta silmaikooni parooli nägemiseks, seejärel hoia pikalt, et näha üksikasjalikku tähemärkide jaotust",
+  "helpCaptionManageVaults": "Halda seife jaotises saad seife ümber nimetada või kustutada või lisada uue",
+  "helpCaptionUnlock": "Sisesta oma pääslause seifi avamiseks"
+}
