@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **Header integrity (F-01 / VERSION 7)**: the AES-256-GCM body is now sealed with the serialised plaintext header as additional authenticated data (AAD). Every plaintext header field — Argon2id parameters, salts, ML-KEM ciphertext, X25519 public key, YubiKey records, alias, passphrase_blob — is committed to the authentication tag. Any modification to the header without the vault key causes body decryption to fail immediately. The nonce is excluded from AAD because AES-GCM authenticates it implicitly.
+- **Rename-requires-login**: `set_vault_alias` now requires an active (unlocked) session. The body is re-sealed with the new alias as AAD so the alias change is cryptographically binding.
+- **Re-seal on all header mutations**: add-YubiKey, remove-YubiKey, and passphrase-change for multi-key vaults now all re-seal the body so the updated header is committed as AAD.
+- **Alias preservation**: `save_vault` and `save_vault_with_yubikey` now read and preserve the existing alias from disk before a full re-seal, preventing CRUD saves from silently clearing an alias set at vault creation.
+- **Flutter rename flow**: `onRename` in `main.dart` now calls `setVaultAlias` for the currently active vault, keeping the file-header alias in sync with the registry alias.
+- **Alias bound to body at seal time**: `seal_vault`, `seal_vault_with_yubikey`, and `seal_vault_with_keys` now accept an `alias` parameter so the alias is part of the partial `SealedVault` before `header_aad()` is computed. Previously the alias was set on the returned struct after sealing, causing an AAD mismatch on every open.
+- **Vault-list AppBar reflects rename immediately**: `VaultListScreen` now reads the active vault alias from `GabbroApp.registry` at build time rather than from the frozen `vaultAlias` prop set at unlock, so the AppBar title updates as soon as the user navigates back from Manage Vaults without requiring a lock/unlock cycle.
+- **V6 multi-key vaults migrate to V7 on first CRUD save**: `reseal_vault_body` now bumps `sealed.version` to `VERSION` (7) before computing AAD, so passphrase+YubiKey vaults (and any other multi-key V6 vault) are transparently upgraded on the next re-seal operation.
+
 ### Changed
 - Dependency surface audit (Phase 1): replaced `once_cell::sync::Lazy` with `std::sync::LazyLock` (stabilised in Rust 1.80) in `vault/session.rs`; removed `once_cell` as a direct dependency.
 - Dependency licence audit (Phase 2): ran `cargo update` (65 Cargo.lock entries updated within SemVer ranges; no `Cargo.toml` version bumps required). All Flutter direct deps already current per `flutter pub outdated`. Added missing `intl`, `jni`, and `libfido2-sys` to the Open Source Components list in About screen.

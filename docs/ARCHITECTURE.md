@@ -145,8 +145,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 349 | 8 |
-| Flutter (`flutter test`) | 491 | 0 |
+| Rust (`cargo test -q`) | ~370 | 8 |
+| Flutter (`flutter test`) | 492 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -157,35 +157,19 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next tasks (three phases)
+### Next session
 
-v0.1.0-alpha.4 released 2026-06-03. Tag pushed, GitHub release published with Linux and Android artifacts.
-
-In-app help carousel shipped (post-alpha.4, unreleased). 12 annotated screenshots, fully localised, accessible via Menu → Help.
-
-**Phase 1 — Dependency surface audit** ✓ done 2026-06-04
-`once_cell` removed — replaced with `std::sync::LazyLock` (Rust 1.80+) in `vault/session.rs`. All other direct deps are genuinely irreplaceable (crypto, FFI, serialisation). `once_cell` remains in the transitive graph via `flutter_rust_bridge`.
-
-**Phase 2 — Dependency licence audit** ✓ done 2026-06-04
-`cargo update` applied (65 Cargo.lock entries updated within SemVer ranges; no `Cargo.toml` bumps required — all direct deps already at their latest semver-compatible version). Flutter direct deps all current per `flutter pub outdated`. Added missing `intl` (BSD-3-Clause), `jni` (MIT), `libfido2-sys` (BSD-2-Clause) to `_kComponents` in `about_screen.dart`.
-
-**Phase 3 — Header integrity + rename-requires-login (F-01)**
-Make plaintext-header tampering detectable. Design already specified in Bikeshed:
-- `set_vault_alias` requires an unlocked session (like delete)
-- Re-seal body on every header-mutating op using the session's cached `vault_key_master`
-- Bind stable header fields to the AES-GCM tag as AAD (`SealedVault::header_aad()` + `aes_gcm::*_with_aad`)
-- VERSION 7 bump. Cross-stack: Flutter rename flow + `vault_bridge` + `vault_crypto` + `aes_gcm`.
+Next task: release **v0.1.0-alpha.5** (full `cargo test -q` + `flutter test` gate, then tag + artifacts). Bundles: in-app help carousel, Phases 1–3 (dependency audit, licence audit, header integrity / VERSION 7).
 
 ### Open from the security audit
 
 Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 
-- **F-01** — reclassified (header-as-AAD is architecturally incompatible here); the viable path is the **Header integrity + rename-requires-login** Bikeshed feature (VERSION 7).
 - **F-03** — X-Wing transcript-binding combiner; gated on a human cryptographer (no verifiable-against-spec answer).
 - **F-10** — eTLD+1 autofill matching; post-v1 "Strict FQDN" toggle.
 - **L-3** — iOS Keychain protection class; V2+ iOS port.
 
-Everything else (F-02, F-04–F-09, F-11, L-6) is done — see the audit doc.
+Everything else (F-01, F-02, F-04–F-09, F-11, L-6) is done — see the audit doc.
 
 ---
 
@@ -259,6 +243,7 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - Add import from Google Password Manager functionality
+- Add import from Dashlane Password Manager functionality
 
 ### Code Quality
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.

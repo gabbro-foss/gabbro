@@ -3608,3 +3608,59 @@ in practice, but it is a subtle property of the format worth documenting.
 (`HKDF(yubikey_salt, intermediate_key ∥ hmac_secret, "gabbro-yubikey-v1")`),
 entirely separate from the hybrid KEM combiner. The two steps are independent.
 in tests that chain two dialogs.
+
+---
+
+## AES-GCM AAD — the partial-struct ordering trap
+
+When using AES-GCM additional authenticated data (AAD) to bind a plaintext
+header to an encrypted body, every mutable header field must be **finalised
+before** `header_aad()` is called.  The typical pitfall:
+
+```rust
+// WRONG — alias set after seal; AAD was computed without it
+let mut sealed = seal_vault(passphrase, plaintext)?;
+sealed.alias = Some("Work".to_string());  // header ≠ AAD → open fails
+```
+
+The fix is to include all header fields as constructor arguments so the partial
+`SealedVault` already has the correct alias when `header_aad()` runs:
+
+```rust
+// CORRECT — alias is in the struct before header_aad() is called
+let sealed = seal_vault(passphrase, plaintext, Some("Work".to_string()))?;
+```
+
+This is easy to miss because the bug only surfaces at *open* time, not at seal
+time — the AES-GCM tag is computed over the wrong AAD and silently written to
+disk; decryption simply fails later with an opaque authentication error.
+
+**Rule:** never mutate a `SealedVault`'s header fields after the body has been
+sealed.  The only legitimate post-seal mutation is via `reseal_vault_body`,
+which re-derives the nonce and ciphertext under the current (potentially
+updated) header.
+
+---
+
+## Flutter route state vs parent setState
+
+Widgets pushed onto the Navigator stack via `pushReplacement` (e.g.
+`VaultListScreen`) receive their props at push time.  A parent `setState` call
+that updates `_registry` does **not** automatically propagate into a pushed
+route's frozen `widget.*` props.
+
+The correct pattern for props that can change while a route is on the stack
+(such as a vault alias that can be renamed from a *different* route) is to read
+them from a shared ancestor at `build()` time:
+
+```dart
+// Frozen prop — stale after parent setState
+widget.vaultAlias
+
+// Live read — always current when build() runs
+GabbroApp.maybeOf(context)?.registry.lastUsed?.alias ?? widget.vaultAlias
+```
+
+Because Flutter calls `build()` when a route becomes the top of the stack
+(e.g. the covering route is popped), the live read sees the latest state
+without any explicit notification mechanism.
