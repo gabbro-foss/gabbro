@@ -2,9 +2,9 @@
 
 A post-quantum password manager built with security as core DNA.
 
-> **Status: Alpha — v0.1.0-alpha.1 released 2026-05-30 (invited testers only).**
+> **Status: Alpha — v0.1.0-alpha.5 (invited testers only).**
 > All vault operations are implemented and tested in Rust.
-> Flutter UI implemented (450 tests passing).
+> Flutter UI implemented (492 tests passing).
 
 ---
 
@@ -29,6 +29,7 @@ Named after the intrusive igneous rock — hard, stable, enduring.
 - **Local-first** — your vault lives on your device; sync is your
   choice and your responsibility
 - **Localised** — UI available in English, French, German, Italian, and Spanish; follows system locale with in-app override
+- **In-app help** — offline help carousel; no external website or internet connection required
 - **FOSS** — GPL-3.0-only licensed
 
 ---

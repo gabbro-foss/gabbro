@@ -15,7 +15,7 @@ The Executive summary and findings below are the **original 2026-05-31 pass**, k
 
 | Finding | Sev. | Status |
 |---------|------|--------|
-| **F-01** header not AEAD-authenticated | Low | **Reclassified** — body-AAD is architecturally incompatible here; viable path is the "Header integrity + rename-requires-login" feature (VERSION 7). |
+| **F-01** header not AEAD-authenticated | Low | **Fixed** (VERSION 7, 2026-06-05) — full header bound as AES-GCM AAD; alias rename and key management now require unlock + reseal. |
 | **F-02** ML-KEM KeyGen vs FIPS 203 | Low | **Fixed** 2026-06-01 (VERSION 6, `generate_deterministic(d,z)`). |
 | **F-03** hybrid combiner not transcript-binding | Low | **Open** — gated on human crypto review (X-Wing). |
 | **F-04** session secrets not `Zeroizing` | Low | **Fixed** (Round 1). |
@@ -28,7 +28,7 @@ The Executive summary and findings below are the **original 2026-05-31 pass**, k
 | **F-11** decrypted body not zeroized | Low | **Fixed** 2026-06-01 (found by the memory-forensics self-test). |
 | **L-6** memory-forensics test | — | **Done** 2026-06-01 (`scripts/mem_forensics.sh`). |
 
-**Still open:** F-01 (→ feature), F-03 (→ human crypto review), F-10 (→ post-v1). Everything else is fixed or by-design.
+**Still open:** F-03 (→ human crypto review), F-10 (→ post-v1). Everything else is fixed or by-design.
 
 ---
 
@@ -113,7 +113,13 @@ Severity scale: **High** = immediate exploitable defect | **Medium** = realistic
 
 ### F-01 (Low) — AES-GCM does not authenticate the vault header (no AAD)
 
-**Status — RECLASSIFIED (2026-06-01); NOT implemented as recommended.** The recommended fix (pass the serialised header as AAD to the **body** `encrypt`/`decrypt`) is architecturally incompatible with Gabbro. Tracing the code: `set_vault_alias` (`api/vault_bridge.rs:619`) rewrites the alias with no passphrase, no key, and no body reseal; `add_key_to_sealed` / `remove_key_from_sealed` / `change_vault_passphrase_with_keys` mutate the header without re-encrypting the body (and the passphrase-change path has no `vault_key_master` to reseal with). So any field AAD could *safely* bind is one that no header-mutating op changes without a body reseal — and those (Argon2 params, salts, ML-KEM ct, ephemeral pubkey, nonce) are **already self-protecting**: they feed key derivation, so tampering yields the wrong key and decryption fails closed. The fields that actually need protection — `alias`, YubiKey `credential_id`, record order — are exactly the ones changed *without* the unlock secret, so they cannot be bound to a tag that requires that secret to recompute. Net: header-as-body-AAD adds zero protection over the status quo and breaks the rename/key-management features. Reclassified to the ARCHITECTURE.md Bikeshed feature **"Header integrity + rename-requires-login"**, whose first step (rename requires an unlocked session, like delete) is the precondition that makes header authentication achievable. **For the human reviewer:** decide whether that VERSION 7 feature is worth it versus accepting `alias` as documented plaintext metadata (this finding's own assessment: "pure metadata; no credential compromise").
+**Status — FIXED (VERSION 7, 2026-06-05).** The architectural incompatibility described in the 2026-06-01 reclassification was resolved by enforcing unlock as a precondition for all header-mutating operations:
+
+- `set_vault_alias` now requires an active (unlocked) session and re-seals the body so the new alias is bound as AAD.
+- `add_yubikey_to_vault` / `remove_yubikey_from_vault` call `reseal_vault_body` after modifying the YubiKey records list so the updated header is committed as AAD.
+- `change_vault_passphrase_with_keys` re-seals the body with the new header material.
+
+The `header_aad()` function in `vault/file_format.rs` now commits every plaintext header field — Argon2id parameters, both salts, ML-KEM ciphertext, X25519 ephemeral public key, all YubiKey records (credential IDs, salts, key blobs), alias, and passphrase_blob — to the AES-GCM authentication tag. Modification of any of these without the vault key causes body decryption to fail. Vaults below VERSION 7 are migrated on first save. YubiKey credential IDs remain visible in the plaintext header by design (needed for key selection at the unlock screen), but can no longer be changed silently.
 
 **Where:** `rust/src/crypto/aes_gcm.rs:27` (`cipher.encrypt(nonce, plaintext)`), `:44` (`cipher.decrypt(nonce, ciphertext)`)
 
@@ -348,7 +354,7 @@ The Proton report scored **8 findings** (1 medium, 7 low) and recorded **6 unsco
 | 526.2501.002      | Insecure Permissions on Session Token Files              | 3.3  | **Yes**               | New finding **F-08** above. Vault file is encrypted; header is plaintext. |
 | 526.2501.003      | Non-atomic Permission Setting may Enable Race Conditions | 3.3  | **Yes**               | Covered by **F-08** recommendation (temp-file + atomic rename).        |
 | 526.2501.004      | TOCTOU in Process Termination Logic (`kill_process_by_pid`) | 3.2 | No                | Gabbro does not kill external processes. `unsafe { libc::kill }` is not present in scope. |
-| 526.2501.101      | Username Appears In Device Storage (Android Pass app)    | 2.3  | **Mostly no**         | Gabbro has no account / email / sign-in. Vault alias is plaintext in header (see F-01). No log files. No SQLite. |
+| 526.2501.101      | Username Appears In Device Storage (Android Pass app)    | 2.3  | **Mostly no**         | Gabbro has no account / email / sign-in. Vault alias is visible in the plaintext header (by design; see F-01 — fixed in VERSION 7, alias integrity now enforced via AAD). No log files. No SQLite. |
 | 526.2501.102      | Inconsistent User Data Removal (SQLite WAL retention)    | 4.4  | No                    | Gabbro is single-file (`.gabbro`) — not SQLite. Deletion is `fs::remove_file`. **Architectural choice that avoids this entire bug class.** |
 | 526.2501.301      | iOS Weak Keychain Protection Class                       | 1.9  | **Not yet**           | iOS port is v2+. **Bikeshed entry recommended** — when iOS lands, use `kSecAttrAccessibleWhenUnlockedThisDeviceOnly` for any Keychain-stored secret (probably none, since gabbro doesn't store the master passphrase). |
 | 526.2501.201      | Missing FQDN Match may leak Credentials on Subdomains    | N/A  | **Yes**               | New finding **F-10** above. Same eTLD+1 default as Proton; same defensible UX tradeoff. |
@@ -452,7 +458,7 @@ No CI workflows exist yet (`.github/` contains only `FUNDING.yml`). When CI is a
 | Injection (SQL/NoSQL)                 | N/A — no database. JSON serialization is via `serde_json`, no string concatenation.    |
 | Authentication / session              | Argon2id + FIDO2 hmac-secret; min 2 keys (ADR-010). Master key never crosses bridge.   |
 | Access control                        | Single-user local app; vault-level access only.                                        |
-| Cryptography                          | See NIST alignment table; F-01 to F-03.                                                |
+| Cryptography                          | See NIST alignment table; F-01 fixed (VERSION 7); F-03 open (transcript binding, human reviewer).  |
 | Data flow                             | Secrets live in Rust; Flutter receives `EntrySummaryData` (no passwords) for list view. Autofill JSON is a documented, narrowly-scoped exception (F-04). |
 | Business logic                        | Multi-key invariant (≥2 keys); passphrase change preserves all key_blobs; legacy V2 path explicit. |
 | Configuration / deployment            | Keystore + key.properties git-ignored and verified absent from history.                |
@@ -506,7 +512,7 @@ Crates scanned: 211. **CVEs / RUSTSEC vulnerabilities: 0.** Warnings: 4 (informa
 
 This AI audit is informational. The Bikeshed pre-v1 gate still requires:
 
-1. **Academic / RustCrypto-maintainer review** of the hybrid construction in `vault_crypto.rs`. F-01, F-02, F-03 are exactly the questions to put in front of that reviewer.
+1. **Academic / RustCrypto-maintainer review** of the hybrid construction in `vault_crypto.rs`. F-03 (transcript-binding combiner) is the primary open question. F-01 and F-02 are fixed; the reviewer should verify the implementations but no design questions remain for those.
 2. **Side-channel analysis** of the Argon2id / X25519 / ML-KEM call sites against the chosen target hardware. AI cannot reason about timing/cache leakage at compiled-code level.
 3. **Formal model** of the multi-key vault state machine (`seal_vault_with_keys`, `add_key_to_sealed`, `remove_key_from_sealed`, `change_vault_passphrase_with_keys`) to verify the invariant "any single registered key unlocks; passphrase change does not invalidate any key_blob".
 4. **External cryptographic audit** as listed in ARCHITECTURE.md → Bikeshed → "Security (pre-v1 gates)".

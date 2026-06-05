@@ -17,12 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Vault-list AppBar reflects rename immediately**: `VaultListScreen` now reads the active vault alias from `GabbroApp.registry` at build time rather than from the frozen `vaultAlias` prop set at unlock, so the AppBar title updates as soon as the user navigates back from Manage Vaults without requiring a lock/unlock cycle.
 - **V6 multi-key vaults migrate to V7 on first CRUD save**: `reseal_vault_body` now bumps `sealed.version` to `VERSION` (7) before computing AAD, so passphrase+YubiKey vaults (and any other multi-key V6 vault) are transparently upgraded on the next re-seal operation.
 
+### Fixed
+- `docs/AI_SECURITY_AUDIT.md`: F-01 status corrected from "Reclassified" to "Fixed (VERSION 7)". The architectural incompatibilities cited in the reclassification (alias rename without unlock, key management without reseal) were resolved as part of the VERSION 7 work; the finding is fully addressed. Updated remediation table, "Still open" summary line, and the finding section text.
+- `docs/SECURITY.md`: F-01 "Known limitations" section updated to reflect VERSION 7 header-integrity guarantee; stale "planned for a future version" text removed.
+
 ### Changed
 - Dependency surface audit (Phase 1): replaced `once_cell::sync::Lazy` with `std::sync::LazyLock` (stabilised in Rust 1.80) in `vault/session.rs`; removed `once_cell` as a direct dependency.
 - Dependency licence audit (Phase 2): ran `cargo update` (65 Cargo.lock entries updated within SemVer ranges; no `Cargo.toml` version bumps required). All Flutter direct deps already current per `flutter pub outdated`. Added missing `intl`, `jni`, and `libfido2-sys` to the Open Source Components list in About screen.
 
 ### Added
-- In-app help screen: carousel of 12 annotated screenshots accessible from the main menu (Menu → Help). Swipeable `PageView` with per-slide localised captions and dot-indicator navigation. All 14 l10n keys translated across 5 languages (EN/DE/ES/FR/IT). Help images normalised: Flameshot border artefacts trimmed, uniform 8 px `#5C7A3E` padding applied to all 12 assets.
+- In-app help screen: carousel of 12 annotated screenshots accessible from the main menu (Menu → Help). Swipeable `PageView` with per-slide localised captions and dot-indicator navigation. All 14 l10n keys translated across 5 languages (EN/DE/ES/FR/IT). Help images normalised: Flameshot border artefacts trimmed, uniform 8 px `#5C7A3E` padding applied to all 12 assets. Help is fully offline — no network request, no link to an external website or social media.
+- `docs/SECURITY.md`: in-app offline help added to the competitor comparison table as a differentiator. Gabbro's help carousel requires no internet connection and makes no external calls, unlike apps that redirect users to company websites or social media for support.
 
 ## [0.1.0-alpha.4] – 2026-06-03
 

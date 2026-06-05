@@ -1394,35 +1394,57 @@ A followed by B joined into a single byte sequence. Not a logical OR.
 In Rust: `ikm.extend_from_slice(&a); ikm.extend_from_slice(&b)`.
 In Python: `a + b` on byte arrays.
 
-### Seeded RNG for deterministic keypair derivation
-The `ml-kem` and `x25519-dalek` v2 crates do not accept raw byte
-seeds directly for keypair generation — they require an RNG. To
-derive keypairs deterministically from KDF output, we seed `StdRng`
-(a cryptographically secure deterministic RNG from the `rand` crate)
-with our KDF bytes, then pass it to the keypair generator. Same seed
-→ same RNG stream → same keypair. This is the idiomatic approach;
-the `ml-kem` crate's direct seed API (`hazmat` feature) is explicitly
-marked unsafe for production use.
+### Seeded RNG for deterministic keypair derivation (legacy, VERSION ≤ 5)
+For Argon2id KDF output bytes [32..64], the original (VERSION ≤ 5) approach
+seeded `StdRng` (a cryptographically secure deterministic RNG) with those 32
+bytes and passed the RNG to the keypair generator. Same seed → same RNG stream
+→ same keypair. The `ml-kem` crate's `hazmat` feature offered a direct seed API
+but was explicitly marked unsafe for production use at the time.
 
-### Hybrid key exchange — the lock/unlock flow
+Since VERSION 6, the FIPS 203-conformant path is used instead (see below).
+The legacy `StdRng` path is retained in `from_kdf_output_legacy` to keep
+VERSION ≤ 5 vaults readable; new vaults always use `from_kdf_output_fips`.
+
+### FIPS 203-conformant ML-KEM keypair derivation (VERSION 6+)
+FIPS 203 §7.1 specifies `ML-KEM.KeyGen(d, z)` where `d` and `z` are each
+32-byte uniform seeds. Since VERSION 6, Gabbro feeds KDF output bytes directly:
+
+```
+bytes [32..64] → d  (first  ML-KEM seed)
+bytes [64..96] → z  (second ML-KEM seed)
+```
+
+The `ml-kem` crate (≥ 0.2.3) exposes this via the `deterministic` feature and
+`MlKem1024::generate_deterministic(d, z)` — no `StdRng` indirection, no bytes
+discarded, FIPS 203 §7.1 conformant. This was discovered during the
+AI-assisted security audit (F-02) when the doc-comment claimed both 32-byte
+halves were used but the implementation only consumed the first 32.
+
+### Hybrid key exchange — the lock/unlock flow (VERSION 6+)
 
 ```
 SETUP: passphrase + salt → Argon2id → 96 bytes
-bytes [0..32]  → seed StdRng → X25519 keypair
-bytes [32..64] → seed StdRng → ML-KEM-1024 keypair
-bytes [64..96] → reserved
+bytes [0..32]  → X25519 static private key (clamped directly)
+bytes [32..64] → d  → ML-KEM.KeyGen(d, z) → ML-KEM-1024 keypair  ← FIPS 203 §7.1
+bytes [64..96] → z  ↗
+
 LOCK:
 ML-KEM encapsulate → ml_kem_ciphertext + shared_secret_A
 X25519 ephemeral exchange → ephemeral_public + shared_secret_B
-HKDF(A || B, salt, "gabbro-hybrid-kex-v1") → vault_key
-AES-256-GCM(vault_key, plaintext) → ciphertext + nonce
+HKDF(hkdf_salt, A ∥ B, "gabbro-hybrid-kex-v1") → intermediate_key
+AES-256-GCM(intermediate_key, plaintext, AAD=header_aad()) → ciphertext + nonce  ← VERSION 7 AAD
+
 UNLOCK:
-Argon2id(passphrase, stored_salt) → same keypairs
-ML-KEM decapsulate(stored_ciphertext) → shared_secret_A
+Argon2id(passphrase, stored_argon2_salt) → same 96 bytes → same keypairs
+ML-KEM decapsulate(stored_ml_kem_ciphertext) → shared_secret_A
 X25519(stored_ephemeral_public) → shared_secret_B
-HKDF(A || B, stored_salt, info) → vault_key
-AES-256-GCM decrypt → plaintext
+HKDF(stored_hkdf_salt, A ∥ B, info) → intermediate_key
+AES-256-GCM decrypt(intermediate_key, ciphertext, nonce, AAD=header_aad()) → plaintext
 ```
+
+For VERSION ≤ 5 (legacy read path), `bytes [32..64]` seeded `StdRng` instead
+of feeding `d/z` directly. The file's version byte selects the path at open time
+(`ml_kem_keypair_for_version` in `vault_crypto.rs`).
 
 ### Random session key vs passphrase-derived key
 The vault body is encrypted with a random session key, not the

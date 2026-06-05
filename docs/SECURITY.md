@@ -1,7 +1,7 @@
 # Gabbro — Security Overview
 
 **Version:** pre-v1 (0.1.0-alpha)  
-**Last updated:** 2026-06-01  
+**Last updated:** 2026-06-05  
 **Status: this codebase has not been reviewed by an external cryptographer or security auditor.**
 
 ---
@@ -224,19 +224,31 @@ A long, randomly generated passphrase (use the built-in generator) substantially
 raises the cost of a brute-force attack, but cannot match the categorical
 protection of a hardware second factor. **If you have a YubiKey, use it.**
 
-### F-01 — Vault header is partially unauthenticated
+### Header integrity (fixed in VERSION 7)
 
-The `.gabbro` file has a plaintext header. Most header values feed key derivation
-— if any of those are tampered, decryption fails and no data is released.
-However, two fields are not cryptographically protected:
+Since VERSION 7, every byte of the `.gabbro` plaintext header — Argon2id
+parameters, salts, ML-KEM ciphertext, X25519 public key, YubiKey records (including
+credential IDs, salts, and key blobs), alias, and passphrase_blob — is committed to
+the AES-256-GCM authentication tag as additional authenticated data (AAD). Any
+modification to the header without possessing the vault key causes body decryption
+to fail immediately.
 
-- **Alias** (the vault's display name): can be changed by anyone with file-system
-  access without detection. No credential compromise results.
-- **YubiKey credential IDs**: observable to anyone who can read the file. This is
-  by design — the login screen needs them to select the right key before unlock.
+**What this protects:**
+- **Alias**: renaming the vault without an active unlocked session is now detectable.
+  The rename path requires unlock; the body is re-sealed with the new alias bound as
+  AAD.
+- **YubiKey records**: adding, removing, or reordering records without the vault key
+  causes decryption failure. Key management operations (add / remove YubiKey) always
+  re-seal the body with the updated header as AAD.
 
-This is planned for a future version. It does not affect the confidentiality of
-your passwords.
+**What remains observable (by design):**
+- **YubiKey credential IDs** are still visible in the plaintext header — the unlock
+  screen needs them to identify the right key before any decryption can occur. They
+  cannot be silently changed or removed, but they can be read by anyone with
+  file-system access to the vault file.
+
+Existing vaults (VERSION ≤ 6) gain this protection automatically on the next save,
+CRUD operation, or key management action.
 
 ### F-03 — Hybrid KEM combiner is not transcript-binding
 
@@ -274,8 +286,10 @@ manager. The protections available depend on which mode you use.
 **In scope — passphrase-only mode:**
 - File disclosure/theft: Argon2id raises the cost of offline brute-force. A weak
   passphrase is still at risk.
-- File tampering: AES-GCM authentication tag detects ciphertext tampering. Header
-  tampering is partially detectable (see F-01).
+- File tampering: AES-GCM authentication tag detects ciphertext tampering. Since
+  VERSION 7 the full plaintext header is also bound as AAD, so header tampering is
+  detected on the next decrypt attempt. YubiKey credential IDs remain visible in
+  the header (by design) but cannot be silently modified.
 - Local file permissions: `0600` prevents other local users from reading the file.
 - Memory after lock: `Zeroizing` scrubs secrets; verified by `gcore` self-test.
 
@@ -311,6 +325,7 @@ the current implementation.
 | Memory-scrubbing on lock | ✓ (verified by gcore test) | ✓ (documented) | Unknown | Relies on GPG agent |
 | External cryptographic audit | **✗ none yet** | ✓ multiple | ✓ multiple (Cure53, etc.) | ✓ (GPG is audited) |
 | No telemetry | ✓ | ✓ | ✓ (self-hosted) | ✓ |
+| In-app help (offline, no external calls) | ✓ | Partial (local CHM on Windows; online wiki for many topics) | ✗ (links to bitwarden.com) | ✓ (man pages) |
 | File format stability | Pre-v1 (may change) | Stable (KDBX4) | Stable | Stable (GPG) |
 
 **Note:** KeePass and Bitwarden have received multiple independent security audits.
