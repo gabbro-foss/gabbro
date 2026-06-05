@@ -161,7 +161,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 Next tasks (in order):
 
-1. **Release v0.1.0-alpha.5** — full `cargo test -q` + `flutter test` gate (both green), then tag + artifacts. Bundles: in-app help carousel, Phases 1–3 (dependency audit, licence audit, header integrity / VERSION 7), multi-language expansion (all 35 locales complete).
+1. **Release v0.1.0-alpha.5** — full `cargo test -q` + `flutter test` gate (both green), then tag + artifacts. Bundles: in-app help carousel, Phases 1–3 (dependency audit, licence audit, header integrity / VERSION 7), multi-language expansion (33 user-facing locales complete).
 
 ### Open from the security audit
 
@@ -280,7 +280,7 @@ The passphrase generator uses EFF-style wordlists compiled into the Rust binary 
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - Add import from Google Password Manager functionality
 - Add import from Dashlane Password Manager functionality
-- Passphrase generator language expansion: extend the passphrase wordlist selector to match the 26-locale UI language list (see § Multi-language expansion Step 3). Rust work — source / create EFF-style wordlists, extend `Language` enum, re-embed, regenerate bridge. CJK and some low-resource locales need a design decision. Prerequisite: UI language expansion (Step 2) already merged.
+- Passphrase generator language expansion: extend the passphrase wordlist selector to match the 33-locale UI language list (see § Multi-language expansion Step 3). Rust work — source / create EFF-style wordlists, extend `Language` enum, re-embed, regenerate bridge. CJK and some low-resource locales need a design decision. Prerequisite: UI language expansion (Step 2) already merged.
 
 ### Code Quality
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
