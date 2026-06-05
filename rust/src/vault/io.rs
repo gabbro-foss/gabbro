@@ -112,7 +112,7 @@ mod tests {
         let passphrase = b"correct horst battery staple";
         let plaintext = b"vault io roundtrip test";
 
-        let sealed = seal_vault(passphrase, plaintext).unwrap();
+        let sealed = seal_vault(passphrase, plaintext, None).unwrap();
         write_vault(&sealed, &path).unwrap();
         let recovered_sealed = read_vault(&path).unwrap();
         let recovered_plaintext = open_vault(passphrase, &recovered_sealed).unwrap();
@@ -130,7 +130,7 @@ mod tests {
         let passphrase = b"header test passphrase";
         let plaintext = b"header test body";
 
-        let mut sealed = seal_vault(passphrase, plaintext).unwrap();
+        let mut sealed = seal_vault(passphrase, plaintext, None).unwrap();
         sealed.alias = Some("Personal".to_string());
         write_vault(&sealed, &path).unwrap();
 
@@ -153,7 +153,7 @@ mod tests {
         let passphrase = b"no alias test";
         let plaintext = b"no alias body";
 
-        let sealed = seal_vault(passphrase, plaintext).unwrap();
+        let sealed = seal_vault(passphrase, plaintext, None).unwrap();
         write_vault(&sealed, &path).unwrap();
 
         let header = read_vault_header(&path).unwrap();
@@ -191,7 +191,7 @@ mod tests {
         let passphrase = b"perms test passphrase";
         let plaintext = b"perms test body";
 
-        let sealed = seal_vault(passphrase, plaintext).unwrap();
+        let sealed = seal_vault(passphrase, plaintext, None).unwrap();
         write_vault(&sealed, &path).unwrap();
 
         let mode = fs::metadata(&path).unwrap().permissions().mode() & 0o777;
@@ -213,7 +213,7 @@ mod tests {
         fs::write(&real, b"placeholder").unwrap();
         symlink(&real, &link).unwrap();
 
-        let sealed = seal_vault(b"pw", b"body").unwrap();
+        let sealed = seal_vault(b"pw", b"body", None).unwrap();
         let err = write_vault(&sealed, &link).unwrap_err();
 
         let _ = fs::remove_file(&real);
@@ -236,7 +236,7 @@ mod tests {
         let _ = fs::remove_file(&real);
         let _ = fs::remove_file(&link);
 
-        let sealed = seal_vault(b"pw", b"body").unwrap();
+        let sealed = seal_vault(b"pw", b"body", None).unwrap();
         let bytes = sealed.to_bytes();
         fs::write(&real, &bytes).unwrap();
         symlink(&real, &link).unwrap();
