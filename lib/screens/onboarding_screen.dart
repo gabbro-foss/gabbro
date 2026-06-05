@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
+import 'package:gabbro/screens/language_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
@@ -515,26 +516,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     showModalBottomSheet<void>(
       context: context,
       builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final lang in LanguageChoice.values)
-              ListTile(
-                title: Text(switch (lang) {
-                  LanguageChoice.system => l.langSystem,
-                  LanguageChoice.en => l.langEnglish,
-                  LanguageChoice.fr => l.langFrench,
-                  LanguageChoice.de => l.langGerman,
-                  LanguageChoice.it => l.langItalian,
-                  LanguageChoice.es => l.langSpanish,
-                }),
-                selected: app.settings.language == lang,
-                onTap: () {
-                  app.updateSettings(app.settings.copyWith(language: lang));
-                  Navigator.of(ctx).pop();
-                },
-              ),
-          ],
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.6,
+          ),
+          child: ListView(
+            children: [
+              for (final lang in sortedLanguageChoices(l))
+                ListTile(
+                  title: Text(languageChoiceLabel(lang, l)),
+                  selected: app.settings.language == lang,
+                  onTap: () {
+                    app.updateSettings(app.settings.copyWith(language: lang));
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+            ],
+          ),
         ),
       ),
     );
