@@ -161,8 +161,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 Next tasks (in order):
 
-1. **Multi-language expansion — Step 2 (cont.)** — 13 ARB files still to write: `sk`, `hr`, `sl`, `sr_Latn` + `sr` (fallback), `el`, `ja`, `ko`, `zh_CN`, `zh_TW` + `zh` (fallback), `kk`, `eu`, `yo`. Run `flutter gen-l10n` + `flutter test` after completion. See § Multi-language expansion below.
-2. **Release v0.1.0-alpha.5** — full `cargo test -q` + `flutter test` gate (both green), then tag + artifacts. Bundles: in-app help carousel, Phases 1–3 (dependency audit, licence audit, header integrity / VERSION 7), multi-language expansion.
+1. **Release v0.1.0-alpha.5** — full `cargo test -q` + `flutter test` gate (both green), then tag + artifacts. Bundles: in-app help carousel, Phases 1–3 (dependency audit, licence audit, header integrity / VERSION 7), multi-language expansion (all 35 locales complete).
 
 ### Open from the security audit
 
@@ -180,9 +179,9 @@ Everything else (F-01, F-02, F-04–F-09, F-11, L-6) is done — see the audit d
 
 **Step 1 — UI prerequisite: DONE.** Scrollable sorted language picker replaces chip row in both `language_screen.dart` and `onboarding_screen.dart`. Single source of truth via `languageChoiceLabel()` and `sortedLanguageChoices()`.
 
-**Step 2 — ARB files + wiring: IN PROGRESS (22 of 35 done).**
+**Step 2 — ARB files + wiring: COMPLETE (34/34 done).**
 
-`LanguageChoice` enum now has 34 user-facing values + `system` (= 35 total). `_localeFor()` in `main.dart` handles complex BCP-47 tags.
+`LanguageChoice` enum has 33 user-facing values + `system` (= 34 total). `_localeFor()` in `main.dart` handles complex BCP-47 tags.
 
 | Locale | Language | Done | Notes |
 |--------|----------|------|-------|
@@ -202,18 +201,18 @@ Everything else (F-01, F-02, F-04–F-09, F-11, L-6) is done — see the audit d
 | `bg` | Bulgarian | ✓ | |
 | `pl` | Polish | ✓ | |
 | `cs` | Czech | ✓ | |
-| `sk` | Slovak | — | Next session |
-| `hr` | Croatian | — | Next session |
-| `sl` | Slovenian | — | Next session |
-| `sr_Latn` | Serbian (Latin) | — | Needs `app_sr.arb` fallback too |
-| `el` | Greek | — | Next session |
-| `ja` | Japanese | — | Next session |
-| `ko` | Korean | — | Next session |
-| `zh_CN` | Chinese Simplified | — | Needs `app_zh.arb` fallback too |
-| `zh_TW` | Chinese Traditional | — | Next session |
-| `kk` | Kazakh | — | Native reviewer requested before commit |
-| `eu` | Basque | — | Next session |
-| `yo` | Yoruba | — | Next session |
+| `sk` | Slovak | ✓ | |
+| `hr` | Croatian | ✓ | |
+| `sl` | Slovenian | ✓ | |
+| `sr_Latn` | Serbian (Latin) | ✓ | `app_sr.arb` fallback = sr_Latn content |
+| `el` | Greek | ✓ | |
+| `ja` | Japanese | ✓ | |
+| `ko` | Korean | ✓ | |
+| `zh_CN` | Chinese Simplified | ✓ | `app_zh.arb` fallback = zh_CN content |
+| `zh_TW` | Chinese Traditional | ✓ | |
+| `kk` | Kazakh | ✓ | AI-translated; native review recommended before v1 |
+| `eu` | Basque | ✓ | |
+| `yo` | Yoruba | ✓ | |
 
 **Deferred:** Hebrew (RTL layout work required), Scottish Gaelic (low resource), Arabic (RTL).
 

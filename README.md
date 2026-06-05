@@ -28,7 +28,7 @@ Named after the intrusive igneous rock — hard, stable, enduring.
   Rust; secrets never cross the Flutter/Rust bridge in plaintext
 - **Local-first** — your vault lives on your device; sync is your
   choice and your responsibility
-- **Localised** — UI available in English, French, German, Italian, and Spanish; follows system locale with in-app override
+- **Localised** — UI available in 33 languages (EN, FR, DE, IT, ES, and 28 more); follows system locale with in-app override
 - **In-app help** — offline help carousel; no external website or internet connection required
 - **FOSS** — GPL-3.0-only licensed
 

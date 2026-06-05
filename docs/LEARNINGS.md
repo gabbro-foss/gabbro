@@ -4,6 +4,44 @@ A running journal of concepts covered during development.
 
 ---
 
+## Flutter l10n — `GlobalMaterialLocalizations` does not cover all BCP-47 tags
+
+`GlobalMaterialLocalizations.delegate.isSupported(locale)` returns `false` for
+locales outside Flutter's built-in set (e.g. `yo` Yoruba, `nn` Norwegian
+Nynorsk). When `MaterialApp.locale` is set to such a locale, every Material
+widget that calls `MaterialLocalizations.of(context)!` crashes with
+`Null check operator used on a null value`.
+
+Fix: replace `GlobalMaterialLocalizations.delegate` with a custom wrapper that
+intercepts unsupported locales and loads English Material strings instead.
+Our ARB delegate is unaffected and still loads in the correct language.
+
+```dart
+class _FallbackMaterialLocalizationsDelegate
+    extends LocalizationsDelegate<MaterialLocalizations> {
+  const _FallbackMaterialLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<MaterialLocalizations> load(Locale locale) {
+    if (GlobalMaterialLocalizations.delegate.isSupported(locale)) {
+      return GlobalMaterialLocalizations.delegate.load(locale);
+    }
+    return GlobalMaterialLocalizations.delegate.load(const Locale('en'));
+  }
+
+  @override
+  bool shouldReload(_FallbackMaterialLocalizationsDelegate old) => false;
+}
+```
+
+Use this in `localizationsDelegates` instead of `AppLocalizations.localizationsDelegates`
+(which embeds `GlobalMaterialLocalizations.delegate` directly).
+
+---
+
 ## FIDO2 — device compatibility beyond YubiKey
 
 libfido2 speaks standard CTAP2 over USB HID. Any FIDO2 device that supports
