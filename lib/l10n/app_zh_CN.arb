@@ -1,0 +1,803 @@
+{
+  "@@locale": "zh_CN",
+
+  "appName": "Gabbro",
+
+  "cancel": "取消",
+  "delete": "删除",
+  "save": "保存",
+  "close": "关闭",
+  "ok": "确定",
+  "edit": "编辑",
+  "add": "添加",
+  "remove": "移除",
+  "rename": "重命名",
+  "confirm": "确认",
+  "continueAction": "继续",
+  "dismiss": "关闭",
+  "authorize": "授权",
+  "register": "注册",
+  "sync": "同步",
+  "assign": "分配",
+  "unlock": "解锁",
+  "generate": "生成",
+  "import": "导入",
+  "export": "导出",
+  "openInBrowser": "在浏览器中打开",
+  "useThisPassword": "使用此密码",
+  "reviewArrow": "检查 →",
+  "skip": "跳过",
+  "keep": "保留",
+  "revert": "还原",
+  "next": "下一步：映射列",
+  "syncFromVault": "从保险库同步",
+  "createVault": "创建保险库",
+  "pickFile": "选择文件",
+  "noFileSelected": "未选择文件",
+  "chooseFolder": "选择文件夹",
+  "addCustomField": "添加自定义字段",
+  "exportFile": "导出文件",
+  "addVault": "添加保险库",
+  "addYubiKey": "添加 YubiKey",
+  "noChangesToSave": "没有要保存的更改。",
+
+  "appearanceTitle": "外观",
+  "securityTitle": "安全",
+  "aboutTitle": "关于 Gabbro",
+  "generatorTitle": "密码生成器",
+  "importTitle": "导入条目",
+  "exportTitle": "导出保险库",
+  "changePassphraseTitle": "更改密码短语",
+  "csvMappingTitle": "CSV 列映射",
+  "manageFoldersTitle": "管理文件夹",
+  "manageVaultsTitle": "管理保险库",
+  "manageYubiKeysTitle": "管理 YubiKey",
+  "passwordHistoryTitle": "密码历史",
+  "reviewChangesTitle": "检查更改",
+  "unlockGabbroTitle": "解锁 Gabbro",
+
+  "sectionTheme": "主题",
+  "sectionTextSize": "字体大小",
+  "sectionAlphabetBar": "字母栏位置",
+  "sectionAccessibility": "辅助功能",
+  "sectionLanguage": "语言",
+  "sectionForegroundLock": "前台锁定",
+  "sectionBackgroundLock": "后台锁定",
+  "sectionPasswordHistory": "密码历史",
+  "sectionPassphraseCopyPaste": "密码短语复制/粘贴",
+  "sectionVaultList": "保险库列表",
+  "sectionClipboardClear": "剪贴板清除",
+  "sectionCharacterSets": "字符集",
+  "sectionGeneratorLanguage": "语言",
+
+  "themeSystem": "系统",
+  "themeLight": "浅色",
+  "themeDark": "深色",
+
+  "textSizeSmall": "小",
+  "textSizeRegular": "常规",
+  "textSizeLarge": "大",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "仅限手机 — 平板电脑始终使用左侧。",
+  "alphabetBarLeft": "左",
+  "alphabetBarRight": "右",
+
+  "highContrastTitle": "高对比度",
+  "highContrastSubtitle": "提高对比度以改善可读性",
+
+  "languageNote": "覆盖系统语言。«系统»跟随设备的地区设置。",
+  "langSystem": "系统",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "应用打开时在此非活动时间后锁定。",
+  "backgroundLockDescription": "应用进入后台此时间后锁定。",
+  "passwordHistoryDescription": "更改后保留旧密码的时长。«始终保留»表示只能手动删除历史记录。",
+  "passphraseCopyPasteDescription": "阻止密码短语字段中的复制和粘贴。建议：防止短语通过剪贴板泄露。",
+  "passphraseCopyPasteNote": "注意：这会阻止长按上下文菜单和文本选择。键盘内置粘贴按钮可能仍然有效 — 这是平台限制。",
+  "blockCopyPasteTitle": "阻止复制/粘贴",
+  "vaultListDescription": "在登录屏幕显示所有保险库列表，以便选择要解锁的保险库，而无需进入«管理保险库»。",
+  "showVaultListTitle": "登录时显示保险库列表",
+  "vaultListNote": "安全说明：关闭此选项时，登录屏幕只显示最后使用的保险库 — 不会暗示其他保险库的存在。权衡：要切换保险库，必须先解锁，然后转到菜单 → 管理保险库。",
+  "clipboardClearDescription": "复制密码后清除剪贴板。注意：剪贴板管理器可能保留副本。",
+
+  "duration30s": "30 秒",
+  "duration1min": "1 分钟",
+  "duration5min": "5 分钟",
+  "duration15min": "15 分钟",
+  "duration60s": "60 秒",
+  "duration2min": "2 分钟",
+  "durationNever": "从不",
+  "duration7days": "7 天",
+  "duration30days": "30 天",
+  "duration90days": "90 天",
+  "durationKeepForever": "始终保留",
+
+  "menuExportVault": "导出保险库",
+  "menuImportEntries": "导入条目",
+  "menuSyncFromFile": "从文件同步",
+  "menuManageVaults": "管理保险库",
+  "menuChangePassphrase": "更改密码短语",
+  "menuManageYubiKeys": "管理 YubiKey",
+  "menuAppearance": "外观",
+  "menuSecurity": "安全",
+  "menuManageFolders": "管理文件夹",
+  "menuPasswordGenerator": "密码生成器",
+  "menuAbout": "关于",
+
+  "tooltipSelectEntries": "选择条目",
+  "tooltipLockVault": "锁定保险库",
+  "tooltipSelectAll": "全选",
+  "tooltipDeselectAll": "取消全选",
+  "tooltipMenu": "菜单",
+  "tooltipCopy": "复制",
+  "tooltipCopied": "已复制！",
+  "tooltipShow": "显示",
+  "tooltipHide": "隐藏",
+  "tooltipBrowse": "浏览",
+  "tooltipEditAlias": "编辑别名",
+  "tooltipRemoveField": "移除字段",
+  "tooltipRename": "重命名",
+  "tooltipDeleteVault": "删除保险库",
+  "tooltipAssignToFolder": "分配到文件夹",
+  "tooltipShowPin": "显示 PIN",
+  "tooltipHidePin": "隐藏 PIN",
+  "tooltipShowValue": "显示值",
+  "tooltipHideValue": "隐藏",
+  "tooltipCancel": "取消",
+  "tooltipOpenInBrowser": "在浏览器中打开",
+
+  "allFolders": "所有文件夹",
+  "noFolder": "无",
+  "selectFolder": "选择文件夹",
+  "folderName": "文件夹名称",
+
+  "noEntriesMatch": "没有与搜索匹配的条目。",
+  "noVaultsRegistered": "没有已注册的保险库。",
+  "noYubiKeysRegistered": "没有已注册的 YubiKey",
+  "selectEntry": "选择条目",
+  "newEntryTitle": "新条目",
+  "createEntryTitle": "新建 {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "编辑：{type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "（无 URL）",
+  "noNameFallback": "（无名称）",
+  "untitledFallback": "（无标题）",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "已选：{count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "搜索所有字段…",
+  "searchEntriesHint": "搜索条目…",
+  "searchAllFieldsTooltip": "搜索所有字段",
+  "searchByTitleTooltip": "按标题搜索",
+  "entryTypeAll": "全部",
+  "entryTypePassword": "密码",
+  "entryTypeNote": "笔记",
+  "entryTypeCard": "卡片",
+  "entryTypeIdentity": "身份",
+  "entryTypeFile": "文件",
+  "entryTypeCustom": "自定义",
+  "errorPrefix": "错误：{error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "保险库",
+  "navAppearance": "外观",
+  "navSecurity": "安全",
+  "navAbout": "关于",
+
+  "deleteEntryTitle": "删除条目？",
+  "cannotBeUndone": "此操作无法撤销。",
+  "deleteEntryDialogTitle": "删除条目？",
+  "deleteEntriesTitle": "{count, plural, other{删除 {count} 个条目？}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "分配到文件夹",
+  "folderConflictTitle": "文件夹冲突",
+  "syncFailedTitle": "同步失败",
+  "syncFromFileTitle": "从文件同步",
+  "nothingToSync": "没有需要同步的内容 — 两个保险库均已是最新状态。",
+
+  "importedEntries": "{count, plural, other{已导入 {count} 个条目。}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "导出文件",
+  "saveDecryptedFileTo": "将解密文件保存到：",
+  "exportPathLabel": "导出路径",
+  "exportedToPath": "已导出到 {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "导出失败：{error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "在浏览器中打开？",
+  "couldNotOpen": "无法打开 {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "删除历史条目",
+  "failedToClearHistory": "清除历史失败：{error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "还原密码失败：{error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "重命名文件夹",
+  "addFolderTitle": "添加文件夹",
+  "deleteFolderTitle": "删除文件夹",
+  "deleteFolderConfirm": "删除«{folder}»？",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "将条目移至",
+  "clearToNone": "移至«无»",
+
+  "renameVaultTitle": "重命名保险库",
+  "deleteVaultTitle": "删除保险库？",
+  "deleteVaultConfirmTitle": "确定吗？",
+  "typeDeleteToConfirm": "输入 DELETE 确认",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "触碰您的 YubiKey",
+  "noVaultsRegisteredText": "没有已注册的保险库。",
+
+  "addYubiKeyTitle": "添加 YubiKey",
+  "enterYubiKeyPinTitle": "输入 YubiKey PIN",
+  "editAliasForKey": "编辑密钥 {index} 的别名",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "将只剩一个已注册的 YubiKey。",
+  "removeKeyConfirm": "确定要移除此密钥吗？",
+  "removeKeyVaultConfirm": "从保险库中移除此 YubiKey？",
+  "yubiKeyRemoved": "YubiKey 已移除",
+  "failedToRemoveKey": "移除密钥失败：{error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey 已添加",
+  "failedToAddKey": "添加密钥失败：{error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "保存别名失败：{error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "未找到 FIDO2 设备。请插入 YubiKey 后重试。",
+  "transportLabel": "传输：",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "密码短语",
+  "yubiKeyPinLabel": "YubiKey PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "当前密码短语",
+  "newPassphraseLabel": "新密码短语",
+  "confirmPassphraseLabel": "确认新密码短语",
+  "vaultPassphraseLabel": "保险库密码短语",
+  "aliasLabel": "别名",
+  "aliasHint": "例如：主要、工作密钥…",
+  "masterPassphraseLabel": "主密码短语",
+  "confirmPassphraseLabelShort": "确认密码短语",
+
+  "fieldTitle": "标题",
+  "fieldContent": "内容",
+  "fieldFirstName": "名",
+  "fieldLastName": "姓",
+  "fieldEmail": "电子邮件（可选）",
+  "fieldPhone": "电话（可选）",
+  "fieldAddress": "地址（可选）",
+  "fieldCardLabel": "卡片名称（例如：«Visa Platinum»）",
+  "fieldCardholderName": "持卡人姓名",
+  "fieldCardNumber": "卡号",
+  "fieldExpiry": "有效期（MM/YY）",
+  "fieldCvv": "CVV（可选）",
+  "fieldCardPin": "PIN（可选）",
+  "fieldCreditLimit": "信用额度（可选）",
+  "fieldAccountNumber": "账号（可选）",
+  "fieldNotes": "备注（可选）",
+  "fieldUrl": "URL（可选）",
+  "fieldUsername": "用户名",
+  "fieldPassword": "密码",
+  "fieldSeparator": "分隔符",
+  "fieldFolder": "文件夹",
+  "fieldLabel": "标签",
+  "fieldValue": "值",
+  "fieldCustomFields": "自定义字段",
+  "fieldLabelOptional": "{label}（可选）",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "此条目类型暂不支持。",
+  "csvColumnNone": "（无）",
+  "csvPreviewLabel": "预览",
+  "csvImportButton": "导入",
+
+  "gabbroVaultSection": "Gabbro 保险库",
+  "genericCsvSection": "通用 CSV",
+
+  "changePassphraseSuccess": "密码短语已更改",
+  "changePassphraseButton": "更改密码短语",
+
+  "continueLabel": "继续",
+  "protectWithYubiKey": "使用 YubiKey 保护",
+  "yubiKeySubtitle": "硬件安全密钥（推荐）",
+  "accessibilityButton": "辅助功能",
+
+  "aboutProjectSection": "项目",
+  "aboutLicenceSection": "许可证",
+  "aboutOpenSourceSection": "开源组件",
+  "aboutAttributionSection": "致谢",
+
+  "lengthLabel": "长度",
+  "wordsLabel": "单词数",
+  "generateButton": "生成",
+  "usePasswordButton": "使用此密码",
+  "showHidePassword": "显示",
+
+  "deleteVaultPostDeletion": "您的保险库已删除。请创建新的保险库以继续。",
+
+  "syncFilePassphraseLabel": "保险库密码短语",
+
+  "historyWarning": "只保留 1 个历史值。历史记录根据安全设置自动删除。",
+  "historyCurrent": "当前",
+  "historyPrevious": "以前",
+  "historySavedOn": "保存于 {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · 过期于 {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "导入问题（{index}/{total}）",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "类型：{category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "编辑、修正并保存此条目，或跳过以拒绝。",
+
+  "entriesSkipped": "{count, plural, other{已跳过 {count} 个条目}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "以下条目已存在于您的保险库中，未被覆盖：",
+
+  "syncDeleteEntryContent": "另一台设备已删除«{title}»。\n\n在此处也删除，还是保留？",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}»在两台设备上位于不同文件夹中。\n\n此设备：{local}\n另一台设备：{incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "无文件夹保留",
+  "folderConflictKeepLocal": "保留«{folder}»",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "无文件夹移动",
+  "folderConflictMoveIncoming": "移至«{folder}»",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "保险库已同步 — 添加：{added} 个，更新：{updated} 个，删除：{deleted} 个。",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "此保险库文件使用不同的密码短语。同步仅在具有相同密码短语的保险库之间支持。",
+
+  "reviewSensitiveFields": "敏感字段",
+  "reviewOtherFields": "其他字段",
+  "reviewPasswordChanged": "密码已更改",
+  "reviewCvvChanged": "CVV 已更改",
+  "reviewPinChanged": "PIN 已更改",
+  "reviewTransactionPasswordChanged": "交易密码已更改",
+  "tooltipShowValues": "显示值",
+  "reviewOld": "旧",
+  "reviewNew": "新",
+  "reviewEmpty": "（空）",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "备注",
+  "reviewFieldContent": "内容",
+  "reviewFieldEmail": "电子邮件",
+  "reviewFieldPhone": "电话",
+  "reviewFieldAddress": "地址",
+  "reviewFieldCardLabel": "卡片名称",
+  "reviewFieldStatus": "状态",
+  "reviewFieldCardholder": "持卡人",
+  "reviewFieldExpiry": "有效期",
+  "reviewFieldCreditLimit": "信用额度",
+  "reviewFieldAccountNumber": "账号",
+  "reviewFieldNetwork": "网络",
+  "reviewFieldBank": "银行",
+  "reviewFieldFilename": "文件名",
+  "reviewFieldSize": "大小",
+  "reviewFieldCardNumber": "卡号",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "交易密码",
+  "timestampCreated": "创建时间",
+  "timestampUpdated": "更新时间",
+  "timestampUnknown": "未知",
+  "noTitleFallback": "（无标题）",
+  "tooltipExportFile": "导出文件",
+  "tooltipEditEntry": "编辑条目",
+  "tooltipDeleteEntry": "删除条目",
+  "exportLabel": "导出",
+  "customEntryFieldsHeader": "字段",
+  "copiedNeverClears": "已复制 — 剪贴板永不自动清除",
+  "copiedClears30s": "已复制 — 剪贴板将在 30 秒后清除",
+  "copiedClears60s": "已复制 — 剪贴板将在 60 秒后清除",
+  "copiedClears2min": "已复制 — 剪贴板将在 2 分钟后清除",
+
+  "passwordBreakdownTitle": "密码分析",
+  "charTypeUppercase": "大写字母",
+  "charTypeLowercase": "小写字母",
+  "charTypeDigit": "数字",
+  "charTypeSymbol": "符号",
+
+  "exportIncludeDate": "在文件名中包含日期",
+  "exportChooseFormat": "选择导出格式。",
+  "exportUnencryptedWarning": "完全未加密 — 所有密码将以明文写入。请安全保存文件并在使用后删除。",
+  "exportPassphraseOnlyNote": "仅使用密码短语保护。导入时无需 YubiKey。",
+  "exportChooseDestinationJson": "选择导出 JSON 文件的目标位置。",
+  "exportChooseDestinationVault": "选择导出保险库文件的目标位置。",
+  "exportTwoFilesNote": "将创建两个文件：vault.gabbro 和 vault.gabbro.sha256",
+  "exportSelectDestination": "选择目标位置。",
+
+  "aboutVersion": "版本 {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "后量子密码管理器",
+  "aboutSourceCode": "源代码",
+  "aboutReportIssue": "报告问题",
+  "aboutSupportGabbro": "支持 Gabbro",
+  "aboutLicenceBody": "Gabbro 是在 GNU General Public License v3.0 only (GPL-3.0-only) 下授权的自由开源软件。\n\n您有权在许可证条款下使用、研究和分发此应用程序。",
+  "aboutOwnerRole": "项目所有者、架构师和主要开发者：",
+  "aboutAiPartner": "AI 开发合作伙伴：",
+  "aboutNoTelemetry": "Gabbro 不建立任何外部网络连接。无遥测、分析或账户。",
+
+  "strengthTierTerrible": "非常弱",
+  "strengthTierWeak": "弱",
+  "strengthTierFair": "一般",
+  "strengthTierStrong": "强",
+  "strengthTierVeryStrong": "很强",
+  "strengthTierExcellent": "优秀",
+  "yubiKeyProtectedNote": "YubiKey 保护的保险库 — 密钥绑定将被保留。",
+  "yubiKeyPinRequired": "需要 YubiKey PIN",
+  "tapYubiKeyNow": "现在触碰您的 YubiKey…",
+  "touchYubiKeyToAuthorize": "触碰 YubiKey 以授权此更改。",
+  "currentPassphraseRequired": "需要当前密码短语",
+  "newPassphraseRequired": "需要新密码短语",
+  "passphraseTooWeak": "密码短语太弱",
+  "confirmPassphraseRequired": "请确认新密码短语",
+  "passphrasesDoNotMatch": "密码短语不匹配",
+  "passphrasesMatch": "✓ 密码短语匹配",
+  "passphrasesNoMatch": "✗ 密码短语不匹配",
+  "entropyDisplay": "{tier} · {bits} 位",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "传输错误。",
+  "authorizationFailed": "授权失败 — 请检查 PIN 后重试。",
+
+  "unlockEnterPassphraseAndPin": "输入密码短语和 YubiKey PIN 解锁",
+  "unlockEnterPassphrase": "输入密码短语解锁",
+  "unlockEntropyDisplay": "{tier} · {bits} 位熵",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "插入 YubiKey 并在闪烁时触碰",
+  "unlockErrorPassphrase": "无法解锁保险库。请检查密码短语。",
+  "unlockErrorPassphraseAndPin": "无法解锁保险库。请检查密码短语和 YubiKey PIN。",
+
+  "importSelectFile": "请选择文件。",
+  "importFileNotFound": "文件未找到。",
+  "importEnterPassphrase": "请输入此保险库的密码短语。",
+  "importDuplicateWarning": "UUID 已存在于您保险库中的条目将自动跳过。将显示摘要。",
+  "importGabbroSubtitle": "从另一个 Gabbro 保险库（.gabbro 文件）同步条目",
+  "importEnpassSubtitle": "来自 Enpass 的 JSON 导出（工具 → 导出）",
+  "importBitwardenSubtitle": "来自 Bitwarden 的未加密 JSON 导出（工具 → 导出保险库）",
+  "importCsvSubtitle": "来自任何密码管理器的 CSV 导出",
+
+  "vaultNameAlreadyExists": "名为«{alias}»的保险库已存在。",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "这将永久删除«{alias}»及其所有数据。\n\n文件：{path}\n\n此操作无法撤销。",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "这将永久删除«{alias}»并移除其 YubiKey 绑定。\n\n文件：{path}\n\n此操作无法撤销。",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "输入 PIN 并触碰 YubiKey 以授权删除。",
+  "deleteVaultTooltip": "删除保险库",
+
+  "yubiKeySecurityWarning": "安全警告",
+  "removeYubiKeyTitle": "移除 YubiKey",
+  "yubiKeyLastKeyRiskWarning": "警告：如果剩余密钥丢失、损坏或被盗，将永久无法访问保险库。没有恢复选项。",
+  "onlyOneKeyRegisteredWarning": "只注册了一个密钥。如果此密钥丢失，将永久无法访问保险库。",
+  "tapRegisterNfc": "将密钥靠近手机进行注册",
+  "tapRegisterUsb": "连接后触碰密钥进行注册",
+  "tapActivateNfc": "再次将密钥靠近手机进行激活",
+  "tapActivateUsb": "连接后再次触碰密钥进行激活",
+  "failedToRegisterKey": "注册密钥失败：{error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "激活密钥失败：{error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "密钥 {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "触碰新的 YubiKey 进行注册…",
+  "tapYubiKeyToActivate": "再次触碰新的 YubiKey 进行激活…",
+  "editAliasTooltip": "编辑别名",
+  "cannotRemoveLastKey": "无法移除最后一个密钥",
+  "removeKeyTooltip": "移除密钥",
+  "manageYubiKeysError": "错误：{error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "经典",
+  "generatorModePassphrase": "密码短语",
+  "charSetsHeader": "字符集",
+  "languageHeader": "语言",
+  "separatorLabel": "分隔符",
+  "capitaliseWords": "单词首字母大写",
+  "appendDigit": "添加数字",
+  "entropyBitsDisplay": "~{bits} 位熵",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "请至少选择一个字符集",
+  "passwordMinLengthNote": "密码至少 32 个字符。如果网站有更短的限制，请复制所需数量的前几个字符。",
+  "excludeAmbiguousChars": "排除模糊字符（0, O, l, 1, I）",
+
+  "onboardingGetStarted": "创建您的保险库以开始使用。",
+  "onboardingVaultName": "保险库名称",
+  "onboardingAliasRequired": "别名为必填项",
+  "onboardingNewVaultLocation": "新保险库位置（与以前相同）",
+  "onboardingVaultLocation": "保险库位置",
+  "onboardingLoadingPath": "加载中…",
+  "onboardingPathHint": "保险库文件路径",
+  "onboardingPathRequired": "路径为必填项",
+  "onboardingReusePassphraseHint": "选择新的主密码短语或重复使用以前的。",
+  "onboardingPassphraseRequired": "密码短语为必填项",
+  "onboardingConfirmRequired": "请确认密码短语",
+  "onboardingPrimaryKeyPin": "主密钥 PIN",
+  "onboardingBackupKeyPin": "备用密钥 PIN",
+  "onboardingKeyNPin": "密钥 {n} 的 PIN",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "您将触碰每个 YubiKey 两次（共 4 次）。在两个密钥之间，系统会提示您交换它们。",
+  "onboardingYubikeySlowNote": "使用 YubiKey 创建保险库需要 20-30 秒。应用可能看起来没有响应 — 这是正常的。",
+  "onboardingStep1Label": "注册主密钥",
+  "onboardingStep1Hint": "现在触碰 YubiKey",
+  "onboardingStep2Label": "激活主密钥",
+  "onboardingStep2Hint": "再次触碰 YubiKey",
+  "onboardingStep3Label": "切换到备用密钥",
+  "onboardingStep3Hint": "取出主密钥，然后插入备用 YubiKey",
+  "onboardingStep4Label": "注册备用密钥",
+  "onboardingStep4Hint": "触碰备用 YubiKey",
+  "onboardingStep5Label": "激活备用密钥",
+  "onboardingStep5Hint": "最后触碰备用 YubiKey",
+
+  "textSizePreview": "辉长岩是一种富含镁和铁的粗粒结构侵入岩。",
+
+  "fieldCardStatus": "状态",
+  "fieldPaymentNetwork": "支付网络",
+
+  "cardStatusActive": "有效",
+  "cardStatusLapsed": "过期",
+  "cardStatusInactive": "无效",
+
+  "validatorTitleRequired": "标题为必填项",
+  "validatorUsernameRequired": "用户名为必填项",
+  "validatorPasswordRequired": "密码为必填项",
+  "validatorContentRequired": "内容为必填项",
+  "validatorFirstNameRequired": "名为必填项",
+  "validatorLastNameRequired": "姓为必填项",
+  "validatorCardLabelRequired": "卡片名称为必填项",
+  "validatorCardholderRequired": "持卡人姓名为必填项",
+  "validatorCardNumberRequired": "卡号为必填项",
+  "validatorCardNumberLength": "卡号必须为 6-19 位数字",
+  "validatorExpiryRequired": "有效期为必填项",
+  "validatorExpiryFormat": "请使用 MM/YY 格式",
+  "validatorExpiryMonth": "月份必须为 01-12",
+  "validatorCvvLength": "CVV 必须为 3 或 4 位数字",
+  "validatorLabelRequired": "标签为必填项",
+  "validatorStatusRequired": "状态为必填项",
+
+  "sectionBiometricUnlock": "生物特征解锁",
+  "biometricUnlockDescription": "使用指纹或面部解锁保险库，而不是输入密码短语。",
+  "biometricUnlockTitle": "启用生物特征解锁",
+  "biometricUnlockNote": "此设备上注册的所有生物特征数据均可解锁 — 不仅限于注册时使用的数据。",
+  "biometricUnavailable": "此设备不支持生物特征解锁。未找到生物特征传感器，或系统设置中未注册生物特征数据。",
+  "biometricDialogTitle": "关于生物特征解锁",
+  "biometricDialogBody": "启用后，Gabbro 将加密主密码短语并存储在此设备上，由您的生物特征数据保护。只有在解锁时才会解密该短语。\n\nGabbro 从不存储您的指纹或面部数据 — 它们保留在手机的安全芯片中。",
+  "biometricDialogAllBiometrics": "此设备上注册的所有生物特征数据都能解锁 Gabbro — 无法限制为特定指纹。",
+  "biometricDialogInvalidation": "如果向此手机添加新的生物特征数据（包括第二个指纹），此设置将自动停用并需要重新配置。",
+  "biometricDialogRecommendation": "建议：如果您有高威胁模型或共享此设备，请保持停用状态。",
+  "biometricInvalidated": "由于此设备上的生物特征数据已更改（系统设置中添加了新的指纹或面部），生物特征解锁已停用。这是安全措施。请重新输入密码短语并重新启用生物特征解锁。",
+  "useBiometrics": "使用生物特征",
+  "biometricCancelled": "生物特征验证未完成。请输入密码短语解锁。",
+  "biometricEnrollTitle": "输入密码短语",
+  "biometricEnrollDescription": "输入主密码短语以启用生物特征解锁。",
+  "biometricYubikeyHint": "在下方输入 YubiKey PIN，然后点击«使用生物特征»，再触碰 YubiKey。",
+
+  "helpTitle": "帮助",
+  "menuHelp": "帮助",
+  "helpCaptionCreate": "创建保险库：输入名称、密码短语，可选择使用 YubiKey 保护",
+  "helpCaptionEmpty": "点击 + 添加第一个条目",
+  "helpCaptionDetail": "点击眼睛图标显示密码，然后长按查看详细字符分析",
+  "helpCaptionTitleSearch": "默认：搜索栏仅搜索条目标题",
+  "helpCaptionFullSearch": "点击放大镜切换到搜索所有字段；再次点击返回标题搜索",
+  "helpCaptionFilter": "使用过滤按钮仅显示特定类型的条目",
+  "helpCaptionFolders": "使用文件夹选择按文件夹过滤条目",
+  "helpCaptionSelect": "长按条目进入选择模式；添加更多项目后，分配到文件夹或删除。点击 X 退出。",
+  "helpCaptionJumpToLetter": "点击索引栏中的字母跳转到该部分",
+  "helpCaptionBreakdown": "点击眼睛图标显示密码，然后长按查看详细字符分析",
+  "helpCaptionManageVaults": "在«管理保险库»中，您可以重命名或删除保险库，或添加新的",
+  "helpCaptionUnlock": "输入密码短语解锁保险库"
+}

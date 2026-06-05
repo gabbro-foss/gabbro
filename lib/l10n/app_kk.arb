@@ -1,0 +1,803 @@
+{
+  "@@locale": "kk",
+
+  "appName": "Gabbro",
+
+  "cancel": "Бас тарту",
+  "delete": "Жою",
+  "save": "Сақтау",
+  "close": "Жабу",
+  "ok": "OK",
+  "edit": "Өңдеу",
+  "add": "Қосу",
+  "remove": "Алып тастау",
+  "rename": "Атауын өзгерту",
+  "confirm": "Растау",
+  "continueAction": "Жалғастыру",
+  "dismiss": "Жабу",
+  "authorize": "Рұқсат беру",
+  "register": "Тіркеу",
+  "sync": "Синхрондау",
+  "assign": "Тағайындау",
+  "unlock": "Бекітуді ашу",
+  "generate": "Жасау",
+  "import": "Импорттау",
+  "export": "Экспорттау",
+  "openInBrowser": "Браузерде ашу",
+  "useThisPassword": "Осы құпия сөзді пайдалану",
+  "reviewArrow": "Тексеру →",
+  "skip": "Өткізіп жіберу",
+  "keep": "Сақтап қалу",
+  "revert": "Қайтару",
+  "next": "Келесі: бағандарды бейнелеу",
+  "syncFromVault": "Сейфтен синхрондау",
+  "createVault": "Сейф жасау",
+  "pickFile": "Файлды таңдау",
+  "noFileSelected": "Файл таңдалмаған",
+  "chooseFolder": "Қалтаны таңдау",
+  "addCustomField": "Арнаулы өріс қосу",
+  "exportFile": "Файлды экспорттау",
+  "addVault": "Сейф қосу",
+  "addYubiKey": "YubiKey қосу",
+  "noChangesToSave": "Сақтайтын өзгерістер жоқ.",
+
+  "appearanceTitle": "Сыртқы түр",
+  "securityTitle": "Қауіпсіздік",
+  "aboutTitle": "Gabbro туралы",
+  "generatorTitle": "Құпия сөз генераторы",
+  "importTitle": "Жазбаларды импорттау",
+  "exportTitle": "Сейфті экспорттау",
+  "changePassphraseTitle": "Кілт фразасын өзгерту",
+  "csvMappingTitle": "CSV бағандарын бейнелеу",
+  "manageFoldersTitle": "Қалталарды басқару",
+  "manageVaultsTitle": "Сейфтерді басқару",
+  "manageYubiKeysTitle": "YubiKey кілттерін басқару",
+  "passwordHistoryTitle": "Құпия сөз тарихы",
+  "reviewChangesTitle": "Өзгерістерді тексеру",
+  "unlockGabbroTitle": "Gabbroны ашу",
+
+  "sectionTheme": "Тема",
+  "sectionTextSize": "Мәтін өлшемі",
+  "sectionAlphabetBar": "Әліпбилік жолақтың орны",
+  "sectionAccessibility": "Қолжетімділік",
+  "sectionLanguage": "Тіл",
+  "sectionForegroundLock": "Алдыңғы фонды бекіту",
+  "sectionBackgroundLock": "Фондық бекіту",
+  "sectionPasswordHistory": "Құпия сөз тарихы",
+  "sectionPassphraseCopyPaste": "Кілт фразасын көшіру/қою",
+  "sectionVaultList": "Сейфтер тізімі",
+  "sectionClipboardClear": "Алмасу буферін тазалау",
+  "sectionCharacterSets": "Таңбалар жиыны",
+  "sectionGeneratorLanguage": "Тіл",
+
+  "themeSystem": "Жүйелік",
+  "themeLight": "Ашық",
+  "themeDark": "Қараңғы",
+
+  "textSizeSmall": "Кіші",
+  "textSizeRegular": "Қалыпты",
+  "textSizeLarge": "Үлкен",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Тек телефонда — планшет әрқашан сол жақты пайдаланады.",
+  "alphabetBarLeft": "Солға",
+  "alphabetBarRight": "Оңға",
+
+  "highContrastTitle": "Жоғары контраст",
+  "highContrastSubtitle": "Оқуды жеңілдету үшін контрасты арттырады",
+
+  "languageNote": "Жүйе тілін ауыстырады. «Жүйелік» құрылғының аймақтық параметрлерін орындайды.",
+  "langSystem": "Жүйелік",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Қосымша ашық тұрғанда осы белсенсіздік уақытынан кейін бекіту.",
+  "backgroundLockDescription": "Қосымша фонда осыншама уақыт болғаннан кейін бекіту.",
+  "passwordHistoryDescription": "Өзгеріс жасалғаннан кейін алдыңғы құпия сөзді қанша уақыт сақтау керек. «Әрқашан сақтау» — тарихты тек қолмен өшіруге болады.",
+  "passphraseCopyPasteDescription": "Кілт фразасы өрістерінде көшіруді және қоюды блоктау. Ұсынылады: фразаның алмасу буфері арқылы ағып кетуін болдырмайды.",
+  "passphraseCopyPasteNote": "Ескерту: бұл ұзақ басқанда контекстік мәзірді және мәтін таңдауды блоктайды. Пернетақтаның кірістірілген қою түймесі жұмыс жасай беруі мүмкін — бұл платформаның шектеуі.",
+  "blockCopyPasteTitle": "Көшіруді/қоюды блоктау",
+  "vaultListDescription": "Кіру экранында барлық сейфтердің тізімін көрсету, «Сейфтерді басқаруға» кірмей қайсысын ашу керектігін таңдауға мүмкіндік береді.",
+  "showVaultListTitle": "Кіру кезінде сейфтер тізімін көрсету",
+  "vaultListNote": "Қауіпсіздік ескертпесі: бұл ӨШІРІЛІП тұрса, кіру экраны тек соңғы пайдаланылған сейфті көрсетеді — басқалардың бар екенін білдірмейді. Ымыра: сейфті ауыстыру үшін алдымен бекітуді ашу, содан кейін Мәзір → Сейфтерді басқаруға өту керек.",
+  "clipboardClearDescription": "Құпия сөзді көшіргеннен кейін алмасу буферін тазалау. Ескерту: алмасу буферінің менеджерлері көшірмені сақтай алады.",
+
+  "duration30s": "30 с",
+  "duration1min": "1 мин",
+  "duration5min": "5 мин",
+  "duration15min": "15 мин",
+  "duration60s": "60 с",
+  "duration2min": "2 мин",
+  "durationNever": "Ешқашан",
+  "duration7days": "7 күн",
+  "duration30days": "30 күн",
+  "duration90days": "90 күн",
+  "durationKeepForever": "Әрқашан сақтау",
+
+  "menuExportVault": "Сейфті экспорттау",
+  "menuImportEntries": "Жазбаларды импорттау",
+  "menuSyncFromFile": "Файлдан синхрондау",
+  "menuManageVaults": "Сейфтерді басқару",
+  "menuChangePassphrase": "Кілт фразасын өзгерту",
+  "menuManageYubiKeys": "YubiKey кілттерін басқару",
+  "menuAppearance": "Сыртқы түр",
+  "menuSecurity": "Қауіпсіздік",
+  "menuManageFolders": "Қалталарды басқару",
+  "menuPasswordGenerator": "Құпия сөз генераторы",
+  "menuAbout": "Туралы",
+
+  "tooltipSelectEntries": "Жазбаларды таңдау",
+  "tooltipLockVault": "Сейфті бекіту",
+  "tooltipSelectAll": "Барлығын таңдау",
+  "tooltipDeselectAll": "Барлығының таңдауын алу",
+  "tooltipMenu": "Мәзір",
+  "tooltipCopy": "Көшіру",
+  "tooltipCopied": "Көшірілді!",
+  "tooltipShow": "Көрсету",
+  "tooltipHide": "Жасыру",
+  "tooltipBrowse": "Шолу",
+  "tooltipEditAlias": "Бүркеншік атын өңдеу",
+  "tooltipRemoveField": "Өрісті жою",
+  "tooltipRename": "Атауын өзгерту",
+  "tooltipDeleteVault": "Сейфті жою",
+  "tooltipAssignToFolder": "Қалтаға тағайындау",
+  "tooltipShowPin": "PIN-ді көрсету",
+  "tooltipHidePin": "PIN-ді жасыру",
+  "tooltipShowValue": "Мәнді көрсету",
+  "tooltipHideValue": "Жасыру",
+  "tooltipCancel": "Бас тарту",
+  "tooltipOpenInBrowser": "Браузерде ашу",
+
+  "allFolders": "Барлық қалталар",
+  "noFolder": "Жоқ",
+  "selectFolder": "Қалтаны таңдау",
+  "folderName": "Қалта атауы",
+
+  "noEntriesMatch": "Іздеуге сәйкес жазбалар жоқ.",
+  "noVaultsRegistered": "Тіркелген сейфтер жоқ.",
+  "noYubiKeysRegistered": "Тіркелген YubiKey кілттері жоқ",
+  "selectEntry": "Жазбаны таңдау",
+  "newEntryTitle": "Жаңа жазба",
+  "createEntryTitle": "Жаңа {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Өңдеу: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(URL жоқ)",
+  "noNameFallback": "(Атау жоқ)",
+  "untitledFallback": "(Тақырып жоқ)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "Таңдалды: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Барлық өрістерде іздеу…",
+  "searchEntriesHint": "Жазбаларды іздеу…",
+  "searchAllFieldsTooltip": "Барлық өрістерде іздейді",
+  "searchByTitleTooltip": "Тақырып бойынша іздейді",
+  "entryTypeAll": "Барлығы",
+  "entryTypePassword": "Құпия сөз",
+  "entryTypeNote": "Жазба",
+  "entryTypeCard": "Карта",
+  "entryTypeIdentity": "Сәйкестік",
+  "entryTypeFile": "Файл",
+  "entryTypeCustom": "Арнаулы",
+  "errorPrefix": "Қате: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Сейф",
+  "navAppearance": "Сыртқы түр",
+  "navSecurity": "Қауіпсіздік",
+  "navAbout": "Туралы",
+
+  "deleteEntryTitle": "Жазбаны жою керек пе?",
+  "cannotBeUndone": "Бұл әрекетті болдырмауға болмайды.",
+  "deleteEntryDialogTitle": "Жазбаны жою керек пе?",
+  "deleteEntriesTitle": "{count, plural, other{{count} жазбаны жою керек пе?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Қалтаға тағайындау",
+  "folderConflictTitle": "Қалта қайшылығы",
+  "syncFailedTitle": "Синхрондау сәтсіз болды",
+  "syncFromFileTitle": "Файлдан синхрондау",
+  "nothingToSync": "Синхрондайтын ештеңе жоқ — екі сейф те жаңартылған.",
+
+  "importedEntries": "{count, plural, other{{count} жазба импортталды.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Файлды экспорттау",
+  "saveDecryptedFileTo": "Шифры ашылған файлды сақтайтын орын:",
+  "exportPathLabel": "Экспорт жолы",
+  "exportedToPath": "{path} ішіне экспортталды",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Экспорт сәтсіз болды: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Браузерде ашу керек пе?",
+  "couldNotOpen": "{url} ашылмады",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Алдыңғы жазбаны жою",
+  "failedToClearHistory": "Тарихты тазалау сәтсіз болды: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Құпия сөзді қайтару сәтсіз болды: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Қалтаның атауын өзгерту",
+  "addFolderTitle": "Қалта қосу",
+  "deleteFolderTitle": "Қалтаны жою",
+  "deleteFolderConfirm": "«{folder}» жою керек пе?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Жазбаларды мына жерге жылжыту:",
+  "clearToNone": "«Жоқ» қалпына жылжыту",
+
+  "renameVaultTitle": "Сейфтің атауын өзгерту",
+  "deleteVaultTitle": "Сейфті жою керек пе?",
+  "deleteVaultConfirmTitle": "Сенімдісіз бе?",
+  "typeDeleteToConfirm": "Растау үшін DELETE деп енгізіңіз",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "YubiKey кілтіңізді басыңыз",
+  "noVaultsRegisteredText": "Тіркелген сейфтер жоқ.",
+
+  "addYubiKeyTitle": "YubiKey қосу",
+  "enterYubiKeyPinTitle": "YubiKey PIN енгізу",
+  "editAliasForKey": "{index} кілтінің бүркеншік атын өңдеу",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Тіркелген бір ғана YubiKey қалады.",
+  "removeKeyConfirm": "Бұл кілтті алып тастауды қалайсыз ба?",
+  "removeKeyVaultConfirm": "Бұл YubiKey кілтін сейфтен алып тастау керек пе?",
+  "yubiKeyRemoved": "YubiKey алып тасталды",
+  "failedToRemoveKey": "Кілтті алып тастау сәтсіз болды: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey қосылды",
+  "failedToAddKey": "Кілтті қосу сәтсіз болды: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Бүркеншік атты сақтау сәтсіз болды: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "FIDO2 құрылғысы табылмады. YubiKey кілтін салып, қайталап көріңіз.",
+  "transportLabel": "Тасымал:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Кілт фразасы",
+  "yubiKeyPinLabel": "YubiKey PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Ағымдағы кілт фразасы",
+  "newPassphraseLabel": "Жаңа кілт фразасы",
+  "confirmPassphraseLabel": "Жаңа кілт фразасын растау",
+  "vaultPassphraseLabel": "Сейфтің кілт фразасы",
+  "aliasLabel": "Бүркеншік ат",
+  "aliasHint": "мысалы: Негізгі, Жұмыс кілті…",
+  "masterPassphraseLabel": "Негізгі кілт фразасы",
+  "confirmPassphraseLabelShort": "Кілт фразасын растау",
+
+  "fieldTitle": "Тақырып",
+  "fieldContent": "Мазмұн",
+  "fieldFirstName": "Аты",
+  "fieldLastName": "Тегі",
+  "fieldEmail": "Электрондық пошта (міндетті емес)",
+  "fieldPhone": "Телефон (міндетті емес)",
+  "fieldAddress": "Мекенжай (міндетті емес)",
+  "fieldCardLabel": "Карта атауы (мысалы: «Visa Platinum»)",
+  "fieldCardholderName": "Карта иесінің аты",
+  "fieldCardNumber": "Карта нөмірі",
+  "fieldExpiry": "Мерзімі (АА/ЖЖ)",
+  "fieldCvv": "CVV (міндетті емес)",
+  "fieldCardPin": "PIN (міндетті емес)",
+  "fieldCreditLimit": "Несие лимиті (міндетті емес)",
+  "fieldAccountNumber": "Шот нөмірі (міндетті емес)",
+  "fieldNotes": "Ескертпелер (міндетті емес)",
+  "fieldUrl": "URL (міндетті емес)",
+  "fieldUsername": "Пайдаланушы аты",
+  "fieldPassword": "Құпия сөз",
+  "fieldSeparator": "Бөлгіш",
+  "fieldFolder": "Қалта",
+  "fieldLabel": "Жапсырма",
+  "fieldValue": "Мән",
+  "fieldCustomFields": "Арнаулы өрістер",
+  "fieldLabelOptional": "{label} (міндетті емес)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Бұл жазба түрі әлі қолданылмайды.",
+  "csvColumnNone": "(жоқ)",
+  "csvPreviewLabel": "Алдын ала қарау",
+  "csvImportButton": "Импорттау",
+
+  "gabbroVaultSection": "Gabbro сейфі",
+  "genericCsvSection": "Жалпы CSV",
+
+  "changePassphraseSuccess": "Кілт фразасы өзгертілді",
+  "changePassphraseButton": "Кілт фразасын өзгерту",
+
+  "continueLabel": "Жалғастыру",
+  "protectWithYubiKey": "YubiKey арқылы қорғау",
+  "yubiKeySubtitle": "Аппараттық қауіпсіздік кілті (ұсынылады)",
+  "accessibilityButton": "Қолжетімділік",
+
+  "aboutProjectSection": "Жоба",
+  "aboutLicenceSection": "Лицензия",
+  "aboutOpenSourceSection": "Ашық бастапқы компоненттер",
+  "aboutAttributionSection": "Алғыс",
+
+  "lengthLabel": "Ұзындық",
+  "wordsLabel": "Сөздер",
+  "generateButton": "Жасау",
+  "usePasswordButton": "Осы құпия сөзді пайдалану",
+  "showHidePassword": "Көрсету",
+
+  "deleteVaultPostDeletion": "Сейфіңіз жойылды. Жалғастыру үшін жаңа сейф жасаңыз.",
+
+  "syncFilePassphraseLabel": "Сейфтің кілт фразасы",
+
+  "historyWarning": "Тек 1 алдыңғы мән сақталады. Тарих қауіпсіздік параметрлеріне сәйкес автоматты жойылады.",
+  "historyCurrent": "Ағымдағы",
+  "historyPrevious": "Алдыңғы",
+  "historySavedOn": "{date} сақталды",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · {expires} мерзімі бітеді",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Импорт мәселесі ({index}/{total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Түрі: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Бұл жазбаны өңдеп, түзетіп сақтаңыз немесе бас тарту үшін өткізіп жіберіңіз.",
+
+  "entriesSkipped": "{count, plural, other{{count} жазба өткізіп жіберілді}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Бұл жазбалар сейфте бар болғандықтан қайта жазылмады:",
+
+  "syncDeleteEntryContent": "Басқа құрылғы «{title}» жойды.\n\nМұнда да жою керек пе, әлде сақтап қалу керек пе?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}» екі құрылғыда әртүрлі қалталарда.\n\nБұл құрылғы: {local}\nБасқа құрылғы: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Қалтасыз сақтау",
+  "folderConflictKeepLocal": "«{folder}» сақтау",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Қалтасыз жылжыту",
+  "folderConflictMoveIncoming": "«{folder}» ішіне жылжыту",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Сейф синхрондалды — қосылды: {added}, жаңартылды: {updated}, жойылды: {deleted}.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Бұл сейф файлы басқа кілт фразасын пайдаланады. Синхрондау тек бірдей кілт фразасы бар сейфтер арасында қолданылады.",
+
+  "reviewSensitiveFields": "Құпия өрістер",
+  "reviewOtherFields": "Басқа өрістер",
+  "reviewPasswordChanged": "Құпия сөз өзгертілді",
+  "reviewCvvChanged": "CVV өзгертілді",
+  "reviewPinChanged": "PIN өзгертілді",
+  "reviewTransactionPasswordChanged": "Транзакция құпия сөзі өзгертілді",
+  "tooltipShowValues": "Мәндерді көрсету",
+  "reviewOld": "Ескі",
+  "reviewNew": "Жаңа",
+  "reviewEmpty": "(бос)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Ескертпелер",
+  "reviewFieldContent": "Мазмұн",
+  "reviewFieldEmail": "Электрондық пошта",
+  "reviewFieldPhone": "Телефон",
+  "reviewFieldAddress": "Мекенжай",
+  "reviewFieldCardLabel": "Карта атауы",
+  "reviewFieldStatus": "Күй",
+  "reviewFieldCardholder": "Карта иесі",
+  "reviewFieldExpiry": "Мерзімі",
+  "reviewFieldCreditLimit": "Несие лимиті",
+  "reviewFieldAccountNumber": "Шот нөмірі",
+  "reviewFieldNetwork": "Желі",
+  "reviewFieldBank": "Банк",
+  "reviewFieldFilename": "Файл атауы",
+  "reviewFieldSize": "Өлшем",
+  "reviewFieldCardNumber": "Нөмір",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Транзакция құпия сөзі",
+  "timestampCreated": "Жасалды",
+  "timestampUpdated": "Жаңартылды",
+  "timestampUnknown": "Белгісіз",
+  "noTitleFallback": "(Тақырып жоқ)",
+  "tooltipExportFile": "Файлды экспорттау",
+  "tooltipEditEntry": "Жазбаны өңдеу",
+  "tooltipDeleteEntry": "Жазбаны жою",
+  "exportLabel": "Экспорт",
+  "customEntryFieldsHeader": "Өрістер",
+  "copiedNeverClears": "Көшірілді — алмасу буфері ешқашан автоматты тазаланбайды",
+  "copiedClears30s": "Көшірілді — алмасу буфері 30 с кейін тазаланады",
+  "copiedClears60s": "Көшірілді — алмасу буфері 60 с кейін тазаланады",
+  "copiedClears2min": "Көшірілді — алмасу буфері 2 мин кейін тазаланады",
+
+  "passwordBreakdownTitle": "Құпия сөз талдауы",
+  "charTypeUppercase": "Бас әріптер",
+  "charTypeLowercase": "Кіші әріптер",
+  "charTypeDigit": "Цифрлар",
+  "charTypeSymbol": "Таңба",
+
+  "exportIncludeDate": "Файл атауына күн қосу",
+  "exportChooseFormat": "Экспорт форматын таңдаңыз.",
+  "exportUnencryptedWarning": "Мүлдем шифрланбаған — барлық құпиялар ашық мәтін ретінде жазылады. Файлды қауіпсіз сақтаңыз және пайдаланғаннан кейін жойыңыз.",
+  "exportPassphraseOnlyNote": "Тек кілт фразасымен қорғалған. Импорт үшін YubiKey қажет емес.",
+  "exportChooseDestinationJson": "Экспортталған JSON файлының орнын таңдаңыз.",
+  "exportChooseDestinationVault": "Экспортталған сейф файлының орнын таңдаңыз.",
+  "exportTwoFilesNote": "Екі файл жасалады: vault.gabbro және vault.gabbro.sha256",
+  "exportSelectDestination": "Орнын таңдаңыз.",
+
+  "aboutVersion": "Нұсқа {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Кванттан кейінгі құпия сөз менеджері",
+  "aboutSourceCode": "Бастапқы код",
+  "aboutReportIssue": "Мәселе туралы хабарлау",
+  "aboutSupportGabbro": "Gabbroны қолдау",
+  "aboutLicenceBody": "Gabbro — GNU General Public License v3.0 only (GPL-3.0-only) бойынша лицензиаланған еркін ашық бастапқы бағдарламалық жасақтама.\n\nЛицензия шарттары бойынша бұл қосымшаны пайдалануға, зерттеуге және таратуға еркіндігіңіз бар.",
+  "aboutOwnerRole": "Жоба иесі, архитектор және бас әзірлеуші:",
+  "aboutAiPartner": "AI әзірлеу серіктесі:",
+  "aboutNoTelemetry": "Gabbro ешқандай сыртқы желі қосылымын орнатпайды. Телеметрия, аналитика немесе аккаунттар жоқ.",
+
+  "strengthTierTerrible": "Өте нашар",
+  "strengthTierWeak": "Нашар",
+  "strengthTierFair": "Орташа",
+  "strengthTierStrong": "Күшті",
+  "strengthTierVeryStrong": "Өте күшті",
+  "strengthTierExcellent": "Тамаша",
+  "yubiKeyProtectedNote": "YubiKey арқылы қорғалған сейф — кілтпен байланыс сақталады.",
+  "yubiKeyPinRequired": "YubiKey PIN қажет",
+  "tapYubiKeyNow": "Қазір YubiKey кілтіңізді басыңыз…",
+  "touchYubiKeyToAuthorize": "Осы өзгерісті рұқсат ету үшін YubiKey басыңыз.",
+  "currentPassphraseRequired": "Ағымдағы кілт фразасы қажет",
+  "newPassphraseRequired": "Жаңа кілт фразасы қажет",
+  "passphraseTooWeak": "Кілт фразасы тым нашар",
+  "confirmPassphraseRequired": "Жаңа кілт фразасын растаңыз",
+  "passphrasesDoNotMatch": "Кілт фразалары сәйкес келмейді",
+  "passphrasesMatch": "✓ Кілт фразалары сәйкес келді",
+  "passphrasesNoMatch": "✗ Кілт фразалары сәйкес келмейді",
+  "entropyDisplay": "{tier} · {bits} бит",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Тасымал қатесі.",
+  "authorizationFailed": "Рұқсат сәтсіз болды — PIN тексеріп, қайталап көріңіз.",
+
+  "unlockEnterPassphraseAndPin": "Бекітуді ашу үшін кілт фразасы мен YubiKey PIN енгізіңіз",
+  "unlockEnterPassphrase": "Бекітуді ашу үшін кілт фразасын енгізіңіз",
+  "unlockEntropyDisplay": "{tier} · {bits} бит энтропия",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "YubiKey салыңыз және жыпылықтағанда басыңыз",
+  "unlockErrorPassphrase": "Сейфті ашу мүмкін болмады. Кілт фразасын тексеріңіз.",
+  "unlockErrorPassphraseAndPin": "Сейфті ашу мүмкін болмады. Кілт фразасы мен YubiKey PIN тексеріңіз.",
+
+  "importSelectFile": "Файлды таңдаңыз.",
+  "importFileNotFound": "Файл табылмады.",
+  "importEnterPassphrase": "Осы сейфтің кілт фразасын енгізіңіз.",
+  "importDuplicateWarning": "UUID сейфте бар жазбалар автоматты өткізіп жіберіледі. Қорытынды көрсетіледі.",
+  "importGabbroSubtitle": "Басқа Gabbro сейфінен жазбаларды синхрондау (.gabbro файлы)",
+  "importEnpassSubtitle": "Enpass бағдарламасынан JSON экспорты (Құралдар → Экспорттау)",
+  "importBitwardenSubtitle": "Bitwarden бағдарламасынан шифрланбаған JSON экспорты (Құралдар → Сейфті экспорттау)",
+  "importCsvSubtitle": "Кез-келген құпия сөз менеджерінен CSV экспорты",
+
+  "vaultNameAlreadyExists": "«{alias}» атты сейф бар.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Бұл «{alias}» мен оның барлық деректерін тұрақты жояды.\n\nФайл: {path}\n\nБұл әрекетті болдырмауға болмайды.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Бұл «{alias}» мен оның YubiKey байланысын тұрақты жояды.\n\nФайл: {path}\n\nБұл әрекетті болдырмауға болмайды.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "PIN енгізіп, жоюды рұқсат ету үшін YubiKey басыңыз.",
+  "deleteVaultTooltip": "Сейфті жою",
+
+  "yubiKeySecurityWarning": "Қауіпсіздік ескертуі",
+  "removeYubiKeyTitle": "YubiKey алып тастау",
+  "yubiKeyLastKeyRiskWarning": "ЕСКЕРТУ: қалған кілт жоғалса, зақымдалса немесе ұрланса, сейфке кіру мүмкіндігі мәңгілікке жабылады. Қалпына келтіру мүмкіндігі жоқ.",
+  "onlyOneKeyRegisteredWarning": "Тек бір кілт тіркелген. Бұл кілт жоғалса, сейфке кіру мүмкіндігі мәңгілікке жабылады.",
+  "tapRegisterNfc": "Тіркеу үшін кілтті телефонға жақындатыңыз",
+  "tapRegisterUsb": "Қосылғаннан кейін тіркеу үшін кілтті басыңыз",
+  "tapActivateNfc": "Белсендіру үшін кілтті телефонға қайта жақындатыңыз",
+  "tapActivateUsb": "Қосылғаннан кейін белсендіру үшін кілтті қайта басыңыз",
+  "failedToRegisterKey": "Кілтті тіркеу сәтсіз болды: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Кілтті белсендіру сәтсіз болды: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Кілт {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Тіркеу үшін жаңа YubiKey кілтін басыңыз…",
+  "tapYubiKeyToActivate": "Белсендіру үшін жаңа YubiKey кілтін қайта басыңыз…",
+  "editAliasTooltip": "Бүркеншік атын өңдеу",
+  "cannotRemoveLastKey": "Соңғы кілтті алып тастауға болмайды",
+  "removeKeyTooltip": "Кілтті алып тастау",
+  "manageYubiKeysError": "Қате: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Классикалық",
+  "generatorModePassphrase": "Кілт фразасы",
+  "charSetsHeader": "Таңбалар жиыны",
+  "languageHeader": "Тіл",
+  "separatorLabel": "Бөлгіш",
+  "capitaliseWords": "Сөздердің бас әрпін жазу",
+  "appendDigit": "Цифр қосу",
+  "entropyBitsDisplay": "~{bits} бит энтропия",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Кем дегенде бір таңбалар жиынын таңдаңыз",
+  "passwordMinLengthNote": "Құпия сөздер кем дегенде 32 таңбадан тұрады. Егер сайттың қысқарақ шегі болса, қажетті саны бірінші таңбаларды көшіріңіз.",
+  "excludeAmbiguousChars": "Екіұшты таңбаларды алып тастау (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Бастау үшін сейфіңізді жасаңыз.",
+  "onboardingVaultName": "Сейф атауы",
+  "onboardingAliasRequired": "Бүркеншік ат міндетті",
+  "onboardingNewVaultLocation": "Жаңа сейфтің орны (бұрынғыдай)",
+  "onboardingVaultLocation": "Сейфтің орны",
+  "onboardingLoadingPath": "Жүктелуде…",
+  "onboardingPathHint": "Сейф файлының жолы",
+  "onboardingPathRequired": "Жол міндетті",
+  "onboardingReusePassphraseHint": "Жаңа негізгі кілт фразасын таңдаңыз немесе бұрынғысын қайта пайдаланыңыз.",
+  "onboardingPassphraseRequired": "Кілт фразасы міндетті",
+  "onboardingConfirmRequired": "Кілт фразасын растаңыз",
+  "onboardingPrimaryKeyPin": "Негізгі кілттің PIN-і",
+  "onboardingBackupKeyPin": "Резервтік кілттің PIN-і",
+  "onboardingKeyNPin": "{n} кілтінің PIN-і",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Әр YubiKey кілтін екі рет басасыз (барлығы 4 рет). Екі кілт арасында оларды алмастыру ұсынылады.",
+  "onboardingYubikeySlowNote": "YubiKey кілтімен сейф жасау 20–30 секунд алады. Қосымша жауап бермейтіндей көрінуі мүмкін — бұл қалыпты жай.",
+  "onboardingStep1Label": "Негізгі кілтті тіркеу",
+  "onboardingStep1Hint": "Қазір YubiKey кілтін басыңыз",
+  "onboardingStep2Label": "Негізгі кілтті белсендіру",
+  "onboardingStep2Hint": "YubiKey кілтін қайта басыңыз",
+  "onboardingStep3Label": "Резервтік кілтке ауысу",
+  "onboardingStep3Hint": "Негізгі кілтті шығарып, резервтік YubiKey салыңыз",
+  "onboardingStep4Label": "Резервтік кілтті тіркеу",
+  "onboardingStep4Hint": "Резервтік YubiKey кілтін басыңыз",
+  "onboardingStep5Label": "Резервтік кілтті белсендіру",
+  "onboardingStep5Hint": "Соңғы рет резервтік YubiKey кілтін басыңыз",
+
+  "textSizePreview": "Габбро — Mg және Fe-ге бай ірі түйіршікті құрылымдағы интрузивті магмалық жыныс.",
+
+  "fieldCardStatus": "Күй",
+  "fieldPaymentNetwork": "Төлем желісі",
+
+  "cardStatusActive": "Белсенді",
+  "cardStatusLapsed": "Мерзімі өткен",
+  "cardStatusInactive": "Белсенді емес",
+
+  "validatorTitleRequired": "Тақырып міндетті",
+  "validatorUsernameRequired": "Пайдаланушы аты міндетті",
+  "validatorPasswordRequired": "Құпия сөз міндетті",
+  "validatorContentRequired": "Мазмұн міндетті",
+  "validatorFirstNameRequired": "Аты міндетті",
+  "validatorLastNameRequired": "Тегі міндетті",
+  "validatorCardLabelRequired": "Карта атауы міндетті",
+  "validatorCardholderRequired": "Карта иесінің аты міндетті",
+  "validatorCardNumberRequired": "Карта нөмірі міндетті",
+  "validatorCardNumberLength": "Карта нөмірі 6–19 цифрдан тұруы керек",
+  "validatorExpiryRequired": "Мерзімі міндетті",
+  "validatorExpiryFormat": "АА/ЖЖ форматын пайдаланыңыз",
+  "validatorExpiryMonth": "Ай 01–12 болуы керек",
+  "validatorCvvLength": "CVV 3 немесе 4 цифрдан тұруы керек",
+  "validatorLabelRequired": "Жапсырма міндетті",
+  "validatorStatusRequired": "Күй міндетті",
+
+  "sectionBiometricUnlock": "Биометриялық бекітуді ашу",
+  "biometricUnlockDescription": "Кілт фразасын енгізудің орнына саусақ ізі немесе бет арқылы сейфті ашу.",
+  "biometricUnlockTitle": "Биометриялық бекітуді ашуды қосу",
+  "biometricUnlockNote": "Бұл құрылғыда тіркелген барлық биометриялық деректер жұмыс жасайды — тек тіркеу кезінде пайдаланылғандар ғана емес.",
+  "biometricUnavailable": "Бұл құрылғыда биометриялық бекітуді ашу мүмкін емес. Биометриялық сенсор табылмады немесе жүйе параметрлерінде биометриялық деректер тіркелмеген.",
+  "biometricDialogTitle": "Биометриялық бекітуді ашу туралы",
+  "biometricDialogBody": "Қосылған кезде Gabbro негізгі кілт фразасын шифрлап, биометриялық деректеріңізбен қорғалған осы құрылғыда сақтайды. Фраза тек бекітуді ашу кезінде шифры ашылады.\n\nGabbro саусақ іздерінің немесе беттің деректерін ешқашан сақтамайды — олар телефонның қауіпсіз чипінде қалады.",
+  "biometricDialogAllBiometrics": "Бұл құрылғыда тіркелген барлық биометриялық деректер Gabbroны аша алады — белгілі бір саусақ ізімен шектеу мүмкін емес.",
+  "biometricDialogInvalidation": "Бұл телефонға жаңа биометриялық деректер қосылса (екінші саусақ ізін қосқанда), бұл параметр автоматты өшіріліп, қайта теңшеу қажет болады.",
+  "biometricDialogRecommendation": "Ұсыныс: жоғары қауіп моделі болса немесе бұл құрылғыны бөліссеңіз, өшірулі қалдырыңыз.",
+  "biometricInvalidated": "Бұл құрылғыдағы биометриялық деректер өзгергендіктен (жүйе параметрлерінде жаңа саусақ ізі немесе бет қосылды) биометриялық бекітуді ашу өшірілді. Бұл қауіпсіздік шарасы. Кілт фразасын қайта енгізіп, биометриялық бекітуді ашуды қайта іске қосыңыз.",
+  "useBiometrics": "Биометрияны пайдалану",
+  "biometricCancelled": "Биометриялық тексеру аяқталмады. Бекітуді ашу үшін кілт фразасын енгізіңіз.",
+  "biometricEnrollTitle": "Кілт фразасын енгізу",
+  "biometricEnrollDescription": "Биометриялық бекітуді ашуды қосу үшін негізгі кілт фразасын енгізіңіз.",
+  "biometricYubikeyHint": "Төменде YubiKey PIN енгізіп, «Биометрияны пайдалану» басыңыз, содан кейін YubiKey кілтін басыңыз.",
+
+  "helpTitle": "Анықтама",
+  "menuHelp": "Анықтама",
+  "helpCaptionCreate": "Сейф жасау: атау мен кілт фразасын енгізіп, қалаусаңыз YubiKey арқылы қорғаңыз",
+  "helpCaptionEmpty": "Бірінші жазба қосу үшін + басыңыз",
+  "helpCaptionDetail": "Құпия сөзді көрсету үшін көз белгішесін басыңыз, таңбалардың толық талдауы үшін ұзақ басыңыз",
+  "helpCaptionTitleSearch": "Әдепкі бойынша: іздеу жолағы тек жазба тақырыптарын іздейді",
+  "helpCaptionFullSearch": "Барлық өрістерде іздеуге ауысу үшін үлкейткішті басыңыз; тақырыпты іздеуге оралу үшін қайта басыңыз",
+  "helpCaptionFilter": "Белгілі бір түрдегі жазбаларды ғана көрсету үшін сүзгі түймелерін пайдаланыңыз",
+  "helpCaptionFolders": "Жазбаларды қалта бойынша сүзу үшін қалта таңдауды пайдаланыңыз",
+  "helpCaptionSelect": "Таңдау режиміне өту үшін жазбаны ұзақ басыңыз; қосымша элементтер қосып, қалтаға тағайындаңыз немесе жойыңыз. Шығу үшін X басыңыз.",
+  "helpCaptionJumpToLetter": "Сол бөлімге өту үшін индекс жолағындағы әріпті басыңыз",
+  "helpCaptionBreakdown": "Құпия сөзді көрсету үшін көз белгішесін басыңыз, таңбалардың толық талдауы үшін ұзақ басыңыз",
+  "helpCaptionManageVaults": "«Сейфтерді басқарuda» сейфтерді қайта атауға, жоюға немесе жаңасын қосуға болады",
+  "helpCaptionUnlock": "Сейфтің бекітуін ашу үшін кілт фразасын енгізіңіз"
+}

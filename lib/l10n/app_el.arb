@@ -1,0 +1,803 @@
+{
+  "@@locale": "el",
+
+  "appName": "Gabbro",
+
+  "cancel": "Άκυρο",
+  "delete": "Διαγραφή",
+  "save": "Αποθήκευση",
+  "close": "Κλείσιμο",
+  "ok": "OK",
+  "edit": "Επεξεργασία",
+  "add": "Προσθήκη",
+  "remove": "Κατάργηση",
+  "rename": "Μετονομασία",
+  "confirm": "Επιβεβαίωση",
+  "continueAction": "Συνέχεια",
+  "dismiss": "Παράλειψη",
+  "authorize": "Εξουσιοδότηση",
+  "register": "Εγγραφή",
+  "sync": "Συγχρονισμός",
+  "assign": "Ανάθεση",
+  "unlock": "Ξεκλείδωμα",
+  "generate": "Δημιουργία",
+  "import": "Εισαγωγή",
+  "export": "Εξαγωγή",
+  "openInBrowser": "Άνοιγμα στο πρόγραμμα περιήγησης",
+  "useThisPassword": "Χρήση αυτού του κωδικού",
+  "reviewArrow": "Έλεγχος →",
+  "skip": "Παράλειψη",
+  "keep": "Διατήρηση",
+  "revert": "Επαναφορά",
+  "next": "Επόμενο: αντιστοίχιση στηλών",
+  "syncFromVault": "Συγχρονισμός από θησαυροφυλάκιο",
+  "createVault": "Δημιουργία θησαυροφυλακίου",
+  "pickFile": "Επιλογή αρχείου",
+  "noFileSelected": "Δεν επιλέχθηκε αρχείο",
+  "chooseFolder": "Επιλογή φακέλου",
+  "addCustomField": "Προσθήκη προσαρμοσμένου πεδίου",
+  "exportFile": "Εξαγωγή αρχείου",
+  "addVault": "Προσθήκη θησαυροφυλακίου",
+  "addYubiKey": "Προσθήκη YubiKey",
+  "noChangesToSave": "Δεν υπάρχουν αλλαγές για αποθήκευση.",
+
+  "appearanceTitle": "Εμφάνιση",
+  "securityTitle": "Ασφάλεια",
+  "aboutTitle": "Σχετικά με το Gabbro",
+  "generatorTitle": "Γεννήτρια κωδικών",
+  "importTitle": "Εισαγωγή καταχωρίσεων",
+  "exportTitle": "Εξαγωγή θησαυροφυλακίου",
+  "changePassphraseTitle": "Αλλαγή φράσης πρόσβασης",
+  "csvMappingTitle": "Αντιστοίχιση στηλών CSV",
+  "manageFoldersTitle": "Διαχείριση φακέλων",
+  "manageVaultsTitle": "Διαχείριση θησαυροφυλακίων",
+  "manageYubiKeysTitle": "Διαχείριση κλειδιών YubiKey",
+  "passwordHistoryTitle": "Ιστορικό κωδικών",
+  "reviewChangesTitle": "Έλεγχος αλλαγών",
+  "unlockGabbroTitle": "Ξεκλείδωμα Gabbro",
+
+  "sectionTheme": "Θέμα",
+  "sectionTextSize": "Μέγεθος κειμένου",
+  "sectionAlphabetBar": "Θέση αλφαβητικής γραμμής",
+  "sectionAccessibility": "Προσβασιμότητα",
+  "sectionLanguage": "Γλώσσα",
+  "sectionForegroundLock": "Κλείδωμα προσκηνίου",
+  "sectionBackgroundLock": "Κλείδωμα παρασκηνίου",
+  "sectionPasswordHistory": "Ιστορικό κωδικών",
+  "sectionPassphraseCopyPaste": "Αντιγραφή/επικόλληση φράσης πρόσβασης",
+  "sectionVaultList": "Λίστα θησαυροφυλακίων",
+  "sectionClipboardClear": "Εκκαθάριση προχείρου",
+  "sectionCharacterSets": "Σύνολα χαρακτήρων",
+  "sectionGeneratorLanguage": "Γλώσσα",
+
+  "themeSystem": "Σύστημα",
+  "themeLight": "Φωτεινό",
+  "themeDark": "Σκοτεινό",
+
+  "textSizeSmall": "Μικρό",
+  "textSizeRegular": "Κανονικό",
+  "textSizeLarge": "Μεγάλο",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Μόνο στο τηλέφωνο — το tablet χρησιμοποιεί πάντα την αριστερή πλευρά.",
+  "alphabetBarLeft": "Αριστερά",
+  "alphabetBarRight": "Δεξιά",
+
+  "highContrastTitle": "Υψηλή αντίθεση",
+  "highContrastSubtitle": "Αυξάνει την αντίθεση για καλύτερη αναγνωσιμότητα",
+
+  "languageNote": "Παρακάμπτει τη γλώσσα συστήματος. Το «Σύστημα» ακολουθεί τις περιφερειακές ρυθμίσεις της συσκευής.",
+  "langSystem": "Σύστημα",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Κλείδωμα μετά από αυτό το χρονικό διάστημα αδράνειας όταν η εφαρμογή είναι ανοιχτή.",
+  "backgroundLockDescription": "Κλείδωμα μετά από αυτό το χρονικό διάστημα στο παρασκήνιο.",
+  "passwordHistoryDescription": "Πόσο καιρό να διατηρείται ο προηγούμενος κωδικός μετά από αλλαγή. «Πάντα» σημαίνει ότι το ιστορικό διαγράφεται μόνο χειροκίνητα.",
+  "passphraseCopyPasteDescription": "Αποκλεισμός αντιγραφής και επικόλλησης στα πεδία φράσης πρόσβασης. Συνιστάται: αποτρέπει τη διαρροή φράσης μέσω προχείρου.",
+  "passphraseCopyPasteNote": "Σημείωση: αυτό αποκλείει το μενού περιβάλλοντος με παρατεταμένο πάτημα και την επιλογή κειμένου. Το ενσωματωμένο κουμπί επικόλλησης του πληκτρολογίου μπορεί να λειτουργεί ακόμα — αυτό είναι περιορισμός πλατφόρμας.",
+  "blockCopyPasteTitle": "Αποκλεισμός αντιγραφής/επικόλλησης",
+  "vaultListDescription": "Εμφάνιση λίστας όλων των θησαυροφυλακίων στην οθόνη σύνδεσης για επιλογή χωρίς μετάβαση στη «Διαχείριση θησαυροφυλακίων».",
+  "showVaultListTitle": "Εμφάνιση λίστας θησαυροφυλακίων κατά σύνδεση",
+  "vaultListNote": "Σημείωση ασφαλείας: όταν είναι ΑΠΕΝΕΡΓΟΠΟΙΗΜΕΝΟ, η οθόνη σύνδεσης εμφανίζει μόνο το τελευταίο χρησιμοποιηθέν θησαυροφυλάκιο. Συμβιβασμός: για αλλαγή θησαυροφυλακίου πρέπει πρώτα να ξεκλειδώσετε και μετά να πάτε στο Μενού → Διαχείριση θησαυροφυλακίων.",
+  "clipboardClearDescription": "Εκκαθάριση προχείρου μετά από αντιγραφή μυστικού. Σημείωση: οι διαχειριστές προχείρου μπορεί να διατηρούν το αντίγραφο.",
+
+  "duration30s": "30 δ",
+  "duration1min": "1 λεπτό",
+  "duration5min": "5 λεπτά",
+  "duration15min": "15 λεπτά",
+  "duration60s": "60 δ",
+  "duration2min": "2 λεπτά",
+  "durationNever": "Ποτέ",
+  "duration7days": "7 ημέρες",
+  "duration30days": "30 ημέρες",
+  "duration90days": "90 ημέρες",
+  "durationKeepForever": "Πάντα",
+
+  "menuExportVault": "Εξαγωγή θησαυροφυλακίου",
+  "menuImportEntries": "Εισαγωγή καταχωρίσεων",
+  "menuSyncFromFile": "Συγχρονισμός από αρχείο",
+  "menuManageVaults": "Διαχείριση θησαυροφυλακίων",
+  "menuChangePassphrase": "Αλλαγή φράσης πρόσβασης",
+  "menuManageYubiKeys": "Διαχείριση κλειδιών YubiKey",
+  "menuAppearance": "Εμφάνιση",
+  "menuSecurity": "Ασφάλεια",
+  "menuManageFolders": "Διαχείριση φακέλων",
+  "menuPasswordGenerator": "Γεννήτρια κωδικών",
+  "menuAbout": "Σχετικά",
+
+  "tooltipSelectEntries": "Επιλογή καταχωρίσεων",
+  "tooltipLockVault": "Κλείδωμα θησαυροφυλακίου",
+  "tooltipSelectAll": "Επιλογή όλων",
+  "tooltipDeselectAll": "Αποεπιλογή όλων",
+  "tooltipMenu": "Μενού",
+  "tooltipCopy": "Αντιγραφή",
+  "tooltipCopied": "Αντιγράφηκε!",
+  "tooltipShow": "Εμφάνιση",
+  "tooltipHide": "Απόκρυψη",
+  "tooltipBrowse": "Αναζήτηση",
+  "tooltipEditAlias": "Επεξεργασία ψευδωνύμου",
+  "tooltipRemoveField": "Κατάργηση πεδίου",
+  "tooltipRename": "Μετονομασία",
+  "tooltipDeleteVault": "Διαγραφή θησαυροφυλακίου",
+  "tooltipAssignToFolder": "Ανάθεση σε φάκελο",
+  "tooltipShowPin": "Εμφάνιση PIN",
+  "tooltipHidePin": "Απόκρυψη PIN",
+  "tooltipShowValue": "Εμφάνιση τιμής",
+  "tooltipHideValue": "Απόκρυψη",
+  "tooltipCancel": "Άκυρο",
+  "tooltipOpenInBrowser": "Άνοιγμα στο πρόγραμμα περιήγησης",
+
+  "allFolders": "Όλοι οι φάκελοι",
+  "noFolder": "Κανένας",
+  "selectFolder": "Επιλογή φακέλου",
+  "folderName": "Όνομα φακέλου",
+
+  "noEntriesMatch": "Δεν βρέθηκαν καταχωρίσεις που να ταιριάζουν.",
+  "noVaultsRegistered": "Δεν υπάρχουν καταχωρημένα θησαυροφυλάκια.",
+  "noYubiKeysRegistered": "Δεν υπάρχουν καταχωρημένα κλειδιά YubiKey",
+  "selectEntry": "Επιλογή καταχώρισης",
+  "newEntryTitle": "Νέα καταχώριση",
+  "createEntryTitle": "Νέο(-α) {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Επεξεργασία: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(χωρίς URL)",
+  "noNameFallback": "(χωρίς όνομα)",
+  "untitledFallback": "(χωρίς τίτλο)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "Επιλεγμένα: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Αναζήτηση σε όλα τα πεδία…",
+  "searchEntriesHint": "Αναζήτηση καταχωρίσεων…",
+  "searchAllFieldsTooltip": "Αναζήτηση σε όλα τα πεδία",
+  "searchByTitleTooltip": "Αναζήτηση με τίτλο",
+  "entryTypeAll": "Όλα",
+  "entryTypePassword": "Κωδικός",
+  "entryTypeNote": "Σημείωση",
+  "entryTypeCard": "Κάρτα",
+  "entryTypeIdentity": "Ταυτότητα",
+  "entryTypeFile": "Αρχείο",
+  "entryTypeCustom": "Προσαρμοσμένο",
+  "errorPrefix": "Σφάλμα: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Θησαυροφυλάκιο",
+  "navAppearance": "Εμφάνιση",
+  "navSecurity": "Ασφάλεια",
+  "navAbout": "Σχετικά",
+
+  "deleteEntryTitle": "Διαγραφή καταχώρισης;",
+  "cannotBeUndone": "Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
+  "deleteEntryDialogTitle": "Διαγραφή καταχώρισης;",
+  "deleteEntriesTitle": "{count, plural, one{Διαγραφή 1 καταχώρισης;} other{Διαγραφή {count} καταχωρίσεων;}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Ανάθεση σε φάκελο",
+  "folderConflictTitle": "Διένεξη φακέλων",
+  "syncFailedTitle": "Αποτυχία συγχρονισμού",
+  "syncFromFileTitle": "Συγχρονισμός από αρχείο",
+  "nothingToSync": "Δεν υπάρχει τίποτα για συγχρονισμό — και τα δύο θησαυροφυλάκια είναι ήδη ενημερωμένα.",
+
+  "importedEntries": "{count, plural, one{Εισήχθη 1 καταχώριση.} other{Εισήχθησαν {count} καταχωρίσεις.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Εξαγωγή αρχείου",
+  "saveDecryptedFileTo": "Αποθήκευση αποκρυπτογραφημένου αρχείου σε:",
+  "exportPathLabel": "Διαδρομή εξαγωγής",
+  "exportedToPath": "Εξαχθηκε σε {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Αποτυχία εξαγωγής: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Άνοιγμα στο πρόγραμμα περιήγησης;",
+  "couldNotOpen": "Δεν ήταν δυνατό το άνοιγμα {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Διαγραφή προηγούμενης καταχώρισης",
+  "failedToClearHistory": "Αποτυχία εκκαθάρισης ιστορικού: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Αποτυχία επαναφοράς κωδικού: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Μετονομασία φακέλου",
+  "addFolderTitle": "Προσθήκη φακέλου",
+  "deleteFolderTitle": "Διαγραφή φακέλου",
+  "deleteFolderConfirm": "Διαγραφή «{folder}»;",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Μεταφορά καταχωρίσεων σε",
+  "clearToNone": "Μεταφορά σε «Κανένας»",
+
+  "renameVaultTitle": "Μετονομασία θησαυροφυλακίου",
+  "deleteVaultTitle": "Διαγραφή θησαυροφυλακίου;",
+  "deleteVaultConfirmTitle": "Είστε σίγουροι;",
+  "typeDeleteToConfirm": "Πληκτρολογήστε DELETE για επιβεβαίωση",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Αγγίξτε το YubiKey σας",
+  "noVaultsRegisteredText": "Δεν υπάρχουν καταχωρημένα θησαυροφυλάκια.",
+
+  "addYubiKeyTitle": "Προσθήκη YubiKey",
+  "enterYubiKeyPinTitle": "Εισαγωγή PIN YubiKey",
+  "editAliasForKey": "Επεξεργασία ψευδωνύμου κλειδιού {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Θα παραμείνει μόνο ένα καταχωρημένο κλειδί YubiKey.",
+  "removeKeyConfirm": "Θέλετε να αφαιρέσετε αυτό το κλειδί;",
+  "removeKeyVaultConfirm": "Αφαίρεση αυτού του κλειδιού YubiKey από το θησαυροφυλάκιο;",
+  "yubiKeyRemoved": "Το YubiKey αφαιρέθηκε",
+  "failedToRemoveKey": "Αποτυχία αφαίρεσης κλειδιού: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "Το YubiKey προστέθηκε",
+  "failedToAddKey": "Αποτυχία προσθήκης κλειδιού: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Αποτυχία αποθήκευσης ψευδωνύμου: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Δεν βρέθηκε συσκευή FIDO2. Εισάγετε το YubiKey και δοκιμάστε ξανά.",
+  "transportLabel": "Μεταφορά:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Φράση πρόσβασης",
+  "yubiKeyPinLabel": "PIN YubiKey",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Τρέχουσα φράση πρόσβασης",
+  "newPassphraseLabel": "Νέα φράση πρόσβασης",
+  "confirmPassphraseLabel": "Επιβεβαίωση νέας φράσης πρόσβασης",
+  "vaultPassphraseLabel": "Φράση πρόσβασης θησαυροφυλακίου",
+  "aliasLabel": "Ψευδώνυμο",
+  "aliasHint": "π.χ. Κύριο, Κλειδί εργασίας…",
+  "masterPassphraseLabel": "Κύρια φράση πρόσβασης",
+  "confirmPassphraseLabelShort": "Επιβεβαίωση φράσης πρόσβασης",
+
+  "fieldTitle": "Τίτλος",
+  "fieldContent": "Περιεχόμενο",
+  "fieldFirstName": "Όνομα",
+  "fieldLastName": "Επώνυμο",
+  "fieldEmail": "Email (προαιρετικό)",
+  "fieldPhone": "Τηλέφωνο (προαιρετικό)",
+  "fieldAddress": "Διεύθυνση (προαιρετικό)",
+  "fieldCardLabel": "Όνομα κάρτας (π.χ. «Visa Platinum»)",
+  "fieldCardholderName": "Όνομα κατόχου κάρτας",
+  "fieldCardNumber": "Αριθμός κάρτας",
+  "fieldExpiry": "Λήξη (ΜΜ/ΕΕ)",
+  "fieldCvv": "CVV (προαιρετικό)",
+  "fieldCardPin": "PIN (προαιρετικό)",
+  "fieldCreditLimit": "Πιστωτικό όριο (προαιρετικό)",
+  "fieldAccountNumber": "Αριθμός λογαριασμού (προαιρετικό)",
+  "fieldNotes": "Σημειώσεις (προαιρετικό)",
+  "fieldUrl": "URL (προαιρετικό)",
+  "fieldUsername": "Όνομα χρήστη",
+  "fieldPassword": "Κωδικός",
+  "fieldSeparator": "Διαχωριστής",
+  "fieldFolder": "Φάκελος",
+  "fieldLabel": "Ετικέτα",
+  "fieldValue": "Τιμή",
+  "fieldCustomFields": "Προσαρμοσμένα πεδία",
+  "fieldLabelOptional": "{label} (προαιρετικό)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Αυτός ο τύπος καταχώρισης δεν υποστηρίζεται ακόμα.",
+  "csvColumnNone": "(κανένα)",
+  "csvPreviewLabel": "Προεπισκόπηση",
+  "csvImportButton": "Εισαγωγή",
+
+  "gabbroVaultSection": "Θησαυροφυλάκιο Gabbro",
+  "genericCsvSection": "Γενικό CSV",
+
+  "changePassphraseSuccess": "Η φράση πρόσβασης άλλαξε",
+  "changePassphraseButton": "Αλλαγή φράσης πρόσβασης",
+
+  "continueLabel": "Συνέχεια",
+  "protectWithYubiKey": "Προστασία με YubiKey",
+  "yubiKeySubtitle": "Κλειδί ασφαλείας υλικού (συνιστάται)",
+  "accessibilityButton": "Προσβασιμότητα",
+
+  "aboutProjectSection": "Έργο",
+  "aboutLicenceSection": "Άδεια",
+  "aboutOpenSourceSection": "Στοιχεία ανοιχτού κώδικα",
+  "aboutAttributionSection": "Αποδόσεις",
+
+  "lengthLabel": "Μήκος",
+  "wordsLabel": "Λέξεις",
+  "generateButton": "Δημιουργία",
+  "usePasswordButton": "Χρήση αυτού του κωδικού",
+  "showHidePassword": "Εμφάνιση",
+
+  "deleteVaultPostDeletion": "Το θησαυροφυλάκιό σας διαγράφηκε. Δημιουργήστε νέο για να συνεχίσετε.",
+
+  "syncFilePassphraseLabel": "Φράση πρόσβασης θησαυροφυλακίου",
+
+  "historyWarning": "Διατηρείται μόνο 1 προηγούμενη τιμή. Το ιστορικό διαγράφεται αυτόματα βάσει των ρυθμίσεων ασφαλείας.",
+  "historyCurrent": "Τρέχον",
+  "historyPrevious": "Προηγούμενο",
+  "historySavedOn": "Αποθηκεύτηκε {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · λήγει {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Πρόβλημα εισαγωγής ({index} από {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Τύπος: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Επεξεργαστείτε, διορθώστε και αποθηκεύστε αυτή την καταχώριση, ή παραλείψτε για να την απορρίψετε.",
+
+  "entriesSkipped": "{count, plural, one{1 καταχώριση παραλείφθηκε} other{{count} καταχωρίσεις παραλείφθηκαν}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Αυτές οι καταχωρίσεις υπάρχουν ήδη στο θησαυροφυλάκιό σας και δεν αντικαταστάθηκαν:",
+
+  "syncDeleteEntryContent": "Η άλλη συσκευή διέγραψε «{title}».\n\nΔιαγραφή και εδώ, ή διατήρηση;",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "Το «{title}» βρίσκεται σε διαφορετικούς φακέλους σε δύο συσκευές.\n\nΑυτή η συσκευή: {local}\nΆλλη συσκευή: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Διατήρηση χωρίς φάκελο",
+  "folderConflictKeepLocal": "Διατήρηση «{folder}»",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Μεταφορά χωρίς φάκελο",
+  "folderConflictMoveIncoming": "Μεταφορά σε «{folder}»",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Θησαυροφυλάκιο συγχρονίστηκε — προστέθηκαν: {added}, ενημερώθηκαν: {updated}, διαγράφηκαν: {deleted}.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Αυτό το αρχείο θησαυροφυλακίου χρησιμοποιεί διαφορετική φράση πρόσβασης. Ο συγχρονισμός υποστηρίζεται μόνο μεταξύ θησαυροφυλακίων με την ίδια φράση πρόσβασης.",
+
+  "reviewSensitiveFields": "Ευαίσθητα πεδία",
+  "reviewOtherFields": "Άλλα πεδία",
+  "reviewPasswordChanged": "Κωδικός άλλαξε",
+  "reviewCvvChanged": "CVV άλλαξε",
+  "reviewPinChanged": "PIN άλλαξε",
+  "reviewTransactionPasswordChanged": "Κωδικός συναλλαγής άλλαξε",
+  "tooltipShowValues": "Εμφάνιση τιμών",
+  "reviewOld": "Παλιό",
+  "reviewNew": "Νέο",
+  "reviewEmpty": "(κενό)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Σημειώσεις",
+  "reviewFieldContent": "Περιεχόμενο",
+  "reviewFieldEmail": "Email",
+  "reviewFieldPhone": "Τηλέφωνο",
+  "reviewFieldAddress": "Διεύθυνση",
+  "reviewFieldCardLabel": "Όνομα κάρτας",
+  "reviewFieldStatus": "Κατάσταση",
+  "reviewFieldCardholder": "Κάτοχος κάρτας",
+  "reviewFieldExpiry": "Λήξη",
+  "reviewFieldCreditLimit": "Πιστωτικό όριο",
+  "reviewFieldAccountNumber": "Αριθμός λογαριασμού",
+  "reviewFieldNetwork": "Δίκτυο",
+  "reviewFieldBank": "Τράπεζα",
+  "reviewFieldFilename": "Όνομα αρχείου",
+  "reviewFieldSize": "Μέγεθος",
+  "reviewFieldCardNumber": "Αριθμός",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Κωδικός συναλλαγής",
+  "timestampCreated": "Δημιουργήθηκε",
+  "timestampUpdated": "Ενημερώθηκε",
+  "timestampUnknown": "Άγνωστο",
+  "noTitleFallback": "(χωρίς τίτλο)",
+  "tooltipExportFile": "Εξαγωγή αρχείου",
+  "tooltipEditEntry": "Επεξεργασία καταχώρισης",
+  "tooltipDeleteEntry": "Διαγραφή καταχώρισης",
+  "exportLabel": "Εξαγωγή",
+  "customEntryFieldsHeader": "Πεδία",
+  "copiedNeverClears": "Αντιγράφηκε — το πρόχειρο δεν εκκαθαρίζεται αυτόματα ποτέ",
+  "copiedClears30s": "Αντιγράφηκε — το πρόχειρο εκκαθαρίζεται σε 30 δ",
+  "copiedClears60s": "Αντιγράφηκε — το πρόχειρο εκκαθαρίζεται σε 60 δ",
+  "copiedClears2min": "Αντιγράφηκε — το πρόχειρο εκκαθαρίζεται σε 2 λεπτά",
+
+  "passwordBreakdownTitle": "Ανάλυση κωδικού",
+  "charTypeUppercase": "Κεφαλαία γράμματα",
+  "charTypeLowercase": "Πεζά γράμματα",
+  "charTypeDigit": "Ψηφία",
+  "charTypeSymbol": "Σύμβολο",
+
+  "exportIncludeDate": "Συμπερίληψη ημερομηνίας στο όνομα αρχείου",
+  "exportChooseFormat": "Επιλέξτε μορφή εξαγωγής.",
+  "exportUnencryptedWarning": "Εντελώς αναποκρύπτο — όλα τα μυστικά θα γραφτούν ως απλό κείμενο. Αποθηκεύστε το αρχείο με ασφάλεια και διαγράψτε το μετά τη χρήση.",
+  "exportPassphraseOnlyNote": "Προστατεύεται μόνο με φράση πρόσβασης. Το YubiKey δεν απαιτείται για εισαγωγή.",
+  "exportChooseDestinationJson": "Επιλέξτε προορισμό για το εξαχθέν αρχείο JSON.",
+  "exportChooseDestinationVault": "Επιλέξτε προορισμό για το εξαχθέν αρχείο θησαυροφυλακίου.",
+  "exportTwoFilesNote": "Θα δημιουργηθούν δύο αρχεία: vault.gabbro και vault.gabbro.sha256",
+  "exportSelectDestination": "Επιλέξτε προορισμό.",
+
+  "aboutVersion": "Έκδοση {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Μετακβαντικός διαχειριστής κωδικών",
+  "aboutSourceCode": "Πηγαίος κώδικας",
+  "aboutReportIssue": "Αναφορά προβλήματος",
+  "aboutSupportGabbro": "Υποστήριξη Gabbro",
+  "aboutLicenceBody": "Το Gabbro είναι ελεύθερο λογισμικό ανοιχτού κώδικα, αδειοδοτημένο υπό GNU General Public License v3.0 only (GPL-3.0-only).\n\nΈχετε την ελευθερία να χρησιμοποιείτε, να μελετάτε και να διανέμετε αυτή την εφαρμογή υπό τους όρους της άδειας.",
+  "aboutOwnerRole": "Ιδιοκτήτης έργου, αρχιτέκτονας και κύριος προγραμματιστής:",
+  "aboutAiPartner": "Συνεργάτης AI ανάπτυξης:",
+  "aboutNoTelemetry": "Το Gabbro δεν δημιουργεί κανένα εξερχόμενο σύνδεσμο δικτύου. Χωρίς τηλεμετρία, αναλυτικά ή λογαριασμούς.",
+
+  "strengthTierTerrible": "Τρομερό",
+  "strengthTierWeak": "Αδύναμο",
+  "strengthTierFair": "Μέτριο",
+  "strengthTierStrong": "Ισχυρό",
+  "strengthTierVeryStrong": "Πολύ ισχυρό",
+  "strengthTierExcellent": "Εξαιρετικό",
+  "yubiKeyProtectedNote": "Θησαυροφυλάκιο προστατευμένο με YubiKey — η σύνδεση με το κλειδί θα διατηρηθεί.",
+  "yubiKeyPinRequired": "Απαιτείται PIN YubiKey",
+  "tapYubiKeyNow": "Αγγίξτε τώρα το YubiKey σας…",
+  "touchYubiKeyToAuthorize": "Αγγίξτε το YubiKey για εξουσιοδότηση αυτής της αλλαγής.",
+  "currentPassphraseRequired": "Απαιτείται τρέχουσα φράση πρόσβασης",
+  "newPassphraseRequired": "Απαιτείται νέα φράση πρόσβασης",
+  "passphraseTooWeak": "Η φράση πρόσβασης είναι πολύ αδύναμη",
+  "confirmPassphraseRequired": "Επιβεβαιώστε τη νέα φράση πρόσβασης",
+  "passphrasesDoNotMatch": "Οι φράσεις πρόσβασης δεν ταιριάζουν",
+  "passphrasesMatch": "✓ Οι φράσεις πρόσβασης ταιριάζουν",
+  "passphrasesNoMatch": "✗ Οι φράσεις πρόσβασης δεν ταιριάζουν",
+  "entropyDisplay": "{tier} · {bits} bit",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Σφάλμα μεταφοράς.",
+  "authorizationFailed": "Αποτυχία εξουσιοδότησης — ελέγξτε το PIN και δοκιμάστε ξανά.",
+
+  "unlockEnterPassphraseAndPin": "Εισάγετε φράση πρόσβασης και PIN YubiKey για ξεκλείδωμα",
+  "unlockEnterPassphrase": "Εισάγετε φράση πρόσβασης για ξεκλείδωμα",
+  "unlockEntropyDisplay": "{tier} · {bits} bit εντροπίας",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Εισάγετε το YubiKey και αγγίξτε το όταν αναβοσβήνει",
+  "unlockErrorPassphrase": "Αδύνατο ξεκλείδωμα θησαυροφυλακίου. Ελέγξτε τη φράση πρόσβασης.",
+  "unlockErrorPassphraseAndPin": "Αδύνατο ξεκλείδωμα θησαυροφυλακίου. Ελέγξτε τη φράση πρόσβασης και το PIN YubiKey.",
+
+  "importSelectFile": "Επιλέξτε αρχείο.",
+  "importFileNotFound": "Το αρχείο δεν βρέθηκε.",
+  "importEnterPassphrase": "Εισάγετε τη φράση πρόσβασης για αυτό το θησαυροφυλάκιο.",
+  "importDuplicateWarning": "Οι καταχωρίσεις των οποίων το UUID υπάρχει ήδη στο θησαυροφυλάκιό σας θα παραλειφθούν αυτόματα. Θα εμφανιστεί περίληψη.",
+  "importGabbroSubtitle": "Συγχρονισμός καταχωρίσεων από άλλο θησαυροφυλάκιο Gabbro (αρχείο .gabbro)",
+  "importEnpassSubtitle": "Εξαγωγή JSON από Enpass (Εργαλεία → Εξαγωγή)",
+  "importBitwardenSubtitle": "Μη κρυπτογραφημένη εξαγωγή JSON από Bitwarden (Εργαλεία → Εξαγωγή θησαυροφυλακίου)",
+  "importCsvSubtitle": "Εξαγωγή CSV από οποιονδήποτε διαχειριστή κωδικών",
+
+  "vaultNameAlreadyExists": "Υπάρχει ήδη θησαυροφυλάκιο με το όνομα «{alias}».",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Αυτό θα διαγράψει οριστικά «{alias}» και όλα τα δεδομένα του.\n\nΑρχείο: {path}\n\nΑυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Αυτό θα διαγράψει οριστικά «{alias}» και θα αφαιρέσει τη σύνδεσή του με το YubiKey.\n\nΑρχείο: {path}\n\nΑυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Εισάγετε το PIN και αγγίξτε το YubiKey για εξουσιοδότηση διαγραφής.",
+  "deleteVaultTooltip": "Διαγραφή θησαυροφυλακίου",
+
+  "yubiKeySecurityWarning": "Προειδοποίηση ασφαλείας",
+  "removeYubiKeyTitle": "Αφαίρεση YubiKey",
+  "yubiKeyLastKeyRiskWarning": "ΠΡΟΕΙΔΟΠΟΙΗΣΗ: αν το εναπομένον κλειδί χαθεί, καταστραφεί ή κλαπεί, η πρόσβαση στο θησαυροφυλάκιο θα αποκλειστεί μόνιμα. Δεν υπάρχει επιλογή ανάκτησης.",
+  "onlyOneKeyRegisteredWarning": "Είναι καταχωρημένο μόνο ένα κλειδί. Αν αυτό το κλειδί χαθεί, η πρόσβαση στο θησαυροφυλάκιο θα αποκλειστεί μόνιμα.",
+  "tapRegisterNfc": "Προσεγγίστε το κλειδί στο τηλέφωνο για εγγραφή",
+  "tapRegisterUsb": "Μετά τη σύνδεση αγγίξτε το κλειδί για εγγραφή",
+  "tapActivateNfc": "Ξαναπροσεγγίστε το κλειδί στο τηλέφωνο για ενεργοποίηση",
+  "tapActivateUsb": "Μετά τη σύνδεση ξαναγγίξτε το κλειδί για ενεργοποίηση",
+  "failedToRegisterKey": "Αποτυχία εγγραφής κλειδιού: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Αποτυχία ενεργοποίησης κλειδιού: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Κλειδί {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Αγγίξτε το νέο YubiKey για εγγραφή…",
+  "tapYubiKeyToActivate": "Ξαναγγίξτε το νέο YubiKey για ενεργοποίηση…",
+  "editAliasTooltip": "Επεξεργασία ψευδωνύμου",
+  "cannotRemoveLastKey": "Δεν μπορεί να αφαιρεθεί το τελευταίο κλειδί",
+  "removeKeyTooltip": "Αφαίρεση κλειδιού",
+  "manageYubiKeysError": "Σφάλμα: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Κλασικό",
+  "generatorModePassphrase": "Φράση πρόσβασης",
+  "charSetsHeader": "Σύνολα χαρακτήρων",
+  "languageHeader": "Γλώσσα",
+  "separatorLabel": "Διαχωριστής",
+  "capitaliseWords": "Κεφαλαία στις λέξεις",
+  "appendDigit": "Προσθήκη ψηφίου",
+  "entropyBitsDisplay": "~{bits} bit εντροπίας",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Επιλέξτε τουλάχιστον ένα σύνολο χαρακτήρων",
+  "passwordMinLengthNote": "Οι κωδικοί έχουν τουλάχιστον 32 χαρακτήρες. Αν η ιστοσελίδα έχει μικρότερο όριο, αντιγράψτε τον απαιτούμενο αριθμό πρώτων χαρακτήρων.",
+  "excludeAmbiguousChars": "Αποκλεισμός διφορούμενων χαρακτήρων (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Δημιουργήστε το θησαυροφυλάκιό σας για να ξεκινήσετε.",
+  "onboardingVaultName": "Όνομα θησαυροφυλακίου",
+  "onboardingAliasRequired": "Το ψευδώνυμο είναι υποχρεωτικό",
+  "onboardingNewVaultLocation": "Τοποθεσία νέου θησαυροφυλακίου (ίδια με πριν)",
+  "onboardingVaultLocation": "Τοποθεσία θησαυροφυλακίου",
+  "onboardingLoadingPath": "Φόρτωση…",
+  "onboardingPathHint": "Διαδρομή αρχείου θησαυροφυλακίου",
+  "onboardingPathRequired": "Η διαδρομή είναι υποχρεωτική",
+  "onboardingReusePassphraseHint": "Επιλέξτε νέα κύρια φράση πρόσβασης ή επαναχρησιμοποιήστε την προηγούμενη.",
+  "onboardingPassphraseRequired": "Η φράση πρόσβασης είναι υποχρεωτική",
+  "onboardingConfirmRequired": "Επιβεβαιώστε τη φράση πρόσβασης",
+  "onboardingPrimaryKeyPin": "PIN κύριου κλειδιού",
+  "onboardingBackupKeyPin": "PIN κλειδιού εφεδρείας",
+  "onboardingKeyNPin": "PIN κλειδιού {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Θα αγγίξετε κάθε YubiKey δύο φορές (σύνολο 4 αγγίγματα). Μεταξύ των δύο κλειδιών θα σας ζητηθεί να τα αντικαταστήσετε.",
+  "onboardingYubikeySlowNote": "Η δημιουργία θησαυροφυλακίου με YubiKey διαρκεί 20–30 δευτερόλεπτα. Η εφαρμογή μπορεί να φαίνεται ανεπίδεκτη — αυτό είναι φυσιολογικό.",
+  "onboardingStep1Label": "Εγγραφή κύριου κλειδιού",
+  "onboardingStep1Hint": "Αγγίξτε το YubiKey τώρα",
+  "onboardingStep2Label": "Ενεργοποίηση κύριου κλειδιού",
+  "onboardingStep2Hint": "Ξαναγγίξτε το YubiKey",
+  "onboardingStep3Label": "Εναλλαγή στο εφεδρικό κλειδί",
+  "onboardingStep3Hint": "Αφαιρέστε το κύριο κλειδί και εισάγετε το εφεδρικό YubiKey",
+  "onboardingStep4Label": "Εγγραφή εφεδρικού κλειδιού",
+  "onboardingStep4Hint": "Αγγίξτε το εφεδρικό YubiKey",
+  "onboardingStep5Label": "Ενεργοποίηση εφεδρικού κλειδιού",
+  "onboardingStep5Hint": "Αγγίξτε για τελευταία φορά το εφεδρικό YubiKey",
+
+  "textSizePreview": "Ο γάββρος είναι πλουτωνικό πέτρωμα πλούσιο σε Mg και Fe με χονδρόκοκκη δομή.",
+
+  "fieldCardStatus": "Κατάσταση",
+  "fieldPaymentNetwork": "Δίκτυο πληρωμής",
+
+  "cardStatusActive": "Ενεργή",
+  "cardStatusLapsed": "Ληγμένη",
+  "cardStatusInactive": "Ανενεργή",
+
+  "validatorTitleRequired": "Ο τίτλος είναι υποχρεωτικός",
+  "validatorUsernameRequired": "Το όνομα χρήστη είναι υποχρεωτικό",
+  "validatorPasswordRequired": "Ο κωδικός είναι υποχρεωτικός",
+  "validatorContentRequired": "Το περιεχόμενο είναι υποχρεωτικό",
+  "validatorFirstNameRequired": "Το όνομα είναι υποχρεωτικό",
+  "validatorLastNameRequired": "Το επώνυμο είναι υποχρεωτικό",
+  "validatorCardLabelRequired": "Το όνομα κάρτας είναι υποχρεωτικό",
+  "validatorCardholderRequired": "Το όνομα κατόχου κάρτας είναι υποχρεωτικό",
+  "validatorCardNumberRequired": "Ο αριθμός κάρτας είναι υποχρεωτικός",
+  "validatorCardNumberLength": "Ο αριθμός κάρτας πρέπει να έχει 6–19 ψηφία",
+  "validatorExpiryRequired": "Η ημερομηνία λήξης είναι υποχρεωτική",
+  "validatorExpiryFormat": "Χρησιμοποιήστε τη μορφή ΜΜ/ΕΕ",
+  "validatorExpiryMonth": "Ο μήνας πρέπει να είναι 01–12",
+  "validatorCvvLength": "Το CVV πρέπει να έχει 3 ή 4 ψηφία",
+  "validatorLabelRequired": "Η ετικέτα είναι υποχρεωτική",
+  "validatorStatusRequired": "Η κατάσταση είναι υποχρεωτική",
+
+  "sectionBiometricUnlock": "Βιομετρικό ξεκλείδωμα",
+  "biometricUnlockDescription": "Χρησιμοποιήστε δακτυλικό αποτύπωμα ή πρόσωπο για ξεκλείδωμα θησαυροφυλακίου αντί εισαγωγής φράσης πρόσβασης.",
+  "biometricUnlockTitle": "Ενεργοποίηση βιομετρικού ξεκλειδώματος",
+  "biometricUnlockNote": "Όλα τα βιομετρικά δεδομένα καταχωρημένα σε αυτή τη συσκευή μπορούν να ξεκλειδώσουν — όχι μόνο αυτά που χρησιμοποιήθηκαν κατά την εγγραφή.",
+  "biometricUnavailable": "Το βιομετρικό ξεκλείδωμα δεν είναι διαθέσιμο σε αυτή τη συσκευή. Δεν βρέθηκε αισθητήρας βιομετρικών ή δεν υπάρχουν καταχωρημένα βιομετρικά δεδομένα στις ρυθμίσεις συστήματος.",
+  "biometricDialogTitle": "Σχετικά με το βιομετρικό ξεκλείδωμα",
+  "biometricDialogBody": "Όταν είναι ενεργοποιημένο, το Gabbro κρυπτογραφεί την κύρια φράση πρόσβασης και την αποθηκεύει σε αυτή τη συσκευή, προστατευμένη με τα βιομετρικά σας δεδομένα. Η φράση αποκρυπτογραφείται μόνο κατά το ξεκλείδωμα.\n\nΤο Gabbro δεν αποθηκεύει ποτέ δεδομένα δακτυλικών αποτυπωμάτων ή προσώπου — παραμένουν στο ασφαλές τσιπ του τηλεφώνου.",
+  "biometricDialogAllBiometrics": "Όλα τα βιομετρικά δεδομένα καταχωρημένα σε αυτή τη συσκευή θα μπορούν να ξεκλειδώσουν το Gabbro — δεν είναι δυνατός ο περιορισμός σε συγκεκριμένο δακτυλικό αποτύπωμα.",
+  "biometricDialogInvalidation": "Αν προστεθούν νέα βιομετρικά δεδομένα σε αυτό το τηλέφωνο (συμπεριλαμβανομένου δεύτερου δακτυλικού αποτυπώματος), αυτή η ρύθμιση θα απενεργοποιηθεί αυτόματα και θα χρειαστεί επαναδιαμόρφωση.",
+  "biometricDialogRecommendation": "Σύσταση: αφήστε απενεργοποιημένο αν έχετε υψηλό μοντέλο απειλών ή μοιράζεστε αυτή τη συσκευή.",
+  "biometricInvalidated": "Το βιομετρικό ξεκλείδωμα απενεργοποιήθηκε επειδή τα βιομετρικά δεδομένα σε αυτή τη συσκευή άλλαξαν (προστέθηκε νέο δακτυλικό αποτύπωμα ή πρόσωπο). Αυτό είναι μέτρο ασφαλείας. Εισάγετε ξανά τη φράση πρόσβασης και ενεργοποιήστε ξανά το βιομετρικό ξεκλείδωμα.",
+  "useBiometrics": "Χρήση βιομετρικών",
+  "biometricCancelled": "Η βιομετρική επαλήθευση δεν ολοκληρώθηκε. Εισάγετε τη φράση πρόσβασης για ξεκλείδωμα.",
+  "biometricEnrollTitle": "Εισαγωγή φράσης πρόσβασης",
+  "biometricEnrollDescription": "Εισάγετε την κύρια φράση πρόσβασης για ενεργοποίηση βιομετρικού ξεκλειδώματος.",
+  "biometricYubikeyHint": "Παρακάτω εισάγετε το PIN YubiKey, μετά κάντε κλικ στο «Χρήση βιομετρικών», μετά αγγίξτε το YubiKey.",
+
+  "helpTitle": "Βοήθεια",
+  "menuHelp": "Βοήθεια",
+  "helpCaptionCreate": "Δημιουργήστε θησαυροφυλάκιο: εισάγετε όνομα, φράση πρόσβασης και προαιρετικά προστατέψτε με YubiKey",
+  "helpCaptionEmpty": "Κάντε κλικ στο + για προσθήκη πρώτης καταχώρισης",
+  "helpCaptionDetail": "Κάντε κλικ στο εικονίδιο ματιού για εμφάνιση κωδικού, μετά κρατήστε πατημένο για λεπτομερή ανάλυση χαρακτήρων",
+  "helpCaptionTitleSearch": "Προεπιλογή: η γραμμή αναζήτησης ψάχνει μόνο τους τίτλους καταχωρίσεων",
+  "helpCaptionFullSearch": "Κλικ στον μεγεθυντή για εναλλαγή σε αναζήτηση σε όλα τα πεδία· κλικ ξανά για επιστροφή στην αναζήτηση τίτλου",
+  "helpCaptionFilter": "Χρησιμοποιήστε τα κουμπιά φιλτραρίσματος για εμφάνιση μόνο καταχωρίσεων συγκεκριμένου τύπου",
+  "helpCaptionFolders": "Χρησιμοποιήστε την επιλογή φακέλου για φιλτράρισμα καταχωρίσεων ανά φάκελο",
+  "helpCaptionSelect": "Παρατεταμένο πάτημα σε καταχώριση για είσοδο σε λειτουργία επιλογής· προσθέστε περισσότερα στοιχεία, μετά αναθέστε σε φάκελο ή διαγράψτε. Κλικ X για έξοδο.",
+  "helpCaptionJumpToLetter": "Κλικ σε γράμμα της αλφαβητικής γραμμής για μετάβαση στην ενότητα",
+  "helpCaptionBreakdown": "Κάντε κλικ στο εικονίδιο ματιού για εμφάνιση κωδικού, μετά κρατήστε πατημένο για λεπτομερή ανάλυση χαρακτήρων",
+  "helpCaptionManageVaults": "Στη «Διαχείριση θησαυροφυλακίων» μπορείτε να μετονομάσετε ή διαγράψετε θησαυροφυλάκια ή να προσθέσετε νέο",
+  "helpCaptionUnlock": "Εισάγετε τη φράση πρόσβασης για ξεκλείδωμα θησαυροφυλακίου"
+}

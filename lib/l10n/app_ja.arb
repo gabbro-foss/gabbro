@@ -1,0 +1,803 @@
+{
+  "@@locale": "ja",
+
+  "appName": "Gabbro",
+
+  "cancel": "キャンセル",
+  "delete": "削除",
+  "save": "保存",
+  "close": "閉じる",
+  "ok": "OK",
+  "edit": "編集",
+  "add": "追加",
+  "remove": "削除",
+  "rename": "名前変更",
+  "confirm": "確認",
+  "continueAction": "続行",
+  "dismiss": "閉じる",
+  "authorize": "承認",
+  "register": "登録",
+  "sync": "同期",
+  "assign": "割り当て",
+  "unlock": "ロック解除",
+  "generate": "生成",
+  "import": "インポート",
+  "export": "エクスポート",
+  "openInBrowser": "ブラウザで開く",
+  "useThisPassword": "このパスワードを使用",
+  "reviewArrow": "確認 →",
+  "skip": "スキップ",
+  "keep": "保持",
+  "revert": "元に戻す",
+  "next": "次へ: 列をマッピング",
+  "syncFromVault": "ボルトから同期",
+  "createVault": "ボルトを作成",
+  "pickFile": "ファイルを選択",
+  "noFileSelected": "ファイルが選択されていません",
+  "chooseFolder": "フォルダを選択",
+  "addCustomField": "カスタムフィールドを追加",
+  "exportFile": "ファイルをエクスポート",
+  "addVault": "ボルトを追加",
+  "addYubiKey": "YubiKeyを追加",
+  "noChangesToSave": "保存する変更はありません。",
+
+  "appearanceTitle": "外観",
+  "securityTitle": "セキュリティ",
+  "aboutTitle": "Gabbroについて",
+  "generatorTitle": "パスワードジェネレーター",
+  "importTitle": "エントリをインポート",
+  "exportTitle": "ボルトをエクスポート",
+  "changePassphraseTitle": "パスフレーズを変更",
+  "csvMappingTitle": "CSV列のマッピング",
+  "manageFoldersTitle": "フォルダの管理",
+  "manageVaultsTitle": "ボルトの管理",
+  "manageYubiKeysTitle": "YubiKeyの管理",
+  "passwordHistoryTitle": "パスワード履歴",
+  "reviewChangesTitle": "変更を確認",
+  "unlockGabbroTitle": "Gabbroのロック解除",
+
+  "sectionTheme": "テーマ",
+  "sectionTextSize": "テキストサイズ",
+  "sectionAlphabetBar": "アルファベットバーの位置",
+  "sectionAccessibility": "アクセシビリティ",
+  "sectionLanguage": "言語",
+  "sectionForegroundLock": "フォアグラウンドロック",
+  "sectionBackgroundLock": "バックグラウンドロック",
+  "sectionPasswordHistory": "パスワード履歴",
+  "sectionPassphraseCopyPaste": "パスフレーズのコピー/貼り付け",
+  "sectionVaultList": "ボルトリスト",
+  "sectionClipboardClear": "クリップボードのクリア",
+  "sectionCharacterSets": "文字セット",
+  "sectionGeneratorLanguage": "言語",
+
+  "themeSystem": "システム",
+  "themeLight": "ライト",
+  "themeDark": "ダーク",
+
+  "textSizeSmall": "小",
+  "textSizeRegular": "標準",
+  "textSizeLarge": "大",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "スマートフォンのみ — タブレットは常に左側を使用します。",
+  "alphabetBarLeft": "左",
+  "alphabetBarRight": "右",
+
+  "highContrastTitle": "ハイコントラスト",
+  "highContrastSubtitle": "読みやすさのためにコントラストを向上させます",
+
+  "languageNote": "システム言語を上書きします。«システム»はデバイスの地域設定に従います。",
+  "langSystem": "システム",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "アプリが開いているときのこの非アクティブ時間後にロックします。",
+  "backgroundLockDescription": "アプリがこの時間バックグラウンドになった後にロックします。",
+  "passwordHistoryDescription": "変更後に以前のパスワードを保持する期間。«常に保持»は手動でのみ履歴が削除されることを意味します。",
+  "passphraseCopyPasteDescription": "パスフレーズフィールドでのコピーと貼り付けをブロックします。推奨: クリップボードからのフレーズ漏洩を防ぎます。",
+  "passphraseCopyPasteNote": "注意: これにより、長押しコンテキストメニューとテキスト選択がブロックされます。キーボードの組み込み貼り付けボタンはまだ機能する場合があります — これはプラットフォームの制限です。",
+  "blockCopyPasteTitle": "コピー/貼り付けをブロック",
+  "vaultListDescription": "ログイン画面にすべてのボルトのリストを表示し、«ボルトの管理»に移動せずにどれをロック解除するか選択できるようにします。",
+  "showVaultListTitle": "ログイン時にボルトリストを表示",
+  "vaultListNote": "セキュリティノート: これがOFFの場合、ログイン画面には最後に使用したボルトのみが表示されます。トレードオフ: ボルトを切り替えるには、まずロック解除してからメニュー → ボルトの管理に移動する必要があります。",
+  "clipboardClearDescription": "秘密をコピーした後にクリップボードをクリアします。注意: クリップボードマネージャーがコピーを保持する場合があります。",
+
+  "duration30s": "30秒",
+  "duration1min": "1分",
+  "duration5min": "5分",
+  "duration15min": "15分",
+  "duration60s": "60秒",
+  "duration2min": "2分",
+  "durationNever": "なし",
+  "duration7days": "7日",
+  "duration30days": "30日",
+  "duration90days": "90日",
+  "durationKeepForever": "常に保持",
+
+  "menuExportVault": "ボルトをエクスポート",
+  "menuImportEntries": "エントリをインポート",
+  "menuSyncFromFile": "ファイルから同期",
+  "menuManageVaults": "ボルトの管理",
+  "menuChangePassphrase": "パスフレーズを変更",
+  "menuManageYubiKeys": "YubiKeyの管理",
+  "menuAppearance": "外観",
+  "menuSecurity": "セキュリティ",
+  "menuManageFolders": "フォルダの管理",
+  "menuPasswordGenerator": "パスワードジェネレーター",
+  "menuAbout": "バージョン情報",
+
+  "tooltipSelectEntries": "エントリを選択",
+  "tooltipLockVault": "ボルトをロック",
+  "tooltipSelectAll": "すべて選択",
+  "tooltipDeselectAll": "すべて選択解除",
+  "tooltipMenu": "メニュー",
+  "tooltipCopy": "コピー",
+  "tooltipCopied": "コピーしました!",
+  "tooltipShow": "表示",
+  "tooltipHide": "非表示",
+  "tooltipBrowse": "参照",
+  "tooltipEditAlias": "エイリアスを編集",
+  "tooltipRemoveField": "フィールドを削除",
+  "tooltipRename": "名前変更",
+  "tooltipDeleteVault": "ボルトを削除",
+  "tooltipAssignToFolder": "フォルダに割り当て",
+  "tooltipShowPin": "PINを表示",
+  "tooltipHidePin": "PINを非表示",
+  "tooltipShowValue": "値を表示",
+  "tooltipHideValue": "非表示",
+  "tooltipCancel": "キャンセル",
+  "tooltipOpenInBrowser": "ブラウザで開く",
+
+  "allFolders": "すべてのフォルダ",
+  "noFolder": "なし",
+  "selectFolder": "フォルダを選択",
+  "folderName": "フォルダ名",
+
+  "noEntriesMatch": "検索に一致するエントリはありません。",
+  "noVaultsRegistered": "登録済みのボルトはありません。",
+  "noYubiKeysRegistered": "登録済みのYubiKeyはありません",
+  "selectEntry": "エントリを選択",
+  "newEntryTitle": "新しいエントリ",
+  "createEntryTitle": "新規 {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "編集: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(URLなし)",
+  "noNameFallback": "(名前なし)",
+  "untitledFallback": "(タイトルなし)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "選択済み: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "すべてのフィールドを検索…",
+  "searchEntriesHint": "エントリを検索…",
+  "searchAllFieldsTooltip": "すべてのフィールドを検索",
+  "searchByTitleTooltip": "タイトルで検索",
+  "entryTypeAll": "すべて",
+  "entryTypePassword": "パスワード",
+  "entryTypeNote": "メモ",
+  "entryTypeCard": "カード",
+  "entryTypeIdentity": "ID",
+  "entryTypeFile": "ファイル",
+  "entryTypeCustom": "カスタム",
+  "errorPrefix": "エラー: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "ボルト",
+  "navAppearance": "外観",
+  "navSecurity": "セキュリティ",
+  "navAbout": "バージョン情報",
+
+  "deleteEntryTitle": "エントリを削除しますか?",
+  "cannotBeUndone": "この操作は元に戻せません。",
+  "deleteEntryDialogTitle": "エントリを削除しますか?",
+  "deleteEntriesTitle": "{count, plural, other{{count}件のエントリを削除しますか?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "フォルダに割り当て",
+  "folderConflictTitle": "フォルダの競合",
+  "syncFailedTitle": "同期に失敗しました",
+  "syncFromFileTitle": "ファイルから同期",
+  "nothingToSync": "同期するものはありません — 両方のボルトはすでに最新です。",
+
+  "importedEntries": "{count, plural, other{{count}件のエントリをインポートしました。}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "ファイルをエクスポート",
+  "saveDecryptedFileTo": "復号化されたファイルの保存先:",
+  "exportPathLabel": "エクスポートパス",
+  "exportedToPath": "{path}にエクスポートしました",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "エクスポートに失敗しました: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "ブラウザで開きますか?",
+  "couldNotOpen": "{url}を開けませんでした",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "以前のエントリを削除",
+  "failedToClearHistory": "履歴のクリアに失敗しました: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "パスワードの元に戻す操作に失敗しました: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "フォルダの名前変更",
+  "addFolderTitle": "フォルダを追加",
+  "deleteFolderTitle": "フォルダを削除",
+  "deleteFolderConfirm": "「{folder}」を削除しますか?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "エントリの移動先:",
+  "clearToNone": "「なし」に移動",
+
+  "renameVaultTitle": "ボルトの名前変更",
+  "deleteVaultTitle": "ボルトを削除しますか?",
+  "deleteVaultConfirmTitle": "よろしいですか?",
+  "typeDeleteToConfirm": "DELETEと入力して確認",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "YubiKeyに触れてください",
+  "noVaultsRegisteredText": "登録済みのボルトはありません。",
+
+  "addYubiKeyTitle": "YubiKeyを追加",
+  "enterYubiKeyPinTitle": "YubiKey PINを入力",
+  "editAliasForKey": "キー{index}のエイリアスを編集",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "YubiKeyは1つだけ登録されたままになります。",
+  "removeKeyConfirm": "このキーを削除してもよろしいですか?",
+  "removeKeyVaultConfirm": "このYubiKeyをボルトから削除しますか?",
+  "yubiKeyRemoved": "YubiKeyを削除しました",
+  "failedToRemoveKey": "キーの削除に失敗しました: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKeyを追加しました",
+  "failedToAddKey": "キーの追加に失敗しました: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "エイリアスの保存に失敗しました: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "FIDO2デバイスが見つかりません。YubiKeyを挿入してもう一度お試しください。",
+  "transportLabel": "トランスポート:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "パスフレーズ",
+  "yubiKeyPinLabel": "YubiKey PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "現在のパスフレーズ",
+  "newPassphraseLabel": "新しいパスフレーズ",
+  "confirmPassphraseLabel": "新しいパスフレーズを確認",
+  "vaultPassphraseLabel": "ボルトのパスフレーズ",
+  "aliasLabel": "エイリアス",
+  "aliasHint": "例: メイン、作業用キー…",
+  "masterPassphraseLabel": "マスターパスフレーズ",
+  "confirmPassphraseLabelShort": "パスフレーズを確認",
+
+  "fieldTitle": "タイトル",
+  "fieldContent": "コンテンツ",
+  "fieldFirstName": "名",
+  "fieldLastName": "姓",
+  "fieldEmail": "メール (任意)",
+  "fieldPhone": "電話 (任意)",
+  "fieldAddress": "住所 (任意)",
+  "fieldCardLabel": "カード名 (例: «Visa Platinum»)",
+  "fieldCardholderName": "カード名義人",
+  "fieldCardNumber": "カード番号",
+  "fieldExpiry": "有効期限 (MM/YY)",
+  "fieldCvv": "CVV (任意)",
+  "fieldCardPin": "PIN (任意)",
+  "fieldCreditLimit": "クレジット限度額 (任意)",
+  "fieldAccountNumber": "口座番号 (任意)",
+  "fieldNotes": "メモ (任意)",
+  "fieldUrl": "URL (任意)",
+  "fieldUsername": "ユーザー名",
+  "fieldPassword": "パスワード",
+  "fieldSeparator": "区切り文字",
+  "fieldFolder": "フォルダ",
+  "fieldLabel": "ラベル",
+  "fieldValue": "値",
+  "fieldCustomFields": "カスタムフィールド",
+  "fieldLabelOptional": "{label} (任意)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "このエントリタイプはまだサポートされていません。",
+  "csvColumnNone": "(なし)",
+  "csvPreviewLabel": "プレビュー",
+  "csvImportButton": "インポート",
+
+  "gabbroVaultSection": "Gabbroボルト",
+  "genericCsvSection": "汎用CSV",
+
+  "changePassphraseSuccess": "パスフレーズを変更しました",
+  "changePassphraseButton": "パスフレーズを変更",
+
+  "continueLabel": "続行",
+  "protectWithYubiKey": "YubiKeyで保護",
+  "yubiKeySubtitle": "ハードウェアセキュリティキー (推奨)",
+  "accessibilityButton": "アクセシビリティ",
+
+  "aboutProjectSection": "プロジェクト",
+  "aboutLicenceSection": "ライセンス",
+  "aboutOpenSourceSection": "オープンソースコンポーネント",
+  "aboutAttributionSection": "クレジット",
+
+  "lengthLabel": "長さ",
+  "wordsLabel": "単語数",
+  "generateButton": "生成",
+  "usePasswordButton": "このパスワードを使用",
+  "showHidePassword": "表示",
+
+  "deleteVaultPostDeletion": "ボルトが削除されました。続けるには新しいボルトを作成してください。",
+
+  "syncFilePassphraseLabel": "ボルトのパスフレーズ",
+
+  "historyWarning": "以前の値は1つだけ保持されます。履歴はセキュリティ設定に基づいて自動的に削除されます。",
+  "historyCurrent": "現在",
+  "historyPrevious": "以前",
+  "historySavedOn": "{date}に保存",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · {expires}に期限切れ",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "インポートの問題 ({index}/{total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "タイプ: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "このエントリを編集、修正して保存するか、スキップして拒否してください。",
+
+  "entriesSkipped": "{count, plural, other{{count}件のエントリをスキップしました}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "以下のエントリはすでにボルトに存在し、上書きされませんでした:",
+
+  "syncDeleteEntryContent": "別のデバイスが「{title}」を削除しました。\n\nここでも削除しますか、それとも保持しますか?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "「{title}」は2つのデバイスで異なるフォルダにあります。\n\nこのデバイス: {local}\n別のデバイス: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "フォルダなしで保持",
+  "folderConflictKeepLocal": "「{folder}」を保持",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "フォルダなしで移動",
+  "folderConflictMoveIncoming": "「{folder}」に移動",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "ボルトが同期されました — 追加: {added}件、更新: {updated}件、削除: {deleted}件。",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "このボルトファイルは異なるパスフレーズを使用しています。同期は同じパスフレーズを持つボルト間でのみサポートされます。",
+
+  "reviewSensitiveFields": "機密フィールド",
+  "reviewOtherFields": "その他のフィールド",
+  "reviewPasswordChanged": "パスワードが変更されました",
+  "reviewCvvChanged": "CVVが変更されました",
+  "reviewPinChanged": "PINが変更されました",
+  "reviewTransactionPasswordChanged": "取引パスワードが変更されました",
+  "tooltipShowValues": "値を表示",
+  "reviewOld": "旧",
+  "reviewNew": "新",
+  "reviewEmpty": "(空)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "メモ",
+  "reviewFieldContent": "コンテンツ",
+  "reviewFieldEmail": "メール",
+  "reviewFieldPhone": "電話",
+  "reviewFieldAddress": "住所",
+  "reviewFieldCardLabel": "カード名",
+  "reviewFieldStatus": "ステータス",
+  "reviewFieldCardholder": "カード名義人",
+  "reviewFieldExpiry": "有効期限",
+  "reviewFieldCreditLimit": "クレジット限度額",
+  "reviewFieldAccountNumber": "口座番号",
+  "reviewFieldNetwork": "ネットワーク",
+  "reviewFieldBank": "銀行",
+  "reviewFieldFilename": "ファイル名",
+  "reviewFieldSize": "サイズ",
+  "reviewFieldCardNumber": "番号",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "取引パスワード",
+  "timestampCreated": "作成日",
+  "timestampUpdated": "更新日",
+  "timestampUnknown": "不明",
+  "noTitleFallback": "(タイトルなし)",
+  "tooltipExportFile": "ファイルをエクスポート",
+  "tooltipEditEntry": "エントリを編集",
+  "tooltipDeleteEntry": "エントリを削除",
+  "exportLabel": "エクスポート",
+  "customEntryFieldsHeader": "フィールド",
+  "copiedNeverClears": "コピーしました — クリップボードは自動的にクリアされません",
+  "copiedClears30s": "コピーしました — クリップボードは30秒後にクリアされます",
+  "copiedClears60s": "コピーしました — クリップボードは60秒後にクリアされます",
+  "copiedClears2min": "コピーしました — クリップボードは2分後にクリアされます",
+
+  "passwordBreakdownTitle": "パスワード分析",
+  "charTypeUppercase": "大文字",
+  "charTypeLowercase": "小文字",
+  "charTypeDigit": "数字",
+  "charTypeSymbol": "記号",
+
+  "exportIncludeDate": "ファイル名に日付を含める",
+  "exportChooseFormat": "エクスポート形式を選択してください。",
+  "exportUnencryptedWarning": "完全に暗号化されていません — すべての秘密が平文として書き込まれます。ファイルを安全に保管し、使用後は削除してください。",
+  "exportPassphraseOnlyNote": "パスフレーズのみで保護されています。インポートにYubiKeyは不要です。",
+  "exportChooseDestinationJson": "エクスポートされたJSONファイルの保存先を選択してください。",
+  "exportChooseDestinationVault": "エクスポートされたボルトファイルの保存先を選択してください。",
+  "exportTwoFilesNote": "2つのファイルが作成されます: vault.gabbro と vault.gabbro.sha256",
+  "exportSelectDestination": "保存先を選択してください。",
+
+  "aboutVersion": "バージョン {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "ポスト量子パスワードマネージャー",
+  "aboutSourceCode": "ソースコード",
+  "aboutReportIssue": "問題を報告",
+  "aboutSupportGabbro": "Gabbroをサポート",
+  "aboutLicenceBody": "GabbroはGNU General Public License v3.0 only (GPL-3.0-only)の下でライセンスされたフリーのオープンソースソフトウェアです。\n\nライセンスの条件の下で、このアプリケーションを使用、研究、配布する自由があります。",
+  "aboutOwnerRole": "プロジェクトオーナー、アーキテクト、主要開発者:",
+  "aboutAiPartner": "AI開発パートナー:",
+  "aboutNoTelemetry": "Gabbroは外部ネットワーク接続を行いません。テレメトリー、分析、アカウントなし。",
+
+  "strengthTierTerrible": "非常に弱い",
+  "strengthTierWeak": "弱い",
+  "strengthTierFair": "普通",
+  "strengthTierStrong": "強い",
+  "strengthTierVeryStrong": "とても強い",
+  "strengthTierExcellent": "優秀",
+  "yubiKeyProtectedNote": "YubiKeyで保護されたボルト — キーのバインドが保持されます。",
+  "yubiKeyPinRequired": "YubiKey PINが必要です",
+  "tapYubiKeyNow": "今すぐYubiKeyに触れてください…",
+  "touchYubiKeyToAuthorize": "この変更を承認するためにYubiKeyに触れてください。",
+  "currentPassphraseRequired": "現在のパスフレーズが必要です",
+  "newPassphraseRequired": "新しいパスフレーズが必要です",
+  "passphraseTooWeak": "パスフレーズが弱すぎます",
+  "confirmPassphraseRequired": "新しいパスフレーズを確認してください",
+  "passphrasesDoNotMatch": "パスフレーズが一致しません",
+  "passphrasesMatch": "✓ パスフレーズが一致します",
+  "passphrasesNoMatch": "✗ パスフレーズが一致しません",
+  "entropyDisplay": "{tier} · {bits}ビット",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "トランスポートエラー。",
+  "authorizationFailed": "承認に失敗しました — PINを確認してもう一度お試しください。",
+
+  "unlockEnterPassphraseAndPin": "パスフレーズとYubiKey PINを入力してロック解除",
+  "unlockEnterPassphrase": "パスフレーズを入力してロック解除",
+  "unlockEntropyDisplay": "{tier} · {bits}ビットのエントロピー",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "YubiKeyを挿入し、点滅したら触れてください",
+  "unlockErrorPassphrase": "ボルトのロック解除に失敗しました。パスフレーズを確認してください。",
+  "unlockErrorPassphraseAndPin": "ボルトのロック解除に失敗しました。パスフレーズとYubiKey PINを確認してください。",
+
+  "importSelectFile": "ファイルを選択してください。",
+  "importFileNotFound": "ファイルが見つかりません。",
+  "importEnterPassphrase": "このボルトのパスフレーズを入力してください。",
+  "importDuplicateWarning": "UUIDがすでにボルトに存在するエントリは自動的にスキップされます。概要が表示されます。",
+  "importGabbroSubtitle": "別のGabbroボルト (.gabbro) からエントリを同期",
+  "importEnpassSubtitle": "EnpassからのJSONエクスポート (ツール → エクスポート)",
+  "importBitwardenSubtitle": "BitwardenからのJSONエクスポート (ツール → ボルトをエクスポート)",
+  "importCsvSubtitle": "パスワードマネージャーからのCSVエクスポート",
+
+  "vaultNameAlreadyExists": "「{alias}」という名前のボルトはすでに存在します。",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "これにより「{alias}」とすべてのデータが完全に削除されます。\n\nファイル: {path}\n\nこの操作は元に戻せません。",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "これにより「{alias}」とYubiKeyバインドが完全に削除されます。\n\nファイル: {path}\n\nこの操作は元に戻せません。",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "PINを入力し、削除を承認するためにYubiKeyに触れてください。",
+  "deleteVaultTooltip": "ボルトを削除",
+
+  "yubiKeySecurityWarning": "セキュリティ警告",
+  "removeYubiKeyTitle": "YubiKeyを削除",
+  "yubiKeyLastKeyRiskWarning": "警告: 残りのキーが紛失、損傷、または盗難にあった場合、ボルトへのアクセスは永久に失われます。回復オプションはありません。",
+  "onlyOneKeyRegisteredWarning": "登録されているキーは1つだけです。このキーが紛失した場合、ボルトへのアクセスは永久に失われます。",
+  "tapRegisterNfc": "登録のためにキーをスマートフォンに近づけてください",
+  "tapRegisterUsb": "接続後、登録のためにキーに触れてください",
+  "tapActivateNfc": "アクティベーションのためにキーをスマートフォンに再度近づけてください",
+  "tapActivateUsb": "接続後、アクティベーションのためにキーに再度触れてください",
+  "failedToRegisterKey": "キーの登録に失敗しました: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "キーのアクティベーションに失敗しました: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "キー{index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "新しいYubiKeyに触れて登録…",
+  "tapYubiKeyToActivate": "新しいYubiKeyに再度触れてアクティベート…",
+  "editAliasTooltip": "エイリアスを編集",
+  "cannotRemoveLastKey": "最後のキーは削除できません",
+  "removeKeyTooltip": "キーを削除",
+  "manageYubiKeysError": "エラー: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "クラシック",
+  "generatorModePassphrase": "パスフレーズ",
+  "charSetsHeader": "文字セット",
+  "languageHeader": "言語",
+  "separatorLabel": "区切り文字",
+  "capitaliseWords": "単語を大文字化",
+  "appendDigit": "数字を追加",
+  "entropyBitsDisplay": "~{bits}ビットのエントロピー",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "少なくとも1つの文字セットを選択してください",
+  "passwordMinLengthNote": "パスワードは少なくとも32文字です。ウェブサイトにより短い制限がある場合は、必要な数の最初の文字をコピーしてください。",
+  "excludeAmbiguousChars": "曖昧な文字を除外 (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "ボルトを作成して始めましょう。",
+  "onboardingVaultName": "ボルト名",
+  "onboardingAliasRequired": "エイリアスは必須です",
+  "onboardingNewVaultLocation": "新しいボルトの場所 (以前と同じ)",
+  "onboardingVaultLocation": "ボルトの場所",
+  "onboardingLoadingPath": "読み込み中…",
+  "onboardingPathHint": "ボルトファイルのパス",
+  "onboardingPathRequired": "パスは必須です",
+  "onboardingReusePassphraseHint": "新しいマスターパスフレーズを選択するか、以前のものを再使用してください。",
+  "onboardingPassphraseRequired": "パスフレーズは必須です",
+  "onboardingConfirmRequired": "パスフレーズを確認してください",
+  "onboardingPrimaryKeyPin": "プライマリキーのPIN",
+  "onboardingBackupKeyPin": "バックアップキーのPIN",
+  "onboardingKeyNPin": "キー{n}のPIN",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "各YubiKeyに2回触れます (合計4回)。2つのキーの間で交換するよう求められます。",
+  "onboardingYubikeySlowNote": "YubiKeyを使ったボルトの作成には20〜30秒かかります。アプリが反応していないように見えることがありますが、これは正常です。",
+  "onboardingStep1Label": "プライマリキーを登録",
+  "onboardingStep1Hint": "今YubiKeyに触れてください",
+  "onboardingStep2Label": "プライマリキーをアクティベート",
+  "onboardingStep2Hint": "YubiKeyに再度触れてください",
+  "onboardingStep3Label": "バックアップキーに切り替え",
+  "onboardingStep3Hint": "プライマリキーを抜いてバックアップYubiKeyを挿入してください",
+  "onboardingStep4Label": "バックアップキーを登録",
+  "onboardingStep4Hint": "バックアップYubiKeyに触れてください",
+  "onboardingStep5Label": "バックアップキーをアクティベート",
+  "onboardingStep5Hint": "最後にバックアップYubiKeyに触れてください",
+
+  "textSizePreview": "ガブロはMgとFeが豊富な粗粒構造を持つ深成岩です。",
+
+  "fieldCardStatus": "ステータス",
+  "fieldPaymentNetwork": "支払いネットワーク",
+
+  "cardStatusActive": "有効",
+  "cardStatusLapsed": "失効",
+  "cardStatusInactive": "無効",
+
+  "validatorTitleRequired": "タイトルは必須です",
+  "validatorUsernameRequired": "ユーザー名は必須です",
+  "validatorPasswordRequired": "パスワードは必須です",
+  "validatorContentRequired": "コンテンツは必須です",
+  "validatorFirstNameRequired": "名は必須です",
+  "validatorLastNameRequired": "姓は必須です",
+  "validatorCardLabelRequired": "カード名は必須です",
+  "validatorCardholderRequired": "カード名義人は必須です",
+  "validatorCardNumberRequired": "カード番号は必須です",
+  "validatorCardNumberLength": "カード番号は6〜19桁である必要があります",
+  "validatorExpiryRequired": "有効期限は必須です",
+  "validatorExpiryFormat": "MM/YYの形式を使用してください",
+  "validatorExpiryMonth": "月は01〜12である必要があります",
+  "validatorCvvLength": "CVVは3桁または4桁である必要があります",
+  "validatorLabelRequired": "ラベルは必須です",
+  "validatorStatusRequired": "ステータスは必須です",
+
+  "sectionBiometricUnlock": "生体認証ロック解除",
+  "biometricUnlockDescription": "パスフレーズを入力する代わりに、指紋や顔を使ってボルトのロックを解除します。",
+  "biometricUnlockTitle": "生体認証ロック解除を有効にする",
+  "biometricUnlockNote": "このデバイスに登録されているすべての生体認証データが使用できます — 登録時に使用したものだけではありません。",
+  "biometricUnavailable": "このデバイスでは生体認証ロック解除を利用できません。生体認証センサーが見つからないか、システム設定に生体認証データが登録されていません。",
+  "biometricDialogTitle": "生体認証ロック解除について",
+  "biometricDialogBody": "有効にすると、Gabbroはマスターパスフレーズを暗号化し、生体認証データで保護されたこのデバイスに保存します。フレーズはロック解除時にのみ復号化されます。\n\nGabbroは指紋や顔のデータを保存しません — スマートフォンのセキュアチップに残ります。",
+  "biometricDialogAllBiometrics": "このデバイスに登録されているすべての生体認証データがGabbroのロックを解除できます — 特定の指紋に制限することはできません。",
+  "biometricDialogInvalidation": "このスマートフォンに新しい生体認証データ (2番目の指紋を含む) が追加された場合、この設定は自動的に無効になり、再設定が必要になります。",
+  "biometricDialogRecommendation": "推奨: 高い脅威モデルがある場合やデバイスを共有している場合は、無効のままにしてください。",
+  "biometricInvalidated": "このデバイスの生体認証データが変更されたため (システム設定で新しい指紋または顔が追加されました)、生体認証ロック解除が無効になりました。これはセキュリティ対策です。パスフレーズを再入力し、生体認証ロック解除を再度有効にしてください。",
+  "useBiometrics": "生体認証を使用",
+  "biometricCancelled": "生体認証が完了しませんでした。ロック解除するにはパスフレーズを入力してください。",
+  "biometricEnrollTitle": "パスフレーズを入力",
+  "biometricEnrollDescription": "生体認証ロック解除を有効にするためにマスターパスフレーズを入力してください。",
+  "biometricYubikeyHint": "下にYubiKey PINを入力し、«生体認証を使用»をクリックしてから、YubiKeyに触れてください。",
+
+  "helpTitle": "ヘルプ",
+  "menuHelp": "ヘルプ",
+  "helpCaptionCreate": "ボルトを作成: 名前、パスフレーズを入力し、オプションでYubiKeyで保護",
+  "helpCaptionEmpty": "+をクリックして最初のエントリを追加",
+  "helpCaptionDetail": "目のアイコンをクリックしてパスワードを表示し、長押しで詳細な文字分析を表示",
+  "helpCaptionTitleSearch": "デフォルト: 検索バーはエントリのタイトルのみを検索します",
+  "helpCaptionFullSearch": "虫眼鏡をクリックしてすべてのフィールドの検索に切り替え; もう一度クリックしてタイトル検索に戻る",
+  "helpCaptionFilter": "フィルターボタンを使用して特定のタイプのエントリのみを表示",
+  "helpCaptionFolders": "フォルダ選択を使用してフォルダごとにエントリをフィルタリング",
+  "helpCaptionSelect": "エントリを長押しして選択モードに入る; さらに項目を追加し、フォルダに割り当てるか削除。Xをクリックして終了。",
+  "helpCaptionJumpToLetter": "インデックスバーの文字をクリックしてそのセクションに移動",
+  "helpCaptionBreakdown": "目のアイコンをクリックしてパスワードを表示し、長押しで詳細な文字分析を表示",
+  "helpCaptionManageVaults": "«ボルトの管理»でボルトの名前変更や削除、または新しいボルトを追加できます",
+  "helpCaptionUnlock": "パスフレーズを入力してボルトのロックを解除"
+}

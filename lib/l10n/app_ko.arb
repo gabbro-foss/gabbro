@@ -1,0 +1,803 @@
+{
+  "@@locale": "ko",
+
+  "appName": "Gabbro",
+
+  "cancel": "취소",
+  "delete": "삭제",
+  "save": "저장",
+  "close": "닫기",
+  "ok": "확인",
+  "edit": "편집",
+  "add": "추가",
+  "remove": "제거",
+  "rename": "이름 변경",
+  "confirm": "확인",
+  "continueAction": "계속",
+  "dismiss": "닫기",
+  "authorize": "승인",
+  "register": "등록",
+  "sync": "동기화",
+  "assign": "할당",
+  "unlock": "잠금 해제",
+  "generate": "생성",
+  "import": "가져오기",
+  "export": "내보내기",
+  "openInBrowser": "브라우저에서 열기",
+  "useThisPassword": "이 비밀번호 사용",
+  "reviewArrow": "검토 →",
+  "skip": "건너뛰기",
+  "keep": "유지",
+  "revert": "되돌리기",
+  "next": "다음: 열 매핑",
+  "syncFromVault": "볼트에서 동기화",
+  "createVault": "볼트 만들기",
+  "pickFile": "파일 선택",
+  "noFileSelected": "파일이 선택되지 않았습니다",
+  "chooseFolder": "폴더 선택",
+  "addCustomField": "사용자 정의 필드 추가",
+  "exportFile": "파일 내보내기",
+  "addVault": "볼트 추가",
+  "addYubiKey": "YubiKey 추가",
+  "noChangesToSave": "저장할 변경 사항이 없습니다.",
+
+  "appearanceTitle": "외관",
+  "securityTitle": "보안",
+  "aboutTitle": "Gabbro 정보",
+  "generatorTitle": "비밀번호 생성기",
+  "importTitle": "항목 가져오기",
+  "exportTitle": "볼트 내보내기",
+  "changePassphraseTitle": "암호 문구 변경",
+  "csvMappingTitle": "CSV 열 매핑",
+  "manageFoldersTitle": "폴더 관리",
+  "manageVaultsTitle": "볼트 관리",
+  "manageYubiKeysTitle": "YubiKey 관리",
+  "passwordHistoryTitle": "비밀번호 기록",
+  "reviewChangesTitle": "변경 사항 검토",
+  "unlockGabbroTitle": "Gabbro 잠금 해제",
+
+  "sectionTheme": "테마",
+  "sectionTextSize": "글자 크기",
+  "sectionAlphabetBar": "알파벳 바 위치",
+  "sectionAccessibility": "접근성",
+  "sectionLanguage": "언어",
+  "sectionForegroundLock": "포그라운드 잠금",
+  "sectionBackgroundLock": "백그라운드 잠금",
+  "sectionPasswordHistory": "비밀번호 기록",
+  "sectionPassphraseCopyPaste": "암호 문구 복사/붙여넣기",
+  "sectionVaultList": "볼트 목록",
+  "sectionClipboardClear": "클립보드 지우기",
+  "sectionCharacterSets": "문자 세트",
+  "sectionGeneratorLanguage": "언어",
+
+  "themeSystem": "시스템",
+  "themeLight": "라이트",
+  "themeDark": "다크",
+
+  "textSizeSmall": "작음",
+  "textSizeRegular": "보통",
+  "textSizeLarge": "큼",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "스마트폰에서만 사용 — 태블릿은 항상 왼쪽을 사용합니다.",
+  "alphabetBarLeft": "왼쪽",
+  "alphabetBarRight": "오른쪽",
+
+  "highContrastTitle": "고대비",
+  "highContrastSubtitle": "가독성을 높이기 위해 대비를 강화합니다",
+
+  "languageNote": "시스템 언어를 재정의합니다. «시스템»은 기기의 지역 설정을 따릅니다.",
+  "langSystem": "시스템",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "앱이 열려 있을 때 이 비활성 시간 이후 잠급니다.",
+  "backgroundLockDescription": "앱이 이 시간 동안 백그라운드에 있은 후 잠급니다.",
+  "passwordHistoryDescription": "변경 후 이전 비밀번호를 보관하는 기간. «항상 유지»는 수동으로만 기록이 삭제됨을 의미합니다.",
+  "passphraseCopyPasteDescription": "암호 문구 필드에서 복사 및 붙여넣기를 차단합니다. 권장: 클립보드를 통한 문구 유출을 방지합니다.",
+  "passphraseCopyPasteNote": "참고: 이렇게 하면 길게 누르기 컨텍스트 메뉴와 텍스트 선택이 차단됩니다. 키보드 내장 붙여넣기 버튼은 여전히 작동할 수 있습니다 — 이는 플랫폼 제한입니다.",
+  "blockCopyPasteTitle": "복사/붙여넣기 차단",
+  "vaultListDescription": "로그인 화면에 모든 볼트 목록을 표시하여 «볼트 관리»로 이동하지 않고도 잠금 해제할 볼트를 선택할 수 있습니다.",
+  "showVaultListTitle": "로그인 시 볼트 목록 표시",
+  "vaultListNote": "보안 참고: 이것이 꺼져 있으면 로그인 화면에는 마지막으로 사용한 볼트만 표시됩니다. 트레이드오프: 볼트를 변경하려면 먼저 잠금을 해제한 후 메뉴 → 볼트 관리로 이동해야 합니다.",
+  "clipboardClearDescription": "비밀을 복사한 후 클립보드를 지웁니다. 참고: 클립보드 관리자가 복사본을 유지할 수 있습니다.",
+
+  "duration30s": "30초",
+  "duration1min": "1분",
+  "duration5min": "5분",
+  "duration15min": "15분",
+  "duration60s": "60초",
+  "duration2min": "2분",
+  "durationNever": "없음",
+  "duration7days": "7일",
+  "duration30days": "30일",
+  "duration90days": "90일",
+  "durationKeepForever": "항상 유지",
+
+  "menuExportVault": "볼트 내보내기",
+  "menuImportEntries": "항목 가져오기",
+  "menuSyncFromFile": "파일에서 동기화",
+  "menuManageVaults": "볼트 관리",
+  "menuChangePassphrase": "암호 문구 변경",
+  "menuManageYubiKeys": "YubiKey 관리",
+  "menuAppearance": "외관",
+  "menuSecurity": "보안",
+  "menuManageFolders": "폴더 관리",
+  "menuPasswordGenerator": "비밀번호 생성기",
+  "menuAbout": "정보",
+
+  "tooltipSelectEntries": "항목 선택",
+  "tooltipLockVault": "볼트 잠금",
+  "tooltipSelectAll": "모두 선택",
+  "tooltipDeselectAll": "모두 선택 해제",
+  "tooltipMenu": "메뉴",
+  "tooltipCopy": "복사",
+  "tooltipCopied": "복사됨!",
+  "tooltipShow": "표시",
+  "tooltipHide": "숨기기",
+  "tooltipBrowse": "찾아보기",
+  "tooltipEditAlias": "별칭 편집",
+  "tooltipRemoveField": "필드 제거",
+  "tooltipRename": "이름 변경",
+  "tooltipDeleteVault": "볼트 삭제",
+  "tooltipAssignToFolder": "폴더에 할당",
+  "tooltipShowPin": "PIN 표시",
+  "tooltipHidePin": "PIN 숨기기",
+  "tooltipShowValue": "값 표시",
+  "tooltipHideValue": "숨기기",
+  "tooltipCancel": "취소",
+  "tooltipOpenInBrowser": "브라우저에서 열기",
+
+  "allFolders": "모든 폴더",
+  "noFolder": "없음",
+  "selectFolder": "폴더 선택",
+  "folderName": "폴더 이름",
+
+  "noEntriesMatch": "검색과 일치하는 항목이 없습니다.",
+  "noVaultsRegistered": "등록된 볼트가 없습니다.",
+  "noYubiKeysRegistered": "등록된 YubiKey가 없습니다",
+  "selectEntry": "항목 선택",
+  "newEntryTitle": "새 항목",
+  "createEntryTitle": "새 {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "편집: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(URL 없음)",
+  "noNameFallback": "(이름 없음)",
+  "untitledFallback": "(제목 없음)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "선택됨: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "모든 필드 검색…",
+  "searchEntriesHint": "항목 검색…",
+  "searchAllFieldsTooltip": "모든 필드를 검색합니다",
+  "searchByTitleTooltip": "제목으로 검색합니다",
+  "entryTypeAll": "전체",
+  "entryTypePassword": "비밀번호",
+  "entryTypeNote": "메모",
+  "entryTypeCard": "카드",
+  "entryTypeIdentity": "신원",
+  "entryTypeFile": "파일",
+  "entryTypeCustom": "사용자 정의",
+  "errorPrefix": "오류: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "볼트",
+  "navAppearance": "외관",
+  "navSecurity": "보안",
+  "navAbout": "정보",
+
+  "deleteEntryTitle": "항목을 삭제하시겠습니까?",
+  "cannotBeUndone": "이 작업은 취소할 수 없습니다.",
+  "deleteEntryDialogTitle": "항목을 삭제하시겠습니까?",
+  "deleteEntriesTitle": "{count, plural, other{{count}개의 항목을 삭제하시겠습니까?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "폴더에 할당",
+  "folderConflictTitle": "폴더 충돌",
+  "syncFailedTitle": "동기화에 실패했습니다",
+  "syncFromFileTitle": "파일에서 동기화",
+  "nothingToSync": "동기화할 것이 없습니다 — 두 볼트 모두 이미 최신 상태입니다.",
+
+  "importedEntries": "{count, plural, other{{count}개의 항목을 가져왔습니다.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "파일 내보내기",
+  "saveDecryptedFileTo": "복호화된 파일 저장 위치:",
+  "exportPathLabel": "내보내기 경로",
+  "exportedToPath": "{path}에 내보냈습니다",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "내보내기에 실패했습니다: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "브라우저에서 열기?",
+  "couldNotOpen": "{url}을(를) 열 수 없습니다",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "이전 항목 삭제",
+  "failedToClearHistory": "기록 지우기에 실패했습니다: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "비밀번호 되돌리기에 실패했습니다: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "폴더 이름 변경",
+  "addFolderTitle": "폴더 추가",
+  "deleteFolderTitle": "폴더 삭제",
+  "deleteFolderConfirm": "«{folder}»을(를) 삭제하시겠습니까?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "항목 이동 대상:",
+  "clearToNone": "«없음»으로 이동",
+
+  "renameVaultTitle": "볼트 이름 변경",
+  "deleteVaultTitle": "볼트를 삭제하시겠습니까?",
+  "deleteVaultConfirmTitle": "확실하십니까?",
+  "typeDeleteToConfirm": "확인을 위해 DELETE를 입력하세요",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "YubiKey에 터치하세요",
+  "noVaultsRegisteredText": "등록된 볼트가 없습니다.",
+
+  "addYubiKeyTitle": "YubiKey 추가",
+  "enterYubiKeyPinTitle": "YubiKey PIN 입력",
+  "editAliasForKey": "키 {index}의 별칭 편집",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "등록된 YubiKey가 하나만 남게 됩니다.",
+  "removeKeyConfirm": "이 키를 제거하시겠습니까?",
+  "removeKeyVaultConfirm": "이 YubiKey를 볼트에서 제거하시겠습니까?",
+  "yubiKeyRemoved": "YubiKey가 제거됐습니다",
+  "failedToRemoveKey": "키 제거에 실패했습니다: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey가 추가됐습니다",
+  "failedToAddKey": "키 추가에 실패했습니다: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "별칭 저장에 실패했습니다: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "FIDO2 장치를 찾을 수 없습니다. YubiKey를 삽입하고 다시 시도하세요.",
+  "transportLabel": "전송:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "암호 문구",
+  "yubiKeyPinLabel": "YubiKey PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "현재 암호 문구",
+  "newPassphraseLabel": "새 암호 문구",
+  "confirmPassphraseLabel": "새 암호 문구 확인",
+  "vaultPassphraseLabel": "볼트 암호 문구",
+  "aliasLabel": "별칭",
+  "aliasHint": "예: 메인, 작업용 키…",
+  "masterPassphraseLabel": "마스터 암호 문구",
+  "confirmPassphraseLabelShort": "암호 문구 확인",
+
+  "fieldTitle": "제목",
+  "fieldContent": "내용",
+  "fieldFirstName": "이름",
+  "fieldLastName": "성",
+  "fieldEmail": "이메일 (선택사항)",
+  "fieldPhone": "전화 (선택사항)",
+  "fieldAddress": "주소 (선택사항)",
+  "fieldCardLabel": "카드 이름 (예: «Visa Platinum»)",
+  "fieldCardholderName": "카드 소지자 이름",
+  "fieldCardNumber": "카드 번호",
+  "fieldExpiry": "유효기간 (MM/YY)",
+  "fieldCvv": "CVV (선택사항)",
+  "fieldCardPin": "PIN (선택사항)",
+  "fieldCreditLimit": "신용 한도 (선택사항)",
+  "fieldAccountNumber": "계좌번호 (선택사항)",
+  "fieldNotes": "메모 (선택사항)",
+  "fieldUrl": "URL (선택사항)",
+  "fieldUsername": "사용자 이름",
+  "fieldPassword": "비밀번호",
+  "fieldSeparator": "구분자",
+  "fieldFolder": "폴더",
+  "fieldLabel": "레이블",
+  "fieldValue": "값",
+  "fieldCustomFields": "사용자 정의 필드",
+  "fieldLabelOptional": "{label} (선택사항)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "이 항목 유형은 아직 지원되지 않습니다.",
+  "csvColumnNone": "(없음)",
+  "csvPreviewLabel": "미리보기",
+  "csvImportButton": "가져오기",
+
+  "gabbroVaultSection": "Gabbro 볼트",
+  "genericCsvSection": "일반 CSV",
+
+  "changePassphraseSuccess": "암호 문구가 변경됐습니다",
+  "changePassphraseButton": "암호 문구 변경",
+
+  "continueLabel": "계속",
+  "protectWithYubiKey": "YubiKey로 보호",
+  "yubiKeySubtitle": "하드웨어 보안 키 (권장)",
+  "accessibilityButton": "접근성",
+
+  "aboutProjectSection": "프로젝트",
+  "aboutLicenceSection": "라이선스",
+  "aboutOpenSourceSection": "오픈소스 구성 요소",
+  "aboutAttributionSection": "크레딧",
+
+  "lengthLabel": "길이",
+  "wordsLabel": "단어 수",
+  "generateButton": "생성",
+  "usePasswordButton": "이 비밀번호 사용",
+  "showHidePassword": "표시",
+
+  "deleteVaultPostDeletion": "볼트가 삭제됐습니다. 계속하려면 새 볼트를 만드세요.",
+
+  "syncFilePassphraseLabel": "볼트 암호 문구",
+
+  "historyWarning": "이전 값은 1개만 유지됩니다. 기록은 보안 설정에 따라 자동으로 삭제됩니다.",
+  "historyCurrent": "현재",
+  "historyPrevious": "이전",
+  "historySavedOn": "{date}에 저장됨",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · {expires}에 만료",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "가져오기 문제 ({index}/{total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "유형: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "이 항목을 편집, 수정하고 저장하거나 건너뛰어 거부하세요.",
+
+  "entriesSkipped": "{count, plural, other{{count}개의 항목을 건너뛰었습니다}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "다음 항목은 이미 볼트에 존재하며 덮어쓰지 않았습니다:",
+
+  "syncDeleteEntryContent": "다른 기기에서 «{title}»을(를) 삭제했습니다.\n\n여기서도 삭제하시겠습니까, 아니면 유지하시겠습니까?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}»이(가) 두 기기에서 서로 다른 폴더에 있습니다.\n\n이 기기: {local}\n다른 기기: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "폴더 없이 유지",
+  "folderConflictKeepLocal": "«{folder}» 유지",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "폴더 없이 이동",
+  "folderConflictMoveIncoming": "«{folder}»로 이동",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "볼트가 동기화됐습니다 — 추가: {added}개, 업데이트: {updated}개, 삭제: {deleted}개.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "이 볼트 파일은 다른 암호 문구를 사용합니다. 동기화는 같은 암호 문구를 가진 볼트 간에만 지원됩니다.",
+
+  "reviewSensitiveFields": "민감한 필드",
+  "reviewOtherFields": "기타 필드",
+  "reviewPasswordChanged": "비밀번호가 변경됐습니다",
+  "reviewCvvChanged": "CVV가 변경됐습니다",
+  "reviewPinChanged": "PIN이 변경됐습니다",
+  "reviewTransactionPasswordChanged": "거래 비밀번호가 변경됐습니다",
+  "tooltipShowValues": "값 표시",
+  "reviewOld": "이전",
+  "reviewNew": "새",
+  "reviewEmpty": "(비어 있음)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "메모",
+  "reviewFieldContent": "내용",
+  "reviewFieldEmail": "이메일",
+  "reviewFieldPhone": "전화",
+  "reviewFieldAddress": "주소",
+  "reviewFieldCardLabel": "카드 이름",
+  "reviewFieldStatus": "상태",
+  "reviewFieldCardholder": "카드 소지자",
+  "reviewFieldExpiry": "유효기간",
+  "reviewFieldCreditLimit": "신용 한도",
+  "reviewFieldAccountNumber": "계좌번호",
+  "reviewFieldNetwork": "네트워크",
+  "reviewFieldBank": "은행",
+  "reviewFieldFilename": "파일 이름",
+  "reviewFieldSize": "크기",
+  "reviewFieldCardNumber": "번호",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "거래 비밀번호",
+  "timestampCreated": "생성됨",
+  "timestampUpdated": "업데이트됨",
+  "timestampUnknown": "알 수 없음",
+  "noTitleFallback": "(제목 없음)",
+  "tooltipExportFile": "파일 내보내기",
+  "tooltipEditEntry": "항목 편집",
+  "tooltipDeleteEntry": "항목 삭제",
+  "exportLabel": "내보내기",
+  "customEntryFieldsHeader": "필드",
+  "copiedNeverClears": "복사됨 — 클립보드는 자동으로 지워지지 않습니다",
+  "copiedClears30s": "복사됨 — 클립보드는 30초 후 지워집니다",
+  "copiedClears60s": "복사됨 — 클립보드는 60초 후 지워집니다",
+  "copiedClears2min": "복사됨 — 클립보드는 2분 후 지워집니다",
+
+  "passwordBreakdownTitle": "비밀번호 분석",
+  "charTypeUppercase": "대문자",
+  "charTypeLowercase": "소문자",
+  "charTypeDigit": "숫자",
+  "charTypeSymbol": "기호",
+
+  "exportIncludeDate": "파일 이름에 날짜 포함",
+  "exportChooseFormat": "내보내기 형식을 선택하세요.",
+  "exportUnencryptedWarning": "완전히 암호화되지 않음 — 모든 비밀이 일반 텍스트로 기록됩니다. 파일을 안전하게 보관하고 사용 후 삭제하세요.",
+  "exportPassphraseOnlyNote": "암호 문구로만 보호됩니다. 가져오기에 YubiKey가 필요하지 않습니다.",
+  "exportChooseDestinationJson": "내보낸 JSON 파일의 저장 위치를 선택하세요.",
+  "exportChooseDestinationVault": "내보낸 볼트 파일의 저장 위치를 선택하세요.",
+  "exportTwoFilesNote": "두 개의 파일이 만들어집니다: vault.gabbro 및 vault.gabbro.sha256",
+  "exportSelectDestination": "저장 위치를 선택하세요.",
+
+  "aboutVersion": "버전 {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "포스트 퀀텀 비밀번호 관리자",
+  "aboutSourceCode": "소스 코드",
+  "aboutReportIssue": "문제 보고",
+  "aboutSupportGabbro": "Gabbro 지원",
+  "aboutLicenceBody": "Gabbro는 GNU General Public License v3.0 only (GPL-3.0-only) 하에 라이선스된 무료 오픈소스 소프트웨어입니다.\n\n라이선스 조건에 따라 이 애플리케이션을 사용, 연구, 배포할 자유가 있습니다.",
+  "aboutOwnerRole": "프로젝트 소유자, 아키텍트 및 주요 개발자:",
+  "aboutAiPartner": "AI 개발 파트너:",
+  "aboutNoTelemetry": "Gabbro는 외부 네트워크 연결을 하지 않습니다. 원격 측정, 분석 또는 계정이 없습니다.",
+
+  "strengthTierTerrible": "매우 약함",
+  "strengthTierWeak": "약함",
+  "strengthTierFair": "보통",
+  "strengthTierStrong": "강함",
+  "strengthTierVeryStrong": "매우 강함",
+  "strengthTierExcellent": "우수",
+  "yubiKeyProtectedNote": "YubiKey로 보호된 볼트 — 키 바인딩이 유지됩니다.",
+  "yubiKeyPinRequired": "YubiKey PIN이 필요합니다",
+  "tapYubiKeyNow": "지금 YubiKey에 터치하세요…",
+  "touchYubiKeyToAuthorize": "이 변경을 승인하기 위해 YubiKey에 터치하세요.",
+  "currentPassphraseRequired": "현재 암호 문구가 필요합니다",
+  "newPassphraseRequired": "새 암호 문구가 필요합니다",
+  "passphraseTooWeak": "암호 문구가 너무 약합니다",
+  "confirmPassphraseRequired": "새 암호 문구를 확인하세요",
+  "passphrasesDoNotMatch": "암호 문구가 일치하지 않습니다",
+  "passphrasesMatch": "✓ 암호 문구가 일치합니다",
+  "passphrasesNoMatch": "✗ 암호 문구가 일치하지 않습니다",
+  "entropyDisplay": "{tier} · {bits}비트",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "전송 오류.",
+  "authorizationFailed": "승인에 실패했습니다 — PIN을 확인하고 다시 시도하세요.",
+
+  "unlockEnterPassphraseAndPin": "암호 문구와 YubiKey PIN을 입력하여 잠금 해제",
+  "unlockEnterPassphrase": "암호 문구를 입력하여 잠금 해제",
+  "unlockEntropyDisplay": "{tier} · {bits}비트 엔트로피",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "YubiKey를 삽입하고 깜박이면 터치하세요",
+  "unlockErrorPassphrase": "볼트 잠금을 해제할 수 없습니다. 암호 문구를 확인하세요.",
+  "unlockErrorPassphraseAndPin": "볼트 잠금을 해제할 수 없습니다. 암호 문구와 YubiKey PIN을 확인하세요.",
+
+  "importSelectFile": "파일을 선택하세요.",
+  "importFileNotFound": "파일을 찾을 수 없습니다.",
+  "importEnterPassphrase": "이 볼트의 암호 문구를 입력하세요.",
+  "importDuplicateWarning": "UUID가 이미 볼트에 존재하는 항목은 자동으로 건너뜁니다. 요약이 표시됩니다.",
+  "importGabbroSubtitle": "다른 Gabbro 볼트 (.gabbro)에서 항목 동기화",
+  "importEnpassSubtitle": "Enpass에서 JSON 내보내기 (도구 → 내보내기)",
+  "importBitwardenSubtitle": "Bitwarden에서 암호화되지 않은 JSON 내보내기 (도구 → 볼트 내보내기)",
+  "importCsvSubtitle": "비밀번호 관리자에서 CSV 내보내기",
+
+  "vaultNameAlreadyExists": "이름이 «{alias}»인 볼트가 이미 존재합니다.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "이렇게 하면 «{alias}»와 모든 데이터가 영구적으로 삭제됩니다.\n\n파일: {path}\n\n이 작업은 취소할 수 없습니다.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "이렇게 하면 «{alias}»와 YubiKey 바인딩이 영구적으로 삭제됩니다.\n\n파일: {path}\n\n이 작업은 취소할 수 없습니다.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "PIN을 입력하고 삭제를 승인하기 위해 YubiKey에 터치하세요.",
+  "deleteVaultTooltip": "볼트 삭제",
+
+  "yubiKeySecurityWarning": "보안 경고",
+  "removeYubiKeyTitle": "YubiKey 제거",
+  "yubiKeyLastKeyRiskWarning": "경고: 남은 키가 분실, 손상 또는 도난된 경우 볼트에 대한 접근이 영구적으로 차단됩니다. 복구 옵션이 없습니다.",
+  "onlyOneKeyRegisteredWarning": "키가 하나만 등록되어 있습니다. 이 키를 분실하면 볼트에 대한 접근이 영구적으로 차단됩니다.",
+  "tapRegisterNfc": "등록을 위해 스마트폰에 키를 가져다 대세요",
+  "tapRegisterUsb": "연결 후 등록을 위해 키에 터치하세요",
+  "tapActivateNfc": "활성화를 위해 스마트폰에 키를 다시 가져다 대세요",
+  "tapActivateUsb": "연결 후 활성화를 위해 키에 다시 터치하세요",
+  "failedToRegisterKey": "키 등록에 실패했습니다: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "키 활성화에 실패했습니다: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "키 {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "등록을 위해 새 YubiKey에 터치하세요…",
+  "tapYubiKeyToActivate": "활성화를 위해 새 YubiKey에 다시 터치하세요…",
+  "editAliasTooltip": "별칭 편집",
+  "cannotRemoveLastKey": "마지막 키는 제거할 수 없습니다",
+  "removeKeyTooltip": "키 제거",
+  "manageYubiKeysError": "오류: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "클래식",
+  "generatorModePassphrase": "암호 문구",
+  "charSetsHeader": "문자 세트",
+  "languageHeader": "언어",
+  "separatorLabel": "구분자",
+  "capitaliseWords": "단어 대문자화",
+  "appendDigit": "숫자 추가",
+  "entropyBitsDisplay": "~{bits}비트 엔트로피",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "문자 세트를 하나 이상 선택하세요",
+  "passwordMinLengthNote": "비밀번호는 최소 32자입니다. 웹사이트에 더 짧은 제한이 있는 경우 필요한 수의 첫 번째 문자를 복사하세요.",
+  "excludeAmbiguousChars": "모호한 문자 제외 (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "볼트를 만들어 시작하세요.",
+  "onboardingVaultName": "볼트 이름",
+  "onboardingAliasRequired": "별칭은 필수입니다",
+  "onboardingNewVaultLocation": "새 볼트 위치 (이전과 동일)",
+  "onboardingVaultLocation": "볼트 위치",
+  "onboardingLoadingPath": "로드 중…",
+  "onboardingPathHint": "볼트 파일 경로",
+  "onboardingPathRequired": "경로는 필수입니다",
+  "onboardingReusePassphraseHint": "새 마스터 암호 문구를 선택하거나 이전 것을 재사용하세요.",
+  "onboardingPassphraseRequired": "암호 문구는 필수입니다",
+  "onboardingConfirmRequired": "암호 문구를 확인하세요",
+  "onboardingPrimaryKeyPin": "기본 키 PIN",
+  "onboardingBackupKeyPin": "백업 키 PIN",
+  "onboardingKeyNPin": "키 {n} PIN",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "각 YubiKey에 2번씩 터치합니다 (총 4번). 두 키 사이에 교체하도록 안내됩니다.",
+  "onboardingYubikeySlowNote": "YubiKey를 사용한 볼트 생성에는 20~30초가 걸립니다. 앱이 반응하지 않는 것처럼 보일 수 있지만 정상입니다.",
+  "onboardingStep1Label": "기본 키 등록",
+  "onboardingStep1Hint": "지금 YubiKey에 터치하세요",
+  "onboardingStep2Label": "기본 키 활성화",
+  "onboardingStep2Hint": "YubiKey에 다시 터치하세요",
+  "onboardingStep3Label": "백업 키로 전환",
+  "onboardingStep3Hint": "기본 키를 제거하고 백업 YubiKey를 삽입하세요",
+  "onboardingStep4Label": "백업 키 등록",
+  "onboardingStep4Hint": "백업 YubiKey에 터치하세요",
+  "onboardingStep5Label": "백업 키 활성화",
+  "onboardingStep5Hint": "마지막으로 백업 YubiKey에 터치하세요",
+
+  "textSizePreview": "가브로는 Mg와 Fe가 풍부한 조립질 구조를 가진 심성암입니다.",
+
+  "fieldCardStatus": "상태",
+  "fieldPaymentNetwork": "결제 네트워크",
+
+  "cardStatusActive": "활성",
+  "cardStatusLapsed": "만료",
+  "cardStatusInactive": "비활성",
+
+  "validatorTitleRequired": "제목은 필수입니다",
+  "validatorUsernameRequired": "사용자 이름은 필수입니다",
+  "validatorPasswordRequired": "비밀번호는 필수입니다",
+  "validatorContentRequired": "내용은 필수입니다",
+  "validatorFirstNameRequired": "이름은 필수입니다",
+  "validatorLastNameRequired": "성은 필수입니다",
+  "validatorCardLabelRequired": "카드 이름은 필수입니다",
+  "validatorCardholderRequired": "카드 소지자 이름은 필수입니다",
+  "validatorCardNumberRequired": "카드 번호는 필수입니다",
+  "validatorCardNumberLength": "카드 번호는 6~19자리여야 합니다",
+  "validatorExpiryRequired": "유효기간은 필수입니다",
+  "validatorExpiryFormat": "MM/YY 형식을 사용하세요",
+  "validatorExpiryMonth": "월은 01~12여야 합니다",
+  "validatorCvvLength": "CVV는 3자리 또는 4자리여야 합니다",
+  "validatorLabelRequired": "레이블은 필수입니다",
+  "validatorStatusRequired": "상태는 필수입니다",
+
+  "sectionBiometricUnlock": "생체 인증 잠금 해제",
+  "biometricUnlockDescription": "암호 문구 입력 대신 지문이나 얼굴을 사용하여 볼트 잠금을 해제합니다.",
+  "biometricUnlockTitle": "생체 인증 잠금 해제 활성화",
+  "biometricUnlockNote": "이 기기에 등록된 모든 생체 인증 데이터가 사용 가능합니다 — 등록 시 사용한 것만이 아닙니다.",
+  "biometricUnavailable": "이 기기에서는 생체 인증 잠금 해제를 사용할 수 없습니다. 생체 인증 센서를 찾을 수 없거나 시스템 설정에 생체 인증 데이터가 등록되지 않았습니다.",
+  "biometricDialogTitle": "생체 인증 잠금 해제 정보",
+  "biometricDialogBody": "활성화하면 Gabbro는 마스터 암호 문구를 암호화하여 생체 인증 데이터로 보호된 이 기기에 저장합니다. 문구는 잠금 해제 시에만 복호화됩니다.\n\nGabbro는 지문이나 얼굴 데이터를 저장하지 않습니다 — 스마트폰의 보안 칩에 남아 있습니다.",
+  "biometricDialogAllBiometrics": "이 기기에 등록된 모든 생체 인증 데이터가 Gabbro의 잠금을 해제할 수 있습니다 — 특정 지문으로 제한할 수 없습니다.",
+  "biometricDialogInvalidation": "이 스마트폰에 새 생체 인증 데이터(두 번째 지문 포함)가 추가되면 이 설정이 자동으로 비활성화되고 재설정이 필요합니다.",
+  "biometricDialogRecommendation": "권장: 높은 위협 모델이 있거나 기기를 공유하는 경우 비활성화 상태로 두세요.",
+  "biometricInvalidated": "이 기기의 생체 인증 데이터가 변경되어 (시스템 설정에서 새 지문 또는 얼굴이 추가됨) 생체 인증 잠금 해제가 비활성화됐습니다. 이는 보안 조치입니다. 암호 문구를 다시 입력하고 생체 인증 잠금 해제를 다시 활성화하세요.",
+  "useBiometrics": "생체 인증 사용",
+  "biometricCancelled": "생체 인증이 완료되지 않았습니다. 잠금을 해제하려면 암호 문구를 입력하세요.",
+  "biometricEnrollTitle": "암호 문구 입력",
+  "biometricEnrollDescription": "생체 인증 잠금 해제를 활성화하기 위해 마스터 암호 문구를 입력하세요.",
+  "biometricYubikeyHint": "아래에 YubiKey PIN을 입력하고 «생체 인증 사용»을 클릭한 후 YubiKey에 터치하세요.",
+
+  "helpTitle": "도움말",
+  "menuHelp": "도움말",
+  "helpCaptionCreate": "볼트 만들기: 이름, 암호 문구를 입력하고 선택적으로 YubiKey로 보호",
+  "helpCaptionEmpty": "+를 클릭하여 첫 번째 항목 추가",
+  "helpCaptionDetail": "눈 아이콘을 클릭하여 비밀번호를 표시하고 길게 눌러 자세한 문자 분석 표시",
+  "helpCaptionTitleSearch": "기본값: 검색창은 항목 제목만 검색합니다",
+  "helpCaptionFullSearch": "돋보기를 클릭하여 모든 필드 검색으로 전환; 다시 클릭하여 제목 검색으로 돌아가기",
+  "helpCaptionFilter": "필터 버튼을 사용하여 특정 유형의 항목만 표시",
+  "helpCaptionFolders": "폴더 선택을 사용하여 폴더별로 항목 필터링",
+  "helpCaptionSelect": "항목을 길게 눌러 선택 모드로 진입; 더 많은 항목 추가 후 폴더에 할당하거나 삭제. X를 클릭하여 종료.",
+  "helpCaptionJumpToLetter": "인덱스 바의 문자를 클릭하여 해당 섹션으로 이동",
+  "helpCaptionBreakdown": "눈 아이콘을 클릭하여 비밀번호를 표시하고 길게 눌러 자세한 문자 분석 표시",
+  "helpCaptionManageVaults": "«볼트 관리»에서 볼트 이름을 변경하거나 삭제하거나 새 볼트를 추가할 수 있습니다",
+  "helpCaptionUnlock": "암호 문구를 입력하여 볼트 잠금 해제"
+}

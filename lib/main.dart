@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
@@ -30,6 +32,55 @@ Locale _localeFor(LanguageChoice choice) {
   };
 }
 
+/// Material localizations delegate that falls back to English for locales not
+/// covered by [GlobalMaterialLocalizations] (e.g. yo, nn).
+class _FallbackMaterialLocalizationsDelegate
+    extends LocalizationsDelegate<MaterialLocalizations> {
+  const _FallbackMaterialLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<MaterialLocalizations> load(Locale locale) {
+    if (GlobalMaterialLocalizations.delegate.isSupported(locale)) {
+      return GlobalMaterialLocalizations.delegate.load(locale);
+    }
+    return GlobalMaterialLocalizations.delegate.load(const Locale('en'));
+  }
+
+  @override
+  bool shouldReload(_FallbackMaterialLocalizationsDelegate old) => false;
+}
+
+/// Cupertino localizations delegate that falls back to English for locales not
+/// covered by [GlobalCupertinoLocalizations] (e.g. yo, nn).
+class _FallbackCupertinoLocalizationsDelegate
+    extends LocalizationsDelegate<CupertinoLocalizations> {
+  const _FallbackCupertinoLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<CupertinoLocalizations> load(Locale locale) {
+    if (GlobalCupertinoLocalizations.delegate.isSupported(locale)) {
+      return GlobalCupertinoLocalizations.delegate.load(locale);
+    }
+    return GlobalCupertinoLocalizations.delegate.load(const Locale('en'));
+  }
+
+  @override
+  bool shouldReload(_FallbackCupertinoLocalizationsDelegate old) => false;
+}
+
+const List<LocalizationsDelegate<dynamic>> gabbroLocalizationsDelegates = [
+  AppLocalizations.delegate,
+  _FallbackMaterialLocalizationsDelegate(),
+  _FallbackCupertinoLocalizationsDelegate(),
+  GlobalWidgetsLocalizations.delegate,
+];
+
 @pragma('vm:entry-point')
 Future<void> autofillUnlockMain() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,7 +100,7 @@ Future<void> autofillUnlockMain() async {
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      localizationsDelegates: gabbroLocalizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: settings.language == LanguageChoice.system
           ? null
@@ -554,7 +605,7 @@ class _GabbroAppState extends State<GabbroApp>
           navigatorKey: _navigatorKey,
           title: 'Gabbro',
           debugShowCheckedModeBanner: false,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: gabbroLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: _settings.language == LanguageChoice.system
               ? null

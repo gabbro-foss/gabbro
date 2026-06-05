@@ -21,12 +21,16 @@ void main() {
 
     testWidgets('shows all language options', (tester) async {
       await tester.pumpWidget(_buildScreen());
+      // System is always first.
       expect(find.text('System'), findsOneWidget);
-      expect(find.text('English'), findsOneWidget);
-      expect(find.text('Français'), findsOneWidget);
+      // The list is lazy and scrollable (35 items). Verify items near the top
+      // of the alphabetical sort (Dansk, Deutsch, English) which are always
+      // in the initial viewport.
+      expect(find.text('Dansk'), findsOneWidget);
       expect(find.text('Deutsch'), findsOneWidget);
-      expect(find.text('Italiano'), findsOneWidget);
-      expect(find.text('Español'), findsOneWidget);
+      expect(find.text('English'), findsOneWidget);
+      // Full set: system + 33 user-facing languages = 34 total.
+      expect(LanguageChoice.values.length, 34);
     });
 
     testWidgets('current language radio is selected', (tester) async {

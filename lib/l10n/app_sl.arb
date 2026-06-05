@@ -1,0 +1,803 @@
+{
+  "@@locale": "sl",
+
+  "appName": "Gabbro",
+
+  "cancel": "Prekliči",
+  "delete": "Izbriši",
+  "save": "Shrani",
+  "close": "Zapri",
+  "ok": "V redu",
+  "edit": "Uredi",
+  "add": "Dodaj",
+  "remove": "Odstrani",
+  "rename": "Preimenuj",
+  "confirm": "Potrdi",
+  "continueAction": "Nadaljuj",
+  "dismiss": "Zapri",
+  "authorize": "Pooblasti",
+  "register": "Registriraj",
+  "sync": "Sinhroniziraj",
+  "assign": "Dodeli",
+  "unlock": "Odkleni",
+  "generate": "Generiraj",
+  "import": "Uvozi",
+  "export": "Izvozi",
+  "openInBrowser": "Odpri v brskalniku",
+  "useThisPassword": "Uporabi to geslo",
+  "reviewArrow": "Pregled →",
+  "skip": "Preskoči",
+  "keep": "Obdrži",
+  "revert": "Povrni",
+  "next": "Naprej: poveži stolpce",
+  "syncFromVault": "Sinhroniziraj iz trezorja",
+  "createVault": "Ustvari trezor",
+  "pickFile": "Izberi datoteko",
+  "noFileSelected": "Nobena datoteka ni izbrana",
+  "chooseFolder": "Izberi mapo",
+  "addCustomField": "Dodaj polje po meri",
+  "exportFile": "Izvozi datoteko",
+  "addVault": "Dodaj trezor",
+  "addYubiKey": "Dodaj YubiKey",
+  "noChangesToSave": "Ni sprememb za shranitev.",
+
+  "appearanceTitle": "Videz",
+  "securityTitle": "Varnost",
+  "aboutTitle": "O aplikaciji Gabbro",
+  "generatorTitle": "Generator gesel",
+  "importTitle": "Uvozi vnose",
+  "exportTitle": "Izvozi trezor",
+  "changePassphraseTitle": "Spremeni geslo za dostop",
+  "csvMappingTitle": "Preslikava stolpcev CSV",
+  "manageFoldersTitle": "Upravljanje map",
+  "manageVaultsTitle": "Upravljanje trezorjev",
+  "manageYubiKeysTitle": "Upravljanje ključev YubiKey",
+  "passwordHistoryTitle": "Zgodovina gesel",
+  "reviewChangesTitle": "Pregled sprememb",
+  "unlockGabbroTitle": "Odkleni Gabbro",
+
+  "sectionTheme": "Tema",
+  "sectionTextSize": "Velikost besedila",
+  "sectionAlphabetBar": "Položaj abecedne vrstice",
+  "sectionAccessibility": "Dostopnost",
+  "sectionLanguage": "Jezik",
+  "sectionForegroundLock": "Zaklepanje v ospredju",
+  "sectionBackgroundLock": "Zaklepanje v ozadju",
+  "sectionPasswordHistory": "Zgodovina gesel",
+  "sectionPassphraseCopyPaste": "Kopiranje/lepljenje gesla za dostop",
+  "sectionVaultList": "Seznam trezorjev",
+  "sectionClipboardClear": "Brisanje odložišča",
+  "sectionCharacterSets": "Nabori znakov",
+  "sectionGeneratorLanguage": "Jezik",
+
+  "themeSystem": "Sistemska",
+  "themeLight": "Svetla",
+  "themeDark": "Temna",
+
+  "textSizeSmall": "Majhna",
+  "textSizeRegular": "Navadna",
+  "textSizeLarge": "Velika",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Samo na telefonu — tablica vedno uporablja levo stran.",
+  "alphabetBarLeft": "Levo",
+  "alphabetBarRight": "Desno",
+
+  "highContrastTitle": "Visok kontrast",
+  "highContrastSubtitle": "Poveča kontrast za boljšo berljivost",
+
+  "languageNote": "Prepiše sistemski jezik. «Sistemski» sledi regionalnim nastavitvam naprave.",
+  "langSystem": "Sistemski",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Zakleni po tem času nedejavnosti, ko je aplikacija odprta.",
+  "backgroundLockDescription": "Zakleni po tem, ko je aplikacija v ozadju toliko časa.",
+  "passwordHistoryDescription": "Kako dolgo hraniti prejšnje geslo po spremembi. «Vedno hrani» pomeni, da se zgodovina briše samo ročno.",
+  "passphraseCopyPasteDescription": "Blokiraj kopiranje in lepljenje v poljih gesla za dostop. Priporočeno: preprečuje uhajanje fraze prek odložišča.",
+  "passphraseCopyPasteNote": "Opomba: to blokira kontekstni meni ob dolgem pritisku in izbiro besedila. Vgrajen gumb za lepljenje tipkovnice morda še vedno deluje — to je omejitev platforme.",
+  "blockCopyPasteTitle": "Blokiraj kopiranje/lepljenje",
+  "vaultListDescription": "Prikaži seznam vseh trezorjev na zaslonu za prijavo, da lahko izberete, katerega odkleniti, brez prehoda v «Upravljanje trezorjev».",
+  "showVaultListTitle": "Prikaži seznam trezorjev ob prijavi",
+  "vaultListNote": "Varnostna opomba: ko je to IZKLOPLJENO, zaslon za prijavo prikaže samo zadnji uporabljen trezor — brez namigov o obstoju drugih. Kompromis: za zamenjavo trezorja morate najprej odkleniti in nato iti v Meni → Upravljanje trezorjev.",
+  "clipboardClearDescription": "Pobriši odložišče po kopiranju skrivnosti. Opomba: upravljalci odložišča lahko hranijo kopijo.",
+
+  "duration30s": "30 s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60 s",
+  "duration2min": "2 min",
+  "durationNever": "Nikoli",
+  "duration7days": "7 dni",
+  "duration30days": "30 dni",
+  "duration90days": "90 dni",
+  "durationKeepForever": "Vedno hrani",
+
+  "menuExportVault": "Izvozi trezor",
+  "menuImportEntries": "Uvozi vnose",
+  "menuSyncFromFile": "Sinhroniziraj iz datoteke",
+  "menuManageVaults": "Upravljanje trezorjev",
+  "menuChangePassphrase": "Spremeni geslo za dostop",
+  "menuManageYubiKeys": "Upravljanje ključev YubiKey",
+  "menuAppearance": "Videz",
+  "menuSecurity": "Varnost",
+  "menuManageFolders": "Upravljanje map",
+  "menuPasswordGenerator": "Generator gesel",
+  "menuAbout": "O aplikaciji",
+
+  "tooltipSelectEntries": "Izberi vnose",
+  "tooltipLockVault": "Zakleni trezor",
+  "tooltipSelectAll": "Izberi vse",
+  "tooltipDeselectAll": "Prekliči izbor",
+  "tooltipMenu": "Meni",
+  "tooltipCopy": "Kopiraj",
+  "tooltipCopied": "Kopirano!",
+  "tooltipShow": "Prikaži",
+  "tooltipHide": "Skrij",
+  "tooltipBrowse": "Prebrskaj",
+  "tooltipEditAlias": "Uredi vzdevek",
+  "tooltipRemoveField": "Odstrani polje",
+  "tooltipRename": "Preimenuj",
+  "tooltipDeleteVault": "Izbriši trezor",
+  "tooltipAssignToFolder": "Dodeli mapi",
+  "tooltipShowPin": "Prikaži PIN",
+  "tooltipHidePin": "Skrij PIN",
+  "tooltipShowValue": "Prikaži vrednost",
+  "tooltipHideValue": "Skrij",
+  "tooltipCancel": "Prekliči",
+  "tooltipOpenInBrowser": "Odpri v brskalniku",
+
+  "allFolders": "Vse mape",
+  "noFolder": "Brez",
+  "selectFolder": "Izberi mapo",
+  "folderName": "Ime mape",
+
+  "noEntriesMatch": "Ni vnosov, ki ustrezajo iskanju.",
+  "noVaultsRegistered": "Ni registriranih trezorjev.",
+  "noYubiKeysRegistered": "Ni registriranih ključev YubiKey",
+  "selectEntry": "Izberi vnos",
+  "newEntryTitle": "Nov vnos",
+  "createEntryTitle": "Nov(-a) {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Uredi: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(brez URL-ja)",
+  "noNameFallback": "(brez imena)",
+  "untitledFallback": "(brez naslova)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "Izbrano: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Išči po vseh poljih…",
+  "searchEntriesHint": "Išči vnose…",
+  "searchAllFieldsTooltip": "Išče po vseh poljih",
+  "searchByTitleTooltip": "Išče po naslovu",
+  "entryTypeAll": "Vse",
+  "entryTypePassword": "Geslo",
+  "entryTypeNote": "Opomba",
+  "entryTypeCard": "Kartica",
+  "entryTypeIdentity": "Identiteta",
+  "entryTypeFile": "Datoteka",
+  "entryTypeCustom": "Po meri",
+  "errorPrefix": "Napaka: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Trezor",
+  "navAppearance": "Videz",
+  "navSecurity": "Varnost",
+  "navAbout": "O aplikaciji",
+
+  "deleteEntryTitle": "Izbriši vnos?",
+  "cannotBeUndone": "Tega dejanja ni mogoče razveljaviti.",
+  "deleteEntryDialogTitle": "Izbriši vnos?",
+  "deleteEntriesTitle": "{count, plural, one{Izbriši 1 vnos?} two{Izbriši {count} vnosa?} few{Izbriši {count} vnose?} other{Izbriši {count} vnosov?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Dodeli mapi",
+  "folderConflictTitle": "Konflikt map",
+  "syncFailedTitle": "Sinhronizacija ni uspela",
+  "syncFromFileTitle": "Sinhroniziraj iz datoteke",
+  "nothingToSync": "Ni ničesar za sinhronizacijo — oba trezorja sta že posodobljena.",
+
+  "importedEntries": "{count, plural, one{Uvožen 1 vnos.} two{Uvožena {count} vnosa.} few{Uvoženi {count} vnosi.} other{Uvoženih {count} vnosov.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Izvozi datoteko",
+  "saveDecryptedFileTo": "Shrani dešifrirano datoteko v:",
+  "exportPathLabel": "Pot izvoza",
+  "exportedToPath": "Izvoženo v {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Izvoz ni uspel: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Odpri v brskalniku?",
+  "couldNotOpen": "Ne morem odpreti {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Izbriši prejšnji vnos",
+  "failedToClearHistory": "Brisanje zgodovine ni uspelo: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Povrnitev gesla ni uspela: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Preimenuj mapo",
+  "addFolderTitle": "Dodaj mapo",
+  "deleteFolderTitle": "Izbriši mapo",
+  "deleteFolderConfirm": "Izbriši «{folder}»?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Premakni vnose v",
+  "clearToNone": "Premakni v «Brez»",
+
+  "renameVaultTitle": "Preimenuj trezor",
+  "deleteVaultTitle": "Izbriši trezor?",
+  "deleteVaultConfirmTitle": "Ste prepričani?",
+  "typeDeleteToConfirm": "Vnesite DELETE za potrditev",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Dotaknite se vašega YubiKey",
+  "noVaultsRegisteredText": "Ni registriranih trezorjev.",
+
+  "addYubiKeyTitle": "Dodaj YubiKey",
+  "enterYubiKeyPinTitle": "Vnesi YubiKey PIN",
+  "editAliasForKey": "Uredi vzdevek ključa {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Ostal bo samo en registriran ključ YubiKey.",
+  "removeKeyConfirm": "Res želite odstraniti ta ključ?",
+  "removeKeyVaultConfirm": "Odstraniti ta ključ YubiKey iz trezorja?",
+  "yubiKeyRemoved": "YubiKey odstranjen",
+  "failedToRemoveKey": "Odstranitev ključa ni uspela: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey dodan",
+  "failedToAddKey": "Dodajanje ključa ni uspelo: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Shranitev vzdevka ni uspela: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Ni najdene naprave FIDO2. Vstavite YubiKey in poskusite znova.",
+  "transportLabel": "Prenos:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Geslo za dostop",
+  "yubiKeyPinLabel": "YubiKey PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Trenutno geslo za dostop",
+  "newPassphraseLabel": "Novo geslo za dostop",
+  "confirmPassphraseLabel": "Potrdi novo geslo za dostop",
+  "vaultPassphraseLabel": "Geslo za dostop do trezorja",
+  "aliasLabel": "Vzdevek",
+  "aliasHint": "npr. Glavni, Delovni ključ…",
+  "masterPassphraseLabel": "Glavno geslo za dostop",
+  "confirmPassphraseLabelShort": "Potrdi geslo za dostop",
+
+  "fieldTitle": "Naslov",
+  "fieldContent": "Vsebina",
+  "fieldFirstName": "Ime",
+  "fieldLastName": "Priimek",
+  "fieldEmail": "E-pošta (neobvezno)",
+  "fieldPhone": "Telefon (neobvezno)",
+  "fieldAddress": "Naslov (neobvezno)",
+  "fieldCardLabel": "Ime kartice (npr. «Visa Platinum»)",
+  "fieldCardholderName": "Ime imetnika kartice",
+  "fieldCardNumber": "Številka kartice",
+  "fieldExpiry": "Veljavnost (MM/LL)",
+  "fieldCvv": "CVV (neobvezno)",
+  "fieldCardPin": "PIN (neobvezno)",
+  "fieldCreditLimit": "Kreditna omejitev (neobvezno)",
+  "fieldAccountNumber": "Številka računa (neobvezno)",
+  "fieldNotes": "Opombe (neobvezno)",
+  "fieldUrl": "URL (neobvezno)",
+  "fieldUsername": "Uporabniško ime",
+  "fieldPassword": "Geslo",
+  "fieldSeparator": "Ločilo",
+  "fieldFolder": "Mapa",
+  "fieldLabel": "Oznaka",
+  "fieldValue": "Vrednost",
+  "fieldCustomFields": "Polja po meri",
+  "fieldLabelOptional": "{label} (neobvezno)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Ta vrsta vnosa še ni podprta.",
+  "csvColumnNone": "(nič)",
+  "csvPreviewLabel": "Predogled",
+  "csvImportButton": "Uvozi",
+
+  "gabbroVaultSection": "Trezor Gabbro",
+  "genericCsvSection": "Splošni CSV",
+
+  "changePassphraseSuccess": "Geslo za dostop spremenjeno",
+  "changePassphraseButton": "Spremeni geslo za dostop",
+
+  "continueLabel": "Nadaljuj",
+  "protectWithYubiKey": "Zaščiti z YubiKey",
+  "yubiKeySubtitle": "Strojni varnostni ključ (priporočeno)",
+  "accessibilityButton": "Dostopnost",
+
+  "aboutProjectSection": "Projekt",
+  "aboutLicenceSection": "Licenca",
+  "aboutOpenSourceSection": "Komponente odprtokodne programske opreme",
+  "aboutAttributionSection": "Zahvale",
+
+  "lengthLabel": "Dolžina",
+  "wordsLabel": "Besede",
+  "generateButton": "Generiraj",
+  "usePasswordButton": "Uporabi to geslo",
+  "showHidePassword": "Prikaži",
+
+  "deleteVaultPostDeletion": "Vaš trezor je bil izbrisan. Ustvarite novega za nadaljevanje.",
+
+  "syncFilePassphraseLabel": "Geslo za dostop do trezorja",
+
+  "historyWarning": "Shranjuje se samo 1 prejšnja vrednost. Zgodovina se samodejno briše glede na varnostne nastavitve.",
+  "historyCurrent": "Trenutno",
+  "historyPrevious": "Prejšnje",
+  "historySavedOn": "Shranjeno {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · poteče {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Težava z uvozom ({index} od {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Vrsta: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Uredite, popravite in shranite ta vnos ali preskočite, da ga zavrnete.",
+
+  "entriesSkipped": "{count, plural, one{1 vnos preskočen} two{{count} vnosa preskočena} few{{count} vnosi preskočeni} other{{count} vnosov preskočenih}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Ti vnosi že obstajajo v vašem trezorju in niso bili prepisani:",
+
+  "syncDeleteEntryContent": "Druga naprava je izbrisala «{title}».\n\nIzbrisati tudi tukaj ali obdržati?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}» je v različnih mapah na dveh napravah.\n\nTa naprava: {local}\nDruga naprava: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Obdrži brez mape",
+  "folderConflictKeepLocal": "Obdrži «{folder}»",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Premakni brez mape",
+  "folderConflictMoveIncoming": "Premakni v «{folder}»",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Trezor sinhroniziran — dodano: {added}, posodobljeno: {updated}, izbrisano: {deleted}.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Ta datoteka trezorja uporablja drugačno geslo za dostop. Sinhronizacija je podprta samo med trezorji z enakim geslom za dostop.",
+
+  "reviewSensitiveFields": "Občutljiva polja",
+  "reviewOtherFields": "Ostala polja",
+  "reviewPasswordChanged": "Geslo spremenjeno",
+  "reviewCvvChanged": "CVV spremenjen",
+  "reviewPinChanged": "PIN spremenjen",
+  "reviewTransactionPasswordChanged": "Transakcijsko geslo spremenjeno",
+  "tooltipShowValues": "Prikaži vrednosti",
+  "reviewOld": "Staro",
+  "reviewNew": "Novo",
+  "reviewEmpty": "(prazno)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Opombe",
+  "reviewFieldContent": "Vsebina",
+  "reviewFieldEmail": "E-pošta",
+  "reviewFieldPhone": "Telefon",
+  "reviewFieldAddress": "Naslov",
+  "reviewFieldCardLabel": "Ime kartice",
+  "reviewFieldStatus": "Status",
+  "reviewFieldCardholder": "Imetnik kartice",
+  "reviewFieldExpiry": "Veljavnost",
+  "reviewFieldCreditLimit": "Kreditna omejitev",
+  "reviewFieldAccountNumber": "Številka računa",
+  "reviewFieldNetwork": "Omrežje",
+  "reviewFieldBank": "Banka",
+  "reviewFieldFilename": "Ime datoteke",
+  "reviewFieldSize": "Velikost",
+  "reviewFieldCardNumber": "Številka",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Transakcijsko geslo",
+  "timestampCreated": "Ustvarjeno",
+  "timestampUpdated": "Posodobljeno",
+  "timestampUnknown": "Neznano",
+  "noTitleFallback": "(brez naslova)",
+  "tooltipExportFile": "Izvozi datoteko",
+  "tooltipEditEntry": "Uredi vnos",
+  "tooltipDeleteEntry": "Izbriši vnos",
+  "exportLabel": "Izvoz",
+  "customEntryFieldsHeader": "Polja",
+  "copiedNeverClears": "Kopirano — odložišče se nikoli samodejno ne počisti",
+  "copiedClears30s": "Kopirano — odložišče se počisti čez 30 s",
+  "copiedClears60s": "Kopirano — odložišče se počisti čez 60 s",
+  "copiedClears2min": "Kopirano — odložišče se počisti čez 2 min",
+
+  "passwordBreakdownTitle": "Analiza gesla",
+  "charTypeUppercase": "Velike črke",
+  "charTypeLowercase": "Male črke",
+  "charTypeDigit": "Številke",
+  "charTypeSymbol": "Simbol",
+
+  "exportIncludeDate": "Vključi datum v ime datoteke",
+  "exportChooseFormat": "Izberite format izvoza.",
+  "exportUnencryptedWarning": "Popolnoma nešifrirano — vse skrivnosti bodo zapisane kot navadno besedilo. Datoteko varno shranite in jo po uporabi izbrišite.",
+  "exportPassphraseOnlyNote": "Zaščiteno samo z geslom za dostop. YubiKey ni potreben za uvoz.",
+  "exportChooseDestinationJson": "Izberite cilj za izvoženo datoteko JSON.",
+  "exportChooseDestinationVault": "Izberite cilj za izvoženo datoteko trezorja.",
+  "exportTwoFilesNote": "Ustvarjeni bodo dve datoteki: vault.gabbro in vault.gabbro.sha256",
+  "exportSelectDestination": "Izberite cilj.",
+
+  "aboutVersion": "Različica {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Postkvantni upravitelj gesel",
+  "aboutSourceCode": "Izvorna koda",
+  "aboutReportIssue": "Prijavi težavo",
+  "aboutSupportGabbro": "Podpri Gabbro",
+  "aboutLicenceBody": "Gabbro je prosta programska oprema z odprtokodno kodo, licencirana pod GNU General Public License v3.0 only (GPL-3.0-only).\n\nImate svobodo to aplikacijo uporabljati, proučevati in distribuirati v skladu s pogoji licence.",
+  "aboutOwnerRole": "Lastnik projekta, arhitekt in glavni razvijalec:",
+  "aboutAiPartner": "AI razvojni partner:",
+  "aboutNoTelemetry": "Gabbro ne vzpostavlja nobenih odhodnih omrežnih povezav. Brez telemetrije, analitike ali računov.",
+
+  "strengthTierTerrible": "Grozno",
+  "strengthTierWeak": "Šibko",
+  "strengthTierFair": "Sprejemljivo",
+  "strengthTierStrong": "Močno",
+  "strengthTierVeryStrong": "Zelo močno",
+  "strengthTierExcellent": "Odlično",
+  "yubiKeyProtectedNote": "Trezor zaščiten z YubiKey — vezava na ključ bo ohranjena.",
+  "yubiKeyPinRequired": "Potreben je YubiKey PIN",
+  "tapYubiKeyNow": "Zdaj se dotaknite vašega YubiKey…",
+  "touchYubiKeyToAuthorize": "Dotaknite se YubiKey za avtorizacijo te spremembe.",
+  "currentPassphraseRequired": "Potrebno je trenutno geslo za dostop",
+  "newPassphraseRequired": "Potrebno je novo geslo za dostop",
+  "passphraseTooWeak": "Geslo za dostop je prešibko",
+  "confirmPassphraseRequired": "Potrdite novo geslo za dostop",
+  "passphrasesDoNotMatch": "Gesli za dostop se ne ujemata",
+  "passphrasesMatch": "✓ Gesli za dostop se ujemata",
+  "passphrasesNoMatch": "✗ Gesli za dostop se ne ujemata",
+  "entropyDisplay": "{tier} · {bits} bitov",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Napaka prenosa.",
+  "authorizationFailed": "Avtorizacija ni uspela — preverite PIN in poskusite znova.",
+
+  "unlockEnterPassphraseAndPin": "Vnesite geslo za dostop in YubiKey PIN za odklenitev",
+  "unlockEnterPassphrase": "Vnesite geslo za dostop za odklenitev",
+  "unlockEntropyDisplay": "{tier} · {bits} bitov entropije",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Vstavite YubiKey in se ga dotaknite, ko zasveti",
+  "unlockErrorPassphrase": "Trezorja ni mogoče odkleniti. Preverite geslo za dostop.",
+  "unlockErrorPassphraseAndPin": "Trezorja ni mogoče odkleniti. Preverite geslo za dostop in YubiKey PIN.",
+
+  "importSelectFile": "Izberite datoteko.",
+  "importFileNotFound": "Datoteka ni najdena.",
+  "importEnterPassphrase": "Vnesite geslo za dostop za ta trezor.",
+  "importDuplicateWarning": "Vnosi, katerih UUID že obstaja v vašem trezorju, bodo samodejno preskočeni. Prikazan bo pregled.",
+  "importGabbroSubtitle": "Sinhroniziraj vnose iz drugega trezorja Gabbro (datoteka .gabbro)",
+  "importEnpassSubtitle": "JSON izvoz iz Enpass (Orodja → Izvozi)",
+  "importBitwardenSubtitle": "Nešifrirani JSON izvoz iz Bitwarden (Orodja → Izvozi trezor)",
+  "importCsvSubtitle": "CSV izvoz iz kateregakoli upravitelja gesel",
+
+  "vaultNameAlreadyExists": "Trezor z imenom «{alias}» že obstaja.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "S tem boste trajno izbrisali «{alias}» in vse njegove podatke.\n\nDatoteka: {path}\n\nTega dejanja ni mogoče razveljaviti.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "S tem boste trajno izbrisali «{alias}» in odstranili njegovo vezavo na YubiKey.\n\nDatoteka: {path}\n\nTega dejanja ni mogoče razveljaviti.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Vnesite PIN in se dotaknite YubiKey za avtorizacijo brisanja.",
+  "deleteVaultTooltip": "Izbriši trezor",
+
+  "yubiKeySecurityWarning": "Varnostno opozorilo",
+  "removeYubiKeyTitle": "Odstrani YubiKey",
+  "yubiKeyLastKeyRiskWarning": "OPOZORILO: če bo preostali ključ izgubljen, poškodovan ali ukraden, bo dostop do trezorja trajno onemogočen. Možnosti za obnovitev ni.",
+  "onlyOneKeyRegisteredWarning": "Registriran je samo en ključ. Če bo ta ključ izgubljen, bo dostop do trezorja trajno onemogočen.",
+  "tapRegisterNfc": "Priloži ključ k telefonu za registracijo",
+  "tapRegisterUsb": "Po priključitvi se dotakni ključa za registracijo",
+  "tapActivateNfc": "Znova priloži ključ k telefonu za aktivacijo",
+  "tapActivateUsb": "Po priključitvi se znova dotakni ključa za aktivacijo",
+  "failedToRegisterKey": "Registracija ključa ni uspela: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Aktivacija ključa ni uspela: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Ključ {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Dotaknite se novega YubiKey za registracijo…",
+  "tapYubiKeyToActivate": "Znova se dotaknite novega YubiKey za aktivacijo…",
+  "editAliasTooltip": "Uredi vzdevek",
+  "cannotRemoveLastKey": "Zadnjega ključa ni mogoče odstraniti",
+  "removeKeyTooltip": "Odstrani ključ",
+  "manageYubiKeysError": "Napaka: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klasično",
+  "generatorModePassphrase": "Geslo za dostop",
+  "charSetsHeader": "Nabori znakov",
+  "languageHeader": "Jezik",
+  "separatorLabel": "Ločilo",
+  "capitaliseWords": "Velike začetnice besed",
+  "appendDigit": "Dodaj številko",
+  "entropyBitsDisplay": "~{bits} bitov entropije",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Izberite vsaj en nabor znakov",
+  "passwordMinLengthNote": "Gesla imajo vsaj 32 znakov. Če ima spletna stran krajšo omejitev, kopirajte potrebno število prvih znakov.",
+  "excludeAmbiguousChars": "Izključi dvoumne znake (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Ustvarite vaš trezor za začetek.",
+  "onboardingVaultName": "Ime trezorja",
+  "onboardingAliasRequired": "Vzdevek je obvezen",
+  "onboardingNewVaultLocation": "Lokacija novega trezorja (enako kot prej)",
+  "onboardingVaultLocation": "Lokacija trezorja",
+  "onboardingLoadingPath": "Nalaganje…",
+  "onboardingPathHint": "Pot do datoteke trezorja",
+  "onboardingPathRequired": "Pot je obvezna",
+  "onboardingReusePassphraseHint": "Izberite novo glavno geslo za dostop ali znova uporabite prejšnje.",
+  "onboardingPassphraseRequired": "Geslo za dostop je obvezno",
+  "onboardingConfirmRequired": "Potrdite geslo za dostop",
+  "onboardingPrimaryKeyPin": "PIN primarnega ključa",
+  "onboardingBackupKeyPin": "PIN varnostnega ključa",
+  "onboardingKeyNPin": "PIN ključa {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Vsakega YubiKey se boste dotaknili dvakrat (skupaj 4 dotiki). Med obema ključema boste pozvani k zamenjavi.",
+  "onboardingYubikeySlowNote": "Ustvarjanje trezorja z YubiKey traja 20–30 sekund. Aplikacija je morda videti neodzivna — to je normalno.",
+  "onboardingStep1Label": "Registriraj primarni ključ",
+  "onboardingStep1Hint": "Zdaj se dotakni YubiKey",
+  "onboardingStep2Label": "Aktiviraj primarni ključ",
+  "onboardingStep2Hint": "Znova se dotakni YubiKey",
+  "onboardingStep3Label": "Preklopi na varnostni ključ",
+  "onboardingStep3Hint": "Odstrani primarni ključ in nato vstavi varnostni YubiKey",
+  "onboardingStep4Label": "Registriraj varnostni ključ",
+  "onboardingStep4Hint": "Dotakni se varnostnega YubiKey",
+  "onboardingStep5Label": "Aktiviraj varnostni ključ",
+  "onboardingStep5Hint": "Zadnjič se dotakni varnostnega YubiKey",
+
+  "textSizePreview": "Gabbro je intruzivna magmatska kamnina, bogata z Mg in Fe, z grobozrnato strukturo.",
+
+  "fieldCardStatus": "Status",
+  "fieldPaymentNetwork": "Plačilno omrežje",
+
+  "cardStatusActive": "Aktivna",
+  "cardStatusLapsed": "Potekla",
+  "cardStatusInactive": "Neaktivna",
+
+  "validatorTitleRequired": "Naslov je obvezen",
+  "validatorUsernameRequired": "Uporabniško ime je obvezno",
+  "validatorPasswordRequired": "Geslo je obvezno",
+  "validatorContentRequired": "Vsebina je obvezna",
+  "validatorFirstNameRequired": "Ime je obvezno",
+  "validatorLastNameRequired": "Priimek je obvezen",
+  "validatorCardLabelRequired": "Ime kartice je obvezno",
+  "validatorCardholderRequired": "Ime imetnika kartice je obvezno",
+  "validatorCardNumberRequired": "Številka kartice je obvezna",
+  "validatorCardNumberLength": "Številka kartice mora imeti 6–19 številk",
+  "validatorExpiryRequired": "Datum veljavnosti je obvezen",
+  "validatorExpiryFormat": "Uporabite format MM/LL",
+  "validatorExpiryMonth": "Mesec mora biti 01–12",
+  "validatorCvvLength": "CVV mora imeti 3 ali 4 številke",
+  "validatorLabelRequired": "Oznaka je obvezna",
+  "validatorStatusRequired": "Status je obvezen",
+
+  "sectionBiometricUnlock": "Biometrično odklepanje",
+  "biometricUnlockDescription": "Uporabite prstni odtis ali obraz za odklepanje trezorja namesto vnosa gesla za dostop.",
+  "biometricUnlockTitle": "Omogoči biometrično odklepanje",
+  "biometricUnlockNote": "Delujejo vsi biometrični podatki, registrirani na tej napravi — ne samo tisti, uporabljeni pri registraciji.",
+  "biometricUnavailable": "Biometrično odklepanje ni na voljo na tej napravi. Ni bilo najdenega biometričnega senzorja ali v sistemskih nastavitvah ni registriranih biometričnih podatkov.",
+  "biometricDialogTitle": "O biometričnem odklepanju",
+  "biometricDialogBody": "Ko je omogočeno, Gabbro šifrira glavno geslo za dostop in ga shrani na tej napravi, zaščiteno z vašimi biometričnimi podatki. Fraza se dešifrira samo ob odklepanju.\n\nGabbro nikoli ne shranjuje podatkov vaših prstnih odtisov ali obraza — ostanejo v varnem čipu telefona.",
+  "biometricDialogAllBiometrics": "Vsi biometrični podatki, registrirani na tej napravi, bodo lahko odklenili Gabbro — ni mogoče omejiti na določen prstni odtis.",
+  "biometricDialogInvalidation": "Če bodo tej napravi dodani novi biometrični podatki (vključno z drugim prstnim odtisom), bo ta nastavitev samodejno deaktivirana in jo bo treba znova konfigurirati.",
+  "biometricDialogRecommendation": "Priporočilo: pustite deaktivirano, če imate visok model groženj ali delite to napravo.",
+  "biometricInvalidated": "Biometrično odklepanje je bilo deaktivirano, ker so se biometrični podatki na tej napravi spremenili (v sistemskih nastavitvah je bil dodan nov prstni odtis ali obraz). To je varnostni ukrep. Znova vnesite geslo za dostop in znova aktivirajte biometrično odklepanje.",
+  "useBiometrics": "Uporabi biometrijo",
+  "biometricCancelled": "Biometrična preverjanje ni bilo dokončano. Vnesite geslo za dostop za odklenitev.",
+  "biometricEnrollTitle": "Vnesi geslo za dostop",
+  "biometricEnrollDescription": "Vnesite glavno geslo za dostop za omogočanje biometričnega odklepanja.",
+  "biometricYubikeyHint": "Spodaj vnesite YubiKey PIN, nato kliknite «Uporabi biometrijo», nato se dotaknite YubiKey.",
+
+  "helpTitle": "Pomoč",
+  "menuHelp": "Pomoč",
+  "helpCaptionCreate": "Ustvarite trezor: vnesite ime, geslo za dostop in po želji zaščitite z YubiKey",
+  "helpCaptionEmpty": "Kliknite + za dodajanje prvega vnosa",
+  "helpCaptionDetail": "Kliknite ikono očesa za prikaz gesla, nato zadržite za prikaz podrobne analize znakov",
+  "helpCaptionTitleSearch": "Privzeto: iskalna vrstica išče samo naslove vnosov",
+  "helpCaptionFullSearch": "Kliknite povečevalno steklo za preklop na iskanje po vseh poljih; kliknite znova za vrnitev na iskanje po naslovu",
+  "helpCaptionFilter": "Uporabite gumbe za filtriranje za prikaz samo vnosov določene vrste",
+  "helpCaptionFolders": "Uporabite izbiro mape za filtriranje vnosov po mapi",
+  "helpCaptionSelect": "Z dolgim pritiskom na vnos vstopite v način izbire; dodajte več elementov, nato dodelite mapi ali izbrišite. Kliknite X za izhod.",
+  "helpCaptionJumpToLetter": "Kliknite črko v indeksni vrstici za skok na to sekcijo",
+  "helpCaptionBreakdown": "Kliknite ikono očesa za prikaz gesla, nato zadržite za prikaz podrobne analize znakov",
+  "helpCaptionManageVaults": "V «Upravljanju trezorjev» lahko preimenujete ali izbrišete trezorje ali dodate novega",
+  "helpCaptionUnlock": "Vnesite geslo za dostop za odklenitev trezorja"
+}

@@ -1,0 +1,803 @@
+{
+  "@@locale": "yo",
+
+  "appName": "Gabbro",
+
+  "cancel": "Fagilee",
+  "delete": "Parẹ",
+  "save": "Pamọ",
+  "close": "Pa",
+  "ok": "O dara",
+  "edit": "Ṣatunkọ",
+  "add": "Fi kun",
+  "remove": "Yọ kuro",
+  "rename": "Tún orúkọ ṣe",
+  "confirm": "Jẹrisi",
+  "continueAction": "Tẹsiwaju",
+  "dismiss": "Pa",
+  "authorize": "Fun laṣẹ",
+  "register": "Forukọsilẹ",
+  "sync": "Ṣọkan",
+  "assign": "Yàn",
+  "unlock": "Ṣii",
+  "generate": "Ṣẹda",
+  "import": "Mu wọle",
+  "export": "Mu jade",
+  "openInBrowser": "Ṣii ninu aṣawakiri",
+  "useThisPassword": "Lo ọrọ igbaniwọle yii",
+  "reviewArrow": "Ṣayẹwo →",
+  "skip": "Fo",
+  "keep": "Tọju",
+  "revert": "Pada sẹhin",
+  "next": "Tókàn: ṣe àwọn ọwọ́n",
+  "syncFromVault": "Ṣọkan lati vọọliti",
+  "createVault": "Ṣẹda vọọliti",
+  "pickFile": "Yan faili",
+  "noFileSelected": "Ko si faili ti a yan",
+  "chooseFolder": "Yan folda",
+  "addCustomField": "Fi aaye aṣa kun",
+  "exportFile": "Mu faili jade",
+  "addVault": "Fi vọọliti kun",
+  "addYubiKey": "Fi YubiKey kun",
+  "noChangesToSave": "Ko si awọn ayipada lati pamọ.",
+
+  "appearanceTitle": "Irisi",
+  "securityTitle": "Aabo",
+  "aboutTitle": "Nipa Gabbro",
+  "generatorTitle": "Ẹrọ ṣiṣẹda ọrọ igbaniwọle",
+  "importTitle": "Mu awọn titẹ sii wọle",
+  "exportTitle": "Mu vọọliti jade",
+  "changePassphraseTitle": "Yipada gbolohun ọrọ igbaniwọle",
+  "csvMappingTitle": "Ṣe àwọn ọwọ́n CSV",
+  "manageFoldersTitle": "Ṣakoso awọn folda",
+  "manageVaultsTitle": "Ṣakoso awọn vọọliti",
+  "manageYubiKeysTitle": "Ṣakoso awọn bọtini YubiKey",
+  "passwordHistoryTitle": "Itan ọrọ igbaniwọle",
+  "reviewChangesTitle": "Ṣayẹwo awọn ayipada",
+  "unlockGabbroTitle": "Ṣii Gabbro",
+
+  "sectionTheme": "Akori",
+  "sectionTextSize": "Iwọn ọrọ",
+  "sectionAlphabetBar": "Ipo ẹ̀gbẹ́ alfabeti",
+  "sectionAccessibility": "Iraye si",
+  "sectionLanguage": "Ede",
+  "sectionForegroundLock": "Titi iwaju",
+  "sectionBackgroundLock": "Titi ẹhin",
+  "sectionPasswordHistory": "Itan ọrọ igbaniwọle",
+  "sectionPassphraseCopyPaste": "Daakọ/lẹmọ gbolohun ọrọ igbaniwọle",
+  "sectionVaultList": "Atokọ vọọliti",
+  "sectionClipboardClear": "Sare paapo",
+  "sectionCharacterSets": "Awọn ṣeto ohun kikọ",
+  "sectionGeneratorLanguage": "Ede",
+
+  "themeSystem": "Eto",
+  "themeLight": "Imọlẹ",
+  "themeDark": "Okunkun",
+
+  "textSizeSmall": "Kekere",
+  "textSizeRegular": "Deede",
+  "textSizeLarge": "Nla",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Fun foonu nikan — tabulẹti ma n lo apa osi nigbagbogbo.",
+  "alphabetBarLeft": "Osi",
+  "alphabetBarRight": "Otun",
+
+  "highContrastTitle": "Iyatọ giga",
+  "highContrastSubtitle": "Pọsi iyatọ fun kika ti o dara sii",
+
+  "languageNote": "Fọ ede eto pada. «Eto» tẹle awọn eto agbegbe ẹrọ.",
+  "langSystem": "Eto",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Titi lẹhin akoko aiṣiṣẹ yii nigba ti app ṣii.",
+  "backgroundLockDescription": "Titi lẹhin ti app wa ni ẹhin fun akoko yii.",
+  "passwordHistoryDescription": "Iye akoko lati tọju ọrọ igbaniwọle tẹlẹ lẹhin ayipada. «Tọju nigbagbogbo» tumọ si pe itan naa ma n pa ni ọwọ nikan.",
+  "passphraseCopyPasteDescription": "Dena daakọ ati lẹmọ ni awọn aaye gbolohun ọrọ igbaniwọle. Ti a gba ni: ṣe idiwọ jijẹki gbolohun nipasẹ paapo.",
+  "passphraseCopyPasteNote": "Akiyesi: eyi dena mẹnu ọrọ ti a tẹ gigun ati yiyan ọrọ. Bọtini lẹmọ ti a kọ sinu keyboard le tun ṣiṣẹ — iyẹn jẹ idinwo ẹrọ pẹpẹ.",
+  "blockCopyPasteTitle": "Dena daakọ/lẹmọ",
+  "vaultListDescription": "Fi atokọ gbogbo awọn vọọliti han lori iboju wiwọle lati yan ewo lati ṣii laisi lilọ si «Ṣakoso vọọliti».",
+  "showVaultListTitle": "Fi atokọ vọọliti han nigba wiwọle",
+  "vaultListNote": "Akiyesi aabo: nigba ti eyi PADE, iboju wiwọle nikan n ṣe afihan vọọliti to kẹhin ti a lo. Iṣowo: lati yipada vọọliti, o gbọdọ kọkọ ṣii lẹhinna lọ si Mẹnu → Ṣakoso awọn vọọliti.",
+  "clipboardClearDescription": "Pa paapo lẹhin daakọ aṣiri. Akiyesi: awọn alakoso paapo le tọju adakọ.",
+
+  "duration30s": "30 s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60 s",
+  "duration2min": "2 min",
+  "durationNever": "Rara",
+  "duration7days": "Ọjọ 7",
+  "duration30days": "Ọjọ 30",
+  "duration90days": "Ọjọ 90",
+  "durationKeepForever": "Tọju nigbagbogbo",
+
+  "menuExportVault": "Mu vọọliti jade",
+  "menuImportEntries": "Mu awọn titẹ sii wọle",
+  "menuSyncFromFile": "Ṣọkan lati faili",
+  "menuManageVaults": "Ṣakoso awọn vọọliti",
+  "menuChangePassphrase": "Yipada gbolohun ọrọ igbaniwọle",
+  "menuManageYubiKeys": "Ṣakoso awọn bọtini YubiKey",
+  "menuAppearance": "Irisi",
+  "menuSecurity": "Aabo",
+  "menuManageFolders": "Ṣakoso awọn folda",
+  "menuPasswordGenerator": "Ẹrọ ṣiṣẹda ọrọ igbaniwọle",
+  "menuAbout": "Nipa",
+
+  "tooltipSelectEntries": "Yan awọn titẹ sii",
+  "tooltipLockVault": "Titi vọọliti",
+  "tooltipSelectAll": "Yan gbogbo",
+  "tooltipDeselectAll": "Yọ yiyan gbogbo",
+  "tooltipMenu": "Mẹnu",
+  "tooltipCopy": "Daakọ",
+  "tooltipCopied": "Ti daakọ!",
+  "tooltipShow": "Fi han",
+  "tooltipHide": "Pa mọ",
+  "tooltipBrowse": "Ṣagbero",
+  "tooltipEditAlias": "Ṣatunkọ orukọ apejuwe",
+  "tooltipRemoveField": "Yọ aaye kuro",
+  "tooltipRename": "Tún orúkọ ṣe",
+  "tooltipDeleteVault": "Pa vọọliti rẹ",
+  "tooltipAssignToFolder": "Yàn si folda",
+  "tooltipShowPin": "Fi PIN han",
+  "tooltipHidePin": "Pa PIN mọ",
+  "tooltipShowValue": "Fi iye han",
+  "tooltipHideValue": "Pa mọ",
+  "tooltipCancel": "Fagilee",
+  "tooltipOpenInBrowser": "Ṣii ninu aṣawakiri",
+
+  "allFolders": "Gbogbo awọn folda",
+  "noFolder": "Ko si",
+  "selectFolder": "Yan folda",
+  "folderName": "Orukọ folda",
+
+  "noEntriesMatch": "Ko si awọn titẹ sii ti o baamu wiwa.",
+  "noVaultsRegistered": "Ko si awọn vọọliti ti o forukọsilẹ.",
+  "noYubiKeysRegistered": "Ko si awọn bọtini YubiKey ti o forukọsilẹ",
+  "selectEntry": "Yan titẹ sii",
+  "newEntryTitle": "Titẹ sii tuntun",
+  "createEntryTitle": "Tuntun {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Ṣatunkọ: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(ko si URL)",
+  "noNameFallback": "(ko si orukọ)",
+  "untitledFallback": "(ko si akọle)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "Ti yan: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Ṣawari gbogbo awọn aaye…",
+  "searchEntriesHint": "Ṣawari awọn titẹ sii…",
+  "searchAllFieldsTooltip": "N ṣawari gbogbo awọn aaye",
+  "searchByTitleTooltip": "N ṣawari nipasẹ akọle",
+  "entryTypeAll": "Gbogbo",
+  "entryTypePassword": "Ọrọ igbaniwọle",
+  "entryTypeNote": "Akọsilẹ",
+  "entryTypeCard": "Kaadi",
+  "entryTypeIdentity": "Idanimọ",
+  "entryTypeFile": "Faili",
+  "entryTypeCustom": "Aṣa",
+  "errorPrefix": "Aṣiṣe: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Vọọliti",
+  "navAppearance": "Irisi",
+  "navSecurity": "Aabo",
+  "navAbout": "Nipa",
+
+  "deleteEntryTitle": "Pa titẹ sii rẹ?",
+  "cannotBeUndone": "A ko le yi iṣẹ yii pada.",
+  "deleteEntryDialogTitle": "Pa titẹ sii rẹ?",
+  "deleteEntriesTitle": "{count, plural, other{Pa awọn titẹ sii {count} rẹ?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Yàn si folda",
+  "folderConflictTitle": "Ikọlu folda",
+  "syncFailedTitle": "Iṣọkan kuna",
+  "syncFromFileTitle": "Ṣọkan lati faili",
+  "nothingToSync": "Ko si ohun lati ṣọkan — awọn vọọliti mejeeji ti wa ni imudojuiwọn.",
+
+  "importedEntries": "{count, plural, other{A mu awọn titẹ sii {count} wọle.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Mu faili jade",
+  "saveDecryptedFileTo": "Fi faili ti a ṣipaya pamọ si:",
+  "exportPathLabel": "Ipa itọsọna okeere",
+  "exportedToPath": "Ti mu jade si {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Ifijiṣẹ okeere kuna: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Ṣii ninu aṣawakiri?",
+  "couldNotOpen": "Ko le ṣii {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Pa titẹ sii iṣaaju rẹ",
+  "failedToClearHistory": "Piparẹ itan kuna: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Didabọ ọrọ igbaniwọle kuna: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Tún orukọ folda ṣe",
+  "addFolderTitle": "Fi folda kun",
+  "deleteFolderTitle": "Pa folda rẹ",
+  "deleteFolderConfirm": "Pa «{folder}» rẹ?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Gbe awọn titẹ sii lọ si",
+  "clearToNone": "Gbe lọ si «Ko si»",
+
+  "renameVaultTitle": "Tún orukọ vọọliti ṣe",
+  "deleteVaultTitle": "Pa vọọliti rẹ?",
+  "deleteVaultConfirmTitle": "Ṣe o da ọ loju?",
+  "typeDeleteToConfirm": "Tẹ DELETE lati jẹrisi",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Fọwọ kan YubiKey rẹ",
+  "noVaultsRegisteredText": "Ko si awọn vọọliti ti o forukọsilẹ.",
+
+  "addYubiKeyTitle": "Fi YubiKey kun",
+  "enterYubiKeyPinTitle": "Tẹ PIN YubiKey",
+  "editAliasForKey": "Ṣatunkọ orukọ apejuwe bọtini {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Bọtini YubiKey kan ṣoṣo ti o forukọsilẹ yoo ku.",
+  "removeKeyConfirm": "Njẹ o fẹ yọ bọtini yii kuro?",
+  "removeKeyVaultConfirm": "Yọ bọtini YubiKey yii kuro ninu vọọliti?",
+  "yubiKeyRemoved": "YubiKey ti yọ kuro",
+  "failedToRemoveKey": "Yiyọ bọtini kuna: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey ti fi kun",
+  "failedToAddKey": "Fifi bọtini kun kuna: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Fifipamọ orukọ apejuwe kuna: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "A ko ri ẹrọ FIDO2. Fi YubiKey sii ki o tun gbiyanju.",
+  "transportLabel": "Gbigbe:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Gbolohun ọrọ igbaniwọle",
+  "yubiKeyPinLabel": "PIN YubiKey",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Gbolohun ọrọ igbaniwọle lọwọlọwọ",
+  "newPassphraseLabel": "Gbolohun ọrọ igbaniwọle tuntun",
+  "confirmPassphraseLabel": "Jẹrisi gbolohun ọrọ igbaniwọle tuntun",
+  "vaultPassphraseLabel": "Gbolohun ọrọ igbaniwọle vọọliti",
+  "aliasLabel": "Orukọ apejuwe",
+  "aliasHint": "fun apẹẹrẹ: Akọkọ, Bọtini iṣẹ…",
+  "masterPassphraseLabel": "Gbolohun ọrọ igbaniwọle akọkọ",
+  "confirmPassphraseLabelShort": "Jẹrisi gbolohun ọrọ igbaniwọle",
+
+  "fieldTitle": "Akọle",
+  "fieldContent": "Akoonu",
+  "fieldFirstName": "Orukọ",
+  "fieldLastName": "Orukọ idile",
+  "fieldEmail": "Imeeli (aṣayan)",
+  "fieldPhone": "Foonu (aṣayan)",
+  "fieldAddress": "Adiresi (aṣayan)",
+  "fieldCardLabel": "Orukọ kaadi (fun apẹẹrẹ: «Visa Platinum»)",
+  "fieldCardholderName": "Orukọ oniwun kaadi",
+  "fieldCardNumber": "Nọmba kaadi",
+  "fieldExpiry": "Ipari (MM/YY)",
+  "fieldCvv": "CVV (aṣayan)",
+  "fieldCardPin": "PIN (aṣayan)",
+  "fieldCreditLimit": "Opin kirẹditi (aṣayan)",
+  "fieldAccountNumber": "Nọmba akanti (aṣayan)",
+  "fieldNotes": "Awọn akọsilẹ (aṣayan)",
+  "fieldUrl": "URL (aṣayan)",
+  "fieldUsername": "Orukọ olumulo",
+  "fieldPassword": "Ọrọ igbaniwọle",
+  "fieldSeparator": "Iyapa",
+  "fieldFolder": "Folda",
+  "fieldLabel": "Aami",
+  "fieldValue": "Iye",
+  "fieldCustomFields": "Awọn aaye aṣa",
+  "fieldLabelOptional": "{label} (aṣayan)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Iru titẹ sii yii ko ṣe atilẹyin sibẹ.",
+  "csvColumnNone": "(ko si)",
+  "csvPreviewLabel": "Iwoye iṣaaju",
+  "csvImportButton": "Mu wọle",
+
+  "gabbroVaultSection": "Vọọliti Gabbro",
+  "genericCsvSection": "CSV gbogbogbo",
+
+  "changePassphraseSuccess": "Gbolohun ọrọ igbaniwọle ti yipada",
+  "changePassphraseButton": "Yipada gbolohun ọrọ igbaniwọle",
+
+  "continueLabel": "Tẹsiwaju",
+  "protectWithYubiKey": "Daabobo pẹlu YubiKey",
+  "yubiKeySubtitle": "Bọtini aabo ohun elo (ti a ṣe iṣeduro)",
+  "accessibilityButton": "Iraye si",
+
+  "aboutProjectSection": "Iṣẹ akanṣe",
+  "aboutLicenceSection": "Iwe-aṣẹ",
+  "aboutOpenSourceSection": "Awọn paati orisun-ṣiṣi",
+  "aboutAttributionSection": "Ẹ dupe",
+
+  "lengthLabel": "Ipari",
+  "wordsLabel": "Awọn ọrọ",
+  "generateButton": "Ṣẹda",
+  "usePasswordButton": "Lo ọrọ igbaniwọle yii",
+  "showHidePassword": "Fi han",
+
+  "deleteVaultPostDeletion": "Vọọliti rẹ ti pa. Ṣẹda tuntun lati tẹsiwaju.",
+
+  "syncFilePassphraseLabel": "Gbolohun ọrọ igbaniwọle vọọliti",
+
+  "historyWarning": "Iye iṣaaju 1 nikan ni a tọju. Itan ni a pa laifọwọyi da lori awọn eto aabo.",
+  "historyCurrent": "Lọwọlọwọ",
+  "historyPrevious": "Iṣaaju",
+  "historySavedOn": "Ti pamọ {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · pari ni {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Isoro gbigba wọle ({index} ti {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Iru: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Ṣatunkọ, ṣe atunṣe ki o pamọ titẹ sii yii, tabi fo lati kọ.",
+
+  "entriesSkipped": "{count, plural, other{A fo awọn titẹ sii {count}}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Awọn titẹ sii wọnyi ti wa ninu vọọliti rẹ tẹlẹ ati pe a ko rọpo wọn:",
+
+  "syncDeleteEntryContent": "Ẹrọ miiran pa «{title}».\n\nPa nibi pẹlu, tabi tọju?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}» wa ninu awọn folda oriṣiriṣi lori ẹrọ meji.\n\nẸrọ yii: {local}\nẸrọ miiran: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Tọju laisi folda",
+  "folderConflictKeepLocal": "Tọju «{folder}»",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Gbe laisi folda",
+  "folderConflictMoveIncoming": "Gbe si «{folder}»",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Vọọliti ti ṣọkan — fi kun: {added}, imudojuiwọn: {updated}, pa: {deleted}.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Faili vọọliti yii nlo gbolohun ọrọ igbaniwọle ti o yatọ. A ṣe atilẹyin iṣọkan laarin awọn vọọliti ti o ni gbolohun ọrọ igbaniwọle kanna nikan.",
+
+  "reviewSensitiveFields": "Awọn aaye ifura",
+  "reviewOtherFields": "Awọn aaye miiran",
+  "reviewPasswordChanged": "Ọrọ igbaniwọle yipada",
+  "reviewCvvChanged": "CVV yipada",
+  "reviewPinChanged": "PIN yipada",
+  "reviewTransactionPasswordChanged": "Ọrọ igbaniwọle iṣowo yipada",
+  "tooltipShowValues": "Fi awọn iye han",
+  "reviewOld": "Atijọ",
+  "reviewNew": "Tuntun",
+  "reviewEmpty": "(ofo)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Awọn akọsilẹ",
+  "reviewFieldContent": "Akoonu",
+  "reviewFieldEmail": "Imeeli",
+  "reviewFieldPhone": "Foonu",
+  "reviewFieldAddress": "Adiresi",
+  "reviewFieldCardLabel": "Orukọ kaadi",
+  "reviewFieldStatus": "Ipo",
+  "reviewFieldCardholder": "Oniwun kaadi",
+  "reviewFieldExpiry": "Ipari",
+  "reviewFieldCreditLimit": "Opin kirẹditi",
+  "reviewFieldAccountNumber": "Nọmba akanti",
+  "reviewFieldNetwork": "Nẹtiwọki",
+  "reviewFieldBank": "Ile-ifowopamọ",
+  "reviewFieldFilename": "Orukọ faili",
+  "reviewFieldSize": "Iwọn",
+  "reviewFieldCardNumber": "Nọmba",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Ọrọ igbaniwọle iṣowo",
+  "timestampCreated": "Ti ṣẹda",
+  "timestampUpdated": "Ti imudojuiwọn",
+  "timestampUnknown": "Aimọ",
+  "noTitleFallback": "(ko si akọle)",
+  "tooltipExportFile": "Mu faili jade",
+  "tooltipEditEntry": "Ṣatunkọ titẹ sii",
+  "tooltipDeleteEntry": "Pa titẹ sii rẹ",
+  "exportLabel": "Okeere",
+  "customEntryFieldsHeader": "Awọn aaye",
+  "copiedNeverClears": "Ti daakọ — paapo ko sare laifọwọyi rara",
+  "copiedClears30s": "Ti daakọ — paapo yoo sare ni 30 s",
+  "copiedClears60s": "Ti daakọ — paapo yoo sare ni 60 s",
+  "copiedClears2min": "Ti daakọ — paapo yoo sare ni iṣẹju 2",
+
+  "passwordBreakdownTitle": "Itupalẹ ọrọ igbaniwọle",
+  "charTypeUppercase": "Awọn lẹta nla",
+  "charTypeLowercase": "Awọn lẹta kekere",
+  "charTypeDigit": "Awọn nọmba",
+  "charTypeSymbol": "Ami",
+
+  "exportIncludeDate": "Fi ọjọ sinu orukọ faili",
+  "exportChooseFormat": "Yan ọna iṣafihan okeere.",
+  "exportUnencryptedWarning": "Ko ni fipamọ rara — a yoo kọ gbogbo awọn aṣiri bi ọrọ deede. Pamọ faili ni aabo ki o pa lẹhin lilo.",
+  "exportPassphraseOnlyNote": "Ti daabobo pẹlu gbolohun ọrọ igbaniwọle nikan. YubiKey ko nilo fun gbigba wọle.",
+  "exportChooseDestinationJson": "Yan ibi ti faili JSON okeere yoo wa.",
+  "exportChooseDestinationVault": "Yan ibi ti faili vọọliti okeere yoo wa.",
+  "exportTwoFilesNote": "A yoo ṣẹda awọn faili meji: vault.gabbro ati vault.gabbro.sha256",
+  "exportSelectDestination": "Yan ibi.",
+
+  "aboutVersion": "Ẹya {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Olugba ọrọ igbaniwọle lẹhin-kuatomu",
+  "aboutSourceCode": "Koodu orisun",
+  "aboutReportIssue": "Jabo isoro",
+  "aboutSupportGabbro": "Ṣe atilẹyin Gabbro",
+  "aboutLicenceBody": "Gabbro jẹ sọfitiwia orisun ṣiṣi ọfẹ, ti a fun ni iwe-aṣẹ labẹ GNU General Public License v3.0 only (GPL-3.0-only).\n\nO ni ominira lati lo, ṣe iwadi ati pin ẹrọ yii labẹ awọn ofin iwe-aṣẹ.",
+  "aboutOwnerRole": "Oniwun iṣẹ akanṣe, ayaworan, ati olupilẹṣẹ akọkọ:",
+  "aboutAiPartner": "Alabaṣepọ idagbasoke AI:",
+  "aboutNoTelemetry": "Gabbro ko ṣe eyikeyi asopọ nẹtiwọki ita. Ko si telemetry, itupalẹ, tabi akanti.",
+
+  "strengthTierTerrible": "Buru pupọ",
+  "strengthTierWeak": "Alailagbara",
+  "strengthTierFair": "Dara daadaa",
+  "strengthTierStrong": "Lagbara",
+  "strengthTierVeryStrong": "Lagbara pupọ",
+  "strengthTierExcellent": "Daradara",
+  "yubiKeyProtectedNote": "Vọọliti ti daabobo pẹlu YubiKey — asopọ bọtini yoo wa ni fipamọ.",
+  "yubiKeyPinRequired": "PIN YubiKey nilo",
+  "tapYubiKeyNow": "Fọwọ kan YubiKey rẹ bayi…",
+  "touchYubiKeyToAuthorize": "Fọwọ kan YubiKey lati fun laṣẹ ayipada yii.",
+  "currentPassphraseRequired": "Gbolohun ọrọ igbaniwọle lọwọlọwọ nilo",
+  "newPassphraseRequired": "Gbolohun ọrọ igbaniwọle tuntun nilo",
+  "passphraseTooWeak": "Gbolohun ọrọ igbaniwọle jẹ alailagbara ju",
+  "confirmPassphraseRequired": "Jẹrisi gbolohun ọrọ igbaniwọle tuntun",
+  "passphrasesDoNotMatch": "Awọn gbolohun ọrọ igbaniwọle ko baramu",
+  "passphrasesMatch": "✓ Awọn gbolohun ọrọ igbaniwọle baramu",
+  "passphrasesNoMatch": "✗ Awọn gbolohun ọrọ igbaniwọle ko baramu",
+  "entropyDisplay": "{tier} · {bits} bit",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Aṣiṣe gbigbe.",
+  "authorizationFailed": "Aṣẹ kuna — ṣayẹwo PIN ki o tun gbiyanju.",
+
+  "unlockEnterPassphraseAndPin": "Tẹ gbolohun ọrọ igbaniwọle ati PIN YubiKey lati ṣii",
+  "unlockEnterPassphrase": "Tẹ gbolohun ọrọ igbaniwọle lati ṣii",
+  "unlockEntropyDisplay": "{tier} · {bits} bit entropy",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Fi YubiKey sii ki o fọwọ kan nigba ti o n ṣan",
+  "unlockErrorPassphrase": "Ko le ṣii vọọliti. Ṣayẹwo gbolohun ọrọ igbaniwọle.",
+  "unlockErrorPassphraseAndPin": "Ko le ṣii vọọliti. Ṣayẹwo gbolohun ọrọ igbaniwọle ati PIN YubiKey.",
+
+  "importSelectFile": "Yan faili kan.",
+  "importFileNotFound": "A ko ri faili.",
+  "importEnterPassphrase": "Tẹ gbolohun ọrọ igbaniwọle fun vọọliti yii.",
+  "importDuplicateWarning": "A yoo fo awọn titẹ sii ti UUID wọn ti wa ninu vọọliti rẹ tẹlẹ laifọwọyi. A yoo ṣe afihan akopọ.",
+  "importGabbroSubtitle": "Ṣọkan awọn titẹ sii lati vọọliti Gabbro miiran (faili .gabbro)",
+  "importEnpassSubtitle": "Gbigba jade JSON lati Enpass (Awọn irinṣẹ → Gba jade)",
+  "importBitwardenSubtitle": "Gbigba jade JSON ti ko ni fipamọ lati Bitwarden (Awọn irinṣẹ → Gba vọọliti jade)",
+  "importCsvSubtitle": "Gbigba jade CSV lati olugba ọrọ igbaniwọle eyikeyi",
+
+  "vaultNameAlreadyExists": "Vọọliti ti a npè ni «{alias}» ti wa tẹlẹ.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Eyi yoo pa «{alias}» ati gbogbo data rẹ patapata.\n\nFaili: {path}\n\nA ko le yi iṣẹ yii pada.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Eyi yoo pa «{alias}» ati asopọ YubiKey rẹ patapata.\n\nFaili: {path}\n\nA ko le yi iṣẹ yii pada.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Tẹ PIN ki o fọwọ kan YubiKey lati fun laṣẹ piparẹ.",
+  "deleteVaultTooltip": "Pa vọọliti rẹ",
+
+  "yubiKeySecurityWarning": "Ikilọ aabo",
+  "removeYubiKeyTitle": "Yọ YubiKey kuro",
+  "yubiKeyLastKeyRiskWarning": "IKILỌ: ti bọtini ti o ku ba sọnu, baje, tabi ji, iwọle si vọọliti yoo ti dina lailai. Ko si aṣayan imularada.",
+  "onlyOneKeyRegisteredWarning": "Bọtini kan ṣoṣo ni a ti forukọsilẹ. Ti bọtini yii ba sọnu, iwọle si vọọliti yoo ti dina lailai.",
+  "tapRegisterNfc": "Sunmọ bọtini naa si foonu lati forukọsilẹ",
+  "tapRegisterUsb": "Lẹhin asopọ, fọwọ kan bọtini lati forukọsilẹ",
+  "tapActivateNfc": "Sunmọ bọtini naa si foonu lẹẹkansi lati mu ṣiṣẹ",
+  "tapActivateUsb": "Lẹhin asopọ, fọwọ kan bọtini lẹẹkansi lati mu ṣiṣẹ",
+  "failedToRegisterKey": "Forukọsilẹ bọtini kuna: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Ṣiṣẹda bọtini kuna: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Bọtini {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Fọwọ kan YubiKey tuntun lati forukọsilẹ…",
+  "tapYubiKeyToActivate": "Fọwọ kan YubiKey tuntun lẹẹkansi lati mu ṣiṣẹ…",
+  "editAliasTooltip": "Ṣatunkọ orukọ apejuwe",
+  "cannotRemoveLastKey": "A ko le yọ bọtini ti o kẹhin kuro",
+  "removeKeyTooltip": "Yọ bọtini kuro",
+  "manageYubiKeysError": "Aṣiṣe: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Kilasika",
+  "generatorModePassphrase": "Gbolohun ọrọ igbaniwọle",
+  "charSetsHeader": "Awọn ṣeto ohun kikọ",
+  "languageHeader": "Ede",
+  "separatorLabel": "Iyapa",
+  "capitaliseWords": "Fi lẹta nla bẹrẹ awọn ọrọ",
+  "appendDigit": "Fi nọmba kun",
+  "entropyBitsDisplay": "~{bits} bit entropy",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Yan o kere ju ṣeto ohun kikọ kan",
+  "passwordMinLengthNote": "Awọn ọrọ igbaniwọle ni o kere ju 32 ohun kikọ. Ti oju opo wẹẹbu ba ni opin kuru, daakọ iye ohun kikọ akọkọ ti o nilo.",
+  "excludeAmbiguousChars": "Yọ awọn ohun kikọ ambiguous kuro (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Ṣẹda vọọliti rẹ lati bẹrẹ.",
+  "onboardingVaultName": "Orukọ vọọliti",
+  "onboardingAliasRequired": "Orukọ apejuwe jẹ dandan",
+  "onboardingNewVaultLocation": "Ipo vọọliti tuntun (kanna bii tẹlẹ)",
+  "onboardingVaultLocation": "Ipo vọọliti",
+  "onboardingLoadingPath": "N kojọpọ…",
+  "onboardingPathHint": "Ipa ọna faili vọọliti",
+  "onboardingPathRequired": "Ipa ọna jẹ dandan",
+  "onboardingReusePassphraseHint": "Yan gbolohun ọrọ igbaniwọle akọkọ tuntun tabi lo atijọ lẹẹkansi.",
+  "onboardingPassphraseRequired": "Gbolohun ọrọ igbaniwọle jẹ dandan",
+  "onboardingConfirmRequired": "Jẹrisi gbolohun ọrọ igbaniwọle",
+  "onboardingPrimaryKeyPin": "PIN bọtini akọkọ",
+  "onboardingBackupKeyPin": "PIN bọtini ẹlẹgbẹ",
+  "onboardingKeyNPin": "PIN bọtini {n}",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "Iwọ yoo fọwọ kan YubiKey kọọkan lẹẹmeji (lapapọ awọn igba 4). Laarin awọn bọtini meji, a yoo beere lọwọ rẹ lati yi wọn pada.",
+  "onboardingYubikeySlowNote": "Ṣiṣẹda vọọliti pẹlu YubiKey gba iṣẹju 20-30. App le dabi pe ko n dahun — iyẹn jẹ deede.",
+  "onboardingStep1Label": "Forukọsilẹ bọtini akọkọ",
+  "onboardingStep1Hint": "Fọwọ kan YubiKey bayi",
+  "onboardingStep2Label": "Mu bọtini akọkọ ṣiṣẹ",
+  "onboardingStep2Hint": "Fọwọ kan YubiKey lẹẹkansi",
+  "onboardingStep3Label": "Yipada si bọtini ẹlẹgbẹ",
+  "onboardingStep3Hint": "Yọ bọtini akọkọ kuro ki o fi bọtini ẹlẹgbẹ YubiKey sii",
+  "onboardingStep4Label": "Forukọsilẹ bọtini ẹlẹgbẹ",
+  "onboardingStep4Hint": "Fọwọ kan bọtini ẹlẹgbẹ YubiKey",
+  "onboardingStep5Label": "Mu bọtini ẹlẹgbẹ ṣiṣẹ",
+  "onboardingStep5Hint": "Fọwọ kan bọtini ẹlẹgbẹ YubiKey ni igba ikẹhin",
+
+  "textSizePreview": "Gabbro jẹ apata inu ti o ni Mg ati Fe pupọ pẹlu eto patiku nla.",
+
+  "fieldCardStatus": "Ipo",
+  "fieldPaymentNetwork": "Nẹtiwọki isanwo",
+
+  "cardStatusActive": "Nṣiṣẹ",
+  "cardStatusLapsed": "Ti pari",
+  "cardStatusInactive": "Ko nṣiṣẹ",
+
+  "validatorTitleRequired": "Akọle jẹ dandan",
+  "validatorUsernameRequired": "Orukọ olumulo jẹ dandan",
+  "validatorPasswordRequired": "Ọrọ igbaniwọle jẹ dandan",
+  "validatorContentRequired": "Akoonu jẹ dandan",
+  "validatorFirstNameRequired": "Orukọ jẹ dandan",
+  "validatorLastNameRequired": "Orukọ idile jẹ dandan",
+  "validatorCardLabelRequired": "Orukọ kaadi jẹ dandan",
+  "validatorCardholderRequired": "Orukọ oniwun kaadi jẹ dandan",
+  "validatorCardNumberRequired": "Nọmba kaadi jẹ dandan",
+  "validatorCardNumberLength": "Nọmba kaadi gbọdọ ni awọn nọmba 6-19",
+  "validatorExpiryRequired": "Ọjọ ipari jẹ dandan",
+  "validatorExpiryFormat": "Lo ọna MM/YY",
+  "validatorExpiryMonth": "Osu gbọdọ jẹ 01-12",
+  "validatorCvvLength": "CVV gbọdọ ni awọn nọmba 3 tabi 4",
+  "validatorLabelRequired": "Aami jẹ dandan",
+  "validatorStatusRequired": "Ipo jẹ dandan",
+
+  "sectionBiometricUnlock": "Ṣii ẹya ara",
+  "biometricUnlockDescription": "Lo ika ọwọ tabi oju lati ṣii vọọliti dipo titẹ gbolohun ọrọ igbaniwọle.",
+  "biometricUnlockTitle": "Mu ṣiṣi ẹya ara ṣiṣẹ",
+  "biometricUnlockNote": "Gbogbo data ẹya ara ti a forukọsilẹ lori ẹrọ yii le ṣii — kii ṣe awọn ti a lo nigba forukọsilẹ nikan.",
+  "biometricUnavailable": "Ṣiṣi ẹya ara ko si fun ẹrọ yii. A ko ri sensọ ẹya ara tabi ko si data ẹya ara ti o forukọsilẹ ninu awọn eto eto.",
+  "biometricDialogTitle": "Nipa ṣiṣi ẹya ara",
+  "biometricDialogBody": "Nigba ti o mu ṣiṣẹ, Gabbro yoo fipamọ gbolohun ọrọ igbaniwọle akọkọ o si pamọ rẹ sori ẹrọ yii, ti data ẹya ara rẹ daabobo. A ṣipaya gbolohun ọrọ igbaniwọle nikan nigba ṣiṣi.\n\nGabbro ko tọju data ika ọwọ tabi oju rẹ rara — wọn wa ninu chip aabo foonu.",
+  "biometricDialogAllBiometrics": "Gbogbo data ẹya ara ti a forukọsilẹ sori ẹrọ yii yoo le ṣii Gabbro — ko ṣee ṣe lati diwọn si ika ọwọ kan pato.",
+  "biometricDialogInvalidation": "Ti data ẹya ara tuntun ba fi kun foonu yii (pẹlu ika ọwọ keji), eto yii yoo ti pa laifọwọyi o si nilo tunto.",
+  "biometricDialogRecommendation": "Aba: fi silẹ ko ṣiṣẹ ti o ba ni awoṣe irokeke giga tabi o pin ẹrọ yii.",
+  "biometricInvalidated": "A ti pa ṣiṣi ẹya ara nitori data ẹya ara lori ẹrọ yii yipada (a fi ika ọwọ tabi oju tuntun kun ninu awọn eto eto). Iyẹn jẹ igbese aabo. Tẹ gbolohun ọrọ igbaniwọle lẹẹkansi ki o tun mu ṣiṣi ẹya ara ṣiṣẹ.",
+  "useBiometrics": "Lo ẹya ara",
+  "biometricCancelled": "Ijẹrisi ẹya ara ko pari. Tẹ gbolohun ọrọ igbaniwọle lati ṣii.",
+  "biometricEnrollTitle": "Tẹ gbolohun ọrọ igbaniwọle",
+  "biometricEnrollDescription": "Tẹ gbolohun ọrọ igbaniwọle akọkọ lati mu ṣiṣi ẹya ara ṣiṣẹ.",
+  "biometricYubikeyHint": "Tẹ PIN YubiKey ni isalẹ, lẹhinna tẹ «Lo ẹya ara», lẹhinna fọwọ kan YubiKey.",
+
+  "helpTitle": "Iranlọwọ",
+  "menuHelp": "Iranlọwọ",
+  "helpCaptionCreate": "Ṣẹda vọọliti: tẹ orukọ, gbolohun ọrọ igbaniwọle ki o daabobo pẹlu YubiKey ti o fẹ",
+  "helpCaptionEmpty": "Tẹ + lati fi titẹ sii akọkọ kun",
+  "helpCaptionDetail": "Tẹ aami oju lati ri ọrọ igbaniwọle, lẹhinna tẹ gigun lati ri itupalẹ ohun kikọ alaye",
+  "helpCaptionTitleSearch": "Atilẹba: ẹkun wiwa n ṣawari awọn akọle titẹ sii nikan",
+  "helpCaptionFullSearch": "Tẹ maikirosikopu lati yi pada si wiwa gbogbo awọn aaye; tẹ lẹẹkansi lati pada si wiwa akọle",
+  "helpCaptionFilter": "Lo awọn bọtini àlẹmọ lati ṣe afihan awọn titẹ sii ti iru kan pato nikan",
+  "helpCaptionFolders": "Lo yiyan folda lati àlẹmọ awọn titẹ sii nipasẹ folda",
+  "helpCaptionSelect": "Tẹ gigun lori titẹ sii lati wọ ipo yiyan; fi awọn nkan diẹ sii kun, lẹhinna yàn si folda tabi pa. Tẹ X lati jade.",
+  "helpCaptionJumpToLetter": "Tẹ lẹta ninu ẹgbẹ-atọka lati lọ si apakan yẹn",
+  "helpCaptionBreakdown": "Tẹ aami oju lati ri ọrọ igbaniwọle, lẹhinna tẹ gigun lati ri itupalẹ ohun kikọ alaye",
+  "helpCaptionManageVaults": "Ninu «Ṣakoso awọn vọọliti» o le tún orukọ ṣe tabi pa awọn vọọliti, tabi fi tuntun kun",
+  "helpCaptionUnlock": "Tẹ gbolohun ọrọ igbaniwọle lati ṣii vọọliti"
+}

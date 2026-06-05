@@ -1,0 +1,803 @@
+{
+  "@@locale": "eu",
+
+  "appName": "Gabbro",
+
+  "cancel": "Utzi",
+  "delete": "Ezabatu",
+  "save": "Gorde",
+  "close": "Itxi",
+  "ok": "Ados",
+  "edit": "Editatu",
+  "add": "Gehitu",
+  "remove": "Kendu",
+  "rename": "Berrizendatu",
+  "confirm": "Berretsi",
+  "continueAction": "Jarraitu",
+  "dismiss": "Itxi",
+  "authorize": "Baimendu",
+  "register": "Erregistratu",
+  "sync": "Sinkronizatu",
+  "assign": "Esleitu",
+  "unlock": "Desblokeatu",
+  "generate": "Sortu",
+  "import": "Inportatu",
+  "export": "Esportatu",
+  "openInBrowser": "Nabigatzailean ireki",
+  "useThisPassword": "Pasahitz hau erabili",
+  "reviewArrow": "Berrikusi →",
+  "skip": "Saltatu",
+  "keep": "Gorde",
+  "revert": "Berrezarri",
+  "next": "Hurrengoa: zutabeak mapatu",
+  "syncFromVault": "Gandegitik sinkronizatu",
+  "createVault": "Gandegi bat sortu",
+  "pickFile": "Fitxategia hautatu",
+  "noFileSelected": "Ez da fitxategirik hautatu",
+  "chooseFolder": "Karpeta hautatu",
+  "addCustomField": "Eremu pertsonalizatua gehitu",
+  "exportFile": "Fitxategia esportatu",
+  "addVault": "Gandegi bat gehitu",
+  "addYubiKey": "YubiKey gehitu",
+  "noChangesToSave": "Ez dago gordetzeko aldaketarik.",
+
+  "appearanceTitle": "Itxura",
+  "securityTitle": "Segurtasuna",
+  "aboutTitle": "Gabbro-ri buruz",
+  "generatorTitle": "Pasahitz-sorgailua",
+  "importTitle": "Sarrerak inportatu",
+  "exportTitle": "Gandegi esportatu",
+  "changePassphraseTitle": "Pasaesaldia aldatu",
+  "csvMappingTitle": "CSV zutabeen mapaketa",
+  "manageFoldersTitle": "Karpetak kudeatu",
+  "manageVaultsTitle": "Gandegiak kudeatu",
+  "manageYubiKeysTitle": "YubiKey gakoak kudeatu",
+  "passwordHistoryTitle": "Pasahitz historia",
+  "reviewChangesTitle": "Aldaketak berrikusi",
+  "unlockGabbroTitle": "Gabbro desblokeatu",
+
+  "sectionTheme": "Gaia",
+  "sectionTextSize": "Testu tamaina",
+  "sectionAlphabetBar": "Alfabeto-barraren posizioa",
+  "sectionAccessibility": "Irisgarritasuna",
+  "sectionLanguage": "Hizkuntza",
+  "sectionForegroundLock": "Aurreko planoko blokeoa",
+  "sectionBackgroundLock": "Atzeko planoko blokeoa",
+  "sectionPasswordHistory": "Pasahitz historia",
+  "sectionPassphraseCopyPaste": "Pasaesaldia kopiatu/itsatsi",
+  "sectionVaultList": "Gandegi zerrenda",
+  "sectionClipboardClear": "Arbelaren garbiketa",
+  "sectionCharacterSets": "Karaktere-multzoak",
+  "sectionGeneratorLanguage": "Hizkuntza",
+
+  "themeSystem": "Sistema",
+  "themeLight": "Argia",
+  "themeDark": "Iluna",
+
+  "textSizeSmall": "Txikia",
+  "textSizeRegular": "Arrunta",
+  "textSizeLarge": "Handia",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Telefonoan soilik — tabletak ezkerraldea erabiltzen du beti.",
+  "alphabetBarLeft": "Ezkerra",
+  "alphabetBarRight": "Eskuina",
+
+  "highContrastTitle": "Kontraste altua",
+  "highContrastSubtitle": "Irakurgarritasuna hobetzeko kontrastea areagotzen du",
+
+  "languageNote": "Sistemaren hizkuntza gainidazten du. «Sistema»-k gailuaren eskualdeko ezarpenak jarraitzen ditu.",
+  "langSystem": "Sistema",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+
+  "foregroundLockDescription": "Aplikazioa irekita dagoenean inaktibitate-denbora hau igarotakoan blokeatu.",
+  "backgroundLockDescription": "Aplikazioa atzeko planoan denbora hau egon ondoren blokeatu.",
+  "passwordHistoryDescription": "Aldaketa egin ondoren aurreko pasahitza zenbat denbora gordetzea. «Beti gorde»-k esan nahi du historia eskuz soilik ezabatzen dela.",
+  "passphraseCopyPasteDescription": "Pasaesaldiaren eremuetan kopiatzea eta itsastea blokeatu. Gomendatua: pasaesaldia arbelaren bidez ihes egitea saihesten du.",
+  "passphraseCopyPasteNote": "Oharra: honek luze sakatutako testuinguru-menua eta testu hautaketa blokeatzen ditu. Teklatuaren barneko itsasteko botoiak oraindik funtziona dezake — hori plataformaren mugapena da.",
+  "blockCopyPasteTitle": "Kopiatzea/itsastea blokeatu",
+  "vaultListDescription": "Saioa hasteko pantailan gandegi guztien zerrenda erakutsi, «Gandegiak kudeatu»-ra joan gabe zein desblokeatu aukeratzeko.",
+  "showVaultListTitle": "Saioa hastean gandegi-zerrenda erakutsi",
+  "vaultListNote": "Segurtasun oharra: hau ITZALITA dagoenean, saioa hasteko pantailak azken erabilitako gandegiak soilik erakusten ditu. Konpromisoa: gandegiak aldatzeko, lehenik desblokeatu eta gero Menu → Gandegiak kudeatu joan behar da.",
+  "clipboardClearDescription": "Sekretua kopiatu ondoren arbela garbitu. Oharra: arbelaren kudeatzaileek kopia gorde dezakete.",
+
+  "duration30s": "30 s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60 s",
+  "duration2min": "2 min",
+  "durationNever": "Inoiz ez",
+  "duration7days": "7 egun",
+  "duration30days": "30 egun",
+  "duration90days": "90 egun",
+  "durationKeepForever": "Beti gorde",
+
+  "menuExportVault": "Gandegi esportatu",
+  "menuImportEntries": "Sarrerak inportatu",
+  "menuSyncFromFile": "Fitxategitik sinkronizatu",
+  "menuManageVaults": "Gandegiak kudeatu",
+  "menuChangePassphrase": "Pasaesaldia aldatu",
+  "menuManageYubiKeys": "YubiKey gakoak kudeatu",
+  "menuAppearance": "Itxura",
+  "menuSecurity": "Segurtasuna",
+  "menuManageFolders": "Karpetak kudeatu",
+  "menuPasswordGenerator": "Pasahitz-sorgailua",
+  "menuAbout": "Honi buruz",
+
+  "tooltipSelectEntries": "Sarrerak hautatu",
+  "tooltipLockVault": "Gandegiak blokeatu",
+  "tooltipSelectAll": "Denak hautatu",
+  "tooltipDeselectAll": "Denak desautatu",
+  "tooltipMenu": "Menua",
+  "tooltipCopy": "Kopiatu",
+  "tooltipCopied": "Kopiatuta!",
+  "tooltipShow": "Erakutsi",
+  "tooltipHide": "Ezkutatu",
+  "tooltipBrowse": "Arakatu",
+  "tooltipEditAlias": "Ezizena editatu",
+  "tooltipRemoveField": "Eremua kendu",
+  "tooltipRename": "Berrizendatu",
+  "tooltipDeleteVault": "Gandegi ezabatu",
+  "tooltipAssignToFolder": "Karpetari esleitu",
+  "tooltipShowPin": "PINa erakutsi",
+  "tooltipHidePin": "PINa ezkutatu",
+  "tooltipShowValue": "Balioa erakutsi",
+  "tooltipHideValue": "Ezkutatu",
+  "tooltipCancel": "Utzi",
+  "tooltipOpenInBrowser": "Nabigatzailean ireki",
+
+  "allFolders": "Karpeta guztiak",
+  "noFolder": "Bat ere ez",
+  "selectFolder": "Karpeta hautatu",
+  "folderName": "Karpetaren izena",
+
+  "noEntriesMatch": "Ez dago bilaketarekin bat datozen sarrerarik.",
+  "noVaultsRegistered": "Ez dago erregistratutako gandegirik.",
+  "noYubiKeysRegistered": "Ez dago erregistratutako YubiKey gakorik",
+  "selectEntry": "Sarrera hautatu",
+  "newEntryTitle": "Sarrera berria",
+  "createEntryTitle": "Berri(-a) {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "Editatu: {type}",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(URLrik gabe)",
+  "noNameFallback": "(izenik gabe)",
+  "untitledFallback": "(izenbururik gabe)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro — {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "Hautatuta: {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Eremu guztietan bilatu…",
+  "searchEntriesHint": "Sarrerak bilatu…",
+  "searchAllFieldsTooltip": "Eremu guztietan bilatzen du",
+  "searchByTitleTooltip": "Izenburuaren arabera bilatzen du",
+  "entryTypeAll": "Denak",
+  "entryTypePassword": "Pasahitza",
+  "entryTypeNote": "Oharra",
+  "entryTypeCard": "Txartela",
+  "entryTypeIdentity": "Identitatea",
+  "entryTypeFile": "Fitxategia",
+  "entryTypeCustom": "Pertsonalizatua",
+  "errorPrefix": "Errorea: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Gandegiak",
+  "navAppearance": "Itxura",
+  "navSecurity": "Segurtasuna",
+  "navAbout": "Honi buruz",
+
+  "deleteEntryTitle": "Sarrera ezabatu?",
+  "cannotBeUndone": "Ekintza hau ezin da desegin.",
+  "deleteEntryDialogTitle": "Sarrera ezabatu?",
+  "deleteEntriesTitle": "{count, plural, one{{count} sarrera ezabatu?} other{{count} sarrerak ezabatu?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Karpetari esleitu",
+  "folderConflictTitle": "Karpeta gatazka",
+  "syncFailedTitle": "Sinkronizazioa huts egin du",
+  "syncFromFileTitle": "Fitxategitik sinkronizatu",
+  "nothingToSync": "Ez dago sinkronizatzeko ezer — bi gandegiak eguneratuta daude dagoeneko.",
+
+  "importedEntries": "{count, plural, one{1 sarrera inportatu da.} other{{count} sarrera inportatu dira.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Fitxategia esportatu",
+  "saveDecryptedFileTo": "Deszifratu fitxategia hemen gorde:",
+  "exportPathLabel": "Esportazio bidea",
+  "exportedToPath": "{path}-(r)a esportatu da",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Esportazioak huts egin du: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Nabigatzailean ireki?",
+  "couldNotOpen": "Ezin da ireki {url}",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Aurreko sarrera ezabatu",
+  "failedToClearHistory": "Historiaren garbiketa huts egin du: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Pasahitza berrezartzeak huts egin du: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Karpeta berrizendatu",
+  "addFolderTitle": "Karpeta gehitu",
+  "deleteFolderTitle": "Karpeta ezabatu",
+  "deleteFolderConfirm": "«{folder}» ezabatu?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Sarrerak hona eraman:",
+  "clearToNone": "«Bat ere ez»-era eraman",
+
+  "renameVaultTitle": "Gandegi berrizendatu",
+  "deleteVaultTitle": "Gandegi ezabatu?",
+  "deleteVaultConfirmTitle": "Ziur zaude?",
+  "typeDeleteToConfirm": "Berresteko DELETE idatzi",
+  "typeDeleteWord": "DELETE",
+  "touchYourYubiKey": "Ukitu zure YubiKey",
+  "noVaultsRegisteredText": "Ez dago erregistratutako gandegirik.",
+
+  "addYubiKeyTitle": "YubiKey gehitu",
+  "enterYubiKeyPinTitle": "YubiKey PINa sartu",
+  "editAliasForKey": "{index} gakoaren ezizena editatu",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Erregistratutako YubiKey gako bat bakarrik geratuko da.",
+  "removeKeyConfirm": "Gako hau kendu nahi al duzu?",
+  "removeKeyVaultConfirm": "YubiKey gako hau gandegitik kendu?",
+  "yubiKeyRemoved": "YubiKey kenduta",
+  "failedToRemoveKey": "Gakoa kentzeak huts egin du: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey gehituta",
+  "failedToAddKey": "Gakoa gehitzeak huts egin du: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Ezizena gordetzeak huts egin du: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Ez da FIDO2 gailurik aurkitu. Sartu YubiKey eta saiatu berriro.",
+  "transportLabel": "Garraioa:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Pasaesaldia",
+  "yubiKeyPinLabel": "YubiKey PINa",
+  "pinLabel": "PINa",
+  "currentPassphraseLabel": "Uneko pasaesaldia",
+  "newPassphraseLabel": "Pasaesaldi berria",
+  "confirmPassphraseLabel": "Pasaesaldi berria berretsi",
+  "vaultPassphraseLabel": "Gandegiko pasaesaldia",
+  "aliasLabel": "Ezizena",
+  "aliasHint": "adib. Nagusia, Lan gakoa…",
+  "masterPassphraseLabel": "Pasaesaldi nagusia",
+  "confirmPassphraseLabelShort": "Pasaesaldia berretsi",
+
+  "fieldTitle": "Izenburua",
+  "fieldContent": "Edukia",
+  "fieldFirstName": "Izena",
+  "fieldLastName": "Abizena",
+  "fieldEmail": "Emaila (aukerakoa)",
+  "fieldPhone": "Telefonoa (aukerakoa)",
+  "fieldAddress": "Helbidea (aukerakoa)",
+  "fieldCardLabel": "Txartelaren izena (adib. «Visa Platinum»)",
+  "fieldCardholderName": "Txartel-jabearen izena",
+  "fieldCardNumber": "Txartel-zenbakia",
+  "fieldExpiry": "Iraungipena (HH/UU)",
+  "fieldCvv": "CVV (aukerakoa)",
+  "fieldCardPin": "PINa (aukerakoa)",
+  "fieldCreditLimit": "Kreditu-muga (aukerakoa)",
+  "fieldAccountNumber": "Kontu-zenbakia (aukerakoa)",
+  "fieldNotes": "Oharrak (aukerakoa)",
+  "fieldUrl": "URLa (aukerakoa)",
+  "fieldUsername": "Erabiltzaile-izena",
+  "fieldPassword": "Pasahitza",
+  "fieldSeparator": "Bereiztailea",
+  "fieldFolder": "Karpeta",
+  "fieldLabel": "Etiketa",
+  "fieldValue": "Balioa",
+  "fieldCustomFields": "Eremu pertsonalizatuak",
+  "fieldLabelOptional": "{label} (aukerakoa)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Sarrera mota hau oraindik ez dago onartuta.",
+  "csvColumnNone": "(bat ere ez)",
+  "csvPreviewLabel": "Aurrebista",
+  "csvImportButton": "Inportatu",
+
+  "gabbroVaultSection": "Gabbro gandegiak",
+  "genericCsvSection": "CSV generikoa",
+
+  "changePassphraseSuccess": "Pasaesaldia aldatuta",
+  "changePassphraseButton": "Pasaesaldia aldatu",
+
+  "continueLabel": "Jarraitu",
+  "protectWithYubiKey": "YubiKey-ekin babestu",
+  "yubiKeySubtitle": "Hardware segurtasun-gakoa (gomendatua)",
+  "accessibilityButton": "Irisgarritasuna",
+
+  "aboutProjectSection": "Proiektua",
+  "aboutLicenceSection": "Lizentzia",
+  "aboutOpenSourceSection": "Kode irekiko osagaiak",
+  "aboutAttributionSection": "Eskertzak",
+
+  "lengthLabel": "Luzera",
+  "wordsLabel": "Hitzak",
+  "generateButton": "Sortu",
+  "usePasswordButton": "Pasahitz hau erabili",
+  "showHidePassword": "Erakutsi",
+
+  "deleteVaultPostDeletion": "Zure gandegiak ezabatu da. Jarraitzeko gandegi berria sortu.",
+
+  "syncFilePassphraseLabel": "Gandegiko pasaesaldia",
+
+  "historyWarning": "Aurreko balio 1 bakarrik gordetzen da. Historia segurtasun-ezarpenen arabera automatikoki ezabatzen da.",
+  "historyCurrent": "Unekoa",
+  "historyPrevious": "Aurrekoa",
+  "historySavedOn": "{date}-(e)an gordeta",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · {expires}-(e)an iraungitzen da",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Inportazio-arazoa ({index}/{total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Mota: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Editatu, zuzendu eta gorde sarrera hau, edo saltatu ukatzeko.",
+
+  "entriesSkipped": "{count, plural, one{1 sarrera saltatu da} other{{count} sarrerak saltatu dira}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Sarrera hauek dagoeneko daude zure gandegian eta ez dira gainidatzi:",
+
+  "syncDeleteEntryContent": "Beste gailu batek «{title}» ezabatu du.\n\nHemen ere ezabatu, ala gorde?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "«{title}» bi gailuetan karpeta ezberdinetan dago.\n\nGailu hau: {local}\nBeste gailua: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Karpetarik gabe gorde",
+  "folderConflictKeepLocal": "«{folder}» gorde",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Karpetarik gabe eraman",
+  "folderConflictMoveIncoming": "«{folder}»-(r)a eraman",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Gandegiak sinkronizatu du — gehituta: {added}, eguneratuta: {updated}, ezabatuta: {deleted}.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Gandegi-fitxategi honek pasaesaldi ezberdina erabiltzen du. Sinkronizazioa pasaesaldi bera duten gandegien artean soilik onartzen da.",
+
+  "reviewSensitiveFields": "Eremu sentikorrak",
+  "reviewOtherFields": "Beste eremuak",
+  "reviewPasswordChanged": "Pasahitza aldatu da",
+  "reviewCvvChanged": "CVV aldatu da",
+  "reviewPinChanged": "PINa aldatu da",
+  "reviewTransactionPasswordChanged": "Transakzio-pasahitza aldatu da",
+  "tooltipShowValues": "Balioak erakutsi",
+  "reviewOld": "Zaharra",
+  "reviewNew": "Berria",
+  "reviewEmpty": "(hutsa)",
+
+  "reviewFieldUrl": "URLa",
+  "reviewFieldNotes": "Oharrak",
+  "reviewFieldContent": "Edukia",
+  "reviewFieldEmail": "Emaila",
+  "reviewFieldPhone": "Telefonoa",
+  "reviewFieldAddress": "Helbidea",
+  "reviewFieldCardLabel": "Txartelaren izena",
+  "reviewFieldStatus": "Egoera",
+  "reviewFieldCardholder": "Txartel-jabea",
+  "reviewFieldExpiry": "Iraungipena",
+  "reviewFieldCreditLimit": "Kreditu-muga",
+  "reviewFieldAccountNumber": "Kontu-zenbakia",
+  "reviewFieldNetwork": "Sarea",
+  "reviewFieldBank": "Bankua",
+  "reviewFieldFilename": "Fitxategiaren izena",
+  "reviewFieldSize": "Tamaina",
+  "reviewFieldCardNumber": "Zenbakia",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Transakzio-pasahitza",
+  "timestampCreated": "Sortuta",
+  "timestampUpdated": "Eguneratuta",
+  "timestampUnknown": "Ezezaguna",
+  "noTitleFallback": "(izenbururik gabe)",
+  "tooltipExportFile": "Fitxategia esportatu",
+  "tooltipEditEntry": "Sarrera editatu",
+  "tooltipDeleteEntry": "Sarrera ezabatu",
+  "exportLabel": "Esportazioa",
+  "customEntryFieldsHeader": "Eremuak",
+  "copiedNeverClears": "Kopiatuta — arbela ez da inoiz automatikoki garbitzen",
+  "copiedClears30s": "Kopiatuta — arbela 30 s-tan garbituko da",
+  "copiedClears60s": "Kopiatuta — arbela 60 s-tan garbituko da",
+  "copiedClears2min": "Kopiatuta — arbela 2 minututan garbituko da",
+
+  "passwordBreakdownTitle": "Pasahitzaren azterketa",
+  "charTypeUppercase": "Letra larriak",
+  "charTypeLowercase": "Letra xeheak",
+  "charTypeDigit": "Zenbakiak",
+  "charTypeSymbol": "Ikurra",
+
+  "exportIncludeDate": "Data fitxategi-izenean sartu",
+  "exportChooseFormat": "Aukeratu esportazio-formatua.",
+  "exportUnencryptedWarning": "Guztiz enkriptatu gabe — sekretu guztiak testu arrunt gisa idatziko dira. Gorde fitxategia seguru eta ezabatu erabili ondoren.",
+  "exportPassphraseOnlyNote": "Pasaesaldiarekin soilik babestuta. Inportatzeko ez da YubiKey behar.",
+  "exportChooseDestinationJson": "Aukeratu esportatutako JSON fitxategirako helburua.",
+  "exportChooseDestinationVault": "Aukeratu esportatutako gandegi-fitxategirako helburua.",
+  "exportTwoFilesNote": "Bi fitxategi sortuko dira: vault.gabbro eta vault.gabbro.sha256",
+  "exportSelectDestination": "Aukeratu helburua.",
+
+  "aboutVersion": "{version} bertsioa",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Kuantoarekin osteko pasahitz-kudeatzailea",
+  "aboutSourceCode": "Iturburu-kodea",
+  "aboutReportIssue": "Arazoa jakinarazi",
+  "aboutSupportGabbro": "Gabbro lagundu",
+  "aboutLicenceBody": "Gabbro kode irekiko software librea da, GNU General Public License v3.0 only (GPL-3.0-only) lizentziapean.\n\nLizentziaren baldintzen arabera aplikazio hau erabiltzeko, ikasteko eta banatzeko askatasuna duzu.",
+  "aboutOwnerRole": "Proiektu-jabea, arkitektoa eta garatzaile nagusia:",
+  "aboutAiPartner": "AI garapen-partnerra:",
+  "aboutNoTelemetry": "Gabbro-k ez du kanpoko sare-konexiorik ezartzen. Telemetriarik, analisiarik edo konturik ez.",
+
+  "strengthTierTerrible": "Oso ahula",
+  "strengthTierWeak": "Ahula",
+  "strengthTierFair": "Normala",
+  "strengthTierStrong": "Sendoa",
+  "strengthTierVeryStrong": "Oso sendoa",
+  "strengthTierExcellent": "Bikaina",
+  "yubiKeyProtectedNote": "YubiKey-ekin babestutako gandegiak — gakoaren lotura gordeko da.",
+  "yubiKeyPinRequired": "YubiKey PINa behar da",
+  "tapYubiKeyNow": "Orain ukitu zure YubiKey…",
+  "touchYubiKeyToAuthorize": "Aldaketa baimendu YubiKey ukituz.",
+  "currentPassphraseRequired": "Uneko pasaesaldia behar da",
+  "newPassphraseRequired": "Pasaesaldi berria behar da",
+  "passphraseTooWeak": "Pasaesaldia ahulegia da",
+  "confirmPassphraseRequired": "Berretsi pasaesaldi berria",
+  "passphrasesDoNotMatch": "Pasaesaldiak ez datoz bat",
+  "passphrasesMatch": "✓ Pasaesaldiak bat datoz",
+  "passphrasesNoMatch": "✗ Pasaesaldiak ez datoz bat",
+  "entropyDisplay": "{tier} · {bits} bit",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Garraioa-errorea.",
+  "authorizationFailed": "Baimena huts egin du — egiaztatu PINa eta saiatu berriro.",
+
+  "unlockEnterPassphraseAndPin": "Sartu pasaesaldia eta YubiKey PINa desblokeatzeko",
+  "unlockEnterPassphrase": "Sartu pasaesaldia desblokeatzeko",
+  "unlockEntropyDisplay": "{tier} · {bits} bit entropia",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Sartu YubiKey eta ukitu keinuka dagoenean",
+  "unlockErrorPassphrase": "Ezin da gandegiak desblokeatu. Egiaztatu pasaesaldia.",
+  "unlockErrorPassphraseAndPin": "Ezin da gandegiak desblokeatu. Egiaztatu pasaesaldia eta YubiKey PINa.",
+
+  "importSelectFile": "Hautatu fitxategi bat.",
+  "importFileNotFound": "Fitxategia ez da aurkitu.",
+  "importEnterPassphrase": "Sartu gandegi honetako pasaesaldia.",
+  "importDuplicateWarning": "UUIDs zure gandegian dagoeneko dauden sarrerak automatikoki saltatuko dira. Laburpena erakutsiko da.",
+  "importGabbroSubtitle": "Beste Gabbro gandegi batetik sarrerak sinkronizatu (.gabbro fitxategia)",
+  "importEnpassSubtitle": "Enpass-etiko JSON esportazioa (Tresnak → Esportatu)",
+  "importBitwardenSubtitle": "Bitwarden-etiko JSON enkriptatu gabeko esportazioa (Tresnak → Gandegi esportatu)",
+  "importCsvSubtitle": "Edozein pasahitz-kudeatzailetik CSV esportazioa",
+
+  "vaultNameAlreadyExists": "«{alias}» izeneko gandegiak dagoeneko badago.",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Honek «{alias}» eta bere datu guztiak betiko ezabatuko ditu.\n\nFitxategia: {path}\n\nEkintza hau ezin da desegin.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Honek «{alias}» eta bere YubiKey lotura betiko ezabatuko ditu.\n\nFitxategia: {path}\n\nEkintza hau ezin da desegin.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Sartu PINa eta ukitu YubiKey ezabaketari baimena emateko.",
+  "deleteVaultTooltip": "Gandegi ezabatu",
+
+  "yubiKeySecurityWarning": "Segurtasun abisua",
+  "removeYubiKeyTitle": "YubiKey kendu",
+  "yubiKeyLastKeyRiskWarning": "ABISUA: geratzen den gakoa galdu, kaltetutu edo lapurtuko balitz, gandegirako sarbidea betirako galduko litzateke. Ez dago berreskuratze-aukerarik.",
+  "onlyOneKeyRegisteredWarning": "Gako bakarra erregistratuta dago. Gako hau galtzekotan, gandegirako sarbidea betirako galduko litzateke.",
+  "tapRegisterNfc": "Erregistratzeko, hurbildu gakoa telefonora",
+  "tapRegisterUsb": "Konektatu ondoren, ukitu gakoa erregistratzeko",
+  "tapActivateNfc": "Aktibatzeko, hurbildu gakoa telefonora berriro",
+  "tapActivateUsb": "Konektatu ondoren, ukitu gakoa berriro aktibatzeko",
+  "failedToRegisterKey": "Gakoa erregistratzeak huts egin du: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Gakoa aktibatzeak huts egin du: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "{index} gakoa",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Ukitu YubiKey berria erregistratzeko…",
+  "tapYubiKeyToActivate": "Ukitu YubiKey berria berriro aktibatzeko…",
+  "editAliasTooltip": "Ezizena editatu",
+  "cannotRemoveLastKey": "Azken gakoa ezin da kendu",
+  "removeKeyTooltip": "Gakoa kendu",
+  "manageYubiKeysError": "Errorea: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klasikoa",
+  "generatorModePassphrase": "Pasaesaldia",
+  "charSetsHeader": "Karaktere-multzoak",
+  "languageHeader": "Hizkuntza",
+  "separatorLabel": "Bereiztailea",
+  "capitaliseWords": "Hitzak letra larriz",
+  "appendDigit": "Zenbakia gehitu",
+  "entropyBitsDisplay": "~{bits} bit entropia",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Hautatu gutxienez karaktere-multzo bat",
+  "passwordMinLengthNote": "Pasahitzek gutxienez 32 karaktere dituzte. Webguneak muga laburragoa badu, kopiatu beharrezko lehen karaktereak.",
+  "excludeAmbiguousChars": "Karaktere anbiguoak baztertu (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Sortu zure gandegiak hasteko.",
+  "onboardingVaultName": "Gandegi-izena",
+  "onboardingAliasRequired": "Ezizena nahitaezkoa da",
+  "onboardingNewVaultLocation": "Gandegi berriaren kokapena (lehengo bera)",
+  "onboardingVaultLocation": "Gandegi-kokapena",
+  "onboardingLoadingPath": "Kargatzen…",
+  "onboardingPathHint": "Gandegi-fitxategiaren bidea",
+  "onboardingPathRequired": "Bidea nahitaezkoa da",
+  "onboardingReusePassphraseHint": "Aukeratu pasaesaldi nagusi berria edo berrerabili aurrekoa.",
+  "onboardingPassphraseRequired": "Pasaesaldia nahitaezkoa da",
+  "onboardingConfirmRequired": "Berretsi pasaesaldia",
+  "onboardingPrimaryKeyPin": "Lehen gakoko PINa",
+  "onboardingBackupKeyPin": "Babeskopia-gakoko PINa",
+  "onboardingKeyNPin": "{n} gakoko PINa",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "YubiKey bakoitza bi aldiz ukituko duzu (guztira 4 aldiz). Bi gakoen artean, trukatzeko eskatuko zaizu.",
+  "onboardingYubikeySlowNote": "YubiKey-ekin gandegiak sortzeak 20-30 segundo behar ditu. Aplikazioa ez erantzuten ariko dela dirudi — hori normala da.",
+  "onboardingStep1Label": "Lehen gakoa erregistratu",
+  "onboardingStep1Hint": "Orain ukitu YubiKey",
+  "onboardingStep2Label": "Lehen gakoa aktibatu",
+  "onboardingStep2Hint": "Berriro ukitu YubiKey",
+  "onboardingStep3Label": "Aldatu babeskopia-gakora",
+  "onboardingStep3Hint": "Atera lehen gakoa eta sartu babeskopia YubiKey",
+  "onboardingStep4Label": "Babeskopia-gakoa erregistratu",
+  "onboardingStep4Hint": "Ukitu babeskopia YubiKey",
+  "onboardingStep5Label": "Babeskopia-gakoa aktibatu",
+  "onboardingStep5Hint": "Azken aldiz ukitu babeskopia YubiKey",
+
+  "textSizePreview": "Gabbro Mg eta Fe aberatsa den egitura larrikorreko arrisku intrusiboa da.",
+
+  "fieldCardStatus": "Egoera",
+  "fieldPaymentNetwork": "Ordainketa-sarea",
+
+  "cardStatusActive": "Aktibo",
+  "cardStatusLapsed": "Iraungita",
+  "cardStatusInactive": "Inaktibo",
+
+  "validatorTitleRequired": "Izenburua nahitaezkoa da",
+  "validatorUsernameRequired": "Erabiltzaile-izena nahitaezkoa da",
+  "validatorPasswordRequired": "Pasahitza nahitaezkoa da",
+  "validatorContentRequired": "Edukia nahitaezkoa da",
+  "validatorFirstNameRequired": "Izena nahitaezkoa da",
+  "validatorLastNameRequired": "Abizena nahitaezkoa da",
+  "validatorCardLabelRequired": "Txartelaren izena nahitaezkoa da",
+  "validatorCardholderRequired": "Txartel-jabearen izena nahitaezkoa da",
+  "validatorCardNumberRequired": "Txartel-zenbakia nahitaezkoa da",
+  "validatorCardNumberLength": "Txartel-zenbakiak 6-19 zifra izan behar ditu",
+  "validatorExpiryRequired": "Iraungipena nahitaezkoa da",
+  "validatorExpiryFormat": "Erabili HH/UU formatua",
+  "validatorExpiryMonth": "Hilabeteak 01-12 artean egon behar du",
+  "validatorCvvLength": "CVV-k 3 edo 4 zifra izan behar ditu",
+  "validatorLabelRequired": "Etiketa nahitaezkoa da",
+  "validatorStatusRequired": "Egoera nahitaezkoa da",
+
+  "sectionBiometricUnlock": "Desblokeo biometrikoa",
+  "biometricUnlockDescription": "Erabili hatz-marka edo aurpegia gandegiak desblokeatzeko pasaesaldia sartu beharrean.",
+  "biometricUnlockTitle": "Desblokeo biometrikoa gaitu",
+  "biometricUnlockNote": "Gailu honetan erregistratutako datu biometriko guztiak erabilgarri egongo dira — erregistroan erabilitakoak soilik ez.",
+  "biometricUnavailable": "Desblokeo biometrikoa ez dago erabilgarri gailu honetan. Ez da sensor biometrikorik aurkitu edo sistema-ezarpenetan ez daude datu biometrikoak erregistratuta.",
+  "biometricDialogTitle": "Desblokeo biometrikoari buruz",
+  "biometricDialogBody": "Gaituta dagoenean, Gabbro-k pasaesaldi nagusia enkriptatuko du eta gailu honetan gordeko du, zure datu biometrikoekin babestuta. Pasaesaldia desblokeo garaian soilik deszifratu egiten da.\n\nGabbro-k ez ditu inoiz hatz-marken edo aurpegiaren datuak gordetzen — telefonoaren chip seguruan geratzen dira.",
+  "biometricDialogAllBiometrics": "Gailu honetan erregistratutako datu biometriko guztiek Gabbro desblokeatu ahal izango dute — ezin da hatz-marka jakin batera mugatu.",
+  "biometricDialogInvalidation": "Telefono honetara datu biometriko berriak gehitzen badira (bigarren hatz-marka barne), ezarpen hau automatikoki desgaituko da eta berriro konfiguratu beharko da.",
+  "biometricDialogRecommendation": "Gomendioa: utzi desgaituta mehatxu-eredu altua baduzu edo gailu hau partekatzen baduzu.",
+  "biometricInvalidated": "Desblokeo biometrikoa desgaitu da gailu honetako datu biometrikoak aldatu direlako (sistema-ezarpenetan hatz-marka edo aurpegi berria gehitu da). Hori segurtasun-neurria da. Sartu pasaesaldia berriro eta berriro gaitu desblokeo biometrikoa.",
+  "useBiometrics": "Biometria erabili",
+  "biometricCancelled": "Egiaztapen biometrikoa ez da osatu. Sartu pasaesaldia desblokeatzeko.",
+  "biometricEnrollTitle": "Pasaesaldia sartu",
+  "biometricEnrollDescription": "Sartu pasaesaldi nagusia desblokeo biometrikoa gaitzeko.",
+  "biometricYubikeyHint": "Idatzi YubiKey PINa behean, egin klik «Biometria erabili»-n, gero ukitu YubiKey.",
+
+  "helpTitle": "Laguntza",
+  "menuHelp": "Laguntza",
+  "helpCaptionCreate": "Sortu gandegiak: sartu izena, pasaesaldia eta aukeran babestu YubiKey-ekin",
+  "helpCaptionEmpty": "+ sakatu lehen sarrera gehitzeko",
+  "helpCaptionDetail": "Sakatu begi-ikonoa pasahitza ikusteko, gero luze sakatu karaktereen azterketa zehatza ikusteko",
+  "helpCaptionTitleSearch": "Lehenespenez: bilaketa-barrak sarrera-izenburuak bakarrik bilatzen ditu",
+  "helpCaptionFullSearch": "Sakatu lupa eremu guztiak bilatzeko; berriro sakatu izenburuaren araberako bilaketa itzultzeko",
+  "helpCaptionFilter": "Erabili iragazki-botoiak mota jakineko sarrerak soilik ikusteko",
+  "helpCaptionFolders": "Erabili karpeta hautaketa sarrerak karpetaren arabera iragazteko",
+  "helpCaptionSelect": "Luze sakatu sarreran hautaketa-modura sartzeko; gehitu elementu gehiago, gero esleitu karpetari edo ezabatu. Sakatu X irteteko.",
+  "helpCaptionJumpToLetter": "Sakatu indize-barrako letra atal horretara joateko",
+  "helpCaptionBreakdown": "Sakatu begi-ikonoa pasahitza ikusteko, gero luze sakatu karaktereen azterketa zehatza ikusteko",
+  "helpCaptionManageVaults": "«Gandegiak kudeatu»-n gandegiak berrizendatu edo ezabatu ditzakezu, edo berria gehitu",
+  "helpCaptionUnlock": "Sartu pasaesaldia gandegiak desblokeatzeko"
+}
