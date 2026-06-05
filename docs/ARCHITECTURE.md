@@ -159,7 +159,10 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Next session
 
-Next task: release **v0.1.0-alpha.5** (full `cargo test -q` + `flutter test` gate, then tag + artifacts). Bundles: in-app help carousel, Phases 1–3 (dependency audit, licence audit, header integrity / VERSION 7).
+Next tasks (in order):
+
+1. **Multi-language expansion** — language picker UI refactor (chips → scrollable list / dropdown) then 26 new ARB files; Flutter-only. See § Multi-language expansion below.
+2. **Release v0.1.0-alpha.5** — full `cargo test -q` + `flutter test` gate (both green), then tag + artifacts. Bundles: in-app help carousel, Phases 1–3 (dependency audit, licence audit, header integrity / VERSION 7), multi-language expansion.
 
 ### Open from the security audit
 
@@ -173,25 +176,66 @@ Everything else (F-01, F-02, F-04–F-09, F-11, L-6) is done — see the audit d
 
 ---
 
-#### Adding a language after v1 (n+1 cost)
+### Multi-language expansion
 
-Adding a further language is cheap — **not** a full session:
+**Current 5:** EN · DE · ES · FR · IT
 
-- One new `lib/l10n/app_XX.arb` file (~430 translated key-value pairs)
-- 2 lines of code: add locale to `supportedLocales` and to the in-app picker list
-- Run `flutter gen-l10n` + `flutter test`
-- Estimated effort: **20–30 minutes per language** (Claude generates translations; user spot-checks)
+**Target: 26 new locales — Flutter-only (Steps 1–2)**
 
-Confidence varies by language family:
+#### Step 1 — UI prerequisite (Flutter)
 
-| Language                          | Confidence  | Notes                                                             |
-|-----------------------------------|-------------|-------------------------------------------------------------------|
-| Norwegian (Bokmål), Swedish, Dutch| High        | Close to German/English; translations are reliable                |
-| Portuguese, Romanian              | High        | Close to Spanish/French                                           |
-| Polish, Czech, Slovak             | Medium      | Good training data; Slavic case system warrants native spot-check |
-| Hungarian, Finnish, Estonian      | Medium-Low  | Uralic grammar differs structurally; more likely to need review   |
+The current chip / segmented-row language picker does not scale beyond ~6 options. Replace with a scrollable list or dropdown **before** adding new locales. Affected:
 
-Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}}` syntax — no extra plumbing needed. Right-to-left languages (Arabic, Hebrew) would require additional layout-mirroring work and are out of scope for v1.
+- `lib/screens/language_screen.dart` (Settings → Language)
+- Any first-run language selection in the unlock / onboarding flow
+
+#### Step 2 — ARB files + wiring (Flutter-only)
+
+For each locale: one `lib/l10n/app_XX.arb` (~430 key-value pairs) + 1 entry in `supportedLocales` + 1 entry in the language picker. Run `flutter gen-l10n` + `flutter test` after each batch.
+
+| Locale | Language | Confidence | Notes |
+|--------|----------|------------|-------|
+| `pt_PT` | Portuguese (European) | High | |
+| `pt_BR` | Portuguese (Brazilian) | High | Separate ARB; distinct vocab from PT |
+| `da` | Danish | High | |
+| `nb` | Norwegian Bokmål | High | |
+| `nn` | Norwegian Nynorsk | Medium-High | Watch for Bokmål creep |
+| `sv` | Swedish | High | |
+| `fi` | Finnish | Medium | Strings may run long |
+| `et` | Estonian | Medium | Finnic/Uralic; close to Finnish |
+| `hu` | Hungarian | Medium-Low | Complex case system |
+| `lt` | Lithuanian | Medium | |
+| `lv` | Latvian | Medium | |
+| `ru` | Russian | Medium-High | Cyrillic |
+| `uk` | Ukrainian | Medium-High | Cyrillic |
+| `bg` | Bulgarian | Medium-High | Cyrillic; EU official |
+| `pl` | Polish | Medium | |
+| `cs` | Czech | Medium | |
+| `sk` | Slovak | Medium | |
+| `hr` | Croatian | Medium | |
+| `sl` | Slovenian | Medium | EU official |
+| `sr_Latn` | Serbian (Latin) | Medium | Latin script; politically neutral across BCS region |
+| `el` | Greek | High | |
+| `ja` | Japanese | High | Strings typically more compact |
+| `ko` | Korean | High | |
+| `zh_CN` | Chinese Simplified | High | Mainland China, Singapore |
+| `zh_TW` | Chinese Traditional | High | Taiwan, HK, Macau |
+| `kk` | Kazakh | Medium-Low | Cyrillic; native reviewer to check before commit |
+
+**Deferred:** Hebrew (RTL layout work required), Scottish Gaelic (low resource), Basque (low resource), Yoruba (low resource), Arabic (RTL).
+
+Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}}` syntax — no extra plumbing needed.
+
+#### Step 3 — Passphrase generator language expansion (Rust + Flutter, separate task)
+
+The passphrase generator uses EFF-style wordlists compiled into the Rust binary at build time (`include_str!`). Expanding it to match the UI language list is **not** Flutter-only:
+
+- Source or create a wordlist (minimum ~7776 words) per language — feasibility varies
+- Nordic / Slavic / Baltic / Greek: suitable public wordlists likely exist
+- CJK: different character-selection model; needs a design decision before implementation
+- Kazakh: may require wordlist creation or sourcing
+- Add new `Language` enum variants in `rust/src/api/passphrase_generator.rs`, embed wordlists, regenerate bridge
+- Tracked in Bikeshed → Features & UX
 
 ---
 
@@ -244,6 +288,7 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - Add import from Google Password Manager functionality
 - Add import from Dashlane Password Manager functionality
+- Passphrase generator language expansion: extend the passphrase wordlist selector to match the 26-locale UI language list (see § Multi-language expansion Step 3). Rust work — source / create EFF-style wordlists, extend `Language` enum, re-embed, regenerate bridge. CJK and some low-resource locales need a design decision. Prerequisite: UI language expansion (Step 2) already merged.
 
 ### Code Quality
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
@@ -257,7 +302,6 @@ Non-trivial plural rules use ARB's built-in `{count, plural, one{…} other{…}
 - Data breach alerts / HaveIBeenPwned integration.
 - Panic button / app hiding on mobile.
 - Remote app / vault deletion.
-- Non-ASCII wordlists (CJK) for passphrase generator.
 - Custom and hideable filter chips (post-v1 user feedback gate).
 - Tablet list pane width: draggable divider.
 - Cross-layer integration tests (`integration_test/` + Rust `tests/` crate). YAGNI: if users file bugs, those become the organic integration test suite.
