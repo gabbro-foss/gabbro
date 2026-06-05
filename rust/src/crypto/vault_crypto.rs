@@ -1412,7 +1412,7 @@ mod tests {
         let new_hmac = [0x77u8; 32];
         let new_salt = [0x88u8; 32];
 
-        let new_sealed = add_key_to_sealed(
+        let mut new_sealed = add_key_to_sealed(
             &sealed,
             new_cred_id.clone(),
             &new_hmac,
@@ -1421,6 +1421,9 @@ mod tests {
             &master,
         )
         .unwrap();
+
+        // The header changed (3 records now); re-seal so the new AAD matches.
+        reseal_vault_body(&mut new_sealed, &master, plaintext).unwrap();
 
         let (recovered, _, _) =
             open_vault_with_key_record(b"passphrase", &new_hmac, &new_cred_id, &new_sealed)
@@ -1616,7 +1619,20 @@ mod tests {
         let keys = two_test_keys();
         let plaintext = b"still readable after removal";
         let sealed = seal_vault_with_keys(b"passphrase", &keys, plaintext, None).unwrap();
-        let new_sealed = remove_key_from_sealed(&sealed, &keys[0].credential_id).unwrap();
+
+        // Unlock first to obtain vault_key_master needed for re-sealing.
+        let (_, master, _) = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+
+        let mut new_sealed = remove_key_from_sealed(&sealed, &keys[0].credential_id).unwrap();
+
+        // The header changed (1 record now); re-seal so the new AAD matches.
+        reseal_vault_body(&mut new_sealed, &master, plaintext).unwrap();
 
         let (recovered, _, _) = open_vault_with_key_record(
             b"passphrase",
