@@ -29,7 +29,7 @@ Named after the intrusive igneous rock — hard, stable, enduring.
 - **Local-first** — your vault lives on your device; sync is your
   choice and your responsibility
 - **Localised** — UI available in 33 languages (EN, FR, DE, IT, ES, and 28 more); follows system locale with in-app override
-- **Multi-language passphrase generator** — 20-language wordlist library; classic generator uses language-native character pools (Greek, Cyrillic)
+- **Multi-language passphrase generator** — 20-language wordlist library; classic generator uses language-native character pools (Greek, Cyrillic, Hiragana/Katakana, Hangul, CJK)
 - **In-app help** — offline help carousel; no external website or internet connection required
 - **FOSS** — GPL-3.0-only licensed
 

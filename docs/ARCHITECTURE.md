@@ -148,8 +148,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | ~374 | 8 |
-| Flutter (`flutter test`) | 496 | 0 |
+| Rust (`cargo test -q`) | ~380 | 8 |
+| Flutter (`flutter test`) | 499 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -162,27 +162,8 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Next session
 
-**Step 1 — Hardware test** (validates the current commits; no code changes expected).  
-Test matrix for the multi-language generator changeset on Android:
-1. Generator screen — language picker visible in both Classic and Passphrase modes at all times.
-2. Classic mode — pick Greek → Greek characters in output; pick Russian → Cyrillic; pick English → Latin.
-3. App language set to Greek (Settings → Language → Ελληνικά) → generator opens with Greek pre-selected and Greek characters immediately (no user interaction required).
-4. App language set to unsupported locale (e.g. Croatian) → `passphraseNoWordlist` info message visible below the picker.
-5. Passphrase mode — generate in each of the 20 languages; entropy display updates correctly.
-6. Manage Folders screen — info note visible at top in the active locale.
-7. About screen — `diceware-wordlist-bg` and `Diceware-word-lists (et)` listed with CC-BY-4.0.
-
-**Step 2 — CJK language variants** (after hardware test passes).  
-Add to `Language` enum: `Japanese`, `Korean`, `ChineseSimplified`, `ChineseTraditional`.  
-Approved character sets:
-- Japanese: Hiragana (あ–ん, 46 chars) = lowercase pool; Katakana (ア–ン, 46 chars) = uppercase pool.
-- Korean: KS X 1001 Level 1 syllables (2350 chars) as a combined pool.
-- Chinese Simplified + Traditional: GB2312 Level 1 (3755 chars) for both.
-
-Files to update: `rust/src/api/types.rs` (enum), `rust/src/api/password_generator.rs` (pools), bridge regen, `_languageLabel` and `_languageChoiceToLanguage` and `_systemLocaleToLanguage` and `_poolSize` in `generator_widget.dart`.
-
-**Step 3 — Release v0.1.0-alpha.5** (after CJK and full test gate).  
-Full `cargo test -q` + `flutter test` + `cargo clippy -- -D warnings` all green, then tag + artifacts.  
+**Step 3 — Release v0.1.0-alpha.5** (full test gate, then tag + artifacts).  
+Full `cargo test -q` + `flutter test` + `cargo clippy -- -D warnings` all green.  
 Bundles: in-app help carousel, Phases 1–3, multi-language expansion (33 UI locales + 20-language passphrase + CJK classic pools).
 
 ### Open from the security audit
@@ -276,6 +257,17 @@ Notes: et (7052) and bg (7527) are slightly under 7776 — source files contain 
 - `about_screen.dart`: CC-BY-4.0 attribution for `et` and `bg` wordlist sources.
 - All 34 ARB locales updated with `passphraseNoWordlist` and `manageFoldersDefaultNote`.
 
+#### Step 4 — CJK classic-mode pools: COMPLETE
+
+`Language` enum extended to 24 variants: + `Japanese`, `Korean`, `ChineseSimplified`, `ChineseTraditional`.
+
+Character pools (classic mode only — no passphrase wordlists exist for CJK):
+- Japanese uppercase → Katakana ア–ン (46 chars); lowercase → Hiragana あ–ん (46 chars).
+- Korean uppercase/lowercase → combined Hangul syllables U+AC00–U+B52D (2350 chars).
+- Chinese Simplified + Traditional → combined CJK Unified Ideographs U+4E00–U+5CAA (3755 chars).
+
+`_hasPassphraseWordlist()` added to `generator_widget.dart`; `_showLangFallback` now also fires for CJK so the "no wordlist" info message appears in passphrase mode. `_poolSize()` handles combined-pool languages (Korean/Chinese counted once regardless of uppercase+lowercase selection). TDD: 6 new Rust tests + 3 new Dart tests. Bridge regenerated.
+
 ---
 
 ## Build Environment
@@ -327,7 +319,6 @@ Notes: et (7052) and bg (7527) are slightly under 7776 — source files contain 
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 - Add import from Google Password Manager functionality
 - Add import from Dashlane Password Manager functionality
-- Passphrase generator: CJK language variants (Japanese, Korean, Chinese Simplified/Traditional) need adding to Language enum + character pools in password_generator.rs + bridge regen. See discussion in session for approved character sets (Hiragana+Katakana, KS X 1001 Level 1 syllables, GB2312 Level 1 chars).
 
 ### Code Quality
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
