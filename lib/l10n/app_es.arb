@@ -559,6 +559,7 @@
   "charTypeLowercase": "Minúscula",
   "charTypeDigit": "Dígito",
   "charTypeSymbol": "Símbolo",
+  "charTypeLetter": "Letra",
 
   "exportIncludeDate": "Incluir fecha en el nombre de archivo",
   "exportChooseFormat": "Elige un formato de exportación.",

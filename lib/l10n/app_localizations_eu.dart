@@ -1218,6 +1218,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get charTypeSymbol => 'Ikurra';
 
   @override
+  String get charTypeLetter => 'Letra';
+
+  @override
   String get exportIncludeDate => 'Data fitxategi-izenean sartu';
 
   @override

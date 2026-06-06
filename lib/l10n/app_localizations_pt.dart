@@ -1218,6 +1218,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get charTypeSymbol => 'Símbolo';
 
   @override
+  String get charTypeLetter => 'Letra';
+
+  @override
   String get exportIncludeDate => 'Incluir data no nome do arquivo';
 
   @override
@@ -3006,6 +3009,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get charTypeSymbol => 'Símbolo';
+
+  @override
+  String get charTypeLetter => 'Letra';
 
   @override
   String get exportIncludeDate => 'Incluir data no nome do arquivo';
@@ -4798,6 +4804,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get charTypeSymbol => 'Símbolo';
+
+  @override
+  String get charTypeLetter => 'Letra';
 
   @override
   String get exportIncludeDate => 'Incluir data no nome do ficheiro';

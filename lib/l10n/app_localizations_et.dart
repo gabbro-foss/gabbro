@@ -1219,6 +1219,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get charTypeSymbol => 'Sümbol';
 
   @override
+  String get charTypeLetter => 'Täht';
+
+  @override
   String get exportIncludeDate => 'Lisa kuupäev faili nimesse';
 
   @override

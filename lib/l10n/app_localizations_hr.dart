@@ -1217,6 +1217,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get charTypeSymbol => 'Simbol';
 
   @override
+  String get charTypeLetter => 'Slovo';
+
+  @override
   String get exportIncludeDate => 'Uključi datum u naziv datoteke';
 
   @override

@@ -1201,6 +1201,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get charTypeSymbol => '기호';
 
   @override
+  String get charTypeLetter => '글자';
+
+  @override
   String get exportIncludeDate => '파일 이름에 날짜 포함';
 
   @override

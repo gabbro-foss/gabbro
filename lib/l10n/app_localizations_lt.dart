@@ -1220,6 +1220,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get charTypeSymbol => 'Simbolis';
 
   @override
+  String get charTypeLetter => 'Raidė';
+
+  @override
   String get exportIncludeDate => 'Įtraukti datą į failo pavadinimą';
 
   @override

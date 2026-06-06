@@ -3,12 +3,14 @@ import 'dart:ui' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 
-enum _CharType { uppercase, lowercase, digit, symbol }
+enum _CharType { uppercase, lowercase, digit, letter, symbol }
 
 _CharType _classify(String ch) {
-  if (RegExp(r'[A-Z]').hasMatch(ch)) return _CharType.uppercase;
-  if (RegExp(r'[a-z]').hasMatch(ch)) return _CharType.lowercase;
-  if (RegExp(r'[0-9]').hasMatch(ch)) return _CharType.digit;
+  if (RegExp(r'\p{Lu}', unicode: true).hasMatch(ch)) return _CharType.uppercase;
+  if (RegExp(r'\p{Ll}', unicode: true).hasMatch(ch)) return _CharType.lowercase;
+  if (RegExp(r'\p{Nd}', unicode: true).hasMatch(ch)) return _CharType.digit;
+  // Catches Lo/Lt/Lm: CJK ideographs, Arabic, Hebrew, etc. — letters without case.
+  if (RegExp(r'\p{L}', unicode: true).hasMatch(ch)) return _CharType.letter;
   return _CharType.symbol;
 }
 
@@ -16,6 +18,7 @@ const _kSymbol = {
   _CharType.uppercase: '▲',
   _CharType.lowercase: '▼',
   _CharType.digit: '●',
+  _CharType.letter: '◆',
   _CharType.symbol: '■',
 };
 
@@ -23,6 +26,7 @@ String _labelFor(_CharType t, AppLocalizations l) => switch (t) {
   _CharType.uppercase => l.charTypeUppercase,
   _CharType.lowercase => l.charTypeLowercase,
   _CharType.digit     => l.charTypeDigit,
+  _CharType.letter    => l.charTypeLetter,
   _CharType.symbol    => l.charTypeSymbol,
 };
 
@@ -30,6 +34,7 @@ const _kExample = {
   _CharType.uppercase: 'A',
   _CharType.lowercase: 'a',
   _CharType.digit: '7',
+  _CharType.letter: '字',
   _CharType.symbol: r'$',
 };
 
@@ -39,6 +44,7 @@ Color _colorFor(_CharType t, Brightness brightness) {
     _CharType.uppercase => Color(dark ? 0xFF90CAF9 : 0xFF1565C0),
     _CharType.lowercase => Color(dark ? 0xFFA5D6A7 : 0xFF2E7D32),
     _CharType.digit     => Color(dark ? 0xFFFFAB40 : 0xFFE65100),
+    _CharType.letter    => Color(dark ? 0xFF80DEEA : 0xFF00838F),
     _CharType.symbol    => Color(dark ? 0xFFCE93D8 : 0xFF6A1B9A),
   };
 }

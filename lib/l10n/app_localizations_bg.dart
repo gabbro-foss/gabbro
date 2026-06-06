@@ -1220,6 +1220,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get charTypeSymbol => 'Символ';
 
   @override
+  String get charTypeLetter => 'Буква';
+
+  @override
   String get exportIncludeDate => 'Включи дата в името на файла';
 
   @override

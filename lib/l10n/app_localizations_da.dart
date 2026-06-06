@@ -1216,6 +1216,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get charTypeSymbol => 'Symbol';
 
   @override
+  String get charTypeLetter => 'Bogstav';
+
+  @override
   String get exportIncludeDate => 'Inkludér dato i filnavn';
 
   @override

@@ -140,6 +140,43 @@ void main() {
       expect(controller.offset, lessThan(afterRight));
     });
 
+    testWidgets('classifies CJK characters as letter, not symbol',
+        (tester) async {
+      // 字 (U+5B57) is Unicode category Lo — has no case.
+      // Before the fix it falls through to symbol (■); after it should be letter (◆).
+      const password = '字A1!';
+
+      await tester.pumpWidget(
+        testApp(Scaffold(
+          body: PasswordBreakdownSheet(password: password),
+        )),
+      );
+
+      // ◆ appears once in the character row (字) + once in the legend = 2.
+      // If CJK were still symbol, ■ would be 4 and ◆ would be 0.
+      expect(find.text('◆'), findsNWidgets(2));
+      expect(find.text('■'), findsNWidgets(2)); // only ! + legend
+    });
+
+    testWidgets('classifies non-Latin uppercase and lowercase correctly',
+        (tester) async {
+      // Cyrillic А (U+0410) = uppercase, а (U+0430) = lowercase, 1 = digit, ! = symbol.
+      // Without unicode-aware classification all non-ASCII letters fall through to symbol.
+      const password = 'Аа1!';
+
+      await tester.pumpWidget(
+        testApp(Scaffold(
+          body: PasswordBreakdownSheet(password: password),
+        )),
+      );
+
+      // Each type symbol appears once in the character row + once in the legend = 2.
+      expect(find.text('▲'), findsNWidgets(2)); // Cyrillic А + legend
+      expect(find.text('▼'), findsNWidgets(2)); // Cyrillic а + legend
+      expect(find.text('●'), findsNWidgets(2)); // digit 1 + legend
+      expect(find.text('■'), findsNWidgets(2)); // symbol ! + legend
+    });
+
     testWidgets('drag gesture scrolls through characters', (tester) async {
       const password = 'Abcdefgh1234!@#\$Abcdefgh1234!@#\$';
 

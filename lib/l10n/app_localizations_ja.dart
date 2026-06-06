@@ -1200,6 +1200,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get charTypeSymbol => '記号';
 
   @override
+  String get charTypeLetter => '文字';
+
+  @override
   String get exportIncludeDate => 'ファイル名に日付を含める';
 
   @override

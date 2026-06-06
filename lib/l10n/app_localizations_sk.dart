@@ -1219,6 +1219,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get charTypeSymbol => 'Symbol';
 
   @override
+  String get charTypeLetter => 'Písmeno';
+
+  @override
   String get exportIncludeDate => 'Zahrnúť dátum do názvu súboru';
 
   @override

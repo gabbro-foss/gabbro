@@ -1216,6 +1216,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get charTypeSymbol => 'Таңба';
 
   @override
+  String get charTypeLetter => 'Әріп';
+
+  @override
   String get exportIncludeDate => 'Файл атауына күн қосу';
 
   @override

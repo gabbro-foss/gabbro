@@ -1218,6 +1218,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get charTypeSymbol => 'Simbols';
 
   @override
+  String get charTypeLetter => 'Burts';
+
+  @override
   String get exportIncludeDate => 'Iekļaut datumu faila nosaukumā';
 
   @override

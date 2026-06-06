@@ -1220,6 +1220,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get charTypeSymbol => 'Символ';
 
   @override
+  String get charTypeLetter => 'Буква';
+
+  @override
   String get exportIncludeDate => 'Включити дату в ім\'я файлу';
 
   @override

@@ -1226,6 +1226,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get charTypeSymbol => 'Symbole';
 
   @override
+  String get charTypeLetter => 'Lettre';
+
+  @override
   String get exportIncludeDate => 'Inclure la date dans le nom de fichier';
 
   @override

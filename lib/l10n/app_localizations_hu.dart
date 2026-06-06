@@ -1215,6 +1215,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get charTypeSymbol => 'Szimbólum';
 
   @override
+  String get charTypeLetter => 'Betű';
+
+  @override
   String get exportIncludeDate => 'Dátum belefoglalása a fájlnévbe';
 
   @override

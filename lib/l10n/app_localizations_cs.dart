@@ -1219,6 +1219,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get charTypeSymbol => 'Symbol';
 
   @override
+  String get charTypeLetter => 'Písmeno';
+
+  @override
   String get exportIncludeDate => 'Zahrnout datum do názvu souboru';
 
   @override

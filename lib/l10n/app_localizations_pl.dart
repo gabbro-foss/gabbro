@@ -1224,6 +1224,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get charTypeSymbol => 'Symbol';
 
   @override
+  String get charTypeLetter => 'Litera';
+
+  @override
   String get exportIncludeDate => 'Dołącz datę do nazwy pliku';
 
   @override

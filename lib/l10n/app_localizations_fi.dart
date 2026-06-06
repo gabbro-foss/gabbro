@@ -1219,6 +1219,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get charTypeSymbol => 'Symboli';
 
   @override
+  String get charTypeLetter => 'Kirjain';
+
+  @override
   String get exportIncludeDate => 'Sisällytä päivämäärä tiedostonimeen';
 
   @override

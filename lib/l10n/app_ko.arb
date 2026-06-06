@@ -559,6 +559,7 @@
   "charTypeLowercase": "소문자",
   "charTypeDigit": "숫자",
   "charTypeSymbol": "기호",
+  "charTypeLetter": "글자",
 
   "exportIncludeDate": "파일 이름에 날짜 포함",
   "exportChooseFormat": "내보내기 형식을 선택하세요.",

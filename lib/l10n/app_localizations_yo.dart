@@ -1213,6 +1213,9 @@ class AppLocalizationsYo extends AppLocalizations {
   String get charTypeSymbol => 'Ami';
 
   @override
+  String get charTypeLetter => 'Lẹ́tà';
+
+  @override
   String get exportIncludeDate => 'Fi ọjọ sinu orukọ faili';
 
   @override

@@ -2387,6 +2387,12 @@ abstract class AppLocalizations {
   /// **'Symbol'**
   String get charTypeSymbol;
 
+  /// No description provided for @charTypeLetter.
+  ///
+  /// In en, this message translates to:
+  /// **'Letter'**
+  String get charTypeLetter;
+
   /// No description provided for @exportIncludeDate.
   ///
   /// In en, this message translates to:

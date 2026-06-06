@@ -1196,6 +1196,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get charTypeSymbol => '符号';
 
   @override
+  String get charTypeLetter => '文字';
+
+  @override
   String get exportIncludeDate => '在文件名中包含日期';
 
   @override
@@ -2913,6 +2916,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get charTypeSymbol => '符号';
 
   @override
+  String get charTypeLetter => '文字';
+
+  @override
   String get exportIncludeDate => '在文件名中包含日期';
 
   @override
@@ -4628,6 +4634,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get charTypeSymbol => '符號';
+
+  @override
+  String get charTypeLetter => '文字';
 
   @override
   String get exportIncludeDate => '在檔案名稱中包含日期';

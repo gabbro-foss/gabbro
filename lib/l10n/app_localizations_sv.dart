@@ -1216,6 +1216,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get charTypeSymbol => 'Symbol';
 
   @override
+  String get charTypeLetter => 'Bokstav';
+
+  @override
   String get exportIncludeDate => 'Inkludera datum i filnamn';
 
   @override

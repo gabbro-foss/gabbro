@@ -1226,6 +1226,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get charTypeSymbol => 'Σύμβολο';
 
   @override
+  String get charTypeLetter => 'Γράμμα';
+
+  @override
   String get exportIncludeDate => 'Συμπερίληψη ημερομηνίας στο όνομα αρχείου';
 
   @override
