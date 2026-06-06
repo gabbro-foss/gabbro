@@ -162,10 +162,28 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Next session
 
-**Passphrase wordlists for deferred languages.**  
-No usable plain-text source found yet for: `hr`, `sr_Latn`, `lt`, `lv`, `kk`, `yo`, `ja`, `ko`, `zh`.  
-Benelux gap: `nl` (Dutch), `lb` (Luxembourgish), and `wa` (Walloon) are not yet in the Language enum — find GPL-3.0-compatible wordlists and add them.  
-Goal: find GPL-3.0-compatible diceware/EFF-style word lists for as many as possible, then wire them in.
+**Passphrase wordlists for deferred languages — research done, wiring pending.**
+
+Drop-in ready (diceware-formatted, correct licence — just wire in):
+- `nl` Dutch — 7,776 words, CC-BY — https://mko.re/diceware/diceware-wordlist-nl.txt
+- `zh_CN` Chinese Simplified — 7,776 words, CC-BY 4.0 — https://github.com/cfbao/chinese-diceware
+
+BIP-39 pools (MIT, 2,048 words each — smaller than full diceware but replaces English fallback):
+- `ja` Japanese — hiragana — https://github.com/bitcoin/bips/blob/master/bip-0039/japanese.txt
+- `ko` Korean — hangul — https://github.com/bitcoin/bips/blob/master/bip-0039/korean.txt
+- `zh_TW` Chinese Traditional — https://github.com/bitcoin/bips/blob/master/bip-0039/chinese_traditional.txt
+
+Needs curation from raw frequency corpus (CC-BY-SA 4.0, hermitdave/FrequencyWords — filter ~50k list to ~7k clean lemmas):
+- `hr` Croatian — also check atoponce/nodepassgen for a pre-curated 9,204-word GPL-3.0 list
+- `lt` Lithuanian — heavily inflected; lemmatisation recommended before use
+- `lv` Latvian — or use LUMII-AILab/Tezaurs (CC-BY-SA 4.0, 315k lemmas, better quality)
+- `kk` Kazakh — smaller corpus, Cyrillic script, script-transition ongoing
+
+Not viable / deferred indefinitely:
+- `yo` Yoruba — CC0 pool exists but no frequency ordering and complex tonal diacritics; low priority
+- `sr_Latn` Serbian Latin — only Cyrillic corpora found; would need transliteration pipeline
+- `lb` Luxembourgish — CC0 LOD dictionary exists (~35k) but needs processing; very small speaker base
+- `wa` Walloon — nothing usable; endangered language; French covers Wallonia — drop from scope
 
 **UI locales deferred** (RTL layout work required): Hebrew, Arabic. Scottish Gaelic deferred (low resource).
 
