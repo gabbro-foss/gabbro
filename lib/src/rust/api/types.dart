@@ -32,4 +32,8 @@ enum Language {
   slovak,
   bulgarian,
   ukrainian,
+  japanese,
+  korean,
+  chineseSimplified,
+  chineseTraditional,
 }

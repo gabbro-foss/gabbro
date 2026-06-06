@@ -64,6 +64,11 @@ fn wordlist_for(language: &Language) -> Vec<&'static str> {
         Language::Slovak => WORDLIST_SK,
         Language::Bulgarian => WORDLIST_BG,
         Language::Ukrainian => WORDLIST_UK,
+        // No wordlist for CJK — callers receive Err("wordlist is empty")
+        Language::Japanese
+        | Language::Korean
+        | Language::ChineseSimplified
+        | Language::ChineseTraditional => "",
     };
     raw.lines().filter(|l| !l.is_empty()).collect()
 }

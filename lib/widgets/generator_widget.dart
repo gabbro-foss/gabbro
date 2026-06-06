@@ -46,6 +46,10 @@ String _languageLabel(Language lang, AppLocalizations l) => switch (lang) {
       Language.slovak => l.langSlovak,
       Language.bulgarian => l.langBulgarian,
       Language.ukrainian => l.langUkrainian,
+      Language.japanese => l.langJapanese,
+      Language.korean => l.langKorean,
+      Language.chineseSimplified => l.langChineseSimplified,
+      Language.chineseTraditional => l.langChineseTraditional,
     };
 
 /// Maps a [LanguageChoice] (app UI locale) to a [Language] (passphrase wordlist
@@ -72,7 +76,22 @@ Language? _languageChoiceToLanguage(LanguageChoice choice) => switch (choice) {
       LanguageChoice.sk => Language.slovak,
       LanguageChoice.bg => Language.bulgarian,
       LanguageChoice.uk => Language.ukrainian,
+      LanguageChoice.ja => Language.japanese,
+      LanguageChoice.ko => Language.korean,
+      LanguageChoice.zhCn => Language.chineseSimplified,
+      LanguageChoice.zhTw => Language.chineseTraditional,
       _ => null, // no wordlist for this LanguageChoice
+    };
+
+/// Returns false for languages that have a classic character pool but no
+/// passphrase wordlist — the generator shows a "no wordlist" info message.
+bool _hasPassphraseWordlist(Language lang) => switch (lang) {
+      Language.japanese ||
+      Language.korean ||
+      Language.chineseSimplified ||
+      Language.chineseTraditional =>
+        false,
+      _ => true,
     };
 
 /// Resolves the device locale language code to a [Language] when the app
@@ -100,6 +119,9 @@ Language? _systemLocaleToLanguage(Locale locale) {
     'sk' => Language.slovak,
     'bg' => Language.bulgarian,
     'uk' => Language.ukrainian,
+    'ja' => Language.japanese,
+    'ko' => Language.korean,
+    'zh' => Language.chineseSimplified,
     _ => null,
   };
 }
@@ -190,7 +212,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
       resolved = _languageChoiceToLanguage(choice);
     }
     final newLanguage = resolved ?? Language.english;
-    final newFallback = resolved == null;
+    final newFallback = resolved == null || !_hasPassphraseWordlist(newLanguage);
     if (newLanguage != _language || newFallback != _showLangFallback) {
       setState(() {
         _language = newLanguage;
@@ -238,18 +260,22 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
   }
 
   Future<void> _generatePassphrase() async {
+    // Fall back to English wordlist for languages that have a classic pool but
+    // no passphrase wordlist (CJK). The message already tells the user this.
+    final passphraseLanguage =
+        _hasPassphraseWordlist(_language) ? _language : Language.english;
     final config = PassphraseConfig(
       wordCount: _wordCount.round(),
       separator: _separator,
       capitalise: _capitalise,
       appendNumber: _appendNumber,
-      language: _language,
+      language: passphraseLanguage,
     );
     try {
       final phrase = await widget.generatePassphraseFn(config);
       final bits = await widget.passphraseEntropyBitsFn(
         _wordCount.round(),
-        _language,
+        passphraseLanguage,
       );
       if (mounted) {
         setState(() {
@@ -269,21 +295,33 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
 
   int _poolSize() {
     int size = 0;
-    if (_useUppercase) {
-      size += switch (_language) {
-        Language.greek => 24,
-        Language.russian || Language.ukrainian => 33,
-        Language.bulgarian => 30,
-        _ => _excludeAmbiguous ? 24 : 26,
-      };
-    }
-    if (_useLowercase) {
-      size += switch (_language) {
-        Language.greek => 24,
-        Language.russian || Language.ukrainian => 33,
-        Language.bulgarian => 30,
-        _ => _excludeAmbiguous ? 23 : 26,
-      };
+    switch (_language) {
+      // Combined pools: one pool regardless of uppercase/lowercase selection.
+      case Language.korean:
+        if (_useUppercase || _useLowercase) size += 2350;
+      case Language.chineseSimplified || Language.chineseTraditional:
+        if (_useUppercase || _useLowercase) size += 3755;
+      // Japanese: Katakana (uppercase) + Hiragana (lowercase), 46 each.
+      case Language.japanese:
+        if (_useUppercase) size += 46;
+        if (_useLowercase) size += 46;
+      default:
+        if (_useUppercase) {
+          size += switch (_language) {
+            Language.greek => 24,
+            Language.russian || Language.ukrainian => 33,
+            Language.bulgarian => 30,
+            _ => _excludeAmbiguous ? 24 : 26,
+          };
+        }
+        if (_useLowercase) {
+          size += switch (_language) {
+            Language.greek => 24,
+            Language.russian || Language.ukrainian => 33,
+            Language.bulgarian => 30,
+            _ => _excludeAmbiguous ? 23 : 26,
+          };
+        }
     }
     if (_useDigits) size += _excludeAmbiguous ? 8 : 10;
     if (_useSymbols) size += 26; // "!@#$%^&*()-_=+[]{}|;:,.<>?"
@@ -376,7 +414,10 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
                     .toList(),
                 onChanged: (lang) {
                   if (lang == null) return;
-                  setState(() => _language = lang);
+                  setState(() {
+                    _language = lang;
+                    _showLangFallback = !_hasPassphraseWordlist(lang);
+                  });
                   _generate();
                 },
               ),

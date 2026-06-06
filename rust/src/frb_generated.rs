@@ -2433,6 +2433,10 @@ impl SseDecode for crate::api::types::Language {
             17 => crate::api::types::Language::Slovak,
             18 => crate::api::types::Language::Bulgarian,
             19 => crate::api::types::Language::Ukrainian,
+            20 => crate::api::types::Language::Japanese,
+            21 => crate::api::types::Language::Korean,
+            22 => crate::api::types::Language::ChineseSimplified,
+            23 => crate::api::types::Language::ChineseTraditional,
             _ => unreachable!("Invalid variant for Language: {}", inner),
         };
     }
@@ -3537,6 +3541,10 @@ impl flutter_rust_bridge::IntoDart for crate::api::types::Language {
             Self::Slovak => 17.into_dart(),
             Self::Bulgarian => 18.into_dart(),
             Self::Ukrainian => 19.into_dart(),
+            Self::Japanese => 20.into_dart(),
+            Self::Korean => 21.into_dart(),
+            Self::ChineseSimplified => 22.into_dart(),
+            Self::ChineseTraditional => 23.into_dart(),
             _ => unreachable!(),
         }
     }
@@ -4121,6 +4129,10 @@ impl SseEncode for crate::api::types::Language {
                 crate::api::types::Language::Slovak => 17,
                 crate::api::types::Language::Bulgarian => 18,
                 crate::api::types::Language::Ukrainian => 19,
+                crate::api::types::Language::Japanese => 20,
+                crate::api::types::Language::Korean => 21,
+                crate::api::types::Language::ChineseSimplified => 22,
+                crate::api::types::Language::ChineseTraditional => 23,
                 _ => {
                     unimplemented!("");
                 }

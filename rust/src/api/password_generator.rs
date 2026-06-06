@@ -32,38 +32,61 @@ pub fn generate_password(config: PasswordConfig) -> Result<String, String> {
 
     let mut pool = String::new();
 
-    if config.use_uppercase {
-        let chars = match config.language {
-            Language::Greek => "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ",
-            Language::Russian => "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
-            Language::Ukrainian => "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ",
-            Language::Bulgarian => "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЬЮЯ",
-            _ => {
-                if config.exclude_ambiguous {
-                    "ABCDEFGHJKLMNPQRSTUVWXYZ" // removed I, O
-                } else {
-                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                }
+    match config.language {
+        // CJK combined pools: uppercase/lowercase both map to a single unified pool.
+        // Korean: 2350 Hangul syllables U+AC00–U+B52D.
+        Language::Korean => {
+            if config.use_uppercase || config.use_lowercase {
+                pool.extend((0u32..2350).filter_map(|i| char::from_u32(0xAC00 + i)));
             }
-        };
-        pool.push_str(chars);
-    }
+        }
+        // Chinese Simplified + Traditional share GB2312 Level 1: 3755 CJK chars U+4E00–U+5CAA.
+        Language::ChineseSimplified | Language::ChineseTraditional => {
+            if config.use_uppercase || config.use_lowercase {
+                pool.extend((0u32..3755).filter_map(|i| char::from_u32(0x4E00 + i)));
+            }
+        }
+        _ => {
+            if config.use_uppercase {
+                let chars = match config.language {
+                    Language::Greek => "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ",
+                    Language::Russian => "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
+                    Language::Ukrainian => "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ",
+                    Language::Bulgarian => "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЬЮЯ",
+                    Language::Japanese => {
+                        "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン"
+                    }
+                    _ => {
+                        if config.exclude_ambiguous {
+                            "ABCDEFGHJKLMNPQRSTUVWXYZ" // removed I, O
+                        } else {
+                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                        }
+                    }
+                };
+                pool.push_str(chars);
+            }
 
-    if config.use_lowercase {
-        let chars = match config.language {
-            Language::Greek => "αβγδεζηθικλμνξοπρστυφχψω",
-            Language::Russian => "абвгдеёжзийклмнопрстуфхцчшщъыьэюя",
-            Language::Ukrainian => "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя",
-            Language::Bulgarian => "абвгдежзийклмнопрстуфхцчшщъьюя",
-            _ => {
-                if config.exclude_ambiguous {
-                    "abcdefghjkmnpqrstuvwxyz" // removed i, l, o
-                } else {
-                    "abcdefghijklmnopqrstuvwxyz"
-                }
+            if config.use_lowercase {
+                let chars = match config.language {
+                    Language::Greek => "αβγδεζηθικλμνξοπρστυφχψω",
+                    Language::Russian => "абвгдеёжзийклмнопрстуфхцчшщъыьэюя",
+                    Language::Ukrainian => "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя",
+                    Language::Bulgarian => "абвгдежзийклмнопрстуфхцчшщъьюя",
+                    Language::Japanese => {
+                        "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん"
+                    }
+                    _ => {
+                        if config.exclude_ambiguous {
+                            "abcdefghjkmnpqrstuvwxyz" // removed i, l, o
+                        } else {
+                            "abcdefghijklmnopqrstuvwxyz"
+                        }
+                    }
+                };
+                pool.push_str(chars);
             }
-        };
-        pool.push_str(chars);
+        }
     }
 
     if config.use_digits {
@@ -219,6 +242,123 @@ mod tests {
             pwd.chars()
                 .all(|c| "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω".contains(c)),
             "Non-Greek char found in Greek password"
+        );
+    }
+
+    #[test]
+    fn test_japanese_katakana_uppercase() {
+        let config = PasswordConfig {
+            length: 200,
+            use_uppercase: true,
+            use_lowercase: false,
+            use_digits: false,
+            use_symbols: false,
+            exclude_ambiguous: false,
+            language: Language::Japanese,
+        };
+        let pwd = generate_password(config).unwrap();
+        let katakana: std::collections::HashSet<char> =
+            "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン"
+                .chars()
+                .collect();
+        assert!(
+            pwd.chars().all(|c| katakana.contains(&c)),
+            "Non-Katakana char found in Japanese uppercase password"
+        );
+    }
+
+    #[test]
+    fn test_japanese_hiragana_lowercase() {
+        let config = PasswordConfig {
+            length: 200,
+            use_uppercase: false,
+            use_lowercase: true,
+            use_digits: false,
+            use_symbols: false,
+            exclude_ambiguous: false,
+            language: Language::Japanese,
+        };
+        let pwd = generate_password(config).unwrap();
+        let hiragana: std::collections::HashSet<char> =
+            "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん"
+                .chars()
+                .collect();
+        assert!(
+            pwd.chars().all(|c| hiragana.contains(&c)),
+            "Non-Hiragana char found in Japanese lowercase password"
+        );
+    }
+
+    #[test]
+    fn test_korean_uses_hangul_syllables() {
+        let config = PasswordConfig {
+            length: 200,
+            use_uppercase: true,
+            use_lowercase: false,
+            use_digits: false,
+            use_symbols: false,
+            exclude_ambiguous: false,
+            language: Language::Korean,
+        };
+        let pwd = generate_password(config).unwrap();
+        assert!(
+            pwd.chars().all(|c| ('\u{AC00}'..='\u{B52D}').contains(&c)),
+            "Non-Hangul char found in Korean password"
+        );
+    }
+
+    #[test]
+    fn test_korean_combined_pool_not_doubled() {
+        // Both uppercase AND lowercase selected: pool is 2350, not 4700.
+        let config = PasswordConfig {
+            length: 200,
+            use_uppercase: true,
+            use_lowercase: true,
+            use_digits: false,
+            use_symbols: false,
+            exclude_ambiguous: false,
+            language: Language::Korean,
+        };
+        let pwd = generate_password(config).unwrap();
+        assert!(
+            pwd.chars().all(|c| ('\u{AC00}'..='\u{B52D}').contains(&c)),
+            "Non-Hangul char found when both uppercase and lowercase selected for Korean"
+        );
+    }
+
+    #[test]
+    fn test_chinese_simplified_uses_cjk() {
+        let config = PasswordConfig {
+            length: 200,
+            use_uppercase: false,
+            use_lowercase: true,
+            use_digits: false,
+            use_symbols: false,
+            exclude_ambiguous: false,
+            language: Language::ChineseSimplified,
+        };
+        let pwd = generate_password(config).unwrap();
+        assert!(
+            pwd.chars().all(|c| ('\u{4E00}'..='\u{5CAA}').contains(&c)),
+            "Non-CJK char found in Chinese Simplified password"
+        );
+    }
+
+    #[test]
+    fn test_chinese_traditional_same_pool() {
+        let config = PasswordConfig {
+            length: 200,
+            use_uppercase: true,
+            use_lowercase: false,
+            use_digits: false,
+            use_symbols: false,
+            exclude_ambiguous: false,
+            language: Language::ChineseTraditional,
+        };
+        let pwd = generate_password(config).unwrap();
+        assert!(
+            pwd.chars().all(|c| ('\u{4E00}'..='\u{5CAA}').contains(&c)),
+            "Non-CJK char found in Chinese Traditional password"
         );
     }
 

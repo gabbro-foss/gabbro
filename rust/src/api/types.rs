@@ -27,4 +27,8 @@ pub enum Language {
     Slovak,
     Bulgarian,
     Ukrainian,
+    Japanese,
+    Korean,
+    ChineseSimplified,
+    ChineseTraditional,
 }

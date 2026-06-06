@@ -33,6 +33,9 @@ String _stubPassword(PasswordConfig config) => 'A' * config.length;
 String _stubPasswordScript(PasswordConfig config) => switch (config.language) {
       Language.greek => 'α' * config.length,
       Language.russian || Language.ukrainian || Language.bulgarian => 'а' * config.length,
+      Language.japanese => 'あ' * config.length,
+      Language.korean => '가' * config.length,
+      Language.chineseSimplified || Language.chineseTraditional => '一' * config.length,
       _ => 'A' * config.length,
     };
 
@@ -262,6 +265,57 @@ void main() {
         value.runes.any((r) => r >= 0x03B1 && r <= 0x03C9),
         isTrue,
         reason: 'Toggling char sets must not reset the script to Latin',
+      );
+    });
+
+    testWidgets(
+        'Japanese app language: initial classic password uses Hiragana immediately',
+        (tester) async {
+      await tester.pumpWidget(
+          _wrapWithApp(_scriptWidget(), language: LanguageChoice.ja));
+      await tester.pumpAndSettle();
+
+      final value = await _revealedValue(tester);
+      // あ is U+3042 — any Hiragana char satisfies this range
+      expect(
+        value.runes.any((r) => r >= 0x3041 && r <= 0x3096),
+        isTrue,
+        reason: 'Classic mode must use Hiragana on first render when '
+            'app language is Japanese',
+      );
+    });
+
+    testWidgets(
+        'Korean app language: initial classic password uses Hangul immediately',
+        (tester) async {
+      await tester.pumpWidget(
+          _wrapWithApp(_scriptWidget(), language: LanguageChoice.ko));
+      await tester.pumpAndSettle();
+
+      final value = await _revealedValue(tester);
+      // 가 is U+AC00 — Hangul syllables start here
+      expect(
+        value.runes.any((r) => r >= 0xAC00 && r <= 0xB52D),
+        isTrue,
+        reason: 'Classic mode must use Hangul on first render when '
+            'app language is Korean',
+      );
+    });
+
+    testWidgets(
+        'Chinese Simplified app language: initial classic password uses CJK immediately',
+        (tester) async {
+      await tester.pumpWidget(
+          _wrapWithApp(_scriptWidget(), language: LanguageChoice.zhCn));
+      await tester.pumpAndSettle();
+
+      final value = await _revealedValue(tester);
+      // 一 is U+4E00 — first CJK unified ideograph
+      expect(
+        value.runes.any((r) => r >= 0x4E00 && r <= 0x5CAA),
+        isTrue,
+        reason: 'Classic mode must use CJK chars on first render when '
+            'app language is Chinese Simplified',
       );
     });
   });
