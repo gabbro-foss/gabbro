@@ -1782,4 +1782,12 @@ class AppLocalizationsKk extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Сейфтің бекітуін ашу үшін кілт фразасын енгізіңіз';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Сіздің тіліңіз үшін сөздік жоқ. Ағылшын тілі қолданылады.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Әдепкі қалталарды өзгертуге немесе жоюға болады.';
 }

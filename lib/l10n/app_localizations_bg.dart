@@ -1784,4 +1784,12 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Въведи паролна фраза за отключване на трезора';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Няма списък с думи за вашия език. Използва се английски.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Папките по подразбиране могат да се преименуват или изтрият.';
 }

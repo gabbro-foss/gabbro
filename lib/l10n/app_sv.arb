@@ -805,5 +805,7 @@
   "helpCaptionJumpToLetter": "Tryck på en bokstav i indexfältet för att hoppa till det avsnittet",
   "helpCaptionBreakdown": "Tryck på ögon­ikonen för att visa ett lösenord, håll sedan inne för att se en detaljerad teckenanalys",
   "helpCaptionManageVaults": "I Hantera valv kan du byta namn på eller ta bort valv, eller lägga till ett nytt",
-  "helpCaptionUnlock": "Ange din lösenfras för att låsa upp valvet"
+  "helpCaptionUnlock": "Ange din lösenfras för att låsa upp valvet",
+  "passphraseNoWordlist": "Ingen ordlista för ditt språk ännu. Engelska används.",
+  "manageFoldersDefaultNote": "Standardmappar kan döpas om eller tas bort."
 }

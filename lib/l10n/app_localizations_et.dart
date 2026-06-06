@@ -1781,4 +1781,12 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get helpCaptionUnlock => 'Sisesta oma pääslause seifi avamiseks';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Teie keele jaoks pole veel sõnaloendit. Kasutatakse inglise keelt.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Vaikekaustu saab ümber nimetada või kustutada.';
 }

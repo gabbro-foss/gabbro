@@ -1651,8 +1651,7 @@ fn wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_word_count = <u32>::sse_decode(&mut deserializer);
-            let api_language =
-                <crate::api::passphrase_generator::Language>::sse_decode(&mut deserializer);
+            let api_language = <crate::api::types::Language>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
                 transform_result_sse::<_, ()>((move || {
@@ -2409,16 +2408,31 @@ impl SseDecode for crate::api::import::ImportResult {
     }
 }
 
-impl SseDecode for crate::api::passphrase_generator::Language {
+impl SseDecode for crate::api::types::Language {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <i32>::sse_decode(deserializer);
         return match inner {
-            0 => crate::api::passphrase_generator::Language::English,
-            1 => crate::api::passphrase_generator::Language::French,
-            2 => crate::api::passphrase_generator::Language::German,
-            3 => crate::api::passphrase_generator::Language::Spanish,
-            4 => crate::api::passphrase_generator::Language::Italian,
+            0 => crate::api::types::Language::English,
+            1 => crate::api::types::Language::French,
+            2 => crate::api::types::Language::German,
+            3 => crate::api::types::Language::Spanish,
+            4 => crate::api::types::Language::Italian,
+            5 => crate::api::types::Language::Swedish,
+            6 => crate::api::types::Language::Danish,
+            7 => crate::api::types::Language::Norwegian,
+            8 => crate::api::types::Language::Finnish,
+            9 => crate::api::types::Language::Slovenian,
+            10 => crate::api::types::Language::Polish,
+            11 => crate::api::types::Language::Russian,
+            12 => crate::api::types::Language::Hungarian,
+            13 => crate::api::types::Language::Czech,
+            14 => crate::api::types::Language::Greek,
+            15 => crate::api::types::Language::Portuguese,
+            16 => crate::api::types::Language::Estonian,
+            17 => crate::api::types::Language::Slovak,
+            18 => crate::api::types::Language::Bulgarian,
+            19 => crate::api::types::Language::Ukrainian,
             _ => unreachable!("Invalid variant for Language: {}", inner),
         };
     }
@@ -2727,8 +2741,7 @@ impl SseDecode for crate::api::passphrase_generator::PassphraseConfig {
         let mut var_separator = <String>::sse_decode(deserializer);
         let mut var_capitalise = <bool>::sse_decode(deserializer);
         let mut var_appendNumber = <bool>::sse_decode(deserializer);
-        let mut var_language =
-            <crate::api::passphrase_generator::Language>::sse_decode(deserializer);
+        let mut var_language = <crate::api::types::Language>::sse_decode(deserializer);
         return crate::api::passphrase_generator::PassphraseConfig {
             word_count: var_wordCount,
             separator: var_separator,
@@ -2748,6 +2761,7 @@ impl SseDecode for crate::api::password_generator::PasswordConfig {
         let mut var_useDigits = <bool>::sse_decode(deserializer);
         let mut var_useSymbols = <bool>::sse_decode(deserializer);
         let mut var_excludeAmbiguous = <bool>::sse_decode(deserializer);
+        let mut var_language = <crate::api::types::Language>::sse_decode(deserializer);
         return crate::api::password_generator::PasswordConfig {
             length: var_length,
             use_uppercase: var_useUppercase,
@@ -2755,6 +2769,7 @@ impl SseDecode for crate::api::password_generator::PasswordConfig {
             use_digits: var_useDigits,
             use_symbols: var_useSymbols,
             exclude_ambiguous: var_excludeAmbiguous,
+            language: var_language,
         };
     }
 }
@@ -3499,7 +3514,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::import::ImportResult>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::passphrase_generator::Language {
+impl flutter_rust_bridge::IntoDart for crate::api::types::Language {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
             Self::English => 0.into_dart(),
@@ -3507,18 +3522,30 @@ impl flutter_rust_bridge::IntoDart for crate::api::passphrase_generator::Languag
             Self::German => 2.into_dart(),
             Self::Spanish => 3.into_dart(),
             Self::Italian => 4.into_dart(),
+            Self::Swedish => 5.into_dart(),
+            Self::Danish => 6.into_dart(),
+            Self::Norwegian => 7.into_dart(),
+            Self::Finnish => 8.into_dart(),
+            Self::Slovenian => 9.into_dart(),
+            Self::Polish => 10.into_dart(),
+            Self::Russian => 11.into_dart(),
+            Self::Hungarian => 12.into_dart(),
+            Self::Czech => 13.into_dart(),
+            Self::Greek => 14.into_dart(),
+            Self::Portuguese => 15.into_dart(),
+            Self::Estonian => 16.into_dart(),
+            Self::Slovak => 17.into_dart(),
+            Self::Bulgarian => 18.into_dart(),
+            Self::Ukrainian => 19.into_dart(),
             _ => unreachable!(),
         }
     }
 }
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::passphrase_generator::Language
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::api::types::Language {}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::types::Language>
+    for crate::api::types::Language
 {
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::passphrase_generator::Language>
-    for crate::api::passphrase_generator::Language
-{
-    fn into_into_dart(self) -> crate::api::passphrase_generator::Language {
+    fn into_into_dart(self) -> crate::api::types::Language {
         self
     }
 }
@@ -3635,6 +3662,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::password_generator::PasswordC
             self.use_digits.into_into_dart().into_dart(),
             self.use_symbols.into_into_dart().into_dart(),
             self.exclude_ambiguous.into_into_dart().into_dart(),
+            self.language.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4068,16 +4096,31 @@ impl SseEncode for crate::api::import::ImportResult {
     }
 }
 
-impl SseEncode for crate::api::passphrase_generator::Language {
+impl SseEncode for crate::api::types::Language {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(
             match self {
-                crate::api::passphrase_generator::Language::English => 0,
-                crate::api::passphrase_generator::Language::French => 1,
-                crate::api::passphrase_generator::Language::German => 2,
-                crate::api::passphrase_generator::Language::Spanish => 3,
-                crate::api::passphrase_generator::Language::Italian => 4,
+                crate::api::types::Language::English => 0,
+                crate::api::types::Language::French => 1,
+                crate::api::types::Language::German => 2,
+                crate::api::types::Language::Spanish => 3,
+                crate::api::types::Language::Italian => 4,
+                crate::api::types::Language::Swedish => 5,
+                crate::api::types::Language::Danish => 6,
+                crate::api::types::Language::Norwegian => 7,
+                crate::api::types::Language::Finnish => 8,
+                crate::api::types::Language::Slovenian => 9,
+                crate::api::types::Language::Polish => 10,
+                crate::api::types::Language::Russian => 11,
+                crate::api::types::Language::Hungarian => 12,
+                crate::api::types::Language::Czech => 13,
+                crate::api::types::Language::Greek => 14,
+                crate::api::types::Language::Portuguese => 15,
+                crate::api::types::Language::Estonian => 16,
+                crate::api::types::Language::Slovak => 17,
+                crate::api::types::Language::Bulgarian => 18,
+                crate::api::types::Language::Ukrainian => 19,
                 _ => {
                     unimplemented!("");
                 }
@@ -4307,7 +4350,7 @@ impl SseEncode for crate::api::passphrase_generator::PassphraseConfig {
         <String>::sse_encode(self.separator, serializer);
         <bool>::sse_encode(self.capitalise, serializer);
         <bool>::sse_encode(self.append_number, serializer);
-        <crate::api::passphrase_generator::Language>::sse_encode(self.language, serializer);
+        <crate::api::types::Language>::sse_encode(self.language, serializer);
     }
 }
 
@@ -4320,6 +4363,7 @@ impl SseEncode for crate::api::password_generator::PasswordConfig {
         <bool>::sse_encode(self.use_digits, serializer);
         <bool>::sse_encode(self.use_symbols, serializer);
         <bool>::sse_encode(self.exclude_ambiguous, serializer);
+        <crate::api::types::Language>::sse_encode(self.language, serializer);
     }
 }
 

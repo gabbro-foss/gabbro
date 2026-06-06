@@ -805,5 +805,7 @@
   "helpCaptionJumpToLetter": "Dotknij litery na pasku indeksu, aby przeskoczyć do tej sekcji",
   "helpCaptionBreakdown": "Dotknij ikony oka, aby wyświetlić hasło, następnie naciśnij i przytrzymaj, aby zobaczyć szczegółową analizę znaków",
   "helpCaptionManageVaults": "W «Zarządzaj skarbcami» możesz zmienić nazwę lub usunąć skarbce, a także dodać nowy",
-  "helpCaptionUnlock": "Wprowadź hasło główne, aby odblokować skarbiec"
+  "helpCaptionUnlock": "Wprowadź hasło główne, aby odblokować skarbiec",
+  "passphraseNoWordlist": "Brak listy słów dla Twojego języka. Używa się angielskiego.",
+  "manageFoldersDefaultNote": "Domyślne foldery można zmienić lub usunąć."
 }

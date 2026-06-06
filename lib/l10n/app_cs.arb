@@ -805,5 +805,7 @@
   "helpCaptionJumpToLetter": "Klepnutím na písmeno v indexovém panelu přejdete na danou sekci",
   "helpCaptionBreakdown": "Klepnutím na ikonu oka zobrazíte heslo, poté podržte pro zobrazení podrobné analýzy znaků",
   "helpCaptionManageVaults": "Ve «Správě trezorů» můžete přejmenovat nebo smazat trezory, nebo přidat nový",
-  "helpCaptionUnlock": "Zadejte přístupovou frázi pro odemknutí trezoru"
+  "helpCaptionUnlock": "Zadejte přístupovou frázi pro odemknutí trezoru",
+  "passphraseNoWordlist": "Pro váš jazyk zatím není seznam slov. Používá se angličtina.",
+  "manageFoldersDefaultNote": "Výchozí složky lze přejmenovat nebo odstranit."
 }

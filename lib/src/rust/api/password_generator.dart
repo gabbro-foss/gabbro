@@ -5,6 +5,7 @@
 
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'types.dart';
 
 /// Generate a random password according to the given config.
 /// Returns an error string if the config produces an empty character pool.
@@ -29,6 +30,11 @@ class PasswordConfig {
   final bool useSymbols;
   final bool excludeAmbiguous;
 
+  /// Drives the character pool for uppercase/lowercase.
+  /// Greek and Cyrillic scripts replace the Latin pool; Latin-script
+  /// languages use the standard ASCII pool (exclude_ambiguous still applies).
+  final Language language;
+
   const PasswordConfig({
     required this.length,
     required this.useUppercase,
@@ -36,6 +42,7 @@ class PasswordConfig {
     required this.useDigits,
     required this.useSymbols,
     required this.excludeAmbiguous,
+    required this.language,
   });
 
   @override
@@ -45,7 +52,8 @@ class PasswordConfig {
       useLowercase.hashCode ^
       useDigits.hashCode ^
       useSymbols.hashCode ^
-      excludeAmbiguous.hashCode;
+      excludeAmbiguous.hashCode ^
+      language.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -57,5 +65,6 @@ class PasswordConfig {
           useLowercase == other.useLowercase &&
           useDigits == other.useDigits &&
           useSymbols == other.useSymbols &&
-          excludeAmbiguous == other.excludeAmbiguous;
+          excludeAmbiguous == other.excludeAmbiguous &&
+          language == other.language;
 }

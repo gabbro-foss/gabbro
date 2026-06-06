@@ -805,5 +805,7 @@
   "helpCaptionJumpToLetter": "Puuduta registriribal tähte, et hüpata sellele jaotisele",
   "helpCaptionBreakdown": "Puuduta silmaikooni parooli nägemiseks, seejärel hoia pikalt, et näha üksikasjalikku tähemärkide jaotust",
   "helpCaptionManageVaults": "Halda seife jaotises saad seife ümber nimetada või kustutada või lisada uue",
-  "helpCaptionUnlock": "Sisesta oma pääslause seifi avamiseks"
+  "helpCaptionUnlock": "Sisesta oma pääslause seifi avamiseks",
+  "passphraseNoWordlist": "Teie keele jaoks pole veel sõnaloendit. Kasutatakse inglise keelt.",
+  "manageFoldersDefaultNote": "Vaikekaustu saab ümber nimetada või kustutada."
 }

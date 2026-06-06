@@ -9,6 +9,7 @@ import 'api/import.dart';
 import 'api/passphrase_generator.dart';
 import 'api/password_generator.dart';
 import 'api/simple.dart';
+import 'api/types.dart';
 import 'api/vault.dart';
 import 'api/vault_bridge.dart';
 import 'dart:async';
@@ -2673,8 +2674,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   PasswordConfig dco_decode_password_config(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return PasswordConfig(
       length: dco_decode_u_32(arr[0]),
       useUppercase: dco_decode_bool(arr[1]),
@@ -2682,6 +2683,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       useDigits: dco_decode_bool(arr[3]),
       useSymbols: dco_decode_bool(arr[4]),
       excludeAmbiguous: dco_decode_bool(arr[5]),
+      language: dco_decode_language(arr[6]),
     );
   }
 
@@ -3562,6 +3564,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_useDigits = sse_decode_bool(deserializer);
     var var_useSymbols = sse_decode_bool(deserializer);
     var var_excludeAmbiguous = sse_decode_bool(deserializer);
+    var var_language = sse_decode_language(deserializer);
     return PasswordConfig(
       length: var_length,
       useUppercase: var_useUppercase,
@@ -3569,6 +3572,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       useDigits: var_useDigits,
       useSymbols: var_useSymbols,
       excludeAmbiguous: var_excludeAmbiguous,
+      language: var_language,
     );
   }
 
@@ -4343,6 +4347,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.useDigits, serializer);
     sse_encode_bool(self.useSymbols, serializer);
     sse_encode_bool(self.excludeAmbiguous, serializer);
+    sse_encode_language(self.language, serializer);
   }
 
   @protected

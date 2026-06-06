@@ -1785,4 +1785,12 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get helpCaptionUnlock => 'Syötä salauslause avataksesi holvin';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Kielelläsi ei ole vielä sanalistaa. Käytetään englantia.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Oletuskansioita voi nimetä uudelleen tai poistaa.';
 }

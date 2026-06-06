@@ -1788,4 +1788,12 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get helpCaptionUnlock => 'Ievadiet ieejas frāzi, lai atbloķētu seifu';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Jūsu valodai vēl nav vārdu saraksta. Tiek izmantota angļu valoda.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Noklusējuma mapes var pārdēvēt vai dzēst.';
 }

@@ -1781,4 +1781,12 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get helpCaptionUnlock => 'Tẹ gbolohun ọrọ igbaniwọle lati ṣii vọọliti';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Ko si atokọ ọrọ fun ede rẹ sibẹ. Lilo Gẹẹsi.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Awọn folda aiyipada le jẹ atun-lorukọ tabi paarẹ.';
 }

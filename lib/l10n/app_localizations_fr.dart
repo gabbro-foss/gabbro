@@ -1805,4 +1805,12 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Saisissez votre phrase secrète pour déverrouiller votre coffre';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Pas encore de liste de mots pour votre langue. Anglais utilisé.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Les dossiers par défaut peuvent être renommés ou supprimés.';
 }

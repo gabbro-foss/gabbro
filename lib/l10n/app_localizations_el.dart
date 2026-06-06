@@ -1800,4 +1800,12 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Εισάγετε τη φράση πρόσβασης για ξεκλείδωμα θησαυροφυλακίου';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Δεν υπάρχει λίστα λέξεων για τη γλώσσα σας. Χρησιμοποιείται αγγλική.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Οι προεπιλεγμένοι φάκελοι μπορούν να μετονομαστούν ή να διαγραφούν.';
 }

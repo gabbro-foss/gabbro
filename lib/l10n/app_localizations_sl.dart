@@ -1788,4 +1788,12 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Vnesite geslo za dostop za odklenitev trezorja';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Za vaš jezik še ni seznama besed. Uporablja se angleščina.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Privzete mape je mogoče preimenovati ali izbrisati.';
 }

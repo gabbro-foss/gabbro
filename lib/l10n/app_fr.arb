@@ -799,5 +799,7 @@
   "helpCaptionJumpToLetter": "Appuyez sur une lettre dans la barre d'index pour accéder à cette section",
   "helpCaptionBreakdown": "Appuyez sur l'icône œil pour afficher un mot de passe, puis appuyez longuement pour voir une décomposition détaillée des caractères",
   "helpCaptionManageVaults": "Dans Gérer les coffres, renommez ou supprimez des coffres, ou ajoutez-en un nouveau",
-  "helpCaptionUnlock": "Saisissez votre phrase secrète pour déverrouiller votre coffre"
+  "helpCaptionUnlock": "Saisissez votre phrase secrète pour déverrouiller votre coffre",
+  "passphraseNoWordlist": "Pas encore de liste de mots pour votre langue. Anglais utilisé.",
+  "manageFoldersDefaultNote": "Les dossiers par défaut peuvent être renommés ou supprimés."
 }

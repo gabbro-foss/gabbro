@@ -805,5 +805,7 @@
   "helpCaptionJumpToLetter": "Tryk på et bogstav på indeksbjælken for at hoppe til det afsnit",
   "helpCaptionBreakdown": "Tryk på øjeikonet for at afsløre en adgangskode, hold derefter nede for at se en detaljeret tegnanalyse",
   "helpCaptionManageVaults": "I Administrér hvælvinger kan du omdøbe eller slette hvælvinger eller tilføje en ny",
-  "helpCaptionUnlock": "Indtast din adgangssætning for at låse hvælvingen op"
+  "helpCaptionUnlock": "Indtast din adgangssætning for at låse hvælvingen op",
+  "passphraseNoWordlist": "Ingen ordliste til dit sprog endnu. Bruger engelsk.",
+  "manageFoldersDefaultNote": "Standardmapper kan omdøbes eller slettes."
 }

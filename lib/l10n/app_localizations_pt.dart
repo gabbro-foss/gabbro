@@ -1784,6 +1784,14 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Insira a frase secreta para desbloquear o cofre';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Ainda não há lista de palavras para o seu idioma. Usando inglês.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'As pastas padrão podem ser renomeadas ou excluídas.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -3566,6 +3574,14 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get helpCaptionUnlock =>
       'Insira a frase secreta para desbloquear o cofre';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Ainda não há lista de palavras para o seu idioma. Usando inglês.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'As pastas padrão podem ser renomeadas ou excluídas.';
 }
 
 /// The translations for Portuguese, as used in Portugal (`pt_PT`).
@@ -5352,4 +5368,12 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get helpCaptionUnlock =>
       'Introduza a frase-passe para desbloquear o cofre';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Ainda não existe uma lista de palavras para o seu idioma. A usar inglês.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'As pastas predefinidas podem ser renomeadas ou eliminadas.';
 }

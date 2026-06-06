@@ -1733,4 +1733,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get helpCaptionUnlock => 'パスフレーズを入力してボルトのロックを解除';
+
+  @override
+  String get passphraseNoWordlist => 'お使いの言語のワードリストはまだありません。英語を使用しています。';
+
+  @override
+  String get manageFoldersDefaultNote => 'デフォルトフォルダは名前の変更や削除ができます。';
 }

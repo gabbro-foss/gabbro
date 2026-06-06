@@ -1792,4 +1792,12 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Wprowadź hasło główne, aby odblokować skarbiec';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Brak listy słów dla Twojego języka. Używa się angielskiego.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Domyślne foldery można zmienić lub usunąć.';
 }

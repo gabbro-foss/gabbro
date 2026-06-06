@@ -1783,4 +1783,12 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Indtast din adgangssætning for at låse hvælvingen op';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Ingen ordliste til dit sprog endnu. Bruger engelsk.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Standardmapper kan omdøbes eller slettes.';
 }

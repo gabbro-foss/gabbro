@@ -799,5 +799,7 @@
   "helpCaptionJumpToLetter": "インデックスバーの文字をクリックしてそのセクションに移動",
   "helpCaptionBreakdown": "目のアイコンをクリックしてパスワードを表示し、長押しで詳細な文字分析を表示",
   "helpCaptionManageVaults": "«ボルトの管理»でボルトの名前変更や削除、または新しいボルトを追加できます",
-  "helpCaptionUnlock": "パスフレーズを入力してボルトのロックを解除"
+  "helpCaptionUnlock": "パスフレーズを入力してボルトのロックを解除",
+  "passphraseNoWordlist": "お使いの言語のワードリストはまだありません。英語を使用しています。",
+  "manageFoldersDefaultNote": "デフォルトフォルダは名前の変更や削除ができます。"
 }

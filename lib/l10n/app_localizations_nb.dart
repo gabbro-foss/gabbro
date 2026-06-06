@@ -1779,4 +1779,12 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get helpCaptionUnlock => 'Angi passfrasen din for å låse opp hvelvet';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Ingen ordliste for ditt språk ennå. Bruker engelsk.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Standardmapper kan gis nytt navn eller slettes.';
 }

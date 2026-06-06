@@ -4,6 +4,7 @@ import 'test_helpers.dart';
 import 'package:gabbro/widgets/generator_widget.dart';
 import 'package:gabbro/src/rust/api/password_generator.dart';
 import 'package:gabbro/src/rust/api/passphrase_generator.dart';
+import 'package:gabbro/src/rust/api/types.dart';
 
 // ---------------------------------------------------------------------------
 // Minimal stub — GeneratorWidget is not yet implemented. All tests below
@@ -89,9 +90,11 @@ void main() {
       await tester.pumpWidget(_wrap(_stubWidget(onUsePassword: (v) => received = v)));
       await tester.pumpAndSettle();
       // Generate first
+      await tester.ensureVisible(find.byKey(const Key('generate_button')));
       await tester.tap(find.byKey(const Key('generate_button')));
       await tester.pumpAndSettle();
       // Then use
+      await tester.ensureVisible(find.byKey(const Key('use_password_button')));
       await tester.tap(find.byKey(const Key('use_password_button')));
       await tester.pumpAndSettle();
       expect(received, isNotNull);
@@ -144,7 +147,7 @@ void main() {
       expect(find.byKey(const Key('word_count_slider')), findsOneWidget);
     });
 
-    testWidgets('shows language selector', (tester) async {
+    testWidgets('shows language selector in passphrase mode', (tester) async {
       await tester.pumpWidget(_wrap(_stubWidget()));
       await switchToPassphrase(tester);
       expect(find.byKey(const Key('language_selector')), findsOneWidget);
@@ -160,6 +163,13 @@ void main() {
       await tester.pumpWidget(_wrap(_stubWidget()));
       await switchToPassphrase(tester);
       expect(find.byKey(const Key('toggle_append_number')), findsOneWidget);
+    });
+  });
+
+  group('GeneratorWidget — language selector', () {
+    testWidgets('visible in classic mode without switching', (tester) async {
+      await tester.pumpWidget(_wrap(_stubWidget()));
+      expect(find.byKey(const Key('language_selector')), findsOneWidget);
     });
   });
 }

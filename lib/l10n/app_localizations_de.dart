@@ -1794,4 +1794,12 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Gib deine Passphrase ein, um deinen Tresor zu entsperren';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Noch keine Wortliste für deine Sprache. Englisch wird verwendet.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Standardordner können umbenannt oder gelöscht werden.';
 }

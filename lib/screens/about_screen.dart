@@ -336,6 +336,16 @@ const _kComponents = [
     url: 'https://github.com/dart-lang/sdk',
   ),
   _Component(
+    name: 'diceware-wordlist-bg',
+    licence: 'CC-BY-4.0',
+    url: 'https://github.com/assenv/diceware-wordlist-bg',
+  ),
+  _Component(
+    name: 'Diceware-word-lists (et)',
+    licence: 'CC-BY-4.0',
+    url: 'https://github.com/agreinhold/Diceware-word-lists',
+  ),
+  _Component(
     name: 'file_picker',
     licence: 'MIT',
     url: 'https://github.com/miguelpruivo/flutter_file_picker',

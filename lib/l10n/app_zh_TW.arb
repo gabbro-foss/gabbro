@@ -799,5 +799,7 @@
   "helpCaptionJumpToLetter": "按一下索引列中的字母跳轉到該部分",
   "helpCaptionBreakdown": "按一下眼睛圖示顯示密碼，然後長按查看詳細字元分析",
   "helpCaptionManageVaults": "在«管理保險庫»中，您可以重新命名或刪除保險庫，或新增新的",
-  "helpCaptionUnlock": "輸入密碼片語解鎖保險庫"
+  "helpCaptionUnlock": "輸入密碼片語解鎖保險庫",
+  "passphraseNoWordlist": "您的語言暫無詞彙列表。使用英語。",
+  "manageFoldersDefaultNote": "預設資料夾可以重新命名或刪除。"
 }

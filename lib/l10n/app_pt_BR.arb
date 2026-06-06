@@ -805,5 +805,7 @@
   "helpCaptionJumpToLetter": "Toque em uma letra na barra de índice para pular para aquela seção",
   "helpCaptionBreakdown": "Toque no ícone de olho para revelar uma senha, depois pressione longamente para ver uma análise detalhada dos caracteres",
   "helpCaptionManageVaults": "Em Gerenciar cofres, renomeie ou exclua cofres, ou adicione um novo",
-  "helpCaptionUnlock": "Insira a frase secreta para desbloquear o cofre"
+  "helpCaptionUnlock": "Insira a frase secreta para desbloquear o cofre",
+  "passphraseNoWordlist": "Ainda não há lista de palavras para o seu idioma. Usando inglês.",
+  "manageFoldersDefaultNote": "As pastas padrão podem ser renomeadas ou excluídas."
 }

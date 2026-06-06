@@ -1781,4 +1781,12 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get helpCaptionUnlock => 'Sartu pasaesaldia gandegiak desblokeatzeko';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Zure hizkuntzarako oraindik ez dago hitz-zerrendasik. Ingelesa erabiltzen da.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Karpeta lehenetsiak berrizendatu edo ezabatu daitezke.';
 }

@@ -1,3 +1,5 @@
+use super::types::Language;
+
 const MIN_LENGTH: u32 = 32;
 const MAX_LENGTH: u32 = 256;
 
@@ -9,6 +11,10 @@ pub struct PasswordConfig {
     pub use_digits: bool,
     pub use_symbols: bool,
     pub exclude_ambiguous: bool,
+    /// Drives the character pool for uppercase/lowercase.
+    /// Greek and Cyrillic scripts replace the Latin pool; Latin-script
+    /// languages use the standard ASCII pool (exclude_ambiguous still applies).
+    pub language: Language,
 }
 
 /// Generate a random password according to the given config.
@@ -27,19 +33,35 @@ pub fn generate_password(config: PasswordConfig) -> Result<String, String> {
     let mut pool = String::new();
 
     if config.use_uppercase {
-        let chars = if config.exclude_ambiguous {
-            "ABCDEFGHJKLMNPQRSTUVWXYZ" // removed I, O
-        } else {
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        let chars = match config.language {
+            Language::Greek => "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ",
+            Language::Russian => "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
+            Language::Ukrainian => "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ",
+            Language::Bulgarian => "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЬЮЯ",
+            _ => {
+                if config.exclude_ambiguous {
+                    "ABCDEFGHJKLMNPQRSTUVWXYZ" // removed I, O
+                } else {
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                }
+            }
         };
         pool.push_str(chars);
     }
 
     if config.use_lowercase {
-        let chars = if config.exclude_ambiguous {
-            "abcdefghjkmnpqrstuvwxyz" // removed i, l, o
-        } else {
-            "abcdefghijklmnopqrstuvwxyz"
+        let chars = match config.language {
+            Language::Greek => "αβγδεζηθικλμνξοπρστυφχψω",
+            Language::Russian => "абвгдеёжзийклмнопрстуфхцчшщъыьэюя",
+            Language::Ukrainian => "абвгґдеєжзиіїйклмнопрстуфхцчшщьюя",
+            Language::Bulgarian => "абвгдежзийклмнопрстуфхцчшщъьюя",
+            _ => {
+                if config.exclude_ambiguous {
+                    "abcdefghjkmnpqrstuvwxyz" // removed i, l, o
+                } else {
+                    "abcdefghijklmnopqrstuvwxyz"
+                }
+            }
         };
         pool.push_str(chars);
     }
@@ -93,6 +115,7 @@ mod tests {
             use_digits: true,
             use_symbols: false,
             exclude_ambiguous: false,
+            language: Language::English,
         }
     }
 
@@ -111,6 +134,7 @@ mod tests {
             use_digits: false,
             use_symbols: false,
             exclude_ambiguous: false,
+            language: Language::English,
         };
         assert!(generate_password(config).is_err());
     }
@@ -124,6 +148,7 @@ mod tests {
             use_digits: true,
             use_symbols: false,
             exclude_ambiguous: false,
+            language: Language::English,
         };
         let pwd = generate_password(config).unwrap();
         assert!(pwd.chars().all(|c| c.is_ascii_digit()));
@@ -138,6 +163,7 @@ mod tests {
             use_digits: true,
             use_symbols: false,
             exclude_ambiguous: true,
+            language: Language::English,
         };
         let pwd = generate_password(config).unwrap();
         let banned = ['0', '1', 'I', 'O', 'i', 'l', 'o'];
@@ -175,5 +201,43 @@ mod tests {
             ..default_config()
         };
         assert!(generate_password(config).is_err());
+    }
+
+    #[test]
+    fn test_greek_uppercase_lowercase_are_greek() {
+        let config = PasswordConfig {
+            length: 200,
+            use_uppercase: true,
+            use_lowercase: true,
+            use_digits: false,
+            use_symbols: false,
+            exclude_ambiguous: false,
+            language: Language::Greek,
+        };
+        let pwd = generate_password(config).unwrap();
+        assert!(
+            pwd.chars()
+                .all(|c| "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω".contains(c)),
+            "Non-Greek char found in Greek password"
+        );
+    }
+
+    #[test]
+    fn test_cyrillic_russian_no_latin() {
+        let config = PasswordConfig {
+            length: 200,
+            use_uppercase: true,
+            use_lowercase: true,
+            use_digits: false,
+            use_symbols: false,
+            exclude_ambiguous: false,
+            language: Language::Russian,
+        };
+        let pwd = generate_password(config).unwrap();
+        assert!(
+            pwd.chars()
+                .all(|c| c.is_alphabetic() && !c.is_ascii_alphabetic()),
+            "Latin char found in Russian password"
+        );
     }
 }

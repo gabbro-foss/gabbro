@@ -1782,4 +1782,12 @@ class AppLocalizationsHr extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Unesite pristupnu frazu za otključavanje trezora';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Još nema popisa riječi za vaš jezik. Koristi se engleski.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Zadane mape mogu se preimenovati ili izbrisati.';
 }

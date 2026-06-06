@@ -186,7 +186,21 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: Text(
+                    l.manageFoldersDefaultNote,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
               itemCount: _folders.length,
               itemBuilder: (context, index) {
                 final folder = _folders[index];
@@ -208,6 +222,9 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
                   ),
                 );
               },
+            ),
+                ),
+              ],
             ),
     );
   }

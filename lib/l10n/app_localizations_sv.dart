@@ -1779,4 +1779,12 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get helpCaptionUnlock => 'Ange din lösenfras för att låsa upp valvet';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Ingen ordlista för ditt språk ännu. Engelska används.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Standardmappar kan döpas om eller tas bort.';
 }

@@ -3358,6 +3358,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter your passphrase to unlock your vault'**
   String get helpCaptionUnlock;
+
+  /// No description provided for @passphraseNoWordlist.
+  ///
+  /// In en, this message translates to:
+  /// **'No wordlist for your language yet. Using English.'**
+  String get passphraseNoWordlist;
+
+  /// No description provided for @manageFoldersDefaultNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Default folders can be renamed or deleted.'**
+  String get manageFoldersDefaultNote;
 }
 
 class _AppLocalizationsDelegate

@@ -1713,6 +1713,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get helpCaptionUnlock => '输入密码短语解锁保险库';
+
+  @override
+  String get passphraseNoWordlist => '您的语言暂无词汇列表。使用英语。';
+
+  @override
+  String get manageFoldersDefaultNote => '默认文件夹可以重命名或删除。';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3424,6 +3430,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get helpCaptionUnlock => '输入密码短语解锁保险库';
+
+  @override
+  String get passphraseNoWordlist => '您的语言暂无词汇列表。使用英语。';
+
+  @override
+  String get manageFoldersDefaultNote => '默认文件夹可以重命名或删除。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -5135,4 +5147,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get helpCaptionUnlock => '輸入密碼片語解鎖保險庫';
+
+  @override
+  String get passphraseNoWordlist => '您的語言暫無詞彙列表。使用英語。';
+
+  @override
+  String get manageFoldersDefaultNote => '預設資料夾可以重新命名或刪除。';
 }

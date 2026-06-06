@@ -1786,6 +1786,14 @@ class AppLocalizationsSr extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Unesite pristupnu frazu za otključavanje trezora';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Нема листе речи за ваш језик. Користи се енглески.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Подразумеване фасцикле могу се преименовати или избрисати.';
 }
 
 /// The translations for Serbian, using the Latin script (`sr_Latn`).
@@ -3570,4 +3578,12 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get helpCaptionUnlock =>
       'Unesite pristupnu frazu za otključavanje trezora';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Nema liste reči za vaš jezik. Koristi se engleski.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Podrazumevane fascikle mogu se preimenovati ili izbrisati.';
 }

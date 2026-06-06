@@ -1788,4 +1788,12 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Введите кодовую фразу для разблокировки хранилища';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Для вашего языка нет списка слов. Используется английский.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Папки по умолчанию можно переименовать или удалить.';
 }

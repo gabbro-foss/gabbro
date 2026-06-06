@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/main.dart';
+import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/password_generator.dart';
 import 'package:gabbro/src/rust/api/passphrase_generator.dart';
+import 'package:gabbro/src/rust/api/types.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 
@@ -21,6 +24,85 @@ Future<double> _defaultPassphraseEntropyBits(int wordCount, Language language) =
 
 double _defaultEntropyBits(int poolSize, int length) =>
     entropyBits(poolSize: poolSize, length: length);
+
+String _languageLabel(Language lang, AppLocalizations l) => switch (lang) {
+      Language.english => l.langEnglish,
+      Language.french => l.langFrench,
+      Language.german => l.langGerman,
+      Language.spanish => l.langSpanish,
+      Language.italian => l.langItalian,
+      Language.swedish => l.langSwedish,
+      Language.danish => l.langDanish,
+      Language.norwegian => l.langNorwegianBokmal,
+      Language.finnish => l.langFinnish,
+      Language.slovenian => l.langSlovenian,
+      Language.polish => l.langPolish,
+      Language.russian => l.langRussian,
+      Language.hungarian => l.langHungarian,
+      Language.czech => l.langCzech,
+      Language.greek => l.langGreek,
+      Language.portuguese => l.langPortuguesePt,
+      Language.estonian => l.langEstonian,
+      Language.slovak => l.langSlovak,
+      Language.bulgarian => l.langBulgarian,
+      Language.ukrainian => l.langUkrainian,
+    };
+
+/// Maps a [LanguageChoice] (app UI locale) to a [Language] (passphrase wordlist
+/// / character pool). Returns null when no wordlist exists for that language.
+/// For [LanguageChoice.system] the caller should resolve via the device locale.
+Language? _languageChoiceToLanguage(LanguageChoice choice) => switch (choice) {
+      LanguageChoice.en => Language.english,
+      LanguageChoice.fr => Language.french,
+      LanguageChoice.de => Language.german,
+      LanguageChoice.es => Language.spanish,
+      LanguageChoice.it => Language.italian,
+      LanguageChoice.sv => Language.swedish,
+      LanguageChoice.da => Language.danish,
+      LanguageChoice.nb || LanguageChoice.nn => Language.norwegian,
+      LanguageChoice.fi => Language.finnish,
+      LanguageChoice.sl => Language.slovenian,
+      LanguageChoice.pl => Language.polish,
+      LanguageChoice.ru => Language.russian,
+      LanguageChoice.hu => Language.hungarian,
+      LanguageChoice.cs => Language.czech,
+      LanguageChoice.el => Language.greek,
+      LanguageChoice.ptPt || LanguageChoice.ptBr => Language.portuguese,
+      LanguageChoice.et => Language.estonian,
+      LanguageChoice.sk => Language.slovak,
+      LanguageChoice.bg => Language.bulgarian,
+      LanguageChoice.uk => Language.ukrainian,
+      _ => null, // no wordlist for this LanguageChoice
+    };
+
+/// Resolves the device locale language code to a [Language] when the app
+/// setting is [LanguageChoice.system].
+Language? _systemLocaleToLanguage(Locale locale) {
+  final tag = locale.languageCode;
+  return switch (tag) {
+    'en' => Language.english,
+    'fr' => Language.french,
+    'de' => Language.german,
+    'es' => Language.spanish,
+    'it' => Language.italian,
+    'sv' => Language.swedish,
+    'da' => Language.danish,
+    'nb' || 'nn' || 'no' => Language.norwegian,
+    'fi' => Language.finnish,
+    'sl' => Language.slovenian,
+    'pl' => Language.polish,
+    'ru' => Language.russian,
+    'hu' => Language.hungarian,
+    'cs' => Language.czech,
+    'el' => Language.greek,
+    'pt' => Language.portuguese,
+    'et' => Language.estonian,
+    'sk' => Language.slovak,
+    'bg' => Language.bulgarian,
+    'uk' => Language.ukrainian,
+    _ => null,
+  };
+}
 
 // ---------------------------------------------------------------------------
 // GeneratorWidget
@@ -84,6 +166,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
   bool _capitalise = false;
   bool _appendNumber = false;
   Language _language = Language.english;
+  bool _showLangFallback = false;
 
   // ── Clipboard ─────────────────────────────────────────────────────────────
   bool _copied = false;
@@ -92,6 +175,28 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
   void initState() {
     super.initState();
     _generate();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final appState = GabbroApp.maybeOf(context);
+    if (appState == null) return; // test environment without GabbroApp
+    final choice = appState.settings.language;
+    final Language? resolved;
+    if (choice == LanguageChoice.system) {
+      resolved = _systemLocaleToLanguage(Localizations.localeOf(context));
+    } else {
+      resolved = _languageChoiceToLanguage(choice);
+    }
+    final newLanguage = resolved ?? Language.english;
+    final newFallback = resolved == null;
+    if (newLanguage != _language || newFallback != _showLangFallback) {
+      setState(() {
+        _language = newLanguage;
+        _showLangFallback = newFallback;
+      });
+    }
   }
 
   // ── Generation ────────────────────────────────────────────────────────────
@@ -112,6 +217,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
       useDigits: _useDigits,
       useSymbols: _useSymbols,
       excludeAmbiguous: _excludeAmbiguous,
+      language: _language,
     );
     try {
       final pwd = widget.generatePasswordFn(config);
@@ -162,8 +268,22 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
 
   int _poolSize() {
     int size = 0;
-    if (_useUppercase) size += _excludeAmbiguous ? 24 : 26;
-    if (_useLowercase) size += _excludeAmbiguous ? 23 : 26;
+    if (_useUppercase) {
+      size += switch (_language) {
+        Language.greek => 24,
+        Language.russian || Language.ukrainian => 33,
+        Language.bulgarian => 30,
+        _ => _excludeAmbiguous ? 24 : 26,
+      };
+    }
+    if (_useLowercase) {
+      size += switch (_language) {
+        Language.greek => 24,
+        Language.russian || Language.ukrainian => 33,
+        Language.bulgarian => 30,
+        _ => _excludeAmbiguous ? 23 : 26,
+      };
+    }
     if (_useDigits) size += _excludeAmbiguous ? 8 : 10;
     if (_useSymbols) size += 26; // "!@#$%^&*()-_=+[]{}|;:,.<>?"
     return size;
@@ -230,6 +350,46 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
                   ),
             ),
           ),
+          const SizedBox(height: 20),
+
+          // Language picker — shared: drives passphrase wordlist and classic
+          // character pool (Greek / Cyrillic scripts replace Latin pool).
+          SectionHeader(label: l.languageHeader),
+          const SizedBox(height: 8),
+          InputDecorator(
+            decoration: const InputDecoration(border: OutlineInputBorder()),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<Language>(
+                key: const Key('language_selector'),
+                value: _language,
+                isExpanded: true,
+                items: (Language.values.toList()
+                      ..sort((a, b) =>
+                          _languageLabel(a, l).compareTo(_languageLabel(b, l))))
+                    .map(
+                      (lang) => DropdownMenuItem<Language>(
+                        value: lang,
+                        child: Text(_languageLabel(lang, l)),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (lang) {
+                  if (lang == null) return;
+                  setState(() => _language = lang);
+                  _generate();
+                },
+              ),
+            ),
+          ),
+          if (_showLangFallback) ...[
+            const SizedBox(height: 6),
+            Text(
+              l.passphraseNoWordlist,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+            ),
+          ],
           const SizedBox(height: 20),
 
           // Mode-specific controls
@@ -428,25 +588,6 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
           },
         ),
         const SizedBox(height: 8),
-        SectionHeader(label: l.languageHeader),
-        const SizedBox(height: 8),
-        SegmentedRow<Language>(
-          key: const Key('language_selector'),
-          values: Language.values,
-          selected: _language,
-          label: (lang) => switch (lang) {
-            Language.english => 'EN',
-            Language.french => 'FR',
-            Language.german => 'DE',
-            Language.spanish => 'ES',
-            Language.italian => 'IT',
-          },
-          onSelected: (lang) {
-            setState(() => _language = lang);
-            _generatePassphrase();
-          },
-        ),
-        const SizedBox(height: 12),
         TextFormField(
           initialValue: _separator,
           decoration: InputDecoration(

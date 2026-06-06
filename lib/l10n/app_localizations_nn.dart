@@ -1780,4 +1780,12 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get helpCaptionUnlock => 'Angi passfrasen din for å låse opp kvelvet';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Ingen ordliste for ditt språk endå. Brukar engelsk.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Standardmapper kan gjevast nytt namn eller slettast.';
 }

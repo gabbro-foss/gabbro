@@ -1791,4 +1791,12 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Inserisci la tua passphrase per sbloccare il vault';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Nessuna lista di parole per la tua lingua ancora. Si usa l\'inglese.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Le cartelle predefinite possono essere rinominate o eliminate.';
 }

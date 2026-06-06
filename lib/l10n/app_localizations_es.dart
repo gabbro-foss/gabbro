@@ -1797,4 +1797,12 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Introduce tu frase de contraseña para desbloquear tu cofre';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Aún no hay lista de palabras para tu idioma. Se usa inglés.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Las carpetas predeterminadas se pueden renombrar o eliminar.';
 }

@@ -805,5 +805,7 @@
   "helpCaptionJumpToLetter": "Kosketa hakemistopalkissa olevaa kirjainta hypätäksesi kyseiseen osioon",
   "helpCaptionBreakdown": "Kosketa silmäkuvaketta paljastaaksesi salasanan, paina sitten pitkään nähdäksesi yksityiskohtaisen merkkirakennelman",
   "helpCaptionManageVaults": "Hallinnoi holveja -kohdassa voit nimetä tai poistaa holveja tai lisätä uuden",
-  "helpCaptionUnlock": "Syötä salauslause avataksesi holvin"
+  "helpCaptionUnlock": "Syötä salauslause avataksesi holvin",
+  "passphraseNoWordlist": "Kielelläsi ei ole vielä sanalistaa. Käytetään englantia.",
+  "manageFoldersDefaultNote": "Oletuskansioita voi nimetä uudelleen tai poistaa."
 }

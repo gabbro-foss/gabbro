@@ -799,5 +799,7 @@
   "helpCaptionJumpToLetter": "Tẹ lẹta ninu ẹgbẹ-atọka lati lọ si apakan yẹn",
   "helpCaptionBreakdown": "Tẹ aami oju lati ri ọrọ igbaniwọle, lẹhinna tẹ gigun lati ri itupalẹ ohun kikọ alaye",
   "helpCaptionManageVaults": "Ninu «Ṣakoso awọn vọọliti» o le tún orukọ ṣe tabi pa awọn vọọliti, tabi fi tuntun kun",
-  "helpCaptionUnlock": "Tẹ gbolohun ọrọ igbaniwọle lati ṣii vọọliti"
+  "helpCaptionUnlock": "Tẹ gbolohun ọrọ igbaniwọle lati ṣii vọọliti",
+  "passphraseNoWordlist": "Ko si atokọ ọrọ fun ede rẹ sibẹ. Lilo Gẹẹsi.",
+  "manageFoldersDefaultNote": "Awọn folda aiyipada le jẹ atun-lorukọ tabi paarẹ."
 }

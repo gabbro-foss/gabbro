@@ -5,6 +5,7 @@
 
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'types.dart';
 
 // These functions are ignored because they are not marked as `pub`: `wordlist_for`
 
@@ -24,8 +25,6 @@ Future<double> passphraseEntropyBits({
   wordCount: wordCount,
   language: language,
 );
-
-enum Language { english, french, german, spanish, italian }
 
 class PassphraseConfig {
   final int wordCount;

@@ -1789,4 +1789,12 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Įveskite slaptafrazę, kad atrakintumėte saugyklą';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Jūsų kalbai dar nėra žodžių sąrašo. Naudojama anglų kalba.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Numatytuosius aplankus galima pervadinti arba ištrinti.';
 }

@@ -1784,4 +1784,12 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Zadajte prístupovú frázu na odomknutie trezora';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Pre váš jazyk zatiaľ nie je zoznam slov. Používa sa angličtina.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Predvolené priečinky možno premenovať alebo odstrániť.';
 }

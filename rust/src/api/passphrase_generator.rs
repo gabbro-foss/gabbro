@@ -1,4 +1,4 @@
-use flutter_rust_bridge::frb;
+pub use super::types::Language;
 use rand::Rng;
 
 // ---------------------------------------------------------------------------
@@ -10,19 +10,25 @@ const WORDLIST_FR: &str = include_str!("../../assets/wordlist_fr.txt");
 const WORDLIST_DE: &str = include_str!("../../assets/wordlist_de.txt");
 const WORDLIST_ES: &str = include_str!("../../assets/wordlist_es.txt");
 const WORDLIST_IT: &str = include_str!("../../assets/wordlist_it.txt");
+const WORDLIST_SV: &str = include_str!("../../assets/wordlist_sv.txt");
+const WORDLIST_DA: &str = include_str!("../../assets/wordlist_da.txt");
+const WORDLIST_NB: &str = include_str!("../../assets/wordlist_nb.txt");
+const WORDLIST_FI: &str = include_str!("../../assets/wordlist_fi.txt");
+const WORDLIST_SL: &str = include_str!("../../assets/wordlist_sl.txt");
+const WORDLIST_PL: &str = include_str!("../../assets/wordlist_pl.txt");
+const WORDLIST_RU: &str = include_str!("../../assets/wordlist_ru.txt");
+const WORDLIST_HU: &str = include_str!("../../assets/wordlist_hu.txt");
+const WORDLIST_CS: &str = include_str!("../../assets/wordlist_cs.txt");
+const WORDLIST_EL: &str = include_str!("../../assets/wordlist_el.txt");
+const WORDLIST_PT: &str = include_str!("../../assets/wordlist_pt.txt");
+const WORDLIST_ET: &str = include_str!("../../assets/wordlist_et.txt");
+const WORDLIST_SK: &str = include_str!("../../assets/wordlist_sk.txt");
+const WORDLIST_BG: &str = include_str!("../../assets/wordlist_bg.txt");
+const WORDLIST_UK: &str = include_str!("../../assets/wordlist_uk.txt");
 
 // ---------------------------------------------------------------------------
 // Public types
 // ---------------------------------------------------------------------------
-
-#[frb(dart_metadata=("freezed"))]
-pub enum Language {
-    English,
-    French,
-    German,
-    Spanish,
-    Italian,
-}
 
 pub struct PassphraseConfig {
     pub word_count: u32,
@@ -43,6 +49,21 @@ fn wordlist_for(language: &Language) -> Vec<&'static str> {
         Language::German => WORDLIST_DE,
         Language::Spanish => WORDLIST_ES,
         Language::Italian => WORDLIST_IT,
+        Language::Swedish => WORDLIST_SV,
+        Language::Danish => WORDLIST_DA,
+        Language::Norwegian => WORDLIST_NB,
+        Language::Finnish => WORDLIST_FI,
+        Language::Slovenian => WORDLIST_SL,
+        Language::Polish => WORDLIST_PL,
+        Language::Russian => WORDLIST_RU,
+        Language::Hungarian => WORDLIST_HU,
+        Language::Czech => WORDLIST_CS,
+        Language::Greek => WORDLIST_EL,
+        Language::Portuguese => WORDLIST_PT,
+        Language::Estonian => WORDLIST_ET,
+        Language::Slovak => WORDLIST_SK,
+        Language::Bulgarian => WORDLIST_BG,
+        Language::Ukrainian => WORDLIST_UK,
     };
     raw.lines().filter(|l| !l.is_empty()).collect()
 }
@@ -245,6 +266,22 @@ mod tests {
     }
 
     #[test]
+    fn test_entropy_estonian() {
+        // 4 words from 7052-word list: 4 * log2(7052) ≈ 51.1 bits
+        let entropy = passphrase_entropy_bits(4, Language::Estonian);
+        let expected = 4.0 * (7052_f64).log2();
+        assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
+    }
+
+    #[test]
+    fn test_entropy_bulgarian() {
+        // 4 words from 7527-word list: 4 * log2(7527) ≈ 51.5 bits
+        let entropy = passphrase_entropy_bits(4, Language::Bulgarian);
+        let expected = 4.0 * (7527_f64).log2();
+        assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
+    }
+
+    #[test]
     fn test_all_languages_generate() {
         let languages = [
             ("English", Language::English),
@@ -252,6 +289,21 @@ mod tests {
             ("German", Language::German),
             ("Spanish", Language::Spanish),
             ("Italian", Language::Italian),
+            ("Swedish", Language::Swedish),
+            ("Danish", Language::Danish),
+            ("Norwegian", Language::Norwegian),
+            ("Finnish", Language::Finnish),
+            ("Slovenian", Language::Slovenian),
+            ("Polish", Language::Polish),
+            ("Russian", Language::Russian),
+            ("Hungarian", Language::Hungarian),
+            ("Czech", Language::Czech),
+            ("Greek", Language::Greek),
+            ("Portuguese", Language::Portuguese),
+            ("Estonian", Language::Estonian),
+            ("Slovak", Language::Slovak),
+            ("Bulgarian", Language::Bulgarian),
+            ("Ukrainian", Language::Ukrainian),
         ];
         for (name, lang) in languages {
             let config = PassphraseConfig {

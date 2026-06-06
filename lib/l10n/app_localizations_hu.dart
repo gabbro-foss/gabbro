@@ -1784,4 +1784,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get helpCaptionUnlock => 'Add meg a jelmondatot a széf feloldásához';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Az Ön nyelvéhez még nincs szólista. Angolt használ.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Az alapértelmezett mappák átnevezhetők vagy törölhetők.';
 }

@@ -805,5 +805,7 @@
   "helpCaptionJumpToLetter": "Pieskarieties indeksa joslā esošajam burtam, lai pārietu uz šo sadaļu",
   "helpCaptionBreakdown": "Pieskarieties acu ikonai, lai atklātu paroli, pēc tam turiet, lai skatītu detalizētu rakstzīmju sadalījumu",
   "helpCaptionManageVaults": "Seifa pārvaldībā varat pārdēvēt vai dzēst seifus, vai pievienot jaunu",
-  "helpCaptionUnlock": "Ievadiet ieejas frāzi, lai atbloķētu seifu"
+  "helpCaptionUnlock": "Ievadiet ieejas frāzi, lai atbloķētu seifu",
+  "passphraseNoWordlist": "Jūsu valodai vēl nav vārdu saraksta. Tiek izmantota angļu valoda.",
+  "manageFoldersDefaultNote": "Noklusējuma mapes var pārdēvēt vai dzēst."
 }

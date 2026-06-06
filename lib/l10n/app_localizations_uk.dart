@@ -1789,4 +1789,12 @@ class AppLocalizationsUk extends AppLocalizations {
   @override
   String get helpCaptionUnlock =>
       'Введіть кодову фразу для розблокування сховища';
+
+  @override
+  String get passphraseNoWordlist =>
+      'Для вашої мови ще немає списку слів. Використовується англійська.';
+
+  @override
+  String get manageFoldersDefaultNote =>
+      'Типові теки можна перейменовувати або видаляти.';
 }

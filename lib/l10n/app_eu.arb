@@ -799,5 +799,7 @@
   "helpCaptionJumpToLetter": "Sakatu indize-barrako letra atal horretara joateko",
   "helpCaptionBreakdown": "Sakatu begi-ikonoa pasahitza ikusteko, gero luze sakatu karaktereen azterketa zehatza ikusteko",
   "helpCaptionManageVaults": "«Gandegiak kudeatu»-n gandegiak berrizendatu edo ezabatu ditzakezu, edo berria gehitu",
-  "helpCaptionUnlock": "Sartu pasaesaldia gandegiak desblokeatzeko"
+  "helpCaptionUnlock": "Sartu pasaesaldia gandegiak desblokeatzeko",
+  "passphraseNoWordlist": "Zure hizkuntzarako oraindik ez dago hitz-zerrendasik. Ingelesa erabiltzen da.",
+  "manageFoldersDefaultNote": "Karpeta lehenetsiak berrizendatu edo ezabatu daitezke."
 }

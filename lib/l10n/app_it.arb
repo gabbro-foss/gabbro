@@ -799,5 +799,7 @@
   "helpCaptionJumpToLetter": "Tocca una lettera nella barra dell'indice per passare a quella sezione",
   "helpCaptionBreakdown": "Tocca l'icona occhio per rivelare una password, poi tieni premuto per vedere una scomposizione dettagliata dei caratteri",
   "helpCaptionManageVaults": "In Gestisci vault, puoi rinominare o eliminare vault, o aggiungerne uno nuovo",
-  "helpCaptionUnlock": "Inserisci la tua passphrase per sbloccare il vault"
+  "helpCaptionUnlock": "Inserisci la tua passphrase per sbloccare il vault",
+  "passphraseNoWordlist": "Nessuna lista di parole per la tua lingua ancora. Si usa l'inglese.",
+  "manageFoldersDefaultNote": "Le cartelle predefinite possono essere rinominate o eliminate."
 }

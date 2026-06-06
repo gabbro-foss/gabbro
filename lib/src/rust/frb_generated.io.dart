@@ -9,6 +9,7 @@ import 'api/import.dart';
 import 'api/passphrase_generator.dart';
 import 'api/password_generator.dart';
 import 'api/simple.dart';
+import 'api/types.dart';
 import 'api/vault.dart';
 import 'api/vault_bridge.dart';
 import 'dart:async';
