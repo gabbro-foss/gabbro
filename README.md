@@ -2,9 +2,9 @@
 
 A post-quantum password manager built with security as core DNA.
 
-> **Status: Alpha — v0.1.0-alpha.5 (invited testers only).**
+> **Status: Alpha — v0.1.0-alpha.4 released; v0.1.0-alpha.5 in preparation.**
 > All vault operations are implemented and tested in Rust.
-> Flutter UI implemented (492 tests passing).
+> Flutter UI implemented (496 tests passing).
 
 ---
 
@@ -29,6 +29,7 @@ Named after the intrusive igneous rock — hard, stable, enduring.
 - **Local-first** — your vault lives on your device; sync is your
   choice and your responsibility
 - **Localised** — UI available in 33 languages (EN, FR, DE, IT, ES, and 28 more); follows system locale with in-app override
+- **Multi-language passphrase generator** — 20-language wordlist library; classic generator uses language-native character pools (Greek, Cyrillic)
 - **In-app help** — offline help carousel; no external website or internet connection required
 - **FOSS** — GPL-3.0-only licensed
 
