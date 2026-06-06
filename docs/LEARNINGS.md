@@ -3750,3 +3750,40 @@ GabbroApp.maybeOf(context)?.registry.lastUsed?.alias ?? widget.vaultAlias
 Because Flutter calls `build()` when a route becomes the top of the stack
 (e.g. the covering route is popped), the live read sees the latest state
 without any explicit notification mechanism.
+
+---
+
+## Wordlist curation — explicit character-class filters for frequency corpora
+
+When filtering raw frequency-corpus data (e.g. hermitdave/FrequencyWords,
+OpenSubtitles-derived) for passphrase wordlists, never use `[a-z]` as the
+base Latin range. It includes `q`, `w`, `x`, `y` which are absent from
+Croatian, Latvian, Slovenian, and several other European alphabets.
+
+Use an explicit enumeration of the target language's actual alphabet:
+
+```python
+# Bad — allows English loan words and proper-noun derivatives through
+r"[a-zčćđšž]{4,12}"   # Croatian: q/w/x/y admitted, đ may be forgotten
+
+# Good — only letters that exist in Croatian
+r"[abcčćđefghijklmnoprsštuvzž]{4,12}"
+```
+
+Common traps:
+- **Missing letters**: enumerate carefully. Croatian `đ` sits between `d` and `e`
+  and is easily skipped; zero words containing it is a red flag.
+- **y in Lithuanian**: `y` IS a valid Lithuanian letter — do not exclude it.
+  Only `q`, `w`, `x` are absent from Lithuanian.
+- **Aspell-sourced lists are not immune**: `aspell-sl` (Slovenian) includes
+  derived forms of foreign proper nouns ("andyjevimi", "auschwičani") that
+  pass a permissive `[a-z...]` filter.
+- **Subtitle corpora have cross-language bleed**: hermitdave/FrequencyWords
+  uses OpenSubtitles data; a small number of foreign words in the target
+  language's subtitles will survive any character-class filter. This is an
+  accepted limitation — it does not affect security (entropy comes from pool
+  size, not every word being a dictionary word).
+
+After generating any wordlist, run a quick audit:
+1. Check that every script-specific letter appears in at least some words.
+2. Check that forbidden letters (q/w/x/y for most Latin-script European languages) appear in zero words.
