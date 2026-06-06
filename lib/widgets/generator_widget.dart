@@ -196,6 +196,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
         _language = newLanguage;
         _showLangFallback = newFallback;
       });
+      _generate(); // regenerate immediately with the resolved script/wordlist
     }
   }
 
