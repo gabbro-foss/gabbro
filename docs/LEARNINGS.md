@@ -4,6 +4,32 @@ A running journal of concepts covered during development.
 
 ---
 
+## Dart RegExp — Unicode property escapes for script-aware character classification
+
+Dart's `RegExp` supports Unicode property escapes when `unicode: true` is passed.
+This is the correct way to classify characters from non-Latin scripts:
+
+```dart
+RegExp(r'\p{Lu}', unicode: true).hasMatch(ch)  // uppercase letter (any script)
+RegExp(r'\p{Ll}', unicode: true).hasMatch(ch)  // lowercase letter (any script)
+RegExp(r'\p{Nd}', unicode: true).hasMatch(ch)  // decimal digit
+RegExp(r'\p{L}',  unicode: true).hasMatch(ch)  // any letter (catches Lo/Lt/Lm)
+```
+
+ASCII-only patterns (`[A-Z]`, `[a-z]`) silently misclassify Cyrillic, Greek,
+Arabic, CJK, and any other non-Latin letter as "other/symbol".
+
+Unicode letter categories relevant to password analysis:
+- **Lu** — uppercase letter (А Α — Cyrillic, Greek, etc.)
+- **Ll** — lowercase letter (а α)
+- **Lo** — other letter, no case (CJK ideographs, Arabic, Hebrew, Hangul, Hiragana, Katakana…)
+- **Nd** — decimal digit (covers non-ASCII digits too)
+
+CJK scripts (Chinese, Japanese, Korean) have **no concept of uppercase or lowercase**.
+All CJK characters are Lo — the correct display is a neutral "Letter" marker, not uppercase or lowercase.
+
+---
+
 ## Flutter l10n — `GlobalMaterialLocalizations` does not cover all BCP-47 tags
 
 `GlobalMaterialLocalizations.delegate.isSupported(locale)` returns `false` for

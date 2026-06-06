@@ -149,7 +149,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | ~380 | 8 |
-| Flutter (`flutter test`) | 499 | 0 |
+| Flutter (`flutter test`) | 501 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -164,6 +164,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 **Passphrase wordlists for deferred languages.**  
 No usable plain-text source found yet for: `hr`, `sr_Latn`, `lt`, `lv`, `kk`, `yo`, `ja`, `ko`, `zh`.  
+Benelux gap: `nl` (Dutch), `lb` (Luxembourgish), and `wa` (Walloon) are not yet in the Language enum — find GPL-3.0-compatible wordlists and add them.  
 Goal: find GPL-3.0-compatible diceware/EFF-style word lists for as many as possible, then wire them in.
 
 **UI locales deferred** (RTL layout work required): Hebrew, Arabic. Scottish Gaelic deferred (low resource).
