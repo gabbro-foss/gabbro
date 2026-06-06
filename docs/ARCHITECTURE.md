@@ -149,7 +149,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | ~380 | 8 |
-| Flutter (`flutter test`) | 501 | 0 |
+| Flutter (`flutter test`) | 502 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -162,16 +162,9 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Next session
 
-**Passphrase wordlists for deferred languages — research done, wiring pending.**
+**Passphrase wordlists — remaining deferred languages.**
 
-Drop-in ready (diceware-formatted, correct licence — just wire in):
-- `nl` Dutch — 7,776 words, CC-BY — https://mko.re/diceware/diceware-wordlist-nl.txt
-- `zh_CN` Chinese Simplified — 7,776 words, CC-BY 4.0 — https://github.com/cfbao/chinese-diceware
-
-BIP-39 pools (MIT, 2,048 words each — smaller than full diceware but replaces English fallback):
-- `ja` Japanese — hiragana — https://github.com/bitcoin/bips/blob/master/bip-0039/japanese.txt
-- `ko` Korean — hangul — https://github.com/bitcoin/bips/blob/master/bip-0039/korean.txt
-- `zh_TW` Chinese Traditional — https://github.com/bitcoin/bips/blob/master/bip-0039/chinese_traditional.txt
+Wired in this session: `nl`, `ja`, `ko`, `zh_CN`, `zh_TW`.
 
 Needs curation from raw frequency corpus (CC-BY-SA 4.0, hermitdave/FrequencyWords — filter ~50k list to ~7k clean lemmas):
 - `hr` Croatian — also check atoponce/nodepassgen for a pre-curated 9,204-word GPL-3.0 list
@@ -183,7 +176,9 @@ Not viable / deferred indefinitely:
 - `yo` Yoruba — CC0 pool exists but no frequency ordering and complex tonal diacritics; low priority
 - `sr_Latn` Serbian Latin — only Cyrillic corpora found; would need transliteration pipeline
 - `lb` Luxembourgish — CC0 LOD dictionary exists (~35k) but needs processing; very small speaker base
-- `wa` Walloon — nothing usable; endangered language; French covers Wallonia — drop from scope
+- `wa` Walloon — nothing usable; endangered language; French covers Wallonia — dropped
+
+Note: Dutch UI locale (`app_nl.arb`, ~632 strings) not yet added — Dutch is a generator language only for now.
 
 **UI locales deferred** (RTL layout work required): Hebrew, Arabic. Scottish Gaelic deferred (low resource).
 

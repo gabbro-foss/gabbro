@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Passphrase generator: CJK languages now have real wordlists instead of falling back to English. Japanese and Korean use the BIP-39 mnemonic lists (MIT, 2,048 words each); Chinese Simplified uses the cfbao diceware list (CC-BY 4.0, 7,776 words); Chinese Traditional uses the BIP-39 Traditional list (MIT, 2,048 words). `_hasPassphraseWordlist` simplified to always return true. 4 new Rust entropy tests.
+- Passphrase generator: Dutch added as a generator language (`Language::Dutch`, 7,776-word diceware list, CC-BY, source: mko.re). Dutch device users are auto-resolved via system locale. `langDutch` translation key added to all 36 ARB files. 1 new Flutter test.
+
 ### Fixed
 - Password breakdown sheet: non-Latin letters (Greek, Cyrillic, etc.) were misclassified as symbols because `_classify` used ASCII-only regex (`[A-Z]`/`[a-z]`). Replaced with Unicode property escapes (`\p{Lu}`, `\p{Ll}`, `\p{Nd}`) using `unicode: true`. CJK and other scripts without case (Unicode category Lo) now show as a new ◆ **Letter** type (teal) rather than ■ Symbol. `charTypeLetter` translation key added to all 36 ARB files. 2 new TDD tests.
 
