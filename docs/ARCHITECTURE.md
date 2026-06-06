@@ -23,7 +23,7 @@ FOSS, GPL-3.0-only. Potential Yubico partnership.
 
 **Vault entries:** 6 types — Login (displayed as "Password" in UI), Note, Identity, Card, File, Custom. Common fields: UUID, created, modified, folder, tags, favourite. No TOTP — YubiKey covers 2FA; keeping them separate is more secure.
 
-**Password generator:** classic (32–256 chars) and passphrase (4–20 words, 25 languages, EFF-style wordlists embedded at compile time). Classic mode is script-aware (Latin/Greek/Cyrillic pools). All generation in Rust.
+**Password generator:** classic (32–256 chars) and passphrase (4–20 words, 29 languages, EFF-style wordlists embedded at compile time). Classic mode is script-aware (Latin/Greek/Cyrillic pools). All generation in Rust.
 
 **Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text size, high-contrast, alphabet bar position.
 
@@ -74,7 +74,7 @@ gabbro/
 │   │   │   ├── simple.rs
 │   │   │   ├── password_generator.rs
 │   │   │   ├── passphrase_generator.rs
-│   │   │   ├── types.rs            # Shared types (Language enum — 25 variants)
+│   │   │   ├── types.rs            # Shared types (Language enum — 29 variants)
 │   │   │   ├── vault.rs
 │   │   │   ├── vault_bridge.rs
 │   │   │   ├── import.rs
@@ -149,7 +149,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | ~380 | 8 |
-| Flutter (`flutter test`) | 502 | 0 |
+| Flutter (`flutter test`) | 506 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -162,25 +162,13 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Next session
 
-**Passphrase wordlists — remaining deferred languages.**
+**Importers — Google Password Manager and Dashlane.**
 
-Wired in this session: `nl`, `ja`, `ko`, `zh_CN`, `zh_TW`.
+See `rust/src/import/` for the existing importer pattern (Enpass CSV). Two new importers:
+- Google Password Manager (CSV export)
+- Dashlane (CSV or JSON export)
 
-Needs curation from raw frequency corpus (CC-BY-SA 4.0, hermitdave/FrequencyWords — filter ~50k list to ~7k clean lemmas):
-- `hr` Croatian — also check atoponce/nodepassgen for a pre-curated 9,204-word GPL-3.0 list
-- `lt` Lithuanian — heavily inflected; lemmatisation recommended before use
-- `lv` Latvian — or use LUMII-AILab/Tezaurs (CC-BY-SA 4.0, 315k lemmas, better quality)
-- `kk` Kazakh — smaller corpus, Cyrillic script, script-transition ongoing
-
-Not viable / deferred indefinitely:
-- `yo` Yoruba — CC0 pool exists but no frequency ordering and complex tonal diacritics; low priority
-- `sr_Latn` Serbian Latin — only Cyrillic corpora found; would need transliteration pipeline
-- `lb` Luxembourgish — CC0 LOD dictionary exists (~35k) but needs processing; very small speaker base
-- `wa` Walloon — nothing usable; endangered language; French covers Wallonia — dropped
-
-Note: Dutch UI locale (`app_nl.arb`, ~632 strings) not yet added — Dutch is a generator language only for now.
-
-**UI locales deferred** (RTL layout work required): Hebrew, Arabic. Scottish Gaelic deferred (low resource).
+**UI locales deferred** (RTL layout work required): Hebrew, Arabic.
 
 ### Open from the security audit
 
@@ -239,8 +227,6 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 ### Features & UX
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
-- Add import from Google Password Manager functionality
-- Add import from Dashlane Password Manager functionality
 
 ### Code Quality
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
@@ -248,6 +234,8 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - verify that the artefact files are still valid (ammend or remove as required)
 
 ### V2+ / Defer
+- Dutch UI locale (`app_nl.arb`, ~632 strings) — `LanguageChoice.nl` not in enum; Dutch is generator language only. Add when a translator is available.
+- Passphrase wordlists — not viable without significant pipeline work: `yo` Yoruba (no frequency ordering, complex tonal diacritics); `sr_Latn` Serbian Latin (only Cyrillic corpora; needs transliteration pipeline); `lb` Luxembourgish (small speaker base); `wa` Walloon (nothing usable, French covers Wallonia).
 - Passkey (WebAuthn discoverable credential) support.
 - Vault sync across devices.
 - Autofill save requests (`onSaveRequest`) — see also Features & UX above.
