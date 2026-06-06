@@ -122,6 +122,7 @@
   "langYoruba": "Yorùbá",
   "langChineseSimplified": "中文（简体）",
   "langChineseTraditional": "中文（繁體）",
+  "langDutch": "Nizozemština",
 
   "foregroundLockDescription": "Zamknout po tomto čase nečinnosti, když je aplikace otevřená.",
   "backgroundLockDescription": "Zamknout po tom, co aplikace je na pozadí po tuto dobu.",

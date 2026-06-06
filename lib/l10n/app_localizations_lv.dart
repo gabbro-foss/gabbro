@@ -350,6 +350,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Nīderlandiešu';
+
+  @override
   String get foregroundLockDescription =>
       'Bloķēt pēc šī neaktivitātes laika, kamēr lietotne ir atvērta.';
 

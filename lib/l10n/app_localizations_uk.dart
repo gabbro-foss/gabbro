@@ -352,6 +352,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Нідерландська';
+
+  @override
   String get foregroundLockDescription =>
       'Блокувати після цього часу бездіяльності, поки програма відкрита.';
 

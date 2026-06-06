@@ -122,6 +122,7 @@
   "langYoruba": "Yorùbá",
   "langChineseSimplified": "中文（简体）",
   "langChineseTraditional": "中文（繁體）",
+  "langDutch": "Нидерландски",
 
   "foregroundLockDescription": "Заключи след този период на неактивност, докато приложението е отворено.",
   "backgroundLockDescription": "Заключи след като приложението е било на заден план за толкова дълго.",

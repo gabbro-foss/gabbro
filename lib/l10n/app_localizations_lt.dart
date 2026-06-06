@@ -352,6 +352,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Nyderlandų';
+
+  @override
   String get foregroundLockDescription =>
       'Užrakinti po tokio neveiklumo laiko, kai programa yra atidaryta.';
 

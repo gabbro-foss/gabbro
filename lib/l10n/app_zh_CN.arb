@@ -122,6 +122,7 @@
   "langYoruba": "Yorùbá",
   "langChineseSimplified": "中文（简体）",
   "langChineseTraditional": "中文（繁體）",
+  "langDutch": "荷兰语",
 
   "foregroundLockDescription": "应用打开时在此非活动时间后锁定。",
   "backgroundLockDescription": "应用进入后台此时间后锁定。",

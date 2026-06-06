@@ -122,6 +122,7 @@
   "langYoruba": "Yorùbá",
   "langChineseSimplified": "中文（简体）",
   "langChineseTraditional": "中文（繁體）",
+  "langDutch": "네덜란드어",
 
   "foregroundLockDescription": "앱이 열려 있을 때 이 비활성 시간 이후 잠급니다.",
   "backgroundLockDescription": "앱이 이 시간 동안 백그라운드에 있은 후 잠급니다.",

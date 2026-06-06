@@ -351,6 +351,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Nederlandera';
+
+  @override
   String get foregroundLockDescription =>
       'Aplikazioa irekita dagoenean inaktibitate-denbora hau igarotakoan blokeatu.';
 

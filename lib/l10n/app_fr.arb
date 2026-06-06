@@ -122,6 +122,7 @@
   "langYoruba": "Yorùbá",
   "langChineseSimplified": "中文（简体）",
   "langChineseTraditional": "中文（繁體）",
+  "langDutch": "Néerlandais",
 
   "foregroundLockDescription": "Verrouiller après cette période d'inactivité lorsque l'application est ouverte.",
   "backgroundLockDescription": "Verrouiller après que l'application a été en arrière-plan pendant ce temps.",

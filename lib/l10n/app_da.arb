@@ -122,6 +122,7 @@
   "langYoruba": "Yorùbá",
   "langChineseSimplified": "中文（简体）",
   "langChineseTraditional": "中文（繁體）",
+  "langDutch": "Nederlandsk",
 
   "foregroundLockDescription": "Lås efter denne inaktivitetsperiode, mens appen er åben.",
   "backgroundLockDescription": "Lås efter at appen har været i baggrunden i denne periode.",

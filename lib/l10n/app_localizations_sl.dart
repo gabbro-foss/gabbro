@@ -351,6 +351,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Nizozemščina';
+
+  @override
   String get foregroundLockDescription =>
       'Zakleni po tem času nedejavnosti, ko je aplikacija odprta.';
 

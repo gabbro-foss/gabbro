@@ -352,6 +352,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Hollanti';
+
+  @override
   String get foregroundLockDescription =>
       'Lukitse tämän käyttämättömyysajan jälkeen, kun sovellus on auki.';
 

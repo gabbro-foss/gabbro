@@ -351,6 +351,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Neerlandês';
+
+  @override
   String get foregroundLockDescription =>
       'Bloquear após este tempo de inatividade com o aplicativo aberto.';
 
@@ -2144,6 +2147,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Holandês';
+
+  @override
   String get foregroundLockDescription =>
       'Bloquear após este tempo de inatividade com o aplicativo aberto.';
 
@@ -3935,6 +3941,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get langChineseTraditional => '中文（繁體）';
+
+  @override
+  String get langDutch => 'Neerlandês';
 
   @override
   String get foregroundLockDescription =>

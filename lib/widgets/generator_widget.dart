@@ -50,6 +50,7 @@ String _languageLabel(Language lang, AppLocalizations l) => switch (lang) {
       Language.korean => l.langKorean,
       Language.chineseSimplified => l.langChineseSimplified,
       Language.chineseTraditional => l.langChineseTraditional,
+      Language.dutch => l.langDutch,
     };
 
 /// Maps a [LanguageChoice] (app UI locale) to a [Language] (passphrase wordlist
@@ -85,14 +86,7 @@ Language? _languageChoiceToLanguage(LanguageChoice choice) => switch (choice) {
 
 /// Returns false for languages that have a classic character pool but no
 /// passphrase wordlist — the generator shows a "no wordlist" info message.
-bool _hasPassphraseWordlist(Language lang) => switch (lang) {
-      Language.japanese ||
-      Language.korean ||
-      Language.chineseSimplified ||
-      Language.chineseTraditional =>
-        false,
-      _ => true,
-    };
+bool _hasPassphraseWordlist(Language lang) => true;
 
 /// Resolves the device locale language code to a [Language] when the app
 /// setting is [LanguageChoice.system].
@@ -122,6 +116,7 @@ Language? _systemLocaleToLanguage(Locale locale) {
     'ja' => Language.japanese,
     'ko' => Language.korean,
     'zh' => Language.chineseSimplified,
+    'nl' => Language.dutch,
     _ => null,
   };
 }

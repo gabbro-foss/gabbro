@@ -350,6 +350,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Holland';
+
+  @override
   String get foregroundLockDescription =>
       'Zárolás ennyi inaktivitás után, amíg az alkalmazás nyitva van.';
 

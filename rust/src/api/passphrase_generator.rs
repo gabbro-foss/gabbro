@@ -25,6 +25,11 @@ const WORDLIST_ET: &str = include_str!("../../assets/wordlist_et.txt");
 const WORDLIST_SK: &str = include_str!("../../assets/wordlist_sk.txt");
 const WORDLIST_BG: &str = include_str!("../../assets/wordlist_bg.txt");
 const WORDLIST_UK: &str = include_str!("../../assets/wordlist_uk.txt");
+const WORDLIST_JA: &str = include_str!("../../assets/wordlist_ja.txt");
+const WORDLIST_KO: &str = include_str!("../../assets/wordlist_ko.txt");
+const WORDLIST_ZH_CN: &str = include_str!("../../assets/wordlist_zh_cn.txt");
+const WORDLIST_ZH_TW: &str = include_str!("../../assets/wordlist_zh_tw.txt");
+const WORDLIST_NL: &str = include_str!("../../assets/wordlist_nl.txt");
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -64,11 +69,11 @@ fn wordlist_for(language: &Language) -> Vec<&'static str> {
         Language::Slovak => WORDLIST_SK,
         Language::Bulgarian => WORDLIST_BG,
         Language::Ukrainian => WORDLIST_UK,
-        // No wordlist for CJK — callers receive Err("wordlist is empty")
-        Language::Japanese
-        | Language::Korean
-        | Language::ChineseSimplified
-        | Language::ChineseTraditional => "",
+        Language::Japanese => WORDLIST_JA,
+        Language::Korean => WORDLIST_KO,
+        Language::ChineseSimplified => WORDLIST_ZH_CN,
+        Language::ChineseTraditional => WORDLIST_ZH_TW,
+        Language::Dutch => WORDLIST_NL,
     };
     raw.lines().filter(|l| !l.is_empty()).collect()
 }
@@ -309,6 +314,11 @@ mod tests {
             ("Slovak", Language::Slovak),
             ("Bulgarian", Language::Bulgarian),
             ("Ukrainian", Language::Ukrainian),
+            ("Japanese", Language::Japanese),
+            ("Korean", Language::Korean),
+            ("ChineseSimplified", Language::ChineseSimplified),
+            ("ChineseTraditional", Language::ChineseTraditional),
+            ("Dutch", Language::Dutch),
         ];
         for (name, lang) in languages {
             let config = PassphraseConfig {
@@ -321,6 +331,45 @@ mod tests {
             let result = generate_passphrase(config);
             assert!(result.is_ok(), "Failed for language: {}", name);
         }
+    }
+
+    #[test]
+    fn test_entropy_dutch() {
+        // 4 words from 7776-word list: 4 * log2(7776) ≈ 51.7 bits
+        let entropy = passphrase_entropy_bits(4, Language::Dutch);
+        let expected = 4.0 * (7776_f64).log2();
+        assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
+    }
+
+    #[test]
+    fn test_entropy_japanese() {
+        // 4 words from 2048-word BIP-39 list: 4 * log2(2048) = 44.0 bits
+        let entropy = passphrase_entropy_bits(4, Language::Japanese);
+        let expected = 4.0 * (2048_f64).log2();
+        assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
+    }
+
+    #[test]
+    fn test_entropy_korean() {
+        let entropy = passphrase_entropy_bits(4, Language::Korean);
+        let expected = 4.0 * (2048_f64).log2();
+        assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
+    }
+
+    #[test]
+    fn test_entropy_chinese_simplified() {
+        // 4 words from 7776-word cfbao list: 4 * log2(7776) ≈ 51.7 bits
+        let entropy = passphrase_entropy_bits(4, Language::ChineseSimplified);
+        let expected = 4.0 * (7776_f64).log2();
+        assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
+    }
+
+    #[test]
+    fn test_entropy_chinese_traditional() {
+        // 4 words from 2048-word BIP-39 list: 4 * log2(2048) = 44.0 bits
+        let entropy = passphrase_entropy_bits(4, Language::ChineseTraditional);
+        let expected = 4.0 * (2048_f64).log2();
+        assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
     }
 
     #[test]

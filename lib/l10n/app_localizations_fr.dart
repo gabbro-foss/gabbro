@@ -352,6 +352,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Néerlandais';
+
+  @override
   String get foregroundLockDescription =>
       'Verrouiller après cette période d\'inactivité lorsque l\'application est ouverte.';
 

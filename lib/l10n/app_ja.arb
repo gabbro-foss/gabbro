@@ -122,6 +122,7 @@
   "langYoruba": "Yorùbá",
   "langChineseSimplified": "中文（简体）",
   "langChineseTraditional": "中文（繁體）",
+  "langDutch": "オランダ語",
 
   "foregroundLockDescription": "アプリが開いているときのこの非アクティブ時間後にロックします。",
   "backgroundLockDescription": "アプリがこの時間バックグラウンドになった後にロックします。",

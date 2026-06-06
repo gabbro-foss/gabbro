@@ -122,6 +122,7 @@
   "langYoruba": "Yorùbá",
   "langChineseSimplified": "中文（简体）",
   "langChineseTraditional": "中文（繁體）",
+  "langDutch": "Нидерландский",
 
   "foregroundLockDescription": "Блокировать после этого периода бездействия, пока приложение открыто.",
   "backgroundLockDescription": "Блокировать после нахождения приложения в фоне в течение этого времени.",

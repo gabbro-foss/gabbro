@@ -350,6 +350,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Нидерланд тілі';
+
+  @override
   String get foregroundLockDescription =>
       'Қосымша ашық тұрғанда осы белсенсіздік уақытынан кейін бекіту.';
 

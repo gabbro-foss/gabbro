@@ -350,6 +350,9 @@ class AppLocalizationsYo extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Èdè Dọ́ọ̀tù';
+
+  @override
   String get foregroundLockDescription =>
       'Titi lẹhin akoko aiṣiṣẹ yii nigba ti app ṣii.';
 

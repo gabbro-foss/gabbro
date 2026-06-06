@@ -839,6 +839,12 @@ abstract class AppLocalizations {
   /// **'中文（繁體）'**
   String get langChineseTraditional;
 
+  /// No description provided for @langDutch.
+  ///
+  /// In en, this message translates to:
+  /// **'Dutch'**
+  String get langDutch;
+
   /// No description provided for @foregroundLockDescription.
   ///
   /// In en, this message translates to:

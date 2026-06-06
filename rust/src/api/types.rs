@@ -4,7 +4,7 @@ use flutter_rust_bridge::frb;
 ///
 /// Each variant maps to an embedded wordlist (passphrase mode) and to a
 /// script-specific character pool (classic mode).  `nb` covers both Bokmål
-/// and Nynorsk; `pt` covers both pt-PT and pt-BR.
+/// and Nynorsk; `pt` covers both pt-PT and pt-BR; `nl` covers Dutch and Flemish.
 #[frb(dart_metadata = ("freezed"))]
 pub enum Language {
     English,
@@ -31,4 +31,5 @@ pub enum Language {
     Korean,
     ChineseSimplified,
     ChineseTraditional,
+    Dutch,
 }

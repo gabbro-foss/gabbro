@@ -352,6 +352,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Ολλανδικά';
+
+  @override
   String get foregroundLockDescription =>
       'Κλείδωμα μετά από αυτό το χρονικό διάστημα αδράνειας όταν η εφαρμογή είναι ανοιχτή.';
 

@@ -10,7 +10,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 ///
 /// Each variant maps to an embedded wordlist (passphrase mode) and to a
 /// script-specific character pool (classic mode).  `nb` covers both Bokmål
-/// and Nynorsk; `pt` covers both pt-PT and pt-BR.
+/// and Nynorsk; `pt` covers both pt-PT and pt-BR; `nl` covers Dutch and Flemish.
 enum Language {
   english,
   french,
@@ -36,4 +36,5 @@ enum Language {
   korean,
   chineseSimplified,
   chineseTraditional,
+  dutch,
 }

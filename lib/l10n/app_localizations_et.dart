@@ -351,6 +351,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
+  String get langDutch => 'Hollandi';
+
+  @override
   String get foregroundLockDescription =>
       'Lukusta pärast seda kasutamata aega, kui rakendus on avatud.';
 

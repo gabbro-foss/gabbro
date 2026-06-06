@@ -318,5 +318,39 @@ void main() {
             'app language is Chinese Simplified',
       );
     });
+
+  });
+
+  _dutchTests();
+}
+
+// ---------------------------------------------------------------------------
+// Dutch generator language tests (no app-locale LanguageChoice.nl needed)
+// ---------------------------------------------------------------------------
+
+Widget _wrappedGenerator() => testApp(Scaffold(
+      body: GeneratorWidget(
+        generatePasswordFn: _stubPassword,
+        generatePassphraseFn: _stubPassphrase,
+        passphraseEntropyBitsFn: _stubEntropyBits,
+        entropyBitsFn: _stubEntropy,
+      ),
+    ));
+
+void _dutchTests() {
+  group('Dutch generator language', () {
+    testWidgets('Dutch appears as a language option in the picker',
+        (tester) async {
+      await tester.pumpWidget(_wrappedGenerator());
+      await tester.pumpAndSettle();
+
+      // The language picker is always visible but may be scrollable;
+      // skipOffstage: false finds it even when scrolled out of view.
+      expect(
+        find.text('Dutch', skipOffstage: false),
+        findsOneWidget,
+        reason: 'Language.dutch must be listed with label langDutch = "Dutch"',
+      );
+    });
   });
 }
