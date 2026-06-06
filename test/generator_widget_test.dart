@@ -322,6 +322,10 @@ void main() {
   });
 
   _dutchTests();
+  _croatianTests();
+  _lithuanianTests();
+  _latvianTests();
+  _kazakhTests();
 }
 
 // ---------------------------------------------------------------------------
@@ -346,10 +350,75 @@ void _dutchTests() {
 
       // The language picker is always visible but may be scrollable;
       // skipOffstage: false finds it even when scrolled out of view.
+      // app_en.arb uses endonym: langDutch = "Nederlands"
       expect(
-        find.text('Dutch', skipOffstage: false),
+        find.text('Nederlands', skipOffstage: false),
         findsOneWidget,
-        reason: 'Language.dutch must be listed with label langDutch = "Dutch"',
+        reason: 'Language.dutch must be listed with label langDutch = "Nederlands"',
+      );
+    });
+  });
+}
+
+void _croatianTests() {
+  group('Croatian generator language', () {
+    testWidgets('Croatian appears as a language option in the picker',
+        (tester) async {
+      await tester.pumpWidget(_wrappedGenerator());
+      await tester.pumpAndSettle();
+      // app_en.arb uses endonym: langCroatian = "Hrvatski"
+      expect(
+        find.text('Hrvatski', skipOffstage: false),
+        findsOneWidget,
+        reason: 'Language.croatian must be listed with label langCroatian = "Hrvatski"',
+      );
+    });
+  });
+}
+
+void _lithuanianTests() {
+  group('Lithuanian generator language', () {
+    testWidgets('Lithuanian appears as a language option in the picker',
+        (tester) async {
+      await tester.pumpWidget(_wrappedGenerator());
+      await tester.pumpAndSettle();
+      // app_en.arb uses endonym: langLithuanian = "Lietuvių"
+      expect(
+        find.text('Lietuvių', skipOffstage: false),
+        findsOneWidget,
+        reason: 'Language.lithuanian must be listed with label langLithuanian = "Lietuvių"',
+      );
+    });
+  });
+}
+
+void _latvianTests() {
+  group('Latvian generator language', () {
+    testWidgets('Latvian appears as a language option in the picker',
+        (tester) async {
+      await tester.pumpWidget(_wrappedGenerator());
+      await tester.pumpAndSettle();
+      // app_en.arb uses endonym: langLatvian = "Latviešu"
+      expect(
+        find.text('Latviešu', skipOffstage: false),
+        findsOneWidget,
+        reason: 'Language.latvian must be listed with label langLatvian = "Latviešu"',
+      );
+    });
+  });
+}
+
+void _kazakhTests() {
+  group('Kazakh generator language', () {
+    testWidgets('Kazakh appears as a language option in the picker',
+        (tester) async {
+      await tester.pumpWidget(_wrappedGenerator());
+      await tester.pumpAndSettle();
+      // app_en.arb uses endonym: langKazakh = "Қазақша"
+      expect(
+        find.text('Қазақша', skipOffstage: false),
+        findsOneWidget,
+        reason: 'Language.kazakh must be listed with label langKazakh = "Қазақша"',
       );
     });
   });

@@ -37,4 +37,8 @@ enum Language {
   chineseSimplified,
   chineseTraditional,
   dutch,
+  croatian,
+  lithuanian,
+  latvian,
+  kazakh,
 }

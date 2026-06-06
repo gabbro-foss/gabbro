@@ -842,7 +842,7 @@ abstract class AppLocalizations {
   /// No description provided for @langDutch.
   ///
   /// In en, this message translates to:
-  /// **'Dutch'**
+  /// **'Nederlands'**
   String get langDutch;
 
   /// No description provided for @foregroundLockDescription.

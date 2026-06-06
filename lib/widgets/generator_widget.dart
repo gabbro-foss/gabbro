@@ -51,6 +51,10 @@ String _languageLabel(Language lang, AppLocalizations l) => switch (lang) {
       Language.chineseSimplified => l.langChineseSimplified,
       Language.chineseTraditional => l.langChineseTraditional,
       Language.dutch => l.langDutch,
+      Language.croatian => l.langCroatian,
+      Language.lithuanian => l.langLithuanian,
+      Language.latvian => l.langLatvian,
+      Language.kazakh => l.langKazakh,
     };
 
 /// Maps a [LanguageChoice] (app UI locale) to a [Language] (passphrase wordlist
@@ -81,6 +85,10 @@ Language? _languageChoiceToLanguage(LanguageChoice choice) => switch (choice) {
       LanguageChoice.ko => Language.korean,
       LanguageChoice.zhCn => Language.chineseSimplified,
       LanguageChoice.zhTw => Language.chineseTraditional,
+      LanguageChoice.hr => Language.croatian,
+      LanguageChoice.lt => Language.lithuanian,
+      LanguageChoice.lv => Language.latvian,
+      LanguageChoice.kk => Language.kazakh,
       _ => null, // no wordlist for this LanguageChoice
     };
 
@@ -117,6 +125,10 @@ Language? _systemLocaleToLanguage(Locale locale) {
     'ko' => Language.korean,
     'zh' => Language.chineseSimplified,
     'nl' => Language.dutch,
+    'hr' => Language.croatian,
+    'lt' => Language.lithuanian,
+    'lv' => Language.latvian,
+    'kk' => Language.kazakh,
     _ => null,
   };
 }

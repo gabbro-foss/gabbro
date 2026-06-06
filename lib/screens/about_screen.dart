@@ -331,6 +331,16 @@ const _kComponents = [
     url: 'https://github.com/marshallpierce/rust-base64',
   ),
   _Component(
+    name: 'BIP-39 wordlists (ja, ko, zh-TW)',
+    licence: 'MIT',
+    url: 'https://github.com/trezor/python-mnemonic',
+  ),
+  _Component(
+    name: 'ChineseWordDiceware (zh-CN)',
+    licence: 'CC-BY-4.0',
+    url: 'https://github.com/cfbao/ChineseWordDiceware',
+  ),
+  _Component(
     name: 'Dart',
     licence: 'BSD-3-Clause',
     url: 'https://github.com/dart-lang/sdk',
@@ -341,7 +351,7 @@ const _kComponents = [
     url: 'https://github.com/assenv/diceware-wordlist-bg',
   ),
   _Component(
-    name: 'Diceware-word-lists (et)',
+    name: 'Diceware-word-lists (et, uk)',
     licence: 'CC-BY-4.0',
     url: 'https://github.com/agreinhold/Diceware-word-lists',
   ),
@@ -364,6 +374,11 @@ const _kComponents = [
     name: 'flutter_rust_bridge',
     licence: 'MIT',
     url: 'https://github.com/fzyzcjy/flutter_rust_bridge',
+  ),
+  _Component(
+    name: 'FrequencyWords (hr, lt, lv, kk)',
+    licence: 'CC-BY-SA 4.0',
+    url: 'https://github.com/hermitdave/FrequencyWords',
   ),
   _Component(
     name: 'freezed_annotation',

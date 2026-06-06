@@ -32,4 +32,8 @@ pub enum Language {
     ChineseSimplified,
     ChineseTraditional,
     Dutch,
+    Croatian,
+    Lithuanian,
+    Latvian,
+    Kazakh,
 }

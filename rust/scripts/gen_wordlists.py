@@ -10,6 +10,11 @@ Licensed downloads:
   bg  — assenv/diceware-wordlist-bg    (space NNNNN word, CC-BY-4.0)
   el  — kalpetros/greek-dictionary     (space NNNNN word, MIT, Greek only)
   uk  — agreinhold/Diceware-word-lists (tab NNNNN\tword\tRomanized, MIT, skip header)
+Frequency corpora (CC-BY-SA 4.0, hermitdave/FrequencyWords):
+  hr  — hr_50k.txt  (7776 words, freq_word0 format)
+  lt  — lt_50k.txt  (7776 words, freq_word0 format)
+  lv  — lv_50k.txt  (7776 words, freq_word0 format)
+  kk  — kk_full.txt (4311 words — full corpus; freq_word0 format)
 
 Run from the repo root: python3 rust/scripts/gen_wordlists.py
 """
@@ -71,7 +76,7 @@ ASPELL = {
     "da": r"[a-zæøå]{4,12}",
     "nb": r"[a-zæøå]{4,12}",
     "fi": r"[a-zäöå]{4,12}",
-    "sl": r"[a-zčšž]{4,12}",
+    "sl": r"[abcčdefghijklmnoprsštuvzž]{4,12}",  # explicit — excludes q w x y
     "pl": r"[a-ząćęłńóśźż]{4,12}",
     "ru": r"[а-яё]{4,12}",
     "hu": r"[a-záéíóöőúüű]{4,12}",
@@ -117,6 +122,31 @@ DOWNLOADS: dict[str, tuple[str, str, str | None]] = {
         r"[а-я]{3,12}",        # strips symbols and numbers, Cyrillic only
     ),
     # el is generated from aspell-el (see ASPELL dict above)
+    # Frequency corpora (CC-BY-SA 4.0, hermitdave/FrequencyWords)
+    "hr": (
+        "https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/hr/hr_50k.txt",
+        "freq_word0",
+        # Explicit Croatian alphabet — excludes q w x y which are not Croatian letters
+        r"[abcčćđefghijklmnoprsštuvzž]{4,12}",
+    ),
+    "lt": (
+        "https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/lt/lt_50k.txt",
+        "freq_word0",
+        # Explicit Lithuanian alphabet — y IS a valid Lithuanian letter; excludes q w x
+        r"[aąbcčdeęėfghiįyjklmnoprsštuųūvzž]{4,12}",
+    ),
+    "lv": (
+        "https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/lv/lv_50k.txt",
+        "freq_word0",
+        # Explicit Latvian alphabet — excludes q w x y which are not Latvian letters
+        r"[aābcčdeēfgģhiījkķlļmnņoprsštuūvzž]{4,12}",
+    ),
+    "kk": (
+        # Only ~4311 words available; full corpus used (no sampling needed)
+        "https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/kk/kk_full.txt",
+        "freq_word0",
+        r"[а-яёәғқңөұүһі]{4,12}",
+    ),
     "uk": (
         f"{BASE_AGREINHOLD}/diceware_ua_uk_long.txt",
         "tab_field1_uk",       # header + NNNNN\tword\tRomanized
@@ -154,6 +184,11 @@ def parse(content: str, fmt: str) -> list[str]:
             # skip header row (first field is "index")
             if len(parts) >= 2 and parts[0].strip() != "index":
                 words.append(parts[1].strip())
+        elif fmt == "freq_word0":
+            # hermitdave/FrequencyWords: "word count" — word is first field
+            parts = line.split()
+            if parts:
+                words.append(parts[0].lower())
     return [w for w in words if w]
 
 

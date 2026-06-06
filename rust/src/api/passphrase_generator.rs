@@ -30,6 +30,10 @@ const WORDLIST_KO: &str = include_str!("../../assets/wordlist_ko.txt");
 const WORDLIST_ZH_CN: &str = include_str!("../../assets/wordlist_zh_cn.txt");
 const WORDLIST_ZH_TW: &str = include_str!("../../assets/wordlist_zh_tw.txt");
 const WORDLIST_NL: &str = include_str!("../../assets/wordlist_nl.txt");
+const WORDLIST_HR: &str = include_str!("../../assets/wordlist_hr.txt");
+const WORDLIST_LT: &str = include_str!("../../assets/wordlist_lt.txt");
+const WORDLIST_LV: &str = include_str!("../../assets/wordlist_lv.txt");
+const WORDLIST_KK: &str = include_str!("../../assets/wordlist_kk.txt");
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -74,6 +78,10 @@ fn wordlist_for(language: &Language) -> Vec<&'static str> {
         Language::ChineseSimplified => WORDLIST_ZH_CN,
         Language::ChineseTraditional => WORDLIST_ZH_TW,
         Language::Dutch => WORDLIST_NL,
+        Language::Croatian => WORDLIST_HR,
+        Language::Lithuanian => WORDLIST_LT,
+        Language::Latvian => WORDLIST_LV,
+        Language::Kazakh => WORDLIST_KK,
     };
     raw.lines().filter(|l| !l.is_empty()).collect()
 }
@@ -319,6 +327,10 @@ mod tests {
             ("ChineseSimplified", Language::ChineseSimplified),
             ("ChineseTraditional", Language::ChineseTraditional),
             ("Dutch", Language::Dutch),
+            ("Croatian", Language::Croatian),
+            ("Lithuanian", Language::Lithuanian),
+            ("Latvian", Language::Latvian),
+            ("Kazakh", Language::Kazakh),
         ];
         for (name, lang) in languages {
             let config = PassphraseConfig {
@@ -369,6 +381,38 @@ mod tests {
         // 4 words from 2048-word BIP-39 list: 4 * log2(2048) = 44.0 bits
         let entropy = passphrase_entropy_bits(4, Language::ChineseTraditional);
         let expected = 4.0 * (2048_f64).log2();
+        assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
+    }
+
+    #[test]
+    fn test_entropy_croatian() {
+        // 4 words from 7776-word list: 4 * log2(7776) ≈ 51.7 bits
+        let entropy = passphrase_entropy_bits(4, Language::Croatian);
+        let expected = 4.0 * (7776_f64).log2();
+        assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
+    }
+
+    #[test]
+    fn test_entropy_lithuanian() {
+        // 4 words from 7776-word list: 4 * log2(7776) ≈ 51.7 bits
+        let entropy = passphrase_entropy_bits(4, Language::Lithuanian);
+        let expected = 4.0 * (7776_f64).log2();
+        assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
+    }
+
+    #[test]
+    fn test_entropy_latvian() {
+        // 4 words from 7776-word list: 4 * log2(7776) ≈ 51.7 bits
+        let entropy = passphrase_entropy_bits(4, Language::Latvian);
+        let expected = 4.0 * (7776_f64).log2();
+        assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
+    }
+
+    #[test]
+    fn test_entropy_kazakh() {
+        // 4 words from 4311-word list (limited corpus): 4 * log2(4311) ≈ 48.3 bits
+        let entropy = passphrase_entropy_bits(4, Language::Kazakh);
+        let expected = 4.0 * (4311_f64).log2();
         assert!((entropy - expected).abs() < 0.1, "Got: {}", entropy);
     }
 
