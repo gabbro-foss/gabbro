@@ -23,7 +23,7 @@ FOSS, GPL-3.0-only. Potential Yubico partnership.
 
 **Vault entries:** 6 types — Login (displayed as "Password" in UI), Note, Identity, Card, File, Custom. Common fields: UUID, created, modified, folder, tags, favourite. No TOTP — YubiKey covers 2FA; keeping them separate is more secure.
 
-**Password generator:** classic (32–256 chars) and passphrase (4–20 words, 20 languages, EFF-style wordlists embedded at compile time). Classic mode is script-aware (Latin/Greek/Cyrillic pools). All generation in Rust.
+**Password generator:** classic (32–256 chars) and passphrase (4–20 words, 25 languages, EFF-style wordlists embedded at compile time). Classic mode is script-aware (Latin/Greek/Cyrillic pools). All generation in Rust.
 
 **Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text size, high-contrast, alphabet bar position.
 
@@ -74,7 +74,7 @@ gabbro/
 │   │   │   ├── simple.rs
 │   │   │   ├── password_generator.rs
 │   │   │   ├── passphrase_generator.rs
-│   │   │   ├── types.rs            # Shared types (Language enum — 20 variants)
+│   │   │   ├── types.rs            # Shared types (Language enum — 25 variants)
 │   │   │   ├── vault.rs
 │   │   │   ├── vault_bridge.rs
 │   │   │   ├── import.rs
