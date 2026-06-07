@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Tablet / landscape two-pane layout: list pane width is now user-adjustable via a draggable divider. A grip badge (rotated `drag_handle` icon on a tinted pill) is always visible as a touch affordance. Width is persisted in `settings.jsonc` as `tablet_list_pane_width` (stored range 180–900 dp; effective max clamped to `screen_width − 300 dp` at runtime so the detail pane always has at least ~200 dp). Resize cursor shown on Linux/desktop hover. Works on Linux (mouse drag) and Android landscape (touch drag). 9 new widget tests.
+
 ## [0.1.0-alpha.6] – 2026-06-07
 
 ### Added

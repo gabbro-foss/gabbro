@@ -2,9 +2,9 @@
 
 A post-quantum password manager built with security as core DNA.
 
-> **Status: Alpha — v0.1.0-alpha.5 released.**
+> **Status: Alpha — v0.1.0-alpha.6 released.**
 > All vault operations are implemented and tested in Rust.
-> Flutter UI implemented (506 tests passing).
+> Flutter UI implemented (546 tests passing).
 
 ---
 

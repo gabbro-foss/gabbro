@@ -152,7 +152,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | ~380 | 8 |
-| Flutter (`flutter test`) | 537 | 0 |
+| Flutter (`flutter test`) | 546 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
 
 Note: Rust test count does not yet reflect the new Google PM and Dashlane importer unit tests — run after the next full `cargo test -q`.
@@ -167,7 +167,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Next session
 
-To be decided with [user]. Candidates from Bikeshed: autofill save requests (`onSaveRequest`), test coverage measurement, or Code Quality items.
+TBD — check Bikeshed with [user].
 
 **UI locales deferred** (RTL layout work required): Hebrew, Arabic.
 
@@ -243,7 +243,6 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - Panic button / app hiding on mobile.
 - Remote app / vault deletion.
 - Custom and hideable filter chips (post-v1 user feedback gate).
-- Tablet list pane width: draggable divider.
 - Cross-layer integration tests (`integration_test/` + Rust `tests/` crate). YAGNI: if users file bugs, those become the organic integration test suite.
 - iOS, Windows, macOS support.
 - Yubico partnership.
