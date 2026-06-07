@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Import: Google Password Manager CSV importer (`rust/src/import/google_pm.rs`). Fixed-schema CSV from passwords.google.com (`name,url,username,password,note`). Extra columns become custom fields. Bridge function `import_from_google_pm`. UI section added to Import screen (position 3).
+- Import: Dashlane credentials CSV importer (`rust/src/import/dashlane.rs`). Credentials CSV from Dashlane export (`username,username2,username3,url,category,note,password,title`). Alternate usernames become custom fields; `category` dropped. Bridge function `import_from_dashlane`. UI section added to Import screen (position 4).
+- Import screen: section order revised — Gabbro, CSV, Google PM, Dashlane, Enpass, Bitwarden.
+- l10n: `importGooglePmSubtitle` and `importDashlaneSubtitle` added to all 35 locale ARB files.
 - Help carousel: 13th slide added for the encrypted vault sync process (`help_012_vault_sync.png`). Caption `helpCaptionVaultSync` translated in all 36 locales.
 - Passphrase generator: Croatian, Lithuanian, Latvian, and Kazakh added as generator languages (`Language::Croatian/Lithuanian/Latvian/Kazakh`). Croatian, Lithuanian, and Latvian each use a 7,776-word list curated from hermitdave/FrequencyWords (CC-BY-SA 4.0) with explicit per-language character-class filters. Kazakh uses all 4,311 available words from the same corpus (limited corpus; Cyrillic script). System locale codes `hr`/`lt`/`lv`/`kk` auto-resolve to the matching wordlist; app language choices `LanguageChoice.hr/lt/lv/kk` map to the new variants. 4 new Rust entropy tests, 4 new Flutter widget tests.
 - About screen: BIP-39 wordlists (ja/ko/zh-TW, MIT), ChineseWordDiceware (zh-CN, CC-BY-4.0), and FrequencyWords (hr/lt/lv/kk, CC-BY-SA 4.0) attribution entries added. `Diceware-word-lists` entry updated to cover both `et` and `uk`.

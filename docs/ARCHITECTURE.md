@@ -99,6 +99,9 @@ gabbro/
 │   │   │   └── device.rs
 │   │   ├── import/
 │   │   │   ├── enpass.rs
+│   │   │   ├── bitwarden.rs
+│   │   │   ├── google_pm.rs
+│   │   │   ├── dashlane.rs
 │   │   │   └── csv.rs
 │   │   ├── bin/
 │   │   │   ├── bench_kdf.rs
@@ -152,6 +155,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Flutter (`flutter test`) | 537 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
 
+Note: Rust test count does not yet reflect the new Google PM and Dashlane importer unit tests — run after the next full `cargo test -q`.
+
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
 
 ---
@@ -162,11 +167,7 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Next session
 
-**Importers — Google Password Manager and Dashlane.**
-
-See `rust/src/import/` for the existing importer pattern (Enpass CSV). Two new importers:
-- Google Password Manager (CSV export)
-- Dashlane (CSV or JSON export)
+To be decided with [user]. Candidates from Bikeshed: autofill save requests (`onSaveRequest`), test coverage measurement, or Code Quality items.
 
 **UI locales deferred** (RTL layout work required): Hebrew, Arabic.
 

@@ -4,6 +4,17 @@ A running journal of concepts covered during development.
 
 ---
 
+## Adding a new bridge function — two codegen steps required
+
+After adding a new Rust function in `rust/src/api/`:
+
+1. `flutter_rust_bridge_codegen generate` — regenerates `lib/src/rust/frb_generated.dart` and the stub in `lib/src/rust/api/<module>.dart`. Without this, Dart sees `Method not found`.
+2. `flutter gen-l10n` — regenerates `lib/l10n/app_localizations*.dart` from the ARB files. Without this, newly-added ARB keys produce `The getter 'X' isn't defined`. (Happens even if the ARB edit is correct.)
+
+Both steps are needed before `flutter test` will compile cleanly.
+
+---
+
 ## Adding a new UI language — three sites to update, one easy to miss
 
 Adding a new `LanguageChoice` variant requires updates in three places:
