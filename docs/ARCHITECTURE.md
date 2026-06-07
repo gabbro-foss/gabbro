@@ -149,7 +149,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | ~380 | 8 |
-| Flutter (`flutter test`) | 506 | 0 |
+| Flutter (`flutter test`) | 537 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -234,7 +234,6 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - verify that the artefact files are still valid (ammend or remove as required)
 
 ### V2+ / Defer
-- Dutch UI locale (`app_nl.arb`, ~632 strings) — `LanguageChoice.nl` not in enum; Dutch is generator language only. Add when a translator is available.
 - Passphrase wordlists — not viable without significant pipeline work: `yo` Yoruba (no frequency ordering, complex tonal diacritics); `sr_Latn` Serbian Latin (only Cyrillic corpora; needs transliteration pipeline); `lb` Luxembourgish (small speaker base); `wa` Walloon (nothing usable, French covers Wallonia).
 - Passkey (WebAuthn discoverable credential) support.
 - Vault sync across devices.

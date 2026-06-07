@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - About screen: BIP-39 wordlists (ja/ko/zh-TW, MIT), ChineseWordDiceware (zh-CN, CC-BY-4.0), and FrequencyWords (hr/lt/lv/kk, CC-BY-SA 4.0) attribution entries added. `Diceware-word-lists` entry updated to cover both `et` and `uk`.
 - Passphrase generator: CJK languages now have real wordlists instead of falling back to English. Japanese and Korean use the BIP-39 mnemonic lists (MIT, 2,048 words each); Chinese Simplified uses the cfbao diceware list (CC-BY 4.0, 7,776 words); Chinese Traditional uses the BIP-39 Traditional list (MIT, 2,048 words). `_hasPassphraseWordlist` simplified to always return true. 4 new Rust entropy tests.
 - Passphrase generator: Dutch added as a generator language (`Language::Dutch`, 7,776-word diceware list, CC-BY, source: mko.re). Dutch device users are auto-resolved via system locale. `langDutch` translation key added to all 36 ARB files. 1 new Flutter test.
+- UI locale: Dutch (`nl`) added. `app_nl.arb` (machine-translated). `LanguageChoice.nl` added to the enum; `langDutch` label wired in `language_screen.dart`.
+- Generator: `LanguageChoice.nl` now maps to `Language.dutch` in `_languageChoiceToLanguage` so the passphrase wordlist follows the UI language. 31-case parameterised regression test added to guard all `LanguageChoice → Language` mappings.
 
 ### Fixed
 - `langDutch` in `app_en.arb` corrected from exonym `"Dutch"` to endonym `"Nederlands"`, consistent with the convention used for all other language labels in the English ARB.

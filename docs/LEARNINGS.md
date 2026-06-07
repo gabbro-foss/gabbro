@@ -4,6 +4,22 @@ A running journal of concepts covered during development.
 
 ---
 
+## Adding a new UI language — three sites to update, one easy to miss
+
+Adding a new `LanguageChoice` variant requires updates in three places:
+
+1. **`lib/l10n/app_<code>.arb`** — the translation file itself.
+2. **`lib/settings.dart`** — add the variant to the `LanguageChoice` enum.
+3. **`lib/screens/language_screen.dart`** — add the label arm to `languageChoiceLabel()`.
+
+The easy-to-miss fourth site for languages that have a passphrase wordlist:
+
+4. **`lib/widgets/generator_widget.dart`** — add the arm to `_languageChoiceToLanguage()`.
+
+Without step 4, the passphrase generator silently falls back to English when the user sets that UI language — no error, wrong wordlist. The 31-case parameterised test in `test/generator_widget_test.dart` (`_uiToGeneratorLanguageMappingTests`) now catches this.
+
+---
+
 ## Dart RegExp — Unicode property escapes for script-aware character classification
 
 Dart's `RegExp` supports Unicode property escapes when `unicode: true` is passed.
