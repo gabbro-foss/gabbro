@@ -1721,6 +1721,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get helpCaptionUnlock => '输入密码短语解锁保险库';
 
   @override
+  String get helpCaptionVaultSync => '加密保险库同步流程';
+
+  @override
   String get passphraseNoWordlist => '您的语言暂无词汇列表。使用英语。';
 
   @override
@@ -3444,6 +3447,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get helpCaptionUnlock => '输入密码短语解锁保险库';
 
   @override
+  String get helpCaptionVaultSync => '加密保险库同步流程';
+
+  @override
   String get passphraseNoWordlist => '您的语言暂无词汇列表。使用英语。';
 
   @override
@@ -5165,6 +5171,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get helpCaptionUnlock => '輸入密碼片語解鎖保險庫';
+
+  @override
+  String get helpCaptionVaultSync => '加密保險庫同步流程';
 
   @override
   String get passphraseNoWordlist => '您的語言暫無詞彙列表。使用英語。';

@@ -808,6 +808,7 @@
   "helpCaptionBreakdown": "Tap the eye icon to reveal a password, then long-press it to view a detailed character breakdown",
   "helpCaptionManageVaults": "In Manage vaults, rename or delete vaults, or add a new one",
   "helpCaptionUnlock": "Enter your passphrase to unlock your vault",
+  "helpCaptionVaultSync": "Encrypted vault sync process",
   "passphraseNoWordlist": "No wordlist for your language yet. Using English.",
   "manageFoldersDefaultNote": "Default folders can be renamed or deleted."
 }

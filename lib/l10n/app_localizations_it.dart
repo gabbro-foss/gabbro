@@ -1799,6 +1799,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Inserisci la tua passphrase per sbloccare il vault';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Processo di sincronizzazione dell\'archivio cifrato';
+
+  @override
   String get passphraseNoWordlist =>
       'Nessuna lista di parole per la tua lingua ancora. Si usa l\'inglese.';
 

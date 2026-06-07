@@ -1789,6 +1789,10 @@ class AppLocalizationsEu extends AppLocalizations {
   String get helpCaptionUnlock => 'Sartu pasaesaldia gandegiak desblokeatzeko';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Enkriptatutako gandegiaren sinkronizazio-prozesua';
+
+  @override
   String get passphraseNoWordlist =>
       'Zure hizkuntzarako oraindik ez dago hitz-zerrendasik. Ingelesa erabiltzen da.';
 

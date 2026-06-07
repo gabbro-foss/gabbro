@@ -1788,6 +1788,10 @@ class AppLocalizationsNn extends AppLocalizations {
   String get helpCaptionUnlock => 'Angi passfrasen din for å låse opp kvelvet';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Kryptert synkroniseringsprosess for kvelvet';
+
+  @override
   String get passphraseNoWordlist =>
       'Ingen ordliste for ditt språk endå. Brukar engelsk.';
 

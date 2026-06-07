@@ -802,6 +802,7 @@
   "helpCaptionBreakdown": "Toca el icono de ojo para revelar una contraseña, luego mantenla pulsada para ver un desglose detallado de caracteres",
   "helpCaptionManageVaults": "En Gestionar cofres, puedes renombrar o eliminar cofres, o añadir uno nuevo",
   "helpCaptionUnlock": "Introduce tu frase de contraseña para desbloquear tu cofre",
+  "helpCaptionVaultSync": "Proceso de sincronización de cofre cifrado",
   "passphraseNoWordlist": "Aún no hay lista de palabras para tu idioma. Se usa inglés.",
   "manageFoldersDefaultNote": "Las carpetas predeterminadas se pueden renombrar o eliminar."
 }

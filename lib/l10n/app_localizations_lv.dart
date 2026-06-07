@@ -1796,6 +1796,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get helpCaptionUnlock => 'Ievadiet ieejas frāzi, lai atbloķētu seifu';
 
   @override
+  String get helpCaptionVaultSync => 'Šifrēta seifa sinhronizācijas process';
+
+  @override
   String get passphraseNoWordlist =>
       'Jūsu valodai vēl nav vārdu saraksta. Tiek izmantota angļu valoda.';
 

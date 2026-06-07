@@ -1796,6 +1796,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Введите кодовую фразу для разблокировки хранилища';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Процесс синхронизации зашифрованного хранилища';
+
+  @override
   String get passphraseNoWordlist =>
       'Для вашего языка нет списка слов. Используется английский.';
 

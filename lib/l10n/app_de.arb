@@ -802,6 +802,7 @@
   "helpCaptionBreakdown": "Tippe auf das Augensymbol, um ein Passwort anzuzeigen, dann lange drücken für eine detaillierte Zeichenaufschlüsselung",
   "helpCaptionManageVaults": "Unter Tresore verwalten kannst du Tresore umbenennen, löschen oder neue hinzufügen",
   "helpCaptionUnlock": "Gib deine Passphrase ein, um deinen Tresor zu entsperren",
+  "helpCaptionVaultSync": "Synchronisierungsprozess für verschlüsselten Tresor",
   "passphraseNoWordlist": "Noch keine Wortliste für deine Sprache. Englisch wird verwendet.",
   "manageFoldersDefaultNote": "Standardordner können umbenannt oder gelöscht werden."
 }

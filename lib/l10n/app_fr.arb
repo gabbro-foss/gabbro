@@ -802,6 +802,7 @@
   "helpCaptionBreakdown": "Appuyez sur l'icône œil pour afficher un mot de passe, puis appuyez longuement pour voir une décomposition détaillée des caractères",
   "helpCaptionManageVaults": "Dans Gérer les coffres, renommez ou supprimez des coffres, ou ajoutez-en un nouveau",
   "helpCaptionUnlock": "Saisissez votre phrase secrète pour déverrouiller votre coffre",
+  "helpCaptionVaultSync": "Processus de synchronisation du coffre chiffré",
   "passphraseNoWordlist": "Pas encore de liste de mots pour votre langue. Anglais utilisé.",
   "manageFoldersDefaultNote": "Les dossiers par défaut peuvent être renommés ou supprimés."
 }

@@ -1789,6 +1789,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get helpCaptionUnlock => 'Sisesta oma pääslause seifi avamiseks';
 
   @override
+  String get helpCaptionVaultSync => 'Krüpteeritud seifi sünkroonimisprotsess';
+
+  @override
   String get passphraseNoWordlist =>
       'Teie keele jaoks pole veel sõnaloendit. Kasutatakse inglise keelt.';
 

@@ -1797,6 +1797,10 @@ class AppLocalizationsLt extends AppLocalizations {
       'Įveskite slaptafrazę, kad atrakintumėte saugyklą';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Užšifruotos saugyklos sinchronizavimo procesas';
+
+  @override
   String get passphraseNoWordlist =>
       'Jūsų kalbai dar nėra žodžių sąrašo. Naudojama anglų kalba.';
 

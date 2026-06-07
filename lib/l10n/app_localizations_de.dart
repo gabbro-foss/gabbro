@@ -1802,6 +1802,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Gib deine Passphrase ein, um deinen Tresor zu entsperren';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Synchronisierungsprozess für verschlüsselten Tresor';
+
+  @override
   String get passphraseNoWordlist =>
       'Noch keine Wortliste für deine Sprache. Englisch wird verwendet.';
 

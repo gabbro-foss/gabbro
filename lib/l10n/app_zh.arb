@@ -802,6 +802,7 @@
   "helpCaptionBreakdown": "点击眼睛图标显示密码，然后长按查看详细字符分析",
   "helpCaptionManageVaults": "在«管理保险库»中，您可以重命名或删除保险库，或添加新的",
   "helpCaptionUnlock": "输入密码短语解锁保险库",
+  "helpCaptionVaultSync": "加密保险库同步流程",
   "passphraseNoWordlist": "您的语言暂无词汇列表。使用英语。",
   "manageFoldersDefaultNote": "默认文件夹可以重命名或删除。"
 }

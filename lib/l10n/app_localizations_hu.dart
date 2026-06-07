@@ -1792,6 +1792,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get helpCaptionUnlock => 'Add meg a jelmondatot a széf feloldásához';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Titkosított széf szinkronizálási folyamata';
+
+  @override
   String get passphraseNoWordlist =>
       'Az Ön nyelvéhez még nincs szólista. Angolt használ.';
 

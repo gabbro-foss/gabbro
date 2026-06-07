@@ -808,6 +808,7 @@
   "helpCaptionBreakdown": "Toque no ícone de olho para revelar uma senha, depois pressione longamente para ver uma análise detalhada dos caracteres",
   "helpCaptionManageVaults": "Em Gerenciar cofres, renomeie ou exclua cofres, ou adicione um novo",
   "helpCaptionUnlock": "Insira a frase secreta para desbloquear o cofre",
+  "helpCaptionVaultSync": "Processo de sincronização do cofre criptografado",
   "passphraseNoWordlist": "Ainda não há lista de palavras para o seu idioma. Usando inglês.",
   "manageFoldersDefaultNote": "As pastas padrão podem ser renomeadas ou excluídas."
 }

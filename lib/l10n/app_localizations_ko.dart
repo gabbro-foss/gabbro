@@ -1746,6 +1746,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get helpCaptionUnlock => '암호 문구를 입력하여 볼트 잠금 해제';
 
   @override
+  String get helpCaptionVaultSync => '암호화된 볼트 동기화 프로세스';
+
+  @override
   String get passphraseNoWordlist => '해당 언어의 단어 목록이 아직 없습니다. 영어를 사용합니다.';
 
   @override

@@ -1796,6 +1796,10 @@ class AppLocalizationsSl extends AppLocalizations {
       'Vnesite geslo za dostop za odklenitev trezorja';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Postopek sinhronizacije šifriranega trezorja';
+
+  @override
   String get passphraseNoWordlist =>
       'Za vaš jezik še ni seznama besed. Uporablja se angleščina.';
 

@@ -1792,6 +1792,10 @@ class AppLocalizationsBg extends AppLocalizations {
       'Въведи паролна фраза за отключване на трезора';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Процес на синхронизиране на шифрован трезор';
+
+  @override
   String get passphraseNoWordlist =>
       'Няма списък с думи за вашия език. Използва се английски.';
 

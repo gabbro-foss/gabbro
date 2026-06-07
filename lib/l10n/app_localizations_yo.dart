@@ -1789,6 +1789,9 @@ class AppLocalizationsYo extends AppLocalizations {
   String get helpCaptionUnlock => 'Tẹ gbolohun ọrọ igbaniwọle lati ṣii vọọliti';
 
   @override
+  String get helpCaptionVaultSync => 'Ilana isọdọkan vọọliti ti o ni aabo';
+
+  @override
   String get passphraseNoWordlist =>
       'Ko si atokọ ọrọ fun ede rẹ sibẹ. Lilo Gẹẹsi.';
 

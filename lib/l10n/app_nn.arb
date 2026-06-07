@@ -808,6 +808,7 @@
   "helpCaptionBreakdown": "Trykk på augeikonet for å avsløre eit passord, hald deretter inne for å sjå ei detaljert teiknanalyse",
   "helpCaptionManageVaults": "I Administrer kvelv kan du endre namn på eller slette kvelv, eller leggje til eit nytt",
   "helpCaptionUnlock": "Angi passfrasen din for å låse opp kvelvet",
+  "helpCaptionVaultSync": "Kryptert synkroniseringsprosess for kvelvet",
   "passphraseNoWordlist": "Ingen ordliste for ditt språk endå. Brukar engelsk.",
   "manageFoldersDefaultNote": "Standardmapper kan gjevast nytt namn eller slettast."
 }

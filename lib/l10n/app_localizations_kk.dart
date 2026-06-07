@@ -1790,6 +1790,9 @@ class AppLocalizationsKk extends AppLocalizations {
       'Сейфтің бекітуін ашу үшін кілт фразасын енгізіңіз';
 
   @override
+  String get helpCaptionVaultSync => 'Шифрланған сейфті синхрондау процесі';
+
+  @override
   String get passphraseNoWordlist =>
       'Сіздің тіліңіз үшін сөздік жоқ. Ағылшын тілі қолданылады.';
 

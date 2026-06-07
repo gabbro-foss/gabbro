@@ -1792,6 +1792,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Insira a frase secreta para desbloquear o cofre';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Processo de sincronização do cofre criptografado';
+
+  @override
   String get passphraseNoWordlist =>
       'Ainda não há lista de palavras para o seu idioma. Usando inglês.';
 
@@ -3586,6 +3590,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get helpCaptionUnlock =>
       'Insira a frase secreta para desbloquear o cofre';
+
+  @override
+  String get helpCaptionVaultSync =>
+      'Processo de sincronização do cofre criptografado';
 
   @override
   String get passphraseNoWordlist =>
@@ -5386,6 +5394,10 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get helpCaptionUnlock =>
       'Introduza a frase-passe para desbloquear o cofre';
+
+  @override
+  String get helpCaptionVaultSync =>
+      'Processo de sincronização do cofre cifrado';
 
   @override
   String get passphraseNoWordlist =>

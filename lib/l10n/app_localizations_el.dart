@@ -1808,6 +1808,10 @@ class AppLocalizationsEl extends AppLocalizations {
       'Εισάγετε τη φράση πρόσβασης για ξεκλείδωμα θησαυροφυλακίου';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Διαδικασία συγχρονισμού κρυπτογραφημένου θησαυροφυλακίου';
+
+  @override
   String get passphraseNoWordlist =>
       'Δεν υπάρχει λίστα λέξεων για τη γλώσσα σας. Χρησιμοποιείται αγγλική.';
 

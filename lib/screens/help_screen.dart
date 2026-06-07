@@ -25,6 +25,7 @@ class _HelpScreenState extends State<HelpScreen> {
     'assets/help/help_009_password_generator_show_password_breakdown.png',
     'assets/help/help_010_manage_vaults_main.png',
     'assets/help/help_011_unlock_screen.png',
+    'assets/help/help_012_vault_sync.png',
   ];
 
   List<String> _captions(AppLocalizations l) => [
@@ -40,6 +41,7 @@ class _HelpScreenState extends State<HelpScreen> {
     l.helpCaptionBreakdown,
     l.helpCaptionManageVaults,
     l.helpCaptionUnlock,
+    l.helpCaptionVaultSync,
   ];
 
   @override

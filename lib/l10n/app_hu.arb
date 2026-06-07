@@ -808,6 +808,7 @@
   "helpCaptionBreakdown": "Koppints a szem ikonra a jelszó felfedéséhez, majd nyomj hosszan a részletes karakterelemzés megtekintéséhez",
   "helpCaptionManageVaults": "A Széfek kezelése részben átnevezhetsz vagy törölhetsz széfeket, illetve hozzáadhatsz egy újat",
   "helpCaptionUnlock": "Add meg a jelmondatot a széf feloldásához",
+  "helpCaptionVaultSync": "Titkosított széf szinkronizálási folyamata",
   "passphraseNoWordlist": "Az Ön nyelvéhez még nincs szólista. Angolt használ.",
   "manageFoldersDefaultNote": "Az alapértelmezett mappák átnevezhetők vagy törölhetők."
 }

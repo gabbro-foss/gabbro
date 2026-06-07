@@ -1792,6 +1792,9 @@ class AppLocalizationsCs extends AppLocalizations {
       'Zadejte přístupovou frázi pro odemknutí trezoru';
 
   @override
+  String get helpCaptionVaultSync => 'Proces synchronizace šifrovaného trezoru';
+
+  @override
   String get passphraseNoWordlist =>
       'Pro váš jazyk zatím není seznam slov. Používá se angličtina.';
 

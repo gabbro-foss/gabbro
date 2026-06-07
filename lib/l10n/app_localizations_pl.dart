@@ -1800,6 +1800,10 @@ class AppLocalizationsPl extends AppLocalizations {
       'Wprowadź hasło główne, aby odblokować skarbiec';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Zaszyfrowany proces synchronizacji skarbca';
+
+  @override
   String get passphraseNoWordlist =>
       'Brak listy słów dla Twojego języka. Używa się angielskiego.';
 

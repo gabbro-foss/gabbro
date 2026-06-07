@@ -802,6 +802,7 @@
   "helpCaptionBreakdown": "Kliknite ikono očesa za prikaz gesla, nato zadržite za prikaz podrobne analize znakov",
   "helpCaptionManageVaults": "V «Upravljanju trezorjev» lahko preimenujete ali izbrišete trezorje ali dodate novega",
   "helpCaptionUnlock": "Vnesite geslo za dostop za odklenitev trezorja",
+  "helpCaptionVaultSync": "Postopek sinhronizacije šifriranega trezorja",
   "passphraseNoWordlist": "Za vaš jezik še ni seznama besed. Uporablja se angleščina.",
   "manageFoldersDefaultNote": "Privzete mape je mogoče preimenovati ali izbrisati."
 }

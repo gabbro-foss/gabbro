@@ -1787,6 +1787,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get helpCaptionUnlock => 'Ange din lösenfras för att låsa upp valvet';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Krypterad synkroniseringsprocess för valvet';
+
+  @override
   String get passphraseNoWordlist =>
       'Ingen ordlista för ditt språk ännu. Engelska används.';
 

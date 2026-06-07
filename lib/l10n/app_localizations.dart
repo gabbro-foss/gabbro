@@ -3371,6 +3371,12 @@ abstract class AppLocalizations {
   /// **'Enter your passphrase to unlock your vault'**
   String get helpCaptionUnlock;
 
+  /// No description provided for @helpCaptionVaultSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted vault sync process'**
+  String get helpCaptionVaultSync;
+
   /// No description provided for @passphraseNoWordlist.
   ///
   /// In en, this message translates to:

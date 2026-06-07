@@ -1805,6 +1805,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Introduce tu frase de contraseña para desbloquear tu cofre';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Proceso de sincronización de cofre cifrado';
+
+  @override
   String get passphraseNoWordlist =>
       'Aún no hay lista de palabras para tu idioma. Se usa inglés.';
 

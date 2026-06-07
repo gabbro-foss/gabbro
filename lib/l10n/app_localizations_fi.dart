@@ -1793,6 +1793,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get helpCaptionUnlock => 'Syötä salauslause avataksesi holvin';
 
   @override
+  String get helpCaptionVaultSync => 'Salatun holvin synkronointiprosessi';
+
+  @override
   String get passphraseNoWordlist =>
       'Kielelläsi ei ole vielä sanalistaa. Käytetään englantia.';
 

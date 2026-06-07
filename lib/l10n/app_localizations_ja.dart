@@ -1741,6 +1741,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get helpCaptionUnlock => 'パスフレーズを入力してボルトのロックを解除';
 
   @override
+  String get helpCaptionVaultSync => '暗号化されたボルトの同期プロセス';
+
+  @override
   String get passphraseNoWordlist => 'お使いの言語のワードリストはまだありません。英語を使用しています。';
 
   @override

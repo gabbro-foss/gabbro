@@ -808,6 +808,7 @@
   "helpCaptionBreakdown": "Kosketa silmäkuvaketta paljastaaksesi salasanan, paina sitten pitkään nähdäksesi yksityiskohtaisen merkkirakennelman",
   "helpCaptionManageVaults": "Hallinnoi holveja -kohdassa voit nimetä tai poistaa holveja tai lisätä uuden",
   "helpCaptionUnlock": "Syötä salauslause avataksesi holvin",
+  "helpCaptionVaultSync": "Salatun holvin synkronointiprosessi",
   "passphraseNoWordlist": "Kielelläsi ei ole vielä sanalistaa. Käytetään englantia.",
   "manageFoldersDefaultNote": "Oletuskansioita voi nimetä uudelleen tai poistaa."
 }

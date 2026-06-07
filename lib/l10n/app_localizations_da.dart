@@ -1791,6 +1791,10 @@ class AppLocalizationsDa extends AppLocalizations {
       'Indtast din adgangssætning for at låse hvælvingen op';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Krypteret synkroniseringsproces for hvælving';
+
+  @override
   String get passphraseNoWordlist =>
       'Ingen ordliste til dit sprog endnu. Bruger engelsk.';
 

@@ -1813,6 +1813,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Saisissez votre phrase secrète pour déverrouiller votre coffre';
 
   @override
+  String get helpCaptionVaultSync =>
+      'Processus de synchronisation du coffre chiffré';
+
+  @override
   String get passphraseNoWordlist =>
       'Pas encore de liste de mots pour votre langue. Anglais utilisé.';
 

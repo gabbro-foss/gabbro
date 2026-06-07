@@ -802,6 +802,7 @@
   "helpCaptionBreakdown": "Klepnutím na ikonu oka zobrazíte heslo, potom podržte pre zobrazenie podrobnej analýzy znakov",
   "helpCaptionManageVaults": "V «Správe trezorov» môžete premenovať alebo vymazať trezory, alebo pridať nový",
   "helpCaptionUnlock": "Zadajte prístupovú frázu na odomknutie trezora",
+  "helpCaptionVaultSync": "Proces synchronizácie šifrovaného trezoru",
   "passphraseNoWordlist": "Pre váš jazyk zatiaľ nie je zoznam slov. Používa sa angličtina.",
   "manageFoldersDefaultNote": "Predvolené priečinky možno premenovať alebo odstrániť."
 }

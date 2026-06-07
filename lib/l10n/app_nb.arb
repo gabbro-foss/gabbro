@@ -808,6 +808,7 @@
   "helpCaptionBreakdown": "Trykk på øye­ikonet for å avsløre et passord, hold deretter inne for å se en detaljert tegnanalyse",
   "helpCaptionManageVaults": "I Administrer hvelvinger kan du gi nytt navn til eller slette hvelvinger, eller legge til et nytt",
   "helpCaptionUnlock": "Angi passfrasen din for å låse opp hvelvet",
+  "helpCaptionVaultSync": "Kryptert synkroniseringsprosess for hvelvet",
   "passphraseNoWordlist": "Ingen ordliste for ditt språk ennå. Bruker engelsk.",
   "manageFoldersDefaultNote": "Standardmapper kan gis nytt navn eller slettes."
 }

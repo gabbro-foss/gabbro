@@ -1779,6 +1779,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpCaptionUnlock => 'Enter your passphrase to unlock your vault';
 
   @override
+  String get helpCaptionVaultSync => 'Encrypted vault sync process';
+
+  @override
   String get passphraseNoWordlist =>
       'No wordlist for your language yet. Using English.';
 
