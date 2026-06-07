@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.6] – 2026-06-07
+
 ### Added
 - Import: Google Password Manager CSV importer (`rust/src/import/google_pm.rs`). Fixed-schema CSV from passwords.google.com (`name,url,username,password,note`). Extra columns become custom fields. Bridge function `import_from_google_pm`. UI section added to Import screen (position 3).
 - Import: Dashlane credentials CSV importer (`rust/src/import/dashlane.rs`). Credentials CSV from Dashlane export (`username,username2,username3,url,category,note,password,title`). Alternate usernames become custom fields; `category` dropped. Bridge function `import_from_dashlane`. UI section added to Import screen (position 4).
