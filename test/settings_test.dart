@@ -380,6 +380,48 @@ void main() {
     });
   });
 
+  // ── tabletListPaneWidth ───────────────────────────────────────────────────
+
+  group('tabletListPaneWidth', () {
+    test('defaults to 260.0', () {
+      final s = AppSettings.fromJson({});
+      expect(s.tabletListPaneWidth, 260.0);
+    });
+
+    test('round-trips 320.0 through fromJson', () {
+      final s = AppSettings.fromJson({'tablet_list_pane_width': 320.0});
+      expect(s.tabletListPaneWidth, 320.0);
+    });
+
+    test('accepts integer value from JSON', () {
+      final s = AppSettings.fromJson({'tablet_list_pane_width': 350});
+      expect(s.tabletListPaneWidth, 350.0);
+    });
+
+    test('clamps below 180 to 180', () {
+      final s = AppSettings.fromJson({'tablet_list_pane_width': 50.0});
+      expect(s.tabletListPaneWidth, 180.0);
+    });
+
+    test('clamps above 900 to 900', () {
+      final s = AppSettings.fromJson({'tablet_list_pane_width': 1200.0});
+      expect(s.tabletListPaneWidth, 900.0);
+    });
+
+    test('serialises to toJson', () {
+      const s = AppSettings(tabletListPaneWidth: 380.0);
+      expect(s.toJson()['tablet_list_pane_width'], 380.0);
+    });
+
+    test('copyWith overrides tabletListPaneWidth only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(tabletListPaneWidth: 400.0);
+      expect(updated.tabletListPaneWidth, 400.0);
+      expect(updated.theme, original.theme);
+      expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
+    });
+  });
+
   // ── BackgroundLockTimeout ─────────────────────────────────────────────────
 
   group('BackgroundLockTimeout', () {

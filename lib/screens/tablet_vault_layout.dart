@@ -122,6 +122,19 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
 
   final ItemScrollController _itemScrollController = ItemScrollController();
 
+  double _listPaneWidth = 260.0;
+  bool _listPaneWidthInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_listPaneWidthInitialized) {
+      _listPaneWidthInitialized = true;
+      _listPaneWidth =
+          GabbroApp.maybeOf(context)?.settings.tabletListPaneWidth ?? 260.0;
+    }
+  }
+
   @override
   void didUpdateWidget(TabletVaultLayout oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -315,9 +328,20 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
     );
   }
 
+  // Maximum list pane width: always leaves ≥200dp for the detail pane and
+  // the navigation rail (~100dp combined). Grows naturally on wide screens.
+  double _maxListPaneWidth(BuildContext context) =>
+      (MediaQuery.sizeOf(context).width - 300.0).clamp(180.0, double.infinity);
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    // Clamp stored width to the contextual max on every build so that the
+    // pane is never wider than the screen allows (e.g. after window resize
+    // or orientation change).
+    final effectiveWidth = _listPaneWidth.clamp(180.0, _maxListPaneWidth(context));
+
     return Row(
       children: [
         // ── Navigation rail ────────────────────────────────────────────────
@@ -349,12 +373,61 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
           ],
         ),
         const VerticalDivider(width: 1),
-        // ── List pane (fixed width, dimmed during editing) ─────────────────
+        // ── List pane (resizable) ──────────────────────────────────────────
         SizedBox(
-          width: 260,
+          key: const ValueKey('tablet-list-pane'),
+          width: effectiveWidth,
           child: _buildListPane(context),
         ),
-        const VerticalDivider(width: 1),
+        // ── Drag handle ────────────────────────────────────────────────────
+        GestureDetector(
+          key: const ValueKey('list-pane-divider'),
+          onHorizontalDragUpdate: (details) {
+            setState(() {
+              _listPaneWidth = (_listPaneWidth + details.delta.dx)
+                  .clamp(180.0, _maxListPaneWidth(context));
+            });
+          },
+          onHorizontalDragEnd: (_) {
+            final appState = GabbroApp.maybeOf(context);
+            appState?.updateSettings(
+              appState.settings.copyWith(tabletListPaneWidth: _listPaneWidth),
+            );
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.resizeColumn,
+            child: Stack(
+              children: [
+                VerticalDivider(
+                  width: 20,
+                  thickness: 1,
+                  color: theme.dividerColor,
+                ),
+                Center(
+                  child: Container(
+                    key: const ValueKey('list-pane-grip'),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 6,
+                      horizontal: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: RotatedBox(
+                      quarterTurns: 1,
+                      child: Icon(
+                        Icons.drag_handle,
+                        size: 16,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         // ── Detail pane (flex) ─────────────────────────────────────────────
         Expanded(child: _buildDetailPane(context)),
       ],

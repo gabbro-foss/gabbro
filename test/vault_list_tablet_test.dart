@@ -267,6 +267,98 @@ void main() {
     });
 
     // -----------------------------------------------------------------------
+    // Test 11: Dragging the divider handle to the right widens the list pane.
+    // -----------------------------------------------------------------------
+    testWidgets('dragging divider handle widens the list pane', (tester) async {
+      _setWidth(tester, 900);
+
+      await tester.pumpWidget(testApp(Scaffold(
+        body: TabletVaultLayout(
+          groupedEntries: _fakeEntries(),
+          filteredEntries: _fakeEntries(),
+          letterIndex: const {'A': 0},
+          onLetterSelected: (_) {},
+          displayTitle: (e) => e.title,
+          displayType: (_) => 'Password',
+          entryTypeIcon: (_) => Icons.lock_outline,
+          searchBar: const SizedBox.shrink(),
+          filterChipRow: const SizedBox.shrink(),
+          searchActive: false,
+          onEntryTap: (_) {},
+          onRefresh: () {},
+          vaultPath: '/tmp/test.gabbro',
+          clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
+          selectionMode: false,
+          selectedIds: const {},
+          onToggleSelection: (_) {},
+        ),
+      )));
+      await tester.pumpAndSettle();
+
+      // Grip badge is always visible as a drag affordance.
+      expect(find.byKey(const ValueKey('list-pane-grip')), findsOneWidget);
+
+      final before = (tester.renderObject(
+        find.byKey(const ValueKey('tablet-list-pane')),
+      ) as RenderBox).size.width;
+
+      await tester.drag(
+        find.byKey(const ValueKey('list-pane-divider')),
+        const Offset(80, 0),
+      );
+      await tester.pumpAndSettle();
+
+      final after = (tester.renderObject(
+        find.byKey(const ValueKey('tablet-list-pane')),
+      ) as RenderBox).size.width;
+
+      expect(after, greaterThan(before));
+    });
+
+    // -----------------------------------------------------------------------
+    // Test 12: Dragging beyond the dynamic max clamps the list pane width.
+    // -----------------------------------------------------------------------
+    testWidgets('dragging past dynamic max clamps list pane width', (tester) async {
+      _setWidth(tester, 900);
+
+      await tester.pumpWidget(testApp(Scaffold(
+        body: TabletVaultLayout(
+          groupedEntries: _fakeEntries(),
+          filteredEntries: _fakeEntries(),
+          letterIndex: const {'A': 0},
+          onLetterSelected: (_) {},
+          displayTitle: (e) => e.title,
+          displayType: (_) => 'Password',
+          entryTypeIcon: (_) => Icons.lock_outline,
+          searchBar: const SizedBox.shrink(),
+          filterChipRow: const SizedBox.shrink(),
+          searchActive: false,
+          onEntryTap: (_) {},
+          onRefresh: () {},
+          vaultPath: '/tmp/test.gabbro',
+          clipboardClearTimeout: ClipboardClearTimeout.sixtySeconds,
+          selectionMode: false,
+          selectedIds: const {},
+          onToggleSelection: (_) {},
+        ),
+      )));
+      await tester.pumpAndSettle();
+
+      // Drag far beyond the screen — max for 900dp screen = 900 - 300 = 600dp.
+      await tester.drag(
+        find.byKey(const ValueKey('list-pane-divider')),
+        const Offset(2000, 0),
+      );
+      await tester.pumpAndSettle();
+
+      final width = (tester.renderObject(
+        find.byKey(const ValueKey('tablet-list-pane')),
+      ) as RenderBox).size.width;
+
+      expect(width, lessThanOrEqualTo(600.0));
+    });
+
+    // -----------------------------------------------------------------------
     // Test 10: Stale _selectedEntryId reset after import/vault reload.
     //
     // Drives TabletVaultLayout directly. Tap id-1 to set _selectedEntryId,
