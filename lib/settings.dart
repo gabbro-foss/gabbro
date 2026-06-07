@@ -251,7 +251,7 @@ enum LanguageChoice {
   // Simple locales — enum name equals BCP-47 language code
   bg, cs, da, de, el, en, es, et, eu, fi, fr,
   hr, hu, it, ja, kk, ko, lt, lv, nb, nn,
-  pl, ru, sk, sl, sv, uk, yo,
+  nl, pl, ru, sk, sl, sv, uk, yo,
   // Complex locales — enum name differs from BCP-47 tag; see _localeFor() in main.dart
   ptBr, ptPt, srLatn, zhCn, zhTw,
 }

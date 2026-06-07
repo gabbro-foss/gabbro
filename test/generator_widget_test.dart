@@ -326,6 +326,7 @@ void main() {
   _lithuanianTests();
   _latvianTests();
   _kazakhTests();
+  _uiToGeneratorLanguageMappingTests();
 }
 
 // ---------------------------------------------------------------------------
@@ -421,5 +422,83 @@ void _kazakhTests() {
         reason: 'Language.kazakh must be listed with label langKazakh = "Қазақша"',
       );
     });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// LanguageChoice → Language mapping regression tests
+//
+// These guard _languageChoiceToLanguage() in generator_widget.dart.
+// When a new LanguageChoice with a passphrase wordlist is added, add it here.
+// ---------------------------------------------------------------------------
+
+void _uiToGeneratorLanguageMappingTests() {
+  // All LanguageChoice values that have a passphrase wordlist, paired with the
+  // Language they must resolve to.  Both nb and nn map to norwegian; both
+  // ptBr and ptPt map to portuguese.
+  const cases = <(LanguageChoice, Language)>[
+    (LanguageChoice.bg,   Language.bulgarian),
+    (LanguageChoice.cs,   Language.czech),
+    (LanguageChoice.da,   Language.danish),
+    (LanguageChoice.de,   Language.german),
+    (LanguageChoice.el,   Language.greek),
+    (LanguageChoice.en,   Language.english),
+    (LanguageChoice.es,   Language.spanish),
+    (LanguageChoice.et,   Language.estonian),
+    (LanguageChoice.fi,   Language.finnish),
+    (LanguageChoice.fr,   Language.french),
+    (LanguageChoice.hr,   Language.croatian),
+    (LanguageChoice.hu,   Language.hungarian),
+    (LanguageChoice.it,   Language.italian),
+    (LanguageChoice.ja,   Language.japanese),
+    (LanguageChoice.kk,   Language.kazakh),
+    (LanguageChoice.ko,   Language.korean),
+    (LanguageChoice.lt,   Language.lithuanian),
+    (LanguageChoice.lv,   Language.latvian),
+    (LanguageChoice.nb,   Language.norwegian),
+    (LanguageChoice.nl,   Language.dutch),
+    (LanguageChoice.nn,   Language.norwegian),
+    (LanguageChoice.pl,   Language.polish),
+    (LanguageChoice.ptBr, Language.portuguese),
+    (LanguageChoice.ptPt, Language.portuguese),
+    (LanguageChoice.ru,   Language.russian),
+    (LanguageChoice.sk,   Language.slovak),
+    (LanguageChoice.sl,   Language.slovenian),
+    (LanguageChoice.sv,   Language.swedish),
+    (LanguageChoice.uk,   Language.ukrainian),
+    (LanguageChoice.zhCn, Language.chineseSimplified),
+    (LanguageChoice.zhTw, Language.chineseTraditional),
+  ];
+
+  group('LanguageChoice → Language mapping', () {
+    for (final (choice, expected) in cases) {
+      testWidgets('${choice.name} → ${expected.name}', (tester) async {
+        Language? captured;
+
+        // Wrap in GabbroApp so didChangeDependencies resolves the app language
+        // via _languageChoiceToLanguage.  Classic mode generates immediately on
+        // init without needing a mode switch, avoiding locale-specific UI text.
+        await tester.pumpWidget(_wrapWithApp(
+          GeneratorWidget(
+            generatePasswordFn: (config) {
+              captured = config.language;
+              return _stubPassword(config);
+            },
+            generatePassphraseFn: _stubPassphrase,
+            passphraseEntropyBitsFn: _stubEntropyBits,
+            entropyBitsFn: _stubEntropy,
+          ),
+          language: choice,
+        ));
+        await tester.pumpAndSettle();
+
+        expect(
+          captured,
+          expected,
+          reason: 'LanguageChoice.${choice.name} must resolve to '
+              'Language.${expected.name} via _languageChoiceToLanguage',
+        );
+      });
+    }
   });
 }

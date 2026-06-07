@@ -31,6 +31,7 @@ String languageChoiceLabel(LanguageChoice v, AppLocalizations l) => switch (v) {
       LanguageChoice.lv      => l.langLatvian,
       LanguageChoice.nb      => l.langNorwegianBokmal,
       LanguageChoice.nn      => l.langNorwegianNynorsk,
+      LanguageChoice.nl      => l.langDutch,
       LanguageChoice.pl      => l.langPolish,
       LanguageChoice.ptBr    => l.langPortugueseBr,
       LanguageChoice.ptPt    => l.langPortuguesePt,

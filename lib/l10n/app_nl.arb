@@ -1,0 +1,814 @@
+{
+  "@@locale": "nl",
+
+  "appName": "Gabbro",
+
+  "cancel": "Annuleren",
+  "delete": "Verwijderen",
+  "save": "Opslaan",
+  "close": "Sluiten",
+  "ok": "OK",
+  "edit": "Bewerken",
+  "add": "Toevoegen",
+  "remove": "Verwijderen",
+  "rename": "Hernoemen",
+  "confirm": "Bevestigen",
+  "continueAction": "Doorgaan",
+  "dismiss": "Sluiten",
+  "authorize": "Autoriseren",
+  "register": "Registreren",
+  "sync": "Synchroniseren",
+  "assign": "Toewijzen",
+  "unlock": "Ontgrendelen",
+  "generate": "Genereren",
+  "import": "Importeren",
+  "export": "Exporteren",
+  "openInBrowser": "Openen in browser",
+  "useThisPassword": "Dit wachtwoord gebruiken",
+  "reviewArrow": "Controleer →",
+  "skip": "Overslaan",
+  "keep": "Behouden",
+  "revert": "Terugzetten",
+  "next": "Volgende: kolommen koppelen",
+  "syncFromVault": "Synchroniseren vanuit kluis",
+  "createVault": "Kluis aanmaken",
+  "pickFile": "Bestand kiezen",
+  "noFileSelected": "Geen bestand geselecteerd",
+  "chooseFolder": "Map kiezen",
+  "addCustomField": "Aangepast veld toevoegen",
+  "exportFile": "Bestand exporteren",
+  "addVault": "Kluis toevoegen",
+  "addYubiKey": "YubiKey toevoegen",
+  "noChangesToSave": "Geen wijzigingen om op te slaan.",
+
+  "appearanceTitle": "Weergave",
+  "securityTitle": "Beveiliging",
+  "aboutTitle": "Over Gabbro",
+  "generatorTitle": "Wachtwoordgenerator",
+  "importTitle": "Items importeren",
+  "exportTitle": "Kluis exporteren",
+  "changePassphraseTitle": "Wachtwoordzin wijzigen",
+  "csvMappingTitle": "CSV-kolommen koppelen",
+  "manageFoldersTitle": "Mappen beheren",
+  "manageVaultsTitle": "Kluizen beheren",
+  "manageYubiKeysTitle": "YubiKeys beheren",
+  "passwordHistoryTitle": "Wachtwoordgeschiedenis",
+  "reviewChangesTitle": "Wijzigingen controleren",
+  "unlockGabbroTitle": "Gabbro ontgrendelen",
+
+  "sectionTheme": "Thema",
+  "sectionTextSize": "Tekstgrootte",
+  "sectionAlphabetBar": "Positie van de alfabetbalk",
+  "sectionAccessibility": "Toegankelijkheid",
+  "sectionLanguage": "Taal",
+  "sectionForegroundLock": "Vergrendeling op voorgrond",
+  "sectionBackgroundLock": "Vergrendeling op achtergrond",
+  "sectionPasswordHistory": "Wachtwoordgeschiedenis",
+  "sectionPassphraseCopyPaste": "Kopiëren/plakken van wachtwoordzin",
+  "sectionVaultList": "Kluislijst",
+  "sectionClipboardClear": "Klembord wissen",
+  "sectionCharacterSets": "Tekensets",
+  "sectionGeneratorLanguage": "Taal",
+
+  "themeSystem": "Systeem",
+  "themeLight": "Licht",
+  "themeDark": "Donker",
+
+  "textSizeSmall": "Klein",
+  "textSizeRegular": "Normaal",
+  "textSizeLarge": "Groot",
+  "textSizeXL": "XL",
+  "textSizeXXL": "XXL",
+
+  "alphabetBarNote": "Alleen voor telefoonindeling — tablet gebruikt altijd links.",
+  "alphabetBarLeft": "Links",
+  "alphabetBarRight": "Rechts",
+
+  "highContrastTitle": "Hoog contrast",
+  "highContrastSubtitle": "Verhoogt het contrast voor betere leesbaarheid",
+
+  "languageNote": "Overschrijft de systeemtaal. \"Systeem\" volgt de taal van uw apparaat.",
+  "langSystem": "Systeem",
+  "langEnglish": "English",
+  "langFrench": "Français",
+  "langGerman": "Deutsch",
+  "langItalian": "Italiano",
+  "langSpanish": "Español",
+  "langBulgarian": "Български",
+  "langCzech": "Čeština",
+  "langDanish": "Dansk",
+  "langGreek": "Ελληνικά",
+  "langEstonian": "Eesti",
+  "langFinnish": "Suomi",
+  "langCroatian": "Hrvatski",
+  "langHungarian": "Magyar",
+  "langJapanese": "日本語",
+  "langKazakh": "Қазақша",
+  "langKorean": "한국어",
+  "langLithuanian": "Lietuvių",
+  "langLatvian": "Latviešu",
+  "langNorwegianBokmal": "Norsk bokmål",
+  "langNorwegianNynorsk": "Norsk nynorsk",
+  "langPolish": "Polski",
+  "langPortugueseBr": "Português (BR)",
+  "langPortuguesePt": "Português (PT)",
+  "langRussian": "Русский",
+  "langSlovak": "Slovenčina",
+  "langSlovenian": "Slovenščina",
+  "langSerbianLatin": "Srpski",
+  "langSwedish": "Svenska",
+  "langUkrainian": "Українська",
+  "langBasque": "Euskara",
+  "langYoruba": "Yorùbá",
+  "langChineseSimplified": "中文（简体）",
+  "langChineseTraditional": "中文（繁體）",
+  "langDutch": "Nederlands",
+
+  "foregroundLockDescription": "Vergrendelen na deze hoeveelheid inactiviteit terwijl de app open is.",
+  "backgroundLockDescription": "Vergrendelen nadat de app zo lang op de achtergrond is geweest.",
+  "passwordHistoryDescription": "Hoe lang een vorig wachtwoord bewaard blijft na een wijziging. \"Voor altijd bewaren\" betekent dat de geschiedenis alleen handmatig wordt verwijderd.",
+  "passphraseCopyPasteDescription": "Kopiëren en plakken blokkeren op velden voor de hoofdwachtwoordzin. Aanbevolen: voorkomt lekken van de wachtwoordzin via het klembord.",
+  "passphraseCopyPasteNote": "Opmerking: dit blokkeert het contextmenu bij lang indrukken en tekstselectie. De inline plakknop van uw toetsenbord kan nog steeds werken — dit is een platformbeperking die niet geblokkeerd kan worden.",
+  "blockCopyPasteTitle": "Kopiëren/plakken blokkeren",
+  "vaultListDescription": "Toon een keuzelijst van alle kluizen op het inlogscherm, zodat u kunt kiezen welke u wilt ontgrendelen zonder naar Kluizen beheren te gaan.",
+  "showVaultListTitle": "Kluislijst tonen bij inloggen",
+  "vaultListNote": "Beveiligingsopmerking: wanneer dit UIT is, toont het inlogscherm alleen de laatst gebruikte kluis — geen aanwijzing dat er andere kluizen bestaan. Afweging: om van kluis te wisselen, moet u eerst ontgrendelen en daarna naar Menu → Kluizen beheren gaan.",
+  "clipboardClearDescription": "Het klembord wissen na het kopiëren van een geheim. Opmerking: klembordbeheerders kunnen een kopie bewaren.",
+
+  "duration30s": "30s",
+  "duration1min": "1 min",
+  "duration5min": "5 min",
+  "duration15min": "15 min",
+  "duration60s": "60s",
+  "duration2min": "2 min",
+  "durationNever": "Nooit",
+  "duration7days": "7 dagen",
+  "duration30days": "30 dagen",
+  "duration90days": "90 dagen",
+  "durationKeepForever": "Voor altijd bewaren",
+
+  "menuExportVault": "Kluis exporteren",
+  "menuImportEntries": "Items importeren",
+  "menuSyncFromFile": "Synchroniseren vanuit bestand",
+  "menuManageVaults": "Kluizen beheren",
+  "menuChangePassphrase": "Wachtwoordzin wijzigen",
+  "menuManageYubiKeys": "YubiKeys beheren",
+  "menuAppearance": "Weergave",
+  "menuSecurity": "Beveiliging",
+  "menuManageFolders": "Mappen beheren",
+  "menuPasswordGenerator": "Wachtwoordgenerator",
+  "menuAbout": "Over",
+
+  "tooltipSelectEntries": "Items selecteren",
+  "tooltipLockVault": "Kluis vergrendelen",
+  "tooltipSelectAll": "Alles selecteren",
+  "tooltipDeselectAll": "Alles deselecteren",
+  "tooltipMenu": "Menu",
+  "tooltipCopy": "Kopiëren",
+  "tooltipCopied": "Gekopieerd!",
+  "tooltipShow": "Tonen",
+  "tooltipHide": "Verbergen",
+  "tooltipBrowse": "Bladeren",
+  "tooltipEditAlias": "Alias bewerken",
+  "tooltipRemoveField": "Veld verwijderen",
+  "tooltipRename": "Hernoemen",
+  "tooltipDeleteVault": "Kluis verwijderen",
+  "tooltipAssignToFolder": "Toewijzen aan map",
+  "tooltipShowPin": "PIN tonen",
+  "tooltipHidePin": "PIN verbergen",
+  "tooltipShowValue": "Waarde tonen",
+  "tooltipHideValue": "Verbergen",
+  "tooltipCancel": "Annuleren",
+  "tooltipOpenInBrowser": "Openen in browser",
+
+  "allFolders": "Alle mappen",
+  "noFolder": "Geen",
+  "selectFolder": "Selecteer een map",
+  "folderName": "Mapnaam",
+
+  "noEntriesMatch": "Geen items komen overeen met uw zoekopdracht.",
+  "noVaultsRegistered": "Geen kluizen geregistreerd.",
+  "noYubiKeysRegistered": "Geen YubiKeys geregistreerd",
+  "selectEntry": "Selecteer een item",
+  "newEntryTitle": "Nieuw item",
+  "createEntryTitle": "Nieuw {type}",
+  "@createEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editEntryTitle": "{type} bewerken",
+  "@editEntryTitle": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "noUrlFallback": "(geen URL)",
+  "noNameFallback": "(geen naam)",
+  "untitledFallback": "(zonder titel)",
+  "gabbroTitle": "Gabbro",
+  "gabbroVaultTitle": "Gabbro - {alias}",
+  "@gabbroVaultTitle": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "selectedCount": "{count} geselecteerd",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "searchAllFieldsHint": "Alle velden doorzoeken…",
+  "searchEntriesHint": "Items zoeken…",
+  "searchAllFieldsTooltip": "Alle velden worden doorzocht",
+  "searchByTitleTooltip": "Zoeken op titel",
+  "entryTypeAll": "Alles",
+  "entryTypePassword": "Wachtwoord",
+  "entryTypeNote": "Notitie",
+  "entryTypeCard": "Kaart",
+  "entryTypeIdentity": "Identiteit",
+  "entryTypeFile": "Bestand",
+  "entryTypeCustom": "Aangepast",
+  "errorPrefix": "Fout: {error}",
+  "@errorPrefix": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "navVault": "Kluis",
+  "navAppearance": "Weergave",
+  "navSecurity": "Beveiliging",
+  "navAbout": "Over",
+
+  "deleteEntryTitle": "Item verwijderen?",
+  "cannotBeUndone": "Dit kan niet ongedaan worden gemaakt.",
+  "deleteEntryDialogTitle": "Item verwijderen?",
+  "deleteEntriesTitle": "{count, plural, one{1 item verwijderen?} other{{count} items verwijderen?}}",
+  "@deleteEntriesTitle": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "assignToFolderTitle": "Toewijzen aan map",
+  "folderConflictTitle": "Mapconflict",
+  "syncFailedTitle": "Synchronisatie mislukt",
+  "syncFromFileTitle": "Synchroniseren vanuit bestand",
+  "nothingToSync": "Niets te synchroniseren — beide kluizen zijn al up-to-date.",
+
+  "importedEntries": "{count, plural, one{1 item geïmporteerd.} other{{count} items geïmporteerd.}}",
+  "@importedEntries": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "exportFileTitle": "Bestand exporteren",
+  "saveDecryptedFileTo": "Ontsleuteld bestand opslaan in:",
+  "exportPathLabel": "Exportpad",
+  "exportedToPath": "Geëxporteerd naar {path}",
+  "@exportedToPath": {
+    "placeholders": {
+      "path": {"type": "String"}
+    }
+  },
+  "exportFailed": "Export mislukt: {error}",
+  "@exportFailed": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "openInBrowserTitle": "Openen in browser?",
+  "couldNotOpen": "Kon {url} niet openen",
+  "@couldNotOpen": {
+    "placeholders": {
+      "url": {"type": "String"}
+    }
+  },
+
+  "deleteEntryFromHistoryLabel": "Vorig item verwijderen",
+  "failedToClearHistory": "Geschiedenis wissen mislukt: {error}",
+  "@failedToClearHistory": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToRevertPassword": "Wachtwoord terugzetten mislukt: {error}",
+  "@failedToRevertPassword": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "renameFolderTitle": "Map hernoemen",
+  "addFolderTitle": "Map toevoegen",
+  "deleteFolderTitle": "Map verwijderen",
+  "deleteFolderConfirm": "\"{folder}\" verwijderen?",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "reassignEntriesTo": "Items opnieuw toewijzen aan",
+  "clearToNone": "Wissen naar \"Geen\"",
+
+  "renameVaultTitle": "Kluis hernoemen",
+  "deleteVaultTitle": "Kluis verwijderen?",
+  "deleteVaultConfirmTitle": "Weet u het zeker?",
+  "typeDeleteToConfirm": "Typ VERWIJDEREN om te bevestigen",
+  "typeDeleteWord": "VERWIJDEREN",
+  "touchYourYubiKey": "Raak uw YubiKey aan",
+  "noVaultsRegisteredText": "Geen kluizen geregistreerd.",
+
+  "addYubiKeyTitle": "YubiKey toevoegen",
+  "enterYubiKeyPinTitle": "YubiKey-PIN invoeren",
+  "editAliasForKey": "Alias bewerken voor sleutel {index}",
+  "@editAliasForKey": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "lastKeyWarning": "Dit laat maar één geregistreerde YubiKey over.",
+  "removeKeyConfirm": "Weet u zeker dat u deze sleutel wilt verwijderen?",
+  "removeKeyVaultConfirm": "Deze YubiKey uit de kluis verwijderen?",
+  "yubiKeyRemoved": "YubiKey verwijderd",
+  "failedToRemoveKey": "Sleutel verwijderen mislukt: {error}",
+  "@failedToRemoveKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "yubiKeyAdded": "YubiKey toegevoegd",
+  "failedToAddKey": "Sleutel toevoegen mislukt: {error}",
+  "@failedToAddKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToSaveAlias": "Alias opslaan mislukt: {error}",
+  "@failedToSaveAlias": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "noFidoDeviceFound": "Geen FIDO2-apparaat gevonden. Steek uw YubiKey in en probeer opnieuw.",
+  "transportLabel": "Transport:",
+  "transportUsb": "USB",
+  "transportNfc": "NFC",
+
+  "passphraseLabel": "Wachtwoordzin",
+  "yubiKeyPinLabel": "YubiKey-PIN",
+  "pinLabel": "PIN",
+  "currentPassphraseLabel": "Huidige wachtwoordzin",
+  "newPassphraseLabel": "Nieuwe wachtwoordzin",
+  "confirmPassphraseLabel": "Nieuwe wachtwoordzin bevestigen",
+  "vaultPassphraseLabel": "Kluiswachtwoordzin",
+  "aliasLabel": "Alias",
+  "aliasHint": "bijv. Primair, Werksleutel…",
+  "masterPassphraseLabel": "Hoofdwachtwoordzin",
+  "confirmPassphraseLabelShort": "Wachtwoordzin bevestigen",
+
+  "fieldTitle": "Titel",
+  "fieldContent": "Inhoud",
+  "fieldFirstName": "Voornaam",
+  "fieldLastName": "Achternaam",
+  "fieldEmail": "E-mail (optioneel)",
+  "fieldPhone": "Telefoon (optioneel)",
+  "fieldAddress": "Adres (optioneel)",
+  "fieldCardLabel": "Kaartlabel (bijv. \"Visa Platinum\")",
+  "fieldCardholderName": "Naam van kaarthouder",
+  "fieldCardNumber": "Kaartnummer",
+  "fieldExpiry": "Vervaldatum (MM/JJ)",
+  "fieldCvv": "CVV (optioneel)",
+  "fieldCardPin": "PIN (optioneel)",
+  "fieldCreditLimit": "Kredietlimiet (optioneel)",
+  "fieldAccountNumber": "Rekeningnummer (optioneel)",
+  "fieldNotes": "Notities (optioneel)",
+  "fieldUrl": "URL (optioneel)",
+  "fieldUsername": "Gebruikersnaam",
+  "fieldPassword": "Wachtwoord",
+  "fieldSeparator": "Scheidingsteken",
+  "fieldFolder": "Map",
+  "fieldLabel": "Label",
+  "fieldValue": "Waarde",
+  "fieldCustomFields": "Aangepaste velden",
+  "fieldLabelOptional": "{label} (optioneel)",
+  "@fieldLabelOptional": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "entryTypeNotSupported": "Itemtype wordt nog niet ondersteund.",
+  "csvColumnNone": "(geen)",
+  "csvPreviewLabel": "Voorbeeld",
+  "csvImportButton": "Importeren",
+
+  "gabbroVaultSection": "Gabbro-kluis",
+  "genericCsvSection": "Algemene CSV",
+
+  "changePassphraseSuccess": "Wachtwoordzin succesvol gewijzigd",
+  "changePassphraseButton": "Wachtwoordzin wijzigen",
+
+  "continueLabel": "Doorgaan",
+  "protectWithYubiKey": "Beveiligen met YubiKey",
+  "yubiKeySubtitle": "Hardwarematige beveiligingssleutel (aanbevolen)",
+  "accessibilityButton": "Toegankelijkheid",
+
+  "aboutProjectSection": "Project",
+  "aboutLicenceSection": "Licentie",
+  "aboutOpenSourceSection": "Open-sourcecomponenten",
+  "aboutAttributionSection": "Naamsvermelding",
+
+  "lengthLabel": "Lengte",
+  "wordsLabel": "Woorden",
+  "generateButton": "Genereren",
+  "usePasswordButton": "Dit wachtwoord gebruiken",
+  "showHidePassword": "Tonen",
+
+  "deleteVaultPostDeletion": "Uw kluis is verwijderd. Maak een nieuwe aan om door te gaan.",
+
+  "syncFilePassphraseLabel": "Kluiswachtwoordzin",
+
+  "historyWarning": "Er wordt slechts 1 vorige waarde bewaard. Geschiedenis wordt automatisch gewist op basis van uw beveiligingsinstellingen.",
+  "historyCurrent": "Huidig",
+  "historyPrevious": "Vorig",
+  "historySavedOn": "Opgeslagen op {date}",
+  "@historySavedOn": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "historyExpiresAppend": "{saved} · verloopt op {expires}",
+  "@historyExpiresAppend": {
+    "placeholders": {
+      "saved": {"type": "String"},
+      "expires": {"type": "String"}
+    }
+  },
+
+  "importIssueTitle": "Importprobleem ({index} van {total})",
+  "@importIssueTitle": {
+    "placeholders": {
+      "index": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "importIssueType": "Type: {category}",
+  "@importIssueType": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "importIssueHelp": "Bewerk om te corrigeren en sla dit item op, of sla het over om het te verwijderen.",
+
+  "entriesSkipped": "{count, plural, one{1 item overgeslagen} other{{count} items overgeslagen}}",
+  "@entriesSkipped": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "skippedEntriesNote": "Deze items bestaan al in uw kluis en zijn niet overschreven:",
+
+  "syncDeleteEntryContent": "Het andere apparaat heeft '{title}' verwijderd.\n\nHier ook verwijderen, of behouden?",
+  "@syncDeleteEntryContent": {
+    "placeholders": {
+      "title": {"type": "String"}
+    }
+  },
+  "folderConflictContent": "'{title}' staat in verschillende mappen op elk apparaat.\n\nDit apparaat: {local}\nAnder apparaat: {incoming}",
+  "@folderConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "local": {"type": "String"},
+      "incoming": {"type": "String"}
+    }
+  },
+  "folderConflictKeepUnfoldered": "Zonder map bewaren",
+  "folderConflictKeepLocal": "\"{folder}\" bewaren",
+  "@folderConflictKeepLocal": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "folderConflictMoveUnfoldered": "Verplaatsen naar geen map",
+  "folderConflictMoveIncoming": "Verplaatsen naar \"{folder}\"",
+  "@folderConflictMoveIncoming": {
+    "placeholders": {
+      "folder": {"type": "String"}
+    }
+  },
+  "vaultSynced": "Kluis gesynchroniseerd — {added} toegevoegd, {updated} bijgewerkt, {deleted} verwijderd.",
+  "@vaultSynced": {
+    "placeholders": {
+      "added": {"type": "int"},
+      "updated": {"type": "int"},
+      "deleted": {"type": "int"}
+    }
+  },
+  "syncPassphraseMismatch": "Dit kluisbestand gebruikt een andere wachtwoordzin. Synchronisatie wordt alleen ondersteund tussen kluizen met dezelfde wachtwoordzin.",
+
+  "reviewSensitiveFields": "Gevoelige velden",
+  "reviewOtherFields": "Overige velden",
+  "reviewPasswordChanged": "Wachtwoord gewijzigd",
+  "reviewCvvChanged": "CVV gewijzigd",
+  "reviewPinChanged": "PIN gewijzigd",
+  "reviewTransactionPasswordChanged": "Transactiewachtwoord gewijzigd",
+  "tooltipShowValues": "Waarden tonen",
+  "reviewOld": "Oud",
+  "reviewNew": "Nieuw",
+  "reviewEmpty": "(leeg)",
+
+  "reviewFieldUrl": "URL",
+  "reviewFieldNotes": "Notities",
+  "reviewFieldContent": "Inhoud",
+  "reviewFieldEmail": "E-mail",
+  "reviewFieldPhone": "Telefoon",
+  "reviewFieldAddress": "Adres",
+  "reviewFieldCardLabel": "Kaartlabel",
+  "reviewFieldStatus": "Status",
+  "reviewFieldCardholder": "Kaarthouder",
+  "reviewFieldExpiry": "Vervaldatum",
+  "reviewFieldCreditLimit": "Kredietlimiet",
+  "reviewFieldAccountNumber": "Rekeningnummer",
+  "reviewFieldNetwork": "Netwerk",
+  "reviewFieldBank": "Bank",
+  "reviewFieldFilename": "Bestandsnaam",
+  "reviewFieldSize": "Grootte",
+  "reviewFieldCardNumber": "Nummer",
+  "reviewFieldCVV": "CVV",
+  "reviewFieldTransactionPassword": "Transactiewachtwoord",
+  "timestampCreated": "Aangemaakt",
+  "timestampUpdated": "Bijgewerkt",
+  "timestampUnknown": "Onbekend",
+  "noTitleFallback": "(geen titel)",
+  "tooltipExportFile": "Bestand exporteren",
+  "tooltipEditEntry": "Item bewerken",
+  "tooltipDeleteEntry": "Item verwijderen",
+  "exportLabel": "Exporteren",
+  "customEntryFieldsHeader": "Velden",
+  "copiedNeverClears": "Gekopieerd — klembord wordt nooit automatisch gewist",
+  "copiedClears30s": "Gekopieerd — klembord wordt over 30s gewist",
+  "copiedClears60s": "Gekopieerd — klembord wordt over 60s gewist",
+  "copiedClears2min": "Gekopieerd — klembord wordt over 2 min gewist",
+
+  "passwordBreakdownTitle": "Wachtwoordanalyse",
+  "charTypeUppercase": "Hoofdletter",
+  "charTypeLowercase": "Kleine letter",
+  "charTypeDigit": "Cijfer",
+  "charTypeSymbol": "Symbool",
+  "charTypeLetter": "Letter",
+
+  "exportIncludeDate": "Datum in bestandsnaam opnemen",
+  "exportChooseFormat": "Kies een exportindeling.",
+  "exportUnencryptedWarning": "Volledig niet-versleuteld — alle geheimen worden in platte tekst geschreven. Bewaar dit bestand veilig en verwijder het na gebruik.",
+  "exportPassphraseOnlyNote": "Alleen beveiligd door uw wachtwoordzin. YubiKey is niet vereist om te importeren.",
+  "exportChooseDestinationJson": "Kies een bestemming voor uw geëxporteerde JSON-bestand.",
+  "exportChooseDestinationVault": "Kies een bestemming voor uw geëxporteerde kluisbestand.",
+  "exportTwoFilesNote": "Er worden twee bestanden geschreven: vault.gabbro en vault.gabbro.sha256",
+  "exportSelectDestination": "Selecteer een bestemming.",
+
+  "aboutVersion": "Versie {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+  "aboutTagline": "Een post-kwantum wachtwoordbeheerder",
+  "aboutSourceCode": "Broncode",
+  "aboutReportIssue": "Een probleem melden",
+  "aboutSupportGabbro": "Gabbro ondersteunen",
+  "aboutLicenceBody": "Gabbro is vrije en open-sourcesoftware, gelicenseerd onder de GNU General Public License v3.0 only (GPL-3.0-only).\n\nU bent vrij om deze software te gebruiken, te bestuderen en te herverdelen onder de voorwaarden van die licentie.",
+  "aboutOwnerRole": "Projecteigenaar, architect en hoofdontwikkelaar:",
+  "aboutAiPartner": "AI-ontwikkelingspartner:",
+  "aboutNoTelemetry": "Gabbro maakt geen uitgaande netwerkverbindingen. Geen telemetrie, geen analyses, geen accounts.",
+
+  "strengthTierTerrible": "Verschrikkelijk",
+  "strengthTierWeak": "Zwak",
+  "strengthTierFair": "Matig",
+  "strengthTierStrong": "Sterk",
+  "strengthTierVeryStrong": "Zeer sterk",
+  "strengthTierExcellent": "Uitstekend",
+  "yubiKeyProtectedNote": "YubiKey-beveiligde kluis — uw YubiKey-koppeling blijft behouden.",
+  "yubiKeyPinRequired": "YubiKey-PIN is vereist",
+  "tapYubiKeyNow": "Raak nu uw YubiKey aan…",
+  "touchYubiKeyToAuthorize": "Raak uw YubiKey aan om deze wijziging te autoriseren.",
+  "currentPassphraseRequired": "Huidige wachtwoordzin is vereist",
+  "newPassphraseRequired": "Nieuwe wachtwoordzin is vereist",
+  "passphraseTooWeak": "Wachtwoordzin is te zwak",
+  "confirmPassphraseRequired": "Bevestig uw nieuwe wachtwoordzin",
+  "passphrasesDoNotMatch": "Wachtwoordzinnen komen niet overeen",
+  "passphrasesMatch": "✓ Wachtwoordzinnen komen overeen",
+  "passphrasesNoMatch": "✗ Wachtwoordzinnen komen niet overeen",
+  "entropyDisplay": "{tier} · {bits} bits",
+  "@entropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "transportError": "Transportfout.",
+  "authorizationFailed": "Autorisatie mislukt — controleer uw PIN en probeer opnieuw.",
+
+  "unlockEnterPassphraseAndPin": "Voer uw wachtwoordzin en YubiKey-PIN in om te ontgrendelen",
+  "unlockEnterPassphrase": "Voer uw wachtwoordzin in om te ontgrendelen",
+  "unlockEntropyDisplay": "{tier} · {bits} bits entropie",
+  "@unlockEntropyDisplay": {
+    "placeholders": {
+      "tier": {"type": "String"},
+      "bits": {"type": "String"}
+    }
+  },
+  "insertYubiKeyAndTap": "Steek uw YubiKey in en raak hem aan als hij knippert",
+  "unlockErrorPassphrase": "Kluis kon niet worden ontgrendeld. Controleer uw wachtwoordzin.",
+  "unlockErrorPassphraseAndPin": "Kluis kon niet worden ontgrendeld. Controleer uw wachtwoordzin en YubiKey-PIN.",
+
+  "importSelectFile": "Selecteer een bestand.",
+  "importFileNotFound": "Bestand niet gevonden.",
+  "importEnterPassphrase": "Voer de wachtwoordzin voor deze kluis in.",
+  "importDuplicateWarning": "Items waarvan het UUID al in uw kluis bestaat, worden automatisch overgeslagen. Er wordt een samenvatting getoond.",
+  "importGabbroSubtitle": "Items synchroniseren vanuit een andere Gabbro-kluis (.gabbro-bestand)",
+  "importEnpassSubtitle": "JSON-export vanuit Enpass (Hulpmiddelen → Exporteren)",
+  "importBitwardenSubtitle": "Niet-versleutelde JSON-export vanuit Bitwarden (Hulpmiddelen → Kluis exporteren)",
+  "importCsvSubtitle": "CSV-export vanuit elke wachtwoordbeheerder",
+
+  "vaultNameAlreadyExists": "Er bestaat al een kluis met de naam \"{alias}\".",
+  "@vaultNameAlreadyExists": {
+    "placeholders": {
+      "alias": {"type": "String"}
+    }
+  },
+  "deleteVaultContent": "Dit verwijdert permanent \"{alias}\" en alle bijbehorende gegevens.\n\nBestand: {path}\n\nDit kan niet ongedaan worden gemaakt.",
+  "@deleteVaultContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "deleteVaultYubikeyContent": "Dit verwijdert permanent \"{alias}\" en verwijdert de YubiKey-koppeling.\n\nBestand: {path}\n\nDit kan niet ongedaan worden gemaakt.",
+  "@deleteVaultYubikeyContent": {
+    "placeholders": {
+      "alias": {"type": "String"},
+      "path": {"type": "String"}
+    }
+  },
+  "yubiKeyAuthorizeDeletion": "Voer uw PIN in en raak uw YubiKey aan om deze verwijdering te autoriseren.",
+  "deleteVaultTooltip": "Kluis verwijderen",
+
+  "navVault": "Kluis",
+  "navAbout": "Over",
+
+  "yubiKeySecurityWarning": "Beveiligingswaarschuwing",
+  "removeYubiKeyTitle": "YubiKey verwijderen",
+  "yubiKeyLastKeyRiskWarning": "WAARSCHUWING: als die resterende sleutel verloren gaat, beschadigd raakt of gestolen wordt, is toegang tot de kluis permanent onmogelijk. Er is geen herstelpad.",
+  "onlyOneKeyRegisteredWarning": "Slechts één sleutel geregistreerd. Als deze sleutel verloren gaat, is toegang tot de kluis permanent onmogelijk.",
+  "tapRegisterNfc": "Houd de sleutel tegen de telefoon om te registreren",
+  "tapRegisterUsb": "Raak de sleutel aan zodra hij is verbonden om te registreren",
+  "tapActivateNfc": "Houd de sleutel opnieuw tegen de telefoon om te activeren",
+  "tapActivateUsb": "Raak de sleutel opnieuw aan zodra hij is verbonden om te activeren",
+  "failedToRegisterKey": "Sleutel registreren mislukt: {error}",
+  "@failedToRegisterKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "failedToActivateKey": "Sleutel activeren mislukt: {error}",
+  "@failedToActivateKey": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "keyDefaultTitle": "Sleutel {index}",
+  "@keyDefaultTitle": {
+    "placeholders": {
+      "index": {"type": "int"}
+    }
+  },
+  "tapYubiKeyToRegister": "Raak uw nieuwe YubiKey aan om te registreren…",
+  "tapYubiKeyToActivate": "Raak uw nieuwe YubiKey opnieuw aan om te activeren…",
+  "editAliasTooltip": "Alias bewerken",
+  "cannotRemoveLastKey": "Laatste sleutel kan niet worden verwijderd",
+  "removeKeyTooltip": "Sleutel verwijderen",
+  "manageYubiKeysError": "Fout: {error}",
+  "@manageYubiKeysError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "generatorModeClassic": "Klassiek",
+  "generatorModePassphrase": "Wachtwoordzin",
+  "charSetsHeader": "Tekensets",
+  "languageHeader": "Taal",
+  "separatorLabel": "Scheidingsteken",
+  "capitaliseWords": "Woorden met hoofdletter",
+  "appendDigit": "Cijfer toevoegen",
+  "entropyBitsDisplay": "~{bits} bits entropie",
+  "@entropyBitsDisplay": {
+    "placeholders": {
+      "bits": {"type": "String"}
+    }
+  },
+  "selectAtLeastOneCharSet": "Selecteer ten minste één tekenset",
+  "passwordMinLengthNote": "Wachtwoorden zijn minimaal 32 tekens. Als een website een kortere limiet heeft, kopieer dan de eerste tekens die u nodig heeft.",
+  "tooltipShow": "Tonen",
+  "tooltipCopied": "Gekopieerd!",
+  "tooltipCopy": "Kopiëren",
+  "excludeAmbiguousChars": "Dubbelzinnige tekens uitsluiten (0, O, l, 1, I)",
+
+  "onboardingGetStarted": "Maak uw kluis aan om te beginnen.",
+  "onboardingVaultName": "Kluisnaam",
+  "onboardingAliasRequired": "Alias is vereist",
+  "onboardingNewVaultLocation": "Nieuwe kluislocatie (zelfde als voorheen)",
+  "onboardingVaultLocation": "Kluislocatie",
+  "onboardingLoadingPath": "Laden…",
+  "onboardingPathHint": "Pad naar kluisbestand",
+  "onboardingPathRequired": "Pad is vereist",
+  "onboardingReusePassphraseHint": "Kies een nieuwe hoofdwachtwoordzin, of hergebruik uw vorige als u dat liever heeft.",
+  "onboardingPassphraseRequired": "Wachtwoordzin is vereist",
+  "onboardingConfirmRequired": "Bevestig uw wachtwoordzin",
+  "onboardingPrimaryKeyPin": "Primaire-sleutel-PIN",
+  "onboardingBackupKeyPin": "Reservesleutel-PIN",
+  "onboardingKeyNPin": "Sleutel {n} PIN",
+  "@onboardingKeyNPin": {
+    "placeholders": {
+      "n": {"type": "int"}
+    }
+  },
+  "onboardingYubikeyTapInstruction": "U tikt elke YubiKey twee keer aan (4 tikken in totaal). Tussen de twee sleutels wordt u gevraagd om te wisselen.",
+  "onboardingYubikeySlowNote": "Het aanmaken van een kluis met YubiKey duurt 20–30 seconden. De app kan er niet op reageren — dit is normaal.",
+  "onboardingStep1Label": "Primaire sleutel registreren",
+  "onboardingStep1Hint": "Raak nu uw YubiKey aan",
+  "onboardingStep2Label": "Primaire sleutel activeren",
+  "onboardingStep2Hint": "Raak uw YubiKey opnieuw aan",
+  "onboardingStep3Label": "Wisselen naar reservesleutel",
+  "onboardingStep3Hint": "Verwijder uw primaire sleutel en verbind uw reserve-YubiKey",
+  "onboardingStep4Label": "Reservesleutel registreren",
+  "onboardingStep4Hint": "Raak uw reserve-YubiKey aan",
+  "onboardingStep5Label": "Reservesleutel activeren",
+  "onboardingStep5Hint": "Raak uw reserve-YubiKey voor de laatste keer aan",
+
+  "textSizePreview": "Gabbro is een intrusief stollingsgesteente dat rijk is aan Mg en Fe en grof van korrel is.",
+
+  "fieldCardStatus": "Status",
+  "fieldPaymentNetwork": "Betalingsnetwerk",
+
+  "cardStatusActive": "Actief",
+  "cardStatusLapsed": "Verlopen",
+  "cardStatusInactive": "Inactief",
+
+  "validatorTitleRequired": "Titel is vereist",
+  "validatorUsernameRequired": "Gebruikersnaam is vereist",
+  "validatorPasswordRequired": "Wachtwoord is vereist",
+  "validatorContentRequired": "Inhoud is vereist",
+  "validatorFirstNameRequired": "Voornaam is vereist",
+  "validatorLastNameRequired": "Achternaam is vereist",
+  "validatorCardLabelRequired": "Kaartlabel is vereist",
+  "validatorCardholderRequired": "Naam van kaarthouder is vereist",
+  "validatorCardNumberRequired": "Kaartnummer is vereist",
+  "validatorCardNumberLength": "Kaartnummer moet 6–19 cijfers bevatten",
+  "validatorExpiryRequired": "Vervaldatum is vereist",
+  "validatorExpiryFormat": "Gebruik het formaat MM/JJ",
+  "validatorExpiryMonth": "Maand moet 01–12 zijn",
+  "validatorCvvLength": "CVV moet 3 of 4 cijfers bevatten",
+  "validatorLabelRequired": "Label is vereist",
+  "validatorStatusRequired": "Status is vereist",
+
+  "sectionBiometricUnlock": "Biometrisch ontgrendelen",
+  "biometricUnlockDescription": "Gebruik uw vingerafdruk of gezicht om de kluis te ontgrendelen in plaats van uw wachtwoordzin in te typen.",
+  "biometricUnlockTitle": "Biometrisch ontgrendelen inschakelen",
+  "biometricUnlockNote": "Alle biometrische gegevens die op dit apparaat zijn ingeschreven, werken — niet alleen de gegevens die zijn gebruikt voor de inschrijving.",
+  "biometricUnavailable": "Biometrisch ontgrendelen is niet beschikbaar op dit apparaat. Er is geen biometrische sensor gevonden of er zijn geen biometrische gegevens ingeschreven in de systeeminstellingen.",
+  "biometricDialogTitle": "Over biometrisch ontgrendelen",
+  "biometricDialogBody": "Wanneer ingeschakeld, versleutelt Gabbro uw hoofdwachtwoordzin en slaat deze op op dit apparaat, beveiligd door uw biometrische gegevens. Uw wachtwoordzin wordt alleen ontsleuteld op het moment van ontgrendelen.\n\nUw vingerafdruk- of gezichtsgegevens worden nooit opgeslagen door Gabbro — ze blijven in de beveiligde chip van uw telefoon.",
+  "biometricDialogAllBiometrics": "Alle biometrische gegevens die momenteel op dit apparaat zijn ingeschreven, kunnen Gabbro ontgrendelen — u kunt het niet beperken tot een specifieke vingerafdruk.",
+  "biometricDialogInvalidation": "Als een nieuw biometrisch gegeven aan deze telefoon wordt toegevoegd (inclusief een tweede vingerafdruk), wordt deze instelling automatisch uitgeschakeld en moet u deze opnieuw instellen.",
+  "biometricDialogRecommendation": "Aanbeveling: houd dit uitgeschakeld als u een hoog dreigingsmodel heeft of dit apparaat deelt.",
+  "biometricInvalidated": "Biometrisch ontgrendelen is uitgeschakeld omdat de biometrische gegevens op dit apparaat zijn gewijzigd (een nieuwe vingerafdruk of gezicht is toegevoegd in de systeeminstellingen). Dit is een veiligheidsmaatregel. Voer uw wachtwoordzin opnieuw in en schakel biometrisch ontgrendelen opnieuw in als u deze functie wilt blijven gebruiken.",
+  "useBiometrics": "Biometrie gebruiken",
+  "biometricCancelled": "Biometrische verificatie is niet voltooid. Voer uw wachtwoordzin in om te ontgrendelen.",
+  "biometricEnrollTitle": "Voer uw wachtwoordzin in",
+  "biometricEnrollDescription": "Voer uw hoofdwachtwoordzin in om biometrisch ontgrendelen in te schakelen.",
+  "biometricYubikeyHint": "Voer hieronder uw YubiKey-PIN in, tik dan op Biometrie gebruiken en raak dan uw YubiKey aan.",
+
+  "helpTitle": "Help",
+  "menuHelp": "Help",
+  "helpCaptionCreate": "Maak een kluis aan: voer een naam en wachtwoordzin in en beveilig deze optioneel met een YubiKey",
+  "helpCaptionEmpty": "Tik op + om uw eerste item toe te voegen",
+  "helpCaptionDetail": "Tik op het oogpictogram om een wachtwoord te onthullen, en houd het lang ingedrukt om een gedetailleerde tekenanalyse te bekijken",
+  "helpCaptionTitleSearch": "Standaard zoekt de zoekbalk alleen in itemtitels",
+  "helpCaptionFullSearch": "Tik op het vergrootglaspictogram om te wisselen naar zoeken in alle velden; tik opnieuw om terug te keren naar alleen titels",
+  "helpCaptionFilter": "Gebruik de filterchips om alleen items van een specifiek type te tonen",
+  "helpCaptionFolders": "Gebruik de mappenkiezer om items op map te filteren",
+  "helpCaptionSelect": "Houd een item lang ingedrukt om de selectiemodus te activeren; voeg meer items toe en wijs ze toe aan een map of verwijder ze. Tik op X om af te sluiten.",
+  "helpCaptionJumpToLetter": "Tik op een letter in de indexbalk om naar dat gedeelte te springen",
+  "helpCaptionBreakdown": "Tik op het oogpictogram om een wachtwoord te onthullen, en houd het lang ingedrukt om een gedetailleerde tekenanalyse te bekijken",
+  "helpCaptionManageVaults": "Hernoem of verwijder kluizen in Kluizen beheren, of voeg een nieuwe toe",
+  "helpCaptionUnlock": "Voer uw wachtwoordzin in om uw kluis te ontgrendelen",
+  "helpCaptionVaultSync": "Versleuteld kluissynchronisatieproces",
+  "passphraseNoWordlist": "Nog geen woordenlijst voor uw taal. Engels wordt gebruikt.",
+  "manageFoldersDefaultNote": "Standaardmappen kunnen worden hernoemd of verwijderd."
+}

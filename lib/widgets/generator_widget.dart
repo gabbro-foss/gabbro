@@ -89,6 +89,7 @@ Language? _languageChoiceToLanguage(LanguageChoice choice) => switch (choice) {
       LanguageChoice.lt => Language.lithuanian,
       LanguageChoice.lv => Language.latvian,
       LanguageChoice.kk => Language.kazakh,
+      LanguageChoice.nl => Language.dutch,
       _ => null, // no wordlist for this LanguageChoice
     };
 

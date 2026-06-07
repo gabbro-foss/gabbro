@@ -29,8 +29,8 @@ void main() {
       expect(find.text('Dansk'), findsOneWidget);
       expect(find.text('Deutsch'), findsOneWidget);
       expect(find.text('English'), findsOneWidget);
-      // Full set: system + 33 user-facing languages = 34 total.
-      expect(LanguageChoice.values.length, 34);
+      // Full set: system + 34 user-facing languages = 35 total.
+      expect(LanguageChoice.values.length, 35);
     });
 
     testWidgets('current language radio is selected', (tester) async {
