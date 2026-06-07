@@ -129,7 +129,7 @@ gabbro/
 ├── assets/
 │   ├── fonts/
 │   ├── images/
-│   └── help/                       # 12 annotated screenshots for the in-app help carousel
+│   └── help/                       # 13 annotated screenshots for the in-app help carousel
 ├── challenge/
 │   ├── README.md               # Crack-me challenge rules and reward
 │   ├── decryptMe_2026-06-01.gabbro        # Sealed vault (passphrase + YubiKey; body unreadable without hardware)

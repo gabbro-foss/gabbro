@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Help carousel: 13th slide added for the encrypted vault sync process (`help_012_vault_sync.png`). Caption `helpCaptionVaultSync` translated in all 36 locales.
 - Passphrase generator: Croatian, Lithuanian, Latvian, and Kazakh added as generator languages (`Language::Croatian/Lithuanian/Latvian/Kazakh`). Croatian, Lithuanian, and Latvian each use a 7,776-word list curated from hermitdave/FrequencyWords (CC-BY-SA 4.0) with explicit per-language character-class filters. Kazakh uses all 4,311 available words from the same corpus (limited corpus; Cyrillic script). System locale codes `hr`/`lt`/`lv`/`kk` auto-resolve to the matching wordlist; app language choices `LanguageChoice.hr/lt/lv/kk` map to the new variants. 4 new Rust entropy tests, 4 new Flutter widget tests.
 - About screen: BIP-39 wordlists (ja/ko/zh-TW, MIT), ChineseWordDiceware (zh-CN, CC-BY-4.0), and FrequencyWords (hr/lt/lv/kk, CC-BY-SA 4.0) attribution entries added. `Diceware-word-lists` entry updated to cover both `et` and `uk`.
 - Passphrase generator: CJK languages now have real wordlists instead of falling back to English. Japanese and Korean use the BIP-39 mnemonic lists (MIT, 2,048 words each); Chinese Simplified uses the cfbao diceware list (CC-BY 4.0, 7,776 words); Chinese Traditional uses the BIP-39 Traditional list (MIT, 2,048 words). `_hasPassphraseWordlist` simplified to always return true. 4 new Rust entropy tests.
