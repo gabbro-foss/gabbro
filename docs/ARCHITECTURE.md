@@ -151,11 +151,9 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | ~380 | 8 |
+| Rust (`cargo test -q`) | 411 | 8 |
 | Flutter (`flutter test`) | 546 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
-
-Note: Rust test count does not yet reflect the new Google PM and Dashlane importer unit tests — run after the next full `cargo test -q`.
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
 
