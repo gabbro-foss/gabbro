@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "Esportazione JSON da Enpass (Strumenti → Esporta)",
   "importBitwardenSubtitle": "Esportazione JSON non cifrata da Bitwarden (Strumenti → Esporta archivio)",
   "importCsvSubtitle": "Esportazione CSV da qualsiasi gestore di password",
+  "importGooglePmSubtitle": "Esportazione CSV da Google Password Manager (passwords.google.com → Scarica)",
+  "importDashlaneSubtitle": "Esportazione CSV da Dashlane (Impostazioni → Esporta dati → Credenziali)",
 
   "vaultNameAlreadyExists": "Esiste già un archivio chiamato «{alias}».",
   "@vaultNameAlreadyExists": {

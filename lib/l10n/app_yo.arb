@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "Gbigba jade JSON lati Enpass (Awọn irinṣẹ → Gba jade)",
   "importBitwardenSubtitle": "Gbigba jade JSON ti ko ni fipamọ lati Bitwarden (Awọn irinṣẹ → Gba vọọliti jade)",
   "importCsvSubtitle": "Gbigba jade CSV lati olugba ọrọ igbaniwọle eyikeyi",
+  "importGooglePmSubtitle": "Igbasilẹ CSV lati Google Password Manager (passwords.google.com → Gba)",
+  "importDashlaneSubtitle": "Igbasilẹ CSV lati Dashlane (Ìtòlẹsẹẹsẹ → Gbé àwọn data jáde → Àwọn ẹrí)",
 
   "vaultNameAlreadyExists": "Vọọliti ti a npè ni «{alias}» ti wa tẹlẹ.",
   "@vaultNameAlreadyExists": {

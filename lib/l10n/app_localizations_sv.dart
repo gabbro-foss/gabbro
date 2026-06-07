@@ -1399,6 +1399,14 @@ class AppLocalizationsSv extends AppLocalizations {
   String get importCsvSubtitle => 'CSV-export från valfri lösenordshanterare';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV-export från Google Password Manager (passwords.google.com → Ladda ned)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV-export från Dashlane (Inställningar → Exportera data → Autentiseringsuppgifter)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Ett valv med namnet \"$alias\" finns redan.';
   }

@@ -126,7 +126,7 @@ pub fn import_csv(input: &str, config: &CsvImportConfig) -> Result<Vec<CsvEntry>
 /// Parse a single CSV line into fields, handling quoted fields containing commas.
 /// Trims leading/trailing whitespace from each field.
 /// Treats `"None"` and `""` as empty string.
-fn parse_csv_line(line: &str) -> Vec<String> {
+pub(crate) fn parse_csv_line(line: &str) -> Vec<String> {
     let mut fields = Vec::new();
     let mut current = String::new();
     let mut in_quotes = false;
@@ -145,7 +145,7 @@ fn parse_csv_line(line: &str) -> Vec<String> {
     fields
 }
 
-fn normalise_field(value: &str) -> String {
+pub(crate) fn normalise_field(value: &str) -> String {
     if value.eq_ignore_ascii_case("none") {
         String::new()
     } else {

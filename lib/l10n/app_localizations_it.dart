@@ -1405,6 +1405,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Esportazione CSV da qualsiasi gestore di password';
 
   @override
+  String get importGooglePmSubtitle =>
+      'Esportazione CSV da Google Password Manager (passwords.google.com → Scarica)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'Esportazione CSV da Dashlane (Impostazioni → Esporta dati → Credenziali)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Esiste già un archivio chiamato «$alias».';
   }

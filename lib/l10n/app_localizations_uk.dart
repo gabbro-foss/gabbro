@@ -1405,6 +1405,14 @@ class AppLocalizationsUk extends AppLocalizations {
   String get importCsvSubtitle => 'CSV-експорт з будь-якого менеджера паролів';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV-експорт із Google Password Manager (passwords.google.com → Завантажити)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV-експорт із Dashlane (Налаштування → Експортувати дані → Облікові дані)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Сховище з назвою «$alias» вже існує.';
   }

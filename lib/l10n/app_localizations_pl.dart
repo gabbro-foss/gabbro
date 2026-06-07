@@ -1408,6 +1408,14 @@ class AppLocalizationsPl extends AppLocalizations {
   String get importCsvSubtitle => 'Eksport CSV z dowolnego menedżera haseł';
 
   @override
+  String get importGooglePmSubtitle =>
+      'Eksport CSV z Google Password Manager (passwords.google.com → Pobierz)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'Eksport CSV z Dashlane (Ustawienia → Eksportuj dane → Poświadczenia)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Skarbiec o nazwie «$alias» już istnieje.';
   }

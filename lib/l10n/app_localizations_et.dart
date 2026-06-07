@@ -1402,6 +1402,14 @@ class AppLocalizationsEt extends AppLocalizations {
   String get importCsvSubtitle => 'CSV-eksport mis tahes paroolihaldurilt';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV-eksport Google Password Manager\'ist (passwords.google.com → Laadi alla)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV-eksport Dashlane\'ist (Seaded → Ekspordi andmed → Mandaadid)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Seif nimega \"$alias\" on juba olemas.';
   }

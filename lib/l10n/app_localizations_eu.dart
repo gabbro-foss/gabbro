@@ -1401,6 +1401,14 @@ class AppLocalizationsEu extends AppLocalizations {
       'Edozein pasahitz-kudeatzailetik CSV esportazioa';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV esportazioa Google Password Manager-etik (passwords.google.com → Deskargatu)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV esportazioa Dashlane-tik (Ezarpenak → Esportatu datuak → Kredentzialak)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return '«$alias» izeneko gandegiak dagoeneko badago.';
   }

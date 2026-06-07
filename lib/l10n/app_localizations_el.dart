@@ -1412,6 +1412,14 @@ class AppLocalizationsEl extends AppLocalizations {
       'Εξαγωγή CSV από οποιονδήποτε διαχειριστή κωδικών';
 
   @override
+  String get importGooglePmSubtitle =>
+      'Εξαγωγή CSV από Google Password Manager (passwords.google.com → Λήψη)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'Εξαγωγή CSV από Dashlane (Ρυθμίσεις → Εξαγωγή δεδομένων → Διαπιστευτήρια)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Υπάρχει ήδη θησαυροφυλάκιο με το όνομα «$alias».';
   }

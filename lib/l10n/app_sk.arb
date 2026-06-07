@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "JSON export z Enpass (Nástroje → Exportovať)",
   "importBitwardenSubtitle": "Nešifrovaný JSON export z Bitwarden (Nástroje → Exportovať trezor)",
   "importCsvSubtitle": "CSV export z ľubovoľného správcu hesiel",
+  "importGooglePmSubtitle": "CSV export z Google Password Manager (passwords.google.com → Stiahnuť)",
+  "importDashlaneSubtitle": "CSV export z Dashlane (Nastavenia → Exportovať údaje → Prihlasovacie údaje)",
 
   "vaultNameAlreadyExists": "Trezor s názvom «{alias}» už existuje.",
   "@vaultNameAlreadyExists": {

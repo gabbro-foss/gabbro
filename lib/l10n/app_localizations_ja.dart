@@ -1372,6 +1372,14 @@ class AppLocalizationsJa extends AppLocalizations {
   String get importCsvSubtitle => 'パスワードマネージャーからのCSVエクスポート';
 
   @override
+  String get importGooglePmSubtitle =>
+      'Google パスワード マネージャーから CSV エクスポート（passwords.google.com → ダウンロード）';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'Dashlane から CSV エクスポート（設定 → データのエクスポート → 認証情報）';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return '「$alias」という名前のボルトはすでに存在します。';
   }

@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "JSON eksportas iš Enpass (Įrankiai → Eksportuoti)",
   "importBitwardenSubtitle": "Nešifruotas JSON eksportas iš Bitwarden (Įrankiai → Eksportuoti saugyklą)",
   "importCsvSubtitle": "CSV eksportas iš bet kurios slaptažodžių tvarkyklės",
+  "importGooglePmSubtitle": "CSV eksportas iš Google Password Manager (passwords.google.com → Atsisiųsti)",
+  "importDashlaneSubtitle": "CSV eksportas iš Dashlane (Nustatymai → Eksportuoti duomenis → Kredencialai)",
 
   "vaultNameAlreadyExists": "Saugykla pavadinimu «{alias}» jau egzistuoja.",
   "@vaultNameAlreadyExists": {

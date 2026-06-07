@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "來自 Enpass 的 JSON 匯出（工具 → 匯出）",
   "importBitwardenSubtitle": "來自 Bitwarden 的未加密 JSON 匯出（工具 → 匯出保險庫）",
   "importCsvSubtitle": "來自任何密碼管理員的 CSV 匯出",
+  "importGooglePmSubtitle": "從 Google Password Manager 匯出 CSV（passwords.google.com → 下載）",
+  "importDashlaneSubtitle": "從 Dashlane 匯出 CSV（設定 → 匯出資料 → 憑證）",
 
   "vaultNameAlreadyExists": "名為«{alias}»的保險庫已存在。",
   "@vaultNameAlreadyExists": {

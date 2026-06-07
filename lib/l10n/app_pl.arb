@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "Eksport JSON z Enpass (Narzędzia → Eksportuj)",
   "importBitwardenSubtitle": "Niezaszyfrowany eksport JSON z Bitwarden (Narzędzia → Eksportuj skarbiec)",
   "importCsvSubtitle": "Eksport CSV z dowolnego menedżera haseł",
+  "importGooglePmSubtitle": "Eksport CSV z Google Password Manager (passwords.google.com → Pobierz)",
+  "importDashlaneSubtitle": "Eksport CSV z Dashlane (Ustawienia → Eksportuj dane → Poświadczenia)",
 
   "vaultNameAlreadyExists": "Skarbiec o nazwie «{alias}» już istnieje.",
   "@vaultNameAlreadyExists": {

@@ -1403,6 +1403,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Exportação CSV de qualquer gerenciador de senhas';
 
   @override
+  String get importGooglePmSubtitle =>
+      'Exportação CSV do Google Password Manager (passwords.google.com → Baixar)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'Exportação CSV do Dashlane (Configurações → Exportar dados → Credenciais)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Já existe um cofre com o nome \"$alias\".';
   }
@@ -3201,6 +3209,14 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get importCsvSubtitle =>
       'Exportação CSV de qualquer gerenciador de senhas';
+
+  @override
+  String get importGooglePmSubtitle =>
+      'Exportação CSV do Google Password Manager (passwords.google.com → Baixar)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'Exportação CSV do Dashlane (Configurações → Exportar dados → Credenciais)';
 
   @override
   String vaultNameAlreadyExists(String alias) {
@@ -5004,6 +5020,14 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get importCsvSubtitle =>
       'Exportação CSV de qualquer gestor de palavras-passe';
+
+  @override
+  String get importGooglePmSubtitle =>
+      'Exportação CSV do Google Password Manager (passwords.google.com → Transferir)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'Exportação CSV do Dashlane (Definições → Exportar dados → Credenciais)';
 
   @override
   String vaultNameAlreadyExists(String alias) {

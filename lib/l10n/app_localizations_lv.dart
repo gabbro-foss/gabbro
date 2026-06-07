@@ -1403,6 +1403,14 @@ class AppLocalizationsLv extends AppLocalizations {
   String get importCsvSubtitle => 'CSV eksports no jebkura paroļu pārvaldnieka';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV eksports no Google Password Manager (passwords.google.com → Lejupielādēt)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV eksports no Dashlane (Iestatījumi → Eksportēt datus → Akreditācijas dati)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Seifs ar nosaukumu \"$alias\" jau pastāv.';
   }

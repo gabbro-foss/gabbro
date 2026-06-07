@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "JSON export from Enpass (Tools → Export)",
   "importBitwardenSubtitle": "Unencrypted JSON export from Bitwarden (Tools → Export Vault)",
   "importCsvSubtitle": "CSV export from any password manager",
+  "importGooglePmSubtitle": "CSV export from Google Password Manager (passwords.google.com → Download)",
+  "importDashlaneSubtitle": "CSV export from Dashlane (Settings → Export Data → Credentials)",
 
   "vaultNameAlreadyExists": "A vault named \"{alias}\" already exists.",
   "@vaultNameAlreadyExists": {

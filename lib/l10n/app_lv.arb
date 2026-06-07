@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "JSON eksports no Enpass (Rīki → Eksportēt)",
   "importBitwardenSubtitle": "Nešifrēts JSON eksports no Bitwarden (Rīki → Eksportēt seifa datus)",
   "importCsvSubtitle": "CSV eksports no jebkura paroļu pārvaldnieka",
+  "importGooglePmSubtitle": "CSV eksports no Google Password Manager (passwords.google.com → Lejupielādēt)",
+  "importDashlaneSubtitle": "CSV eksports no Dashlane (Iestatījumi → Eksportēt datus → Akreditācijas dati)",
 
   "vaultNameAlreadyExists": "Seifs ar nosaukumu \"{alias}\" jau pastāv.",
   "@vaultNameAlreadyExists": {

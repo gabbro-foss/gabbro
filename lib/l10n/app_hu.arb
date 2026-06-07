@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "JSON-exportálás az Enpassból (Eszközök → Exportálás)",
   "importBitwardenSubtitle": "Titkosítatlan JSON-exportálás a Bitwardenből (Eszközök → Széf exportálása)",
   "importCsvSubtitle": "CSV-exportálás bármely jelszókezelőből",
+  "importGooglePmSubtitle": "CSV-exportálás a Google Password Manager-ből (passwords.google.com → Letöltés)",
+  "importDashlaneSubtitle": "CSV-exportálás a Dashlane-ből (Beállítások → Adatok exportálása → Hitelesítő adatok)",
 
   "vaultNameAlreadyExists": "Már létezik «{alias}» nevű széf.",
   "@vaultNameAlreadyExists": {

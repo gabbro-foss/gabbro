@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "Enpass бағдарламасынан JSON экспорты (Құралдар → Экспорттау)",
   "importBitwardenSubtitle": "Bitwarden бағдарламасынан шифрланбаған JSON экспорты (Құралдар → Сейфті экспорттау)",
   "importCsvSubtitle": "Кез-келген құпия сөз менеджерінен CSV экспорты",
+  "importGooglePmSubtitle": "Google Password Manager-ден CSV экспорты (passwords.google.com → Жүктеу)",
+  "importDashlaneSubtitle": "Dashlane-ден CSV экспорты (Параметрлер → Деректерді экспорттау → Тіркелгі деректері)",
 
   "vaultNameAlreadyExists": "«{alias}» атты сейф бар.",
   "@vaultNameAlreadyExists": {

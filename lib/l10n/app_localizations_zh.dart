@@ -1362,6 +1362,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importCsvSubtitle => '来自任何密码管理器的 CSV 导出';
 
   @override
+  String get importGooglePmSubtitle =>
+      '从 Google Password Manager 导出 CSV（passwords.google.com → 下载）';
+
+  @override
+  String get importDashlaneSubtitle => '从 Dashlane 导出 CSV（设置 → 导出数据 → 凭据）';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return '名为«$alias»的保险库已存在。';
   }
@@ -3088,6 +3095,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get importCsvSubtitle => '来自任何密码管理器的 CSV 导出';
 
   @override
+  String get importGooglePmSubtitle =>
+      '从 Google Password Manager 导出 CSV（passwords.google.com → 下载）';
+
+  @override
+  String get importDashlaneSubtitle => '从 Dashlane 导出 CSV（设置 → 导出数据 → 凭据）';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return '名为«$alias»的保险库已存在。';
   }
@@ -4812,6 +4826,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get importCsvSubtitle => '來自任何密碼管理員的 CSV 匯出';
+
+  @override
+  String get importGooglePmSubtitle =>
+      '從 Google Password Manager 匯出 CSV（passwords.google.com → 下載）';
+
+  @override
+  String get importDashlaneSubtitle => '從 Dashlane 匯出 CSV（設定 → 匯出資料 → 憑證）';
 
   @override
   String vaultNameAlreadyExists(String alias) {

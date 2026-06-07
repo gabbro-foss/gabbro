@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "JSON-vienti Enpassista (Työkalut → Vie)",
   "importBitwardenSubtitle": "Salaamaton JSON-vienti Bitwardenista (Työkalut → Vie holvi)",
   "importCsvSubtitle": "CSV-vienti mistä tahansa salasanahallinnasta",
+  "importGooglePmSubtitle": "CSV-vienti Google Password Manager -palvelusta (passwords.google.com → Lataa)",
+  "importDashlaneSubtitle": "CSV-vienti Dashlane-palvelusta (Asetukset → Vie tiedot → Tunnistetiedot)",
 
   "vaultNameAlreadyExists": "Holvi nimeltä \"{alias}\" on jo olemassa.",
   "@vaultNameAlreadyExists": {

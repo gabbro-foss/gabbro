@@ -1406,6 +1406,14 @@ class AppLocalizationsSr extends AppLocalizations {
   String get importCsvSubtitle => 'CSV izvoz iz bilo kog menadžera lozinki';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV извоз из Google Password Manager (passwords.google.com → Преузми)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV извоз из Dashlane (Подешавања → Извоз података → Акредитиви)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Trezor sa nazivom «$alias» već postoji.';
   }
@@ -3205,6 +3213,14 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get importCsvSubtitle => 'CSV izvoz iz bilo kog menadžera lozinki';
+
+  @override
+  String get importGooglePmSubtitle =>
+      'CSV izvoz iz Google Password Manager (passwords.google.com → Preuzmi)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV izvoz iz Dashlane (Podešavanja → Izvoz podataka → Akreditivi)';
 
   @override
   String vaultNameAlreadyExists(String alias) {

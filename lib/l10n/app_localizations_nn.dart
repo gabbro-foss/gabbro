@@ -1399,6 +1399,14 @@ class AppLocalizationsNn extends AppLocalizations {
       'CSV-eksport frå kva som helst passordhandsamar';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV-eksport frå Google Password Manager (passwords.google.com → Last ned)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV-eksport frå Dashlane (Innstillingar → Eksporter data → Påloggingsinformasjon)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Eit kvelv med namnet \"$alias\" finst allereie.';
   }

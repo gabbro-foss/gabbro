@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "Εξαγωγή JSON από Enpass (Εργαλεία → Εξαγωγή)",
   "importBitwardenSubtitle": "Μη κρυπτογραφημένη εξαγωγή JSON από Bitwarden (Εργαλεία → Εξαγωγή θησαυροφυλακίου)",
   "importCsvSubtitle": "Εξαγωγή CSV από οποιονδήποτε διαχειριστή κωδικών",
+  "importGooglePmSubtitle": "Εξαγωγή CSV από Google Password Manager (passwords.google.com → Λήψη)",
+  "importDashlaneSubtitle": "Εξαγωγή CSV από Dashlane (Ρυθμίσεις → Εξαγωγή δεδομένων → Διαπιστευτήρια)",
 
   "vaultNameAlreadyExists": "Υπάρχει ήδη θησαυροφυλάκιο με το όνομα «{alias}».",
   "@vaultNameAlreadyExists": {

@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "JSON-Export aus Enpass (Werkzeuge → Exportieren)",
   "importBitwardenSubtitle": "Unverschlüsselter JSON-Export aus Bitwarden (Werkzeuge → Tresor exportieren)",
   "importCsvSubtitle": "CSV-Export aus einem beliebigen Passwortmanager",
+  "importGooglePmSubtitle": "CSV-Export aus Google Password Manager (passwords.google.com → Herunterladen)",
+  "importDashlaneSubtitle": "CSV-Export aus Dashlane (Einstellungen → Daten exportieren → Anmeldedaten)",
 
   "vaultNameAlreadyExists": "Ein Tresor namens «{alias}» existiert bereits.",
   "@vaultNameAlreadyExists": {

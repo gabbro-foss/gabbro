@@ -1399,6 +1399,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get importCsvSubtitle => 'CSV-exportálás bármely jelszókezelőből';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV-exportálás a Google Password Manager-ből (passwords.google.com → Letöltés)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV-exportálás a Dashlane-ből (Beállítások → Adatok exportálása → Hitelesítő adatok)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Már létezik «$alias» nevű széf.';
   }

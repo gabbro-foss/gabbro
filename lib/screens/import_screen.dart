@@ -13,6 +13,10 @@ Future<ImportResult> _defaultImportEnpass(List<int> data) =>
     importFromEnpass(data: data);
 Future<ImportResult> _defaultImportBitwarden(List<int> data) =>
     importFromBitwarden(data: data);
+Future<ImportResult> _defaultImportGooglePm(List<int> data) =>
+    importFromGooglePm(data: data);
+Future<ImportResult> _defaultImportDashlane(List<int> data) =>
+    importFromDashlane(data: data);
 CsvPreviewData _defaultSniffCsv(String input) => sniffCsvFile(input: input);
 Future<GabbroImportResult> _defaultImportGabbro(
         String path, List<int> passphrase) =>
@@ -21,6 +25,8 @@ Future<GabbroImportResult> _defaultImportGabbro(
 class ImportScreen extends StatefulWidget {
   final Future<ImportResult> Function(List<int> data) onImportEnpass;
   final Future<ImportResult> Function(List<int> data) onImportBitwarden;
+  final Future<ImportResult> Function(List<int> data) onImportGooglePm;
+  final Future<ImportResult> Function(List<int> data) onImportDashlane;
   final CsvPreviewData Function(String input) onSniffCsv;
   final Future<GabbroImportResult> Function(String path, List<int> passphrase)
       onImportGabbro;
@@ -29,6 +35,8 @@ class ImportScreen extends StatefulWidget {
     super.key,
     this.onImportEnpass = _defaultImportEnpass,
     this.onImportBitwarden = _defaultImportBitwarden,
+    this.onImportGooglePm = _defaultImportGooglePm,
+    this.onImportDashlane = _defaultImportDashlane,
     this.onSniffCsv = _defaultSniffCsv,
     this.onImportGabbro = _defaultImportGabbro,
   });
@@ -40,16 +48,22 @@ class ImportScreen extends StatefulWidget {
 class _ImportScreenState extends State<ImportScreen> {
   String? _enpassPath;
   String? _bitwardenPath;
+  String? _googlePmPath;
+  String? _dashlanePath;
   String? _csvPath;
   String? _gabbroPath;
 
   bool _isImportingEnpass = false;
   bool _isImportingBitwarden = false;
+  bool _isImportingGooglePm = false;
+  bool _isImportingDashlane = false;
   bool _isSniffingCsv = false;
   bool _isImportingGabbro = false;
 
   String? _enpassError;
   String? _bitwardenError;
+  String? _googlePmError;
+  String? _dashlaneError;
   String? _csvError;
   String? _gabbroError;
 
@@ -129,6 +143,76 @@ class _ImportScreenState extends State<ImportScreen> {
       if (mounted) setState(() => _bitwardenError = e.toString());
     } finally {
       if (mounted) setState(() => _isImportingBitwarden = false);
+    }
+  }
+
+  // ── Google Password Manager ──────────────────────────────────────────────
+
+  Future<void> _importGooglePm() async {
+    final path = _googlePmPath;
+    if (path == null || path.isEmpty) {
+      setState(() => _googlePmError = AppLocalizations.of(context).importSelectFile);
+      return;
+    }
+    final file = File(path);
+    if (!file.existsSync()) {
+      setState(() => _googlePmError = AppLocalizations.of(context).importFileNotFound);
+      return;
+    }
+    setState(() {
+      _isImportingGooglePm = true;
+      _googlePmError = null;
+    });
+    try {
+      final bytes = await file.readAsBytes();
+      final result = await widget.onImportGooglePm(bytes);
+      var editedCount = 0;
+      if (result.failures.isNotEmpty && mounted) {
+        editedCount = await showImportFailuresDialog(context, result.failures);
+      }
+      if (result.skipped.isNotEmpty && mounted) {
+        await showSkippedEntriesDialog(context, result.skipped);
+      }
+      if (mounted) Navigator.of(context).pop(result.imported.toInt() + editedCount);
+    } catch (e) {
+      if (mounted) setState(() => _googlePmError = e.toString());
+    } finally {
+      if (mounted) setState(() => _isImportingGooglePm = false);
+    }
+  }
+
+  // ── Dashlane ─────────────────────────────────────────────────────────────
+
+  Future<void> _importDashlane() async {
+    final path = _dashlanePath;
+    if (path == null || path.isEmpty) {
+      setState(() => _dashlaneError = AppLocalizations.of(context).importSelectFile);
+      return;
+    }
+    final file = File(path);
+    if (!file.existsSync()) {
+      setState(() => _dashlaneError = AppLocalizations.of(context).importFileNotFound);
+      return;
+    }
+    setState(() {
+      _isImportingDashlane = true;
+      _dashlaneError = null;
+    });
+    try {
+      final bytes = await file.readAsBytes();
+      final result = await widget.onImportDashlane(bytes);
+      var editedCount = 0;
+      if (result.failures.isNotEmpty && mounted) {
+        editedCount = await showImportFailuresDialog(context, result.failures);
+      }
+      if (result.skipped.isNotEmpty && mounted) {
+        await showSkippedEntriesDialog(context, result.skipped);
+      }
+      if (mounted) Navigator.of(context).pop(result.imported.toInt() + editedCount);
+    } catch (e) {
+      if (mounted) setState(() => _dashlaneError = e.toString());
+    } finally {
+      if (mounted) setState(() => _isImportingDashlane = false);
     }
   }
 
@@ -258,6 +342,34 @@ class _ImportScreenState extends State<ImportScreen> {
               const Divider(),
               const SizedBox(height: 24),
               _csvSection(l),
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 24),
+              _importSection(
+                title: 'Google Password Manager',
+                subtitle: l.importGooglePmSubtitle,
+                hint: '/home/user/Google Passwords.csv',
+                allowedExtensions: ['csv'],
+                onPathSelected: (p) => setState(() => _googlePmPath = p),
+                isLoading: _isImportingGooglePm,
+                error: _googlePmError,
+                onImport: _importGooglePm,
+                importLabel: l.import,
+              ),
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 24),
+              _importSection(
+                title: 'Dashlane',
+                subtitle: l.importDashlaneSubtitle,
+                hint: '/home/user/dashlane_credentials.csv',
+                allowedExtensions: ['csv'],
+                onPathSelected: (p) => setState(() => _dashlanePath = p),
+                isLoading: _isImportingDashlane,
+                error: _dashlaneError,
+                onImport: _importDashlane,
+                importLabel: l.import,
+              ),
               const SizedBox(height: 24),
               const Divider(),
               const SizedBox(height: 24),

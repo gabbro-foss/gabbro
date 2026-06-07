@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "JSON-eksport Enpassist (Tööriistad → Ekspordi)",
   "importBitwardenSubtitle": "Krüpteerimata JSON-eksport Bitwardenist (Tööriistad → Ekspordi seif)",
   "importCsvSubtitle": "CSV-eksport mis tahes paroolihaldurilt",
+  "importGooglePmSubtitle": "CSV-eksport Google Password Manager'ist (passwords.google.com → Laadi alla)",
+  "importDashlaneSubtitle": "CSV-eksport Dashlane'ist (Seaded → Ekspordi andmed → Mandaadid)",
 
   "vaultNameAlreadyExists": "Seif nimega \"{alias}\" on juba olemas.",
   "@vaultNameAlreadyExists": {

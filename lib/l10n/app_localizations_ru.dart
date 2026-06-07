@@ -1405,6 +1405,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get importCsvSubtitle => 'CSV-экспорт из любого менеджера паролей';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV-экспорт из Google Password Manager (passwords.google.com → Загрузить)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV-экспорт из Dashlane (Настройки → Экспорт данных → Учётные данные)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Хранилище с именем «$alias» уже существует.';
   }

@@ -1405,6 +1405,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get importCsvSubtitle => 'CSV-export vanuit elke wachtwoordbeheerder';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV-export vanuit Google Password Manager (passwords.google.com → Downloaden)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV-export vanuit Dashlane (Instellingen → Gegevens exporteren → Inloggegevens)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Er bestaat al een kluis met de naam \"$alias\".';
   }

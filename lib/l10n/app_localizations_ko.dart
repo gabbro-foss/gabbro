@@ -1374,6 +1374,14 @@ class AppLocalizationsKo extends AppLocalizations {
   String get importCsvSubtitle => '비밀번호 관리자에서 CSV 내보내기';
 
   @override
+  String get importGooglePmSubtitle =>
+      'Google 비밀번호 관리자에서 CSV 내보내기 (passwords.google.com → 다운로드)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'Dashlane에서 CSV 내보내기 (설정 → 데이터 내보내기 → 자격 증명)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return '이름이 «$alias»인 볼트가 이미 존재합니다.';
   }

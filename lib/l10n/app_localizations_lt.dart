@@ -1405,6 +1405,14 @@ class AppLocalizationsLt extends AppLocalizations {
       'CSV eksportas iš bet kurios slaptažodžių tvarkyklės';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV eksportas iš Google Password Manager (passwords.google.com → Atsisiųsti)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV eksportas iš Dashlane (Nustatymai → Eksportuoti duomenis → Kredencialai)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Saugykla pavadinimu «$alias» jau egzistuoja.';
   }

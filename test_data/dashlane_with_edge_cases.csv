@@ -1,0 +1,9 @@
+username,username2,username3,url,category,note,password,title
+rob@example.com,,,https://github.com,Work,Normal entry,h0rs3-b4tt3ry-st4pl3,GitHub
+rob@example.com,,,https://fallback.example.com,Personal,,s3cr3t,
+rob@example.com,,,,Finance,Entry with no title or URL,n0-url-n0-title,
+rob@example.com,,,https://premium.example.com,Entertainment,Title contains a comma,Qu0t3d-P4ss,"Service, Premium"
+rôb@exàmple.com,rôb.bckp@exàmple.com,,https://münchen.example.com,Personal,Accented characters in all fields,Ünïcödé-Pässwörd,Unicode Site
+rob@example.com,rob.alt@example.com,rob.old@example.com,https://triple.example.com,Work,All three username fields populated,Tr1pl3-U53r!,Triple Username
+rob@example.com,,,https://nopass.example.com,Personal,No password stored here,,Empty Password
+DOMAIN\rsmith,,,https://work.example.com,Work,Windows domain login with backslash,C0rp0r4t3!,Work System

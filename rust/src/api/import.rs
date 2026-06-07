@@ -7,7 +7,9 @@
 use crate::api::vault::chrono_now;
 use crate::import::bitwarden;
 use crate::import::csv::{import_csv, sniff_csv as csv_sniff, CsvImportConfig};
+use crate::import::dashlane;
 use crate::import::enpass;
+use crate::import::google_pm;
 use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
 use crate::vault::session;
 use uuid::Uuid;
@@ -132,6 +134,23 @@ pub async fn import_from_csv(
     })
 }
 
+/// Fill empty `created_at` / `updated_at` timestamps on a freshly-imported
+/// entry. Google PM and Dashlane parsers generate new UUIDs but leave
+/// timestamps empty; the bridge stamps them before adding to the session.
+fn stamp_timestamps(mut entry: VaultEntry, now: &str) -> VaultEntry {
+    let meta = match &mut entry {
+        VaultEntry::Login(e) => &mut e.meta,
+        _ => return entry,
+    };
+    if meta.created_at.is_empty() {
+        meta.created_at = now.to_string();
+    }
+    if meta.updated_at.is_empty() {
+        meta.updated_at = now.to_string();
+    }
+    entry
+}
+
 /// Extract the UUID and display title from any `VaultEntry` variant.
 fn entry_id_and_title(entry: &crate::vault::entry::VaultEntry) -> (String, String) {
     use crate::vault::entry::VaultEntry::*;
@@ -224,6 +243,97 @@ pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
                 reason: String::from("UUID already exists"),
             });
         } else {
+            session::session_add_entry_no_save(entry)?;
+            imported += 1;
+        }
+    }
+
+    session::session_save()?;
+    Ok(ImportResult {
+        imported,
+        failures: failures
+            .into_iter()
+            .map(|f| ImportFailureData {
+                title: f.title,
+                category: f.category,
+                reason: f.reason,
+                raw_fields: f.raw_fields,
+            })
+            .collect(),
+        skipped,
+    })
+}
+
+/// Import all entries from a Google Password Manager CSV export into the
+/// live session, then persist once.
+///
+/// `data` is the raw bytes of the `.csv` export from passwords.google.com.
+/// The vault must already be unlocked — returns `Err` if no session is active.
+///
+/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+pub async fn import_from_google_pm(data: Vec<u8>) -> Result<ImportResult, String> {
+    let (entries, failures) = google_pm::parse(&data)?;
+    let existing_ids = session::session_entry_ids()?;
+
+    let mut imported = 0;
+    let mut skipped = Vec::new();
+
+    for entry in entries {
+        let (id, title) = entry_id_and_title(&entry);
+        if existing_ids.contains(&id) {
+            skipped.push(SkippedEntryData {
+                title,
+                reason: String::from("UUID already exists"),
+            });
+        } else {
+            let now = chrono_now();
+            // Google PM entries are freshly assigned UUIDs — stamp timestamps.
+            let entry = stamp_timestamps(entry, &now);
+            session::session_add_entry_no_save(entry)?;
+            imported += 1;
+        }
+    }
+
+    session::session_save()?;
+    Ok(ImportResult {
+        imported,
+        failures: failures
+            .into_iter()
+            .map(|f| ImportFailureData {
+                title: f.title,
+                category: f.category,
+                reason: f.reason,
+                raw_fields: f.raw_fields,
+            })
+            .collect(),
+        skipped,
+    })
+}
+
+/// Import all entries from a Dashlane credentials CSV export into the
+/// live session, then persist once.
+///
+/// `data` is the raw bytes of the `.csv` credentials export from Dashlane.
+/// The vault must already be unlocked — returns `Err` if no session is active.
+///
+/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+pub async fn import_from_dashlane(data: Vec<u8>) -> Result<ImportResult, String> {
+    let (entries, failures) = dashlane::parse(&data)?;
+    let existing_ids = session::session_entry_ids()?;
+
+    let mut imported = 0;
+    let mut skipped = Vec::new();
+
+    for entry in entries {
+        let (id, title) = entry_id_and_title(&entry);
+        if existing_ids.contains(&id) {
+            skipped.push(SkippedEntryData {
+                title,
+                reason: String::from("UUID already exists"),
+            });
+        } else {
+            let now = chrono_now();
+            let entry = stamp_timestamps(entry, &now);
             session::session_add_entry_no_save(entry)?;
             imported += 1;
         }
@@ -758,5 +868,67 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
         );
 
         teardown(&path);
+    }
+
+    const GOOGLE_PM_CSV: &str = "\
+name,url,username,password,note
+GitHub,https://github.com,rob,hunter2,my github
+Google,https://google.com,rob@gmail.com,s3cr3t,";
+
+    const DASHLANE_CSV: &str = "\
+username,username2,username3,url,category,note,password,title
+rob@example.com,,,https://github.com,Work,my github,hunter2,GitHub
+user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
+
+    #[test]
+    #[serial]
+    fn import_from_google_pm_adds_entries_to_session() {
+        let pass = b"google pm test passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let result = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec())).unwrap();
+        assert_eq!(result.imported, 2);
+        assert!(result.failures.is_empty());
+
+        let summaries = session::list_entry_summaries().unwrap();
+        // 1 existing note + 2 imported logins
+        assert_eq!(summaries.len(), 3);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn import_from_google_pm_locked_vault_returns_error() {
+        session::lock_vault().unwrap();
+        let result = run(import_from_google_pm(GOOGLE_PM_CSV.as_bytes().to_vec()));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    #[serial]
+    fn import_from_dashlane_adds_entries_to_session() {
+        let pass = b"dashlane test passphrase";
+        let path = setup_vault(pass);
+        session::unlock_vault(pass, path.clone()).unwrap();
+
+        let result = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec())).unwrap();
+        assert_eq!(result.imported, 2);
+        assert!(result.failures.is_empty());
+
+        let summaries = session::list_entry_summaries().unwrap();
+        // 1 existing note + 2 imported logins
+        assert_eq!(summaries.len(), 3);
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn import_from_dashlane_locked_vault_returns_error() {
+        session::lock_vault().unwrap();
+        let result = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec()));
+        assert!(result.is_err());
     }
 }

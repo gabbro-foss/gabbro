@@ -1403,6 +1403,14 @@ class AppLocalizationsFi extends AppLocalizations {
       'CSV-vienti mistä tahansa salasanahallinnasta';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV-vienti Google Password Manager -palvelusta (passwords.google.com → Lataa)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV-vienti Dashlane-palvelusta (Asetukset → Vie tiedot → Tunnistetiedot)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Holvi nimeltä \"$alias\" on jo olemassa.';
   }

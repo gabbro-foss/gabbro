@@ -1418,6 +1418,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Export CSV depuis n\'importe quel gestionnaire de mots de passe';
 
   @override
+  String get importGooglePmSubtitle =>
+      'Export CSV de Google Password Manager (passwords.google.com → Télécharger)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'Export CSV de Dashlane (Paramètres → Exporter les données → Identifiants)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Un coffre nommé « $alias » existe déjà.';
   }

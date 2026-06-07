@@ -2707,6 +2707,18 @@ abstract class AppLocalizations {
   /// **'CSV export from any password manager'**
   String get importCsvSubtitle;
 
+  /// No description provided for @importGooglePmSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV export from Google Password Manager (passwords.google.com → Download)'**
+  String get importGooglePmSubtitle;
+
+  /// No description provided for @importDashlaneSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV export from Dashlane (Settings → Export Data → Credentials)'**
+  String get importDashlaneSubtitle;
+
   /// No description provided for @vaultNameAlreadyExists.
   ///
   /// In en, this message translates to:

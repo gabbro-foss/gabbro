@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "Exportação JSON do Enpass (Ferramentas → Exportar)",
   "importBitwardenSubtitle": "Exportação JSON não encriptada do Bitwarden (Ferramentas → Exportar Cofre)",
   "importCsvSubtitle": "Exportação CSV de qualquer gestor de palavras-passe",
+  "importGooglePmSubtitle": "Exportação CSV do Google Password Manager (passwords.google.com → Transferir)",
+  "importDashlaneSubtitle": "Exportação CSV do Dashlane (Definições → Exportar dados → Credenciais)",
 
   "vaultNameAlreadyExists": "Já existe um cofre com o nome \"{alias}\".",
   "@vaultNameAlreadyExists": {

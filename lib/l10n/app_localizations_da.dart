@@ -1404,6 +1404,14 @@ class AppLocalizationsDa extends AppLocalizations {
       'CSV-eksport fra enhver adgangskodeadministrator';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV-eksport fra Google Password Manager (passwords.google.com → Download)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV-eksport fra Dashlane (Indstillinger → Eksportér data → Loginoplysninger)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'En hvælving med navnet \"$alias\" findes allerede.';
   }

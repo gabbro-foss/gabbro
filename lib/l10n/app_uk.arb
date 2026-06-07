@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "JSON-експорт з Enpass (Інструменти → Експорт)",
   "importBitwardenSubtitle": "Незашифрований JSON-експорт з Bitwarden (Інструменти → Експорт сховища)",
   "importCsvSubtitle": "CSV-експорт з будь-якого менеджера паролів",
+  "importGooglePmSubtitle": "CSV-експорт із Google Password Manager (passwords.google.com → Завантажити)",
+  "importDashlaneSubtitle": "CSV-експорт із Dashlane (Налаштування → Експортувати дані → Облікові дані)",
 
   "vaultNameAlreadyExists": "Сховище з назвою «{alias}» вже існує.",
   "@vaultNameAlreadyExists": {

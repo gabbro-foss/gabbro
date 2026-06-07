@@ -1401,6 +1401,14 @@ class AppLocalizationsKk extends AppLocalizations {
       'Кез-келген құпия сөз менеджерінен CSV экспорты';
 
   @override
+  String get importGooglePmSubtitle =>
+      'Google Password Manager-ден CSV экспорты (passwords.google.com → Жүктеу)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'Dashlane-ден CSV экспорты (Параметрлер → Деректерді экспорттау → Тіркелгі деректері)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return '«$alias» атты сейф бар.';
   }

@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "JSON izvoz iz Enpass (Alati → Izvezi)",
   "importBitwardenSubtitle": "Nešifrovani JSON izvoz iz Bitwarden (Alati → Izvezi trezor)",
   "importCsvSubtitle": "CSV izvoz iz bilo kog menadžera lozinki",
+  "importGooglePmSubtitle": "CSV izvoz iz Google Password Manager (passwords.google.com → Preuzmi)",
+  "importDashlaneSubtitle": "CSV izvoz iz Dashlane (Podešavanja → Izvoz podataka → Akreditivi)",
 
   "vaultNameAlreadyExists": "Trezor sa nazivom «{alias}» već postoji.",
   "@vaultNameAlreadyExists": {

@@ -1400,6 +1400,14 @@ class AppLocalizationsYo extends AppLocalizations {
       'Gbigba jade CSV lati olugba ọrọ igbaniwọle eyikeyi';
 
   @override
+  String get importGooglePmSubtitle =>
+      'Igbasilẹ CSV lati Google Password Manager (passwords.google.com → Gba)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'Igbasilẹ CSV lati Dashlane (Ìtòlẹsẹẹsẹ → Gbé àwọn data jáde → Àwọn ẹrí)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Vọọliti ti a npè ni «$alias» ti wa tẹlẹ.';
   }

@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "EnpassからのJSONエクスポート (ツール → エクスポート)",
   "importBitwardenSubtitle": "BitwardenからのJSONエクスポート (ツール → ボルトをエクスポート)",
   "importCsvSubtitle": "パスワードマネージャーからのCSVエクスポート",
+  "importGooglePmSubtitle": "Google パスワード マネージャーから CSV エクスポート（passwords.google.com → ダウンロード）",
+  "importDashlaneSubtitle": "Dashlane から CSV エクスポート（設定 → データのエクスポート → 認証情報）",
 
   "vaultNameAlreadyExists": "「{alias}」という名前のボルトはすでに存在します。",
   "@vaultNameAlreadyExists": {

@@ -1,0 +1,9 @@
+username,username2,username3,url,category,note,password,title
+rob@example.com,,,https://github.com,Work,Work account for personal projects,h0rs3-b4tt3ry-st4pl3,GitHub
+rob.smith@gmail.com,rob.backup@gmail.com,,https://accounts.google.com,Personal,,c0rr3ct-h0rs3-b4tt3ry,Google
+rob@example.com,,,https://www.netflix.com,Entertainment,Shared with partner — 2 screens,Tr0ub4dor&3,Netflix
+rob.smith,,,https://bank.example.com,Finance,,X!9kLmP#2qRv7nZw,Online Banking
+admin,,,https://jump.example.com,Work,Passphrase for key not the key itself,-----BEGIN RSA PRIVATE KEY-----,SSH Jump Host
+rsmith@corp.example.com,rsmith@alt.corp.example.com,r.smith@legacy.corp.example.com,https://vpn.corp.example.com,Work,Rotate every 90 days,Wint3r2024!,Work VPN
+rsmith_42,,,https://forum.example.com,Personal,Old account from 2019,p4ssw0rd123,Forum Account
+rob@example.com,,,https://shopping.example.com,Shopping,,Sh0pping-P4ss!,Shopping Site

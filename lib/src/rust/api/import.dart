@@ -6,7 +6,7 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `entry_id_and_title`
+// These functions are ignored because they are not marked as `pub`: `entry_id_and_title`, `stamp_timestamps`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`, `fmt`
 
 /// Sniff the headers and first 3 rows of a CSV string.
@@ -52,6 +52,26 @@ Future<ImportResult> importFromBitwarden({required List<int> data}) =>
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
 Future<ImportResult> importFromEnpass({required List<int> data}) =>
     RustLib.instance.api.crateApiImportImportFromEnpass(data: data);
+
+/// Import all entries from a Google Password Manager CSV export into the
+/// live session, then persist once.
+///
+/// `data` is the raw bytes of the `.csv` export from passwords.google.com.
+/// The vault must already be unlocked — returns `Err` if no session is active.
+///
+/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+Future<ImportResult> importFromGooglePm({required List<int> data}) =>
+    RustLib.instance.api.crateApiImportImportFromGooglePm(data: data);
+
+/// Import all entries from a Dashlane credentials CSV export into the
+/// live session, then persist once.
+///
+/// `data` is the raw bytes of the `.csv` credentials export from Dashlane.
+/// The vault must already be unlocked — returns `Err` if no session is active.
+///
+/// Async — triggers a single vault save (Argon2id + encryption) at the end.
+Future<ImportResult> importFromDashlane({required List<int> data}) =>
+    RustLib.instance.api.crateApiImportImportFromDashlane(data: data);
 
 /// Import entries from a `.gabbro` vault file into the live session.
 ///

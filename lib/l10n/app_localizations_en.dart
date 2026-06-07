@@ -1396,6 +1396,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importCsvSubtitle => 'CSV export from any password manager';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV export from Google Password Manager (passwords.google.com → Download)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV export from Dashlane (Settings → Export Data → Credentials)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'A vault named \"$alias\" already exists.';
   }

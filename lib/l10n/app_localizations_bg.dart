@@ -1403,6 +1403,14 @@ class AppLocalizationsBg extends AppLocalizations {
   String get importCsvSubtitle => 'CSV експорт от всеки мениджър на пароли';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV експорт от Google Password Manager (passwords.google.com → Изтегляне)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV експорт от Dashlane (Настройки → Експортиране на данни → Идентификационни данни)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Вече съществува трезор с името «$alias».';
   }

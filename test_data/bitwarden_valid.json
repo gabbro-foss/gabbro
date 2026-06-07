@@ -1,0 +1,48 @@
+{
+  "encrypted": false,
+  "folders": [
+    {"id": "f-001", "name": "Work"}
+  ],
+  "items": [
+    {
+      "id": "bw-001",
+      "folderId": "f-001",
+      "type": 1,
+      "name": "GitHub",
+      "notes": "my dev account",
+      "favorite": true,
+      "fields": [],
+      "login": {
+        "uris": [{"uri": "https://github.com"}],
+        "username": "rob",
+        "password": "hunter2"
+      }
+    },
+    {
+      "id": "bw-002",
+      "folderId": null,
+      "type": 3,
+      "name": "Visa Platinum",
+      "notes": null,
+      "favorite": false,
+      "fields": [],
+      "card": {
+        "cardholderName": "Rob Bastian",
+        "brand": "Visa",
+        "number": "4111111111111111",
+        "expMonth": "12",
+        "expYear": "2028",
+        "code": "123"
+      }
+    },
+    {
+      "id": "bw-003",
+      "folderId": null,
+      "type": 2,
+      "name": "SSH Key",
+      "notes": "Passphrase for my ed25519 key",
+      "favorite": false,
+      "fields": []
+    }
+  ]
+}

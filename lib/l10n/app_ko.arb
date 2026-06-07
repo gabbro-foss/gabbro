@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "Enpass에서 JSON 내보내기 (도구 → 내보내기)",
   "importBitwardenSubtitle": "Bitwarden에서 암호화되지 않은 JSON 내보내기 (도구 → 볼트 내보내기)",
   "importCsvSubtitle": "비밀번호 관리자에서 CSV 내보내기",
+  "importGooglePmSubtitle": "Google 비밀번호 관리자에서 CSV 내보내기 (passwords.google.com → 다운로드)",
+  "importDashlaneSubtitle": "Dashlane에서 CSV 내보내기 (설정 → 데이터 내보내기 → 자격 증명)",
 
   "vaultNameAlreadyExists": "이름이 «{alias}»인 볼트가 이미 존재합니다.",
   "@vaultNameAlreadyExists": {

@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "JSON-export vanuit Enpass (Hulpmiddelen → Exporteren)",
   "importBitwardenSubtitle": "Niet-versleutelde JSON-export vanuit Bitwarden (Hulpmiddelen → Kluis exporteren)",
   "importCsvSubtitle": "CSV-export vanuit elke wachtwoordbeheerder",
+  "importGooglePmSubtitle": "CSV-export vanuit Google Password Manager (passwords.google.com → Downloaden)",
+  "importDashlaneSubtitle": "CSV-export vanuit Dashlane (Instellingen → Gegevens exporteren → Inloggegevens)",
 
   "vaultNameAlreadyExists": "Er bestaat al een kluis met de naam \"{alias}\".",
   "@vaultNameAlreadyExists": {

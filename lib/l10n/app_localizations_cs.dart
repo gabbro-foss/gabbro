@@ -1404,6 +1404,14 @@ class AppLocalizationsCs extends AppLocalizations {
   String get importCsvSubtitle => 'CSV export z libovolného správce hesel';
 
   @override
+  String get importGooglePmSubtitle =>
+      'CSV export z Google Password Manager (passwords.google.com → Stáhnout)';
+
+  @override
+  String get importDashlaneSubtitle =>
+      'CSV export z Dashlane (Nastavení → Export dat → Přihlašovací údaje)';
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Trezor s názvem «$alias» již existuje.';
   }

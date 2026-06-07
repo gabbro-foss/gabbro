@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "Enpass-etiko JSON esportazioa (Tresnak → Esportatu)",
   "importBitwardenSubtitle": "Bitwarden-etiko JSON enkriptatu gabeko esportazioa (Tresnak → Gandegi esportatu)",
   "importCsvSubtitle": "Edozein pasahitz-kudeatzailetik CSV esportazioa",
+  "importGooglePmSubtitle": "CSV esportazioa Google Password Manager-etik (passwords.google.com → Deskargatu)",
+  "importDashlaneSubtitle": "CSV esportazioa Dashlane-tik (Ezarpenak → Esportatu datuak → Kredentzialak)",
 
   "vaultNameAlreadyExists": "«{alias}» izeneko gandegiak dagoeneko badago.",
   "@vaultNameAlreadyExists": {

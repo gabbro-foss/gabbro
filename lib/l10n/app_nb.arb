@@ -634,6 +634,8 @@
   "importEnpassSubtitle": "JSON-eksport fra Enpass (Verktøy → Eksporter)",
   "importBitwardenSubtitle": "Ukryptert JSON-eksport fra Bitwarden (Verktøy → Eksporter hvelv)",
   "importCsvSubtitle": "CSV-eksport fra en hvilken som helst passordbehandler",
+  "importGooglePmSubtitle": "CSV-eksport fra Google Password Manager (passwords.google.com → Last ned)",
+  "importDashlaneSubtitle": "CSV-eksport fra Dashlane (Innstillinger → Eksporter data → Påloggingsinformasjon)",
 
   "vaultNameAlreadyExists": "Et hvelv med navnet \"{alias}\" finnes allerede.",
   "@vaultNameAlreadyExists": {
