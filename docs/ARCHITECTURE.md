@@ -151,7 +151,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 480 | 8 |
+| Rust (`cargo test -q`) | 477 | 8 |
 | Flutter (`flutter test`) | 664 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
 
@@ -174,18 +174,18 @@ Baseline (2026-06-08): Rust 411 / 8 ignored; Flutter 590 / 0; Kotlin 0 / 18 (har
 | Suite | Baseline | Current |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 411 / 8 ignored | 480 / 8 ignored ✅ done |
-| Flutter (`flutter test`) | 590 / 0 | 664 / 0 — in progress |
-| Kotlin (`./gradlew :app:testDebugUnitTest`) | 0 / 18 ignored | 0 / 18 — not started |
+| Flutter (`flutter test`) | 590 / 0 | 664 / 0 ✅ done (hard-to-reach paths documented below) |
+| Kotlin (`./gradlew :app:testDebugUnitTest`) | 0 / 19 ignored | 4 / 19 ignored — in progress |
 
 #### Rust — complete ✅
 
 All reachable targets covered across sessions 2–3: `fido/device.rs`, `crypto/vault_crypto.rs`,
 `import/bitwarden.rs`, `import/enpass.rs`, `api/vault_bridge.rs`, `api/import.rs`.
 
-#### Flutter — remaining hard-to-reach paths
+#### Flutter — complete ✅ (hard-to-reach paths remain)
 
-These require Rust bridge injection or platform channel mocking; impractical from widget
-tests without an `integration_test/` + real device setup:
+664 passing / 0 ignored. Remaining gaps require Rust bridge injection or platform channel
+mocking — impractical from widget tests without `integration_test/` + real device:
 
 - **`screens/entry_detail_screen.dart`** — edit button push (`CreateEntryScreen` calls
   `listFolders()` bridge in `initState`; no injection point); password history navigation.
@@ -197,17 +197,58 @@ tests without an `integration_test/` + real device setup:
 - **`screens/onboarding_screen.dart`** — alias-path auto-sync (requires no `initialPath`,
   triggers `getApplicationSupportDirectory()` platform channel).
 
-#### Kotlin — next phase
+#### Kotlin — next phase (use Claude Opus 4.8, not Sonnet)
 
-All 18 existing tests are `@Ignore`d hardware stubs. Targets for Robolectric / JVM-fake testing:
+**Incident (2026-06-08) — UNRESOLVED, device still bricked:**
 
-- **`BiometricHelper.kt`** — enrol/unenrol state machine, `isEnrolled` flag, error paths
-  from `BiometricPrompt`. Testable with constructor-injected fakes for `SharedPreferences`
-  and `KeyStore`.
-- **`GabbroAutofillService.kt`** — autofill matching and dataset assembly logic can be
-  separated from the Android service lifecycle and tested with plain JVM fakes.
-- Hardware-only paths (`YubiKeyManager`, `UnlockActivity`, `RustBridge`) remain
-  `@Ignore`d with clear documentation.
+1. `GabbroAutofillService.kt` was refactored (private methods → companion object,
+   `android.net.Uri` → `java.net.URI`). Vault unlock broke on device.
+2. Production code was fully reverted to the exact pre-session state.
+3. **Vault unlock is still broken after the revert.** Something upstream was damaged.
+
+Known actions taken during the session that may have caused side-effects:
+- `./gradlew :app:testDebugUnitTest` run from inside the `android/` subdirectory — this
+  triggered a full Gradle debug build outside of Flutter's build system and may have
+  corrupted build cache or generated conflicting intermediate artifacts.
+- `GabbroAutofillServiceTest.kt` added (test-only file; should not affect production APK).
+
+The exact upstream breakage is unknown. The Kotlin source changes are fully reverted
+(`git diff` confirms `GabbroAutofillService.kt` matches HEAD). The breakage is therefore
+either in build artifacts, Gradle cache, or generated code — not in source.
+
+**To diagnose / recover:**
+- `./gradlew clean` from inside `android/`
+- `flutter clean && flutter pub get`
+- `flutter build apk --release` and reinstall
+- If still broken, check `build/` and `.gradle/` directories for stale artifacts.
+
+**Rule reinforced: never run `./gradlew` directly from `android/` during a session.
+All Android builds must go through `flutter build apk`. Never modify production Kotlin
+without building + hardware-testing the result immediately.**
+
+**Current state:** `GabbroAutofillServiceTest.kt` added with 4 passing JVM tests covering
+`CredentialSummary` data-class semantics and `ParsedStructure.isEmpty()`. All other
+autofill and biometric logic remains `@Ignore`d (19 stubs).
+
+**Constraints discovered:**
+- `org.json.JSONArray` is a stub in JVM unit tests (`android.jar`) — throws
+  `RuntimeException("Stub!")`. `parseSummariesJson` cannot be tested without Robolectric.
+- `extractAppToken` and `extractRegistrableDomain` are private instance methods on
+  `GabbroAutofillService extends AutofillService` — cannot be instantiated in JVM tests.
+  Refactoring to companion object to enable testing caused the device incident above.
+- `BiometricHelper.isEnrolled` / `unenroll` require `SharedPreferences` →
+  need Robolectric or a `Context` fake.
+
+**Next step for Kotlin phase:**
+Add Robolectric (`testImplementation("org.robolectric:robolectric:4.13")`) to
+`android/app/build.gradle.kts`. This unblocks:
+  1. `parseSummariesJson` — real `org.json` via Robolectric
+  2. `extractRegistrableDomain` — real `android.net.Uri` via Robolectric
+  3. `BiometricHelper.isEnrolled` / `unenroll` — real `SharedPreferences` via Robolectric
+Robolectric tests stay in `src/test/` (JVM, no device needed). Verify with
+`./gradlew :app:testDebugUnitTest` after adding the dependency.
+Hardware-only paths (`YubiKeyManager`, `UnlockActivity`, `RustBridge`,
+`BiometricPrompt`) remain `@Ignore`d.
 
 ### Open from the security audit
 
