@@ -365,29 +365,41 @@ pub fn get_hmac_secret_for_pair(
         let secret_slice = std::slice::from_raw_parts(secret_ptr, 64);
 
         // Pick the correct half: index 0 → first 32 bytes, index 1 → last 32 bytes.
-        let (hmac_bytes, credential_id) = if matched_id == records[0].credential_id {
-            let mut out = [0u8; 32];
-            out.copy_from_slice(&secret_slice[..32]);
-            (out, records[0].credential_id.clone())
-        } else if matched_id == records[1].credential_id {
-            let mut out = [0u8; 32];
-            out.copy_from_slice(&secret_slice[32..]);
-            (out, records[1].credential_id.clone())
-        } else {
-            fido_assert_free(&mut (assert as *mut _));
-            fido_dev_close(dev);
-            fido_dev_free(&mut (dev as *mut _));
-            return Err("assertion credential ID does not match either record".to_string());
-        };
+        let result = select_hmac_half(secret_slice, &matched_id, records);
 
         fido_assert_free(&mut (assert as *mut _));
         fido_dev_close(dev);
         fido_dev_free(&mut (dev as *mut _));
 
-        Ok(HmacMatch {
-            hmac: hmac_bytes,
-            credential_id,
-        })
+        match result {
+            Some((hmac, credential_id)) => Ok(HmacMatch { hmac, credential_id }),
+            None => Err("assertion credential ID does not match either record".to_string()),
+        }
+    }
+}
+
+/// Given a 64-byte combined HMAC output, extract the 32-byte half that belongs
+/// to `matched_id`.
+///
+/// Returns `None` if `matched_id` matches neither record — this guards against
+/// firmware anomalies or protocol confusion where the YubiKey returns a
+/// credential ID that was never in the allow-list.
+fn select_hmac_half(
+    secret: &[u8],
+    matched_id: &[u8],
+    records: [&YubiKeyRecord; 2],
+) -> Option<([u8; 32], Vec<u8>)> {
+    debug_assert_eq!(secret.len(), 64);
+    if matched_id == records[0].credential_id {
+        let mut out = [0u8; 32];
+        out.copy_from_slice(&secret[..32]);
+        Some((out, records[0].credential_id.clone()))
+    } else if matched_id == records[1].credential_id {
+        let mut out = [0u8; 32];
+        out.copy_from_slice(&secret[32..]);
+        Some((out, records[1].credential_id.clone()))
+    } else {
+        None
     }
 }
 
@@ -441,11 +453,171 @@ mod tests {
         }
     }
 
+    fn record_with_id(id: &[u8]) -> YubiKeyRecord {
+        YubiKeyRecord {
+            credential_id: id.to_vec(),
+            salt: [0u8; 32],
+            key_blob: vec![],
+        }
+    }
+
+    // ── fido_err_hint ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn fido_err_hint_known_codes_contain_human_description() {
+        assert!(fido_err_hint(0x05).contains("timeout"));
+        assert!(fido_err_hint(0x30).contains("not allowed"));
+        assert!(fido_err_hint(0x31).contains("wrong PIN"));
+        assert!(fido_err_hint(0x32).contains("blocked"));
+        assert!(fido_err_hint(0x33).contains("authentication failed"));
+        assert!(fido_err_hint(0x34).contains("authentication failed"));
+        assert!(fido_err_hint(0x35).contains("not set"));
+        assert!(fido_err_hint(0x36).contains("required"));
+    }
+
+    #[test]
+    fn fido_err_hint_unknown_code_returns_decimal_string() {
+        assert_eq!(fido_err_hint(0), "0");
+        assert_eq!(fido_err_hint(-1), "-1");
+        assert_eq!(fido_err_hint(0x99), "153");
+    }
+
+    #[test]
+    fn fido_err_hint_known_code_includes_numeric_code_in_output() {
+        // Format is "{r} ({description})" for known codes.
+        let hint = fido_err_hint(0x31); // 0x31 = 49
+        assert!(hint.starts_with("49 "), "got: {hint}");
+        assert!(hint.contains("wrong PIN"), "got: {hint}");
+    }
+
+    // ── select_hmac_half ──────────────────────────────────────────────────────
+
+    #[test]
+    fn select_hmac_half_first_record_gets_first_32_bytes() {
+        let mut secret = [0u8; 64];
+        secret[0] = 0xAA;
+        secret[31] = 0xBB;
+        secret[32] = 0xCC; // start of second half — must NOT appear in result
+
+        let rec0 = record_with_id(&[1, 2, 3]);
+        let rec1 = record_with_id(&[4, 5, 6]);
+
+        let (hmac, id) = select_hmac_half(&secret, &[1, 2, 3], [&rec0, &rec1]).unwrap();
+        assert_eq!(hmac[0], 0xAA);
+        assert_eq!(hmac[31], 0xBB);
+        assert_eq!(id, vec![1, 2, 3]);
+    }
+
+    #[test]
+    fn select_hmac_half_second_record_gets_last_32_bytes() {
+        let mut secret = [0u8; 64];
+        secret[31] = 0xAA; // end of first half — must NOT appear in result
+        secret[32] = 0xCC;
+        secret[63] = 0xDD;
+
+        let rec0 = record_with_id(&[1, 2, 3]);
+        let rec1 = record_with_id(&[4, 5, 6]);
+
+        let (hmac, id) = select_hmac_half(&secret, &[4, 5, 6], [&rec0, &rec1]).unwrap();
+        assert_eq!(hmac[0], 0xCC);
+        assert_eq!(hmac[31], 0xDD);
+        assert_eq!(id, vec![4, 5, 6]);
+    }
+
+    #[test]
+    fn select_hmac_half_unknown_id_returns_none() {
+        let secret = [0u8; 64];
+        let rec0 = record_with_id(&[1]);
+        let rec1 = record_with_id(&[2]);
+        assert!(select_hmac_half(&secret, &[99], [&rec0, &rec1]).is_none());
+    }
+
+    #[test]
+    fn select_hmac_half_empty_id_returns_none_when_records_are_nonempty() {
+        let secret = [0u8; 64];
+        let rec0 = record_with_id(&[1, 2, 3]);
+        let rec1 = record_with_id(&[4, 5, 6]);
+        assert!(select_hmac_half(&secret, &[], [&rec0, &rec1]).is_none());
+    }
+
+    #[test]
+    fn select_hmac_half_halves_are_independent() {
+        // Verify that distinct salts in each half don't bleed into the other.
+        let mut secret = [0u8; 64];
+        for i in 0..32 {
+            secret[i] = 0xAA;
+            secret[32 + i] = 0xBB;
+        }
+        let rec0 = record_with_id(&[1]);
+        let rec1 = record_with_id(&[2]);
+
+        let (h0, _) = select_hmac_half(&secret, &[1], [&rec0, &rec1]).unwrap();
+        let (h1, _) = select_hmac_half(&secret, &[2], [&rec0, &rec1]).unwrap();
+        assert!(h0.iter().all(|&b| b == 0xAA));
+        assert!(h1.iter().all(|&b| b == 0xBB));
+    }
+
+    // ── NUL-byte rejection (pure Rust, no FFI) ────────────────────────────────
+
+    #[test]
+    fn register_credential_rejects_nul_in_device_path() {
+        let result = register_credential("/dev/hidraw\x005", "pin");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn register_credential_rejects_nul_in_pin() {
+        let result = register_credential("/dev/hidraw5", "pin\x00secret");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn get_hmac_secret_rejects_nul_in_device_path() {
+        let result = get_hmac_secret("/dev/hidraw\x005", &fake_record(), "pin");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn get_hmac_secret_rejects_nul_in_pin() {
+        let result = get_hmac_secret("/dev/hidraw5", &fake_record(), "pin\x00bad");
+        assert!(result.is_err());
+    }
+
+    // ── get_hmac_secret_any_of dispatcher ────────────────────────────────────
+
     #[test]
     fn get_hmac_secret_any_of_empty_records_errors() {
         let result = get_hmac_secret_any_of("/dev/null", &[], "pin");
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("no records"));
+    }
+
+    #[test]
+    #[serial]
+    fn get_hmac_secret_any_of_three_or_more_exhausted_returns_no_match_error() {
+        // With 3 records and no real device, all C(3,2)=3 pairs fail at
+        // fido_dev_open. The dispatcher must return the "no matching" sentinel
+        // rather than a raw device error.
+        let records = vec![
+            record_with_id(&[1]),
+            record_with_id(&[2]),
+            record_with_id(&[3]),
+        ];
+        let result = get_hmac_secret_any_of("/nonexistent-gabbro-fido-device", &records, "pin");
+        assert!(result.is_err());
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("no matching FIDO2 credential"),
+            "expected 'no matching' sentinel, got: {msg}"
+        );
+    }
+
+    #[test]
+    fn get_hmac_secret_any_of_empty_records_does_not_call_ffi() {
+        // Empty slice branch returns before any FFI; verify the error text.
+        let result = get_hmac_secret_any_of("/nonexistent-gabbro-fido-device", &[], "pin");
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("no records provided"));
     }
 
     #[test]

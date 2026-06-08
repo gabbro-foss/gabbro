@@ -20,14 +20,93 @@ Uint8List _fromHex(String hex) {
   return Uint8List.fromList(result);
 }
 
+// ── Default bridge implementations ───────────────────────────────────────────
+
+List<YubikeyRecordData> _defaultListKeys(String path) =>
+    listVaultYubikeyRecords(path: path);
+
+Future<void> _defaultSetAlias(String hex, String alias) =>
+    setYubikeyAlias(credentialIdHex: hex, alias: alias);
+
+Future<void> _defaultRemoveKey(List<int> credId) =>
+    removeYubikey(credId: credId);
+
+Future<FidoCredentialData> _defaultFidoRegister({
+  required String devicePath,
+  required String pin,
+}) =>
+    fidoRegister(devicePath: devicePath, pin: pin);
+
+Future<List<int>> _defaultFidoGetHmacSecret({
+  required String devicePath,
+  required List<int> credentialId,
+  required List<int> salt,
+  required String pin,
+}) =>
+    fidoGetHmacSecret(
+      devicePath: devicePath,
+      credentialId: credentialId,
+      salt: salt,
+      pin: pin,
+    );
+
+Future<void> _defaultAddYubikey({
+  required List<int> newCredId,
+  required List<int> newHmacSecret,
+  required List<int> newSalt,
+}) =>
+    addYubikey(
+      newCredId: newCredId,
+      newHmacSecret: newHmacSecret,
+      newSalt: newSalt,
+    );
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 class ManageYubiKeysScreen extends StatefulWidget {
   final String vaultPath;
   final String transport;
+
+  // null = use Platform.isAndroid at runtime; set to true/false in tests.
+  final bool? isAndroid;
+
+  // ── Injected bridge callbacks (default to real bridge; swap in tests) ──────
+  final List<YubikeyRecordData> Function(String path) onListKeys;
+  final List<YubikeyAliasData> Function() onListAliases;
+  final Future<void> Function(String hex, String alias) onSetAlias;
+  final Future<void> Function(List<int> credId) onRemoveKey;
+  final Future<void> Function({
+    required List<int> newCredId,
+    required List<int> newHmacSecret,
+    required List<int> newSalt,
+  }) onAddYubikey;
+
+  // ── Linux FIDO callbacks ──────────────────────────────────────────────────
+  final List<String> Function() onFidoListDevices;
+  final Future<FidoCredentialData> Function({
+    required String devicePath,
+    required String pin,
+  }) onFidoRegister;
+  final Future<List<int>> Function({
+    required String devicePath,
+    required List<int> credentialId,
+    required List<int> salt,
+    required String pin,
+  }) onFidoGetHmacSecret;
 
   const ManageYubiKeysScreen({
     super.key,
     required this.vaultPath,
     this.transport = 'usb',
+    this.isAndroid,
+    this.onListKeys = _defaultListKeys,
+    this.onListAliases = listYubikeyAliases,
+    this.onSetAlias = _defaultSetAlias,
+    this.onRemoveKey = _defaultRemoveKey,
+    this.onAddYubikey = _defaultAddYubikey,
+    this.onFidoListDevices = fidoListDevices,
+    this.onFidoRegister = _defaultFidoRegister,
+    this.onFidoGetHmacSecret = _defaultFidoGetHmacSecret,
   });
 
   @override
@@ -55,8 +134,8 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
       _error = null;
     });
     try {
-      final records = listVaultYubikeyRecords(path: widget.vaultPath);
-      final aliases = listYubikeyAliases();
+      final records = widget.onListKeys(widget.vaultPath);
+      final aliases = widget.onListAliases();
       final aliasMap = <String, String>{};
       for (final a in aliases) {
         aliasMap[a.credentialIdHex] = a.alias;
@@ -110,19 +189,20 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     );
     if (confirmed == true && mounted) {
       try {
-        await setYubikeyAlias(
-          credentialIdHex: hex,
-          alias: controller.text.trim(),
-        );
+        await widget.onSetAlias(hex, controller.text.trim());
         await _load();
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).failedToSaveAlias(e.toString()))));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(AppLocalizations.of(context)
+                  .failedToSaveAlias(e.toString()))));
         }
       }
     }
-    controller.dispose();
+    // Defer disposal so the dialog's exit animation can finish before the
+    // controller is released (avoids a post-dismiss rebuild touching a
+    // disposed ChangeNotifier in debug mode).
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
   }
 
   Future<void> _removeKey(YubikeyRecordData record, int index) async {
@@ -152,7 +232,9 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(isSecondToLast ? l.yubiKeySecurityWarning : l.removeYubiKeyTitle),
+        title: Text(isSecondToLast
+            ? l.yubiKeySecurityWarning
+            : l.removeYubiKeyTitle),
         content: warningContent,
         actions: [
           TextButton(
@@ -172,38 +254,39 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
 
     if (confirmed == true && mounted) {
       try {
-        await removeYubikey(credId: record.credentialId);
+        await widget.onRemoveKey(record.credentialId);
         await _load();
         if (mounted) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).yubiKeyRemoved)));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(AppLocalizations.of(context).yubiKeyRemoved)));
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).failedToRemoveKey(e.toString()))));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(AppLocalizations.of(context)
+                  .failedToRemoveKey(e.toString()))));
         }
       }
     }
   }
 
   Future<void> _addKey() async {
-    final appState = GabbroApp.of(context);
-    appState.suspendForegroundLock();
+    final appState = GabbroApp.maybeOf(context);
+    appState?.suspendForegroundLock();
     try {
-      if (Platform.isLinux) {
-        await _addKeyLinux();
-      } else {
+      if (widget.isAndroid ?? Platform.isAndroid) {
         await _addKeyAndroid();
+      } else {
+        await _addKeyLinux();
       }
     } finally {
-      if (mounted) appState.resumeForegroundLock();
+      if (mounted) appState?.resumeForegroundLock();
     }
   }
 
   Future<void> _addKeyLinux() async {
     final l = AppLocalizations.of(context);
-    final devices = fidoListDevices();
+    final devices = widget.onFidoListDevices();
     if (devices.isEmpty) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -217,12 +300,14 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     final devicePath = devices.first;
     _showLinuxProgress(l.tapYubiKeyToRegister);
     try {
-      final cred = await fidoRegister(devicePath: devicePath, pin: pin);
+      final cred = await widget.onFidoRegister(
+          devicePath: devicePath, pin: pin);
       if (!mounted) return;
       Navigator.of(context).pop();
 
-      _showLinuxProgress(AppLocalizations.of(context).tapYubiKeyToActivate);
-      final hmac = await fidoGetHmacSecret(
+      _showLinuxProgress(
+          AppLocalizations.of(context).tapYubiKeyToActivate);
+      final hmac = await widget.onFidoGetHmacSecret(
         devicePath: devicePath,
         credentialId: cred.credentialId,
         salt: cred.salt,
@@ -231,23 +316,25 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
       if (!mounted) return;
       Navigator.of(context).pop();
 
-      await addYubikey(
+      await widget.onAddYubikey(
         newCredId: cred.credentialId,
         newHmacSecret: hmac,
         newSalt: cred.salt,
       );
       await _load();
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).yubiKeyAdded)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content:
+                Text(AppLocalizations.of(context).yubiKeyAdded)));
       }
     } catch (e) {
       if (mounted) {
         try {
           Navigator.of(context).pop();
         } catch (_) {}
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).failedToAddKey(e.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context)
+                .failedToAddKey(e.toString()))));
       }
     }
   }
@@ -287,7 +374,8 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
                 const SizedBox(height: 16),
                 _stepRow(
                   ctx,
-                  label: isNfc ? dl.tapActivateNfc : dl.tapActivateUsb,
+                  label:
+                      isNfc ? dl.tapActivateNfc : dl.tapActivateUsb,
                   done: false,
                   active: step == 1,
                 ),
@@ -337,15 +425,16 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
       }
       if (hmacHex == null) throw Exception('No HMAC secret from YubiKey');
 
-      await addYubikey(
+      await widget.onAddYubikey(
         newCredId: _fromHex(credIdHex),
         newHmacSecret: _fromHex(hmacHex),
         newSalt: salt,
       );
       await _silentRefresh();
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).yubiKeyAdded)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content:
+                Text(AppLocalizations.of(context).yubiKeyAdded)));
       }
     } catch (e) {
       if (mounted) {
@@ -408,8 +497,8 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
   // Refresh records without showing the full-screen loading spinner.
   Future<void> _silentRefresh() async {
     try {
-      final records = listVaultYubikeyRecords(path: widget.vaultPath);
-      final aliases = listYubikeyAliases();
+      final records = widget.onListKeys(widget.vaultPath);
+      final aliases = widget.onListAliases();
       final aliasMap = <String, String>{};
       for (final a in aliases) {
         aliasMap[a.credentialIdHex] = a.alias;
@@ -459,7 +548,8 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
               decoration: InputDecoration(
                 labelText: l.pinLabel,
                 suffixIcon: IconButton(
-                  icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+                  icon:
+                      Icon(obscure ? Icons.visibility_off : Icons.visibility),
                   onPressed: () => setLocal(() => obscure = !obscure),
                 ),
               ),
@@ -479,7 +569,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
         },
       ),
     );
-    controller.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
     return (pin == null || pin.isEmpty) ? null : pin;
   }
 
@@ -554,7 +644,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
         },
       ),
     );
-    controller.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
     if (result == null) return null;
     return (result['pin'] ?? '', result['transport'] ?? 'usb');
   }
@@ -584,7 +674,9 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
                         if (_records.length == 1)
                           Container(
                             width: double.infinity,
-                            color: Theme.of(context).colorScheme.errorContainer,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .errorContainer,
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 10),
                             child: Row(
@@ -620,16 +712,16 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
                               final bl = AppLocalizations.of(context);
                               return ListTile(
                                 leading: const Icon(Icons.security),
-                                title: Text(
-                                    alias.isEmpty ? bl.keyDefaultTitle(i + 1) : alias),
+                                title: Text(alias.isEmpty
+                                    ? bl.keyDefaultTitle(i + 1)
+                                    : alias),
                                 subtitle:
                                     Text(_credHint(record.credentialId)),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     IconButton(
-                                      icon:
-                                          const Icon(Icons.edit_outlined),
+                                      icon: const Icon(Icons.edit_outlined),
                                       tooltip: bl.editAliasTooltip,
                                       onPressed: () =>
                                           _editAlias(record, i),

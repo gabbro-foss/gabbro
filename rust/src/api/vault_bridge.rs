@@ -1569,6 +1569,340 @@ mod tests {
         }
     }
 
+    // ── Error-path and CRUD tests ─────────────────────────────────────────────
+
+    #[test]
+    #[serial]
+    fn unlock_vault_wrong_passphrase_returns_error() {
+        use crate::api::vault::save_vault;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_wrong_pass_test.gabbro");
+        let pass = b"correct passphrase";
+        save_vault(&VaultBody::empty(), pass, &path).unwrap();
+
+        let result = run(unlock_vault(
+            b"wrong passphrase".to_vec(),
+            path.to_str().unwrap().to_string(),
+        ));
+        assert!(result.is_err(), "wrong passphrase must fail");
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn get_entry_when_locked_returns_error() {
+        lock_vault().ok();
+        let result = get_entry(String::from("any-uuid"));
+        assert!(result.is_err(), "get_entry must fail when vault is locked");
+    }
+
+    #[test]
+    #[serial]
+    fn get_entry_unknown_uuid_returns_error() {
+        use crate::api::vault::save_vault;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_get_unknown_test.gabbro");
+        let pass = b"get-unknown-pass";
+        save_vault(&VaultBody::empty(), pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        let result = get_entry(String::from("nonexistent-uuid-12345"));
+        assert!(result.is_err(), "unknown UUID must return Err");
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn create_and_delete_entry_roundtrip() {
+        use crate::api::vault::save_vault;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_delete_entry_test.gabbro");
+        let pass = b"delete-entry-pass";
+        save_vault(&VaultBody::empty(), pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        let summary = run(create_entry(VaultEntryData::Note(
+            crate::api::vault::NoteEntryData {
+                id: String::new(),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+                title: String::from("Temp note"),
+                content: String::from("to be deleted"),
+                custom_fields: vec![],
+            },
+        )))
+        .unwrap();
+
+        assert_eq!(list_entry_summaries().unwrap().len(), 1);
+
+        run(delete_entry(summary.id)).unwrap();
+
+        assert_eq!(
+            list_entry_summaries().unwrap().len(),
+            0,
+            "entry must be gone after delete"
+        );
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn update_entry_persists_change() {
+        use crate::api::vault::save_vault;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_update_entry_test.gabbro");
+        let pass = b"update-entry-pass";
+        save_vault(&VaultBody::empty(), pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        let summary = run(create_entry(VaultEntryData::Note(
+            crate::api::vault::NoteEntryData {
+                id: String::new(),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+                title: String::from("Original title"),
+                content: String::from("original content"),
+                custom_fields: vec![],
+            },
+        )))
+        .unwrap();
+
+        let id = summary.id.clone();
+
+        run(update_entry(
+            VaultEntryData::Note(crate::api::vault::NoteEntryData {
+                id: id.clone(),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+                title: String::from("Updated title"),
+                content: String::from("updated content"),
+                custom_fields: vec![],
+            }),
+            None,
+        ))
+        .unwrap();
+
+        let retrieved = get_entry(id).unwrap();
+        match retrieved {
+            VaultEntryData::Note(e) => {
+                assert_eq!(e.title, "Updated title");
+                assert_eq!(e.content, "updated content");
+            }
+            _ => panic!("expected Note"),
+        }
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn delete_entries_bulk_removes_all() {
+        use crate::api::vault::save_vault;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_delete_entries_test.gabbro");
+        let pass = b"delete-entries-pass";
+        save_vault(&VaultBody::empty(), pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        let s1 = run(create_entry(VaultEntryData::Note(
+            crate::api::vault::NoteEntryData {
+                id: String::new(),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+                title: String::from("Note 1"),
+                content: String::from("content 1"),
+                custom_fields: vec![],
+            },
+        )))
+        .unwrap();
+        let s2 = run(create_entry(VaultEntryData::Note(
+            crate::api::vault::NoteEntryData {
+                id: String::new(),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+                title: String::from("Note 2"),
+                content: String::from("content 2"),
+                custom_fields: vec![],
+            },
+        )))
+        .unwrap();
+
+        assert_eq!(list_entry_summaries().unwrap().len(), 2);
+
+        run(delete_entries(vec![s1.id, s2.id])).unwrap();
+
+        assert_eq!(
+            list_entry_summaries().unwrap().len(),
+            0,
+            "all entries must be removed by delete_entries"
+        );
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn change_passphrase_allows_unlock_with_new_passphrase() {
+        use crate::api::vault::save_vault;
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_change_pass_test.gabbro");
+        let old = b"old passphrase";
+        let new = b"new passphrase";
+
+        save_vault(&VaultBody::empty(), old, &path).unwrap();
+        run(unlock_vault(
+            old.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        run(change_passphrase(old.to_vec(), new.to_vec())).unwrap();
+        lock_vault().unwrap();
+
+        // New passphrase must open the vault.
+        run(unlock_vault(
+            new.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+        lock_vault().unwrap();
+
+        // Old passphrase must be rejected.
+        let result = run(unlock_vault(
+            old.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ));
+        assert!(result.is_err(), "old passphrase must be rejected after change");
+
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn export_vault_creates_gabbro_file() {
+        use crate::api::vault::save_vault;
+        use std::env::temp_dir;
+
+        let mut src = temp_dir();
+        src.push("gabbro_bridge_export_src_test.gabbro");
+        let mut dst = temp_dir();
+        dst.push("gabbro_bridge_export_dst_test.gabbro");
+        let pass = b"export-test-pass";
+
+        save_vault(&VaultBody::empty(), pass, &src).unwrap();
+        run(unlock_vault(pass.to_vec(), src.to_str().unwrap().to_string())).unwrap();
+
+        run(export_vault(dst.to_str().unwrap().to_string())).unwrap();
+
+        assert!(dst.exists(), "export must create the destination file");
+
+        lock_vault().unwrap();
+        // The exported file must be openable with the same passphrase.
+        run(unlock_vault(pass.to_vec(), dst.to_str().unwrap().to_string())).unwrap();
+        lock_vault().unwrap();
+
+        let _ = std::fs::remove_file(&src);
+        let _ = std::fs::remove_file(&dst);
+    }
+
+    #[test]
+    #[serial]
+    fn unlock_vault_with_yubikey_wrong_hmac_secret_size_returns_error() {
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_yubikey_size_test.gabbro");
+
+        // 31-byte hmac_secret — must be rejected before any file I/O.
+        let result = run(unlock_vault_with_yubikey(
+            b"passphrase".to_vec(),
+            vec![0u8; 31],
+            vec![0u8; 32],
+            vec![0u8; 32],
+            path.to_str().unwrap().to_string(),
+        ));
+        assert!(result.is_err(), "31-byte hmac_secret must be rejected");
+
+        // 33-byte hkdf_salt — must be rejected before any file I/O.
+        let result = run(unlock_vault_with_yubikey(
+            b"passphrase".to_vec(),
+            vec![0u8; 32],
+            vec![0u8; 32],
+            vec![0u8; 33],
+            path.to_str().unwrap().to_string(),
+        ));
+        assert!(result.is_err(), "33-byte hkdf_salt must be rejected");
+    }
+
+    #[test]
+    #[serial]
+    fn init_vault_with_keys_requires_at_least_two_keys() {
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_init_keys_min_test.gabbro");
+
+        // Single key — must fail (ADR-010: minimum 2 keys at creation).
+        let result = run(init_vault_with_keys(
+            b"init-keys-min-pass".to_vec(),
+            vec![YubiKeyInitData {
+                credential_id: vec![0xABu8; 32],
+                hmac_secret: vec![0x42u8; 32],
+                hkdf_salt: vec![0x11u8; 32],
+            }],
+            path.to_str().unwrap().to_string(),
+            None,
+        ));
+        assert!(result.is_err(), "init_vault_with_keys must require at least 2 keys");
+        let msg = result.unwrap_err();
+        assert!(
+            msg.contains("at least 2"),
+            "error must mention minimum key count, got: {msg}"
+        );
+
+        let _ = std::fs::remove_file(&path);
+    }
+
     #[test]
     #[serial]
     fn card_create_entry_preserves_custom_fields() {

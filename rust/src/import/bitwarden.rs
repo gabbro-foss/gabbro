@@ -584,4 +584,157 @@ mod tests {
         let result = parse(b"not valid json");
         assert!(result.is_err());
     }
+
+    // ── Robustness / parser hardening ─────────────────────────────────────────
+
+    #[test]
+    fn empty_byte_input_returns_err() {
+        assert!(parse(b"").is_err());
+    }
+
+    #[test]
+    fn empty_items_array_returns_no_entries_and_no_failures() {
+        let (entries, failures) = parse(br#"{"items":[]}"#).unwrap();
+        assert!(entries.is_empty());
+        assert!(failures.is_empty());
+    }
+
+    #[test]
+    fn login_item_without_login_block_is_silently_skipped() {
+        // type=1 but no "login" key → convert_login returns None → skipped, no panic
+        let json = br#"{
+            "items":[{
+                "id":"skip-me","type":1,"name":"Orphan",
+                "notes":null,"fields":[]
+            }]
+        }"#;
+        let (entries, failures) = parse(json).unwrap();
+        assert!(entries.is_empty(), "orphan login must be skipped, not panicked");
+        assert!(failures.is_empty());
+    }
+
+    #[test]
+    fn card_item_without_card_block_is_silently_skipped() {
+        // type=3 but no "card" key → convert_card returns Ok(None) → skipped
+        let json = br#"{
+            "items":[{
+                "id":"no-card","type":3,"name":"Ghost Card",
+                "notes":null,"fields":[]
+            }]
+        }"#;
+        let (entries, failures) = parse(json).unwrap();
+        assert!(entries.is_empty());
+        assert!(failures.is_empty());
+    }
+
+    #[test]
+    fn card_with_invalid_number_goes_to_failures_not_err() {
+        // An item that fails domain validation must land in failures[], not abort the import.
+        let json = br#"{
+            "items":[{
+                "id":"bad-card","type":3,"name":"Bad Card",
+                "notes":null,"fields":[],
+                "card":{
+                    "cardholderName":"Test",
+                    "brand":"Visa",
+                    "number":"not-a-real-card-number",
+                    "expMonth":"1","expYear":"2030","code":"123"
+                }
+            }]
+        }"#;
+        let (entries, failures) = parse(json).unwrap();
+        assert!(entries.is_empty(), "invalid card must not appear in entries");
+        assert_eq!(failures.len(), 1, "invalid card must appear in failures");
+    }
+
+    #[test]
+    fn unknown_item_type_does_not_panic() {
+        // Types outside 1-4 are silently skipped. A stream of unknowns must
+        // return empty results, not a panic or error.
+        let json = br#"{
+            "items":[
+                {"id":"u1","type":99,"name":"Future type","notes":null,"fields":[]},
+                {"id":"u2","type":0,"name":"Zero type","notes":null,"fields":[]}
+            ]
+        }"#;
+        let (entries, failures) = parse(json).unwrap();
+        assert!(entries.is_empty());
+        assert!(failures.is_empty());
+    }
+
+    #[test]
+    fn note_without_notes_field_gets_empty_content() {
+        // notes: null → NoteEntry.content defaults to ""
+        let json = br#"{
+            "items":[{
+                "id":"note1","type":2,"name":"Silent Note",
+                "notes":null,"fields":[],"secureNote":{}
+            }]
+        }"#;
+        let (entries, _) = parse(json).unwrap();
+        assert_eq!(entries.len(), 1);
+        if let VaultEntry::Note(n) = &entries[0] {
+            assert_eq!(n.content, "");
+        } else {
+            panic!("expected NoteEntry");
+        }
+    }
+
+    #[test]
+    fn custom_field_with_null_name_and_value_does_not_panic() {
+        // Bitwarden allows null field names/values — must not panic, must
+        // produce empty-string label/value via unwrap_or_default().
+        let json = br#"{
+            "items":[{
+                "id":"ff","type":2,"name":"Field Test",
+                "notes":null,
+                "fields":[{"name":null,"value":null,"type":0}],
+                "secureNote":{}
+            }]
+        }"#;
+        let (entries, _) = parse(json).unwrap();
+        assert_eq!(entries.len(), 1);
+        if let VaultEntry::Note(_) = &entries[0] {
+        } else {
+            panic!("expected NoteEntry");
+        }
+    }
+
+    #[test]
+    fn login_with_no_uris_gets_empty_url() {
+        let json = br#"{
+            "items":[{
+                "id":"no-url","type":1,"name":"No URL Login",
+                "notes":null,"fields":[],
+                "login":{"uris":[],"username":"user","password":"pass","totp":null}
+            }]
+        }"#;
+        let (entries, _) = parse(json).unwrap();
+        assert_eq!(entries.len(), 1);
+        if let VaultEntry::Login(l) = &entries[0] {
+            assert_eq!(l.url, "", "missing URI list must produce empty url");
+            assert_eq!(l.username, "user");
+            assert_eq!(l.password, "pass");
+        } else {
+            panic!("expected LoginEntry");
+        }
+    }
+
+    #[test]
+    fn folder_lookup_unknown_id_gives_empty_folder() {
+        // folderId references a folder that doesn't exist in the folders list.
+        let json = br#"{
+            "folders":[{"id":"f1","name":"Work"}],
+            "items":[{
+                "id":"x","type":2,"name":"Orphan","notes":null,"fields":[],
+                "folderId":"does-not-exist","secureNote":{}
+            }]
+        }"#;
+        let (entries, _) = parse(json).unwrap();
+        assert_eq!(entries.len(), 1);
+        if let VaultEntry::Note(_) = &entries[0] {
+        } else {
+            panic!("expected NoteEntry");
+        }
+    }
 }

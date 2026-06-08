@@ -227,4 +227,54 @@ void main() {
       expect(assignedIds!.length, 1);
     },
   );
+
+  // ── Delete confirmation dialog ────────────────────────────────────────────
+
+  testWidgets(
+    'narrow: delete button opens confirmation dialog',
+    (tester) async {
+      _setNarrow(tester);
+      await tester.pumpWidget(_buildScreen(_twoEntries));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.checklist));
+      await tester.pump();
+      await tester.tap(find.byType(Checkbox).first);
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.delete));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'narrow: delete dialog Cancel dismissed without deleting',
+    (tester) async {
+      _setNarrow(tester);
+      var deleteCallCount = 0;
+      await tester.pumpWidget(testApp(VaultListScreen(
+        vaultPath: '/tmp/test.gabbro',
+        listEntries: _twoEntries,
+        onDeleteEntryFn: (_) async => deleteCallCount++,
+      )));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.checklist));
+      await tester.pump();
+      await tester.tap(find.byType(Checkbox).first);
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.delete));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(deleteCallCount, 0, reason: 'Cancel must not call delete');
+    },
+  );
 }

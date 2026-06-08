@@ -931,4 +931,191 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
         let result = run(import_from_dashlane(DASHLANE_CSV.as_bytes().to_vec()));
         assert!(result.is_err());
     }
+
+    // ── Locked-vault error paths for remaining importers ──────────────────────
+
+    #[test]
+    #[serial]
+    fn import_from_bitwarden_locked_vault_returns_error() {
+        session::lock_vault().unwrap();
+        let result = run(import_from_bitwarden(BITWARDEN_JSON.as_bytes().to_vec()));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    #[serial]
+    fn import_from_enpass_locked_vault_returns_error() {
+        session::lock_vault().unwrap();
+        let result = run(import_from_enpass(ENPASS_JSON.as_bytes().to_vec()));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    #[serial]
+    fn import_from_gabbro_wrong_passphrase_returns_error() {
+        let session_pass = b"session passphrase";
+        let session_path = setup_vault(session_pass);
+        session::unlock_vault(session_pass, session_path.clone()).unwrap();
+
+        let source_pass = b"source passphrase";
+        let source_path = setup_source_vault(source_pass);
+
+        let result = run(import_from_gabbro(
+            source_path.to_str().unwrap().to_string(),
+            b"wrong passphrase".to_vec(),
+        ));
+        assert!(result.is_err(), "wrong passphrase must fail Gabbro import");
+
+        teardown(&session_path);
+        let _ = std::fs::remove_file(&source_path);
+    }
+
+    // ── stamp_timestamps unit tests ───────────────────────────────────────────
+
+    #[test]
+    fn stamp_timestamps_fills_empty_created_and_updated_at() {
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("test-id"),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+            },
+            title: String::from("test"),
+            url: String::new(),
+            username: String::new(),
+            password: String::new(),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        });
+
+        let stamped = stamp_timestamps(entry, "2025-01-01T00:00:00Z");
+        match stamped {
+            VaultEntry::Login(ref e) => {
+                assert_eq!(e.meta.created_at, "2025-01-01T00:00:00Z");
+                assert_eq!(e.meta.updated_at, "2025-01-01T00:00:00Z");
+            }
+            _ => panic!("expected Login"),
+        }
+    }
+
+    #[test]
+    fn stamp_timestamps_preserves_existing_timestamps() {
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("test-id"),
+                created_at: String::from("2024-01-01T00:00:00Z"),
+                updated_at: String::from("2024-06-01T00:00:00Z"),
+                folder: String::new(),
+            },
+            title: String::from("test"),
+            url: String::new(),
+            username: String::new(),
+            password: String::new(),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+        });
+
+        let stamped = stamp_timestamps(entry, "2025-01-01T00:00:00Z");
+        match stamped {
+            VaultEntry::Login(ref e) => {
+                assert_eq!(
+                    e.meta.created_at, "2024-01-01T00:00:00Z",
+                    "existing created_at must not be overwritten"
+                );
+                assert_eq!(
+                    e.meta.updated_at, "2024-06-01T00:00:00Z",
+                    "existing updated_at must not be overwritten"
+                );
+            }
+            _ => panic!("expected Login"),
+        }
+    }
+
+    #[test]
+    fn stamp_timestamps_non_login_entry_returned_unchanged() {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+        let entry = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("note-id"),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+            },
+            title: String::from("A note"),
+            content: String::from("content"),
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+
+        // stamp_timestamps only modifies Login entries; Notes pass through.
+        let result = stamp_timestamps(entry, "2025-01-01T00:00:00Z");
+        match result {
+            VaultEntry::Note(ref e) => {
+                assert_eq!(
+                    e.meta.created_at, "",
+                    "non-Login created_at must not be stamped"
+                );
+            }
+            _ => panic!("expected Note"),
+        }
+    }
+
+    // ── entry_id_and_title unit tests ─────────────────────────────────────────
+
+    #[test]
+    fn entry_id_and_title_identity_concatenates_names() {
+        use crate::vault::entry::{EntryMeta, IdentityEntry, VaultEntry};
+
+        let entry = VaultEntry::Identity(IdentityEntry {
+            meta: EntryMeta {
+                id: String::from("id-001"),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+            },
+            first_name: String::from("Rob"),
+            last_name: String::from("Example"),
+            email: String::from("rob@example.com"),
+            phone: None,
+            address: None,
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+
+        let (id, title) = entry_id_and_title(&entry);
+        assert_eq!(id, "id-001");
+        assert_eq!(title, "Rob Example");
+    }
+
+    #[test]
+    fn entry_id_and_title_file_uses_filename() {
+        use crate::vault::entry::{EntryMeta, FileEntry, VaultEntry};
+
+        let entry = VaultEntry::File(FileEntry {
+            meta: EntryMeta {
+                id: String::from("file-001"),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+            },
+            filename: String::from("document.pdf"),
+            data: vec![],
+            notes: None,
+            custom_fields: vec![],
+        });
+
+        let (id, title) = entry_id_and_title(&entry);
+        assert_eq!(id, "file-001");
+        assert_eq!(title, "document.pdf");
+    }
 }

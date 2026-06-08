@@ -35,6 +35,28 @@ NoteEntryData _noteEntry() => NoteEntryData(
       customFields: const [],
     );
 
+CardEntryData _cardEntry() => CardEntryData(
+      id: 'card-id-1',
+      cardholderName: 'Rob Bastian',
+      cardNumber: '4111111111111111',
+      expiry: '12/28',
+      cvv: '123',
+      status: 'active',
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+      customFields: const [],
+    );
+
+CustomEntryData _customEntry() => CustomEntryData(
+      id: 'custom-id-1',
+      title: 'My Custom Secret',
+      fields: const [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+    );
+
 // ── Widget helper ─────────────────────────────────────────────────────────────
 
 Widget _buildScreen(
@@ -389,5 +411,139 @@ void main() {
     await tester.tap(find.byIcon(Icons.visibility_off));
     await tester.pump();
     expect(find.text('AB123456'), findsOneWidget);
+  });
+
+  // ── Card entry ───────────────────────────────────────────────────────────────
+
+  testWidgets('card entry renders cardholder and obscures card number and CVV',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.card(_cardEntry())),
+    );
+
+    expect(find.text('Rob Bastian'), findsWidgets);
+    // Both card number and CVV start obscured.
+    expect(find.text('••••••••'), findsNWidgets(2));
+    expect(find.text('4111111111111111'), findsNothing);
+    expect(find.text('123'), findsNothing);
+    // Two visibility_off icons — one per toggle field.
+    expect(find.byIcon(Icons.visibility_off), findsNWidgets(2));
+  });
+
+  testWidgets('card number toggle reveals card number', (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.card(_cardEntry())),
+    );
+
+    // Card number toggle is the first visibility_off icon.
+    await tester.tap(find.byIcon(Icons.visibility_off).at(0));
+    await tester.pump();
+
+    expect(find.text('4111111111111111'), findsOneWidget);
+    // CVV still obscured.
+    expect(find.text('••••••••'), findsOneWidget);
+    expect(find.text('123'), findsNothing);
+  });
+
+  testWidgets('card CVV toggle reveals CVV value', (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.card(_cardEntry())),
+    );
+
+    // CVV toggle is the second visibility_off icon.
+    await tester.tap(find.byIcon(Icons.visibility_off).at(1));
+    await tester.pump();
+
+    expect(find.text('123'), findsOneWidget);
+    // Card number still obscured.
+    expect(find.text('••••••••'), findsOneWidget);
+    expect(find.text('4111111111111111'), findsNothing);
+  });
+
+  // ── Custom entry ─────────────────────────────────────────────────────────────
+
+  testWidgets('custom entry renders title', (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.custom(_customEntry())),
+    );
+
+    // Title appears in AppBar and as a body field value.
+    expect(find.text('My Custom Secret'), findsWidgets);
+  });
+
+  // ── Delete dialog cancel path ─────────────────────────────────────────────────
+
+  testWidgets('cancel delete dialog does not call onDeleteEntry',
+      (tester) async {
+    bool deleteCalled = false;
+    await tester.pumpWidget(
+      _buildScreen(
+        VaultEntryData.login(_loginEntry()),
+        onDeleteEntry: (_) async {
+          deleteCalled = true;
+        },
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(deleteCalled, isFalse,
+        reason: 'Cancel must not trigger delete');
+    // Screen is still alive.
+    expect(find.byType(EntryDetailScreen), findsOneWidget);
+  });
+
+  // ── Empty URL ────────────────────────────────────────────────────────────────
+
+  testWidgets('login with empty URL shows no browser launch icon',
+      (tester) async {
+    final entry = LoginEntryData(
+      id: 'no-url-id',
+      title: 'No URL Login',
+      url: '',
+      username: 'rob',
+      password: 'pw',
+      notes: null,
+      customFields: const [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+    );
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.login(entry)),
+    );
+
+    expect(find.byIcon(Icons.open_in_browser_outlined), findsNothing);
+  });
+
+  // ── Note hidden custom field ──────────────────────────────────────────────────
+
+  testWidgets('note hidden custom field toggles visible', (tester) async {
+    final entry = NoteEntryData(
+      id: 'test-note-cf',
+      title: 'Secret Note',
+      content: 'Note content',
+      customFields: [
+        CustomFieldData(label: 'Token', value: 'secret_token', hidden: true),
+      ],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+    );
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.note(entry)),
+    );
+
+    expect(find.text('••••••••'), findsOneWidget);
+    expect(find.text('secret_token'), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.visibility_off));
+    await tester.pump();
+
+    expect(find.text('secret_token'), findsOneWidget);
+    expect(find.text('••••••••'), findsNothing);
   });
 }

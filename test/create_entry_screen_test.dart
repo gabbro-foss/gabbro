@@ -691,5 +691,191 @@ void main() {
     expect(login.customFields[0].value, equals('ABC-123'));
   });
 
+  // ── Password field visibility toggle ─────────────────────────────────────
+
+  testWidgets('login password field starts obscured and toggles visible',
+      (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Login'));
+    await tester.pumpAndSettle();
+
+    // Initially obscured → eye-off icon shown.
+    expect(find.byIcon(Icons.visibility_off), findsWidgets);
+
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(TextFormField, 'Password'),
+        matching: find.byIcon(Icons.visibility_off),
+      ).first,
+    );
+    await tester.pumpAndSettle();
+
+    // After toggle, eye icon shown (not eye-off).
+    expect(find.byIcon(Icons.visibility), findsWidgets);
+  });
+
+  // ── Custom field deletion ─────────────────────────────────────────────────
+
+  testWidgets('custom field can be removed after being added', (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Note'));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Add custom field'));
+    await tester.tap(find.text('Add custom field'));
+    await tester.pumpAndSettle();
+
+    // Field is now present.
+    expect(find.widgetWithText(TextFormField, 'Label'), findsOneWidget);
+
+    // Tap the remove button.
+    await tester.ensureVisible(find.byIcon(Icons.remove_circle_outline));
+    await tester.tap(find.byIcon(Icons.remove_circle_outline));
+    await tester.pumpAndSettle();
+
+    // Field is gone.
+    expect(find.widgetWithText(TextFormField, 'Label'), findsNothing);
+  });
+
+  // ── Custom field hidden toggle ────────────────────────────────────────────
+
+  testWidgets('custom field value can be toggled hidden', (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Note'));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Add custom field'));
+    await tester.tap(find.text('Add custom field'));
+    await tester.pumpAndSettle();
+
+    // Initially the value field shows the "visible" eye (not hidden).
+    final valueField = find.widgetWithText(TextFormField, 'Value');
+    final visIcon = find.descendant(
+      of: valueField,
+      matching: find.byIcon(Icons.visibility),
+    );
+    await tester.ensureVisible(visIcon);
+    await tester.tap(visIcon);
+    await tester.pumpAndSettle();
+
+    // After toggle, value is obscured → eye-off icon shown.
+    expect(
+      find.descendant(
+        of: find.widgetWithText(TextFormField, 'Value'),
+        matching: find.byIcon(Icons.visibility_off),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  // ── CVV visibility toggle (card form) ────────────────────────────────────
+
+  testWidgets('card CVV field starts obscured and can be toggled', (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Card'));
+    await tester.pumpAndSettle();
+
+    // CVV field: initially obscured.
+    final cvvField = find.widgetWithText(TextFormField, 'CVV (optional)');
+    await tester.ensureVisible(cvvField);
+    final offIcon = find.descendant(
+      of: cvvField,
+      matching: find.byIcon(Icons.visibility_off),
+    ).first;
+    await tester.tap(offIcon);
+    await tester.pumpAndSettle();
+
+    // After toggle, visibility icon appears.
+    expect(
+      find.descendant(
+        of: find.widgetWithText(TextFormField, 'CVV (optional)'),
+        matching: find.byIcon(Icons.visibility),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  // ── Custom entry type ─────────────────────────────────────────────────────
+
+  testWidgets('custom entry form renders title field', (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Custom'));
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(TextFormField, 'Title'), findsOneWidget);
+  });
+
+  testWidgets('custom entry required title validation fires on empty save',
+      (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Custom'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Save'));
+    await tester.pump();
+
+    expect(find.text('Title is required'), findsOneWidget);
+  });
+
+  testWidgets('custom entry saves with title', (tester) async {
+    VaultEntryData? saved;
+    await tester.pumpWidget(
+      _buildCreateScreen(
+        'Custom',
+        onCreateEntry: (e) async {
+          saved = e;
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Title'),
+      'Rock Collection',
+    );
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(saved, isNotNull);
+    expect(saved, isA<VaultEntryData_Custom>());
+    final custom = (saved! as VaultEntryData_Custom).field0;
+    expect(custom.title, 'Rock Collection');
+  });
+
+  // ── Note entry validation ─────────────────────────────────────────────────
+
+  testWidgets('note entry required title validation fires on empty save',
+      (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Note'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Save'));
+    await tester.pump();
+
+    expect(find.text('Title is required'), findsOneWidget);
+  });
+
+  // ── Identity entry ────────────────────────────────────────────────────────
+
+  testWidgets('identity form renders first and last name fields',
+      (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Identity'));
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(TextFormField, 'First name'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'Last name'), findsOneWidget);
+  });
+
+  // ── Edit mode: no-changes guard ───────────────────────────────────────────
+
+  testWidgets('review without changes shows no-changes snackbar',
+      (tester) async {
+    await tester.pumpWidget(
+      _buildEditScreen(VaultEntryData.login(_loginEntry())),
+    );
+    await tester.pumpAndSettle();
+
+    // Tap Review → without touching any field: _hasChanges() returns false.
+    await tester.ensureVisible(find.text('Review →'));
+    await tester.tap(find.text('Review →'));
+    await tester.pump();
+
+    expect(find.byType(SnackBar), findsOneWidget);
+  });
+
   // ── End custom field tests ────────────────────────────────────────────────
 }

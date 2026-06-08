@@ -1643,4 +1643,159 @@ mod tests {
         .unwrap();
         assert_eq!(recovered, plaintext);
     }
+
+    // ── Body integrity and tamper detection ───────────────────────────────────
+
+    #[test]
+    fn tampered_ciphertext_body_is_rejected() {
+        // AES-GCM auth tag must catch any modification to the encrypted body,
+        // even when the plaintext header (AAD) is intact.
+        let passphrase = b"integrity-check passphrase";
+        let mut sealed = seal_vault(passphrase, b"secret body", None).unwrap();
+        sealed.ciphertext[0] ^= 0x01;
+        assert!(
+            open_vault(passphrase, &sealed).is_err(),
+            "bit flip in ciphertext body must be rejected by AES-GCM auth tag"
+        );
+    }
+
+    #[test]
+    fn truncated_ml_kem_ciphertext_returns_error_not_panic() {
+        // A corrupt or truncated ML-KEM ciphertext must produce Err, not panic.
+        let passphrase = b"truncated kem";
+        let mut sealed = seal_vault(passphrase, b"data", None).unwrap();
+        sealed.ml_kem_ciphertext.truncate(16); // was 1568 bytes; now obviously wrong
+        let result = open_vault(passphrase, &sealed);
+        assert!(result.is_err());
+        assert!(
+            result.unwrap_err().contains("1568"),
+            "error should name the expected length"
+        );
+    }
+
+    // ── Alias field: storage, retrieval, and AAD binding ─────────────────────
+
+    #[test]
+    fn seal_with_alias_preserves_alias_in_header() {
+        let sealed = seal_vault(b"pass", b"body", Some("my-vault".to_string())).unwrap();
+        assert_eq!(sealed.alias.as_deref(), Some("my-vault"));
+    }
+
+    #[test]
+    fn seal_with_alias_roundtrip_opens_correctly() {
+        let passphrase = b"pass";
+        let plaintext = b"aliased vault data";
+        let sealed = seal_vault(passphrase, plaintext, Some("my-vault".to_string())).unwrap();
+        let recovered = open_vault(passphrase, &sealed).unwrap();
+        assert_eq!(recovered, plaintext);
+    }
+
+    #[test]
+    fn mutated_alias_breaks_v7_aad_binding() {
+        // In VERSION 7+, the alias is part of the AAD.  Changing it after sealing
+        // must cause decryption to fail, proving the header is cryptographically
+        // bound to the body.
+        let passphrase = b"pass";
+        let mut sealed = seal_vault(passphrase, b"body", Some("vault-a".to_string())).unwrap();
+        assert!(sealed.version >= AAD_MIN_VERSION);
+        sealed.alias = Some("vault-b".to_string()); // tamper: change alias without resealing
+        assert!(
+            open_vault(passphrase, &sealed).is_err(),
+            "alias mutation must break body decryption via AAD mismatch"
+        );
+    }
+
+    // ── Edge cases ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn empty_plaintext_roundtrip() {
+        // An empty body (e.g., freshly created vault with no entries) must
+        // seal and reopen without error.
+        let passphrase = b"empty vault passphrase";
+        let sealed = seal_vault(passphrase, b"", None).unwrap();
+        let recovered = open_vault(passphrase, &sealed).unwrap();
+        assert!(recovered.is_empty());
+    }
+
+    #[test]
+    fn empty_passphrase_is_accepted() {
+        // An empty passphrase is a user choice (weak but not forbidden).
+        // The vault must seal and open without error.
+        let sealed = seal_vault(b"", b"data", None).unwrap();
+        let recovered = open_vault(b"", &sealed).unwrap();
+        assert_eq!(recovered, b"data");
+    }
+
+    // ── Multi-key: tampered key_blob ─────────────────────────────────────────
+
+    #[test]
+    fn tampered_key_blob_fails_gracefully() {
+        // A corrupt key_blob (e.g., storage error) must return Err, not
+        // partial data or a panic.
+        let keys = two_test_keys();
+        let mut sealed = seal_vault_with_keys(b"passphrase", &keys, b"vault", None).unwrap();
+        sealed.yubikey_records[0].key_blob[0] ^= 0xFF;
+
+        let result = open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        );
+        assert!(result.is_err(), "corrupted key_blob must return Err");
+    }
+
+    #[test]
+    fn any_header_modification_breaks_body_decryption_for_all_keys() {
+        // In V7+ the entire plaintext header is bound as AES-GCM AAD.
+        // Modifying ANY header byte (including an individual key_blob) makes
+        // the body unreadable to ALL keys — not just the one whose blob was
+        // changed.  This prevents a partial header-substitution attack.
+        let keys = two_test_keys();
+        let mut sealed =
+            seal_vault_with_keys(b"passphrase", &keys, b"protected body", None).unwrap();
+        assert!(sealed.version >= AAD_MIN_VERSION, "test assumes V7+");
+
+        sealed.yubikey_records[0].key_blob[0] ^= 0xFF; // header changed → AAD broken
+
+        assert!(open_vault_with_key_record(
+            b"passphrase",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .is_err());
+        assert!(
+            open_vault_with_key_record(
+                b"passphrase",
+                &keys[1].hmac_secret,
+                &keys[1].credential_id,
+                &sealed,
+            )
+            .is_err(),
+            "second key must also be locked out when header is modified"
+        );
+    }
+
+    #[test]
+    fn reseal_body_with_empty_plaintext_roundtrip() {
+        let keys = two_test_keys();
+        let mut sealed = seal_vault_with_keys(b"pass", &keys, b"initial", None).unwrap();
+        let (_, master, _) = open_vault_with_key_record(
+            b"pass",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+        reseal_vault_body(&mut sealed, &master, b"").unwrap();
+        let (recovered, _, _) = open_vault_with_key_record(
+            b"pass",
+            &keys[0].hmac_secret,
+            &keys[0].credential_id,
+            &sealed,
+        )
+        .unwrap();
+        assert!(recovered.is_empty());
+    }
 }

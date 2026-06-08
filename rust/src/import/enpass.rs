@@ -850,4 +850,115 @@ mod tests {
             "attachment data should be base64-decoded to raw bytes"
         );
     }
+
+    // ── Pure-function unit tests ───────────────────────────────────────────────
+
+    #[test]
+    fn normalise_expiry_mm_yyyy_converts_to_mm_yy() {
+        assert_eq!(normalise_expiry("01/2027"), "01/27");
+        assert_eq!(normalise_expiry("12/2030"), "12/30");
+    }
+
+    #[test]
+    fn normalise_expiry_mm_yy_is_unchanged() {
+        assert_eq!(normalise_expiry("01/27"), "01/27");
+        assert_eq!(normalise_expiry("12/30"), "12/30");
+    }
+
+    #[test]
+    fn normalise_expiry_unrecognised_format_is_returned_unchanged() {
+        assert_eq!(normalise_expiry(""), "");
+        assert_eq!(normalise_expiry("bad"), "bad");
+        assert_eq!(normalise_expiry("01/202"), "01/202"); // 3-digit year → unchanged
+    }
+
+    #[test]
+    fn sanitise_key_lowercases_and_replaces_non_alphanumeric() {
+        assert_eq!(sanitise_key("Credit Card Number"), "credit_card_number");
+        assert_eq!(sanitise_key("URL"), "url");
+        assert_eq!(sanitise_key("First & Last"), "first___last");
+        assert_eq!(sanitise_key("PIN (4-digit)"), "pin__4_digit_");
+    }
+
+    #[test]
+    fn sanitise_key_empty_string_returns_empty() {
+        assert_eq!(sanitise_key(""), "");
+    }
+
+    #[test]
+    fn non_empty_returns_some_for_nonempty_string() {
+        assert_eq!(non_empty("hello"), Some("hello".to_string()));
+        assert_eq!(non_empty(" "), Some(" ".to_string())); // space is non-empty
+    }
+
+    #[test]
+    fn non_empty_returns_none_for_empty_string() {
+        assert_eq!(non_empty(""), None);
+    }
+
+    #[test]
+    fn should_drop_field_rejects_sensitive_types() {
+        assert!(should_drop_field("totp"));
+        assert!(should_drop_field("section"));
+        assert!(should_drop_field("ccType"));
+    }
+
+    #[test]
+    fn should_drop_field_rejects_android_prefix() {
+        assert!(should_drop_field(".Android.something"));
+        assert!(should_drop_field(".AndroidMetadata"));
+    }
+
+    #[test]
+    fn should_drop_field_accepts_normal_types() {
+        assert!(!should_drop_field("username"));
+        assert!(!should_drop_field("password"));
+        assert!(!should_drop_field("url"));
+        assert!(!should_drop_field(""));
+    }
+
+    // ── Robustness / parser hardening ─────────────────────────────────────────
+
+    #[test]
+    fn empty_byte_input_returns_err() {
+        assert!(parse(b"").is_err());
+    }
+
+    #[test]
+    fn empty_items_array_returns_no_entries() {
+        let (entries, failures) = parse(br#"{"items":[]}"#).unwrap();
+        assert!(entries.is_empty());
+        assert!(failures.is_empty());
+    }
+
+    #[test]
+    fn item_with_no_username_or_email_gets_empty_username() {
+        let json = r#"{"items":[{
+            "uuid":"x","title":"No Creds","category":"login",
+            "note":"","favorite":0,"archived":0,"trashed":0,
+            "fields":[
+                {"label":"URL","type":"url","value":"https://example.com","sensitive":0,"deleted":0}
+            ],"attachments":[]
+        }]}"#;
+        let (entries, _) = parse(json.as_bytes()).unwrap();
+        let VaultEntry::Login(ref l) = entries[0] else {
+            panic!("expected Login")
+        };
+        assert_eq!(l.username, "", "no username or email field → empty username");
+    }
+
+    #[test]
+    fn unknown_category_maps_to_custom_entry() {
+        let json = r#"{"items":[{
+            "uuid":"z","title":"Weird Thing","category":"futuretype",
+            "note":"some note","favorite":0,"archived":0,"trashed":0,
+            "fields":[],"attachments":[]
+        }]}"#;
+        let (entries, _) = parse(json.as_bytes()).unwrap();
+        assert_eq!(entries.len(), 1);
+        assert!(
+            matches!(entries[0], VaultEntry::Custom(_)),
+            "unknown category must fall through to Custom, not panic"
+        );
+    }
 }

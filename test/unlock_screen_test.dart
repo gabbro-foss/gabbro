@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
@@ -306,6 +306,64 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('BIOMETRIC_INVALIDATED exception hides button and shows error',
+        (tester) async {
+      bool invalidatedCalled = false;
+      await tester.pumpWidget(_buildScreen(
+        biometricEnabled: true,
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async {
+          throw PlatformException(code: 'BIOMETRIC_INVALIDATED');
+        },
+        onBiometricInvalidated: () => invalidatedCalled = true,
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+
+      // Button must disappear (biometricEnrolled reset to false).
+      expect(find.text('Use biometrics'), findsNothing);
+      // onBiometricInvalidated must have been called.
+      expect(invalidatedCalled, isTrue);
+    });
+
+    testWidgets('other PlatformException shows biometric cancelled message',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        biometricEnabled: true,
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async {
+          throw PlatformException(code: 'SOME_OTHER_ERROR');
+        },
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('not completed'),
+        findsOneWidget,
+        reason: 'non-invalidated PlatformException shows cancellation message',
+      );
+      // Button must still be visible (biometricEnrolled not reset).
+      expect(find.text('Use biometrics'), findsOneWidget);
+    });
+
+    testWidgets('biometric success calls unlock and navigates', (tester) async {
+      bool unlockCalled = false;
+      await tester.pumpWidget(_buildScreen(
+        biometricEnabled: true,
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: (_) async => [1, 2, 3],
+        onUnlock: (_, _) async => unlockCalled = true,
+      ));
+      await tester.pump();
+      await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+
+      expect(unlockCalled, isTrue);
+    });
   });
 
   group('vault dropdown', () {
@@ -382,5 +440,90 @@ void main() {
       expect(switchedPath, '/tmp/b.gabbro');
       expect(switchedAlias, 'Beta');
     });
+  });
+
+  // ── Passphrase visibility toggle ───────────────────────────────────────────
+
+  testWidgets('passphrase visibility toggle switches icon', (tester) async {
+    await tester.pumpWidget(_buildScreen()); // passphrase-only mode
+
+    expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+    expect(find.byIcon(Icons.visibility), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.visibility_off));
+    await tester.pump();
+
+    expect(find.byIcon(Icons.visibility), findsOneWidget);
+    expect(find.byIcon(Icons.visibility_off), findsNothing);
+  });
+
+  // ── PIN visibility toggle in YubiKey mode ─────────────────────────────────
+
+  testWidgets('PIN visibility toggle in yubikey mode switches icon',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+
+    // Both passphrase and PIN fields start with visibility_off.
+    expect(find.byIcon(Icons.visibility_off), findsNWidgets(2));
+
+    // Tap the PIN field's eye icon (last visibility_off).
+    await tester.tap(find.byIcon(Icons.visibility_off).last);
+    await tester.pump();
+
+    // PIN icon flips to visibility; passphrase icon stays as visibility_off.
+    expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+    expect(find.byIcon(Icons.visibility), findsOneWidget);
+  });
+
+  // ── PlatformException error codes ─────────────────────────────────────────
+
+  testWidgets('TRANSPORT_ERROR exception shows transport error message',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      onUnlockWithYubikey: (a, b, c, d, e, f) async => throw PlatformException(
+        code: 'TRANSPORT_ERROR',
+        message: 'NFC read timed out',
+      ),
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.ensureVisible(find.text('Unlock'));
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('NFC read timed out'), findsOneWidget);
+  });
+
+  testWidgets('NO_FIDO2_DEVICE exception shows device-not-found message',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      onUnlockWithYubikey: (a, b, c, d, e, f) async => throw PlatformException(
+        code: 'NO_FIDO2_DEVICE',
+        message: 'No FIDO2 device found',
+      ),
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.ensureVisible(find.text('Unlock'));
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('No FIDO2 device found'), findsOneWidget);
+  });
+
+  // ── Entropy indicator ─────────────────────────────────────────────────────
+
+  testWidgets('typing in passphrase field shows entropy strength indicator',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen());
+
+    expect(find.byType(LinearProgressIndicator), findsNothing);
+
+    await tester.enterText(find.byType(TextField), 'hunter2');
+    await tester.pump();
+
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
   });
 }

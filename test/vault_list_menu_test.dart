@@ -95,4 +95,62 @@ void main() {
       expect(find.text('Delete vault'), findsNothing);
     });
   });
+
+  // ── Menu navigation ───────────────────────────────────────────────────────
+
+  testWidgets('tapping Password generator pushes GeneratorScreen', (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Password generator'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Scaffold), findsAtLeastNWidgets(1));
+    // GeneratorScreen has AppBar with localized title
+    expect(find.byType(AppBar), findsWidgets);
+  });
+
+  testWidgets('tapping Help pushes HelpScreen', (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Help'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(PageView), findsOneWidget);
+  });
+
+  testWidgets('tapping About pushes AboutScreen', (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('About'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('0.1.0'), findsOneWidget);
+  });
+
+  testWidgets('tapping Manage vaults is null-safe when no GabbroApp', (tester) async {
+    // GabbroApp.maybeOf returns null here — must not throw.
+    await tester.pumpWidget(_buildScreen());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Manage vaults'));
+    await tester.pumpAndSettle();
+
+    // No crash — screen is still rendered.
+    expect(find.byType(Scaffold), findsAtLeastNWidgets(1));
+  });
 }

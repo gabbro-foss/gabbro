@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
@@ -581,5 +582,163 @@ void main() {
 
     expect(createdAlias, 'My Vault');
     expect(createdPath, '/tmp/test.gabbro');
+  });
+
+  // ── Post-deletion message ──────────────────────────────────────────────────
+
+  testWidgets('postDeletionMessage shows info banner', (tester) async {
+    await tester.pumpWidget(testApp(OnboardingScreen(
+      initialPath: '/tmp/test.gabbro',
+      postDeletionMessage: 'Your vault has been deleted.',
+      onInitVault: (_, _, _) async {},
+      onEstimateEntropy: _fakeStrongEntropy,
+      blockPassphraseCopyPaste: false,
+      showYubikey: false,
+    )));
+
+    expect(find.text('Your vault has been deleted.'), findsOneWidget);
+    expect(find.byIcon(Icons.info_outline), findsOneWidget);
+  });
+
+  // ── Error display ──────────────────────────────────────────────────────────
+
+  testWidgets('generic exception from onInitVault shows error message',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onInitVault: (_, _, _) async =>
+          throw Exception('disk full'),
+    ));
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Alias'), 'TestVault');
+    await tester.pump();
+    const passphrase = 'correct horse battery staple one two three four';
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
+    await tester.pump();
+
+    await tester.ensureVisible(find.text('Create vault'));
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create vault'));
+      await Future.delayed(const Duration(milliseconds: 300));
+    });
+    await tester.pump();
+
+    expect(find.textContaining('disk full'), findsOneWidget);
+  });
+
+  testWidgets('PlatformException from onInitVault shows e.message',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onInitVault: (_, _, _) async => throw PlatformException(
+        code: 'YUBIKEY_ERROR',
+        message: 'Key tap timeout',
+      ),
+    ));
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Alias'), 'TestVault');
+    await tester.pump();
+    const passphrase = 'correct horse battery staple one two three four';
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
+    await tester.pump();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
+    await tester.pump();
+
+    await tester.ensureVisible(find.text('Create vault'));
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create vault'));
+      await Future.delayed(const Duration(milliseconds: 300));
+    });
+    await tester.pump();
+
+    expect(find.text('Key tap timeout'), findsOneWidget);
+  });
+
+  // ── Create vault button state ──────────────────────────────────────────────
+
+  testWidgets('create vault button is disabled before passphrase is entered',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen());
+
+    final btn = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Create vault'),
+    );
+    expect(btn.onPressed, isNull,
+        reason: '_strongEnough is false when _entropy is null');
+  });
+
+  // ── Passphrase visibility toggles ─────────────────────────────────────────
+
+  testWidgets('passphrase visibility toggle switches icon', (tester) async {
+    await tester.pumpWidget(_buildScreen());
+
+    // Two visibility_off icons: passphrase + confirm fields.
+    expect(find.byIcon(Icons.visibility_off), findsNWidgets(2));
+
+    // Tap the passphrase field's eye (first one) — scroll it into view first.
+    await tester.ensureVisible(find.byIcon(Icons.visibility_off).first);
+    await tester.tap(find.byIcon(Icons.visibility_off).first);
+    await tester.pump();
+
+    expect(find.byIcon(Icons.visibility), findsOneWidget);
+    expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+  });
+
+  testWidgets('confirm passphrase visibility toggle switches icon',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen());
+
+    // Scroll the confirm field's eye into view, then tap.
+    await tester.ensureVisible(find.byIcon(Icons.visibility_off).last);
+    await tester.tap(find.byIcon(Icons.visibility_off).last);
+    await tester.pump();
+
+    expect(find.byIcon(Icons.visibility), findsOneWidget);
+    expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+  });
+
+  // ── YubiKey PIN visibility toggles ─────────────────────────────────────────
+
+  testWidgets('primary PIN visibility toggle in yubikey mode switches icon',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(showYubikey: true, isAndroid: true));
+
+    await tester.ensureVisible(find.byType(SwitchListTile));
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pump();
+
+    // Four visibility_off: passphrase + confirm + PIN1 + PIN2.
+    expect(find.byIcon(Icons.visibility_off), findsNWidgets(4));
+
+    // Toggle primary PIN (index 2).
+    await tester.ensureVisible(find.byIcon(Icons.visibility_off).at(2));
+    await tester.tap(find.byIcon(Icons.visibility_off).at(2));
+    await tester.pump();
+
+    expect(find.byIcon(Icons.visibility_off), findsNWidgets(3));
+    expect(find.byIcon(Icons.visibility), findsOneWidget);
+  });
+
+  testWidgets('backup PIN visibility toggle in yubikey mode switches icon',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(showYubikey: true, isAndroid: true));
+
+    await tester.ensureVisible(find.byType(SwitchListTile));
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pump();
+
+    // Toggle backup PIN (last visibility_off, index 3).
+    await tester.ensureVisible(find.byIcon(Icons.visibility_off).last);
+    await tester.tap(find.byIcon(Icons.visibility_off).last);
+    await tester.pump();
+
+    expect(find.byIcon(Icons.visibility_off), findsNWidgets(3));
+    expect(find.byIcon(Icons.visibility), findsOneWidget);
   });
 }
