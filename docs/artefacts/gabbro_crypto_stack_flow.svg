@@ -1,147 +1,312 @@
-<svg width="100%" viewBox="0 0 680 820" role="img" xmlns="http://www.w3.org/2000/svg">
-<title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Gabbro crypto stack — lock and unlock flow</title>
-<desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Two-column diagram showing the vault lock (encrypt) and unlock (decrypt) flows side by side, with Argon2id KDF at the top feeding both.</desc>
-<defs>
-  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-    <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  </marker>
-<mask id="imagine-text-gaps-68gj8a" maskUnits="userSpaceOnUse"><rect x="0" y="0" width="680" height="820" fill="white"/><rect x="289.7295227050781" y="41.027767181396484" width="100.66099548339844" height="21.944459915161133" fill="black" rx="2"/><rect x="255.36053466796875" y="60.444435119628906" width="169.27880859375" height="19.11112689971924" fill="black" rx="2"/><rect x="196.64102172851562" y="108.44442749023438" width="66.71794509887695" height="19.11112689971924" fill="black" rx="2"/><rect x="412.2138977050781" y="108.44442749023438" width="75.5721206665039" height="19.11112689971924" fill="black" rx="2"/><rect x="159.1609344482422" y="141.02777099609375" width="132.04593658447266" height="21.9444637298584" fill="black" rx="2"/><rect x="387.2278137207031" y="141.02777099609375" width="135.54440307617188" height="21.9444637298584" fill="black" rx="2"/><rect x="59.36153030395508" y="212.44444274902344" width="41.54934310913086" height="19.11112689971924" fill="black" rx="2"/><rect x="570.2933959960938" y="212.44444274902344" width="59.6793327331543" height="19.11112689971924" fill="black" rx="2"/><rect x="84.27379608154297" y="245.0277557373047" width="152.03773498535156" height="21.9444637298584" fill="black" rx="2"/><rect x="82.62236022949219" y="327.0277404785156" width="64.75526809692383" height="21.9444637298584" fill="black" rx="2"/><rect x="71.07504272460938" y="346.4444274902344" width="88.12104034423828" height="19.11112689971924" fill="black" rx="2"/><rect x="247.54379272460938" y="327.0277404785156" width="54.912376403808594" height="21.9444637298584" fill="black" rx="2"/><rect x="212.805908203125" y="346.4444274902344" width="124.38814544677734" height="19.11112689971924" fill="black" rx="2"/><rect x="49.389686584472656" y="377.7221984863281" width="131.22061157226562" height="19.11112689971924" fill="black" rx="2"/><rect x="60.228675842285156" y="391.7221984863281" width="110.14934539794922" height="19.11112689971924" fill="black" rx="2"/><rect x="209.38967895507812" y="377.7221984863281" width="131.22061157226562" height="19.11112689971924" fill="black" rx="2"/><rect x="220.71563720703125" y="391.7221984863281" width="108.56867980957031" height="19.11112689971924" fill="black" rx="2"/><rect x="175.80770874023438" y="415.7221984863281" width="38.38458061218262" height="20.055572509765625" fill="black" rx="2"/><rect x="152.23562622070312" y="445.0277404785156" width="105.52874755859375" height="21.9444637298584" fill="black" rx="2"/><rect x="136.8662567138672" y="464.4444274902344" width="136.2675018310547" height="19.11112689971924" fill="black" rx="2"/><rect x="124.68437194824219" y="521.0277709960938" width="160.63124084472656" height="21.9444637298584" fill="black" rx="2"/><rect x="141.6179962158203" y="540.4443969726562" width="126.7640151977539" height="19.11112689971924" fill="black" rx="2"/><rect x="452.85015869140625" y="241.0277557373047" width="124.29959869384766" height="21.9444637298584" fill="black" rx="2"/><rect x="441.87835693359375" y="260.4444274902344" width="146.24319458007812" height="19.11112689971924" fill="black" rx="2"/><rect x="422.62237548828125" y="327.0277404785156" width="64.75526809692383" height="21.9444637298584" fill="black" rx="2"/><rect x="416.3211669921875" y="346.4444274902344" width="77.35771179199219" height="19.11112689971924" fill="black" rx="2"/><rect x="587.5438232421875" y="327.0277404785156" width="54.912376403808594" height="21.9444637298584" fill="black" rx="2"/><rect x="561.4534912109375" y="346.4444274902344" width="107.09298706054688" height="19.11112689971924" fill="black" rx="2"/><rect x="400.22869873046875" y="377.7221984863281" width="110.14934539794922" height="19.11112689971924" fill="black" rx="2"/><rect x="560.7156372070312" y="377.7221984863281" width="108.56867980957031" height="19.11112689971924" fill="black" rx="2"/><rect x="515.8076782226562" y="415.7221984863281" width="38.38458061218262" height="20.055572509765625" fill="black" rx="2"/><rect x="482.235595703125" y="445.0277404785156" width="105.52874755859375" height="21.9444637298584" fill="black" rx="2"/><rect x="466.8662414550781" y="464.4444274902344" width="136.2675018310547" height="19.11112689971924" fill="black" rx="2"/><rect x="454.5367736816406" y="521.0277709960938" width="160.92637634277344" height="21.9444637298584" fill="black" rx="2"/><rect x="443.9191589355469" y="540.4443969726562" width="182.16163635253906" height="19.11112689971924" fill="black" rx="2"/><rect x="129.57958984375" y="595.72216796875" width="420.8406982421875" height="19.11112689971924" fill="black" rx="2"/></mask></defs>
-
-<!-- ── TOP: KDF block (centred) ── -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="190" y="30" width="300" height="56" rx="8" stroke-width="0.5" style="fill:rgb(60, 52, 137);stroke:rgb(175, 169, 236);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="340" y="52" text-anchor="middle" dominant-baseline="central" style="fill:rgb(206, 203, 246);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">Argon2id KDF</text>
-  <text x="340" y="70" text-anchor="middle" dominant-baseline="central" style="fill:rgb(175, 169, 236);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">passphrase + salt → 96 bytes</text>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 14.1.5 (0)
+ -->
+<!-- Title: gabbro_crypto_stack Pages: 1 -->
+<svg width="669pt" height="1238pt"
+ viewBox="0.00 0.00 669.00 1238.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1234.25)">
+<title>gabbro_crypto_stack</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-1234.25 664.75,-1234.25 664.75,4 -4,4"/>
+<text xml:space="preserve" text-anchor="start" x="186.75" y="-1213.95" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="14.00">Gabbro crypto stack · file&#45;format VERSION 7</text>
+<text xml:space="preserve" text-anchor="start" x="83.25" y="-1203.75" font-family="Helvetica,sans-Serif" font-size="10.00">passphrase → Argon2id → X25519 + ML&#45;KEM&#45;1024 → HKDF&#45;SHA256 → AES&#45;256&#45;GCM (header bound as AAD)</text>
+<g id="clust1" class="cluster">
+<title>cluster_kdf</title>
+<path fill="white" stroke="#b08900" stroke-dasharray="5,2" d="M181,-954C181,-954 479,-954 479,-954 485,-954 491,-960 491,-966 491,-966 491,-1178.25 491,-1178.25 491,-1184.25 485,-1190.25 479,-1190.25 479,-1190.25 181,-1190.25 181,-1190.25 175,-1190.25 169,-1184.25 169,-1178.25 169,-1178.25 169,-966 169,-966 169,-960 175,-954 181,-954"/>
+<text xml:space="preserve" text-anchor="middle" x="330" y="-1175.8" font-family="Helvetica,sans-Serif" font-size="11.00">Key derivation (from passphrase)</text>
 </g>
-
-<!-- split label -->
-<text x="230" y="118" text-anchor="middle" dominant-baseline="central" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">bytes 0–31</text>
-<text x="450" y="118" text-anchor="middle" dominant-baseline="central" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">bytes 32–95</text>
-
-<!-- arrows from KDF down to keypair boxes -->
-<line x1="270" y1="86" x2="230" y2="130" marker-end="url(#arrow)" mask="url(#imagine-text-gaps-68gj8a)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="410" y1="86" x2="450" y2="130" marker-end="url(#arrow)" mask="url(#imagine-text-gaps-68gj8a)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-<!-- keypair boxes -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="130" y="130" width="190" height="44" rx="8" stroke-width="0.5" style="fill:rgb(8, 80, 65);stroke:rgb(93, 202, 165);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="225" y="152" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159, 225, 203);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">X25519 private key</text>
+<g id="clust2" class="cluster">
+<title>cluster_kex</title>
+<path fill="white" stroke="#3c8c3c" stroke-dasharray="5,2" d="M195,-679.5C195,-679.5 451,-679.5 451,-679.5 457,-679.5 463,-685.5 463,-691.5 463,-691.5 463,-923 463,-923 463,-929 457,-935 451,-935 451,-935 195,-935 195,-935 189,-935 183,-929 183,-923 183,-923 183,-691.5 183,-691.5 183,-685.5 189,-679.5 195,-679.5"/>
+<text xml:space="preserve" text-anchor="middle" x="323" y="-920.55" font-family="Helvetica,sans-Serif" font-size="11.00">Hybrid post&#45;quantum key exchange</text>
 </g>
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="360" y="130" width="190" height="44" rx="8" stroke-width="0.5" style="fill:rgb(8, 80, 65);stroke:rgb(93, 202, 165);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="455" y="152" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159, 225, 203);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">ML-KEM-1024 seed</text>
+<g id="clust3" class="cluster">
+<title>cluster_pp</title>
+<path fill="white" stroke="#3f72b0" stroke-dasharray="5,2" d="M369,-158C369,-158 513,-158 513,-158 519,-158 525,-164 525,-170 525,-170 525,-300.5 525,-300.5 525,-306.5 519,-312.5 513,-312.5 513,-312.5 369,-312.5 369,-312.5 363,-312.5 357,-306.5 357,-300.5 357,-300.5 357,-170 357,-170 357,-164 363,-158 369,-158"/>
+<text xml:space="preserve" text-anchor="middle" x="441" y="-298.05" font-family="Helvetica,sans-Serif" font-size="11.00">Vault type A — passphrase only</text>
 </g>
-
-<!-- ── DIVIDER ── -->
-<line x1="40" y1="206" x2="640" y2="206" stroke="var(--color-border-tertiary)" stroke-width="0.5" stroke-dasharray="4 4" style="fill:rgb(0, 0, 0);stroke:rgba(222, 220, 209, 0.15);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-dasharray:4px, 4px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<text x="80" y="222" text-anchor="middle" dominant-baseline="central" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">LOCK</text>
-<text x="600" y="222" text-anchor="middle" dominant-baseline="central" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">UNLOCK</text>
-
-<!-- ══ LEFT COLUMN: LOCK ══ -->
-
-<!-- random session key K -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="40" y="234" width="240" height="44" rx="8" stroke-width="0.5" style="fill:rgb(99, 56, 6);stroke:rgb(239, 159, 39);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="160" y="256" text-anchor="middle" dominant-baseline="central" style="fill:rgb(250, 199, 117);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">random session key K</text>
+<g id="clust4" class="cluster">
+<title>cluster_yk</title>
+<path fill="white" stroke="#9b59b6" stroke-dasharray="5,2" d="M20,-158C20,-158 337,-158 337,-158 343,-158 349,-164 349,-170 349,-170 349,-639 349,-639 349,-645 343,-651 337,-651 337,-651 20,-651 20,-651 14,-651 8,-645 8,-639 8,-639 8,-170 8,-170 8,-164 14,-158 20,-158"/>
+<text xml:space="preserve" text-anchor="middle" x="178.5" y="-636.55" font-family="Helvetica,sans-Serif" font-size="11.00">Vault type B — passphrase + 2–4 YubiKeys (multi&#45;key)</text>
 </g>
-
-<!-- arrows from K down to two encap boxes -->
-<line x1="120" y1="278" x2="90" y2="316" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="200" y1="278" x2="230" y2="316" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-<!-- ML-KEM encapsulate -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="40" y="316" width="150" height="56" rx="8" stroke-width="0.5" style="fill:rgb(8, 80, 65);stroke:rgb(93, 202, 165);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="115" y="338" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159, 225, 203);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">ML-KEM</text>
-  <text x="115" y="356" text-anchor="middle" dominant-baseline="central" style="fill:rgb(93, 202, 165);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">encapsulate K</text>
+<!-- pass -->
+<g id="node1" class="node">
+<title>pass</title>
+<path fill="#fde9c8" stroke="#444444" stroke-width="1.1" d="M265.12,-1160.75C265.12,-1160.75 222.88,-1160.75 222.88,-1160.75 216.88,-1160.75 210.88,-1154.75 210.88,-1148.75 210.88,-1148.75 210.88,-1136.75 210.88,-1136.75 210.88,-1130.75 216.88,-1124.75 222.88,-1124.75 222.88,-1124.75 265.12,-1124.75 265.12,-1124.75 271.12,-1124.75 277.12,-1130.75 277.12,-1136.75 277.12,-1136.75 277.12,-1148.75 277.12,-1148.75 277.12,-1154.75 271.12,-1160.75 265.12,-1160.75"/>
+<text xml:space="preserve" text-anchor="middle" x="244" y="-1139.25" font-family="Helvetica,sans-Serif" font-size="10.00">passphrase</text>
 </g>
-
-<!-- X25519 ephemeral -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="200" y="316" width="150" height="56" rx="8" stroke-width="0.5" style="fill:rgb(8, 80, 65);stroke:rgb(93, 202, 165);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="275" y="338" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159, 225, 203);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">X25519</text>
-  <text x="275" y="356" text-anchor="middle" dominant-baseline="central" style="fill:rgb(93, 202, 165);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">ephemeral exchange</text>
+<!-- argon -->
+<g id="node2" class="node">
+<title>argon</title>
+<path fill="#f6c667" stroke="#444444" stroke-width="1.1" d="M297.38,-1087.75C297.38,-1087.75 190.62,-1087.75 190.62,-1087.75 184.62,-1087.75 178.62,-1081.75 178.62,-1075.75 178.62,-1075.75 178.62,-1055.75 178.62,-1055.75 178.62,-1049.75 184.62,-1043.75 190.62,-1043.75 190.62,-1043.75 297.38,-1043.75 297.38,-1043.75 303.38,-1043.75 309.38,-1049.75 309.38,-1055.75 309.38,-1055.75 309.38,-1075.75 309.38,-1075.75 309.38,-1081.75 303.38,-1087.75 297.38,-1087.75"/>
+<text xml:space="preserve" text-anchor="middle" x="244" y="-1074.25" font-family="Helvetica,sans-Serif" font-size="10.00">Argon2id KDF</text>
+<text xml:space="preserve" text-anchor="middle" x="244" y="-1062.25" font-family="Helvetica,sans-Serif" font-size="10.00">salt + params from header</text>
+<text xml:space="preserve" text-anchor="middle" x="244" y="-1050.25" font-family="Helvetica,sans-Serif" font-size="10.00">→ 96 bytes</text>
 </g>
-
-<!-- output labels under each -->
-<text x="115" y="392" text-anchor="middle" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">→ ciphertext (header)</text>
-<text x="115" y="406" text-anchor="middle" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">→ shared secret A</text>
-<text x="275" y="392" text-anchor="middle" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">→ ciphertext (header)</text>
-<text x="275" y="406" text-anchor="middle" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">→ shared secret B</text>
-
-<!-- arrows down to HKDF -->
-<line x1="115" y1="408" x2="115" y2="434" marker-end="url(#arrow)" mask="url(#imagine-text-gaps-68gj8a)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="275" y1="408" x2="275" y2="434" marker-end="url(#arrow)" mask="url(#imagine-text-gaps-68gj8a)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-<!-- concat label -->
-<text x="195" y="430" text-anchor="middle" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">A ∥ B</text>
-
-<!-- HKDF -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="60" y="440" width="290" height="44" rx="8" stroke-width="0.5" style="fill:rgb(60, 52, 137);stroke:rgb(175, 169, 236);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="205" y="456" text-anchor="middle" dominant-baseline="central" style="fill:rgb(206, 203, 246);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">HKDF-SHA256</text>
-  <text x="205" y="474" text-anchor="middle" dominant-baseline="central" style="fill:rgb(175, 169, 236);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">"gabbro-hybrid-kex-v1"</text>
+<!-- pass&#45;&gt;argon -->
+<g id="edge1" class="edge">
+<title>pass&#45;&gt;argon</title>
+<path fill="none" stroke="#555555" d="M244,-1124.35C244,-1116.92 244,-1107.98 244,-1099.39"/>
+<polygon fill="#555555" stroke="#555555" points="247.5,-1099.58 244,-1089.58 240.5,-1099.58 247.5,-1099.58"/>
 </g>
-
-<line x1="205" y1="484" x2="205" y2="510" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-<!-- AES-256-GCM -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="60" y="510" width="290" height="56" rx="8" stroke-width="0.5" style="fill:rgb(113, 43, 19);stroke:rgb(240, 153, 123);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="205" y="532" text-anchor="middle" dominant-baseline="central" style="fill:rgb(245, 196, 179);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">AES-256-GCM encrypt</text>
-  <text x="205" y="550" text-anchor="middle" dominant-baseline="central" style="fill:rgb(240, 153, 123);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">vault body + auth tag</text>
+<!-- seedx -->
+<g id="node3" class="node">
+<title>seedx</title>
+<path fill="#fbe3a1" stroke="#444444" stroke-width="1.1" d="M289,-1002.38C289,-1002.38 189,-1002.38 189,-1002.38 183,-1002.38 177,-996.38 177,-990.38 177,-990.38 177,-978.38 177,-978.38 177,-972.38 183,-966.38 189,-966.38 189,-966.38 289,-966.38 289,-966.38 295,-966.38 301,-972.38 301,-978.38 301,-978.38 301,-990.38 301,-990.38 301,-996.38 295,-1002.38 289,-1002.38"/>
+<text xml:space="preserve" text-anchor="middle" x="239" y="-986.88" font-family="Helvetica,sans-Serif" font-size="10.00">bytes 0–31</text>
+<text xml:space="preserve" text-anchor="middle" x="239" y="-974.88" font-family="Helvetica,sans-Serif" font-size="10.00">X25519 private&#45;key seed</text>
 </g>
-
-<!-- ══ RIGHT COLUMN: UNLOCK ══ -->
-
-<!-- Read header -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="390" y="234" width="250" height="44" rx="8" stroke-width="0.5" style="fill:rgb(68, 68, 65);stroke:rgb(180, 178, 169);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="515" y="252" text-anchor="middle" dominant-baseline="central" style="fill:rgb(211, 209, 199);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">read vault header</text>
-  <text x="515" y="270" text-anchor="middle" dominant-baseline="central" style="fill:rgb(180, 178, 169);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">salt, params, ciphertexts</text>
+<!-- argon&#45;&gt;seedx -->
+<g id="edge2" class="edge">
+<title>argon&#45;&gt;seedx</title>
+<path fill="none" stroke="#555555" d="M242.66,-1043.48C242.09,-1034.4 241.41,-1023.68 240.8,-1013.92"/>
+<polygon fill="#555555" stroke="#555555" points="244.31,-1013.96 240.19,-1004.2 237.32,-1014.4 244.31,-1013.96"/>
 </g>
-
-<line x1="515" y1="278" x2="515" y2="316" marker-end="url(#arrow)" mask="url(#imagine-text-gaps-68gj8a)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-<!-- ML-KEM decap -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="380" y="316" width="150" height="56" rx="8" stroke-width="0.5" style="fill:rgb(8, 80, 65);stroke:rgb(93, 202, 165);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="455" y="338" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159, 225, 203);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">ML-KEM</text>
-  <text x="455" y="356" text-anchor="middle" dominant-baseline="central" style="fill:rgb(93, 202, 165);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">decapsulate</text>
+<!-- seedk -->
+<g id="node4" class="node">
+<title>seedk</title>
+<path fill="#fbe3a1" stroke="#444444" stroke-width="1.1" d="M471.25,-1006.75C471.25,-1006.75 330.75,-1006.75 330.75,-1006.75 324.75,-1006.75 318.75,-1000.75 318.75,-994.75 318.75,-994.75 318.75,-974 318.75,-974 318.75,-968 324.75,-962 330.75,-962 330.75,-962 471.25,-962 471.25,-962 477.25,-962 483.25,-968 483.25,-974 483.25,-974 483.25,-994.75 483.25,-994.75 483.25,-1000.75 477.25,-1006.75 471.25,-1006.75"/>
+<text xml:space="preserve" text-anchor="middle" x="401" y="-993.25" font-family="Helvetica,sans-Serif" font-size="10.00">bytes 32–95</text>
+<text xml:space="preserve" text-anchor="middle" x="401" y="-981.25" font-family="Helvetica,sans-Serif" font-size="10.00">ML&#45;KEM&#45;1024 &#160;d ∥ z</text>
+<text xml:space="preserve" text-anchor="middle" x="401" y="-968.5" font-family="Helvetica,sans-Serif" font-size="10.00">FIPS 203 KeyGen (VERSION 6+)</text>
 </g>
-
-<!-- X25519 reverse -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="540" y="316" width="150" height="56" rx="8" stroke-width="0.5" style="fill:rgb(8, 80, 65);stroke:rgb(93, 202, 165);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="615" y="338" text-anchor="middle" dominant-baseline="central" style="fill:rgb(159, 225, 203);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">X25519</text>
-  <text x="615" y="356" text-anchor="middle" dominant-baseline="central" style="fill:rgb(93, 202, 165);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">reverse exchange</text>
+<!-- argon&#45;&gt;seedk -->
+<g id="edge3" class="edge">
+<title>argon&#45;&gt;seedk</title>
+<path fill="none" stroke="#555555" d="M286.49,-1043.27C305.28,-1033.77 327.59,-1022.49 347.5,-1012.42"/>
+<polygon fill="#555555" stroke="#555555" points="348.96,-1015.6 356.31,-1007.97 345.81,-1009.36 348.96,-1015.6"/>
 </g>
-
-<text x="455" y="392" text-anchor="middle" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">→ shared secret A</text>
-<text x="615" y="392" text-anchor="middle" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">→ shared secret B</text>
-
-<line x1="455" y1="394" x2="455" y2="434" marker-end="url(#arrow)" mask="url(#imagine-text-gaps-68gj8a)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-<line x1="615" y1="394" x2="615" y2="434" marker-end="url(#arrow)" mask="url(#imagine-text-gaps-68gj8a)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-<text x="535" y="430" text-anchor="middle" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">A ∥ B</text>
-
-<!-- HKDF right -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="400" y="440" width="270" height="44" rx="8" stroke-width="0.5" style="fill:rgb(60, 52, 137);stroke:rgb(175, 169, 236);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="535" y="456" text-anchor="middle" dominant-baseline="central" style="fill:rgb(206, 203, 246);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">HKDF-SHA256</text>
-  <text x="535" y="474" text-anchor="middle" dominant-baseline="central" style="fill:rgb(175, 169, 236);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">"gabbro-hybrid-kex-v1"</text>
+<!-- x25519 -->
+<g id="node6" class="node">
+<title>x25519</title>
+<path fill="#bfe3c0" stroke="#444444" stroke-width="1.1" d="M309.38,-905.5C309.38,-905.5 202.62,-905.5 202.62,-905.5 196.62,-905.5 190.62,-899.5 190.62,-893.5 190.62,-893.5 190.62,-873.5 190.62,-873.5 190.62,-867.5 196.62,-861.5 202.62,-861.5 202.62,-861.5 309.38,-861.5 309.38,-861.5 315.38,-861.5 321.38,-867.5 321.38,-873.5 321.38,-873.5 321.38,-893.5 321.38,-893.5 321.38,-899.5 315.38,-905.5 309.38,-905.5"/>
+<text xml:space="preserve" text-anchor="middle" x="256" y="-892" font-family="Helvetica,sans-Serif" font-size="10.00">X25519</text>
+<text xml:space="preserve" text-anchor="middle" x="256" y="-880" font-family="Helvetica,sans-Serif" font-size="10.00">ephemeral (lock) /</text>
+<text xml:space="preserve" text-anchor="middle" x="256" y="-868" font-family="Helvetica,sans-Serif" font-size="10.00">reverse (unlock) exchange</text>
 </g>
-
-<line x1="535" y1="484" x2="535" y2="510" marker-end="url(#arrow)" style="fill:none;stroke:rgb(156, 154, 146);color:rgb(255, 255, 255);stroke-width:1.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-
-<!-- AES-256-GCM decrypt -->
-<g style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
-  <rect x="400" y="510" width="270" height="56" rx="8" stroke-width="0.5" style="fill:rgb(113, 43, 19);stroke:rgb(240, 153, 123);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
-  <text x="535" y="532" text-anchor="middle" dominant-baseline="central" style="fill:rgb(245, 196, 179);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:14px;font-weight:500;text-anchor:middle;dominant-baseline:central">AES-256-GCM decrypt</text>
-  <text x="535" y="550" text-anchor="middle" dominant-baseline="central" style="fill:rgb(240, 153, 123);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:central">auth tag validates → vault body</text>
+<!-- seedx&#45;&gt;x25519 -->
+<g id="edge5" class="edge">
+<title>seedx&#45;&gt;x25519</title>
+<path fill="none" stroke="#555555" d="M241.96,-966.15C244.27,-952.71 247.55,-933.63 250.36,-917.3"/>
+<polygon fill="#555555" stroke="#555555" points="253.8,-917.95 252.05,-907.5 246.9,-916.76 253.8,-917.95"/>
 </g>
-
-<!-- ── bottom note ── -->
-<text x="340" y="610" text-anchor="middle" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:middle;dominant-baseline:auto">changing passphrase only re-runs encapsulation — vault body unchanged</text>
-
+<!-- mlkem -->
+<g id="node5" class="node">
+<title>mlkem</title>
+<path fill="#bfe3c0" stroke="#444444" stroke-width="1.1" d="M438,-905.5C438,-905.5 356,-905.5 356,-905.5 350,-905.5 344,-899.5 344,-893.5 344,-893.5 344,-873.5 344,-873.5 344,-867.5 350,-861.5 356,-861.5 356,-861.5 438,-861.5 438,-861.5 444,-861.5 450,-867.5 450,-873.5 450,-873.5 450,-893.5 450,-893.5 450,-899.5 444,-905.5 438,-905.5"/>
+<text xml:space="preserve" text-anchor="middle" x="397" y="-892" font-family="Helvetica,sans-Serif" font-size="10.00">ML&#45;KEM&#45;1024</text>
+<text xml:space="preserve" text-anchor="middle" x="397" y="-880" font-family="Helvetica,sans-Serif" font-size="10.00">encapsulate (lock) /</text>
+<text xml:space="preserve" text-anchor="middle" x="397" y="-868" font-family="Helvetica,sans-Serif" font-size="10.00">decapsulate (unlock)</text>
+</g>
+<!-- seedk&#45;&gt;mlkem -->
+<g id="edge4" class="edge">
+<title>seedk&#45;&gt;mlkem</title>
+<path fill="none" stroke="#555555" d="M400.13,-961.92C399.6,-948.83 398.92,-931.85 398.32,-917.12"/>
+<polygon fill="#555555" stroke="#555555" points="401.83,-917.28 397.93,-907.42 394.83,-917.56 401.83,-917.28"/>
+</g>
+<!-- hkdf -->
+<g id="node7" class="node">
+<title>hkdf</title>
+<path fill="#8fd18f" stroke="#444444" stroke-width="1.1" d="M334,-804.5C334,-804.5 216,-804.5 216,-804.5 210,-804.5 204,-798.5 204,-792.5 204,-792.5 204,-772.5 204,-772.5 204,-766.5 210,-760.5 216,-760.5 216,-760.5 334,-760.5 334,-760.5 340,-760.5 346,-766.5 346,-772.5 346,-772.5 346,-792.5 346,-792.5 346,-798.5 340,-804.5 334,-804.5"/>
+<text xml:space="preserve" text-anchor="middle" x="275" y="-791" font-family="Helvetica,sans-Serif" font-size="10.00">HKDF&#45;SHA256</text>
+<text xml:space="preserve" text-anchor="middle" x="275" y="-779" font-family="Helvetica,sans-Serif" font-size="10.00">salt = hkdf_salt</text>
+<text xml:space="preserve" text-anchor="middle" x="275" y="-767" font-family="Helvetica,sans-Serif" font-size="10.00">info = &quot;gabbro&#45;hybrid&#45;kex&#45;v1&quot;</text>
+</g>
+<!-- mlkem&#45;&gt;hkdf -->
+<g id="edge6" class="edge">
+<title>mlkem&#45;&gt;hkdf</title>
+<path fill="none" stroke="#555555" d="M378.2,-860.97C367.13,-848.94 352.5,-834.08 338,-822.5 333.16,-818.64 327.92,-814.85 322.59,-811.24"/>
+<polygon fill="#555555" stroke="#555555" points="324.53,-808.33 314.25,-805.8 320.71,-814.19 324.53,-808.33"/>
+<text xml:space="preserve" text-anchor="middle" x="408" y="-834.95" font-family="Helvetica,sans-Serif" font-size="9.00"> secret A</text>
+<text xml:space="preserve" text-anchor="middle" x="408" y="-824.45" font-family="Helvetica,sans-Serif" font-size="9.00"> (ML&#45;KEM ct → header)</text>
+</g>
+<!-- x25519&#45;&gt;hkdf -->
+<g id="edge7" class="edge">
+<title>x25519&#45;&gt;hkdf</title>
+<path fill="none" stroke="#555555" d="M224.29,-860.98C212.15,-849.97 202.86,-836.05 210.5,-822.5 212.58,-818.81 215.17,-815.42 218.11,-812.33"/>
+<polygon fill="#555555" stroke="#555555" points="220.29,-815.07 225.44,-805.82 215.64,-809.84 220.29,-815.07"/>
+<text xml:space="preserve" text-anchor="middle" x="274.25" y="-834.95" font-family="Helvetica,sans-Serif" font-size="9.00"> secret B</text>
+<text xml:space="preserve" text-anchor="middle" x="274.25" y="-824.45" font-family="Helvetica,sans-Serif" font-size="9.00"> (ephemeral pubkey → header)</text>
+</g>
+<!-- ik -->
+<g id="node8" class="node">
+<title>ik</title>
+<path fill="#8fd18f" stroke="#444444" stroke-width="1.1" d="M335.12,-723.5C335.12,-723.5 214.88,-723.5 214.88,-723.5 208.88,-723.5 202.88,-717.5 202.88,-711.5 202.88,-711.5 202.88,-699.5 202.88,-699.5 202.88,-693.5 208.88,-687.5 214.88,-687.5 214.88,-687.5 335.12,-687.5 335.12,-687.5 341.12,-687.5 347.12,-693.5 347.12,-699.5 347.12,-699.5 347.12,-711.5 347.12,-711.5 347.12,-717.5 341.12,-723.5 335.12,-723.5"/>
+<text xml:space="preserve" text-anchor="middle" x="275" y="-708.38" font-family="Helvetica,sans-Serif" font-size="10.00">intermediate key</text>
+<text xml:space="preserve" text-anchor="middle" x="275" y="-696.38" font-family="Helvetica,sans-Serif" font-size="10.00">= HKDF(secret A ∥ secret B)</text>
+</g>
+<!-- hkdf&#45;&gt;ik -->
+<g id="edge8" class="edge">
+<title>hkdf&#45;&gt;ik</title>
+<path fill="none" stroke="#555555" d="M275,-760.21C275,-752.53 275,-743.72 275,-735.49"/>
+<polygon fill="#555555" stroke="#555555" points="278.5,-735.56 275,-725.56 271.5,-735.56 278.5,-735.56"/>
+</g>
+<!-- vk_pp -->
+<g id="node9" class="node">
+<title>vk_pp</title>
+<path fill="#cfe0f5" stroke="#444444" stroke-width="1.1" d="M492.88,-283C492.88,-283 377.12,-283 377.12,-283 371.12,-283 365.12,-277 365.12,-271 365.12,-271 365.12,-259 365.12,-259 365.12,-253 371.12,-247 377.12,-247 377.12,-247 492.88,-247 492.88,-247 498.88,-247 504.88,-253 504.88,-259 504.88,-259 504.88,-271 504.88,-271 504.88,-277 498.88,-283 492.88,-283"/>
+<text xml:space="preserve" text-anchor="middle" x="435" y="-261.5" font-family="Helvetica,sans-Serif" font-size="10.00">vault key = intermediate key</text>
+</g>
+<!-- ik&#45;&gt;vk_pp -->
+<g id="edge9" class="edge">
+<title>ik&#45;&gt;vk_pp</title>
+<path fill="none" stroke="#555555" d="M328.63,-687.05C364.44,-671.65 405,-645.22 405,-604.5 405,-604.5 405,-604.5 405,-370 405,-343.36 414.2,-314.34 422.41,-293.74"/>
+<polygon fill="#555555" stroke="#555555" points="425.59,-295.2 426.22,-284.62 419.13,-292.5 425.59,-295.2"/>
+<text xml:space="preserve" text-anchor="middle" x="429.38" y="-485.95" font-family="Helvetica,sans-Serif" font-size="9.00"> no YubiKey</text>
+</g>
+<!-- pblob -->
+<g id="node11" class="node">
+<title>pblob</title>
+<path fill="#ebd2f0" stroke="#444444" stroke-width="1.1" d="M273,-621.5C273,-621.5 83,-621.5 83,-621.5 77,-621.5 71,-615.5 71,-609.5 71,-609.5 71,-597.5 71,-597.5 71,-591.5 77,-585.5 83,-585.5 83,-585.5 273,-585.5 273,-585.5 279,-585.5 285,-591.5 285,-597.5 285,-597.5 285,-609.5 285,-609.5 285,-615.5 279,-621.5 273,-621.5"/>
+<text xml:space="preserve" text-anchor="middle" x="178" y="-606" font-family="Helvetica,sans-Serif" font-size="10.00">passphrase_blob</text>
+<text xml:space="preserve" text-anchor="middle" x="178" y="-594" font-family="Helvetica,sans-Serif" font-size="10.00">= AES&#45;GCM(intermediate key, wrapping_key)</text>
+</g>
+<!-- ik&#45;&gt;pblob -->
+<g id="edge11" class="edge">
+<title>ik&#45;&gt;pblob</title>
+<path fill="none" stroke="#555555" d="M258.1,-687.08C242.66,-671.16 219.66,-647.45 202.26,-629.51"/>
+<polygon fill="#555555" stroke="#555555" points="205.23,-627.55 195.76,-622.81 200.21,-632.42 205.23,-627.55"/>
+<text xml:space="preserve" text-anchor="middle" x="272.73" y="-660.95" font-family="Helvetica,sans-Serif" font-size="9.00"> unlock: decrypt</text>
+</g>
+<!-- aes_pp -->
+<g id="node10" class="node">
+<title>aes_pp</title>
+<path fill="#9cc2ee" stroke="#444444" stroke-width="1.1" d="M490.75,-210C490.75,-210 377.25,-210 377.25,-210 371.25,-210 365.25,-204 365.25,-198 365.25,-198 365.25,-178 365.25,-178 365.25,-172 371.25,-166 377.25,-166 377.25,-166 490.75,-166 490.75,-166 496.75,-166 502.75,-172 502.75,-178 502.75,-178 502.75,-198 502.75,-198 502.75,-204 496.75,-210 490.75,-210"/>
+<text xml:space="preserve" text-anchor="middle" x="434" y="-196.5" font-family="Helvetica,sans-Serif" font-size="10.00">AES&#45;256&#45;GCM</text>
+<text xml:space="preserve" text-anchor="middle" x="434" y="-184.5" font-family="Helvetica,sans-Serif" font-size="10.00">encrypt / decrypt vault body</text>
+<text xml:space="preserve" text-anchor="middle" x="434" y="-172.5" font-family="Helvetica,sans-Serif" font-size="10.00">AAD = plaintext header</text>
+</g>
+<!-- vk_pp&#45;&gt;aes_pp -->
+<g id="edge10" class="edge">
+<title>vk_pp&#45;&gt;aes_pp</title>
+<path fill="none" stroke="#555555" d="M434.77,-246.6C434.67,-239.17 434.55,-230.23 434.44,-221.64"/>
+<polygon fill="#555555" stroke="#555555" points="437.94,-221.78 434.3,-211.83 430.94,-221.88 437.94,-221.78"/>
+</g>
+<!-- body -->
+<g id="node18" class="node">
+<title>body</title>
+<polygon fill="#ececec" stroke="#444444" stroke-width="1.1" points="476.75,-129 261.25,-129 261.25,-93 482.75,-93 482.75,-123 476.75,-129"/>
+<polyline fill="none" stroke="#444444" stroke-width="1.1" points="476.75,-129 476.75,-123"/>
+<polyline fill="none" stroke="#444444" stroke-width="1.1" points="482.75,-123 476.75,-123"/>
+<text xml:space="preserve" text-anchor="middle" x="372" y="-113.5" font-family="Helvetica,sans-Serif" font-size="10.00">sealed .gabbro file</text>
+<text xml:space="preserve" text-anchor="middle" x="372" y="-101.5" font-family="Helvetica,sans-Serif" font-size="10.00">plaintext header + body (ciphertext + GCM tag)</text>
+</g>
+<!-- aes_pp&#45;&gt;body -->
+<g id="edge18" class="edge">
+<title>aes_pp&#45;&gt;body</title>
+<path fill="none" stroke="#555555" d="M416.4,-165.71C409.31,-157.13 401.06,-147.16 393.62,-138.15"/>
+<polygon fill="#555555" stroke="#555555" points="396.54,-136.19 387.47,-130.72 391.15,-140.65 396.54,-136.19"/>
+</g>
+<!-- wrap -->
+<g id="node12" class="node">
+<title>wrap</title>
+<path fill="#e0bee8" stroke="#444444" stroke-width="1.1" d="M153.75,-548.5C153.75,-548.5 28.25,-548.5 28.25,-548.5 22.25,-548.5 16.25,-542.5 16.25,-536.5 16.25,-536.5 16.25,-524.5 16.25,-524.5 16.25,-518.5 22.25,-512.5 28.25,-512.5 28.25,-512.5 153.75,-512.5 153.75,-512.5 159.75,-512.5 165.75,-518.5 165.75,-524.5 165.75,-524.5 165.75,-536.5 165.75,-536.5 165.75,-542.5 159.75,-548.5 153.75,-548.5"/>
+<text xml:space="preserve" text-anchor="middle" x="91" y="-527" font-family="Helvetica,sans-Serif" font-size="10.00">wrapping_key (random, stable)</text>
+</g>
+<!-- pblob&#45;&gt;wrap -->
+<g id="edge12" class="edge">
+<title>pblob&#45;&gt;wrap</title>
+<path fill="none" stroke="#555555" d="M156.94,-585.31C146.2,-576.55 132.95,-565.73 121.15,-556.1"/>
+<polygon fill="#555555" stroke="#555555" points="123.6,-553.59 113.64,-549.98 119.18,-559.01 123.6,-553.59"/>
+</g>
+<!-- combine -->
+<g id="node14" class="node">
+<title>combine</title>
+<path fill="#e0bee8" stroke="#444444" stroke-width="1.1" d="M316.62,-466C316.62,-466 163.38,-466 163.38,-466 157.38,-466 151.38,-460 151.38,-454 151.38,-454 151.38,-442 151.38,-442 151.38,-436 157.38,-430 163.38,-430 163.38,-430 316.62,-430 316.62,-430 322.62,-430 328.62,-436 328.62,-442 328.62,-442 328.62,-454 328.62,-454 328.62,-460 322.62,-466 316.62,-466"/>
+<text xml:space="preserve" text-anchor="middle" x="240" y="-450.5" font-family="Helvetica,sans-Serif" font-size="10.00">combine_yubikey(</text>
+<text xml:space="preserve" text-anchor="middle" x="240" y="-438.5" font-family="Helvetica,sans-Serif" font-size="10.00">wrapping_key, hmac_secret_i, salt_i)</text>
+</g>
+<!-- wrap&#45;&gt;combine -->
+<g id="edge13" class="edge">
+<title>wrap&#45;&gt;combine</title>
+<path fill="none" stroke="#555555" d="M123.33,-512.03C145.1,-500.27 174.04,-484.64 197.64,-471.88"/>
+<polygon fill="#555555" stroke="#555555" points="199.27,-474.99 206.4,-467.15 195.94,-468.83 199.27,-474.99"/>
+</g>
+<!-- yk_hw -->
+<g id="node13" class="node">
+<title>yk_hw</title>
+<path fill="#f5b7b1" stroke="#444444" stroke-width="1.1" d="M328.5,-548.5C328.5,-548.5 195.5,-548.5 195.5,-548.5 189.5,-548.5 183.5,-542.5 183.5,-536.5 183.5,-536.5 183.5,-524.5 183.5,-524.5 183.5,-518.5 189.5,-512.5 195.5,-512.5 195.5,-512.5 328.5,-512.5 328.5,-512.5 334.5,-512.5 340.5,-518.5 340.5,-524.5 340.5,-524.5 340.5,-536.5 340.5,-536.5 340.5,-542.5 334.5,-548.5 328.5,-548.5"/>
+<text xml:space="preserve" text-anchor="middle" x="262" y="-533" font-family="Helvetica,sans-Serif" font-size="10.00">YubiKey FIDO2</text>
+<text xml:space="preserve" text-anchor="middle" x="262" y="-521" font-family="Helvetica,sans-Serif" font-size="10.00">hmac&#45;secret (per registered key)</text>
+</g>
+<!-- yk_hw&#45;&gt;combine -->
+<g id="edge14" class="edge">
+<title>yk_hw&#45;&gt;combine</title>
+<path fill="none" stroke="#555555" d="M257.23,-512.03C254.46,-501.91 250.91,-488.91 247.75,-477.35"/>
+<polygon fill="#555555" stroke="#555555" points="251.18,-476.62 245.16,-467.89 244.42,-478.46 251.18,-476.62"/>
+<text xml:space="preserve" text-anchor="middle" x="283.44" y="-485.95" font-family="Helvetica,sans-Serif" font-size="9.00"> hmac_secret_i</text>
+</g>
+<!-- kblob -->
+<g id="node15" class="node">
+<title>kblob</title>
+<path fill="#ebd2f0" stroke="#444444" stroke-width="1.1" d="M329,-393C329,-393 151,-393 151,-393 145,-393 139,-387 139,-381 139,-381 139,-361 139,-361 139,-355 145,-349 151,-349 151,-349 329,-349 329,-349 335,-349 341,-355 341,-361 341,-361 341,-381 341,-381 341,-387 335,-393 329,-393"/>
+<text xml:space="preserve" text-anchor="middle" x="240" y="-379.5" font-family="Helvetica,sans-Serif" font-size="10.00">key_blob_i</text>
+<text xml:space="preserve" text-anchor="middle" x="240" y="-367.5" font-family="Helvetica,sans-Serif" font-size="10.00">= AES&#45;GCM(combined, vault_key_master)</text>
+<text xml:space="preserve" text-anchor="middle" x="240" y="-355.5" font-family="Helvetica,sans-Serif" font-size="10.00">one per registered key (2–4)</text>
+</g>
+<!-- combine&#45;&gt;kblob -->
+<g id="edge15" class="edge">
+<title>combine&#45;&gt;kblob</title>
+<path fill="none" stroke="#555555" d="M240,-429.6C240,-422.17 240,-413.23 240,-404.64"/>
+<polygon fill="#555555" stroke="#555555" points="243.5,-404.83 240,-394.83 236.5,-404.83 243.5,-404.83"/>
+</g>
+<!-- vkm -->
+<g id="node16" class="node">
+<title>vkm</title>
+<path fill="#d9a7e3" stroke="#444444" stroke-width="1.1" d="M313.25,-283C313.25,-283 202.75,-283 202.75,-283 196.75,-283 190.75,-277 190.75,-271 190.75,-271 190.75,-259 190.75,-259 190.75,-253 196.75,-247 202.75,-247 202.75,-247 313.25,-247 313.25,-247 319.25,-247 325.25,-253 325.25,-259 325.25,-259 325.25,-271 325.25,-271 325.25,-277 319.25,-283 313.25,-283"/>
+<text xml:space="preserve" text-anchor="middle" x="258" y="-261.5" font-family="Helvetica,sans-Serif" font-size="10.00">vault_key_master (random)</text>
+</g>
+<!-- kblob&#45;&gt;vkm -->
+<g id="edge16" class="edge">
+<title>kblob&#45;&gt;vkm</title>
+<path fill="none" stroke="#555555" d="M243.73,-348.45C246.44,-332.79 250.14,-311.44 253.09,-294.38"/>
+<polygon fill="#555555" stroke="#555555" points="256.48,-295.33 254.73,-284.88 249.58,-294.14 256.48,-295.33"/>
+<text xml:space="preserve" text-anchor="middle" x="280.34" y="-322.45" font-family="Helvetica,sans-Serif" font-size="9.00"> unlock: decrypt</text>
+</g>
+<!-- aes_yk -->
+<g id="node17" class="node">
+<title>aes_yk</title>
+<path fill="#9cc2ee" stroke="#444444" stroke-width="1.1" d="M326.75,-210C326.75,-210 213.25,-210 213.25,-210 207.25,-210 201.25,-204 201.25,-198 201.25,-198 201.25,-178 201.25,-178 201.25,-172 207.25,-166 213.25,-166 213.25,-166 326.75,-166 326.75,-166 332.75,-166 338.75,-172 338.75,-178 338.75,-178 338.75,-198 338.75,-198 338.75,-204 332.75,-210 326.75,-210"/>
+<text xml:space="preserve" text-anchor="middle" x="270" y="-196.5" font-family="Helvetica,sans-Serif" font-size="10.00">AES&#45;256&#45;GCM</text>
+<text xml:space="preserve" text-anchor="middle" x="270" y="-184.5" font-family="Helvetica,sans-Serif" font-size="10.00">encrypt / decrypt vault body</text>
+<text xml:space="preserve" text-anchor="middle" x="270" y="-172.5" font-family="Helvetica,sans-Serif" font-size="10.00">AAD = plaintext header</text>
+</g>
+<!-- vkm&#45;&gt;aes_yk -->
+<g id="edge17" class="edge">
+<title>vkm&#45;&gt;aes_yk</title>
+<path fill="none" stroke="#555555" d="M260.78,-246.6C261.97,-239.17 263.4,-230.23 264.78,-221.64"/>
+<polygon fill="#555555" stroke="#555555" points="268.23,-222.24 266.35,-211.81 261.31,-221.13 268.23,-222.24"/>
+</g>
+<!-- aes_yk&#45;&gt;body -->
+<g id="edge19" class="edge">
+<title>aes_yk&#45;&gt;body</title>
+<path fill="none" stroke="#555555" d="M299.23,-165.51C311.74,-156.31 326.39,-145.54 339.26,-136.07"/>
+<polygon fill="#555555" stroke="#555555" points="341.06,-139.1 347.04,-130.35 336.91,-133.46 341.06,-139.1"/>
+</g>
+<!-- note_aad -->
+<g id="node19" class="node">
+<title>note_aad</title>
+<polygon fill="#fff7d6" stroke="#b08900" stroke-width="1.1" points="366.88,-56 65.12,-56 65.12,0 372.88,0 372.88,-50 366.88,-56"/>
+<polyline fill="none" stroke="#b08900" stroke-width="1.1" points="366.88,-56 366.88,-50"/>
+<polyline fill="none" stroke="#b08900" stroke-width="1.1" points="372.88,-50 366.88,-50"/>
+<text xml:space="preserve" text-anchor="middle" x="219" y="-42.5" font-family="Helvetica,sans-Serif" font-size="10.00">VERSION 7 header integrity (F&#45;01): the entire plaintext header</text>
+<text xml:space="preserve" text-anchor="middle" x="219" y="-30.5" font-family="Helvetica,sans-Serif" font-size="10.00">— Argon2 params, salts, ML&#45;KEM ciphertext, X25519 pubkey,</text>
+<text xml:space="preserve" text-anchor="middle" x="219" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">YubiKey records, alias, passphrase_blob — is the AES&#45;GCM AAD.</text>
+<text xml:space="preserve" text-anchor="middle" x="219" y="-6.5" font-family="Helvetica,sans-Serif" font-size="10.00">Any header tamper makes body decryption fail.</text>
+</g>
+<!-- body&#45;&gt;note_aad -->
+<!-- note_pp -->
+<g id="node20" class="node">
+<title>note_pp</title>
+<polygon fill="#fff7d6" stroke="#b08900" stroke-width="1.1" points="654.75,-50 391.25,-50 391.25,-6 660.75,-6 660.75,-44 654.75,-50"/>
+<polyline fill="none" stroke="#b08900" stroke-width="1.1" points="654.75,-50 654.75,-44"/>
+<polyline fill="none" stroke="#b08900" stroke-width="1.1" points="660.75,-44 654.75,-44"/>
+<text xml:space="preserve" text-anchor="middle" x="526" y="-36.5" font-family="Helvetica,sans-Serif" font-size="10.00">Passphrase change re&#45;runs Argon2id + KEX and re&#45;wraps</text>
+<text xml:space="preserve" text-anchor="middle" x="526" y="-24.5" font-family="Helvetica,sans-Serif" font-size="10.00">wrapping_key into a new passphrase_blob; key_blobs and</text>
+<text xml:space="preserve" text-anchor="middle" x="526" y="-12.5" font-family="Helvetica,sans-Serif" font-size="10.00">the vault body are unchanged (any one key still opens).</text>
+</g>
+<!-- body&#45;&gt;note_pp -->
+</g>
 </svg>

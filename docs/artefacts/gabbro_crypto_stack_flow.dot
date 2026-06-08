@@ -1,0 +1,86 @@
+// Gabbro crypto stack — source of truth for gabbro_crypto_stack_flow.svg
+// Render:  dot -Tsvg gabbro_crypto_stack_flow.dot -o gabbro_crypto_stack_flow.svg
+//
+// Reflects the implementation as of file-format VERSION 7:
+//   passphrase -> Argon2id -> X25519 + ML-KEM-1024 -> HKDF-SHA256 -> AES-256-GCM
+//   with the plaintext header bound as AES-GCM AAD (F-01), and the YubiKey
+//   multi-key keyslot layer (wrapping_key / vault_key_master / passphrase_blob /
+//   per-key key_blob). Arrows read top-down as the UNLOCK / key-derivation path;
+//   sealing is the inverse (see notes).
+
+digraph gabbro_crypto_stack {
+  rankdir=TB;
+  bgcolor="white";
+  labelloc="t";
+  label=<<b>Gabbro crypto stack &#183; file-format VERSION 7</b><br/><font point-size="10">passphrase &#8594; Argon2id &#8594; X25519 + ML-KEM-1024 &#8594; HKDF-SHA256 &#8594; AES-256-GCM (header bound as AAD)</font>>;
+  fontname="Helvetica"; fontsize=14;
+  node [fontname="Helvetica", fontsize=10, shape=box, style="rounded,filled", color="#444444", penwidth=1.1];
+  edge [fontname="Helvetica", fontsize=9, color="#555555"];
+
+  // ───────── Key derivation from the passphrase ─────────
+  subgraph cluster_kdf {
+    label="Key derivation (from passphrase)"; fontsize=11; style="rounded,dashed"; color="#B08900";
+    pass   [label="passphrase", fillcolor="#FDE9C8"];
+    argon  [label="Argon2id KDF\nsalt + params from header\n→ 96 bytes", fillcolor="#F6C667"];
+    seedx  [label="bytes 0–31\nX25519 private-key seed", fillcolor="#FBE3A1"];
+    seedk  [label="bytes 32–95\nML-KEM-1024  d ∥ z\nFIPS 203 KeyGen (VERSION 6+)", fillcolor="#FBE3A1"];
+  }
+  pass -> argon;
+  argon -> seedx;
+  argon -> seedk;
+
+  // ───────── Hybrid post-quantum key exchange ─────────
+  subgraph cluster_kex {
+    label="Hybrid post-quantum key exchange"; fontsize=11; style="rounded,dashed"; color="#3C8C3C";
+    mlkem  [label="ML-KEM-1024\nencapsulate (lock) /\ndecapsulate (unlock)", fillcolor="#BFE3C0"];
+    x25519 [label="X25519\nephemeral (lock) /\nreverse (unlock) exchange", fillcolor="#BFE3C0"];
+    hkdf   [label="HKDF-SHA256\nsalt = hkdf_salt\ninfo = \"gabbro-hybrid-kex-v1\"", fillcolor="#8FD18F"];
+    ik     [label="intermediate key\n= HKDF(secret A ∥ secret B)", fillcolor="#8FD18F"];
+  }
+  seedk -> mlkem;
+  seedx -> x25519;
+  mlkem -> hkdf [label=" secret A\n (ML-KEM ct → header)"];
+  x25519 -> hkdf [label=" secret B\n (ephemeral pubkey → header)"];
+  hkdf -> ik;
+
+  // ───────── Vault type A: passphrase only ─────────
+  subgraph cluster_pp {
+    label="Vault type A — passphrase only"; fontsize=11; style="rounded,dashed"; color="#3F72B0";
+    vk_pp  [label="vault key = intermediate key", fillcolor="#CFE0F5"];
+    aes_pp [label="AES-256-GCM\nencrypt / decrypt vault body\nAAD = plaintext header", fillcolor="#9CC2EE"];
+  }
+  ik -> vk_pp [label=" no YubiKey"];
+  vk_pp -> aes_pp;
+
+  // ───────── Vault type B: passphrase + 2–4 YubiKeys ─────────
+  subgraph cluster_yk {
+    label="Vault type B — passphrase + 2–4 YubiKeys (multi-key)"; fontsize=11; style="rounded,dashed"; color="#9B59B6";
+    pblob   [label="passphrase_blob\n= AES-GCM(intermediate key, wrapping_key)", fillcolor="#EBD2F0"];
+    wrap    [label="wrapping_key (random, stable)", fillcolor="#E0BEE8"];
+    yk_hw   [label="YubiKey FIDO2\nhmac-secret (per registered key)", style="rounded,filled,bold", fillcolor="#F5B7B1"];
+    combine [label="combine_yubikey(\nwrapping_key, hmac_secret_i, salt_i)", fillcolor="#E0BEE8"];
+    kblob   [label="key_blob_i\n= AES-GCM(combined, vault_key_master)\none per registered key (2–4)", fillcolor="#EBD2F0"];
+    vkm     [label="vault_key_master (random)", fillcolor="#D9A7E3"];
+    aes_yk  [label="AES-256-GCM\nencrypt / decrypt vault body\nAAD = plaintext header", fillcolor="#9CC2EE"];
+  }
+  ik -> pblob [label=" unlock: decrypt"];
+  pblob -> wrap;
+  wrap -> combine;
+  yk_hw -> combine [label=" hmac_secret_i"];
+  combine -> kblob;
+  kblob -> vkm [label=" unlock: decrypt"];
+  vkm -> aes_yk;
+
+  // ───────── Output ─────────
+  body [label="sealed .gabbro file\nplaintext header + body (ciphertext + GCM tag)", shape=note, fillcolor="#ECECEC"];
+  aes_pp -> body;
+  aes_yk -> body;
+
+  // ───────── Notes ─────────
+  note_aad [shape=note, fillcolor="#FFF7D6", color="#B08900",
+    label="VERSION 7 header integrity (F-01): the entire plaintext header\n— Argon2 params, salts, ML-KEM ciphertext, X25519 pubkey,\nYubiKey records, alias, passphrase_blob — is the AES-GCM AAD.\nAny header tamper makes body decryption fail."];
+  note_pp [shape=note, fillcolor="#FFF7D6", color="#B08900",
+    label="Passphrase change re-runs Argon2id + KEX and re-wraps\nwrapping_key into a new passphrase_blob; key_blobs and\nthe vault body are unchanged (any one key still opens)."];
+  body -> note_aad [style=invis];
+  body -> note_pp  [style=invis];
+}
