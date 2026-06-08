@@ -294,6 +294,7 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 ### Features & UX
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
+- Autofill via `auto-type` (apparently available with KeePass and KeePassXC natively without the need for a browser extension)
 
 ### Code Quality
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
