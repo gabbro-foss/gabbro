@@ -944,7 +944,10 @@ mod tests {
         let VaultEntry::Login(ref l) = entries[0] else {
             panic!("expected Login")
         };
-        assert_eq!(l.username, "", "no username or email field → empty username");
+        assert_eq!(
+            l.username, "",
+            "no username or email field → empty username"
+        );
     }
 
     #[test]

@@ -1812,7 +1812,10 @@ mod tests {
             old.to_vec(),
             path.to_str().unwrap().to_string(),
         ));
-        assert!(result.is_err(), "old passphrase must be rejected after change");
+        assert!(
+            result.is_err(),
+            "old passphrase must be rejected after change"
+        );
 
         let _ = std::fs::remove_file(&path);
     }
@@ -1830,7 +1833,11 @@ mod tests {
         let pass = b"export-test-pass";
 
         save_vault(&VaultBody::empty(), pass, &src).unwrap();
-        run(unlock_vault(pass.to_vec(), src.to_str().unwrap().to_string())).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            src.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
 
         run(export_vault(dst.to_str().unwrap().to_string())).unwrap();
 
@@ -1838,7 +1845,11 @@ mod tests {
 
         lock_vault().unwrap();
         // The exported file must be openable with the same passphrase.
-        run(unlock_vault(pass.to_vec(), dst.to_str().unwrap().to_string())).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            dst.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
         lock_vault().unwrap();
 
         let _ = std::fs::remove_file(&src);
@@ -1893,7 +1904,10 @@ mod tests {
             path.to_str().unwrap().to_string(),
             None,
         ));
-        assert!(result.is_err(), "init_vault_with_keys must require at least 2 keys");
+        assert!(
+            result.is_err(),
+            "init_vault_with_keys must require at least 2 keys"
+        );
         let msg = result.unwrap_err();
         assert!(
             msg.contains("at least 2"),

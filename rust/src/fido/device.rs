@@ -372,7 +372,10 @@ pub fn get_hmac_secret_for_pair(
         fido_dev_free(&mut (dev as *mut _));
 
         match result {
-            Some((hmac, credential_id)) => Ok(HmacMatch { hmac, credential_id }),
+            Some((hmac, credential_id)) => Ok(HmacMatch {
+                hmac,
+                credential_id,
+            }),
             None => Err("assertion credential ID does not match either record".to_string()),
         }
     }

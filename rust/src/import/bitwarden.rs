@@ -609,7 +609,10 @@ mod tests {
             }]
         }"#;
         let (entries, failures) = parse(json).unwrap();
-        assert!(entries.is_empty(), "orphan login must be skipped, not panicked");
+        assert!(
+            entries.is_empty(),
+            "orphan login must be skipped, not panicked"
+        );
         assert!(failures.is_empty());
     }
 
@@ -643,7 +646,10 @@ mod tests {
             }]
         }"#;
         let (entries, failures) = parse(json).unwrap();
-        assert!(entries.is_empty(), "invalid card must not appear in entries");
+        assert!(
+            entries.is_empty(),
+            "invalid card must not appear in entries"
+        );
         assert_eq!(failures.len(), 1, "invalid card must appear in failures");
     }
 
