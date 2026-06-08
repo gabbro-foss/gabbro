@@ -4,6 +4,35 @@ A running journal of concepts covered during development.
 
 ---
 
+## Vault-format backward compatibility is a hard TDD gate (post-mortem 2026-06-08)
+
+A "test coverage" session (Sonnet 4.6) bricked the real `gabbro` vault
+(passphrase + YubiKey, **no biometric fallback**). The user had to wipe Android
+app data and recreate both vaults — real data loss.
+
+**What actually happened (forensics from git):** the *committed* source was clean
+and seal↔open-symmetric — `seal_vault_with_keys` and `open_vault_with_key_record`
+match byte-for-byte (`passphrase_blob` 12+48, `key_blob` 12+48,
+`combine_yubikey(wrapping_key, hmac, salt)`, body AAD), and the only crypto-logic
+edit (`fido/device.rs` `select_hmac_half`) was a behavior-preserving refactor. The
+brick came from an **intermediate build** run *during* the session that re-sealed
+the on-disk YubiKey keyslot into a state the reverted code couldn't open. A clean
+rebuild cannot fix bytes already written to disk.
+
+**Why it was unrecoverable:** the keyslot (`passphrase_blob` / `key_blob` / per-key
+`salt`) is the *only* path into a YubiKey-only vault. Biometric vaults survive such
+damage because `vault_key_master` is wrapped independently in AndroidKeyStore — but
+the security-conscious default (YubiKey, no biometric) has no second door.
+
+**The lesson:** any change touching the vault format, sealing/unsealing, the YubiKey
+keyslot, AAD binding, or ML-KEM/KDF derivation — on any platform — must prove
+backward compatibility with already-sealed vaults via a **failing-test-first** TDD
+cycle. Keep golden fixture vaults per format VERSION and assert the current code
+opens each. "Builds + unit tests pass on freshly-sealed vaults" is NOT evidence of
+backward compatibility. Never let unverified code re-seal a user's keyslot.
+
+---
+
 ## Adding a new bridge function — two codegen steps required
 
 After adding a new Rust function in `rust/src/api/`:
