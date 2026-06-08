@@ -134,6 +134,7 @@ gabbro/
 │   ├── LEARNINGS.md
 │   ├── SECURITY.md             # User-facing security overview (Track A Phase 2)
 │   ├── AI_AUTHORSHIP_AND_IP.md
+│   ├── AI_DEVELOPMENT_PROCESS.md  # "Is Gabbro vibe-coded?" — process/trust rationale
 │   ├── AI_SECURITY_AUDIT.md    # AI-assisted security review (2026-05-31)
 │   ├── artefacts/
 │   └── decisions/              # ADR documents
@@ -294,14 +295,13 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 ### Features & UX
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
-- Autofill via `auto-type` (apparently available with KeePass and KeePassXC natively without the need for a browser extension)
 
 ### Code Quality
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
-- Explain if this project can be defined as "vide-coding" or not, and why, especially in the light of things like this: "vibe-coded cryptography software" in https://blogs.gentoo.org/mgorny/2026/05/28/why-gentoo/#more-2634
 
 ### V2+ / Defer
 - Passphrase wordlists — not viable without significant pipeline work: `yo` Yoruba (no frequency ordering, complex tonal diacritics); `sr_Latn` Serbian Latin (only Cyrillic corpora; needs transliteration pipeline); `lb` Luxembourgish (small speaker base); `wa` Walloon (nothing usable, French covers Wallonia).
+- Autofill via `auto-type` (desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
 - Passkey (WebAuthn discoverable credential) support.
 - Vault sync across devices.
 - Autofill save requests (`onSaveRequest`) — see also Features & UX above.
