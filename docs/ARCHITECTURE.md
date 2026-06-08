@@ -110,6 +110,14 @@ gabbro/
 │   ├── scripts/
 │   │   ├── mem_forensics.sh        # gcore memory-forensics driver (audit L-6)
 │   │   └── gen_wordlists.py        # generates rust/assets/wordlist_XX.txt (Step 3)
+│   ├── examples/
+│   │   └── gen_fixtures.rs         # one-time golden-vault fixture generator (see tests/fixtures/FIXTURES.md)
+│   └── tests/
+│       ├── vault_backward_compat.rs    # frozen-fixture backward-compat harness (read v6+, migrate, YubiKey rotation)
+│       └── fixtures/
+│           ├── FIXTURES.md         # fixture provenance + recipe to add a vN_*.gabbro per new VERSION
+│           ├── fixture_spec.rs     # shared seal/assert spec, included by both harness and generator (no drift)
+│           └── vaults/             # committed FROZEN golden vaults: v6/v7 × {passphrase, multikey}
 ├── android/app/src/main/
 │   └── kotlin/app/gabbro/gabbro/
 │       ├── GabbroAutofillService.kt
@@ -152,10 +160,11 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 477 | 8 |
+| Rust vault backward-compat (`cargo test --test vault_backward_compat`) | 7 | 0 |
 | Flutter (`flutter test`) | 664 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 4 | 19 |
 
-Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
+Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. The backward-compat harness is a separate integration binary that reads committed frozen golden vaults — see Current Focus and `rust/tests/fixtures/FIXTURES.md`. Cross-layer integration tests otherwise deferred (see V2+/YAGNI note in Bikeshed).
 
 ---
 
@@ -165,105 +174,62 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 ### Active task: systematic test coverage improvement
 
-**Philosophy:** tests exist to catch real flaws — logic errors, failure-mode mishandling,
-secret leakage, malformed-input crashes, state-machine bypasses. Not line coverage for
-its own sake.
+**Philosophy:** tests catch real flaws — logic errors, mishandled failure modes,
+secret leakage, malformed-input crashes, state-machine bypasses — not line count.
 
-Baseline (2026-06-08): Rust 411 / 8 ignored; Flutter 590 / 0; Kotlin 0 / 18 (hardware stubs).
+#### Coverage status
 
-| Suite | Baseline | Current |
-|-------|---------|---------|
-| Rust (`cargo test -q`) | 411 / 8 ignored | 480 / 8 ignored ✅ done |
-| Flutter (`flutter test`) | 590 / 0 | 664 / 0 ✅ done (hard-to-reach paths documented below) |
-| Kotlin (`./gradlew :app:testDebugUnitTest`) | 0 / 19 ignored | 4 / 19 ignored — in progress |
+| Layer | State |
+|-------|-------|
+| Rust unit (`cargo test -q`) | ✅ reachable targets covered (`fido/device`, `crypto/vault_crypto`, importers, `api/vault_bridge`, `api/import`) |
+| Rust vault backward-compat harness | ✅ done — see below |
+| Flutter (`flutter test`) | ✅ 664 passing; remaining gaps need `integration_test/` + a real device (see Remaining) |
+| Kotlin (`./gradlew :app:testDebugUnitTest`) | 🔶 in progress — 4 passing / 19 `@Ignore`d; Robolectric next |
 
-#### Rust — complete ✅
+#### Vault-format backward-compatibility harness — ✅ done
 
-All reachable targets covered across sessions 2–3: `fido/device.rs`, `crypto/vault_crypto.rs`,
-`import/bitwarden.rs`, `import/enpass.rs`, `api/vault_bridge.rs`, `api/import.rs`.
+The safety net the 2026-06-08 brick proved we needed (post-mortem in LEARNINGS.md).
+`rust/tests/vault_backward_compat.rs` loads **frozen golden `.gabbro` vaults committed
+to git** (`tests/fixtures/vaults/`, one set per format VERSION, sealed by the build
+that shipped that version) and proves the *current* code can still:
 
-#### Flutter — complete ✅ (hard-to-reach paths remain)
+- **read** each v6/v7 vault — passphrase-only and multi-key (YubiKey) keyslot paths;
+- **migrate** it to the current VERSION on re-seal, contents preserved;
+- **survive the full YubiKey loss/rotation journey** — create with YK1+YK2 → lose
+  YK2/add YK3 → lose YK1/add YK4, unlockable with the surviving keys at every step,
+  with a post-onboarding floor of one key — and this holds starting from both a v6
+  and a v7 vault, asserting the on-disk version is current after every mutation.
 
-664 passing / 0 ignored. Remaining gaps require Rust bridge injection or platform channel
-mocking — impractical from widget tests without `integration_test/` + real device:
+7 tests, driven through the real bridge functions the app calls. A round-trip test
+can never catch a brick; only frozen old bytes can. Generation recipe and the
+per-VERSION gate live in `rust/tests/fixtures/FIXTURES.md`. Scope is v6+ (no user
+vaults predate v6). Fixtures use fixed fake key material and low Argon2id params
+(stored in-header; the read path is unaffected) so the suite stays fast.
 
-- **`screens/entry_detail_screen.dart`** — edit button push (`CreateEntryScreen` calls
-  `listFolders()` bridge in `initState`; no injection point); password history navigation.
-- **`screens/create_entry_screen.dart`** — URL normalisation; File-pick flow (platform
-  `FilePicker` channel).
-- **`main.dart`** — `navigateToManageVaults`, `onActiveVaultDeleted` (require real vault
-  file + Navigator state); `autofillUnlockMain` (calls `RustLib.init()`);
-  `_FallbackCupertinoLocalizationsDelegate` fallback branch.
-- **`screens/onboarding_screen.dart`** — alias-path auto-sync (requires no `initialPath`,
-  triggers `getApplicationSupportDirectory()` platform channel).
+> **RELEASE GATE — non-negotiable.** Every new format VERSION must ship with a
+> committed `vN_passphrase.gabbro` and `vN_multikey_2keys.gabbro`, generated by the
+> build that introduces VERSION N (recipe in `FIXTURES.md`), with
+> `cargo test --test vault_backward_compat` green. The harness only protects versions
+> that have a fixture — skipping this step silently removes the net for that version.
+> Mirrored in the Release Process pre-flight below.
 
-#### Kotlin — next phase (use Claude Opus 4.8, not Sonnet)
+#### Remaining
 
-**Incident (2026-06-08) — RESOLVED via data wipe; real data loss. Post-mortem in LEARNINGS.md.**
-
-A Sonnet 4.6 "test coverage" session bricked the real `gabbro` vault
-(passphrase + YubiKey, no biometric fallback). Resolved only by clearing Android
-app data and recreating both vaults — the YubiKey-only vault's contents were lost.
-Both vaults now lock/unlock correctly.
-
-Root cause (git forensics): the **committed** source was clean and
-seal↔open-symmetric — `seal_vault_with_keys` / `open_vault_with_key_record` match,
-and the only crypto edit (`fido/device.rs` `select_hmac_half`) was a
-behavior-preserving refactor. The earlier "build cache / Gradle artifact corruption"
-theory was **wrong**: git-tracked source is what ships, and `flutter clean` clears
-any cache. The brick came from an **intermediate build** run during the session that
-re-sealed the on-disk YubiKey keyslot into a state the reverted code couldn't open —
-bytes a clean rebuild cannot fix. The `test` vault survived because biometric wraps
-`vault_key_master` independently in AndroidKeyStore; the YubiKey-only vault had no
-second door.
-
-**Hard rule going forward (also in memory + LEARNINGS):** any change touching the
-vault format, sealing/unsealing, the YubiKey keyslot, AAD binding, or KDF/ML-KEM
-derivation — on any platform — must prove backward compatibility with already-sealed
-vaults via a failing-test-first TDD cycle (golden fixture vaults per format VERSION).
-Never let unverified code re-seal a user's keyslot. Also: never run `./gradlew`
-directly from `android/`; all Android builds go through `flutter build apk`; never
-modify production Kotlin without hardware-testing the result immediately.
-
-**Current state:** `GabbroAutofillServiceTest.kt` added with 4 passing JVM tests covering
-`CredentialSummary` data-class semantics and `ParsedStructure.isEmpty()`. All other
-autofill and biometric logic remains `@Ignore`d (19 stubs).
-
-**Constraints discovered:**
-- `org.json.JSONArray` is a stub in JVM unit tests (`android.jar`) — throws
-  `RuntimeException("Stub!")`. `parseSummariesJson` cannot be tested without Robolectric.
-- `extractAppToken` and `extractRegistrableDomain` are private instance methods on
-  `GabbroAutofillService extends AutofillService` — cannot be instantiated in JVM tests.
-  Refactoring to companion object to enable testing caused the device incident above.
-- `BiometricHelper.isEnrolled` / `unenroll` require `SharedPreferences` →
-  need Robolectric or a `Context` fake.
-
-**Next step for Kotlin phase:**
-Add Robolectric (`testImplementation("org.robolectric:robolectric:4.13")`) to
-`android/app/build.gradle.kts`. This unblocks:
-  1. `parseSummariesJson` — real `org.json` via Robolectric
-  2. `extractRegistrableDomain` — real `android.net.Uri` via Robolectric
-  3. `BiometricHelper.isEnrolled` / `unenroll` — real `SharedPreferences` via Robolectric
-Robolectric tests stay in `src/test/` (JVM, no device needed). Verify with
-`./gradlew :app:testDebugUnitTest` after adding the dependency.
-Hardware-only paths (`YubiKeyManager`, `UnlockActivity`, `RustBridge`,
-`BiometricPrompt`) remain `@Ignore`d.
-
-### Next phase (agreed 2026-06-08, in order)
-
-**1. Vault-format backward-compatibility fixture suite — PRIORITY (from the incident above).**
-The missing safety net that would have caught the 2026-06-08 brick. Commit golden
-fixture `.gabbro` vaults, one per format VERSION (2, 3, 4, 5, 6, 7), generated by the
-code that shipped that version. Add failing-test-first Rust tests asserting the
-*current* `open_vault_*` code opens each fixture and returns the expected plaintext —
-covering both the passphrase-only path and the YubiKey keyslot path (with a fixed
-test `hmac_secret`/`salt`). Any future change to seal/open, `file_format.rs`,
-`serialization.rs`, the YubiKey keyslot, AAD binding, or KDF/ML-KEM derivation must
-keep these green. Net-new tests; no production change. See LEARNINGS.md post-mortem
-and the memory rule.
-
-**2. Kotlin coverage phase (Robolectric)** — as detailed in "Next step for Kotlin
-phase" above. Follows the fixture suite.
+1. **Kotlin coverage (Robolectric)** — *use Claude Opus 4.8, not Sonnet (incident).*
+   Add `testImplementation("org.robolectric:robolectric:4.13")` to
+   `android/app/build.gradle.kts` to unblock JVM tests for `parseSummariesJson` (real
+   `org.json`), `extractRegistrableDomain` (real `android.net.Uri`), and
+   `BiometricHelper.isEnrolled`/`unenroll` (real `SharedPreferences`). Tests stay in
+   `src/test/`; verify with `./gradlew :app:testDebugUnitTest`. Hardware-only paths
+   (`YubiKeyManager`, `UnlockActivity`, `RustBridge`, `BiometricPrompt`) stay `@Ignore`d.
+   Do **not** refactor production Kotlin (e.g. to companion objects) just to enable a
+   test without hardware-testing the result immediately — that class of change caused
+   the brick.
+2. **Flutter hard-to-reach paths** — need `integration_test/` + a real device:
+   `entry_detail_screen` / `create_entry_screen` bridge & FilePicker flows;
+   `main.dart` (`navigateToManageVaults`, `onActiveVaultDeleted`, `autofillUnlockMain`,
+   the `_Fallback*LocalizationsDelegate` branches); `onboarding_screen` alias-path
+   auto-sync.
 
 ### Open from the security audit
 
@@ -299,7 +265,12 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 1. Move the `[Unreleased]` block in `CHANGELOG.md` to `[0.1.0-alpha.N] – YYYY-MM-DD`.
 2. Bump `version` in `pubspec.yaml` to match.
 3. `flutter test` + `cargo test -q` + `cargo clippy -- -D warnings` all green.
-4. Commit, then `git tag -a v0.1.0-alpha.N -m "v0.1.0-alpha.N" && git push origin v0.1.0-alpha.N`.
+4. **Vault backward-compat gate:** `cargo test --test vault_backward_compat` green. **If
+   this release introduces a new vault format VERSION**, first generate and commit its
+   `vN_passphrase.gabbro` + `vN_multikey_2keys.gabbro` fixtures (recipe:
+   `rust/tests/fixtures/FIXTURES.md`) — the harness only protects versions that have a
+   fixture.
+5. Commit, then `git tag -a v0.1.0-alpha.N -m "v0.1.0-alpha.N" && git push origin v0.1.0-alpha.N`.
 
 **Build:**
 - **Linux:** `flutter build linux --release` → self-contained bundle in `build/linux/x64/release/bundle/`; package with `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.)

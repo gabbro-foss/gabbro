@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- Vault-format backward-compatibility harness (`rust/tests/vault_backward_compat.rs`): the safety net for the 2026-06-08 vault-brick class. Loads **frozen golden `.gabbro` vaults committed to git** (one set per format VERSION, sealed by the build that shipped it) and proves the current code can still read every v6+ vault (passphrase-only and YubiKey multi-key), migrate it to the current VERSION on re-seal, and survive the full YubiKey loss/rotation journey (create with two keys → lose one/add a replacement, twice → still unlockable, floor of one key) starting from both v6 and v7. Unlike a round-trip test, frozen old bytes catch a breaking seal/open change before it ships. Net-new tests; no production code change. Generation recipe and the per-VERSION release gate are in `rust/tests/fixtures/FIXTURES.md`; the gate is wired into the Release Process pre-flight. 7 tests.
+
 ### Added
 - Tablet / landscape two-pane layout: list pane width is now user-adjustable via a draggable divider. A grip badge (rotated `drag_handle` icon on a tinted pill) is always visible as a touch affordance. Width is persisted in `settings.jsonc` as `tablet_list_pane_width` (stored range 180–900 dp; effective max clamped to `screen_width − 300 dp` at runtime so the detail pane always has at least ~200 dp). Resize cursor shown on Linux/desktop hover. Works on Linux (mouse drag) and Android landscape (touch drag). 9 new widget tests.
 
