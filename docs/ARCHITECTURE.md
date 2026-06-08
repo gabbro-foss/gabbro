@@ -151,8 +151,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 411 | 8 |
-| Flutter (`flutter test`) | 546 | 0 |
+| Rust (`cargo test -q`) | 480 | 8 |
+| Flutter (`flutter test`) | 664 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 0 | 18 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. Cross-layer integration tests deferred (see V2+/YAGNI note in Bikeshed).
@@ -163,11 +163,51 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next session
+### Active task: systematic test coverage improvement
 
-TBD — check Bikeshed with [user].
+**Philosophy:** tests exist to catch real flaws — logic errors, failure-mode mishandling,
+secret leakage, malformed-input crashes, state-machine bypasses. Not line coverage for
+its own sake.
 
-**UI locales deferred** (RTL layout work required): Hebrew, Arabic.
+Baseline (2026-06-08): Rust 411 / 8 ignored; Flutter 590 / 0; Kotlin 0 / 18 (hardware stubs).
+
+| Suite | Baseline | Current |
+|-------|---------|---------|
+| Rust (`cargo test -q`) | 411 / 8 ignored | 480 / 8 ignored ✅ done |
+| Flutter (`flutter test`) | 590 / 0 | 664 / 0 — in progress |
+| Kotlin (`./gradlew :app:testDebugUnitTest`) | 0 / 18 ignored | 0 / 18 — not started |
+
+#### Rust — complete ✅
+
+All reachable targets covered across sessions 2–3: `fido/device.rs`, `crypto/vault_crypto.rs`,
+`import/bitwarden.rs`, `import/enpass.rs`, `api/vault_bridge.rs`, `api/import.rs`.
+
+#### Flutter — remaining hard-to-reach paths
+
+These require Rust bridge injection or platform channel mocking; impractical from widget
+tests without an `integration_test/` + real device setup:
+
+- **`screens/entry_detail_screen.dart`** — edit button push (`CreateEntryScreen` calls
+  `listFolders()` bridge in `initState`; no injection point); password history navigation.
+- **`screens/create_entry_screen.dart`** — URL normalisation; File-pick flow (platform
+  `FilePicker` channel).
+- **`main.dart`** — `navigateToManageVaults`, `onActiveVaultDeleted` (require real vault
+  file + Navigator state); `autofillUnlockMain` (calls `RustLib.init()`);
+  `_FallbackCupertinoLocalizationsDelegate` fallback branch.
+- **`screens/onboarding_screen.dart`** — alias-path auto-sync (requires no `initialPath`,
+  triggers `getApplicationSupportDirectory()` platform channel).
+
+#### Kotlin — next phase
+
+All 18 existing tests are `@Ignore`d hardware stubs. Targets for Robolectric / JVM-fake testing:
+
+- **`BiometricHelper.kt`** — enrol/unenrol state machine, `isEnrolled` flag, error paths
+  from `BiometricPrompt`. Testable with constructor-injected fakes for `SharedPreferences`
+  and `KeyStore`.
+- **`GabbroAutofillService.kt`** — autofill matching and dataset assembly logic can be
+  separated from the Android service lifecycle and tested with plain JVM fakes.
+- Hardware-only paths (`YubiKeyManager`, `UnlockActivity`, `RustBridge`) remain
+  `@Ignore`d with clear documentation.
 
 ### Open from the security audit
 
@@ -176,6 +216,8 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - **F-03** — X-Wing transcript-binding combiner; gated on a human cryptographer (no verifiable-against-spec answer).
 - **F-10** — eTLD+1 autofill matching; post-v1 "Strict FQDN" toggle.
 - **L-3** — iOS Keychain protection class; V2+ iOS port.
+
+**UI locales deferred** (RTL layout work required): Hebrew, Arabic.
 
 ---
 
@@ -220,7 +262,6 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
 - Verify Android storage permissions hold on Android 11+ (app-private storage + SAF — no `MANAGE_EXTERNAL_STORAGE`).
 - Test on de-Googled Android (GrapheneOS/CalyxOS) before v1 — find a willing community tester, don't buy hardware.
-- test/measure code test coverage before launch
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
