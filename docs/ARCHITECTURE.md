@@ -417,6 +417,21 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - **Summarize `ARCHITECTURE.md`** — the document has grown too long again. Once the code
   coverage task is finished, do a condensing pass (trim historical narration the git log /
   CHANGELOG already capture, tighten Coverage status and Current Focus).
+- **Language-picker invariant tests** (quick win) — pure-function tests in
+  `test/language_screen_test.dart`: every `LanguageChoice` maps to a non-empty, *unique*
+  label via `languageChoiceLabel` (no ambiguous picker rows), and `sortedLanguageChoices`
+  returns all `LanguageChoice.values` with `system` first and the rest alphabetical by label.
+  Auto-covers future languages; replaces the brittle `values.length == 35` magic number.
+  Complements the endonym guard added for the langDutch fix.
+- **Locale-resolution guard** (quick win) — assert every non-`system` `LanguageChoice`
+  resolves (via `_localeFor` in `main.dart`) to a locale present in
+  `AppLocalizations.supportedLocales`, so a half-wired new language can't silently fall back
+  to English (user picks "Polski", gets English). `_localeFor` is private — needs a small
+  test seam or a per-choice GabbroApp drive that detects the fallback.
+- **Fix stale Current Focus facts** (quick win, distinct from the summarize pass) — Coverage
+  status still says Flutter "664 passing" (now 723); the `onActiveVaultDeleted` note still
+  says "blocked pending the privacy-mode vault-delete ADR" though ADR-012 has shipped and the
+  remnant was removed.
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer
