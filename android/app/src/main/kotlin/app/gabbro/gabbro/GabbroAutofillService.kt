@@ -197,7 +197,9 @@ class GabbroAutofillService : AutofillService() {
             .firstOrNull { it.length > 2 && it !in skipSegments }
     }
 
-    private fun extractRegistrableDomain(input: String?): String? {
+    // `internal` (not `private`) so same-module JVM unit tests can exercise the
+    // real domain-matching logic under Robolectric. No runtime behaviour change.
+    internal fun extractRegistrableDomain(input: String?): String? {
         if (input.isNullOrBlank()) return null
         val withScheme = if (input.contains("://")) input else "https://$input"
         val host = android.net.Uri.parse(withScheme).host
@@ -211,7 +213,9 @@ class GabbroAutofillService : AutofillService() {
     }
 
     /** Parse summaries JSON into lightweight stubs — no password fetch. */
-    private fun parseSummariesJson(json: String): List<CredentialSummary> {
+    // `internal` (not `private`) for the same unit-test reason as
+    // extractRegistrableDomain above. No runtime behaviour change.
+    internal fun parseSummariesJson(json: String): List<CredentialSummary> {
         return try {
             val array = org.json.JSONArray(json)
             (0 until array.length()).map { i ->
