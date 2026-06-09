@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -50,6 +53,72 @@ void main() {
       expect(find.text('Darstellung'), findsOneWidget);
       expect(find.text('Appearance'), findsNothing);
     });
+  });
+
+  // ── Language-label endonym convention ──────────────────────────────────────
+  //
+  // Language names shown in the language picker are ENDONYMS (the language's own
+  // name) and must be identical in every locale's ARB — e.g. langGerman is
+  // "Deutsch" and langDutch is "Nederlands" everywhere, never translated into the
+  // UI locale's exonym (no "Holland"/"Hollandi"/"Nederländska"). This guards the
+  // alpha.6 langDutch fix and catches the same mistake for any future language.
+  //
+  // The endonym keys match `lang<UpperCase>...`. langSystem ("System default") is
+  // a normal translatable string, not an endonym, so it is excluded. languageHeader
+  // and languageNote start with lowercase "langu" and never match `lang[A-Z]`.
+
+  group('language-label endonym convention', () {
+    bool isEndonymKey(String key) =>
+        key.startsWith('lang') &&
+        key.length > 4 &&
+        key[4] == key[4].toUpperCase() &&
+        key[4] != key[4].toLowerCase() && // 4th char is an A-Z style letter
+        key != 'langSystem';
+
+    Map<String, String> readArb(File f) {
+      final json = jsonDecode(f.readAsStringSync()) as Map<String, dynamic>;
+      return {
+        for (final e in json.entries)
+          if (e.value is String) e.key: e.value as String,
+      };
+    }
+
+    final l10nDir = Directory('lib/l10n');
+    final base = readArb(File('lib/l10n/app_en.arb'));
+    final endonymKeys = base.keys.where(isEndonymKey).toList()..sort();
+
+    test('base ARB exposes language labels to check', () {
+      // Sanity: if this ever hits zero the matcher above has silently broken and
+      // the per-locale checks below would vacuously pass.
+      expect(endonymKeys, isNotEmpty);
+      expect(endonymKeys, contains('langDutch'));
+      expect(endonymKeys, isNot(contains('langSystem')));
+    });
+
+    final arbFiles = l10nDir
+        .listSync()
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.arb'))
+        .toList()
+      ..sort((a, b) => a.path.compareTo(b.path));
+
+    for (final f in arbFiles) {
+      final name = f.uri.pathSegments.last;
+      test('$name uses endonyms for all language labels', () {
+        final values = readArb(f);
+        for (final key in endonymKeys) {
+          // A locale may omit an endonym key entirely — gen-l10n then falls back
+          // to the (correct) English endonym. Only a present value can be wrong.
+          if (!values.containsKey(key)) continue;
+          expect(
+            values[key],
+            base[key],
+            reason: '$name overrides $key with "${values[key]}" but the endonym '
+                'convention requires "${base[key]}" (same in every locale).',
+          );
+        }
+      });
+    }
   });
 
   // ── _localeFor complex locale branches ─────────────────────────────────────

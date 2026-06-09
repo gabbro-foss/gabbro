@@ -348,7 +348,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
-  String get langDutch => '네덜란드어';
+  String get langDutch => 'Nederlands';
 
   @override
   String get foregroundLockDescription => '앱이 열려 있을 때 이 비활성 시간 이후 잠급니다.';

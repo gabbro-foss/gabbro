@@ -348,7 +348,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
-  String get langDutch => '荷兰语';
+  String get langDutch => 'Nederlands';
 
   @override
   String get foregroundLockDescription => '应用打开时在此非活动时间后锁定。';
@@ -2099,7 +2099,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
-  String get langDutch => '荷兰语';
+  String get langDutch => 'Nederlands';
 
   @override
   String get foregroundLockDescription => '应用打开时在此非活动时间后锁定。';
@@ -3850,7 +3850,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
-  String get langDutch => '荷蘭語';
+  String get langDutch => 'Nederlands';
 
   @override
   String get foregroundLockDescription => '應用程式開啟時在此閒置時間後鎖定。';

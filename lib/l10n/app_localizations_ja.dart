@@ -348,7 +348,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
-  String get langDutch => 'オランダ語';
+  String get langDutch => 'Nederlands';
 
   @override
   String get foregroundLockDescription => 'アプリが開いているときのこの非アクティブ時間後にロックします。';

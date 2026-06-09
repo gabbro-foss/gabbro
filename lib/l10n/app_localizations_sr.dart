@@ -351,7 +351,7 @@ class AppLocalizationsSr extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
-  String get langDutch => 'Holandski';
+  String get langDutch => 'Nederlands';
 
   @override
   String get foregroundLockDescription =>
@@ -2179,7 +2179,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
-  String get langDutch => 'Holandski';
+  String get langDutch => 'Nederlands';
 
   @override
   String get foregroundLockDescription =>

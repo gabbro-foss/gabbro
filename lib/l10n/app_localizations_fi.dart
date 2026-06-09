@@ -352,7 +352,7 @@ class AppLocalizationsFi extends AppLocalizations {
   String get langChineseTraditional => '中文（繁體）';
 
   @override
-  String get langDutch => 'Hollanti';
+  String get langDutch => 'Nederlands';
 
   @override
   String get foregroundLockDescription =>
