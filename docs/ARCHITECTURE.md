@@ -182,6 +182,10 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 **Philosophy:** tests catch real flaws — logic errors, mishandled failure modes,
 secret leakage, malformed-input crashes, state-machine bypasses — not line count.
 
+**Next task → Flutter `integration_test/` coverage** (Rust, Kotlin and Flutter unit
+layers are now done — see Coverage status). This is the last open coverage frontier;
+it needs a real device. Detail under Remaining below.
+
 #### Coverage status
 
 | Layer | State |
@@ -218,13 +222,20 @@ vaults predate v6). Fixtures use fixed fake key material and low Argon2id params
 > that have a fixture — skipping this step silently removes the net for that version.
 > Mirrored in the Release Process pre-flight below.
 
-#### Remaining
+#### Remaining — Flutter `integration_test/` (the next task)
 
-1. **Flutter hard-to-reach paths** — need `integration_test/` + a real device:
-   `entry_detail_screen` / `create_entry_screen` bridge & FilePicker flows;
-   `main.dart` (`navigateToManageVaults`, `onActiveVaultDeleted`, `autofillUnlockMain`,
-   the `_Fallback*LocalizationsDelegate` branches); `onboarding_screen` alias-path
-   auto-sync.
+The only coverage layer left. These paths can't be reached by `flutter test` widget
+tests — they need `integration_test/` driving a real device (bridge calls, native file
+pickers, app-launch wiring):
+
+- `entry_detail_screen` / `create_entry_screen` — Rust-bridge & FilePicker flows;
+- `main.dart` — `navigateToManageVaults`, `onActiveVaultDeleted`, `autofillUnlockMain`,
+  the `_Fallback*LocalizationsDelegate` branches;
+- `onboarding_screen` — alias-path auto-sync.
+
+Same philosophy as the rest of the campaign: target the real flaws on these paths, not
+line count. Cross-layer integration scaffolding is otherwise YAGNI (Bikeshed) — keep this
+scoped to the hard-to-reach app paths above.
 
 ### Open from the security audit
 
