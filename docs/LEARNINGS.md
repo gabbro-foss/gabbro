@@ -3931,3 +3931,37 @@ last-two-labels eTLD+1 in `extractRegistrableDomain` (audit F-10 — asserts
 `login.example.co.uk → "co.uk"`), and `parseSummariesJson` discarding the *whole* batch
 on a single malformed record (one try/catch around the entire map). Both are pinned so a
 future change to that behaviour is a deliberate, visible decision.
+
+## Flutter — integration_test on Linux desktop must run in profile, not debug
+
+`flutter test` runs Dart on the host VM, where the compiled Rust `.so` is not loaded —
+so every direct bridge call (e.g. `getEntry` at `entry_detail_screen.dart:355`) is
+unreachable and the cross-layer FFI → crypto → disk stack is untested. `integration_test/`
+fixes that by running on a real device with the real library. On Linux desktop the build
+mode matters and the tooling is fussy:
+
+- **`flutter test integration_test/foo_test.dart -d linux` builds the Rust lib in DEBUG.**
+  Production Argon2id in a debug build is so slow that `initVault` + a `createEntry` save
+  (two KDFs) blow the 30s default test timeout — the first symptom is a `TimeoutException`,
+  not a logic failure. CLAUDE.md already says "use release builds for performance testing";
+  this is the same trap.
+- **`flutter test --release` is not a valid flag** ("Could not find an option named --release").
+- **`flutter drive --release` is rejected for non-web** ("Flutter Driver (non-web) does not
+  support running in release mode. Use --profile mode").
+- **The working path is `flutter drive … --profile`** — profile builds the Rust lib
+  optimized (fast Argon2id) while keeping the driver attachable:
+
+  ```bash
+  flutter drive --driver=test_driver/integration_test.dart \
+    --target=integration_test/vault_session_test.dart -d linux --profile
+  ```
+
+  Even so, give vault-creating tests a generous `timeout: Timeout(Duration(minutes: 3))` —
+  real Argon2id is seconds, but the default 30s is uncomfortably close under load.
+
+Other notes: needs a live display (`DISPLAY` set; the suite opens a real GTK window — no
+xvfb here). On desktop `flutter drive` prints a benign "integration_test plugin was not
+detected" warning, but results **are** captured (`+N All tests passed` and a non-zero exit
+on failure — the debug TimeoutException above was reported correctly). Scope Phase 1 to the
+**passphrase-only** vault path (`initVault`/`unlockVault`) so no YubiKey is needed; gate
+multi-key unlock, `autofillUnlockMain`, and native FilePicker to hardware/Android phases.

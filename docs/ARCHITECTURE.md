@@ -152,6 +152,9 @@ gabbro/
 │   └── decryptMe_2026-06-01.gabbro.sha256
 ├── test/                       # Flutter unit/widget tests
 ├── integration_test/
+│   └── vault_session_test.dart     # Phase 1: real-FFI passphrase-vault round-trip (Linux)
+├── test_driver/
+│   └── integration_test.dart       # flutter drive entrypoint (run integration_test in --profile)
 ├── CHANGELOG.md
 └── README.md
 ```
@@ -167,9 +170,10 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 477 | 8 |
 | Rust vault backward-compat (`cargo test --test vault_backward_compat`) | 7 | 0 |
 | Flutter (`flutter test`) | 664 | 0 |
+| Flutter integration (`flutter drive … -d linux --profile`) | 2 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
 
-Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. The backward-compat harness is a separate integration binary that reads committed frozen golden vaults — see Current Focus and `rust/tests/fixtures/FIXTURES.md`. Cross-layer integration tests otherwise deferred (see V2+/YAGNI note in Bikeshed).
+Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. The backward-compat harness is a separate integration binary that reads committed frozen golden vaults — see Current Focus and `rust/tests/fixtures/FIXTURES.md`. `integration_test/` covers the hard-to-reach app paths that need the real Rust bridge on a device (Current Focus → Remaining); broad cross-layer scaffolding beyond those targeted paths stays YAGNI (Bikeshed).
 
 ---
 
@@ -182,9 +186,12 @@ Strategy: TDD from day one. Rust native test framework; Flutter unit + widget te
 **Philosophy:** tests catch real flaws — logic errors, mishandled failure modes,
 secret leakage, malformed-input crashes, state-machine bypasses — not line count.
 
-**Next task → Flutter `integration_test/` coverage** (Rust, Kotlin and Flutter unit
-layers are now done — see Coverage status). This is the last open coverage frontier;
-it needs a real device. Detail under Remaining below.
+**In progress → Flutter `integration_test/` coverage** (Rust, Kotlin and Flutter unit
+layers are done — see Coverage status). The last coverage frontier; needs a real
+device. **Phased, Linux-first:** Phase 1 (Linux desktop, passphrase-vault, no
+hardware) is underway — harness + the real-FFI session round-trip are green; Phase 2
+covers the hardware/Android-only paths. Detail and remaining scenarios under Remaining
+below.
 
 #### Coverage status
 
@@ -192,7 +199,8 @@ it needs a real device. Detail under Remaining below.
 |-------|-------|
 | Rust unit (`cargo test -q`) | ✅ reachable targets covered (`fido/device`, `crypto/vault_crypto`, importers, `api/vault_bridge`, `api/import`) |
 | Rust vault backward-compat harness | ✅ done — see below |
-| Flutter (`flutter test`) | ✅ 664 passing; remaining gaps need `integration_test/` + a real device (see Remaining) |
+| Flutter (`flutter test`) | ✅ 664 passing; hard-to-reach paths covered by `integration_test/` (below) |
+| Flutter integration (`flutter drive`) | 🔶 Phase 1 underway (Linux) — harness + session round-trip green (2 tests); scenarios 3–6 + Phase 2 hardware paths remain |
 | Kotlin (`./gradlew :app:testDebugUnitTest`) | ✅ Robolectric reachable targets covered — 23 passing / 17 `@Ignore`d (hardware-only: YubiKey, BiometricPrompt, AndroidKeyStore) |
 
 #### Vault-format backward-compatibility harness — ✅ done
@@ -222,16 +230,32 @@ vaults predate v6). Fixtures use fixed fake key material and low Argon2id params
 > that have a fixture — skipping this step silently removes the net for that version.
 > Mirrored in the Release Process pre-flight below.
 
-#### Remaining — Flutter `integration_test/` (the next task)
+#### Remaining — Flutter `integration_test/` (in progress)
 
-The only coverage layer left. These paths can't be reached by `flutter test` widget
-tests — they need `integration_test/` driving a real device (bridge calls, native file
-pickers, app-launch wiring):
+These paths can't be reached by `flutter test` widget tests (host VM, no native lib):
+they need `integration_test/` driving a real device so the **actual** Rust FFI →
+crypto → disk stack runs. Phase 1 targets the passphrase-only vault path (no YubiKey).
 
-- `entry_detail_screen` / `create_entry_screen` — Rust-bridge & FilePicker flows;
-- `main.dart` — `navigateToManageVaults`, `onActiveVaultDeleted`, `autofillUnlockMain`,
-  the `_Fallback*LocalizationsDelegate` branches;
-- `onboarding_screen` — alias-path auto-sync.
+**Run command** (profile, not debug — `flutter test -d linux` builds the Rust lib in
+debug, where Argon2id is too slow; `--release` is rejected for non-web `flutter drive`):
+
+```bash
+flutter drive --driver=test_driver/integration_test.dart \
+  --target=integration_test/<suite>_test.dart -d linux --profile
+```
+
+Phase 1 (Linux desktop, no hardware):
+- ✅ **Harness + session round-trip** (`integration_test/vault_session_test.dart`):
+  `initVault` → `createEntry` → real `getEntry`; `lockVault` → `unlockVault` re-reads
+  from disk. Proves real FFI/Argon2id/AES-GCM and the un-injectable `getEntry` path.
+- ☐ `entry_detail_screen` real `getEntry` refresh (`:355`); `create_entry_screen`
+  edit→persist (`_defaultGetEntry` / `createEntry` / `updateEntry`);
+- ☐ `main.dart` — `navigateToManageVaults`, `onActiveVaultDeleted`;
+- ☐ `onboarding_screen` alias-path auto-sync; `_Fallback*LocalizationsDelegate`
+  branches (run under an unsupported locale).
+
+Phase 2 (gated — hardware / native UI, documented `skip:`): multi-key **YubiKey**
+unlock, **`autofillUnlockMain`** (Android), native **FilePicker** pickers.
 
 Same philosophy as the rest of the campaign: target the real flaws on these paths, not
 line count. Cross-layer integration scaffolding is otherwise YAGNI (Bikeshed) — keep this
@@ -329,7 +353,7 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - Panic button / app hiding on mobile.
 - Remote app / vault deletion.
 - Custom and hideable filter chips (post-v1 user feedback gate).
-- Cross-layer integration tests (`integration_test/` + Rust `tests/` crate). YAGNI: if users file bugs, those become the organic integration test suite.
+- *Broad* cross-layer integration scaffolding beyond the targeted hard-to-reach paths now in Current Focus (e.g. an exhaustive `integration_test/` × Rust `tests/` matrix). YAGNI: if users file bugs, those become the organic integration test suite.
 - iOS, Windows, macOS support.
 - Yubico partnership.
 - Destination Linux podcast outreach (when approaching public release).
