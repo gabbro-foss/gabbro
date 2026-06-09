@@ -65,6 +65,7 @@ gabbro/
 │   │   ├── generator_widget.dart
 │   │   ├── gabbro_logo.dart
 │   │   └── password_breakdown_sheet.dart
+│   ├── app_paths.dart          # GabbroPaths: single source for config/data dirs + test sandbox override
 │   ├── settings.dart
 │   ├── vault_registry.dart
 │   └── src/rust/               # Auto-generated bridge (do not edit)
@@ -172,11 +173,18 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 477 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 664 | 0 |
+| Flutter (`flutter test`) | 667 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. The backward-compat harness is a separate integration binary that reads committed frozen golden vaults — see Current Focus and `rust/tests/fixtures/FIXTURES.md`. `integration_test/` covers the hard-to-reach app paths that need the real Rust bridge on a device (Current Focus → Remaining); broad cross-layer scaffolding beyond those targeted paths stays YAGNI (Bikeshed).
+
+**Test isolation (non-negotiable):** no test may touch the user's real settings or
+vault folders. All config/data directories resolve through `GabbroPaths`
+(`lib/app_paths.dart`), and `test/flutter_test_config.dart` roots every `flutter test`
+run in a throwaway temp sandbox — so even a test that forgets to isolate itself reads an
+empty registry and can never reach a real vault (wherever the user saved it). Mirrors the
+`rust/tests/fixtures/` ethos of never operating on real data.
 
 ---
 
@@ -268,7 +276,9 @@ Phase 1 (Linux desktop, no hardware):
   `previous_password`); `entry_detail_screen` `getEntry` refresh after
   `sessionClearPasswordHistory` (`:355`) and `sessionRevertPassword` (`:374`); history
   survives a real `lockVault`→`unlockVault` disk round-trip.
-- ☐ `main.dart` — `navigateToManageVaults`, `onActiveVaultDeleted`;
+- ☐ `main.dart` — `navigateToManageVaults` (widget-testable; not real-FFI).
+  `onActiveVaultDeleted` is **blocked pending the privacy-mode vault-delete ADR**
+  (Bikeshed → Features & UX) — its navigation is known-suspect, so we don't pin it yet.
 - ☐ `onboarding_screen` alias-path auto-sync; `_Fallback*LocalizationsDelegate`
   branches (run under an unsupported locale).
 
@@ -371,6 +381,31 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
+- **Multi-vault access + deletion in privacy mode (`show_vault_list` OFF) — needs an ADR
+  before any code.** Surfaced by the integration/coverage campaign (2026-06-09) while
+  scoping `onActiveVaultDeleted` coverage — a real privacy bug, not just a gap.
+  - **Problem.** With `show_vault_list` OFF (default, privacy), the login screen never
+    lists vaults, so the *only* way to open a non-`lastUsed` vault is the switcher
+    dropdown — which the toggle hides. `OnboardingScreen` is create-only (no "open an
+    existing vault by path"). Consequences: (1) in privacy mode every vault except
+    `lastUsed` is unreachable from the login screen; (2) `onActiveVaultDeleted`
+    (`main.dart:483`) currently routes to the remaining vault's unlock screen whenever
+    any vault remains, *ignoring the toggle* — leaking the remaining vault's alias in
+    privacy mode; (3) deleting the active vault in privacy mode with other vaults present
+    can **orphan** them (only re-reachable via: create a throwaway vault → unlock →
+    enable toggle → switch).
+  - **Options discussed.** **A — Constrain deletion:** delete non-active vaults from the
+    management screen while logged into another (app stays unlocked; no leak/orphan);
+    block/warn on deleting the *active* vault when others exist + toggle OFF. Small, no new
+    surface. **B — Privacy-safe "Open existing vault…" entry point:** a file-picker open
+    that lists nothing (no alias leak) but opens any vault you can point to, regardless of
+    the toggle — fixes the root (multi-vault usable in privacy mode; post-delete fallback
+    stops being a trap). Larger; new unlock entry path + security surface.
+  - **Requirement.** Write an **ADR** (threat model: one user/device who can act freely
+    once authenticated, but may not want others with device access to even *see* other
+    vaults exist) deciding the model before implementing. Until then `onActiveVaultDeleted`'s
+    navigation is known-suspect and is deliberately **not** pinned by tests, so we don't
+    cement the leak. (Post-auth management screen listing all vaults is fine and stays.)
 - **Autofill match quality (Android) — needs a serious dedicated session.** On-device
   reality (2026-06-09, S23): on most sites autofill offers nothing, on some it fills the
   *wrong* credential ("wrong password"), on very few it works. Three suspects, all now
