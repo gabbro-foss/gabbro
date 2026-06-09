@@ -113,7 +113,8 @@ gabbro/
 │   ├── examples/
 │   │   └── gen_fixtures.rs         # one-time golden-vault fixture generator (see tests/fixtures/FIXTURES.md)
 │   └── tests/
-│       ├── vault_backward_compat.rs    # frozen-fixture backward-compat harness (read v6+, migrate, YubiKey rotation)
+│       ├── vault_backward_compat.rs    # frozen-fixture backward-compat gate (read v6+, migrate, YubiKey rotation, passphrase change)
+│       ├── vault_state_machine_fuzz.rs # opt-in (#[ignore]) seeded-rand fuzzer: random {change_passphrase, add/remove key} order
 │       └── fixtures/
 │           ├── FIXTURES.md         # fixture provenance + recipe to add a vN_*.gabbro per new VERSION
 │           ├── fixture_spec.rs     # shared seal/assert spec, included by both harness and generator (no drift)
@@ -169,9 +170,10 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Suite | Passing | Ignored |
 |-------|---------|---------|
 | Rust (`cargo test -q`) | 477 | 8 |
-| Rust vault backward-compat (`cargo test --test vault_backward_compat`) | 7 | 0 |
+| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
+| Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 664 | 0 |
-| Flutter integration (`flutter drive … -d linux --profile`) | 6 | 0 |
+| Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. The backward-compat harness is a separate integration binary that reads committed frozen golden vaults — see Current Focus and `rust/tests/fixtures/FIXTURES.md`. `integration_test/` covers the hard-to-reach app paths that need the real Rust bridge on a device (Current Focus → Remaining); broad cross-layer scaffolding beyond those targeted paths stays YAGNI (Bikeshed).
@@ -201,7 +203,7 @@ below.
 | Rust unit (`cargo test -q`) | ✅ reachable targets covered (`fido/device`, `crypto/vault_crypto`, importers, `api/vault_bridge`, `api/import`) |
 | Rust vault backward-compat harness | ✅ done — see below |
 | Flutter (`flutter test`) | ✅ 664 passing; hard-to-reach paths covered by `integration_test/` (below) |
-| Flutter integration (`flutter drive`) | 🔶 Phase 1 underway (Linux) — session round-trip + entry edit/history/revert green (6 tests); main.dart + onboarding + fallback-locale scenarios + Phase 2 hardware paths remain |
+| Flutter integration (`flutter drive`) | 🔶 Phase 1 underway (Linux) — session round-trip + changePassphrase + entry edit/history/revert green (7 tests); main.dart + onboarding + fallback-locale scenarios + Phase 2 hardware paths remain |
 | Kotlin (`./gradlew :app:testDebugUnitTest`) | ✅ Robolectric reachable targets covered — 23 passing / 17 `@Ignore`d (hardware-only: YubiKey, BiometricPrompt, AndroidKeyStore) |
 
 #### Vault-format backward-compatibility harness — ✅ done
@@ -216,19 +218,30 @@ that shipped that version) and proves the *current* code can still:
 - **survive the full YubiKey loss/rotation journey** — create with YK1+YK2 → lose
   YK2/add YK3 → lose YK1/add YK4, unlockable with the surviving keys at every step,
   with a post-onboarding floor of one key — and this holds starting from both a v6
-  and a v7 vault, asserting the on-disk version is current after every mutation.
+  and a v7 vault, asserting the on-disk version is current after every mutation;
+- **survive a passphrase change** — vault A (passphrase-only) changes its passphrase
+  and still opens under the new one (old one rejected); vault B (multi-key) interleaves
+  a passphrase change into the rotation journey, ending with a *new passphrase AND new
+  keys* and still openable by every surviving `(new passphrase + registered YK)` pair,
+  with the old passphrase and removed keys all refused. A wrong old passphrase is
+  rejected and leaves the vault openable under the original.
 
-7 tests, driven through the real bridge functions the app calls. A round-trip test
+10 tests, driven through the real bridge functions the app calls. A round-trip test
 can never catch a brick; only frozen old bytes can. Generation recipe and the
 per-VERSION gate live in `rust/tests/fixtures/FIXTURES.md`. Scope is v6+ (no user
-vaults predate v6). Fixtures use fixed fake key material and low Argon2id params
-(stored in-header; the read path is unaffected) so the suite stays fast.
+vaults predate v6). Fixtures use fixed fake key material and low Argon2id params, but
+the passphrase-change tests re-seal at production strength — run the gate in
+`--release` (~14 s vs ~6 min in debug). The opt-in `vault_state_machine_fuzz.rs`
+(seeded `rand`, `#[ignore]`'d) randomises the *order* of {change_passphrase, add/remove
+key} over the same fixtures to surface interleavings the hand-written tests miss;
+failures get promoted here as fixed regression tests.
 
 > **RELEASE GATE — non-negotiable.** Every new format VERSION must ship with a
 > committed `vN_passphrase.gabbro` and `vN_multikey_2keys.gabbro`, generated by the
 > build that introduces VERSION N (recipe in `FIXTURES.md`), with
-> `cargo test --test vault_backward_compat` green. The harness only protects versions
-> that have a fixture — skipping this step silently removes the net for that version.
+> `cargo test --release --test vault_backward_compat` green. The gate only protects
+> versions that have a fixture — skipping this step silently removes the net for that
+> version.
 > Mirrored in the Release Process pre-flight below.
 
 #### Remaining — Flutter `integration_test/` (in progress)
@@ -246,9 +259,10 @@ flutter drive --driver=test_driver/integration_test.dart \
 ```
 
 Phase 1 (Linux desktop, no hardware):
-- ✅ **Harness + session round-trip** (`integration_test/vault_session_test.dart`):
-  `initVault` → `createEntry` → real `getEntry`; `lockVault` → `unlockVault` re-reads
-  from disk. Proves real FFI/Argon2id/AES-GCM and the un-injectable `getEntry` path.
+- ✅ **Harness + session round-trip + changePassphrase** (`integration_test/vault_session_test.dart`,
+  3 tests): `initVault` → `createEntry` → real `getEntry`; `lockVault` → `unlockVault`
+  re-reads from disk; `changePassphrase` re-seals and the vault re-opens under the new
+  passphrase only. Proves real FFI/Argon2id/AES-GCM and the un-injectable `getEntry` path.
 - ✅ **Entry edit + password-history refresh** (`integration_test/entry_edit_test.dart`,
   4 tests): `create_entry_screen` edit→`updateEntry`→real `getEntry` (auto-records
   `previous_password`); `entry_detail_screen` `getEntry` refresh after
@@ -296,15 +310,42 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 **Tag format:** `v0.1.0-alpha.N` until the pre-v1 security gates (Bikeshed) clear — honest with testers that no external crypto review has happened yet. Repo is private; the Debian collaborator pulls releases from GitHub, other testers receive artifacts directly.
 
 **Pre-flight:**
+
 1. Move the `[Unreleased]` block in `CHANGELOG.md` to `[0.1.0-alpha.N] – YYYY-MM-DD`.
 2. Bump `version` in `pubspec.yaml` to match.
-3. `flutter test` + `cargo test -q` + `cargo clippy -- -D warnings` all green.
-4. **Vault backward-compat gate:** `cargo test --test vault_backward_compat` green. **If
-   this release introduces a new vault format VERSION**, first generate and commit its
-   `vN_passphrase.gabbro` + `vN_multikey_2keys.gabbro` fixtures (recipe:
-   `rust/tests/fixtures/FIXTURES.md`) — the harness only protects versions that have a
-   fixture.
-5. Commit, then `git tag -a v0.1.0-alpha.N -m "v0.1.0-alpha.N" && git push origin v0.1.0-alpha.N`.
+3. Run **all** of the following green. The first three are the routine suites; the
+   rest are NOT covered by `flutter test` or `cargo test -q` and must be run by hand:
+
+   ```bash
+   # Routine suites (debug)
+   flutter test
+   cargo test -q
+   cargo clippy -- -D warnings
+
+   # Flutter integration — real Rust FFI on a device (flutter test can't load the native lib).
+   # Run once per suite in integration_test/:
+   flutter drive --driver=test_driver/integration_test.dart \
+     --target=integration_test/vault_session_test.dart -d linux --profile
+   flutter drive --driver=test_driver/integration_test.dart \
+     --target=integration_test/entry_edit_test.dart   -d linux --profile
+
+   # Vault backward-compat gate — run in release (debug works but is ~6 min vs ~14 s).
+   cargo test --release --test vault_backward_compat
+
+   # Vault state-machine fuzzer — #[ignore]'d, so cargo test -q never runs it.
+   cargo test --release --test vault_state_machine_fuzz -- --ignored
+   ```
+
+   Notes:
+   - **New vault format VERSION this release?** Before running the gate, generate and
+     commit its `vN_passphrase.gabbro` + `vN_multikey_2keys.gabbro` fixtures (recipe:
+     `rust/tests/fixtures/FIXTURES.md`). The gate only protects versions with a fixture.
+   - **Fuzzer found a failure?** It prints the seed + op log. Reproduce, minimise, and
+     add the sequence to `vault_backward_compat.rs` as a fixed regression test. Widen
+     the search with `GABBRO_FUZZ_CASES=64`.
+   - The 8 ignored Rust + 17 ignored Kotlin tests are hardware-only (YubiKey /
+     biometric / AndroidKeyStore) and cannot run without the devices.
+4. Commit, then `git tag -a v0.1.0-alpha.N -m "v0.1.0-alpha.N" && git push origin v0.1.0-alpha.N`.
 
 **Build:**
 - **Linux:** `flutter build linux --release` → self-contained bundle in `build/linux/x64/release/bundle/`; package with `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.)
