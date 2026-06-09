@@ -55,9 +55,13 @@ Vault deletion is **registry-based and in-app** (Option A). The rule:
    The app then falls back to `OnboardingScreen` — nothing remains, so there is
    no alias to leak and nothing to orphan.
 
-`onActiveVaultDeleted`'s "route to the remaining vault" branch is removed; it now
-handles only the sole-vault case (→ onboarding). All deletion entry points share
-one authorization flow so the gate cannot be bypassed.
+There is a single deletion path — the vault-management screen's delete flow
+(`ManageVaultsScreen._showDeleteDialog` → the app's `onDelete`). Its active-vault
+branch's "route to the remaining vault" path is removed, so the active vault is
+only deleted when it is the sole one (→ onboarding). The old
+`onActiveVaultDeleted` method — an unwired remnant of the removed "delete the
+active vault from the hamburger menu" option (pre-multi-vault) — is deleted as
+dead code; it carried the same leak.
 
 ### Why this respects `show_vault_list` OFF
 
