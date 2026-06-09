@@ -173,7 +173,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 477 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 667 | 0 |
+| Flutter (`flutter test`) | 680 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
 
@@ -276,11 +276,22 @@ Phase 1 (Linux desktop, no hardware):
   `previous_password`); `entry_detail_screen` `getEntry` refresh after
   `sessionClearPasswordHistory` (`:355`) and `sessionRevertPassword` (`:374`); history
   survives a real `lockVault`→`unlockVault` disk round-trip.
-- ☐ `main.dart` — `navigateToManageVaults` (widget-testable; not real-FFI).
+**Re-categorised → widget/unit tests (`test/`), not `integration_test/`.** Investigation
+showed the remaining "main.dart / onboarding / fallback-locale" items are *not* real-FFI
+paths: the app shell and target screens mount with injectable/guarded FFI, and the
+`GabbroPaths` test-sandbox refactor made onboarding's default-path step mountable. So they
+were covered as fast `flutter test` widget/unit tests, not `flutter drive`:
+- ✅ `main.dart` `navigateToManageVaults` → `test/main_navigation_test.dart`.
   `onActiveVaultDeleted` is **blocked pending the privacy-mode vault-delete ADR**
   (Bikeshed → Features & UX) — its navigation is known-suspect, so we don't pin it yet.
-- ☐ `onboarding_screen` alias-path auto-sync; `_Fallback*LocalizationsDelegate`
-  branches (run under an unsupported locale).
+- ✅ `onboarding_screen` alias→path sanitisation (`sanitiseVaultAlias`, the path-traversal
+  guard) → `test/onboarding_alias_test.dart`.
+- ✅ `_Fallback{Material,Cupertino}LocalizationsDelegate` both branches (supported locale +
+  English fallback for `yo`) → `test/fallback_localizations_test.dart`.
+
+That clears the Phase 1 `integration_test/` frontier: the genuinely FFI-dependent paths
+(`vault_session_test.dart`, `entry_edit_test.dart`) are covered on a device; the rest were
+better served by `flutter test`.
 
 Phase 2 (gated — hardware / native UI, documented `skip:`): multi-key **YubiKey**
 unlock, **`autofillUnlockMain`** (Android), native **FilePicker** pickers.
