@@ -74,11 +74,11 @@ void _setWidth(WidgetTester tester, double width) {
 }
 
 void main() {
-  group('VaultListScreen — tablet two-pane layout', () {
+  group('VaultListScreen - tablet two-pane layout', () {
     // -----------------------------------------------------------------------
     // Test 1: NavigationRail present at ≥600dp
     // -----------------------------------------------------------------------
-    testWidgets('NavigationRail visible at ≥600dp', (tester) async {
+    testWidgets('NavigationRail visible at >=600dp', (tester) async {
       _setWidth(tester, 700);
       await tester.pumpWidget(_buildScreen());
       expect(find.byType(NavigationRail), findsOneWidget);
@@ -87,7 +87,7 @@ void main() {
     // -----------------------------------------------------------------------
     // Test 2: NavigationBar (bottom) absent at ≥600dp
     // -----------------------------------------------------------------------
-    testWidgets('NavigationBar absent at ≥600dp', (tester) async {
+    testWidgets('NavigationBar absent at >=600dp', (tester) async {
       _setWidth(tester, 700);
       await tester.pumpWidget(_buildScreen());
       expect(find.byType(NavigationBar), findsNothing);
@@ -105,7 +105,7 @@ void main() {
     // -----------------------------------------------------------------------
     // Test 4: List pane present at ≥600dp — search field is the landmark.
     // -----------------------------------------------------------------------
-    testWidgets('list pane present at ≥600dp (search field visible)', (
+    testWidgets('list pane present at >=600dp (search field visible)', (
       tester,
     ) async {
       _setWidth(tester, 700);

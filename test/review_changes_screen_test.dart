@@ -291,7 +291,7 @@ void main() {
     expect(find.text('ZZ999999'), findsOneWidget);
   });
 
-  testWidgets('Custom diff shows new field added (empty → value)', (tester) async {
+  testWidgets('Custom diff shows new field added (empty -> value)', (tester) async {
     // original has no fields; updated adds one — the new field must appear in diff
     final original = CustomEntryData(
       id: 'custom-id-2',

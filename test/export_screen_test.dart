@@ -195,7 +195,7 @@ void main() {
       expect(find.text('JSON'), findsOneWidget);
     });
 
-    testWidgets('default format is gabbro — shows passphrase-only note',
+    testWidgets('default format is gabbro - shows passphrase-only note',
         (tester) async {
       await tester.pumpWidget(
         testApp(ExportScreen(

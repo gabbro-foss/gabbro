@@ -67,7 +67,7 @@ GeneratorWidget _stubWidget({void Function(String)? onUsePassword}) =>
     );
 
 void main() {
-  group('GeneratorWidget — mode toggle', () {
+  group('GeneratorWidget - mode toggle', () {
     testWidgets('shows classic mode by default', (tester) async {
       await tester.pumpWidget(_wrap(_stubWidget()));
       expect(find.text('Classic'), findsOneWidget);
@@ -87,7 +87,7 @@ void main() {
     });
   });
 
-  group('GeneratorWidget — generated value display', () {
+  group('GeneratorWidget - generated value display', () {
     testWidgets('shows generate button', (tester) async {
       await tester.pumpWidget(_wrap(_stubWidget()));
       expect(find.byKey(const Key('generate_button')), findsOneWidget);
@@ -109,7 +109,7 @@ void main() {
     });
   });
 
-  group('GeneratorWidget — Use this password button', () {
+  group('GeneratorWidget - Use this password button', () {
     testWidgets('absent when onUsePassword is null', (tester) async {
       await tester.pumpWidget(_wrap(_stubWidget()));
       expect(find.byKey(const Key('use_password_button')), findsNothing);
@@ -138,7 +138,7 @@ void main() {
     });
   });
 
-  group('GeneratorWidget — classic mode controls', () {
+  group('GeneratorWidget - classic mode controls', () {
     testWidgets('shows all four character set toggles', (tester) async {
       await tester.pumpWidget(_wrap(_stubWidget()));
       expect(find.byKey(const Key('toggle_uppercase')), findsOneWidget);
@@ -153,7 +153,7 @@ void main() {
     });
   });
 
-  group('GeneratorWidget — password breakdown sheet', () {
+  group('GeneratorWidget - password breakdown sheet', () {
     testWidgets('long-pressing revealed password shows breakdown sheet',
         (tester) async {
       await tester.pumpWidget(_wrap(_stubWidget()));
@@ -171,7 +171,7 @@ void main() {
     });
   });
 
-  group('GeneratorWidget — passphrase mode controls', () {
+  group('GeneratorWidget - passphrase mode controls', () {
     Future<void> switchToPassphrase(WidgetTester tester) async {
       await tester.tap(find.text('Passphrase'));
       await tester.pumpAndSettle();
@@ -202,7 +202,7 @@ void main() {
     });
   });
 
-  group('GeneratorWidget — language selector', () {
+  group('GeneratorWidget - language selector', () {
     testWidgets('visible in classic mode without switching', (tester) async {
       await tester.pumpWidget(_wrap(_stubWidget()));
       expect(find.byKey(const Key('language_selector')), findsOneWidget);
@@ -214,7 +214,7 @@ void main() {
   // didChangeDependencies can resolve the app language into a Language variant.
   // ---------------------------------------------------------------------------
 
-  group('GeneratorWidget — language-to-script wiring', () {
+  group('GeneratorWidget - language-to-script wiring', () {
     testWidgets(
         'Greek app language: initial classic password uses Greek script immediately',
         (tester) async {
@@ -470,9 +470,9 @@ void _uiToGeneratorLanguageMappingTests() {
     (LanguageChoice.zhTw, Language.chineseTraditional),
   ];
 
-  group('LanguageChoice → Language mapping', () {
+  group('LanguageChoice -> Language mapping', () {
     for (final (choice, expected) in cases) {
-      testWidgets('${choice.name} → ${expected.name}', (tester) async {
+      testWidgets('${choice.name} -> ${expected.name}', (tester) async {
         Language? captured;
 
         // Wrap in GabbroApp so didChangeDependencies resolves the app language
