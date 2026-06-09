@@ -173,7 +173,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 477 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 685 | 0 |
+| Flutter (`flutter test`) | 723 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
 
@@ -392,16 +392,9 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
-- **Multi-vault deletion in privacy mode — done (ADR-012).** The privacy bug surfaced by the
-  coverage campaign (active-vault deletion leaked a remaining vault's alias / could orphan
-  vaults under `show_vault_list` OFF) is fixed: active-vault delete is blocked when others
-  exist (shown-disabled + message), the sole vault deletes to onboarding, the dead
-  `onActiveVaultDeleted` remnant is removed, and YubiKey-vault deletion still requires a
-  registered key (invariant tested). The vault-management screen documents 3-2-1 backup
-  responsibility + the OS-level emergency wipe; the new strings are translated across all UI
-  locales (best-effort — yo/kk/eu welcome native refinement). **Only remaining:** Option B
-  (privacy-safe "open existing vault by path") as a noted future relaxation — dead on Android
-  app-private storage, low priority.
+- Privacy-safe "open existing vault by path" (ADR-012 Option B) — a future relaxation of the
+  vault-deletion privacy rules under `show_vault_list` OFF. Dead on Android app-private
+  storage, low priority.
 - **Autofill match quality (Android) — needs a serious dedicated session.** On-device
   reality (2026-06-09, S23): on most sites autofill offers nothing, on some it fills the
   *wrong* credential ("wrong password"), on very few it works. Three suspects, all now
@@ -421,6 +414,9 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 
 ### Code Quality
+- **Summarize `ARCHITECTURE.md`** — the document has grown too long again. Once the code
+  coverage task is finished, do a condensing pass (trim historical narration the git log /
+  CHANGELOG already capture, tighten Coverage status and Current Focus).
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer
