@@ -102,4 +102,40 @@ void main() {
     expect(reopened, isA<VaultEntryData_Login>());
     expect((reopened as VaultEntryData_Login).field0.username, 'bob');
   }, timeout: const Timeout(Duration(minutes: 3)));
+
+  test('changePassphrase re-seals; vault re-opens under the new passphrase only',
+      () async {
+    // Proves the Flutter FFI marshals changePassphrase's two byte-vector
+    // arguments and that the real re-seal round-trips on a device. The vault-level
+    // backward-compat of this path (from frozen v6/v7 bytes, multi-key) is the
+    // Rust gate's job; this is purely the bridge round-trip.
+    final newPassphrase = utf8.encode('an entirely different passphrase');
+    await initVault(passphrase: passphrase, path: vaultPath, alias: 'IT');
+    final login = await createLoginEntry(
+      folder: '',
+      title: 'Rotated',
+      url: 'https://rotate.example',
+      username: 'carol',
+      password: 'p4ss',
+      notes: null,
+      customFields: const [],
+    );
+    final id = (await createEntry(entry: VaultEntryData_Login(login))).id;
+
+    await changePassphrase(
+      oldPassphrase: passphrase,
+      newPassphrase: newPassphrase,
+    );
+
+    // Drop the session and prove the file now opens only under the new passphrase.
+    lockVault();
+    await expectLater(unlockVault(passphrase: passphrase, path: vaultPath),
+        throwsA(anything),
+        reason: 'the old passphrase must be rejected after the change');
+
+    await unlockVault(passphrase: newPassphrase, path: vaultPath);
+    final reopened = getEntry(id: id);
+    expect((reopened as VaultEntryData_Login).field0.username, 'carol',
+        reason: 'the entry must survive the re-seal under the new passphrase');
+  }, timeout: const Timeout(Duration(minutes: 3)));
 }

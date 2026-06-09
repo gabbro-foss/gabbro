@@ -52,10 +52,20 @@
 //!   ✓ v7_multikey_opens_with_each_registered_key
 //!   ✓ yubikey_rotation_survives_key_loss_and_version_bumps   (from v6 and v7)
 //!   ✓ cannot_remove_the_last_yubikey
+//!   ✓ passphrase_change_survives_and_migrates                (vault A, from v6 and v7)
+//!   ✓ wrong_old_passphrase_rejected_and_vault_left_openable
+//!   ✓ passphrase_rotation_interleaved_with_key_loss          (vault B, from v6 and v7)
+//!
+//! See also the opt-in (`#[ignore]`'d) state-machine fuzzer in
+//! `tests/vault_state_machine_fuzz.rs`, which randomises the ORDER of
+//! {change_passphrase, add_key, remove_key} over these same fixtures (seeded `rand`,
+//! no `proptest` dependency) and whose failures get promoted back into this
+//! deterministic gate as fixed regression tests. Run it in release:
+//! `cargo test --release --test vault_state_machine_fuzz -- --ignored`.
 
 use rust_lib_gabbro::api::vault::{
-    add_yubikey_to_vault, load_vault, load_vault_with_key_record, remove_yubikey_from_vault,
-    save_vault,
+    add_yubikey_to_vault, change_passphrase, change_passphrase_with_keys, load_vault,
+    load_vault_with_key_record, remove_yubikey_from_vault, save_vault,
 };
 use rust_lib_gabbro::vault::entry::VaultEntry;
 use rust_lib_gabbro::vault::file_format::VERSION;
@@ -307,4 +317,211 @@ fn cannot_remove_the_last_yubikey() {
 
     // The sole surviving key still opens the vault.
     assert_opens_with(path, YK1_HMAC, YK1_CRED, "YK1 (sole remaining key)");
+}
+
+// ── Passphrase change + key rotation ──────────────────────────────────────────
+//
+// A v4 multi-key vault layers the YubiKey ON TOP of the passphrase: the passphrase
+// unwraps the `passphrase_blob` to a `wrapping_key`, then `wrapping_key` + a
+// registered key unwraps that key's `key_blob` to the `vault_key_master` that
+// decrypts the body. So opening always needs BOTH a passphrase and a registered
+// key. `change_passphrase_with_keys` rewraps the SAME wrapping_key under the new
+// passphrase, leaving every key_blob and the body untouched, then re-seals/migrates
+// the file to the current VERSION. These tests prove that property survives a real
+// loss/rotation journey, starting from frozen v6 and v7 golden vaults.
+
+/// Assert a passphrase-only vault opens with `pass` and yields the canary.
+fn assert_opens_with_passphrase(path: &std::path::Path, pass: &[u8], who: &str) {
+    let body = load_vault(pass, path).unwrap_or_else(|e| panic!("vault must open with {who}: {e}"));
+    assert_canary(&body);
+}
+
+/// Multi-key open with an explicit passphrase (the rotation/change tests need the
+/// NEW passphrase, whereas `assert_opens_with` hard-codes FIXTURE_PASSPHRASE).
+fn assert_opens_with_pass(
+    path: &std::path::Path,
+    pass: &[u8],
+    hmac: &[u8; 32],
+    cred: &[u8],
+    who: &str,
+) {
+    let (body, _master, _wrapping) = load_vault_with_key_record(pass, hmac, cred, path)
+        .unwrap_or_else(|e| panic!("vault must open with {who}: {e}"));
+    assert_canary(&body);
+}
+
+/// Vault A: a passphrase-only vault whose passphrase is changed. The change is a
+/// load+save, so it also migrates the file to the current VERSION. Afterwards the
+/// new passphrase opens it (canary intact) and the old passphrase does not.
+fn run_passphrase_change_scenario(fixture_name: &str) {
+    const NEW_PASSPHRASE: &[u8] = b"vault A rotated passphrase -- brand new";
+    let tv = temp_copy(fixture_name);
+    let path = tv.path.as_path();
+
+    assert_opens_with_passphrase(path, FIXTURE_PASSPHRASE, "original passphrase");
+
+    change_passphrase(path, FIXTURE_PASSPHRASE, NEW_PASSPHRASE).expect("change vault A passphrase");
+    assert_eq!(
+        read_vault(path).unwrap().version,
+        VERSION,
+        "a passphrase change re-seals and migrates the vault to the current VERSION"
+    );
+
+    assert_opens_with_passphrase(path, NEW_PASSPHRASE, "new passphrase after the change");
+    assert!(
+        load_vault(FIXTURE_PASSPHRASE, path).is_err(),
+        "the old passphrase must stop working after the change"
+    );
+}
+
+#[test]
+fn passphrase_change_survives_and_migrates() {
+    // Proven from both a genuine v6 and a genuine v7 passphrase-only golden vault.
+    run_passphrase_change_scenario("v6_passphrase.gabbro");
+    run_passphrase_change_scenario("v7_passphrase.gabbro");
+}
+
+#[test]
+fn wrong_old_passphrase_rejected_and_vault_left_openable() {
+    // A change attempted with the wrong old passphrase must fail at the decrypt
+    // step and leave the vault byte-for-byte usable under the ORIGINAL passphrase —
+    // no partial write, no half-applied new passphrase.
+    const WRONG: &[u8] = b"not the real old passphrase";
+    const WOULD_BE_NEW: &[u8] = b"the passphrase that must never take effect";
+    let tv = temp_copy("v7_passphrase.gabbro");
+    let path = tv.path.as_path();
+
+    change_passphrase(path, WRONG, WOULD_BE_NEW)
+        .expect_err("changing with the wrong old passphrase must be rejected");
+
+    assert_opens_with_passphrase(path, FIXTURE_PASSPHRASE, "original after a rejected change");
+    assert!(
+        load_vault(WOULD_BE_NEW, path).is_err(),
+        "a rejected change must not have applied the would-be new passphrase"
+    );
+}
+
+/// Vault B: the headline multi-key journey with a passphrase change interleaved.
+/// The journey: created with passphrase + YK1 + YK2 (the fixture); lose YK2 ->
+/// remove YK2, add YK3; change the passphrase (multi-key path); lose YK1 -> remove
+/// YK1, add YK4.
+///
+/// At the end the vault has a NEW passphrase AND new keys (YK3, YK4) and must still
+/// open with `new passphrase + YK3/YK4`; the old passphrase and the removed keys
+/// must all be refused; the canary survives every step; the on-disk version is
+/// current after every mutation.
+fn run_passphrase_rotation_scenario(fixture_name: &str) {
+    const NEW_PASSPHRASE: &[u8] = b"vault B rotated passphrase -- mid journey";
+    let tv = temp_copy(fixture_name);
+    let path = tv.path.as_path();
+
+    // Step 1: both initial keys open it.
+    assert_opens_with(path, YK1_HMAC, YK1_CRED, "YK1 (initial)");
+    assert_opens_with(path, YK2_HMAC, YK2_CRED, "YK2 (initial)");
+
+    // Step 2: lose YK2, add YK3 — authorise with surviving YK1.
+    let (body, master, wrapping) =
+        load_vault_with_key_record(FIXTURE_PASSPHRASE, YK1_HMAC, YK1_CRED, path)
+            .expect("authorise rotation with YK1");
+    let wrapping = wrapping.expect("multi-key vault must expose a wrapping_key");
+    let pt = serialize_vault_body(&body).expect("serialize vault body");
+    add_yubikey_to_vault(
+        &pt,
+        &wrapping,
+        &master,
+        YK3_CRED.to_vec(),
+        YK3_HMAC,
+        YK3_SALT,
+        path,
+    )
+    .expect("add YK3");
+    remove_yubikey_from_vault(&pt, &master, YK2_CRED, path).expect("remove lost YK2");
+    assert_eq!(
+        read_vault(path).unwrap().version,
+        VERSION,
+        "version current after rotation 1"
+    );
+
+    // Step 3: change the passphrase on the multi-key vault. Get the master via a
+    // surviving key under the CURRENT passphrase, then rotate.
+    let (body, master, _wrapping) =
+        load_vault_with_key_record(FIXTURE_PASSPHRASE, YK1_HMAC, YK1_CRED, path)
+            .expect("open to fetch master before passphrase change");
+    let pt = serialize_vault_body(&body).expect("serialize vault body");
+    change_passphrase_with_keys(FIXTURE_PASSPHRASE, NEW_PASSPHRASE, &master, &pt, path)
+        .expect("change passphrase on multi-key vault B");
+    assert_eq!(
+        read_vault(path).unwrap().version,
+        VERSION,
+        "a multi-key passphrase change also re-seals + migrates to the current VERSION"
+    );
+
+    // The old passphrase no longer opens it, even with a registered key...
+    assert!(
+        load_vault_with_key_record(FIXTURE_PASSPHRASE, YK1_HMAC, YK1_CRED, path).is_err(),
+        "old passphrase must stop working after the change, even with a registered key"
+    );
+    // ...but the new passphrase + either surviving key (YK1 or YK3) does.
+    assert_opens_with_pass(
+        path,
+        NEW_PASSPHRASE,
+        YK1_HMAC,
+        YK1_CRED,
+        "YK1 + new passphrase",
+    );
+    assert_opens_with_pass(
+        path,
+        NEW_PASSPHRASE,
+        YK3_HMAC,
+        YK3_CRED,
+        "YK3 + new passphrase",
+    );
+
+    // Step 4: lose YK1, add YK4 — authorise with surviving YK3 under the NEW passphrase.
+    let (body, master, wrapping) =
+        load_vault_with_key_record(NEW_PASSPHRASE, YK3_HMAC, YK3_CRED, path)
+            .expect("authorise second rotation with YK3 + new passphrase");
+    let wrapping = wrapping.expect("multi-key vault must expose a wrapping_key");
+    let pt = serialize_vault_body(&body).expect("serialize vault body");
+    add_yubikey_to_vault(
+        &pt,
+        &wrapping,
+        &master,
+        YK4_CRED.to_vec(),
+        YK4_HMAC,
+        YK4_SALT,
+        path,
+    )
+    .expect("add YK4");
+    remove_yubikey_from_vault(&pt, &master, YK1_CRED, path).expect("remove lost YK1");
+    assert_eq!(
+        read_vault(path).unwrap().version,
+        VERSION,
+        "version current after rotation 2"
+    );
+
+    // Final state: new passphrase AND new keys. YK3/YK4 + new passphrase open it.
+    assert_opens_with_pass(path, NEW_PASSPHRASE, YK3_HMAC, YK3_CRED, "YK3 (final)");
+    assert_opens_with_pass(path, NEW_PASSPHRASE, YK4_HMAC, YK4_CRED, "YK4 (final)");
+
+    // Everything that should be locked out, is: removed keys and the old passphrase.
+    assert!(
+        load_vault_with_key_record(NEW_PASSPHRASE, YK1_HMAC, YK1_CRED, path).is_err(),
+        "removed YK1 must not open vault B"
+    );
+    assert!(
+        load_vault_with_key_record(NEW_PASSPHRASE, YK2_HMAC, YK2_CRED, path).is_err(),
+        "removed YK2 must not open vault B"
+    );
+    assert!(
+        load_vault_with_key_record(FIXTURE_PASSPHRASE, YK3_HMAC, YK3_CRED, path).is_err(),
+        "the old passphrase must not open vault B with any key"
+    );
+}
+
+#[test]
+fn passphrase_rotation_interleaved_with_key_loss() {
+    // The vault-B headline guarantee, proven from both a v6 and a v7 golden vault.
+    run_passphrase_rotation_scenario("v6_multikey_2keys.gabbro");
+    run_passphrase_rotation_scenario("v7_multikey_2keys.gabbro");
 }
