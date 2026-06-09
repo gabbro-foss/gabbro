@@ -154,6 +154,48 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
     }
   }
 
+  /// Backup responsibility (3-2-1) + the out-of-band emergency wipe (ADR-012),
+  /// surfaced transparently from the vault-management screen. The Linux wipe
+  /// commands are shown verbatim (selectable, not translated) because they are
+  /// literal shell; the prose around them is localized.
+  Future<void> _showBackupInfoDialog(AppLocalizations l) async {
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.backupEmergencyHeading),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l.backupResponsibilityBody),
+              const SizedBox(height: 16),
+              Text(
+                Platform.isAndroid
+                    ? l.emergencyWipeAndroidBody
+                    : l.emergencyWipeLinuxBody,
+              ),
+              if (!Platform.isAndroid) ...[
+                const SizedBox(height: 12),
+                const SelectableText(
+                  'rm -rf ~/.local/share/app.gabbro.gabbro/\n'
+                  'rm -rf ~/.config/gabbro/',
+                  style: TextStyle(fontFamily: 'monospace', fontSize: 13),
+                ),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l.close),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Delete button for a vault row. Disabled (greyed, tap explains) for the
   /// active vault while other vaults exist — ADR-012: the active vault may only
   /// be deleted when it is the sole one, so deletion never navigates toward
@@ -402,7 +444,16 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(l.manageVaultsTitle)),
+      appBar: AppBar(
+        title: Text(l.manageVaultsTitle),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            tooltip: l.backupEmergencyHeading,
+            onPressed: () => _showBackupInfoDialog(l),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -551,4 +551,18 @@ void main() {
           reason: 'the last remaining vault deletes (then falls back to onboarding)');
     });
   });
+
+  // ── Backup + emergency-wipe info (ADR-012) ────────────────────────────────
+  group('backup & emergency-wipe info', () {
+    testWidgets('info icon opens the backup + emergency-wipe dialog', (tester) async {
+      await tester.pumpWidget(_buildScreen(registry: registry));
+      await tester.tap(find.byIcon(Icons.info_outline));
+      await tester.pumpAndSettle();
+      expect(find.text('Backups & emergency wipe'), findsWidgets);
+      expect(find.textContaining('Gabbro does not back up'), findsOneWidget);
+      // On the Linux host the Linux wipe instructions + commands are shown.
+      expect(find.textContaining('rm -rf'), findsOneWidget,
+          reason: 'the verbatim emergency-wipe commands are shown on desktop');
+    });
+  });
 }

@@ -2755,6 +2755,30 @@ abstract class AppLocalizations {
   /// **'Open another vault to delete this one'**
   String get deleteActiveVaultBlocked;
 
+  /// No description provided for @backupEmergencyHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Backups & emergency wipe'**
+  String get backupEmergencyHeading;
+
+  /// No description provided for @backupResponsibilityBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.'**
+  String get backupResponsibilityBody;
+
+  /// No description provided for @emergencyWipeAndroidBody.
+  ///
+  /// In en, this message translates to:
+  /// **'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.'**
+  String get emergencyWipeAndroidBody;
+
+  /// No description provided for @emergencyWipeLinuxBody.
+  ///
+  /// In en, this message translates to:
+  /// **'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.'**
+  String get emergencyWipeLinuxBody;
+
   /// No description provided for @yubiKeySecurityWarning.
   ///
   /// In en, this message translates to:
