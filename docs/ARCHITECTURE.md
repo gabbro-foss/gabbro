@@ -318,18 +318,22 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 
    ```bash
    # Routine suites (debug)
+   # Run from gabbro/
    flutter test
+   cd rust
    cargo test -q
    cargo clippy -- -D warnings
 
    # Flutter integration — real Rust FFI on a device (flutter test can't load the native lib).
    # Run once per suite in integration_test/:
+   cd ..
    flutter drive --driver=test_driver/integration_test.dart \
      --target=integration_test/vault_session_test.dart -d linux --profile
    flutter drive --driver=test_driver/integration_test.dart \
      --target=integration_test/entry_edit_test.dart   -d linux --profile
 
    # Vault backward-compat gate — run in release (debug works but is ~6 min vs ~14 s).
+   cd rust
    cargo test --release --test vault_backward_compat
 
    # Vault state-machine fuzzer — #[ignore]'d, so cargo test -q never runs it.
