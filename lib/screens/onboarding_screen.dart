@@ -31,7 +31,13 @@ Uint8List _fromHex(String hex) {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-String _sanitiseAlias(String alias) {
+/// Turns a user-entered vault alias into a safe filename stem for the default
+/// vault path. Lowercases, spaces -> `_`, and strips everything outside
+/// `[a-z0-9_-]` so an alias can never inject a path separator or `..` traversal
+/// into the generated vault path (the alias-path auto-sync feeds this straight
+/// into `<dataDir>/<stem>_gabbro.gabbro`). Empty result falls back to `vault`.
+@visibleForTesting
+String sanitiseVaultAlias(String alias) {
   final s = alias.trim().toLowerCase().replaceAll(' ', '_');
   final cleaned = s.replaceAll(RegExp(r'[^a-z0-9_\-]'), '');
   return cleaned.isEmpty ? 'vault' : cleaned;
@@ -362,7 +368,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   String _aliasBasedPath(String dirPath, String alias) {
-    final base = _sanitiseAlias(alias);
+    final base = sanitiseVaultAlias(alias);
     final primary = '$dirPath/${base}_gabbro.gabbro';
     if (!File(primary).existsSync()) return primary;
     for (var i = 2; ; i++) {
