@@ -126,9 +126,13 @@ gabbro/
 │       ├── YubiKeyManager.kt      # USB FIDO2 hmac-secret (register + getHmacSecret)
 │       └── BiometricHelper.kt     # AndroidKeyStore + BiometricPrompt enrol/auth/unenrol
 ├── android/app/src/test/
-│   └── kotlin/app/gabbro/gabbro/
-│       ├── YubiKeyManagerTest.kt
-│       └── BiometricHelperTest.kt
+│   ├── kotlin/app/gabbro/gabbro/
+│   │   ├── YubiKeyManagerTest.kt
+│   │   ├── BiometricHelperTest.kt              # Robolectric: isEnrolled (real SharedPreferences)
+│   │   ├── GabbroAutofillServiceTest.kt        # pure-data (CredentialSummary, ParsedStructure)
+│   │   └── GabbroAutofillServiceRobolectricTest.kt  # Robolectric: Uri + org.json helpers
+│   └── resources/
+│       └── robolectric.properties             # pins Robolectric runtime to sdk=34
 ├── docs/
 │   ├── ARCHITECTURE.md         # This file
 │   ├── LEARNINGS.md
@@ -163,7 +167,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 477 | 8 |
 | Rust vault backward-compat (`cargo test --test vault_backward_compat`) | 7 | 0 |
 | Flutter (`flutter test`) | 664 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 4 | 19 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. The backward-compat harness is a separate integration binary that reads committed frozen golden vaults — see Current Focus and `rust/tests/fixtures/FIXTURES.md`. Cross-layer integration tests otherwise deferred (see V2+/YAGNI note in Bikeshed).
 
@@ -185,7 +189,7 @@ secret leakage, malformed-input crashes, state-machine bypasses — not line cou
 | Rust unit (`cargo test -q`) | ✅ reachable targets covered (`fido/device`, `crypto/vault_crypto`, importers, `api/vault_bridge`, `api/import`) |
 | Rust vault backward-compat harness | ✅ done — see below |
 | Flutter (`flutter test`) | ✅ 664 passing; remaining gaps need `integration_test/` + a real device (see Remaining) |
-| Kotlin (`./gradlew :app:testDebugUnitTest`) | 🔶 in progress — 4 passing / 19 `@Ignore`d; Robolectric next |
+| Kotlin (`./gradlew :app:testDebugUnitTest`) | ✅ Robolectric reachable targets covered — 23 passing / 17 `@Ignore`d (hardware-only: YubiKey, BiometricPrompt, AndroidKeyStore) |
 
 #### Vault-format backward-compatibility harness — ✅ done
 
@@ -216,17 +220,7 @@ vaults predate v6). Fixtures use fixed fake key material and low Argon2id params
 
 #### Remaining
 
-1. **Kotlin coverage (Robolectric)** — *use Claude Opus 4.8, not Sonnet (incident).*
-   Add `testImplementation("org.robolectric:robolectric:4.13")` to
-   `android/app/build.gradle.kts` to unblock JVM tests for `parseSummariesJson` (real
-   `org.json`), `extractRegistrableDomain` (real `android.net.Uri`), and
-   `BiometricHelper.isEnrolled`/`unenroll` (real `SharedPreferences`). Tests stay in
-   `src/test/`; verify with `./gradlew :app:testDebugUnitTest`. Hardware-only paths
-   (`YubiKeyManager`, `UnlockActivity`, `RustBridge`, `BiometricPrompt`) stay `@Ignore`d.
-   Do **not** refactor production Kotlin (e.g. to companion objects) just to enable a
-   test without hardware-testing the result immediately — that class of change caused
-   the brick.
-2. **Flutter hard-to-reach paths** — need `integration_test/` + a real device:
+1. **Flutter hard-to-reach paths** — need `integration_test/` + a real device:
    `entry_detail_screen` / `create_entry_screen` bridge & FilePicker flows;
    `main.dart` (`navigateToManageVaults`, `onActiveVaultDeleted`, `autofillUnlockMain`,
    the `_Fallback*LocalizationsDelegate` branches); `onboarding_screen` alias-path
@@ -293,6 +287,21 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
+- **Autofill match quality (Android) — needs a serious dedicated session.** On-device
+  reality (2026-06-09, S23): on most sites autofill offers nothing, on some it fills the
+  *wrong* credential ("wrong password"), on very few it works. Three suspects, all now
+  pinned by Robolectric tests in `GabbroAutofillServiceRobolectricTest`:
+  (1) **field detection** — `ParsedStructure.collectIds` heuristics (autofill hints →
+  inputType → hint/idEntry keywords) miss many real login forms, especially SPA/Chromium
+  DOM-to-AssistStructure shapes → "offers nothing";
+  (2) **domain matching** — `extractRegistrableDomain`'s naive last-two-labels eTLD+1
+  (audit **F-10**) collapses e.g. `*.co.uk` to `co.uk`, so unrelated sites can collide →
+  "wrong password"; needs the Public Suffix List;
+  (3) **native-app matching** — `extractAppToken` + `summary.url.contains(token)` substring
+  match is far too loose (e.g. token `paypal` matches any URL containing it) → wrong entry.
+  Plan it as: PSL-backed eTLD+1, a real form-field model, and tightened app matching
+  (package-name mapping, see the V2+ item). Touches the Android autofill security surface,
+  so design-then-implement with on-device verification.
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 
