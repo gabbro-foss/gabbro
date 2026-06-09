@@ -1438,6 +1438,10 @@ class AppLocalizationsPl extends AppLocalizations {
   String get deleteVaultTooltip => 'Usuń skarbiec';
 
   @override
+  String get deleteActiveVaultBlocked =>
+      'Open another vault to delete this one';
+
+  @override
   String get yubiKeySecurityWarning => 'Ostrzeżenie bezpieczeństwa';
 
   @override

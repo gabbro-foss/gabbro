@@ -1434,6 +1434,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get deleteVaultTooltip => 'Smazat trezor';
 
   @override
+  String get deleteActiveVaultBlocked =>
+      'Open another vault to delete this one';
+
+  @override
   String get yubiKeySecurityWarning => 'Bezpečnostní varování';
 
   @override

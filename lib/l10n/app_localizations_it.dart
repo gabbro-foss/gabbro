@@ -1435,6 +1435,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get deleteVaultTooltip => 'Elimina archivio';
 
   @override
+  String get deleteActiveVaultBlocked =>
+      'Open another vault to delete this one';
+
+  @override
   String get yubiKeySecurityWarning => 'Avviso di sicurezza';
 
   @override

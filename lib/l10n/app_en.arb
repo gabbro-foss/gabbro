@@ -659,6 +659,7 @@
   },
   "yubiKeyAuthorizeDeletion": "Enter your PIN and touch your YubiKey to authorize this deletion.",
   "deleteVaultTooltip": "Delete vault",
+  "deleteActiveVaultBlocked": "Open another vault to delete this one",
 
   "navVault": "Vault",
   "navAbout": "About",

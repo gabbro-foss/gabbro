@@ -1435,6 +1435,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get deleteVaultTooltip => 'Tresor löschen';
 
   @override
+  String get deleteActiveVaultBlocked =>
+      'Open another vault to delete this one';
+
+  @override
   String get yubiKeySecurityWarning => 'Sicherheitswarnung';
 
   @override

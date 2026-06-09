@@ -1433,6 +1433,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get deleteVaultTooltip => 'Poista holvi';
 
   @override
+  String get deleteActiveVaultBlocked =>
+      'Open another vault to delete this one';
+
+  @override
   String get yubiKeySecurityWarning => 'Turvallisuusvaroitus';
 
   @override

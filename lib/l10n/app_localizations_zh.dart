@@ -1390,6 +1390,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteVaultTooltip => '删除保险库';
 
   @override
+  String get deleteActiveVaultBlocked =>
+      'Open another vault to delete this one';
+
+  @override
   String get yubiKeySecurityWarning => '安全警告';
 
   @override

@@ -1432,6 +1432,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get deleteVaultTooltip => 'Kustuta seif';
 
   @override
+  String get deleteActiveVaultBlocked =>
+      'Open another vault to delete this one';
+
+  @override
   String get yubiKeySecurityWarning => 'Turvahoiatus';
 
   @override

@@ -1431,6 +1431,10 @@ class AppLocalizationsKk extends AppLocalizations {
   String get deleteVaultTooltip => 'Сейфті жою';
 
   @override
+  String get deleteActiveVaultBlocked =>
+      'Open another vault to delete this one';
+
+  @override
   String get yubiKeySecurityWarning => 'Қауіпсіздік ескертуі';
 
   @override

@@ -162,10 +162,6 @@ abstract class GabbroAppState {
   void switchToVault(String path, String alias);
   /// Push the ManageVaultsScreen onto the root navigator.
   void navigateToManageVaults();
-  /// Called after the active vault's file has been deleted (via VaultListScreen
-  /// menu). Removes the vault from the registry and navigates to the next
-  /// vault's unlock screen, or to OnboardingScreen if no vaults remain.
-  Future<void> onActiveVaultDeleted(String path);
 }
 
 ThemeData gabbroLightTheme({required bool highContrast}) {
@@ -479,40 +475,12 @@ class _GabbroAppState extends State<GabbroApp>
     );
   }
 
-  @override
-  Future<void> onActiveVaultDeleted(String path) async {
-    final updated = _registry.remove(path);
-    await updated.save();
-    // Direct field mutation — no setState, so _buildHome() is not called before
-    // the pushAndRemoveUntil navigation completes. _onVaultCreated / touchVaultLastUsed
-    // will call setState the next time the registry legitimately changes.
-    _registry = updated;
-    final lastUsed = updated.lastUsed;
-    if (lastUsed == null) {
-      _navigatorKey.currentState?.pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (_) => OnboardingScreen(
-            initialPath: path,
-            postDeletionMessage:
-                'Your vault has been deleted. Create a new one to continue.',
-            blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
-            onVaultCreated: _onVaultCreated,
-          ),
-        ),
-        (_) => false,
-      );
-    } else {
-      _navigatorKey.currentState?.pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (_) => _buildUnlockScreen(lastUsed.path, lastUsed.alias),
-        ),
-        (_) => false,
-      );
-    }
-  }
 
   ManageVaultsScreen _buildManageVaultsScreen() => ManageVaultsScreen(
     registry: _registry,
+    // The currently unlocked vault. Deleting it is blocked when others exist
+    // (ADR-012), so the active vault can only be deleted when it is the sole one.
+    activeVaultPath: _registry.lastUsed?.path,
     onConfirmYubikey: confirmYubikey,
     onConfirmAnyYubikey: confirmAnyYubikey,
     onRename: (path, alias) async {
@@ -532,31 +500,25 @@ class _GabbroAppState extends State<GabbroApp>
       final updated = _registry.remove(path);
       await updated.save();
       if (isActive) {
-        // Direct field mutation — same reason as onActiveVaultDeleted: avoid
-        // setState racing with pushAndRemoveUntil navigation.
+        // The active vault can only be deleted when it is the SOLE vault
+        // (ADR-012 — deleting it while others exist is blocked in the UI), so
+        // nothing remains and we fall back to onboarding. No "route to the
+        // remaining vault" path exists, which is what previously leaked the
+        // remaining vault's alias under show_vault_list = OFF.
+        // Direct field mutation (no setState) to avoid racing pushAndRemoveUntil.
         _registry = updated;
         try { lockVault(); } catch (_) {}
-        final lastUsed = updated.lastUsed;
-        if (lastUsed == null) {
-          _navigatorKey.currentState?.pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (_) => OnboardingScreen(
-                postDeletionMessage:
-                    'Your vault has been deleted. Create a new one to continue.',
-                blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
-                onVaultCreated: _onVaultCreated,
-              ),
+        _navigatorKey.currentState?.pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => OnboardingScreen(
+              postDeletionMessage:
+                  'Your vault has been deleted. Create a new one to continue.',
+              blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+              onVaultCreated: _onVaultCreated,
             ),
-            (_) => false,
-          );
-        } else {
-          _navigatorKey.currentState?.pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (_) => _buildUnlockScreen(lastUsed.path, lastUsed.alias),
-            ),
-            (_) => false,
-          );
-        }
+          ),
+          (_) => false,
+        );
       } else {
         setState(() => _registry = updated);
       }

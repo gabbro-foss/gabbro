@@ -27,6 +27,7 @@ YubikeyRecordData _fakeYkRecord() => YubikeyRecordData(
 
 Widget _buildScreen({
   required VaultRegistry registry,
+  String? activeVaultPath,
   Future<void> Function(String path, String alias)? onRename,
   Future<void> Function(String path)? onDelete,
   VoidCallback? onAddVault,
@@ -37,6 +38,7 @@ Widget _buildScreen({
 }) =>
     testApp(ManageVaultsScreen(
       registry: registry,
+      activeVaultPath: activeVaultPath,
       onRename: onRename ?? (_, _) async {},
       onDelete: onDelete ?? (_) async {},
       onAddVault: onAddVault ?? () {},
@@ -471,6 +473,82 @@ void main() {
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
       expect(deleteCalled, isFalse);
+    });
+
+    testWidgets('a failed YubiKey authorization does not delete (ADR-012 invariant)',
+        (tester) async {
+      var deleteCalled = false;
+      await tester.pumpWidget(_buildScreen(
+        registry: ykRegistry,
+        listYubikeyRecords: (_) => [_fakeYkRecord()],
+        onConfirmYubikey: (_, _, _, _) async => throw Exception('wrong key'),
+        onDelete: (_) async => deleteCalled = true,
+      ));
+      await throughStep2(tester);
+      await tester.enterText(
+        find.byKey(const Key('delete_vault_yubikey_pin_field')),
+        '123456',
+      );
+      await tester.pump();
+      await tester.tap(find.widgetWithText(TextButton, 'Authorize'));
+      await tester.pumpAndSettle();
+      expect(deleteCalled, isFalse,
+          reason: 'a wrong/absent YubiKey must refuse deletion of a YubiKey vault');
+    });
+  });
+
+  // ── Active-vault delete gating (ADR-012) ──────────────────────────────────
+  //
+  // The active vault may only be deleted when it is the sole one. While other
+  // vaults exist its delete is blocked (a message explains why), so deletion
+  // never navigates toward another vault and cannot leak its alias under
+  // show_vault_list = OFF.
+  group('active-vault delete gating (ADR-012)', () {
+    final twoVaults = VaultRegistry([
+      _record(path: '/tmp/a.gabbro', alias: 'Alpha'),
+      _record(path: '/tmp/b.gabbro', alias: 'Beta'),
+    ]);
+
+    Finder deleteFor(String alias) => find.descendant(
+          of: find.widgetWithText(ListTile, alias),
+          matching: find.byIcon(Icons.delete_outlined),
+        );
+
+    testWidgets('active vault delete is blocked when others exist', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        registry: twoVaults,
+        activeVaultPath: '/tmp/a.gabbro', // Alpha is the active vault
+      ));
+      await tester.tap(deleteFor('Alpha'));
+      await tester.pumpAndSettle();
+      expect(find.text('Delete vault?'), findsNothing,
+          reason: 'the delete confirmation must not open for the active vault');
+      expect(find.text('Open another vault to delete this one'), findsWidgets,
+          reason: 'a message explains why deletion is blocked');
+    });
+
+    testWidgets('non-active vault delete is allowed when others exist', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        registry: twoVaults,
+        activeVaultPath: '/tmp/a.gabbro', // Alpha active -> Beta is deletable
+      ));
+      await tester.tap(deleteFor('Beta'));
+      await tester.pumpAndSettle();
+      expect(find.text('Delete vault?'), findsOneWidget);
+    });
+
+    testWidgets('the sole vault may be deleted even though it is active',
+        (tester) async {
+      final soleVault =
+          VaultRegistry([_record(path: '/tmp/a.gabbro', alias: 'Alpha')]);
+      await tester.pumpWidget(_buildScreen(
+        registry: soleVault,
+        activeVaultPath: '/tmp/a.gabbro',
+      ));
+      await tester.tap(deleteFor('Alpha'));
+      await tester.pumpAndSettle();
+      expect(find.text('Delete vault?'), findsOneWidget,
+          reason: 'the last remaining vault deletes (then falls back to onboarding)');
     });
   });
 }

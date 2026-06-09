@@ -1429,6 +1429,10 @@ class AppLocalizationsNb extends AppLocalizations {
   String get deleteVaultTooltip => 'Slett hvelv';
 
   @override
+  String get deleteActiveVaultBlocked =>
+      'Open another vault to delete this one';
+
+  @override
   String get yubiKeySecurityWarning => 'Sikkerhetsadvarsel';
 
   @override

@@ -1404,6 +1404,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get deleteVaultTooltip => '볼트 삭제';
 
   @override
+  String get deleteActiveVaultBlocked =>
+      'Open another vault to delete this one';
+
+  @override
   String get yubiKeySecurityWarning => '보안 경고';
 
   @override

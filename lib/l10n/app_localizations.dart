@@ -2749,6 +2749,12 @@ abstract class AppLocalizations {
   /// **'Delete vault'**
   String get deleteVaultTooltip;
 
+  /// No description provided for @deleteActiveVaultBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Open another vault to delete this one'**
+  String get deleteActiveVaultBlocked;
+
   /// No description provided for @yubiKeySecurityWarning.
   ///
   /// In en, this message translates to:

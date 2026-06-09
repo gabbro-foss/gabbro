@@ -1435,6 +1435,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get deleteVaultTooltip => 'Ištrinti saugyklą';
 
   @override
+  String get deleteActiveVaultBlocked =>
+      'Open another vault to delete this one';
+
+  @override
   String get yubiKeySecurityWarning => 'Saugumo įspėjimas';
 
   @override

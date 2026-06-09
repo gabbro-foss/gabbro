@@ -1429,6 +1429,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get deleteVaultTooltip => 'Széf törlése';
 
   @override
+  String get deleteActiveVaultBlocked =>
+      'Open another vault to delete this one';
+
+  @override
   String get yubiKeySecurityWarning => 'Biztonsági figyelmeztetés';
 
   @override
