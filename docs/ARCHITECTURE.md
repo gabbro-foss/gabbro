@@ -152,7 +152,8 @@ gabbro/
 │   └── decryptMe_2026-06-01.gabbro.sha256
 ├── test/                       # Flutter unit/widget tests
 ├── integration_test/
-│   └── vault_session_test.dart     # Phase 1: real-FFI passphrase-vault round-trip (Linux)
+│   ├── vault_session_test.dart     # Phase 1: real-FFI passphrase-vault round-trip (Linux)
+│   └── entry_edit_test.dart        # Phase 1: real-FFI edit/update + clear/revert password-history refresh (Linux)
 ├── test_driver/
 │   └── integration_test.dart       # flutter drive entrypoint (run integration_test in --profile)
 ├── CHANGELOG.md
@@ -170,7 +171,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 477 | 8 |
 | Rust vault backward-compat (`cargo test --test vault_backward_compat`) | 7 | 0 |
 | Flutter (`flutter test`) | 664 | 0 |
-| Flutter integration (`flutter drive … -d linux --profile`) | 2 | 0 |
+| Flutter integration (`flutter drive … -d linux --profile`) | 6 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
 
 Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. The backward-compat harness is a separate integration binary that reads committed frozen golden vaults — see Current Focus and `rust/tests/fixtures/FIXTURES.md`. `integration_test/` covers the hard-to-reach app paths that need the real Rust bridge on a device (Current Focus → Remaining); broad cross-layer scaffolding beyond those targeted paths stays YAGNI (Bikeshed).
@@ -200,7 +201,7 @@ below.
 | Rust unit (`cargo test -q`) | ✅ reachable targets covered (`fido/device`, `crypto/vault_crypto`, importers, `api/vault_bridge`, `api/import`) |
 | Rust vault backward-compat harness | ✅ done — see below |
 | Flutter (`flutter test`) | ✅ 664 passing; hard-to-reach paths covered by `integration_test/` (below) |
-| Flutter integration (`flutter drive`) | 🔶 Phase 1 underway (Linux) — harness + session round-trip green (2 tests); scenarios 3–6 + Phase 2 hardware paths remain |
+| Flutter integration (`flutter drive`) | 🔶 Phase 1 underway (Linux) — session round-trip + entry edit/history/revert green (6 tests); main.dart + onboarding + fallback-locale scenarios + Phase 2 hardware paths remain |
 | Kotlin (`./gradlew :app:testDebugUnitTest`) | ✅ Robolectric reachable targets covered — 23 passing / 17 `@Ignore`d (hardware-only: YubiKey, BiometricPrompt, AndroidKeyStore) |
 
 #### Vault-format backward-compatibility harness — ✅ done
@@ -248,8 +249,11 @@ Phase 1 (Linux desktop, no hardware):
 - ✅ **Harness + session round-trip** (`integration_test/vault_session_test.dart`):
   `initVault` → `createEntry` → real `getEntry`; `lockVault` → `unlockVault` re-reads
   from disk. Proves real FFI/Argon2id/AES-GCM and the un-injectable `getEntry` path.
-- ☐ `entry_detail_screen` real `getEntry` refresh (`:355`); `create_entry_screen`
-  edit→persist (`_defaultGetEntry` / `createEntry` / `updateEntry`);
+- ✅ **Entry edit + password-history refresh** (`integration_test/entry_edit_test.dart`,
+  4 tests): `create_entry_screen` edit→`updateEntry`→real `getEntry` (auto-records
+  `previous_password`); `entry_detail_screen` `getEntry` refresh after
+  `sessionClearPasswordHistory` (`:355`) and `sessionRevertPassword` (`:374`); history
+  survives a real `lockVault`→`unlockVault` disk round-trip.
 - ☐ `main.dart` — `navigateToManageVaults`, `onActiveVaultDeleted`;
 - ☐ `onboarding_screen` alias-path auto-sync; `_Fallback*LocalizationsDelegate`
   branches (run under an unsupported locale).
