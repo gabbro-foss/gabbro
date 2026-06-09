@@ -432,6 +432,25 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
   status still says Flutter "664 passing" (now 723); the `onActiveVaultDeleted` note still
   says "blocked pending the privacy-mode vault-delete ADR" though ADR-012 has shipped and the
   remnant was removed.
+- **`SealedVault::from_bytes` malformed-input fuzz test** (quick win, security-adjacent) —
+  the parser in `rust/src/vault/file_format.rs` is *currently* well-defended: every slice at
+  lines ~232–369 is preceded by an `if data.len() < pos + N { return Err(..) }` guard, so each
+  `try_into().unwrap()` is infallible by construction and truncated input returns a clean
+  `Err`, not a panic. But that safety is held **only by inspection** — there is no negative
+  test. The backward-compat harness (`rust/tests/vault_backward_compat.rs`) only ever feeds
+  *valid* vaults through `from_bytes`. One careless edit (a slice added without its guard, or
+  the theoretical `pos + body_len` usize-overflow from the attacker-controlled 8-byte body-len
+  field at line ~369 — wraps in release, can invert a slice range) would reintroduce a
+  crash-on-open and nothing would catch it. Add a property/fuzz test (mirror the
+  `vault_state_machine_fuzz.rs` seeded-`rand` style, likely as a new
+  `rust/tests/vault_parse_fuzz.rs`) that feeds `from_bytes`: (1) every truncation `data[..n]`
+  of a valid sealed vault for all n, (2) random garbage of assorted lengths, (3) a valid magic
+  prefix followed by corrupted/oversized length fields, and asserts **returns `Err`, never
+  panics** (use `std::panic::catch_unwind` or just rely on the harness — a panic fails the
+  test). Locks in the existing good behaviour and the project's "tests catch malformed-input
+  crashes" philosophy. Audit context: only 26 production `.unwrap()`s exist repo-wide; the
+  rest are the generated bridge (`frb_generated.rs`, off-limits) or `expect()` on fixed-size
+  crypto conversions and dev-only bins (`mem_forensics`, `bench_kdf`) — all benign. ~30–45 min.
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer
