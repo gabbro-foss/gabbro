@@ -3965,3 +3965,36 @@ detected" warning, but results **are** captured (`+N All tests passed` and a non
 on failure — the debug TimeoutException above was reported correctly). Scope Phase 1 to the
 **passphrase-only** vault path (`initVault`/`unlockVault`) so no YubiKey is needed; gate
 multi-key unlock, `autofillUnlockMain`, and native FilePicker to hardware/Android phases.
+
+## Flutter — `flutter_test_config.dart` for a foolproof global test sandbox
+
+Tests must never touch the user's real on-disk state. Gabbro writes to two real
+folders: the config dir (`~/.config/gabbro` on Linux: `settings.jsonc` + the vault
+registry `vaults.jsonc`) and the data dir (the default vault location, via
+`getApplicationSupportDirectory`). On Linux these resolve from `Platform.environment['HOME']`
+— which a Dart test **cannot** override (`Platform.environment` is immutable). So a widget
+test that triggers `VaultRegistry.save()` would clobber the real registry, and could even
+leak the paths of real vaults into the test.
+
+The fix has two parts:
+
+1. **One source of truth with a test seam.** `lib/app_paths.dart` (`GabbroPaths`) owns both
+   dirs and has a `@visibleForTesting static String? sandboxRoot`. When set, `configDir()`
+   and `dataDir()` root under it; when null, the real logic runs unchanged. Every call site
+   (settings, registry + its legacy-vault probe, onboarding default path, autofill fallback)
+   routes through it.
+
+2. **A foolproof global net.** `test/flutter_test_config.dart` is a *magic filename*: Flutter's
+   test runner automatically wraps EVERY test in `test/` with its `testExecutable(testMain)`.
+   We create one throwaway temp dir there and set `GabbroPaths.sandboxRoot` before `testMain()`,
+   delete it after. Result: even a test that forgets to isolate itself reads an *empty*
+   registry and can never reach a real vault. Per-test isolation just points `sandboxRoot` at
+   its own temp in `setUp` and **restores the previous (global) value — not null — in
+   `tearDown`** (nulling it would re-expose the real folders to later test files).
+
+Gotchas: `flutter_test_config.dart` only governs `test/` (not `integration_test/`, which runs
+under a different harness — those tests already use explicit temp vault paths). And adding the
+global sandbox is also a *latent-bug detector*: if any existing test was secretly reading a
+real file, it now sees the empty sandbox and fails — none did here (suite stayed green), which
+is itself the proof that nothing was touching real data. Mirrors the `rust/tests/fixtures/`
+ethos: never operate on real data.
