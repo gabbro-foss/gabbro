@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:gabbro/app_paths.dart';
 
 enum VaultType { passphrase, yubikey }
 
@@ -89,18 +89,7 @@ class VaultRegistry {
   // ── File I/O ─────────────────────────────────────────────────────────────────
 
   static Future<File> _registryFile() async {
-    final String dirPath;
-    if (Platform.isLinux || Platform.isMacOS) {
-      final home = Platform.environment['HOME'] ?? '';
-      dirPath = Platform.isLinux
-          ? '$home/.config/gabbro'
-          : '$home/Library/Application Support/gabbro';
-    } else {
-      final dir = await getApplicationSupportDirectory();
-      dirPath = dir.path;
-    }
-    final dir = Directory(dirPath);
-    if (!dir.existsSync()) await dir.create(recursive: true);
+    final dirPath = await GabbroPaths.configDir();
     return File('$dirPath/vaults.jsonc');
   }
 
@@ -120,8 +109,8 @@ class VaultRegistry {
 
   static Future<VaultRegistry> _migrate() async {
     try {
-      final appDir = await getApplicationSupportDirectory();
-      final legacyVault = File('${appDir.path}/gabbro.gabbro');
+      final dataDir = await GabbroPaths.dataDir();
+      final legacyVault = File('$dataDir/gabbro.gabbro');
       if (legacyVault.existsSync()) {
         final registry = VaultRegistry([
           VaultRecord(

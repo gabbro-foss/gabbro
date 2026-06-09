@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+import 'package:gabbro/app_paths.dart';
 
 // Valid values shown in comments throughout this file.
 // Lines beginning with // or # are stripped before parsing.
@@ -127,19 +127,7 @@ class AppSettings {
   // ── File I/O ───────────────────────────────────────────────────────────
 
   static Future<File> _settingsFile() async {
-    final String dirPath;
-    if (Platform.isLinux || Platform.isMacOS) {
-      final home = Platform.environment['HOME'] ?? '';
-      dirPath = Platform.isLinux
-          ? '$home/.config/gabbro'
-          : '$home/Library/Application Support/gabbro';
-    } else {
-      // Android (and future platforms): use app support directory.
-      final dir = await getApplicationSupportDirectory();
-      dirPath = dir.path;
-    }
-    final dir = Directory(dirPath);
-    if (!dir.existsSync()) await dir.create(recursive: true);
+    final dirPath = await GabbroPaths.configDir();
     return File('$dirPath/settings.jsonc');
   }
 

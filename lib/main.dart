@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
@@ -13,7 +14,6 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/frb_generated.dart';
 import 'package:gabbro/vault_registry.dart';
-import 'package:path_provider/path_provider.dart';
 
 /// Maps a non-system [LanguageChoice] to the correct [Locale].
 ///
@@ -91,8 +91,8 @@ Future<void> autofillUnlockMain() async {
   if (lastUsed != null) {
     vaultPath = lastUsed.path;
   } else {
-    final dir = await getApplicationSupportDirectory();
-    vaultPath = '${dir.path}/gabbro.gabbro';
+    final dataDir = await GabbroPaths.dataDir();
+    vaultPath = '$dataDir/gabbro.gabbro';
   }
   const channel = MethodChannel('app.gabbro.gabbro/autofill');
   final settings = await AppSettings.load();

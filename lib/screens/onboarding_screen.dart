@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/language_screen.dart';
@@ -14,7 +15,6 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
-import 'package:path_provider/path_provider.dart';
 
 // ── Hex helpers ───────────────────────────────────────────────────────────────
 
@@ -341,13 +341,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _initDefaultPath() async {
-    final dir = await getApplicationSupportDirectory();
+    final dirPath = await GabbroPaths.dataDir();
     final alias = _aliasController.text.trim();
     setState(() {
-      _defaultDir = dir.path;
+      _defaultDir = dirPath;
       _vaultPath = alias.isEmpty
-          ? _firstFreeVaultPath(dir.path)
-          : _aliasBasedPath(dir.path, alias);
+          ? _firstFreeVaultPath(dirPath)
+          : _aliasBasedPath(dirPath, alias);
     });
   }
 
