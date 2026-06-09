@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "PIN eingeben und YubiKey berühren, um diese Löschung zu autorisieren.",
   "deleteVaultTooltip": "Tresor löschen",
+  "deleteActiveVaultBlocked": "Öffnen Sie einen anderen Tresor, um diesen zu löschen",
+  "backupEmergencyHeading": "Backups und Notfall-Löschung",
+  "backupResponsibilityBody": "Gabbro sichert Ihre Tresore nicht. Bewahren Sie eine Kopie jedes Tresors auf einem anderen Gerät auf — Ihre eigenen Backups sind die einzige Möglichkeit, einen gelöschten oder verlorenen Tresor wiederherzustellen.",
+  "emergencyWipeAndroidBody": "Um alle Gabbro-Daten auf dem Gerät sofort zu vernichten — ohne Authentifizierung, unwiderruflich — öffnen Sie die Geräteeinstellungen, suchen Sie Gabbro in der App-Liste und wählen Sie Daten löschen.",
+  "emergencyWipeLinuxBody": "Um alle Gabbro-Daten auf dem Gerät sofort zu vernichten — ohne Authentifizierung, unwiderruflich — löschen Sie diese Ordner in einem Terminal. Tresore, die Sie an anderen Orten gespeichert haben, befinden sich nicht in diesen Ordnern und müssen separat gelöscht werden.",
 
   "yubiKeySecurityWarning": "Sicherheitswarnung",
   "removeYubiKeyTitle": "YubiKey entfernen",

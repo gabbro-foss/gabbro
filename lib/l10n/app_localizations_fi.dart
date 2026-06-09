@@ -1433,23 +1433,22 @@ class AppLocalizationsFi extends AppLocalizations {
   String get deleteVaultTooltip => 'Poista holvi';
 
   @override
-  String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+  String get deleteActiveVaultBlocked => 'Avaa toinen holvi poistaaksesi tämän';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading => 'Varmuuskopiot ja hätätyhjennys';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'Gabbro ei varmuuskopioi holvejasi. Säilytä kustakin holvista kopio toisella laitteella — omat varmuuskopiosi ovat ainoa tapa palauttaa poistettu tai kadonnut holvi.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      'Tuhotaksesi kaikki laitteella olevat Gabbron tiedot välittömästi — ilman todennusta, peruuttamattomasti — avaa laitteen Asetukset, etsi Gabbro sovellusluettelosta ja valitse Tyhjennä tiedot.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      'Tuhotaksesi kaikki laitteella olevat Gabbron tiedot välittömästi — ilman todennusta, peruuttamattomasti — poista nämä kansiot päätteessä. Muihin sijainteihin tallentamasi holvit eivät ole näissä kansioissa, ja ne on poistettava erikseen.';
 
   @override
   String get yubiKeySecurityWarning => 'Turvallisuusvaroitus';

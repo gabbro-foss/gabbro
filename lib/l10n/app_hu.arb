@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Add meg a PIN-t és érintsd meg a YubiKey-edet a törlés engedélyezéséhez.",
   "deleteVaultTooltip": "Széf törlése",
+  "deleteActiveVaultBlocked": "Nyisson meg egy másik széfet ennek törléséhez",
+  "backupEmergencyHeading": "Biztonsági mentések és vészhelyzeti törlés",
+  "backupResponsibilityBody": "A Gabbro nem készít biztonsági mentést a széfjeiről. Tartson minden széfről egy másolatot egy másik eszközön — a saját biztonsági mentései az egyetlen módja egy törölt vagy elveszett széf helyreállításának.",
+  "emergencyWipeAndroidBody": "Az eszközön lévő összes Gabbro-adat azonnali megsemmisítéséhez — hitelesítés nélkül, visszafordíthatatlanul — nyissa meg az eszköz Beállításait, keresse meg a Gabbrót az alkalmazások listájában, és válassza az Adatok törlése lehetőséget.",
+  "emergencyWipeLinuxBody": "Az eszközön lévő összes Gabbro-adat azonnali megsemmisítéséhez — hitelesítés nélkül, visszafordíthatatlanul — törölje ezeket a mappákat egy terminálban. A más helyekre mentett széfek nem ezekben a mappákban találhatók, és külön kell törölni őket.",
 
   "navVault": "Széf",
   "navAbout": "Névjegy",

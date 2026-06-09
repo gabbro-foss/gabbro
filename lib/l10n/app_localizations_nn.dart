@@ -1430,22 +1430,22 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+      'Opn eit anna kvelv for å slette dette';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading => 'Tryggingskopiar og naudsletting';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'Gabbro tek ikkje tryggingskopiar av kvelva dine. Oppbevar ein kopi av kvart kvelv på ei anna eining — dine eigne tryggingskopiar er den einaste måten å gjenopprette eit sletta eller tapt kvelv på.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      'For å øydeleggje alle Gabbro-data på eininga med ein gong — utan autentisering, ugjenkalleleg — opn Innstillingar på eininga, finn Gabbro i applista og vel Tøm data.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      'For å øydeleggje alle Gabbro-data på eininga med ein gong — utan autentisering, ugjenkalleleg — slett desse mappene i ein terminal. Kvelv du har lagra andre stader, ligg ikkje i desse mappene og må slettast separat.';
 
   @override
   String get yubiKeySecurityWarning => 'Tryggleiksåtvaring';

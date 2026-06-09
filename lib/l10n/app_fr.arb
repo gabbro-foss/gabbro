@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Entrez votre PIN et touchez votre YubiKey pour autoriser cette suppression.",
   "deleteVaultTooltip": "Supprimer le coffre",
+  "deleteActiveVaultBlocked": "Ouvrez un autre coffre pour supprimer celui-ci",
+  "backupEmergencyHeading": "Sauvegardes et effacement d'urgence",
+  "backupResponsibilityBody": "Gabbro ne sauvegarde pas vos coffres. Conservez une copie de chaque coffre sur un autre appareil — vos propres sauvegardes sont le seul moyen de récupérer un coffre supprimé ou perdu.",
+  "emergencyWipeAndroidBody": "Pour détruire immédiatement toutes les données Gabbro de l'appareil — sans authentification, irréversible — ouvrez les Paramètres de l'appareil, trouvez Gabbro dans la liste des applications et choisissez Effacer les données.",
+  "emergencyWipeLinuxBody": "Pour détruire immédiatement toutes les données Gabbro de l'appareil — sans authentification, irréversible — supprimez ces dossiers dans un terminal. Les coffres que vous avez enregistrés à d'autres emplacements ne se trouvent pas dans ces dossiers et doivent être supprimés séparément.",
 
   "yubiKeySecurityWarning": "Avertissement de sécurité",
   "removeYubiKeyTitle": "Retirer la YubiKey",

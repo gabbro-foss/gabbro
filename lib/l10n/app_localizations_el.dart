@@ -1443,22 +1443,23 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+      'Ανοίξτε ένα άλλο θησαυροφυλάκιο για να διαγράψετε αυτό';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading =>
+      'Αντίγραφα ασφαλείας και διαγραφή έκτακτης ανάγκης';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'Το Gabbro δεν δημιουργεί αντίγραφα ασφαλείας των θησαυροφυλακίων σας. Διατηρήστε ένα αντίγραφο κάθε θησαυροφυλακίου σε άλλη συσκευή — τα δικά σας αντίγραφα ασφαλείας είναι ο μόνος τρόπος για να ανακτήσετε ένα διαγραμμένο ή χαμένο θησαυροφυλάκιο.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      'Για να καταστρέψετε αμέσως όλα τα δεδομένα του Gabbro στη συσκευή — χωρίς έλεγχο ταυτότητας, μη αναστρέψιμα — ανοίξτε τις Ρυθμίσεις της συσκευής, βρείτε το Gabbro στη λίστα εφαρμογών και επιλέξτε Διαγραφή δεδομένων.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      'Για να καταστρέψετε αμέσως όλα τα δεδομένα του Gabbro στη συσκευή — χωρίς έλεγχο ταυτότητας, μη αναστρέψιμα — διαγράψτε αυτούς τους φακέλους σε ένα τερματικό. Τα θησαυροφυλάκια που αποθηκεύσατε σε άλλες τοποθεσίες δεν βρίσκονται σε αυτούς τους φακέλους και πρέπει να διαγραφούν ξεχωριστά.';
 
   @override
   String get yubiKeySecurityWarning => 'Προειδοποίηση ασφαλείας';

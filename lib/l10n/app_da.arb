@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Indtast din PIN og rør ved din YubiKey for at autorisere denne sletning.",
   "deleteVaultTooltip": "Slet hvælving",
+  "deleteActiveVaultBlocked": "Åbn en anden boks for at slette denne",
+  "backupEmergencyHeading": "Sikkerhedskopier og nødsletning",
+  "backupResponsibilityBody": "Gabbro sikkerhedskopierer ikke dine bokse. Gem en kopi af hver boks på en anden enhed — dine egne sikkerhedskopier er den eneste måde at gendanne en slettet eller mistet boks på.",
+  "emergencyWipeAndroidBody": "For at ødelægge alle Gabbro-data på enheden med det samme — uden godkendelse, uigenkaldeligt — åbn enhedens Indstillinger, find Gabbro på listen over apps, og vælg Ryd data.",
+  "emergencyWipeLinuxBody": "For at ødelægge alle Gabbro-data på enheden med det samme — uden godkendelse, uigenkaldeligt — slet disse mapper i en terminal. Bokse, du har gemt andre steder, findes ikke i disse mapper og skal slettes separat.",
 
   "navVault": "Hvælving",
   "navAbout": "Om",

@@ -1390,23 +1390,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteVaultTooltip => '删除保险库';
 
   @override
-  String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+  String get deleteActiveVaultBlocked => '打开另一个保险库以删除此保险库';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading => '备份与紧急清除';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'Gabbro 不会备份你的保险库。请将每个保险库的副本保存在另一台设备上——你自己的备份是恢复已删除或丢失保险库的唯一方法。';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      '若要立即销毁设备上的所有 Gabbro 数据（无需身份验证，不可恢复），请打开设备的设置，在应用列表中找到 Gabbro，然后选择清除数据。';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      '若要立即销毁设备上的所有 Gabbro 数据（无需身份验证，不可恢复），请在终端中删除这些文件夹。你保存在其他位置的保险库不在这些文件夹中，必须单独删除。';
 
   @override
   String get yubiKeySecurityWarning => '安全警告';
@@ -3142,6 +3141,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get deleteVaultTooltip => '删除保险库';
 
   @override
+  String get deleteActiveVaultBlocked => '打开另一个保险库以删除此保险库';
+
+  @override
+  String get backupEmergencyHeading => '备份与紧急清除';
+
+  @override
+  String get backupResponsibilityBody =>
+      'Gabbro 不会备份你的保险库。请将每个保险库的副本保存在另一台设备上——你自己的备份是恢复已删除或丢失保险库的唯一方法。';
+
+  @override
+  String get emergencyWipeAndroidBody =>
+      '若要立即销毁设备上的所有 Gabbro 数据（无需身份验证，不可恢复），请打开设备的设置，在应用列表中找到 Gabbro，然后选择清除数据。';
+
+  @override
+  String get emergencyWipeLinuxBody =>
+      '若要立即销毁设备上的所有 Gabbro 数据（无需身份验证，不可恢复），请在终端中删除这些文件夹。你保存在其他位置的保险库不在这些文件夹中，必须单独删除。';
+
+  @override
   String get yubiKeySecurityWarning => '安全警告';
 
   @override
@@ -4873,6 +4890,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get deleteVaultTooltip => '刪除保險庫';
+
+  @override
+  String get deleteActiveVaultBlocked => '開啟另一個保險庫以刪除此保險庫';
+
+  @override
+  String get backupEmergencyHeading => '備份與緊急清除';
+
+  @override
+  String get backupResponsibilityBody =>
+      'Gabbro 不會備份你的保險庫。請將每個保險庫的副本保存在另一台裝置上——你自己的備份是復原已刪除或遺失保險庫的唯一方法。';
+
+  @override
+  String get emergencyWipeAndroidBody =>
+      '若要立即銷毀裝置上的所有 Gabbro 資料（無需身分驗證，無法復原），請開啟裝置的設定，在應用程式清單中找到 Gabbro，然後選擇清除資料。';
+
+  @override
+  String get emergencyWipeLinuxBody =>
+      '若要立即銷毀裝置上的所有 Gabbro 資料（無需身分驗證，無法復原），請在終端機中刪除這些資料夾。你儲存在其他位置的保險庫不在這些資料夾中，必須個別刪除。';
 
   @override
   String get yubiKeySecurityWarning => '安全警告';

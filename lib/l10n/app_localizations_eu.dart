@@ -1432,22 +1432,22 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+      'Ireki beste kutxa gotor bat hau ezabatzeko';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading => 'Babeskopiak eta larrialdiko ezabaketa';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'Gabbrok ez ditu zure kutxa gotorren babeskopiak egiten. Gorde kutxa gotor bakoitzaren kopia bat beste gailu batean — zure babeskopiak dira ezabatutako edo galdutako kutxa gotor bat berreskuratzeko modu bakarra.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      'Gailuko Gabbro datu guztiak berehala suntsitzeko — autentifikaziorik gabe, atzeraezina — ireki gailuaren Ezarpenak, bilatu Gabbro aplikazioen zerrendan eta hautatu Ezabatu datuak.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      'Gailuko Gabbro datu guztiak berehala suntsitzeko — autentifikaziorik gabe, atzeraezina — ezabatu karpeta hauek terminal batean. Beste kokaleku batzuetan gorde dituzun kutxa gotorrak ez daude karpeta hauetan, eta bereizita ezabatu behar dira.';
 
   @override
   String get yubiKeySecurityWarning => 'Segurtasun abisua';

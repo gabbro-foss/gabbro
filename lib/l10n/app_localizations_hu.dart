@@ -1430,22 +1430,23 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+      'Nyisson meg egy másik széfet ennek törléséhez';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading =>
+      'Biztonsági mentések és vészhelyzeti törlés';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'A Gabbro nem készít biztonsági mentést a széfjeiről. Tartson minden széfről egy másolatot egy másik eszközön — a saját biztonsági mentései az egyetlen módja egy törölt vagy elveszett széf helyreállításának.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      'Az eszközön lévő összes Gabbro-adat azonnali megsemmisítéséhez — hitelesítés nélkül, visszafordíthatatlanul — nyissa meg az eszköz Beállításait, keresse meg a Gabbrót az alkalmazások listájában, és válassza az Adatok törlése lehetőséget.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      'Az eszközön lévő összes Gabbro-adat azonnali megsemmisítéséhez — hitelesítés nélkül, visszafordíthatatlanul — törölje ezeket a mappákat egy terminálban. A más helyekre mentett széfek nem ezekben a mappákban találhatók, és külön kell törölni őket.';
 
   @override
   String get yubiKeySecurityWarning => 'Biztonsági figyelmeztetés';

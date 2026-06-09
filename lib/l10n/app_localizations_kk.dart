@@ -1431,23 +1431,22 @@ class AppLocalizationsKk extends AppLocalizations {
   String get deleteVaultTooltip => 'Сейфті жою';
 
   @override
-  String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+  String get deleteActiveVaultBlocked => 'Мұны жою үшін басқа қойманы ашыңыз';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading => 'Сақтық көшірмелер және төтенше жою';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'Gabbro қоймаларыңыздың сақтық көшірмесін жасамайды. Әр қойманың көшірмесін басқа құрылғыда сақтаңыз — жойылған немесе жоғалған қойманы қалпына келтірудің жалғыз жолы — өзіңіздің сақтық көшірмелеріңіз.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      'Құрылғыдағы барлық Gabbro деректерін дереу жою үшін — аутентификациясыз, қайтарымсыз — құрылғының Параметрлерін ашыңыз, қолданбалар тізімінен Gabbro табыңыз және Деректерді тазалау таңдаңыз.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      'Құрылғыдағы барлық Gabbro деректерін дереу жою үшін — аутентификациясыз, қайтарымсыз — терминалда осы қалталарды жойыңыз. Басқа орындарға сақталған қоймалар осы қалталарда жоқ және оларды бөлек жою керек.';
 
   @override
   String get yubiKeySecurityWarning => 'Қауіпсіздік ескертуі';

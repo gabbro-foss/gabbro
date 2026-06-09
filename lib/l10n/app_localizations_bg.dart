@@ -1434,22 +1434,22 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+      'Отворете друг сейф, за да изтриете този';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading => 'Резервни копия и аварийно изтриване';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'Gabbro не прави резервни копия на вашите сейфове. Съхранявайте копие на всеки сейф на друго устройство — вашите собствени резервни копия са единственият начин да възстановите изтрит или загубен сейф.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      'За да унищожите незабавно всички данни на Gabbro на устройството — без удостоверяване, необратимо — отворете Настройките на устройството, намерете Gabbro в списъка с приложения и изберете Изчистване на данните.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      'За да унищожите незабавно всички данни на Gabbro на устройството — без удостоверяване, необратимо — изтрийте тези папки в терминал. Сейфовете, които сте записали на други места, не са в тези папки и трябва да бъдат изтрити отделно.';
 
   @override
   String get yubiKeySecurityWarning => 'Предупреждение за сигурност';

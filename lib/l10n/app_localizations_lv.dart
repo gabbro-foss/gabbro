@@ -1433,23 +1433,22 @@ class AppLocalizationsLv extends AppLocalizations {
   String get deleteVaultTooltip => 'Dzēst seifu';
 
   @override
-  String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+  String get deleteActiveVaultBlocked => 'Atveriet citu seifu, lai izdzēstu šo';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading => 'Dublējumkopijas un ārkārtas dzēšana';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'Gabbro neveido jūsu seifu dublējumkopijas. Glabājiet katra seifa kopiju citā ierīcē — jūsu pašu dublējumkopijas ir vienīgais veids, kā atjaunot izdzēstu vai pazaudētu seifu.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      'Lai nekavējoties iznīcinātu visus ierīcē esošos Gabbro datus — bez autentifikācijas, neatgriezeniski — atveriet ierīces Iestatījumus, atrodiet Gabbro lietotņu sarakstā un izvēlieties Notīrīt datus.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      'Lai nekavējoties iznīcinātu visus ierīcē esošos Gabbro datus — bez autentifikācijas, neatgriezeniski — izdzēsiet šīs mapes terminālī. Citās vietās saglabātie seifi neatrodas šajās mapēs, un tie jādzēš atsevišķi.';
 
   @override
   String get yubiKeySecurityWarning => 'Drošības brīdinājums';

@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Inserisci il PIN e tocca la tua YubiKey per autorizzare questa eliminazione.",
   "deleteVaultTooltip": "Elimina archivio",
+  "deleteActiveVaultBlocked": "Apri un'altra cassaforte per eliminare questa",
+  "backupEmergencyHeading": "Backup ed eliminazione di emergenza",
+  "backupResponsibilityBody": "Gabbro non esegue il backup delle tue casseforti. Conserva una copia di ogni cassaforte su un altro dispositivo — i tuoi backup sono l'unico modo per recuperare una cassaforte eliminata o persa.",
+  "emergencyWipeAndroidBody": "Per distruggere immediatamente tutti i dati di Gabbro sul dispositivo — senza autenticazione, irreversibile — apri le Impostazioni del dispositivo, trova Gabbro nell'elenco delle app e scegli Cancella dati.",
+  "emergencyWipeLinuxBody": "Per distruggere immediatamente tutti i dati di Gabbro sul dispositivo — senza autenticazione, irreversibile — elimina queste cartelle in un terminale. Le casseforti salvate in altre posizioni non si trovano in queste cartelle e devono essere eliminate separatamente.",
 
   "yubiKeySecurityWarning": "Avviso di sicurezza",
   "removeYubiKeyTitle": "Rimuovi YubiKey",

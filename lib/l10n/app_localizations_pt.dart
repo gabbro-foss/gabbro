@@ -1433,23 +1433,23 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deleteVaultTooltip => 'Excluir cofre';
 
   @override
-  String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+  String get deleteActiveVaultBlocked => 'Abra outro cofre para eliminar este';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading =>
+      'Cópias de segurança e limpeza de emergência';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'O Gabbro não faz cópias de segurança dos seus cofres. Guarde uma cópia de cada cofre noutro dispositivo — as suas próprias cópias são a única forma de recuperar um cofre eliminado ou perdido.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      'Para destruir imediatamente todos os dados do Gabbro no dispositivo — sem autenticação, irreversível — abra as Definições do dispositivo, encontre o Gabbro na lista de aplicações e escolha Limpar dados.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      'Para destruir imediatamente todos os dados do Gabbro no dispositivo — sem autenticação, irreversível — elimine estas pastas num terminal. Os cofres que guardou noutras localizações não estão nestas pastas e têm de ser eliminados separadamente.';
 
   @override
   String get yubiKeySecurityWarning => 'Aviso de segurança';
@@ -3258,6 +3258,24 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get deleteVaultTooltip => 'Excluir cofre';
+
+  @override
+  String get deleteActiveVaultBlocked => 'Abra outro cofre para excluir este';
+
+  @override
+  String get backupEmergencyHeading => 'Backups e limpeza de emergência';
+
+  @override
+  String get backupResponsibilityBody =>
+      'O Gabbro não faz backup dos seus cofres. Guarde uma cópia de cada cofre em outro dispositivo — seus próprios backups são a única forma de recuperar um cofre excluído ou perdido.';
+
+  @override
+  String get emergencyWipeAndroidBody =>
+      'Para destruir imediatamente todos os dados do Gabbro no dispositivo — sem autenticação, irreversível — abra as Configurações do dispositivo, encontre o Gabbro na lista de aplicativos e escolha Limpar dados.';
+
+  @override
+  String get emergencyWipeLinuxBody =>
+      'Para destruir imediatamente todos os dados do Gabbro no dispositivo — sem autenticação, irreversível — exclua estas pastas em um terminal. Os cofres que você salvou em outros locais não estão nestas pastas e devem ser excluídos separadamente.';
 
   @override
   String get yubiKeySecurityWarning => 'Aviso de segurança';
@@ -5069,6 +5087,25 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get deleteVaultTooltip => 'Eliminar cofre';
+
+  @override
+  String get deleteActiveVaultBlocked => 'Abra outro cofre para eliminar este';
+
+  @override
+  String get backupEmergencyHeading =>
+      'Cópias de segurança e limpeza de emergência';
+
+  @override
+  String get backupResponsibilityBody =>
+      'O Gabbro não faz cópias de segurança dos seus cofres. Guarde uma cópia de cada cofre noutro dispositivo — as suas próprias cópias são a única forma de recuperar um cofre eliminado ou perdido.';
+
+  @override
+  String get emergencyWipeAndroidBody =>
+      'Para destruir imediatamente todos os dados do Gabbro no dispositivo — sem autenticação, irreversível — abra as Definições do dispositivo, encontre o Gabbro na lista de aplicações e escolha Limpar dados.';
+
+  @override
+  String get emergencyWipeLinuxBody =>
+      'Para destruir imediatamente todos os dados do Gabbro no dispositivo — sem autenticação, irreversível — elimine estas pastas num terminal. Os cofres que guardou noutras localizações não estão nestas pastas e têm de ser eliminados separadamente.';
 
   @override
   String get yubiKeySecurityWarning => 'Aviso de segurança';

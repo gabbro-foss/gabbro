@@ -1436,22 +1436,22 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+      'Open een andere kluis om deze te verwijderen';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading => 'Back-ups en noodwissing';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'Gabbro maakt geen back-ups van je kluizen. Bewaar een kopie van elke kluis op een ander apparaat — je eigen back-ups zijn de enige manier om een verwijderde of verloren kluis te herstellen.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      'Om alle Gabbro-gegevens op het apparaat onmiddellijk te vernietigen — zonder authenticatie, onomkeerbaar — open de Instellingen van het apparaat, zoek Gabbro in de lijst met apps en kies Gegevens wissen.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      'Om alle Gabbro-gegevens op het apparaat onmiddellijk te vernietigen — zonder authenticatie, onomkeerbaar — verwijder deze mappen in een terminal. Kluizen die je op andere locaties hebt opgeslagen, staan niet in deze mappen en moeten apart worden verwijderd.';
 
   @override
   String get yubiKeySecurityWarning => 'Beveiligingswaarschuwing';

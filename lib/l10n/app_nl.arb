@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Voer uw PIN in en raak uw YubiKey aan om deze verwijdering te autoriseren.",
   "deleteVaultTooltip": "Kluis verwijderen",
+  "deleteActiveVaultBlocked": "Open een andere kluis om deze te verwijderen",
+  "backupEmergencyHeading": "Back-ups en noodwissing",
+  "backupResponsibilityBody": "Gabbro maakt geen back-ups van je kluizen. Bewaar een kopie van elke kluis op een ander apparaat — je eigen back-ups zijn de enige manier om een verwijderde of verloren kluis te herstellen.",
+  "emergencyWipeAndroidBody": "Om alle Gabbro-gegevens op het apparaat onmiddellijk te vernietigen — zonder authenticatie, onomkeerbaar — open de Instellingen van het apparaat, zoek Gabbro in de lijst met apps en kies Gegevens wissen.",
+  "emergencyWipeLinuxBody": "Om alle Gabbro-gegevens op het apparaat onmiddellijk te vernietigen — zonder authenticatie, onomkeerbaar — verwijder deze mappen in een terminal. Kluizen die je op andere locaties hebt opgeslagen, staan niet in deze mappen en moeten apart worden verwijderd.",
 
   "navVault": "Kluis",
   "navAbout": "Over",

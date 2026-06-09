@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Ievadiet PIN un pieskarieties YubiKey, lai atļautu dzēšanu.",
   "deleteVaultTooltip": "Dzēst seifu",
+  "deleteActiveVaultBlocked": "Atveriet citu seifu, lai izdzēstu šo",
+  "backupEmergencyHeading": "Dublējumkopijas un ārkārtas dzēšana",
+  "backupResponsibilityBody": "Gabbro neveido jūsu seifu dublējumkopijas. Glabājiet katra seifa kopiju citā ierīcē — jūsu pašu dublējumkopijas ir vienīgais veids, kā atjaunot izdzēstu vai pazaudētu seifu.",
+  "emergencyWipeAndroidBody": "Lai nekavējoties iznīcinātu visus ierīcē esošos Gabbro datus — bez autentifikācijas, neatgriezeniski — atveriet ierīces Iestatījumus, atrodiet Gabbro lietotņu sarakstā un izvēlieties Notīrīt datus.",
+  "emergencyWipeLinuxBody": "Lai nekavējoties iznīcinātu visus ierīcē esošos Gabbro datus — bez autentifikācijas, neatgriezeniski — izdzēsiet šīs mapes terminālī. Citās vietās saglabātie seifi neatrodas šajās mapēs, un tie jādzēš atsevišķi.",
 
   "navVault": "Seifs",
   "navAbout": "Par",

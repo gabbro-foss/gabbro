@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "PINを入力し、削除を承認するためにYubiKeyに触れてください。",
   "deleteVaultTooltip": "ボルトを削除",
+  "deleteActiveVaultBlocked": "これを削除するには別のボールトを開いてください",
+  "backupEmergencyHeading": "バックアップと緊急消去",
+  "backupResponsibilityBody": "Gabbro はボールトのバックアップを作成しません。各ボールトのコピーを別のデバイスに保管してください。削除または紛失したボールトを復元する唯一の方法は、ご自身のバックアップです。",
+  "emergencyWipeAndroidBody": "デバイス上のすべての Gabbro データを直ちに破棄するには（認証なし、取り消し不可）、デバイスの設定を開き、アプリ一覧で Gabbro を見つけて「データを消去」を選択してください。",
+  "emergencyWipeLinuxBody": "デバイス上のすべての Gabbro データを直ちに破棄するには（認証なし、取り消し不可）、ターミナルでこれらのフォルダーを削除してください。他の場所に保存したボールトはこれらのフォルダーには含まれておらず、別途削除する必要があります。",
 
   "yubiKeySecurityWarning": "セキュリティ警告",
   "removeYubiKeyTitle": "YubiKeyを削除",

@@ -1431,22 +1431,22 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+      'Ṣí àpótí ìṣúra mìíràn láti pa èyí rẹ́';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading => 'Àwọn àdàkọ ìpamọ́ àti ìpasẹ́ pàjáwìrì';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'Gabbro kì í ṣe àdàkọ ìpamọ́ àwọn àpótí ìṣúra rẹ. Pa àdàkọ àpótí ìṣúra kọ̀ọ̀kan mọ́ sórí ẹ̀rọ mìíràn — àwọn àdàkọ ìpamọ́ tìrẹ nìkan ni ọ̀nà láti gba àpótí ìṣúra tí a pa rẹ́ tàbí tí ó sọnù padà.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      'Láti pa gbogbo dátà Gabbro tó wà lórí ẹ̀rọ run lẹ́sẹ̀kẹsẹ̀ — láìsí ìfọwọ́sí, kò ṣeé yí padà — ṣí Ètò ẹ̀rọ rẹ, wá Gabbro nínú àtòjọ àwọn áàpù, kí o sì yan Pa dátà rẹ́.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      'Láti pa gbogbo dátà Gabbro tó wà lórí ẹ̀rọ run lẹ́sẹ̀kẹsẹ̀ — láìsí ìfọwọ́sí, kò ṣeé yí padà — pa àwọn fódà wọ̀nyí rẹ́ nínú támínà. Àwọn àpótí ìṣúra tí o fi pamọ́ sí àwọn ibòmíràn kò sí nínú àwọn fódà wọ̀nyí, ó sì gbọdọ̀ pa wọ́n rẹ́ lọ́tọ̀.';
 
   @override
   String get yubiKeySecurityWarning => 'Ikilọ aabo';

@@ -1404,23 +1404,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String get deleteVaultTooltip => '볼트 삭제';
 
   @override
-  String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+  String get deleteActiveVaultBlocked => '이 보관함을 삭제하려면 다른 보관함을 여세요';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading => '백업 및 긴급 삭제';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'Gabbro는 보관함을 백업하지 않습니다. 각 보관함의 사본을 다른 기기에 보관하세요. 삭제되거나 분실된 보관함을 복구하는 유일한 방법은 사용자 본인의 백업입니다.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      '기기의 모든 Gabbro 데이터를 즉시 파기하려면(인증 없음, 되돌릴 수 없음) 기기 설정을 열고 앱 목록에서 Gabbro를 찾아 데이터 지우기를 선택하세요.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      '기기의 모든 Gabbro 데이터를 즉시 파기하려면(인증 없음, 되돌릴 수 없음) 터미널에서 이 폴더들을 삭제하세요. 다른 위치에 저장한 보관함은 이 폴더에 없으므로 별도로 삭제해야 합니다.';
 
   @override
   String get yubiKeySecurityWarning => '보안 경고';

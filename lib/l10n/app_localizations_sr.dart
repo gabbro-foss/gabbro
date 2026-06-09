@@ -1437,22 +1437,22 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
+      'Отворите други сеф да бисте обрисали овај';
 
   @override
-  String get backupEmergencyHeading => 'Backups & emergency wipe';
+  String get backupEmergencyHeading => 'Резервне копије и хитно брисање';
 
   @override
   String get backupResponsibilityBody =>
-      'Gabbro does not back up your vaults. Keep a copy of each vault on another device — your own backups are the only way to recover a deleted or lost vault.';
+      'Gabbro не прави резервне копије ваших сефова. Чувајте копију сваког сефа на другом уређају — ваше сопствене резервне копије су једини начин да вратите обрисани или изгубљени сеф.';
 
   @override
   String get emergencyWipeAndroidBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.';
+      'Да бисте одмах уништили све Gabbro податке на уређају — без аутентификације, неповратно — отворите Подешавања уређаја, пронађите Gabbro на листи апликација и изаберите Обриши податке.';
 
   @override
   String get emergencyWipeLinuxBody =>
-      'To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.';
+      'Да бисте одмах уништили све Gabbro податке на уређају — без аутентификације, неповратно — обришите ове фасцикле у терминалу. Сефови сачувани на другим локацијама нису у овим фасциклама и морате их обрисати засебно.';
 
   @override
   String get yubiKeySecurityWarning => 'Bezbednosno upozorenje';
@@ -3262,6 +3262,25 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get deleteVaultTooltip => 'Obriši trezor';
+
+  @override
+  String get deleteActiveVaultBlocked =>
+      'Otvorite drugi sef da biste obrisali ovaj';
+
+  @override
+  String get backupEmergencyHeading => 'Rezervne kopije i hitno brisanje';
+
+  @override
+  String get backupResponsibilityBody =>
+      'Gabbro ne pravi rezervne kopije vaših sefova. Čuvajte kopiju svakog sefa na drugom uređaju — vaše sopstvene rezervne kopije su jedini način da vratite obrisani ili izgubljeni sef.';
+
+  @override
+  String get emergencyWipeAndroidBody =>
+      'Da biste odmah uništili sve Gabbro podatke na uređaju — bez autentifikacije, nepovratno — otvorite Podešavanja uređaja, pronađite Gabbro na listi aplikacija i izaberite Obriši podatke.';
+
+  @override
+  String get emergencyWipeLinuxBody =>
+      'Da biste odmah uništili sve Gabbro podatke na uređaju — bez autentifikacije, nepovratno — obrišite ove fascikle u terminalu. Sefovi sačuvani na drugim lokacijama nisu u ovim fasciklama i morate ih obrisati zasebno.';
 
   @override
   String get yubiKeySecurityWarning => 'Bezbednosno upozorenje';

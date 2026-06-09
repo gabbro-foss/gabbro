@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Insira o PIN e toque na YubiKey para autorizar esta exclusão.",
   "deleteVaultTooltip": "Excluir cofre",
+  "deleteActiveVaultBlocked": "Abra outro cofre para eliminar este",
+  "backupEmergencyHeading": "Cópias de segurança e limpeza de emergência",
+  "backupResponsibilityBody": "O Gabbro não faz cópias de segurança dos seus cofres. Guarde uma cópia de cada cofre noutro dispositivo — as suas próprias cópias são a única forma de recuperar um cofre eliminado ou perdido.",
+  "emergencyWipeAndroidBody": "Para destruir imediatamente todos os dados do Gabbro no dispositivo — sem autenticação, irreversível — abra as Definições do dispositivo, encontre o Gabbro na lista de aplicações e escolha Limpar dados.",
+  "emergencyWipeLinuxBody": "Para destruir imediatamente todos os dados do Gabbro no dispositivo — sem autenticação, irreversível — elimine estas pastas num terminal. Os cofres que guardou noutras localizações não estão nestas pastas e têm de ser eliminados separadamente.",
 
   "navVault": "Cofre",
   "navAbout": "Sobre",

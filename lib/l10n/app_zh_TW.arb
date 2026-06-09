@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "輸入 PIN 並碰觸 YubiKey 以授權刪除。",
   "deleteVaultTooltip": "刪除保險庫",
+  "deleteActiveVaultBlocked": "開啟另一個保險庫以刪除此保險庫",
+  "backupEmergencyHeading": "備份與緊急清除",
+  "backupResponsibilityBody": "Gabbro 不會備份你的保險庫。請將每個保險庫的副本保存在另一台裝置上——你自己的備份是復原已刪除或遺失保險庫的唯一方法。",
+  "emergencyWipeAndroidBody": "若要立即銷毀裝置上的所有 Gabbro 資料（無需身分驗證，無法復原），請開啟裝置的設定，在應用程式清單中找到 Gabbro，然後選擇清除資料。",
+  "emergencyWipeLinuxBody": "若要立即銷毀裝置上的所有 Gabbro 資料（無需身分驗證，無法復原），請在終端機中刪除這些資料夾。你儲存在其他位置的保險庫不在這些資料夾中，必須個別刪除。",
 
   "yubiKeySecurityWarning": "安全警告",
   "removeYubiKeyTitle": "移除 YubiKey",

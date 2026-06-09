@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "PIN을 입력하고 삭제를 승인하기 위해 YubiKey에 터치하세요.",
   "deleteVaultTooltip": "볼트 삭제",
+  "deleteActiveVaultBlocked": "이 보관함을 삭제하려면 다른 보관함을 여세요",
+  "backupEmergencyHeading": "백업 및 긴급 삭제",
+  "backupResponsibilityBody": "Gabbro는 보관함을 백업하지 않습니다. 각 보관함의 사본을 다른 기기에 보관하세요. 삭제되거나 분실된 보관함을 복구하는 유일한 방법은 사용자 본인의 백업입니다.",
+  "emergencyWipeAndroidBody": "기기의 모든 Gabbro 데이터를 즉시 파기하려면(인증 없음, 되돌릴 수 없음) 기기 설정을 열고 앱 목록에서 Gabbro를 찾아 데이터 지우기를 선택하세요.",
+  "emergencyWipeLinuxBody": "기기의 모든 Gabbro 데이터를 즉시 파기하려면(인증 없음, 되돌릴 수 없음) 터미널에서 이 폴더들을 삭제하세요. 다른 위치에 저장한 보관함은 이 폴더에 없으므로 별도로 삭제해야 합니다.",
 
   "yubiKeySecurityWarning": "보안 경고",
   "removeYubiKeyTitle": "YubiKey 제거",

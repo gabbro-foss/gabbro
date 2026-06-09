@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Sartu PINa eta ukitu YubiKey ezabaketari baimena emateko.",
   "deleteVaultTooltip": "Gandegi ezabatu",
+  "deleteActiveVaultBlocked": "Ireki beste kutxa gotor bat hau ezabatzeko",
+  "backupEmergencyHeading": "Babeskopiak eta larrialdiko ezabaketa",
+  "backupResponsibilityBody": "Gabbrok ez ditu zure kutxa gotorren babeskopiak egiten. Gorde kutxa gotor bakoitzaren kopia bat beste gailu batean — zure babeskopiak dira ezabatutako edo galdutako kutxa gotor bat berreskuratzeko modu bakarra.",
+  "emergencyWipeAndroidBody": "Gailuko Gabbro datu guztiak berehala suntsitzeko — autentifikaziorik gabe, atzeraezina — ireki gailuaren Ezarpenak, bilatu Gabbro aplikazioen zerrendan eta hautatu Ezabatu datuak.",
+  "emergencyWipeLinuxBody": "Gailuko Gabbro datu guztiak berehala suntsitzeko — autentifikaziorik gabe, atzeraezina — ezabatu karpeta hauek terminal batean. Beste kokaleku batzuetan gorde dituzun kutxa gotorrak ez daude karpeta hauetan, eta bereizita ezabatu behar dira.",
 
   "yubiKeySecurityWarning": "Segurtasun abisua",
   "removeYubiKeyTitle": "YubiKey kendu",

@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Wprowadź PIN i dotknij klucza YubiKey, aby autoryzować usunięcie.",
   "deleteVaultTooltip": "Usuń skarbiec",
+  "deleteActiveVaultBlocked": "Otwórz inny sejf, aby usunąć ten",
+  "backupEmergencyHeading": "Kopie zapasowe i awaryjne wymazanie",
+  "backupResponsibilityBody": "Gabbro nie tworzy kopii zapasowych Twoich sejfów. Przechowuj kopię każdego sejfu na innym urządzeniu — własne kopie zapasowe to jedyny sposób na odzyskanie usuniętego lub utraconego sejfu.",
+  "emergencyWipeAndroidBody": "Aby natychmiast zniszczyć wszystkie dane Gabbro na urządzeniu — bez uwierzytelniania, nieodwracalnie — otwórz Ustawienia urządzenia, znajdź Gabbro na liście aplikacji i wybierz Wyczyść dane.",
+  "emergencyWipeLinuxBody": "Aby natychmiast zniszczyć wszystkie dane Gabbro na urządzeniu — bez uwierzytelniania, nieodwracalnie — usuń te foldery w terminalu. Sejfy zapisane w innych lokalizacjach nie znajdują się w tych folderach i należy je usunąć osobno.",
 
   "navVault": "Skarbiec",
   "navAbout": "O aplikacji",

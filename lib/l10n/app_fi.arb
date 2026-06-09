@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Syötä PIN ja kosketa YubiKey-avaintasi valtuuttaaksesi poiston.",
   "deleteVaultTooltip": "Poista holvi",
+  "deleteActiveVaultBlocked": "Avaa toinen holvi poistaaksesi tämän",
+  "backupEmergencyHeading": "Varmuuskopiot ja hätätyhjennys",
+  "backupResponsibilityBody": "Gabbro ei varmuuskopioi holvejasi. Säilytä kustakin holvista kopio toisella laitteella — omat varmuuskopiosi ovat ainoa tapa palauttaa poistettu tai kadonnut holvi.",
+  "emergencyWipeAndroidBody": "Tuhotaksesi kaikki laitteella olevat Gabbron tiedot välittömästi — ilman todennusta, peruuttamattomasti — avaa laitteen Asetukset, etsi Gabbro sovellusluettelosta ja valitse Tyhjennä tiedot.",
+  "emergencyWipeLinuxBody": "Tuhotaksesi kaikki laitteella olevat Gabbron tiedot välittömästi — ilman todennusta, peruuttamattomasti — poista nämä kansiot päätteessä. Muihin sijainteihin tallentamasi holvit eivät ole näissä kansioissa, ja ne on poistettava erikseen.",
 
   "navVault": "Holvi",
   "navAbout": "Tietoja",

@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Tẹ PIN ki o fọwọ kan YubiKey lati fun laṣẹ piparẹ.",
   "deleteVaultTooltip": "Pa vọọliti rẹ",
+  "deleteActiveVaultBlocked": "Ṣí àpótí ìṣúra mìíràn láti pa èyí rẹ́",
+  "backupEmergencyHeading": "Àwọn àdàkọ ìpamọ́ àti ìpasẹ́ pàjáwìrì",
+  "backupResponsibilityBody": "Gabbro kì í ṣe àdàkọ ìpamọ́ àwọn àpótí ìṣúra rẹ. Pa àdàkọ àpótí ìṣúra kọ̀ọ̀kan mọ́ sórí ẹ̀rọ mìíràn — àwọn àdàkọ ìpamọ́ tìrẹ nìkan ni ọ̀nà láti gba àpótí ìṣúra tí a pa rẹ́ tàbí tí ó sọnù padà.",
+  "emergencyWipeAndroidBody": "Láti pa gbogbo dátà Gabbro tó wà lórí ẹ̀rọ run lẹ́sẹ̀kẹsẹ̀ — láìsí ìfọwọ́sí, kò ṣeé yí padà — ṣí Ètò ẹ̀rọ rẹ, wá Gabbro nínú àtòjọ àwọn áàpù, kí o sì yan Pa dátà rẹ́.",
+  "emergencyWipeLinuxBody": "Láti pa gbogbo dátà Gabbro tó wà lórí ẹ̀rọ run lẹ́sẹ̀kẹsẹ̀ — láìsí ìfọwọ́sí, kò ṣeé yí padà — pa àwọn fódà wọ̀nyí rẹ́ nínú támínà. Àwọn àpótí ìṣúra tí o fi pamọ́ sí àwọn ibòmíràn kò sí nínú àwọn fódà wọ̀nyí, ó sì gbọdọ̀ pa wọ́n rẹ́ lọ́tọ̀.",
 
   "yubiKeySecurityWarning": "Ikilọ aabo",
   "removeYubiKeyTitle": "Yọ YubiKey kuro",

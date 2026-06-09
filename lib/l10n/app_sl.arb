@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Vnesite PIN in se dotaknite YubiKey za avtorizacijo brisanja.",
   "deleteVaultTooltip": "Izbriši trezor",
+  "deleteActiveVaultBlocked": "Odprite drug trezor, da izbrišete tega",
+  "backupEmergencyHeading": "Varnostne kopije in zasilni izbris",
+  "backupResponsibilityBody": "Gabbro ne ustvarja varnostnih kopij vaših trezorjev. Hranite kopijo vsakega trezorja v drugi napravi — vaše lastne varnostne kopije so edini način za obnovitev izbrisanega ali izgubljenega trezorja.",
+  "emergencyWipeAndroidBody": "Če želite takoj uničiti vse podatke Gabbro v napravi — brez preverjanja pristnosti, nepovratno — odprite Nastavitve naprave, poiščite Gabbro na seznamu aplikacij in izberite Počisti podatke.",
+  "emergencyWipeLinuxBody": "Če želite takoj uničiti vse podatke Gabbro v napravi — brez preverjanja pristnosti, nepovratno — izbrišite te mape v terminalu. Trezorji, shranjeni na drugih mestih, niso v teh mapah in jih morate izbrisati ločeno.",
 
   "yubiKeySecurityWarning": "Varnostno opozorilo",
   "removeYubiKeyTitle": "Odstrani YubiKey",

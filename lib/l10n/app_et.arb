@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Sisesta PIN ja puuduta YubiKey't selle kustutamise autoriseerimiseks.",
   "deleteVaultTooltip": "Kustuta seif",
+  "deleteActiveVaultBlocked": "Selle kustutamiseks avage teine hoidla",
+  "backupEmergencyHeading": "Varukoopiad ja hädaolukorra kustutamine",
+  "backupResponsibilityBody": "Gabbro ei varunda teie hoidlaid. Hoidke igast hoidlast koopiat teises seadmes — teie enda varukoopiad on ainus viis kustutatud või kaotatud hoidla taastamiseks.",
+  "emergencyWipeAndroidBody": "Kõigi seadmes olevate Gabbro andmete kohe hävitamiseks — ilma autentimiseta, pöördumatult — avage seadme Seaded, leidke rakenduste loendist Gabbro ja valige Kustuta andmed.",
+  "emergencyWipeLinuxBody": "Kõigi seadmes olevate Gabbro andmete kohe hävitamiseks — ilma autentimiseta, pöördumatult — kustutage need kaustad terminalis. Teistesse asukohtadesse salvestatud hoidlad ei asu nendes kaustades ja need tuleb eraldi kustutada.",
 
   "navVault": "Seif",
   "navAbout": "Teave",

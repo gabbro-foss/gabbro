@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "输入 PIN 并触碰 YubiKey 以授权删除。",
   "deleteVaultTooltip": "删除保险库",
+  "deleteActiveVaultBlocked": "打开另一个保险库以删除此保险库",
+  "backupEmergencyHeading": "备份与紧急清除",
+  "backupResponsibilityBody": "Gabbro 不会备份你的保险库。请将每个保险库的副本保存在另一台设备上——你自己的备份是恢复已删除或丢失保险库的唯一方法。",
+  "emergencyWipeAndroidBody": "若要立即销毁设备上的所有 Gabbro 数据（无需身份验证，不可恢复），请打开设备的设置，在应用列表中找到 Gabbro，然后选择清除数据。",
+  "emergencyWipeLinuxBody": "若要立即销毁设备上的所有 Gabbro 数据（无需身份验证，不可恢复），请在终端中删除这些文件夹。你保存在其他位置的保险库不在这些文件夹中，必须单独删除。",
 
   "yubiKeySecurityWarning": "安全警告",
   "removeYubiKeyTitle": "移除 YubiKey",

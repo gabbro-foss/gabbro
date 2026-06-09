@@ -659,6 +659,11 @@
   },
   "yubiKeyAuthorizeDeletion": "Angi PIN-en din og trykk på YubiKey-en din for å autorisere slettingen.",
   "deleteVaultTooltip": "Slett hvelv",
+  "deleteActiveVaultBlocked": "Åpne et annet hvelv for å slette dette",
+  "backupEmergencyHeading": "Sikkerhetskopier og nødsletting",
+  "backupResponsibilityBody": "Gabbro sikkerhetskopierer ikke hvelvene dine. Oppbevar en kopi av hvert hvelv på en annen enhet — dine egne sikkerhetskopier er den eneste måten å gjenopprette et slettet eller tapt hvelv på.",
+  "emergencyWipeAndroidBody": "For å ødelegge alle Gabbro-data på enheten umiddelbart — uten autentisering, ugjenkallelig — åpne enhetens Innstillinger, finn Gabbro i applisten og velg Tøm data.",
+  "emergencyWipeLinuxBody": "For å ødelegge alle Gabbro-data på enheten umiddelbart — uten autentisering, ugjenkallelig — slett disse mappene i en terminal. Hvelv du har lagret andre steder, ligger ikke i disse mappene og må slettes separat.",
 
   "navVault": "Hvelv",
   "navAbout": "Om",
