@@ -600,6 +600,27 @@ class _ImportScreenState extends State<ImportScreen> {
           ),
         ],
         const SizedBox(height: 12),
+        // While syncing a key-protected source we are blocked on a hardware tap.
+        // Surface the "tap now" prompt (matching the change-passphrase / manage-
+        // vaults screens) so the spinner is never silent — on Android the tap call
+        // blocks until a key is presented; the user can also back out to cancel.
+        if (_isImportingGabbro && _gabbroSourceIsKeyProtected) ...[
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.touch_app, size: 20,
+                  color: Theme.of(context).colorScheme.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l.tapYubiKeyNow,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+        ],
         FilledButton(
           onPressed: _isImportingGabbro ? null : _importGabbro,
           child: _isImportingGabbro

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -8,6 +9,7 @@ import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/widgets/yubikey_tap.dart';
 
 /// Scrolls to [sectionTitle], then taps the FilledButton in that section.
 Future<void> _tapImportForSection(
@@ -225,6 +227,35 @@ void main() {
       expect(keyCred, [1, 2]);
       expect(tapPin, '1234');
       expect(plainCalled, isFalse);
+    });
+
+    testWidgets('key-protected sync shows tap-now prompt while awaiting the key',
+        (tester) async {
+      final tmp = tempGabbroFile();
+      final gate = Completer<YubikeyHmacMatch>();
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [fakeRecord()],
+        onGetYubikeyHmac: (_, _, _) => gate.future,
+        onImportGabbroWithKey: (_, _, _, _) async =>
+            GabbroImportResult(imported: BigInt.one, skipped: []),
+      )));
+
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
+      await tester.enterText(
+          find.widgetWithText(TextField, 'YubiKey PIN'), '1234');
+      await tester.ensureVisible(find.text('Sync from vault'));
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pump(); // kick off the async; tap is now pending
+
+      expect(find.text('Tap your YubiKey now…'), findsOneWidget);
+
+      // Let the pending tap resolve so no timer is left dangling.
+      gate.complete((hmac: <int>[1], credentialId: <int>[1, 2]));
+      await tester.pump();
+      await tester.pump();
     });
 
     // ── No-file validation for each importer ─────────────────────────────────
