@@ -6,7 +6,7 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `entry_id_and_title`, `stamp_timestamps`
+// These functions are ignored because they are not marked as `pub`: `entry_id_and_title`, `merge_source_into_session`, `stamp_timestamps`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`, `fmt`
 
 /// Sniff the headers and first 3 rows of a CSV string.
@@ -88,6 +88,27 @@ Future<GabbroImportResult> importFromGabbro({
 }) => RustLib.instance.api.crateApiImportImportFromGabbro(
   path: path,
   passphrase: passphrase,
+);
+
+/// Import/sync from a **key-protected** `.gabbro` vault (ADR-013).
+///
+/// Opens the source at `path` with the source passphrase AND a registered YubiKey
+/// (its hmac-secret output + credential id), then merges into the session exactly
+/// as [`import_from_gabbro`]. This is the path for syncing a vault created with
+/// YubiKey protection: passphrase alone is refused by the crypto, so the source's
+/// chosen protection is upheld across the sync. `hmac_secret` must be 32 bytes.
+///
+/// The vault must already be unlocked — returns `Err` if no session is active.
+Future<GabbroImportResult> importFromGabbroWithKey({
+  required String path,
+  required List<int> passphrase,
+  required List<int> hmacSecret,
+  required List<int> credentialId,
+}) => RustLib.instance.api.crateApiImportImportFromGabbroWithKey(
+  path: path,
+  passphrase: passphrase,
+  hmacSecret: hmacSecret,
+  credentialId: credentialId,
 );
 
 /// Column mapping config passed in by Flutter after the user maps columns.

@@ -146,11 +146,25 @@ Future<void> assignFolderToEntries({
   folder: folder,
 );
 
-/// Write .gabbro + .gabbro.sha256 from current session state.
+/// Write .gabbro + .gabbro.sha256, preserving the vault's protection (ADR-013).
 ///
+/// The default export: copies the sealed on-disk vault byte-for-byte, so a
+/// key-protected vault stays key-protected (its keyslots and alias are retained).
 /// Async — filesystem operation.
 Future<void> exportVault({required String path}) =>
     RustLib.instance.api.crateApiVaultBridgeExportVault(path: path);
+
+/// Write a **passphrase-only** .gabbro + .gabbro.sha256 — the opt-in security
+/// downgrade (ADR-013).
+///
+/// Re-seals the current session under the passphrase alone, dropping any YubiKey
+/// requirement so the artifact opens with the passphrase only. The original vault
+/// is never mutated. Flutter must only reach this via the explicit, warned export
+/// toggle (shown for key-protected vaults). Async — filesystem operation.
+Future<void> exportVaultPassphraseOnly({required String path}) => RustLib
+    .instance
+    .api
+    .crateApiVaultBridgeExportVaultPassphraseOnly(path: path);
 
 /// Serialize the current session to a plaintext JSON file at `path`.
 ///
