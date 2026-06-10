@@ -91,23 +91,23 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 `v0.1.0-alpha.6` is **released and published** (commit `071283a`, tag `v0.1.0-alpha.6`,
 GitHub release live with the Linux tarball + Android APK). After the heavy code-coverage
-release, a deliberately lighter session: three self-contained **quick wins**, all
-test-only (no production behaviour change), TDD where it applies. Do in any order.
+release, a deliberately lighter session: self-contained **quick wins**, all test-only
+(no production behaviour change), TDD where it applies. Do in any order.
 
-1. **Language-picker invariant tests** — pure-function tests in `test/language_screen_test.dart`:
-   every `LanguageChoice` maps to a non-empty, *unique* label via `languageChoiceLabel`
-   (no ambiguous picker rows), and `sortedLanguageChoices` returns all
-   `LanguageChoice.values` with `system` first and the rest alphabetical by label.
-   Auto-covers future languages; replaces the brittle `values.length == 35` magic number.
-   Complements the endonym guard added for the langDutch fix.
+- ~~Language-picker invariant tests~~ — **DONE** (`36e2883`): pure-function invariants in
+  `test/language_screen_test.dart` (non-empty + unique labels in every locale;
+  `sortedLanguageChoices` = full set, system first, rest alphabetical). Replaced the
+  `values.length == 35` magic number. 5 tests, all green.
 
-2. **Locale-resolution guard** — assert every non-`system` `LanguageChoice` resolves (via
+Remaining:
+
+1. **Locale-resolution guard** — assert every non-`system` `LanguageChoice` resolves (via
    `_localeFor` in `main.dart`) to a locale present in `AppLocalizations.supportedLocales`,
    so a half-wired new language can't silently fall back to English (user picks "Polski",
    gets English). `_localeFor` is private — needs a small test seam or a per-choice
    `GabbroApp` drive that detects the fallback.
 
-3. **`SealedVault::from_bytes` malformed-input fuzz test** (security-adjacent, ~30–45 min) —
+2. **`SealedVault::from_bytes` malformed-input fuzz test** (security-adjacent, ~30–45 min) —
    the parser in `rust/src/vault/file_format.rs` is *currently* well-defended (every slice at
    lines ~232–369 is guarded by an `if data.len() < pos + N { return Err }`), but that safety
    is held **only by inspection** — no negative test exists; the backward-compat harness only
