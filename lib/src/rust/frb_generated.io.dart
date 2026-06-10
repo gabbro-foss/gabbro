@@ -92,6 +92,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   EntrySummaryData dco_decode_entry_summary_data(dynamic raw);
 
   @protected
+  ExportArtifact dco_decode_export_artifact(dynamic raw);
+
+  @protected
   double dco_decode_f_64(dynamic raw);
 
   @protected
@@ -326,6 +329,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   EntrySummaryData sse_decode_entry_summary_data(SseDeserializer deserializer);
+
+  @protected
+  ExportArtifact sse_decode_export_artifact(SseDeserializer deserializer);
 
   @protected
   double sse_decode_f_64(SseDeserializer deserializer);
@@ -624,6 +630,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_entry_summary_data(
     EntrySummaryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_export_artifact(
+    ExportArtifact self,
     SseSerializer serializer,
   );
 

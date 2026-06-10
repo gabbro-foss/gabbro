@@ -808,13 +808,39 @@ pub fn change_passphrase(
 /// before decryption with standard tools (`sha256sum`, `certutil`).
 #[flutter_rust_bridge::frb(ignore)]
 pub fn export_vault(body: &VaultBody, passphrase: &[u8], export_path: &Path) -> Result<(), String> {
-    let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
-    // The passphrase-only downgrade artifact carries no alias — a standalone copy.
-    let sealed = seal_vault(passphrase, &plaintext, None)?;
-    let vault_bytes = sealed.to_bytes();
-
+    let vault_bytes = build_passphrase_only_bytes(body, passphrase)?;
     atomic_write_0600(export_path, &vault_bytes)?;
     write_sha256_companion(export_path, &vault_bytes)
+}
+
+/// Build the passphrase-only export ciphertext for `body` (ADR-013 downgrade),
+/// without touching the filesystem. Re-seals under `passphrase` alone — no
+/// YubiKey requirement, no alias (a standalone copy). Shared by the Linux
+/// path-write ([`export_vault`]) and the Android byte-return path so neither can
+/// drift from the other.
+#[flutter_rust_bridge::frb(ignore)]
+pub fn build_passphrase_only_bytes(body: &VaultBody, passphrase: &[u8]) -> Result<Vec<u8>, String> {
+    let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
+    let sealed = seal_vault(passphrase, &plaintext, None)?;
+    Ok(sealed.to_bytes())
+}
+
+/// Format the detached SHA-256 companion line for `vault_bytes` (ADR-002):
+/// one `sha256sum`-style line `"<hex>  <filename>\n"` naming the vault file.
+/// The companion file itself is `<filename>.sha256`.
+#[flutter_rust_bridge::frb(ignore)]
+pub fn sha256_line(vault_bytes: &[u8], filename: &str) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(vault_bytes);
+    let hash_bytes: [u8; 32] = hasher.finalize().into();
+    format!(
+        "{}  {}\n",
+        hash_bytes
+            .iter()
+            .map(|b| format!("{:02x}", b))
+            .collect::<String>(),
+        filename
+    )
 }
 
 /// Export a vault preserving its exact on-disk protection (ADR-013).
@@ -838,20 +864,11 @@ pub fn export_vault_preserving(source_path: &Path, export_path: &Path) -> Result
 /// Write the detached `<export>.gabbro.sha256` companion for `vault_bytes`
 /// (ADR-002). One-line hex digest in `sha256sum` format, naming the `.gabbro` file.
 fn write_sha256_companion(export_path: &Path, vault_bytes: &[u8]) -> Result<(), String> {
-    let mut hasher = Sha256::new();
-    hasher.update(vault_bytes);
-    let hash_bytes: [u8; 32] = hasher.finalize().into();
-    let hash_hex = format!(
-        "{}  {}\n",
-        hash_bytes
-            .iter()
-            .map(|b| format!("{:02x}", b))
-            .collect::<String>(),
-        export_path
-            .file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or("vault.gabbro")
-    );
+    let filename = export_path
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("vault.gabbro");
+    let hash_hex = sha256_line(vault_bytes, filename);
     let hash_path = export_path.with_extension("gabbro.sha256");
     atomic_write_0600(&hash_path, hash_hex.as_bytes())
 }
@@ -2526,6 +2543,20 @@ mod tests {
         let _ = std::fs::remove_file(&export);
         let _ = std::fs::remove_file(source.with_extension("gabbro.sha256"));
         let _ = std::fs::remove_file(export.with_extension("gabbro.sha256"));
+    }
+
+    #[test]
+    fn sha256_line_hashes_bytes_and_names_file() {
+        // Known SHA-256 of the empty input, sha256sum format: "<hex>  <name>\n".
+        let line = sha256_line(b"", "Gabbro.gabbro");
+        assert_eq!(
+            line,
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  Gabbro.gabbro\n"
+        );
+        // Different bytes hash differently; the filename is echoed verbatim.
+        let other = sha256_line(b"abc", "vault.json");
+        assert!(other.ends_with("  vault.json\n"));
+        assert_ne!(line, other);
     }
 
     #[test]

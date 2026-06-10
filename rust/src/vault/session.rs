@@ -731,6 +731,38 @@ pub fn session_export_vault_json(export_path: PathBuf) -> Result<(), String> {
     Ok(())
 }
 
+/// Build the protection-preserving export artifact (ciphertext bytes + SHA-256
+/// line) for the current session **without writing** — the Android SAF path,
+/// where the file write happens in Kotlin via the granted directory tree.
+///
+/// Mirrors [`session_export_vault`] but returns the bytes instead of writing to a
+/// path. `vault_filename` (e.g. `Gabbro.gabbro`) names the file in the SHA line;
+/// the companion is `<vault_filename>.sha256`. The bytes are ciphertext — safe to
+/// cross the Flutter/Rust bridge.
+pub fn session_export_vault_bytes(vault_filename: &str) -> Result<(Vec<u8>, String), String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
+    let vault_bytes = std::fs::read(&session.path)
+        .map_err(|e| format!("Failed to read vault for export: {e}"))?;
+    let line = crate::api::vault::sha256_line(&vault_bytes, vault_filename);
+    Ok((vault_bytes, line))
+}
+
+/// Build the opt-in passphrase-only downgrade export artifact (ADR-013) for the
+/// current session **without writing** — the Android SAF counterpart to
+/// [`session_export_vault_passphrase_only`]. Re-seals the body under the
+/// passphrase alone; the bytes are ciphertext.
+pub fn session_export_vault_passphrase_only_bytes(
+    vault_filename: &str,
+) -> Result<(Vec<u8>, String), String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
+    let body = build_body(session);
+    let vault_bytes = crate::api::vault::build_passphrase_only_bytes(&body, &session.passphrase)?;
+    let line = crate::api::vault::sha256_line(&vault_bytes, vault_filename);
+    Ok((vault_bytes, line))
+}
+
 /// Lightweight login summary for the autofill fill path.
 ///
 /// Contains only the fields needed for domain matching and credential delivery.

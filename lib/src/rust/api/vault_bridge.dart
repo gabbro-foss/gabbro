@@ -174,6 +174,24 @@ Future<void> exportVaultPassphraseOnly({required String path}) => RustLib
 Future<void> exportVaultJson({required String path}) =>
     RustLib.instance.api.crateApiVaultBridgeExportVaultJson(path: path);
 
+/// Build the protection-preserving export artifact for the current session
+/// without writing (ADR-013 default) — Android SAF path. `vault_filename` (e.g.
+/// `Gabbro.gabbro`) names the file in the SHA line. Returns ciphertext bytes.
+Future<ExportArtifact> buildExportBytes({required String vaultFilename}) =>
+    RustLib.instance.api.crateApiVaultBridgeBuildExportBytes(
+      vaultFilename: vaultFilename,
+    );
+
+/// Build the opt-in passphrase-only downgrade export artifact for the current
+/// session without writing (ADR-013) — Android SAF path. Re-seals under the
+/// passphrase alone; bytes are ciphertext. Reach only via the explicit, warned
+/// downgrade toggle.
+Future<ExportArtifact> buildExportPassphraseOnlyBytes({
+  required String vaultFilename,
+}) => RustLib.instance.api.crateApiVaultBridgeBuildExportPassphraseOnlyBytes(
+  vaultFilename: vaultFilename,
+);
+
 /// Read the vault header at `path` and return any YubiKey records it contains.
 ///
 /// Does **not** decrypt the vault body — safe to call before the user enters
@@ -337,6 +355,32 @@ Future<MergeSummary> mergeVaultFromFile({
   passphrase: passphrase,
 );
 
+/// Merge a **key-protected** incoming `.gabbro` file into the current session (ADR-013).
+///
+/// The analogue of [`merge_vault_from_file`] for a source created with YubiKey
+/// protection: passphrase alone is refused by the crypto, so the source's chosen
+/// protection is upheld across the sync. Opens the file at `path` with the source
+/// passphrase AND a registered YubiKey (its hmac-secret output + credential id),
+/// then runs the entry-level merge against the live session.
+///
+/// `hmac_secret` must be exactly 32 bytes.
+///
+/// Returns `Err` if:
+/// - the vault is locked
+/// - `path` cannot be read or is not a valid Gabbro file
+/// - the passphrase + key combination does not unlock the file
+Future<MergeSummary> mergeVaultFromFileWithKey({
+  required String path,
+  required List<int> passphrase,
+  required List<int> hmacSecret,
+  required List<int> credentialId,
+}) => RustLib.instance.api.crateApiVaultBridgeMergeVaultFromFileWithKey(
+  path: path,
+  passphrase: passphrase,
+  hmacSecret: hmacSecret,
+  credentialId: credentialId,
+);
+
 /// Lightweight entry summary returned by `list_entry_summaries()`.
 ///
 /// Contains just enough for Flutter to render a list row — no secrets.
@@ -375,6 +419,31 @@ class EntrySummaryData {
           title == other.title &&
           folder == other.folder &&
           searchBlob == other.searchBlob;
+}
+
+/// The bytes of an export plus its detached SHA-256 line (ADR-002/013).
+///
+/// Returned by the Android byte-return export path: Rust produces the ciphertext
+/// (`vault_bytes`, safe to cross the bridge) and the `sha256_line`, and the Kotlin
+/// SAF layer writes both `<filename>` and `<filename>.sha256` into the user's
+/// granted directory tree (raw-path writes can't overwrite a file another app
+/// created under scoped storage).
+class ExportArtifact {
+  final Uint8List vaultBytes;
+  final String sha256Line;
+
+  const ExportArtifact({required this.vaultBytes, required this.sha256Line});
+
+  @override
+  int get hashCode => vaultBytes.hashCode ^ sha256Line.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExportArtifact &&
+          runtimeType == other.runtimeType &&
+          vaultBytes == other.vaultBytes &&
+          sha256Line == other.sha256Line;
 }
 
 @freezed

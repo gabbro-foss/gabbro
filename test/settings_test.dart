@@ -93,6 +93,16 @@ void main() {
       expect(restored.textSize, original.textSize);
       expect(restored.highContrast, original.highContrast);
     });
+
+    test('androidExportFolderUri round-trips and defaults to empty', () {
+      expect(AppSettings.fromJson({}).androidExportFolderUri, '');
+      const original = AppSettings(
+        androidExportFolderUri:
+            'content://com.android.externalstorage.documents/tree/primary%3ADownload%2FGabbroSync',
+      );
+      final restored = AppSettings.fromJson(original.toJson());
+      expect(restored.androidExportFolderUri, original.androidExportFolderUri);
+    });
   });
 
   // ── copyWith ──────────────────────────────────────────────────────────────

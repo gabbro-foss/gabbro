@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/widgets/yubikey_tap.dart';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -266,6 +269,122 @@ void main() {
       expect(find.textContaining("'Work note'"), findsOneWidget);
       expect(find.textContaining('Work'), findsWidgets);
       expect(find.textContaining('Personal'), findsWidgets);
+    });
+  });
+
+  // ── ADR-013: key-protected source sync ──────────────────────────────────────
+  group('VaultListScreen key-protected sync flow', () {
+    final sourceRecords = [
+      YubikeyRecordData(
+        credentialId: Uint8List.fromList([0xA1, 0xA1]),
+        salt: Uint8List.fromList([0x12, 0x12]),
+      ),
+    ];
+
+    Widget buildKeyProtectedScreen({
+      required Future<MergeSummary> Function(
+              String, List<int>, List<int>, List<int>)
+          mergeVaultWithKey,
+      Future<YubikeyHmacMatch> Function(List<YubikeyRecordData>, String, String)?
+          onGetSyncYubikeyHmac,
+      bool isAndroid = false,
+    }) =>
+        testApp(VaultListScreen(
+          vaultPath: '/tmp/test.gabbro',
+          listEntries: () => [],
+          yubikeyRecords: [],
+          onPickSyncFile: () async => '/tmp/keyprotected.gabbro',
+          // Passphrase-only merge must never be reached for a key-protected source.
+          mergeVault: (_, _) async =>
+              throw StateError('passphrase-only merge must not be called'),
+          onDetectSyncSourceRecords: (_) => sourceRecords,
+          onGetSyncYubikeyHmac: onGetSyncYubikeyHmac ??
+              (records, pin, transport) async =>
+                  (hmac: const [0x11], credentialId: const [0xA1]),
+          mergeVaultWithKey: mergeVaultWithKey,
+          isAndroid: isAndroid,
+        ));
+
+    testWidgets('key-protected source prompts for YubiKey PIN', (tester) async {
+      await tester.pumpWidget(buildKeyProtectedScreen(
+        mergeVaultWithKey: (_, _, _, _) async => _summary(added: 1),
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      // Both the passphrase and the YubiKey PIN field must be present.
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+        findsNWidgets(2),
+      );
+      expect(find.text('YubiKey PIN'), findsOneWidget);
+    });
+
+    testWidgets('keyed merge receives tapped key material', (tester) async {
+      List<int>? capturedHmac;
+      List<int>? capturedCred;
+      List<int>? capturedPassphrase;
+      await tester.pumpWidget(buildKeyProtectedScreen(
+        onGetSyncYubikeyHmac: (records, pin, transport) async =>
+            (hmac: const [0x42], credentialId: const [0xAB]),
+        mergeVaultWithKey: (path, passphrase, hmac, cred) async {
+          capturedPassphrase = passphrase;
+          capturedHmac = hmac;
+          capturedCred = cred;
+          return _summary(added: 2);
+        },
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      final fields = find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      );
+      await tester.enterText(fields.at(0), 'sharedpass');
+      await tester.enterText(fields.at(1), '123456');
+      await tester.tap(find.text('Sync'));
+      await tester.pumpAndSettle();
+
+      expect(capturedPassphrase, equals(utf8.encode('sharedpass')));
+      expect(capturedHmac, equals(const [0x42]));
+      expect(capturedCred, equals(const [0xAB]));
+      expect(find.textContaining('Vault synced'), findsOneWidget);
+    });
+
+    testWidgets('missing PIN blocks the keyed merge', (tester) async {
+      bool mergeCalled = false;
+      await tester.pumpWidget(buildKeyProtectedScreen(
+        mergeVaultWithKey: (_, _, _, _) async {
+          mergeCalled = true;
+          return _summary(added: 1);
+        },
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      // Enter passphrase but leave the PIN empty, then try to sync.
+      await tester.enterText(
+        find
+            .descendant(
+              of: find.byType(AlertDialog),
+              matching: find.byType(TextField),
+            )
+            .at(0),
+        'sharedpass',
+      );
+      await tester.tap(find.text('Sync'));
+      await tester.pumpAndSettle();
+
+      expect(mergeCalled, isFalse);
+      // The dialog stays open with a PIN-required error.
+      expect(find.text('Sync'), findsOneWidget);
     });
   });
 }

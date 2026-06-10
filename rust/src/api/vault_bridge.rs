@@ -563,6 +563,44 @@ pub async fn export_vault_json(path: String) -> Result<(), String> {
     session::session_export_vault_json(PathBuf::from(path))
 }
 
+/// The bytes of an export plus its detached SHA-256 line (ADR-002/013).
+///
+/// Returned by the Android byte-return export path: Rust produces the ciphertext
+/// (`vault_bytes`, safe to cross the bridge) and the `sha256_line`, and the Kotlin
+/// SAF layer writes both `<filename>` and `<filename>.sha256` into the user's
+/// granted directory tree (raw-path writes can't overwrite a file another app
+/// created under scoped storage).
+pub struct ExportArtifact {
+    pub vault_bytes: Vec<u8>,
+    pub sha256_line: String,
+}
+
+/// Build the protection-preserving export artifact for the current session
+/// without writing (ADR-013 default) — Android SAF path. `vault_filename` (e.g.
+/// `Gabbro.gabbro`) names the file in the SHA line. Returns ciphertext bytes.
+pub async fn build_export_bytes(vault_filename: String) -> Result<ExportArtifact, String> {
+    let (vault_bytes, sha256_line) = session::session_export_vault_bytes(&vault_filename)?;
+    Ok(ExportArtifact {
+        vault_bytes,
+        sha256_line,
+    })
+}
+
+/// Build the opt-in passphrase-only downgrade export artifact for the current
+/// session without writing (ADR-013) — Android SAF path. Re-seals under the
+/// passphrase alone; bytes are ciphertext. Reach only via the explicit, warned
+/// downgrade toggle.
+pub async fn build_export_passphrase_only_bytes(
+    vault_filename: String,
+) -> Result<ExportArtifact, String> {
+    let (vault_bytes, sha256_line) =
+        session::session_export_vault_passphrase_only_bytes(&vault_filename)?;
+    Ok(ExportArtifact {
+        vault_bytes,
+        sha256_line,
+    })
+}
+
 /// YubiKey credential record returned by `list_vault_yubikey_records`.
 ///
 /// The Android layer uses `credential_id` to identify which YubiKey credential
@@ -868,6 +906,39 @@ pub async fn merge_vault_from_file(
 ) -> Result<crate::api::vault::MergeSummary, String> {
     let file_path = PathBuf::from(path);
     let incoming_body = crate::api::vault::load_vault(&passphrase, &file_path)?;
+    session::session_merge_vault_from_body(incoming_body)
+}
+
+/// Merge a **key-protected** incoming `.gabbro` file into the current session (ADR-013).
+///
+/// The analogue of [`merge_vault_from_file`] for a source created with YubiKey
+/// protection: passphrase alone is refused by the crypto, so the source's chosen
+/// protection is upheld across the sync. Opens the file at `path` with the source
+/// passphrase AND a registered YubiKey (its hmac-secret output + credential id),
+/// then runs the entry-level merge against the live session.
+///
+/// `hmac_secret` must be exactly 32 bytes.
+///
+/// Returns `Err` if:
+/// - the vault is locked
+/// - `path` cannot be read or is not a valid Gabbro file
+/// - the passphrase + key combination does not unlock the file
+pub async fn merge_vault_from_file_with_key(
+    path: String,
+    passphrase: Vec<u8>,
+    hmac_secret: Vec<u8>,
+    credential_id: Vec<u8>,
+) -> Result<crate::api::vault::MergeSummary, String> {
+    let secret: [u8; 32] = hmac_secret
+        .try_into()
+        .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
+    let file_path = PathBuf::from(path);
+    let (incoming_body, _master, _wrapping) = crate::api::vault::load_vault_with_key_record(
+        &passphrase,
+        &secret,
+        &credential_id,
+        &file_path,
+    )?;
     session::session_merge_vault_from_body(incoming_body)
 }
 
@@ -1993,5 +2064,253 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+    }
+
+    // ── ADR-013: key-protected vault SYNC (the import-path fix, mirrored) ──────
+    //
+    // The bug found on 2026-06-10: ADR-013 taught the import-entries path to open
+    // a key-protected source (passphrase + YubiKey), but the SYNC path
+    // (`merge_vault_from_file`) still tried passphrase alone. A key-protected file
+    // is correctly refused by the crypto, so sync surfaced a misleading "different
+    // passphrase" error and never asked for the key. The fix:
+    // `merge_vault_from_file_with_key` mirrors `import_from_gabbro_with_key`.
+
+    /// Build a key-protected source vault (passphrase + YK1 + YK2), export it
+    /// PRESERVING protection (ADR-013 default), and return the artifact + source
+    /// paths. The artifact keeps the YubiKey keyslots, so passphrase alone cannot
+    /// open it. YK1 = (hmac `[0x11;32]`, cred `[0xA1;64]`, salt `[0x12;32]`).
+    fn export_keyprotected_artifact(
+        pass: &[u8],
+        suffix: &str,
+    ) -> (std::path::PathBuf, std::path::PathBuf) {
+        use crate::api::vault::{export_vault_preserving, save_vault_with_keys};
+        use crate::crypto::vault_crypto::YubiKeyRegistration;
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        use std::env::temp_dir;
+
+        let yk1 = YubiKeyRegistration {
+            credential_id: vec![0xA1u8; 64],
+            hmac_secret: [0x11u8; 32],
+            salt: [0x12u8; 32],
+        };
+        let yk2 = YubiKeyRegistration {
+            credential_id: vec![0xA2u8; 48],
+            hmac_secret: [0x21u8; 32],
+            salt: [0x22u8; 32],
+        };
+
+        let mut source = temp_dir();
+        source.push(format!("gabbro_bridge_kp_source_{suffix}.gabbro"));
+        let mut artifact = temp_dir();
+        artifact.push(format!("gabbro_bridge_kp_artifact_{suffix}.gabbro"));
+
+        let body = VaultBody {
+            folders: vec![],
+            entries: vec![VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("from-vault-a-001"),
+                    created_at: String::from("2025-03-01T00:00:00Z"),
+                    updated_at: String::from("2025-03-01T00:00:00Z"),
+                    folder: String::new(),
+                },
+                title: String::from("Synced from A"),
+                content: String::from("hardware secret"),
+                custom_fields: vec![],
+                attachments: vec![],
+            })],
+            ..Default::default()
+        };
+        save_vault_with_keys(&body, pass, &[yk1, yk2], &source).unwrap();
+        export_vault_preserving(&source, &artifact).unwrap();
+        (artifact, source)
+    }
+
+    /// Unlock an empty passphrase-only session B with one pre-existing note.
+    fn setup_session_b(pass: &[u8], suffix: &str) -> std::path::PathBuf {
+        use crate::api::vault::save_vault;
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        use std::env::temp_dir;
+
+        let mut path = temp_dir();
+        path.push(format!("gabbro_bridge_kp_session_b_{suffix}.gabbro"));
+        save_vault(
+            &VaultBody {
+                folders: vec![],
+                entries: vec![VaultEntry::Note(NoteEntry {
+                    meta: EntryMeta {
+                        id: String::from("vault-b-own-001"),
+                        created_at: String::from("2025-01-01T00:00:00Z"),
+                        updated_at: String::from("2025-01-01T00:00:00Z"),
+                        folder: String::new(),
+                    },
+                    title: String::from("Vault B own note"),
+                    content: String::from("local"),
+                    custom_fields: vec![],
+                    attachments: vec![],
+                })],
+                ..Default::default()
+            },
+            pass,
+            &path,
+        )
+        .unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+        path
+    }
+
+    #[test]
+    #[serial]
+    fn merge_vault_from_file_refuses_keyprotected_source_with_passphrase_alone() {
+        let pass_a: &[u8] = b"vault A passphrase -- hardware protected";
+        let (artifact, source) = export_keyprotected_artifact(pass_a, "sync_refuse");
+
+        let pass_b = b"vault B passphrase -- yubikeyless";
+        let path_b = setup_session_b(pass_b, "sync_refuse");
+
+        // Passphrase alone must NOT open a key-protected export → sync refused.
+        let result = run(merge_vault_from_file(
+            artifact.to_str().unwrap().to_string(),
+            pass_a.to_vec(),
+        ));
+        assert!(
+            result.is_err(),
+            "syncing a key-protected export with passphrase alone must be refused"
+        );
+        // Session untouched — nothing leaked in.
+        assert_eq!(list_entry_summaries().unwrap().len(), 1);
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path_b);
+        let _ = std::fs::remove_file(&source);
+        let _ = std::fs::remove_file(&artifact);
+        let _ = std::fs::remove_file(artifact.with_extension("gabbro.sha256"));
+    }
+
+    #[test]
+    #[serial]
+    fn merge_vault_from_file_with_key_syncs_keyprotected_source() {
+        let pass_a: &[u8] = b"vault A passphrase -- hardware protected";
+        let (artifact, source) = export_keyprotected_artifact(pass_a, "sync_ok");
+
+        let pass_b = b"vault B passphrase -- yubikeyless";
+        let path_b = setup_session_b(pass_b, "sync_ok");
+
+        // Passphrase_A + a registered key (YK1) authorises the sync.
+        let summary = run(merge_vault_from_file_with_key(
+            artifact.to_str().unwrap().to_string(),
+            pass_a.to_vec(),
+            vec![0x11u8; 32], // YK1 hmac-secret output
+            vec![0xA1u8; 64], // YK1 credential id
+        ))
+        .unwrap();
+
+        assert_eq!(summary.added, 1, "A's entry must sync into B");
+
+        let summaries = list_entry_summaries().unwrap();
+        assert_eq!(summaries.len(), 2, "B's own entry + A's synced entry");
+        assert!(
+            summaries.iter().any(|s| s.id == "from-vault-a-001"),
+            "B must hold the entry that originated in key-protected vault A"
+        );
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path_b);
+        let _ = std::fs::remove_file(&source);
+        let _ = std::fs::remove_file(&artifact);
+        let _ = std::fs::remove_file(artifact.with_extension("gabbro.sha256"));
+    }
+
+    // ── Android SAF export: build-bytes path (the file write happens in Kotlin) ─
+
+    #[test]
+    #[serial]
+    fn build_export_bytes_preserving_is_byte_identical_to_source() {
+        use crate::api::vault::save_vault;
+        use std::env::temp_dir;
+
+        let pass = b"export-bytes-preserving-pass";
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_export_bytes_preserving.gabbro");
+        save_vault(&VaultBody::default(), pass, &path).unwrap();
+        run(unlock_vault(
+            pass.to_vec(),
+            path.to_str().unwrap().to_string(),
+        ))
+        .unwrap();
+
+        let artifact = run(build_export_bytes("Gabbro.gabbro".to_string())).unwrap();
+
+        let on_disk = std::fs::read(&path).unwrap();
+        assert_eq!(
+            artifact.vault_bytes, on_disk,
+            "preserving export must be byte-identical to the on-disk vault (keyslots + alias retained)"
+        );
+        assert_eq!(
+            artifact.sha256_line,
+            crate::api::vault::sha256_line(&on_disk, "Gabbro.gabbro"),
+            "sha line must hash the bytes and name the file"
+        );
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn build_export_passphrase_only_bytes_opens_with_passphrase_alone() {
+        use crate::api::vault::load_vault;
+        use crate::vault::io::read_vault;
+        use std::env::temp_dir;
+
+        let pass = b"export-bytes-downgrade-pass";
+        let mut path = temp_dir();
+        path.push("gabbro_bridge_export_bytes_downgrade.gabbro");
+
+        // Key-protected session: passphrase + 2 keys (ADR-010 minimum).
+        run(init_vault_with_keys(
+            pass.to_vec(),
+            vec![
+                YubiKeyInitData {
+                    credential_id: vec![0xA1u8; 64],
+                    hmac_secret: vec![0x11u8; 32],
+                    hkdf_salt: vec![0x12u8; 32],
+                },
+                YubiKeyInitData {
+                    credential_id: vec![0xA2u8; 48],
+                    hmac_secret: vec![0x21u8; 32],
+                    hkdf_salt: vec![0x22u8; 32],
+                },
+            ],
+            path.to_str().unwrap().to_string(),
+            None,
+        ))
+        .unwrap();
+
+        let artifact = run(build_export_passphrase_only_bytes(
+            "Gabbro.gabbro".to_string(),
+        ))
+        .unwrap();
+
+        // Write the returned bytes and prove they open with the passphrase ALONE
+        // and carry no YubiKey keyslots — i.e. the downgrade really dropped the key.
+        let mut out = temp_dir();
+        out.push("gabbro_bridge_export_bytes_downgrade_out.gabbro");
+        std::fs::write(&out, &artifact.vault_bytes).unwrap();
+        assert!(
+            load_vault(pass, &out).is_ok(),
+            "passphrase-only export must open with the passphrase alone"
+        );
+        assert!(
+            read_vault(&out).unwrap().yubikey_records.is_empty(),
+            "downgrade artifact must drop all YubiKey keyslots"
+        );
+
+        lock_vault().unwrap();
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(&out);
     }
 }

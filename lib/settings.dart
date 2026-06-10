@@ -23,6 +23,12 @@ class AppSettings {
   final bool biometricUnlock;
   final double tabletListPaneWidth;
 
+  /// Persisted SAF tree URI of the Android `.gabbro` export destination folder
+  /// (`content://…/tree/…`). Empty until the user picks a folder. Lets export
+  /// remember the sync folder across runs instead of re-picking each time.
+  /// Android-only; ignored on Linux.
+  final String androidExportFolderUri;
+
   const AppSettings({
     this.theme = ThemeChoice.system,
     this.textSize = TextSizeChoice.regular,
@@ -37,6 +43,7 @@ class AppSettings {
     this.language = LanguageChoice.system,
     this.biometricUnlock = false,
     this.tabletListPaneWidth = 260.0,
+    this.androidExportFolderUri = '',
   });
 
   static AppSettings get defaults => const AppSettings();
@@ -57,6 +64,7 @@ class AppSettings {
     'language': language.name,
     'biometric_unlock': biometricUnlock,
     'tablet_list_pane_width': tabletListPaneWidth,
+    'android_export_folder_uri': androidExportFolderUri,
   };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -91,6 +99,7 @@ class AppSettings {
               ?.toDouble()
               .clamp(180.0, 900.0) ??
           260.0,
+      androidExportFolderUri: json['android_export_folder_uri'] as String? ?? '',
     );
   }
 
@@ -108,6 +117,7 @@ class AppSettings {
     LanguageChoice? language,
     bool? biometricUnlock,
     double? tabletListPaneWidth,
+    String? androidExportFolderUri,
   }) => AppSettings(
     theme: theme ?? this.theme,
     textSize: textSize ?? this.textSize,
@@ -122,6 +132,8 @@ class AppSettings {
     language: language ?? this.language,
     biometricUnlock: biometricUnlock ?? this.biometricUnlock,
     tabletListPaneWidth: tabletListPaneWidth ?? this.tabletListPaneWidth,
+    androidExportFolderUri:
+        androidExportFolderUri ?? this.androidExportFolderUri,
   );
 
   // ── File I/O ───────────────────────────────────────────────────────────
@@ -212,7 +224,11 @@ class AppSettings {
   // Width of the list pane in the tablet / landscape two-pane layout (dp).
   // Drag the divider in the app to resize; this value is updated automatically.
   // Stored range: 180–900. Effective max is capped at 65% of screen width at runtime.
-  "tablet_list_pane_width": $tabletListPaneWidth
+  "tablet_list_pane_width": $tabletListPaneWidth,
+
+  // Android export destination folder (SAF tree URI). Set automatically when you
+  // pick an export folder; remembered so exports go straight there. Android only.
+  "android_export_folder_uri": ${jsonEncode(androidExportFolderUri)}
 }
 ''';
 

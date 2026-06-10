@@ -1,7 +1,52 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/screens/export_screen.dart';
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
+
+// A fake SAF write capture, shared by the Android .gabbro export tests.
+class _SafCapture {
+  String? treeUri;
+  String? filename;
+  Uint8List? data;
+  String? sha256Filename;
+  String? sha256Content;
+}
+
+/// Builds an ExportScreen wired for Android `.gabbro` SAF export with a
+/// pre-remembered folder, capturing what the SAF write seam receives.
+Widget _androidGabbroScreen(
+  _SafCapture cap, {
+  String? vaultAlias,
+  bool isKeyProtected = false,
+  ExportArtifact? preservingArtifact,
+  ExportArtifact? downgradeArtifact,
+}) {
+  final preserving = preservingArtifact ??
+      ExportArtifact(vaultBytes: Uint8List.fromList([1, 2, 3]), sha256Line: 'AA  x\n');
+  final downgrade = downgradeArtifact ??
+      ExportArtifact(vaultBytes: Uint8List.fromList([9, 9]), sha256Line: 'BB  x\n');
+  return testApp(ExportScreen(
+    isAndroid: true,
+    vaultAlias: vaultAlias,
+    isKeyProtected: isKeyProtected,
+    initialExportFolderUri: 'content://docs/tree/primary%3ADownload%2FGabbroSync',
+    onHasGrant: (_) async => true,
+    onExport: (path) async {},
+    onExportJson: (path) async {},
+    onBuildExportBytes: (filename) async => preserving,
+    onBuildExportPassphraseOnlyBytes: (filename) async => downgrade,
+    onWriteExport: (treeUri, filename, data, shaName, shaContent) async {
+      cap.treeUri = treeUri;
+      cap.filename = filename;
+      cap.data = data;
+      cap.sha256Filename = shaName;
+      cap.sha256Content = shaContent;
+    },
+  ));
+}
 
 void main() {
   // ── sanitiseAlias unit tests ──────────────────────────────────────────────
@@ -96,38 +141,45 @@ void main() {
       expect(exportBtn.onPressed, isNull);
     });
 
-    testWidgets('android mode: export fires with picked directory path',
+    testWidgets('android .gabbro: SAF write receives bytes + sha companion',
         (tester) async {
-      String? exportedPath;
-      await tester.pumpWidget(
-        testApp(ExportScreen(
-            isAndroid: true,
-            initialPath: '/storage/emulated/0/Documents',
-            onExport: (path) async => exportedPath = path,
-            onExportJson: (path) async {},
-        )),
-      );
+      final cap = _SafCapture();
+      await tester.pumpWidget(_androidGabbroScreen(cap, vaultAlias: 'My Work'));
       await tester.tap(find.text('Export'));
-      await tester.pump();
-      expect(exportedPath, startsWith('/storage/emulated/0/Documents/vault_'));
-      expect(exportedPath, endsWith('.gabbro'));
+      await tester.pumpAndSettle();
+      // Date toggle is ON by default, so a dated filename is expected here.
+      expect(cap.treeUri, 'content://docs/tree/primary%3ADownload%2FGabbroSync');
+      expect(cap.filename, startsWith('My_Work_'));
+      expect(cap.filename, endsWith('.gabbro'));
+      expect(cap.sha256Filename, '${cap.filename}.sha256');
+      expect(cap.data, equals(Uint8List.fromList([1, 2, 3])));
+      expect(cap.sha256Content, 'AA  x\n');
     });
 
-    testWidgets('android mode: export path uses sanitised alias', (tester) async {
-      String? exportedPath;
-      await tester.pumpWidget(
-        testApp(ExportScreen(
-            isAndroid: true,
-            initialPath: '/storage/emulated/0/Documents',
-            vaultAlias: 'My Work',
-            onExport: (path) async => exportedPath = path,
-            onExportJson: (path) async {},
-        )),
-      );
+    testWidgets('android .gabbro: filename uses sanitised alias', (tester) async {
+      final cap = _SafCapture();
+      await tester.pumpWidget(_androidGabbroScreen(cap, vaultAlias: "Rob's Vault!"));
       await tester.tap(find.text('Export'));
-      await tester.pump();
-      expect(exportedPath, startsWith('/storage/emulated/0/Documents/My_Work_'));
-      expect(exportedPath, endsWith('.gabbro'));
+      await tester.pumpAndSettle();
+      expect(cap.filename, startsWith('Robs_Vault_'));
+      expect(cap.filename, endsWith('.gabbro'));
+    });
+
+    testWidgets('android .gabbro: no remembered folder -> Export disabled, no write',
+        (tester) async {
+      final cap = _SafCapture();
+      await tester.pumpWidget(testApp(ExportScreen(
+        isAndroid: true,
+        onExport: (path) async {},
+        onExportJson: (path) async {},
+        onWriteExport: (a, b, c, d, e) async => cap.filename = b,
+      )));
+      await tester.pumpAndSettle();
+      final exportBtn = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Export'),
+      );
+      expect(exportBtn.onPressed, isNull);
+      expect(cap.filename, isNull);
     });
 
     // ── Include date toggle ──────────────────────────────────────────────────
@@ -144,41 +196,50 @@ void main() {
       expect(toggle.value, isTrue);
     });
 
-    testWidgets('android: toggle off omits date from exported path',
+    testWidgets('android .gabbro: date toggle off -> static filename (rsync target)',
         (tester) async {
-      String? exportedPath;
-      await tester.pumpWidget(
-        testApp(ExportScreen(
-            isAndroid: true,
-            initialPath: '/storage/emulated/0/Documents',
-            vaultAlias: 'My Work',
-            onExport: (path) async => exportedPath = path,
-            onExportJson: (path) async {},
-        )),
-      );
+      final cap = _SafCapture();
+      await tester.pumpWidget(_androidGabbroScreen(cap, vaultAlias: 'My Work'));
+      // Turn the include-date toggle off — there is exactly one SwitchListTile
+      // for a passphrase-only vault (no downgrade toggle).
       await tester.tap(find.byType(SwitchListTile));
       await tester.pump();
       await tester.tap(find.text('Export'));
-      await tester.pump();
-      expect(exportedPath, '/storage/emulated/0/Documents/My_Work.gabbro');
+      await tester.pumpAndSettle();
+      expect(cap.filename, 'My_Work.gabbro');
+      expect(cap.sha256Filename, 'My_Work.gabbro.sha256');
     });
 
-    testWidgets('android: toggle on includes date in exported path',
+    testWidgets('android .gabbro: date toggle on -> dated filename',
         (tester) async {
-      String? exportedPath;
-      await tester.pumpWidget(
-        testApp(ExportScreen(
-            isAndroid: true,
-            initialPath: '/storage/emulated/0/Documents',
-            vaultAlias: 'My Work',
-            onExport: (path) async => exportedPath = path,
-            onExportJson: (path) async {},
-        )),
-      );
+      final cap = _SafCapture();
+      await tester.pumpWidget(_androidGabbroScreen(cap, vaultAlias: 'My Work'));
       await tester.tap(find.text('Export'));
+      await tester.pumpAndSettle();
+      expect(cap.filename, startsWith('My_Work_'));
+      expect(cap.filename, endsWith('.gabbro'));
+    });
+
+    testWidgets('android .gabbro: downgrade toggle routes to passphrase-only build',
+        (tester) async {
+      final cap = _SafCapture();
+      await tester.pumpWidget(_androidGabbroScreen(
+        cap,
+        vaultAlias: 'My Work',
+        isKeyProtected: true,
+        downgradeArtifact: ExportArtifact(
+          vaultBytes: Uint8List.fromList([7, 7, 7]),
+          sha256Line: 'DD  x\n',
+        ),
+      ));
+      // Opt in to the downgrade, then export.
+      await tester.tap(find.widgetWithText(
+          SwitchListTile, 'Export without YubiKey protection (passphrase only)'));
       await tester.pump();
-      expect(exportedPath, startsWith('/storage/emulated/0/Documents/My_Work_'));
-      expect(exportedPath, endsWith('.gabbro'));
+      await tester.tap(find.text('Export'));
+      await tester.pumpAndSettle();
+      expect(cap.data, equals(Uint8List.fromList([7, 7, 7])));
+      expect(cap.sha256Content, 'DD  x\n');
     });
 
     // ── Format selector ──────────────────────────────────────────────────────

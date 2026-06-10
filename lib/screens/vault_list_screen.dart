@@ -28,9 +28,36 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/widgets/yubikey_tap.dart';
+
 List<String> _defaultListFolders() => listFolders();
 Future<MergeSummary> _defaultMergeVault(String path, List<int> passphrase) =>
     mergeVaultFromFile(path: path, passphrase: passphrase);
+
+/// Sync from a key-protected source: passphrase + a tapped registered YubiKey
+/// (ADR-013). The sync analogue of the import screen's keyed Gabbro path.
+Future<MergeSummary> _defaultMergeVaultWithKey(
+  String path,
+  List<int> passphrase,
+  List<int> hmac,
+  List<int> credentialId,
+) => mergeVaultFromFileWithKey(
+  path: path,
+  passphrase: passphrase,
+  hmacSecret: hmac,
+  credentialId: credentialId,
+);
+
+/// Reads the source vault's YubiKey records to decide whether a key is required.
+/// Non-empty means key-protected. Sync — header read only.
+List<YubikeyRecordData> _defaultDetectSyncSourceRecords(String path) =>
+    listVaultYubikeyRecords(path: path);
+
+Future<YubikeyHmacMatch> _defaultGetSyncYubikeyHmac(
+  List<YubikeyRecordData> records,
+  String pin,
+  String transport,
+) => getAnyYubikeyHmacSecret(records: records, pin: pin, transport: transport);
 Future<String?> _defaultPickSyncFile() async {
   final result = await FilePicker.pickFiles(
     type: FileType.custom,
@@ -66,10 +93,12 @@ Future<void> confirmYubikey(
     );
     return;
   }
-  await _yubikeyChannel.invokeMethod<String>(
-    'get_hmac_secret',
-    {'credentialId': _toHex(credentialId), 'salt': _toHex(salt), 'pin': pin, 'transport': transport},
-  );
+  await _yubikeyChannel.invokeMethod<String>('get_hmac_secret', {
+    'credentialId': _toHex(credentialId),
+    'salt': _toHex(salt),
+    'pin': pin,
+    'transport': transport,
+  });
 }
 
 Future<void> confirmAnyYubikey(
@@ -88,14 +117,18 @@ Future<void> confirmAnyYubikey(
     await fidoGetHmacSecretAny(
       devicePath: devices.first,
       records: records
-          .map((r) => FidoRecordInput(credentialId: r.credentialId, salt: r.salt))
+          .map(
+            (r) => FidoRecordInput(credentialId: r.credentialId, salt: r.salt),
+          )
           .toList(),
       pin: pin,
     );
     return;
   }
   final recordsArg = records
-      .map((r) => {'credentialId': _toHex(r.credentialId), 'salt': _toHex(r.salt)})
+      .map(
+        (r) => {'credentialId': _toHex(r.credentialId), 'salt': _toHex(r.salt)},
+      )
       .toList();
   await _yubikeyChannel.invokeMethod<Map<Object?, Object?>>(
     'get_hmac_secret_multi',
@@ -108,26 +141,53 @@ class VaultListScreen extends StatefulWidget {
   final String? vaultAlias;
   final List<EntrySummaryData> Function() listEntries;
   final List<String> Function()? listFolders;
-  final Future<MergeSummary> Function(String path, List<int> passphrase) mergeVault;
+  final Future<MergeSummary> Function(String path, List<int> passphrase)
+  mergeVault;
+
+  /// Sync from a key-protected source: passphrase + tapped YubiKey (ADR-013).
+  final Future<MergeSummary> Function(
+    String path,
+    List<int> passphrase,
+    List<int> hmac,
+    List<int> credentialId,
+  )
+  mergeVaultWithKey;
+
+  /// Detects whether the chosen `.gabbro` sync source is key-protected.
+  final List<YubikeyRecordData> Function(String path) onDetectSyncSourceRecords;
+
+  /// Prompts for a YubiKey tap and returns the hmac + matched credential.
+  final Future<YubikeyHmacMatch> Function(
+    List<YubikeyRecordData> records,
+    String pin,
+    String transport,
+  )
+  onGetSyncYubikeyHmac;
+
   final Future<String?> Function() onPickSyncFile;
+  final bool isAndroid;
 
   final VaultEntryData Function(String id)? getEntryFn;
   final Future<void> Function(String id)? onDeleteEntryFn;
   final void Function()? onRefreshFn;
   final AlphabetBarPosition? alphabetBarPosition;
-  final Future<void> Function(List<String> ids, String folder)? onAssignFolderFn;
+  final Future<void> Function(List<String> ids, String folder)?
+  onAssignFolderFn;
 
   /// Pre-injected YubiKey records. `null` = auto-detect from vault file at
   /// construction time. Pass `[]` to force passphrase-only mode (tests).
   final List<YubikeyRecordData>? yubikeyRecords;
 
-  const VaultListScreen({
+  VaultListScreen({
     super.key,
     required this.vaultPath,
     this.vaultAlias,
     this.listEntries = listEntrySummaries,
     this.listFolders,
     this.mergeVault = _defaultMergeVault,
+    this.mergeVaultWithKey = _defaultMergeVaultWithKey,
+    this.onDetectSyncSourceRecords = _defaultDetectSyncSourceRecords,
+    this.onGetSyncYubikeyHmac = _defaultGetSyncYubikeyHmac,
     this.onPickSyncFile = _defaultPickSyncFile,
     this.getEntryFn,
     this.onDeleteEntryFn,
@@ -135,7 +195,8 @@ class VaultListScreen extends StatefulWidget {
     this.alphabetBarPosition,
     this.onAssignFolderFn,
     this.yubikeyRecords,
-  });
+    bool? isAndroid,
+  }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
   @override
   State<VaultListScreen> createState() => _VaultListScreenState();
@@ -267,15 +328,16 @@ class _VaultListScreenState extends State<VaultListScreen> {
   String? _currentAlias(BuildContext context) =>
       GabbroApp.maybeOf(context)?.registry.lastUsed?.alias ?? widget.vaultAlias;
 
-  String _displayType(String entryType, AppLocalizations l) => switch (entryType) {
-    'Login' => l.entryTypePassword,
-    'Note' => l.entryTypeNote,
-    'Identity' => l.entryTypeIdentity,
-    'Card' => l.entryTypeCard,
-    'File' => l.entryTypeFile,
-    'Custom' => l.entryTypeCustom,
-    _ => entryType,
-  };
+  String _displayType(String entryType, AppLocalizations l) =>
+      switch (entryType) {
+        'Login' => l.entryTypePassword,
+        'Note' => l.entryTypeNote,
+        'Identity' => l.entryTypeIdentity,
+        'Card' => l.entryTypeCard,
+        'File' => l.entryTypeFile,
+        'Custom' => l.entryTypeCustom,
+        _ => entryType,
+      };
 
   // Used internally for sort/group/search — English fallbacks are fine here.
   String _displayTitle(EntrySummaryData entry) {
@@ -322,9 +384,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
     if (_searchQuery.isEmpty) return folderFiltered;
     final query = _searchQuery.toLowerCase();
     return folderFiltered
-        .where((e) => _fullTextSearch
-            ? e.searchBlob.contains(query)
-            : _displayTitle(e).toLowerCase().contains(query))
+        .where(
+          (e) => _fullTextSearch
+              ? e.searchBlob.contains(query)
+              : _displayTitle(e).toLowerCase().contains(query),
+        )
         .toList();
   }
 
@@ -412,7 +476,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   AppLocalizations.of(context).newEntryTitle,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
               ...types.map(
@@ -443,11 +510,17 @@ class _VaultListScreenState extends State<VaultListScreen> {
   }
 
   Future<void> _openExportScreen() async {
+    final appState = GabbroApp.of(context);
     await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (_) => ExportScreen(
           vaultAlias: widget.vaultAlias,
           isKeyProtected: _isYubikeyVault,
+          // Remember the Android SAF export folder across runs (ADR-013).
+          initialExportFolderUri: appState.settings.androidExportFolderUri,
+          onSaveExportFolderUri: (uri) => appState.updateSettings(
+            appState.settings.copyWith(androidExportFolderUri: uri),
+          ),
         ),
       ),
     );
@@ -461,9 +534,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
     if (mounted) {
       setState(() => _isImporting = false);
       if (count != null && count > 0) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).importedEntries(count))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context).importedEntries(count)),
+          ),
+        );
         _loadEntries();
       }
     }
@@ -557,151 +632,200 @@ class _VaultListScreenState extends State<VaultListScreen> {
     final path = await widget.onPickSyncFile();
     if (path == null || !mounted) return;
 
-    // _SyncPassphraseDialog owns the controller; returns passphrase or null.
-    final passphraseText = await showDialog<String>(
+    // ADR-013: a key-protected source (passphrase + YubiKey) cannot be opened
+    // with the passphrase alone — the crypto refuses it. Detect that up front so
+    // the sync flow can ask for the key, mirroring the import-entries path. A
+    // header-read failure (unreadable / not a gabbro file) falls through to the
+    // passphrase-only path; mergeVault then surfaces the real error.
+    List<YubikeyRecordData> sourceRecords;
+    try {
+      sourceRecords = widget.onDetectSyncSourceRecords(path);
+    } catch (_) {
+      sourceRecords = const [];
+    }
+    final isKeyProtected = sourceRecords.isNotEmpty;
+
+    // _SyncPassphraseDialog owns the controllers; returns passphrase (+ PIN and
+    // transport when key-protected), or null on cancel.
+    final creds = await showDialog<_SyncCredentials>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => _SyncPassphraseDialog(filePath: path),
+      builder: (ctx) => _SyncPassphraseDialog(
+        filePath: path,
+        isKeyProtected: isKeyProtected,
+        isAndroid: widget.isAndroid,
+      ),
     );
-    if (passphraseText == null || !mounted) return;
+    if (creds == null || !mounted) return;
 
-    final passphraseBytes = utf8.encode(passphraseText);
-      setState(() => _isSyncing = true);
-      try {
-        final summary = await widget.mergeVault(path, passphraseBytes);
-        if (!mounted) return;
+    final passphraseBytes = utf8.encode(creds.passphrase);
+    setState(() => _isSyncing = true);
+    try {
+      final MergeSummary summary;
+      if (isKeyProtected) {
+        // Tap a registered key to open the key-protected source, then merge.
+        final match = await widget.onGetSyncYubikeyHmac(
+          sourceRecords,
+          creds.pin,
+          creds.transport,
+        );
+        summary = await widget.mergeVaultWithKey(
+          path,
+          passphraseBytes,
+          match.hmac,
+          match.credentialId,
+        );
+      } else {
+        summary = await widget.mergeVault(path, passphraseBytes);
+      }
+      if (!mounted) return;
 
-        final isIdentical = summary.added == 0 &&
-            summary.updated == 0 &&
-            summary.pendingDeletes.isEmpty &&
-            summary.folderConflicts.isEmpty;
+      final isIdentical =
+          summary.added == 0 &&
+          summary.updated == 0 &&
+          summary.pendingDeletes.isEmpty &&
+          summary.folderConflicts.isEmpty;
 
-        if (isIdentical) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context).nothingToSync),
-            ),
-          );
-          return;
-        }
+      if (isIdentical) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).nothingToSync)),
+        );
+        return;
+      }
 
-        _loadEntries();
+      _loadEntries();
 
-        // --- Pending deletes: ask user to confirm each deletion ---
-        var deletedCount = 0;
-        for (final item in summary.pendingDeletes) {
-          if (!mounted) break;
-          final confirmed = await showDialog<bool>(
-            context: context,
-            barrierDismissible: false,
-            builder: (ctx) {
-              final l = AppLocalizations.of(ctx);
-              return AlertDialog(
-                title: Text(l.deleteEntryTitle),
-                content: Text(l.syncDeleteEntryContent(item.title)),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(ctx).pop(false),
-                    child: Text(l.keep),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.of(ctx).pop(true),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Theme.of(ctx).colorScheme.error,
-                    ),
-                    child: Text(l.delete),
-                  ),
-                ],
-              );
-            },
-          );
-          if (confirmed == true) {
-            await deleteEntry(id: item.id);
-            deletedCount++;
-          }
-        }
-
-        // --- Folder conflicts: ask user to pick which folder ---
-        var folderChangedCount = 0;
-        for (final conflict in summary.folderConflicts) {
-          if (!mounted) break;
-          final chosenFolder = await showDialog<String>(
-            context: context,
-            barrierDismissible: false,
-            builder: (ctx) {
-              final l = AppLocalizations.of(ctx);
-              final noFolder = l.noFolder;
-              return AlertDialog(
-                title: Text(l.folderConflictTitle),
-                content: Text(l.folderConflictContent(
-                  conflict.title,
-                  conflict.localFolder.isEmpty ? noFolder : conflict.localFolder,
-                  conflict.incomingFolder.isEmpty ? noFolder : conflict.incomingFolder,
-                )),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(ctx).pop(conflict.localFolder),
-                    child: Text(conflict.localFolder.isEmpty
-                        ? l.folderConflictKeepUnfoldered
-                        : l.folderConflictKeepLocal(conflict.localFolder)),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.of(ctx).pop(conflict.incomingFolder),
-                    child: Text(conflict.incomingFolder.isEmpty
-                        ? l.folderConflictMoveUnfoldered
-                        : l.folderConflictMoveIncoming(conflict.incomingFolder)),
-                  ),
-                ],
-              );
-            },
-          );
-          if (chosenFolder != null) {
-            await assignFolderToEntries(
-                ids: [conflict.id], folder: chosenFolder);
-            if (chosenFolder != conflict.localFolder) folderChangedCount++;
-          }
-        }
-
-        if (deletedCount > 0 || summary.folderConflicts.isNotEmpty) {
-          _loadEntries();
-        }
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context).vaultSynced(
-                summary.added,
-                summary.updated + folderChangedCount,
-                deletedCount,
-              )),
-            ),
-          );
-        }
-      } catch (e) {
-        if (!mounted) return;
-        final msg = e.toString();
-        final isPassphraseMismatch = msg.contains('decryption failed');
-        await showDialog<void>(
+      // --- Pending deletes: ask user to confirm each deletion ---
+      var deletedCount = 0;
+      for (final item in summary.pendingDeletes) {
+        if (!mounted) break;
+        final confirmed = await showDialog<bool>(
           context: context,
+          barrierDismissible: false,
           builder: (ctx) {
             final l = AppLocalizations.of(ctx);
             return AlertDialog(
-              title: Text(l.syncFailedTitle),
-              content: Text(
-                isPassphraseMismatch ? l.syncPassphraseMismatch : msg,
-              ),
+              title: Text(l.deleteEntryTitle),
+              content: Text(l.syncDeleteEntryContent(item.title)),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: Text(l.dismiss),
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                  child: Text(l.keep),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(ctx).colorScheme.error,
+                  ),
+                  child: Text(l.delete),
                 ),
               ],
             );
           },
         );
-      } finally {
-        if (mounted) setState(() => _isSyncing = false);
+        if (confirmed == true) {
+          await deleteEntry(id: item.id);
+          deletedCount++;
+        }
       }
+
+      // --- Folder conflicts: ask user to pick which folder ---
+      var folderChangedCount = 0;
+      for (final conflict in summary.folderConflicts) {
+        if (!mounted) break;
+        final chosenFolder = await showDialog<String>(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) {
+            final l = AppLocalizations.of(ctx);
+            final noFolder = l.noFolder;
+            return AlertDialog(
+              title: Text(l.folderConflictTitle),
+              content: Text(
+                l.folderConflictContent(
+                  conflict.title,
+                  conflict.localFolder.isEmpty
+                      ? noFolder
+                      : conflict.localFolder,
+                  conflict.incomingFolder.isEmpty
+                      ? noFolder
+                      : conflict.incomingFolder,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(conflict.localFolder),
+                  child: Text(
+                    conflict.localFolder.isEmpty
+                        ? l.folderConflictKeepUnfoldered
+                        : l.folderConflictKeepLocal(conflict.localFolder),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      Navigator.of(ctx).pop(conflict.incomingFolder),
+                  child: Text(
+                    conflict.incomingFolder.isEmpty
+                        ? l.folderConflictMoveUnfoldered
+                        : l.folderConflictMoveIncoming(conflict.incomingFolder),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+        if (chosenFolder != null) {
+          await assignFolderToEntries(ids: [conflict.id], folder: chosenFolder);
+          if (chosenFolder != conflict.localFolder) folderChangedCount++;
+        }
+      }
+
+      if (deletedCount > 0 || summary.folderConflicts.isNotEmpty) {
+        _loadEntries();
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).vaultSynced(
+                summary.added,
+                summary.updated + folderChangedCount,
+                deletedCount,
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      final msg = e.toString();
+      // Only the passphrase-only path can fail purely on a wrong passphrase.
+      // For a key-protected source a decryption failure may instead mean the
+      // wrong key/PIN, so the "different passphrase" message would mislead.
+      final isPassphraseMismatch =
+          !isKeyProtected && msg.contains('decryption failed');
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) {
+          final l = AppLocalizations.of(ctx);
+          return AlertDialog(
+            title: Text(l.syncFailedTitle),
+            content: Text(
+              isPassphraseMismatch ? l.syncPassphraseMismatch : msg,
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(l.dismiss),
+              ),
+            ],
+          );
+        },
+      );
+    } finally {
+      if (mounted) setState(() => _isSyncing = false);
+    }
   }
 
   Future<void> _onMenuSelected(String value) async {
@@ -718,7 +842,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
           MaterialPageRoute(
             builder: (context) => ChangePassphraseScreen(
               vaultPath: widget.vaultPath,
-              blockPassphraseCopyPaste: cpAppState.settings.blockPassphraseCopyPaste,
+              blockPassphraseCopyPaste:
+                  cpAppState.settings.blockPassphraseCopyPaste,
             ),
           ),
         );
@@ -727,9 +852,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
           MaterialPageRoute(builder: (context) => const AppearanceScreen()),
         );
       case 'language':
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const LanguageScreen()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => const LanguageScreen()));
       case 'security':
         final appState = GabbroApp.of(context);
         Navigator.of(context).push(
@@ -771,9 +896,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
         );
         if (mounted) _loadEntries();
       case 'help':
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const HelpScreen()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => const HelpScreen()));
       case 'about':
         Navigator.of(
           context,
@@ -824,8 +949,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
                       child: FilterChip(
                         label: Text(_filterLabel(f, l)),
                         selected: _selectedFilter == f,
-                        onSelected: (_) =>
-                            setState(() => _selectedFilter = f),
+                        onSelected: (_) => setState(() => _selectedFilter = f),
                       ),
                     ),
                   )
@@ -866,8 +990,8 @@ class _VaultListScreenState extends State<VaultListScreen> {
           _isSelecting
               ? l.selectedCount(_selectedIds.length)
               : _currentAlias(context) != null
-                  ? l.gabbroVaultTitle(_currentAlias(context)!)
-                  : l.gabbroTitle,
+              ? l.gabbroVaultTitle(_currentAlias(context)!)
+              : l.gabbroTitle,
         ),
         actions: [
           if (_isImporting || _isSyncing)
@@ -899,112 +1023,138 @@ class _VaultListScreenState extends State<VaultListScreen> {
                 return [
                   PopupMenuItem(
                     value: 'export',
-                    child: Row(children: [
-                      const Icon(Icons.upload_outlined, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(ml.menuExportVault)),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.upload_outlined, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(ml.menuExportVault)),
+                      ],
+                    ),
                   ),
                   PopupMenuItem(
                     value: 'import',
-                    child: Row(children: [
-                      const Icon(Icons.download_outlined, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(ml.menuImportEntries)),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.download_outlined, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(ml.menuImportEntries)),
+                      ],
+                    ),
                   ),
                   PopupMenuItem(
                     value: 'sync',
-                    child: Row(children: [
-                      const Icon(Icons.sync, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(ml.menuSyncFromFile)),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.sync, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(ml.menuSyncFromFile)),
+                      ],
+                    ),
                   ),
                   const PopupMenuDivider(),
                   PopupMenuItem(
                     value: 'manage_vaults',
-                    child: Row(children: [
-                      const Icon(Icons.folder_special_outlined, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(ml.menuManageVaults)),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.folder_special_outlined, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(ml.menuManageVaults)),
+                      ],
+                    ),
                   ),
                   const PopupMenuDivider(),
                   PopupMenuItem(
                     value: 'change_passphrase',
-                    child: Row(children: [
-                      const Icon(Icons.key_outlined, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(ml.menuChangePassphrase)),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.key_outlined, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(ml.menuChangePassphrase)),
+                      ],
+                    ),
                   ),
                   PopupMenuItem(
                     enabled: _isYubikeyVault,
                     value: 'yubikeys',
-                    child: Row(children: [
-                      const Icon(Icons.security_outlined, size: 20),
-                      const SizedBox(width: 12),
-                      Text(ml.menuManageYubiKeys),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.security_outlined, size: 20),
+                        const SizedBox(width: 12),
+                        Text(ml.menuManageYubiKeys),
+                      ],
+                    ),
                   ),
                   const PopupMenuDivider(),
                   PopupMenuItem(
                     value: 'appearance',
-                    child: Row(children: [
-                      const Icon(Icons.palette_outlined, size: 20),
-                      const SizedBox(width: 12),
-                      Text(ml.menuAppearance),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.palette_outlined, size: 20),
+                        const SizedBox(width: 12),
+                        Text(ml.menuAppearance),
+                      ],
+                    ),
                   ),
                   PopupMenuItem(
                     value: 'language',
-                    child: Row(children: [
-                      const Icon(Icons.language_outlined, size: 20),
-                      const SizedBox(width: 12),
-                      Text(ml.sectionLanguage),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.language_outlined, size: 20),
+                        const SizedBox(width: 12),
+                        Text(ml.sectionLanguage),
+                      ],
+                    ),
                   ),
                   PopupMenuItem(
                     value: 'security',
-                    child: Row(children: [
-                      const Icon(Icons.shield_outlined, size: 20),
-                      const SizedBox(width: 12),
-                      Text(ml.menuSecurity),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.shield_outlined, size: 20),
+                        const SizedBox(width: 12),
+                        Text(ml.menuSecurity),
+                      ],
+                    ),
                   ),
                   PopupMenuItem(
                     value: 'manage_folders',
-                    child: Row(children: [
-                      const Icon(Icons.folder_outlined, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(ml.menuManageFolders)),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.folder_outlined, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(ml.menuManageFolders)),
+                      ],
+                    ),
                   ),
                   PopupMenuItem(
                     value: 'generator',
-                    child: Row(children: [
-                      const Icon(Icons.casino_outlined, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(ml.menuPasswordGenerator)),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.casino_outlined, size: 20),
+                        const SizedBox(width: 12),
+                        Expanded(child: Text(ml.menuPasswordGenerator)),
+                      ],
+                    ),
                   ),
                   const PopupMenuDivider(),
                   PopupMenuItem(
                     value: 'help',
-                    child: Row(children: [
-                      const Icon(Icons.help_outline, size: 20),
-                      const SizedBox(width: 12),
-                      Text(ml.menuHelp),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.help_outline, size: 20),
+                        const SizedBox(width: 12),
+                        Text(ml.menuHelp),
+                      ],
+                    ),
                   ),
                   PopupMenuItem(
                     value: 'about',
-                    child: Row(children: [
-                      const Icon(Icons.info_outline, size: 20),
-                      const SizedBox(width: 12),
-                      Text(ml.menuAbout),
-                    ]),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info_outline, size: 20),
+                        const SizedBox(width: 12),
+                        Text(ml.menuAbout),
+                      ],
+                    ),
                   ),
                 ];
               },
@@ -1087,9 +1237,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
                         ? l.searchAllFieldsHint
                         : l.searchEntriesHint,
                     prefixIcon: IconButton(
-                      icon: Icon(_fullTextSearch
-                          ? Icons.manage_search
-                          : Icons.search),
+                      icon: Icon(
+                        _fullTextSearch ? Icons.manage_search : Icons.search,
+                      ),
                       tooltip: _fullTextSearch
                           ? l.searchAllFieldsTooltip
                           : l.searchByTitleTooltip,
@@ -1107,11 +1257,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
                         : null,
                     border: const OutlineInputBorder(),
                     isDense: true,
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
                   ),
-                  onChanged: (value) =>
-                      setState(() => _searchQuery = value),
+                  onChanged: (value) => setState(() => _searchQuery = value),
                 ),
               ),
               filterChipRow: Column(
@@ -1131,8 +1279,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
                             child: Text(l.allFolders),
                           ),
                           ..._folders.map(
-                            (f) =>
-                                DropdownMenuItem(value: f, child: Text(f)),
+                            (f) => DropdownMenuItem(value: f, child: Text(f)),
                           ),
                         ],
                       ),
@@ -1173,9 +1320,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
                           ? l.searchAllFieldsHint
                           : l.searchEntriesHint,
                       prefixIcon: IconButton(
-                        icon: Icon(_fullTextSearch
-                            ? Icons.manage_search
-                            : Icons.search),
+                        icon: Icon(
+                          _fullTextSearch ? Icons.manage_search : Icons.search,
+                        ),
                         tooltip: _fullTextSearch
                             ? l.searchAllFieldsTooltip
                             : l.searchByTitleTooltip,
@@ -1193,11 +1340,9 @@ class _VaultListScreenState extends State<VaultListScreen> {
                           : null,
                       border: const OutlineInputBorder(),
                       isDense: true,
-                      contentPadding:
-                          const EdgeInsets.symmetric(vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
                     ),
-                    onChanged: (value) =>
-                        setState(() => _searchQuery = value),
+                    onChanged: (value) => setState(() => _searchQuery = value),
                   ),
                 ),
                 if (_folders.isNotEmpty)
@@ -1209,10 +1354,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
                       onChanged: (value) =>
                           setState(() => _selectedFolder = value ?? ''),
                       items: [
-                        DropdownMenuItem(
-                          value: '',
-                          child: Text(l.allFolders),
-                        ),
+                        DropdownMenuItem(value: '', child: Text(l.allFolders)),
                         ..._folders.map(
                           (f) => DropdownMenuItem(value: f, child: Text(f)),
                         ),
@@ -1246,15 +1388,13 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                 ).copyWith(scrollbars: false),
                                 child: ScrollablePositionedList.builder(
                                   itemScrollController: _itemScrollController,
-                                  padding:
-                                      const EdgeInsets.only(bottom: 80),
+                                  padding: const EdgeInsets.only(bottom: 80),
                                   itemCount: _groupedEntries.length,
                                   itemBuilder: (context, index) {
                                     final item = _groupedEntries[index];
                                     if (item is String) {
                                       return Padding(
-                                        padding:
-                                            const EdgeInsets.fromLTRB(
+                                        padding: const EdgeInsets.fromLTRB(
                                           16,
                                           8,
                                           16,
@@ -1280,14 +1420,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                               value: _selectedIds.contains(
                                                 entry.id,
                                               ),
-                                              onChanged: (_) =>
-                                                  setState(() {
+                                              onChanged: (_) => setState(() {
                                                 if (_selectedIds.contains(
                                                   entry.id,
                                                 )) {
-                                                  _selectedIds.remove(
-                                                    entry.id,
-                                                  );
+                                                  _selectedIds.remove(entry.id);
                                                 } else {
                                                   _selectedIds.add(entry.id);
                                                 }
@@ -1300,10 +1437,13 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                                 context,
                                               ).colorScheme.primary,
                                               semanticLabel: _displayType(
-                                                entry.entryType, el,
+                                                entry.entryType,
+                                                el,
                                               ),
                                             ),
-                                      title: Text(_localizedDisplayTitle(entry, el)),
+                                      title: Text(
+                                        _localizedDisplayTitle(entry, el),
+                                      ),
                                       subtitle: Text(
                                         _displayType(entry.entryType, el),
                                       ),
@@ -1328,12 +1468,12 @@ class _VaultListScreenState extends State<VaultListScreen> {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 EntryDetailScreen(
-                                              entry: getEntry(id: entry.id),
-                                              clipboardClearTimeout:
-                                                  GabbroApp.of(
-                                                context,
-                                              ).settings.clipboardClearTimeout,
-                                            ),
+                                                  entry: getEntry(id: entry.id),
+                                                  clipboardClearTimeout:
+                                                      GabbroApp.of(context)
+                                                          .settings
+                                                          .clipboardClearTimeout,
+                                                ),
                                           ),
                                         );
                                         if (mounted) _loadEntries();
@@ -1373,9 +1513,28 @@ class _VaultListScreenState extends State<VaultListScreen> {
 /// Owns its TextEditingController so Flutter can dispose it safely during the
 /// dialog exit animation via State.dispose(), avoiding use-after-dispose errors.
 /// Returns the entered passphrase text on confirm, or null on cancel.
+/// Credentials gathered by [_SyncPassphraseDialog]. `pin` and `transport` are
+/// only meaningful when the source is key-protected (ADR-013).
+class _SyncCredentials {
+  final String passphrase;
+  final String pin;
+  final String transport;
+  const _SyncCredentials({
+    required this.passphrase,
+    this.pin = '',
+    this.transport = 'usb',
+  });
+}
+
 class _SyncPassphraseDialog extends StatefulWidget {
   final String filePath;
-  const _SyncPassphraseDialog({required this.filePath});
+  final bool isKeyProtected;
+  final bool isAndroid;
+  const _SyncPassphraseDialog({
+    required this.filePath,
+    this.isKeyProtected = false,
+    this.isAndroid = false,
+  });
 
   @override
   State<_SyncPassphraseDialog> createState() => _SyncPassphraseDialogState();
@@ -1383,12 +1542,32 @@ class _SyncPassphraseDialog extends StatefulWidget {
 
 class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
   final _ctrl = TextEditingController();
+  final _pinCtrl = TextEditingController();
   bool _showPass = false;
+  bool _pinObscured = true;
+  String _transport = 'usb';
+  String? _error;
 
   @override
   void dispose() {
     _ctrl.dispose();
+    _pinCtrl.dispose();
     super.dispose();
+  }
+
+  void _submit() {
+    // A key-protected source needs a YubiKey PIN to run the CTAP2 assertion.
+    if (widget.isKeyProtected && _pinCtrl.text.isEmpty) {
+      setState(() => _error = AppLocalizations.of(context).yubiKeyPinRequired);
+      return;
+    }
+    Navigator.of(context).pop(
+      _SyncCredentials(
+        passphrase: _ctrl.text,
+        pin: _pinCtrl.text,
+        transport: _transport,
+      ),
+    );
   }
 
   @override
@@ -1396,39 +1575,116 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
     final l = AppLocalizations.of(context);
     return AlertDialog(
       title: Text(l.syncFromFileTitle),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            widget.filePath,
-            style: Theme.of(context).textTheme.bodySmall,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _ctrl,
-            obscureText: !_showPass,
-            decoration: InputDecoration(
-              labelText: l.vaultPassphraseLabel,
-              border: const OutlineInputBorder(),
-              suffixIcon: IconButton(
-                icon: Icon(_showPass ? Icons.visibility_off : Icons.visibility),
-                onPressed: () => setState(() => _showPass = !_showPass),
+      // Scroll the content so the soft keyboard never pushes the action buttons
+      // up over the fields (passphrase + PIN + transport can exceed the height
+      // left above the keyboard).
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.filePath,
+              style: Theme.of(context).textTheme.bodySmall,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _ctrl,
+              obscureText: !_showPass,
+              decoration: InputDecoration(
+                labelText: l.vaultPassphraseLabel,
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _showPass ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () => setState(() => _showPass = !_showPass),
+                ),
               ),
             ),
-          ),
-        ],
+            if (widget.isKeyProtected) ...[
+              const SizedBox(height: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.usb,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l.importSourceKeyProtected,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _pinCtrl,
+                obscureText: _pinObscured,
+                decoration: InputDecoration(
+                  labelText: l.yubiKeyPinLabel,
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _pinObscured ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () =>
+                        setState(() => _pinObscured = !_pinObscured),
+                  ),
+                ),
+              ),
+              if (widget.isAndroid) ...[
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Text(
+                      l.transportLabel,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(width: 12),
+                    SegmentedButton<String>(
+                      segments: [
+                        ButtonSegment(
+                          value: 'usb',
+                          label: Text(l.transportUsb),
+                        ),
+                        ButtonSegment(
+                          value: 'nfc',
+                          label: Text(l.transportNfc),
+                        ),
+                      ],
+                      selected: {_transport},
+                      onSelectionChanged: (s) =>
+                          setState(() => _transport = s.first),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+            if (_error != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                _error!,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l.cancel),
         ),
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(_ctrl.text),
-          child: Text(l.sync),
-        ),
+        TextButton(onPressed: _submit, child: Text(l.sync)),
       ],
     );
   }

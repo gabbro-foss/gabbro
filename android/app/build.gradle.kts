@@ -64,6 +64,10 @@ dependencies {
     implementation("com.yubico.yubikit:android:3.1.0")
     implementation("com.yubico.yubikit:fido:3.1.0")
     implementation("androidx.biometric:biometric-ktx:1.2.0-alpha05")
+    // SAF (Storage Access Framework) export: write/overwrite files inside a
+    // user-granted directory tree, which raw POSIX paths can't do under scoped
+    // storage. No new manifest permission — the grant comes from the folder picker.
+    implementation("androidx.documentfile:documentfile:1.0.1")
 
     // JVM unit tests. Robolectric supplies real implementations of framework
     // classes (android.net.Uri, org.json, SharedPreferences) that are otherwise
