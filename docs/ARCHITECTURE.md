@@ -218,13 +218,20 @@ without ever mutating the original.
 analyze` clean). Protection detection for the UI reuses the existing
 `list_vault_yubikey_records(path)` (non-empty ⇒ key-protected).
 
-**Remaining (Flutter — widget-testable on host; only end-to-end key sync needs the device):**
-- Export screen: passphrase-only toggle (default OFF; hidden/disabled for
-  passphrase-only vaults), an always-visible protection-type indicator, and the
-  downgrade warning.
-- Import/sync screen: detect a key-protected source → prompt for a YubiKey.
-- l10n for all new strings across the ARB files.
-- **Interim state:** syncing a *key-protected* export currently errors until the
+**Export screen — done (commit `6139045`):** always-visible protection
+indicator (key-protected vs passphrase-only, fixing the now-misleading
+"passphrase only" note); opt-in "Export without YubiKey protection" toggle
+(default OFF, hidden for passphrase-only vaults) → warning →
+`exportVaultPassphraseOnly`; OFF → preserving export. `vault_list_screen` passes
+`isKeyProtected`. 3 l10n strings × 37 ARBs (best-effort) regenerated. 4 new
+widget tests; all 24 export-screen tests green; `flutter analyze` clean.
+
+**Remaining:**
+- Import/sync screen: detect a key-protected source (via
+  `list_vault_yubikey_records`) → prompt for a YubiKey → `importFromGabbroWithKey`.
+  Reuses the unlock hardware flow (platform-specific); host-widget-testable with
+  injectable FFI, but end-to-end key sync needs the device.
+- **Interim state:** syncing a *key-protected* export currently errors until that
   UI lands; the hole is closed and passphrase-only export/sync is unaffected.
 
 ### Active task: systematic test coverage improvement
