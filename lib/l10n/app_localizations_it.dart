@@ -1238,6 +1238,18 @@ class AppLocalizationsIt extends AppLocalizations {
       'Protetto solo dalla tua passphrase. La YubiKey non è richiesta per l\'importazione.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Protetto dalla tua passphrase e da una YubiKey. La copia esportata mantiene questa protezione — per importarla è necessaria una YubiKey registrata.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Esporta senza protezione YubiKey (solo passphrase)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Il file esportato si aprirà con la sola passphrase — nessuna YubiKey necessaria. Chiunque conosca la passphrase può leggerlo. La tua cassaforte originale resta invariata.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Scegli una destinazione per il file JSON esportato.';
 

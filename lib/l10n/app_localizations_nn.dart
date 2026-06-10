@@ -1235,6 +1235,18 @@ class AppLocalizationsNn extends AppLocalizations {
       'Beskytta av passfrasen din åleine. YubiKey er ikkje nødvendig for import.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Verna av passordfrasen din og ein YubiKey. Den eksporterte kopien held på dette vernet — ein registrert YubiKey trengst for å importere han.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Eksporter utan YubiKey-vern (berre passordfrase)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Den eksporterte fila opnar med berre passordfrasen din — ingen YubiKey nødvendig. Kven som helst som kjenner passordfrasen kan lese henne. Det opphavlege hvelvet ditt blir uendra.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Vel eit mål for den eksporterte JSON-fila.';
 

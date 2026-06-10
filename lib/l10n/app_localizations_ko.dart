@@ -1221,6 +1221,17 @@ class AppLocalizationsKo extends AppLocalizations {
       '암호 문구로만 보호됩니다. 가져오기에 YubiKey가 필요하지 않습니다.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      '암호 구문과 YubiKey로 보호됩니다. 내보낸 사본은 이 보호를 유지합니다 — 가져오려면 등록된 YubiKey가 필요합니다.';
+
+  @override
+  String get exportWithoutYubikey => 'YubiKey 보호 없이 내보내기(암호 구문만)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      '내보낸 파일은 암호 구문만으로 열립니다 — YubiKey가 필요하지 않습니다. 암호 구문을 아는 사람은 누구나 읽을 수 있습니다. 원본 보관함은 변경되지 않습니다.';
+
+  @override
   String get exportChooseDestinationJson => '내보낸 JSON 파일의 저장 위치를 선택하세요.';
 
   @override

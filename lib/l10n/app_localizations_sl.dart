@@ -1244,6 +1244,17 @@ class AppLocalizationsSl extends AppLocalizations {
       'Zaščiteno samo z geslom za dostop. YubiKey ni potreben za uvoz.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Zaščiteno z vašim geslom in ključem YubiKey. Izvožena kopija ohrani to zaščito — za uvoz je potreben registriran YubiKey.';
+
+  @override
+  String get exportWithoutYubikey => 'Izvozi brez zaščite YubiKey (samo geslo)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Izvožena datoteka se odpre samo z vašim geslom — YubiKey ni potreben. Vsak, ki pozna geslo, jo lahko prebere. Vaš izvirni trezor ostane nespremenjen.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Izberite cilj za izvoženo datoteko JSON.';
 

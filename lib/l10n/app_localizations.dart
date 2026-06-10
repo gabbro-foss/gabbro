@@ -2425,6 +2425,24 @@ abstract class AppLocalizations {
   /// **'Protected by your passphrase only. YubiKey is not required to import.'**
   String get exportPassphraseOnlyNote;
 
+  /// No description provided for @exportProtectionKeyProtected.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected by your passphrase and a YubiKey. The exported copy keeps this protection — a registered YubiKey is required to import it.'**
+  String get exportProtectionKeyProtected;
+
+  /// No description provided for @exportWithoutYubikey.
+  ///
+  /// In en, this message translates to:
+  /// **'Export without YubiKey protection (passphrase only)'**
+  String get exportWithoutYubikey;
+
+  /// No description provided for @exportWithoutYubikeyWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'The exported file will open with your passphrase alone — no YubiKey needed. Anyone who knows the passphrase can read it. Your original vault is unchanged.'**
+  String get exportWithoutYubikeyWarning;
+
   /// No description provided for @exportChooseDestinationJson.
   ///
   /// In en, this message translates to:

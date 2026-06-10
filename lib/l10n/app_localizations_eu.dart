@@ -1238,6 +1238,18 @@ class AppLocalizationsEu extends AppLocalizations {
       'Pasaesaldiarekin soilik babestuta. Inportatzeko ez da YubiKey behar.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Zure pasaesaldiarekin eta YubiKey batekin babestuta. Esportatutako kopiak babes hori mantentzen du — hura inportatzeko erregistratutako YubiKey bat behar da.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Esportatu YubiKey babesik gabe (pasaesaldia soilik)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Esportatutako fitxategia zure pasaesaldiarekin soilik irekiko da — ez da YubiKeyrik behar. Pasaesaldia dakien edonork irakur dezake. Zure jatorrizko kutxa gotorra ez da aldatzen.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Aukeratu esportatutako JSON fitxategirako helburua.';
 

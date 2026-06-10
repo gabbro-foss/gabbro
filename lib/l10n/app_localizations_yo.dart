@@ -1233,6 +1233,18 @@ class AppLocalizationsYo extends AppLocalizations {
       'Ti daabobo pẹlu gbolohun ọrọ igbaniwọle nikan. YubiKey ko nilo fun gbigba wọle.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Ti ni aabo nipasẹ gbolohun-igbaniwọle rẹ ati YubiKey kan. Ẹda ti a ko jade ní ìpamọ́ yìí — YubiKey tí a forúkọsílẹ̀ ni a nílò láti gbé wọlé.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Ko jade láìsí aabo YubiKey (gbolohun-igbaniwọle nìkan)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Fáìlì tí a ko jade yóò ṣí pẹ̀lú gbolohun-igbaniwọle rẹ nìkan — kò sí YubiKey tó nílò. Ẹnikẹ́ni tó bá mọ gbolohun-igbaniwọle lè kà á. Àpótí ìpamọ́ ìpilẹ̀ṣẹ̀ rẹ kò yí padà.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Yan ibi ti faili JSON okeere yoo wa.';
 

@@ -445,7 +445,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
   Future<void> _openExportScreen() async {
     await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) => ExportScreen(vaultAlias: widget.vaultAlias),
+        builder: (_) => ExportScreen(
+          vaultAlias: widget.vaultAlias,
+          isKeyProtected: _isYubikeyVault,
+        ),
       ),
     );
   }

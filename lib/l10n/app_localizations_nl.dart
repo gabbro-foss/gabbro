@@ -1239,6 +1239,18 @@ class AppLocalizationsNl extends AppLocalizations {
       'Alleen beveiligd door uw wachtwoordzin. YubiKey is niet vereist om te importeren.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Beveiligd met je wachtwoordzin en een YubiKey. De geëxporteerde kopie behoudt deze beveiliging — een geregistreerde YubiKey is vereist om te importeren.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Exporteren zonder YubiKey-beveiliging (alleen wachtwoordzin)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Het geëxporteerde bestand opent met alleen je wachtwoordzin — geen YubiKey nodig. Iedereen die de wachtwoordzin kent, kan het lezen. Je oorspronkelijke kluis blijft ongewijzigd.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Kies een bestemming voor uw geëxporteerde JSON-bestand.';
 

@@ -30,12 +30,22 @@ enum _ExportFormat { gabbroVault, json }
 
 Future<void> _defaultExport(String path) => exportVault(path: path);
 Future<void> _defaultExportJson(String path) => exportVaultJson(path: path);
+Future<void> _defaultExportPassphraseOnly(String path) =>
+    exportVaultPassphraseOnly(path: path);
 
 class ExportScreen extends StatefulWidget {
   final String? initialPath;
   final String? vaultAlias;
   final Future<void> Function(String path) onExport;
   final Future<void> Function(String path) onExportJson;
+
+  /// The protection-preserving default writes a passphrase-only copy of a
+  /// key-protected vault only when the user opts in via the downgrade toggle.
+  final Future<void> Function(String path) onExportPassphraseOnly;
+
+  /// Whether the active vault is protected by a YubiKey (ADR-013). Drives the
+  /// protection indicator and the opt-in passphrase-only downgrade toggle.
+  final bool isKeyProtected;
   final bool isAndroid;
 
   ExportScreen({
@@ -44,6 +54,8 @@ class ExportScreen extends StatefulWidget {
     this.vaultAlias,
     this.onExport = _defaultExport,
     this.onExportJson = _defaultExportJson,
+    this.onExportPassphraseOnly = _defaultExportPassphraseOnly,
+    this.isKeyProtected = false,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -57,6 +69,10 @@ class _ExportScreenState extends State<ExportScreen> {
   String? _path;
   _ExportFormat _format = _ExportFormat.gabbroVault;
   bool _includeDate = true;
+  // ADR-013: opt-in downgrade — export a key-protected vault as passphrase-only.
+  // Default OFF (the protection-preserving default); only shown for key-protected
+  // vaults exporting to .gabbro.
+  bool _passphraseOnly = false;
   bool _isExporting = false;
   String? _error;
 
@@ -101,7 +117,11 @@ class _ExportScreenState extends State<ExportScreen> {
       final path = _exportPath;
       if (_format == _ExportFormat.json) {
         await widget.onExportJson(path);
+      } else if (widget.isKeyProtected && _passphraseOnly) {
+        // Opt-in downgrade: write a passphrase-only copy (ADR-013).
+        await widget.onExportPassphraseOnly(path);
       } else {
+        // Protection-preserving default.
         await widget.onExport(path);
       }
       if (mounted) Navigator.of(context).pop(true);
@@ -176,11 +196,53 @@ class _ExportScreenState extends State<ExportScreen> {
                     ],
                   ),
                 )
-              else
+              else ...[
+                // ADR-013 protection indicator: always state what protection the
+                // exported copy will carry.
                 Text(
-                  l.exportPassphraseOnlyNote,
+                  widget.isKeyProtected && !_passphraseOnly
+                      ? l.exportProtectionKeyProtected
+                      : l.exportPassphraseOnlyNote,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
+                // Opt-in passphrase-only downgrade — key-protected vaults only.
+                if (widget.isKeyProtected) ...[
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l.exportWithoutYubikey),
+                    value: _passphraseOnly,
+                    onChanged: (v) => setState(() {
+                      _passphraseOnly = v;
+                      _error = null;
+                    }),
+                  ),
+                  if (_passphraseOnly)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: colorScheme.errorContainer,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(Icons.warning_amber_rounded,
+                              color: colorScheme.onErrorContainer, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              l.exportWithoutYubikeyWarning,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(color: colorScheme.onErrorContainer),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ],
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(l.exportIncludeDate),

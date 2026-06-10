@@ -1244,6 +1244,18 @@ class AppLocalizationsPl extends AppLocalizations {
       'Chronione tylko hasłem głównym. YubiKey nie jest potrzebny do importu.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Chronione Twoim hasłem-frazą i kluczem YubiKey. Wyeksportowana kopia zachowuje tę ochronę — do jej zaimportowania wymagany jest zarejestrowany YubiKey.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Eksportuj bez ochrony YubiKey (tylko hasło-fraza)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Wyeksportowany plik otworzy się przy użyciu samego hasła-frazy — YubiKey nie jest potrzebny. Każdy, kto zna hasło-frazę, może go odczytać. Twój oryginalny sejf pozostaje bez zmian.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Wybierz miejsce docelowe dla eksportowanego pliku JSON.';
 

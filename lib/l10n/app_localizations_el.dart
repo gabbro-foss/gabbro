@@ -1246,6 +1246,18 @@ class AppLocalizationsEl extends AppLocalizations {
       'Προστατεύεται μόνο με φράση πρόσβασης. Το YubiKey δεν απαιτείται για εισαγωγή.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Προστατεύεται από τη φράση πρόσβασής σας και ένα YubiKey. Το εξαγόμενο αντίγραφο διατηρεί αυτήν την προστασία — για την εισαγωγή του απαιτείται καταχωρισμένο YubiKey.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Εξαγωγή χωρίς προστασία YubiKey (μόνο φράση πρόσβασης)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Το εξαγόμενο αρχείο θα ανοίξει μόνο με τη φράση πρόσβασής σας — δεν χρειάζεται YubiKey. Οποιοσδήποτε γνωρίζει τη φράση πρόσβασης μπορεί να το διαβάσει. Το αρχικό σας θησαυροφυλάκιο παραμένει αμετάβλητο.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Επιλέξτε προορισμό για το εξαχθέν αρχείο JSON.';
 

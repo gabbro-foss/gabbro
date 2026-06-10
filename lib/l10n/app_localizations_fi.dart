@@ -1239,6 +1239,18 @@ class AppLocalizationsFi extends AppLocalizations {
       'Suojattu vain salauslauseella. YubiKey-avain ei ole tarpeen tuonnissa.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Suojattu tunnuslauseellasi ja YubiKey-avaimella. Viety kopio säilyttää tämän suojauksen — sen tuomiseen tarvitaan rekisteröity YubiKey.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Vie ilman YubiKey-suojausta (vain tunnuslause)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Viety tiedosto avautuu pelkällä tunnuslauseellasi — YubiKeytä ei tarvita. Kuka tahansa tunnuslauseen tietävä voi lukea sen. Alkuperäinen holvisi säilyy ennallaan.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Valitse kohde viedylle JSON-tiedostolle.';
 

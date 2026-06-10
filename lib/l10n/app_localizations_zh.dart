@@ -1214,6 +1214,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get exportPassphraseOnlyNote => '仅使用密码短语保护。导入时无需 YubiKey。';
 
   @override
+  String get exportProtectionKeyProtected =>
+      '由您的口令和 YubiKey 保护。导出的副本会保留此保护 — 导入它需要已注册的 YubiKey。';
+
+  @override
+  String get exportWithoutYubikey => '导出时不使用 YubiKey 保护（仅口令）';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      '导出的文件仅凭您的口令即可打开 — 无需 YubiKey。知道口令的任何人都能读取它。您的原始保险库保持不变。';
+
+  @override
   String get exportChooseDestinationJson => '选择导出 JSON 文件的目标位置。';
 
   @override
@@ -2965,6 +2976,17 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get exportPassphraseOnlyNote => '仅使用密码短语保护。导入时无需 YubiKey。';
 
   @override
+  String get exportProtectionKeyProtected =>
+      '由您的口令和 YubiKey 保护。导出的副本会保留此保护 — 导入它需要已注册的 YubiKey。';
+
+  @override
+  String get exportWithoutYubikey => '导出时不使用 YubiKey 保护（仅口令）';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      '导出的文件仅凭您的口令即可打开 — 无需 YubiKey。知道口令的任何人都能读取它。您的原始保险库保持不变。';
+
+  @override
   String get exportChooseDestinationJson => '选择导出 JSON 文件的目标位置。';
 
   @override
@@ -4714,6 +4736,17 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get exportPassphraseOnlyNote => '僅使用密碼片語保護。匯入時無需 YubiKey。';
+
+  @override
+  String get exportProtectionKeyProtected =>
+      '由您的通行碼和 YubiKey 保護。匯出的副本會保留此保護 — 匯入它需要已註冊的 YubiKey。';
+
+  @override
+  String get exportWithoutYubikey => '匯出時不使用 YubiKey 保護（僅通行碼）';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      '匯出的檔案僅憑您的通行碼即可開啟 — 無需 YubiKey。知道通行碼的任何人都能讀取它。您的原始保險庫保持不變。';
 
   @override
   String get exportChooseDestinationJson => '選擇匯出 JSON 檔案的目標位置。';

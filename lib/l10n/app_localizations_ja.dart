@@ -1220,6 +1220,17 @@ class AppLocalizationsJa extends AppLocalizations {
       'パスフレーズのみで保護されています。インポートにYubiKeyは不要です。';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'パスフレーズと YubiKey で保護されています。エクスポートしたコピーはこの保護を維持します — インポートには登録済みの YubiKey が必要です。';
+
+  @override
+  String get exportWithoutYubikey => 'YubiKey 保護なしでエクスポート（パスフレーズのみ）';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'エクスポートしたファイルはパスフレーズだけで開きます — YubiKey は不要です。パスフレーズを知っている人は誰でも読めます。元の保管庫は変更されません。';
+
+  @override
   String get exportChooseDestinationJson => 'エクスポートされたJSONファイルの保存先を選択してください。';
 
   @override

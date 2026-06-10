@@ -254,5 +254,85 @@ void main() {
       await tester.pump();
       expect(jsonExportedPath, '/home/user/vault.json');
     });
+
+    // ── ADR-013: protection-preserving export + opt-in downgrade ─────────────
+
+    const downgradeLabel = 'Export without YubiKey protection (passphrase only)';
+
+    testWidgets('passphrase-only vault: no downgrade toggle, shows passphrase note',
+        (tester) async {
+      await tester.pumpWidget(
+        testApp(ExportScreen(
+            isKeyProtected: false,
+            onExport: (path) async {},
+            onExportJson: (path) async {},
+        )),
+      );
+      expect(find.text(downgradeLabel), findsNothing);
+      expect(find.textContaining('passphrase only'), findsOneWidget);
+    });
+
+    testWidgets('key-protected vault: shows key-protected note and downgrade toggle (default OFF)',
+        (tester) async {
+      await tester.pumpWidget(
+        testApp(ExportScreen(
+            isKeyProtected: true,
+            onExport: (path) async {},
+            onExportJson: (path) async {},
+        )),
+      );
+      expect(find.textContaining('keeps this protection'), findsOneWidget);
+      final toggle = tester.widget<SwitchListTile>(
+        find.widgetWithText(SwitchListTile, downgradeLabel),
+      );
+      expect(toggle.value, isFalse);
+      // Warning only appears once the user opts in.
+      expect(find.textContaining('no YubiKey needed'), findsNothing);
+    });
+
+    testWidgets('key-protected vault: toggle OFF routes to the preserving export',
+        (tester) async {
+      String? preservedPath;
+      var downgraded = false;
+      await tester.pumpWidget(
+        testApp(ExportScreen(
+            isAndroid: false,
+            isKeyProtected: true,
+            initialPath: '/home/user/vault.gabbro',
+            onExport: (path) async => preservedPath = path,
+            onExportPassphraseOnly: (path) async => downgraded = true,
+            onExportJson: (path) async {},
+        )),
+      );
+      await tester.tap(find.text('Export'));
+      await tester.pump();
+      expect(preservedPath, '/home/user/vault.gabbro');
+      expect(downgraded, isFalse);
+    });
+
+    testWidgets('key-protected vault: toggle ON shows warning and routes to passphrase-only export',
+        (tester) async {
+      String? downgradedPath;
+      var preserved = false;
+      await tester.pumpWidget(
+        testApp(ExportScreen(
+            isAndroid: false,
+            isKeyProtected: true,
+            initialPath: '/home/user/vault.gabbro',
+            onExport: (path) async => preserved = true,
+            onExportPassphraseOnly: (path) async => downgradedPath = path,
+            onExportJson: (path) async {},
+        )),
+      );
+      await tester.tap(find.widgetWithText(SwitchListTile, downgradeLabel));
+      await tester.pump();
+      // Opting in surfaces the downgrade warning.
+      expect(find.textContaining('no YubiKey needed'), findsOneWidget);
+
+      await tester.tap(find.text('Export'));
+      await tester.pump();
+      expect(downgradedPath, '/home/user/vault.gabbro');
+      expect(preserved, isFalse);
+    });
   });
 }

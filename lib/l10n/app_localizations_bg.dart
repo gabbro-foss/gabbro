@@ -1240,6 +1240,18 @@ class AppLocalizationsBg extends AppLocalizations {
       'Защитено само с паролна фраза. YubiKey не е необходим за импортиране.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Защитено с вашата парола-фраза и YubiKey. Експортираното копие запазва тази защита — за импортирането му е необходим регистриран YubiKey.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Експортиране без защита с YubiKey (само парола-фраза)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Експортираният файл ще се отвори само с вашата парола-фраза — без YubiKey. Всеки, който знае паролата-фраза, може да го прочете. Оригиналният ви сейф остава непроменен.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Избери местоназначение за експортирания JSON файл.';
 

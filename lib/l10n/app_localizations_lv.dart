@@ -1238,6 +1238,18 @@ class AppLocalizationsLv extends AppLocalizations {
       'Aizsargāts tikai ar ieejas frāzi. YubiKey nav nepieciešams importēšanai.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Aizsargāts ar jūsu paroles frāzi un YubiKey. Eksportētā kopija saglabā šo aizsardzību — tās importēšanai nepieciešams reģistrēts YubiKey.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Eksportēt bez YubiKey aizsardzības (tikai paroles frāze)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Eksportētais fails tiks atvērts tikai ar jūsu paroles frāzi — YubiKey nav nepieciešams. Ikviens, kas zina paroles frāzi, var to izlasīt. Jūsu sākotnējā glabātava paliek nemainīga.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Izvēlieties eksportētā JSON faila galamērķi.';
 

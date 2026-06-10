@@ -1240,6 +1240,18 @@ class AppLocalizationsUk extends AppLocalizations {
       'Захищено лише кодовою фразою. YubiKey не потрібен для імпорту.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Захищено вашою парольною фразою та YubiKey. Експортована копія зберігає цей захист — для її імпортування потрібен зареєстрований YubiKey.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Експортувати без захисту YubiKey (лише парольна фраза)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Експортований файл відкриється лише вашою парольною фразою — YubiKey не потрібен. Будь-хто, хто знає парольну фразу, зможе його прочитати. Ваше початкове сховище залишається незмінним.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Виберіть місце призначення для експортованого файлу JSON.';
 

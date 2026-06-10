@@ -1235,6 +1235,18 @@ class AppLocalizationsHu extends AppLocalizations {
       'Csak a jelmondat védi. Az importáláshoz nem szükséges YubiKey.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'A jelmondatod és egy YubiKey véd. Az exportált másolat megőrzi ezt a védelmet — az importáláshoz regisztrált YubiKey szükséges.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Exportálás YubiKey-védelem nélkül (csak jelmondat)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Az exportált fájl pusztán a jelmondatoddal megnyílik — nincs szükség YubiKeyre. Bárki, aki ismeri a jelmondatot, elolvashatja. Az eredeti széfed változatlan marad.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Válassz célhelyet az exportált JSON-fájlhoz.';
 

@@ -1239,6 +1239,18 @@ class AppLocalizationsSk extends AppLocalizations {
       'Chránené iba prístupovou frázou. YubiKey nie je pre import potrebný.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Chránené vašou prístupovou frázou a kľúčom YubiKey. Exportovaná kópia si túto ochranu ponecháva — na jej import je potrebný zaregistrovaný YubiKey.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Exportovať bez ochrany YubiKey (iba prístupová fráza)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Exportovaný súbor sa otvorí iba vašou prístupovou frázou — YubiKey nie je potrebný. Ktokoľvek, kto pozná prístupovú frázu, si ho môže prečítať. Váš pôvodný trezor zostáva nezmenený.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Zvoľte cieľ pre exportovaný súbor JSON.';
 

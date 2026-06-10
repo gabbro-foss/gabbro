@@ -1236,6 +1236,18 @@ class AppLocalizationsKk extends AppLocalizations {
       'Тек кілт фразасымен қорғалған. Импорт үшін YubiKey қажет емес.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Сіздің құпия фразаңызбен және YubiKey арқылы қорғалған. Экспортталған көшірме осы қорғанысты сақтайды — оны импорттау үшін тіркелген YubiKey қажет.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'YubiKey қорғанысынсыз экспорттау (тек құпия фраза)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Экспортталған файл тек құпия фразаңызбен ашылады — YubiKey қажет емес. Құпия фразаны білетін кез келген адам оны оқи алады. Бастапқы қоймаңыз өзгеріссіз қалады.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Экспортталған JSON файлының орнын таңдаңыз.';
 

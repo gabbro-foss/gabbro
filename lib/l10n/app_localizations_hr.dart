@@ -1237,6 +1237,18 @@ class AppLocalizationsHr extends AppLocalizations {
       'Zaštićeno samo pristupnom frazom. YubiKey nije potreban za uvoz.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Zaštićeno vašom pristupnom frazom i YubiKeyjem. Izvezena kopija zadržava ovu zaštitu — za njezin uvoz potreban je registrirani YubiKey.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Izvezi bez YubiKey zaštite (samo pristupna fraza)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Izvezena datoteka otvorit će se samo vašom pristupnom frazom — YubiKey nije potreban. Svatko tko zna pristupnu frazu može je pročitati. Vaš izvorni trezor ostaje nepromijenjen.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Odaberite odredište za izvezenu JSON datoteku.';
 

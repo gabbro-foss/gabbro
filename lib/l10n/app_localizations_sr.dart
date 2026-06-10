@@ -1242,6 +1242,18 @@ class AppLocalizationsSr extends AppLocalizations {
       'Zaštićeno samo pristupnom frazom. YubiKey nije potreban za uvoz.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Заштићено вашом приступном фразом и YubiKey-јем. Извезена копија задржава ову заштиту — за њен увоз потребан је регистровани YubiKey.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Извези без YubiKey заштите (само приступна фраза)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Извезена датотека отвориће се само вашом приступном фразом — YubiKey није потребан. Свако ко зна приступну фразу може је прочитати. Ваш изворни трезор остаје непромењен.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Izaberite odredište za izvezenu JSON datoteku.';
 
@@ -3068,6 +3080,18 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get exportPassphraseOnlyNote =>
       'Zaštićeno samo pristupnom frazom. YubiKey nije potreban za uvoz.';
+
+  @override
+  String get exportProtectionKeyProtected =>
+      'Zaštićeno vašom pristupnom frazom i YubiKey-jem. Izvezena kopija zadržava ovu zaštitu — za njen uvoz potreban je registrovani YubiKey.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Izvezi bez YubiKey zaštite (samo pristupna fraza)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Izvezena datoteka otvoriće se samo vašom pristupnom frazom — YubiKey nije potreban. Svako ko zna pristupnu frazu može je pročitati. Vaš izvorni trezor ostaje nepromenjen.';
 
   @override
   String get exportChooseDestinationJson =>

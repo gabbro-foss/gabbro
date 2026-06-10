@@ -1240,6 +1240,18 @@ class AppLocalizationsLt extends AppLocalizations {
       'Apsaugota tik slaptafrazė. YubiKey neReikalingas importuoti.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Apsaugota jūsų slaptafraze ir YubiKey. Eksportuota kopija išlaiko šią apsaugą — jai importuoti reikia registruoto YubiKey.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Eksportuoti be YubiKey apsaugos (tik slaptafrazė)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Eksportuotas failas atsidarys vien su jūsų slaptafraze — YubiKey nereikia. Bet kas, žinantis slaptafrazę, gali jį perskaityti. Jūsų pradinis seifas lieka nepakitęs.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Pasirinkite eksportuoto JSON failo paskirties vietą.';
 

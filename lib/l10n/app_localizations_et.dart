@@ -1239,6 +1239,18 @@ class AppLocalizationsEt extends AppLocalizations {
       'Kaitstud ainult pääslausega. YubiKey ei ole importimiseks vajalik.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Kaitstud teie paroolifraasi ja YubiKey-ga. Eksporditud koopia säilitab selle kaitse — selle importimiseks on vaja registreeritud YubiKeyd.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Ekspordi ilma YubiKey kaitseta (ainult paroolifraas)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Eksporditud fail avaneb ainult teie paroolifraasiga — YubiKeyd pole vaja. Igaüks, kes teab paroolifraasi, saab seda lugeda. Teie algne hoidla jääb muutmata.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Vali eksporditud JSON-faili sihtkoht.';
 

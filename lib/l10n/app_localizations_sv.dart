@@ -1236,6 +1236,18 @@ class AppLocalizationsSv extends AppLocalizations {
       'Skyddad av din lösenfras enbart. YubiKey krävs inte för import.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Skyddad av din lösenfras och en YubiKey. Den exporterade kopian behåller detta skydd — en registrerad YubiKey krävs för att importera den.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Exportera utan YubiKey-skydd (endast lösenfras)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'Den exporterade filen öppnas med enbart din lösenfras — ingen YubiKey behövs. Vem som helst som känner till lösenfrasen kan läsa den. Ditt ursprungliga valv förblir oförändrat.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Välj en destination för din exporterade JSON-fil.';
 

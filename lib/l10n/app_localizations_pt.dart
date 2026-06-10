@@ -1238,6 +1238,18 @@ class AppLocalizationsPt extends AppLocalizations {
       'Protegido apenas pela frase secreta. A YubiKey não é necessária para importar.';
 
   @override
+  String get exportProtectionKeyProtected =>
+      'Protegido pela sua palavra-passe e por uma YubiKey. A cópia exportada mantém esta proteção — é necessária uma YubiKey registada para a importar.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Exportar sem proteção YubiKey (apenas palavra-passe)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'O ficheiro exportado abrirá apenas com a sua palavra-passe — sem necessidade de YubiKey. Qualquer pessoa que saiba a palavra-passe pode lê-lo. O seu cofre original permanece inalterado.';
+
+  @override
   String get exportChooseDestinationJson =>
       'Escolha um destino para o arquivo JSON exportado.';
 
@@ -3063,6 +3075,18 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get exportPassphraseOnlyNote =>
       'Protegido apenas pela frase secreta. A YubiKey não é necessária para importar.';
+
+  @override
+  String get exportProtectionKeyProtected =>
+      'Protegido pela sua senha e por uma YubiKey. A cópia exportada mantém essa proteção — é necessária uma YubiKey registrada para importá-la.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Exportar sem proteção YubiKey (apenas senha)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'O arquivo exportado abrirá apenas com a sua senha — sem necessidade de YubiKey. Qualquer pessoa que saiba a senha pode lê-lo. Seu cofre original permanece inalterado.';
 
   @override
   String get exportChooseDestinationJson =>
@@ -4891,6 +4915,18 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get exportPassphraseOnlyNote =>
       'Protegido apenas pela frase-passe. A YubiKey não é necessária para importar.';
+
+  @override
+  String get exportProtectionKeyProtected =>
+      'Protegido pela sua palavra-passe e por uma YubiKey. A cópia exportada mantém esta proteção — é necessária uma YubiKey registada para a importar.';
+
+  @override
+  String get exportWithoutYubikey =>
+      'Exportar sem proteção YubiKey (apenas palavra-passe)';
+
+  @override
+  String get exportWithoutYubikeyWarning =>
+      'O ficheiro exportado abrirá apenas com a sua palavra-passe — sem necessidade de YubiKey. Qualquer pessoa que saiba a palavra-passe pode lê-lo. O seu cofre original permanece inalterado.';
 
   @override
   String get exportChooseDestinationJson =>
