@@ -4,8 +4,7 @@
 
 A post-quantum password manager built with security as core DNA.
 Named after the intrusive igneous rock — hard, stable, enduring.
-Cross-platform: Linux (Arch, Mint), Android, later iOS/Windows/macOS.
-FOSS, GPL-3.0-only. Potential Yubico partnership.
+Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Core principle:** if it touches a secret, it lives in Rust. Everything else lives in Flutter. Secrets never cross the Flutter/Rust bridge in plaintext.
 
@@ -17,7 +16,7 @@ FOSS, GPL-3.0-only. Potential Yubico partnership.
 
 **Authentication (app access):** Mandatory FIDO2/WebAuthn hardware key (YubiKey). v1 uses Ed25519 (hardware constraint); target ML-DSA-44 once Yubico ships PQ-capable hardware (ADR-005). Min 2 keys (primary + backup), max 4. Auto-lock: 30s default, configurable.
 
-**YubiKey NFC / NDEF OTP:** YubiKeys ship with OTP slot 1 as an NDEF URI over NFC (`https://my.yubico.com/yk/...`). Without mitigation, Android opens a browser tab when the key is tapped. Gabbro suppresses this via `NfcConfiguration().skipNdefCheck(true)` (prevents NDEF being read during the CTAP2 session) and by re-arming foreground dispatch after `stopNfcDiscovery` (routes any post-session NDEF intents to `onNewIntent` rather than the browser). OTP slot 1 may remain enabled — no `ykman` workaround is needed. See LEARNINGS.md for the full diagnosis and collateral-effects table.
+**YubiKey NFC / NDEF OTP:** a YubiKey's OTP slot 1 (an NDEF URI) would open a browser when tapped on Android. Gabbro suppresses this via `NfcConfiguration().skipNdefCheck(true)` and by re-arming foreground dispatch after `stopNfcDiscovery`; OTP slot 1 can stay enabled (no `ykman` workaround). Full diagnosis in LEARNINGS.md.
 
 **Vault file format:** `.gabbro` binary. Plaintext header (magic, version, Argon2id params + salt, HKDF salt, nonce, ML-KEM ciphertext, X25519 ephemeral pubkey) + AES-256-GCM encrypted body (JSON-serialised entries). Self-contained; auth tag detects tampering.
 
@@ -27,9 +26,9 @@ FOSS, GPL-3.0-only. Potential Yubico partnership.
 
 **Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text size, high-contrast, alphabet bar position.
 
-**Platforms:** v1: Linux (Arch + Mint/deb), Android (F-Droid + Play Store). v2: Windows, macOS, iOS.
+**Platforms:** v1: Linux (Arch + Mint/deb), Android (F-Droid + Play Store). Later: Windows.
 
-**Versioning:** SemVer (semver.org/spec/v2.0.0.html). `pubspec.yaml` is `0.1.0+1`. `1.0` is a public trust commitment; don't ship it prematurely. CHANGELOG.md follows Keep a Changelog 1.0.0.
+**Versioning:** SemVer (semver.org/spec/v2.0.0.html). `pubspec.yaml` is `0.1.0-alpha.6+6`. `1.0` is a public trust commitment; don't ship it prematurely. CHANGELOG.md follows Keep a Changelog 1.0.0.
 
 **Licence:** GPL-3.0-only (ADR-004). Play Store one-time payment is licence-compatible; F-Droid free build coexists without conflict.
 
@@ -39,127 +38,25 @@ FOSS, GPL-3.0-only. Potential Yubico partnership.
 
 ```
 gabbro/
-├── lib/                        # Flutter app
-│   ├── main.dart
-│   ├── screens/
-│   │   ├── unlock_screen.dart
-│   │   ├── manage_vaults_screen.dart
-│   │   ├── export_screen.dart
-│   │   ├── import_screen.dart
-│   │   ├── csv_mapping_screen.dart
-│   │   ├── change_passphrase_screen.dart
-│   │   ├── help_screen.dart
-│   │   ├── about_screen.dart
-│   │   ├── appearance_screen.dart
-│   │   ├── language_screen.dart
-│   │   ├── generator_screen.dart
-│   │   ├── security_screen.dart
-│   │   ├── review_changes_screen.dart
-│   │   ├── password_history_screen.dart
-│   │   ├── alphabet_index_bar.dart
-│   │   ├── tablet_vault_layout.dart
-│   │   └── manage_folders_screen.dart
-│   ├── widgets/
-│   │   ├── path_field.dart
-│   │   ├── segmented_row.dart
-│   │   ├── generator_widget.dart
-│   │   ├── gabbro_logo.dart
-│   │   └── password_breakdown_sheet.dart
-│   ├── app_paths.dart          # GabbroPaths: single source for config/data dirs + test sandbox override
-│   ├── settings.dart
-│   ├── vault_registry.dart
-│   └── src/rust/               # Auto-generated bridge (do not edit)
-├── rust/
-│   ├── src/
-│   │   ├── api/                # Bridge surface exposed to Flutter
-│   │   │   ├── simple.rs
-│   │   │   ├── password_generator.rs
-│   │   │   ├── passphrase_generator.rs
-│   │   │   ├── types.rs            # Shared types (Language enum — 29 variants)
-│   │   │   ├── vault.rs
-│   │   │   ├── vault_bridge.rs
-│   │   │   ├── import.rs
-│   │   │   ├── autofill_bridge.rs
-│   │   │   ├── fido_bridge.rs      # Linux FIDO2 bridge (fido_list_devices, fido_register, fido_get_hmac_secret)
-│   │   │   └── entropy.rs
-│   │   ├── crypto/             # Internal crypto (not bridge-exposed)
-│   │   │   ├── kdf.rs
-│   │   │   ├── keypair.rs
-│   │   │   ├── ml_kem.rs
-│   │   │   ├── hkdf.rs
-│   │   │   ├── aes_gcm.rs
-│   │   │   └── vault_crypto.rs
-│   │   ├── vault/              # Internal domain model
-│   │   │   ├── entry.rs
-│   │   │   ├── file_format.rs
-│   │   │   ├── io.rs
-│   │   │   ├── serialization.rs
-│   │   │   └── session.rs
-│   │   ├── fido/               # FIDO2/libfido2 FFI binding
-│   │   │   ├── mod.rs
-│   │   │   └── device.rs
-│   │   ├── import/
-│   │   │   ├── enpass.rs
-│   │   │   ├── bitwarden.rs
-│   │   │   ├── google_pm.rs
-│   │   │   ├── dashlane.rs
-│   │   │   └── csv.rs
-│   │   ├── bin/
-│   │   │   ├── bench_kdf.rs
-│   │   │   └── mem_forensics.rs    # memory-forensics self-test (--features forensics)
-│   │   └── lib.rs
-│   ├── scripts/
-│   │   ├── mem_forensics.sh        # gcore memory-forensics driver (audit L-6)
-│   │   └── gen_wordlists.py        # generates rust/assets/wordlist_XX.txt (Step 3)
-│   ├── examples/
-│   │   └── gen_fixtures.rs         # one-time golden-vault fixture generator (see tests/fixtures/FIXTURES.md)
-│   └── tests/
-│       ├── vault_backward_compat.rs    # frozen-fixture backward-compat gate (read v6+, migrate, YubiKey rotation, passphrase change)
-│       ├── vault_state_machine_fuzz.rs # opt-in (#[ignore]) seeded-rand fuzzer: random {change_passphrase, add/remove key} order
-│       └── fixtures/
-│           ├── FIXTURES.md         # fixture provenance + recipe to add a vN_*.gabbro per new VERSION
-│           ├── fixture_spec.rs     # shared seal/assert spec, included by both harness and generator (no drift)
-│           └── vaults/             # committed FROZEN golden vaults: v6/v7 × {passphrase, multikey}
-├── android/app/src/main/
-│   └── kotlin/app/gabbro/gabbro/
-│       ├── GabbroAutofillService.kt
-│       ├── UnlockActivity.kt
-│       ├── RustBridge.kt
-│       ├── YubiKeyManager.kt      # USB FIDO2 hmac-secret (register + getHmacSecret)
-│       └── BiometricHelper.kt     # AndroidKeyStore + BiometricPrompt enrol/auth/unenrol
-├── android/app/src/test/
-│   ├── kotlin/app/gabbro/gabbro/
-│   │   ├── YubiKeyManagerTest.kt
-│   │   ├── BiometricHelperTest.kt              # Robolectric: isEnrolled (real SharedPreferences)
-│   │   ├── GabbroAutofillServiceTest.kt        # pure-data (CredentialSummary, ParsedStructure)
-│   │   └── GabbroAutofillServiceRobolectricTest.kt  # Robolectric: Uri + org.json helpers
-│   └── resources/
-│       └── robolectric.properties             # pins Robolectric runtime to sdk=34
-├── docs/
-│   ├── ARCHITECTURE.md         # This file
-│   ├── LEARNINGS.md
-│   ├── SECURITY.md             # User-facing security overview (Track A Phase 2)
-│   ├── AI_AUTHORSHIP_AND_IP.md
-│   ├── AI_DEVELOPMENT_PROCESS.md  # "Is Gabbro vibe-coded?" — process/trust rationale
-│   ├── AI_SECURITY_AUDIT.md    # AI-assisted security review (2026-05-31)
-│   ├── artefacts/
-│   └── decisions/              # ADR documents
-├── assets/
-│   ├── fonts/
-│   ├── images/
-│   └── help/                       # 13 annotated screenshots for the in-app help carousel
-├── challenge/
-│   ├── README.md               # Crack-me challenge rules and reward
-│   ├── decryptMe_2026-06-01.gabbro        # Sealed vault (passphrase + YubiKey; body unreadable without hardware)
-│   └── decryptMe_2026-06-01.gabbro.sha256
-├── test/                       # Flutter unit/widget tests
-├── integration_test/
-│   ├── vault_session_test.dart     # Phase 1: real-FFI passphrase-vault round-trip (Linux)
-│   └── entry_edit_test.dart        # Phase 1: real-FFI edit/update + clear/revert password-history refresh (Linux)
-├── test_driver/
-│   └── integration_test.dart       # flutter drive entrypoint (run integration_test in --profile)
-├── CHANGELOG.md
-└── README.md
+├── lib/                  # Flutter app
+│   ├── screens/          # unlock, vault list, export, import, generator, settings, manage vaults/folders, …
+│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, …
+│   ├── src/rust/         # Auto-generated bridge (do not edit)
+│   └── *.dart            # main, app_paths (GabbroPaths), settings, vault_registry
+├── rust/src/
+│   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, entropy, types
+│   ├── crypto/           # Internal (not bridge-exposed): kdf, keypair, ml_kem, hkdf, aes_gcm, vault_crypto
+│   ├── vault/            # Domain model: entry, file_format, io, serialization, session
+│   ├── fido/             # FIDO2/libfido2 FFI (Linux only)
+│   ├── import/           # enpass, bitwarden, google_pm, dashlane, csv
+│   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics; wordlist gen; gen_fixtures
+├── rust/tests/           # Backward-compat gate + state-machine fuzzer + frozen golden fixtures (FIXTURES.md)
+├── android/…/kotlin/…/   # GabbroAutofillService, UnlockActivity, YubiKeyManager, BiometricHelper (+ Robolectric tests)
+├── docs/                 # ARCHITECTURE, LEARNINGS, SECURITY, AI_*; decisions/ (ADRs); artefacts/
+├── test/  integration_test/  test_driver/   # Flutter widget/unit + Linux real-FFI device suites
+├── assets/               # fonts, images, help/ (in-app help screenshots)
+├── challenge/            # crack-me challenge vault + rules
+└── CHANGELOG.md  README.md
 ```
 
 ## Features
@@ -170,14 +67,12 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 477 | 8 |
+| Rust (`cargo test -q`) | 484 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 723 | 0 |
+| Flutter (`flutter test`) | 733 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
-
-Strategy: TDD from day one. Rust native test framework; Flutter unit + widget tests in `test/`. The backward-compat harness is a separate integration binary that reads committed frozen golden vaults — see Current Focus and `rust/tests/fixtures/FIXTURES.md`. `integration_test/` covers the hard-to-reach app paths that need the real Rust bridge on a device (Current Focus → Remaining); broad cross-layer scaffolding beyond those targeted paths stays YAGNI (Bikeshed).
 
 **Test isolation (non-negotiable):** no test may touch the user's real settings or
 vault folders. All config/data directories resolve through `GabbroPaths`
@@ -192,113 +87,11 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Active task: systematic test coverage improvement
+### Next active task — _to set with [user]_
 
-**Philosophy:** tests catch real flaws — logic errors, mishandled failure modes,
-secret leakage, malformed-input crashes, state-machine bypasses — not line count.
-
-**In progress → Flutter `integration_test/` coverage** (Rust, Kotlin and Flutter unit
-layers are done — see Coverage status). The last coverage frontier; needs a real
-device. **Phased, Linux-first:** Phase 1 (Linux desktop, passphrase-vault, no
-hardware) is underway — harness + the real-FFI session round-trip are green; Phase 2
-covers the hardware/Android-only paths. Detail and remaining scenarios under Remaining
-below.
-
-#### Coverage status
-
-| Layer | State |
-|-------|-------|
-| Rust unit (`cargo test -q`) | ✅ reachable targets covered (`fido/device`, `crypto/vault_crypto`, importers, `api/vault_bridge`, `api/import`) |
-| Rust vault backward-compat harness | ✅ done — see below |
-| Flutter (`flutter test`) | ✅ 664 passing; hard-to-reach paths covered by `integration_test/` (below) |
-| Flutter integration (`flutter drive`) | 🔶 Phase 1 underway (Linux) — session round-trip + changePassphrase + entry edit/history/revert green (7 tests); main.dart + onboarding + fallback-locale scenarios + Phase 2 hardware paths remain |
-| Kotlin (`./gradlew :app:testDebugUnitTest`) | ✅ Robolectric reachable targets covered — 23 passing / 17 `@Ignore`d (hardware-only: YubiKey, BiometricPrompt, AndroidKeyStore) |
-
-#### Vault-format backward-compatibility harness — ✅ done
-
-The safety net the 2026-06-08 brick proved we needed (post-mortem in LEARNINGS.md).
-`rust/tests/vault_backward_compat.rs` loads **frozen golden `.gabbro` vaults committed
-to git** (`tests/fixtures/vaults/`, one set per format VERSION, sealed by the build
-that shipped that version) and proves the *current* code can still:
-
-- **read** each v6/v7 vault — passphrase-only and multi-key (YubiKey) keyslot paths;
-- **migrate** it to the current VERSION on re-seal, contents preserved;
-- **survive the full YubiKey loss/rotation journey** — create with YK1+YK2 → lose
-  YK2/add YK3 → lose YK1/add YK4, unlockable with the surviving keys at every step,
-  with a post-onboarding floor of one key — and this holds starting from both a v6
-  and a v7 vault, asserting the on-disk version is current after every mutation;
-- **survive a passphrase change** — vault A (passphrase-only) changes its passphrase
-  and still opens under the new one (old one rejected); vault B (multi-key) interleaves
-  a passphrase change into the rotation journey, ending with a *new passphrase AND new
-  keys* and still openable by every surviving `(new passphrase + registered YK)` pair,
-  with the old passphrase and removed keys all refused. A wrong old passphrase is
-  rejected and leaves the vault openable under the original.
-
-10 tests, driven through the real bridge functions the app calls. A round-trip test
-can never catch a brick; only frozen old bytes can. Generation recipe and the
-per-VERSION gate live in `rust/tests/fixtures/FIXTURES.md`. Scope is v6+ (no user
-vaults predate v6). Fixtures use fixed fake key material and low Argon2id params, but
-the passphrase-change tests re-seal at production strength — run the gate in
-`--release` (~14 s vs ~6 min in debug). The opt-in `vault_state_machine_fuzz.rs`
-(seeded `rand`, `#[ignore]`'d) randomises the *order* of {change_passphrase, add/remove
-key} over the same fixtures to surface interleavings the hand-written tests miss;
-failures get promoted here as fixed regression tests.
-
-> **RELEASE GATE — non-negotiable.** Every new format VERSION must ship with a
-> committed `vN_passphrase.gabbro` and `vN_multikey_2keys.gabbro`, generated by the
-> build that introduces VERSION N (recipe in `FIXTURES.md`), with
-> `cargo test --release --test vault_backward_compat` green. The gate only protects
-> versions that have a fixture — skipping this step silently removes the net for that
-> version.
-> Mirrored in the Release Process pre-flight below.
-
-#### Remaining — Flutter `integration_test/` (in progress)
-
-These paths can't be reached by `flutter test` widget tests (host VM, no native lib):
-they need `integration_test/` driving a real device so the **actual** Rust FFI →
-crypto → disk stack runs. Phase 1 targets the passphrase-only vault path (no YubiKey).
-
-**Run command** (profile, not debug — `flutter test -d linux` builds the Rust lib in
-debug, where Argon2id is too slow; `--release` is rejected for non-web `flutter drive`):
-
-```bash
-flutter drive --driver=test_driver/integration_test.dart \
-  --target=integration_test/<suite>_test.dart -d linux --profile
-```
-
-Phase 1 (Linux desktop, no hardware):
-- ✅ **Harness + session round-trip + changePassphrase** (`integration_test/vault_session_test.dart`,
-  3 tests): `initVault` → `createEntry` → real `getEntry`; `lockVault` → `unlockVault`
-  re-reads from disk; `changePassphrase` re-seals and the vault re-opens under the new
-  passphrase only. Proves real FFI/Argon2id/AES-GCM and the un-injectable `getEntry` path.
-- ✅ **Entry edit + password-history refresh** (`integration_test/entry_edit_test.dart`,
-  4 tests): `create_entry_screen` edit→`updateEntry`→real `getEntry` (auto-records
-  `previous_password`); `entry_detail_screen` `getEntry` refresh after
-  `sessionClearPasswordHistory` (`:355`) and `sessionRevertPassword` (`:374`); history
-  survives a real `lockVault`→`unlockVault` disk round-trip.
-**Re-categorised → widget/unit tests (`test/`), not `integration_test/`.** Investigation
-showed the remaining "main.dart / onboarding / fallback-locale" items are *not* real-FFI
-paths: the app shell and target screens mount with injectable/guarded FFI, and the
-`GabbroPaths` test-sandbox refactor made onboarding's default-path step mountable. So they
-were covered as fast `flutter test` widget/unit tests, not `flutter drive`:
-- ✅ `main.dart` `navigateToManageVaults` → `test/main_navigation_test.dart`.
-  `onActiveVaultDeleted` is **blocked pending the privacy-mode vault-delete ADR**
-  (Bikeshed → Features & UX) — its navigation is known-suspect, so we don't pin it yet.
-- ✅ `onboarding_screen` alias→path sanitisation (`sanitiseVaultAlias`, the path-traversal
-  guard) → `test/onboarding_alias_test.dart`.
-- ✅ `_Fallback{Material,Cupertino}LocalizationsDelegate` both branches (supported locale +
-  English fallback for `yo`) → `test/fallback_localizations_test.dart`.
-
-That clears the Phase 1 `integration_test/` frontier: the genuinely FFI-dependent paths
-(`vault_session_test.dart`, `entry_edit_test.dart`) are covered on a device; the rest were
-better served by `flutter test`.
-
-Phase 2 (gated — hardware / native UI, documented `skip:`): multi-key **YubiKey**
-unlock, **`autofillUnlockMain`** (Android), native **FilePicker** pickers.
-
-Same philosophy as the rest of the campaign: target the real flaws on these paths, not
-line count. Cross-layer integration scaffolding is otherwise YAGNI (Bikeshed) — keep this
-scoped to the hard-to-reach app paths above.
+No campaign currently active. Candidates: the test/l10n quick wins (Bikeshed → Code
+Quality), or `v0.1.0-alpha.6` release prep (deferred — the ADR-013 security fix is the
+anchor).
 
 ### Open from the security audit
 
@@ -306,7 +99,6 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 
 - **F-03** — X-Wing transcript-binding combiner; gated on a human cryptographer (no verifiable-against-spec answer).
 - **F-10** — eTLD+1 autofill matching; post-v1 "Strict FQDN" toggle.
-- **L-3** — iOS Keychain protection class; V2+ iOS port.
 
 **UI locales deferred** (RTL layout work required): Hebrew, Arabic.
 
@@ -414,9 +206,6 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 
 ### Code Quality
-- **Summarize `ARCHITECTURE.md`** — the document has grown too long again. Once the code
-  coverage task is finished, do a condensing pass (trim historical narration the git log /
-  CHANGELOG already capture, tighten Coverage status and Current Focus).
 - **Dedupe the YubiKey tap dispatch** — `lib/widgets/yubikey_tap.dart`
   (`getAnyYubikeyHmacSecret`, added for ADR-013 import sync) duplicates the
   Linux/Android multi-key tap logic the unlock screen still inlines. The unlock
@@ -436,10 +225,6 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
   `AppLocalizations.supportedLocales`, so a half-wired new language can't silently fall back
   to English (user picks "Polski", gets English). `_localeFor` is private — needs a small
   test seam or a per-choice GabbroApp drive that detects the fallback.
-- **Fix stale Current Focus facts** (quick win, distinct from the summarize pass) — Coverage
-  status still says Flutter "664 passing" (now 723); the `onActiveVaultDeleted` note still
-  says "blocked pending the privacy-mode vault-delete ADR" though ADR-012 has shipped and the
-  remnant was removed.
 - **`SealedVault::from_bytes` malformed-input fuzz test** (quick win, security-adjacent) —
   the parser in `rust/src/vault/file_format.rs` is *currently* well-defended: every slice at
   lines ~232–369 is preceded by an `if data.len() < pos + N { return Err(..) }` guard, so each
@@ -472,11 +257,11 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - Remote app / vault deletion.
 - Custom and hideable filter chips (post-v1 user feedback gate).
 - *Broad* cross-layer integration scaffolding beyond the targeted hard-to-reach paths now in Current Focus (e.g. an exhaustive `integration_test/` × Rust `tests/` matrix). YAGNI: if users file bugs, those become the organic integration test suite.
-- iOS, Windows, macOS support.
+- Windows support.
 - Yubico partnership.
 - Destination Linux podcast outreach (when approaching public release).
 - Donation/sustainability model (GitHub Sponsors + Liberapay + Monero — dedicated session near release).
-- No-telemetry verification guide (ripgrep scan, Wireshark, NetGuard, iOS caveat).
+- No-telemetry verification guide (ripgrep scan, Wireshark, NetGuard).
 - Support model (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
 - Import: content-hash deduplication and entry-level merge.
 - Native app autofill matching by package name (v2).
