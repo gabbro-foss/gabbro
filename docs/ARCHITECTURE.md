@@ -226,13 +226,20 @@ indicator (key-protected vs passphrase-only, fixing the now-misleading
 `isKeyProtected`. 3 l10n strings × 37 ARBs (best-effort) regenerated. 4 new
 widget tests; all 24 export-screen tests green; `flutter analyze` clean.
 
-**Remaining:**
-- Import/sync screen: detect a key-protected source (via
-  `list_vault_yubikey_records`) → prompt for a YubiKey → `importFromGabbroWithKey`.
-  Reuses the unlock hardware flow (platform-specific); host-widget-testable with
-  injectable FFI, but end-to-end key sync needs the device.
-- **Interim state:** syncing a *key-protected* export currently errors until that
-  UI lands; the hole is closed and passphrase-only export/sync is unaffected.
+**Import screen — done (commit `d450061`):** the Gabbro sync section detects the
+source's protection (`list_vault_yubikey_records` on selection); a key-protected
+source reveals a YubiKey PIN field, a transport selector (Android), and an info
+note, then taps a registered key and calls `importFromGabbroWithKey`.
+passphrase-only sources keep the existing path. New shared
+`lib/widgets/yubikey_tap.dart` (`getAnyYubikeyHmacSecret`) mirrors the unlock
+multi-key tap but returns the hmac + credential. 1 l10n string × 37 ARBs; 3 widget
+tests; 730 flutter tests green; `flutter analyze` clean.
+
+**Remaining — on-device verification only (Phase 2):**
+- Real key-protected export → sync with a physical YubiKey tap on Linux and
+  Android (the Dart flow is host-tested; the hardware path is not yet exercised).
+- Follow-up (not blocking): unlock screen could adopt `yubikey_tap.dart` to drop
+  its duplicated tap dispatch.
 
 ### Active task: systematic test coverage improvement
 
