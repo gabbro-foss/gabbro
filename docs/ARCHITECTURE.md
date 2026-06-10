@@ -87,31 +87,38 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next active task — quick-win test hardening (lighter session)
+### Next active task — dedupe the YubiKey tap dispatch
 
-`v0.1.0-alpha.6` is **released and published** (commit `071283a`, tag `v0.1.0-alpha.6`,
-GitHub release live with the Linux tarball + Android APK). After the heavy code-coverage
-release, a deliberately lighter session: self-contained **quick wins**, all test-only
-(no production behaviour change), TDD where it applies. Do in any order.
+Unify the YubiKey hmac-secret tap logic on one shared helper. **No behaviour
+change** — this is a Code Quality refactor that removes a duplicated copy of the
+Linux/Android tap dispatch.
 
-- ~~Language-picker invariant tests~~ — **DONE** (`36e2883`): pure-function invariants in
-  `test/language_screen_test.dart` (non-empty + unique labels in every locale;
-  `sortedLanguageChoices` = full set, system first, rest alphabetical). Replaced the
-  `values.length == 35` magic number. 5 tests, all green.
-- ~~Locale-resolution guard~~ — **DONE** (`8739939`): `test/locale_resolution_test.dart`
-  asserts every non-`system` `LanguageChoice` maps (via `localeFor`) to a locale in
-  `AppLocalizations.supportedLocales`, so a half-wired language can't silently fall back to
-  English. Seam: `_localeFor` -> public `localeFor` + `@visibleForTesting`.
-- ~~`SealedVault::from_bytes` malformed-input fuzz~~ — **DONE** (`9d19ab9`):
-  `rust/tests/vault_parse_fuzz.rs` (truncations, seeded-random garbage, oversized/overflowing
-  length fields; asserts `Err` never panic, not `#[ignore]`'d). **It found a real bug** — the
-  attacker-controlled 8-byte body-length overflowed `pos + body_len`, crashing the parser on
-  open (debug: add panic; release: wrap -> reversed-slice panic). Fixed with `checked_add`.
-  CHANGELOG `[Unreleased]` Security. Backward-compat gate green (debug + release).
+**The duplication.** `lib/widgets/yubikey_tap.dart` (`getAnyYubikeyHmacSecret`,
+added for ADR-013 import sync) already centralises the multi-key tap: Linux via
+`fidoGetHmacSecretAny`, Android via the `app.gabbro.gabbro/yubikey`
+`get_hmac_secret_multi` MethodChannel, plus the `_toHex`/`_fromHex` helpers and the
+channel const. `lib/screens/unlock_screen.dart` re-implements the same thing inline
+in `_linuxUnlockWithAnyYubikey` / `_defaultUnlockWithAnyYubikey` (multi-key) and has
+its own copies of `_yubikeyChannel`, `_toHex`, `_fromHex`. The single-key paths
+(`_linuxUnlockWithYubikey` / `_defaultUnlockWithYubikey`) are close but not
+identical — check whether they can also route through the shared helper or at least
+share the hex/channel utilities.
 
-All three quick wins are done. The `from_bytes` fix is a security-adjacent bugfix
-(`[Unreleased]` in CHANGELOG) -> warrants a future `v0.1.0-alpha.7` when the next batch of
-work lands.
+**Plan.** (1) Have the unlock screen's multi-key path call
+`getAnyYubikeyHmacSecret` instead of its inline dispatch; delete the duplicated
+`_yubikeyChannel`/`_toHex`/`_fromHex` from `unlock_screen.dart`. (2) Decide on the
+single-key paths (fold in or leave, document the call). (3) Keep all existing
+unlock tests green; add a channel-mock widget test if a behaviour seam opens up.
+
+**Constraints.**
+- TDD where a seam exists (channel-mocked widget tests, like the autofill-unlock tests).
+- **This touches the unlock path → MUST hardware-test on Android (USB + NFC, single-
+  and multi-key) before any commit.** Build success != device success. See
+  [[feedback-android-hardware-before-commit]] and [[feedback-vault-format-backward-compat-tdd]].
+- Out of scope (note only): the Android tap call blocks with no timeout/explicit
+  Cancel (recoverable only via the back arrow); unlock shares that pattern. Deemed
+  sufficient for now (the "tap your YubiKey now" cue exists). Don't scope-creep
+  unless Rob asks.
 
 ### Open from the security audit
 
@@ -226,14 +233,6 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 
 ### Code Quality
-- **Dedupe the YubiKey tap dispatch** — `lib/widgets/yubikey_tap.dart`
-  (`getAnyYubikeyHmacSecret`, added for ADR-013 import sync) duplicates the
-  Linux/Android multi-key tap logic the unlock screen still inlines. The unlock
-  screen (and the single-key paths) could adopt the shared helper. Low priority,
-  no behaviour change. While there, consider the app-wide gap the ADR-013 hardware
-  test surfaced: the Android tap call blocks with no timeout/explicit Cancel
-  (recoverable only via the back arrow); unlock has the same pattern. Deemed
-  sufficient for now (a "tap your YubiKey now" cue was added to import sync).
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer
