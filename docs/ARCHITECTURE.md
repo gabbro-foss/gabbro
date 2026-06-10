@@ -87,17 +87,41 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next active task — _to set with [user]_
+### Next active task — `v0.1.0-alpha.6` release
 
-No campaign currently active. Candidates: the test/l10n quick wins (Bikeshed → Code
-Quality), or `v0.1.0-alpha.6` release prep.
+The agreed next task. ADR-013 (export security + key-protected *Sync from file*) and
+the Android SAF export are done, committed, and hardware-verified — the release's
+anchor, alongside everything accumulated since alpha.5 (the `[0.1.0-alpha.6]` CHANGELOG
+block is already the complete, correct changelog; no reconstruction needed).
 
-ADR-013 is fully closed — both Gabbro→Gabbro front-ends enforce the source's
-protection, and Android export writes through SAF. Hardware-verified on Android
-(key-protected sync over NFC; export overwrite into a synced folder + the
-remembered-folder path; android→NAS→linux round-trip). Two low-risk SAF edges left
-unverified by choice: first export into a brand-new empty folder (createFile
-branch) and revoked-grant re-prompt.
+**Pre-flight** (full build/package/publish commands in ## Release Process below):
+
+1. **Gate must be green.** Rob runs `~/bash_scripts/test_gabbro` (Linux: `flutter test`,
+   `cargo test -q`, `cargo clippy --all-targets`, the two `flutter drive` integration
+   suites, the backward-compat gate, the fuzzer) **plus** the Android unit tests
+   (`cd android && ./gradlew :app:testDebugUnitTest` — not in the script; ran green
+   this session, 23/17).
+2. Set the date on the `[0.1.0-alpha.6]` CHANGELOG block (currently `YYYY-MM-DD`).
+3. Confirm `pubspec.yaml` is `0.1.0-alpha.6` (optionally bump the build to `+7`).
+4. Commit (docs).
+
+**⚠️ The `v0.1.0-alpha.6` tag is premature — MOVE it, don't reuse in place.** alpha.6
+was **never published** (the GitHub release is an unpublished draft), but the git tag
+was pushed early to commit `5f7675a` (2026-06-07) and development continued under the
+same version. Before tagging the real release:
+
+```
+git push origin :refs/tags/v0.1.0-alpha.6   # delete the stale remote tag
+git tag -d v0.1.0-alpha.6                    # delete it locally
+# …after the release commit:
+git tag -a v0.1.0-alpha.6 -m "v0.1.0-alpha.6" && git push origin v0.1.0-alpha.6
+```
+
+Safe because nothing shipped as alpha.6; on any other clone use `git fetch --tags --force`.
+
+**Publish:** delete the stale GitHub draft release, then create it fresh from the moved
+tag with the Linux tarball + Android APK + the alpha disclaimer (manually on github.com —
+no `gh` CLI on Rob's box).
 
 ### Open from the security audit
 
