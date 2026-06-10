@@ -67,10 +67,10 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 484 | 8 |
+| Rust (`cargo test -q`) | 489 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 733 | 0 |
+| Flutter (`flutter test`) | 739 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
 
@@ -90,8 +90,14 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 ### Next active task — _to set with [user]_
 
 No campaign currently active. Candidates: the test/l10n quick wins (Bikeshed → Code
-Quality), or `v0.1.0-alpha.6` release prep (deferred — the ADR-013 security fix is the
-anchor).
+Quality), or `v0.1.0-alpha.6` release prep.
+
+ADR-013 is fully closed — both Gabbro→Gabbro front-ends enforce the source's
+protection, and Android export writes through SAF. Hardware-verified on Android
+(key-protected sync over NFC; export overwrite into a synced folder + the
+remembered-folder path; android→NAS→linux round-trip). Two low-risk SAF edges left
+unverified by choice: first export into a brand-new empty folder (createFile
+branch) and revoked-grant re-prompt.
 
 ### Open from the security audit
 
@@ -115,6 +121,7 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - `Ctap2Session` has no unified `YubiKeyConnection` constructor — use the `ctap2Session()` private helper in `YubiKeyManager` which dispatches on `SmartCardConnection` (NFC) vs `FidoConnection` (USB HID).
 - USB transport: `UsbFidoConnection` (HID interface). NFC transport: `SmartCardConnection` (ISO 7816). Both produce a `YubiKeyConnection` usable with `ctap2Session()`.
 - RP ID `"app.gabbro.gabbro"` is correct at CTAP2 level — it is just an identifier string, no domain required.
+- Export to shared storage uses SAF, not raw paths: the `app.gabbro.gabbro/export` MethodChannel (`MainActivity.kt`, `androidx.documentfile` dep) writes `.gabbro` files into a user-granted directory tree (`ACTION_OPEN_DOCUMENT_TREE` + `takePersistableUriPermission`). Raw `fs::rename` can't overwrite another app's file under scoped storage (EPERM). No `MANAGE_EXTERNAL_STORAGE`. See ADR-013.
 
 ---
 
@@ -179,7 +186,6 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 ### Security (pre-v1 gates)
 - **F-03 X-Wing combiner** — migrate the hybrid KEM combiner to a transcript-binding (X-Wing-style) construction (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). No single verifiable-against-spec answer → genuinely needs a human cryptographer's judgement. Would require VERSION 8.
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
-- Verify Android storage permissions hold on Android 11+ (app-private storage + SAF — no `MANAGE_EXTERNAL_STORAGE`).
 - Test on de-Googled Android (GrapheneOS/CalyxOS) before v1 — find a willing community tester, don't buy hardware.
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 

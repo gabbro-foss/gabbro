@@ -119,6 +119,65 @@ These are pinned by automated Rust tests using fake key records (the
 `vault_backward_compat` / `setup_multi_key_vault` pattern — no hardware needed);
 the Flutter export/import UI prompts are device-tested in Phase 2.
 
+### Implementation note — two front-ends, both enforced (2026-06-10)
+
+"Import/sync" (decision §2) is **two distinct Gabbro→Gabbro front-ends** over the
+same merge core, and they were fixed in two steps:
+
+- **Import entries** (`import_from_gabbro` / `_with_key`, the Import screen) — wired
+  to the key-protected path first.
+- **Sync from file** (`merge_vault_from_file`, the vault menu's "Sync from file") —
+  initially still passphrase-only. A key-protected source was correctly *refused* by
+  the crypto (the invariant held — no bypass), but the path never offered the key, so
+  it surfaced the misleading "different passphrase" error and could not sync at all.
+
+Found the same day by hardware test (Linux export → Android sync). Closed by
+`merge_vault_from_file_with_key`, the exact mirror of `import_from_gabbro_with_key`:
+the sync UI now reads the source header, prompts for a registered YubiKey (PIN +
+USB/NFC transport on Android), and opens with passphrase **+** key. Both front-ends
+reuse the same l10n and the shared `getAnyYubikeyHmacSecret` tap helper (DRY). The
+invariant above is now pinned for the sync path too
+(`merge_vault_from_file_with_key_syncs_keyprotected_source` and the passphrase-alone
+refusal test in `vault_bridge.rs`).
+
+### Implementation note — Android export writes via SAF (2026-06-10)
+
+The default export (§1) writes a `.gabbro` + `.gabbro.sha256` into a user-chosen
+folder. On Android this folder is shared storage. The original implementation
+wrote via a raw POSIX path (temp file + `fs::rename`), which fails with `EPERM`
+when the destination already exists and was created by **another app** — exactly
+the case when exporting into a folder a NAS/sync client populated. Under scoped
+storage (targetSdk ≥ 30, and Gabbro requests **no** `MANAGE_EXTERNAL_STORAGE`), an
+app may create a new file in a shared folder but may not replace another app's
+file via raw paths. Found 2026-06-10 by hardware test (`Operation not permitted`
+on re-export over a synced `Gabbro.gabbro`).
+
+Fix: Android `.gabbro` export goes through the **Storage Access Framework**. The
+user already grants a directory tree via the folder picker
+(`ACTION_OPEN_DOCUMENT_TREE`); a SAF tree grant permits overwriting *any* file in
+the tree regardless of creator. So:
+
+- **No new manifest permission** — the grant is scoped to the one folder the user
+  picks, is persisted (`takePersistableUriPermission`, remembered in
+  `androidExportFolderUri`), and is revocable in Android Settings. This is the
+  least-privilege option and aligns with the app's security posture; All-Files
+  Access was explicitly rejected.
+- **Split build from write:** Rust produces the export **ciphertext** bytes +
+  SHA-256 line (`build_export_bytes` / `build_export_passphrase_only_bytes`,
+  sharing the helpers with the Linux path-write so neither drifts); Kotlin writes
+  them into the granted tree via `DocumentFile` (`app.gabbro.gabbro/export`
+  channel). Only ciphertext crosses the bridge — no plaintext secret.
+- **Find-then-overwrite:** the SAF writer looks up the existing child by name and
+  overwrites it in place (`openOutputStream(uri, "wt")`), never blind-creating —
+  which would trip SAF's `Name (1).gabbro` de-duplication and break a fixed-name
+  sync target.
+- **Linux unchanged** (raw-path write keeps its 0600 + atomic-rename semantics).
+- **Plaintext JSON export is deliberately excluded** from SAF: routing it would
+  force plaintext secrets across the Flutter/Rust bridge (forbidden). JSON keeps
+  its raw-path write; overwriting a non-owned JSON in shared storage still fails
+  (a documented, low-impact limitation — JSON is a one-off migration export, not a
+  sync target).
+
 ## Consequences
 
 ### Positive
