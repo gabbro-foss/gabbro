@@ -370,10 +370,17 @@ impl SealedVault {
         pos += 8;
 
         // --- Body ---
-        if data.len() < pos + body_len {
+        // body_len is attacker-controlled (8 bytes straight off disk), so compute
+        // the end with a checked add: `pos + body_len` would otherwise overflow
+        // usize for a huge body_len, wrapping the guard below and turning the slice
+        // into a reversed range -> panic on open. See tests/vault_parse_fuzz.rs.
+        let body_end = pos
+            .checked_add(body_len)
+            .ok_or_else(|| "File truncated at body".to_string())?;
+        if data.len() < body_end {
             return Err("File truncated at body".to_string());
         }
-        let ciphertext = data[pos..pos + body_len].to_vec();
+        let ciphertext = data[pos..body_end].to_vec();
 
         Ok(SealedVault {
             version,
