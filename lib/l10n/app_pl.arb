@@ -632,6 +632,7 @@
   "importSelectFile": "Wybierz plik.",
   "importFileNotFound": "Plik nie znaleziony.",
   "importEnterPassphrase": "Wprowadź hasło główne dla tego skarbca.",
+  "importSourceKeyProtected": "Ten sejf jest chroniony kluczem YubiKey. Aby zsynchronizować, musisz dotknąć zarejestrowanego klucza.",
   "importDuplicateWarning": "Wpisy, których UUID już istnieje w Twoim skarbcu, zostaną automatycznie pominięte. Zobaczysz podsumowanie.",
   "importGabbroSubtitle": "Synchronizuj wpisy z innego skarbca Gabbro (plik .gabbro)",
   "importEnpassSubtitle": "Eksport JSON z Enpass (Narzędzia → Eksportuj)",

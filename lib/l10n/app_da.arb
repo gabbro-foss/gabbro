@@ -632,6 +632,7 @@
   "importSelectFile": "Vælg en fil.",
   "importFileNotFound": "Fil ikke fundet.",
   "importEnterPassphrase": "Indtast adgangssætningen til denne hvælving.",
+  "importSourceKeyProtected": "Denne boks er beskyttet af en YubiKey. Du skal trykke på en registreret nøgle for at synkronisere.",
   "importDuplicateWarning": "Poster hvis UUID allerede findes i din hvælving springes automatisk over. Du vil se et resumé.",
   "importGabbroSubtitle": "Synkronisér poster fra en anden Gabbro-hvælving (.gabbro-fil)",
   "importEnpassSubtitle": "JSON-eksport fra Enpass (Funktioner → Eksportér)",

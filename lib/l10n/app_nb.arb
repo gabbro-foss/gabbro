@@ -632,6 +632,7 @@
   "importSelectFile": "Velg en fil.",
   "importFileNotFound": "Fil ikke funnet.",
   "importEnterPassphrase": "Angi passfrasen for dette hvelvet.",
+  "importSourceKeyProtected": "Dette hvelvet er beskyttet av en YubiKey. Du må trykke på en registrert nøkkel for å synkronisere.",
   "importDuplicateWarning": "Oppføringer hvis UUID allerede finnes i hvelvet hoppes over automatisk. Du vil se et sammendrag.",
   "importGabbroSubtitle": "Synkroniser oppføringer fra et annet Gabbro-hvelv (.gabbro-fil)",
   "importEnpassSubtitle": "JSON-eksport fra Enpass (Verktøy → Eksporter)",

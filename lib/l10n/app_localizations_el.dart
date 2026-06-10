@@ -1404,6 +1404,10 @@ class AppLocalizationsEl extends AppLocalizations {
       'Εισάγετε τη φράση πρόσβασης για αυτό το θησαυροφυλάκιο.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Αυτό το θησαυροφυλάκιο προστατεύεται από ένα YubiKey. Θα χρειαστεί να αγγίξετε ένα καταχωρισμένο κλειδί για συγχρονισμό.';
+
+  @override
   String get importDuplicateWarning =>
       'Οι καταχωρίσεις των οποίων το UUID υπάρχει ήδη στο θησαυροφυλάκιό σας θα παραλειφθούν αυτόματα. Θα εμφανιστεί περίληψη.';
 

@@ -1366,6 +1366,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get importEnterPassphrase => 'このボルトのパスフレーズを入力してください。';
 
   @override
+  String get importSourceKeyProtected =>
+      'この保管庫は YubiKey で保護されています。同期するには、登録済みのキーをタップする必要があります。';
+
+  @override
   String get importDuplicateWarning =>
       'UUIDがすでにボルトに存在するエントリは自動的にスキップされます。概要が表示されます。';
 

@@ -632,6 +632,7 @@
   "importSelectFile": "ファイルを選択してください。",
   "importFileNotFound": "ファイルが見つかりません。",
   "importEnterPassphrase": "このボルトのパスフレーズを入力してください。",
+  "importSourceKeyProtected": "この保管庫は YubiKey で保護されています。同期するには、登録済みのキーをタップする必要があります。",
   "importDuplicateWarning": "UUIDがすでにボルトに存在するエントリは自動的にスキップされます。概要が表示されます。",
   "importGabbroSubtitle": "別のGabbroボルト (.gabbro) からエントリを同期",
   "importEnpassSubtitle": "EnpassからのJSONエクスポート (ツール → エクスポート)",

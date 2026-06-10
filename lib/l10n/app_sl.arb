@@ -632,6 +632,7 @@
   "importSelectFile": "Izberite datoteko.",
   "importFileNotFound": "Datoteka ni najdena.",
   "importEnterPassphrase": "Vnesite geslo za dostop za ta trezor.",
+  "importSourceKeyProtected": "Ta trezor je zaščiten s ključem YubiKey. Za sinhronizacijo se boste morali dotakniti registriranega ključa.",
   "importDuplicateWarning": "Vnosi, katerih UUID že obstaja v vašem trezorju, bodo samodejno preskočeni. Prikazan bo pregled.",
   "importGabbroSubtitle": "Sinhroniziraj vnose iz drugega trezorja Gabbro (datoteka .gabbro)",
   "importEnpassSubtitle": "JSON izvoz iz Enpass (Orodja → Izvozi)",

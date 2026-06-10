@@ -632,6 +632,7 @@
   "importSelectFile": "Seleziona un file.",
   "importFileNotFound": "File non trovato.",
   "importEnterPassphrase": "Inserisci la passphrase per questo archivio.",
+  "importSourceKeyProtected": "Questa cassaforte è protetta da una YubiKey. Dovrai toccare una chiave registrata per sincronizzare.",
   "importDuplicateWarning": "Le voci il cui UUID esiste già nel tuo archivio verranno saltate automaticamente. Ti verrà mostrato un riepilogo.",
   "importGabbroSubtitle": "Sincronizza voci da un altro archivio Gabbro (file .gabbro)",
   "importEnpassSubtitle": "Esportazione JSON da Enpass (Strumenti → Esporta)",

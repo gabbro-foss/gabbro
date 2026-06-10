@@ -632,6 +632,7 @@
   "importSelectFile": "Selecteer een bestand.",
   "importFileNotFound": "Bestand niet gevonden.",
   "importEnterPassphrase": "Voer de wachtwoordzin voor deze kluis in.",
+  "importSourceKeyProtected": "Deze kluis is beveiligd met een YubiKey. Je moet een geregistreerde sleutel aanraken om te synchroniseren.",
   "importDuplicateWarning": "Items waarvan het UUID al in uw kluis bestaat, worden automatisch overgeslagen. Er wordt een samenvatting getoond.",
   "importGabbroSubtitle": "Items synchroniseren vanuit een andere Gabbro-kluis (.gabbro-bestand)",
   "importEnpassSubtitle": "JSON-export vanuit Enpass (Hulpmiddelen → Exporteren)",

@@ -632,6 +632,7 @@
   "importSelectFile": "Избери файл.",
   "importFileNotFound": "Файлът не е намерен.",
   "importEnterPassphrase": "Въведи паролната фраза за този трезор.",
+  "importSourceKeyProtected": "Този сейф е защитен с YubiKey. За да синхронизирате, ще трябва да докоснете регистриран ключ.",
   "importDuplicateWarning": "Записи, чийто UUID вече съществува в твоя трезор, ще бъдат автоматично пропуснати. Ще видиш обобщение.",
   "importGabbroSubtitle": "Синхронизирай записи от друг трезор Gabbro (.gabbro файл)",
   "importEnpassSubtitle": "JSON експорт от Enpass (Инструменти → Експортирай)",

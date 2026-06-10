@@ -632,6 +632,7 @@
   "importSelectFile": "请选择文件。",
   "importFileNotFound": "文件未找到。",
   "importEnterPassphrase": "请输入此保险库的密码短语。",
+  "importSourceKeyProtected": "此保险库受 YubiKey 保护。同步时需要轻触已注册的密钥。",
   "importDuplicateWarning": "UUID 已存在于您保险库中的条目将自动跳过。将显示摘要。",
   "importGabbroSubtitle": "从另一个 Gabbro 保险库（.gabbro 文件）同步条目",
   "importEnpassSubtitle": "来自 Enpass 的 JSON 导出（工具 → 导出）",

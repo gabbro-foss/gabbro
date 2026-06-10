@@ -632,6 +632,7 @@
   "importSelectFile": "Selecione um arquivo.",
   "importFileNotFound": "Arquivo não encontrado.",
   "importEnterPassphrase": "Insira a frase secreta deste cofre.",
+  "importSourceKeyProtected": "Este cofre está protegido por uma YubiKey. Terá de tocar numa chave registada para sincronizar.",
   "importDuplicateWarning": "Entradas cujo UUID já existe no cofre serão puladas automaticamente. Será exibido um resumo.",
   "importGabbroSubtitle": "Sincronizar entradas de outro cofre Gabbro (arquivo .gabbro)",
   "importEnpassSubtitle": "Exportação JSON do Enpass (Ferramentas → Exportar)",

@@ -1390,6 +1390,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importEnterPassphrase => 'Enter the passphrase for this vault.';
 
   @override
+  String get importSourceKeyProtected =>
+      'This vault is protected by a YubiKey. You will need to tap a registered key to sync from it.';
+
+  @override
   String get importDuplicateWarning =>
       'Entries whose UUID already exists in your vault will be skipped automatically. You will be shown a summary.';
 

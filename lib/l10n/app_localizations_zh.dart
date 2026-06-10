@@ -1358,6 +1358,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importEnterPassphrase => '请输入此保险库的密码短语。';
 
   @override
+  String get importSourceKeyProtected => '此保险库受 YubiKey 保护。同步时需要轻触已注册的密钥。';
+
+  @override
   String get importDuplicateWarning => 'UUID 已存在于您保险库中的条目将自动跳过。将显示摘要。';
 
   @override
@@ -3120,6 +3123,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get importEnterPassphrase => '请输入此保险库的密码短语。';
 
   @override
+  String get importSourceKeyProtected => '此保险库受 YubiKey 保护。同步时需要轻触已注册的密钥。';
+
+  @override
   String get importDuplicateWarning => 'UUID 已存在于您保险库中的条目将自动跳过。将显示摘要。';
 
   @override
@@ -4880,6 +4886,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get importEnterPassphrase => '請輸入此保險庫的密碼片語。';
+
+  @override
+  String get importSourceKeyProtected => '此保險庫受 YubiKey 保護。同步時需要輕觸已註冊的金鑰。';
 
   @override
   String get importDuplicateWarning => 'UUID 已存在於您保險庫中的項目將自動跳過。將顯示摘要。';

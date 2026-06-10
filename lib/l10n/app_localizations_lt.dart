@@ -1397,6 +1397,10 @@ class AppLocalizationsLt extends AppLocalizations {
   String get importEnterPassphrase => 'Įveskite šios saugyklos slaptafrazę.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Šis seifas apsaugotas YubiKey. Norėdami sinchronizuoti, turėsite paliesti registruotą raktą.';
+
+  @override
   String get importDuplicateWarning =>
       'Įrašai, kurių UUID jau yra jūsų saugykloje, bus automatiškai praleisti. Bus parodytas suvestinė.';
 

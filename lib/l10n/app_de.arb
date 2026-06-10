@@ -632,6 +632,7 @@
   "importSelectFile": "Datei auswählen.",
   "importFileNotFound": "Datei nicht gefunden.",
   "importEnterPassphrase": "Passphrase für diesen Tresor eingeben.",
+  "importSourceKeyProtected": "Dieser Tresor ist durch einen YubiKey geschützt. Zum Synchronisieren müssen Sie einen registrierten Schlüssel antippen.",
   "importDuplicateWarning": "Einträge, deren UUID bereits im Tresor vorhanden ist, werden automatisch übersprungen. Eine Zusammenfassung wird angezeigt.",
   "importGabbroSubtitle": "Einträge aus einem anderen Gabbro-Tresor synchronisieren (.gabbro-Datei)",
   "importEnpassSubtitle": "JSON-Export aus Enpass (Werkzeuge → Exportieren)",

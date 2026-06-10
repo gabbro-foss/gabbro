@@ -1400,6 +1400,10 @@ class AppLocalizationsSr extends AppLocalizations {
   String get importEnterPassphrase => 'Unesite pristupnu frazu za ovaj trezor.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Овај трезор је заштићен YubiKey-јем. За синхронизацију ћете морати да додирнете регистровани кључ.';
+
+  @override
   String get importDuplicateWarning =>
       'Unosi čiji UUID već postoji u vašem trezoru biće automatski preskočeni. Prikazaće se pregled.';
 
@@ -3238,6 +3242,10 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get importEnterPassphrase => 'Unesite pristupnu frazu za ovaj trezor.';
+
+  @override
+  String get importSourceKeyProtected =>
+      'Ovaj trezor je zaštićen YubiKey-jem. Za sinhronizaciju ćete morati da dodirnete registrovani ključ.';
 
   @override
   String get importDuplicateWarning =>

@@ -1397,6 +1397,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Inserisci la passphrase per questo archivio.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Questa cassaforte è protetta da una YubiKey. Dovrai toccare una chiave registrata per sincronizzare.';
+
+  @override
   String get importDuplicateWarning =>
       'Le voci il cui UUID esiste già nel tuo archivio verranno saltate automaticamente. Ti verrà mostrato un riepilogo.';
 

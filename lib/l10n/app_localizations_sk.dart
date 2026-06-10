@@ -1397,6 +1397,10 @@ class AppLocalizationsSk extends AppLocalizations {
       'Zadajte prístupovú frázu pre tento trezor.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Tento trezor je chránený kľúčom YubiKey. Na synchronizáciu sa musíte dotknúť zaregistrovaného kľúča.';
+
+  @override
   String get importDuplicateWarning =>
       'Záznamy, ktorých UUID už existuje vo vašom trezore, budú automaticky preskočené. Zobrazí sa prehľad.';
 

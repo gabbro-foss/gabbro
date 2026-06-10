@@ -7,7 +7,9 @@ import 'package:gabbro/screens/csv_mapping_screen.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
+import 'package:gabbro/widgets/yubikey_tap.dart';
 
 Future<ImportResult> _defaultImportEnpass(List<int> data) =>
     importFromEnpass(data: data);
@@ -22,6 +24,25 @@ Future<GabbroImportResult> _defaultImportGabbro(
         String path, List<int> passphrase) =>
     importFromGabbro(path: path, passphrase: passphrase);
 
+/// Sync from a key-protected source: passphrase + a tapped registered YubiKey
+/// (ADR-013).
+Future<GabbroImportResult> _defaultImportGabbroWithKey(
+        String path, List<int> passphrase, List<int> hmac, List<int> credentialId) =>
+    importFromGabbroWithKey(
+        path: path,
+        passphrase: passphrase,
+        hmacSecret: hmac,
+        credentialId: credentialId);
+
+/// Reads the source vault's YubiKey records to decide whether a key is required.
+/// Non-empty ⇒ key-protected. Sync — header read only.
+List<YubikeyRecordData> _defaultDetectSourceRecords(String path) =>
+    listVaultYubikeyRecords(path: path);
+
+Future<YubikeyHmacMatch> _defaultGetYubikeyHmac(
+        List<YubikeyRecordData> records, String pin, String transport) =>
+    getAnyYubikeyHmacSecret(records: records, pin: pin, transport: transport);
+
 class ImportScreen extends StatefulWidget {
   final Future<ImportResult> Function(List<int> data) onImportEnpass;
   final Future<ImportResult> Function(List<int> data) onImportBitwarden;
@@ -31,7 +52,27 @@ class ImportScreen extends StatefulWidget {
   final Future<GabbroImportResult> Function(String path, List<int> passphrase)
       onImportGabbro;
 
-  const ImportScreen({
+  /// Sync from a key-protected source: passphrase + tapped YubiKey (ADR-013).
+  final Future<GabbroImportResult> Function(
+      String path, List<int> passphrase, List<int> hmac, List<int> credentialId)
+  onImportGabbroWithKey;
+
+  /// Detects whether the chosen `.gabbro` source is key-protected.
+  final List<YubikeyRecordData> Function(String path) onDetectSourceRecords;
+
+  /// Prompts for a YubiKey tap and returns the hmac + matched credential.
+  final Future<YubikeyHmacMatch> Function(
+      List<YubikeyRecordData> records, String pin, String transport)
+  onGetYubikeyHmac;
+
+  final bool isAndroid;
+
+  /// Pre-selected Gabbro source path. Mainly a test seam (the path is otherwise
+  /// chosen via the native picker); when set, source protection is detected at
+  /// construction so the YubiKey fields render without a picker round-trip.
+  final String? initialGabbroPath;
+
+  ImportScreen({
     super.key,
     this.onImportEnpass = _defaultImportEnpass,
     this.onImportBitwarden = _defaultImportBitwarden,
@@ -39,7 +80,12 @@ class ImportScreen extends StatefulWidget {
     this.onImportDashlane = _defaultImportDashlane,
     this.onSniffCsv = _defaultSniffCsv,
     this.onImportGabbro = _defaultImportGabbro,
-  });
+    this.onImportGabbroWithKey = _defaultImportGabbroWithKey,
+    this.onDetectSourceRecords = _defaultDetectSourceRecords,
+    this.onGetYubikeyHmac = _defaultGetYubikeyHmac,
+    this.initialGabbroPath,
+    bool? isAndroid,
+  }) : isAndroid = isAndroid ?? Platform.isAndroid;
 
   @override
   State<ImportScreen> createState() => _ImportScreenState();
@@ -70,9 +116,33 @@ class _ImportScreenState extends State<ImportScreen> {
   final _passphraseController = TextEditingController();
   bool _showPassphrase = false;
 
+  // ADR-013: when the chosen Gabbro source is key-protected, the user must tap a
+  // registered YubiKey (plus a PIN, and a transport choice on Android) to sync.
+  List<YubikeyRecordData> _gabbroSourceRecords = [];
+  final _yubikeyPinController = TextEditingController();
+  bool _yubikeyPinObscured = true;
+  String _gabbroTransport = 'usb';
+
+  bool get _gabbroSourceIsKeyProtected => _gabbroSourceRecords.isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initialGabbroPath;
+    if (initial != null && initial.isNotEmpty) {
+      _gabbroPath = initial;
+      try {
+        _gabbroSourceRecords = widget.onDetectSourceRecords(initial);
+      } catch (_) {
+        _gabbroSourceRecords = [];
+      }
+    }
+  }
+
   @override
   void dispose() {
     _passphraseController.dispose();
+    _yubikeyPinController.dispose();
     super.dispose();
   }
 
@@ -235,13 +305,34 @@ class _ImportScreenState extends State<ImportScreen> {
       setState(() => _gabbroError = l.importEnterPassphrase);
       return;
     }
+    // A key-protected source also needs a YubiKey PIN (ADR-013).
+    if (_gabbroSourceIsKeyProtected && _yubikeyPinController.text.isEmpty) {
+      setState(() => _gabbroError = l.yubiKeyPinRequired);
+      return;
+    }
     setState(() {
       _isImportingGabbro = true;
       _gabbroError = null;
     });
     try {
       final passphraseBytes = utf8.encode(passphrase);
-      final result = await widget.onImportGabbro(path, passphraseBytes);
+      final GabbroImportResult result;
+      if (_gabbroSourceIsKeyProtected) {
+        // Tap a registered key to open the key-protected source, then sync.
+        final match = await widget.onGetYubikeyHmac(
+          _gabbroSourceRecords,
+          _yubikeyPinController.text,
+          _gabbroTransport,
+        );
+        result = await widget.onImportGabbroWithKey(
+          path,
+          passphraseBytes,
+          match.hmac,
+          match.credentialId,
+        );
+      } else {
+        result = await widget.onImportGabbro(path, passphraseBytes);
+      }
       if (result.skipped.isNotEmpty && mounted) {
         await showSkippedEntriesDialog(context, result.skipped);
       }
@@ -420,7 +511,15 @@ class _ImportScreenState extends State<ImportScreen> {
           mode: PathFieldMode.open,
           hint: '/home/user/vault.gabbro',
           allowedExtensions: ['gabbro'],
-          onPathSelected: (p) => setState(() => _gabbroPath = p),
+          onPathSelected: (p) => setState(() {
+            _gabbroPath = p;
+            _gabbroError = null;
+            try {
+              _gabbroSourceRecords = widget.onDetectSourceRecords(p);
+            } catch (_) {
+              _gabbroSourceRecords = [];
+            }
+          }),
         ),
         const SizedBox(height: 12),
         TextField(
@@ -438,6 +537,58 @@ class _ImportScreenState extends State<ImportScreen> {
             ),
           ),
         ),
+        if (_gabbroSourceIsKeyProtected) ...[
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.usb, size: 20,
+                  color: Theme.of(context).colorScheme.primary),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l.importSourceKeyProtected,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _yubikeyPinController,
+            obscureText: _yubikeyPinObscured,
+            decoration: InputDecoration(
+              labelText: l.yubiKeyPinLabel,
+              border: const OutlineInputBorder(),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _yubikeyPinObscured ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: () => setState(
+                    () => _yubikeyPinObscured = !_yubikeyPinObscured),
+              ),
+            ),
+          ),
+          if (widget.isAndroid) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Text(l.transportLabel,
+                    style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(width: 12),
+                SegmentedButton<String>(
+                  segments: [
+                    ButtonSegment(value: 'usb', label: Text(l.transportUsb)),
+                    ButtonSegment(value: 'nfc', label: Text(l.transportNfc)),
+                  ],
+                  selected: {_gabbroTransport},
+                  onSelectionChanged: (s) =>
+                      setState(() => _gabbroTransport = s.first),
+                ),
+              ],
+            ),
+          ],
+        ],
         if (_gabbroError != null) ...[
           const SizedBox(height: 4),
           Text(

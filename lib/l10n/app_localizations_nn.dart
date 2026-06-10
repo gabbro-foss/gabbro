@@ -1391,6 +1391,10 @@ class AppLocalizationsNn extends AppLocalizations {
   String get importEnterPassphrase => 'Angi passfrasen for dette kvelvet.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Dette hvelvet er verna av ein YubiKey. Du må trykkje på ein registrert nøkkel for å synkronisere.';
+
+  @override
   String get importDuplicateWarning =>
       'Oppføringer der UUID allereie finst i kvelvet vert automatisk hoppa over. Du vil sjå eit samandrag.';
 

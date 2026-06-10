@@ -632,6 +632,7 @@
   "importSelectFile": "Välj en fil.",
   "importFileNotFound": "Fil hittades inte.",
   "importEnterPassphrase": "Ange lösenfransen för det här valvet.",
+  "importSourceKeyProtected": "Detta valv skyddas av en YubiKey. Du måste trycka på en registrerad nyckel för att synkronisera.",
   "importDuplicateWarning": "Poster vars UUID redan finns i ditt valv hoppas över automatiskt. Du kommer se en sammanfattning.",
   "importGabbroSubtitle": "Synkronisera poster från ett annat Gabbro-valv (.gabbro-fil)",
   "importEnpassSubtitle": "JSON-export från Enpass (Verktyg → Exportera)",

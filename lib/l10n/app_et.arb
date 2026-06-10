@@ -632,6 +632,7 @@
   "importSelectFile": "Vali fail.",
   "importFileNotFound": "Faili ei leitud.",
   "importEnterPassphrase": "Sisesta selle seifi pääslause.",
+  "importSourceKeyProtected": "See hoidla on kaitstud YubiKey-ga. Sünkroonimiseks peate puudutama registreeritud võtit.",
   "importDuplicateWarning": "Kirjed, mille UUID on juba seifis olemas, jäetakse automaatselt vahele. Kuvatakse kokkuvõte.",
   "importGabbroSubtitle": "Sünkrooni kirjeid teisest Gabbro seifist (.gabbro fail)",
   "importEnpassSubtitle": "JSON-eksport Enpassist (Tööriistad → Ekspordi)",

@@ -1401,6 +1401,10 @@ class AppLocalizationsSl extends AppLocalizations {
   String get importEnterPassphrase => 'Vnesite geslo za dostop za ta trezor.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Ta trezor je zaščiten s ključem YubiKey. Za sinhronizacijo se boste morali dotakniti registriranega ključa.';
+
+  @override
   String get importDuplicateWarning =>
       'Vnosi, katerih UUID že obstaja v vašem trezorju, bodo samodejno preskočeni. Prikazan bo pregled.';
 

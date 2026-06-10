@@ -1396,6 +1396,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get importEnterPassphrase => 'Syötä tämän holvin salauslause.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Tämä holvi on suojattu YubiKey-avaimella. Sinun on napautettava rekisteröityä avainta synkronoidaksesi.';
+
+  @override
   String get importDuplicateWarning =>
       'Merkinnät, joiden UUID on jo holvissa, ohitetaan automaattisesti. Näet yhteenvedon.';
 

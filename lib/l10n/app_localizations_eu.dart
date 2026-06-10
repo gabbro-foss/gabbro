@@ -1393,6 +1393,10 @@ class AppLocalizationsEu extends AppLocalizations {
   String get importEnterPassphrase => 'Sartu gandegi honetako pasaesaldia.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Kutxa gotor hau YubiKey batek babesten du. Sinkronizatzeko, erregistratutako gako bat ukitu beharko duzu.';
+
+  @override
   String get importDuplicateWarning =>
       'UUIDs zure gandegian dagoeneko dauden sarrerak automatikoki saltatuko dira. Laburpena erakutsiko da.';
 

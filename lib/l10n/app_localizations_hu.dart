@@ -1392,6 +1392,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get importEnterPassphrase => 'Add meg ennek a széfnek a jelmondatát.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Ezt a széfet egy YubiKey védi. A szinkronizáláshoz meg kell érintened egy regisztrált kulcsot.';
+
+  @override
   String get importDuplicateWarning =>
       'Az olyan bejegyzések, amelyek UUID-je már létezik a széfedben, automatikusan kimaradnak. Látni fogsz egy összefoglalót.';
 

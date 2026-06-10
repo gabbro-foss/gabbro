@@ -632,6 +632,7 @@
   "importSelectFile": "Pasirinkite failą.",
   "importFileNotFound": "Failas nerastas.",
   "importEnterPassphrase": "Įveskite šios saugyklos slaptafrazę.",
+  "importSourceKeyProtected": "Šis seifas apsaugotas YubiKey. Norėdami sinchronizuoti, turėsite paliesti registruotą raktą.",
   "importDuplicateWarning": "Įrašai, kurių UUID jau yra jūsų saugykloje, bus automatiškai praleisti. Bus parodytas suvestinė.",
   "importGabbroSubtitle": "Sinchronizuoti įrašus iš kitos Gabbro saugyklos (.gabbro failas)",
   "importEnpassSubtitle": "JSON eksportas iš Enpass (Įrankiai → Eksportuoti)",

@@ -1397,6 +1397,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get importEnterPassphrase => 'Passphrase für diesen Tresor eingeben.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Dieser Tresor ist durch einen YubiKey geschützt. Zum Synchronisieren müssen Sie einen registrierten Schlüssel antippen.';
+
+  @override
   String get importDuplicateWarning =>
       'Einträge, deren UUID bereits im Tresor vorhanden ist, werden automatisch übersprungen. Eine Zusammenfassung wird angezeigt.';
 

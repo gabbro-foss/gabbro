@@ -1395,6 +1395,10 @@ class AppLocalizationsEt extends AppLocalizations {
   String get importEnterPassphrase => 'Sisesta selle seifi pääslause.';
 
   @override
+  String get importSourceKeyProtected =>
+      'See hoidla on kaitstud YubiKey-ga. Sünkroonimiseks peate puudutama registreeritud võtit.';
+
+  @override
   String get importDuplicateWarning =>
       'Kirjed, mille UUID on juba seifis olemas, jäetakse automaatselt vahele. Kuvatakse kokkuvõte.';
 

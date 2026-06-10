@@ -1392,6 +1392,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get importEnterPassphrase => 'Ange lösenfransen för det här valvet.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Detta valv skyddas av en YubiKey. Du måste trycka på en registrerad nyckel för att synkronisera.';
+
+  @override
   String get importDuplicateWarning =>
       'Poster vars UUID redan finns i ditt valv hoppas över automatiskt. Du kommer se en sammanfattning.';
 

@@ -632,6 +632,7 @@
   "importSelectFile": "Select a file.",
   "importFileNotFound": "File not found.",
   "importEnterPassphrase": "Enter the passphrase for this vault.",
+  "importSourceKeyProtected": "This vault is protected by a YubiKey. You will need to tap a registered key to sync from it.",
   "importDuplicateWarning": "Entries whose UUID already exists in your vault will be skipped automatically. You will be shown a summary.",
   "importGabbroSubtitle": "Sync entries from another Gabbro vault (.gabbro file)",
   "importEnpassSubtitle": "JSON export from Enpass (Tools → Export)",

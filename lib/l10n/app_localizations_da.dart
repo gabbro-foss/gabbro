@@ -1396,6 +1396,10 @@ class AppLocalizationsDa extends AppLocalizations {
       'Indtast adgangssætningen til denne hvælving.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Denne boks er beskyttet af en YubiKey. Du skal trykke på en registreret nøgle for at synkronisere.';
+
+  @override
   String get importDuplicateWarning =>
       'Poster hvis UUID allerede findes i din hvælving springes automatisk over. Du vil se et resumé.';
 

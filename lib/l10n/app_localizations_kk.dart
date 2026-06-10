@@ -1393,6 +1393,10 @@ class AppLocalizationsKk extends AppLocalizations {
   String get importEnterPassphrase => 'Осы сейфтің кілт фразасын енгізіңіз.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Бұл қойма YubiKey арқылы қорғалған. Синхрондау үшін тіркелген кілтті түрту қажет.';
+
+  @override
   String get importDuplicateWarning =>
       'UUID сейфте бар жазбалар автоматты өткізіп жіберіледі. Қорытынды көрсетіледі.';
 

@@ -1392,6 +1392,10 @@ class AppLocalizationsYo extends AppLocalizations {
       'Tẹ gbolohun ọrọ igbaniwọle fun vọọliti yii.';
 
   @override
+  String get importSourceKeyProtected =>
+      'YubiKey ni ó ń dáàbò bo àpótí ìpamọ́ yìí. Wàá nílò láti tẹ bọtìnì tí a forúkọsílẹ̀ láti fi muṣiṣẹ́pọ̀.';
+
+  @override
   String get importDuplicateWarning =>
       'A yoo fo awọn titẹ sii ti UUID wọn ti wa ninu vọọliti rẹ tẹlẹ laifọwọyi. A yoo ṣe afihan akopọ.';
 

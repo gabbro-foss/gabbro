@@ -457,7 +457,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
     setState(() => _isImporting = true);
     final count = await Navigator.of(
       context,
-    ).push<int>(MaterialPageRoute(builder: (context) => const ImportScreen()));
+    ).push<int>(MaterialPageRoute(builder: (context) => ImportScreen()));
     if (mounted) {
       setState(() => _isImporting = false);
       if (count != null && count > 0) {

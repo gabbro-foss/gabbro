@@ -632,6 +632,7 @@
   "importSelectFile": "Файлды таңдаңыз.",
   "importFileNotFound": "Файл табылмады.",
   "importEnterPassphrase": "Осы сейфтің кілт фразасын енгізіңіз.",
+  "importSourceKeyProtected": "Бұл қойма YubiKey арқылы қорғалған. Синхрондау үшін тіркелген кілтті түрту қажет.",
   "importDuplicateWarning": "UUID сейфте бар жазбалар автоматты өткізіп жіберіледі. Қорытынды көрсетіледі.",
   "importGabbroSubtitle": "Басқа Gabbro сейфінен жазбаларды синхрондау (.gabbro файлы)",
   "importEnpassSubtitle": "Enpass бағдарламасынан JSON экспорты (Құралдар → Экспорттау)",

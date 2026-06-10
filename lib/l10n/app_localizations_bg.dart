@@ -1396,6 +1396,10 @@ class AppLocalizationsBg extends AppLocalizations {
   String get importEnterPassphrase => 'Въведи паролната фраза за този трезор.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Този сейф е защитен с YubiKey. За да синхронизирате, ще трябва да докоснете регистриран ключ.';
+
+  @override
   String get importDuplicateWarning =>
       'Записи, чийто UUID вече съществува в твоя трезор, ще бъдат автоматично пропуснати. Ще видиш обобщение.';
 

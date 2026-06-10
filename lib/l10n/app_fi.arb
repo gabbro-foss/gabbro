@@ -632,6 +632,7 @@
   "importSelectFile": "Valitse tiedosto.",
   "importFileNotFound": "Tiedostoa ei löydy.",
   "importEnterPassphrase": "Syötä tämän holvin salauslause.",
+  "importSourceKeyProtected": "Tämä holvi on suojattu YubiKey-avaimella. Sinun on napautettava rekisteröityä avainta synkronoidaksesi.",
   "importDuplicateWarning": "Merkinnät, joiden UUID on jo holvissa, ohitetaan automaattisesti. Näet yhteenvedon.",
   "importGabbroSubtitle": "Synkronoi merkintöjä toisesta Gabbro-holvista (.gabbro-tiedosto)",
   "importEnpassSubtitle": "JSON-vienti Enpassista (Työkalut → Vie)",

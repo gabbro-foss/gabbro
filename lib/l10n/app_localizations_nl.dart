@@ -1398,6 +1398,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Voer de wachtwoordzin voor deze kluis in.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Deze kluis is beveiligd met een YubiKey. Je moet een geregistreerde sleutel aanraken om te synchroniseren.';
+
+  @override
   String get importDuplicateWarning =>
       'Items waarvan het UUID al in uw kluis bestaat, worden automatisch overgeslagen. Er wordt een samenvatting getoond.';
 

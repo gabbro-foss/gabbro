@@ -1398,6 +1398,10 @@ class AppLocalizationsUk extends AppLocalizations {
   String get importEnterPassphrase => 'Введіть кодову фразу для цього сховища.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Це сховище захищено YubiKey. Для синхронізації потрібно торкнутися зареєстрованого ключа.';
+
+  @override
   String get importDuplicateWarning =>
       'Записи, UUID яких вже існує у вашому сховищі, будуть автоматично пропущені. Ви побачите зведення.';
 

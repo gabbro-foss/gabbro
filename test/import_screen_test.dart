@@ -1,9 +1,13 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
+import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 /// Scrolls to [sectionTitle], then taps the FilledButton in that section.
 Future<void> _tapImportForSection(
@@ -134,6 +138,93 @@ void main() {
       await tester.tap(find.text('Sync from vault'));
       await tester.pump();
       expect(find.text('Select a file.'), findsOneWidget);
+    });
+
+    // ── ADR-013: key-protected source sync ───────────────────────────────────
+
+    YubikeyRecordData fakeRecord() => YubikeyRecordData(
+          credentialId: Uint8List.fromList([1, 2]),
+          salt: Uint8List.fromList([3, 4]),
+        );
+
+    File tempGabbroFile() {
+      final f = File(
+          '${Directory.systemTemp.path}/gabbro_kp_${DateTime.now().microsecondsSinceEpoch}.gabbro')
+        ..writeAsStringSync('x');
+      addTearDown(() {
+        if (f.existsSync()) f.deleteSync();
+      });
+      return f;
+    }
+
+    testWidgets('key-protected source shows YubiKey PIN field and info note',
+        (tester) async {
+      final tmp = tempGabbroFile();
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [fakeRecord()],
+      )));
+      await tester.ensureVisible(find.text('YubiKey PIN'));
+      expect(find.text('YubiKey PIN'), findsOneWidget);
+      expect(find.textContaining('protected by a YubiKey'), findsOneWidget);
+    });
+
+    testWidgets('passphrase-only source shows no YubiKey fields', (tester) async {
+      final tmp = tempGabbroFile();
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [],
+      )));
+      await tester.ensureVisible(find.text('Sync from vault'));
+      expect(find.text('YubiKey PIN'), findsNothing);
+      expect(find.textContaining('protected by a YubiKey'), findsNothing);
+    });
+
+    testWidgets('key-protected source routes Sync to import-with-key',
+        (tester) async {
+      final tmp = tempGabbroFile();
+      String? keyPath;
+      List<int>? keyHmac;
+      List<int>? keyCred;
+      String? tapPin;
+      var plainCalled = false;
+
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [fakeRecord()],
+        onGetYubikeyHmac: (records, pin, transport) async {
+          tapPin = pin;
+          return (hmac: <int>[9, 9, 9], credentialId: <int>[1, 2]);
+        },
+        onImportGabbroWithKey: (path, pass, hmac, cred) async {
+          keyPath = path;
+          keyHmac = hmac;
+          keyCred = cred;
+          return GabbroImportResult(imported: BigInt.one, skipped: []);
+        },
+        onImportGabbro: (_, _) async {
+          plainCalled = true;
+          return GabbroImportResult(imported: BigInt.zero, skipped: []);
+        },
+      )));
+
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
+      await tester.enterText(
+          find.widgetWithText(TextField, 'YubiKey PIN'), '1234');
+      await tester.ensureVisible(find.text('Sync from vault'));
+      await tester.tap(find.text('Sync from vault'));
+      await tester.pump();
+      await tester.pump();
+
+      expect(keyPath, tmp.path);
+      expect(keyHmac, [9, 9, 9]);
+      expect(keyCred, [1, 2]);
+      expect(tapPin, '1234');
+      expect(plainCalled, isFalse);
     });
 
     // ── No-file validation for each importer ─────────────────────────────────

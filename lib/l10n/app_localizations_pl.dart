@@ -1401,6 +1401,10 @@ class AppLocalizationsPl extends AppLocalizations {
   String get importEnterPassphrase => 'Wprowadź hasło główne dla tego skarbca.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Ten sejf jest chroniony kluczem YubiKey. Aby zsynchronizować, musisz dotknąć zarejestrowanego klucza.';
+
+  @override
   String get importDuplicateWarning =>
       'Wpisy, których UUID już istnieje w Twoim skarbcu, zostaną automatycznie pominięte. Zobaczysz podsumowanie.';
 

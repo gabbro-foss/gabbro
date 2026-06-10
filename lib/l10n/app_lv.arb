@@ -632,6 +632,7 @@
   "importSelectFile": "Izvēlieties failu.",
   "importFileNotFound": "Fails nav atrasts.",
   "importEnterPassphrase": "Ievadiet šī seifa ieejas frāzi.",
+  "importSourceKeyProtected": "Šī glabātava ir aizsargāta ar YubiKey. Lai sinhronizētu, jums būs jāpieskaras reģistrētai atslēgai.",
   "importDuplicateWarning": "Ieraksti, kuru UUID jau pastāv jūsu seifā, tiks automātiski izlaisti. Tiks parādīts kopsavilkums.",
   "importGabbroSubtitle": "Sinhronizēt ierakstus no cita Gabbro seifa (.gabbro fails)",
   "importEnpassSubtitle": "JSON eksports no Enpass (Rīki → Eksportēt)",

@@ -1395,6 +1395,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get importEnterPassphrase => 'Insira a frase secreta deste cofre.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Este cofre está protegido por uma YubiKey. Terá de tocar numa chave registada para sincronizar.';
+
+  @override
   String get importDuplicateWarning =>
       'Entradas cujo UUID já existe no cofre serão puladas automaticamente. Será exibido um resumo.';
 
@@ -3232,6 +3236,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get importEnterPassphrase => 'Insira a frase secreta deste cofre.';
+
+  @override
+  String get importSourceKeyProtected =>
+      'Este cofre está protegido por uma YubiKey. Você precisará tocar em uma chave registrada para sincronizar.';
 
   @override
   String get importDuplicateWarning =>
@@ -5073,6 +5081,10 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get importEnterPassphrase => 'Introduza a frase-passe deste cofre.';
+
+  @override
+  String get importSourceKeyProtected =>
+      'Este cofre está protegido por uma YubiKey. Terá de tocar numa chave registada para sincronizar.';
 
   @override
   String get importDuplicateWarning =>

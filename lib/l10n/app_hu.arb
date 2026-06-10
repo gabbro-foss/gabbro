@@ -632,6 +632,7 @@
   "importSelectFile": "Válassz fájlt.",
   "importFileNotFound": "A fájl nem található.",
   "importEnterPassphrase": "Add meg ennek a széfnek a jelmondatát.",
+  "importSourceKeyProtected": "Ezt a széfet egy YubiKey védi. A szinkronizáláshoz meg kell érintened egy regisztrált kulcsot.",
   "importDuplicateWarning": "Az olyan bejegyzések, amelyek UUID-je már létezik a széfedben, automatikusan kimaradnak. Látni fogsz egy összefoglalót.",
   "importGabbroSubtitle": "Bejegyzések szinkronizálása másik Gabbro széfből (.gabbro fájl)",
   "importEnpassSubtitle": "JSON-exportálás az Enpassból (Eszközök → Exportálás)",

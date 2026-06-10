@@ -1398,6 +1398,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'Введите кодовую фразу для этого хранилища.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Это хранилище защищено YubiKey. Для синхронизации нужно коснуться зарегистрированного ключа.';
+
+  @override
   String get importDuplicateWarning =>
       'Записи, UUID которых уже существует в вашем хранилище, будут автоматически пропущены. Вы увидите сводку.';
 

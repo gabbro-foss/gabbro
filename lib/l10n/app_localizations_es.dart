@@ -1400,6 +1400,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Introduce la contraseña maestra de este almacén.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Esta bóveda está protegida por una YubiKey. Deberás tocar una llave registrada para sincronizar.';
+
+  @override
   String get importDuplicateWarning =>
       'Las entradas cuyo UUID ya existe en tu almacén se omitirán automáticamente. Se te mostrará un resumen.';
 

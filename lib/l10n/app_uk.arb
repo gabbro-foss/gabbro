@@ -632,6 +632,7 @@
   "importSelectFile": "Виберіть файл.",
   "importFileNotFound": "Файл не знайдено.",
   "importEnterPassphrase": "Введіть кодову фразу для цього сховища.",
+  "importSourceKeyProtected": "Це сховище захищено YubiKey. Для синхронізації потрібно торкнутися зареєстрованого ключа.",
   "importDuplicateWarning": "Записи, UUID яких вже існує у вашому сховищі, будуть автоматично пропущені. Ви побачите зведення.",
   "importGabbroSubtitle": "Синхронізувати записи з іншого сховища Gabbro (файл .gabbro)",
   "importEnpassSubtitle": "JSON-експорт з Enpass (Інструменти → Експорт)",

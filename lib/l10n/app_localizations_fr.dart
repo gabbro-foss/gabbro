@@ -1410,6 +1410,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Entrez le mot de passe principal de ce coffre.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Ce coffre est protégé par une YubiKey. Vous devrez toucher une clé enregistrée pour effectuer la synchronisation.';
+
+  @override
   String get importDuplicateWarning =>
       'Les entrées dont l\'UUID existe déjà dans votre coffre seront automatiquement ignorées. Un résumé vous sera présenté.';
 

@@ -632,6 +632,7 @@
   "importSelectFile": "Hautatu fitxategi bat.",
   "importFileNotFound": "Fitxategia ez da aurkitu.",
   "importEnterPassphrase": "Sartu gandegi honetako pasaesaldia.",
+  "importSourceKeyProtected": "Kutxa gotor hau YubiKey batek babesten du. Sinkronizatzeko, erregistratutako gako bat ukitu beharko duzu.",
   "importDuplicateWarning": "UUIDs zure gandegian dagoeneko dauden sarrerak automatikoki saltatuko dira. Laburpena erakutsiko da.",
   "importGabbroSubtitle": "Beste Gabbro gandegi batetik sarrerak sinkronizatu (.gabbro fitxategia)",
   "importEnpassSubtitle": "Enpass-etiko JSON esportazioa (Tresnak → Esportatu)",

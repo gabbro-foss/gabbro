@@ -2695,6 +2695,12 @@ abstract class AppLocalizations {
   /// **'Enter the passphrase for this vault.'**
   String get importEnterPassphrase;
 
+  /// No description provided for @importSourceKeyProtected.
+  ///
+  /// In en, this message translates to:
+  /// **'This vault is protected by a YubiKey. You will need to tap a registered key to sync from it.'**
+  String get importSourceKeyProtected;
+
   /// No description provided for @importDuplicateWarning.
   ///
   /// In en, this message translates to:

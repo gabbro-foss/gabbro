@@ -1396,6 +1396,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get importEnterPassphrase => 'Ievadiet šī seifa ieejas frāzi.';
 
   @override
+  String get importSourceKeyProtected =>
+      'Šī glabātava ir aizsargāta ar YubiKey. Lai sinhronizētu, jums būs jāpieskaras reģistrētai atslēgai.';
+
+  @override
   String get importDuplicateWarning =>
       'Ieraksti, kuru UUID jau pastāv jūsu seifā, tiks automātiski izlaisti. Tiks parādīts kopsavilkums.';
 

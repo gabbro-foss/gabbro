@@ -1368,6 +1368,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get importEnterPassphrase => '이 볼트의 암호 문구를 입력하세요.';
 
   @override
+  String get importSourceKeyProtected =>
+      '이 보관함은 YubiKey로 보호됩니다. 동기화하려면 등록된 키를 탭해야 합니다.';
+
+  @override
   String get importDuplicateWarning =>
       'UUID가 이미 볼트에 존재하는 항목은 자동으로 건너뜁니다. 요약이 표시됩니다.';
 

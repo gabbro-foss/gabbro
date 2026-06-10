@@ -632,6 +632,7 @@
   "importSelectFile": "Selecciona un archivo.",
   "importFileNotFound": "Archivo no encontrado.",
   "importEnterPassphrase": "Introduce la contraseña maestra de este almacén.",
+  "importSourceKeyProtected": "Esta bóveda está protegida por una YubiKey. Deberás tocar una llave registrada para sincronizar.",
   "importDuplicateWarning": "Las entradas cuyo UUID ya existe en tu almacén se omitirán automáticamente. Se te mostrará un resumen.",
   "importGabbroSubtitle": "Sincronizar entradas desde otro almacén Gabbro (archivo .gabbro)",
   "importEnpassSubtitle": "Exportación JSON desde Enpass (Herramientas → Exportar)",
