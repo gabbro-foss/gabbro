@@ -213,9 +213,12 @@ without ever mutating the original.
   now refuses a key-protected source. 7 release-green tests; no regression across
   30 export/import tests.
 
-**Remaining (next session — needs the device):**
-- flutter_rust_bridge codegen for `import_from_gabbro_with_key` and a
-  passphrase-only-downgrade export bridge fn.
+**Bridge — done (commit `f0a032e`):** `export_vault_passphrase_only` and
+`importFromGabbroWithKey` exposed and regenerated (`cargo check` + `flutter
+analyze` clean). Protection detection for the UI reuses the existing
+`list_vault_yubikey_records(path)` (non-empty ⇒ key-protected).
+
+**Remaining (Flutter — widget-testable on host; only end-to-end key sync needs the device):**
 - Export screen: passphrase-only toggle (default OFF; hidden/disabled for
   passphrase-only vaults), an always-visible protection-type indicator, and the
   downgrade warning.
