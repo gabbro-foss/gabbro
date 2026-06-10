@@ -192,6 +192,38 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
+### Active task: vault export security posture (ADR-013)
+
+Export silently re-sealed key-protected vaults passphrase-only, letting a
+yubikeyless vault sync them with the passphrase alone — a second-factor bypass
+(found by hardware test 2026-06-10). ADR-013 decides: export preserves the
+source's protection by default; import/sync enforces it; the protection class is
+immutable in place; an opt-in, warned toggle exports a passphrase-only copy
+without ever mutating the original.
+
+**Rust core — done (commit `ecf711b`):**
+- `export_vault_preserving` (byte-for-byte copy of the sealed file; keyslots +
+  alias retained) wired into `session_export_vault`. The `exportVault` bridge
+  signature is unchanged, so the default-export fix is live after a rebuild — no
+  codegen needed.
+- `session_export_vault_passphrase_only` → `export_vault` is the opt-in downgrade
+  path; the original on-disk vault is never mutated.
+- `import_from_gabbro_with_key` syncs a key-protected source (passphrase +
+  registered key); `import_from_gabbro` refactored onto a shared merge helper and
+  now refuses a key-protected source. 7 release-green tests; no regression across
+  30 export/import tests.
+
+**Remaining (next session — needs the device):**
+- flutter_rust_bridge codegen for `import_from_gabbro_with_key` and a
+  passphrase-only-downgrade export bridge fn.
+- Export screen: passphrase-only toggle (default OFF; hidden/disabled for
+  passphrase-only vaults), an always-visible protection-type indicator, and the
+  downgrade warning.
+- Import/sync screen: detect a key-protected source → prompt for a YubiKey.
+- l10n for all new strings across the ARB files.
+- **Interim state:** syncing a *key-protected* export currently errors until the
+  UI lands; the hole is closed and passphrase-only export/sync is unaffected.
+
 ### Active task: systematic test coverage improvement
 
 **Philosophy:** tests catch real flaws — logic errors, mishandled failure modes,
