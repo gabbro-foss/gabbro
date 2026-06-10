@@ -121,13 +121,13 @@ void main() {
     }
   });
 
-  // ── _localeFor complex locale branches ─────────────────────────────────────
+  // ── localeFor complex locale branches ──────────────────────────────────────
   //
-  // These 5 locales have explicit switch arms in _localeFor (they need a country
+  // These 5 locales have explicit switch arms in localeFor (they need a country
   // or script subtag). The other LanguageChoices hit the wildcard arm already
   // covered by the French/German tests above.
 
-  group('_localeFor complex locales', () {
+  group('localeFor complex locales', () {
     for (final (lang, tag) in [
       (LanguageChoice.ptPt, 'pt-PT'),
       (LanguageChoice.ptBr, 'pt-BR'),
@@ -140,7 +140,7 @@ void main() {
           _buildWithLocale(lang, const AppearanceScreen()),
         );
         await tester.pump();
-        // If _localeFor returns the wrong Locale the app would fail to resolve
+        // If localeFor returns the wrong Locale the app would fail to resolve
         // AppLocalizations and throw — reaching this line proves the mapping works.
         expect(find.byType(AppearanceScreen), findsOneWidget);
       });

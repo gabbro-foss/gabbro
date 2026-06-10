@@ -20,7 +20,11 @@ import 'package:gabbro/vault_registry.dart';
 /// Most locales use a single BCP-47 language tag that matches the enum name.
 /// The five complex locales (pt_PT, pt_BR, sr_Latn, zh_CN, zh_TW) need a
 /// country or script subtag and are handled explicitly.
-Locale _localeFor(LanguageChoice choice) {
+///
+/// Public only as a test seam: `test/locale_resolution_test.dart` asserts every
+/// mapping lands on a locale in [AppLocalizations.supportedLocales].
+@visibleForTesting
+Locale localeFor(LanguageChoice choice) {
   assert(choice != LanguageChoice.system);
   return switch (choice) {
     LanguageChoice.ptPt   => const Locale('pt', 'PT'),
@@ -104,7 +108,7 @@ Future<void> autofillUnlockMain() async {
       supportedLocales: AppLocalizations.supportedLocales,
       locale: settings.language == LanguageChoice.system
           ? null
-          : _localeFor(settings.language),
+          : localeFor(settings.language),
       themeMode: switch (settings.theme) {
         ThemeChoice.system => ThemeMode.system,
         ThemeChoice.light  => ThemeMode.light,
@@ -571,7 +575,7 @@ class _GabbroAppState extends State<GabbroApp>
           supportedLocales: AppLocalizations.supportedLocales,
           locale: _settings.language == LanguageChoice.system
               ? null
-              : _localeFor(_settings.language),
+              : localeFor(_settings.language),
           themeMode: _themeMode,
           theme: gabbroLightTheme(highContrast: hc),
           darkTheme: gabbroDarkTheme(highContrast: hc),
