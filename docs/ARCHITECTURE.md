@@ -50,7 +50,7 @@ gabbro/
 │   ├── fido/             # FIDO2/libfido2 FFI (Linux only)
 │   ├── import/           # enpass, bitwarden, google_pm, dashlane, csv
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics; wordlist gen; gen_fixtures
-├── rust/tests/           # Backward-compat gate + state-machine fuzzer + frozen golden fixtures (FIXTURES.md)
+├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroAutofillService, UnlockActivity, YubiKeyManager, BiometricHelper (+ Robolectric tests)
 ├── docs/                 # ARCHITECTURE, LEARNINGS, SECURITY, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/  test_driver/   # Flutter widget/unit + Linux real-FFI device suites
@@ -102,22 +102,16 @@ release, a deliberately lighter session: self-contained **quick wins**, all test
   asserts every non-`system` `LanguageChoice` maps (via `localeFor`) to a locale in
   `AppLocalizations.supportedLocales`, so a half-wired language can't silently fall back to
   English. Seam: `_localeFor` -> public `localeFor` + `@visibleForTesting`.
+- ~~`SealedVault::from_bytes` malformed-input fuzz~~ — **DONE** (`9d19ab9`):
+  `rust/tests/vault_parse_fuzz.rs` (truncations, seeded-random garbage, oversized/overflowing
+  length fields; asserts `Err` never panic, not `#[ignore]`'d). **It found a real bug** — the
+  attacker-controlled 8-byte body-length overflowed `pos + body_len`, crashing the parser on
+  open (debug: add panic; release: wrap -> reversed-slice panic). Fixed with `checked_add`.
+  CHANGELOG `[Unreleased]` Security. Backward-compat gate green (debug + release).
 
-Remaining:
-
-1. **`SealedVault::from_bytes` malformed-input fuzz test** (security-adjacent, ~30–45 min) —
-   the parser in `rust/src/vault/file_format.rs` is *currently* well-defended (every slice at
-   lines ~232–369 is guarded by an `if data.len() < pos + N { return Err }`), but that safety
-   is held **only by inspection** — no negative test exists; the backward-compat harness only
-   ever feeds *valid* vaults. Add a seeded-`rand` property/fuzz test (mirror
-   `vault_state_machine_fuzz.rs` style, likely new `rust/tests/vault_parse_fuzz.rs`) feeding
-   `from_bytes`: (1) every truncation `data[..n]` of a valid sealed vault, (2) random garbage
-   of assorted lengths, (3) valid magic prefix + corrupted/oversized length fields; assert
-   **returns `Err`, never panics**. Locks in the existing good behaviour. Watch the
-   attacker-controlled 8-byte body-len field (line ~369) `pos + body_len` usize-overflow path.
-
-All three move out of the Bikeshed *Code Quality* section (procedure: picked-up items live
-here, not there).
+All three quick wins are done. The `from_bytes` fix is a security-adjacent bugfix
+(`[Unreleased]` in CHANGELOG) -> warrants a future `v0.1.0-alpha.7` when the next batch of
+work lands.
 
 ### Open from the security audit
 

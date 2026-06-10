@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Security
+- **Crash-on-open hardening: malformed `.gabbro` no longer panics the parser.** `SealedVault::from_bytes` reads an 8-byte body-length field straight off disk and then checked `data.len() < pos + body_len`. Because `body_len` is attacker-controlled and cast to `usize`, a crafted header with a near-`u64::MAX` body length overflowed the `pos + body_len` add — panicking on the add in debug, and in release wrapping to a small value so the guard passed and `data[pos..pos + body_len]` became a reversed range, panicking on the slice. Either way a hand-crafted or corrupt vault file crashed the app on open. Fixed with a `checked_add`: an overflowing body length now returns a clean `Err` like any other truncation. No change for valid vaults (backward-compat gate green). Found by a new negative/fuzz test, not in the wild. The parser was otherwise already well-defended (every slice length-guarded); this closes the one integer-overflow gap.
+- Vault parser fuzz harness (`rust/tests/vault_parse_fuzz.rs`): the negative-input safety net for `SealedVault::from_bytes`, complementing the valid-only `vault_backward_compat` gate. Feeds the parser (1) every truncation of a real golden vault, (2) seeded-random garbage, and (3) structurally valid headers with oversized/overflowing body-length fields, asserting it always returns `Err`, never panics. Not `#[ignore]`'d — parsing does no Argon2id work, so it runs in the routine `cargo test` as a permanent guard. Caught the body-length overflow above.
+
 ## [0.1.0-alpha.6] – 2026-06-10
 
 ### Security
