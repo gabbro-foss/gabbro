@@ -192,55 +192,6 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Active task: vault export security posture (ADR-013)
-
-Export silently re-sealed key-protected vaults passphrase-only, letting a
-yubikeyless vault sync them with the passphrase alone — a second-factor bypass
-(found by hardware test 2026-06-10). ADR-013 decides: export preserves the
-source's protection by default; import/sync enforces it; the protection class is
-immutable in place; an opt-in, warned toggle exports a passphrase-only copy
-without ever mutating the original.
-
-**Rust core — done (commit `ecf711b`):**
-- `export_vault_preserving` (byte-for-byte copy of the sealed file; keyslots +
-  alias retained) wired into `session_export_vault`. The `exportVault` bridge
-  signature is unchanged, so the default-export fix is live after a rebuild — no
-  codegen needed.
-- `session_export_vault_passphrase_only` → `export_vault` is the opt-in downgrade
-  path; the original on-disk vault is never mutated.
-- `import_from_gabbro_with_key` syncs a key-protected source (passphrase +
-  registered key); `import_from_gabbro` refactored onto a shared merge helper and
-  now refuses a key-protected source. 7 release-green tests; no regression across
-  30 export/import tests.
-
-**Bridge — done (commit `f0a032e`):** `export_vault_passphrase_only` and
-`importFromGabbroWithKey` exposed and regenerated (`cargo check` + `flutter
-analyze` clean). Protection detection for the UI reuses the existing
-`list_vault_yubikey_records(path)` (non-empty ⇒ key-protected).
-
-**Export screen — done (commit `6139045`):** always-visible protection
-indicator (key-protected vs passphrase-only, fixing the now-misleading
-"passphrase only" note); opt-in "Export without YubiKey protection" toggle
-(default OFF, hidden for passphrase-only vaults) → warning →
-`exportVaultPassphraseOnly`; OFF → preserving export. `vault_list_screen` passes
-`isKeyProtected`. 3 l10n strings × 37 ARBs (best-effort) regenerated. 4 new
-widget tests; all 24 export-screen tests green; `flutter analyze` clean.
-
-**Import screen — done (commit `d450061`):** the Gabbro sync section detects the
-source's protection (`list_vault_yubikey_records` on selection); a key-protected
-source reveals a YubiKey PIN field, a transport selector (Android), and an info
-note, then taps a registered key and calls `importFromGabbroWithKey`.
-passphrase-only sources keep the existing path. New shared
-`lib/widgets/yubikey_tap.dart` (`getAnyYubikeyHmacSecret`) mirrors the unlock
-multi-key tap but returns the hmac + credential. 1 l10n string × 37 ARBs; 3 widget
-tests; 730 flutter tests green; `flutter analyze` clean.
-
-**Remaining — on-device verification only (Phase 2):**
-- Real key-protected export → sync with a physical YubiKey tap on Linux and
-  Android (the Dart flow is host-tested; the hardware path is not yet exercised).
-- Follow-up (not blocking): unlock screen could adopt `yubikey_tap.dart` to drop
-  its duplicated tap dispatch.
-
 ### Active task: systematic test coverage improvement
 
 **Philosophy:** tests catch real flaws — logic errors, mishandled failure modes,
@@ -466,6 +417,14 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - **Summarize `ARCHITECTURE.md`** — the document has grown too long again. Once the code
   coverage task is finished, do a condensing pass (trim historical narration the git log /
   CHANGELOG already capture, tighten Coverage status and Current Focus).
+- **Dedupe the YubiKey tap dispatch** — `lib/widgets/yubikey_tap.dart`
+  (`getAnyYubikeyHmacSecret`, added for ADR-013 import sync) duplicates the
+  Linux/Android multi-key tap logic the unlock screen still inlines. The unlock
+  screen (and the single-key paths) could adopt the shared helper. Low priority,
+  no behaviour change. While there, consider the app-wide gap the ADR-013 hardware
+  test surfaced: the Android tap call blocks with no timeout/explicit Cancel
+  (recoverable only via the back arrow); unlock has the same pattern. Deemed
+  sufficient for now (a "tap your YubiKey now" cue was added to import sync).
 - **Language-picker invariant tests** (quick win) — pure-function tests in
   `test/language_screen_test.dart`: every `LanguageChoice` maps to a non-empty, *unique*
   label via `languageChoiceLabel` (no ambiguous picker rows), and `sortedLanguageChoices`
