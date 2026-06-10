@@ -22,13 +22,13 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Vault entries:** 6 types — Login (displayed as "Password" in UI), Note, Identity, Card, File, Custom. Common fields: UUID, created, modified, folder, tags, favourite. No TOTP — YubiKey covers 2FA; keeping them separate is more secure.
 
-**Password generator:** classic (32–256 chars) and passphrase (4–20 words, 29 languages, EFF-style wordlists embedded at compile time). Classic mode is script-aware (Latin/Greek/Cyrillic pools). All generation in Rust.
+**Password generator:** classic (32–256 chars) and passphrase (4–20 words, many languages, EFF-style wordlists embedded at compile time). Classic mode is script-aware (Latin/Greek/Cyrillic pools). All generation in Rust.
 
 **Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text size, high-contrast, alphabet bar position.
 
 **Platforms:** v1: Linux (Arch + Mint/deb), Android (F-Droid + Play Store). Later: Windows.
 
-**Versioning:** SemVer (semver.org/spec/v2.0.0.html). `pubspec.yaml` is `0.1.0-alpha.6+6`. `1.0` is a public trust commitment; don't ship it prematurely. CHANGELOG.md follows Keep a Changelog 1.0.0.
+**Versioning:** SemVer (semver.org/spec/v2.0.0.html); the current version lives in `pubspec.yaml` (single source of truth). `1.0` is a public trust commitment; don't ship it prematurely. CHANGELOG.md follows Keep a Changelog 1.0.0.
 
 **Licence:** GPL-3.0-only (ADR-004). Play Store one-time payment is licence-compatible; F-Droid free build coexists without conflict.
 
@@ -87,41 +87,39 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next active task — `v0.1.0-alpha.6` release
+### Next active task — quick-win test hardening (lighter session)
 
-The agreed next task. ADR-013 (export security + key-protected *Sync from file*) and
-the Android SAF export are done, committed, and hardware-verified — the release's
-anchor, alongside everything accumulated since alpha.5 (the `[0.1.0-alpha.6]` CHANGELOG
-block is already the complete, correct changelog; no reconstruction needed).
+`v0.1.0-alpha.6` is **released and published** (commit `071283a`, tag `v0.1.0-alpha.6`,
+GitHub release live with the Linux tarball + Android APK). After the heavy code-coverage
+release, a deliberately lighter session: three self-contained **quick wins**, all
+test-only (no production behaviour change), TDD where it applies. Do in any order.
 
-**Pre-flight** (full build/package/publish commands in ## Release Process below):
+1. **Language-picker invariant tests** — pure-function tests in `test/language_screen_test.dart`:
+   every `LanguageChoice` maps to a non-empty, *unique* label via `languageChoiceLabel`
+   (no ambiguous picker rows), and `sortedLanguageChoices` returns all
+   `LanguageChoice.values` with `system` first and the rest alphabetical by label.
+   Auto-covers future languages; replaces the brittle `values.length == 35` magic number.
+   Complements the endonym guard added for the langDutch fix.
 
-1. **Gate must be green.** Rob runs `~/bash_scripts/test_gabbro` (Linux: `flutter test`,
-   `cargo test -q`, `cargo clippy --all-targets`, the two `flutter drive` integration
-   suites, the backward-compat gate, the fuzzer) **plus** the Android unit tests
-   (`cd android && ./gradlew :app:testDebugUnitTest` — not in the script; ran green
-   this session, 23/17).
-2. Set the date on the `[0.1.0-alpha.6]` CHANGELOG block (currently `YYYY-MM-DD`).
-3. Confirm `pubspec.yaml` is `0.1.0-alpha.6` (optionally bump the build to `+7`).
-4. Commit (docs).
+2. **Locale-resolution guard** — assert every non-`system` `LanguageChoice` resolves (via
+   `_localeFor` in `main.dart`) to a locale present in `AppLocalizations.supportedLocales`,
+   so a half-wired new language can't silently fall back to English (user picks "Polski",
+   gets English). `_localeFor` is private — needs a small test seam or a per-choice
+   `GabbroApp` drive that detects the fallback.
 
-**⚠️ The `v0.1.0-alpha.6` tag is premature — MOVE it, don't reuse in place.** alpha.6
-was **never published** (the GitHub release is an unpublished draft), but the git tag
-was pushed early to commit `5f7675a` (2026-06-07) and development continued under the
-same version. Before tagging the real release:
+3. **`SealedVault::from_bytes` malformed-input fuzz test** (security-adjacent, ~30–45 min) —
+   the parser in `rust/src/vault/file_format.rs` is *currently* well-defended (every slice at
+   lines ~232–369 is guarded by an `if data.len() < pos + N { return Err }`), but that safety
+   is held **only by inspection** — no negative test exists; the backward-compat harness only
+   ever feeds *valid* vaults. Add a seeded-`rand` property/fuzz test (mirror
+   `vault_state_machine_fuzz.rs` style, likely new `rust/tests/vault_parse_fuzz.rs`) feeding
+   `from_bytes`: (1) every truncation `data[..n]` of a valid sealed vault, (2) random garbage
+   of assorted lengths, (3) valid magic prefix + corrupted/oversized length fields; assert
+   **returns `Err`, never panics**. Locks in the existing good behaviour. Watch the
+   attacker-controlled 8-byte body-len field (line ~369) `pos + body_len` usize-overflow path.
 
-```
-git push origin :refs/tags/v0.1.0-alpha.6   # delete the stale remote tag
-git tag -d v0.1.0-alpha.6                    # delete it locally
-# …after the release commit:
-git tag -a v0.1.0-alpha.6 -m "v0.1.0-alpha.6" && git push origin v0.1.0-alpha.6
-```
-
-Safe because nothing shipped as alpha.6; on any other clone use `git fetch --tags --force`.
-
-**Publish:** delete the stale GitHub draft release, then create it fresh from the moved
-tag with the Linux tarball + Android APK + the alpha disclaimer (manually on github.com —
-no `gh` CLI on Rob's box).
+All three move out of the Bikeshed *Code Quality* section (procedure: picked-up items live
+here, not there).
 
 ### Open from the security audit
 
@@ -191,7 +189,7 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
    - **Fuzzer found a failure?** It prints the seed + op log. Reproduce, minimise, and
      add the sequence to `vault_backward_compat.rs` as a fixed regression test. Widen
      the search with `GABBRO_FUZZ_CASES=64`.
-   - The 8 ignored Rust + 17 ignored Kotlin tests are hardware-only (YubiKey /
+   - The ignored Rust + Kotlin tests are hardware-only (YubiKey /
      biometric / AndroidKeyStore) and cannot run without the devices.
 4. Commit, then `git tag -a v0.1.0-alpha.N -m "v0.1.0-alpha.N" && git push origin v0.1.0-alpha.N`.
 
@@ -244,36 +242,6 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
   test surfaced: the Android tap call blocks with no timeout/explicit Cancel
   (recoverable only via the back arrow); unlock has the same pattern. Deemed
   sufficient for now (a "tap your YubiKey now" cue was added to import sync).
-- **Language-picker invariant tests** (quick win) — pure-function tests in
-  `test/language_screen_test.dart`: every `LanguageChoice` maps to a non-empty, *unique*
-  label via `languageChoiceLabel` (no ambiguous picker rows), and `sortedLanguageChoices`
-  returns all `LanguageChoice.values` with `system` first and the rest alphabetical by label.
-  Auto-covers future languages; replaces the brittle `values.length == 35` magic number.
-  Complements the endonym guard added for the langDutch fix.
-- **Locale-resolution guard** (quick win) — assert every non-`system` `LanguageChoice`
-  resolves (via `_localeFor` in `main.dart`) to a locale present in
-  `AppLocalizations.supportedLocales`, so a half-wired new language can't silently fall back
-  to English (user picks "Polski", gets English). `_localeFor` is private — needs a small
-  test seam or a per-choice GabbroApp drive that detects the fallback.
-- **`SealedVault::from_bytes` malformed-input fuzz test** (quick win, security-adjacent) —
-  the parser in `rust/src/vault/file_format.rs` is *currently* well-defended: every slice at
-  lines ~232–369 is preceded by an `if data.len() < pos + N { return Err(..) }` guard, so each
-  `try_into().unwrap()` is infallible by construction and truncated input returns a clean
-  `Err`, not a panic. But that safety is held **only by inspection** — there is no negative
-  test. The backward-compat harness (`rust/tests/vault_backward_compat.rs`) only ever feeds
-  *valid* vaults through `from_bytes`. One careless edit (a slice added without its guard, or
-  the theoretical `pos + body_len` usize-overflow from the attacker-controlled 8-byte body-len
-  field at line ~369 — wraps in release, can invert a slice range) would reintroduce a
-  crash-on-open and nothing would catch it. Add a property/fuzz test (mirror the
-  `vault_state_machine_fuzz.rs` seeded-`rand` style, likely as a new
-  `rust/tests/vault_parse_fuzz.rs`) that feeds `from_bytes`: (1) every truncation `data[..n]`
-  of a valid sealed vault for all n, (2) random garbage of assorted lengths, (3) a valid magic
-  prefix followed by corrupted/oversized length fields, and asserts **returns `Err`, never
-  panics** (use `std::panic::catch_unwind` or just rely on the harness — a panic fails the
-  test). Locks in the existing good behaviour and the project's "tests catch malformed-input
-  crashes" philosophy. Audit context: only 26 production `.unwrap()`s exist repo-wide; the
-  rest are the generated bridge (`frb_generated.rs`, off-limits) or `expect()` on fixed-size
-  crypto conversions and dev-only bins (`mem_forensics`, `bench_kdf`) — all benign. ~30–45 min.
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer
