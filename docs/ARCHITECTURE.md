@@ -98,16 +98,14 @@ release, a deliberately lighter session: self-contained **quick wins**, all test
   `test/language_screen_test.dart` (non-empty + unique labels in every locale;
   `sortedLanguageChoices` = full set, system first, rest alphabetical). Replaced the
   `values.length == 35` magic number. 5 tests, all green.
+- ~~Locale-resolution guard~~ — **DONE** (`8739939`): `test/locale_resolution_test.dart`
+  asserts every non-`system` `LanguageChoice` maps (via `localeFor`) to a locale in
+  `AppLocalizations.supportedLocales`, so a half-wired language can't silently fall back to
+  English. Seam: `_localeFor` -> public `localeFor` + `@visibleForTesting`.
 
 Remaining:
 
-1. **Locale-resolution guard** — assert every non-`system` `LanguageChoice` resolves (via
-   `_localeFor` in `main.dart`) to a locale present in `AppLocalizations.supportedLocales`,
-   so a half-wired new language can't silently fall back to English (user picks "Polski",
-   gets English). `_localeFor` is private — needs a small test seam or a per-choice
-   `GabbroApp` drive that detects the fallback.
-
-2. **`SealedVault::from_bytes` malformed-input fuzz test** (security-adjacent, ~30–45 min) —
+1. **`SealedVault::from_bytes` malformed-input fuzz test** (security-adjacent, ~30–45 min) —
    the parser in `rust/src/vault/file_format.rs` is *currently* well-defended (every slice at
    lines ~232–369 is guarded by an `if data.len() < pos + N { return Err }`), but that safety
    is held **only by inspection** — no negative test exists; the backward-compat harness only
