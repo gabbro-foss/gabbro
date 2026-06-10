@@ -54,7 +54,7 @@ secret, it lives in Rust. Everything else lives in Flutter.
 |---|---|
 | Linux (Arch, Mint) | v1 |
 | Android (F-Droid) | v1 |
-| Windows, macOS, iOS | v2 (future) |
+| Windows | v2 (future) |
 
 ---
 
@@ -109,7 +109,7 @@ gabbro/
 ├── rust_builder/ # Cargokit build integration (do not edit)
 ├── docs/         # Architecture docs and ADRs
 │   └── decisions/
-└── ...           # Platform folders (android, ios, linux, macos, windows)
+└── ...           # Platform folders (android, linux, windows)
 ```
 
 Full details in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
