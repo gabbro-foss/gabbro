@@ -672,13 +672,35 @@ pub fn session_revert_password(id: &str) -> Result<(), String> {
     Ok(())
 }
 
-/// Write .gabbro + .gabbro.sha256 from current session state.
+/// Write .gabbro + .gabbro.sha256, preserving the vault's protection (ADR-013).
+///
+/// The default export copies the sealed on-disk vault byte-for-byte, so a
+/// key-protected vault stays key-protected (its keyslots and alias are retained)
+/// and the copy is never weaker than the original. Every committed CRUD op already
+/// persists to disk, so the on-disk file reflects current session state.
+///
+/// The opt-in passphrase-only *downgrade* is a separate path (see ADR-013) and is
+/// not reachable here.
 pub fn session_export_vault(export_path: PathBuf) -> Result<(), String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
+    crate::api::vault::export_vault_preserving(&session.path, &export_path)
+}
+
+/// Write a passphrase-only `.gabbro` + `.gabbro.sha256` — the opt-in security
+/// downgrade (ADR-013).
+///
+/// Re-seals the current session body under the session passphrase **alone**,
+/// dropping any YubiKey requirement, so the artifact opens with the passphrase
+/// only. Reached solely via the explicit, warned export toggle; the original
+/// vault on disk is never mutated (it stays in its protection class). The user is
+/// already authenticated this session — a key-protected vault required a YubiKey
+/// tap to unlock — so no extra hardware gate is imposed here.
+pub fn session_export_vault_passphrase_only(export_path: PathBuf) -> Result<(), String> {
+    let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+    let session = session.as_ref().ok_or("Vault is locked")?;
     let body = build_body(session);
-    crate::api::vault::export_vault(&body, &session.passphrase, &export_path)?;
-    Ok(())
+    crate::api::vault::export_vault(&body, &session.passphrase, &export_path)
 }
 
 /// Serialize the current session to a plaintext JSON file at `export_path`.
@@ -2881,6 +2903,49 @@ mod yubikey_session_tests {
         assert_eq!(list_entry_summaries().unwrap().len(), 1);
 
         teardown(&path);
+    }
+
+    // ADR-013 opt-in downgrade: exporting a key-protected vault passphrase-only
+    // yields an artifact openable by the passphrase ALONE, while the original
+    // vault on disk stays key-protected (its class is never mutated).
+    #[test]
+    #[serial]
+    fn passphrase_only_downgrade_of_keyprotected_vault_opens_with_passphrase_alone() {
+        use crate::api::vault::load_vault;
+        use std::env::temp_dir;
+
+        let pass = b"multi-key downgrade pass";
+        let path = setup_multi_key_vault(pass);
+
+        // Unlock with a registered key — proves the vault is key-protected and the
+        // session is hardware-authenticated (the implicit downgrade authorization).
+        unlock_vault_with_key_record(
+            pass,
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            path.clone(),
+        )
+        .unwrap();
+
+        let mut export_path = temp_dir();
+        export_path.push("gabbro_downgrade_passonly_out.gabbro");
+        session_export_vault_passphrase_only(export_path.clone()).unwrap();
+
+        // The downgraded artifact opens with the passphrase ALONE — no YubiKey.
+        let body = load_vault(pass, &export_path)
+            .expect("passphrase-only downgrade artifact must open with the passphrase alone");
+        assert_eq!(body.entries.len(), 1);
+
+        // The ORIGINAL vault is untouched — still key-protected.
+        assert!(
+            load_vault(pass, &path).is_err(),
+            "original key-protected vault must stay key-protected after a downgrade export"
+        );
+
+        teardown(&path);
+        let _ = std::fs::remove_file(&export_path);
+        let _ = std::fs::remove_file(export_path.with_extension("gabbro.sha256"));
     }
 }
 

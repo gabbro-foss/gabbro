@@ -795,29 +795,51 @@ pub fn change_passphrase(
     save_vault(&entries, new_passphrase, path)
 }
 
-/// Export the vault to a `.gabbro` file and a companion `.gabbro.sha256`
-/// detached hash file.
+/// Export a vault as a passphrase-only `.gabbro` artifact + `.gabbro.sha256`
+/// companion — the opt-in security **downgrade** path (ADR-013).
 ///
-/// The hash is computed over the raw bytes of the encrypted vault file,
-/// following the Linux ISO verification convention documented in ADR-002.
-/// This allows integrity verification before decryption using standard
-/// tools (`sha256sum` on Linux, `certutil` on Windows).
+/// Re-seals `body` under `passphrase` alone, dropping any YubiKey requirement, so
+/// the resulting file opens with the passphrase only. This is reached only via the
+/// explicit, warned export toggle; the default export ([`export_vault_preserving`])
+/// keeps the source's protection. The alias is not carried into this standalone copy.
 ///
-/// `export_path` should point to the desired `.gabbro` output file.
-/// The `.sha256` file is written alongside it automatically.
+/// The hash is computed over the raw bytes of the encrypted vault file, following
+/// the Linux ISO verification convention (ADR-002), so integrity can be verified
+/// before decryption with standard tools (`sha256sum`, `certutil`).
 #[flutter_rust_bridge::frb(ignore)]
 pub fn export_vault(body: &VaultBody, passphrase: &[u8], export_path: &Path) -> Result<(), String> {
     let plaintext = zeroize::Zeroizing::new(serialize_vault_body(body)?);
-    // Export preserves no alias — the exported file is a standalone copy.
+    // The passphrase-only downgrade artifact carries no alias — a standalone copy.
     let sealed = seal_vault(passphrase, &plaintext, None)?;
     let vault_bytes = sealed.to_bytes();
 
-    // Write the .gabbro file
     atomic_write_0600(export_path, &vault_bytes)?;
+    write_sha256_companion(export_path, &vault_bytes)
+}
 
-    // Compute SHA-256 over the vault bytes
+/// Export a vault preserving its exact on-disk protection (ADR-013).
+///
+/// This is the DEFAULT export path. It copies the sealed `.gabbro` file at
+/// `source_path` to `export_path` **byte-for-byte**, so the registered YubiKey
+/// keyslots and the vault alias are retained — a key-protected vault stays
+/// key-protected and the copy is provably no weaker than the original. The
+/// detached `.gabbro.sha256` companion (ADR-002) is written alongside.
+///
+/// Callers in a live session must ensure committed mutations are persisted before
+/// calling this — every CRUD op already saves, so the on-disk file is current.
+#[flutter_rust_bridge::frb(ignore)]
+pub fn export_vault_preserving(source_path: &Path, export_path: &Path) -> Result<(), String> {
+    let vault_bytes =
+        std::fs::read(source_path).map_err(|e| format!("Failed to read vault for export: {e}"))?;
+    atomic_write_0600(export_path, &vault_bytes)?;
+    write_sha256_companion(export_path, &vault_bytes)
+}
+
+/// Write the detached `<export>.gabbro.sha256` companion for `vault_bytes`
+/// (ADR-002). One-line hex digest in `sha256sum` format, naming the `.gabbro` file.
+fn write_sha256_companion(export_path: &Path, vault_bytes: &[u8]) -> Result<(), String> {
     let mut hasher = Sha256::new();
-    hasher.update(&vault_bytes);
+    hasher.update(vault_bytes);
     let hash_bytes: [u8; 32] = hasher.finalize().into();
     let hash_hex = format!(
         "{}  {}\n",
@@ -830,12 +852,8 @@ pub fn export_vault(body: &VaultBody, passphrase: &[u8], export_path: &Path) -> 
             .and_then(|n| n.to_str())
             .unwrap_or("vault.gabbro")
     );
-
-    // Write the .sha256 companion file
     let hash_path = export_path.with_extension("gabbro.sha256");
-    atomic_write_0600(&hash_path, hash_hex.as_bytes())?;
-
-    Ok(())
+    atomic_write_0600(&hash_path, hash_hex.as_bytes())
 }
 
 // ── Vault persistence ─────────────────────────────────────────────────────────
@@ -2404,5 +2422,168 @@ mod tests {
 
         let _ = std::fs::remove_file(&path);
         let _ = std::fs::remove_file(&hash_path);
+    }
+
+    // ── export_vault_preserving — ADR-013 default (protection-preserving) ──────
+    //
+    // The security boundary: exporting a key-protected vault must keep the YubiKey
+    // requirement (byte-for-byte copy of the sealed file), and exporting any vault
+    // must produce a faithful, integrity-checkable copy.
+
+    use crate::crypto::vault_crypto::YubiKeyRegistration;
+    use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+
+    fn note_body(id: &str, content: &str) -> VaultBody {
+        VaultBody {
+            entries: vec![VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from(id),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::new(),
+                },
+                title: String::from("preserve test"),
+                content: String::from(content),
+                custom_fields: vec![],
+                attachments: vec![],
+            })],
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn export_preserving_keyprotected_vault_keeps_key_requirement() {
+        use std::env::temp_dir;
+
+        let pass: &[u8] = b"key-protected source passphrase";
+        let yk1 = YubiKeyRegistration {
+            credential_id: vec![0xA1u8; 64],
+            hmac_secret: [0x11u8; 32],
+            salt: [0x12u8; 32],
+        };
+        let yk2 = YubiKeyRegistration {
+            credential_id: vec![0xA2u8; 48],
+            hmac_secret: [0x21u8; 32],
+            salt: [0x22u8; 32],
+        };
+
+        let mut source = temp_dir();
+        source.push("gabbro_preserve_keyprot_src.gabbro");
+        let mut export = temp_dir();
+        export.push("gabbro_preserve_keyprot_out.gabbro");
+
+        save_vault_with_keys(
+            &note_body("kp-001", "hardware secret"),
+            pass,
+            &[yk1, yk2],
+            &source,
+        )
+        .unwrap();
+
+        export_vault_preserving(&source, &export).unwrap();
+
+        // The exported artifact must NOT open with the passphrase alone...
+        assert!(
+            load_vault(pass, &export).is_err(),
+            "preserving export of a key-protected vault must stay key-protected"
+        );
+        // ...but a registered key (+ passphrase) opens it, contents intact.
+        let (body, _m, _w) =
+            load_vault_with_key_record(pass, &[0x11u8; 32], &[0xA1u8; 64], &export).unwrap();
+        assert!(
+            body.entries.iter().any(|e| matches!(e, VaultEntry::Note(n)
+                if n.meta.id == "kp-001" && n.content == "hardware secret")),
+            "registered key must open the exported artifact with contents intact"
+        );
+
+        let _ = std::fs::remove_file(&source);
+        let _ = std::fs::remove_file(&export);
+        let _ = std::fs::remove_file(source.with_extension("gabbro.sha256"));
+        let _ = std::fs::remove_file(export.with_extension("gabbro.sha256"));
+    }
+
+    #[test]
+    fn export_preserving_passphrase_only_vault_opens_with_passphrase() {
+        use std::env::temp_dir;
+
+        let pass: &[u8] = b"passphrase-only source";
+        let mut source = temp_dir();
+        source.push("gabbro_preserve_passonly_src.gabbro");
+        let mut export = temp_dir();
+        export.push("gabbro_preserve_passonly_out.gabbro");
+
+        save_vault(&note_body("po-001", "plain secret"), pass, &source).unwrap();
+        export_vault_preserving(&source, &export).unwrap();
+
+        let body =
+            load_vault(pass, &export).expect("passphrase-only export must open with passphrase");
+        assert!(body
+            .entries
+            .iter()
+            .any(|e| matches!(e, VaultEntry::Note(n) if n.meta.id == "po-001")));
+
+        let _ = std::fs::remove_file(&source);
+        let _ = std::fs::remove_file(&export);
+        let _ = std::fs::remove_file(source.with_extension("gabbro.sha256"));
+        let _ = std::fs::remove_file(export.with_extension("gabbro.sha256"));
+    }
+
+    #[test]
+    fn export_preserving_is_byte_identical_to_source() {
+        use std::env::temp_dir;
+
+        let pass: &[u8] = b"byte identity passphrase";
+        let mut source = temp_dir();
+        source.push("gabbro_preserve_identity_src.gabbro");
+        let mut export = temp_dir();
+        export.push("gabbro_preserve_identity_out.gabbro");
+
+        save_vault(&note_body("bi-001", "verbatim"), pass, &source).unwrap();
+        export_vault_preserving(&source, &export).unwrap();
+
+        let src_bytes = std::fs::read(&source).unwrap();
+        let out_bytes = std::fs::read(&export).unwrap();
+        assert_eq!(
+            src_bytes, out_bytes,
+            "preserving export must copy the sealed vault byte-for-byte (keyslots + alias retained)"
+        );
+
+        let _ = std::fs::remove_file(&source);
+        let _ = std::fs::remove_file(&export);
+        let _ = std::fs::remove_file(export.with_extension("gabbro.sha256"));
+    }
+
+    #[test]
+    fn export_preserving_writes_matching_sha256_companion() {
+        use std::env::temp_dir;
+
+        let pass: &[u8] = b"sha companion passphrase";
+        let mut source = temp_dir();
+        source.push("gabbro_preserve_sha_src.gabbro");
+        let mut export = temp_dir();
+        export.push("gabbro_preserve_sha_out.gabbro");
+        let hash_path = export.with_extension("gabbro.sha256");
+
+        save_vault(&note_body("sh-001", "hashed"), pass, &source).unwrap();
+        export_vault_preserving(&source, &export).unwrap();
+
+        let out_bytes = std::fs::read(&export).unwrap();
+        let mut hasher = Sha256::new();
+        hasher.update(&out_bytes);
+        let digest: [u8; 32] = hasher.finalize().into();
+        let expected_hex: String = digest.iter().map(|b| format!("{:02x}", b)).collect();
+
+        let contents = std::fs::read_to_string(&hash_path).unwrap();
+        assert!(
+            contents.starts_with(&expected_hex),
+            "companion hash must match the exported bytes"
+        );
+        assert!(contents.contains("gabbro_preserve_sha_out.gabbro"));
+        assert!(contents.ends_with('\n'));
+
+        let _ = std::fs::remove_file(&source);
+        let _ = std::fs::remove_file(&export);
+        let _ = std::fs::remove_file(&hash_path);
+        let _ = std::fs::remove_file(source.with_extension("gabbro.sha256"));
     }
 }

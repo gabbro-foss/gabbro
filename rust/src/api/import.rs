@@ -389,38 +389,51 @@ pub async fn import_from_gabbro(
     passphrase: Vec<u8>,
 ) -> Result<GabbroImportResult, String> {
     use crate::api::vault::load_vault;
-    use crate::vault::session;
 
     let source_path = std::path::PathBuf::from(&path);
-    let source_entries = load_vault(&passphrase, &source_path)?;
+    let source = load_vault(&passphrase, &source_path)?;
+    merge_source_into_session(source)
+}
+
+/// Import/sync from a **key-protected** `.gabbro` vault (ADR-013).
+///
+/// Opens the source at `path` with the source passphrase AND a registered YubiKey
+/// (its hmac-secret output + credential id), then merges into the session exactly
+/// as [`import_from_gabbro`]. This is the path for syncing a vault created with
+/// YubiKey protection: passphrase alone is refused by the crypto, so the source's
+/// chosen protection is upheld across the sync. `hmac_secret` must be 32 bytes.
+///
+/// The vault must already be unlocked — returns `Err` if no session is active.
+pub async fn import_from_gabbro_with_key(
+    path: String,
+    passphrase: Vec<u8>,
+    hmac_secret: Vec<u8>,
+    credential_id: Vec<u8>,
+) -> Result<GabbroImportResult, String> {
+    use crate::api::vault::load_vault_with_key_record;
+
+    let secret: [u8; 32] = hmac_secret
+        .try_into()
+        .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
+    let source_path = std::path::PathBuf::from(&path);
+    let (source, _master, _wrapping) =
+        load_vault_with_key_record(&passphrase, &secret, &credential_id, &source_path)?;
+    merge_source_into_session(source)
+}
+
+/// Merge a decrypted source vault body into the live session: UUID-based dedup
+/// (existing UUIDs skipped, new entries added), then a single save. Shared by the
+/// passphrase-only and key-protected Gabbro import paths.
+fn merge_source_into_session(
+    source: crate::vault::serialization::VaultBody,
+) -> Result<GabbroImportResult, String> {
     let existing_ids = session::session_entry_ids()?;
 
     let mut imported = 0;
     let mut skipped = Vec::new();
 
-    for entry in source_entries.entries {
-        let id = match &entry {
-            crate::vault::entry::VaultEntry::Login(e) => e.meta.id.clone(),
-            crate::vault::entry::VaultEntry::Note(e) => e.meta.id.clone(),
-            crate::vault::entry::VaultEntry::Identity(e) => e.meta.id.clone(),
-            crate::vault::entry::VaultEntry::Card(e) => e.meta.id.clone(),
-            crate::vault::entry::VaultEntry::File(e) => e.meta.id.clone(),
-            crate::vault::entry::VaultEntry::Custom(e) => e.meta.id.clone(),
-        };
-        let title = match &entry {
-            crate::vault::entry::VaultEntry::Login(e) => e.title.clone(),
-            crate::vault::entry::VaultEntry::Note(e) => e.title.clone(),
-            crate::vault::entry::VaultEntry::Identity(e) => {
-                format!("{} {}", e.first_name, e.last_name)
-            }
-            crate::vault::entry::VaultEntry::Card(e) => e
-                .card_name
-                .clone()
-                .unwrap_or_else(|| e.cardholder_name.clone()),
-            crate::vault::entry::VaultEntry::File(e) => e.filename.clone(),
-            crate::vault::entry::VaultEntry::Custom(e) => e.title.clone(),
-        };
-
+    for entry in source.entries {
+        let (id, title) = entry_id_and_title(&entry);
         if existing_ids.contains(&id) {
             skipped.push(SkippedEntryData {
                 title,
@@ -968,6 +981,124 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
 
         teardown(&session_path);
         let _ = std::fs::remove_file(&source_path);
+    }
+
+    // ── ADR-013: syncing a key-protected export upholds its protection ─────────
+    //
+    // A vault created with passphrase + YubiKeys, exported with protection
+    // preserved (the default), must NOT be syncable with the passphrase alone — a
+    // registered key is required. This is the patch for the second-factor bypass
+    // found on 2026-06-10. The opt-in passphrase-only downgrade is a separate path.
+
+    /// Build a key-protected source vault (passphrase + YK1 + YK2), export it
+    /// PRESERVING protection (ADR-013 default), and return `(artifact, source)`
+    /// paths. The artifact retains the YubiKey keyslots, so passphrase alone
+    /// cannot open it. YK1 = (hmac `[0x11;32]`, cred `[0xA1;64]`).
+    fn export_keyprotected_artifact(
+        pass: &[u8],
+        suffix: &str,
+    ) -> (std::path::PathBuf, std::path::PathBuf) {
+        use crate::api::vault::{export_vault_preserving, save_vault_with_keys};
+        use crate::crypto::vault_crypto::YubiKeyRegistration;
+
+        let yk1 = YubiKeyRegistration {
+            credential_id: vec![0xA1u8; 64],
+            hmac_secret: [0x11u8; 32],
+            salt: [0x12u8; 32],
+        };
+        let yk2 = YubiKeyRegistration {
+            credential_id: vec![0xA2u8; 48],
+            hmac_secret: [0x21u8; 32],
+            salt: [0x22u8; 32],
+        };
+
+        let mut source = temp_dir();
+        source.push(format!("gabbro_kp_source_{suffix}.gabbro"));
+        let mut artifact = temp_dir();
+        artifact.push(format!("gabbro_kp_artifact_{suffix}.gabbro"));
+
+        let body = VaultBody {
+            folders: vec![],
+            entries: vec![VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("from-vault-a-001"),
+                    created_at: String::from("2025-03-01T00:00:00Z"),
+                    updated_at: String::from("2025-03-01T00:00:00Z"),
+                    folder: String::new(),
+                },
+                title: String::from("Synced from A"),
+                content: String::from("hardware secret"),
+                custom_fields: vec![],
+                attachments: vec![],
+            })],
+            ..Default::default()
+        };
+        save_vault_with_keys(&body, pass, &[yk1, yk2], &source).unwrap();
+        export_vault_preserving(&source, &artifact).unwrap();
+        (artifact, source)
+    }
+
+    #[test]
+    #[serial]
+    fn import_from_gabbro_refuses_keyprotected_source_with_passphrase_alone() {
+        let pass_a: &[u8] = b"vault A passphrase -- hardware protected";
+        let (artifact, source) = export_keyprotected_artifact(pass_a, "refuse");
+
+        let pass_b = b"vault B passphrase -- yubikeyless";
+        let path_b = setup_vault(pass_b); // 1 pre-existing note
+        session::unlock_vault(pass_b, path_b.clone()).unwrap();
+
+        // Passphrase alone must NOT open a key-protected export → sync refused.
+        let result = run(import_from_gabbro(
+            artifact.to_str().unwrap().to_string(),
+            pass_a.to_vec(),
+        ));
+        assert!(
+            result.is_err(),
+            "syncing a key-protected export with passphrase alone must be refused"
+        );
+        // The session is untouched — nothing leaked in.
+        assert_eq!(session::list_entry_summaries().unwrap().len(), 1);
+
+        teardown(&path_b);
+        let _ = std::fs::remove_file(&source);
+        let _ = std::fs::remove_file(&artifact);
+        let _ = std::fs::remove_file(artifact.with_extension("gabbro.sha256"));
+    }
+
+    #[test]
+    #[serial]
+    fn import_from_gabbro_with_key_syncs_keyprotected_source() {
+        let pass_a: &[u8] = b"vault A passphrase -- hardware protected";
+        let (artifact, source) = export_keyprotected_artifact(pass_a, "sync");
+
+        let pass_b = b"vault B passphrase -- yubikeyless";
+        let path_b = setup_vault(pass_b); // 1 pre-existing note
+        session::unlock_vault(pass_b, path_b.clone()).unwrap();
+
+        // Passphrase_A + a registered key (YK1) authorises the sync.
+        let result = run(import_from_gabbro_with_key(
+            artifact.to_str().unwrap().to_string(),
+            pass_a.to_vec(),
+            vec![0x11u8; 32], // YK1 hmac-secret output
+            vec![0xA1u8; 64], // YK1 credential id
+        ))
+        .unwrap();
+
+        assert_eq!(result.imported, 1, "A's entry must sync into B");
+        assert!(result.skipped.is_empty(), "no UUID collisions expected");
+
+        let summaries = session::list_entry_summaries().unwrap();
+        assert_eq!(summaries.len(), 2, "B's own entry + A's synced entry");
+        assert!(
+            summaries.iter().any(|s| s.id == "from-vault-a-001"),
+            "B must hold the entry that originated in key-protected vault A"
+        );
+
+        teardown(&path_b);
+        let _ = std::fs::remove_file(&source);
+        let _ = std::fs::remove_file(&artifact);
+        let _ = std::fs::remove_file(artifact.with_extension("gabbro.sha256"));
     }
 
     // ── stamp_timestamps unit tests ───────────────────────────────────────────
