@@ -1846,4 +1846,44 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Az alapértelmezett mappák átnevezhetők vagy törölhetők.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Ez a széffájl nem olvasható. Elérhető egy automatikus vészmásolat az utolsó sikeres mentésből.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Ez a széffájl nem olvasható, és nem létezik automatikus vészmásolat. Állítsa helyre a széfet a saját biztonsági mentéséből.';
+
+  @override
+  String get restoreBackupButton => 'Helyreállítás vészmásolatból';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Helyreállítja a széfet a vészmásolatból?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Az olvashatatlan széffájlt az utolsó sikeres mentés vészmásolata váltja fel. A feloldáshoz továbbra is szükség van a jelmondatára (és a YubiKey-re, ha regisztrálva van).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Helyreállítás';
+
+  @override
+  String get backupRestoredMessage =>
+      'Vészmásolat helyreállítva. Oldja fel a hitelesítő adataival.';
+
+  @override
+  String get deleteBackupButton => 'Használhatatlan vészmásolat törlése';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Törli a vészmásolatot?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Ez a vészmásolat nem tudja helyreállítani a széfet, mert maga is olvashatatlan. A törlés nem vonható vissza.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'A Gabbro emellett minden széfről egy automatikus vészmásolatot is tárol az eszközön, amely minden mentéskor frissül. Ez csak a fájlsérülés ellen véd — nem biztonsági mentés.';
 }

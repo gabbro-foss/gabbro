@@ -673,7 +673,9 @@ pub fn delete_entry(entries: &mut Vec<VaultEntry>, id: &str) -> Result<(), Strin
 /// executes the deletion unconditionally when this is called.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn delete_whole_vault(path: &Path) -> Result<(), String> {
-    std::fs::remove_file(path).map_err(|e| format!("Failed to delete vault: {e}"))
+    std::fs::remove_file(path).map_err(|e| format!("Failed to delete vault: {e}"))?;
+    // R-03: the .bak safety copy must not survive the vault it copies.
+    crate::vault::io::remove_backup(path)
 }
 
 /// Return all entries from the vault, optionally masking sensitive values.
@@ -1213,6 +1215,43 @@ pub(crate) fn purge_expired_history(entries: &mut [VaultEntry]) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // R-03: deleting a vault must not leak a copy via the .bak sibling
+    #[test]
+    fn delete_whole_vault_removes_bak_too() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("gabbro_api_delete_bak_test.gabbro");
+        let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
+        std::fs::write(&path, b"vault bytes").unwrap();
+        std::fs::write(&bak, b"backup bytes").unwrap();
+
+        let result = delete_whole_vault(&path);
+        let main_gone = !path.exists();
+        let bak_gone = !bak.exists();
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(&bak);
+
+        result.expect("delete must succeed");
+        assert!(main_gone, "vault file must be deleted");
+        assert!(
+            bak_gone,
+            ".bak must be deleted with the vault (no copy may survive)"
+        );
+    }
+
+    // R-03: deletion must not fail just because no .bak was ever created
+    #[test]
+    fn delete_whole_vault_succeeds_without_bak() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("gabbro_api_delete_nobak_test.gabbro");
+        let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
+        let _ = std::fs::remove_file(&bak);
+        std::fs::write(&path, b"vault bytes").unwrap();
+
+        let result = delete_whole_vault(&path);
+        let _ = std::fs::remove_file(&path);
+        result.expect("delete must succeed when no .bak exists");
+    }
 
     #[test]
     fn create_login_entry_returns_correct_fields() {

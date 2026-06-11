@@ -1840,4 +1840,44 @@ class AppLocalizationsNb extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Standardmapper kan gis nytt navn eller slettes.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Denne hvelvfilen kan ikke leses. En automatisk reservekopi fra siste vellykkede lagring er tilgjengelig.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Denne hvelvfilen kan ikke leses, og det finnes ingen automatisk reservekopi. Gjenopprett hvelvet fra din egen sikkerhetskopi.';
+
+  @override
+  String get restoreBackupButton => 'Gjenopprett fra reservekopi';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Gjenopprette hvelvet fra reservekopien?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Den uleselige hvelvfilen erstattes av reservekopien fra siste vellykkede lagring. Passordfrasen din (og YubiKey-en din, hvis registrert) kreves fortsatt for å låse opp.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Gjenopprett';
+
+  @override
+  String get backupRestoredMessage =>
+      'Reservekopi gjenopprettet. Lås opp med påloggingsinformasjonen din.';
+
+  @override
+  String get deleteBackupButton => 'Slett ubrukelig reservekopi';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Slette reservekopien?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Denne reservekopien kan ikke gjenopprette hvelvet ditt, siden den selv er uleselig. Sletting kan ikke angres.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro beholder også én automatisk reservekopi av hvert hvelv på enheten, oppdatert ved hver lagring. Den beskytter bare mot filkorrupsjon — den er ikke en sikkerhetskopi.';
 }

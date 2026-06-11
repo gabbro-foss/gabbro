@@ -1841,4 +1841,44 @@ class AppLocalizationsKk extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Әдепкі қалталарды өзгертуге немесе жоюға болады.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Бұл қойма файлын оқу мүмкін емес. Соңғы сәтті сақтаудың автоматты қосалқы көшірмесі қолжетімді.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Бұл қойма файлын оқу мүмкін емес және автоматты қосалқы көшірме жоқ. Қойманы өзіңіздің сақтық көшірмеңізден қалпына келтіріңіз.';
+
+  @override
+  String get restoreBackupButton => 'Қосалқы көшірмеден қалпына келтіру';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Қойманы қосалқы көшірмеден қалпына келтіру керек пе?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Оқылмайтын қойма файлы соңғы сәтті сақтаудың қосалқы көшірмесімен ауыстырылады. Құлпын ашу үшін құпия фразаңыз (және тіркелген болса, YubiKey) бұрынғыша қажет.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Қалпына келтіру';
+
+  @override
+  String get backupRestoredMessage =>
+      'Қосалқы көшірме қалпына келтірілді. Өз деректеріңізбен ашыңыз.';
+
+  @override
+  String get deleteBackupButton => 'Жарамсыз қосалқы көшірмені жою';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Қосалқы көшірмені жою керек пе?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Бұл қосалқы көшірме қойманы қалпына келтіре алмайды, себебі өзі де оқылмайды. Жоюды кері қайтару мүмкін емес.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro әр қойманың бір автоматты қосалқы көшірмесін де құрылғыда сақтайды, ол әр сақтаған сайын жаңарады. Ол тек файлдың бүлінуінен қорғайды — бұл сақтық көшірме емес.';
 }

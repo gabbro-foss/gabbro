@@ -1767,6 +1767,41 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get manageFoldersDefaultNote => '默认文件夹可以重命名或删除。';
+
+  @override
+  String get vaultCorruptBackupAvailable => '无法读取此保险库文件。可使用上次成功保存的自动安全副本。';
+
+  @override
+  String get vaultCorruptNoBackup => '无法读取此保险库文件，且不存在自动安全副本。请从你自己的备份恢复保险库。';
+
+  @override
+  String get restoreBackupButton => '从安全副本恢复';
+
+  @override
+  String get restoreBackupConfirmTitle => '从安全副本恢复保险库？';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      '无法读取的保险库文件将被替换为上次成功保存的安全副本。解锁仍需要你的密码短语（以及已注册的 YubiKey）。';
+
+  @override
+  String get restoreBackupConfirmAction => '恢复';
+
+  @override
+  String get backupRestoredMessage => '安全副本已恢复。请使用你的凭据解锁。';
+
+  @override
+  String get deleteBackupButton => '删除无法使用的安全副本';
+
+  @override
+  String get deleteBackupConfirmTitle => '删除安全副本？';
+
+  @override
+  String get deleteBackupConfirmBody => '此安全副本本身也无法读取，无法恢复你的保险库。删除后无法撤销。';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro 还会在设备上为每个保险库保留一份自动安全副本，每次保存时刷新。它仅防范文件损坏——不是备份。';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3532,6 +3567,41 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get manageFoldersDefaultNote => '默认文件夹可以重命名或删除。';
+
+  @override
+  String get vaultCorruptBackupAvailable => '无法读取此保险库文件。可使用上次成功保存的自动安全副本。';
+
+  @override
+  String get vaultCorruptNoBackup => '无法读取此保险库文件，且不存在自动安全副本。请从你自己的备份恢复保险库。';
+
+  @override
+  String get restoreBackupButton => '从安全副本恢复';
+
+  @override
+  String get restoreBackupConfirmTitle => '从安全副本恢复保险库？';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      '无法读取的保险库文件将被替换为上次成功保存的安全副本。解锁仍需要你的密码短语（以及已注册的 YubiKey）。';
+
+  @override
+  String get restoreBackupConfirmAction => '恢复';
+
+  @override
+  String get backupRestoredMessage => '安全副本已恢复。请使用你的凭据解锁。';
+
+  @override
+  String get deleteBackupButton => '删除无法使用的安全副本';
+
+  @override
+  String get deleteBackupConfirmTitle => '删除安全副本？';
+
+  @override
+  String get deleteBackupConfirmBody => '此安全副本本身也无法读取，无法恢复你的保险库。删除后无法撤销。';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro 还会在设备上为每个保险库保留一份自动安全副本，每次保存时刷新。它仅防范文件损坏——不是备份。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -5297,4 +5367,39 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get manageFoldersDefaultNote => '預設資料夾可以重新命名或刪除。';
+
+  @override
+  String get vaultCorruptBackupAvailable => '無法讀取此保險庫檔案。可使用上次成功儲存的自動安全副本。';
+
+  @override
+  String get vaultCorruptNoBackup => '無法讀取此保險庫檔案，且不存在自動安全副本。請從你自己的備份復原保險庫。';
+
+  @override
+  String get restoreBackupButton => '從安全副本復原';
+
+  @override
+  String get restoreBackupConfirmTitle => '從安全副本復原保險庫？';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      '無法讀取的保險庫檔案將被替換為上次成功儲存的安全副本。解鎖仍需要你的密碼短語（以及已註冊的 YubiKey）。';
+
+  @override
+  String get restoreBackupConfirmAction => '復原';
+
+  @override
+  String get backupRestoredMessage => '安全副本已復原。請使用你的憑證解鎖。';
+
+  @override
+  String get deleteBackupButton => '刪除無法使用的安全副本';
+
+  @override
+  String get deleteBackupConfirmTitle => '刪除安全副本？';
+
+  @override
+  String get deleteBackupConfirmBody => '此安全副本本身也無法讀取，無法復原你的保險庫。刪除後無法復原。';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro 還會在裝置上為每個保險庫保留一份自動安全副本，每次儲存時重新整理。它僅防範檔案損毀——不是備份。';
 }

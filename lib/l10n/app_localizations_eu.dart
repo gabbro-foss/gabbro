@@ -1842,4 +1842,44 @@ class AppLocalizationsEu extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Karpeta lehenetsiak berrizendatu edo ezabatu daitezke.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Kutxa gotorraren fitxategi hau ezin da irakurri. Azken gordetze arrakastatsuaren segurtasun-kopia automatiko bat dago erabilgarri.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Kutxa gotorraren fitxategi hau ezin da irakurri eta ez dago segurtasun-kopia automatikorik. Berreskuratu kutxa gotorra zure babeskopiatik.';
+
+  @override
+  String get restoreBackupButton => 'Berreskuratu segurtasun-kopiatik';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Kutxa gotorra segurtasun-kopiatik berreskuratu?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Irakurri ezin den fitxategia azken gordetze arrakastatsuaren segurtasun-kopiarekin ordezkatuko da. Desblokeatzeko zure pasaesaldia (eta YubiKey-a, erregistratuta badago) behar dira oraindik.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Berreskuratu';
+
+  @override
+  String get backupRestoredMessage =>
+      'Segurtasun-kopia berreskuratu da. Desblokeatu zure kredentzialekin.';
+
+  @override
+  String get deleteBackupButton => 'Ezabatu erabilgaitza den segurtasun-kopia';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Segurtasun-kopia ezabatu?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Segurtasun-kopia honek ezin du zure kutxa gotorra berreskuratu, bera ere irakurgaitza delako. Ezabatzea ezin da desegin.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbrok kutxa gotor bakoitzaren segurtasun-kopia automatiko bat ere gordetzen du gailuan, gordetze bakoitzean eguneratua. Fitxategiaren hondatzetik soilik babesten du — ez da babeskopia bat.';
 }

@@ -815,5 +815,17 @@
   "helpCaptionUnlock": "輸入密碼片語解鎖保險庫",
   "helpCaptionVaultSync": "加密保險庫同步流程",
   "passphraseNoWordlist": "您的語言暫無詞彙列表。使用英語。",
-  "manageFoldersDefaultNote": "預設資料夾可以重新命名或刪除。"
+  "manageFoldersDefaultNote": "預設資料夾可以重新命名或刪除。",
+
+  "vaultCorruptBackupAvailable": "無法讀取此保險庫檔案。可使用上次成功儲存的自動安全副本。",
+  "vaultCorruptNoBackup": "無法讀取此保險庫檔案，且不存在自動安全副本。請從你自己的備份復原保險庫。",
+  "restoreBackupButton": "從安全副本復原",
+  "restoreBackupConfirmTitle": "從安全副本復原保險庫？",
+  "restoreBackupConfirmBody": "無法讀取的保險庫檔案將被替換為上次成功儲存的安全副本。解鎖仍需要你的密碼短語（以及已註冊的 YubiKey）。",
+  "restoreBackupConfirmAction": "復原",
+  "backupRestoredMessage": "安全副本已復原。請使用你的憑證解鎖。",
+  "deleteBackupButton": "刪除無法使用的安全副本",
+  "deleteBackupConfirmTitle": "刪除安全副本？",
+  "deleteBackupConfirmBody": "此安全副本本身也無法讀取，無法復原你的保險庫。刪除後無法復原。",
+  "backupDialogSafetyCopyNote": "Gabbro 還會在裝置上為每個保險庫保留一份自動安全副本，每次儲存時重新整理。它僅防範檔案損毀——不是備份。"
 }

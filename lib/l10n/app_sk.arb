@@ -815,5 +815,17 @@
   "helpCaptionUnlock": "Zadajte prístupovú frázu na odomknutie trezora",
   "helpCaptionVaultSync": "Proces synchronizácie šifrovaného trezoru",
   "passphraseNoWordlist": "Pre váš jazyk zatiaľ nie je zoznam slov. Používa sa angličtina.",
-  "manageFoldersDefaultNote": "Predvolené priečinky možno premenovať alebo odstrániť."
+  "manageFoldersDefaultNote": "Predvolené priečinky možno premenovať alebo odstrániť.",
+
+  "vaultCorruptBackupAvailable": "Tento súbor trezoru sa nedá prečítať. K dispozícii je automatická záchranná kópia z posledného úspešného uloženia.",
+  "vaultCorruptNoBackup": "Tento súbor trezoru sa nedá prečítať a žiadna automatická záchranná kópia neexistuje. Obnovte trezor z vlastnej zálohy.",
+  "restoreBackupButton": "Obnoviť zo záchrannej kópie",
+  "restoreBackupConfirmTitle": "Obnoviť trezor zo záchrannej kópie?",
+  "restoreBackupConfirmBody": "Nečitateľný súbor trezoru bude nahradený záchrannou kópiou z posledného úspešného uloženia. Na odomknutie je stále potrebná vaša prístupová fráza (a YubiKey, ak je registrovaný).",
+  "restoreBackupConfirmAction": "Obnoviť",
+  "backupRestoredMessage": "Záchranná kópia obnovená. Odomknite pomocou svojich prihlasovacích údajov.",
+  "deleteBackupButton": "Vymazať nepoužiteľnú záchrannú kópiu",
+  "deleteBackupConfirmTitle": "Vymazať záchrannú kópiu?",
+  "deleteBackupConfirmBody": "Táto záchranná kópia nemôže obnoviť váš trezor, pretože je sama nečitateľná. Vymazanie sa nedá vrátiť späť.",
+  "backupDialogSafetyCopyNote": "Gabbro tiež uchováva v zariadení jednu automatickú záchrannú kópiu každého trezoru, obnovovanú pri každom uložení. Chráni iba pred poškodením súboru — nie je to záloha."
 }

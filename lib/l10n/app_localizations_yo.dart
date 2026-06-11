@@ -1841,4 +1841,44 @@ class AppLocalizationsYo extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Awọn folda aiyipada le jẹ atun-lorukọ tabi paarẹ.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Kò ṣeé ka fáìlì àpótí ìṣúra yìí. Àdàkọ ààbò aládàáṣiṣẹ́ láti ìfipamọ́ àṣeyọrí tó kẹ́yìn wà ní àrọ́wọ́tó.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Kò ṣeé ka fáìlì àpótí ìṣúra yìí, kò sì sí àdàkọ ààbò aládàáṣiṣẹ́. Dá àpótí ìṣúra padà láti àdàkọ ìpamọ́ tìrẹ.';
+
+  @override
+  String get restoreBackupButton => 'Dá padà láti àdàkọ ààbò';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Dá àpótí ìṣúra padà láti àdàkọ ààbò?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Fáìlì tí kò ṣeé kà ni a ó fi àdàkọ ààbò ìfipamọ́ àṣeyọrí tó kẹ́yìn rọ́pò. Gbólóhùn àṣínà rẹ (àti YubiKey rẹ, bí ó bá ti forúkọ sílẹ̀) ṣì nílò láti ṣí i.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Dá padà';
+
+  @override
+  String get backupRestoredMessage =>
+      'A ti dá àdàkọ ààbò padà. Ṣí i pẹ̀lú àwọn ìwé-ẹ̀rí rẹ.';
+
+  @override
+  String get deleteBackupButton => 'Pa àdàkọ ààbò tí kò wúlò rẹ́';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Pa àdàkọ ààbò rẹ́?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Àdàkọ ààbò yìí kò lè dá àpótí ìṣúra rẹ padà nítorí òun fúnra rẹ̀ kò ṣeé kà. Píparẹ́ kò ṣeé dá padà.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro tún ń tọ́jú àdàkọ ààbò aládàáṣiṣẹ́ kan fún àpótí ìṣúra kọ̀ọ̀kan lórí ẹ̀rọ, tí a ń sọ di tuntun ní ìfipamọ́ kọ̀ọ̀kan. Ó ń dáàbò bo ìbàjẹ́ fáìlì nìkan — kì í ṣe àdàkọ ìpamọ́.';
 }

@@ -1794,4 +1794,42 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get manageFoldersDefaultNote => '기본 폴더는 이름을 바꾸거나 삭제할 수 있습니다.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      '이 보관함 파일을 읽을 수 없습니다. 마지막으로 성공한 저장의 자동 안전 사본을 사용할 수 있습니다.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      '이 보관함 파일을 읽을 수 없고 자동 안전 사본도 없습니다. 본인의 백업에서 보관함을 복원하세요.';
+
+  @override
+  String get restoreBackupButton => '안전 사본에서 복원';
+
+  @override
+  String get restoreBackupConfirmTitle => '안전 사본에서 보관함을 복원할까요?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      '읽을 수 없는 보관함 파일은 마지막으로 성공한 저장의 안전 사본으로 교체됩니다. 잠금 해제에는 여전히 패스프레이즈(및 등록된 경우 YubiKey)가 필요합니다.';
+
+  @override
+  String get restoreBackupConfirmAction => '복원';
+
+  @override
+  String get backupRestoredMessage => '안전 사본이 복원되었습니다. 자격 증명으로 잠금을 해제하세요.';
+
+  @override
+  String get deleteBackupButton => '사용할 수 없는 안전 사본 삭제';
+
+  @override
+  String get deleteBackupConfirmTitle => '안전 사본을 삭제할까요?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      '이 안전 사본 자체도 읽을 수 없어 보관함을 복원할 수 없습니다. 삭제는 되돌릴 수 없습니다.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro는 또한 각 보관함의 자동 안전 사본 하나를 기기에 보관하며 저장할 때마다 갱신합니다. 이는 파일 손상만을 대비한 것으로 백업이 아닙니다.';
 }

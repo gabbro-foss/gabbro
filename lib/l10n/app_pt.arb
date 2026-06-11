@@ -821,5 +821,17 @@
   "helpCaptionUnlock": "Insira a frase secreta para desbloquear o cofre",
   "helpCaptionVaultSync": "Processo de sincronização do cofre criptografado",
   "passphraseNoWordlist": "Ainda não há lista de palavras para o seu idioma. Usando inglês.",
-  "manageFoldersDefaultNote": "As pastas padrão podem ser renomeadas ou excluídas."
+  "manageFoldersDefaultNote": "As pastas padrão podem ser renomeadas ou excluídas.",
+
+  "vaultCorruptBackupAvailable": "Este ficheiro de cofre não pode ser lido. Está disponível uma cópia de recuperação automática da última gravação bem-sucedida.",
+  "vaultCorruptNoBackup": "Este ficheiro de cofre não pode ser lido e não existe nenhuma cópia de recuperação automática. Restaure o cofre a partir da sua própria cópia de segurança.",
+  "restoreBackupButton": "Restaurar a partir da cópia de recuperação",
+  "restoreBackupConfirmTitle": "Restaurar o cofre a partir da cópia de recuperação?",
+  "restoreBackupConfirmBody": "O ficheiro ilegível será substituído pela cópia de recuperação da última gravação bem-sucedida. A sua frase de acesso (e a sua YubiKey, se registada) continua a ser necessária para o desbloquear.",
+  "restoreBackupConfirmAction": "Restaurar",
+  "backupRestoredMessage": "Cópia de recuperação restaurada. Desbloqueie com as suas credenciais.",
+  "deleteBackupButton": "Eliminar a cópia de recuperação inutilizável",
+  "deleteBackupConfirmTitle": "Eliminar a cópia de recuperação?",
+  "deleteBackupConfirmBody": "Esta cópia de recuperação não pode restaurar o seu cofre porque também está ilegível. A eliminação não pode ser anulada.",
+  "backupDialogSafetyCopyNote": "O Gabbro também mantém no dispositivo uma cópia de recuperação automática de cada cofre, atualizada a cada gravação. Protege apenas contra corrupção do ficheiro — não é uma cópia de segurança."
 }

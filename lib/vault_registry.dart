@@ -4,6 +4,19 @@ import 'package:gabbro/app_paths.dart';
 
 enum VaultType { passphrase, yubikey }
 
+/// R-03: delete a vault file together with its `.bak` safety copy.
+///
+/// The Rust save path keeps a `.bak` sibling next to every vault; deleting a
+/// vault must remove both, or a copy of the deleted vault survives — and on
+/// Android the user has no file-manager access to app-private storage to
+/// clean it up themselves.
+Future<void> deleteVaultFiles(String path) async {
+  final vault = File(path);
+  if (vault.existsSync()) await vault.delete();
+  final bak = File('$path.bak');
+  if (bak.existsSync()) await bak.delete();
+}
+
 class VaultRecord {
   final String path;
   final String alias;

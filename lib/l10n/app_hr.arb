@@ -815,5 +815,17 @@
   "helpCaptionUnlock": "Unesite pristupnu frazu za otključavanje trezora",
   "helpCaptionVaultSync": "Postupak sinkronizacije šifriranog trezora",
   "passphraseNoWordlist": "Još nema popisa riječi za vaš jezik. Koristi se engleski.",
-  "manageFoldersDefaultNote": "Zadane mape mogu se preimenovati ili izbrisati."
+  "manageFoldersDefaultNote": "Zadane mape mogu se preimenovati ili izbrisati.",
+
+  "vaultCorruptBackupAvailable": "Ova datoteka trezora ne može se pročitati. Dostupna je automatska pričuvna kopija posljednjeg uspješnog spremanja.",
+  "vaultCorruptNoBackup": "Ova datoteka trezora ne može se pročitati i automatska pričuvna kopija ne postoji. Vratite trezor iz vlastite sigurnosne kopije.",
+  "restoreBackupButton": "Vrati iz pričuvne kopije",
+  "restoreBackupConfirmTitle": "Vratiti trezor iz pričuvne kopije?",
+  "restoreBackupConfirmBody": "Nečitljivu datoteku trezora zamijenit će pričuvna kopija posljednjeg uspješnog spremanja. Za otključavanje su i dalje potrebni vaša pristupna fraza (i YubiKey, ako je registriran).",
+  "restoreBackupConfirmAction": "Vrati",
+  "backupRestoredMessage": "Pričuvna kopija vraćena. Otključajte svojim vjerodajnicama.",
+  "deleteBackupButton": "Izbriši neupotrebljivu pričuvnu kopiju",
+  "deleteBackupConfirmTitle": "Izbrisati pričuvnu kopiju?",
+  "deleteBackupConfirmBody": "Ova pričuvna kopija ne može vratiti vaš trezor jer je i sama nečitljiva. Brisanje se ne može poništiti.",
+  "backupDialogSafetyCopyNote": "Gabbro na uređaju čuva i jednu automatsku pričuvnu kopiju svakog trezora, osvježenu pri svakom spremanju. Štiti samo od oštećenja datoteke — nije sigurnosna kopija."
 }

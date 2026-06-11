@@ -1789,4 +1789,42 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get manageFoldersDefaultNote => 'デフォルトフォルダは名前の変更や削除ができます。';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'このボールトファイルは読み取れません。最後に成功した保存の自動セーフティコピーが利用できます。';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'このボールトファイルは読み取れず、自動セーフティコピーも存在しません。ご自身のバックアップからボールトを復元してください。';
+
+  @override
+  String get restoreBackupButton => 'セーフティコピーから復元';
+
+  @override
+  String get restoreBackupConfirmTitle => 'セーフティコピーからボールトを復元しますか？';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      '読み取れないボールトファイルは、最後に成功した保存のセーフティコピーに置き換えられます。ロック解除には引き続きパスフレーズ（および登録済みの場合は YubiKey）が必要です。';
+
+  @override
+  String get restoreBackupConfirmAction => '復元';
+
+  @override
+  String get backupRestoredMessage => 'セーフティコピーを復元しました。認証情報でロックを解除してください。';
+
+  @override
+  String get deleteBackupButton => '使用できないセーフティコピーを削除';
+
+  @override
+  String get deleteBackupConfirmTitle => 'セーフティコピーを削除しますか？';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'このセーフティコピー自体も読み取れないため、ボールトを復元できません。削除は元に戻せません。';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro は各ボールトの自動セーフティコピーを 1 つ端末内に保持し、保存のたびに更新します。これはファイル破損のみに備えるもので、バックアップではありません。';
 }

@@ -1855,4 +1855,44 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Standardordner können umbenannt oder gelöscht werden.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Diese Tresordatei kann nicht gelesen werden. Eine automatische Sicherheitskopie vom letzten erfolgreichen Speichern ist verfügbar.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Diese Tresordatei kann nicht gelesen werden und es existiert keine automatische Sicherheitskopie. Stellen Sie den Tresor aus Ihrem eigenen Backup wieder her.';
+
+  @override
+  String get restoreBackupButton => 'Aus Sicherheitskopie wiederherstellen';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Tresor aus Sicherheitskopie wiederherstellen?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Die unlesbare Tresordatei wird durch die Sicherheitskopie vom letzten erfolgreichen Speichern ersetzt. Zum Entsperren sind weiterhin Ihre Passphrase (und, falls registriert, Ihr YubiKey) erforderlich.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Wiederherstellen';
+
+  @override
+  String get backupRestoredMessage =>
+      'Sicherheitskopie wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.';
+
+  @override
+  String get deleteBackupButton => 'Unbrauchbare Sicherheitskopie löschen';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Sicherheitskopie löschen?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Diese Sicherheitskopie kann Ihren Tresor nicht wiederherstellen, da sie selbst unlesbar ist. Das Löschen kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro behält zusätzlich eine automatische Sicherheitskopie jedes Tresors auf dem Gerät, die bei jedem Speichern aktualisiert wird. Sie schützt nur vor Dateibeschädigung — sie ist kein Backup.';
 }

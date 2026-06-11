@@ -1847,4 +1847,43 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Noklusējuma mapes var pārdēvēt vai dzēst.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Šo seifa failu nevar nolasīt. Ir pieejama automātiska pēdējās veiksmīgās saglabāšanas rezerves kopija.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Šo seifa failu nevar nolasīt, un automātiskas rezerves kopijas nav. Atjaunojiet seifu no savas dublējumkopijas.';
+
+  @override
+  String get restoreBackupButton => 'Atjaunot no rezerves kopijas';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Atjaunot seifu no rezerves kopijas?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Nenolasāmais seifa fails tiks aizstāts ar pēdējās veiksmīgās saglabāšanas rezerves kopiju. Atbloķēšanai joprojām būs vajadzīga jūsu paroles frāze (un YubiKey, ja reģistrēta).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Atjaunot';
+
+  @override
+  String get backupRestoredMessage =>
+      'Rezerves kopija atjaunota. Atbloķējiet ar saviem akreditācijas datiem.';
+
+  @override
+  String get deleteBackupButton => 'Dzēst nederīgo rezerves kopiju';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Dzēst rezerves kopiju?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Šī rezerves kopija nevar atjaunot seifu, jo pati nav nolasāma. Dzēšanu nevar atsaukt.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro ierīcē glabā arī vienu automātisku katra seifa rezerves kopiju, kas tiek atjaunināta katrā saglabāšanā. Tā aizsargā tikai pret faila bojājumiem — tā nav dublējumkopija.';
 }

@@ -815,5 +815,17 @@
   "helpCaptionUnlock": "パスフレーズを入力してボルトのロックを解除",
   "helpCaptionVaultSync": "暗号化されたボルトの同期プロセス",
   "passphraseNoWordlist": "お使いの言語のワードリストはまだありません。英語を使用しています。",
-  "manageFoldersDefaultNote": "デフォルトフォルダは名前の変更や削除ができます。"
+  "manageFoldersDefaultNote": "デフォルトフォルダは名前の変更や削除ができます。",
+
+  "vaultCorruptBackupAvailable": "このボールトファイルは読み取れません。最後に成功した保存の自動セーフティコピーが利用できます。",
+  "vaultCorruptNoBackup": "このボールトファイルは読み取れず、自動セーフティコピーも存在しません。ご自身のバックアップからボールトを復元してください。",
+  "restoreBackupButton": "セーフティコピーから復元",
+  "restoreBackupConfirmTitle": "セーフティコピーからボールトを復元しますか？",
+  "restoreBackupConfirmBody": "読み取れないボールトファイルは、最後に成功した保存のセーフティコピーに置き換えられます。ロック解除には引き続きパスフレーズ（および登録済みの場合は YubiKey）が必要です。",
+  "restoreBackupConfirmAction": "復元",
+  "backupRestoredMessage": "セーフティコピーを復元しました。認証情報でロックを解除してください。",
+  "deleteBackupButton": "使用できないセーフティコピーを削除",
+  "deleteBackupConfirmTitle": "セーフティコピーを削除しますか？",
+  "deleteBackupConfirmBody": "このセーフティコピー自体も読み取れないため、ボールトを復元できません。削除は元に戻せません。",
+  "backupDialogSafetyCopyNote": "Gabbro は各ボールトの自動セーフティコピーを 1 つ端末内に保持し、保存のたびに更新します。これはファイル破損のみに備えるもので、バックアップではありません。"
 }

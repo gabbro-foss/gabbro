@@ -1845,4 +1845,44 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Папките по подразбиране могат да се преименуват или изтрият.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Този файл на сейфа не може да бъде прочетен. Налично е автоматично аварийно копие от последното успешно запазване.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Този файл на сейфа не може да бъде прочетен и няма автоматично аварийно копие. Възстановете сейфа от собственото си резервно копие.';
+
+  @override
+  String get restoreBackupButton => 'Възстановяване от аварийно копие';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Да се възстанови ли сейфът от аварийното копие?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Нечетимият файл на сейфа ще бъде заменен с аварийното копие от последното успешно запазване. За отключване все още са нужни вашата парола-фраза (и вашият YubiKey, ако е регистриран).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Възстанови';
+
+  @override
+  String get backupRestoredMessage =>
+      'Аварийното копие е възстановено. Отключете с вашите данни.';
+
+  @override
+  String get deleteBackupButton => 'Изтриване на негодното аварийно копие';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Да се изтрие ли аварийното копие?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Това аварийно копие не може да възстанови сейфа, защото самото то е нечетимо. Изтриването е необратимо.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro също пази на устройството по едно автоматично аварийно копие на всеки сейф, обновявано при всяко запазване. То предпазва само от повреда на файла — не е резервно копие.';
 }

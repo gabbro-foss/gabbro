@@ -1859,4 +1859,44 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Las carpetas predeterminadas se pueden renombrar o eliminar.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Este archivo de caja fuerte no se puede leer. Hay disponible una copia de respaldo automática del último guardado correcto.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Este archivo de caja fuerte no se puede leer y no existe ninguna copia de respaldo automática. Restaura la caja fuerte desde tu propia copia de seguridad.';
+
+  @override
+  String get restoreBackupButton => 'Restaurar desde la copia de respaldo';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      '¿Restaurar la caja fuerte desde la copia de respaldo?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'El archivo ilegible se sustituirá por la copia de respaldo del último guardado correcto. Seguirás necesitando tu frase de contraseña (y tu YubiKey, si está registrada) para desbloquearla.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Restaurar';
+
+  @override
+  String get backupRestoredMessage =>
+      'Copia de respaldo restaurada. Desbloquea con tus credenciales.';
+
+  @override
+  String get deleteBackupButton => 'Eliminar la copia de respaldo inservible';
+
+  @override
+  String get deleteBackupConfirmTitle => '¿Eliminar la copia de respaldo?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Esta copia de respaldo no puede restaurar tu caja fuerte porque también es ilegible. La eliminación no se puede deshacer.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro también guarda en el dispositivo una copia de respaldo automática de cada caja fuerte, actualizada en cada guardado. Solo protege contra la corrupción del archivo — no es una copia de seguridad.';
 }

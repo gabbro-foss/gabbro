@@ -17,6 +17,34 @@ import 'package:gabbro/widgets/yubikey_tap.dart';
 Future<void> _defaultUnlock(List<int> passphrase, String path) =>
     unlockVault(passphrase: passphrase, path: path);
 
+// R-03: probe whether the vault file parses at all. Only a parse failure may
+// surface the restore offer — authentication failures never do.
+Future<bool> _defaultVaultIsReadable(String path) async {
+  try {
+    readVaultHeader(path: path);
+    return true;
+  } on StateError {
+    // Bridge not initialized (widget-test context, or a startup race): we
+    // cannot probe, and "cannot probe" must never masquerade as "corrupt" —
+    // report healthy so the restore banner cannot appear by accident.
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+Future<bool> _defaultBackupExists(String path) async {
+  try {
+    return await vaultBackupExists(path: path);
+  } on StateError {
+    return false;
+  }
+}
+
+Future<void> _defaultRestoreBackup(String path) => restoreVaultBackup(path: path);
+
+Future<void> _defaultDeleteBackup(String path) => deleteVaultBackup(path: path);
+
 EntropyResult _defaultEstimateEntropy(String password) =>
     estimateEntropy(password: password);
 
@@ -175,6 +203,22 @@ class UnlockScreen extends StatefulWidget {
   /// Android; the Linux FFI tap is not interruptible from here).
   final bool? isAndroid;
 
+  /// R-03: returns false when the vault file cannot be parsed (corruption).
+  /// Only this — never an authentication failure — can surface the restore
+  /// offer.
+  final Future<bool> Function(String path) onVaultIsReadable;
+
+  /// R-03: whether a `.bak` safety copy exists next to the vault.
+  final Future<bool> Function(String path) onBackupExists;
+
+  /// R-03: replace the corrupt vault file with its `.bak` safety copy.
+  /// Explicit user action; the restored vault still demands full credentials.
+  final Future<void> Function(String path) onRestoreBackup;
+
+  /// R-03: discard an unusable `.bak` — on Android, app-private storage
+  /// offers the user no other way to remove it.
+  final Future<void> Function(String path) onDeleteBackup;
+
   const UnlockScreen({
     super.key,
     required this.vaultPath,
@@ -194,6 +238,10 @@ class UnlockScreen extends StatefulWidget {
     this.onBiometricInvalidated,
     this.onCancelTap = _defaultCancelTap,
     this.isAndroid,
+    this.onVaultIsReadable = _defaultVaultIsReadable,
+    this.onBackupExists = _defaultBackupExists,
+    this.onRestoreBackup = _defaultRestoreBackup,
+    this.onDeleteBackup = _defaultDeleteBackup,
   });
 
   @override
@@ -209,9 +257,14 @@ class _UnlockScreenState extends State<UnlockScreen> {
   String _transport = 'usb';
   String? _errorMessage;
   EntropyResult? _entropy;
-  late final List<YubikeyRecordData> _yubikeyRecords;
+  late List<YubikeyRecordData> _yubikeyRecords;
   late String _selectedPath;
   bool _biometricEnrolled = false;
+  // R-03 restore flow: set only by the parse probe, never by auth failures.
+  bool _vaultCorrupt = false;
+  bool _backupAvailable = false;
+  bool _restoreFailed = false;
+  bool _backupRestored = false;
 
   bool get _isYubikeyMode => _yubikeyRecords.isNotEmpty;
 
@@ -225,6 +278,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
     super.initState();
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
     _selectedPath = widget.vaultPath;
+    _probeVault();
     if (widget.biometricEnabled) {
       widget.onBiometricIsEnrolled(widget.vaultPath).then((enrolled) {
         if (mounted) setState(() => _biometricEnrolled = enrolled);
@@ -238,6 +292,101 @@ class _UnlockScreenState extends State<UnlockScreen> {
     } catch (_) {
       return [];
     }
+  }
+
+  // R-03: surface the restore offer only when the vault file itself cannot
+  // be parsed. Wrong passphrase / wrong PIN / wrong or absent YubiKey all
+  // leave this untouched.
+  Future<void> _probeVault() async {
+    final readable = await widget.onVaultIsReadable(widget.vaultPath);
+    if (readable) return;
+    final hasBackup = await widget.onBackupExists(widget.vaultPath);
+    if (!mounted) return;
+    setState(() {
+      _vaultCorrupt = true;
+      _backupAvailable = hasBackup;
+    });
+  }
+
+  Future<void> _confirmRestoreBackup() async {
+    final l = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.restoreBackupConfirmTitle),
+        content: Text(l.restoreBackupConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l.restoreBackupConfirmAction),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await widget.onRestoreBackup(widget.vaultPath);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _restoreFailed = true;
+        _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      });
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      _vaultCorrupt = false;
+      _restoreFailed = false;
+      _backupRestored = true;
+      _errorMessage = null;
+      // The restored file may carry a different credential set than the
+      // unreadable one suggested: re-detect YubiKey records.
+      if (widget.yubikeyRecords == null) {
+        _yubikeyRecords = _detectYubikeyRecords();
+      }
+    });
+  }
+
+  Future<void> _confirmDeleteBackup() async {
+    final l = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.deleteBackupConfirmTitle),
+        content: Text(l.deleteBackupConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l.delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await widget.onDeleteBackup(widget.vaultPath);
+    } catch (e) {
+      if (!mounted) return;
+      setState(
+        () => _errorMessage = e.toString().replaceFirst('Exception: ', ''),
+      );
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      _backupAvailable = false;
+      _restoreFailed = false;
+      _errorMessage = null;
+    });
   }
 
   @override
@@ -428,6 +577,53 @@ class _UnlockScreenState extends State<UnlockScreen> {
                         onPressed: _isUnlocking ? null : _unlockWithBiometrics,
                         icon: const Icon(Icons.fingerprint),
                         label: Text(AppLocalizations.of(context).useBiometrics),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    // R-03: corruption banner + explicit restore flow. Shown
+                    // only when the parse probe failed, never on auth errors.
+                    if (_vaultCorrupt) ...[
+                      Card(
+                        color: Theme.of(context).colorScheme.errorContainer,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            children: [
+                              Text(
+                                _backupAvailable
+                                    ? l.vaultCorruptBackupAvailable
+                                    : l.vaultCorruptNoBackup,
+                                textAlign: TextAlign.center,
+                              ),
+                              if (_backupAvailable) ...[
+                                const SizedBox(height: 8),
+                                FilledButton.icon(
+                                  onPressed: _confirmRestoreBackup,
+                                  icon: const Icon(
+                                    Icons.settings_backup_restore,
+                                  ),
+                                  label: Text(l.restoreBackupButton),
+                                ),
+                              ],
+                              if (_backupAvailable && _restoreFailed) ...[
+                                const SizedBox(height: 8),
+                                OutlinedButton.icon(
+                                  onPressed: _confirmDeleteBackup,
+                                  icon: const Icon(Icons.delete_outline),
+                                  label: Text(l.deleteBackupButton),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    if (_backupRestored) ...[
+                      Text(
+                        l.backupRestoredMessage,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
                     ],

@@ -57,6 +57,10 @@ Widget _buildScreen({
   void Function()? onBiometricInvalidated,
   bool? isAndroid,
   Future<void> Function()? onCancelTap,
+  Future<bool> Function(String)? onVaultIsReadable,
+  Future<bool> Function(String)? onBackupExists,
+  Future<void> Function(String)? onRestoreBackup,
+  Future<void> Function(String)? onDeleteBackup,
 }) =>
     testApp(UnlockScreen(
       vaultPath: vaultPath,
@@ -76,6 +80,10 @@ Widget _buildScreen({
       onBiometricInvalidated: onBiometricInvalidated,
       isAndroid: isAndroid,
       onCancelTap: onCancelTap ?? () async {},
+      onVaultIsReadable: onVaultIsReadable ?? (_) async => true,
+      onBackupExists: onBackupExists ?? (_) async => false,
+      onRestoreBackup: onRestoreBackup ?? (_) async {},
+      onDeleteBackup: onDeleteBackup ?? (_) async {},
     ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -624,5 +632,159 @@ void main() {
 
     expect(find.text('No YubiKey detected. Tap timed out.'), findsOneWidget);
     expect(find.textContaining('Check your passphrase'), findsNothing);
+  });
+
+  // ── R-03: vault-corruption restore flow ────────────────────────────────────
+
+  testWidgets('corrupt vault with a backup offers the restore option',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onBackupExists: (_) async => true,
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restore from safety copy'), findsOneWidget);
+  });
+
+  testWidgets('corrupt vault without a backup shows plain error, no restore',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onBackupExists: (_) async => false,
+    ));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'This vault file cannot be read and no automatic safety copy '
+        'exists. Restore the vault from your own backup.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Restore from safety copy'), findsNothing);
+  });
+
+  testWidgets('wrong passphrase on a healthy vault never offers restore',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onBackupExists: (_) async => true, // even with a backup present
+      onUnlock: (a, b) async => throw Exception('wrong passphrase'),
+    ));
+
+    await tester.enterText(find.byType(TextField), 'wrongpassphrase');
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Could not unlock vault. Check your passphrase.'),
+        findsOneWidget);
+    expect(find.text('Restore from safety copy'), findsNothing);
+  });
+
+  testWidgets(
+      'yubikey auth failures (wrong PIN, wrong key, timeout, cancel) never offer restore',
+      (tester) async {
+    final failures = <Object>[
+      PlatformException(code: 'CTAP_ERROR', message: 'Wrong PIN'),
+      Exception('decryption failed'),
+      PlatformException(code: 'TAP_TIMEOUT'),
+      PlatformException(code: 'TAP_CANCELLED'),
+    ];
+
+    for (final failure in failures) {
+      await tester.pumpWidget(_buildScreen(
+        yubikeyRecords: [_fakeRecord()],
+        onBackupExists: (_) async => true,
+        onUnlockWithYubikey: (a, b, c, d, e, f) async => throw failure,
+      ));
+
+      await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+      await tester.ensureVisible(find.text('Unlock'));
+      await tester.tap(find.text('Unlock'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Restore from safety copy'), findsNothing,
+          reason: 'no restore offer after: $failure');
+    }
+  });
+
+  testWidgets('confirmed restore calls onRestoreBackup and clears the banner',
+      (tester) async {
+    final restoreCalls = <String>[];
+    var readable = false;
+    await tester.pumpWidget(_buildScreen(
+      vaultPath: '/tmp/corrupt.gabbro',
+      onVaultIsReadable: (_) async => readable,
+      onBackupExists: (_) async => true,
+      onRestoreBackup: (p) async {
+        restoreCalls.add(p);
+        readable = true;
+      },
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Restore from safety copy'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Restore'));
+    await tester.pumpAndSettle();
+
+    expect(restoreCalls, ['/tmp/corrupt.gabbro']);
+    expect(find.text('Restore from safety copy'), findsNothing);
+    expect(find.text('Safety copy restored. Unlock with your credentials.'),
+        findsOneWidget);
+  });
+
+  testWidgets('declined restore touches nothing', (tester) async {
+    final restoreCalls = <String>[];
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onBackupExists: (_) async => true,
+      onRestoreBackup: (p) async => restoreCalls.add(p),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Restore from safety copy'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(restoreCalls, isEmpty);
+    expect(find.text('Restore from safety copy'), findsOneWidget);
+  });
+
+  testWidgets(
+      'failed restore (unusable backup) offers deletion of the safety copy',
+      (tester) async {
+    final deleteCalls = <String>[];
+    await tester.pumpWidget(_buildScreen(
+      vaultPath: '/tmp/corrupt.gabbro',
+      onVaultIsReadable: (_) async => false,
+      onBackupExists: (_) async => true,
+      onRestoreBackup: (_) async =>
+          throw Exception('The vault backup is not usable — restore refused'),
+      onDeleteBackup: (p) async => deleteCalls.add(p),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Restore from safety copy'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Restore'));
+    await tester.pumpAndSettle();
+
+    // The unusable backup can be discarded — on Android there is no other way.
+    await tester.tap(find.text('Delete unusable safety copy'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+
+    expect(deleteCalls, ['/tmp/corrupt.gabbro']);
+    expect(find.text('Delete unusable safety copy'), findsNothing);
+    expect(
+      find.text(
+        'This vault file cannot be read and no automatic safety copy '
+        'exists. Restore the vault from your own backup.',
+      ),
+      findsOneWidget,
+    );
   });
 }

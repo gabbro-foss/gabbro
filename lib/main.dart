@@ -503,8 +503,8 @@ class _GabbroAppState extends State<GabbroApp>
     },
     onDelete: (path) async {
       final isActive = path == _registry.lastUsed?.path;
-      final file = File(path);
-      if (file.existsSync()) await file.delete();
+      // R-03: removes the vault AND its .bak safety copy.
+      await deleteVaultFiles(path);
       final updated = _registry.remove(path);
       await updated.save();
       if (isActive) {

@@ -1845,6 +1845,48 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'As pastas padrão podem ser renomeadas ou excluídas.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Este ficheiro de cofre não pode ser lido. Está disponível uma cópia de recuperação automática da última gravação bem-sucedida.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Este ficheiro de cofre não pode ser lido e não existe nenhuma cópia de recuperação automática. Restaure o cofre a partir da sua própria cópia de segurança.';
+
+  @override
+  String get restoreBackupButton =>
+      'Restaurar a partir da cópia de recuperação';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Restaurar o cofre a partir da cópia de recuperação?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'O ficheiro ilegível será substituído pela cópia de recuperação da última gravação bem-sucedida. A sua frase de acesso (e a sua YubiKey, se registada) continua a ser necessária para o desbloquear.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Restaurar';
+
+  @override
+  String get backupRestoredMessage =>
+      'Cópia de recuperação restaurada. Desbloqueie com as suas credenciais.';
+
+  @override
+  String get deleteBackupButton =>
+      'Eliminar a cópia de recuperação inutilizável';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Eliminar a cópia de recuperação?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Esta cópia de recuperação não pode restaurar o seu cofre porque também está ilegível. A eliminação não pode ser anulada.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'O Gabbro também mantém no dispositivo uma cópia de recuperação automática de cada cofre, atualizada a cada gravação. Protege apenas contra corrupção do ficheiro — não é uma cópia de segurança.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -3687,6 +3729,46 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get manageFoldersDefaultNote =>
       'As pastas padrão podem ser renomeadas ou excluídas.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Este arquivo de cofre não pode ser lido. Há uma cópia de recuperação automática do último salvamento bem-sucedido disponível.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Este arquivo de cofre não pode ser lido e não existe nenhuma cópia de recuperação automática. Restaure o cofre a partir do seu próprio backup.';
+
+  @override
+  String get restoreBackupButton => 'Restaurar da cópia de recuperação';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Restaurar o cofre da cópia de recuperação?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'O arquivo ilegível será substituído pela cópia de recuperação do último salvamento bem-sucedido. Sua frase-senha (e sua YubiKey, se registrada) ainda é necessária para desbloqueá-lo.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Restaurar';
+
+  @override
+  String get backupRestoredMessage =>
+      'Cópia de recuperação restaurada. Desbloqueie com suas credenciais.';
+
+  @override
+  String get deleteBackupButton => 'Excluir cópia de recuperação inutilizável';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Excluir a cópia de recuperação?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Esta cópia de recuperação não pode restaurar seu cofre porque também está ilegível. A exclusão não pode ser desfeita.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'O Gabbro também mantém no dispositivo uma cópia de recuperação automática de cada cofre, atualizada a cada salvamento. Ela protege apenas contra corrupção do arquivo — não é um backup.';
 }
 
 /// The translations for Portuguese, as used in Portugal (`pt_PT`).
@@ -5534,4 +5616,46 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get manageFoldersDefaultNote =>
       'As pastas predefinidas podem ser renomeadas ou eliminadas.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Este ficheiro de cofre não pode ser lido. Está disponível uma cópia de recuperação automática da última gravação bem-sucedida.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Este ficheiro de cofre não pode ser lido e não existe nenhuma cópia de recuperação automática. Restaure o cofre a partir da sua própria cópia de segurança.';
+
+  @override
+  String get restoreBackupButton =>
+      'Restaurar a partir da cópia de recuperação';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Restaurar o cofre a partir da cópia de recuperação?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'O ficheiro ilegível será substituído pela cópia de recuperação da última gravação bem-sucedida. A sua frase de acesso (e a sua YubiKey, se registada) continua a ser necessária para o desbloquear.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Restaurar';
+
+  @override
+  String get backupRestoredMessage =>
+      'Cópia de recuperação restaurada. Desbloqueie com as suas credenciais.';
+
+  @override
+  String get deleteBackupButton =>
+      'Eliminar a cópia de recuperação inutilizável';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Eliminar a cópia de recuperação?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Esta cópia de recuperação não pode restaurar o seu cofre porque também está ilegível. A eliminação não pode ser anulada.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'O Gabbro também mantém no dispositivo uma cópia de recuperação automática de cada cofre, atualizada a cada gravação. Protege apenas contra corrupção do ficheiro — não é uma cópia de segurança.';
 }

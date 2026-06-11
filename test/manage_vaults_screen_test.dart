@@ -564,5 +564,16 @@ void main() {
       expect(find.textContaining('rm -rf'), findsOneWidget,
           reason: 'the verbatim emergency-wipe commands are shown on desktop');
     });
+
+    // R-03: the dialog must mention the automatic on-device safety copy and
+    // make clear it is NOT a backup (3-2-1 remains the user's job).
+    testWidgets('dialog mentions the .bak safety copy without overselling it',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(registry: registry));
+      await tester.tap(find.byIcon(Icons.info_outline));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('safety copy'), findsOneWidget);
+      expect(find.textContaining('it is not a backup'), findsOneWidget);
+    });
   });
 }

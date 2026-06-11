@@ -821,5 +821,17 @@
   "helpCaptionUnlock": "Sisesta oma pääslause seifi avamiseks",
   "helpCaptionVaultSync": "Krüpteeritud seifi sünkroonimisprotsess",
   "passphraseNoWordlist": "Teie keele jaoks pole veel sõnaloendit. Kasutatakse inglise keelt.",
-  "manageFoldersDefaultNote": "Vaikekaustu saab ümber nimetada või kustutada."
+  "manageFoldersDefaultNote": "Vaikekaustu saab ümber nimetada või kustutada.",
+
+  "vaultCorruptBackupAvailable": "Seda hoidlafaili ei saa lugeda. Saadaval on automaatne kaitsekoopia viimasest õnnestunud salvestusest.",
+  "vaultCorruptNoBackup": "Seda hoidlafaili ei saa lugeda ja automaatset kaitsekoopiat pole. Taastage hoidla oma varukoopiast.",
+  "restoreBackupButton": "Taasta kaitsekoopiast",
+  "restoreBackupConfirmTitle": "Kas taastada hoidla kaitsekoopiast?",
+  "restoreBackupConfirmBody": "Loetamatu hoidlafail asendatakse viimase õnnestunud salvestuse kaitsekoopiaga. Avamiseks on endiselt vaja teie salafraasi (ja YubiKeyd, kui see on registreeritud).",
+  "restoreBackupConfirmAction": "Taasta",
+  "backupRestoredMessage": "Kaitsekoopia taastatud. Avage oma mandaatidega.",
+  "deleteBackupButton": "Kustuta kasutuskõlbmatu kaitsekoopia",
+  "deleteBackupConfirmTitle": "Kas kustutada kaitsekoopia?",
+  "deleteBackupConfirmBody": "See kaitsekoopia ei saa teie hoidlat taastada, sest see on ise loetamatu. Kustutamist ei saa tagasi võtta.",
+  "backupDialogSafetyCopyNote": "Gabbro hoiab seadmes ka iga hoidla ühte automaatset kaitsekoopiat, mida värskendatakse igal salvestusel. See kaitseb ainult faili riknemise eest — see ei ole varukoopia."
 }

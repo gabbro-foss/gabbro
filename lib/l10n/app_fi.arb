@@ -821,5 +821,17 @@
   "helpCaptionUnlock": "Syötä salauslause avataksesi holvin",
   "helpCaptionVaultSync": "Salatun holvin synkronointiprosessi",
   "passphraseNoWordlist": "Kielelläsi ei ole vielä sanalistaa. Käytetään englantia.",
-  "manageFoldersDefaultNote": "Oletuskansioita voi nimetä uudelleen tai poistaa."
+  "manageFoldersDefaultNote": "Oletuskansioita voi nimetä uudelleen tai poistaa.",
+
+  "vaultCorruptBackupAvailable": "Tätä holvitiedostoa ei voi lukea. Saatavilla on automaattinen varakopio viimeisimmästä onnistuneesta tallennuksesta.",
+  "vaultCorruptNoBackup": "Tätä holvitiedostoa ei voi lukea, eikä automaattista varakopiota ole. Palauta holvi omasta varmuuskopiostasi.",
+  "restoreBackupButton": "Palauta varakopiosta",
+  "restoreBackupConfirmTitle": "Palautetaanko holvi varakopiosta?",
+  "restoreBackupConfirmBody": "Lukukelvoton holvitiedosto korvataan viimeisimmän onnistuneen tallennuksen varakopiolla. Salalauseesi (ja YubiKey, jos rekisteröity) vaaditaan edelleen lukituksen avaamiseen.",
+  "restoreBackupConfirmAction": "Palauta",
+  "backupRestoredMessage": "Varakopio palautettu. Avaa lukitus tunnuksillasi.",
+  "deleteBackupButton": "Poista käyttökelvoton varakopio",
+  "deleteBackupConfirmTitle": "Poistetaanko varakopio?",
+  "deleteBackupConfirmBody": "Tämä varakopio ei voi palauttaa holviasi, koska se on itsekin lukukelvoton. Poistoa ei voi perua.",
+  "backupDialogSafetyCopyNote": "Gabbro säilyttää laitteella myös yhden automaattisen varakopion jokaisesta holvista, joka päivittyy jokaisella tallennuksella. Se suojaa vain tiedoston vioittumiselta — se ei ole varmuuskopio."
 }

@@ -1843,4 +1843,43 @@ class AppLocalizationsHr extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Zadane mape mogu se preimenovati ili izbrisati.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Ova datoteka trezora ne može se pročitati. Dostupna je automatska pričuvna kopija posljednjeg uspješnog spremanja.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Ova datoteka trezora ne može se pročitati i automatska pričuvna kopija ne postoji. Vratite trezor iz vlastite sigurnosne kopije.';
+
+  @override
+  String get restoreBackupButton => 'Vrati iz pričuvne kopije';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Vratiti trezor iz pričuvne kopije?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Nečitljivu datoteku trezora zamijenit će pričuvna kopija posljednjeg uspješnog spremanja. Za otključavanje su i dalje potrebni vaša pristupna fraza (i YubiKey, ako je registriran).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Vrati';
+
+  @override
+  String get backupRestoredMessage =>
+      'Pričuvna kopija vraćena. Otključajte svojim vjerodajnicama.';
+
+  @override
+  String get deleteBackupButton => 'Izbriši neupotrebljivu pričuvnu kopiju';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Izbrisati pričuvnu kopiju?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Ova pričuvna kopija ne može vratiti vaš trezor jer je i sama nečitljiva. Brisanje se ne može poništiti.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro na uređaju čuva i jednu automatsku pričuvnu kopiju svakog trezora, osvježenu pri svakom spremanju. Štiti samo od oštećenja datoteke — nije sigurnosna kopija.';
 }

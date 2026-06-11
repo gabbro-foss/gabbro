@@ -821,5 +821,17 @@
   "helpCaptionUnlock": "Enter your passphrase to unlock your vault",
   "helpCaptionVaultSync": "Encrypted vault sync process",
   "passphraseNoWordlist": "No wordlist for your language yet. Using English.",
-  "manageFoldersDefaultNote": "Default folders can be renamed or deleted."
+  "manageFoldersDefaultNote": "Default folders can be renamed or deleted.",
+
+  "vaultCorruptBackupAvailable": "This vault file cannot be read. An automatic safety copy from the last successful save is available.",
+  "vaultCorruptNoBackup": "This vault file cannot be read and no automatic safety copy exists. Restore the vault from your own backup.",
+  "restoreBackupButton": "Restore from safety copy",
+  "restoreBackupConfirmTitle": "Restore vault from safety copy?",
+  "restoreBackupConfirmBody": "The unreadable vault file will be replaced by the safety copy from the last successful save. Your passphrase (and YubiKey, if registered) is still required to unlock it.",
+  "restoreBackupConfirmAction": "Restore",
+  "backupRestoredMessage": "Safety copy restored. Unlock with your credentials.",
+  "deleteBackupButton": "Delete unusable safety copy",
+  "deleteBackupConfirmTitle": "Delete the safety copy?",
+  "deleteBackupConfirmBody": "This safety copy cannot restore your vault because it is itself unreadable. Deleting it cannot be undone.",
+  "backupDialogSafetyCopyNote": "Gabbro also keeps one automatic on-device safety copy of each vault, refreshed at every save. It protects against file corruption only — it is not a backup."
 }

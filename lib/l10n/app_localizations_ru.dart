@@ -1849,4 +1849,44 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Папки по умолчанию можно переименовать или удалить.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Этот файл хранилища не читается. Доступна автоматическая аварийная копия последнего успешного сохранения.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Этот файл хранилища не читается, и автоматической аварийной копии нет. Восстановите хранилище из собственной резервной копии.';
+
+  @override
+  String get restoreBackupButton => 'Восстановить из аварийной копии';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Восстановить хранилище из аварийной копии?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Нечитаемый файл хранилища будет заменён аварийной копией последнего успешного сохранения. Для разблокировки по-прежнему нужны ваша парольная фраза (и YubiKey, если зарегистрирован).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Восстановить';
+
+  @override
+  String get backupRestoredMessage =>
+      'Аварийная копия восстановлена. Разблокируйте с помощью своих учётных данных.';
+
+  @override
+  String get deleteBackupButton => 'Удалить непригодную аварийную копию';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Удалить аварийную копию?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Эта аварийная копия не может восстановить хранилище, поскольку сама не читается. Удаление необратимо.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro также хранит на устройстве одну автоматическую аварийную копию каждого хранилища, обновляемую при каждом сохранении. Она защищает только от повреждения файла — это не резервная копия.';
 }

@@ -1850,4 +1850,44 @@ class AppLocalizationsUk extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Типові теки можна перейменовувати або видаляти.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Цей файл сховища не читається. Доступна автоматична аварійна копія останнього успішного збереження.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Цей файл сховища не читається, і автоматичної аварійної копії немає. Відновіть сховище з власної резервної копії.';
+
+  @override
+  String get restoreBackupButton => 'Відновити з аварійної копії';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Відновити сховище з аварійної копії?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Нечитабельний файл сховища буде замінено аварійною копією останнього успішного збереження. Для розблокування все одно потрібні ваша парольна фраза (і YubiKey, якщо зареєстрований).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Відновити';
+
+  @override
+  String get backupRestoredMessage =>
+      'Аварійну копію відновлено. Розблокуйте за допомогою своїх облікових даних.';
+
+  @override
+  String get deleteBackupButton => 'Видалити непридатну аварійну копію';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Видалити аварійну копію?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Ця аварійна копія не може відновити сховище, бо сама не читається. Видалення незворотне.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro також зберігає на пристрої одну автоматичну аварійну копію кожного сховища, що оновлюється під час кожного збереження. Вона захищає лише від пошкодження файлу — це не резервна копія.';
 }

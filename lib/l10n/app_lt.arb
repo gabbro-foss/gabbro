@@ -821,5 +821,17 @@
   "helpCaptionUnlock": "Įveskite slaptafrazę, kad atrakintumėte saugyklą",
   "helpCaptionVaultSync": "Užšifruotos saugyklos sinchronizavimo procesas",
   "passphraseNoWordlist": "Jūsų kalbai dar nėra žodžių sąrašo. Naudojama anglų kalba.",
-  "manageFoldersDefaultNote": "Numatytuosius aplankus galima pervadinti arba ištrinti."
+  "manageFoldersDefaultNote": "Numatytuosius aplankus galima pervadinti arba ištrinti.",
+
+  "vaultCorruptBackupAvailable": "Šio saugyklos failo nepavyksta perskaityti. Galima automatinė paskutinio sėkmingo išsaugojimo apsauginė kopija.",
+  "vaultCorruptNoBackup": "Šio saugyklos failo nepavyksta perskaityti ir automatinės apsauginės kopijos nėra. Atkurkite saugyklą iš savo atsarginės kopijos.",
+  "restoreBackupButton": "Atkurti iš apsauginės kopijos",
+  "restoreBackupConfirmTitle": "Atkurti saugyklą iš apsauginės kopijos?",
+  "restoreBackupConfirmBody": "Neperskaitomas saugyklos failas bus pakeistas paskutinio sėkmingo išsaugojimo apsaugine kopija. Atrakinti vis tiek reikės jūsų slaptafrazės (ir YubiKey, jei užregistruotas).",
+  "restoreBackupConfirmAction": "Atkurti",
+  "backupRestoredMessage": "Apsauginė kopija atkurta. Atrakinkite savo prisijungimo duomenimis.",
+  "deleteBackupButton": "Ištrinti netinkamą apsauginę kopiją",
+  "deleteBackupConfirmTitle": "Ištrinti apsauginę kopiją?",
+  "deleteBackupConfirmBody": "Ši apsauginė kopija negali atkurti saugyklos, nes pati yra neperskaitoma. Ištrynimo atšaukti negalima.",
+  "backupDialogSafetyCopyNote": "Gabbro įrenginyje taip pat laiko po vieną automatinę kiekvienos saugyklos apsauginę kopiją, atnaujinamą kiekvieno išsaugojimo metu. Ji saugo tik nuo failo sugadinimo — tai ne atsarginė kopija."
 }

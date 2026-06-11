@@ -1831,4 +1831,43 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Default folders can be renamed or deleted.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'This vault file cannot be read. An automatic safety copy from the last successful save is available.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'This vault file cannot be read and no automatic safety copy exists. Restore the vault from your own backup.';
+
+  @override
+  String get restoreBackupButton => 'Restore from safety copy';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Restore vault from safety copy?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'The unreadable vault file will be replaced by the safety copy from the last successful save. Your passphrase (and YubiKey, if registered) is still required to unlock it.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Restore';
+
+  @override
+  String get backupRestoredMessage =>
+      'Safety copy restored. Unlock with your credentials.';
+
+  @override
+  String get deleteBackupButton => 'Delete unusable safety copy';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Delete the safety copy?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'This safety copy cannot restore your vault because it is itself unreadable. Deleting it cannot be undone.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro also keeps one automatic on-device safety copy of each vault, refreshed at every save. It protects against file corruption only — it is not a backup.';
 }

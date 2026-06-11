@@ -821,5 +821,17 @@
   "helpCaptionUnlock": "Indtast din adgangssætning for at låse hvælvingen op",
   "helpCaptionVaultSync": "Krypteret synkroniseringsproces for hvælving",
   "passphraseNoWordlist": "Ingen ordliste til dit sprog endnu. Bruger engelsk.",
-  "manageFoldersDefaultNote": "Standardmapper kan omdøbes eller slettes."
+  "manageFoldersDefaultNote": "Standardmapper kan omdøbes eller slettes.",
+
+  "vaultCorruptBackupAvailable": "Denne boksfil kan ikke læses. En automatisk reservekopi fra den seneste vellykkede gemning er tilgængelig.",
+  "vaultCorruptNoBackup": "Denne boksfil kan ikke læses, og der findes ingen automatisk reservekopi. Gendan boksen fra din egen sikkerhedskopi.",
+  "restoreBackupButton": "Gendan fra reservekopi",
+  "restoreBackupConfirmTitle": "Gendan boksen fra reservekopien?",
+  "restoreBackupConfirmBody": "Den ulæselige boksfil erstattes af reservekopien fra den seneste vellykkede gemning. Din adgangssætning (og din YubiKey, hvis registreret) kræves stadig for at låse op.",
+  "restoreBackupConfirmAction": "Gendan",
+  "backupRestoredMessage": "Reservekopi gendannet. Lås op med dine loginoplysninger.",
+  "deleteBackupButton": "Slet ubrugelig reservekopi",
+  "deleteBackupConfirmTitle": "Slet reservekopien?",
+  "deleteBackupConfirmBody": "Denne reservekopi kan ikke gendanne din boks, da den selv er ulæselig. Sletning kan ikke fortrydes.",
+  "backupDialogSafetyCopyNote": "Gabbro gemmer også én automatisk reservekopi af hver boks på enheden, som opdateres ved hver gemning. Den beskytter kun mod filkorruption — den er ikke en sikkerhedskopi."
 }

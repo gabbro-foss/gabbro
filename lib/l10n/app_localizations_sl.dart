@@ -1848,4 +1848,43 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Privzete mape je mogoče preimenovati ali izbrisati.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Te datoteke trezorja ni mogoče prebrati. Na voljo je samodejna rešilna kopija zadnjega uspešnega shranjevanja.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Te datoteke trezorja ni mogoče prebrati in samodejna rešilna kopija ne obstaja. Obnovite trezor iz lastne varnostne kopije.';
+
+  @override
+  String get restoreBackupButton => 'Obnovi iz rešilne kopije';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Obnovim trezor iz rešilne kopije?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Neberljivo datoteko trezorja bo nadomestila rešilna kopija zadnjega uspešnega shranjevanja. Za odklepanje še vedno potrebujete svoje geslo (in YubiKey, če je registriran).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Obnovi';
+
+  @override
+  String get backupRestoredMessage =>
+      'Rešilna kopija obnovljena. Odklenite s svojimi poverilnicami.';
+
+  @override
+  String get deleteBackupButton => 'Izbriši neuporabno rešilno kopijo';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Izbrišem rešilno kopijo?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Ta rešilna kopija ne more obnoviti trezorja, ker je tudi sama neberljiva. Brisanja ni mogoče razveljaviti.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro na napravi hrani tudi eno samodejno rešilno kopijo vsakega trezorja, osveženo ob vsakem shranjevanju. Ščiti le pred okvaro datoteke — ni varnostna kopija.';
 }

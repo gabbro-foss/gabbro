@@ -1844,4 +1844,43 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Standardmapper kan omdøbes eller slettes.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Denne boksfil kan ikke læses. En automatisk reservekopi fra den seneste vellykkede gemning er tilgængelig.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Denne boksfil kan ikke læses, og der findes ingen automatisk reservekopi. Gendan boksen fra din egen sikkerhedskopi.';
+
+  @override
+  String get restoreBackupButton => 'Gendan fra reservekopi';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Gendan boksen fra reservekopien?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Den ulæselige boksfil erstattes af reservekopien fra den seneste vellykkede gemning. Din adgangssætning (og din YubiKey, hvis registreret) kræves stadig for at låse op.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Gendan';
+
+  @override
+  String get backupRestoredMessage =>
+      'Reservekopi gendannet. Lås op med dine loginoplysninger.';
+
+  @override
+  String get deleteBackupButton => 'Slet ubrugelig reservekopi';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Slet reservekopien?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Denne reservekopi kan ikke gendanne din boks, da den selv er ulæselig. Sletning kan ikke fortrydes.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro gemmer også én automatisk reservekopi af hver boks på enheden, som opdateres ved hver gemning. Den beskytter kun mod filkorruption — den er ikke en sikkerhedskopi.';
 }

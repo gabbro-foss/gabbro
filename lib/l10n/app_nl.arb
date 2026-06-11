@@ -821,5 +821,17 @@
   "helpCaptionUnlock": "Voer uw wachtwoordzin in om uw kluis te ontgrendelen",
   "helpCaptionVaultSync": "Versleuteld kluissynchronisatieproces",
   "passphraseNoWordlist": "Nog geen woordenlijst voor uw taal. Engels wordt gebruikt.",
-  "manageFoldersDefaultNote": "Standaardmappen kunnen worden hernoemd of verwijderd."
+  "manageFoldersDefaultNote": "Standaardmappen kunnen worden hernoemd of verwijderd.",
+
+  "vaultCorruptBackupAvailable": "Dit kluisbestand kan niet worden gelezen. Er is een automatische reservekopie van de laatste geslaagde opslag beschikbaar.",
+  "vaultCorruptNoBackup": "Dit kluisbestand kan niet worden gelezen en er bestaat geen automatische reservekopie. Herstel de kluis vanuit je eigen back-up.",
+  "restoreBackupButton": "Herstellen vanaf reservekopie",
+  "restoreBackupConfirmTitle": "Kluis herstellen vanaf reservekopie?",
+  "restoreBackupConfirmBody": "Het onleesbare kluisbestand wordt vervangen door de reservekopie van de laatste geslaagde opslag. Je wachtwoordzin (en je YubiKey, indien geregistreerd) blijft nodig om te ontgrendelen.",
+  "restoreBackupConfirmAction": "Herstellen",
+  "backupRestoredMessage": "Reservekopie hersteld. Ontgrendel met je gegevens.",
+  "deleteBackupButton": "Onbruikbare reservekopie verwijderen",
+  "deleteBackupConfirmTitle": "Reservekopie verwijderen?",
+  "deleteBackupConfirmBody": "Deze reservekopie kan je kluis niet herstellen omdat hij zelf onleesbaar is. Verwijderen kan niet ongedaan worden gemaakt.",
+  "backupDialogSafetyCopyNote": "Gabbro bewaart ook één automatische reservekopie van elke kluis op het apparaat, ververst bij elke opslag. Die beschermt alleen tegen bestandsbeschadiging — het is geen back-up."
 }

@@ -815,5 +815,17 @@
   "helpCaptionUnlock": "Unesite pristupnu frazu za otključavanje trezora",
   "helpCaptionVaultSync": "Proces sinhronizacije šifrovanog trezora",
   "passphraseNoWordlist": "Nema liste reči za vaš jezik. Koristi se engleski.",
-  "manageFoldersDefaultNote": "Podrazumevane fascikle mogu se preimenovati ili izbrisati."
+  "manageFoldersDefaultNote": "Podrazumevane fascikle mogu se preimenovati ili izbrisati.",
+
+  "vaultCorruptBackupAvailable": "Ova datoteka sefa ne može da se pročita. Dostupna je automatska pomoćna kopija poslednjeg uspešnog čuvanja.",
+  "vaultCorruptNoBackup": "Ova datoteka sefa ne može da se pročita i automatska pomoćna kopija ne postoji. Vratite sef iz sopstvene rezervne kopije.",
+  "restoreBackupButton": "Vrati iz pomoćne kopije",
+  "restoreBackupConfirmTitle": "Vratiti sef iz pomoćne kopije?",
+  "restoreBackupConfirmBody": "Nečitljivu datoteku sefa zameniće pomoćna kopija poslednjeg uspešnog čuvanja. Za otključavanje su i dalje potrebni vaša pristupna fraza (i YubiKey, ako je registrovan).",
+  "restoreBackupConfirmAction": "Vrati",
+  "backupRestoredMessage": "Pomoćna kopija vraćena. Otključajte svojim akreditivima.",
+  "deleteBackupButton": "Izbriši neupotrebljivu pomoćnu kopiju",
+  "deleteBackupConfirmTitle": "Izbrisati pomoćnu kopiju?",
+  "deleteBackupConfirmBody": "Ova pomoćna kopija ne može da vrati vaš sef jer je i sama nečitljiva. Brisanje je nepovratno.",
+  "backupDialogSafetyCopyNote": "Gabbro na uređaju čuva i jednu automatsku pomoćnu kopiju svakog sefa, osveženu pri svakom čuvanju. Štiti samo od oštećenja datoteke — nije rezervna kopija."
 }

@@ -1841,4 +1841,44 @@ class AppLocalizationsNn extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Standardmapper kan gjevast nytt namn eller slettast.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Denne kvelvfila kan ikkje lesast. Ein automatisk reservekopi frå siste vellukka lagring er tilgjengeleg.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Denne kvelvfila kan ikkje lesast, og det finst ingen automatisk reservekopi. Gjenopprett kvelvet frå din eigen tryggingskopi.';
+
+  @override
+  String get restoreBackupButton => 'Gjenopprett frå reservekopi';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Gjenopprette kvelvet frå reservekopien?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Den uleselege kvelvfila vert erstatta av reservekopien frå siste vellukka lagring. Passordfrasen din (og YubiKey-en din, om registrert) krevst framleis for å låse opp.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Gjenopprett';
+
+  @override
+  String get backupRestoredMessage =>
+      'Reservekopi gjenoppretta. Lås opp med innloggingsinformasjonen din.';
+
+  @override
+  String get deleteBackupButton => 'Slett ubrukeleg reservekopi';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Slette reservekopien?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Denne reservekopien kan ikkje gjenopprette kvelvet ditt, sidan han sjølv er uleseleg. Sletting kan ikkje angrast.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro har òg éin automatisk reservekopi av kvart kvelv på eininga, oppdatert ved kvar lagring. Han vernar berre mot filkorrupsjon — han er ikkje ein tryggingskopi.';
 }

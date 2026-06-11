@@ -1850,4 +1850,44 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Standaardmappen kunnen worden hernoemd of verwijderd.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Dit kluisbestand kan niet worden gelezen. Er is een automatische reservekopie van de laatste geslaagde opslag beschikbaar.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Dit kluisbestand kan niet worden gelezen en er bestaat geen automatische reservekopie. Herstel de kluis vanuit je eigen back-up.';
+
+  @override
+  String get restoreBackupButton => 'Herstellen vanaf reservekopie';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Kluis herstellen vanaf reservekopie?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Het onleesbare kluisbestand wordt vervangen door de reservekopie van de laatste geslaagde opslag. Je wachtwoordzin (en je YubiKey, indien geregistreerd) blijft nodig om te ontgrendelen.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Herstellen';
+
+  @override
+  String get backupRestoredMessage =>
+      'Reservekopie hersteld. Ontgrendel met je gegevens.';
+
+  @override
+  String get deleteBackupButton => 'Onbruikbare reservekopie verwijderen';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Reservekopie verwijderen?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Deze reservekopie kan je kluis niet herstellen omdat hij zelf onleesbaar is. Verwijderen kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro bewaart ook één automatische reservekopie van elke kluis op het apparaat, ververst bij elke opslag. Die beschermt alleen tegen bestandsbeschadiging — het is geen back-up.';
 }

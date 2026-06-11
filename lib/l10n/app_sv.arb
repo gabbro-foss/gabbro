@@ -821,5 +821,17 @@
   "helpCaptionUnlock": "Ange din lösenfras för att låsa upp valvet",
   "helpCaptionVaultSync": "Krypterad synkroniseringsprocess för valvet",
   "passphraseNoWordlist": "Ingen ordlista för ditt språk ännu. Engelska används.",
-  "manageFoldersDefaultNote": "Standardmappar kan döpas om eller tas bort."
+  "manageFoldersDefaultNote": "Standardmappar kan döpas om eller tas bort.",
+
+  "vaultCorruptBackupAvailable": "Den här valvfilen kan inte läsas. En automatisk reservkopia från den senaste lyckade sparningen finns tillgänglig.",
+  "vaultCorruptNoBackup": "Den här valvfilen kan inte läsas och ingen automatisk reservkopia finns. Återställ valvet från din egen säkerhetskopia.",
+  "restoreBackupButton": "Återställ från reservkopia",
+  "restoreBackupConfirmTitle": "Återställa valvet från reservkopian?",
+  "restoreBackupConfirmBody": "Den oläsbara valvfilen ersätts av reservkopian från den senaste lyckade sparningen. Din lösenfras (och din YubiKey, om registrerad) krävs fortfarande för att låsa upp.",
+  "restoreBackupConfirmAction": "Återställ",
+  "backupRestoredMessage": "Reservkopia återställd. Lås upp med dina uppgifter.",
+  "deleteBackupButton": "Ta bort oanvändbar reservkopia",
+  "deleteBackupConfirmTitle": "Ta bort reservkopian?",
+  "deleteBackupConfirmBody": "Den här reservkopian kan inte återställa ditt valv eftersom den själv är oläsbar. Borttagningen kan inte ångras.",
+  "backupDialogSafetyCopyNote": "Gabbro behåller också en automatisk reservkopia av varje valv på enheten, uppdaterad vid varje sparning. Den skyddar bara mot filkorruption — den är ingen säkerhetskopia."
 }

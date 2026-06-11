@@ -3456,6 +3456,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Default folders can be renamed or deleted.'**
   String get manageFoldersDefaultNote;
+
+  /// No description provided for @vaultCorruptBackupAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This vault file cannot be read. An automatic safety copy from the last successful save is available.'**
+  String get vaultCorruptBackupAvailable;
+
+  /// No description provided for @vaultCorruptNoBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'This vault file cannot be read and no automatic safety copy exists. Restore the vault from your own backup.'**
+  String get vaultCorruptNoBackup;
+
+  /// No description provided for @restoreBackupButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from safety copy'**
+  String get restoreBackupButton;
+
+  /// No description provided for @restoreBackupConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore vault from safety copy?'**
+  String get restoreBackupConfirmTitle;
+
+  /// No description provided for @restoreBackupConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The unreadable vault file will be replaced by the safety copy from the last successful save. Your passphrase (and YubiKey, if registered) is still required to unlock it.'**
+  String get restoreBackupConfirmBody;
+
+  /// No description provided for @restoreBackupConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restoreBackupConfirmAction;
+
+  /// No description provided for @backupRestoredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety copy restored. Unlock with your credentials.'**
+  String get backupRestoredMessage;
+
+  /// No description provided for @deleteBackupButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete unusable safety copy'**
+  String get deleteBackupButton;
+
+  /// No description provided for @deleteBackupConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the safety copy?'**
+  String get deleteBackupConfirmTitle;
+
+  /// No description provided for @deleteBackupConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This safety copy cannot restore your vault because it is itself unreadable. Deleting it cannot be undone.'**
+  String get deleteBackupConfirmBody;
+
+  /// No description provided for @backupDialogSafetyCopyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Gabbro also keeps one automatic on-device safety copy of each vault, refreshed at every save. It protects against file corruption only — it is not a backup.'**
+  String get backupDialogSafetyCopyNote;
 }
 
 class _AppLocalizationsDelegate

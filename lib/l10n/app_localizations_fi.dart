@@ -1844,4 +1844,43 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Oletuskansioita voi nimetä uudelleen tai poistaa.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Tätä holvitiedostoa ei voi lukea. Saatavilla on automaattinen varakopio viimeisimmästä onnistuneesta tallennuksesta.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Tätä holvitiedostoa ei voi lukea, eikä automaattista varakopiota ole. Palauta holvi omasta varmuuskopiostasi.';
+
+  @override
+  String get restoreBackupButton => 'Palauta varakopiosta';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Palautetaanko holvi varakopiosta?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Lukukelvoton holvitiedosto korvataan viimeisimmän onnistuneen tallennuksen varakopiolla. Salalauseesi (ja YubiKey, jos rekisteröity) vaaditaan edelleen lukituksen avaamiseen.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Palauta';
+
+  @override
+  String get backupRestoredMessage =>
+      'Varakopio palautettu. Avaa lukitus tunnuksillasi.';
+
+  @override
+  String get deleteBackupButton => 'Poista käyttökelvoton varakopio';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Poistetaanko varakopio?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Tämä varakopio ei voi palauttaa holviasi, koska se on itsekin lukukelvoton. Poistoa ei voi perua.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro säilyttää laitteella myös yhden automaattisen varakopion jokaisesta holvista, joka päivittyy jokaisella tallennuksella. Se suojaa vain tiedoston vioittumiselta — se ei ole varmuuskopio.';
 }

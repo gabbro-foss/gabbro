@@ -815,5 +815,17 @@
   "helpCaptionUnlock": "Vnesite geslo za dostop za odklenitev trezorja",
   "helpCaptionVaultSync": "Postopek sinhronizacije šifriranega trezorja",
   "passphraseNoWordlist": "Za vaš jezik še ni seznama besed. Uporablja se angleščina.",
-  "manageFoldersDefaultNote": "Privzete mape je mogoče preimenovati ali izbrisati."
+  "manageFoldersDefaultNote": "Privzete mape je mogoče preimenovati ali izbrisati.",
+
+  "vaultCorruptBackupAvailable": "Te datoteke trezorja ni mogoče prebrati. Na voljo je samodejna rešilna kopija zadnjega uspešnega shranjevanja.",
+  "vaultCorruptNoBackup": "Te datoteke trezorja ni mogoče prebrati in samodejna rešilna kopija ne obstaja. Obnovite trezor iz lastne varnostne kopije.",
+  "restoreBackupButton": "Obnovi iz rešilne kopije",
+  "restoreBackupConfirmTitle": "Obnovim trezor iz rešilne kopije?",
+  "restoreBackupConfirmBody": "Neberljivo datoteko trezorja bo nadomestila rešilna kopija zadnjega uspešnega shranjevanja. Za odklepanje še vedno potrebujete svoje geslo (in YubiKey, če je registriran).",
+  "restoreBackupConfirmAction": "Obnovi",
+  "backupRestoredMessage": "Rešilna kopija obnovljena. Odklenite s svojimi poverilnicami.",
+  "deleteBackupButton": "Izbriši neuporabno rešilno kopijo",
+  "deleteBackupConfirmTitle": "Izbrišem rešilno kopijo?",
+  "deleteBackupConfirmBody": "Ta rešilna kopija ne more obnoviti trezorja, ker je tudi sama neberljiva. Brisanja ni mogoče razveljaviti.",
+  "backupDialogSafetyCopyNote": "Gabbro na napravi hrani tudi eno samodejno rešilno kopijo vsakega trezorja, osveženo ob vsakem shranjevanju. Ščiti le pred okvaro datoteke — ni varnostna kopija."
 }

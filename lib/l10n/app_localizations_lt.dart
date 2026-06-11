@@ -1851,4 +1851,44 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Numatytuosius aplankus galima pervadinti arba ištrinti.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Šio saugyklos failo nepavyksta perskaityti. Galima automatinė paskutinio sėkmingo išsaugojimo apsauginė kopija.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Šio saugyklos failo nepavyksta perskaityti ir automatinės apsauginės kopijos nėra. Atkurkite saugyklą iš savo atsarginės kopijos.';
+
+  @override
+  String get restoreBackupButton => 'Atkurti iš apsauginės kopijos';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Atkurti saugyklą iš apsauginės kopijos?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Neperskaitomas saugyklos failas bus pakeistas paskutinio sėkmingo išsaugojimo apsaugine kopija. Atrakinti vis tiek reikės jūsų slaptafrazės (ir YubiKey, jei užregistruotas).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Atkurti';
+
+  @override
+  String get backupRestoredMessage =>
+      'Apsauginė kopija atkurta. Atrakinkite savo prisijungimo duomenimis.';
+
+  @override
+  String get deleteBackupButton => 'Ištrinti netinkamą apsauginę kopiją';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Ištrinti apsauginę kopiją?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Ši apsauginė kopija negali atkurti saugyklos, nes pati yra neperskaitoma. Ištrynimo atšaukti negalima.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro įrenginyje taip pat laiko po vieną automatinę kiekvienos saugyklos apsauginę kopiją, atnaujinamą kiekvieno išsaugojimo metu. Ji saugo tik nuo failo sugadinimo — tai ne atsarginė kopija.';
 }

@@ -815,5 +815,17 @@
   "helpCaptionUnlock": "Introduce tu frase de contraseña para desbloquear tu cofre",
   "helpCaptionVaultSync": "Proceso de sincronización de cofre cifrado",
   "passphraseNoWordlist": "Aún no hay lista de palabras para tu idioma. Se usa inglés.",
-  "manageFoldersDefaultNote": "Las carpetas predeterminadas se pueden renombrar o eliminar."
+  "manageFoldersDefaultNote": "Las carpetas predeterminadas se pueden renombrar o eliminar.",
+
+  "vaultCorruptBackupAvailable": "Este archivo de caja fuerte no se puede leer. Hay disponible una copia de respaldo automática del último guardado correcto.",
+  "vaultCorruptNoBackup": "Este archivo de caja fuerte no se puede leer y no existe ninguna copia de respaldo automática. Restaura la caja fuerte desde tu propia copia de seguridad.",
+  "restoreBackupButton": "Restaurar desde la copia de respaldo",
+  "restoreBackupConfirmTitle": "¿Restaurar la caja fuerte desde la copia de respaldo?",
+  "restoreBackupConfirmBody": "El archivo ilegible se sustituirá por la copia de respaldo del último guardado correcto. Seguirás necesitando tu frase de contraseña (y tu YubiKey, si está registrada) para desbloquearla.",
+  "restoreBackupConfirmAction": "Restaurar",
+  "backupRestoredMessage": "Copia de respaldo restaurada. Desbloquea con tus credenciales.",
+  "deleteBackupButton": "Eliminar la copia de respaldo inservible",
+  "deleteBackupConfirmTitle": "¿Eliminar la copia de respaldo?",
+  "deleteBackupConfirmBody": "Esta copia de respaldo no puede restaurar tu caja fuerte porque también es ilegible. La eliminación no se puede deshacer.",
+  "backupDialogSafetyCopyNote": "Gabbro también guarda en el dispositivo una copia de respaldo automática de cada caja fuerte, actualizada en cada guardado. Solo protege contra la corrupción del archivo — no es una copia de seguridad."
 }

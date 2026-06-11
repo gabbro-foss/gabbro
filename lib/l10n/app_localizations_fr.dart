@@ -1866,4 +1866,44 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Les dossiers par défaut peuvent être renommés ou supprimés.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Ce fichier de coffre est illisible. Une copie de secours automatique du dernier enregistrement réussi est disponible.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Ce fichier de coffre est illisible et aucune copie de secours automatique n\'existe. Restaurez le coffre depuis votre propre sauvegarde.';
+
+  @override
+  String get restoreBackupButton => 'Restaurer depuis la copie de secours';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Restaurer le coffre depuis la copie de secours ?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Le fichier de coffre illisible sera remplacé par la copie de secours du dernier enregistrement réussi. Votre phrase secrète (et votre YubiKey, le cas échéant) reste nécessaire pour le déverrouiller.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Restaurer';
+
+  @override
+  String get backupRestoredMessage =>
+      'Copie de secours restaurée. Déverrouillez avec vos identifiants.';
+
+  @override
+  String get deleteBackupButton => 'Supprimer la copie de secours inutilisable';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Supprimer la copie de secours ?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Cette copie de secours ne peut pas restaurer votre coffre car elle est elle-même illisible. Sa suppression est irréversible.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro conserve aussi sur l\'appareil une copie de secours automatique de chaque coffre, actualisée à chaque enregistrement. Elle ne protège que contre la corruption du fichier — ce n\'est pas une sauvegarde.';
 }

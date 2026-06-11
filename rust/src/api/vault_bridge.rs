@@ -511,6 +511,31 @@ pub async fn change_passphrase(
     session::session_change_passphrase(&old_passphrase, &new_passphrase)
 }
 
+/// R-03: does an automatic safety copy (`.bak`) exist next to this vault?
+///
+/// Drives whether the unlock screen offers a restore when the vault file
+/// itself cannot be parsed. Safe to call with no session (locked state).
+pub async fn vault_backup_exists(path: String) -> bool {
+    crate::vault::io::backup_exists(std::path::Path::new(&path))
+}
+
+/// R-03: replace a corrupt vault file with its `.bak` safety copy.
+///
+/// Explicit user action from the unlock screen's restore flow. Refuses an
+/// unparseable `.bak`. The restored vault still requires full credentials —
+/// restoring grants no access.
+pub async fn restore_vault_backup(path: String) -> Result<(), String> {
+    crate::vault::io::restore_vault_backup(std::path::Path::new(&path))
+}
+
+/// R-03: delete the `.bak` safety copy without touching the vault.
+///
+/// For the case where the backup itself is corrupt and the user chooses to
+/// discard it — on Android, app-private storage offers no other way to do so.
+pub async fn delete_vault_backup(path: String) -> Result<(), String> {
+    crate::vault::io::remove_backup(std::path::Path::new(&path))
+}
+
 /// Clear the previous password history for a Login entry and persist.
 ///
 /// Async — triggers a full vault save.
@@ -954,6 +979,44 @@ mod tests {
         tokio::runtime::Runtime::new().unwrap().block_on(f)
     }
 
+    // R-03: exists -> restore -> delete wiring through the bridge surface
+    #[test]
+    #[serial]
+    fn backup_bridge_roundtrip() {
+        use crate::crypto::vault_crypto::seal_vault;
+        use crate::vault::io::write_vault;
+        use std::env::temp_dir;
+
+        let path = temp_dir().join("gabbro_bridge_backup_test.gabbro");
+        let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(&bak);
+        let path_s = path.to_string_lossy().to_string();
+
+        let sealed_a = seal_vault(b"pw-a", b"body A", None).unwrap();
+        write_vault(&sealed_a, &path).unwrap();
+        assert!(!run(vault_backup_exists(path_s.clone())));
+
+        let sealed_b = seal_vault(b"pw-b", b"body B", None).unwrap();
+        write_vault(&sealed_b, &path).unwrap();
+        assert!(run(vault_backup_exists(path_s.clone())));
+
+        std::fs::write(&path, b"corrupt").unwrap();
+        run(restore_vault_backup(path_s.clone())).expect("restore must succeed");
+        let restored = std::fs::read(&path).unwrap();
+        assert_eq!(
+            restored,
+            sealed_a.to_bytes(),
+            "restore must bring back save A"
+        );
+
+        run(delete_vault_backup(path_s.clone())).expect("delete backup must succeed");
+        assert!(!run(vault_backup_exists(path_s)));
+
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(&bak);
+    }
+
     #[test]
     #[serial]
     fn unlock_lock_roundtrip() {
@@ -1007,6 +1070,7 @@ mod tests {
         assert!(list_entry_summaries().is_err());
 
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1041,6 +1105,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1077,6 +1142,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1119,6 +1185,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1161,6 +1228,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1223,6 +1291,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1354,6 +1423,7 @@ mod tests {
         );
 
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1385,6 +1455,7 @@ mod tests {
         assert_eq!(records[0].salt, hkdf_salt.to_vec());
 
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1424,6 +1495,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1460,6 +1532,7 @@ mod tests {
         assert_eq!(records[0].credential_id, credential_id);
 
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1505,6 +1578,7 @@ mod tests {
         assert_eq!(header.yubikey_records[0].credential_id, credential_id);
 
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1551,6 +1625,7 @@ mod tests {
         lock_vault().unwrap();
 
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1573,6 +1648,7 @@ mod tests {
         );
 
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1598,6 +1674,7 @@ mod tests {
         assert_eq!(sealed.alias, Some(String::from("Work")));
 
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     // ── Custom-field roundtrip tests ──────────────────────────────────────────
@@ -1673,6 +1750,7 @@ mod tests {
         assert!(result.is_err(), "wrong passphrase must fail");
 
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1704,6 +1782,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1747,6 +1826,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1805,6 +1885,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1860,6 +1941,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1902,6 +1984,7 @@ mod tests {
         );
 
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1999,6 +2082,7 @@ mod tests {
         );
 
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -2064,6 +2148,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     // ── ADR-013: key-protected vault SYNC (the import-path fix, mirrored) ──────
@@ -2257,6 +2342,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -2311,6 +2397,7 @@ mod tests {
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
         let _ = std::fs::remove_file(&out);
     }
 }

@@ -821,5 +821,17 @@
   "helpCaptionUnlock": "Angi passfrasen din for å låse opp hvelvet",
   "helpCaptionVaultSync": "Kryptert synkroniseringsprosess for hvelvet",
   "passphraseNoWordlist": "Ingen ordliste for ditt språk ennå. Bruker engelsk.",
-  "manageFoldersDefaultNote": "Standardmapper kan gis nytt navn eller slettes."
+  "manageFoldersDefaultNote": "Standardmapper kan gis nytt navn eller slettes.",
+
+  "vaultCorruptBackupAvailable": "Denne hvelvfilen kan ikke leses. En automatisk reservekopi fra siste vellykkede lagring er tilgjengelig.",
+  "vaultCorruptNoBackup": "Denne hvelvfilen kan ikke leses, og det finnes ingen automatisk reservekopi. Gjenopprett hvelvet fra din egen sikkerhetskopi.",
+  "restoreBackupButton": "Gjenopprett fra reservekopi",
+  "restoreBackupConfirmTitle": "Gjenopprette hvelvet fra reservekopien?",
+  "restoreBackupConfirmBody": "Den uleselige hvelvfilen erstattes av reservekopien fra siste vellykkede lagring. Passordfrasen din (og YubiKey-en din, hvis registrert) kreves fortsatt for å låse opp.",
+  "restoreBackupConfirmAction": "Gjenopprett",
+  "backupRestoredMessage": "Reservekopi gjenopprettet. Lås opp med påloggingsinformasjonen din.",
+  "deleteBackupButton": "Slett ubrukelig reservekopi",
+  "deleteBackupConfirmTitle": "Slette reservekopien?",
+  "deleteBackupConfirmBody": "Denne reservekopien kan ikke gjenopprette hvelvet ditt, siden den selv er uleselig. Sletting kan ikke angres.",
+  "backupDialogSafetyCopyNote": "Gabbro beholder også én automatisk reservekopi av hvert hvelv på enheten, oppdatert ved hver lagring. Den beskytter bare mot filkorrupsjon — den er ikke en sikkerhetskopi."
 }

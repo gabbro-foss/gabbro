@@ -121,6 +121,28 @@ Future<void> changePassphrase({
   newPassphrase: newPassphrase,
 );
 
+/// R-03: does an automatic safety copy (`.bak`) exist next to this vault?
+///
+/// Drives whether the unlock screen offers a restore when the vault file
+/// itself cannot be parsed. Safe to call with no session (locked state).
+Future<bool> vaultBackupExists({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeVaultBackupExists(path: path);
+
+/// R-03: replace a corrupt vault file with its `.bak` safety copy.
+///
+/// Explicit user action from the unlock screen's restore flow. Refuses an
+/// unparseable `.bak`. The restored vault still requires full credentials —
+/// restoring grants no access.
+Future<void> restoreVaultBackup({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeRestoreVaultBackup(path: path);
+
+/// R-03: delete the `.bak` safety copy without touching the vault.
+///
+/// For the case where the backup itself is corrupt and the user chooses to
+/// discard it — on Android, app-private storage offers no other way to do so.
+Future<void> deleteVaultBackup({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeDeleteVaultBackup(path: path);
+
 /// Clear the previous password history for a Login entry and persist.
 ///
 /// Async — triggers a full vault save.

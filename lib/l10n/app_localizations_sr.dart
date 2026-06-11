@@ -1846,6 +1846,45 @@ class AppLocalizationsSr extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Подразумеване фасцикле могу се преименовати или избрисати.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Ова датотека сефа не може да се прочита. Доступна је аутоматска помоћна копија последњег успешног чувања.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Ова датотека сефа не може да се прочита и аутоматска помоћна копија не постоји. Вратите сеф из сопствене резервне копије.';
+
+  @override
+  String get restoreBackupButton => 'Врати из помоћне копије';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Вратити сеф из помоћне копије?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Нечитљиву датотеку сефа замениће помоћна копија последњег успешног чувања. За откључавање су и даље потребни ваша приступна фраза (и YubiKey, ако је регистрован).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Врати';
+
+  @override
+  String get backupRestoredMessage =>
+      'Помоћна копија враћена. Откључајте својим акредитивима.';
+
+  @override
+  String get deleteBackupButton => 'Избриши неупотребљиву помоћну копију';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Избрисати помоћну копију?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Ова помоћна копија не може да врати ваш сеф јер је и сама нечитљива. Брисање је неповратно.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro на уређају чува и једну аутоматску помоћну копију сваког сефа, освежену при сваком чувању. Штити само од оштећења датотеке — није резервна копија.';
 }
 
 /// The translations for Serbian, using the Latin script (`sr_Latn`).
@@ -3690,4 +3729,43 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get manageFoldersDefaultNote =>
       'Podrazumevane fascikle mogu se preimenovati ili izbrisati.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Ova datoteka sefa ne može da se pročita. Dostupna je automatska pomoćna kopija poslednjeg uspešnog čuvanja.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Ova datoteka sefa ne može da se pročita i automatska pomoćna kopija ne postoji. Vratite sef iz sopstvene rezervne kopije.';
+
+  @override
+  String get restoreBackupButton => 'Vrati iz pomoćne kopije';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Vratiti sef iz pomoćne kopije?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Nečitljivu datoteku sefa zameniće pomoćna kopija poslednjeg uspešnog čuvanja. Za otključavanje su i dalje potrebni vaša pristupna fraza (i YubiKey, ako je registrovan).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Vrati';
+
+  @override
+  String get backupRestoredMessage =>
+      'Pomoćna kopija vraćena. Otključajte svojim akreditivima.';
+
+  @override
+  String get deleteBackupButton => 'Izbriši neupotrebljivu pomoćnu kopiju';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Izbrisati pomoćnu kopiju?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Ova pomoćna kopija ne može da vrati vaš sef jer je i sama nečitljiva. Brisanje je nepovratno.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro na uređaju čuva i jednu automatsku pomoćnu kopiju svakog sefa, osveženu pri svakom čuvanju. Štiti samo od oštećenja datoteke — nije rezervna kopija.';
 }

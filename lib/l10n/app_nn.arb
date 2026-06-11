@@ -821,5 +821,17 @@
   "helpCaptionUnlock": "Angi passfrasen din for å låse opp kvelvet",
   "helpCaptionVaultSync": "Kryptert synkroniseringsprosess for kvelvet",
   "passphraseNoWordlist": "Ingen ordliste for ditt språk endå. Brukar engelsk.",
-  "manageFoldersDefaultNote": "Standardmapper kan gjevast nytt namn eller slettast."
+  "manageFoldersDefaultNote": "Standardmapper kan gjevast nytt namn eller slettast.",
+
+  "vaultCorruptBackupAvailable": "Denne kvelvfila kan ikkje lesast. Ein automatisk reservekopi frå siste vellukka lagring er tilgjengeleg.",
+  "vaultCorruptNoBackup": "Denne kvelvfila kan ikkje lesast, og det finst ingen automatisk reservekopi. Gjenopprett kvelvet frå din eigen tryggingskopi.",
+  "restoreBackupButton": "Gjenopprett frå reservekopi",
+  "restoreBackupConfirmTitle": "Gjenopprette kvelvet frå reservekopien?",
+  "restoreBackupConfirmBody": "Den uleselege kvelvfila vert erstatta av reservekopien frå siste vellukka lagring. Passordfrasen din (og YubiKey-en din, om registrert) krevst framleis for å låse opp.",
+  "restoreBackupConfirmAction": "Gjenopprett",
+  "backupRestoredMessage": "Reservekopi gjenoppretta. Lås opp med innloggingsinformasjonen din.",
+  "deleteBackupButton": "Slett ubrukeleg reservekopi",
+  "deleteBackupConfirmTitle": "Slette reservekopien?",
+  "deleteBackupConfirmBody": "Denne reservekopien kan ikkje gjenopprette kvelvet ditt, sidan han sjølv er uleseleg. Sletting kan ikkje angrast.",
+  "backupDialogSafetyCopyNote": "Gabbro har òg éin automatisk reservekopi av kvart kvelv på eininga, oppdatert ved kvar lagring. Han vernar berre mot filkorrupsjon — han er ikkje ein tryggingskopi."
 }

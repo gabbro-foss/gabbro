@@ -1844,4 +1844,43 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Výchozí složky lze přejmenovat nebo odstranit.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Tento soubor trezoru nelze přečíst. Je k dispozici automatická záchranná kopie z posledního úspěšného uložení.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Tento soubor trezoru nelze přečíst a žádná automatická záchranná kopie neexistuje. Obnovte trezor z vlastní zálohy.';
+
+  @override
+  String get restoreBackupButton => 'Obnovit ze záchranné kopie';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Obnovit trezor ze záchranné kopie?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Nečitelný soubor trezoru bude nahrazen záchrannou kopií z posledního úspěšného uložení. K odemčení je stále potřeba vaše přístupová fráze (a YubiKey, pokud je registrován).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Obnovit';
+
+  @override
+  String get backupRestoredMessage =>
+      'Záchranná kopie obnovena. Odemkněte pomocí svých přihlašovacích údajů.';
+
+  @override
+  String get deleteBackupButton => 'Smazat nepoužitelnou záchrannou kopii';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Smazat záchrannou kopii?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Tato záchranná kopie nemůže trezor obnovit, protože je sama nečitelná. Smazání nelze vrátit zpět.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro také uchovává v zařízení jednu automatickou záchrannou kopii každého trezoru, obnovovanou při každém uložení. Chrání pouze před poškozením souboru — není to záloha.';
 }

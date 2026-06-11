@@ -1852,4 +1852,43 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Domyślne foldery można zmienić lub usunąć.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Nie można odczytać tego pliku sejfu. Dostępna jest automatyczna kopia awaryjna z ostatniego udanego zapisu.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Nie można odczytać tego pliku sejfu i nie istnieje żadna automatyczna kopia awaryjna. Przywróć sejf z własnej kopii zapasowej.';
+
+  @override
+  String get restoreBackupButton => 'Przywróć z kopii awaryjnej';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Przywrócić sejf z kopii awaryjnej?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Nieczytelny plik sejfu zostanie zastąpiony kopią awaryjną z ostatniego udanego zapisu. Do odblokowania nadal potrzebne są Twoje hasło główne (i YubiKey, jeśli zarejestrowany).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Przywróć';
+
+  @override
+  String get backupRestoredMessage =>
+      'Kopia awaryjna przywrócona. Odblokuj swoimi danymi.';
+
+  @override
+  String get deleteBackupButton => 'Usuń bezużyteczną kopię awaryjną';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Usunąć kopię awaryjną?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Ta kopia awaryjna nie może przywrócić sejfu, ponieważ sama jest nieczytelna. Usunięcia nie można cofnąć.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro przechowuje też na urządzeniu jedną automatyczną kopię awaryjną każdego sejfu, odświeżaną przy każdym zapisie. Chroni ona wyłącznie przed uszkodzeniem pliku — nie jest kopią zapasową.';
 }

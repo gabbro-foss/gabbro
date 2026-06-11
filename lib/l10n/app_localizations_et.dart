@@ -1842,4 +1842,43 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Vaikekaustu saab ümber nimetada või kustutada.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Seda hoidlafaili ei saa lugeda. Saadaval on automaatne kaitsekoopia viimasest õnnestunud salvestusest.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Seda hoidlafaili ei saa lugeda ja automaatset kaitsekoopiat pole. Taastage hoidla oma varukoopiast.';
+
+  @override
+  String get restoreBackupButton => 'Taasta kaitsekoopiast';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Kas taastada hoidla kaitsekoopiast?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Loetamatu hoidlafail asendatakse viimase õnnestunud salvestuse kaitsekoopiaga. Avamiseks on endiselt vaja teie salafraasi (ja YubiKeyd, kui see on registreeritud).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Taasta';
+
+  @override
+  String get backupRestoredMessage =>
+      'Kaitsekoopia taastatud. Avage oma mandaatidega.';
+
+  @override
+  String get deleteBackupButton => 'Kustuta kasutuskõlbmatu kaitsekoopia';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Kas kustutada kaitsekoopia?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'See kaitsekoopia ei saa teie hoidlat taastada, sest see on ise loetamatu. Kustutamist ei saa tagasi võtta.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro hoiab seadmes ka iga hoidla ühte automaatset kaitsekoopiat, mida värskendatakse igal salvestusel. See kaitseb ainult faili riknemise eest — see ei ole varukoopia.';
 }

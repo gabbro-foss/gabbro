@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/vault_registry.dart';
 
@@ -290,6 +292,39 @@ void main() {
   });
 
   // ── VaultRegistry migration ─────────────────────────────────────────────────
+
+  // R-03: deleting a vault must also delete its .bak safety copy — on Android
+  // the user has no file manager access to clean it up themselves.
+  group('deleteVaultFiles', () {
+    test('deletes the vault file and its .bak sibling', () async {
+      final dir = await Directory.systemTemp.createTemp('gabbro_del_test_');
+      final vault = File('${dir.path}/v.gabbro')..writeAsStringSync('vault');
+      final bak = File('${dir.path}/v.gabbro.bak')..writeAsStringSync('bak');
+
+      await deleteVaultFiles(vault.path);
+
+      expect(vault.existsSync(), isFalse, reason: 'vault file must be deleted');
+      expect(bak.existsSync(), isFalse,
+          reason: '.bak must not survive vault deletion');
+      await dir.delete(recursive: true);
+    });
+
+    test('succeeds when no .bak exists', () async {
+      final dir = await Directory.systemTemp.createTemp('gabbro_del_test_');
+      final vault = File('${dir.path}/v.gabbro')..writeAsStringSync('vault');
+
+      await deleteVaultFiles(vault.path);
+
+      expect(vault.existsSync(), isFalse);
+      await dir.delete(recursive: true);
+    });
+
+    test('succeeds when neither file exists', () async {
+      final dir = await Directory.systemTemp.createTemp('gabbro_del_test_');
+      await deleteVaultFiles('${dir.path}/absent.gabbro');
+      await dir.delete(recursive: true);
+    });
+  });
 
   group('VaultRegistry migration', () {
     test('buildMigratedRegistryForTest creates one entry with given path', () {

@@ -1862,4 +1862,44 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Οι προεπιλεγμένοι φάκελοι μπορούν να μετονομαστούν ή να διαγραφούν.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Αυτό το αρχείο θησαυροφυλακίου δεν μπορεί να διαβαστεί. Διατίθεται ένα αυτόματο εφεδρικό αντίγραφο από την τελευταία επιτυχή αποθήκευση.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Αυτό το αρχείο θησαυροφυλακίου δεν μπορεί να διαβαστεί και δεν υπάρχει αυτόματο εφεδρικό αντίγραφο. Επαναφέρετε το θησαυροφυλάκιο από το δικό σας αντίγραφο ασφαλείας.';
+
+  @override
+  String get restoreBackupButton => 'Επαναφορά από εφεδρικό αντίγραφο';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Επαναφορά θησαυροφυλακίου από το εφεδρικό αντίγραφο;';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Το μη αναγνώσιμο αρχείο θα αντικατασταθεί από το εφεδρικό αντίγραφο της τελευταίας επιτυχούς αποθήκευσης. Για το ξεκλείδωμα εξακολουθούν να απαιτούνται η συνθηματική σας φράση (και το YubiKey σας, αν είναι καταχωρισμένο).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Επαναφορά';
+
+  @override
+  String get backupRestoredMessage =>
+      'Το εφεδρικό αντίγραφο επαναφέρθηκε. Ξεκλειδώστε με τα διαπιστευτήριά σας.';
+
+  @override
+  String get deleteBackupButton => 'Διαγραφή άχρηστου εφεδρικού αντιγράφου';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Διαγραφή του εφεδρικού αντιγράφου;';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Αυτό το εφεδρικό αντίγραφο δεν μπορεί να επαναφέρει το θησαυροφυλάκιο, επειδή είναι και το ίδιο μη αναγνώσιμο. Η διαγραφή δεν αναιρείται.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Το Gabbro διατηρεί επίσης στη συσκευή ένα αυτόματο εφεδρικό αντίγραφο κάθε θησαυροφυλακίου, που ανανεώνεται σε κάθε αποθήκευση. Προστατεύει μόνο από καταστροφή του αρχείου — δεν είναι αντίγραφο ασφαλείας.';
 }

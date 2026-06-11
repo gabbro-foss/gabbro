@@ -1840,4 +1840,44 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Standardmappar kan döpas om eller tas bort.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Den här valvfilen kan inte läsas. En automatisk reservkopia från den senaste lyckade sparningen finns tillgänglig.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Den här valvfilen kan inte läsas och ingen automatisk reservkopia finns. Återställ valvet från din egen säkerhetskopia.';
+
+  @override
+  String get restoreBackupButton => 'Återställ från reservkopia';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Återställa valvet från reservkopian?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Den oläsbara valvfilen ersätts av reservkopian från den senaste lyckade sparningen. Din lösenfras (och din YubiKey, om registrerad) krävs fortfarande för att låsa upp.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Återställ';
+
+  @override
+  String get backupRestoredMessage =>
+      'Reservkopia återställd. Lås upp med dina uppgifter.';
+
+  @override
+  String get deleteBackupButton => 'Ta bort oanvändbar reservkopia';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Ta bort reservkopian?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Den här reservkopian kan inte återställa ditt valv eftersom den själv är oläsbar. Borttagningen kan inte ångras.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro behåller också en automatisk reservkopia av varje valv på enheten, uppdaterad vid varje sparning. Den skyddar bara mot filkorruption — den är ingen säkerhetskopia.';
 }

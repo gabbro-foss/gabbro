@@ -815,5 +815,17 @@
   "helpCaptionUnlock": "Sartu pasaesaldia gandegiak desblokeatzeko",
   "helpCaptionVaultSync": "Enkriptatutako gandegiaren sinkronizazio-prozesua",
   "passphraseNoWordlist": "Zure hizkuntzarako oraindik ez dago hitz-zerrendasik. Ingelesa erabiltzen da.",
-  "manageFoldersDefaultNote": "Karpeta lehenetsiak berrizendatu edo ezabatu daitezke."
+  "manageFoldersDefaultNote": "Karpeta lehenetsiak berrizendatu edo ezabatu daitezke.",
+
+  "vaultCorruptBackupAvailable": "Kutxa gotorraren fitxategi hau ezin da irakurri. Azken gordetze arrakastatsuaren segurtasun-kopia automatiko bat dago erabilgarri.",
+  "vaultCorruptNoBackup": "Kutxa gotorraren fitxategi hau ezin da irakurri eta ez dago segurtasun-kopia automatikorik. Berreskuratu kutxa gotorra zure babeskopiatik.",
+  "restoreBackupButton": "Berreskuratu segurtasun-kopiatik",
+  "restoreBackupConfirmTitle": "Kutxa gotorra segurtasun-kopiatik berreskuratu?",
+  "restoreBackupConfirmBody": "Irakurri ezin den fitxategia azken gordetze arrakastatsuaren segurtasun-kopiarekin ordezkatuko da. Desblokeatzeko zure pasaesaldia (eta YubiKey-a, erregistratuta badago) behar dira oraindik.",
+  "restoreBackupConfirmAction": "Berreskuratu",
+  "backupRestoredMessage": "Segurtasun-kopia berreskuratu da. Desblokeatu zure kredentzialekin.",
+  "deleteBackupButton": "Ezabatu erabilgaitza den segurtasun-kopia",
+  "deleteBackupConfirmTitle": "Segurtasun-kopia ezabatu?",
+  "deleteBackupConfirmBody": "Segurtasun-kopia honek ezin du zure kutxa gotorra berreskuratu, bera ere irakurgaitza delako. Ezabatzea ezin da desegin.",
+  "backupDialogSafetyCopyNote": "Gabbrok kutxa gotor bakoitzaren segurtasun-kopia automatiko bat ere gordetzen du gailuan, gordetze bakoitzean eguneratua. Fitxategiaren hondatzetik soilik babesten du — ez da babeskopia bat."
 }

@@ -1852,4 +1852,45 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Le cartelle predefinite possono essere rinominate o eliminate.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Questo file della cassaforte non può essere letto. È disponibile una copia di sicurezza automatica dell\'ultimo salvataggio riuscito.';
+
+  @override
+  String get vaultCorruptNoBackup =>
+      'Questo file della cassaforte non può essere letto e non esiste alcuna copia di sicurezza automatica. Ripristina la cassaforte dal tuo backup.';
+
+  @override
+  String get restoreBackupButton => 'Ripristina dalla copia di sicurezza';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Ripristinare la cassaforte dalla copia di sicurezza?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Il file illeggibile sarà sostituito dalla copia di sicurezza dell\'ultimo salvataggio riuscito. Per sbloccarla servono comunque la tua passphrase (e la tua YubiKey, se registrata).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Ripristina';
+
+  @override
+  String get backupRestoredMessage =>
+      'Copia di sicurezza ripristinata. Sblocca con le tue credenziali.';
+
+  @override
+  String get deleteBackupButton =>
+      'Elimina la copia di sicurezza inutilizzabile';
+
+  @override
+  String get deleteBackupConfirmTitle => 'Eliminare la copia di sicurezza?';
+
+  @override
+  String get deleteBackupConfirmBody =>
+      'Questa copia di sicurezza non può ripristinare la cassaforte perché è essa stessa illeggibile. L\'eliminazione non può essere annullata.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro conserva inoltre sul dispositivo una copia di sicurezza automatica di ogni cassaforte, aggiornata a ogni salvataggio. Protegge solo dalla corruzione del file — non è un backup.';
 }

@@ -815,5 +815,17 @@
   "helpCaptionUnlock": "Inserisci la tua passphrase per sbloccare il vault",
   "helpCaptionVaultSync": "Processo di sincronizzazione dell'archivio cifrato",
   "passphraseNoWordlist": "Nessuna lista di parole per la tua lingua ancora. Si usa l'inglese.",
-  "manageFoldersDefaultNote": "Le cartelle predefinite possono essere rinominate o eliminate."
+  "manageFoldersDefaultNote": "Le cartelle predefinite possono essere rinominate o eliminate.",
+
+  "vaultCorruptBackupAvailable": "Questo file della cassaforte non può essere letto. È disponibile una copia di sicurezza automatica dell'ultimo salvataggio riuscito.",
+  "vaultCorruptNoBackup": "Questo file della cassaforte non può essere letto e non esiste alcuna copia di sicurezza automatica. Ripristina la cassaforte dal tuo backup.",
+  "restoreBackupButton": "Ripristina dalla copia di sicurezza",
+  "restoreBackupConfirmTitle": "Ripristinare la cassaforte dalla copia di sicurezza?",
+  "restoreBackupConfirmBody": "Il file illeggibile sarà sostituito dalla copia di sicurezza dell'ultimo salvataggio riuscito. Per sbloccarla servono comunque la tua passphrase (e la tua YubiKey, se registrata).",
+  "restoreBackupConfirmAction": "Ripristina",
+  "backupRestoredMessage": "Copia di sicurezza ripristinata. Sblocca con le tue credenziali.",
+  "deleteBackupButton": "Elimina la copia di sicurezza inutilizzabile",
+  "deleteBackupConfirmTitle": "Eliminare la copia di sicurezza?",
+  "deleteBackupConfirmBody": "Questa copia di sicurezza non può ripristinare la cassaforte perché è essa stessa illeggibile. L'eliminazione non può essere annullata.",
+  "backupDialogSafetyCopyNote": "Gabbro conserva inoltre sul dispositivo una copia di sicurezza automatica di ogni cassaforte, aggiornata a ogni salvataggio. Protegge solo dalla corruzione del file — non è un backup."
 }
