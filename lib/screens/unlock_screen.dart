@@ -4,26 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
-import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
-
-// ── Hex helpers ───────────────────────────────────────────────────────────────
-
-String _toHex(List<int> bytes) =>
-    bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
-
-List<int> _fromHex(String hex) {
-  final result = <int>[];
-  for (var i = 0; i < hex.length; i += 2) {
-    result.add(int.parse(hex.substring(i, i + 2), radix: 16));
-  }
-  return result;
-}
+import 'package:gabbro/widgets/yubikey_tap.dart';
 
 // ── Bridge defaults ───────────────────────────────────────────────────────────
 
@@ -33,7 +20,6 @@ Future<void> _defaultUnlock(List<int> passphrase, String path) =>
 EntropyResult _defaultEstimateEntropy(String password) =>
     estimateEntropy(password: password);
 
-const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
 const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');
 
 Future<bool> _defaultBiometricIsEnrolled(String vaultPath) async {
@@ -61,37 +47,6 @@ Future<List<int>?> _defaultBiometricAuthenticate(String vaultPath) async {
   }
 }
 
-Future<void> _linuxUnlockWithYubikey(
-  List<int> passphrase,
-  List<int> credentialId,
-  List<int> hkdfSalt,
-  String pin,
-  String path,
-) async {
-  final devices = fidoListDevices();
-  if (devices.isEmpty) {
-    throw PlatformException(
-      code: 'NO_FIDO2_DEVICE',
-      message: 'No FIDO2 device found. Insert your YubiKey and try again.',
-    );
-  }
-  final devicePath = devices.first;
-
-  final hmacSecret = await fidoGetHmacSecret(
-    devicePath: devicePath,
-    credentialId: Uint8List.fromList(credentialId),
-    salt: Uint8List.fromList(hkdfSalt),
-    pin: pin,
-  );
-  await unlockVaultWithYubikey(
-    passphrase: passphrase,
-    hmacSecret: hmacSecret,
-    credentialId: credentialId,
-    hkdfSalt: hkdfSalt,
-    path: path,
-  );
-}
-
 Future<void> _defaultUnlockWithYubikey(
   List<int> passphrase,
   List<int> credentialId,
@@ -100,63 +55,17 @@ Future<void> _defaultUnlockWithYubikey(
   String path,
   String transport,
 ) async {
-  if (Platform.isLinux) {
-    return _linuxUnlockWithYubikey(
-        passphrase, credentialId, hkdfSalt, pin, path);
-  }
-
-  final hmacHex = await _yubikeyChannel.invokeMethod<String>(
-    'get_hmac_secret',
-    {
-      'credentialId': _toHex(credentialId),
-      'salt': _toHex(hkdfSalt),
-      'pin': pin,
-      'transport': transport,
-    },
+  final hmacSecret = await getYubikeyHmacSecret(
+    credentialId: credentialId,
+    salt: hkdfSalt,
+    pin: pin,
+    transport: transport,
   );
   await unlockVaultWithYubikey(
     passphrase: passphrase,
-    hmacSecret: _fromHex(hmacHex!),
+    hmacSecret: hmacSecret,
     credentialId: credentialId,
     hkdfSalt: hkdfSalt,
-    path: path,
-  );
-}
-
-Future<void> _linuxUnlockWithAnyYubikey(
-  List<int> passphrase,
-  List<YubikeyRecordData> records,
-  String pin,
-  String path,
-  String transport,
-) async {
-  final devices = fidoListDevices();
-  if (devices.isEmpty) {
-    throw PlatformException(
-      code: 'NO_FIDO2_DEVICE',
-      message: 'No FIDO2 device found. Insert your YubiKey and try again.',
-    );
-  }
-  final devicePath = devices.first;
-
-  final match = await fidoGetHmacSecretAny(
-    devicePath: devicePath,
-    records: records
-        .map((r) => FidoRecordInput(credentialId: r.credentialId, salt: r.salt))
-        .toList(),
-    pin: pin,
-  );
-
-  // Find the matching record to retrieve the correct hkdfSalt.
-  final matchedRecord = records.firstWhere(
-    (r) => _listEqual(r.credentialId, match.credentialId),
-  );
-
-  await unlockVaultWithYubikey(
-    passphrase: passphrase,
-    hmacSecret: match.hmac,
-    credentialId: match.credentialId,
-    hkdfSalt: matchedRecord.salt,
     path: path,
   );
 }
@@ -168,39 +77,21 @@ Future<void> _defaultUnlockWithAnyYubikey(
   String path,
   String transport,
 ) async {
-  if (Platform.isLinux) {
-    return _linuxUnlockWithAnyYubikey(passphrase, records, pin, path, transport);
-  }
-
-  // Android: one MethodChannel call with all records. Kotlin dispatches a
-  // single CTAP2 getAssertions with all credential IDs in the allowList and a
-  // 64-byte combined salt (for the first pair), then returns the matched hmac
-  // and credential ID.
-  final recordsArg = records
-      .map((r) => {'credentialId': _toHex(r.credentialId), 'salt': _toHex(r.salt)})
-      .toList();
-
-  final result = await _yubikeyChannel.invokeMethod<Map<Object?, Object?>>(
-    'get_hmac_secret_multi',
-    {
-      'records': recordsArg,
-      'pin': pin,
-      'transport': transport,
-    },
+  final match = await getAnyYubikeyHmacSecret(
+    records: records,
+    pin: pin,
+    transport: transport,
   );
 
-  final hmacHex = result!['hmac'] as String;
-  final credentialIdHex = result['credentialId'] as String;
-  final matchedCredentialId = _fromHex(credentialIdHex);
-
+  // Find the matching record to retrieve the correct hkdfSalt.
   final matchedRecord = records.firstWhere(
-    (r) => _listEqual(r.credentialId, matchedCredentialId),
+    (r) => _listEqual(r.credentialId, match.credentialId),
   );
 
   await unlockVaultWithYubikey(
     passphrase: passphrase,
-    hmacSecret: _fromHex(hmacHex),
-    credentialId: matchedCredentialId,
+    hmacSecret: match.hmac,
+    credentialId: match.credentialId,
     hkdfSalt: matchedRecord.salt,
     path: path,
   );

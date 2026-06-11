@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -8,6 +9,12 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 typedef YubikeyHmacMatch = ({List<int> hmac, List<int> credentialId});
 
 const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
+
+/// Platform check for tap dispatch, indirected through a variable so tests can
+/// drive the Android MethodChannel branch on a Linux host. Production never
+/// reassigns it; tests must reset it to the default in tearDown.
+@visibleForTesting
+bool Function() isLinuxForTapDispatch = () => Platform.isLinux;
 
 String _toHex(List<int> bytes) =>
     bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
@@ -32,7 +39,7 @@ Future<YubikeyHmacMatch> getAnyYubikeyHmacSecret({
   required String pin,
   required String transport,
 }) async {
-  if (Platform.isLinux) {
+  if (isLinuxForTapDispatch()) {
     final devices = fidoListDevices();
     if (devices.isEmpty) {
       throw PlatformException(
@@ -63,4 +70,45 @@ Future<YubikeyHmacMatch> getAnyYubikeyHmacSecret({
     hmac: _fromHex(result!['hmac'] as String),
     credentialId: _fromHex(result['credentialId'] as String),
   );
+}
+
+/// Prompt the user to tap one specific registered YubiKey and return the
+/// resulting hmac-secret output.
+///
+/// Single-credential variant of [getAnyYubikeyHmacSecret] (`fidoGetHmacSecret`
+/// on Linux, the `get_hmac_secret` MethodChannel on Android). Used by the unlock
+/// screen when the vault has a single registered key. Throws `PlatformException`
+/// if no device is present or the tap fails.
+Future<List<int>> getYubikeyHmacSecret({
+  required List<int> credentialId,
+  required List<int> salt,
+  required String pin,
+  required String transport,
+}) async {
+  if (isLinuxForTapDispatch()) {
+    final devices = fidoListDevices();
+    if (devices.isEmpty) {
+      throw PlatformException(
+        code: 'NO_FIDO2_DEVICE',
+        message: 'No FIDO2 device found. Insert your YubiKey and try again.',
+      );
+    }
+    return fidoGetHmacSecret(
+      devicePath: devices.first,
+      credentialId: Uint8List.fromList(credentialId),
+      salt: Uint8List.fromList(salt),
+      pin: pin,
+    );
+  }
+
+  final hmacHex = await _yubikeyChannel.invokeMethod<String>(
+    'get_hmac_secret',
+    {
+      'credentialId': _toHex(credentialId),
+      'salt': _toHex(salt),
+      'pin': pin,
+      'transport': transport,
+    },
+  );
+  return _fromHex(hmacHex!);
 }
