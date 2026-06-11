@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 489 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 756 | 0 |
+| Flutter (`flutter test`) | 758 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
 
@@ -87,28 +87,14 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next active task — CRITICAL: locked vault re-exposed via back navigation
+### Next active task — TBD with Rob
 
-Hardware-found 2026-06-11 (tap-test matrix). Repro: unlock Vault M -> tap the manual
-**lock** button -> on the unlock screen pick a *different* vault from the dropdown ->
-press back -> the app lands on a still-populated, unlocked Vault M. Confidentiality
-breach: a locked vault's decrypted entries are reachable again.
-
-**Root cause (confirmed).** Two lock paths with different stack semantics:
-auto-lock (`main.dart` `_lock()`) uses `pushAndRemoveUntil(..., (_) => false)` and
-wipes the back stack (safe); the manual lock button (`vault_list_screen.dart`
-`_lockAndExit()`) and `switchToVault()` (`main.dart`) both use `pushReplacement`,
-which replaces only the top route and leaves earlier routes intact. `lockVault()`
-clears the Rust session, but the `VaultListScreen` left underneath still holds its
-already-decrypted summaries in Dart memory, so back-navigation re-renders them.
-
-**Approach — full canon-TDD, must be bullet-proof (not "in passing").** Failing
-widget test first: unlock M -> manual-lock -> switch to S -> pop -> assert the route
-below is NOT a populated `VaultListScreen(M)` and the session is locked. Likely fix:
-manual lock + `switchToVault` use `pushAndRemoveUntil` like auto-lock. Audit every
-`pushReplacement`/`push` on the lock/switch/unlock paths for the same stale-route
-hazard. **MUST hardware-test on Android before commit; warrants a release** (security
-fix). See [[feedback-android-hardware-before-commit]].
+The three queued tasks from the 2026-06-11 hardware session are all done and
+committed: YubiKey tap-dispatch dedupe, the stalled-tap timeout/Cancel fix, and the
+locked-vault navigation hardening below. `[Unreleased]` now holds the alpha.6 quick-win
+Security items plus the tap fix and the lock-stack hardening — **enough to warrant an
+`v0.1.0-alpha.7`** when Rob wants it (only ~1 active tester, so no rush). Pick the next
+task with Rob: cut alpha.7, or take an item from the security audit / backlog.
 
 ### Open from the security audit
 
