@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -605,5 +607,58 @@ void main() {
     await _fillAndRegister(tester);
 
     expect(capturedTransport, 'nfc');
+  });
+
+  testWidgets('add key Android: Cancel aborts the in-flight tap via cancel_tap',
+      (tester) async {
+    final registerGate = Completer<String>();
+    var cancelInvoked = false;
+    _setChannelMock((call) async {
+      if (call.method == 'register') return registerGate.future;
+      if (call.method == 'cancel_tap') {
+        cancelInvoked = true;
+        return null;
+      }
+      return null;
+    });
+    addTearDown(_clearChannelMock);
+
+    await tester.pumpWidget(_buildScreen(records: [_record('70')], isAndroid: true));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), '123456');
+    await tester.tap(find.text('Register'));
+    await tester.pump(); // PIN dialog starts closing, progress dialog opens
+    await tester.pump(const Duration(milliseconds: 400)); // PIN dialog exit done
+
+    await tester.tap(find.text('Cancel')); // progress dialog's Cancel
+    await tester.pump();
+
+    expect(cancelInvoked, isTrue);
+
+    registerGate.completeError(PlatformException(code: 'TAP_CANCELLED'));
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('add key Android: TAP_CANCELLED shows no error snackbar',
+      (tester) async {
+    _setChannelMock((call) async {
+      if (call.method == 'register') {
+        throw PlatformException(code: 'TAP_CANCELLED', message: 'cancelled');
+      }
+      return null;
+    });
+    addTearDown(_clearChannelMock);
+
+    await tester.pumpWidget(_buildScreen(records: [_record('71')], isAndroid: true));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+    await _fillAndRegister(tester);
+
+    expect(find.textContaining('Failed to register'), findsNothing);
   });
 }

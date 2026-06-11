@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -53,6 +55,8 @@ Widget _buildScreen({
   Future<bool> Function(String)? onBiometricIsEnrolled,
   Future<List<int>?> Function(String)? onBiometricAuthenticate,
   void Function()? onBiometricInvalidated,
+  bool? isAndroid,
+  Future<void> Function()? onCancelTap,
 }) =>
     testApp(UnlockScreen(
       vaultPath: vaultPath,
@@ -70,6 +74,8 @@ Widget _buildScreen({
       onBiometricIsEnrolled: onBiometricIsEnrolled ?? (_) async => false,
       onBiometricAuthenticate: onBiometricAuthenticate ?? (_) async => null,
       onBiometricInvalidated: onBiometricInvalidated,
+      isAndroid: isAndroid,
+      onCancelTap: onCancelTap ?? () async {},
     ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -525,5 +531,98 @@ void main() {
     await tester.pump();
 
     expect(find.byType(LinearProgressIndicator), findsOneWidget);
+  });
+
+  // ── Stalled-tap Cancel (Android) ──────────────────────────────────────────
+
+  testWidgets('yubikey unlock shows a Cancel button on Android while tapping',
+      (tester) async {
+    bool cancelled = false;
+    final gate = Completer<void>();
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      isAndroid: true,
+      onUnlockWithYubikey: (a, b, c, d, e, f) => gate.future,
+      onCancelTap: () async => cancelled = true,
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.enterText(find.byType(TextField).last, '123456');
+    await tester.ensureVisible(find.text('Unlock'));
+    await tester.tap(find.text('Unlock'));
+    await tester.pump(); // start the tap; spinner + Cancel appear
+
+    expect(find.text('Cancel'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Cancel'));
+    await tester.tap(find.text('Cancel'));
+    await tester.pump();
+
+    expect(cancelled, isTrue);
+
+    gate.completeError(PlatformException(code: 'TAP_CANCELLED'));
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('no Cancel button shown on non-Android while tapping',
+      (tester) async {
+    final gate = Completer<void>();
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      isAndroid: false,
+      onUnlockWithYubikey: (a, b, c, d, e, f) => gate.future,
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.enterText(find.byType(TextField).last, '123456');
+    await tester.ensureVisible(find.text('Unlock'));
+    await tester.tap(find.text('Unlock'));
+    await tester.pump();
+
+    expect(find.text('Cancel'), findsNothing);
+
+    gate.completeError(PlatformException(code: 'TAP_CANCELLED'));
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('TAP_CANCELLED clears the spinner without showing an error',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      isAndroid: true,
+      onUnlockWithYubikey: (a, b, c, d, e, f) async =>
+          throw PlatformException(code: 'TAP_CANCELLED'),
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.enterText(find.byType(TextField).last, '123456');
+    await tester.ensureVisible(find.text('Unlock'));
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.text('Unlock'), findsOneWidget);
+    expect(find.textContaining('Could not unlock'), findsNothing);
+  });
+
+  testWidgets('TAP_TIMEOUT shows a no-key message, not a wrong-passphrase error',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      isAndroid: true,
+      onUnlockWithYubikey: (a, b, c, d, e, f) async => throw PlatformException(
+        code: 'TAP_TIMEOUT',
+        message: 'No YubiKey detected. Tap timed out.',
+      ),
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.enterText(find.byType(TextField).last, '123456');
+    await tester.ensureVisible(find.text('Unlock'));
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('No YubiKey detected. Tap timed out.'), findsOneWidget);
+    expect(find.textContaining('Check your passphrase'), findsNothing);
   });
 }

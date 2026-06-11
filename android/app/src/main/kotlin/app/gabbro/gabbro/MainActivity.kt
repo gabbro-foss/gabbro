@@ -7,6 +7,8 @@ import android.net.Uri
 import android.nfc.NfcAdapter
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,9 +24,22 @@ class MainActivity : FlutterFragmentActivity() {
         const val CHANNEL = "app.gabbro.gabbro/yubikey"
         const val BIOMETRIC_CHANNEL = "app.gabbro.gabbro/biometric"
         const val EXPORT_CHANNEL = "app.gabbro.gabbro/export"
+
+        // A YubiKey tap blocks until a key is presented; bound the wait so a
+        // stalled tap (no key) cannot strand the UI on an endless spinner.
+        const val TAP_TIMEOUT_MS = 30_000L
     }
 
     private var nfcAdapter: NfcAdapter? = null
+
+    // In-flight YubiKey tap state. A tap (register/unlock) arms USB/NFC discovery
+    // and waits for a connection callback; if none arrives it must be bounded by a
+    // timeout and abortable via cancel_tap. Exactly one of timeout / cancel /
+    // success / final-error completes the result (whichever fires first wins).
+    private val tapHandler = Handler(Looper.getMainLooper())
+    private var tapTimeoutRunnable: Runnable? = null
+    private var pendingTapResult: MethodChannel.Result? = null
+    private var pendingTapTransport: String? = null
 
     // SAF directory picker: the result arrives asynchronously, so we stash the
     // pending Flutter result and complete it in the launcher callback.
@@ -194,75 +209,27 @@ class MainActivity : FlutterFragmentActivity() {
                             result.error("BAD_ARGS", "salt required", null)
                             return@setMethodCallHandler
                         }
-                        fun attempt(retriesLeft: Int) {
-                            startDiscovery(
-                                transport,
-                                onConnected = { connection ->
-                                    YubiKeyManager.registerAndGetHmac(
-                                        connection, saltHex.fromHex(), pin,
-                                        onSuccess = { credId, hmacSecret ->
-                                            stopDiscovery(transport)
-                                            result.success(mapOf(
-                                                "credentialId" to credId.toHex(),
-                                                "hmacSecret" to hmacSecret.toHex(),
-                                            ))
-                                        },
-                                        onError = { msg ->
-                                            stopDiscovery(transport)
-                                            if (retriesLeft > 0) {
-                                                android.os.Handler(android.os.Looper.getMainLooper())
-                                                    .postDelayed({ attempt(retriesLeft - 1) }, 500)
-                                            } else {
-                                                result.error("REGISTER_HMAC_FAILED", msg, null)
-                                            }
-                                        },
-                                    )
+                        runTapFlow(result, transport, "REGISTER_HMAC_FAILED") { conn, onOk, onErr ->
+                            YubiKeyManager.registerAndGetHmac(
+                                conn, saltHex.fromHex(), pin,
+                                onSuccess = { credId, hmacSecret ->
+                                    onOk(mapOf(
+                                        "credentialId" to credId.toHex(),
+                                        "hmacSecret" to hmacSecret.toHex(),
+                                    ))
                                 },
-                                onError = { msg ->
-                                    if (retriesLeft > 0) {
-                                        android.os.Handler(android.os.Looper.getMainLooper())
-                                            .postDelayed({ attempt(retriesLeft - 1) }, 500)
-                                    } else {
-                                        result.error("TRANSPORT_ERROR", msg, null)
-                                    }
-                                },
+                                onError = onErr,
                             )
                         }
-                        attempt(1)
                     }
                     "register" -> {
-                        fun attempt(retriesLeft: Int) {
-                            startDiscovery(
-                                transport,
-                                onConnected = { connection ->
-                                    YubiKeyManager.register(
-                                        connection, pin,
-                                        onSuccess = { credId ->
-                                            stopDiscovery(transport)
-                                            result.success(credId.toHex())
-                                        },
-                                        onError = { msg ->
-                                            stopDiscovery(transport)
-                                            if (retriesLeft > 0) {
-                                                android.os.Handler(android.os.Looper.getMainLooper())
-                                                    .postDelayed({ attempt(retriesLeft - 1) }, 500)
-                                            } else {
-                                                result.error("REGISTER_FAILED", msg, null)
-                                            }
-                                        },
-                                    )
-                                },
-                                onError = { msg ->
-                                    if (retriesLeft > 0) {
-                                        android.os.Handler(android.os.Looper.getMainLooper())
-                                            .postDelayed({ attempt(retriesLeft - 1) }, 500)
-                                    } else {
-                                        result.error("TRANSPORT_ERROR", msg, null)
-                                    }
-                                },
+                        runTapFlow(result, transport, "REGISTER_FAILED") { conn, onOk, onErr ->
+                            YubiKeyManager.register(
+                                conn, pin,
+                                onSuccess = { credId -> onOk(credId.toHex()) },
+                                onError = onErr,
                             )
                         }
-                        attempt(1)
                     }
                     "get_hmac_secret" -> {
                         val credIdHex = call.argument<String>("credentialId")
@@ -275,38 +242,13 @@ class MainActivity : FlutterFragmentActivity() {
                             result.error("BAD_ARGS", "salt required", null)
                             return@setMethodCallHandler
                         }
-                        fun attempt(retriesLeft: Int) {
-                            startDiscovery(
-                                transport,
-                                onConnected = { connection ->
-                                    YubiKeyManager.getHmacSecret(
-                                        connection, credIdHex.fromHex(), saltHex.fromHex(), pin,
-                                        onSuccess = { secret ->
-                                            stopDiscovery(transport)
-                                            result.success(secret.toHex())
-                                        },
-                                        onError = { msg ->
-                                            stopDiscovery(transport)
-                                            if (retriesLeft > 0) {
-                                                android.os.Handler(android.os.Looper.getMainLooper())
-                                                    .postDelayed({ attempt(retriesLeft - 1) }, 500)
-                                            } else {
-                                                result.error("HMAC_FAILED", msg, null)
-                                            }
-                                        },
-                                    )
-                                },
-                                onError = { msg ->
-                                    if (retriesLeft > 0) {
-                                        android.os.Handler(android.os.Looper.getMainLooper())
-                                            .postDelayed({ attempt(retriesLeft - 1) }, 500)
-                                    } else {
-                                        result.error("TRANSPORT_ERROR", msg, null)
-                                    }
-                                },
+                        runTapFlow(result, transport, "HMAC_FAILED") { conn, onOk, onErr ->
+                            YubiKeyManager.getHmacSecret(
+                                conn, credIdHex.fromHex(), saltHex.fromHex(), pin,
+                                onSuccess = { secret -> onOk(secret.toHex()) },
+                                onError = onErr,
                             )
                         }
-                        attempt(1)
                     }
                     "get_hmac_secret_multi" -> {
                         val rawRecords = call.argument<List<Map<String, Any>>>("records")
@@ -320,45 +262,104 @@ class MainActivity : FlutterFragmentActivity() {
                                 (r["salt"] as String).fromHex(),
                             )
                         }
-                        fun attempt(retriesLeft: Int) {
-                            startDiscovery(
-                                transport,
-                                onConnected = { connection ->
-                                    YubiKeyManager.getHmacSecretAny(
-                                        connection, records, pin,
-                                        onSuccess = { hmac, credentialId ->
-                                            stopDiscovery(transport)
-                                            result.success(mapOf(
-                                                "hmac" to hmac.toHex(),
-                                                "credentialId" to credentialId.toHex(),
-                                            ))
-                                        },
-                                        onError = { msg ->
-                                            stopDiscovery(transport)
-                                            if (retriesLeft > 0) {
-                                                android.os.Handler(android.os.Looper.getMainLooper())
-                                                    .postDelayed({ attempt(retriesLeft - 1) }, 500)
-                                            } else {
-                                                result.error("HMAC_MULTI_FAILED", msg, null)
-                                            }
-                                        },
-                                    )
+                        runTapFlow(result, transport, "HMAC_MULTI_FAILED") { conn, onOk, onErr ->
+                            YubiKeyManager.getHmacSecretAny(
+                                conn, records, pin,
+                                onSuccess = { hmac, credentialId ->
+                                    onOk(mapOf(
+                                        "hmac" to hmac.toHex(),
+                                        "credentialId" to credentialId.toHex(),
+                                    ))
                                 },
-                                onError = { msg ->
-                                    if (retriesLeft > 0) {
-                                        android.os.Handler(android.os.Looper.getMainLooper())
-                                            .postDelayed({ attempt(retriesLeft - 1) }, 500)
-                                    } else {
-                                        result.error("TRANSPORT_ERROR", msg, null)
-                                    }
-                                },
+                                onError = onErr,
                             )
                         }
-                        attempt(1)
+                    }
+                    "cancel_tap" -> {
+                        pendingTapTransport?.let { t ->
+                            finishTap(t) { it.error("TAP_CANCELLED", "Tap cancelled by user", null) }
+                        }
+                        result.success(null)
                     }
                     else -> result.notImplemented()
                 }
             }
+    }
+
+    /**
+     * Runs one tap-based YubiKey operation (register or unlock): arms discovery,
+     * retries once on a transient transport error, and — crucially — bounds the
+     * whole flow with a [TAP_TIMEOUT_MS] timeout and makes it abortable via
+     * cancel_tap. [invoke] performs the actual CTAP2 call once a connection is up,
+     * reporting back through `onOk` (success payload) / `onErr` (message).
+     *
+     * Exactly one of timeout / cancel / success / final-error completes the
+     * Flutter result; all funnel through [finishTap], which is a no-op once the
+     * result is already answered (the first to fire wins).
+     */
+    private fun runTapFlow(
+        result: MethodChannel.Result,
+        transport: String,
+        errorCode: String,
+        invoke: (
+            connection: YubiKeyConnection,
+            onOk: (Any?) -> Unit,
+            onErr: (String) -> Unit,
+        ) -> Unit,
+    ) {
+        pendingTapResult = result
+        pendingTapTransport = transport
+        armTapTimeout(transport)
+
+        fun attempt(retriesLeft: Int) {
+            if (pendingTapResult == null) return // timed out / cancelled meanwhile
+            startDiscovery(
+                transport,
+                onConnected = { conn ->
+                    invoke(
+                        conn,
+                        { payload -> finishTap(transport) { it.success(payload) } },
+                        { msg ->
+                            stopDiscovery(transport)
+                            if (retriesLeft > 0) {
+                                tapHandler.postDelayed({ attempt(retriesLeft - 1) }, 500)
+                            } else {
+                                finishTap(transport) { it.error(errorCode, msg, null) }
+                            }
+                        },
+                    )
+                },
+                onError = { msg ->
+                    if (retriesLeft > 0) {
+                        tapHandler.postDelayed({ attempt(retriesLeft - 1) }, 500)
+                    } else {
+                        finishTap(transport) { it.error("TRANSPORT_ERROR", msg, null) }
+                    }
+                },
+            )
+        }
+        attempt(1)
+    }
+
+    private fun armTapTimeout(transport: String) {
+        val r = Runnable {
+            finishTap(transport) {
+                it.error("TAP_TIMEOUT", "No YubiKey detected. Tap timed out.", null)
+            }
+        }
+        tapTimeoutRunnable = r
+        tapHandler.postDelayed(r, TAP_TIMEOUT_MS)
+    }
+
+    /** Complete the pending tap result once, stop discovery, and clear timeout/state. */
+    private fun finishTap(transport: String, complete: (MethodChannel.Result) -> Unit) {
+        tapTimeoutRunnable?.let { tapHandler.removeCallbacks(it) }
+        tapTimeoutRunnable = null
+        val r = pendingTapResult ?: return
+        pendingTapResult = null
+        pendingTapTransport = null
+        stopDiscovery(transport)
+        complete(r)
     }
 
     private fun startDiscovery(

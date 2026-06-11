@@ -100,4 +100,31 @@ void main() {
       expect(_hex(match.credentialId), _hex(recordB.credentialId));
     });
   });
+
+  group('cancelYubikeyTap', () {
+    test('invokes cancel_tap on the yubikey channel (Android)', () async {
+      MethodCall? captured;
+      _setChannelMock((call) async {
+        captured = call;
+        return null;
+      });
+
+      await cancelYubikeyTap();
+
+      expect(captured!.method, 'cancel_tap');
+    });
+
+    test('is a no-op on Linux (no channel call)', () async {
+      isLinuxForTapDispatch = () => true;
+      var invoked = false;
+      _setChannelMock((_) async {
+        invoked = true;
+        return null;
+      });
+
+      await cancelYubikeyTap();
+
+      expect(invoked, isFalse);
+    });
+  });
 }

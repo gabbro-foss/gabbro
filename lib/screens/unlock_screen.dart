@@ -22,6 +22,8 @@ EntropyResult _defaultEstimateEntropy(String password) =>
 
 const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');
 
+Future<void> _defaultCancelTap() => cancelYubikeyTap();
+
 Future<bool> _defaultBiometricIsEnrolled(String vaultPath) async {
   if (!Platform.isAndroid) return false;
   try {
@@ -165,6 +167,14 @@ class UnlockScreen extends StatefulWidget {
   /// save biometricUnlock: false to settings.
   final void Function()? onBiometricInvalidated;
 
+  /// Aborts an in-flight YubiKey tap when the user presses Cancel.
+  final Future<void> Function() onCancelTap;
+
+  /// null = use Platform.isAndroid at runtime; set to true/false in tests.
+  /// Gates the Cancel-during-tap button (a stalled tap can only be aborted on
+  /// Android; the Linux FFI tap is not interruptible from here).
+  final bool? isAndroid;
+
   const UnlockScreen({
     super.key,
     required this.vaultPath,
@@ -182,6 +192,8 @@ class UnlockScreen extends StatefulWidget {
     this.onBiometricIsEnrolled = _defaultBiometricIsEnrolled,
     this.onBiometricAuthenticate = _defaultBiometricAuthenticate,
     this.onBiometricInvalidated,
+    this.onCancelTap = _defaultCancelTap,
+    this.isAndroid,
   });
 
   @override
@@ -329,11 +341,15 @@ class _UnlockScreenState extends State<UnlockScreen> {
       }
     } catch (e) {
       if (!mounted) return;
+      // The user cancelled the tap: just drop back to the unlock form, no error.
+      if (e is PlatformException && e.code == 'TAP_CANCELLED') return;
       setState(() {
         _errorMessage = switch (e) {
           PlatformException(code: 'TRANSPORT_ERROR') =>
             e.message ?? l.transportError,
-          PlatformException(code: 'NO_FIDO2_DEVICE') =>
+          // A stalled tap that timed out means no key was presented; reuse the
+          // no-device message (Kotlin supplies a precise message via e.message).
+          PlatformException(code: 'TAP_TIMEOUT' || 'NO_FIDO2_DEVICE') =>
             e.message ?? l.noFidoDeviceFound,
           _ => _isYubikeyMode
               ? l.unlockErrorPassphraseAndPin
@@ -539,6 +555,18 @@ class _UnlockScreenState extends State<UnlockScreen> {
                             )
                           : Text(l.unlock),
                     ),
+                    // While a YubiKey tap is in flight on Android, offer an
+                    // explicit Cancel so a stalled tap (no key presented) does
+                    // not strand the user on an endless spinner.
+                    if (_isUnlocking &&
+                        _isYubikeyMode &&
+                        (widget.isAndroid ?? Platform.isAndroid)) ...[
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: widget.onCancelTap,
+                        child: Text(l.cancel),
+                      ),
+                    ],
                     ],
                   ),
                 ),

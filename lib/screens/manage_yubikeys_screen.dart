@@ -385,6 +385,10 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
               TextButton(
                 onPressed: () {
                   _progressShown = false;
+                  // Abort the native tap so discovery stops and NFC reader mode
+                  // is disarmed; the pending register/hmac call then rejects with
+                  // TAP_CANCELLED (swallowed below).
+                  _yubikeyChannel.invokeMethod('cancel_tap');
                   Navigator.of(ctx).pop();
                 },
                 child: Text(dl.cancel),
@@ -444,6 +448,8 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
           } catch (_) {}
           _progressShown = false;
         }
+        // The user cancelled the tap: no error to report.
+        if (e is PlatformException && e.code == 'TAP_CANCELLED') return;
         final al = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(credIdHex == null

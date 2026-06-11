@@ -112,3 +112,14 @@ Future<List<int>> getYubikeyHmacSecret({
   );
   return _fromHex(hmacHex!);
 }
+
+/// Abort an in-flight Android YubiKey tap (the user pressed Cancel). The native
+/// side stops discovery and completes the pending tap with a `TAP_CANCELLED`
+/// error, so the awaiting unlock/register future rejects and the spinner clears.
+///
+/// No-op on Linux, where the tap is a blocking FFI call that cannot be
+/// interrupted from here.
+Future<void> cancelYubikeyTap() async {
+  if (isLinuxForTapDispatch()) return;
+  await _yubikeyChannel.invokeMethod<void>('cancel_tap');
+}
