@@ -1,10 +1,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.NFC" />
     <uses-feature android:name="android.hardware.nfc" android:required="false" />
+    <!-- R-02 (AI_SECURITY_AUDIT_REVIEW.md): the vault and settings live in
+         app-private storage and must never leave the device via the Android
+         backup framework — neither Auto Backup to Google Drive nor
+         device-to-device migration. Intent is declared at every layer the OS
+         (and OEM transfer tools) may consult: the blanket flag, the API 31+
+         rules, and the API <= 30 rules. User-driven export/backup via SAF to
+         shared storage is unaffected. Guarded by BackupConfigRobolectricTest. -->
     <application
         android:label="gabbro"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules">
         <activity
             android:name=".MainActivity"
             android:exported="true"

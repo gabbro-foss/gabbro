@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- R-02: legacy (API <= 30) twin of data_extraction_rules.xml — exclude every
+     app-private domain from Auto Backup. Never add an <include>.
+     Guarded by BackupConfigRobolectricTest. -->
+<full-backup-content>
+    <exclude domain="root" path="." />
+    <exclude domain="file" path="." />
+    <exclude domain="database" path="." />
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="external" path="." />
+</full-backup-content>
