@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 489 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 748 | 0 |
+| Flutter (`flutter test`) | 756 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
 
@@ -87,27 +87,7 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next active task — fix the infinite-spinner on a stalled YubiKey tap
-
-The Android YubiKey tap (`get_hmac_secret` / `get_hmac_secret_multi` MethodChannel
-in `lib/widgets/yubikey_tap.dart`) blocks with no timeout and no explicit Cancel: if
-no key is ever presented, the unlock screen shows an infinite spinner, recoverable
-only via the back arrow. Hardware-confirmed on 2026-06-11 (tap-test matrix row 7).
-Previously logged as out-of-scope for the dedupe; now promoted to its own task.
-
-**Plan.** Give the tap a bounded lifecycle — a timeout and/or an explicit Cancel
-affordance on the spinner — so a stalled tap returns control to the user with a
-clear message instead of hanging. TDD the Dart side at the channel-mock seam
-(`isLinuxForTapDispatch` + a mocked `app.gabbro.gabbro/yubikey` channel, as in
-`test/yubikey_tap_test.dart`); decide whether the timeout lives Dart-side or Kotlin-side.
-
-**Constraints.**
-- **Touches the unlock path → MUST hardware-test on Android (USB + NFC) before any
-  commit.** See [[feedback-android-hardware-before-commit]].
-- Keep the dedupe seam intact; do not regress the single/multi tap behaviour just
-  verified.
-
-### Then — CRITICAL: locked vault re-exposed via back navigation
+### Next active task — CRITICAL: locked vault re-exposed via back navigation
 
 Hardware-found 2026-06-11 (tap-test matrix). Repro: unlock Vault M -> tap the manual
 **lock** button -> on the unlock screen pick a *different* vault from the dropdown ->
