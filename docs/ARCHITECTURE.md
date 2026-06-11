@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 489 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 739 | 0 |
+| Flutter (`flutter test`) | 748 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
 
@@ -87,38 +87,48 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next active task — dedupe the YubiKey tap dispatch
+### Next active task — fix the infinite-spinner on a stalled YubiKey tap
 
-Unify the YubiKey hmac-secret tap logic on one shared helper. **No behaviour
-change** — this is a Code Quality refactor that removes a duplicated copy of the
-Linux/Android tap dispatch.
+The Android YubiKey tap (`get_hmac_secret` / `get_hmac_secret_multi` MethodChannel
+in `lib/widgets/yubikey_tap.dart`) blocks with no timeout and no explicit Cancel: if
+no key is ever presented, the unlock screen shows an infinite spinner, recoverable
+only via the back arrow. Hardware-confirmed on 2026-06-11 (tap-test matrix row 7).
+Previously logged as out-of-scope for the dedupe; now promoted to its own task.
 
-**The duplication.** `lib/widgets/yubikey_tap.dart` (`getAnyYubikeyHmacSecret`,
-added for ADR-013 import sync) already centralises the multi-key tap: Linux via
-`fidoGetHmacSecretAny`, Android via the `app.gabbro.gabbro/yubikey`
-`get_hmac_secret_multi` MethodChannel, plus the `_toHex`/`_fromHex` helpers and the
-channel const. `lib/screens/unlock_screen.dart` re-implements the same thing inline
-in `_linuxUnlockWithAnyYubikey` / `_defaultUnlockWithAnyYubikey` (multi-key) and has
-its own copies of `_yubikeyChannel`, `_toHex`, `_fromHex`. The single-key paths
-(`_linuxUnlockWithYubikey` / `_defaultUnlockWithYubikey`) are close but not
-identical — check whether they can also route through the shared helper or at least
-share the hex/channel utilities.
-
-**Plan.** (1) Have the unlock screen's multi-key path call
-`getAnyYubikeyHmacSecret` instead of its inline dispatch; delete the duplicated
-`_yubikeyChannel`/`_toHex`/`_fromHex` from `unlock_screen.dart`. (2) Decide on the
-single-key paths (fold in or leave, document the call). (3) Keep all existing
-unlock tests green; add a channel-mock widget test if a behaviour seam opens up.
+**Plan.** Give the tap a bounded lifecycle — a timeout and/or an explicit Cancel
+affordance on the spinner — so a stalled tap returns control to the user with a
+clear message instead of hanging. TDD the Dart side at the channel-mock seam
+(`isLinuxForTapDispatch` + a mocked `app.gabbro.gabbro/yubikey` channel, as in
+`test/yubikey_tap_test.dart`); decide whether the timeout lives Dart-side or Kotlin-side.
 
 **Constraints.**
-- TDD where a seam exists (channel-mocked widget tests, like the autofill-unlock tests).
-- **This touches the unlock path → MUST hardware-test on Android (USB + NFC, single-
-  and multi-key) before any commit.** Build success != device success. See
-  [[feedback-android-hardware-before-commit]] and [[feedback-vault-format-backward-compat-tdd]].
-- Out of scope (note only): the Android tap call blocks with no timeout/explicit
-  Cancel (recoverable only via the back arrow); unlock shares that pattern. Deemed
-  sufficient for now (the "tap your YubiKey now" cue exists). Don't scope-creep
-  unless Rob asks.
+- **Touches the unlock path → MUST hardware-test on Android (USB + NFC) before any
+  commit.** See [[feedback-android-hardware-before-commit]].
+- Keep the dedupe seam intact; do not regress the single/multi tap behaviour just
+  verified.
+
+### Then — CRITICAL: locked vault re-exposed via back navigation
+
+Hardware-found 2026-06-11 (tap-test matrix). Repro: unlock Vault M -> tap the manual
+**lock** button -> on the unlock screen pick a *different* vault from the dropdown ->
+press back -> the app lands on a still-populated, unlocked Vault M. Confidentiality
+breach: a locked vault's decrypted entries are reachable again.
+
+**Root cause (confirmed).** Two lock paths with different stack semantics:
+auto-lock (`main.dart` `_lock()`) uses `pushAndRemoveUntil(..., (_) => false)` and
+wipes the back stack (safe); the manual lock button (`vault_list_screen.dart`
+`_lockAndExit()`) and `switchToVault()` (`main.dart`) both use `pushReplacement`,
+which replaces only the top route and leaves earlier routes intact. `lockVault()`
+clears the Rust session, but the `VaultListScreen` left underneath still holds its
+already-decrypted summaries in Dart memory, so back-navigation re-renders them.
+
+**Approach — full canon-TDD, must be bullet-proof (not "in passing").** Failing
+widget test first: unlock M -> manual-lock -> switch to S -> pop -> assert the route
+below is NOT a populated `VaultListScreen(M)` and the session is locked. Likely fix:
+manual lock + `switchToVault` use `pushAndRemoveUntil` like auto-lock. Audit every
+`pushReplacement`/`push` on the lock/switch/unlock paths for the same stale-route
+hazard. **MUST hardware-test on Android before commit; warrants a release** (security
+fix). See [[feedback-android-hardware-before-commit]].
 
 ### Open from the security audit
 
