@@ -16,7 +16,7 @@
 | Finding | Sev. | Status |
 |---------|------|--------|
 | **R-01** original audit's "no exploitable defect" claim falsified by fuzzer; needs a correction note | Doc | **Open** |
-| **R-02** Android Auto Backup silently uploads the vault to Google Drive | Medium | **Open** |
+| **R-02** Android Auto Backup silently uploads the vault to Google Drive | Medium | **Fixed** (commit `90a2095`, 2026-06-11) — `allowBackup="false"` + `dataExtractionRules` + `fullBackupContent` (all domains excluded), 3 Robolectric merged-manifest tests, APK verified via `aapt dump xmltree`; hardware-verified on device (`pkgFlags` has no `ALLOW_BACKUP`; `bmgr backupnow` → "Backup is not allowed"; upgrade-in-place, unlock, autofill unaffected) |
 | **R-03** no pre-save vault backup rotation (availability gap) | Medium | **Open** |
 | **R-04** Linux process is dumpable; no `PR_SET_DUMPABLE(0)` / `RLIMIT_CORE(0)` | Low | **Open** |
 | **R-05** no stated position on swap exposure of key material | Low | **Open** |
@@ -162,9 +162,17 @@ scope.
 
 **Recommendation.** Set `android:allowBackup="false"` plus
 `android:dataExtractionRules` (API 31+) and `android:fullBackupContent`
-(API ≤ 30) rules files excluding everything. Two manifest attributes and one
-small XML file. Hardware-verify on device (memory: build success ≠ device
-success), e.g. `adb shell bmgr` dry-run or backup-quota inspection.
+(API ≤ 30) rules files excluding every domain. These are not redundant
+encodings: the OS consults them at different decision points (cloud backup vs
+device-to-device transfer), and OEM migration tools do not all honour the
+blanket flag — declare the intent at every layer. Because the rules exclude
+*all* app-private domains, the vault, `settings.jsonc` and `vaults.jsonc`
+(alias-bearing metadata) are covered in one stroke, and future app-private
+files are excluded by default. **Scope boundary (Rob, 2026-06-11):** this must
+not — and by mechanism cannot — affect user-driven export/backup of `.gabbro`
+files via SAF to shared storage (e.g. rsync→NAS 3-2-1 flows); the backup
+framework rules only govern the app-private storage root. Hardware-verify on
+device (build success ≠ device success).
 
 ### R-03 (Medium) — No pre-save vault backup rotation (availability)
 

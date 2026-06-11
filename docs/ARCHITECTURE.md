@@ -72,7 +72,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 758 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 23 | 17 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 26 | 17 |
 
 **Test isolation (non-negotiable):** no test may touch the user's real settings or
 vault folders. All config/data directories resolve through `GabbroPaths`
@@ -99,9 +99,10 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - **F-10** — eTLD+1 autofill matching; post-v1 "Strict FQDN" toggle.
 
 A second-pass review (`AI_SECURITY_AUDIT_REVIEW.md`, 2026-06-11) added findings
-**R-01…R-07**, all open — top priorities: **R-02** Android Auto Backup uploads the
-vault to Google Drive (manifest fix), **R-03** pre-save vault backup rotation,
-**R-04** Linux core-dump hardening.
+**R-01…R-07** (per-finding status lives in that document's remediation table).
+**R-02** (Android Auto Backup uploaded the vault to Google Drive) is **fixed** —
+remaining priorities: **R-03** pre-save vault backup rotation, **R-04** Linux
+core-dump hardening, then R-01/R-05/R-06/R-07.
 
 **UI locales deferred** (RTL layout work required): Hebrew, Arabic.
 
