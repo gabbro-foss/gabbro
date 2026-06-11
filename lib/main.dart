@@ -467,8 +467,12 @@ class _GabbroAppState extends State<GabbroApp>
 
   @override
   void switchToVault(String path, String alias) {
-    _navigatorKey.currentState?.pushReplacement(
+    // pushAndRemoveUntil (not pushReplacement) so the whole back stack is
+    // cleared — a back-press after switching vaults must never reveal a prior
+    // (possibly still-unlocked) vault's screen. Mirrors auto-lock (_lock).
+    _navigatorKey.currentState?.pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => _buildUnlockScreen(path, alias)),
+      (_) => false,
     );
   }
 

@@ -153,4 +153,23 @@ void main() {
     // No crash — screen is still rendered.
     expect(find.byType(Scaffold), findsAtLeastNWidgets(1));
   });
+
+  // Security regression guard: if listEntries throws (the vault is locked), the
+  // screen must NOT render the entry list / its chrome — no decrypted data may
+  // surface. Pins the _error render-gate against future regression.
+  testWidgets('locked vault (listEntries throws) renders no entry-list chrome',
+      (tester) async {
+    await tester.pumpWidget(testApp(VaultListScreen(
+      vaultPath: '/tmp/test.gabbro',
+      listEntries: () => throw Exception('vault is locked'),
+    )));
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    // The error screen replaces the whole list view — no menu, no search field.
+    expect(find.byType(PopupMenuButton<String>), findsNothing,
+        reason: 'a locked load must not render the vault-list AppBar/menu');
+    expect(find.byIcon(Icons.lock_outline), findsNothing,
+        reason: 'no AppBar lock button (and no Login entry rows) when locked');
+  });
 }

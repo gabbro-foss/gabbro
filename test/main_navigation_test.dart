@@ -55,4 +55,34 @@ void main() {
     expect(find.byType(ManageVaultsScreen), findsOneWidget,
         reason: 'navigateToManageVaults pushes the manage-vaults route');
   });
+
+  // Security: switching vaults must clear the back stack so a back-press can
+  // never reveal a prior (possibly unlocked) vault's screen. Mirrors auto-lock,
+  // which already uses pushAndRemoveUntil.
+  testWidgets('switchToVault clears the back stack (no pop back to a prior route)',
+      (tester) async {
+    await tester.pumpWidget(_app(_registryWith(['Alpha', 'Beta'])));
+    await tester.pumpAndSettle();
+    final state = tester.state(find.byType(GabbroApp)) as GabbroAppState;
+
+    // Build up a back stack on top of the initial route.
+    state.navigateToManageVaults();
+    await tester.pumpAndSettle();
+    expect(find.byType(ManageVaultsScreen), findsOneWidget);
+
+    state.switchToVault('/nonexistent-sandbox/Beta.gabbro', 'Beta');
+    await tester.pumpAndSettle();
+
+    // Attempt to go back: nothing prior must be reachable.
+    final nav = tester.firstState<NavigatorState>(find.byType(Navigator));
+    final popped = await nav.maybePop();
+    await tester.pumpAndSettle();
+
+    expect(popped, isFalse,
+        reason: 'after switching vaults the stack is cleared; nothing to pop');
+    expect(find.text('initial'), findsNothing,
+        reason: 'must not be able to return to the pre-switch route');
+    expect(find.byType(ManageVaultsScreen), findsNothing,
+        reason: 'the prior manage-vaults route must not survive the switch');
+  });
 }

@@ -310,6 +310,11 @@ class _VaultListScreenState extends State<VaultListScreen> {
     } catch (e) {
       setState(() {
         _error = e.toString();
+        // Drop any retained decrypted summaries: if the load failed (e.g. the
+        // vault is locked) we must not keep plaintext entries in memory. The
+        // _error gate also hides the list, but clearing is defence-in-depth.
+        _entries = [];
+        _folders = [];
       });
     }
   }
@@ -910,7 +915,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
     lockVault();
     final appState = GabbroApp.of(context);
     final settings = appState.settings;
-    Navigator.of(context).pushReplacement(
+    // pushAndRemoveUntil (not pushReplacement) so the entire back stack is
+    // cleared on lock — no prior route (e.g. this now-locked vault's list) can
+    // survive underneath to be revealed by a back-press. Mirrors auto-lock.
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (context) => UnlockScreen(
           vaultPath: widget.vaultPath,
@@ -924,6 +932,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
           ),
         ),
       ),
+      (_) => false,
     );
   }
 
