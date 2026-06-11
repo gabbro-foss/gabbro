@@ -87,14 +87,9 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next active task — TBD with Rob
+### Next active task
 
-The three queued tasks from the 2026-06-11 hardware session are all done and
-committed: YubiKey tap-dispatch dedupe, the stalled-tap timeout/Cancel fix, and the
-locked-vault navigation hardening below. `[Unreleased]` now holds the alpha.6 quick-win
-Security items plus the tap fix and the lock-stack hardening — **enough to warrant an
-`v0.1.0-alpha.7`** when Rob wants it (only ~1 active tester, so no rush). Pick the next
-task with Rob: cut alpha.7, or take an item from the security audit / backlog.
+Start on remediation actions following `AI_SECURITY_AUDIT_REVIEW.md`
 
 ### Open from the security audit
 
@@ -102,6 +97,11 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 
 - **F-03** — X-Wing transcript-binding combiner; gated on a human cryptographer (no verifiable-against-spec answer).
 - **F-10** — eTLD+1 autofill matching; post-v1 "Strict FQDN" toggle.
+
+A second-pass review (`AI_SECURITY_AUDIT_REVIEW.md`, 2026-06-11) added findings
+**R-01…R-07**, all open — top priorities: **R-02** Android Auto Backup uploads the
+vault to Google Drive (manifest fix), **R-03** pre-save vault backup rotation,
+**R-04** Linux core-dump hardening.
 
 **UI locales deferred** (RTL layout work required): Hebrew, Arabic.
 

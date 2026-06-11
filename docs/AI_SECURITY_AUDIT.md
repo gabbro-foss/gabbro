@@ -7,6 +7,8 @@
 
 > **Reading note.** This is a findings report. Remediation is a separate session. Severities are AI estimates and should be re-rated by a human cryptographer. Nothing here unblocks the pre-v1 gate that requires academic / RustCrypto / formal audit sign-off.
 
+> **Second-pass review (2026-06-11).** This audit was critically reviewed by Claude Fable 5 — see [AI_SECURITY_AUDIT_REVIEW.md](AI_SECURITY_AUDIT_REVIEW.md) for a verdict on this document, its structural blind spots (scope asymmetry, availability, Dart heap), and seven new findings (R-01…R-07) on surfaces this audit did not cover.
+
 ---
 
 ## Remediation status (updated 2026-06-01)
