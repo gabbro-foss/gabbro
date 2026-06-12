@@ -21,6 +21,56 @@ operational reference for building and shipping.
 
 ---
 
+## Running under a Wayland/bubblewrap sandbox
+
+Gabbro is a normal GTK/Flutter Linux app. Launched directly it just works. The
+notes below are only for testers who run it inside a hand-rolled `bwrap`
+(bubblewrap) sandbox, which isolates the app from the session's display and bus
+sockets — two things the app needs.
+
+**1. The Wayland display socket.** GTK needs `$WAYLAND_DISPLAY` and the matching
+socket. A sandbox that doesn't forward them aborts before any Dart runs (no
+window appears). Forward the runtime dir's wayland socket and set the variable,
+e.g.:
+
+```
+bwrap … \
+  --ro-bind "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" \
+  --setenv WAYLAND_DISPLAY "$WAYLAND_DISPLAY" \
+  …
+```
+
+(`$WAYLAND_DISPLAY` is usually `wayland-0`. A tester who bound the socket to a
+different path used an absolute `--setenv WAYLAND_DISPLAY "/tmp/wayland-0"` — the
+value must match wherever the socket actually lives inside the sandbox.)
+
+**2. The DBus session bus + the desktop portal.** Native file dialogs (open,
+save, choose-folder — anywhere the app picks a path) go through the XDG Desktop
+Portal over the **DBus session bus**. If the bus socket isn't bound into the
+sandbox, `org.freedesktop.portal.FileChooser` can't be reached and the dialog
+fails. Bind the bus (and run the portal) into the sandbox:
+
+```
+bwrap … \
+  --ro-bind "$XDG_RUNTIME_DIR/bus" "$XDG_RUNTIME_DIR/bus" \
+  --setenv DBUS_SESSION_BUS_ADDRESS "$DBUS_SESSION_BUS_ADDRESS" \
+  …
+```
+
+(`xdg-desktop-portal` and a backend such as `xdg-desktop-portal-gtk`/`-kde`/
+`-hyprland` must be running for the session.)
+
+**Defensive fallback in the app.** If the portal still can't be reached, Gabbro
+no longer crashes: every file-picker call is wrapped (`lib/safe_file_picker.dart`)
+and surfaces a SnackBar instead. Where a flow has an editable path field (vault
+export, onboarding, file-export), the message invites the user to type or paste
+the path; picker-only flows (restore-from-file, attach-file, sync-from-file)
+state that the system file portal is unreachable. So a missing portal degrades to
+"type the path" rather than a dead button — but binding the bus as above is the
+real fix.
+
+---
+
 ## Release Process
 
 **Tag format:** `v0.1.0-alpha.N` until the pre-v1 security gates (Bikeshed) clear — honest with testers that no external crypto review has happened yet. Repo is private; the Debian collaborator pulls releases from GitHub, other testers receive artifacts directly.

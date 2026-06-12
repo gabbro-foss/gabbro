@@ -4075,3 +4075,35 @@ config stays on `~/.config/gabbro` and honours `XDG_CONFIG_HOME` *only* as a fal
 is unset — because the old config code ignored `XDG_CONFIG_HOME`, so newly honouring it would
 *move* the registry for anyone who has it set. Matching each path's prior behaviour is what makes
 "nothing moves" true; consistency-for-its-own-sake would have been the regression.
+
+## Flutter — `file_picker` on Linux is a DBus-portal client; guard it or it crashes in a sandbox
+
+A Debian/Wayland tester's app threw an unhandled `SocketException: ... address =
+/run/user/1000/bus` straight out of `FilePicker.saveFile`, crashing the isolate. The cause: on
+Linux, `file_picker` does **not** draw its own dialog — it calls
+`org.freedesktop.portal.FileChooser` on the **XDG Desktop Portal**, reached over the **DBus
+*session* bus** (`dbus` package → `DBusClient._openSocket`). In a hand-rolled bubblewrap sandbox
+the bus socket (`$XDG_RUNTIME_DIR/bus`, here `/run/user/1000/bus`) isn't bound in, so the connect
+fails and the exception propagates unhandled. This is a *different* failure from the missing
+`~/.local/share` write-path bug and from the `WAYLAND_DISPLAY` launch bug — three independent
+sandbox-isolation gaps that the one tester hit together. The packaging cure is to bind the bus +
+run a portal backend (documented in `BUILD_AND_RELEASE.md`), but you can't rely on every tester's
+`bwrap` invocation, so **the app must not crash regardless.**
+
+**Pattern: one tested seam, guard at the call site.** `lib/safe_file_picker.dart` wraps every
+picker call: `runPicker(op)` passes the result through (including `null` = user cancelled) but
+converts any thrown `Exception` into a typed `FilePickerUnavailable`; the call site catches that
+and shows a SnackBar via `showPickerUnavailable(context, {hasManualEntry})`. Two messages, not
+one: flows with an editable path field (export, onboarding, file-export) say "type or paste the
+path instead"; picker-only flows (restore-from-file, attach-file, sync-from-file) say the portal
+is unreachable — telling a user to "type the path" where there's no field is a worse bug than the
+crash. Wrap at the call site for *pure* pickers (the seam returns a path); wrap *inside* the seam
+only when it bundles more than picking (e.g. unlock's `onRestoreFromFile` does pick **and**
+restore, so wrapping the whole thing would mislabel an invalid-vault error as a portal failure).
+
+**Dart gotcha that bites this refactor.** A `final` local assigned inside a `try` block does
+**not** type-promote to non-null inside a later closure (`setState(() => ...)`, a dialog
+`builder:`), even after an `if (x == null) return;` guard — only a variable initialised at its
+declaration is "effectively final" for cross-closure promotion. Two fixes: use `x!` inside the
+closure, or bind a fresh `final y = x;` after the guard (its inferred type is already the promoted
+non-null type) and use `y` in the closure.

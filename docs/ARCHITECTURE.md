@@ -42,7 +42,7 @@ gabbro/
 │   ├── screens/          # unlock, vault list, export, import, generator, settings, manage vaults/folders, …
 │   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
-│   └── *.dart            # main, app_paths (GabbroPaths), settings, vault_registry
+│   └── *.dart            # main, app_paths (GabbroPaths), settings, vault_registry, safe_file_picker
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, keypair, ml_kem, hkdf, aes_gcm, vault_crypto
@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 514 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 793 | 0 |
+| Flutter (`flutter test`) | 808 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 26 | 17 |
 
@@ -110,38 +110,29 @@ problems. Only one is fixable in our binary:
    already the manual fallback (`path_field_test.dart`), but only if you *type*
    instead of *clicking* — clicking the folder icon still crashes.
 
-**Design.** New `lib/safe_file_picker.dart` — one tested seam reused everywhere:
-- `class FilePickerUnavailable implements Exception` (carries the underlying cause).
-- `Future<T?> runPicker<T>(Future<T?> Function() op)` — returns the op's value
-  (incl. `null` = user cancelled), but converts any thrown `Exception`
-  (`SocketException`/`DBusException`/…) into `FilePickerUnavailable`.
-- `void showPickerUnavailable(BuildContext)` — consistent localized SnackBar
-  ("File dialog isn't available here — type or paste the path instead").
-- New ARB key (template + all 35 locales; `l10n_test` must stay green).
-- All 6 sites wrap their `FilePicker.*` call in `runPicker`, catch
-  `FilePickerUnavailable`, show the message.
+**Code + docs landed (code-green, NOT yet hardware-verified):**
+- New `lib/safe_file_picker.dart`: `FilePickerUnavailable` (carries the cause),
+  `runPicker<T>` (passes through value/`null`-cancel, converts any thrown
+  `Exception` -> `FilePickerUnavailable`), and `showPickerUnavailable(context,
+  {hasManualEntry})`. Two ARB keys: `filePickerUnavailable` (flows with an
+  editable path field -> "type or paste the path instead") and
+  `filePickerNoPortal` (picker-only flows -> "system file portal isn't
+  reachable"), both in all 37 locales.
+- All 6 call sites guarded: `path_field` and `export_screen`/`entry_detail`/
+  `create_entry`/`vault_list` wrap the picker in `runPicker` at the call site;
+  `unlock_screen` wraps inside `_defaultRestoreFromFile` (the seam bundles
+  pick+restore, so a portal failure is distinguished from an invalid vault).
+- 15 new tests (option b: dedicated widget tests for every site), `flutter test`
+  808 green, `flutter analyze` clean.
+- `BUILD_AND_RELEASE.md` -> "Running under a Wayland/bubblewrap sandbox": the
+  `WAYLAND_DISPLAY` setenv + the `--ro-bind` for the DBus session bus +
+  xdg-desktop-portal (closes problem 1, which is doc-only).
 
-**Decision: full dedicated widget tests for all call sites (option b).** Sites
-without a picker seam today (`entry_detail`, `create_entry`, `vault_list`) get a
-new injectable seam + harness, not just the helper unit tests.
-
-**Test-scenario list (Canon TDD, agreed):**
-- *A. `safe_file_picker` unit:* (1) returns value on success; (2) returns `null`
-  on cancel (cancel != failure); (3) `SocketException` -> `FilePickerUnavailable`;
-  (4) generic `Exception` -> `FilePickerUnavailable`; (5) exposes underlying cause.
-- *B. `PathField` widget (inject throwing picker):* (6) save mode throws -> SnackBar,
-  no rethrow; (7) open mode throws -> SnackBar, no rethrow; (8) throw -> no
-  `onPathSelected`, field text unchanged; (9) regression: returns path -> propagates
-  + updates field; (10) regression: returns `null` -> no SnackBar, no `onPathSelected`.
-- *C. Other call sites (guard + message, each with a dedicated widget test):*
-  (11) `export_screen._pickDirectory`; (12) `unlock_screen` restore-from-file
-  (corrupt-vault state untouched); (13) `entry_detail` download save;
-  (14) `create_entry` attachment pick; (15) `vault_list` pick.
-- *D. l10n:* (16) new ARB key resolves in template; all locales green.
-
-**Docs:** add a "Running under a Wayland/bubblewrap sandbox" section to
-`BUILD_AND_RELEASE.md` (the `WAYLAND_DISPLAY` setenv + the `--ro-bind` for the DBus
-session bus + xdg-desktop-portal), closing problem 1.
+**STILL OPEN (the only thing between here and done):** the Debian/Wayland tester
+must confirm on real hardware that (a) the documented `bwrap` binds let file
+pick/save work, and (b) with the portal still missing, the app shows the SnackBar
+instead of crashing. Component-green is not done — see the "real hardware = done"
+rule. Until then this task stays in Current Focus.
 
 After this: **R-04 — Linux core-dump hardening** (now in the bikeshed Security list).
 
