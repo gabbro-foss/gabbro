@@ -818,14 +818,23 @@
   "manageFoldersDefaultNote": "デフォルトフォルダは名前の変更や削除ができます。",
 
   "vaultCorruptBackupAvailable": "このボールトファイルは読み取れません。最後に成功した保存の自動セーフティコピーが利用できます。",
-  "vaultCorruptNoBackup": "このボールトファイルは読み取れず、自動セーフティコピーも存在しません。ご自身のバックアップからボールトを復元してください。",
   "restoreBackupButton": "セーフティコピーから復元",
   "restoreBackupConfirmTitle": "セーフティコピーからボールトを復元しますか？",
   "restoreBackupConfirmBody": "読み取れないボールトファイルは、最後に成功した保存のセーフティコピーに置き換えられます。ロック解除には引き続きパスフレーズ（および登録済みの場合は YubiKey）が必要です。",
   "restoreBackupConfirmAction": "復元",
   "backupRestoredMessage": "セーフティコピーを復元しました。認証情報でロックを解除してください。",
-  "deleteBackupButton": "使用できないセーフティコピーを削除",
-  "deleteBackupConfirmTitle": "セーフティコピーを削除しますか？",
-  "deleteBackupConfirmBody": "このセーフティコピー自体も読み取れないため、ボールトを復元できません。削除は元に戻せません。",
-  "backupDialogSafetyCopyNote": "Gabbro は各ボールトの自動セーフティコピーを 1 つ端末内に保持し、保存のたびに更新します。これはファイル破損のみに備えるもので、バックアップではありません。"
+  "backupDialogSafetyCopyNote": "Gabbro は各ボールトの自動セーフティコピーを 1 つ端末内に保持し、保存のたびに更新します。これはファイル破損のみに備えるもので、バックアップではありません。",
+  "vaultUnrecoverableBody": "このボールトファイルは読み取れず、そのセーフティコピーも読み取れません。このデバイスでは内容を復元できません。",
+  "vaultUnrecoverableBackupHint": "デバイス外のバックアップがある場合は、そのコピーからボールトを復元してください。",
+  "vaultUnrecoverableNoteLinux": "読み取れないファイルはディスク上に残るため、ご自身で削除または確認できます。",
+  "vaultUnrecoverableNoteAndroid": "読み取れないファイルはアプリのプライベートストレージにあり、ここからのみ削除できます。",
+  "removeVaultFromListButton": "リストから削除",
+  "deleteVaultFileButton": "ファイルを削除",
+  "removeVaultFromListConfirmTitle": "ボールトをリストから削除しますか？",
+  "removeVaultFromListConfirmBody": "このボールトをリストから削除しますか？ ファイルはディスク上に残ります。復元できれば再度追加できます。",
+  "deleteVaultFileConfirmTitle": "破損したボールトファイルを完全に削除しますか？",
+  "deleteVaultFileConfirmBody": "このボールトを完全に削除しますか？ 読み取れないファイルとそのセーフティコピーがこのデバイスから削除されます。この操作は元に戻せません。",
+  "restoreFromFileButton": "バックアップファイルから復元",
+  "vaultRestoredMessage": "ボールトを復元しました。認証情報でロックを解除してください。",
+  "restoreFromFileInvalidError": "このファイルは使用可能な Gabbro ボールトではありません。"
 }

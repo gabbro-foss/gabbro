@@ -824,14 +824,23 @@
   "manageFoldersDefaultNote": "Oletuskansioita voi nimetä uudelleen tai poistaa.",
 
   "vaultCorruptBackupAvailable": "Tätä holvitiedostoa ei voi lukea. Saatavilla on automaattinen varakopio viimeisimmästä onnistuneesta tallennuksesta.",
-  "vaultCorruptNoBackup": "Tätä holvitiedostoa ei voi lukea, eikä automaattista varakopiota ole. Palauta holvi omasta varmuuskopiostasi.",
   "restoreBackupButton": "Palauta varakopiosta",
   "restoreBackupConfirmTitle": "Palautetaanko holvi varakopiosta?",
   "restoreBackupConfirmBody": "Lukukelvoton holvitiedosto korvataan viimeisimmän onnistuneen tallennuksen varakopiolla. Salalauseesi (ja YubiKey, jos rekisteröity) vaaditaan edelleen lukituksen avaamiseen.",
   "restoreBackupConfirmAction": "Palauta",
   "backupRestoredMessage": "Varakopio palautettu. Avaa lukitus tunnuksillasi.",
-  "deleteBackupButton": "Poista käyttökelvoton varakopio",
-  "deleteBackupConfirmTitle": "Poistetaanko varakopio?",
-  "deleteBackupConfirmBody": "Tämä varakopio ei voi palauttaa holviasi, koska se on itsekin lukukelvoton. Poistoa ei voi perua.",
-  "backupDialogSafetyCopyNote": "Gabbro säilyttää laitteella myös yhden automaattisen varakopion jokaisesta holvista, joka päivittyy jokaisella tallennuksella. Se suojaa vain tiedoston vioittumiselta — se ei ole varmuuskopio."
+  "backupDialogSafetyCopyNote": "Gabbro säilyttää laitteella myös yhden automaattisen varakopion jokaisesta holvista, joka päivittyy jokaisella tallennuksella. Se suojaa vain tiedoston vioittumiselta — se ei ole varmuuskopio.",
+  "vaultUnrecoverableBody": "Tätä holvitiedostoa ei voi lukea, ja sen varakopio on myös lukukelvoton. Sen sisältöä ei voi palauttaa tällä laitteella.",
+  "vaultUnrecoverableBackupHint": "Jos sinulla on laitteen ulkopuolinen varmuuskopio, palauta holvi siitä kopiosta.",
+  "vaultUnrecoverableNoteLinux": "Lukukelvoton tiedosto jää levylle, joten voit poistaa tai tarkastaa sen itse.",
+  "vaultUnrecoverableNoteAndroid": "Lukukelvoton tiedosto on sovelluksen yksityisessä tallennustilassa, ja sen voi poistaa vain täältä.",
+  "removeVaultFromListButton": "Poista luettelosta",
+  "deleteVaultFileButton": "Poista tiedosto",
+  "removeVaultFromListConfirmTitle": "Poistetaanko holvi luettelosta?",
+  "removeVaultFromListConfirmBody": "Poistetaanko tämä holvi luettelostasi? Tiedosto jää levylle — voit lisätä sen uudelleen, jos palautat sen.",
+  "deleteVaultFileConfirmTitle": "Poistetaanko vioittunut holvitiedosto pysyvästi?",
+  "deleteVaultFileConfirmBody": "Poistetaanko tämä holvi pysyvästi? Lukukelvoton tiedosto ja sen varakopio poistetaan tästä laitteesta. Tätä ei voi kumota.",
+  "restoreFromFileButton": "Palauta varmuuskopiotiedostosta",
+  "vaultRestoredMessage": "Holvi palautettu. Avaa lukitus tunnuksillasi.",
+  "restoreFromFileInvalidError": "Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi."
 }

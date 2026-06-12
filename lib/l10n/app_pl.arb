@@ -824,14 +824,23 @@
   "manageFoldersDefaultNote": "Domyślne foldery można zmienić lub usunąć.",
 
   "vaultCorruptBackupAvailable": "Nie można odczytać tego pliku sejfu. Dostępna jest automatyczna kopia awaryjna z ostatniego udanego zapisu.",
-  "vaultCorruptNoBackup": "Nie można odczytać tego pliku sejfu i nie istnieje żadna automatyczna kopia awaryjna. Przywróć sejf z własnej kopii zapasowej.",
   "restoreBackupButton": "Przywróć z kopii awaryjnej",
   "restoreBackupConfirmTitle": "Przywrócić sejf z kopii awaryjnej?",
   "restoreBackupConfirmBody": "Nieczytelny plik sejfu zostanie zastąpiony kopią awaryjną z ostatniego udanego zapisu. Do odblokowania nadal potrzebne są Twoje hasło główne (i YubiKey, jeśli zarejestrowany).",
   "restoreBackupConfirmAction": "Przywróć",
   "backupRestoredMessage": "Kopia awaryjna przywrócona. Odblokuj swoimi danymi.",
-  "deleteBackupButton": "Usuń bezużyteczną kopię awaryjną",
-  "deleteBackupConfirmTitle": "Usunąć kopię awaryjną?",
-  "deleteBackupConfirmBody": "Ta kopia awaryjna nie może przywrócić sejfu, ponieważ sama jest nieczytelna. Usunięcia nie można cofnąć.",
-  "backupDialogSafetyCopyNote": "Gabbro przechowuje też na urządzeniu jedną automatyczną kopię awaryjną każdego sejfu, odświeżaną przy każdym zapisie. Chroni ona wyłącznie przed uszkodzeniem pliku — nie jest kopią zapasową."
+  "backupDialogSafetyCopyNote": "Gabbro przechowuje też na urządzeniu jedną automatyczną kopię awaryjną każdego sejfu, odświeżaną przy każdym zapisie. Chroni ona wyłącznie przed uszkodzeniem pliku — nie jest kopią zapasową.",
+  "vaultUnrecoverableBody": "Nie można odczytać tego pliku sejfu, a jego kopia awaryjna również jest nieczytelna. Jego zawartości nie można odzyskać na tym urządzeniu.",
+  "vaultUnrecoverableBackupHint": "Jeśli masz kopię zapasową poza urządzeniem, przywróć sejf z tej kopii.",
+  "vaultUnrecoverableNoteLinux": "Nieczytelny plik pozostaje na dysku, więc możesz go samodzielnie usunąć lub sprawdzić.",
+  "vaultUnrecoverableNoteAndroid": "Nieczytelny plik znajduje się w prywatnej pamięci aplikacji i można go usunąć tylko stąd.",
+  "removeVaultFromListButton": "Usuń z listy",
+  "deleteVaultFileButton": "Usuń plik",
+  "removeVaultFromListConfirmTitle": "Usunąć sejf z listy?",
+  "removeVaultFromListConfirmBody": "Usunąć ten sejf z listy? Plik pozostaje na dysku — możesz dodać go ponownie, jeśli go odzyskasz.",
+  "deleteVaultFileConfirmTitle": "Trwale usunąć uszkodzony plik sejfu?",
+  "deleteVaultFileConfirmBody": "Trwale usunąć ten sejf? Nieczytelny plik i jego kopia awaryjna zostaną usunięte z tego urządzenia. Tej operacji nie można cofnąć.",
+  "restoreFromFileButton": "Przywróć z pliku kopii zapasowej",
+  "vaultRestoredMessage": "Sejf przywrócony. Odblokuj swoimi danymi.",
+  "restoreFromFileInvalidError": "Ten plik nie jest prawidłowym sejfem Gabbro."
 }

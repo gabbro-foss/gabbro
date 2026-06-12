@@ -824,14 +824,23 @@
   "manageFoldersDefaultNote": "As pastas padrão podem ser renomeadas ou excluídas.",
 
   "vaultCorruptBackupAvailable": "Este ficheiro de cofre não pode ser lido. Está disponível uma cópia de recuperação automática da última gravação bem-sucedida.",
-  "vaultCorruptNoBackup": "Este ficheiro de cofre não pode ser lido e não existe nenhuma cópia de recuperação automática. Restaure o cofre a partir da sua própria cópia de segurança.",
   "restoreBackupButton": "Restaurar a partir da cópia de recuperação",
   "restoreBackupConfirmTitle": "Restaurar o cofre a partir da cópia de recuperação?",
   "restoreBackupConfirmBody": "O ficheiro ilegível será substituído pela cópia de recuperação da última gravação bem-sucedida. A sua frase de acesso (e a sua YubiKey, se registada) continua a ser necessária para o desbloquear.",
   "restoreBackupConfirmAction": "Restaurar",
   "backupRestoredMessage": "Cópia de recuperação restaurada. Desbloqueie com as suas credenciais.",
-  "deleteBackupButton": "Eliminar a cópia de recuperação inutilizável",
-  "deleteBackupConfirmTitle": "Eliminar a cópia de recuperação?",
-  "deleteBackupConfirmBody": "Esta cópia de recuperação não pode restaurar o seu cofre porque também está ilegível. A eliminação não pode ser anulada.",
-  "backupDialogSafetyCopyNote": "O Gabbro também mantém no dispositivo uma cópia de recuperação automática de cada cofre, atualizada a cada gravação. Protege apenas contra corrupção do ficheiro — não é uma cópia de segurança."
+  "backupDialogSafetyCopyNote": "O Gabbro também mantém no dispositivo uma cópia de recuperação automática de cada cofre, atualizada a cada gravação. Protege apenas contra corrupção do ficheiro — não é uma cópia de segurança.",
+  "vaultUnrecoverableBody": "Este ficheiro de cofre não pode ser lido e a sua cópia de recuperação também está ilegível. O seu conteúdo não pode ser recuperado neste dispositivo.",
+  "vaultUnrecoverableBackupHint": "Se mantiver uma cópia de segurança fora do dispositivo, restaure o cofre a partir dessa cópia.",
+  "vaultUnrecoverableNoteLinux": "O ficheiro ilegível permanece no disco, para que o possa eliminar ou inspecionar.",
+  "vaultUnrecoverableNoteAndroid": "O ficheiro ilegível está no armazenamento privado da aplicação e só pode ser removido aqui.",
+  "removeVaultFromListButton": "Remover da lista",
+  "deleteVaultFileButton": "Eliminar ficheiro",
+  "removeVaultFromListConfirmTitle": "Remover o cofre da lista?",
+  "removeVaultFromListConfirmBody": "Remover este cofre da sua lista? O ficheiro permanece no disco — pode voltar a adicioná-lo se o recuperar.",
+  "deleteVaultFileConfirmTitle": "Eliminar permanentemente o ficheiro de cofre danificado?",
+  "deleteVaultFileConfirmBody": "Eliminar permanentemente este cofre? O ficheiro ilegível e a sua cópia de recuperação serão removidos deste dispositivo. Esta ação não pode ser anulada.",
+  "restoreFromFileButton": "Restaurar a partir de um ficheiro de cópia de segurança",
+  "vaultRestoredMessage": "Cofre restaurado. Desbloqueie com as suas credenciais.",
+  "restoreFromFileInvalidError": "Esse ficheiro não é um cofre Gabbro utilizável."
 }

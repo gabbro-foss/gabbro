@@ -511,12 +511,15 @@ pub async fn change_passphrase(
     session::session_change_passphrase(&old_passphrase, &new_passphrase)
 }
 
-/// R-03: does an automatic safety copy (`.bak`) exist next to this vault?
+/// R-03 P3: is the automatic safety copy (`.bak`) a *usable* vault — present
+/// and parseable, not just present?
 ///
-/// Drives whether the unlock screen offers a restore when the vault file
-/// itself cannot be parsed. Safe to call with no session (locked state).
-pub async fn vault_backup_exists(path: String) -> bool {
-    crate::vault::io::backup_exists(std::path::Path::new(&path))
+/// Drives whether the unlock screen may offer a restore when the vault file
+/// itself cannot be parsed. Returns false for a missing, symlinked, or
+/// unparseable `.bak`, so the offer can never claim a safety copy that a
+/// confirmed restore would then refuse. Safe to call with no session.
+pub async fn vault_backup_usable(path: String) -> bool {
+    crate::vault::io::backup_usable(std::path::Path::new(&path))
 }
 
 /// R-03: replace a corrupt vault file with its `.bak` safety copy.
@@ -526,6 +529,19 @@ pub async fn vault_backup_exists(path: String) -> bool {
 /// restoring grants no access.
 pub async fn restore_vault_backup(path: String) -> Result<(), String> {
     crate::vault::io::restore_vault_backup(std::path::Path::new(&path))
+}
+
+/// R-03: restore the vault at `path` from an external backup file the user
+/// picked (their own off-device 3-2-1 copy).
+///
+/// Refuses a `source` that is not a usable Gabbro vault, so a corrupt vault is
+/// never replaced by another unreadable file. The restored vault still requires
+/// full credentials to open.
+pub async fn restore_vault_from_file(path: String, source: String) -> Result<(), String> {
+    crate::vault::io::restore_vault_from_file(
+        std::path::Path::new(&path),
+        std::path::Path::new(&source),
+    )
 }
 
 /// R-03: delete the `.bak` safety copy without touching the vault.
@@ -995,26 +1011,80 @@ mod tests {
 
         let sealed_a = seal_vault(b"pw-a", b"body A", None).unwrap();
         write_vault(&sealed_a, &path).unwrap();
-        assert!(!run(vault_backup_exists(path_s.clone())));
+        // R-03 P1 + P3: a valid .bak is synced from the first save on, and a
+        // parseable .bak reports usable.
+        assert!(run(vault_backup_usable(path_s.clone())));
 
         let sealed_b = seal_vault(b"pw-b", b"body B", None).unwrap();
         write_vault(&sealed_b, &path).unwrap();
-        assert!(run(vault_backup_exists(path_s.clone())));
+        assert!(run(vault_backup_usable(path_s.clone())));
 
         std::fs::write(&path, b"corrupt").unwrap();
         run(restore_vault_backup(path_s.clone())).expect("restore must succeed");
         let restored = std::fs::read(&path).unwrap();
         assert_eq!(
             restored,
-            sealed_a.to_bytes(),
-            "restore must bring back save A"
+            sealed_b.to_bytes(),
+            "restore must bring back the last verified save (B), not an older one"
         );
 
+        // R-03 P3: a rotted .bak must report not usable — the offer cannot lie.
+        std::fs::write(&bak, b"rotted backup").unwrap();
+        assert!(!run(vault_backup_usable(path_s.clone())));
+
         run(delete_vault_backup(path_s.clone())).expect("delete backup must succeed");
-        assert!(!run(vault_backup_exists(path_s)));
+        assert!(!run(vault_backup_usable(path_s)));
 
         let _ = std::fs::remove_file(&path);
         let _ = std::fs::remove_file(&bak);
+    }
+
+    // R-03: bridge restore-from-file replaces a corrupt vault with a picked
+    // backup file, and refuses a source that is not a usable vault.
+    #[test]
+    #[serial]
+    fn restore_from_file_bridge_roundtrip() {
+        use crate::crypto::vault_crypto::seal_vault;
+        use crate::vault::io::write_vault;
+        use std::env::temp_dir;
+
+        let path = temp_dir().join("gabbro_bridge_restore_file_test.gabbro");
+        let source = temp_dir().join("gabbro_bridge_restore_file_source.gabbro");
+        let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
+        let source_bak = std::path::PathBuf::from(format!("{}.bak", source.display()));
+        for p in [&path, &source, &bak, &source_bak] {
+            let _ = std::fs::remove_file(p);
+        }
+        let path_s = path.to_string_lossy().to_string();
+        let source_s = source.to_string_lossy().to_string();
+
+        let sealed = seal_vault(b"pw", b"body", None).unwrap();
+        write_vault(&sealed, &source).unwrap();
+        let source_bytes = std::fs::read(&source).unwrap();
+        std::fs::write(&path, b"corrupt").unwrap();
+
+        run(restore_vault_from_file(path_s.clone(), source_s.clone()))
+            .expect("restore from a valid file must succeed");
+        let restored = std::fs::read(&path).unwrap();
+
+        // A source that is not a vault must be refused, leaving the vault as-is.
+        std::fs::write(&source, b"rotted source").unwrap();
+        std::fs::write(&path, b"still corrupt").unwrap();
+        let refused = run(restore_vault_from_file(path_s, source_s));
+        let after_refuse = std::fs::read(&path).unwrap();
+
+        for p in [&path, &source, &bak, &source_bak] {
+            let _ = std::fs::remove_file(p);
+        }
+        assert_eq!(
+            restored, source_bytes,
+            "restore must write the source vault bytes"
+        );
+        assert!(refused.is_err(), "an unparseable source must be refused");
+        assert_eq!(
+            after_refuse, b"still corrupt",
+            "a refused restore leaves the vault untouched"
+        );
     }
 
     #[test]

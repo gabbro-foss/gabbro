@@ -818,14 +818,23 @@
   "manageFoldersDefaultNote": "Privzete mape je mogoče preimenovati ali izbrisati.",
 
   "vaultCorruptBackupAvailable": "Te datoteke trezorja ni mogoče prebrati. Na voljo je samodejna rešilna kopija zadnjega uspešnega shranjevanja.",
-  "vaultCorruptNoBackup": "Te datoteke trezorja ni mogoče prebrati in samodejna rešilna kopija ne obstaja. Obnovite trezor iz lastne varnostne kopije.",
   "restoreBackupButton": "Obnovi iz rešilne kopije",
   "restoreBackupConfirmTitle": "Obnovim trezor iz rešilne kopije?",
   "restoreBackupConfirmBody": "Neberljivo datoteko trezorja bo nadomestila rešilna kopija zadnjega uspešnega shranjevanja. Za odklepanje še vedno potrebujete svoje geslo (in YubiKey, če je registriran).",
   "restoreBackupConfirmAction": "Obnovi",
   "backupRestoredMessage": "Rešilna kopija obnovljena. Odklenite s svojimi poverilnicami.",
-  "deleteBackupButton": "Izbriši neuporabno rešilno kopijo",
-  "deleteBackupConfirmTitle": "Izbrišem rešilno kopijo?",
-  "deleteBackupConfirmBody": "Ta rešilna kopija ne more obnoviti trezorja, ker je tudi sama neberljiva. Brisanja ni mogoče razveljaviti.",
-  "backupDialogSafetyCopyNote": "Gabbro na napravi hrani tudi eno samodejno rešilno kopijo vsakega trezorja, osveženo ob vsakem shranjevanju. Ščiti le pred okvaro datoteke — ni varnostna kopija."
+  "backupDialogSafetyCopyNote": "Gabbro na napravi hrani tudi eno samodejno rešilno kopijo vsakega trezorja, osveženo ob vsakem shranjevanju. Ščiti le pred okvaro datoteke — ni varnostna kopija.",
+  "vaultUnrecoverableBody": "Te datoteke trezorja ni mogoče prebrati, prav tako ni mogoče prebrati njene rešilne kopije. Njene vsebine na tej napravi ni mogoče obnoviti.",
+  "vaultUnrecoverableBackupHint": "Če hranite varnostno kopijo zunaj naprave, obnovite trezor iz te kopije.",
+  "vaultUnrecoverableNoteLinux": "Neberljiva datoteka ostane na disku, zato jo lahko sami izbrišete ali pregledate.",
+  "vaultUnrecoverableNoteAndroid": "Neberljiva datoteka je v zasebni shrambi aplikacije in jo je mogoče odstraniti samo od tu.",
+  "removeVaultFromListButton": "Odstrani s seznama",
+  "deleteVaultFileButton": "Izbriši datoteko",
+  "removeVaultFromListConfirmTitle": "Odstranim trezor s seznama?",
+  "removeVaultFromListConfirmBody": "Odstranim ta trezor z vašega seznama? Datoteka ostane na disku — če jo obnovite, jo lahko znova dodate.",
+  "deleteVaultFileConfirmTitle": "Trajno izbrišem poškodovano datoteko trezorja?",
+  "deleteVaultFileConfirmBody": "Trajno izbrišem ta trezor? Neberljiva datoteka in njena rešilna kopija bosta odstranjeni s te naprave. Tega dejanja ni mogoče razveljaviti.",
+  "restoreFromFileButton": "Obnovi iz datoteke varnostne kopije",
+  "vaultRestoredMessage": "Trezor obnovljen. Odklenite s svojimi poverilnicami.",
+  "restoreFromFileInvalidError": "Ta datoteka ni uporaben trezor Gabbro."
 }

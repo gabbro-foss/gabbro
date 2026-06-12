@@ -1854,10 +1854,6 @@ class AppLocalizationsSl extends AppLocalizations {
       'Te datoteke trezorja ni mogoče prebrati. Na voljo je samodejna rešilna kopija zadnjega uspešnega shranjevanja.';
 
   @override
-  String get vaultCorruptNoBackup =>
-      'Te datoteke trezorja ni mogoče prebrati in samodejna rešilna kopija ne obstaja. Obnovite trezor iz lastne varnostne kopije.';
-
-  @override
   String get restoreBackupButton => 'Obnovi iz rešilne kopije';
 
   @override
@@ -1875,16 +1871,54 @@ class AppLocalizationsSl extends AppLocalizations {
       'Rešilna kopija obnovljena. Odklenite s svojimi poverilnicami.';
 
   @override
-  String get deleteBackupButton => 'Izbriši neuporabno rešilno kopijo';
-
-  @override
-  String get deleteBackupConfirmTitle => 'Izbrišem rešilno kopijo?';
-
-  @override
-  String get deleteBackupConfirmBody =>
-      'Ta rešilna kopija ne more obnoviti trezorja, ker je tudi sama neberljiva. Brisanja ni mogoče razveljaviti.';
-
-  @override
   String get backupDialogSafetyCopyNote =>
       'Gabbro na napravi hrani tudi eno samodejno rešilno kopijo vsakega trezorja, osveženo ob vsakem shranjevanju. Ščiti le pred okvaro datoteke — ni varnostna kopija.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Te datoteke trezorja ni mogoče prebrati, prav tako ni mogoče prebrati njene rešilne kopije. Njene vsebine na tej napravi ni mogoče obnoviti.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Če hranite varnostno kopijo zunaj naprave, obnovite trezor iz te kopije.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Neberljiva datoteka ostane na disku, zato jo lahko sami izbrišete ali pregledate.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Neberljiva datoteka je v zasebni shrambi aplikacije in jo je mogoče odstraniti samo od tu.';
+
+  @override
+  String get removeVaultFromListButton => 'Odstrani s seznama';
+
+  @override
+  String get deleteVaultFileButton => 'Izbriši datoteko';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Odstranim trezor s seznama?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Odstranim ta trezor z vašega seznama? Datoteka ostane na disku — če jo obnovite, jo lahko znova dodate.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Trajno izbrišem poškodovano datoteko trezorja?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Trajno izbrišem ta trezor? Neberljiva datoteka in njena rešilna kopija bosta odstranjeni s te naprave. Tega dejanja ni mogoče razveljaviti.';
+
+  @override
+  String get restoreFromFileButton => 'Obnovi iz datoteke varnostne kopije';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Trezor obnovljen. Odklenite s svojimi poverilnicami.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Ta datoteka ni uporaben trezor Gabbro.';
 }

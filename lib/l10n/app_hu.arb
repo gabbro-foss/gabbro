@@ -824,14 +824,23 @@
   "manageFoldersDefaultNote": "Az alapértelmezett mappák átnevezhetők vagy törölhetők.",
 
   "vaultCorruptBackupAvailable": "Ez a széffájl nem olvasható. Elérhető egy automatikus vészmásolat az utolsó sikeres mentésből.",
-  "vaultCorruptNoBackup": "Ez a széffájl nem olvasható, és nem létezik automatikus vészmásolat. Állítsa helyre a széfet a saját biztonsági mentéséből.",
   "restoreBackupButton": "Helyreállítás vészmásolatból",
   "restoreBackupConfirmTitle": "Helyreállítja a széfet a vészmásolatból?",
   "restoreBackupConfirmBody": "Az olvashatatlan széffájlt az utolsó sikeres mentés vészmásolata váltja fel. A feloldáshoz továbbra is szükség van a jelmondatára (és a YubiKey-re, ha regisztrálva van).",
   "restoreBackupConfirmAction": "Helyreállítás",
   "backupRestoredMessage": "Vészmásolat helyreállítva. Oldja fel a hitelesítő adataival.",
-  "deleteBackupButton": "Használhatatlan vészmásolat törlése",
-  "deleteBackupConfirmTitle": "Törli a vészmásolatot?",
-  "deleteBackupConfirmBody": "Ez a vészmásolat nem tudja helyreállítani a széfet, mert maga is olvashatatlan. A törlés nem vonható vissza.",
-  "backupDialogSafetyCopyNote": "A Gabbro emellett minden széfről egy automatikus vészmásolatot is tárol az eszközön, amely minden mentéskor frissül. Ez csak a fájlsérülés ellen véd — nem biztonsági mentés."
+  "backupDialogSafetyCopyNote": "A Gabbro emellett minden széfről egy automatikus vészmásolatot is tárol az eszközön, amely minden mentéskor frissül. Ez csak a fájlsérülés ellen véd — nem biztonsági mentés.",
+  "vaultUnrecoverableBody": "Ez a széffájl nem olvasható, és a vészmásolata is olvashatatlan. A tartalma nem állítható helyre ezen az eszközön.",
+  "vaultUnrecoverableBackupHint": "Ha van eszközön kívüli biztonsági mentése, állítsa helyre a széfet abból a másolatból.",
+  "vaultUnrecoverableNoteLinux": "Az olvashatatlan fájl a lemezen marad, így saját maga törölheti vagy megvizsgálhatja.",
+  "vaultUnrecoverableNoteAndroid": "Az olvashatatlan fájl az alkalmazás privát tárhelyén található, és csak innen távolítható el.",
+  "removeVaultFromListButton": "Eltávolítás a listáról",
+  "deleteVaultFileButton": "Fájl törlése",
+  "removeVaultFromListConfirmTitle": "Eltávolítja a széfet a listáról?",
+  "removeVaultFromListConfirmBody": "Eltávolítja ezt a széfet a listájáról? A fájl a lemezen marad — ha helyreállítja, később újra hozzáadhatja.",
+  "deleteVaultFileConfirmTitle": "Véglegesen törli a sérült széffájlt?",
+  "deleteVaultFileConfirmBody": "Véglegesen törli ezt a széfet? Az olvashatatlan fájl és a vészmásolata eltávolításra kerül erről az eszközről. Ez a művelet nem vonható vissza.",
+  "restoreFromFileButton": "Helyreállítás biztonsági mentési fájlból",
+  "vaultRestoredMessage": "Széf helyreállítva. Oldja fel a hitelesítő adataival.",
+  "restoreFromFileInvalidError": "Ez a fájl nem használható Gabbro-széf."
 }

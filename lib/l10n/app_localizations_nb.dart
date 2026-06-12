@@ -1846,10 +1846,6 @@ class AppLocalizationsNb extends AppLocalizations {
       'Denne hvelvfilen kan ikke leses. En automatisk reservekopi fra siste vellykkede lagring er tilgjengelig.';
 
   @override
-  String get vaultCorruptNoBackup =>
-      'Denne hvelvfilen kan ikke leses, og det finnes ingen automatisk reservekopi. Gjenopprett hvelvet fra din egen sikkerhetskopi.';
-
-  @override
   String get restoreBackupButton => 'Gjenopprett fra reservekopi';
 
   @override
@@ -1868,16 +1864,54 @@ class AppLocalizationsNb extends AppLocalizations {
       'Reservekopi gjenopprettet. Lås opp med påloggingsinformasjonen din.';
 
   @override
-  String get deleteBackupButton => 'Slett ubrukelig reservekopi';
-
-  @override
-  String get deleteBackupConfirmTitle => 'Slette reservekopien?';
-
-  @override
-  String get deleteBackupConfirmBody =>
-      'Denne reservekopien kan ikke gjenopprette hvelvet ditt, siden den selv er uleselig. Sletting kan ikke angres.';
-
-  @override
   String get backupDialogSafetyCopyNote =>
       'Gabbro beholder også én automatisk reservekopi av hvert hvelv på enheten, oppdatert ved hver lagring. Den beskytter bare mot filkorrupsjon — den er ikke en sikkerhetskopi.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Denne hvelvfilen kan ikke leses, og reservekopien er også uleselig. Innholdet kan ikke gjenopprettes på denne enheten.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Hvis du har en sikkerhetskopi utenfor enheten, gjenopprett hvelvet fra den kopien.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Den uleselige filen blir liggende på disken, så du kan slette eller undersøke den selv.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Den uleselige filen ligger i appens private lagring og kan bare fjernes herfra.';
+
+  @override
+  String get removeVaultFromListButton => 'Fjern fra liste';
+
+  @override
+  String get deleteVaultFileButton => 'Slett fil';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Fjern hvelv fra liste?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Fjerne dette hvelvet fra listen din? Filen blir liggende på disken — du kan legge det til igjen hvis du gjenoppretter det.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Slette den skadede hvelvfilen permanent?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Slette dette hvelvet permanent? Den uleselige filen og reservekopien fjernes fra denne enheten. Dette kan ikke angres.';
+
+  @override
+  String get restoreFromFileButton => 'Gjenopprett fra en sikkerhetskopifil';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Hvelv gjenopprettet. Lås opp med påloggingsinformasjonen din.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Den filen er ikke et brukbart Gabbro-hvelv.';
 }

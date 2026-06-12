@@ -2165,11 +2165,13 @@ mod tests {
         teardown(&path);
     }
 
-    // R-03: a normal CRUD save ROTATES — .bak holds the pre-operation vault —
-    // in contrast to credential changes, which refresh .bak to the current one
+    // R-03 P1: a CRUD save syncs the .bak to the CURRENT vault, so a restore
+    // after corruption returns the user's latest state — including the edit
+    // that just triggered this save. (The pre-P1 behaviour trailed by one save
+    // and lost the most recent edit on restore; hardware-found 2026-06-11.)
     #[test]
     #[serial]
-    fn bak_after_crud_save_holds_pre_operation_state() {
+    fn bak_after_crud_save_matches_current_vault() {
         let pass = b"crud bak pass";
         let path = setup_vault(pass);
         let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
@@ -2185,7 +2187,7 @@ mod tests {
                 updated_at: String::from("2025-01-01T00:00:00Z"),
                 folder: String::from("Personal"),
             },
-            title: String::from("Bak rotation probe"),
+            title: String::from("Bak sync probe"),
             content: String::from("probe"),
             custom_fields: vec![],
             attachments: vec![],
@@ -2199,12 +2201,12 @@ mod tests {
 
         let bak_bytes = bak_bytes.expect(".bak must exist after a CRUD save");
         assert_eq!(
-            bak_bytes, pre_op_bytes,
-            "a CRUD save must rotate: .bak holds the pre-operation vault"
+            bak_bytes, main_bytes,
+            "a CRUD save must sync: .bak holds the current (post-operation) vault"
         );
         assert_ne!(
-            bak_bytes, main_bytes,
-            "a CRUD save must not refresh: .bak trails the current vault by one save"
+            bak_bytes, pre_op_bytes,
+            "the .bak must have advanced past the pre-operation state, not trail it"
         );
     }
 

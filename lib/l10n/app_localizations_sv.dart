@@ -1846,10 +1846,6 @@ class AppLocalizationsSv extends AppLocalizations {
       'Den här valvfilen kan inte läsas. En automatisk reservkopia från den senaste lyckade sparningen finns tillgänglig.';
 
   @override
-  String get vaultCorruptNoBackup =>
-      'Den här valvfilen kan inte läsas och ingen automatisk reservkopia finns. Återställ valvet från din egen säkerhetskopia.';
-
-  @override
   String get restoreBackupButton => 'Återställ från reservkopia';
 
   @override
@@ -1868,16 +1864,54 @@ class AppLocalizationsSv extends AppLocalizations {
       'Reservkopia återställd. Lås upp med dina uppgifter.';
 
   @override
-  String get deleteBackupButton => 'Ta bort oanvändbar reservkopia';
-
-  @override
-  String get deleteBackupConfirmTitle => 'Ta bort reservkopian?';
-
-  @override
-  String get deleteBackupConfirmBody =>
-      'Den här reservkopian kan inte återställa ditt valv eftersom den själv är oläsbar. Borttagningen kan inte ångras.';
-
-  @override
   String get backupDialogSafetyCopyNote =>
       'Gabbro behåller också en automatisk reservkopia av varje valv på enheten, uppdaterad vid varje sparning. Den skyddar bara mot filkorruption — den är ingen säkerhetskopia.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Den här valvfilen kan inte läsas, och dess reservkopia är också oläslig. Innehållet kan inte återställas på den här enheten.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Om du har en säkerhetskopia utanför enheten, återställ valvet från den kopian.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Den oläsliga filen ligger kvar på disken, så du kan ta bort eller granska den själv.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Den oläsliga filen ligger i appens privata lagring och kan bara tas bort härifrån.';
+
+  @override
+  String get removeVaultFromListButton => 'Ta bort från listan';
+
+  @override
+  String get deleteVaultFileButton => 'Ta bort fil';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Ta bort valvet från listan?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Ta bort det här valvet från din lista? Filen ligger kvar på disken — du kan lägga till den igen om du återställer den.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Ta bort den skadade valvfilen permanent?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Ta bort det här valvet permanent? Den oläsliga filen och dess reservkopia tas bort från den här enheten. Det går inte att ångra.';
+
+  @override
+  String get restoreFromFileButton => 'Återställ från en säkerhetskopia';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Valv återställt. Lås upp med dina uppgifter.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Den filen är inte ett användbart Gabbro-valv.';
 }

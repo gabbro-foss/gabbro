@@ -1858,10 +1858,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Questo file della cassaforte non può essere letto. È disponibile una copia di sicurezza automatica dell\'ultimo salvataggio riuscito.';
 
   @override
-  String get vaultCorruptNoBackup =>
-      'Questo file della cassaforte non può essere letto e non esiste alcuna copia di sicurezza automatica. Ripristina la cassaforte dal tuo backup.';
-
-  @override
   String get restoreBackupButton => 'Ripristina dalla copia di sicurezza';
 
   @override
@@ -1880,17 +1876,55 @@ class AppLocalizationsIt extends AppLocalizations {
       'Copia di sicurezza ripristinata. Sblocca con le tue credenziali.';
 
   @override
-  String get deleteBackupButton =>
-      'Elimina la copia di sicurezza inutilizzabile';
-
-  @override
-  String get deleteBackupConfirmTitle => 'Eliminare la copia di sicurezza?';
-
-  @override
-  String get deleteBackupConfirmBody =>
-      'Questa copia di sicurezza non può ripristinare la cassaforte perché è essa stessa illeggibile. L\'eliminazione non può essere annullata.';
-
-  @override
   String get backupDialogSafetyCopyNote =>
       'Gabbro conserva inoltre sul dispositivo una copia di sicurezza automatica di ogni cassaforte, aggiornata a ogni salvataggio. Protegge solo dalla corruzione del file — non è un backup.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Questo file della cassaforte non può essere letto e anche la sua copia di sicurezza è illeggibile. Il suo contenuto non può essere recuperato su questo dispositivo.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Se conservi un backup esterno al dispositivo, ripristina la cassaforte da quella copia.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Il file illeggibile rimane sul disco, così puoi eliminarlo o esaminarlo tu stesso.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Il file illeggibile si trova nella memoria privata dell\'app e può essere rimosso solo da qui.';
+
+  @override
+  String get removeVaultFromListButton => 'Rimuovi dall\'elenco';
+
+  @override
+  String get deleteVaultFileButton => 'Elimina file';
+
+  @override
+  String get removeVaultFromListConfirmTitle =>
+      'Rimuovere la cassaforte dall\'elenco?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Rimuovere questa cassaforte dal tuo elenco? Il file rimane sul disco — puoi aggiungerlo di nuovo se lo recuperi.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Eliminare definitivamente il file della cassaforte danneggiato?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Eliminare definitivamente questa cassaforte? Il file illeggibile e la sua copia di sicurezza verranno rimossi da questo dispositivo. L\'operazione non può essere annullata.';
+
+  @override
+  String get restoreFromFileButton => 'Ripristina da un file di backup';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Cassaforte ripristinata. Sblocca con le tue credenziali.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Questo file non è una cassaforte Gabbro utilizzabile.';
 }

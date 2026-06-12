@@ -1851,10 +1851,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Този файл на сейфа не може да бъде прочетен. Налично е автоматично аварийно копие от последното успешно запазване.';
 
   @override
-  String get vaultCorruptNoBackup =>
-      'Този файл на сейфа не може да бъде прочетен и няма автоматично аварийно копие. Възстановете сейфа от собственото си резервно копие.';
-
-  @override
   String get restoreBackupButton => 'Възстановяване от аварийно копие';
 
   @override
@@ -1873,16 +1869,55 @@ class AppLocalizationsBg extends AppLocalizations {
       'Аварийното копие е възстановено. Отключете с вашите данни.';
 
   @override
-  String get deleteBackupButton => 'Изтриване на негодното аварийно копие';
-
-  @override
-  String get deleteBackupConfirmTitle => 'Да се изтрие ли аварийното копие?';
-
-  @override
-  String get deleteBackupConfirmBody =>
-      'Това аварийно копие не може да възстанови сейфа, защото самото то е нечетимо. Изтриването е необратимо.';
-
-  @override
   String get backupDialogSafetyCopyNote =>
       'Gabbro също пази на устройството по едно автоматично аварийно копие на всеки сейф, обновявано при всяко запазване. То предпазва само от повреда на файла — не е резервно копие.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Този файл на сейфа не може да бъде прочетен, а аварийното му копие също е нечетимо. Съдържанието му не може да бъде възстановено на това устройство.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Ако пазите резервно копие извън устройството, възстановете сейфа от него.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Нечетимият файл остава на диска, така че можете сами да го изтриете или прегледате.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Нечетимият файл е в частното хранилище на приложението и може да бъде премахнат само оттук.';
+
+  @override
+  String get removeVaultFromListButton => 'Премахни от списъка';
+
+  @override
+  String get deleteVaultFileButton => 'Изтрий файла';
+
+  @override
+  String get removeVaultFromListConfirmTitle =>
+      'Премахване на сейфа от списъка?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Да се премахне ли този сейф от списъка ви? Файлът остава на диска — можете да го добавите отново, ако го възстановите.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Окончателно изтриване на повредения файл на сейфа?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Да се изтрие ли окончателно този сейф? Нечетимият файл и аварийното му копие ще бъдат премахнати от това устройство. Това действие е необратимо.';
+
+  @override
+  String get restoreFromFileButton => 'Възстановяване от резервен файл';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Сейфът е възстановен. Отключете с вашите данни.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Този файл не е използваем сейф на Gabbro.';
 }

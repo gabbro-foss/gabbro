@@ -1865,10 +1865,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Este archivo de caja fuerte no se puede leer. Hay disponible una copia de respaldo automática del último guardado correcto.';
 
   @override
-  String get vaultCorruptNoBackup =>
-      'Este archivo de caja fuerte no se puede leer y no existe ninguna copia de respaldo automática. Restaura la caja fuerte desde tu propia copia de seguridad.';
-
-  @override
   String get restoreBackupButton => 'Restaurar desde la copia de respaldo';
 
   @override
@@ -1887,16 +1883,56 @@ class AppLocalizationsEs extends AppLocalizations {
       'Copia de respaldo restaurada. Desbloquea con tus credenciales.';
 
   @override
-  String get deleteBackupButton => 'Eliminar la copia de respaldo inservible';
-
-  @override
-  String get deleteBackupConfirmTitle => '¿Eliminar la copia de respaldo?';
-
-  @override
-  String get deleteBackupConfirmBody =>
-      'Esta copia de respaldo no puede restaurar tu caja fuerte porque también es ilegible. La eliminación no se puede deshacer.';
-
-  @override
   String get backupDialogSafetyCopyNote =>
       'Gabbro también guarda en el dispositivo una copia de respaldo automática de cada caja fuerte, actualizada en cada guardado. Solo protege contra la corrupción del archivo — no es una copia de seguridad.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Este archivo de caja fuerte no se puede leer, y su copia de respaldo también es ilegible. Su contenido no se puede recuperar en este dispositivo.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Si conservas una copia de seguridad fuera del dispositivo, restaura la caja fuerte desde esa copia.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'El archivo ilegible permanece en el disco, así que puedes eliminarlo o revisarlo tú mismo.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'El archivo ilegible está en el almacenamiento privado de la app y solo se puede quitar desde aquí.';
+
+  @override
+  String get removeVaultFromListButton => 'Quitar de la lista';
+
+  @override
+  String get deleteVaultFileButton => 'Eliminar archivo';
+
+  @override
+  String get removeVaultFromListConfirmTitle =>
+      '¿Quitar la caja fuerte de la lista?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      '¿Quitar esta caja fuerte de tu lista? El archivo permanece en el disco — puedes volver a añadirlo si lo recuperas.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      '¿Eliminar permanentemente el archivo de caja fuerte dañado?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      '¿Eliminar permanentemente esta caja fuerte? El archivo ilegible y su copia de respaldo se eliminarán de este dispositivo. Esta acción no se puede deshacer.';
+
+  @override
+  String get restoreFromFileButton =>
+      'Restaurar desde un archivo de copia de seguridad';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Caja fuerte restaurada. Desbloquea con tus credenciales.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Ese archivo no es una caja fuerte de Gabbro utilizable.';
 }

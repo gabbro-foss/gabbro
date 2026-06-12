@@ -1851,10 +1851,6 @@ class AppLocalizationsSk extends AppLocalizations {
       'Tento súbor trezoru sa nedá prečítať. K dispozícii je automatická záchranná kópia z posledného úspešného uloženia.';
 
   @override
-  String get vaultCorruptNoBackup =>
-      'Tento súbor trezoru sa nedá prečítať a žiadna automatická záchranná kópia neexistuje. Obnovte trezor z vlastnej zálohy.';
-
-  @override
   String get restoreBackupButton => 'Obnoviť zo záchrannej kópie';
 
   @override
@@ -1872,16 +1868,54 @@ class AppLocalizationsSk extends AppLocalizations {
       'Záchranná kópia obnovená. Odomknite pomocou svojich prihlasovacích údajov.';
 
   @override
-  String get deleteBackupButton => 'Vymazať nepoužiteľnú záchrannú kópiu';
-
-  @override
-  String get deleteBackupConfirmTitle => 'Vymazať záchrannú kópiu?';
-
-  @override
-  String get deleteBackupConfirmBody =>
-      'Táto záchranná kópia nemôže obnoviť váš trezor, pretože je sama nečitateľná. Vymazanie sa nedá vrátiť späť.';
-
-  @override
   String get backupDialogSafetyCopyNote =>
       'Gabbro tiež uchováva v zariadení jednu automatickú záchrannú kópiu každého trezoru, obnovovanú pri každom uložení. Chráni iba pred poškodením súboru — nie je to záloha.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Tento súbor trezoru sa nedá prečítať a jeho záchranná kópia je tiež nečitateľná. Jeho obsah sa na tomto zariadení nedá obnoviť.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Ak máte zálohu mimo zariadenia, obnovte trezor z tejto kópie.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Nečitateľný súbor zostáva na disku, takže ho môžete sami odstrániť alebo preskúmať.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Nečitateľný súbor je v súkromnom úložisku aplikácie a dá sa odstrániť iba odtiaľto.';
+
+  @override
+  String get removeVaultFromListButton => 'Odstrániť zo zoznamu';
+
+  @override
+  String get deleteVaultFileButton => 'Odstrániť súbor';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Odstrániť trezor zo zoznamu?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Odstrániť tento trezor zo zoznamu? Súbor zostáva na disku — ak ho obnovíte, môžete ho znova pridať.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Natrvalo odstrániť poškodený súbor trezoru?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Natrvalo odstrániť tento trezor? Nečitateľný súbor a jeho záchranná kópia sa odstránia z tohto zariadenia. Túto akciu nie je možné vrátiť späť.';
+
+  @override
+  String get restoreFromFileButton => 'Obnoviť zo záložného súboru';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Trezor obnovený. Odomknite pomocou svojich prihlasovacích údajov.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Tento súbor nie je použiteľný trezor Gabbro.';
 }

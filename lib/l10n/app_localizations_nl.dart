@@ -1856,10 +1856,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit kluisbestand kan niet worden gelezen. Er is een automatische reservekopie van de laatste geslaagde opslag beschikbaar.';
 
   @override
-  String get vaultCorruptNoBackup =>
-      'Dit kluisbestand kan niet worden gelezen en er bestaat geen automatische reservekopie. Herstel de kluis vanuit je eigen back-up.';
-
-  @override
   String get restoreBackupButton => 'Herstellen vanaf reservekopie';
 
   @override
@@ -1878,16 +1874,54 @@ class AppLocalizationsNl extends AppLocalizations {
       'Reservekopie hersteld. Ontgrendel met je gegevens.';
 
   @override
-  String get deleteBackupButton => 'Onbruikbare reservekopie verwijderen';
-
-  @override
-  String get deleteBackupConfirmTitle => 'Reservekopie verwijderen?';
-
-  @override
-  String get deleteBackupConfirmBody =>
-      'Deze reservekopie kan je kluis niet herstellen omdat hij zelf onleesbaar is. Verwijderen kan niet ongedaan worden gemaakt.';
-
-  @override
   String get backupDialogSafetyCopyNote =>
       'Gabbro bewaart ook één automatische reservekopie van elke kluis op het apparaat, ververst bij elke opslag. Die beschermt alleen tegen bestandsbeschadiging — het is geen back-up.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Dit kluisbestand kan niet worden gelezen, en de reservekopie is ook onleesbaar. De inhoud kan op dit apparaat niet worden hersteld.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Als je een back-up buiten dit apparaat bewaart, herstel de kluis dan vanaf die kopie.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Het onleesbare bestand blijft op de schijf staan, zodat je het zelf kunt verwijderen of bekijken.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Het onleesbare bestand staat in de privéopslag van de app en kan alleen hier worden verwijderd.';
+
+  @override
+  String get removeVaultFromListButton => 'Uit lijst verwijderen';
+
+  @override
+  String get deleteVaultFileButton => 'Bestand verwijderen';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Kluis uit lijst verwijderen?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Deze kluis uit je lijst verwijderen? Het bestand blijft op de schijf staan — je kunt het later weer toevoegen als je het herstelt.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Beschadigd kluisbestand definitief verwijderen?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Deze kluis definitief verwijderen? Het onleesbare bestand en de reservekopie worden van dit apparaat verwijderd. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get restoreFromFileButton => 'Herstellen vanaf een back-upbestand';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Kluis hersteld. Ontgrendel met je gegevens.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Dat bestand is geen bruikbare Gabbro-kluis.';
 }

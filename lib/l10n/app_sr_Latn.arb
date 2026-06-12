@@ -818,14 +818,23 @@
   "manageFoldersDefaultNote": "Podrazumevane fascikle mogu se preimenovati ili izbrisati.",
 
   "vaultCorruptBackupAvailable": "Ova datoteka sefa ne može da se pročita. Dostupna je automatska pomoćna kopija poslednjeg uspešnog čuvanja.",
-  "vaultCorruptNoBackup": "Ova datoteka sefa ne može da se pročita i automatska pomoćna kopija ne postoji. Vratite sef iz sopstvene rezervne kopije.",
   "restoreBackupButton": "Vrati iz pomoćne kopije",
   "restoreBackupConfirmTitle": "Vratiti sef iz pomoćne kopije?",
   "restoreBackupConfirmBody": "Nečitljivu datoteku sefa zameniće pomoćna kopija poslednjeg uspešnog čuvanja. Za otključavanje su i dalje potrebni vaša pristupna fraza (i YubiKey, ako je registrovan).",
   "restoreBackupConfirmAction": "Vrati",
   "backupRestoredMessage": "Pomoćna kopija vraćena. Otključajte svojim akreditivima.",
-  "deleteBackupButton": "Izbriši neupotrebljivu pomoćnu kopiju",
-  "deleteBackupConfirmTitle": "Izbrisati pomoćnu kopiju?",
-  "deleteBackupConfirmBody": "Ova pomoćna kopija ne može da vrati vaš sef jer je i sama nečitljiva. Brisanje je nepovratno.",
-  "backupDialogSafetyCopyNote": "Gabbro na uređaju čuva i jednu automatsku pomoćnu kopiju svakog sefa, osveženu pri svakom čuvanju. Štiti samo od oštećenja datoteke — nije rezervna kopija."
+  "backupDialogSafetyCopyNote": "Gabbro na uređaju čuva i jednu automatsku pomoćnu kopiju svakog sefa, osveženu pri svakom čuvanju. Štiti samo od oštećenja datoteke — nije rezervna kopija.",
+  "vaultUnrecoverableBody": "Ova datoteka sefa ne može da se pročita, a ni njena pomoćna kopija nije čitljiva. Njen sadržaj ne može da se oporavi na ovom uređaju.",
+  "vaultUnrecoverableBackupHint": "Ako čuvate rezervnu kopiju van uređaja, vratite sef iz te kopije.",
+  "vaultUnrecoverableNoteLinux": "Nečitljiva datoteka ostaje na disku, pa možete sami da je izbrišete ili pregledate.",
+  "vaultUnrecoverableNoteAndroid": "Nečitljiva datoteka se nalazi u privatnom skladištu aplikacije i može da se ukloni samo odavde.",
+  "removeVaultFromListButton": "Ukloni sa liste",
+  "deleteVaultFileButton": "Izbriši datoteku",
+  "removeVaultFromListConfirmTitle": "Ukloniti sef sa liste?",
+  "removeVaultFromListConfirmBody": "Ukloniti ovaj sef sa vaše liste? Datoteka ostaje na disku — možete ponovo da je dodate ako je oporavite.",
+  "deleteVaultFileConfirmTitle": "Trajno izbrisati oštećenu datoteku sefa?",
+  "deleteVaultFileConfirmBody": "Trajno izbrisati ovaj sef? Nečitljiva datoteka i njena pomoćna kopija biće uklonjeni sa ovog uređaja. Ova radnja ne može da se poništi.",
+  "restoreFromFileButton": "Vrati iz datoteke rezervne kopije",
+  "vaultRestoredMessage": "Sef vraćen. Otključajte svojim akreditivima.",
+  "restoreFromFileInvalidError": "Ta datoteka nije upotrebljiv Gabbro sef."
 }

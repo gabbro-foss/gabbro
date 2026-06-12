@@ -1795,10 +1795,6 @@ class AppLocalizationsJa extends AppLocalizations {
       'このボールトファイルは読み取れません。最後に成功した保存の自動セーフティコピーが利用できます。';
 
   @override
-  String get vaultCorruptNoBackup =>
-      'このボールトファイルは読み取れず、自動セーフティコピーも存在しません。ご自身のバックアップからボールトを復元してください。';
-
-  @override
   String get restoreBackupButton => 'セーフティコピーから復元';
 
   @override
@@ -1815,16 +1811,51 @@ class AppLocalizationsJa extends AppLocalizations {
   String get backupRestoredMessage => 'セーフティコピーを復元しました。認証情報でロックを解除してください。';
 
   @override
-  String get deleteBackupButton => '使用できないセーフティコピーを削除';
-
-  @override
-  String get deleteBackupConfirmTitle => 'セーフティコピーを削除しますか？';
-
-  @override
-  String get deleteBackupConfirmBody =>
-      'このセーフティコピー自体も読み取れないため、ボールトを復元できません。削除は元に戻せません。';
-
-  @override
   String get backupDialogSafetyCopyNote =>
       'Gabbro は各ボールトの自動セーフティコピーを 1 つ端末内に保持し、保存のたびに更新します。これはファイル破損のみに備えるもので、バックアップではありません。';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'このボールトファイルは読み取れず、そのセーフティコピーも読み取れません。このデバイスでは内容を復元できません。';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'デバイス外のバックアップがある場合は、そのコピーからボールトを復元してください。';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      '読み取れないファイルはディスク上に残るため、ご自身で削除または確認できます。';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      '読み取れないファイルはアプリのプライベートストレージにあり、ここからのみ削除できます。';
+
+  @override
+  String get removeVaultFromListButton => 'リストから削除';
+
+  @override
+  String get deleteVaultFileButton => 'ファイルを削除';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'ボールトをリストから削除しますか？';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'このボールトをリストから削除しますか？ ファイルはディスク上に残ります。復元できれば再度追加できます。';
+
+  @override
+  String get deleteVaultFileConfirmTitle => '破損したボールトファイルを完全に削除しますか？';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'このボールトを完全に削除しますか？ 読み取れないファイルとそのセーフティコピーがこのデバイスから削除されます。この操作は元に戻せません。';
+
+  @override
+  String get restoreFromFileButton => 'バックアップファイルから復元';
+
+  @override
+  String get vaultRestoredMessage => 'ボールトを復元しました。認証情報でロックを解除してください。';
+
+  @override
+  String get restoreFromFileInvalidError => 'このファイルは使用可能な Gabbro ボールトではありません。';
 }

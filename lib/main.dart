@@ -166,6 +166,12 @@ abstract class GabbroAppState {
   void switchToVault(String path, String alias);
   /// Push the ManageVaultsScreen onto the root navigator.
   void navigateToManageVaults();
+  /// R-03 P5: remove a vault whose file is unreadable, from the unlock screen.
+  /// When [deleteFiles] is true the vault file and its `.bak` are deleted from
+  /// disk; otherwise only the registry entry is removed (the bytes stay so the
+  /// user can recover them). Routes to the next vault, or onboarding if none
+  /// remain — so a single corrupt vault never strands the user.
+  Future<void> removeVault(String path, {required bool deleteFiles});
 }
 
 ThemeData gabbroLightTheme({required bool highContrast}) {
@@ -480,6 +486,38 @@ class _GabbroAppState extends State<GabbroApp>
   void navigateToManageVaults() {
     _navigatorKey.currentState?.push(
       MaterialPageRoute(builder: (_) => _buildManageVaultsScreen()),
+    );
+  }
+
+  @override
+  Future<void> removeVault(String path, {required bool deleteFiles}) async {
+    if (deleteFiles) {
+      // R-03: removes the vault AND its .bak safety copy.
+      try {
+        await deleteVaultFiles(path);
+      } catch (_) {}
+    }
+    final updated = _registry.remove(path);
+    await updated.save();
+    // Direct field mutation (no setState) to avoid racing pushAndRemoveUntil —
+    // mirrors onDelete for the active vault.
+    _registry = updated;
+    try {
+      lockVault();
+    } catch (_) {}
+    final remaining = updated.lastUsed;
+    _navigatorKey.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => remaining == null
+            ? OnboardingScreen(
+                postDeletionMessage:
+                    'The unreadable vault was removed. Create or add a vault to continue.',
+                blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+                onVaultCreated: _onVaultCreated,
+              )
+            : _buildUnlockScreen(remaining.path, remaining.alias),
+      ),
+      (_) => false,
     );
   }
 

@@ -1848,10 +1848,6 @@ class AppLocalizationsEu extends AppLocalizations {
       'Kutxa gotorraren fitxategi hau ezin da irakurri. Azken gordetze arrakastatsuaren segurtasun-kopia automatiko bat dago erabilgarri.';
 
   @override
-  String get vaultCorruptNoBackup =>
-      'Kutxa gotorraren fitxategi hau ezin da irakurri eta ez dago segurtasun-kopia automatikorik. Berreskuratu kutxa gotorra zure babeskopiatik.';
-
-  @override
   String get restoreBackupButton => 'Berreskuratu segurtasun-kopiatik';
 
   @override
@@ -1870,16 +1866,56 @@ class AppLocalizationsEu extends AppLocalizations {
       'Segurtasun-kopia berreskuratu da. Desblokeatu zure kredentzialekin.';
 
   @override
-  String get deleteBackupButton => 'Ezabatu erabilgaitza den segurtasun-kopia';
-
-  @override
-  String get deleteBackupConfirmTitle => 'Segurtasun-kopia ezabatu?';
-
-  @override
-  String get deleteBackupConfirmBody =>
-      'Segurtasun-kopia honek ezin du zure kutxa gotorra berreskuratu, bera ere irakurgaitza delako. Ezabatzea ezin da desegin.';
-
-  @override
   String get backupDialogSafetyCopyNote =>
       'Gabbrok kutxa gotor bakoitzaren segurtasun-kopia automatiko bat ere gordetzen du gailuan, gordetze bakoitzean eguneratua. Fitxategiaren hondatzetik soilik babesten du — ez da babeskopia bat.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Kutxa gotorraren fitxategi hau ezin da irakurri, eta haren segurtasun-kopia ere irakurtezina da. Bere edukia ezin da gailu honetan berreskuratu.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Gailutik kanpoko babeskopia bat baduzu, berreskuratu kutxa gotorra kopia horretatik.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Fitxategi irakurtezina diskoan geratzen da, beraz, zuk zeuk ezaba edo azter dezakezu.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Fitxategi irakurtezina aplikazioaren biltegi pribatuan dago eta hemendik bakarrik ken daiteke.';
+
+  @override
+  String get removeVaultFromListButton => 'Kendu zerrendatik';
+
+  @override
+  String get deleteVaultFileButton => 'Ezabatu fitxategia';
+
+  @override
+  String get removeVaultFromListConfirmTitle =>
+      'Kutxa gotorra zerrendatik kendu?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Kutxa gotor hau zure zerrendatik kendu? Fitxategia diskoan geratzen da — berreskuratzen baduzu, berriro gehi dezakezu.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Hondatutako kutxa gotorraren fitxategia betiko ezabatu?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Kutxa gotor hau betiko ezabatu? Fitxategi irakurtezina eta haren segurtasun-kopia gailu honetatik kenduko dira. Ekintza hau ezin da desegin.';
+
+  @override
+  String get restoreFromFileButton =>
+      'Berreskuratu babeskopia-fitxategi batetik';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Kutxa gotorra berreskuratu da. Desblokeatu zure kredentzialekin.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat.';
 }

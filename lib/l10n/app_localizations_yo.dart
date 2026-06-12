@@ -1847,10 +1847,6 @@ class AppLocalizationsYo extends AppLocalizations {
       'Kò ṣeé ka fáìlì àpótí ìṣúra yìí. Àdàkọ ààbò aládàáṣiṣẹ́ láti ìfipamọ́ àṣeyọrí tó kẹ́yìn wà ní àrọ́wọ́tó.';
 
   @override
-  String get vaultCorruptNoBackup =>
-      'Kò ṣeé ka fáìlì àpótí ìṣúra yìí, kò sì sí àdàkọ ààbò aládàáṣiṣẹ́. Dá àpótí ìṣúra padà láti àdàkọ ìpamọ́ tìrẹ.';
-
-  @override
   String get restoreBackupButton => 'Dá padà láti àdàkọ ààbò';
 
   @override
@@ -1869,16 +1865,55 @@ class AppLocalizationsYo extends AppLocalizations {
       'A ti dá àdàkọ ààbò padà. Ṣí i pẹ̀lú àwọn ìwé-ẹ̀rí rẹ.';
 
   @override
-  String get deleteBackupButton => 'Pa àdàkọ ààbò tí kò wúlò rẹ́';
-
-  @override
-  String get deleteBackupConfirmTitle => 'Pa àdàkọ ààbò rẹ́?';
-
-  @override
-  String get deleteBackupConfirmBody =>
-      'Àdàkọ ààbò yìí kò lè dá àpótí ìṣúra rẹ padà nítorí òun fúnra rẹ̀ kò ṣeé kà. Píparẹ́ kò ṣeé dá padà.';
-
-  @override
   String get backupDialogSafetyCopyNote =>
       'Gabbro tún ń tọ́jú àdàkọ ààbò aládàáṣiṣẹ́ kan fún àpótí ìṣúra kọ̀ọ̀kan lórí ẹ̀rọ, tí a ń sọ di tuntun ní ìfipamọ́ kọ̀ọ̀kan. Ó ń dáàbò bo ìbàjẹ́ fáìlì nìkan — kì í ṣe àdàkọ ìpamọ́.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Kò ṣeé ka fáìlì àpótí ìṣúra yìí, àti àdàkọ ààbò rẹ̀ pẹ̀lú kò ṣeé ka. Kò ṣeé gba àkóónú rẹ̀ padà lórí ẹ̀rọ yìí.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Tí o bá ní àfẹyìntì lóde ẹ̀rọ, dá àpótí ìṣúra padà láti inú àdàkọ yẹn.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Fáìlì tí kò ṣeé ka yóò dúró lórí diski, nítorí náà o lè pa á rẹ́ tàbí ṣàyẹ̀wò rẹ̀ fúnra rẹ.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Fáìlì tí kò ṣeé ka wà nínú ibi ìpamọ́ àdáni ti áàpù, ó sì lè yọ kúrò níbí yìí nìkan.';
+
+  @override
+  String get removeVaultFromListButton => 'Yọ kúrò nínú àtòjọ';
+
+  @override
+  String get deleteVaultFileButton => 'Pa fáìlì rẹ́';
+
+  @override
+  String get removeVaultFromListConfirmTitle =>
+      'Yọ àpótí ìṣúra kúrò nínú àtòjọ?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Yọ àpótí ìṣúra yìí kúrò nínú àtòjọ rẹ? Fáìlì náà yóò dúró lórí diski — o lè fi kún un lẹ́ẹ̀kansí tí o bá gbà á padà.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Pa fáìlì àpótí ìṣúra tó bàjẹ́ rẹ́ pátápátá?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Pa àpótí ìṣúra yìí rẹ́ pátápátá? A ó yọ fáìlì tí kò ṣeé ka àti àdàkọ ààbò rẹ̀ kúrò lórí ẹ̀rọ yìí. Kò ṣeé yí ìṣe yìí padà.';
+
+  @override
+  String get restoreFromFileButton => 'Dá padà láti fáìlì àfẹyìntì';
+
+  @override
+  String get vaultRestoredMessage =>
+      'A ti dá àpótí ìṣúra padà. Ṣí i pẹ̀lú àwọn ìwé-ẹ̀rí rẹ.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò.';
 }

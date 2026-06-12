@@ -121,12 +121,15 @@ Future<void> changePassphrase({
   newPassphrase: newPassphrase,
 );
 
-/// R-03: does an automatic safety copy (`.bak`) exist next to this vault?
+/// R-03 P3: is the automatic safety copy (`.bak`) a *usable* vault — present
+/// and parseable, not just present?
 ///
-/// Drives whether the unlock screen offers a restore when the vault file
-/// itself cannot be parsed. Safe to call with no session (locked state).
-Future<bool> vaultBackupExists({required String path}) =>
-    RustLib.instance.api.crateApiVaultBridgeVaultBackupExists(path: path);
+/// Drives whether the unlock screen may offer a restore when the vault file
+/// itself cannot be parsed. Returns false for a missing, symlinked, or
+/// unparseable `.bak`, so the offer can never claim a safety copy that a
+/// confirmed restore would then refuse. Safe to call with no session.
+Future<bool> vaultBackupUsable({required String path}) =>
+    RustLib.instance.api.crateApiVaultBridgeVaultBackupUsable(path: path);
 
 /// R-03: replace a corrupt vault file with its `.bak` safety copy.
 ///
@@ -135,6 +138,20 @@ Future<bool> vaultBackupExists({required String path}) =>
 /// restoring grants no access.
 Future<void> restoreVaultBackup({required String path}) =>
     RustLib.instance.api.crateApiVaultBridgeRestoreVaultBackup(path: path);
+
+/// R-03: restore the vault at `path` from an external backup file the user
+/// picked (their own off-device 3-2-1 copy).
+///
+/// Refuses a `source` that is not a usable Gabbro vault, so a corrupt vault is
+/// never replaced by another unreadable file. The restored vault still requires
+/// full credentials to open.
+Future<void> restoreVaultFromFile({
+  required String path,
+  required String source,
+}) => RustLib.instance.api.crateApiVaultBridgeRestoreVaultFromFile(
+  path: path,
+  source: source,
+);
 
 /// R-03: delete the `.bak` safety copy without touching the vault.
 ///

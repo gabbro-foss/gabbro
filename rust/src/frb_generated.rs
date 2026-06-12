@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1113320836;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1094444850;
 
 // Section: executor
 
@@ -2125,6 +2125,45 @@ fn wire__crate__api__vault_bridge__restore_vault_backup_impl(
         },
     )
 }
+fn wire__crate__api__vault_bridge__restore_vault_from_file_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "restore_vault_from_file",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_path = <String>::sse_decode(&mut deserializer);
+            let api_source = <String>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::vault_bridge::restore_vault_from_file(api_path, api_source)
+                                .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__vault_bridge__session_clear_password_history_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -2434,7 +2473,7 @@ fn wire__crate__api__vault_bridge__update_entry_impl(
         },
     )
 }
-fn wire__crate__api__vault_bridge__vault_backup_exists_impl(
+fn wire__crate__api__vault_bridge__vault_backup_usable_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -2442,7 +2481,7 @@ fn wire__crate__api__vault_bridge__vault_backup_exists_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "vault_backup_exists",
+            debug_name: "vault_backup_usable",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -2462,7 +2501,7 @@ fn wire__crate__api__vault_bridge__vault_backup_exists_impl(
                 transform_result_sse::<_, ()>(
                     (move || async move {
                         let output_ok = Result::<_, ()>::Ok(
-                            crate::api::vault_bridge::vault_backup_exists(api_path).await,
+                            crate::api::vault_bridge::vault_backup_usable(api_path).await,
                         )?;
                         Ok(output_ok)
                     })()
@@ -3516,36 +3555,42 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        56 => wire__crate__api__vault_bridge__session_clear_password_history_impl(
+        56 => wire__crate__api__vault_bridge__restore_vault_from_file_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        57 => wire__crate__api__vault_bridge__session_revert_password_impl(
+        57 => wire__crate__api__vault_bridge__session_clear_password_history_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        58 => {
+        58 => wire__crate__api__vault_bridge__session_revert_password_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        59 => {
             wire__crate__api__vault_bridge__set_vault_alias_impl(port, ptr, rust_vec_len, data_len)
         }
-        59 => wire__crate__api__vault_bridge__set_yubikey_alias_impl(
+        60 => wire__crate__api__vault_bridge__set_yubikey_alias_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        61 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
-        62 => wire__crate__api__vault_bridge__unlock_vault_with_yubikey_impl(
+        62 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
+        63 => wire__crate__api__vault_bridge__unlock_vault_with_yubikey_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        63 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
-        64 => wire__crate__api__vault_bridge__vault_backup_exists_impl(
+        64 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
+        65 => wire__crate__api__vault_bridge__vault_backup_usable_impl(
             port,
             ptr,
             rust_vec_len,
@@ -3587,7 +3632,7 @@ fn pde_ffi_dispatcher_sync_impl(
         }
         48 => wire__crate__api__vault_bridge__lock_vault_impl(ptr, rust_vec_len, data_len),
         52 => wire__crate__api__vault_bridge__read_vault_header_impl(ptr, rust_vec_len, data_len),
-        60 => wire__crate__api__import__sniff_csv_file_impl(ptr, rust_vec_len, data_len),
+        61 => wire__crate__api__import__sniff_csv_file_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }

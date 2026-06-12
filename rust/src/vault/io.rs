@@ -112,16 +112,43 @@ pub(crate) fn refresh_backup_after_credential_change(path: &Path) -> Result<(), 
     Ok(())
 }
 
+/// R-03 P1: after the main vault is written, confirm the bytes read back as a
+/// valid vault, then advance the `.bak` to match — so the safety copy always
+/// equals the last *verified* save, never one save behind (the defect that
+/// lost a just-made edit when a user restored after corruption).
+///
+/// If the just-written bytes do not parse, the `.bak` is left at the previous
+/// good save and a loud error is returned: this is the 2026-06-08 brick class
+/// firing at the moment of the bad save instead of silently propagating into
+/// the safety copy.
+fn verify_and_sync_backup(path: &Path) -> Result<(), String> {
+    let written = fs::read(path).map_err(|e| {
+        format!("Vault save verification failed — could not re-read the vault: {e}")
+    })?;
+    SealedVault::from_bytes(&written).map_err(|e| {
+        format!(
+            "The vault was written but did not read back as a valid vault; \
+             the safety copy was kept at the last good save: {e}"
+        )
+    })?;
+    sync_backup_to_current(path)
+}
+
 /// Write a sealed vault to a `.gabbro` file at the given path.
 ///
-/// Refuses symlinks. Rotates the previous save to `.bak` (fail-closed: a
-/// rotation error aborts the save, leaving the on-disk vault untouched).
-/// Writes atomically with mode 0600 on Unix.
+/// Refuses symlinks. Rotates the previous save to `.bak` as mid-write crash
+/// insurance (fail-closed: a rotation error aborts the save, leaving the
+/// on-disk vault untouched), writes atomically with mode 0600 on Unix, then
+/// verifies the just-written bytes parse and syncs the `.bak` to them — so the
+/// safety copy always equals the last verified save (R-03 P1). A write that
+/// does not read back as a valid vault leaves the `.bak` at the previous good
+/// save and returns an error.
 pub fn write_vault(sealed: &SealedVault, path: &Path) -> Result<(), String> {
     check_not_symlink(path)?;
     rotate_backup(path)?;
     let bytes = sealed.to_bytes();
-    atomic_write_0600(path, &bytes)
+    atomic_write_0600(path, &bytes)?;
+    verify_and_sync_backup(path)
 }
 
 /// R-03: delete the `.bak` safety copy, if any. Absence is not an error.
@@ -143,6 +170,25 @@ pub fn backup_exists(path: &Path) -> bool {
     matches!(fs::symlink_metadata(bak_path(path)), Ok(m) if m.is_file())
 }
 
+/// R-03 P3: is the `.bak` a *usable* vault — present, not a symlink, and
+/// parseable as a Gabbro vault?
+///
+/// Drives whether the unlock screen may offer a restore. Mere existence is not
+/// enough: a `.bak` that has itself rotted to garbage must never be advertised
+/// as "a safety copy is available", or the offer lies and a confirmed restore
+/// is then refused (hardware-found 2026-06-11). Parsing does no KDF work, so
+/// this is cheap to call before passphrase entry.
+pub fn backup_usable(path: &Path) -> bool {
+    let bak = bak_path(path);
+    if check_not_symlink(&bak).is_err() {
+        return false;
+    }
+    match fs::read(&bak) {
+        Ok(bytes) => SealedVault::from_bytes(&bytes).is_ok(),
+        Err(_) => false,
+    }
+}
+
 /// R-03: replace the main vault file with the `.bak` safety copy.
 ///
 /// Only called from the unlock screen's explicit restore flow, after the user
@@ -158,6 +204,22 @@ pub fn restore_vault_backup(path: &Path) -> Result<(), String> {
     // of both without helping the user.
     SealedVault::from_bytes(&bytes)
         .map_err(|e| format!("The vault backup is not usable — restore refused: {e}"))?;
+    atomic_write_0600(path, &bytes)
+}
+
+/// R-03: replace the vault file at `path` with an external backup file the user
+/// picked (their own off-device 3-2-1 copy).
+///
+/// Validates that `source` parses as a vault before overwriting — never replace
+/// an unreadable vault with another unreadable file. Refuses symlinks on both
+/// paths. The restored vault still requires full credentials to open, so this
+/// grants no access by itself.
+pub fn restore_vault_from_file(path: &Path, source: &Path) -> Result<(), String> {
+    check_not_symlink(path)?;
+    check_not_symlink(source)?;
+    let bytes = fs::read(source).map_err(|e| format!("Could not read the backup file: {e}"))?;
+    SealedVault::from_bytes(&bytes)
+        .map_err(|e| format!("That file is not a usable Gabbro vault — restore refused: {e}"))?;
     atomic_write_0600(path, &bytes)
 }
 
@@ -308,9 +370,10 @@ mod tests {
         );
     }
 
-    // R-03: a second write must rotate the previous save to a .bak sibling
+    // R-03 P1: after a second save the .bak equals the CURRENT save (synced),
+    // not the previous one — so a restore returns the user's latest state.
     #[test]
-    fn second_write_rotates_previous_vault_to_bak() {
+    fn second_write_syncs_bak_to_current_save() {
         let path = {
             let mut p = temp_dir();
             p.push("gabbro_io_bak_rotate_test.gabbro");
@@ -322,25 +385,25 @@ mod tests {
 
         let sealed_a = seal_vault(b"pw-a", b"body version A", None).unwrap();
         write_vault(&sealed_a, &path).unwrap();
-        let bytes_a = fs::read(&path).unwrap();
 
         let sealed_b = seal_vault(b"pw-b", b"body version B", None).unwrap();
         write_vault(&sealed_b, &path).unwrap();
+        let bytes_b = fs::read(&path).unwrap();
 
         let bak_bytes = fs::read(&bak);
         let _ = fs::remove_file(&path);
         let _ = fs::remove_file(&bak);
         assert_eq!(
             bak_bytes.expect("second write must leave a .bak"),
-            bytes_a,
-            ".bak must hold the previous save's exact bytes"
+            bytes_b,
+            ".bak must hold the current save's exact bytes (synced, not trailing)"
         );
     }
 
-    // R-03: the .bak must be a usable vault, openable with the credentials
-    // that sealed the previous save
+    // R-03 P1: the .bak is a usable vault, openable with the CURRENT save's
+    // credentials (the safety copy mirrors the last verified save).
     #[test]
-    fn bak_opens_as_valid_vault_with_prior_credentials() {
+    fn bak_opens_as_valid_vault_with_current_credentials() {
         let path = {
             let mut p = temp_dir();
             p.push("gabbro_io_bak_opens_test.gabbro");
@@ -350,24 +413,25 @@ mod tests {
         let _ = fs::remove_file(&path);
         let _ = fs::remove_file(&bak);
 
-        let sealed_a = seal_vault(b"pw-old", b"recoverable body", None).unwrap();
+        let sealed_a = seal_vault(b"pw-old", b"older body", None).unwrap();
         write_vault(&sealed_a, &path).unwrap();
         let sealed_b = seal_vault(b"pw-new", b"newer body", None).unwrap();
         write_vault(&sealed_b, &path).unwrap();
 
-        let recovered = read_vault(&bak).and_then(|s| open_vault(b"pw-old", &s));
+        let recovered = read_vault(&bak).and_then(|s| open_vault(b"pw-new", &s));
         let _ = fs::remove_file(&path);
         let _ = fs::remove_file(&bak);
         assert_eq!(
             recovered.expect(".bak must be readable and openable"),
-            b"recoverable body",
-            ".bak must decrypt to the previous save's plaintext"
+            b"newer body",
+            ".bak must decrypt to the current save's plaintext"
         );
     }
 
-    // R-03: the very first save has nothing to rotate
+    // R-03 P1: the very first save creates a .bak equal to that save — the
+    // safety copy mirrors the last verified save from the first one on.
     #[test]
-    fn first_write_creates_no_bak() {
+    fn first_write_creates_bak_matching_save() {
         let path = {
             let mut p = temp_dir();
             p.push("gabbro_io_bak_first_write_test.gabbro");
@@ -380,15 +444,21 @@ mod tests {
         let sealed = seal_vault(b"pw", b"first body", None).unwrap();
         write_vault(&sealed, &path).unwrap();
 
-        let bak_exists = bak.exists();
+        let main_bytes = fs::read(&path).unwrap();
+        let bak_bytes = fs::read(&bak);
         let _ = fs::remove_file(&path);
         let _ = fs::remove_file(&bak);
-        assert!(!bak_exists, "first write must not create a .bak");
+        assert_eq!(
+            bak_bytes.expect("first write must create a .bak"),
+            main_bytes,
+            ".bak must equal the just-written vault from the first save"
+        );
     }
 
-    // R-03: single-generation policy — each save replaces the .bak
+    // R-03 P1: each save syncs the .bak to the current vault — after the third
+    // save it holds the third save, not an older one.
     #[test]
-    fn third_write_replaces_bak_with_second_save() {
+    fn third_write_syncs_bak_to_current_save() {
         let path = {
             let mut p = temp_dir();
             p.push("gabbro_io_bak_replace_test.gabbro");
@@ -402,17 +472,56 @@ mod tests {
         write_vault(&sealed_a, &path).unwrap();
         let sealed_b = seal_vault(b"pw-b", b"body B", None).unwrap();
         write_vault(&sealed_b, &path).unwrap();
-        let bytes_b = fs::read(&path).unwrap();
         let sealed_c = seal_vault(b"pw-c", b"body C", None).unwrap();
         write_vault(&sealed_c, &path).unwrap();
+        let bytes_c = fs::read(&path).unwrap();
 
         let bak_bytes = fs::read(&bak);
         let _ = fs::remove_file(&path);
         let _ = fs::remove_file(&bak);
         assert_eq!(
             bak_bytes.expect(".bak must exist after the third save"),
-            bytes_b,
-            ".bak must hold exactly the previous (second) save, not an older one"
+            bytes_c,
+            ".bak must hold exactly the current (third) save, not an older one"
+        );
+    }
+
+    // R-03 P1: if a save's bytes land on disk but do not parse, the .bak must
+    // be left at the last good save and a loud error returned — the brick class
+    // firing at the bad save, not silently propagating into the safety copy.
+    #[test]
+    fn unparseable_written_vault_keeps_bak_at_last_good_and_errors() {
+        let path = {
+            let mut p = temp_dir();
+            p.push("gabbro_io_verify_fail_test.gabbro");
+            p
+        };
+        let bak = PathBuf::from(format!("{}.bak", path.display()));
+        let _ = fs::remove_file(&path);
+        let _ = fs::remove_file(&bak);
+
+        // Two good saves -> steady state: main == .bak == save B.
+        let sealed_a = seal_vault(b"pw-a", b"body A", None).unwrap();
+        write_vault(&sealed_a, &path).unwrap();
+        let sealed_b = seal_vault(b"pw-b", b"body B", None).unwrap();
+        write_vault(&sealed_b, &path).unwrap();
+        let good_bak = fs::read(&bak).unwrap();
+
+        // Simulate a save that wrote unparseable bytes to the main file.
+        fs::write(&path, b"written but not a valid vault").unwrap();
+        let result = verify_and_sync_backup(&path);
+        let bak_after = fs::read(&bak).unwrap();
+        let _ = fs::remove_file(&path);
+        let _ = fs::remove_file(&bak);
+
+        let err = result.expect_err("an unparseable written vault must error");
+        assert!(
+            err.to_lowercase().contains("safety copy"),
+            "the error must say the safety copy was kept at the last good save: {err}"
+        );
+        assert_eq!(
+            bak_after, good_bak,
+            ".bak must remain at the last good save when the new bytes do not parse"
         );
     }
 
@@ -461,6 +570,9 @@ mod tests {
         write_vault(&sealed_a, &path).unwrap();
         let bytes_a = fs::read(&path).unwrap();
 
+        // Drop the .bak the first save synced, so we can plant a symlink in its
+        // place and prove the NEXT save aborts on it.
+        let _ = fs::remove_file(&bak);
         fs::write(&target, b"attacker-chosen target").unwrap();
         symlink(&target, &bak).unwrap();
 
@@ -500,6 +612,8 @@ mod tests {
 
         let sealed_a = seal_vault(b"pw-a", b"body A", None).unwrap();
         write_vault(&sealed_a, &path).unwrap();
+        // Drop the synced .bak so the symlink can take its place for this probe.
+        let _ = fs::remove_file(&bak);
         fs::write(&target, b"x").unwrap();
         symlink(&target, &bak).unwrap();
 
@@ -529,9 +643,9 @@ mod tests {
 
         let sealed_a = seal_vault(b"pw-a", b"good body", None).unwrap();
         write_vault(&sealed_a, &path).unwrap();
-        let bytes_a = fs::read(&path).unwrap();
         let sealed_b = seal_vault(b"pw-b", b"later body", None).unwrap();
         write_vault(&sealed_b, &path).unwrap();
+        let bytes_b = fs::read(&path).unwrap();
         // simulate corruption of the main file
         fs::write(&path, b"corrupt garbage").unwrap();
 
@@ -542,8 +656,8 @@ mod tests {
 
         result.expect("restore must succeed when a .bak exists");
         assert_eq!(
-            main_after, bytes_a,
-            "restore must replace the main vault with the .bak bytes"
+            main_after, bytes_b,
+            "restore must replace the main vault with the .bak, which mirrors the last verified save"
         );
     }
 
@@ -561,6 +675,9 @@ mod tests {
 
         let sealed = seal_vault(b"pw", b"only body", None).unwrap();
         write_vault(&sealed, &path).unwrap();
+        // The save synced a .bak (R-03 P1); remove it to test the genuine
+        // no-backup case.
+        let _ = fs::remove_file(&bak);
 
         let err = restore_vault_backup(&path);
         let _ = fs::remove_file(&path);
@@ -621,8 +738,100 @@ mod tests {
 
         let _ = fs::remove_file(&path);
         let _ = fs::remove_file(&bak);
-        assert!(!after_first, "no .bak after the first save");
-        assert!(after_second, ".bak present after the second save");
+        assert!(after_first, ".bak present from the first save (synced)");
+        assert!(after_second, ".bak still present after the second save");
+    }
+
+    // R-03 P3: backup_usable is true only when the .bak parses as a vault — a
+    // garbage .bak must report false so the unlock screen cannot lie about it.
+    #[test]
+    fn backup_usable_true_only_for_parseable_bak() {
+        let path = {
+            let mut p = temp_dir();
+            p.push("gabbro_io_bak_usable_test.gabbro");
+            p
+        };
+        let bak = PathBuf::from(format!("{}.bak", path.display()));
+        let _ = fs::remove_file(&path);
+        let _ = fs::remove_file(&bak);
+
+        assert!(!backup_usable(&path), "an absent .bak is not usable");
+
+        let sealed = seal_vault(b"pw", b"body", None).unwrap();
+        write_vault(&sealed, &path).unwrap(); // syncs a valid .bak
+        assert!(backup_usable(&path), "a valid .bak must be usable");
+
+        fs::write(&bak, b"not a vault").unwrap();
+        let usable_after_garbage = backup_usable(&path);
+        let _ = fs::remove_file(&path);
+        let _ = fs::remove_file(&bak);
+        assert!(
+            !usable_after_garbage,
+            "a garbage .bak must report not usable"
+        );
+    }
+
+    // R-03: restore_vault_from_file replaces a corrupt vault with a valid
+    // external backup file the user picked, and the result is openable.
+    #[test]
+    fn restore_vault_from_file_replaces_corrupt_with_valid_source() {
+        let dir = temp_dir();
+        let path = dir.join("gabbro_io_restore_from_file_test.gabbro");
+        let bak = PathBuf::from(format!("{}.bak", path.display()));
+        let source = dir.join("gabbro_io_restore_from_file_source.gabbro");
+        let source_bak = PathBuf::from(format!("{}.bak", source.display()));
+        for p in [&path, &bak, &source, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        let sealed = seal_vault(b"backup pw", b"backup body", None).unwrap();
+        write_vault(&sealed, &source).unwrap(); // a real backup vault
+        let source_bytes = fs::read(&source).unwrap();
+        fs::write(&path, b"corrupt garbage").unwrap(); // on-disk vault is corrupt
+
+        let result = restore_vault_from_file(&path, &source);
+        let main_after = fs::read(&path).unwrap();
+        let recovered = read_vault(&path).and_then(|s| open_vault(b"backup pw", &s));
+        for p in [&path, &bak, &source, &source_bak] {
+            let _ = fs::remove_file(p);
+        }
+
+        result.expect("restore from a valid backup file must succeed");
+        assert_eq!(
+            main_after, source_bytes,
+            "the vault must now equal the picked backup file"
+        );
+        assert_eq!(recovered.expect("restored vault must open"), b"backup body");
+    }
+
+    // R-03: restoring from a file that is not a vault must be refused and must
+    // leave the existing (corrupt) vault untouched — never replace one
+    // unreadable file with another.
+    #[test]
+    fn restore_vault_from_file_refuses_unparseable_source() {
+        let dir = temp_dir();
+        let path = dir.join("gabbro_io_restore_badsrc_test.gabbro");
+        let source = dir.join("gabbro_io_restore_badsrc_source.gabbro");
+        let _ = fs::remove_file(&path);
+        let _ = fs::remove_file(&source);
+
+        fs::write(&path, b"corrupt main").unwrap();
+        fs::write(&source, b"not a vault either").unwrap();
+
+        let result = restore_vault_from_file(&path, &source);
+        let main_after = fs::read(&path).unwrap();
+        let _ = fs::remove_file(&path);
+        let _ = fs::remove_file(&source);
+
+        let err = result.expect_err("restoring from an unparseable file must fail");
+        assert!(
+            err.to_lowercase().contains("usable") || err.to_lowercase().contains("refused"),
+            "error must explain the file is not a usable vault: {err}"
+        );
+        assert_eq!(
+            main_after, b"corrupt main",
+            "a refused restore must leave the existing vault untouched"
+        );
     }
 
     // F-08: vault files must be written with mode 0600 on Unix

@@ -824,14 +824,23 @@
   "manageFoldersDefaultNote": "Noklusējuma mapes var pārdēvēt vai dzēst.",
 
   "vaultCorruptBackupAvailable": "Šo seifa failu nevar nolasīt. Ir pieejama automātiska pēdējās veiksmīgās saglabāšanas rezerves kopija.",
-  "vaultCorruptNoBackup": "Šo seifa failu nevar nolasīt, un automātiskas rezerves kopijas nav. Atjaunojiet seifu no savas dublējumkopijas.",
   "restoreBackupButton": "Atjaunot no rezerves kopijas",
   "restoreBackupConfirmTitle": "Atjaunot seifu no rezerves kopijas?",
   "restoreBackupConfirmBody": "Nenolasāmais seifa fails tiks aizstāts ar pēdējās veiksmīgās saglabāšanas rezerves kopiju. Atbloķēšanai joprojām būs vajadzīga jūsu paroles frāze (un YubiKey, ja reģistrēta).",
   "restoreBackupConfirmAction": "Atjaunot",
   "backupRestoredMessage": "Rezerves kopija atjaunota. Atbloķējiet ar saviem akreditācijas datiem.",
-  "deleteBackupButton": "Dzēst nederīgo rezerves kopiju",
-  "deleteBackupConfirmTitle": "Dzēst rezerves kopiju?",
-  "deleteBackupConfirmBody": "Šī rezerves kopija nevar atjaunot seifu, jo pati nav nolasāma. Dzēšanu nevar atsaukt.",
-  "backupDialogSafetyCopyNote": "Gabbro ierīcē glabā arī vienu automātisku katra seifa rezerves kopiju, kas tiek atjaunināta katrā saglabāšanā. Tā aizsargā tikai pret faila bojājumiem — tā nav dublējumkopija."
+  "backupDialogSafetyCopyNote": "Gabbro ierīcē glabā arī vienu automātisku katra seifa rezerves kopiju, kas tiek atjaunināta katrā saglabāšanā. Tā aizsargā tikai pret faila bojājumiem — tā nav dublējumkopija.",
+  "vaultUnrecoverableBody": "Šo seifa failu nevar nolasīt, un tā rezerves kopija arī nav nolasāma. Tā saturu šajā ierīcē nevar atjaunot.",
+  "vaultUnrecoverableBackupHint": "Ja jums ir dublējums ārpus ierīces, atjaunojiet seifu no šīs kopijas.",
+  "vaultUnrecoverableNoteLinux": "Nelasāmais fails paliek diskā, tāpēc varat to izdzēst vai pārbaudīt pats.",
+  "vaultUnrecoverableNoteAndroid": "Nelasāmais fails atrodas lietotnes privātajā krātuvē, un to var noņemt tikai no šejienes.",
+  "removeVaultFromListButton": "Noņemt no saraksta",
+  "deleteVaultFileButton": "Dzēst failu",
+  "removeVaultFromListConfirmTitle": "Noņemt seifu no saraksta?",
+  "removeVaultFromListConfirmBody": "Noņemt šo seifu no jūsu saraksta? Fails paliek diskā — ja to atjaunosiet, varēsiet to pievienot atkārtoti.",
+  "deleteVaultFileConfirmTitle": "Neatgriezeniski dzēst bojāto seifa failu?",
+  "deleteVaultFileConfirmBody": "Neatgriezeniski dzēst šo seifu? Nelasāmais fails un tā rezerves kopija tiks noņemti no šīs ierīces. Šo darbību nevar atsaukt.",
+  "restoreFromFileButton": "Atjaunot no dublējuma faila",
+  "vaultRestoredMessage": "Seifs atjaunots. Atbloķējiet ar saviem akreditācijas datiem.",
+  "restoreFromFileInvalidError": "Šis fails nav izmantojams Gabbro seifs."
 }

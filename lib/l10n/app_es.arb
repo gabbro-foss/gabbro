@@ -818,14 +818,23 @@
   "manageFoldersDefaultNote": "Las carpetas predeterminadas se pueden renombrar o eliminar.",
 
   "vaultCorruptBackupAvailable": "Este archivo de caja fuerte no se puede leer. Hay disponible una copia de respaldo automática del último guardado correcto.",
-  "vaultCorruptNoBackup": "Este archivo de caja fuerte no se puede leer y no existe ninguna copia de respaldo automática. Restaura la caja fuerte desde tu propia copia de seguridad.",
   "restoreBackupButton": "Restaurar desde la copia de respaldo",
   "restoreBackupConfirmTitle": "¿Restaurar la caja fuerte desde la copia de respaldo?",
   "restoreBackupConfirmBody": "El archivo ilegible se sustituirá por la copia de respaldo del último guardado correcto. Seguirás necesitando tu frase de contraseña (y tu YubiKey, si está registrada) para desbloquearla.",
   "restoreBackupConfirmAction": "Restaurar",
   "backupRestoredMessage": "Copia de respaldo restaurada. Desbloquea con tus credenciales.",
-  "deleteBackupButton": "Eliminar la copia de respaldo inservible",
-  "deleteBackupConfirmTitle": "¿Eliminar la copia de respaldo?",
-  "deleteBackupConfirmBody": "Esta copia de respaldo no puede restaurar tu caja fuerte porque también es ilegible. La eliminación no se puede deshacer.",
-  "backupDialogSafetyCopyNote": "Gabbro también guarda en el dispositivo una copia de respaldo automática de cada caja fuerte, actualizada en cada guardado. Solo protege contra la corrupción del archivo — no es una copia de seguridad."
+  "backupDialogSafetyCopyNote": "Gabbro también guarda en el dispositivo una copia de respaldo automática de cada caja fuerte, actualizada en cada guardado. Solo protege contra la corrupción del archivo — no es una copia de seguridad.",
+  "vaultUnrecoverableBody": "Este archivo de caja fuerte no se puede leer, y su copia de respaldo también es ilegible. Su contenido no se puede recuperar en este dispositivo.",
+  "vaultUnrecoverableBackupHint": "Si conservas una copia de seguridad fuera del dispositivo, restaura la caja fuerte desde esa copia.",
+  "vaultUnrecoverableNoteLinux": "El archivo ilegible permanece en el disco, así que puedes eliminarlo o revisarlo tú mismo.",
+  "vaultUnrecoverableNoteAndroid": "El archivo ilegible está en el almacenamiento privado de la app y solo se puede quitar desde aquí.",
+  "removeVaultFromListButton": "Quitar de la lista",
+  "deleteVaultFileButton": "Eliminar archivo",
+  "removeVaultFromListConfirmTitle": "¿Quitar la caja fuerte de la lista?",
+  "removeVaultFromListConfirmBody": "¿Quitar esta caja fuerte de tu lista? El archivo permanece en el disco — puedes volver a añadirlo si lo recuperas.",
+  "deleteVaultFileConfirmTitle": "¿Eliminar permanentemente el archivo de caja fuerte dañado?",
+  "deleteVaultFileConfirmBody": "¿Eliminar permanentemente esta caja fuerte? El archivo ilegible y su copia de respaldo se eliminarán de este dispositivo. Esta acción no se puede deshacer.",
+  "restoreFromFileButton": "Restaurar desde un archivo de copia de seguridad",
+  "vaultRestoredMessage": "Caja fuerte restaurada. Desbloquea con tus credenciales.",
+  "restoreFromFileInvalidError": "Ese archivo no es una caja fuerte de Gabbro utilizable."
 }

@@ -3460,14 +3460,8 @@ abstract class AppLocalizations {
   /// No description provided for @vaultCorruptBackupAvailable.
   ///
   /// In en, this message translates to:
-  /// **'This vault file cannot be read. An automatic safety copy from the last successful save is available.'**
+  /// **'This vault file cannot be read. A usable safety copy from your last save is available.'**
   String get vaultCorruptBackupAvailable;
-
-  /// No description provided for @vaultCorruptNoBackup.
-  ///
-  /// In en, this message translates to:
-  /// **'This vault file cannot be read and no automatic safety copy exists. Restore the vault from your own backup.'**
-  String get vaultCorruptNoBackup;
 
   /// No description provided for @restoreBackupButton.
   ///
@@ -3499,29 +3493,89 @@ abstract class AppLocalizations {
   /// **'Safety copy restored. Unlock with your credentials.'**
   String get backupRestoredMessage;
 
-  /// No description provided for @deleteBackupButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete unusable safety copy'**
-  String get deleteBackupButton;
-
-  /// No description provided for @deleteBackupConfirmTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete the safety copy?'**
-  String get deleteBackupConfirmTitle;
-
-  /// No description provided for @deleteBackupConfirmBody.
-  ///
-  /// In en, this message translates to:
-  /// **'This safety copy cannot restore your vault because it is itself unreadable. Deleting it cannot be undone.'**
-  String get deleteBackupConfirmBody;
-
   /// No description provided for @backupDialogSafetyCopyNote.
   ///
   /// In en, this message translates to:
   /// **'Gabbro also keeps one automatic on-device safety copy of each vault, refreshed at every save. It protects against file corruption only — it is not a backup.'**
   String get backupDialogSafetyCopyNote;
+
+  /// No description provided for @vaultUnrecoverableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This vault file cannot be read, and its safety copy is unreadable too. Its contents cannot be recovered on this device.'**
+  String get vaultUnrecoverableBody;
+
+  /// No description provided for @vaultUnrecoverableBackupHint.
+  ///
+  /// In en, this message translates to:
+  /// **'If you keep an off-device backup, restore the vault from that copy.'**
+  String get vaultUnrecoverableBackupHint;
+
+  /// No description provided for @vaultUnrecoverableNoteLinux.
+  ///
+  /// In en, this message translates to:
+  /// **'The unreadable file stays on disk, so you can delete or inspect it yourself.'**
+  String get vaultUnrecoverableNoteLinux;
+
+  /// No description provided for @vaultUnrecoverableNoteAndroid.
+  ///
+  /// In en, this message translates to:
+  /// **'The unreadable file is in the app\'s private storage and can only be removed from here.'**
+  String get vaultUnrecoverableNoteAndroid;
+
+  /// No description provided for @removeVaultFromListButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from list'**
+  String get removeVaultFromListButton;
+
+  /// No description provided for @deleteVaultFileButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete file'**
+  String get deleteVaultFileButton;
+
+  /// No description provided for @removeVaultFromListConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove vault from list?'**
+  String get removeVaultFromListConfirmTitle;
+
+  /// No description provided for @removeVaultFromListConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this vault from your list? The file stays on disk — you can add it back if you recover it.'**
+  String get removeVaultFromListConfirmBody;
+
+  /// No description provided for @deleteVaultFileConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete corrupted vault file permanently?'**
+  String get deleteVaultFileConfirmTitle;
+
+  /// No description provided for @deleteVaultFileConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this vault permanently? The unreadable file and its safety copy will be removed from this device. This cannot be undone.'**
+  String get deleteVaultFileConfirmBody;
+
+  /// No description provided for @restoreFromFileButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from a backup file'**
+  String get restoreFromFileButton;
+
+  /// No description provided for @vaultRestoredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Vault restored. Unlock with your credentials.'**
+  String get vaultRestoredMessage;
+
+  /// No description provided for @restoreFromFileInvalidError.
+  ///
+  /// In en, this message translates to:
+  /// **'That file is not a usable Gabbro vault.'**
+  String get restoreFromFileInvalidError;
 }
 
 class _AppLocalizationsDelegate

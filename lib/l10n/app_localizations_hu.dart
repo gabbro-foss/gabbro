@@ -1852,10 +1852,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez a széffájl nem olvasható. Elérhető egy automatikus vészmásolat az utolsó sikeres mentésből.';
 
   @override
-  String get vaultCorruptNoBackup =>
-      'Ez a széffájl nem olvasható, és nem létezik automatikus vészmásolat. Állítsa helyre a széfet a saját biztonsági mentéséből.';
-
-  @override
   String get restoreBackupButton => 'Helyreállítás vészmásolatból';
 
   @override
@@ -1874,16 +1870,56 @@ class AppLocalizationsHu extends AppLocalizations {
       'Vészmásolat helyreállítva. Oldja fel a hitelesítő adataival.';
 
   @override
-  String get deleteBackupButton => 'Használhatatlan vészmásolat törlése';
-
-  @override
-  String get deleteBackupConfirmTitle => 'Törli a vészmásolatot?';
-
-  @override
-  String get deleteBackupConfirmBody =>
-      'Ez a vészmásolat nem tudja helyreállítani a széfet, mert maga is olvashatatlan. A törlés nem vonható vissza.';
-
-  @override
   String get backupDialogSafetyCopyNote =>
       'A Gabbro emellett minden széfről egy automatikus vészmásolatot is tárol az eszközön, amely minden mentéskor frissül. Ez csak a fájlsérülés ellen véd — nem biztonsági mentés.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Ez a széffájl nem olvasható, és a vészmásolata is olvashatatlan. A tartalma nem állítható helyre ezen az eszközön.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Ha van eszközön kívüli biztonsági mentése, állítsa helyre a széfet abból a másolatból.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Az olvashatatlan fájl a lemezen marad, így saját maga törölheti vagy megvizsgálhatja.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Az olvashatatlan fájl az alkalmazás privát tárhelyén található, és csak innen távolítható el.';
+
+  @override
+  String get removeVaultFromListButton => 'Eltávolítás a listáról';
+
+  @override
+  String get deleteVaultFileButton => 'Fájl törlése';
+
+  @override
+  String get removeVaultFromListConfirmTitle =>
+      'Eltávolítja a széfet a listáról?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Eltávolítja ezt a széfet a listájáról? A fájl a lemezen marad — ha helyreállítja, később újra hozzáadhatja.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Véglegesen törli a sérült széffájlt?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Véglegesen törli ezt a széfet? Az olvashatatlan fájl és a vészmásolata eltávolításra kerül erről az eszközről. Ez a művelet nem vonható vissza.';
+
+  @override
+  String get restoreFromFileButton =>
+      'Helyreállítás biztonsági mentési fájlból';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Széf helyreállítva. Oldja fel a hitelesítő adataival.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Ez a fájl nem használható Gabbro-széf.';
 }
