@@ -1855,4 +1855,79 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Standardordner können umbenannt oder gelöscht werden.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Diese Tresordatei kann nicht gelesen werden. Eine automatische Sicherheitskopie vom letzten erfolgreichen Speichern ist verfügbar.';
+
+  @override
+  String get restoreBackupButton => 'Aus Sicherheitskopie wiederherstellen';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Tresor aus Sicherheitskopie wiederherstellen?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Die unlesbare Tresordatei wird durch die Sicherheitskopie vom letzten erfolgreichen Speichern ersetzt. Zum Entsperren sind weiterhin Ihre Passphrase (und, falls registriert, Ihr YubiKey) erforderlich.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Wiederherstellen';
+
+  @override
+  String get backupRestoredMessage =>
+      'Sicherheitskopie wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro behält zusätzlich eine automatische Sicherheitskopie jedes Tresors auf dem Gerät, die bei jedem Speichern aktualisiert wird. Sie schützt nur vor Dateibeschädigung — sie ist kein Backup.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Diese Tresordatei kann nicht gelesen werden, und ihre Sicherheitskopie ist ebenfalls unlesbar. Ihr Inhalt kann auf diesem Gerät nicht wiederhergestellt werden.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Wenn Sie ein Backup außerhalb des Geräts haben, stellen Sie den Tresor aus dieser Kopie wieder her.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Die unlesbare Datei bleibt auf dem Datenträger, sodass Sie sie selbst löschen oder prüfen können.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Die unlesbare Datei liegt im privaten Speicher der App und kann nur hier entfernt werden.';
+
+  @override
+  String get removeVaultFromListButton => 'Aus Liste entfernen';
+
+  @override
+  String get deleteVaultFileButton => 'Datei löschen';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Tresor aus Liste entfernen?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Diesen Tresor aus Ihrer Liste entfernen? Die Datei bleibt auf dem Datenträger — Sie können sie wieder hinzufügen, wenn Sie sie wiederherstellen.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Beschädigte Tresordatei endgültig löschen?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Diesen Tresor endgültig löschen? Die unlesbare Datei und ihre Sicherheitskopie werden von diesem Gerät entfernt. Dies kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get restoreFromFileButton =>
+      'Aus einer Sicherungsdatei wiederherstellen';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Tresor wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Diese Datei ist kein verwendbarer Gabbro-Tresor.';
 }

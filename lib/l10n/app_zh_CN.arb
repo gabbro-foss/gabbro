@@ -815,5 +815,26 @@
   "helpCaptionUnlock": "输入密码短语解锁保险库",
   "helpCaptionVaultSync": "加密保险库同步流程",
   "passphraseNoWordlist": "您的语言暂无词汇列表。使用英语。",
-  "manageFoldersDefaultNote": "默认文件夹可以重命名或删除。"
+  "manageFoldersDefaultNote": "默认文件夹可以重命名或删除。",
+
+  "vaultCorruptBackupAvailable": "无法读取此保险库文件。可使用上次成功保存的自动安全副本。",
+  "restoreBackupButton": "从安全副本恢复",
+  "restoreBackupConfirmTitle": "从安全副本恢复保险库？",
+  "restoreBackupConfirmBody": "无法读取的保险库文件将被替换为上次成功保存的安全副本。解锁仍需要你的密码短语（以及已注册的 YubiKey）。",
+  "restoreBackupConfirmAction": "恢复",
+  "backupRestoredMessage": "安全副本已恢复。请使用你的凭据解锁。",
+  "backupDialogSafetyCopyNote": "Gabbro 还会在设备上为每个保险库保留一份自动安全副本，每次保存时刷新。它仅防范文件损坏——不是备份。",
+  "vaultUnrecoverableBody": "无法读取此保险库文件，其安全副本也无法读取。无法在此设备上恢复其内容。",
+  "vaultUnrecoverableBackupHint": "如果你在设备之外保留了备份，请从该副本恢复保险库。",
+  "vaultUnrecoverableNoteLinux": "无法读取的文件将保留在磁盘上，因此你可以自行删除或检查它。",
+  "vaultUnrecoverableNoteAndroid": "无法读取的文件位于应用的私有存储中，只能从这里移除。",
+  "removeVaultFromListButton": "从列表中移除",
+  "deleteVaultFileButton": "删除文件",
+  "removeVaultFromListConfirmTitle": "从列表中移除保险库？",
+  "removeVaultFromListConfirmBody": "从你的列表中移除此保险库？文件将保留在磁盘上——如果你恢复它，可以重新添加。",
+  "deleteVaultFileConfirmTitle": "永久删除损坏的保险库文件？",
+  "deleteVaultFileConfirmBody": "永久删除此保险库？无法读取的文件及其安全副本将从此设备中移除。此操作无法撤销。",
+  "restoreFromFileButton": "从备份文件恢复",
+  "vaultRestoredMessage": "保险库已恢复。请使用你的凭据解锁。",
+  "restoreFromFileInvalidError": "该文件不是可用的 Gabbro 保险库。"
 }

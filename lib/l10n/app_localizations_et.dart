@@ -1842,4 +1842,78 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Vaikekaustu saab ümber nimetada või kustutada.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Seda hoidlafaili ei saa lugeda. Saadaval on automaatne kaitsekoopia viimasest õnnestunud salvestusest.';
+
+  @override
+  String get restoreBackupButton => 'Taasta kaitsekoopiast';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Kas taastada hoidla kaitsekoopiast?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Loetamatu hoidlafail asendatakse viimase õnnestunud salvestuse kaitsekoopiaga. Avamiseks on endiselt vaja teie salafraasi (ja YubiKeyd, kui see on registreeritud).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Taasta';
+
+  @override
+  String get backupRestoredMessage =>
+      'Kaitsekoopia taastatud. Avage oma mandaatidega.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro hoiab seadmes ka iga hoidla ühte automaatset kaitsekoopiat, mida värskendatakse igal salvestusel. See kaitseb ainult faili riknemise eest — see ei ole varukoopia.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Seda hoidlafaili ei saa lugeda ja selle kaitsekoopia on samuti loetamatu. Selle sisu ei saa selles seadmes taastada.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Kui hoiate seadmevälist varukoopiat, taastage hoidla sellest koopiast.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Loetamatu fail jääb kettale, nii et saate selle ise kustutada või üle vaadata.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Loetamatu fail asub rakenduse privaatses salvestusruumis ja seda saab eemaldada ainult siit.';
+
+  @override
+  String get removeVaultFromListButton => 'Eemalda loendist';
+
+  @override
+  String get deleteVaultFileButton => 'Kustuta fail';
+
+  @override
+  String get removeVaultFromListConfirmTitle =>
+      'Kas eemaldada hoidla loendist?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Kas eemaldada see hoidla teie loendist? Fail jääb kettale — saate selle uuesti lisada, kui selle taastate.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Kas kustutada rikutud hoidlafail jäädavalt?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Kas kustutada see hoidla jäädavalt? Loetamatu fail ja selle kaitsekoopia eemaldatakse sellest seadmest. Seda toimingut ei saa tagasi võtta.';
+
+  @override
+  String get restoreFromFileButton => 'Taasta varukoopia failist';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Hoidla taastatud. Avage oma mandaatidega.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'See fail ei ole kasutatav Gabbro hoidla.';
 }

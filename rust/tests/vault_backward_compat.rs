@@ -96,6 +96,7 @@ struct TempVault {
 impl Drop for TempVault {
     fn drop(&mut self) {
         let _ = std::fs::remove_file(&self.path);
+        let _ = std::fs::remove_file(format!("{}.bak", self.path.display()));
     }
 }
 

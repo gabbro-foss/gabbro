@@ -1841,4 +1841,79 @@ class AppLocalizationsKk extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Әдепкі қалталарды өзгертуге немесе жоюға болады.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Бұл қойма файлын оқу мүмкін емес. Соңғы сәтті сақтаудың автоматты қосалқы көшірмесі қолжетімді.';
+
+  @override
+  String get restoreBackupButton => 'Қосалқы көшірмеден қалпына келтіру';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Қойманы қосалқы көшірмеден қалпына келтіру керек пе?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Оқылмайтын қойма файлы соңғы сәтті сақтаудың қосалқы көшірмесімен ауыстырылады. Құлпын ашу үшін құпия фразаңыз (және тіркелген болса, YubiKey) бұрынғыша қажет.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Қалпына келтіру';
+
+  @override
+  String get backupRestoredMessage =>
+      'Қосалқы көшірме қалпына келтірілді. Өз деректеріңізбен ашыңыз.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro әр қойманың бір автоматты қосалқы көшірмесін де құрылғыда сақтайды, ол әр сақтаған сайын жаңарады. Ол тек файлдың бүлінуінен қорғайды — бұл сақтық көшірме емес.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Бұл қойма файлын оқу мүмкін емес, оның қосалқы көшірмесі де оқылмайды. Оның мазмұнын осы құрылғыда қалпына келтіру мүмкін емес.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Егер құрылғыдан тыс сақтық көшірмеңіз болса, қойманы сол көшірмеден қалпына келтіріңіз.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Оқылмайтын файл дискіде қалады, сондықтан оны өзіңіз жоюға немесе тексеруге болады.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Оқылмайтын файл қолданбаның жеке жадында орналасқан және оны тек осы жерден ғана жоюға болады.';
+
+  @override
+  String get removeVaultFromListButton => 'Тізімнен жою';
+
+  @override
+  String get deleteVaultFileButton => 'Файлды жою';
+
+  @override
+  String get removeVaultFromListConfirmTitle =>
+      'Қойманы тізімнен жою керек пе?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Осы қойманы тізіміңізден жою керек пе? Файл дискіде қалады — оны қалпына келтірсеңіз, қайта қоса аласыз.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Зақымдалған қойма файлын біржола жою керек пе?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Осы қойманы біржола жою керек пе? Оқылмайтын файл мен оның қосалқы көшірмесі осы құрылғыдан жойылады. Бұл әрекетті қайтару мүмкін емес.';
+
+  @override
+  String get restoreFromFileButton => 'Сақтық көшірме файлынан қалпына келтіру';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Қойма қалпына келтірілді. Өз деректеріңізбен ашыңыз.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Бұл файл жарамды Gabbro қоймасы емес.';
 }

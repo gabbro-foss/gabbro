@@ -1849,4 +1849,78 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Папки по умолчанию можно переименовать или удалить.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Этот файл хранилища не читается. Доступна автоматическая аварийная копия последнего успешного сохранения.';
+
+  @override
+  String get restoreBackupButton => 'Восстановить из аварийной копии';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Восстановить хранилище из аварийной копии?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Нечитаемый файл хранилища будет заменён аварийной копией последнего успешного сохранения. Для разблокировки по-прежнему нужны ваша парольная фраза (и YubiKey, если зарегистрирован).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Восстановить';
+
+  @override
+  String get backupRestoredMessage =>
+      'Аварийная копия восстановлена. Разблокируйте с помощью своих учётных данных.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro также хранит на устройстве одну автоматическую аварийную копию каждого хранилища, обновляемую при каждом сохранении. Она защищает только от повреждения файла — это не резервная копия.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Этот файл хранилища не читается, и его аварийная копия также нечитаема. Его содержимое невозможно восстановить на этом устройстве.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Если у вас есть резервная копия вне устройства, восстановите хранилище из неё.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Нечитаемый файл остаётся на диске, поэтому вы можете сами удалить или проверить его.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Нечитаемый файл находится в приватном хранилище приложения и может быть удалён только отсюда.';
+
+  @override
+  String get removeVaultFromListButton => 'Удалить из списка';
+
+  @override
+  String get deleteVaultFileButton => 'Удалить файл';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Удалить хранилище из списка?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Удалить это хранилище из списка? Файл останется на диске — вы сможете добавить его снова, если восстановите.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Удалить повреждённый файл хранилища навсегда?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Удалить это хранилище навсегда? Нечитаемый файл и его аварийная копия будут удалены с этого устройства. Это действие нельзя отменить.';
+
+  @override
+  String get restoreFromFileButton => 'Восстановить из файла резервной копии';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Хранилище восстановлено. Разблокируйте с помощью своих учётных данных.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Этот файл не является пригодным хранилищем Gabbro.';
 }

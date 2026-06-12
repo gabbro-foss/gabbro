@@ -815,5 +815,26 @@
   "helpCaptionUnlock": "Saisissez votre phrase secrète pour déverrouiller votre coffre",
   "helpCaptionVaultSync": "Processus de synchronisation du coffre chiffré",
   "passphraseNoWordlist": "Pas encore de liste de mots pour votre langue. Anglais utilisé.",
-  "manageFoldersDefaultNote": "Les dossiers par défaut peuvent être renommés ou supprimés."
+  "manageFoldersDefaultNote": "Les dossiers par défaut peuvent être renommés ou supprimés.",
+
+  "vaultCorruptBackupAvailable": "Ce fichier de coffre est illisible. Une copie de secours automatique du dernier enregistrement réussi est disponible.",
+  "restoreBackupButton": "Restaurer depuis la copie de secours",
+  "restoreBackupConfirmTitle": "Restaurer le coffre depuis la copie de secours ?",
+  "restoreBackupConfirmBody": "Le fichier de coffre illisible sera remplacé par la copie de secours du dernier enregistrement réussi. Votre phrase secrète (et votre YubiKey, le cas échéant) reste nécessaire pour le déverrouiller.",
+  "restoreBackupConfirmAction": "Restaurer",
+  "backupRestoredMessage": "Copie de secours restaurée. Déverrouillez avec vos identifiants.",
+  "backupDialogSafetyCopyNote": "Gabbro conserve aussi sur l'appareil une copie de secours automatique de chaque coffre, actualisée à chaque enregistrement. Elle ne protège que contre la corruption du fichier — ce n'est pas une sauvegarde.",
+  "vaultUnrecoverableBody": "Ce fichier de coffre est illisible, et sa copie de secours l'est également. Son contenu ne peut pas être récupéré sur cet appareil.",
+  "vaultUnrecoverableBackupHint": "Si vous conservez une sauvegarde hors de l'appareil, restaurez le coffre à partir de cette copie.",
+  "vaultUnrecoverableNoteLinux": "Le fichier illisible reste sur le disque, vous pouvez donc le supprimer ou l'examiner vous-même.",
+  "vaultUnrecoverableNoteAndroid": "Le fichier illisible se trouve dans le stockage privé de l'application et ne peut être supprimé que d'ici.",
+  "removeVaultFromListButton": "Retirer de la liste",
+  "deleteVaultFileButton": "Supprimer le fichier",
+  "removeVaultFromListConfirmTitle": "Retirer le coffre de la liste ?",
+  "removeVaultFromListConfirmBody": "Retirer ce coffre de votre liste ? Le fichier reste sur le disque — vous pourrez le rajouter si vous le récupérez.",
+  "deleteVaultFileConfirmTitle": "Supprimer définitivement le fichier de coffre corrompu ?",
+  "deleteVaultFileConfirmBody": "Supprimer définitivement ce coffre ? Le fichier illisible et sa copie de secours seront supprimés de cet appareil. Cette action est irréversible.",
+  "restoreFromFileButton": "Restaurer depuis un fichier de sauvegarde",
+  "vaultRestoredMessage": "Coffre restauré. Déverrouillez avec vos identifiants.",
+  "restoreFromFileInvalidError": "Ce fichier n'est pas un coffre Gabbro utilisable."
 }

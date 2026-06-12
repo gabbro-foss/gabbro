@@ -821,5 +821,26 @@
   "helpCaptionUnlock": "Insira a frase secreta para desbloquear o cofre",
   "helpCaptionVaultSync": "Processo de sincronização do cofre criptografado",
   "passphraseNoWordlist": "Ainda não há lista de palavras para o seu idioma. Usando inglês.",
-  "manageFoldersDefaultNote": "As pastas padrão podem ser renomeadas ou excluídas."
+  "manageFoldersDefaultNote": "As pastas padrão podem ser renomeadas ou excluídas.",
+
+  "vaultCorruptBackupAvailable": "Este arquivo de cofre não pode ser lido. Há uma cópia de recuperação automática do último salvamento bem-sucedido disponível.",
+  "restoreBackupButton": "Restaurar da cópia de recuperação",
+  "restoreBackupConfirmTitle": "Restaurar o cofre da cópia de recuperação?",
+  "restoreBackupConfirmBody": "O arquivo ilegível será substituído pela cópia de recuperação do último salvamento bem-sucedido. Sua frase-senha (e sua YubiKey, se registrada) ainda é necessária para desbloqueá-lo.",
+  "restoreBackupConfirmAction": "Restaurar",
+  "backupRestoredMessage": "Cópia de recuperação restaurada. Desbloqueie com suas credenciais.",
+  "backupDialogSafetyCopyNote": "O Gabbro também mantém no dispositivo uma cópia de recuperação automática de cada cofre, atualizada a cada salvamento. Ela protege apenas contra corrupção do arquivo — não é um backup.",
+  "vaultUnrecoverableBody": "Este arquivo de cofre não pode ser lido e sua cópia de recuperação também está ilegível. Seu conteúdo não pode ser recuperado neste dispositivo.",
+  "vaultUnrecoverableBackupHint": "Se você mantém um backup fora do dispositivo, restaure o cofre a partir dessa cópia.",
+  "vaultUnrecoverableNoteLinux": "O arquivo ilegível permanece no disco, então você pode excluí-lo ou inspecioná-lo.",
+  "vaultUnrecoverableNoteAndroid": "O arquivo ilegível está no armazenamento privado do app e só pode ser removido aqui.",
+  "removeVaultFromListButton": "Remover da lista",
+  "deleteVaultFileButton": "Excluir arquivo",
+  "removeVaultFromListConfirmTitle": "Remover o cofre da lista?",
+  "removeVaultFromListConfirmBody": "Remover este cofre da sua lista? O arquivo permanece no disco — você pode adicioná-lo novamente se recuperá-lo.",
+  "deleteVaultFileConfirmTitle": "Excluir permanentemente o arquivo de cofre danificado?",
+  "deleteVaultFileConfirmBody": "Excluir permanentemente este cofre? O arquivo ilegível e sua cópia de recuperação serão removidos deste dispositivo. Esta ação não pode ser desfeita.",
+  "restoreFromFileButton": "Restaurar de um arquivo de backup",
+  "vaultRestoredMessage": "Cofre restaurado. Desbloqueie com suas credenciais.",
+  "restoreFromFileInvalidError": "Esse arquivo não é um cofre Gabbro utilizável."
 }

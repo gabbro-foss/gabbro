@@ -673,7 +673,9 @@ pub fn delete_entry(entries: &mut Vec<VaultEntry>, id: &str) -> Result<(), Strin
 /// executes the deletion unconditionally when this is called.
 #[flutter_rust_bridge::frb(ignore)]
 pub fn delete_whole_vault(path: &Path) -> Result<(), String> {
-    std::fs::remove_file(path).map_err(|e| format!("Failed to delete vault: {e}"))
+    std::fs::remove_file(path).map_err(|e| format!("Failed to delete vault: {e}"))?;
+    // R-03: the .bak safety copy must not survive the vault it copies.
+    crate::vault::io::remove_backup(path)
 }
 
 /// Return all entries from the vault, optionally masking sensitive values.
@@ -1213,6 +1215,116 @@ pub(crate) fn purge_expired_history(entries: &mut [VaultEntry]) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // R-03: deleting a vault must not leak a copy via the .bak sibling
+    #[test]
+    fn delete_whole_vault_removes_bak_too() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("gabbro_api_delete_bak_test.gabbro");
+        let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
+        std::fs::write(&path, b"vault bytes").unwrap();
+        std::fs::write(&bak, b"backup bytes").unwrap();
+
+        let result = delete_whole_vault(&path);
+        let main_gone = !path.exists();
+        let bak_gone = !bak.exists();
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(&bak);
+
+        result.expect("delete must succeed");
+        assert!(main_gone, "vault file must be deleted");
+        assert!(
+            bak_gone,
+            ".bak must be deleted with the vault (no copy may survive)"
+        );
+    }
+
+    // R-03: deletion must not fail just because no .bak was ever created
+    #[test]
+    fn delete_whole_vault_succeeds_without_bak() {
+        let dir = std::env::temp_dir();
+        let path = dir.join("gabbro_api_delete_nobak_test.gabbro");
+        let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
+        let _ = std::fs::remove_file(&bak);
+        std::fs::write(&path, b"vault bytes").unwrap();
+
+        let result = delete_whole_vault(&path);
+        let _ = std::fs::remove_file(&path);
+        result.expect("delete must succeed when no .bak exists");
+    }
+
+    // R-03 P0 (failure #4 characterization): a YubiKey-sealed vault whose bytes
+    // have been overwritten with garbage must NOT open — not silently, and never
+    // to an empty-but-valid vault. Proves the AES-GCM auth-tag / parse gate holds
+    // on the YubiKey unlock path, ruling out the Rust layer as the source of the
+    // device report "garbage both files -> unlocks fine to an EMPTY vault."
+    #[test]
+    fn garbaged_yubikey_vault_does_not_open() {
+        use crate::crypto::vault_crypto::seal_vault_with_yubikey;
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        use crate::vault::io::write_vault;
+        use crate::vault::serialization::{serialize_vault_body, VaultBody};
+
+        let dir = std::env::temp_dir();
+        let path = dir.join("gabbro_p0_garbage_yk_test.gabbro");
+        let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(&bak);
+
+        let passphrase = b"p0 yk passphrase";
+        let hmac_secret = [7u8; 32];
+        let salt = [9u8; 32];
+        let credential_id = vec![1u8, 2, 3, 4];
+
+        // A real, non-empty body — so "opened empty" would be a detectable change.
+        let body = VaultBody {
+            entries: vec![VaultEntry::Note(NoteEntry {
+                meta: EntryMeta {
+                    id: String::from("p0-note-001"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::from(""),
+                },
+                title: String::from("secret note"),
+                content: String::from("must never be reachable from garbage"),
+                custom_fields: vec![],
+                attachments: vec![],
+            })],
+            ..Default::default()
+        };
+        let plaintext = serialize_vault_body(&body).unwrap();
+        let sealed = seal_vault_with_yubikey(
+            passphrase,
+            &hmac_secret,
+            credential_id,
+            salt,
+            &plaintext,
+            None,
+        )
+        .unwrap();
+        write_vault(&sealed, &path).unwrap();
+
+        // Setup sanity: with the correct credentials it opens and the entry is there.
+        let good = load_vault_with_yubikey(passphrase, &hmac_secret, &salt, &path)
+            .expect("sealed vault must open with correct credentials");
+        assert_eq!(
+            good.entries.len(),
+            1,
+            "setup sanity: the entry must be present"
+        );
+
+        // Rob's printf scenario: overwrite the sealed bytes with garbage.
+        std::fs::write(&path, b"rubbish").unwrap();
+
+        let result = load_vault_with_yubikey(passphrase, &hmac_secret, &salt, &path);
+        let _ = std::fs::remove_file(&path);
+        let _ = std::fs::remove_file(&bak);
+
+        assert!(
+            result.is_err(),
+            "a garbaged YubiKey vault must fail to open, never unlock to an empty vault"
+        );
+    }
 
     #[test]
     fn create_login_entry_returns_correct_fields() {

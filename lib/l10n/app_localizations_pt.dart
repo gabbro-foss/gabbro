@@ -1845,6 +1845,82 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'As pastas padrão podem ser renomeadas ou excluídas.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Este ficheiro de cofre não pode ser lido. Está disponível uma cópia de recuperação automática da última gravação bem-sucedida.';
+
+  @override
+  String get restoreBackupButton =>
+      'Restaurar a partir da cópia de recuperação';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Restaurar o cofre a partir da cópia de recuperação?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'O ficheiro ilegível será substituído pela cópia de recuperação da última gravação bem-sucedida. A sua frase de acesso (e a sua YubiKey, se registada) continua a ser necessária para o desbloquear.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Restaurar';
+
+  @override
+  String get backupRestoredMessage =>
+      'Cópia de recuperação restaurada. Desbloqueie com as suas credenciais.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'O Gabbro também mantém no dispositivo uma cópia de recuperação automática de cada cofre, atualizada a cada gravação. Protege apenas contra corrupção do ficheiro — não é uma cópia de segurança.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Este ficheiro de cofre não pode ser lido e a sua cópia de recuperação também está ilegível. O seu conteúdo não pode ser recuperado neste dispositivo.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Se mantiver uma cópia de segurança fora do dispositivo, restaure o cofre a partir dessa cópia.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'O ficheiro ilegível permanece no disco, para que o possa eliminar ou inspecionar.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'O ficheiro ilegível está no armazenamento privado da aplicação e só pode ser removido aqui.';
+
+  @override
+  String get removeVaultFromListButton => 'Remover da lista';
+
+  @override
+  String get deleteVaultFileButton => 'Eliminar ficheiro';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Remover o cofre da lista?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Remover este cofre da sua lista? O ficheiro permanece no disco — pode voltar a adicioná-lo se o recuperar.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Eliminar permanentemente o ficheiro de cofre danificado?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Eliminar permanentemente este cofre? O ficheiro ilegível e a sua cópia de recuperação serão removidos deste dispositivo. Esta ação não pode ser anulada.';
+
+  @override
+  String get restoreFromFileButton =>
+      'Restaurar a partir de um ficheiro de cópia de segurança';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Cofre restaurado. Desbloqueie com as suas credenciais.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Esse ficheiro não é um cofre Gabbro utilizável.';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -3687,6 +3763,80 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get manageFoldersDefaultNote =>
       'As pastas padrão podem ser renomeadas ou excluídas.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Este arquivo de cofre não pode ser lido. Há uma cópia de recuperação automática do último salvamento bem-sucedido disponível.';
+
+  @override
+  String get restoreBackupButton => 'Restaurar da cópia de recuperação';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Restaurar o cofre da cópia de recuperação?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'O arquivo ilegível será substituído pela cópia de recuperação do último salvamento bem-sucedido. Sua frase-senha (e sua YubiKey, se registrada) ainda é necessária para desbloqueá-lo.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Restaurar';
+
+  @override
+  String get backupRestoredMessage =>
+      'Cópia de recuperação restaurada. Desbloqueie com suas credenciais.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'O Gabbro também mantém no dispositivo uma cópia de recuperação automática de cada cofre, atualizada a cada salvamento. Ela protege apenas contra corrupção do arquivo — não é um backup.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Este arquivo de cofre não pode ser lido e sua cópia de recuperação também está ilegível. Seu conteúdo não pode ser recuperado neste dispositivo.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Se você mantém um backup fora do dispositivo, restaure o cofre a partir dessa cópia.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'O arquivo ilegível permanece no disco, então você pode excluí-lo ou inspecioná-lo.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'O arquivo ilegível está no armazenamento privado do app e só pode ser removido aqui.';
+
+  @override
+  String get removeVaultFromListButton => 'Remover da lista';
+
+  @override
+  String get deleteVaultFileButton => 'Excluir arquivo';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Remover o cofre da lista?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Remover este cofre da sua lista? O arquivo permanece no disco — você pode adicioná-lo novamente se recuperá-lo.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Excluir permanentemente o arquivo de cofre danificado?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Excluir permanentemente este cofre? O arquivo ilegível e sua cópia de recuperação serão removidos deste dispositivo. Esta ação não pode ser desfeita.';
+
+  @override
+  String get restoreFromFileButton => 'Restaurar de um arquivo de backup';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Cofre restaurado. Desbloqueie com suas credenciais.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Esse arquivo não é um cofre Gabbro utilizável.';
 }
 
 /// The translations for Portuguese, as used in Portugal (`pt_PT`).
@@ -5534,4 +5684,80 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get manageFoldersDefaultNote =>
       'As pastas predefinidas podem ser renomeadas ou eliminadas.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Este ficheiro de cofre não pode ser lido. Está disponível uma cópia de recuperação automática da última gravação bem-sucedida.';
+
+  @override
+  String get restoreBackupButton =>
+      'Restaurar a partir da cópia de recuperação';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Restaurar o cofre a partir da cópia de recuperação?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'O ficheiro ilegível será substituído pela cópia de recuperação da última gravação bem-sucedida. A sua frase de acesso (e a sua YubiKey, se registada) continua a ser necessária para o desbloquear.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Restaurar';
+
+  @override
+  String get backupRestoredMessage =>
+      'Cópia de recuperação restaurada. Desbloqueie com as suas credenciais.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'O Gabbro também mantém no dispositivo uma cópia de recuperação automática de cada cofre, atualizada a cada gravação. Protege apenas contra corrupção do ficheiro — não é uma cópia de segurança.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Este ficheiro de cofre não pode ser lido e a sua cópia de recuperação também está ilegível. O seu conteúdo não pode ser recuperado neste dispositivo.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Se mantiver uma cópia de segurança fora do dispositivo, restaure o cofre a partir dessa cópia.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'O ficheiro ilegível permanece no disco, para que o possa eliminar ou inspecionar.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'O ficheiro ilegível está no armazenamento privado da aplicação e só pode ser removido aqui.';
+
+  @override
+  String get removeVaultFromListButton => 'Remover da lista';
+
+  @override
+  String get deleteVaultFileButton => 'Eliminar ficheiro';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Remover o cofre da lista?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Remover este cofre da sua lista? O ficheiro permanece no disco — pode voltar a adicioná-lo se o recuperar.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Eliminar permanentemente o ficheiro de cofre danificado?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Eliminar permanentemente este cofre? O ficheiro ilegível e a sua cópia de recuperação serão removidos deste dispositivo. Esta ação não pode ser anulada.';
+
+  @override
+  String get restoreFromFileButton =>
+      'Restaurar a partir de um ficheiro de cópia de segurança';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Cofre restaurado. Desbloqueie com as suas credenciais.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Esse ficheiro não é um cofre Gabbro utilizável.';
 }

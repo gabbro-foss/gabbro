@@ -1851,4 +1851,78 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Numatytuosius aplankus galima pervadinti arba ištrinti.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Šio saugyklos failo nepavyksta perskaityti. Galima automatinė paskutinio sėkmingo išsaugojimo apsauginė kopija.';
+
+  @override
+  String get restoreBackupButton => 'Atkurti iš apsauginės kopijos';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Atkurti saugyklą iš apsauginės kopijos?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Neperskaitomas saugyklos failas bus pakeistas paskutinio sėkmingo išsaugojimo apsaugine kopija. Atrakinti vis tiek reikės jūsų slaptafrazės (ir YubiKey, jei užregistruotas).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Atkurti';
+
+  @override
+  String get backupRestoredMessage =>
+      'Apsauginė kopija atkurta. Atrakinkite savo prisijungimo duomenimis.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro įrenginyje taip pat laiko po vieną automatinę kiekvienos saugyklos apsauginę kopiją, atnaujinamą kiekvieno išsaugojimo metu. Ji saugo tik nuo failo sugadinimo — tai ne atsarginė kopija.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Šio saugyklos failo nepavyksta perskaityti, o jo apsauginė kopija taip pat neįskaitoma. Jo turinio šiame įrenginyje atkurti negalima.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Jei turite atsarginę kopiją už įrenginio ribų, atkurkite saugyklą iš tos kopijos.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Neįskaitomas failas lieka diske, todėl galite jį patys ištrinti arba peržiūrėti.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Neįskaitomas failas yra privačioje programos saugykloje ir jį galima pašalinti tik iš čia.';
+
+  @override
+  String get removeVaultFromListButton => 'Pašalinti iš sąrašo';
+
+  @override
+  String get deleteVaultFileButton => 'Ištrinti failą';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Pašalinti saugyklą iš sąrašo?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Pašalinti šią saugyklą iš sąrašo? Failas lieka diske — jį atkūrę galėsite vėl pridėti.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Visam laikui ištrinti sugadintą saugyklos failą?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Visam laikui ištrinti šią saugyklą? Neįskaitomas failas ir jo apsauginė kopija bus pašalinti iš šio įrenginio. Šio veiksmo anuliuoti negalima.';
+
+  @override
+  String get restoreFromFileButton => 'Atkurti iš atsarginės kopijos failo';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Saugykla atkurta. Atrakinkite savo prisijungimo duomenimis.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Šis failas nėra tinkama Gabbro saugykla.';
 }

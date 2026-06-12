@@ -1847,4 +1847,77 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Noklusējuma mapes var pārdēvēt vai dzēst.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Šo seifa failu nevar nolasīt. Ir pieejama automātiska pēdējās veiksmīgās saglabāšanas rezerves kopija.';
+
+  @override
+  String get restoreBackupButton => 'Atjaunot no rezerves kopijas';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Atjaunot seifu no rezerves kopijas?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Nenolasāmais seifa fails tiks aizstāts ar pēdējās veiksmīgās saglabāšanas rezerves kopiju. Atbloķēšanai joprojām būs vajadzīga jūsu paroles frāze (un YubiKey, ja reģistrēta).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Atjaunot';
+
+  @override
+  String get backupRestoredMessage =>
+      'Rezerves kopija atjaunota. Atbloķējiet ar saviem akreditācijas datiem.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro ierīcē glabā arī vienu automātisku katra seifa rezerves kopiju, kas tiek atjaunināta katrā saglabāšanā. Tā aizsargā tikai pret faila bojājumiem — tā nav dublējumkopija.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Šo seifa failu nevar nolasīt, un tā rezerves kopija arī nav nolasāma. Tā saturu šajā ierīcē nevar atjaunot.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Ja jums ir dublējums ārpus ierīces, atjaunojiet seifu no šīs kopijas.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Nelasāmais fails paliek diskā, tāpēc varat to izdzēst vai pārbaudīt pats.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Nelasāmais fails atrodas lietotnes privātajā krātuvē, un to var noņemt tikai no šejienes.';
+
+  @override
+  String get removeVaultFromListButton => 'Noņemt no saraksta';
+
+  @override
+  String get deleteVaultFileButton => 'Dzēst failu';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Noņemt seifu no saraksta?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Noņemt šo seifu no jūsu saraksta? Fails paliek diskā — ja to atjaunosiet, varēsiet to pievienot atkārtoti.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Neatgriezeniski dzēst bojāto seifa failu?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Neatgriezeniski dzēst šo seifu? Nelasāmais fails un tā rezerves kopija tiks noņemti no šīs ierīces. Šo darbību nevar atsaukt.';
+
+  @override
+  String get restoreFromFileButton => 'Atjaunot no dublējuma faila';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Seifs atjaunots. Atbloķējiet ar saviem akreditācijas datiem.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Šis fails nav izmantojams Gabbro seifs.';
 }

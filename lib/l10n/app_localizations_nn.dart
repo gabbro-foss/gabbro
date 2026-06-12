@@ -1841,4 +1841,78 @@ class AppLocalizationsNn extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Standardmapper kan gjevast nytt namn eller slettast.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Denne kvelvfila kan ikkje lesast. Ein automatisk reservekopi frå siste vellukka lagring er tilgjengeleg.';
+
+  @override
+  String get restoreBackupButton => 'Gjenopprett frå reservekopi';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Gjenopprette kvelvet frå reservekopien?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Den uleselege kvelvfila vert erstatta av reservekopien frå siste vellukka lagring. Passordfrasen din (og YubiKey-en din, om registrert) krevst framleis for å låse opp.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Gjenopprett';
+
+  @override
+  String get backupRestoredMessage =>
+      'Reservekopi gjenoppretta. Lås opp med innloggingsinformasjonen din.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro har òg éin automatisk reservekopi av kvart kvelv på eininga, oppdatert ved kvar lagring. Han vernar berre mot filkorrupsjon — han er ikkje ein tryggingskopi.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Denne kvelvfila kan ikkje lesast, og reservekopien er òg uleseleg. Innhaldet kan ikkje gjenopprettast på denne eininga.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Viss du har ein tryggleikskopi utanfor eininga, gjenopprett kvelvet frå den kopien.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Den uleselege fila blir liggjande på disken, så du kan slette eller undersøkje ho sjølv.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Den uleselege fila ligg i det private lageret til appen og kan berre fjernast herifrå.';
+
+  @override
+  String get removeVaultFromListButton => 'Fjern frå liste';
+
+  @override
+  String get deleteVaultFileButton => 'Slett fil';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Fjern kvelv frå liste?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Fjerne dette kvelvet frå lista di? Fila blir liggjande på disken — du kan leggje det til igjen om du gjenopprettar det.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Slette den skadde kvelvfila permanent?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Slette dette kvelvet permanent? Den uleselege fila og reservekopien blir fjerna frå denne eininga. Dette kan ikkje angrast.';
+
+  @override
+  String get restoreFromFileButton => 'Gjenopprett frå ei tryggleikskopifil';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Kvelv gjenoppretta. Lås opp med innloggingsinformasjonen din.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Den fila er ikkje eit brukbart Gabbro-kvelv.';
 }

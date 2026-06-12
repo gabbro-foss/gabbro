@@ -17,7 +17,7 @@
 |---------|------|--------|
 | **R-01** original audit's "no exploitable defect" claim falsified by fuzzer; needs a correction note | Doc | **Open** |
 | **R-02** Android Auto Backup silently uploads the vault to Google Drive | Medium | **Fixed** (commit `90a2095`, 2026-06-11) — `allowBackup="false"` + `dataExtractionRules` + `fullBackupContent` (all domains excluded), 3 Robolectric merged-manifest tests, APK verified via `aapt dump xmltree`; hardware-verified on device (`pkgFlags` has no `ALLOW_BACKUP`; `bmgr backupnow` → "Backup is not allowed"; upgrade-in-place, unlock, autofill unaffected) |
-| **R-03** no pre-save vault backup rotation (availability gap) | Medium | **Open** |
+| **R-03** no pre-save vault backup rotation (availability gap) | Medium | **Fixed** (branch `r03-vault-backup-rework`, 2026-06-12) — automatic `.bak` safety copy (= last *verified* save) + corruption-recovery UX + restore-from-backup-file. Claude Fable 5's first pass was component-green but failed the hardware matrix; diagnosed and reworked by Claude Opus 4.8 + Rob. Linux hardware 14/14; Android emulator verified. See R-03 below. |
 | **R-04** Linux process is dumpable; no `PR_SET_DUMPABLE(0)` / `RLIMIT_CORE(0)` | Low | **Open** |
 | **R-05** no stated position on swap exposure of key material | Low | **Open** |
 | **R-06** Dart-heap secret exposure undocumented; GUI-process forensics pending | Low | **Open** |
@@ -189,6 +189,65 @@ sibling backup (`.gabbro.bak`, or N generations). Cheap; would have turned the
 backward-compat gate. Decide the retention policy with Rob (single `.bak` is
 probably enough; N generations costs disk for large File entries).
 
+**Resolution (Claude Opus 4.8 + Rob, 2026-06-12; branch `r03-vault-backup-rework`).**
+Claude Fable 5's first attempt was component-green but failed the hardware
+matrix in several distinct ways; Claude Opus 4.8 and Rob diagnosed and reworked
+it. Per issue raised during remediation:
+
+- **Save-path rotation (the core ask).** `write_vault` rotates the previous save
+  to `.bak`, writes the main file atomically, **reads it back and
+  parse-verifies it**, then syncs `.bak` to the verified bytes — so the safety
+  copy always equals the *last verified save*. A save whose bytes do not parse
+  leaves `.bak` at the previous good state and returns a loud error: the
+  2026-06-08 brick class now fails at the bad save instead of propagating.
+  Single `.bak`, same disk — corruption insurance, not a backup.
+- **Restore lost the latest edit (P1, hardware-found).** Fable's rotate-only
+  scheme left `.bak` one save behind, so restoring after corruption dropped the
+  most recent edit. The sync-after-verified-save model above fixes it (pinned by
+  a real-FFI integration test reproducing the exact edit→edit→corrupt→restore
+  sequence).
+- **The offer could lie (P3).** `vault_backup_exists` checked only presence, so
+  the unlock screen advertised a "usable safety copy" even when the `.bak` was
+  itself garbage. Replaced with `vault_backup_usable`, which parse-checks it.
+- **Banner only appeared after a vault-switch (P2).** The parse probe ran once
+  at mount. The screen now also re-probes on any unlock failure and on app
+  resume, so corruption surfaces without the switch-away-and-back dance. The
+  auth-failure invariant (wrong passphrase / PIN / key never offers restore)
+  still holds.
+- **Dead-end / misleading UX (P5).** Unlock controls are hidden while the vault
+  is unreadable. Two states: **A** (usable `.bak`) offers restore-from-safety-
+  copy; **B** (no usable `.bak`) is honest that the vault is unrecoverable on
+  device and offers recovery/removal. Platform-aware: desktop offers *Remove
+  from list* (keeps the file) and *Delete file*; Android offers only *Delete
+  file*, because app-private storage makes "remove from list" leave an
+  unreachable orphan (hardware-found).
+- **Tablet crash + settings-toggle spam (P6).** `tablet_vault_layout` fetched
+  the selected entry synchronously during build; when the entry vanished
+  (delete, or a locked/corrupt session surfaced by any app-wide rebuild such as
+  toggling a security setting) it threw inside layout and spammed
+  `DiagnosticsProperty<void>`. The fetch is guarded: it falls back to the empty
+  state and clears the stale selection after the frame.
+- **No actual recovery path (new feature, Rob-mandated).** "Restore from a
+  backup file": the user picks their own off-device 3-2-1 `.gabbro`; the bridge
+  validates it parses, then writes it over the corrupt vault, which then opens
+  with the user's credentials. Offered in both states; refuses a non-vault file,
+  leaving the corrupt vault untouched.
+- **The empty-vault mystery (P0).** Fable's report of a YubiKey vault unlocking
+  to an *empty* vault after both files were garbaged was diagnosed as
+  **environmental** (a stale build), not a code defect: garbage cannot pass the
+  AES-GCM tag and there is no auto-create on the load path. Pinned by a
+  pure-Rust test (garbaged YubiKey vault never opens) and a real-FFI integration
+  test (garbage → unlock fails, never empty); did not reproduce on a fresh build.
+
+**Verification.** Rust unit + bridge tests; real-FFI integration suite (Linux);
+full Flutter suite; `clippy --all-targets` clean; new UI strings across all 37
+locales. **Linux hardware: 14/14.** **Android emulator: State A/B, restore-from-
+file via SAF, platform button set, and delete-file (disk-confirmed).**
+
+**Residual limitation (stated honestly).** A save that *parses but is logically
+wrong* still propagates into `.bak` — no single-generation scheme covers that;
+the backward-compat gate and the parser fuzzer remain the guards for that class.
+
 ### R-04 (Low) — Linux process is dumpable; core dumps capture unlocked secrets
 
 **Where:** app startup (no `prctl` call exists anywhere in the app — only
@@ -273,12 +332,13 @@ minimise secret lifetime in Dart, and *measure* it.
 
 ## Priority order (most user-safety per hour of work)
 
-1. **R-02** — backup manifest fix. A real gap today on every tester's phone.
-2. **R-03** — pre-save vault rotation. Cheap insurance against the worst outcome.
-3. **R-04** — `PR_SET_DUMPABLE(0)` + `RLIMIT_CORE(0)`.
-4. **R-01** — correction note, so the original document stays honest.
-5. **R-06** — GUI-process forensics run (measure, then decide).
-6. **R-05**, **R-07**, **S-1** doc updates — fold into the same docs session.
+Done: **R-02** (backup manifest) and **R-03** (vault safety copy + recovery) — see the status table.
+
+Outstanding:
+1. **R-04** — `PR_SET_DUMPABLE(0)` + `RLIMIT_CORE(0)`.
+2. **R-01** — correction note, so the original document stays honest.
+3. **R-06** — GUI-process forensics run (measure, then decide).
+4. **R-05**, **R-07**, **S-1** doc updates — fold into the same docs session.
 
 None of these need a cryptographer; all are the kind of thing the eventual
 human reviewer will check first.

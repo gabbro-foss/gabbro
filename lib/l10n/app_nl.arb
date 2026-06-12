@@ -821,5 +821,26 @@
   "helpCaptionUnlock": "Voer uw wachtwoordzin in om uw kluis te ontgrendelen",
   "helpCaptionVaultSync": "Versleuteld kluissynchronisatieproces",
   "passphraseNoWordlist": "Nog geen woordenlijst voor uw taal. Engels wordt gebruikt.",
-  "manageFoldersDefaultNote": "Standaardmappen kunnen worden hernoemd of verwijderd."
+  "manageFoldersDefaultNote": "Standaardmappen kunnen worden hernoemd of verwijderd.",
+
+  "vaultCorruptBackupAvailable": "Dit kluisbestand kan niet worden gelezen. Er is een automatische reservekopie van de laatste geslaagde opslag beschikbaar.",
+  "restoreBackupButton": "Herstellen vanaf reservekopie",
+  "restoreBackupConfirmTitle": "Kluis herstellen vanaf reservekopie?",
+  "restoreBackupConfirmBody": "Het onleesbare kluisbestand wordt vervangen door de reservekopie van de laatste geslaagde opslag. Je wachtwoordzin (en je YubiKey, indien geregistreerd) blijft nodig om te ontgrendelen.",
+  "restoreBackupConfirmAction": "Herstellen",
+  "backupRestoredMessage": "Reservekopie hersteld. Ontgrendel met je gegevens.",
+  "backupDialogSafetyCopyNote": "Gabbro bewaart ook één automatische reservekopie van elke kluis op het apparaat, ververst bij elke opslag. Die beschermt alleen tegen bestandsbeschadiging — het is geen back-up.",
+  "vaultUnrecoverableBody": "Dit kluisbestand kan niet worden gelezen, en de reservekopie is ook onleesbaar. De inhoud kan op dit apparaat niet worden hersteld.",
+  "vaultUnrecoverableBackupHint": "Als je een back-up buiten dit apparaat bewaart, herstel de kluis dan vanaf die kopie.",
+  "vaultUnrecoverableNoteLinux": "Het onleesbare bestand blijft op de schijf staan, zodat je het zelf kunt verwijderen of bekijken.",
+  "vaultUnrecoverableNoteAndroid": "Het onleesbare bestand staat in de privéopslag van de app en kan alleen hier worden verwijderd.",
+  "removeVaultFromListButton": "Uit lijst verwijderen",
+  "deleteVaultFileButton": "Bestand verwijderen",
+  "removeVaultFromListConfirmTitle": "Kluis uit lijst verwijderen?",
+  "removeVaultFromListConfirmBody": "Deze kluis uit je lijst verwijderen? Het bestand blijft op de schijf staan — je kunt het later weer toevoegen als je het herstelt.",
+  "deleteVaultFileConfirmTitle": "Beschadigd kluisbestand definitief verwijderen?",
+  "deleteVaultFileConfirmBody": "Deze kluis definitief verwijderen? Het onleesbare bestand en de reservekopie worden van dit apparaat verwijderd. Dit kan niet ongedaan worden gemaakt.",
+  "restoreFromFileButton": "Herstellen vanaf een back-upbestand",
+  "vaultRestoredMessage": "Kluis hersteld. Ontgrendel met je gegevens.",
+  "restoreFromFileInvalidError": "Dat bestand is geen bruikbare Gabbro-kluis."
 }

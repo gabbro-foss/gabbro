@@ -598,7 +598,13 @@ pub fn session_change_passphrase(
         save_vault(&body, new_passphrase, &path)?;
     }
 
+    // The disk change has happened: update the session before anything that
+    // can still fail, so session and disk can never disagree.
     session.passphrase = Zeroizing::new(new_passphrase.to_vec());
+
+    // R-03: the save above rotated the pre-change vault into `.bak`, which the
+    // user may no longer be able to open. Refresh it to the new credentials.
+    crate::vault::io::refresh_backup_after_credential_change(&path)?;
     Ok(())
 }
 
@@ -1062,7 +1068,9 @@ pub fn session_add_yubikey(
         &hmac,
         salt,
         &path,
-    )
+    )?;
+    // R-03: credential change — refresh .bak to the post-change vault.
+    crate::vault::io::refresh_backup_after_credential_change(&path)
 }
 
 /// Remove a YubiKey record from the vault header by its credential ID and
@@ -1087,7 +1095,9 @@ pub fn session_remove_yubikey(cred_id: Vec<u8>) -> Result<(), String> {
     let plaintext = Zeroizing::new(
         crate::vault::serialization::serialize_vault_body(&body).map_err(|e| e.to_string())?,
     );
-    remove_yubikey_from_vault(&plaintext, &vault_key_master, &cred_id, &path)
+    remove_yubikey_from_vault(&plaintext, &vault_key_master, &cred_id, &path)?;
+    // R-03: credential change — refresh .bak to the post-change vault.
+    crate::vault::io::refresh_backup_after_credential_change(&path)
 }
 
 /// Rename the vault and re-seal the body bound to the updated header.
@@ -1381,6 +1391,7 @@ mod assign_folder_tests {
     fn teardown(path: &std::path::PathBuf) {
         let _ = lock_vault();
         let _ = std::fs::remove_file(path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1486,6 +1497,7 @@ mod folder_tests {
     fn teardown(path: &std::path::PathBuf) {
         let _ = lock_vault();
         let _ = std::fs::remove_file(path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -1822,6 +1834,7 @@ mod autofill_tests {
     fn teardown(path: &PathBuf) {
         let _ = lock_vault();
         let _ = std::fs::remove_file(path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -2022,6 +2035,7 @@ mod tests {
     fn teardown(path: &PathBuf) {
         let _ = lock_vault();
         let _ = std::fs::remove_file(path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -2149,6 +2163,83 @@ mod tests {
         assert!(unlock_vault(new, path.clone()).is_ok());
 
         teardown(&path);
+    }
+
+    // R-03 P1: a CRUD save syncs the .bak to the CURRENT vault, so a restore
+    // after corruption returns the user's latest state — including the edit
+    // that just triggered this save. (The pre-P1 behaviour trailed by one save
+    // and lost the most recent edit on restore; hardware-found 2026-06-11.)
+    #[test]
+    #[serial]
+    fn bak_after_crud_save_matches_current_vault() {
+        let pass = b"crud bak pass";
+        let path = setup_vault(pass);
+        let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
+        let _ = std::fs::remove_file(&bak);
+
+        unlock_vault(pass, path.clone()).unwrap();
+        let pre_op_bytes = std::fs::read(&path).unwrap();
+
+        let new_entry = VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: String::from("id-bak-crud"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from("Personal"),
+            },
+            title: String::from("Bak sync probe"),
+            content: String::from("probe"),
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+        session_create_entry(new_entry).unwrap();
+
+        let main_bytes = std::fs::read(&path).unwrap();
+        let bak_bytes = std::fs::read(&bak);
+        let _ = std::fs::remove_file(&bak);
+        teardown(&path);
+
+        let bak_bytes = bak_bytes.expect(".bak must exist after a CRUD save");
+        assert_eq!(
+            bak_bytes, main_bytes,
+            "a CRUD save must sync: .bak holds the current (post-operation) vault"
+        );
+        assert_ne!(
+            bak_bytes, pre_op_bytes,
+            "the .bak must have advanced past the pre-operation state, not trail it"
+        );
+    }
+
+    // R-03: after a passphrase change the .bak must open with the NEW
+    // passphrase (the user may not remember the old one), never the old.
+    // Credential-changing saves refresh the .bak instead of rotating it.
+    #[test]
+    #[serial]
+    fn bak_after_passphrase_change_opens_with_new_passphrase_only() {
+        let old = b"old bak passphrase";
+        let new = b"new bak passphrase";
+        let path = setup_vault(old);
+        let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
+        let _ = std::fs::remove_file(&bak);
+
+        unlock_vault(old, path.clone()).unwrap();
+        session_change_passphrase(old, new).unwrap();
+        lock_vault().unwrap();
+
+        let opened = crate::vault::io::read_vault(&bak)
+            .map_err(|e| format!(".bak missing or unreadable after passphrase change: {e}"))
+            .map(|sealed| {
+                (
+                    crate::crypto::vault_crypto::open_vault(new, &sealed).is_ok(),
+                    crate::crypto::vault_crypto::open_vault(old, &sealed).is_err(),
+                )
+            });
+        let _ = std::fs::remove_file(&bak);
+        teardown(&path);
+
+        let (opens_with_new, refuses_old) = opened.expect(".bak must exist");
+        assert!(opens_with_new, ".bak must open with the NEW passphrase");
+        assert!(refuses_old, ".bak must refuse the OLD passphrase");
     }
 
     #[test]
@@ -2724,6 +2815,7 @@ mod yubikey_session_tests {
     fn teardown(path: &std::path::PathBuf) {
         let _ = lock_vault();
         let _ = std::fs::remove_file(path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     #[test]
@@ -3028,6 +3120,7 @@ mod yubikey_mgmt_tests {
     fn teardown(path: &std::path::PathBuf) {
         let _ = lock_vault();
         let _ = std::fs::remove_file(path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     // ── session_add_yubikey ───────────────────────────────────────────────────
@@ -3061,6 +3154,70 @@ mod yubikey_mgmt_tests {
         assert_eq!(list_entry_summaries().unwrap().len(), 1);
 
         teardown(&path);
+    }
+
+    // R-03: adding a key is a credential change — .bak refreshes to the
+    // post-change vault instead of rotating to the pre-change one
+    #[test]
+    #[serial]
+    fn bak_after_add_yubikey_matches_current_vault() {
+        let pass = b"add-key-bak-pass";
+        let path = setup_two_key_vault(pass, "addbak");
+        let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
+        let _ = std::fs::remove_file(&bak);
+
+        unlock_vault_with_key_record(
+            pass,
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            path.clone(),
+        )
+        .unwrap();
+        session_add_yubikey(vec![0x03u8; 32], vec![0x55u8; 32], vec![0x66u8; 32]).unwrap();
+        lock_vault().unwrap();
+
+        let main_bytes = std::fs::read(&path).unwrap();
+        let bak_bytes = std::fs::read(&bak);
+        let _ = std::fs::remove_file(&bak);
+        teardown(&path);
+        assert_eq!(
+            bak_bytes.expect(".bak must exist after adding a key"),
+            main_bytes,
+            "adding a YubiKey must refresh .bak to the post-change vault"
+        );
+    }
+
+    // R-03: removing a key is a credential change — .bak must match the
+    // post-removal vault (a rotated .bak would still trust the removed key)
+    #[test]
+    #[serial]
+    fn bak_after_remove_yubikey_matches_current_vault() {
+        let pass = b"remove-key-bak-pass";
+        let path = setup_two_key_vault(pass, "removebak");
+        let bak = std::path::PathBuf::from(format!("{}.bak", path.display()));
+        let _ = std::fs::remove_file(&bak);
+
+        unlock_vault_with_key_record(
+            pass,
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            path.clone(),
+        )
+        .unwrap();
+        session_remove_yubikey(vec![0x02u8; 48]).unwrap();
+        lock_vault().unwrap();
+
+        let main_bytes = std::fs::read(&path).unwrap();
+        let bak_bytes = std::fs::read(&bak);
+        let _ = std::fs::remove_file(&bak);
+        teardown(&path);
+        assert_eq!(
+            bak_bytes.expect(".bak must exist after removing a key"),
+            main_bytes,
+            "removing a YubiKey must refresh .bak to the post-change vault"
+        );
     }
 
     #[test]
@@ -3260,6 +3417,7 @@ mod json_export_tests {
     fn teardown(vault_path: &PathBuf, json_path: &PathBuf) {
         let _ = lock_vault();
         let _ = std::fs::remove_file(vault_path);
+        let _ = std::fs::remove_file(format!("{}.bak", vault_path.display()));
         let _ = std::fs::remove_file(json_path);
     }
 
@@ -3714,6 +3872,7 @@ mod merge_tests {
     fn teardown(path: &std::path::PathBuf) {
         let _ = lock_vault();
         let _ = std::fs::remove_file(path);
+        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }
 
     // ── tombstone recorded on single delete ───────────────────────────────────
@@ -4287,6 +4446,7 @@ mod export_sync_tests {
         for p in paths {
             let _ = std::fs::remove_file(p);
             let _ = std::fs::remove_file(p.with_extension("gabbro.sha256"));
+            let _ = std::fs::remove_file(format!("{}.bak", p.display()));
         }
     }
 

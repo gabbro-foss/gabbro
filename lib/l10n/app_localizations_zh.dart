@@ -1767,6 +1767,70 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get manageFoldersDefaultNote => '默认文件夹可以重命名或删除。';
+
+  @override
+  String get vaultCorruptBackupAvailable => '无法读取此保险库文件。可使用上次成功保存的自动安全副本。';
+
+  @override
+  String get restoreBackupButton => '从安全副本恢复';
+
+  @override
+  String get restoreBackupConfirmTitle => '从安全副本恢复保险库？';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      '无法读取的保险库文件将被替换为上次成功保存的安全副本。解锁仍需要你的密码短语（以及已注册的 YubiKey）。';
+
+  @override
+  String get restoreBackupConfirmAction => '恢复';
+
+  @override
+  String get backupRestoredMessage => '安全副本已恢复。请使用你的凭据解锁。';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro 还会在设备上为每个保险库保留一份自动安全副本，每次保存时刷新。它仅防范文件损坏——不是备份。';
+
+  @override
+  String get vaultUnrecoverableBody => '无法读取此保险库文件，其安全副本也无法读取。无法在此设备上恢复其内容。';
+
+  @override
+  String get vaultUnrecoverableBackupHint => '如果你在设备之外保留了备份，请从该副本恢复保险库。';
+
+  @override
+  String get vaultUnrecoverableNoteLinux => '无法读取的文件将保留在磁盘上，因此你可以自行删除或检查它。';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid => '无法读取的文件位于应用的私有存储中，只能从这里移除。';
+
+  @override
+  String get removeVaultFromListButton => '从列表中移除';
+
+  @override
+  String get deleteVaultFileButton => '删除文件';
+
+  @override
+  String get removeVaultFromListConfirmTitle => '从列表中移除保险库？';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      '从你的列表中移除此保险库？文件将保留在磁盘上——如果你恢复它，可以重新添加。';
+
+  @override
+  String get deleteVaultFileConfirmTitle => '永久删除损坏的保险库文件？';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      '永久删除此保险库？无法读取的文件及其安全副本将从此设备中移除。此操作无法撤销。';
+
+  @override
+  String get restoreFromFileButton => '从备份文件恢复';
+
+  @override
+  String get vaultRestoredMessage => '保险库已恢复。请使用你的凭据解锁。';
+
+  @override
+  String get restoreFromFileInvalidError => '该文件不是可用的 Gabbro 保险库。';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3532,6 +3596,70 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get manageFoldersDefaultNote => '默认文件夹可以重命名或删除。';
+
+  @override
+  String get vaultCorruptBackupAvailable => '无法读取此保险库文件。可使用上次成功保存的自动安全副本。';
+
+  @override
+  String get restoreBackupButton => '从安全副本恢复';
+
+  @override
+  String get restoreBackupConfirmTitle => '从安全副本恢复保险库？';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      '无法读取的保险库文件将被替换为上次成功保存的安全副本。解锁仍需要你的密码短语（以及已注册的 YubiKey）。';
+
+  @override
+  String get restoreBackupConfirmAction => '恢复';
+
+  @override
+  String get backupRestoredMessage => '安全副本已恢复。请使用你的凭据解锁。';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro 还会在设备上为每个保险库保留一份自动安全副本，每次保存时刷新。它仅防范文件损坏——不是备份。';
+
+  @override
+  String get vaultUnrecoverableBody => '无法读取此保险库文件，其安全副本也无法读取。无法在此设备上恢复其内容。';
+
+  @override
+  String get vaultUnrecoverableBackupHint => '如果你在设备之外保留了备份，请从该副本恢复保险库。';
+
+  @override
+  String get vaultUnrecoverableNoteLinux => '无法读取的文件将保留在磁盘上，因此你可以自行删除或检查它。';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid => '无法读取的文件位于应用的私有存储中，只能从这里移除。';
+
+  @override
+  String get removeVaultFromListButton => '从列表中移除';
+
+  @override
+  String get deleteVaultFileButton => '删除文件';
+
+  @override
+  String get removeVaultFromListConfirmTitle => '从列表中移除保险库？';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      '从你的列表中移除此保险库？文件将保留在磁盘上——如果你恢复它，可以重新添加。';
+
+  @override
+  String get deleteVaultFileConfirmTitle => '永久删除损坏的保险库文件？';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      '永久删除此保险库？无法读取的文件及其安全副本将从此设备中移除。此操作无法撤销。';
+
+  @override
+  String get restoreFromFileButton => '从备份文件恢复';
+
+  @override
+  String get vaultRestoredMessage => '保险库已恢复。请使用你的凭据解锁。';
+
+  @override
+  String get restoreFromFileInvalidError => '该文件不是可用的 Gabbro 保险库。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -5297,4 +5425,68 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get manageFoldersDefaultNote => '預設資料夾可以重新命名或刪除。';
+
+  @override
+  String get vaultCorruptBackupAvailable => '無法讀取此保險庫檔案。可使用上次成功儲存的自動安全副本。';
+
+  @override
+  String get restoreBackupButton => '從安全副本復原';
+
+  @override
+  String get restoreBackupConfirmTitle => '從安全副本復原保險庫？';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      '無法讀取的保險庫檔案將被替換為上次成功儲存的安全副本。解鎖仍需要你的密碼短語（以及已註冊的 YubiKey）。';
+
+  @override
+  String get restoreBackupConfirmAction => '復原';
+
+  @override
+  String get backupRestoredMessage => '安全副本已復原。請使用你的憑證解鎖。';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro 還會在裝置上為每個保險庫保留一份自動安全副本，每次儲存時重新整理。它僅防範檔案損毀——不是備份。';
+
+  @override
+  String get vaultUnrecoverableBody => '無法讀取此保險庫檔案，其安全副本也無法讀取。無法在此裝置上復原其內容。';
+
+  @override
+  String get vaultUnrecoverableBackupHint => '如果你在裝置之外保留了備份，請從該副本復原保險庫。';
+
+  @override
+  String get vaultUnrecoverableNoteLinux => '無法讀取的檔案將保留在磁碟上，因此你可以自行刪除或檢查它。';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid => '無法讀取的檔案位於應用程式的私人儲存空間中，只能從這裡移除。';
+
+  @override
+  String get removeVaultFromListButton => '從清單中移除';
+
+  @override
+  String get deleteVaultFileButton => '刪除檔案';
+
+  @override
+  String get removeVaultFromListConfirmTitle => '從清單中移除保險庫？';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      '從你的清單中移除此保險庫？檔案將保留在磁碟上——如果你復原它，可以重新新增。';
+
+  @override
+  String get deleteVaultFileConfirmTitle => '永久刪除損毀的保險庫檔案？';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      '永久刪除此保險庫？無法讀取的檔案及其安全副本將從此裝置中移除。此操作無法復原。';
+
+  @override
+  String get restoreFromFileButton => '從備份檔案復原';
+
+  @override
+  String get vaultRestoredMessage => '保險庫已復原。請使用你的憑證解鎖。';
+
+  @override
+  String get restoreFromFileInvalidError => '該檔案不是可用的 Gabbro 保險庫。';
 }

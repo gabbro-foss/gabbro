@@ -1844,4 +1844,78 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Oletuskansioita voi nimetä uudelleen tai poistaa.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Tätä holvitiedostoa ei voi lukea. Saatavilla on automaattinen varakopio viimeisimmästä onnistuneesta tallennuksesta.';
+
+  @override
+  String get restoreBackupButton => 'Palauta varakopiosta';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Palautetaanko holvi varakopiosta?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Lukukelvoton holvitiedosto korvataan viimeisimmän onnistuneen tallennuksen varakopiolla. Salalauseesi (ja YubiKey, jos rekisteröity) vaaditaan edelleen lukituksen avaamiseen.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Palauta';
+
+  @override
+  String get backupRestoredMessage =>
+      'Varakopio palautettu. Avaa lukitus tunnuksillasi.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro säilyttää laitteella myös yhden automaattisen varakopion jokaisesta holvista, joka päivittyy jokaisella tallennuksella. Se suojaa vain tiedoston vioittumiselta — se ei ole varmuuskopio.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Tätä holvitiedostoa ei voi lukea, ja sen varakopio on myös lukukelvoton. Sen sisältöä ei voi palauttaa tällä laitteella.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Jos sinulla on laitteen ulkopuolinen varmuuskopio, palauta holvi siitä kopiosta.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Lukukelvoton tiedosto jää levylle, joten voit poistaa tai tarkastaa sen itse.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Lukukelvoton tiedosto on sovelluksen yksityisessä tallennustilassa, ja sen voi poistaa vain täältä.';
+
+  @override
+  String get removeVaultFromListButton => 'Poista luettelosta';
+
+  @override
+  String get deleteVaultFileButton => 'Poista tiedosto';
+
+  @override
+  String get removeVaultFromListConfirmTitle =>
+      'Poistetaanko holvi luettelosta?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Poistetaanko tämä holvi luettelostasi? Tiedosto jää levylle — voit lisätä sen uudelleen, jos palautat sen.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Poistetaanko vioittunut holvitiedosto pysyvästi?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Poistetaanko tämä holvi pysyvästi? Lukukelvoton tiedosto ja sen varakopio poistetaan tästä laitteesta. Tätä ei voi kumota.';
+
+  @override
+  String get restoreFromFileButton => 'Palauta varmuuskopiotiedostosta';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Holvi palautettu. Avaa lukitus tunnuksillasi.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi.';
 }

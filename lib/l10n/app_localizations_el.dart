@@ -1862,4 +1862,80 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Οι προεπιλεγμένοι φάκελοι μπορούν να μετονομαστούν ή να διαγραφούν.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Αυτό το αρχείο θησαυροφυλακίου δεν μπορεί να διαβαστεί. Διατίθεται ένα αυτόματο εφεδρικό αντίγραφο από την τελευταία επιτυχή αποθήκευση.';
+
+  @override
+  String get restoreBackupButton => 'Επαναφορά από εφεδρικό αντίγραφο';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Επαναφορά θησαυροφυλακίου από το εφεδρικό αντίγραφο;';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Το μη αναγνώσιμο αρχείο θα αντικατασταθεί από το εφεδρικό αντίγραφο της τελευταίας επιτυχούς αποθήκευσης. Για το ξεκλείδωμα εξακολουθούν να απαιτούνται η συνθηματική σας φράση (και το YubiKey σας, αν είναι καταχωρισμένο).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Επαναφορά';
+
+  @override
+  String get backupRestoredMessage =>
+      'Το εφεδρικό αντίγραφο επαναφέρθηκε. Ξεκλειδώστε με τα διαπιστευτήριά σας.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Το Gabbro διατηρεί επίσης στη συσκευή ένα αυτόματο εφεδρικό αντίγραφο κάθε θησαυροφυλακίου, που ανανεώνεται σε κάθε αποθήκευση. Προστατεύει μόνο από καταστροφή του αρχείου — δεν είναι αντίγραφο ασφαλείας.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Αυτό το αρχείο θησαυροφυλακίου δεν μπορεί να διαβαστεί και το εφεδρικό του αντίγραφο είναι επίσης μη αναγνώσιμο. Το περιεχόμενό του δεν μπορεί να ανακτηθεί σε αυτή τη συσκευή.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Αν διατηρείτε αντίγραφο ασφαλείας εκτός συσκευής, επαναφέρετε το θησαυροφυλάκιο από εκείνο το αντίγραφο.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Το μη αναγνώσιμο αρχείο παραμένει στον δίσκο, ώστε να μπορείτε να το διαγράψετε ή να το εξετάσετε μόνοι σας.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Το μη αναγνώσιμο αρχείο βρίσκεται στον ιδιωτικό χώρο αποθήκευσης της εφαρμογής και μπορεί να αφαιρεθεί μόνο από εδώ.';
+
+  @override
+  String get removeVaultFromListButton => 'Αφαίρεση από τη λίστα';
+
+  @override
+  String get deleteVaultFileButton => 'Διαγραφή αρχείου';
+
+  @override
+  String get removeVaultFromListConfirmTitle =>
+      'Αφαίρεση θησαυροφυλακίου από τη λίστα;';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Αφαίρεση αυτού του θησαυροφυλακίου από τη λίστα σας; Το αρχείο παραμένει στον δίσκο — μπορείτε να το προσθέσετε ξανά αν το ανακτήσετε.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Οριστική διαγραφή του κατεστραμμένου αρχείου θησαυροφυλακίου;';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Οριστική διαγραφή αυτού του θησαυροφυλακίου; Το μη αναγνώσιμο αρχείο και το εφεδρικό του αντίγραφο θα αφαιρεθούν από αυτή τη συσκευή. Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.';
+
+  @override
+  String get restoreFromFileButton =>
+      'Επαναφορά από αρχείο αντιγράφου ασφαλείας';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Το θησαυροφυλάκιο επαναφέρθηκε. Ξεκλειδώστε με τα διαπιστευτήριά σας.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Αυτό το αρχείο δεν είναι χρησιμοποιήσιμο θησαυροφυλάκιο Gabbro.';
 }

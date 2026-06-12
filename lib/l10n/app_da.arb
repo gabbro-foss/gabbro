@@ -821,5 +821,26 @@
   "helpCaptionUnlock": "Indtast din adgangssætning for at låse hvælvingen op",
   "helpCaptionVaultSync": "Krypteret synkroniseringsproces for hvælving",
   "passphraseNoWordlist": "Ingen ordliste til dit sprog endnu. Bruger engelsk.",
-  "manageFoldersDefaultNote": "Standardmapper kan omdøbes eller slettes."
+  "manageFoldersDefaultNote": "Standardmapper kan omdøbes eller slettes.",
+
+  "vaultCorruptBackupAvailable": "Denne boksfil kan ikke læses. En automatisk reservekopi fra den seneste vellykkede gemning er tilgængelig.",
+  "restoreBackupButton": "Gendan fra reservekopi",
+  "restoreBackupConfirmTitle": "Gendan boksen fra reservekopien?",
+  "restoreBackupConfirmBody": "Den ulæselige boksfil erstattes af reservekopien fra den seneste vellykkede gemning. Din adgangssætning (og din YubiKey, hvis registreret) kræves stadig for at låse op.",
+  "restoreBackupConfirmAction": "Gendan",
+  "backupRestoredMessage": "Reservekopi gendannet. Lås op med dine loginoplysninger.",
+  "backupDialogSafetyCopyNote": "Gabbro gemmer også én automatisk reservekopi af hver boks på enheden, som opdateres ved hver gemning. Den beskytter kun mod filkorruption — den er ikke en sikkerhedskopi.",
+  "vaultUnrecoverableBody": "Denne boksfil kan ikke læses, og dens reservekopi er også ulæselig. Indholdet kan ikke gendannes på denne enhed.",
+  "vaultUnrecoverableBackupHint": "Hvis du har en sikkerhedskopi uden for enheden, så gendan boksen fra den kopi.",
+  "vaultUnrecoverableNoteLinux": "Den ulæselige fil bliver på disken, så du selv kan slette eller undersøge den.",
+  "vaultUnrecoverableNoteAndroid": "Den ulæselige fil ligger i appens private lager og kan kun fjernes herfra.",
+  "removeVaultFromListButton": "Fjern fra liste",
+  "deleteVaultFileButton": "Slet fil",
+  "removeVaultFromListConfirmTitle": "Fjern boks fra liste?",
+  "removeVaultFromListConfirmBody": "Fjern denne boks fra din liste? Filen bliver på disken — du kan tilføje den igen, hvis du gendanner den.",
+  "deleteVaultFileConfirmTitle": "Slet beskadiget boksfil permanent?",
+  "deleteVaultFileConfirmBody": "Slet denne boks permanent? Den ulæselige fil og dens reservekopi fjernes fra denne enhed. Dette kan ikke fortrydes.",
+  "restoreFromFileButton": "Gendan fra en sikkerhedskopifil",
+  "vaultRestoredMessage": "Boks gendannet. Lås op med dine loginoplysninger.",
+  "restoreFromFileInvalidError": "Den fil er ikke en brugbar Gabbro-boks."
 }

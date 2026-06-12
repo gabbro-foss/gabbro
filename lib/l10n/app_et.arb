@@ -821,5 +821,26 @@
   "helpCaptionUnlock": "Sisesta oma pääslause seifi avamiseks",
   "helpCaptionVaultSync": "Krüpteeritud seifi sünkroonimisprotsess",
   "passphraseNoWordlist": "Teie keele jaoks pole veel sõnaloendit. Kasutatakse inglise keelt.",
-  "manageFoldersDefaultNote": "Vaikekaustu saab ümber nimetada või kustutada."
+  "manageFoldersDefaultNote": "Vaikekaustu saab ümber nimetada või kustutada.",
+
+  "vaultCorruptBackupAvailable": "Seda hoidlafaili ei saa lugeda. Saadaval on automaatne kaitsekoopia viimasest õnnestunud salvestusest.",
+  "restoreBackupButton": "Taasta kaitsekoopiast",
+  "restoreBackupConfirmTitle": "Kas taastada hoidla kaitsekoopiast?",
+  "restoreBackupConfirmBody": "Loetamatu hoidlafail asendatakse viimase õnnestunud salvestuse kaitsekoopiaga. Avamiseks on endiselt vaja teie salafraasi (ja YubiKeyd, kui see on registreeritud).",
+  "restoreBackupConfirmAction": "Taasta",
+  "backupRestoredMessage": "Kaitsekoopia taastatud. Avage oma mandaatidega.",
+  "backupDialogSafetyCopyNote": "Gabbro hoiab seadmes ka iga hoidla ühte automaatset kaitsekoopiat, mida värskendatakse igal salvestusel. See kaitseb ainult faili riknemise eest — see ei ole varukoopia.",
+  "vaultUnrecoverableBody": "Seda hoidlafaili ei saa lugeda ja selle kaitsekoopia on samuti loetamatu. Selle sisu ei saa selles seadmes taastada.",
+  "vaultUnrecoverableBackupHint": "Kui hoiate seadmevälist varukoopiat, taastage hoidla sellest koopiast.",
+  "vaultUnrecoverableNoteLinux": "Loetamatu fail jääb kettale, nii et saate selle ise kustutada või üle vaadata.",
+  "vaultUnrecoverableNoteAndroid": "Loetamatu fail asub rakenduse privaatses salvestusruumis ja seda saab eemaldada ainult siit.",
+  "removeVaultFromListButton": "Eemalda loendist",
+  "deleteVaultFileButton": "Kustuta fail",
+  "removeVaultFromListConfirmTitle": "Kas eemaldada hoidla loendist?",
+  "removeVaultFromListConfirmBody": "Kas eemaldada see hoidla teie loendist? Fail jääb kettale — saate selle uuesti lisada, kui selle taastate.",
+  "deleteVaultFileConfirmTitle": "Kas kustutada rikutud hoidlafail jäädavalt?",
+  "deleteVaultFileConfirmBody": "Kas kustutada see hoidla jäädavalt? Loetamatu fail ja selle kaitsekoopia eemaldatakse sellest seadmest. Seda toimingut ei saa tagasi võtta.",
+  "restoreFromFileButton": "Taasta varukoopia failist",
+  "vaultRestoredMessage": "Hoidla taastatud. Avage oma mandaatidega.",
+  "restoreFromFileInvalidError": "See fail ei ole kasutatav Gabbro hoidla."
 }

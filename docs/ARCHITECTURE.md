@@ -89,7 +89,16 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next active task
 
-Start on remediation actions following `AI_SECURITY_AUDIT_REVIEW.md`
+**Linux/Wayland launch + tolerant write path (urgent).** A Debian/Wayland tester
+had to pass an env var to bubblewrap before the app would boot, after which
+Flutter errored `file-not-found` — apparently because `~/.local/share` did not
+exist on his system. Don't assume the XDG data/config dirs pre-exist: create them
+(and parents) before any read/write and degrade gracefully rather than crashing;
+investigate the Wayland/bubblewrap launch env var (document it, or detect/handle
+it). Start at `GabbroPaths` (`lib/app_paths.dart`) — confirm every read path is
+preceded by a create, not just `dataDir()`/`configDir()`.
+
+Then **R-04** — Linux core-dump hardening (`PR_SET_DUMPABLE(0)` + `RLIMIT_CORE(0)`), following `AI_SECURITY_AUDIT_REVIEW.md`.
 
 ### Open from the security audit
 
@@ -100,9 +109,10 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 
 A second-pass review (`AI_SECURITY_AUDIT_REVIEW.md`, 2026-06-11) added findings
 **R-01…R-07** (per-finding status lives in that document's remediation table).
-**R-02** (Android Auto Backup uploaded the vault to Google Drive) is **fixed** —
-remaining priorities: **R-03** pre-save vault backup rotation, **R-04** Linux
-core-dump hardening, then R-01/R-05/R-06/R-07.
+**R-02** (Android Auto Backup uploaded the vault to Google Drive) and **R-03**
+(automatic `.bak` safety copy + corruption-recovery UX + restore-from-backup-file)
+are **fixed** — remaining priorities: **R-04** Linux core-dump hardening, then
+R-01/R-05/R-06/R-07.
 
 **UI locales deferred** (RTL layout work required): Hebrew, Arabic.
 

@@ -1831,4 +1831,77 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Default folders can be renamed or deleted.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'This vault file cannot be read. A usable safety copy from your last save is available.';
+
+  @override
+  String get restoreBackupButton => 'Restore from safety copy';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Restore vault from safety copy?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'The unreadable vault file will be replaced by the safety copy from the last successful save. Your passphrase (and YubiKey, if registered) is still required to unlock it.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Restore';
+
+  @override
+  String get backupRestoredMessage =>
+      'Safety copy restored. Unlock with your credentials.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro also keeps one automatic on-device safety copy of each vault, refreshed at every save. It protects against file corruption only — it is not a backup.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'This vault file cannot be read, and its safety copy is unreadable too. Its contents cannot be recovered on this device.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'If you keep an off-device backup, restore the vault from that copy.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'The unreadable file stays on disk, so you can delete or inspect it yourself.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'The unreadable file is in the app\'s private storage and can only be removed from here.';
+
+  @override
+  String get removeVaultFromListButton => 'Remove from list';
+
+  @override
+  String get deleteVaultFileButton => 'Delete file';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Remove vault from list?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Remove this vault from your list? The file stays on disk — you can add it back if you recover it.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Delete corrupted vault file permanently?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Delete this vault permanently? The unreadable file and its safety copy will be removed from this device. This cannot be undone.';
+
+  @override
+  String get restoreFromFileButton => 'Restore from a backup file';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Vault restored. Unlock with your credentials.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'That file is not a usable Gabbro vault.';
 }

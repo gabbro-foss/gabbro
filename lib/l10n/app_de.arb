@@ -815,5 +815,26 @@
   "helpCaptionUnlock": "Gib deine Passphrase ein, um deinen Tresor zu entsperren",
   "helpCaptionVaultSync": "Synchronisierungsprozess für verschlüsselten Tresor",
   "passphraseNoWordlist": "Noch keine Wortliste für deine Sprache. Englisch wird verwendet.",
-  "manageFoldersDefaultNote": "Standardordner können umbenannt oder gelöscht werden."
+  "manageFoldersDefaultNote": "Standardordner können umbenannt oder gelöscht werden.",
+
+  "vaultCorruptBackupAvailable": "Diese Tresordatei kann nicht gelesen werden. Eine automatische Sicherheitskopie vom letzten erfolgreichen Speichern ist verfügbar.",
+  "restoreBackupButton": "Aus Sicherheitskopie wiederherstellen",
+  "restoreBackupConfirmTitle": "Tresor aus Sicherheitskopie wiederherstellen?",
+  "restoreBackupConfirmBody": "Die unlesbare Tresordatei wird durch die Sicherheitskopie vom letzten erfolgreichen Speichern ersetzt. Zum Entsperren sind weiterhin Ihre Passphrase (und, falls registriert, Ihr YubiKey) erforderlich.",
+  "restoreBackupConfirmAction": "Wiederherstellen",
+  "backupRestoredMessage": "Sicherheitskopie wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.",
+  "backupDialogSafetyCopyNote": "Gabbro behält zusätzlich eine automatische Sicherheitskopie jedes Tresors auf dem Gerät, die bei jedem Speichern aktualisiert wird. Sie schützt nur vor Dateibeschädigung — sie ist kein Backup.",
+  "vaultUnrecoverableBody": "Diese Tresordatei kann nicht gelesen werden, und ihre Sicherheitskopie ist ebenfalls unlesbar. Ihr Inhalt kann auf diesem Gerät nicht wiederhergestellt werden.",
+  "vaultUnrecoverableBackupHint": "Wenn Sie ein Backup außerhalb des Geräts haben, stellen Sie den Tresor aus dieser Kopie wieder her.",
+  "vaultUnrecoverableNoteLinux": "Die unlesbare Datei bleibt auf dem Datenträger, sodass Sie sie selbst löschen oder prüfen können.",
+  "vaultUnrecoverableNoteAndroid": "Die unlesbare Datei liegt im privaten Speicher der App und kann nur hier entfernt werden.",
+  "removeVaultFromListButton": "Aus Liste entfernen",
+  "deleteVaultFileButton": "Datei löschen",
+  "removeVaultFromListConfirmTitle": "Tresor aus Liste entfernen?",
+  "removeVaultFromListConfirmBody": "Diesen Tresor aus Ihrer Liste entfernen? Die Datei bleibt auf dem Datenträger — Sie können sie wieder hinzufügen, wenn Sie sie wiederherstellen.",
+  "deleteVaultFileConfirmTitle": "Beschädigte Tresordatei endgültig löschen?",
+  "deleteVaultFileConfirmBody": "Diesen Tresor endgültig löschen? Die unlesbare Datei und ihre Sicherheitskopie werden von diesem Gerät entfernt. Dies kann nicht rückgängig gemacht werden.",
+  "restoreFromFileButton": "Aus einer Sicherungsdatei wiederherstellen",
+  "vaultRestoredMessage": "Tresor wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.",
+  "restoreFromFileInvalidError": "Diese Datei ist kein verwendbarer Gabbro-Tresor."
 }

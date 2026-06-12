@@ -1866,4 +1866,80 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Les dossiers par défaut peuvent être renommés ou supprimés.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Ce fichier de coffre est illisible. Une copie de secours automatique du dernier enregistrement réussi est disponible.';
+
+  @override
+  String get restoreBackupButton => 'Restaurer depuis la copie de secours';
+
+  @override
+  String get restoreBackupConfirmTitle =>
+      'Restaurer le coffre depuis la copie de secours ?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Le fichier de coffre illisible sera remplacé par la copie de secours du dernier enregistrement réussi. Votre phrase secrète (et votre YubiKey, le cas échéant) reste nécessaire pour le déverrouiller.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Restaurer';
+
+  @override
+  String get backupRestoredMessage =>
+      'Copie de secours restaurée. Déverrouillez avec vos identifiants.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro conserve aussi sur l\'appareil une copie de secours automatique de chaque coffre, actualisée à chaque enregistrement. Elle ne protège que contre la corruption du fichier — ce n\'est pas une sauvegarde.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Ce fichier de coffre est illisible, et sa copie de secours l\'est également. Son contenu ne peut pas être récupéré sur cet appareil.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Si vous conservez une sauvegarde hors de l\'appareil, restaurez le coffre à partir de cette copie.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Le fichier illisible reste sur le disque, vous pouvez donc le supprimer ou l\'examiner vous-même.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Le fichier illisible se trouve dans le stockage privé de l\'application et ne peut être supprimé que d\'ici.';
+
+  @override
+  String get removeVaultFromListButton => 'Retirer de la liste';
+
+  @override
+  String get deleteVaultFileButton => 'Supprimer le fichier';
+
+  @override
+  String get removeVaultFromListConfirmTitle =>
+      'Retirer le coffre de la liste ?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Retirer ce coffre de votre liste ? Le fichier reste sur le disque — vous pourrez le rajouter si vous le récupérez.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Supprimer définitivement le fichier de coffre corrompu ?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Supprimer définitivement ce coffre ? Le fichier illisible et sa copie de secours seront supprimés de cet appareil. Cette action est irréversible.';
+
+  @override
+  String get restoreFromFileButton =>
+      'Restaurer depuis un fichier de sauvegarde';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Coffre restauré. Déverrouillez avec vos identifiants.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Ce fichier n\'est pas un coffre Gabbro utilisable.';
 }

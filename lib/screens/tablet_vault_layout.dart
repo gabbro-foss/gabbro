@@ -190,12 +190,29 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
     if (_selectedEntryId == null || widget.filteredEntries.isEmpty) {
       return _buildEmptyState(context);
     }
+    // R-03 P6: the detail fetch runs synchronously during build. If the
+    // selected entry has vanished (deleted, or a refresh race against a
+    // locked/corrupted vault — the summary list can briefly disagree with the
+    // session), getEntry throws and crashes the whole layout build. Fall back
+    // to the empty state instead, and clear the stale selection after the frame
+    // so the list and detail pane agree again.
+    final VaultEntryData entry;
+    try {
+      entry = (widget.getEntryFn ?? (id) => getEntry(id: id))(_selectedEntryId!);
+    } catch (_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _selectedEntryId != null) {
+          setState(() => _selectedEntryId = null);
+        }
+      });
+      return _buildEmptyState(context);
+    }
     // ValueKey forces Flutter to rebuild EntryDetailScreen whenever the
     // selected id changes — this is how we refresh after an edit without
     // adding an onChanged callback to EntryDetailScreen.
     return EntryDetailScreen(
       key: ValueKey(_selectedEntryId),
-      entry: (widget.getEntryFn ?? (id) => getEntry(id: id))(_selectedEntryId!),
+      entry: entry,
       clipboardClearTimeout: widget.clipboardClearTimeout,
       onDeleteEntry: widget.onDeleteEntryFn ?? (id) => deleteEntry(id: id),
       onDeleted: () {

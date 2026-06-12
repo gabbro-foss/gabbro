@@ -1852,4 +1852,77 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Domyślne foldery można zmienić lub usunąć.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Nie można odczytać tego pliku sejfu. Dostępna jest automatyczna kopia awaryjna z ostatniego udanego zapisu.';
+
+  @override
+  String get restoreBackupButton => 'Przywróć z kopii awaryjnej';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Przywrócić sejf z kopii awaryjnej?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Nieczytelny plik sejfu zostanie zastąpiony kopią awaryjną z ostatniego udanego zapisu. Do odblokowania nadal potrzebne są Twoje hasło główne (i YubiKey, jeśli zarejestrowany).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Przywróć';
+
+  @override
+  String get backupRestoredMessage =>
+      'Kopia awaryjna przywrócona. Odblokuj swoimi danymi.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro przechowuje też na urządzeniu jedną automatyczną kopię awaryjną każdego sejfu, odświeżaną przy każdym zapisie. Chroni ona wyłącznie przed uszkodzeniem pliku — nie jest kopią zapasową.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Nie można odczytać tego pliku sejfu, a jego kopia awaryjna również jest nieczytelna. Jego zawartości nie można odzyskać na tym urządzeniu.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Jeśli masz kopię zapasową poza urządzeniem, przywróć sejf z tej kopii.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Nieczytelny plik pozostaje na dysku, więc możesz go samodzielnie usunąć lub sprawdzić.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Nieczytelny plik znajduje się w prywatnej pamięci aplikacji i można go usunąć tylko stąd.';
+
+  @override
+  String get removeVaultFromListButton => 'Usuń z listy';
+
+  @override
+  String get deleteVaultFileButton => 'Usuń plik';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Usunąć sejf z listy?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Usunąć ten sejf z listy? Plik pozostaje na dysku — możesz dodać go ponownie, jeśli go odzyskasz.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Trwale usunąć uszkodzony plik sejfu?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Trwale usunąć ten sejf? Nieczytelny plik i jego kopia awaryjna zostaną usunięte z tego urządzenia. Tej operacji nie można cofnąć.';
+
+  @override
+  String get restoreFromFileButton => 'Przywróć z pliku kopii zapasowej';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Sejf przywrócony. Odblokuj swoimi danymi.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Ten plik nie jest prawidłowym sejfem Gabbro.';
 }

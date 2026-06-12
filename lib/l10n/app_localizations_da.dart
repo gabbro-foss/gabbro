@@ -1844,4 +1844,77 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Standardmapper kan omdøbes eller slettes.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Denne boksfil kan ikke læses. En automatisk reservekopi fra den seneste vellykkede gemning er tilgængelig.';
+
+  @override
+  String get restoreBackupButton => 'Gendan fra reservekopi';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Gendan boksen fra reservekopien?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Den ulæselige boksfil erstattes af reservekopien fra den seneste vellykkede gemning. Din adgangssætning (og din YubiKey, hvis registreret) kræves stadig for at låse op.';
+
+  @override
+  String get restoreBackupConfirmAction => 'Gendan';
+
+  @override
+  String get backupRestoredMessage =>
+      'Reservekopi gendannet. Lås op med dine loginoplysninger.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro gemmer også én automatisk reservekopi af hver boks på enheden, som opdateres ved hver gemning. Den beskytter kun mod filkorruption — den er ikke en sikkerhedskopi.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Denne boksfil kan ikke læses, og dens reservekopi er også ulæselig. Indholdet kan ikke gendannes på denne enhed.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Hvis du har en sikkerhedskopi uden for enheden, så gendan boksen fra den kopi.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Den ulæselige fil bliver på disken, så du selv kan slette eller undersøge den.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Den ulæselige fil ligger i appens private lager og kan kun fjernes herfra.';
+
+  @override
+  String get removeVaultFromListButton => 'Fjern fra liste';
+
+  @override
+  String get deleteVaultFileButton => 'Slet fil';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Fjern boks fra liste?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Fjern denne boks fra din liste? Filen bliver på disken — du kan tilføje den igen, hvis du gendanner den.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Slet beskadiget boksfil permanent?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Slet denne boks permanent? Den ulæselige fil og dens reservekopi fjernes fra denne enhed. Dette kan ikke fortrydes.';
+
+  @override
+  String get restoreFromFileButton => 'Gendan fra en sikkerhedskopifil';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Boks gendannet. Lås op med dine loginoplysninger.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Den fil er ikke en brugbar Gabbro-boks.';
 }

@@ -821,5 +821,26 @@
   "helpCaptionUnlock": "Angi passfrasen din for å låse opp kvelvet",
   "helpCaptionVaultSync": "Kryptert synkroniseringsprosess for kvelvet",
   "passphraseNoWordlist": "Ingen ordliste for ditt språk endå. Brukar engelsk.",
-  "manageFoldersDefaultNote": "Standardmapper kan gjevast nytt namn eller slettast."
+  "manageFoldersDefaultNote": "Standardmapper kan gjevast nytt namn eller slettast.",
+
+  "vaultCorruptBackupAvailable": "Denne kvelvfila kan ikkje lesast. Ein automatisk reservekopi frå siste vellukka lagring er tilgjengeleg.",
+  "restoreBackupButton": "Gjenopprett frå reservekopi",
+  "restoreBackupConfirmTitle": "Gjenopprette kvelvet frå reservekopien?",
+  "restoreBackupConfirmBody": "Den uleselege kvelvfila vert erstatta av reservekopien frå siste vellukka lagring. Passordfrasen din (og YubiKey-en din, om registrert) krevst framleis for å låse opp.",
+  "restoreBackupConfirmAction": "Gjenopprett",
+  "backupRestoredMessage": "Reservekopi gjenoppretta. Lås opp med innloggingsinformasjonen din.",
+  "backupDialogSafetyCopyNote": "Gabbro har òg éin automatisk reservekopi av kvart kvelv på eininga, oppdatert ved kvar lagring. Han vernar berre mot filkorrupsjon — han er ikkje ein tryggingskopi.",
+  "vaultUnrecoverableBody": "Denne kvelvfila kan ikkje lesast, og reservekopien er òg uleseleg. Innhaldet kan ikkje gjenopprettast på denne eininga.",
+  "vaultUnrecoverableBackupHint": "Viss du har ein tryggleikskopi utanfor eininga, gjenopprett kvelvet frå den kopien.",
+  "vaultUnrecoverableNoteLinux": "Den uleselege fila blir liggjande på disken, så du kan slette eller undersøkje ho sjølv.",
+  "vaultUnrecoverableNoteAndroid": "Den uleselege fila ligg i det private lageret til appen og kan berre fjernast herifrå.",
+  "removeVaultFromListButton": "Fjern frå liste",
+  "deleteVaultFileButton": "Slett fil",
+  "removeVaultFromListConfirmTitle": "Fjern kvelv frå liste?",
+  "removeVaultFromListConfirmBody": "Fjerne dette kvelvet frå lista di? Fila blir liggjande på disken — du kan leggje det til igjen om du gjenopprettar det.",
+  "deleteVaultFileConfirmTitle": "Slette den skadde kvelvfila permanent?",
+  "deleteVaultFileConfirmBody": "Slette dette kvelvet permanent? Den uleselege fila og reservekopien blir fjerna frå denne eininga. Dette kan ikkje angrast.",
+  "restoreFromFileButton": "Gjenopprett frå ei tryggleikskopifil",
+  "vaultRestoredMessage": "Kvelv gjenoppretta. Lås opp med innloggingsinformasjonen din.",
+  "restoreFromFileInvalidError": "Den fila er ikkje eit brukbart Gabbro-kvelv."
 }

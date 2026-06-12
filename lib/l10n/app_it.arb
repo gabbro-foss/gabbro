@@ -815,5 +815,26 @@
   "helpCaptionUnlock": "Inserisci la tua passphrase per sbloccare il vault",
   "helpCaptionVaultSync": "Processo di sincronizzazione dell'archivio cifrato",
   "passphraseNoWordlist": "Nessuna lista di parole per la tua lingua ancora. Si usa l'inglese.",
-  "manageFoldersDefaultNote": "Le cartelle predefinite possono essere rinominate o eliminate."
+  "manageFoldersDefaultNote": "Le cartelle predefinite possono essere rinominate o eliminate.",
+
+  "vaultCorruptBackupAvailable": "Questo file della cassaforte non può essere letto. È disponibile una copia di sicurezza automatica dell'ultimo salvataggio riuscito.",
+  "restoreBackupButton": "Ripristina dalla copia di sicurezza",
+  "restoreBackupConfirmTitle": "Ripristinare la cassaforte dalla copia di sicurezza?",
+  "restoreBackupConfirmBody": "Il file illeggibile sarà sostituito dalla copia di sicurezza dell'ultimo salvataggio riuscito. Per sbloccarla servono comunque la tua passphrase (e la tua YubiKey, se registrata).",
+  "restoreBackupConfirmAction": "Ripristina",
+  "backupRestoredMessage": "Copia di sicurezza ripristinata. Sblocca con le tue credenziali.",
+  "backupDialogSafetyCopyNote": "Gabbro conserva inoltre sul dispositivo una copia di sicurezza automatica di ogni cassaforte, aggiornata a ogni salvataggio. Protegge solo dalla corruzione del file — non è un backup.",
+  "vaultUnrecoverableBody": "Questo file della cassaforte non può essere letto e anche la sua copia di sicurezza è illeggibile. Il suo contenuto non può essere recuperato su questo dispositivo.",
+  "vaultUnrecoverableBackupHint": "Se conservi un backup esterno al dispositivo, ripristina la cassaforte da quella copia.",
+  "vaultUnrecoverableNoteLinux": "Il file illeggibile rimane sul disco, così puoi eliminarlo o esaminarlo tu stesso.",
+  "vaultUnrecoverableNoteAndroid": "Il file illeggibile si trova nella memoria privata dell'app e può essere rimosso solo da qui.",
+  "removeVaultFromListButton": "Rimuovi dall'elenco",
+  "deleteVaultFileButton": "Elimina file",
+  "removeVaultFromListConfirmTitle": "Rimuovere la cassaforte dall'elenco?",
+  "removeVaultFromListConfirmBody": "Rimuovere questa cassaforte dal tuo elenco? Il file rimane sul disco — puoi aggiungerlo di nuovo se lo recuperi.",
+  "deleteVaultFileConfirmTitle": "Eliminare definitivamente il file della cassaforte danneggiato?",
+  "deleteVaultFileConfirmBody": "Eliminare definitivamente questa cassaforte? Il file illeggibile e la sua copia di sicurezza verranno rimossi da questo dispositivo. L'operazione non può essere annullata.",
+  "restoreFromFileButton": "Ripristina da un file di backup",
+  "vaultRestoredMessage": "Cassaforte ripristinata. Sblocca con le tue credenziali.",
+  "restoreFromFileInvalidError": "Questo file non è una cassaforte Gabbro utilizzabile."
 }

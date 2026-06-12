@@ -821,5 +821,26 @@
   "helpCaptionUnlock": "Zadejte přístupovou frázi pro odemknutí trezoru",
   "helpCaptionVaultSync": "Proces synchronizace šifrovaného trezoru",
   "passphraseNoWordlist": "Pro váš jazyk zatím není seznam slov. Používá se angličtina.",
-  "manageFoldersDefaultNote": "Výchozí složky lze přejmenovat nebo odstranit."
+  "manageFoldersDefaultNote": "Výchozí složky lze přejmenovat nebo odstranit.",
+
+  "vaultCorruptBackupAvailable": "Tento soubor trezoru nelze přečíst. Je k dispozici automatická záchranná kopie z posledního úspěšného uložení.",
+  "restoreBackupButton": "Obnovit ze záchranné kopie",
+  "restoreBackupConfirmTitle": "Obnovit trezor ze záchranné kopie?",
+  "restoreBackupConfirmBody": "Nečitelný soubor trezoru bude nahrazen záchrannou kopií z posledního úspěšného uložení. K odemčení je stále potřeba vaše přístupová fráze (a YubiKey, pokud je registrován).",
+  "restoreBackupConfirmAction": "Obnovit",
+  "backupRestoredMessage": "Záchranná kopie obnovena. Odemkněte pomocí svých přihlašovacích údajů.",
+  "backupDialogSafetyCopyNote": "Gabbro také uchovává v zařízení jednu automatickou záchrannou kopii každého trezoru, obnovovanou při každém uložení. Chrání pouze před poškozením souboru — není to záloha.",
+  "vaultUnrecoverableBody": "Tento soubor trezoru nelze přečíst a jeho záchranná kopie je rovněž nečitelná. Jeho obsah nelze na tomto zařízení obnovit.",
+  "vaultUnrecoverableBackupHint": "Pokud máte zálohu mimo zařízení, obnovte trezor z této kopie.",
+  "vaultUnrecoverableNoteLinux": "Nečitelný soubor zůstane na disku, takže jej můžete sami smazat nebo prozkoumat.",
+  "vaultUnrecoverableNoteAndroid": "Nečitelný soubor je v soukromém úložišti aplikace a lze jej odstranit pouze odsud.",
+  "removeVaultFromListButton": "Odebrat ze seznamu",
+  "deleteVaultFileButton": "Smazat soubor",
+  "removeVaultFromListConfirmTitle": "Odebrat trezor ze seznamu?",
+  "removeVaultFromListConfirmBody": "Odebrat tento trezor ze seznamu? Soubor zůstane na disku — pokud jej obnovíte, můžete jej znovu přidat.",
+  "deleteVaultFileConfirmTitle": "Trvale smazat poškozený soubor trezoru?",
+  "deleteVaultFileConfirmBody": "Trvale smazat tento trezor? Nečitelný soubor a jeho záchranná kopie budou odstraněny z tohoto zařízení. Tuto akci nelze vrátit zpět.",
+  "restoreFromFileButton": "Obnovit ze záložního souboru",
+  "vaultRestoredMessage": "Trezor obnoven. Odemkněte pomocí svých přihlašovacích údajů.",
+  "restoreFromFileInvalidError": "Tento soubor není použitelný trezor Gabbro."
 }

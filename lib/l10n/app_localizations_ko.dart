@@ -1794,4 +1794,73 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get manageFoldersDefaultNote => '기본 폴더는 이름을 바꾸거나 삭제할 수 있습니다.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      '이 보관함 파일을 읽을 수 없습니다. 마지막으로 성공한 저장의 자동 안전 사본을 사용할 수 있습니다.';
+
+  @override
+  String get restoreBackupButton => '안전 사본에서 복원';
+
+  @override
+  String get restoreBackupConfirmTitle => '안전 사본에서 보관함을 복원할까요?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      '읽을 수 없는 보관함 파일은 마지막으로 성공한 저장의 안전 사본으로 교체됩니다. 잠금 해제에는 여전히 패스프레이즈(및 등록된 경우 YubiKey)가 필요합니다.';
+
+  @override
+  String get restoreBackupConfirmAction => '복원';
+
+  @override
+  String get backupRestoredMessage => '안전 사본이 복원되었습니다. 자격 증명으로 잠금을 해제하세요.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro는 또한 각 보관함의 자동 안전 사본 하나를 기기에 보관하며 저장할 때마다 갱신합니다. 이는 파일 손상만을 대비한 것으로 백업이 아닙니다.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      '이 보관함 파일을 읽을 수 없으며, 안전 사본도 읽을 수 없습니다. 이 기기에서는 내용을 복구할 수 없습니다.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      '기기 외부에 백업이 있다면 해당 사본에서 보관함을 복원하세요.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      '읽을 수 없는 파일은 디스크에 남아 있으므로 직접 삭제하거나 검사할 수 있습니다.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      '읽을 수 없는 파일은 앱의 비공개 저장소에 있으며 여기에서만 제거할 수 있습니다.';
+
+  @override
+  String get removeVaultFromListButton => '목록에서 제거';
+
+  @override
+  String get deleteVaultFileButton => '파일 삭제';
+
+  @override
+  String get removeVaultFromListConfirmTitle => '보관함을 목록에서 제거하시겠습니까?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      '이 보관함을 목록에서 제거하시겠습니까? 파일은 디스크에 남아 있습니다. 복구하면 다시 추가할 수 있습니다.';
+
+  @override
+  String get deleteVaultFileConfirmTitle => '손상된 보관함 파일을 영구적으로 삭제하시겠습니까?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      '이 보관함을 영구적으로 삭제하시겠습니까? 읽을 수 없는 파일과 안전 사본이 이 기기에서 제거됩니다. 이 작업은 되돌릴 수 없습니다.';
+
+  @override
+  String get restoreFromFileButton => '백업 파일에서 복원';
+
+  @override
+  String get vaultRestoredMessage => '보관함이 복원되었습니다. 자격 증명으로 잠금을 해제하세요.';
+
+  @override
+  String get restoreFromFileInvalidError => '이 파일은 사용할 수 있는 Gabbro 보관함이 아닙니다.';
 }

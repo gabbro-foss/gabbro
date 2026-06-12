@@ -57,6 +57,12 @@ Widget _buildScreen({
   void Function()? onBiometricInvalidated,
   bool? isAndroid,
   Future<void> Function()? onCancelTap,
+  Future<bool> Function(String)? onVaultIsReadable,
+  Future<bool> Function(String)? onBackupUsable,
+  Future<void> Function(String)? onRestoreBackup,
+  Future<bool> Function(String)? onRestoreFromFile,
+  Future<void> Function(String)? onRemoveVaultFromList,
+  Future<void> Function(String)? onDeleteVaultFile,
 }) =>
     testApp(UnlockScreen(
       vaultPath: vaultPath,
@@ -76,6 +82,12 @@ Widget _buildScreen({
       onBiometricInvalidated: onBiometricInvalidated,
       isAndroid: isAndroid,
       onCancelTap: onCancelTap ?? () async {},
+      onVaultIsReadable: onVaultIsReadable ?? (_) async => true,
+      onBackupUsable: onBackupUsable ?? (_) async => false,
+      onRestoreBackup: onRestoreBackup ?? (_) async {},
+      onRestoreFromFile: onRestoreFromFile ?? (_) async => false,
+      onRemoveVaultFromList: onRemoveVaultFromList ?? (_) async {},
+      onDeleteVaultFile: onDeleteVaultFile ?? (_) async {},
     ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -624,5 +636,373 @@ void main() {
 
     expect(find.text('No YubiKey detected. Tap timed out.'), findsOneWidget);
     expect(find.textContaining('Check your passphrase'), findsNothing);
+  });
+
+  // ── R-03: vault-corruption restore flow ────────────────────────────────────
+
+  testWidgets('corrupt vault with a backup offers the restore option',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => true,
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restore from safety copy'), findsOneWidget);
+  });
+
+  testWidgets(
+      'corrupt vault without a usable backup shows the unrecoverable state '
+      'with remove/delete actions, no restore', (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+    ));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'This vault file cannot be read, and its safety copy is unreadable '
+        'too. Its contents cannot be recovered on this device.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Restore from safety copy'), findsNothing);
+    expect(find.text('Remove from list'), findsOneWidget);
+    expect(find.text('Delete file'), findsOneWidget);
+  });
+
+  testWidgets('wrong passphrase on a healthy vault never offers restore',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onBackupUsable: (_) async => true, // even with a backup present
+      onUnlock: (a, b) async => throw Exception('wrong passphrase'),
+    ));
+
+    await tester.enterText(find.byType(TextField), 'wrongpassphrase');
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Could not unlock vault. Check your passphrase.'),
+        findsOneWidget);
+    expect(find.text('Restore from safety copy'), findsNothing);
+  });
+
+  testWidgets(
+      'R-03 P2: unlock failure after the file became unreadable shows the '
+      'corruption banner, not the passphrase error',
+      (tester) async {
+    var readable = true; // healthy at mount, so no banner appears initially
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => readable,
+      onBackupUsable: (_) async => true,
+      onUnlock: (a, b) async {
+        // The vault file was corrupted while this screen was mounted.
+        readable = false;
+        throw Exception('decrypt failed');
+      },
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('Restore from safety copy'), findsNothing,
+        reason: 'healthy at mount: the banner must not appear yet');
+
+    await tester.enterText(find.byType(TextField), 'whatever');
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restore from safety copy'), findsOneWidget,
+        reason: 're-probe on failure must surface the corruption banner');
+    expect(find.text('Could not unlock vault. Check your passphrase.'),
+        findsNothing,
+        reason: 'a corrupt file must not show the misleading passphrase error');
+  });
+
+  testWidgets(
+      'R-03: re-probes on app resume so a vault corrupted while backgrounded '
+      'shows the banner on return', (tester) async {
+    var readable = true; // healthy when the screen first mounts
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => readable,
+      onBackupUsable: (_) async => true,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('Restore from safety copy'), findsNothing,
+        reason: 'healthy at mount: no banner');
+
+    // Corrupted while the app was backgrounded, then brought back to the
+    // foreground (valid lifecycle path back to resumed is via inactive).
+    readable = false;
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restore from safety copy'), findsOneWidget,
+        reason: 'resume must re-probe and surface the corruption banner');
+  });
+
+  testWidgets(
+      'yubikey auth failures (wrong PIN, wrong key, timeout, cancel) never offer restore',
+      (tester) async {
+    final failures = <Object>[
+      PlatformException(code: 'CTAP_ERROR', message: 'Wrong PIN'),
+      Exception('decryption failed'),
+      PlatformException(code: 'TAP_TIMEOUT'),
+      PlatformException(code: 'TAP_CANCELLED'),
+    ];
+
+    for (final failure in failures) {
+      await tester.pumpWidget(_buildScreen(
+        yubikeyRecords: [_fakeRecord()],
+        onBackupUsable: (_) async => true,
+        onUnlockWithYubikey: (a, b, c, d, e, f) async => throw failure,
+      ));
+
+      await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+      await tester.ensureVisible(find.text('Unlock'));
+      await tester.tap(find.text('Unlock'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Restore from safety copy'), findsNothing,
+          reason: 'no restore offer after: $failure');
+    }
+  });
+
+  testWidgets('confirmed restore calls onRestoreBackup and clears the banner',
+      (tester) async {
+    final restoreCalls = <String>[];
+    var readable = false;
+    await tester.pumpWidget(_buildScreen(
+      vaultPath: '/tmp/corrupt.gabbro',
+      onVaultIsReadable: (_) async => readable,
+      onBackupUsable: (_) async => true,
+      onRestoreBackup: (p) async {
+        restoreCalls.add(p);
+        readable = true;
+      },
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Restore from safety copy'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Restore'));
+    await tester.pumpAndSettle();
+
+    expect(restoreCalls, ['/tmp/corrupt.gabbro']);
+    expect(find.text('Restore from safety copy'), findsNothing);
+    expect(find.text('Safety copy restored. Unlock with your credentials.'),
+        findsOneWidget);
+  });
+
+  testWidgets('declined restore touches nothing', (tester) async {
+    final restoreCalls = <String>[];
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => true,
+      onRestoreBackup: (p) async => restoreCalls.add(p),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Restore from safety copy'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(restoreCalls, isEmpty);
+    expect(find.text('Restore from safety copy'), findsOneWidget);
+  });
+
+  testWidgets(
+      'failed restore (backup rotted after probe) drops to the unrecoverable '
+      'state and Delete file calls onDeleteVaultFile', (tester) async {
+    final deleteCalls = <String>[];
+    await tester.pumpWidget(_buildScreen(
+      vaultPath: '/tmp/corrupt.gabbro',
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => true, // usable at probe...
+      onRestoreBackup: (_) async => // ...but rotted by restore time
+          throw Exception('The vault backup is not usable — restore refused'),
+      onDeleteVaultFile: (p) async => deleteCalls.add(p),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Restore from safety copy'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Restore'));
+    await tester.pumpAndSettle();
+
+    // Restore failed: the screen must drop to the unrecoverable state, no
+    // longer offering a restore the backup can't honour.
+    expect(find.text('Restore from safety copy'), findsNothing);
+    expect(find.text('Remove from list'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Delete file'));
+    await tester.tap(find.text('Delete file')); // the card button
+    await tester.pumpAndSettle();
+    expect(find.text('Delete corrupted vault file permanently?'), findsOneWidget);
+    // Confirm via the dialog's action button (scoped to the AlertDialog, since
+    // the card button carries the same label).
+    await tester.tap(find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.widgetWithText(FilledButton, 'Delete file'),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(deleteCalls, ['/tmp/corrupt.gabbro']);
+  });
+
+  testWidgets('R-03 P5: Remove from list calls onRemoveVaultFromList',
+      (tester) async {
+    final removeCalls = <String>[];
+    await tester.pumpWidget(_buildScreen(
+      vaultPath: '/tmp/dead.gabbro',
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+      onRemoveVaultFromList: (p) async => removeCalls.add(p),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Remove from list'));
+    await tester.tap(find.text('Remove from list')); // the card button
+    await tester.pumpAndSettle();
+    await tester.tap(find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.widgetWithText(FilledButton, 'Remove from list'),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(removeCalls, ['/tmp/dead.gabbro']);
+  });
+
+  testWidgets(
+      'R-03: corrupt vault (no usable backup) offers Restore from a backup file',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('Restore from a backup file'), findsOneWidget);
+  });
+
+  testWidgets(
+      'R-03: corrupt vault WITH a usable backup offers both safety-copy and '
+      'backup-file restore', (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => true,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('Restore from safety copy'), findsOneWidget);
+    expect(find.text('Restore from a backup file'), findsOneWidget);
+  });
+
+  testWidgets(
+      'R-03: restore from file success clears the banner, restores the unlock '
+      'controls, and confirms', (tester) async {
+    var readable = false;
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => readable,
+      onBackupUsable: (_) async => false,
+      onRestoreFromFile: (_) async {
+        readable = true;
+        return true;
+      },
+    ));
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsNothing,
+        reason: 'controls hidden while corrupt');
+
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Vault restored. Unlock with your credentials.'),
+        findsOneWidget);
+    expect(find.byType(TextField), findsOneWidget,
+        reason: 'unlock controls return after a successful restore');
+    expect(find.text('Restore from a backup file'), findsNothing,
+        reason: 'the corruption card is gone');
+  });
+
+  testWidgets(
+      'R-03: restoring from an invalid file shows an error and stays corrupt',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+      onRestoreFromFile: (_) async =>
+          throw Exception('not a usable Gabbro vault — restore refused'),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('That file is not a usable Gabbro vault.'), findsOneWidget);
+    expect(find.text('Restore from a backup file'), findsOneWidget,
+        reason: 'an invalid restore leaves the vault in the corrupt state');
+  });
+
+  testWidgets(
+      'R-03: a corrupt vault hides the passphrase field and Unlock button '
+      '(they are useless until restored)', (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete file'), findsOneWidget,
+        reason: 'the corruption card must still show');
+    expect(find.byType(TextField), findsNothing,
+        reason: 'no passphrase field while the vault cannot be opened');
+    expect(find.widgetWithText(FilledButton, 'Unlock'), findsNothing,
+        reason: 'no Unlock button while the vault cannot be opened');
+  });
+
+  testWidgets(
+      'R-03 P5: State B on Android offers only Delete file (Remove-from-list '
+      'would orphan an unreachable app-private file)', (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: true,
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete file'), findsOneWidget);
+    expect(find.text('Remove from list'), findsNothing);
+  });
+
+  testWidgets('R-03 P5: State B on desktop offers both actions',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: false,
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('Remove from list'), findsOneWidget);
+    expect(find.text('Delete file'), findsOneWidget);
+  });
+
+  testWidgets('R-03 P5: the unrecoverable note is platform-specific',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: true,
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.textContaining("app's private storage"), findsOneWidget);
+    expect(find.textContaining('stays on disk'), findsNothing);
+
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: false,
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('stays on disk'), findsOneWidget);
+    expect(find.textContaining("app's private storage"), findsNothing);
   });
 }

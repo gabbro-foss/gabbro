@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
@@ -16,6 +17,47 @@ import 'package:gabbro/widgets/yubikey_tap.dart';
 
 Future<void> _defaultUnlock(List<int> passphrase, String path) =>
     unlockVault(passphrase: passphrase, path: path);
+
+// R-03: probe whether the vault file parses at all. Only a parse failure may
+// surface the restore offer — authentication failures never do.
+Future<bool> _defaultVaultIsReadable(String path) async {
+  try {
+    readVaultHeader(path: path);
+    return true;
+  } on StateError {
+    // Bridge not initialized (widget-test context, or a startup race): we
+    // cannot probe, and "cannot probe" must never masquerade as "corrupt" —
+    // report healthy so the restore banner cannot appear by accident.
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+Future<bool> _defaultBackupUsable(String path) async {
+  try {
+    return await vaultBackupUsable(path: path);
+  } on StateError {
+    return false;
+  }
+}
+
+Future<void> _defaultRestoreBackup(String path) => restoreVaultBackup(path: path);
+
+// R-03: let the user pick their own off-device backup `.gabbro` and restore it
+// over the corrupt vault. Returns false if the user cancelled the picker.
+// `file_picker` copies the chosen file to an app-readable path on Android too,
+// so the same path-based restore works on every platform.
+Future<bool> _defaultRestoreFromFile(String vaultPath) async {
+  final result = await FilePicker.pickFiles(
+    type: FileType.custom,
+    allowedExtensions: ['gabbro'],
+  );
+  final source = result?.files.single.path;
+  if (source == null) return false; // cancelled
+  await restoreVaultFromFile(path: vaultPath, source: source);
+  return true;
+}
 
 EntropyResult _defaultEstimateEntropy(String password) =>
     estimateEntropy(password: password);
@@ -175,6 +217,33 @@ class UnlockScreen extends StatefulWidget {
   /// Android; the Linux FFI tap is not interruptible from here).
   final bool? isAndroid;
 
+  /// R-03: returns false when the vault file cannot be parsed (corruption).
+  /// Only this — never an authentication failure — can surface the restore
+  /// offer.
+  final Future<bool> Function(String path) onVaultIsReadable;
+
+  /// R-03 P3: whether a *usable* (present and parseable) `.bak` safety copy
+  /// exists next to the vault. A `.bak` that does not parse reports false, so
+  /// the restore offer can never advertise a backup a restore would refuse.
+  final Future<bool> Function(String path) onBackupUsable;
+
+  /// R-03: replace the corrupt vault file with its `.bak` safety copy.
+  /// Explicit user action; the restored vault still demands full credentials.
+  final Future<void> Function(String path) onRestoreBackup;
+
+  /// R-03: pick an external backup `.gabbro` and restore it over the corrupt
+  /// vault. Returns true if a file was picked and restored, false if cancelled.
+  /// Throws if the picked file is not a usable vault.
+  final Future<bool> Function(String vaultPath) onRestoreFromFile;
+
+  /// R-03 P5: remove an unrecoverable vault from the list, leaving the bytes on
+  /// disk. Null → routes through GabbroApp.removeVault(deleteFiles: false).
+  final Future<void> Function(String path)? onRemoveVaultFromList;
+
+  /// R-03 P5: delete an unrecoverable vault's file and its `.bak` from disk.
+  /// Null → routes through GabbroApp.removeVault(deleteFiles: true).
+  final Future<void> Function(String path)? onDeleteVaultFile;
+
   const UnlockScreen({
     super.key,
     required this.vaultPath,
@@ -194,13 +263,20 @@ class UnlockScreen extends StatefulWidget {
     this.onBiometricInvalidated,
     this.onCancelTap = _defaultCancelTap,
     this.isAndroid,
+    this.onVaultIsReadable = _defaultVaultIsReadable,
+    this.onBackupUsable = _defaultBackupUsable,
+    this.onRestoreBackup = _defaultRestoreBackup,
+    this.onRestoreFromFile = _defaultRestoreFromFile,
+    this.onRemoveVaultFromList,
+    this.onDeleteVaultFile,
   });
 
   @override
   State<UnlockScreen> createState() => _UnlockScreenState();
 }
 
-class _UnlockScreenState extends State<UnlockScreen> {
+class _UnlockScreenState extends State<UnlockScreen>
+    with WidgetsBindingObserver {
   final _passphraseController = TextEditingController();
   final _pinController = TextEditingController();
   bool _obscured = true;
@@ -209,9 +285,14 @@ class _UnlockScreenState extends State<UnlockScreen> {
   String _transport = 'usb';
   String? _errorMessage;
   EntropyResult? _entropy;
-  late final List<YubikeyRecordData> _yubikeyRecords;
+  late List<YubikeyRecordData> _yubikeyRecords;
   late String _selectedPath;
   bool _biometricEnrolled = false;
+  // R-03 restore flow: set only by the parse probe, never by auth failures.
+  bool _vaultCorrupt = false;
+  bool _backupAvailable = false;
+  bool _backupRestored = false;
+  bool _vaultRestoredFromFile = false;
 
   bool get _isYubikeyMode => _yubikeyRecords.isNotEmpty;
 
@@ -223,8 +304,10 @@ class _UnlockScreenState extends State<UnlockScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
     _selectedPath = widget.vaultPath;
+    _probeVault();
     if (widget.biometricEnabled) {
       widget.onBiometricIsEnrolled(widget.vaultPath).then((enrolled) {
         if (mounted) setState(() => _biometricEnrolled = enrolled);
@@ -240,11 +323,172 @@ class _UnlockScreenState extends State<UnlockScreen> {
     }
   }
 
+  // R-03: surface the restore offer only when the vault file itself cannot
+  // be parsed. Wrong passphrase / wrong PIN / wrong or absent YubiKey all
+  // leave this untouched.
+  Future<void> _probeVault() async {
+    final readable = await widget.onVaultIsReadable(widget.vaultPath);
+    if (readable) return;
+    final usable = await widget.onBackupUsable(widget.vaultPath);
+    if (!mounted) return;
+    setState(() {
+      _vaultCorrupt = true;
+      _backupAvailable = usable;
+    });
+  }
+
+  Future<void> _confirmRestoreBackup() async {
+    final l = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.restoreBackupConfirmTitle),
+        content: Text(l.restoreBackupConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l.restoreBackupConfirmAction),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await widget.onRestoreBackup(widget.vaultPath);
+    } catch (e) {
+      if (!mounted) return;
+      // The .bak rotted between the usability probe and this restore (rare
+      // race). It is no longer usable, so drop to the unrecoverable state
+      // (remove-from-list / delete-file) rather than offering restore again.
+      setState(() {
+        _backupAvailable = false;
+        _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      });
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      _vaultCorrupt = false;
+      _backupRestored = true;
+      _errorMessage = null;
+      // The restored file may carry a different credential set than the
+      // unreadable one suggested: re-detect YubiKey records.
+      if (widget.yubikeyRecords == null) {
+        _yubikeyRecords = _detectYubikeyRecords();
+      }
+    });
+  }
+
+  // R-03: restore the corrupt vault from an external backup file the user picks
+  // (their off-device 3-2-1 copy). The bridge refuses a file that is not a
+  // usable vault, so a corrupt vault is never replaced by another bad file.
+  Future<void> _restoreFromFile() async {
+    final l = AppLocalizations.of(context);
+    final bool restored;
+    try {
+      restored = await widget.onRestoreFromFile(widget.vaultPath);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _errorMessage = l.restoreFromFileInvalidError);
+      return;
+    }
+    if (!mounted || !restored) return; // user cancelled the picker
+    setState(() {
+      _vaultCorrupt = false;
+      _backupAvailable = false;
+      _vaultRestoredFromFile = true;
+      _errorMessage = null;
+      // The restored file may carry a different credential set: re-detect.
+      if (widget.yubikeyRecords == null) {
+        _yubikeyRecords = _detectYubikeyRecords();
+      }
+    });
+  }
+
+  // R-03 P5: remove an unrecoverable vault from the list, leaving its bytes on
+  // disk (the user may yet recover them off-device).
+  Future<void> _confirmRemoveFromList() async {
+    final l = AppLocalizations.of(context);
+    // Capture the app before the dialog await so no BuildContext is used across
+    // the async gap.
+    final app = GabbroApp.maybeOf(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.removeVaultFromListConfirmTitle),
+        content: Text(l.removeVaultFromListConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l.removeVaultFromListButton),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final cb = widget.onRemoveVaultFromList;
+    if (cb != null) {
+      await cb(widget.vaultPath);
+    } else {
+      await app?.removeVault(widget.vaultPath, deleteFiles: false);
+    }
+  }
+
+  // R-03 P5: permanently delete an unrecoverable vault's file and its .bak.
+  Future<void> _confirmDeleteVaultFile() async {
+    final l = AppLocalizations.of(context);
+    // Capture the app before the dialog await (no BuildContext across the gap).
+    final app = GabbroApp.maybeOf(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.deleteVaultFileConfirmTitle),
+        content: Text(l.deleteVaultFileConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l.deleteVaultFileButton),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final cb = widget.onDeleteVaultFile;
+    if (cb != null) {
+      await cb(widget.vaultPath);
+    } else {
+      await app?.removeVault(widget.vaultPath, deleteFiles: true);
+    }
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _passphraseController.dispose();
     _pinController.dispose();
     super.dispose();
+  }
+
+  // R-03: a vault can be corrupted while the app is backgrounded on its unlock
+  // screen. Re-probe on resume so the corruption banner appears on return,
+  // rather than only after an unlock attempt (P2) or a vault re-mount.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _probeVault();
+    }
   }
 
   void _onDropdownChanged(String? path) {
@@ -343,6 +587,24 @@ class _UnlockScreenState extends State<UnlockScreen> {
       if (!mounted) return;
       // The user cancelled the tap: just drop back to the unlock form, no error.
       if (e is PlatformException && e.code == 'TAP_CANCELLED') return;
+      // R-03 P2: re-probe before showing a generic auth error. If the vault
+      // file itself became unreadable (e.g. corrupted while this screen was
+      // mounted), surface the corruption banner instead of "check your
+      // passphrase" — which would mislead and offer no way forward. A wrong
+      // passphrase / PIN / key leaves the file readable, so the probe returns
+      // readable and the generic error still shows (auth-failure invariant).
+      final stillReadable = await widget.onVaultIsReadable(widget.vaultPath);
+      if (!mounted) return;
+      if (!stillReadable) {
+        final usable = await widget.onBackupUsable(widget.vaultPath);
+        if (!mounted) return;
+        setState(() {
+          _vaultCorrupt = true;
+          _backupAvailable = usable;
+          _errorMessage = null;
+        });
+        return;
+      }
       setState(() {
         _errorMessage = switch (e) {
           PlatformException(code: 'TRANSPORT_ERROR') =>
@@ -380,6 +642,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final onAndroid = widget.isAndroid ?? Platform.isAndroid;
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -414,7 +677,7 @@ class _UnlockScreenState extends State<UnlockScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 48),
-                    if (_biometricEnrolled) ...[
+                    if (_biometricEnrolled && !_vaultCorrupt) ...[
                       if (_isYubikeyMode)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 6),
@@ -428,6 +691,135 @@ class _UnlockScreenState extends State<UnlockScreen> {
                         onPressed: _isUnlocking ? null : _unlockWithBiometrics,
                         icon: const Icon(Icons.fingerprint),
                         label: Text(AppLocalizations.of(context).useBiometrics),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    // R-03: corruption banner + explicit recovery flow. Shown
+                    // only when the parse probe failed, never on auth errors.
+                    // State A: a usable .bak exists -> offer restore.
+                    // State B: no usable .bak -> the vault is unrecoverable on
+                    // this device; offer remove-from-list / delete-file so the
+                    // user is never stranded (responsive buttons that stack on
+                    // narrow Android screens rather than overflowing).
+                    if (_vaultCorrupt) ...[
+                      Card(
+                        color: Theme.of(context).colorScheme.errorContainer,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: _backupAvailable
+                              ? Column(
+                                  children: [
+                                    Text(
+                                      l.vaultCorruptBackupAvailable,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    FilledButton.icon(
+                                      onPressed: _confirmRestoreBackup,
+                                      icon: const Icon(
+                                        Icons.settings_backup_restore,
+                                      ),
+                                      label: Text(l.restoreBackupButton),
+                                    ),
+                                    TextButton.icon(
+                                      onPressed: _restoreFromFile,
+                                      icon: const Icon(Icons.folder_open),
+                                      label: Text(l.restoreFromFileButton),
+                                    ),
+                                  ],
+                                )
+                              : Column(
+                                  children: [
+                                    Text(
+                                      l.vaultUnrecoverableBody,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      l.vaultUnrecoverableBackupHint,
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      onAndroid
+                                          ? l.vaultUnrecoverableNoteAndroid
+                                          : l.vaultUnrecoverableNoteLinux,
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    // Primary recovery: restore from the user's
+                                    // own off-device backup file.
+                                    FilledButton.icon(
+                                      onPressed: _restoreFromFile,
+                                      icon: const Icon(Icons.folder_open),
+                                      label: Text(l.restoreFromFileButton),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    // Secondary "give up" actions. "Remove from
+                                    // list" keeps the file on disk — only useful
+                                    // where the user can reach it (desktop); on
+                                    // Android app-private storage it would orphan
+                                    // an unreachable file, so offer only "Delete
+                                    // file" there.
+                                    OverflowBar(
+                                      alignment: MainAxisAlignment.center,
+                                      overflowAlignment:
+                                          OverflowBarAlignment.center,
+                                      spacing: 8,
+                                      overflowSpacing: 8,
+                                      children: [
+                                        if (!onAndroid)
+                                          OutlinedButton.icon(
+                                            onPressed: _confirmRemoveFromList,
+                                            icon: const Icon(
+                                              Icons.playlist_remove,
+                                            ),
+                                            label: Text(
+                                              l.removeVaultFromListButton,
+                                            ),
+                                          ),
+                                        OutlinedButton.icon(
+                                          onPressed: _confirmDeleteVaultFile,
+                                          icon: const Icon(Icons.delete_forever),
+                                          label: Text(l.deleteVaultFileButton),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Restore failures (bad file / rotted .bak) surface here,
+                      // since the normal error line lives in the hidden controls.
+                      if (_errorMessage != null) ...[
+                        Text(
+                          _errorMessage!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ],
+                    if (_backupRestored) ...[
+                      Text(
+                        l.backupRestoredMessage,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    if (_vaultRestoredFromFile) ...[
+                      Text(
+                        l.vaultRestoredMessage,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
                     ],
@@ -447,6 +839,10 @@ class _UnlockScreenState extends State<UnlockScreen> {
                       ),
                       const SizedBox(height: 16),
                     ],
+                    // R-03: the vault cannot be opened — hide the unlock
+                    // controls until it is restored. The vault dropdown above
+                    // stays visible so the user can switch to another vault.
+                    if (!_vaultCorrupt) ...[
                     TextField(
                       controller: _passphraseController,
                       autofocus: true,
@@ -558,15 +954,14 @@ class _UnlockScreenState extends State<UnlockScreen> {
                     // While a YubiKey tap is in flight on Android, offer an
                     // explicit Cancel so a stalled tap (no key presented) does
                     // not strand the user on an endless spinner.
-                    if (_isUnlocking &&
-                        _isYubikeyMode &&
-                        (widget.isAndroid ?? Platform.isAndroid)) ...[
+                    if (_isUnlocking && _isYubikeyMode && onAndroid) ...[
                       const SizedBox(height: 8),
                       TextButton(
                         onPressed: widget.onCancelTap,
                         child: Text(l.cancel),
                       ),
                     ],
+                    ], // end: unlock controls hidden while _vaultCorrupt
                     ],
                   ),
                 ),

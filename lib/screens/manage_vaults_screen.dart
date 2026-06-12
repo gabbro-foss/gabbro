@@ -169,6 +169,10 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(l.backupResponsibilityBody),
+              const SizedBox(height: 12),
+              // R-03: mention the automatic .bak without overselling it —
+              // it is same-disk corruption insurance, not a backup.
+              Text(l.backupDialogSafetyCopyNote),
               const SizedBox(height: 16),
               Text(
                 Platform.isAndroid

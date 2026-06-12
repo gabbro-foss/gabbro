@@ -1846,6 +1846,79 @@ class AppLocalizationsSr extends AppLocalizations {
   @override
   String get manageFoldersDefaultNote =>
       'Подразумеване фасцикле могу се преименовати или избрисати.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Ова датотека сефа не може да се прочита. Доступна је аутоматска помоћна копија последњег успешног чувања.';
+
+  @override
+  String get restoreBackupButton => 'Врати из помоћне копије';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Вратити сеф из помоћне копије?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Нечитљиву датотеку сефа замениће помоћна копија последњег успешног чувања. За откључавање су и даље потребни ваша приступна фраза (и YubiKey, ако је регистрован).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Врати';
+
+  @override
+  String get backupRestoredMessage =>
+      'Помоћна копија враћена. Откључајте својим акредитивима.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro на уређају чува и једну аутоматску помоћну копију сваког сефа, освежену при сваком чувању. Штити само од оштећења датотеке — није резервна копија.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Ова датотека сефа не може да се прочита, а ни њена помоћна копија није читљива. Њен садржај не може да се опорави на овом уређају.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Ако чувате резервну копију ван уређаја, вратите сеф из те копије.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Нечитљива датотека остаје на диску, па можете сами да је избришете или прегледате.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Нечитљива датотека се налази у приватном складишту апликације и може да се уклони само одавде.';
+
+  @override
+  String get removeVaultFromListButton => 'Уклони са листе';
+
+  @override
+  String get deleteVaultFileButton => 'Избриши датотеку';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Уклонити сеф са листе?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Уклонити овај сеф са ваше листе? Датотека остаје на диску — можете поново да је додате ако је опоравите.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Трајно избрисати оштећену датотеку сефа?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Трајно избрисати овај сеф? Нечитљива датотека и њена помоћна копија биће уклоњени са овог уређаја. Ова радња не може да се поништи.';
+
+  @override
+  String get restoreFromFileButton => 'Врати из датотеке резервне копије';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Сеф враћен. Откључајте својим акредитивима.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Та датотека није употребљив Gabbro сеф.';
 }
 
 /// The translations for Serbian, using the Latin script (`sr_Latn`).
@@ -3690,4 +3763,77 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get manageFoldersDefaultNote =>
       'Podrazumevane fascikle mogu se preimenovati ili izbrisati.';
+
+  @override
+  String get vaultCorruptBackupAvailable =>
+      'Ova datoteka sefa ne može da se pročita. Dostupna je automatska pomoćna kopija poslednjeg uspešnog čuvanja.';
+
+  @override
+  String get restoreBackupButton => 'Vrati iz pomoćne kopije';
+
+  @override
+  String get restoreBackupConfirmTitle => 'Vratiti sef iz pomoćne kopije?';
+
+  @override
+  String get restoreBackupConfirmBody =>
+      'Nečitljivu datoteku sefa zameniće pomoćna kopija poslednjeg uspešnog čuvanja. Za otključavanje su i dalje potrebni vaša pristupna fraza (i YubiKey, ako je registrovan).';
+
+  @override
+  String get restoreBackupConfirmAction => 'Vrati';
+
+  @override
+  String get backupRestoredMessage =>
+      'Pomoćna kopija vraćena. Otključajte svojim akreditivima.';
+
+  @override
+  String get backupDialogSafetyCopyNote =>
+      'Gabbro na uređaju čuva i jednu automatsku pomoćnu kopiju svakog sefa, osveženu pri svakom čuvanju. Štiti samo od oštećenja datoteke — nije rezervna kopija.';
+
+  @override
+  String get vaultUnrecoverableBody =>
+      'Ova datoteka sefa ne može da se pročita, a ni njena pomoćna kopija nije čitljiva. Njen sadržaj ne može da se oporavi na ovom uređaju.';
+
+  @override
+  String get vaultUnrecoverableBackupHint =>
+      'Ako čuvate rezervnu kopiju van uređaja, vratite sef iz te kopije.';
+
+  @override
+  String get vaultUnrecoverableNoteLinux =>
+      'Nečitljiva datoteka ostaje na disku, pa možete sami da je izbrišete ili pregledate.';
+
+  @override
+  String get vaultUnrecoverableNoteAndroid =>
+      'Nečitljiva datoteka se nalazi u privatnom skladištu aplikacije i može da se ukloni samo odavde.';
+
+  @override
+  String get removeVaultFromListButton => 'Ukloni sa liste';
+
+  @override
+  String get deleteVaultFileButton => 'Izbriši datoteku';
+
+  @override
+  String get removeVaultFromListConfirmTitle => 'Ukloniti sef sa liste?';
+
+  @override
+  String get removeVaultFromListConfirmBody =>
+      'Ukloniti ovaj sef sa vaše liste? Datoteka ostaje na disku — možete ponovo da je dodate ako je oporavite.';
+
+  @override
+  String get deleteVaultFileConfirmTitle =>
+      'Trajno izbrisati oštećenu datoteku sefa?';
+
+  @override
+  String get deleteVaultFileConfirmBody =>
+      'Trajno izbrisati ovaj sef? Nečitljiva datoteka i njena pomoćna kopija biće uklonjeni sa ovog uređaja. Ova radnja ne može da se poništi.';
+
+  @override
+  String get restoreFromFileButton => 'Vrati iz datoteke rezervne kopije';
+
+  @override
+  String get vaultRestoredMessage =>
+      'Sef vraćen. Otključajte svojim akreditivima.';
+
+  @override
+  String get restoreFromFileInvalidError =>
+      'Ta datoteka nije upotrebljiv Gabbro sef.';
 }
