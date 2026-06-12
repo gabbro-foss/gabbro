@@ -12,6 +12,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appName => 'Gabbro';
 
   @override
+  String get filePickerUnavailable =>
+      'File dialog unavailable here. Type or paste the path instead.';
+
+  @override
+  String get filePickerNoPortal =>
+      'File dialog unavailable here. The system file portal isn\'t reachable.';
+
+  @override
   String get cancel => '取消';
 
   @override
@@ -1841,6 +1849,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get appName => 'Gabbro';
 
   @override
+  String get filePickerUnavailable =>
+      'File dialog unavailable here. Type or paste the path instead.';
+
+  @override
+  String get filePickerNoPortal =>
+      'File dialog unavailable here. The system file portal isn\'t reachable.';
+
+  @override
   String get cancel => '取消';
 
   @override
@@ -3668,6 +3684,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get appName => 'Gabbro';
+
+  @override
+  String get filePickerUnavailable =>
+      'File dialog unavailable here. Type or paste the path instead.';
+
+  @override
+  String get filePickerNoPortal =>
+      'File dialog unavailable here. The system file portal isn\'t reachable.';
 
   @override
   String get cancel => '取消';

@@ -12,6 +12,14 @@ class AppLocalizationsCs extends AppLocalizations {
   String get appName => 'Gabbro';
 
   @override
+  String get filePickerUnavailable =>
+      'File dialog unavailable here. Type or paste the path instead.';
+
+  @override
+  String get filePickerNoPortal =>
+      'File dialog unavailable here. The system file portal isn\'t reachable.';
+
+  @override
   String get cancel => 'Zrušit';
 
   @override

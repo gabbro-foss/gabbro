@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
 
@@ -82,6 +83,9 @@ Future<ExportArtifact> _defaultBuildExportPassphraseOnlyBytes(
 
 Future<void> _noopSaveFolder(String treeUri) async {}
 
+/// Android JSON export: pick a raw-path destination folder.
+Future<String?> _defaultPickDirectory() => FilePicker.getDirectoryPath();
+
 class ExportScreen extends StatefulWidget {
   final String? initialPath;
   final String? vaultAlias;
@@ -106,6 +110,9 @@ class ExportScreen extends StatefulWidget {
 
   /// Launch the SAF folder picker; null if the user cancels.
   final Future<ExportFolder?> Function() onPickExportDir;
+
+  /// Launch the Android JSON raw-path folder picker; null if cancelled.
+  final Future<String?> Function() onPickDirectory;
 
   /// Whether a persisted write grant for `treeUri` is still held.
   final Future<bool> Function(String treeUri) onHasGrant;
@@ -138,6 +145,7 @@ class ExportScreen extends StatefulWidget {
     this.initialExportFolderUri = '',
     this.onSaveExportFolderUri = _noopSaveFolder,
     this.onPickExportDir = _defaultPickExportDir,
+    this.onPickDirectory = _defaultPickDirectory,
     this.onHasGrant = _defaultHasGrant,
     this.onWriteExport = _defaultWriteExport,
     this.onBuildExportBytes = _defaultBuildExportBytes,
@@ -193,7 +201,13 @@ class _ExportScreenState extends State<ExportScreen> {
   }
 
   Future<void> _pickDirectory() async {
-    final dir = await FilePicker.getDirectoryPath();
+    final String? dir;
+    try {
+      dir = await runPicker(widget.onPickDirectory);
+    } on FilePickerUnavailable {
+      if (mounted) showPickerUnavailable(context, hasManualEntry: false);
+      return;
+    }
     if (dir != null && mounted) {
       setState(() {
         _path = dir;

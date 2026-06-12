@@ -1,6 +1,8 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
+import '../safe_file_picker.dart';
+
 enum PathFieldMode { open, save }
 
 class PathField extends StatefulWidget {
@@ -13,6 +15,11 @@ class PathField extends StatefulWidget {
   final String? Function(String?)? validator;
   final bool readOnly;
 
+  /// Test seams: override the native dialogs to return a path, `null` (cancel),
+  /// or throw (portal unavailable). Default to the real `file_picker`.
+  final Future<String?> Function()? openPicker;
+  final Future<String?> Function()? savePicker;
+
   const PathField({
     super.key,
     required this.mode,
@@ -23,6 +30,8 @@ class PathField extends StatefulWidget {
     this.saveFileName,
     this.validator,
     this.readOnly = false,
+    this.openPicker,
+    this.savePicker,
   });
 
   @override
@@ -58,20 +67,29 @@ class _PathFieldState extends State<PathField> {
     super.dispose();
   }
 
-  Future<void> _pick() async {
-    String? picked;
-    if (widget.mode == PathFieldMode.open) {
-      final result = await FilePicker.pickFiles(
-        type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
-        allowedExtensions: widget.allowedExtensions,
-      );
-      picked = result?.files.single.path;
-    } else {
-      picked = await FilePicker.saveFile(
+  Future<String?> _defaultOpen() async {
+    final result = await FilePicker.pickFiles(
+      type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
+      allowedExtensions: widget.allowedExtensions,
+    );
+    return result?.files.single.path;
+  }
+
+  Future<String?> _defaultSave() => FilePicker.saveFile(
         fileName: widget.saveFileName,
         allowedExtensions: widget.allowedExtensions,
         type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
       );
+
+  Future<void> _pick() async {
+    final String? picked;
+    try {
+      picked = widget.mode == PathFieldMode.open
+          ? await runPicker(widget.openPicker ?? _defaultOpen)
+          : await runPicker(widget.savePicker ?? _defaultSave);
+    } on FilePickerUnavailable {
+      if (mounted) showPickerUnavailable(context);
+      return;
     }
     if (picked != null) {
       setState(() => _controller.text = picked!);

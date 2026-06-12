@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
@@ -40,12 +42,14 @@ Widget _buildCreateScreen(
   String entryType, {
   Future<void> Function(VaultEntryData)? onCreateEntry,
   List<String> Function()? listFolders,
+  Future<PickedFile?> Function()? pickFile,
 }) =>
     testApp(CreateEntryScreen(
       entryType: entryType,
       onCreateEntry: onCreateEntry ?? (_) async {},
       onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
       listFolders: listFolders ?? () => ['Work', 'Private'],
+      pickFile: pickFile ?? (() async => null),
     ));
 
 Widget _buildEditScreen(VaultEntryData existing) => testApp(CreateEntryScreen(
@@ -564,6 +568,24 @@ void main() {
     await tester.pumpWidget(_buildCreateScreen('File'));
     await tester.ensureVisible(find.text('Add custom field'));
     expect(find.text('Add custom field'), findsOneWidget);
+  });
+
+  // Attaching a file has no manual fallback, so an unavailable picker (sandbox/
+  // no portal) shows the no-portal SnackBar instead of crashing the isolate.
+  testWidgets('file form: an unavailable picker shows a SnackBar, no crash',
+      (tester) async {
+    await tester.pumpWidget(_buildCreateScreen(
+      'File',
+      pickFile: () async => throw const SocketException('no bus'),
+    ));
+    await tester.ensureVisible(find.text('Pick file'));
+    await tester.tap(find.text('Pick file'));
+    await tester.pump();
+    expect(
+      find.text(
+          "File dialog unavailable here. The system file portal isn't reachable."),
+      findsOneWidget,
+    );
   });
 
   testWidgets('login form shows Add custom field button', (tester) async {

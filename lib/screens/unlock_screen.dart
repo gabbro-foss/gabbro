@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
+import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
@@ -49,9 +50,11 @@ Future<void> _defaultRestoreBackup(String path) => restoreVaultBackup(path: path
 // `file_picker` copies the chosen file to an app-readable path on Android too,
 // so the same path-based restore works on every platform.
 Future<bool> _defaultRestoreFromFile(String vaultPath) async {
-  final result = await FilePicker.pickFiles(
-    type: FileType.custom,
-    allowedExtensions: ['gabbro'],
+  final result = await runPicker(
+    () => FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['gabbro'],
+    ),
   );
   final source = result?.files.single.path;
   if (source == null) return false; // cancelled
@@ -391,6 +394,11 @@ class _UnlockScreenState extends State<UnlockScreen>
     final bool restored;
     try {
       restored = await widget.onRestoreFromFile(widget.vaultPath);
+    } on FilePickerUnavailable {
+      // The file dialog couldn't open (no portal) - not an invalid vault.
+      if (!mounted) return;
+      showPickerUnavailable(context, hasManualEntry: false);
+      return;
     } catch (_) {
       if (!mounted) return;
       setState(() => _errorMessage = l.restoreFromFileInvalidError);

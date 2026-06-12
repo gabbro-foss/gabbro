@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/safe_file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/password_history_screen.dart';
@@ -49,6 +50,17 @@ Future<void> _defaultLaunchUrl(String url) async {
   await launchUrl(uri, mode: LaunchMode.externalApplication);
 }
 
+/// Pick a destination for a decrypted file export. On Android the native
+/// directory picker yields a folder, to which the filename is appended; on
+/// desktop the save dialog yields a full path. Returns null if cancelled.
+Future<String?> _defaultExportFilePicker(String filename) async {
+  if (Platform.isAndroid) {
+    final dir = await FilePicker.getDirectoryPath();
+    return dir == null ? null : '$dir/$filename';
+  }
+  return FilePicker.saveFile(fileName: filename);
+}
+
 Future<void> _defaultClearHistory(String id) =>
     sessionClearPasswordHistory(id: id);
 Future<void> _defaultRevertPassword(String id) =>
@@ -73,6 +85,10 @@ class EntryDetailScreen extends StatefulWidget {
 
   final Future<void> Function(String url) onLaunchUrl;
 
+  /// Test seam: pick the decrypted-file export destination. Defaults to the
+  /// native dialog; may throw when the file portal is unavailable (sandbox).
+  final Future<String?> Function(String filename) exportFilePicker;
+
   const EntryDetailScreen({
     super.key,
     required this.entry,
@@ -84,6 +100,7 @@ class EntryDetailScreen extends StatefulWidget {
     this.onLaunchUrl = _defaultLaunchUrl,
     this.onDeleted,
     this.onEdited,
+    this.exportFilePicker = _defaultExportFilePicker,
   });
 
   @override
@@ -181,14 +198,14 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                     icon: const Icon(Icons.folder_open),
                     tooltip: dl.tooltipBrowse,
                     onPressed: () async {
-                      String? picked;
-                      if (Platform.isAndroid) {
-                        final dir = await FilePicker.getDirectoryPath();
-                        if (dir != null) picked = '$dir/${e.filename}';
-                      } else {
-                        picked = await FilePicker.saveFile(
-                          fileName: e.filename,
+                      final String? picked;
+                      try {
+                        picked = await runPicker(
+                          () => widget.exportFilePicker(e.filename),
                         );
+                      } on FilePickerUnavailable {
+                        if (ctx.mounted) showPickerUnavailable(ctx);
+                        return;
                       }
                       if (picked != null) {
                         pathController.text = picked;

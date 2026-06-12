@@ -169,6 +169,18 @@ abstract class AppLocalizations {
   /// **'Gabbro'**
   String get appName;
 
+  /// Shown when the native file dialog cannot be reached (e.g. the XDG desktop portal / DBus session bus is missing under a sandbox), in a flow that has an editable path field as the manual fallback.
+  ///
+  /// In en, this message translates to:
+  /// **'File dialog unavailable here. Type or paste the path instead.'**
+  String get filePickerUnavailable;
+
+  /// Shown when the native file dialog cannot be reached (sandbox with no XDG desktop portal / DBus session bus) in a flow that has no manual path-entry fallback.
+  ///
+  /// In en, this message translates to:
+  /// **'File dialog unavailable here. The system file portal isn\'t reachable.'**
+  String get filePickerNoPortal;
+
   /// No description provided for @cancel.
   ///
   /// In en, this message translates to:

@@ -3,6 +3,16 @@
 
   "appName": "Gabbro",
 
+  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
+  "@filePickerUnavailable": {
+    "description": "Shown when the native file dialog cannot be reached (e.g. the XDG desktop portal / DBus session bus is missing under a sandbox), in a flow that has an editable path field as the manual fallback."
+  },
+
+  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
+  "@filePickerNoPortal": {
+    "description": "Shown when the native file dialog cannot be reached (sandbox with no XDG desktop portal / DBus session bus) in a flow that has no manual path-entry fallback."
+  },
+
   "cancel": "Cancel",
   "delete": "Delete",
   "save": "Save",

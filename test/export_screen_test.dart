@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -296,6 +297,30 @@ void main() {
       await tester.pump();
       expect(jsonExportedPath, startsWith('/storage/emulated/0/Documents/vault_'));
       expect(jsonExportedPath, endsWith('.json'));
+    });
+
+    // Android JSON folder picker reaches FilePicker.getDirectoryPath, which
+    // throws when the portal/DBus is unavailable under a sandbox. It must show
+    // the manual-path SnackBar, not crash.
+    testWidgets('android JSON: an unavailable directory picker shows a SnackBar',
+        (tester) async {
+      await tester.pumpWidget(
+        testApp(ExportScreen(
+          isAndroid: true,
+          onExport: (path) async {},
+          onExportJson: (path) async {},
+          onPickDirectory: () async => throw const SocketException('no bus'),
+        )),
+      );
+      await tester.tap(find.text('JSON'));
+      await tester.pump();
+      await tester.tap(find.text('Choose folder'));
+      await tester.pump();
+      expect(
+        find.text(
+            "File dialog unavailable here. The system file portal isn't reachable."),
+        findsOneWidget,
+      );
     });
 
     testWidgets('selecting JSON format calls onExportJson on linux',

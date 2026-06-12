@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
+import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -942,6 +944,34 @@ void main() {
     expect(find.text('That file is not a usable Gabbro vault.'), findsOneWidget);
     expect(find.text('Restore from a backup file'), findsOneWidget,
         reason: 'an invalid restore leaves the vault in the corrupt state');
+  });
+
+  // When the file dialog can't open (sandbox/no portal), the restore-from-file
+  // button must surface the portal message, NOT the misleading "invalid vault"
+  // error, and the vault stays corrupt.
+  testWidgets(
+      'R-03: restore-from-file with an unavailable picker shows the portal '
+      'message, not the invalid-vault error', (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onVaultIsReadable: (_) async => false,
+      onBackupUsable: (_) async => false,
+      onRestoreFromFile: (_) async =>
+          throw const FilePickerUnavailable(SocketException('no bus')),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Restore from a backup file'));
+    await tester.tap(find.text('Restore from a backup file'));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text(
+            "File dialog unavailable here. The system file portal isn't reachable."),
+        findsOneWidget);
+    expect(find.text('That file is not a usable Gabbro vault.'), findsNothing,
+        reason: 'a portal failure is not an invalid-vault error');
+    expect(find.text('Restore from a backup file'), findsOneWidget,
+        reason: 'the vault stays corrupt');
   });
 
   testWidgets(

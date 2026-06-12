@@ -2,6 +2,8 @@
   "@@locale": "bg",
 
   "appName": "Gabbro",
+  "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
+  "filePickerNoPortal": "File dialog unavailable here. The system file portal isn't reachable.",
 
   "cancel": "Откажи",
   "delete": "Изтрий",

@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
@@ -634,8 +635,17 @@ class _VaultListScreenState extends State<VaultListScreen> {
   }
 
   Future<void> _syncFromFile() async {
-    final path = await widget.onPickSyncFile();
-    if (path == null || !mounted) return;
+    final String? picked;
+    try {
+      picked = await runPicker(widget.onPickSyncFile);
+    } on FilePickerUnavailable {
+      if (mounted) showPickerUnavailable(context, hasManualEntry: false);
+      return;
+    }
+    if (picked == null || !mounted) return;
+    // Bound here (not the try-assigned local) so it promotes to non-null inside
+    // the passphrase-dialog builder closure below.
+    final path = picked;
 
     // ADR-013: a key-protected source (passphrase + YubiKey) cannot be opened
     // with the passphrase alone — the crypto refuses it. Detect that up front so

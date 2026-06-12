@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -66,6 +67,7 @@ Widget _buildScreen(
   ClipboardClearTimeout clipboardClearTimeout =
       ClipboardClearTimeout.sixtySeconds,
   Future<void> Function(String url)? onLaunchUrl,
+  Future<String?> Function(String filename)? exportFilePicker,
 }) =>
     testApp(EntryDetailScreen(
       entry: entry,
@@ -73,6 +75,7 @@ Widget _buildScreen(
       onCopyToClipboard: onCopyToClipboard ?? (_) async {},
       clipboardClearTimeout: clipboardClearTimeout,
       onLaunchUrl: onLaunchUrl ?? (_) async {},
+      exportFilePicker: exportFilePicker ?? (_) async => null,
     ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -380,6 +383,35 @@ void main() {
     expect(find.byType(TextField), findsOneWidget);
     // Picker IconButton is present
     expect(find.byIcon(Icons.folder_open), findsOneWidget);
+  });
+
+  // The file-export picker must degrade gracefully when the native dialog can't
+  // open (sandbox/no portal): a SnackBar pointing at the editable path field,
+  // not an unhandled SocketException.
+  testWidgets('file export: an unavailable picker shows a SnackBar, no crash',
+      (tester) async {
+    final entry = FileEntryData(
+      id: 'test-id-file2',
+      filename: 'secret.txt',
+      data: Uint8List.fromList([104, 105]),
+      notes: null,
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: '',
+      customFields: const [],
+    );
+    await tester.pumpWidget(_buildScreen(
+      VaultEntryData.file(entry),
+      exportFilePicker: (_) async => throw const SocketException('no bus'),
+    ));
+    await tester.tap(find.text('Export file'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.folder_open));
+    await tester.pump();
+    expect(
+      find.text('File dialog unavailable here. Type or paste the path instead.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('identity hidden custom field has eye icon toggle',

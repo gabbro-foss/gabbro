@@ -4,15 +4,26 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
+import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/screens/review_changes_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/generator_widget.dart';
 
+/// A file the user picked to attach: its name and (eagerly-loaded) bytes.
+typedef PickedFile = ({String name, Uint8List? bytes});
+
 Future<void> _defaultCreate(VaultEntryData entry) => createEntry(entry: entry);
 VaultEntryData _defaultGetEntry(String id) => getEntry(id: id);
 List<String> _defaultListFolders() => listFolders();
+
+Future<PickedFile?> _defaultPickFile() async {
+  final result = await FilePicker.pickFiles(withData: true);
+  if (result == null || result.files.isEmpty) return null;
+  final f = result.files.first;
+  return (name: f.name, bytes: f.bytes);
+}
 
 class CreateEntryScreen extends StatefulWidget {
   final String entryType;
@@ -26,6 +37,10 @@ class CreateEntryScreen extends StatefulWidget {
   final VaultEntryData Function(String id) onGetEntry;
   final List<String> Function()? listFolders;
 
+  /// Test seam: pick a file to attach. Defaults to the native dialog; may throw
+  /// when the file portal is unavailable (sandbox).
+  final Future<PickedFile?> Function() pickFile;
+
   const CreateEntryScreen({
     super.key,
     required this.entryType,
@@ -34,6 +49,7 @@ class CreateEntryScreen extends StatefulWidget {
     this.onCreateEntry = _defaultCreate,
     this.onGetEntry = _defaultGetEntry,
     this.listFolders,
+    this.pickFile = _defaultPickFile,
   });
 
   @override
@@ -1446,12 +1462,16 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   ];
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.pickFiles(withData: true);
-    if (result == null || result.files.isEmpty) return;
-    final f = result.files.first;
-    if (f.bytes == null) return;
+    final PickedFile? f;
+    try {
+      f = await runPicker(widget.pickFile);
+    } on FilePickerUnavailable {
+      if (mounted) showPickerUnavailable(context, hasManualEntry: false);
+      return;
+    }
+    if (f == null || f.bytes == null) return;
     setState(() {
-      _pickedFilename = f.name;
+      _pickedFilename = f!.name;
       _pickedFileBytes = f.bytes;
     });
   }

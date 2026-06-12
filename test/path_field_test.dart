@@ -1,7 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/widgets/path_field.dart';
+
+// The English copy shown when the native dialog can't be reached (e.g. the XDG
+// portal / DBus session bus is missing under a bubblewrap sandbox).
+const _pickerUnavailableText =
+    'File dialog unavailable here. Type or paste the path instead.';
 
 void main() {
   group('PathField', () {
@@ -101,6 +108,107 @@ void main() {
       await tester.pump();
       expect(find.text('/data/work_gabbro.gabbro'), findsOneWidget);
       expect(find.text('/data/gabbro.gabbro'), findsNothing);
+    });
+
+    // The folder-icon picker must not crash the app when the native dialog is
+    // unreachable (sandbox with no DBus portal). It shows a SnackBar pointing the
+    // user at the editable field instead.
+    testWidgets('save mode: a throwing picker shows a SnackBar, never rethrows',
+        (tester) async {
+      await tester.pumpWidget(
+        testApp(Scaffold(
+          body: PathField(
+            mode: PathFieldMode.save,
+            hint: 'Path',
+            onPathSelected: (_) {},
+            savePicker: () async => throw const SocketException('no bus'),
+          ),
+        )),
+      );
+      await tester.tap(find.byIcon(Icons.folder_open));
+      await tester.pump();
+      expect(find.text(_pickerUnavailableText), findsOneWidget);
+    });
+
+    testWidgets('open mode: a throwing picker shows a SnackBar, never rethrows',
+        (tester) async {
+      await tester.pumpWidget(
+        testApp(Scaffold(
+          body: PathField(
+            mode: PathFieldMode.open,
+            hint: 'Path',
+            onPathSelected: (_) {},
+            openPicker: () async => throw const SocketException('no bus'),
+          ),
+        )),
+      );
+      await tester.tap(find.byIcon(Icons.folder_open));
+      await tester.pump();
+      expect(find.text(_pickerUnavailableText), findsOneWidget);
+    });
+
+    testWidgets('a throwing picker leaves the field text and callback untouched',
+        (tester) async {
+      String? captured;
+      await tester.pumpWidget(
+        testApp(Scaffold(
+          body: PathField(
+            mode: PathFieldMode.open,
+            hint: 'Path',
+            initialPath: '/existing.gabbro',
+            onPathSelected: (p) => captured = p,
+            openPicker: () async => throw const SocketException('no bus'),
+          ),
+        )),
+      );
+      await tester.tap(find.byIcon(Icons.folder_open));
+      await tester.pump();
+      expect(captured, isNull, reason: 'no bogus path on picker failure');
+      expect(find.text('/existing.gabbro'), findsOneWidget);
+    });
+
+    testWidgets('a picker that returns a path still propagates and updates field',
+        (tester) async {
+      String? captured;
+      await tester.pumpWidget(
+        testApp(Scaffold(
+          body: PathField(
+            mode: PathFieldMode.save,
+            hint: 'Path',
+            onPathSelected: (p) => captured = p,
+            savePicker: () async => '/picked/out.gabbro',
+          ),
+        )),
+      );
+      await tester.tap(find.byIcon(Icons.folder_open));
+      await tester.pump();
+      expect(captured, '/picked/out.gabbro');
+      expect(find.text('/picked/out.gabbro'), findsOneWidget);
+      expect(find.text(_pickerUnavailableText), findsNothing);
+    });
+
+    testWidgets('a cancelled picker (null) shows no SnackBar and no callback',
+        (tester) async {
+      String? captured;
+      var called = false;
+      await tester.pumpWidget(
+        testApp(Scaffold(
+          body: PathField(
+            mode: PathFieldMode.save,
+            hint: 'Path',
+            onPathSelected: (p) {
+              called = true;
+              captured = p;
+            },
+            savePicker: () async => null,
+          ),
+        )),
+      );
+      await tester.tap(find.byIcon(Icons.folder_open));
+      await tester.pump();
+      expect(called, isFalse);
+      expect(captured, isNull);
+      expect(find.text(_pickerUnavailableText), findsNothing);
     });
 
     testWidgets('readOnly: true stays a non-editable display with no picker',

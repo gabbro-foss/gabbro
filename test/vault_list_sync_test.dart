@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -27,12 +28,13 @@ MergeSummary _summary({
 Widget _buildScreen({
   required Future<MergeSummary> Function(String, List<int>) mergeVault,
   String? pickedPath,
+  Future<String?> Function()? onPickSyncFile,
 }) =>
     testApp(VaultListScreen(
       vaultPath: '/tmp/test.gabbro',
       listEntries: () => [],
       yubikeyRecords: [],
-      onPickSyncFile: () async => pickedPath,
+      onPickSyncFile: onPickSyncFile ?? () async => pickedPath,
       mergeVault: mergeVault,
     ));
 
@@ -60,6 +62,28 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Sync from file'), findsNothing);
+    });
+
+    // Sync-from-file has no manual path fallback, so an unavailable picker
+    // (sandbox/no portal) must show the no-portal SnackBar, not crash and not
+    // open the passphrase dialog.
+    testWidgets('unavailable picker shows a SnackBar and opens no dialog',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        onPickSyncFile: () async => throw const SocketException('no bus'),
+        mergeVault: (_, _) async => _summary(),
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+            "File dialog unavailable here. The system file portal isn't reachable."),
+        findsOneWidget,
+      );
+      expect(find.text('Cancel'), findsNothing,
+          reason: 'the passphrase dialog must not open');
     });
 
     testWidgets('passphrase dialog appears after file is picked', (tester) async {
