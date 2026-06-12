@@ -89,9 +89,61 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next active task
 
-**R-04 — Linux core-dump hardening** (`PR_SET_DUMPABLE(0)` + `RLIMIT_CORE(0)`),
-following `AI_SECURITY_AUDIT_REVIEW.md`. Stops a crash from writing a core file
-that could contain decrypted vault material.
+**Wayland/bubblewrap file-picker hardening + sandbox launch docs.**
+
+A Debian/Wayland tester (running under a bubblewrap sandbox) surfaced two distinct
+problems. Only one is fixable in our binary:
+
+1. **Boot needs `WAYLAND_DISPLAY` (packaging, not code).** The sandbox didn't
+   forward the Wayland socket, so GTK found no display and the app never reached
+   Dart; the tester worked around it with `--setenv WAYLAND_DISPLAY "/tmp/wayland-0"`.
+   This is *before any Dart runs* → cannot be fixed in `app_paths.dart`. **Doc only.**
+2. **File save/open crashes with `SocketException` (our bug).** `file_picker` on
+   Linux talks *only* to the XDG Desktop Portal over the DBus **session** bus. In
+   the sandbox `/run/user/1000/bus` isn't bound in, so `DBusClient._openSocket`
+   throws `SocketException`, which propagates **unhandled** out of
+   `FilePicker.saveFile`/`pickFiles` and crashes the isolate. Same crash lurks at
+   every picker call site: `path_field.dart:_pick`, `export_screen.dart`
+   (`getDirectoryPath`), `entry_detail_screen.dart` (`saveFile`),
+   `create_entry_screen.dart` (`pickFiles`), `vault_list_screen.dart` (`pickFiles`),
+   `unlock_screen.dart` (restore-from-file `pickFiles`). Editable path fields are
+   already the manual fallback (`path_field_test.dart`), but only if you *type*
+   instead of *clicking* — clicking the folder icon still crashes.
+
+**Design.** New `lib/safe_file_picker.dart` — one tested seam reused everywhere:
+- `class FilePickerUnavailable implements Exception` (carries the underlying cause).
+- `Future<T?> runPicker<T>(Future<T?> Function() op)` — returns the op's value
+  (incl. `null` = user cancelled), but converts any thrown `Exception`
+  (`SocketException`/`DBusException`/…) into `FilePickerUnavailable`.
+- `void showPickerUnavailable(BuildContext)` — consistent localized SnackBar
+  ("File dialog isn't available here — type or paste the path instead").
+- New ARB key (template + all 35 locales; `l10n_test` must stay green).
+- All 6 sites wrap their `FilePicker.*` call in `runPicker`, catch
+  `FilePickerUnavailable`, show the message.
+
+**Decision: full dedicated widget tests for all call sites (option b).** Sites
+without a picker seam today (`entry_detail`, `create_entry`, `vault_list`) get a
+new injectable seam + harness, not just the helper unit tests.
+
+**Test-scenario list (Canon TDD, agreed):**
+- *A. `safe_file_picker` unit:* (1) returns value on success; (2) returns `null`
+  on cancel (cancel != failure); (3) `SocketException` -> `FilePickerUnavailable`;
+  (4) generic `Exception` -> `FilePickerUnavailable`; (5) exposes underlying cause.
+- *B. `PathField` widget (inject throwing picker):* (6) save mode throws -> SnackBar,
+  no rethrow; (7) open mode throws -> SnackBar, no rethrow; (8) throw -> no
+  `onPathSelected`, field text unchanged; (9) regression: returns path -> propagates
+  + updates field; (10) regression: returns `null` -> no SnackBar, no `onPathSelected`.
+- *C. Other call sites (guard + message, each with a dedicated widget test):*
+  (11) `export_screen._pickDirectory`; (12) `unlock_screen` restore-from-file
+  (corrupt-vault state untouched); (13) `entry_detail` download save;
+  (14) `create_entry` attachment pick; (15) `vault_list` pick.
+- *D. l10n:* (16) new ARB key resolves in template; all locales green.
+
+**Docs:** add a "Running under a Wayland/bubblewrap sandbox" section to
+`BUILD_AND_RELEASE.md` (the `WAYLAND_DISPLAY` setenv + the `--ro-bind` for the DBus
+session bus + xdg-desktop-portal), closing problem 1.
+
+After this: **R-04 — Linux core-dump hardening** (now in the bikeshed Security list).
 
 ### Open from the security audit
 
@@ -124,6 +176,7 @@ release process (pre-flight gate, build, publish) live in their own document:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Security (pre-v1 gates)
+- **R-04 Linux core-dump hardening** — `PR_SET_DUMPABLE(0)` + `RLIMIT_CORE(0)`, following `AI_SECURITY_AUDIT_REVIEW.md`. Stops a crash from writing a core file that could contain decrypted vault material. Next security item after the Wayland/file-picker task.
 - **F-03 X-Wing combiner** — migrate the hybrid KEM combiner to a transcript-binding (X-Wing-style) construction (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). No single verifiable-against-spec answer → genuinely needs a human cryptographer's judgement. Would require VERSION 8.
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
 - Test on de-Googled Android (GrapheneOS/CalyxOS) before v1 — find a willing community tester, don't buy hardware.
@@ -154,7 +207,6 @@ release process (pre-flight gate, build, publish) live in their own document:
 ### Code Quality
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 - **NumLock toggled off during unlock (Linux).** Something in the vault-unlocking flow appears to toggle NumLock off (observed on Linux). Low-impact annoyance, almost certainly a quick fix once the cause is found — suspect a key-event / focus interaction during the unlock sequence. Investigate and pin with a note in LEARNINGS.md.
-- **Wayland/bubblewrap launch env var.** A Debian/Wayland tester had to pass an env var to bubblewrap before the app would boot (separate from, and prior to, the now-fixed tolerant write path). This is a Flutter-on-Wayland / GTK-sandbox launch concern that happens before any Dart runs, so it cannot be fixed in `app_paths.dart`. Pending the tester's report of the exact variable; then document it (and/or detect/handle the sandbox at launch).
 
 ### V2+ / Defer
 - Passphrase wordlists — not viable without significant pipeline work: `yo` Yoruba (no frequency ordering, complex tonal diacritics); `sr_Latn` Serbian Latin (only Cyrillic corpora; needs transliteration pipeline); `lb` Luxembourgish (small speaker base); `wa` Walloon (nothing usable, French covers Wallonia).
