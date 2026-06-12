@@ -39,6 +39,20 @@ class _PathFieldState extends State<PathField> {
   }
 
   @override
+  void didUpdateWidget(PathField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reflect an external initialPath change (e.g. the onboarding alias-driven
+    // path preview) without clobbering what the user is actively typing: when
+    // the user types, onChanged feeds the same value straight back as
+    // initialPath, so incoming == the controller text and we leave it alone.
+    final incoming = widget.initialPath ?? '';
+    if (incoming != (oldWidget.initialPath ?? '') &&
+        incoming != _controller.text) {
+      _controller.text = incoming;
+    }
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -69,7 +83,11 @@ class _PathFieldState extends State<PathField> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: _controller,
-      readOnly: true,
+      // Editable so the user can type or paste a path directly (e.g. when the
+      // native file dialog is unavailable under a Wayland bubblewrap sandbox).
+      // Only a caller-requested display field stays read-only.
+      readOnly: widget.readOnly,
+      onChanged: widget.onPathSelected,
       validator: widget.validator,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),

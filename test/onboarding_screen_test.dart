@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
+import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
@@ -25,9 +26,11 @@ Widget _buildScreen({
   bool? showYubikey,
   Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), String, String?)? onInitVaultWithYubikey,
   Future<void> Function(String path, String alias)? onVaultCreated,
+  String? initialPath = '/tmp/test.gabbro',
+  Future<String> Function()? resolveDataDir,
 }) =>
     testApp(OnboardingScreen(
-      initialPath: '/tmp/test.gabbro',
+      initialPath: initialPath,
       onInitVault: onInitVault ?? (a, b, c) async {},
       onEstimateEntropy: _fakeStrongEntropy,
       blockPassphraseCopyPaste: blockPassphraseCopyPaste,
@@ -36,6 +39,7 @@ Widget _buildScreen({
       onInitVaultWithYubikey: onInitVaultWithYubikey ??
           (a, b, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t, alias) async {},
       onVaultCreated: onVaultCreated,
+      resolveDataDir: resolveDataDir ?? GabbroPaths.dataDir,
     ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -62,6 +66,33 @@ void main() {
       find.widgetWithText(TextFormField, '/tmp/test.gabbro'),
       findsOneWidget,
     );
+  });
+
+  // Linux tolerant write path: if the default data dir cannot be resolved (e.g.
+  // a Wayland bubblewrap sandbox with no ~/.local/share), onboarding must not
+  // crash - it must leave the path field empty and editable so the user can
+  // type or paste their own path. Warn, but empower.
+  testWidgets('data dir unresolvable: no crash, path field empty and editable',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      initialPath: null,
+      resolveDataDir: () async =>
+          throw Exception('no data dir under the sandbox'),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull,
+        reason: 'an unresolvable data dir must not crash onboarding');
+
+    // The field is present and empty (showing the hint, not a path).
+    final field = find.byType(TextFormField).first;
+    expect(field, findsOneWidget);
+
+    // The user can type their own path and it sticks.
+    await tester.enterText(field, '/home/user/mine.gabbro');
+    await tester.pump();
+    expect(find.widgetWithText(TextFormField, '/home/user/mine.gabbro'),
+        findsOneWidget);
   });
 
   testWidgets('validation fires when required fields are empty', (tester) async {

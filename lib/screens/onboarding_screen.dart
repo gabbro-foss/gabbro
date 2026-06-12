@@ -273,6 +273,12 @@ class OnboardingScreen extends StatefulWidget {
   /// will reject any value present in this set.
   final Set<String> existingAliases;
 
+  /// Resolves the default directory for new vault files. Seam for tests; in
+  /// production it is [GabbroPaths.dataDir], which can throw when no data
+  /// directory can be determined (e.g. a Wayland bubblewrap sandbox with no
+  /// `~/.local/share`). On failure the path field is left empty and editable.
+  final Future<String> Function() resolveDataDir;
+
   OnboardingScreen({
     super.key,
     this.initialPath,
@@ -285,6 +291,7 @@ class OnboardingScreen extends StatefulWidget {
     this.onInitVaultWithYubikey = _defaultInitVaultWithYubikey,
     this.onVaultCreated,
     this.existingAliases = const {},
+    this.resolveDataDir = GabbroPaths.dataDir,
   }) : showYubikey = showYubikey ?? (Platform.isAndroid || Platform.isLinux),
        isAndroid = isAndroid ?? Platform.isAndroid;
 
@@ -347,13 +354,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Future<void> _initDefaultPath() async {
-    final dirPath = await GabbroPaths.dataDir();
+    String? dirPath;
+    try {
+      dirPath = await widget.resolveDataDir();
+    } catch (_) {
+      // No data directory could be determined (e.g. a sandbox with no
+      // ~/.local/share). Leave the path empty so the editable field lets the
+      // user type or paste their own location instead of crashing.
+      dirPath = null;
+    }
+    if (!mounted) return;
     final alias = _aliasController.text.trim();
     setState(() {
       _defaultDir = dirPath;
-      _vaultPath = alias.isEmpty
-          ? _firstFreeVaultPath(dirPath)
-          : _aliasBasedPath(dirPath, alias);
+      _vaultPath = dirPath == null
+          ? ''
+          : (alias.isEmpty
+              ? _firstFreeVaultPath(dirPath)
+              : _aliasBasedPath(dirPath, alias));
     });
   }
 
@@ -852,7 +870,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             )
                           else
                             PathField(
-                              key: Key(_vaultPath),
                               mode: PathFieldMode.save,
                               hint: l.onboardingPathHint,
                               initialPath: _vaultPath.isEmpty
