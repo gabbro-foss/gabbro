@@ -3998,3 +3998,50 @@ global sandbox is also a *latent-bug detector*: if any existing test was secretl
 real file, it now sees the empty sandbox and fails — none did here (suite stayed green), which
 is itself the proof that nothing was touching real data. Mirrors the `rust/tests/fixtures/`
 ethos: never operate on real data.
+
+## Vault safety copy — "sync after verified save", not "rotate before write" (R-03)
+
+A `.bak` safety copy sounds trivial. The first design (rotate the existing file to `.bak`
+*before* overwriting it) is subtly wrong, and hardware testing found it: the backup is then
+always **one save behind**, so a user who edits, hits corruption, and restores gets the
+*previous* state — their most recent edit is silently lost. "Restore" that drops your last
+change is its own data-loss bug.
+
+The correct model is **`.bak` equals the last *verified* save**: in `write_vault`, write the
+main file atomically, then **read it back and parse it** (`SealedVault::from_bytes` — cheap, no
+KDF), and only then copy those verified bytes to `.bak`. Two payoffs: (1) restore returns
+exactly the last good state, including the latest edit; (2) a save that *wrote successfully but
+is garbage* (the 2026-06-08 brick class — atomic rename prevents torn writes, not bad content)
+now **fails loudly at the bad save** and leaves `.bak` at the previous good state, instead of
+propagating the corruption into the backup. Residual: a save that *parses but is logically
+wrong* still flows into `.bak` — no single-generation scheme covers that; the backward-compat
+gate + parser fuzzer remain the guards for that class.
+
+Three UX lessons from the same work:
+
+- **Probe usability, not existence.** Offering "restore from the safety copy" based only on
+  the `.bak` *existing* is a lie when the `.bak` is itself garbage — the user discovers it only
+  after confirming. Parse-check the `.bak` before advertising it (`backup_usable`, not
+  `backup_exists`).
+- **A suggestion is not a recovery path.** Telling the user "restore from your off-device
+  backup" with no button is the classic expert blind spot. If you say it, provide the path —
+  here, reuse the existing file-picker (`file_picker` returns an app-readable path on Android
+  too) → validate the picked `.gabbro` parses → write it over the corrupt vault.
+- **Destructive UX is platform-shaped.** "Remove from the list but keep the file" only makes
+  sense where the user can reach the file (desktop). On Android app-private storage it just
+  orphans an unreachable file (and collides the next same-named vault onto a `_2` suffix), so
+  there the only honest action is "Delete file". Make the *button set* platform-aware, not just
+  the explanatory text.
+
+## Flutter — never call a throwing bridge fn synchronously in `build()`
+
+`tablet_vault_layout` fetched the selected entry with a synchronous `getEntry(id)` *inside*
+`build()`. That is fine until the entry no longer exists — deleted, or the session went
+locked/corrupt — at which point it throws **during layout** and Flutter degrades into an
+endless `Another exception was thrown: Instance of 'DiagnosticsProperty<void>'` storm (the
+secondary error masks the primary one, which is why it's so confusing to diagnose). The trap:
+*any* app-wide `setState` (e.g. toggling a settings switch that calls `updateSettings`)
+re-runs that `build()` against possibly-stale selection state, so a totally unrelated action
+appears to "cause" the crash. Guard build-time fetches: `try { … } catch { return emptyState; }`
+and clear the stale selection in a post-frame callback. Better still, prefer async fetches with
+a `FutureBuilder`, but where a sync fetch is load-bearing, the guard is mandatory.
