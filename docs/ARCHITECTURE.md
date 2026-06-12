@@ -67,10 +67,10 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 489 | 8 |
+| Rust (`cargo test -q`) | 514 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 758 | 0 |
+| Flutter (`flutter test`) | 793 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 26 | 17 |
 
@@ -89,16 +89,9 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next active task
 
-**Linux/Wayland launch + tolerant write path (urgent).** A Debian/Wayland tester
-had to pass an env var to bubblewrap before the app would boot, after which
-Flutter errored `file-not-found` — apparently because `~/.local/share` did not
-exist on his system. Don't assume the XDG data/config dirs pre-exist: create them
-(and parents) before any read/write and degrade gracefully rather than crashing;
-investigate the Wayland/bubblewrap launch env var (document it, or detect/handle
-it). Start at `GabbroPaths` (`lib/app_paths.dart`) — confirm every read path is
-preceded by a create, not just `dataDir()`/`configDir()`.
-
-Then **R-04** — Linux core-dump hardening (`PR_SET_DUMPABLE(0)` + `RLIMIT_CORE(0)`), following `AI_SECURITY_AUDIT_REVIEW.md`.
+**R-04 — Linux core-dump hardening** (`PR_SET_DUMPABLE(0)` + `RLIMIT_CORE(0)`),
+following `AI_SECURITY_AUDIT_REVIEW.md`. Stops a crash from writing a core file
+that could contain decrypted vault material.
 
 ### Open from the security audit
 
@@ -160,6 +153,8 @@ release process (pre-flight gate, build, publish) live in their own document:
 
 ### Code Quality
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
+- **NumLock toggled off during unlock (Linux).** Something in the vault-unlocking flow appears to toggle NumLock off (observed on Linux). Low-impact annoyance, almost certainly a quick fix once the cause is found — suspect a key-event / focus interaction during the unlock sequence. Investigate and pin with a note in LEARNINGS.md.
+- **Wayland/bubblewrap launch env var.** A Debian/Wayland tester had to pass an env var to bubblewrap before the app would boot (separate from, and prior to, the now-fixed tolerant write path). This is a Flutter-on-Wayland / GTK-sandbox launch concern that happens before any Dart runs, so it cannot be fixed in `app_paths.dart`. Pending the tester's report of the exact variable; then document it (and/or detect/handle the sandbox at launch).
 
 ### V2+ / Defer
 - Passphrase wordlists — not viable without significant pipeline work: `yo` Yoruba (no frequency ordering, complex tonal diacritics); `sr_Latn` Serbian Latin (only Cyrillic corpora; needs transliteration pipeline); `lb` Luxembourgish (small speaker base); `wa` Walloon (nothing usable, French covers Wallonia).

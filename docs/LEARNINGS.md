@@ -4045,3 +4045,33 @@ re-runs that `build()` against possibly-stale selection state, so a totally unre
 appears to "cause" the crash. Guard build-time fetches: `try { … } catch { return emptyState; }`
 and clear the stale selection in a post-frame callback. Better still, prefer async fetches with
 a `FutureBuilder`, but where a sync fetch is load-bearing, the guard is mandatory.
+
+## Linux dirs — wrap path_provider, don't reimplement it (backward-compat by construction)
+
+A Wayland tester's app errored `file-not-found` at launch because `~/.local/share` did not
+exist. The tempting fix — compute the data dir ourselves from XDG env vars — is a **data-loss
+trap**: `path_provider_linux` derives the directory suffix from the **running GTK app's id**
+(`g_get_prgname` → `app.gabbro.gabbro`) read over FFI *at runtime*, not from the binary name
+(`gabbro`) and not from any compile-time constant. Reimplementing that derivation risks
+computing a *different* directory than the one a given machine's path_provider already created,
+so the registry reads empty and it looks exactly like the 2026-06-08 brick (a "new empty
+vault"). The safe shape is **wrap, don't replace**: keep calling
+`getApplicationSupportDirectory()` as the primary resolver — so every working install gets
+byte-identically what it already uses — and only on a thrown exception fall back to an
+XDG-computed path. The fallback must mirror path_provider's *own* precedence (existing app-id
+dir → existing legacy executable-name dir → else create the app-id dir) so even the fallback
+lands on the same place an old install used. The app-id constant is consulted **only** when the
+FFI is unavailable, i.e. never on a normal machine.
+
+**XDG ≠ display server.** `XDG_DATA_HOME`/`XDG_CONFIG_HOME` (freedesktop Base Directory spec,
+defaulting to `~/.local/share` and `~/.config`) say *where files live*; they are completely
+independent of X11-vs-Wayland. There is no "Wayland data path" — Wayland and X11 desktops use
+the same dirs. The Wayland angle in the bug report was two unrelated things coinciding: a
+*launch* problem (bubblewrap needed an env var, before any Dart runs — not fixable in
+`app_paths.dart`) and a *write-path* problem (missing `~/.local/share`). Don't conflate them.
+
+**Config asymmetry is deliberate.** Data honours `XDG_DATA_HOME` (path_provider always did), but
+config stays on `~/.config/gabbro` and honours `XDG_CONFIG_HOME` *only* as a fallback when `HOME`
+is unset — because the old config code ignored `XDG_CONFIG_HOME`, so newly honouring it would
+*move* the registry for anyone who has it set. Matching each path's prior behaviour is what makes
+"nothing moves" true; consistency-for-its-own-sake would have been the regression.
