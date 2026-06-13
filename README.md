@@ -157,6 +157,22 @@ Tested on Android 11+. YubiKey authentication requires a YubiKey 5 series key (U
 
 ---
 
+## Known hardware quirks
+
+**NumLock LED switches off when you plug in a YubiKey (Linux/X11).** On an X11
+session, inserting a YubiKey turns the keyboard's NumLock indicator light off —
+you may notice this when unlocking a passphrase + YubiKey vault. Your numeric
+keypad keeps working normally (the digits still type); only the LED is affected.
+
+This is **not a Gabbro behaviour** and Gabbro cannot prevent it: a YubiKey
+presents a USB keyboard interface (the one that types one-time passwords when you
+touch it), and X11 resets the keyboard's indicator lights whenever any keyboard
+device is plugged in. The same happens with many USB keyboards. It is cosmetic —
+nothing to fix and nothing lost. If the wrong LED bothers you, your desktop's
+"turn NumLock on at login/after hotplug" option (e.g. `numlockx`) re-syncs it.
+
+---
+
 ## Development
 
 ### Prerequisites

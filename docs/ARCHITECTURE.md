@@ -202,7 +202,6 @@ release process (pre-flight gate, build, publish) live in their own document:
 
 ### Code Quality
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
-- **NumLock toggled off during unlock (Linux).** Something in the vault-unlocking flow appears to toggle NumLock off (observed on Linux). Low-impact annoyance, almost certainly a quick fix once the cause is found — suspect a key-event / focus interaction during the unlock sequence. Investigate and pin with a note in LEARNINGS.md.
 
 ### V2+ / Defer
 - Passphrase wordlists — not viable without significant pipeline work: `yo` Yoruba (no frequency ordering, complex tonal diacritics); `sr_Latn` Serbian Latin (only Cyrillic corpora; needs transliteration pipeline); `lb` Luxembourgish (small speaker base); `wa` Walloon (nothing usable, French covers Wallonia).
