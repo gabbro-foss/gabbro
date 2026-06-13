@@ -17,6 +17,16 @@ EntropyResult _fakeStrongEntropy(String ignored) => EntropyResult(
       tier: StrengthTier.veryStrong,
     );
 
+EntropyResult _fakeFairEntropy(String ignored) => EntropyResult(
+      bits: 45,
+      tier: StrengthTier.fair,
+    );
+
+EntropyResult _fakeWeakEntropy(String ignored) => EntropyResult(
+      bits: 30,
+      tier: StrengthTier.weak,
+    );
+
 // ── Widget helper ─────────────────────────────────────────────────────────────
 
 Widget _buildScreen({
@@ -28,11 +38,12 @@ Widget _buildScreen({
   Future<void> Function(String path, String alias)? onVaultCreated,
   String? initialPath = '/tmp/test.gabbro',
   Future<String> Function()? resolveDataDir,
+  EntropyResult Function(String)? onEstimateEntropy,
 }) =>
     testApp(OnboardingScreen(
       initialPath: initialPath,
       onInitVault: onInitVault ?? (a, b, c) async {},
-      onEstimateEntropy: _fakeStrongEntropy,
+      onEstimateEntropy: onEstimateEntropy ?? _fakeStrongEntropy,
       blockPassphraseCopyPaste: blockPassphraseCopyPaste,
       isAndroid: isAndroid,
       showYubikey: showYubikey ?? isAndroid,
@@ -771,5 +782,62 @@ void main() {
 
     expect(find.byIcon(Icons.visibility_off), findsNWidgets(3));
     expect(find.byIcon(Icons.visibility), findsOneWidget);
+  });
+
+  // ── Passphrase strength gate (Fair-and-above allows creation) ──────────────
+
+  group('passphrase strength gate', () {
+    Finder createButton() => find.widgetWithText(FilledButton, 'Create vault');
+
+    bool isEnabled(WidgetTester tester) =>
+        tester.widget<FilledButton>(createButton()).onPressed != null;
+
+    Future<void> enterPassphrase(WidgetTester tester) async {
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Master passphrase'),
+        'some entered passphrase',
+      );
+      await tester.pump();
+    }
+
+    testWidgets('a Fair passphrase enables the Create vault button',
+        (tester) async {
+      await tester.pumpWidget(
+          _buildScreen(onEstimateEntropy: _fakeFairEntropy));
+      await enterPassphrase(tester);
+      expect(isEnabled(tester), isTrue,
+          reason: 'Fair is now strong enough to create a vault');
+    });
+
+    testWidgets('a Fair passphrase keeps the strength warning in plain sight',
+        (tester) async {
+      await tester.pumpWidget(
+          _buildScreen(onEstimateEntropy: _fakeFairEntropy));
+      await enterPassphrase(tester);
+      // The strength meter still labels it "Fair" so the user sees the warning.
+      expect(find.textContaining('Fair'), findsOneWidget);
+      // But it is not blocked as too weak.
+      expect(find.text('Passphrase is too weak'), findsNothing);
+    });
+
+    testWidgets(
+        'a Weak passphrase disables the button and shows an explicit reason',
+        (tester) async {
+      await tester.pumpWidget(
+          _buildScreen(onEstimateEntropy: _fakeWeakEntropy));
+      await enterPassphrase(tester);
+      expect(isEnabled(tester), isFalse);
+      expect(find.text('Passphrase is too weak'), findsOneWidget,
+          reason: 'the disabled button must have a visible explanation');
+    });
+
+    testWidgets('a Strong passphrase enables the button with no weak warning',
+        (tester) async {
+      await tester.pumpWidget(
+          _buildScreen(onEstimateEntropy: _fakeStrongEntropy));
+      await enterPassphrase(tester);
+      expect(isEnabled(tester), isTrue);
+      expect(find.text('Passphrase is too weak'), findsNothing);
+    });
   });
 }

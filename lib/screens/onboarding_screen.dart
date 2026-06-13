@@ -513,11 +513,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     StrengthTier.centuries => l.strengthTierExcellent,
   };
 
-  bool get _strongEnough =>
+  /// A passphrase may create a vault once it reaches the `Fair` tier. Anything
+  /// weaker (Weak / Terrible) is blocked with a visible explanation; a `Fair`
+  /// passphrase is allowed but its strength warning stays in plain sight.
+  bool get _meetsMinimum =>
       _entropy != null &&
-      (_entropy!.tier == StrengthTier.strong ||
-          _entropy!.tier == StrengthTier.veryStrong ||
-          _entropy!.tier == StrengthTier.centuries);
+      _entropy!.tier != StrengthTier.terrible &&
+      _entropy!.tier != StrengthTier.weak;
 
   Future<void> _toggleAccessibility() async {
     final app = GabbroApp.maybeOf(context);
@@ -920,7 +922,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               if (v == null || v.isEmpty) {
                                 return l.onboardingPassphraseRequired;
                               }
-                              if (!_strongEnough) {
+                              if (!_meetsMinimum) {
                                 return l.passphraseTooWeak;
                               }
                               return null;
@@ -951,6 +953,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 color: _tierColor(_entropy!.tier),
                               ),
                             ),
+                            // Below the minimum: make the disabled button's
+                            // reason explicit rather than leaving it greyed out
+                            // with no explanation.
+                            if (!_meetsMinimum) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                l.passphraseTooWeak,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                              ),
+                            ],
                           ],
                           const SizedBox(height: 16),
                           TextFormField(
@@ -1102,7 +1117,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ),
                             ),
                           FilledButton(
-                            onPressed: (_isCreating || !_strongEnough)
+                            onPressed: (_isCreating || !_meetsMinimum)
                                 ? null
                                 : _createVault,
                             child: _isCreating
