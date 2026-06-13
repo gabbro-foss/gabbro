@@ -134,6 +134,11 @@ pick/save work, and (b) with the portal still missing, the app shows the SnackBa
 instead of crashing. Component-green is not done — see the "real hardware = done"
 rule. Until then this task stays in Current Focus.
 
+**Shipped for that test:** cut as **v0.1.0-alpha.7 (2026-06-13)** after the full
+release gate passed green (flutter 808, cargo 514, both integration suites,
+backward-compat gate, fuzzer, Android build). The release exists *so* the
+Debian/Wayland tester can run the bwrap matrix above — it does not close the task.
+
 After this: **R-04 — Linux core-dump hardening** (now in the bikeshed Security list).
 
 ### Open from the security audit
