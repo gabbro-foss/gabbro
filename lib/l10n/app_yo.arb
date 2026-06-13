@@ -723,7 +723,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Yan o kere ju ṣeto ohun kikọ kan",
-  "passwordMinLengthNote": "Awọn ọrọ igbaniwọle ni o kere ju 32 ohun kikọ. Ti oju opo wẹẹbu ba ni opin kuru, daakọ iye ohun kikọ akọkọ ti o nilo.",
+  "passwordMinLengthNote": "Awọn ọrọ igbaniwọle ni o kere ju 12 ohun kikọ. Ti oju opo wẹẹbu ba ni opin kuru, daakọ iye ohun kikọ akọkọ ti o nilo.",
   "excludeAmbiguousChars": "Yọ awọn ohun kikọ ambiguous kuro (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Ṣẹda vọọliti rẹ lati bẹrẹ.",

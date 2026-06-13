@@ -1572,7 +1572,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Paroles ir vismaz 32 rakstzīmes garas. Ja vietnei ir īsāks ierobežojums, nokopējiet nepieciešamās pirmās rakstzīmes.';
+      'Paroles ir vismaz 12 rakstzīmes garas. Ja vietnei ir īsāks ierobežojums, nokopējiet nepieciešamās pirmās rakstzīmes.';
 
   @override
   String get excludeAmbiguousChars =>

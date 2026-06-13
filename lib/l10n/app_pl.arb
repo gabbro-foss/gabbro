@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Wybierz co najmniej jeden zestaw znaków",
-  "passwordMinLengthNote": "Hasła mają co najmniej 32 znaki. Jeśli strona ma krótszy limit, skopiuj wymaganą liczbę pierwszych znaków.",
+  "passwordMinLengthNote": "Hasła mają co najmniej 12 znaki. Jeśli strona ma krótszy limit, skopiuj wymaganą liczbę pierwszych znaków.",
   "tooltipShow": "Pokaż",
   "tooltipCopied": "Skopiowano!",
   "tooltipCopy": "Kopiuj",

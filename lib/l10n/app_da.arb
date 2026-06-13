@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Vælg mindst ét tegnsæt",
-  "passwordMinLengthNote": "Adgangskoder er mindst 32 tegn. Hvis et websted har en kortere grænse, kopiér de første nødvendige tegn.",
+  "passwordMinLengthNote": "Adgangskoder er mindst 12 tegn. Hvis et websted har en kortere grænse, kopiér de første nødvendige tegn.",
   "tooltipShow": "Vis",
   "tooltipCopied": "Kopieret!",
   "tooltipCopy": "Kopiér",

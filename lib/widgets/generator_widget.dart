@@ -97,6 +97,16 @@ Language? _languageChoiceToLanguage(LanguageChoice choice) => switch (choice) {
 /// passphrase wordlist — the generator shows a "no wordlist" info message.
 bool _hasPassphraseWordlist(Language lang) => true;
 
+/// CJK scripts (Han, Hangul, kana) have no concept of letter case, so the
+/// passphrase "capitalise words" option is meaningless for them — the Rust
+/// side's `to_uppercase()` is a no-op. The toggle is disabled and forced off
+/// for these languages.
+bool _isCjkLanguage(Language lang) =>
+    lang == Language.japanese ||
+    lang == Language.korean ||
+    lang == Language.chineseSimplified ||
+    lang == Language.chineseTraditional;
+
 /// Resolves the device locale language code to a [Language] when the app
 /// setting is [LanguageChoice.system].
 Language? _systemLocaleToLanguage(Locale locale) {
@@ -275,7 +285,9 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
     final config = PassphraseConfig(
       wordCount: _wordCount.round(),
       separator: _separator,
-      capitalise: _capitalise,
+      // Caseless CJK scripts cannot be capitalised — Rust's to_uppercase() is
+      // a no-op there, but send false so the config matches the disabled UI.
+      capitalise: _isCjkLanguage(passphraseLanguage) ? false : _capitalise,
       appendNumber: _appendNumber,
       language: passphraseLanguage,
     );
@@ -447,16 +459,18 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
           if (_mode == _GeneratorMode.passphrase) ..._passphraseControls(l),
           const SizedBox(height: 24),
 
-          // Minimum length info
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              l.passwordMinLengthNote,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+          // Minimum length info — only meaningful for classic (character-based)
+          // passwords; passphrases are word-based, so the note is hidden there.
+          if (_mode == _GeneratorMode.classic)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                l.passwordMinLengthNote,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
             ),
-          ),
 
           // Generate button
           FilledButton.icon(
@@ -549,9 +563,9 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
         Slider(
           key: const Key('length_slider'),
           value: _length,
-          min: 32,
+          min: 12,
           max: 256,
-          divisions: 224,
+          divisions: 244,
           label: _length.round().toString(),
           onChanged: (v) {
             setState(() => _length = v);
@@ -653,12 +667,16 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
         const SizedBox(height: 8),
         _switchRow(
           key: const Key('toggle_capitalise'),
+          // Caseless CJK scripts have no capitalisation: show off + disabled,
+          // regardless of the stored preference.
           label: l.capitaliseWords,
-          value: _capitalise,
-          onChanged: (v) {
-            setState(() => _capitalise = v);
-            _generatePassphrase();
-          },
+          value: _isCjkLanguage(_language) ? false : _capitalise,
+          onChanged: _isCjkLanguage(_language)
+              ? null
+              : (v) {
+                  setState(() => _capitalise = v);
+                  _generatePassphrase();
+                },
         ),
         _switchRow(
           key: const Key('toggle_append_number'),
@@ -698,7 +716,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
     required Key key,
     required String label,
     required bool value,
-    required void Function(bool) onChanged,
+    required void Function(bool)? onChanged,
   }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -723,7 +723,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Odaberite barem jedan skup znakova",
-  "passwordMinLengthNote": "Lozinke imaju najmanje 32 znaka. Ako web stranica ima kraći limit, kopirajte potreban broj prvih znakova.",
+  "passwordMinLengthNote": "Lozinke imaju najmanje 12 znaka. Ako web stranica ima kraći limit, kopirajte potreban broj prvih znakova.",
   "excludeAmbiguousChars": "Isključi dvosmislene znakove (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Stvorite vaš trezor za početak.",

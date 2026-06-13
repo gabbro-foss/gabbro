@@ -1571,7 +1571,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Paroolid on vähemalt 32 tähemärki pikad. Kui saidil on lühem limiit, kopeeri vajalikud esimesed tähemärgid.';
+      'Paroolid on vähemalt 12 tähemärki pikad. Kui saidil on lühem limiit, kopeeri vajalikud esimesed tähemärgid.';
 
   @override
   String get excludeAmbiguousChars =>

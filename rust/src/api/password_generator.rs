@@ -1,6 +1,6 @@
 use super::types::Language;
 
-const MIN_LENGTH: u32 = 32;
+const MIN_LENGTH: u32 = 12;
 const MAX_LENGTH: u32 = 256;
 
 /// Configuration for classic password generation.
@@ -212,6 +212,25 @@ mod tests {
     fn test_length_below_minimum_returns_error() {
         let config = PasswordConfig {
             length: 8,
+            ..default_config()
+        };
+        assert!(generate_password(config).is_err());
+    }
+
+    #[test]
+    fn test_length_12_is_allowed() {
+        let config = PasswordConfig {
+            length: 12,
+            ..default_config()
+        };
+        let pwd = generate_password(config).unwrap();
+        assert_eq!(pwd.chars().count(), 12);
+    }
+
+    #[test]
+    fn test_length_11_returns_error() {
+        let config = PasswordConfig {
+            length: 11,
             ..default_config()
         };
         assert!(generate_password(config).is_err());

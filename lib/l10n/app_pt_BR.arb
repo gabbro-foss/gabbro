@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Selecione pelo menos um conjunto de caracteres",
-  "passwordMinLengthNote": "As senhas têm pelo menos 32 caracteres. Se um site tiver um limite menor, copie os primeiros caracteres necessários.",
+  "passwordMinLengthNote": "As senhas têm pelo menos 12 caracteres. Se um site tiver um limite menor, copie os primeiros caracteres necessários.",
   "tooltipShow": "Mostrar",
   "tooltipCopied": "Copiado!",
   "tooltipCopy": "Copiar",

@@ -1575,7 +1575,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Gesla imajo vsaj 32 znakov. Če ima spletna stran krajšo omejitev, kopirajte potrebno število prvih znakov.';
+      'Gesla imajo vsaj 12 znakov. Če ima spletna stran krajšo omejitev, kopirajte potrebno število prvih znakov.';
 
   @override
   String get excludeAmbiguousChars => 'Izključi dvoumne znake (0, O, l, 1, I)';

@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Vali vähemalt üks märgistik",
-  "passwordMinLengthNote": "Paroolid on vähemalt 32 tähemärki pikad. Kui saidil on lühem limiit, kopeeri vajalikud esimesed tähemärgid.",
+  "passwordMinLengthNote": "Paroolid on vähemalt 12 tähemärki pikad. Kui saidil on lühem limiit, kopeeri vajalikud esimesed tähemärgid.",
   "tooltipShow": "Kuva",
   "tooltipCopied": "Kopeeritud!",
   "tooltipCopy": "Kopeeri",

@@ -1568,7 +1568,7 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Құпия сөздер кем дегенде 32 таңбадан тұрады. Егер сайттың қысқарақ шегі болса, қажетті саны бірінші таңбаларды көшіріңіз.';
+      'Құпия сөздер кем дегенде 12 таңбадан тұрады. Егер сайттың қысқарақ шегі болса, қажетті саны бірінші таңбаларды көшіріңіз.';
 
   @override
   String get excludeAmbiguousChars =>

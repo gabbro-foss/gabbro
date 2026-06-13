@@ -1574,7 +1574,7 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Паролі містять не менше 32 символів. Якщо сайт має коротше обмеження, скопіюйте потрібну кількість перших символів.';
+      'Паролі містять не менше 12 символів. Якщо сайт має коротше обмеження, скопіюйте потрібну кількість перших символів.';
 
   @override
   String get excludeAmbiguousChars =>

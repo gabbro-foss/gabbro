@@ -1560,7 +1560,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Passwords are at least 32 characters. If a site has a shorter limit, copy the first characters you need.';
+      'Passwords are at least 12 characters. If a site has a shorter limit, copy the first characters you need.';
 
   @override
   String get excludeAmbiguousChars =>

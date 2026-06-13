@@ -734,7 +734,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Select at least one character set",
-  "passwordMinLengthNote": "Passwords are at least 32 characters. If a site has a shorter limit, copy the first characters you need.",
+  "passwordMinLengthNote": "Passwords are at least 12 characters. If a site has a shorter limit, copy the first characters you need.",
   "tooltipShow": "Show",
   "tooltipCopied": "Copied!",
   "tooltipCopy": "Copy",

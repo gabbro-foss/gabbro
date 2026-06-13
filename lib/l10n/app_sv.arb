@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Välj minst en teckenuppsättning",
-  "passwordMinLengthNote": "Lösenord är minst 32 tecken. Om en webbplats har en kortare gräns, kopiera de första nödvändiga tecknen.",
+  "passwordMinLengthNote": "Lösenord är minst 12 tecken. Om en webbplats har en kortare gräns, kopiera de första nödvändiga tecknen.",
   "tooltipShow": "Visa",
   "tooltipCopied": "Kopierat!",
   "tooltipCopy": "Kopiera",

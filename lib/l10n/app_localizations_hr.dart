@@ -1569,7 +1569,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Lozinke imaju najmanje 32 znaka. Ako web stranica ima kraći limit, kopirajte potreban broj prvih znakova.';
+      'Lozinke imaju najmanje 12 znaka. Ako web stranica ima kraći limit, kopirajte potreban broj prvih znakova.';
 
   @override
   String get excludeAmbiguousChars =>

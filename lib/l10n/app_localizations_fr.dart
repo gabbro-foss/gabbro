@@ -1589,7 +1589,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Les mots de passe comportent au moins 32 caractères. Si un site a une limite plus courte, copiez les premiers caractères dont vous avez besoin.';
+      'Les mots de passe comportent au moins 12 caractères. Si un site a une limite plus courte, copiez les premiers caractères dont vous avez besoin.';
 
   @override
   String get excludeAmbiguousChars =>

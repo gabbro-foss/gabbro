@@ -1572,7 +1572,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Adgangskoder er mindst 32 tegn. Hvis et websted har en kortere grænse, kopiér de første nødvendige tegn.';
+      'Adgangskoder er mindst 12 tegn. Hvis et websted har en kortere grænse, kopiér de første nødvendige tegn.';
 
   @override
   String get excludeAmbiguousChars => 'Udeluk tvetydige tegn (0, O, l, 1, I)';

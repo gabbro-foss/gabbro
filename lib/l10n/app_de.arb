@@ -723,7 +723,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Mindestens einen Zeichensatz auswählen",
-  "passwordMinLengthNote": "Passwörter haben mindestens 32 Zeichen. Wenn eine Website ein kürzeres Limit hat, die ersten benötigten Zeichen kopieren.",
+  "passwordMinLengthNote": "Passwörter haben mindestens 12 Zeichen. Wenn eine Website ein kürzeres Limit hat, die ersten benötigten Zeichen kopieren.",
   "excludeAmbiguousChars": "Mehrdeutige Zeichen ausschließen (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Erstellen Sie Ihren Tresor, um zu beginnen.",

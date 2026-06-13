@@ -1536,7 +1536,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      '비밀번호는 최소 32자입니다. 웹사이트에 더 짧은 제한이 있는 경우 필요한 수의 첫 번째 문자를 복사하세요.';
+      '비밀번호는 최소 12자입니다. 웹사이트에 더 짧은 제한이 있는 경우 필요한 수의 첫 번째 문자를 복사하세요.';
 
   @override
   String get excludeAmbiguousChars => '모호한 문자 제외 (0, O, l, 1, I)';

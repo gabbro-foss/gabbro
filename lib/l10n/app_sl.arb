@@ -723,7 +723,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Izberite vsaj en nabor znakov",
-  "passwordMinLengthNote": "Gesla imajo vsaj 32 znakov. Če ima spletna stran krajšo omejitev, kopirajte potrebno število prvih znakov.",
+  "passwordMinLengthNote": "Gesla imajo vsaj 12 znakov. Če ima spletna stran krajšo omejitev, kopirajte potrebno število prvih znakov.",
   "excludeAmbiguousChars": "Izključi dvoumne znake (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Ustvarite vaš trezor za začetek.",

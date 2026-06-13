@@ -1571,7 +1571,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'As senhas têm pelo menos 32 caracteres. Se um site tiver um limite menor, copie os primeiros caracteres necessários.';
+      'As senhas têm pelo menos 12 caracteres. Se um site tiver um limite menor, copie os primeiros caracteres necessários.';
 
   @override
   String get excludeAmbiguousChars =>
@@ -3497,7 +3497,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get passwordMinLengthNote =>
-      'As senhas têm pelo menos 32 caracteres. Se um site tiver um limite menor, copie os primeiros caracteres necessários.';
+      'As senhas têm pelo menos 12 caracteres. Se um site tiver um limite menor, copie os primeiros caracteres necessários.';
 
   @override
   String get excludeAmbiguousChars =>
@@ -5425,7 +5425,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get passwordMinLengthNote =>
-      'As palavras-passe têm pelo menos 32 caracteres. Se um site tiver um limite menor, copie os primeiros caracteres necessários.';
+      'As palavras-passe têm pelo menos 12 caracteres. Se um site tiver um limite menor, copie os primeiros caracteres necessários.';
 
   @override
   String get excludeAmbiguousChars =>

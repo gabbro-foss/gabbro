@@ -2974,7 +2974,7 @@ abstract class AppLocalizations {
   /// No description provided for @passwordMinLengthNote.
   ///
   /// In en, this message translates to:
-  /// **'Passwords are at least 32 characters. If a site has a shorter limit, copy the first characters you need.'**
+  /// **'Passwords are at least 12 characters. If a site has a shorter limit, copy the first characters you need.'**
   String get passwordMinLengthNote;
 
   /// No description provided for @excludeAmbiguousChars.

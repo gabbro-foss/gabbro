@@ -1571,7 +1571,7 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Heslá majú aspoň 32 znakov. Ak má web kratší limit, skopírujte potrebný počet prvých znakov.';
+      'Heslá majú aspoň 12 znakov. Ak má web kratší limit, skopírujte potrebný počet prvých znakov.';
 
   @override
   String get excludeAmbiguousChars =>

@@ -1519,7 +1519,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get selectAtLeastOneCharSet => '请至少选择一个字符集';
 
   @override
-  String get passwordMinLengthNote => '密码至少 32 个字符。如果网站有更短的限制，请复制所需数量的前几个字符。';
+  String get passwordMinLengthNote => '密码至少 12 个字符。如果网站有更短的限制，请复制所需数量的前几个字符。';
 
   @override
   String get excludeAmbiguousChars => '排除模糊字符（0, O, l, 1, I）';
@@ -3356,7 +3356,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get selectAtLeastOneCharSet => '请至少选择一个字符集';
 
   @override
-  String get passwordMinLengthNote => '密码至少 32 个字符。如果网站有更短的限制，请复制所需数量的前几个字符。';
+  String get passwordMinLengthNote => '密码至少 12 个字符。如果网站有更短的限制，请复制所需数量的前几个字符。';
 
   @override
   String get excludeAmbiguousChars => '排除模糊字符（0, O, l, 1, I）';
@@ -5193,7 +5193,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get selectAtLeastOneCharSet => '請至少選擇一個字元集';
 
   @override
-  String get passwordMinLengthNote => '密碼至少 32 個字元。如果網站有更短的限制，請複製所需數量的前幾個字元。';
+  String get passwordMinLengthNote => '密碼至少 12 個字元。如果網站有更短的限制，請複製所需數量的前幾個字元。';
 
   @override
   String get excludeAmbiguousChars => '排除模糊字元（0, O, l, 1, I）';

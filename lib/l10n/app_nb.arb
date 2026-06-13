@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Velg minst ett tegnsett",
-  "passwordMinLengthNote": "Passord er minst 32 tegn. Hvis et nettsted har en kortere grense, kopier de første nødvendige tegnene.",
+  "passwordMinLengthNote": "Passord er minst 12 tegn. Hvis et nettsted har en kortere grense, kopier de første nødvendige tegnene.",
   "tooltipShow": "Vis",
   "tooltipCopied": "Kopiert!",
   "tooltipCopy": "Kopier",

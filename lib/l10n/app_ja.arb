@@ -723,7 +723,7 @@
     }
   },
   "selectAtLeastOneCharSet": "少なくとも1つの文字セットを選択してください",
-  "passwordMinLengthNote": "パスワードは少なくとも32文字です。ウェブサイトにより短い制限がある場合は、必要な数の最初の文字をコピーしてください。",
+  "passwordMinLengthNote": "パスワードは少なくとも12文字です。ウェブサイトにより短い制限がある場合は、必要な数の最初の文字をコピーしてください。",
   "excludeAmbiguousChars": "曖昧な文字を除外 (0, O, l, 1, I)",
 
   "onboardingGetStarted": "ボルトを作成して始めましょう。",

@@ -1568,7 +1568,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Pasahitzek gutxienez 32 karaktere dituzte. Webguneak muga laburragoa badu, kopiatu beharrezko lehen karaktereak.';
+      'Pasahitzek gutxienez 12 karaktere dituzte. Webguneak muga laburragoa badu, kopiatu beharrezko lehen karaktereak.';
 
   @override
   String get excludeAmbiguousChars =>

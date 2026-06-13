@@ -723,7 +723,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Sélectionnez au moins un jeu de caractères",
-  "passwordMinLengthNote": "Les mots de passe comportent au moins 32 caractères. Si un site a une limite plus courte, copiez les premiers caractères dont vous avez besoin.",
+  "passwordMinLengthNote": "Les mots de passe comportent au moins 12 caractères. Si un site a une limite plus courte, copiez les premiers caractères dont vous avez besoin.",
   "excludeAmbiguousChars": "Exclure les caractères ambigus (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Créez votre coffre pour commencer.",

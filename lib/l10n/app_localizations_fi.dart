@@ -1571,7 +1571,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Salasanat ovat vähintään 32 merkkiä. Jos sivustolla on lyhyempi raja, kopioi tarvittavat ensimmäiset merkit.';
+      'Salasanat ovat vähintään 12 merkkiä. Jos sivustolla on lyhyempi raja, kopioi tarvittavat ensimmäiset merkit.';
 
   @override
   String get excludeAmbiguousChars =>

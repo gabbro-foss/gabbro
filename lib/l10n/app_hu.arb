@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Válassz legalább egy karakterkészletet",
-  "passwordMinLengthNote": "A jelszavak legalább 32 karakteresek. Ha egy webhelyen rövidebb korlát érvényes, másold az első szükséges karaktereket.",
+  "passwordMinLengthNote": "A jelszavak legalább 12 karakteresek. Ha egy webhelyen rövidebb korlát érvényes, másold az első szükséges karaktereket.",
   "tooltipShow": "Megjelenítés",
   "tooltipCopied": "Másolva!",
   "tooltipCopy": "Másolás",

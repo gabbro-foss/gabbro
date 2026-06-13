@@ -1576,7 +1576,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Wachtwoorden zijn minimaal 32 tekens. Als een website een kortere limiet heeft, kopieer dan de eerste tekens die u nodig heeft.';
+      'Wachtwoorden zijn minimaal 12 tekens. Als een website een kortere limiet heeft, kopieer dan de eerste tekens die u nodig heeft.';
 
   @override
   String get excludeAmbiguousChars =>

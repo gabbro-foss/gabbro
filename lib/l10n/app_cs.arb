@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Vyberte alespoň jednu sadu znaků",
-  "passwordMinLengthNote": "Hesla mají alespoň 32 znaků. Pokud má web kratší limit, zkopírujte potřebný počet prvních znaků.",
+  "passwordMinLengthNote": "Hesla mají alespoň 12 znaků. Pokud má web kratší limit, zkopírujte potřebný počet prvních znaků.",
   "tooltipShow": "Zobrazit",
   "tooltipCopied": "Zkopírováno!",
   "tooltipCopy": "Kopírovat",

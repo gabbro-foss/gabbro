@@ -1568,7 +1568,7 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Passord er minst 32 teikn. Viss ei nettside har ei kortare grense, kopier dei første nødvendige teikna.';
+      'Passord er minst 12 teikn. Viss ei nettside har ei kortare grense, kopier dei første nødvendige teikna.';
 
   @override
   String get excludeAmbiguousChars => 'Utelat tvetydige teikn (0, O, l, 1, I)';

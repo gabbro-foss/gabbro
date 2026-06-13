@@ -723,7 +723,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Hautatu gutxienez karaktere-multzo bat",
-  "passwordMinLengthNote": "Pasahitzek gutxienez 32 karaktere dituzte. Webguneak muga laburragoa badu, kopiatu beharrezko lehen karaktereak.",
+  "passwordMinLengthNote": "Pasahitzek gutxienez 12 karaktere dituzte. Webguneak muga laburragoa badu, kopiatu beharrezko lehen karaktereak.",
   "excludeAmbiguousChars": "Karaktere anbiguoak baztertu (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Sortu zure gandegiak hasteko.",

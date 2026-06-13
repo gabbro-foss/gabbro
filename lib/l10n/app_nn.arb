@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Vel minst eitt teiknsett",
-  "passwordMinLengthNote": "Passord er minst 32 teikn. Viss ei nettside har ei kortare grense, kopier dei første nødvendige teikna.",
+  "passwordMinLengthNote": "Passord er minst 12 teikn. Viss ei nettside har ei kortare grense, kopier dei første nødvendige teikna.",
   "tooltipShow": "Vis",
   "tooltipCopied": "Kopiert!",
   "tooltipCopy": "Kopier",

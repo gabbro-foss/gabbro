@@ -1567,7 +1567,7 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Awọn ọrọ igbaniwọle ni o kere ju 32 ohun kikọ. Ti oju opo wẹẹbu ba ni opin kuru, daakọ iye ohun kikọ akọkọ ti o nilo.';
+      'Awọn ọrọ igbaniwọle ni o kere ju 12 ohun kikọ. Ti oju opo wẹẹbu ba ni opin kuru, daakọ iye ohun kikọ akọkọ ti o nilo.';
 
   @override
   String get excludeAmbiguousChars =>

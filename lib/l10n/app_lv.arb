@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Izvēlieties vismaz vienu rakstzīmju kopu",
-  "passwordMinLengthNote": "Paroles ir vismaz 32 rakstzīmes garas. Ja vietnei ir īsāks ierobežojums, nokopējiet nepieciešamās pirmās rakstzīmes.",
+  "passwordMinLengthNote": "Paroles ir vismaz 12 rakstzīmes garas. Ja vietnei ir īsāks ierobežojums, nokopējiet nepieciešamās pirmās rakstzīmes.",
   "tooltipShow": "Rādīt",
   "tooltipCopied": "Nokopēts!",
   "tooltipCopy": "Kopēt",

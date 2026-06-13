@@ -1573,7 +1573,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Пароли содержат не менее 32 символов. Если сайт имеет более короткое ограничение, скопируйте нужное количество первых символов.';
+      'Пароли содержат не менее 12 символов. Если сайт имеет более короткое ограничение, скопируйте нужное количество первых символов.';
 
   @override
   String get excludeAmbiguousChars =>

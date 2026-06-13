@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Valitse vähintään yksi merkistö",
-  "passwordMinLengthNote": "Salasanat ovat vähintään 32 merkkiä. Jos sivustolla on lyhyempi raja, kopioi tarvittavat ensimmäiset merkit.",
+  "passwordMinLengthNote": "Salasanat ovat vähintään 12 merkkiä. Jos sivustolla on lyhyempi raja, kopioi tarvittavat ensimmäiset merkit.",
   "tooltipShow": "Näytä",
   "tooltipCopied": "Kopioitu!",
   "tooltipCopy": "Kopioi",

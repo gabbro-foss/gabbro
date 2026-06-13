@@ -1577,7 +1577,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Hasła mają co najmniej 32 znaki. Jeśli strona ma krótszy limit, skopiuj wymaganą liczbę pierwszych znaków.';
+      'Hasła mają co najmniej 12 znaki. Jeśli strona ma krótszy limit, skopiuj wymaganą liczbę pierwszych znaków.';
 
   @override
   String get excludeAmbiguousChars =>

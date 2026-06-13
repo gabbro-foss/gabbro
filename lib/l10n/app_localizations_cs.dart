@@ -1571,7 +1571,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Hesla mají alespoň 32 znaků. Pokud má web kratší limit, zkopírujte potřebný počet prvních znaků.';
+      'Hesla mají alespoň 12 znaků. Pokud má web kratší limit, zkopírujte potřebný počet prvních znaků.';
 
   @override
   String get excludeAmbiguousChars =>

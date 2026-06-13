@@ -723,7 +723,7 @@
     }
   },
   "selectAtLeastOneCharSet": "請至少選擇一個字元集",
-  "passwordMinLengthNote": "密碼至少 32 個字元。如果網站有更短的限制，請複製所需數量的前幾個字元。",
+  "passwordMinLengthNote": "密碼至少 12 個字元。如果網站有更短的限制，請複製所需數量的前幾個字元。",
   "excludeAmbiguousChars": "排除模糊字元（0, O, l, 1, I）",
 
   "onboardingGetStarted": "建立您的保險庫以開始使用。",

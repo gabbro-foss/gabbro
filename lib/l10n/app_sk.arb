@@ -723,7 +723,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Vyberte aspoň jednu sadu znakov",
-  "passwordMinLengthNote": "Heslá majú aspoň 32 znakov. Ak má web kratší limit, skopírujte potrebný počet prvých znakov.",
+  "passwordMinLengthNote": "Heslá majú aspoň 12 znakov. Ak má web kratší limit, skopírujte potrebný počet prvých znakov.",
   "excludeAmbiguousChars": "Vylúčiť nejednoznačné znaky (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Vytvorte svoj trezor pre začiatok.",

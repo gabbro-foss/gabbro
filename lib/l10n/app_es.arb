@@ -723,7 +723,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Selecciona al menos un juego de caracteres",
-  "passwordMinLengthNote": "Las contraseñas tienen al menos 32 caracteres. Si un sitio tiene un límite más corto, copia los primeros caracteres que necesites.",
+  "passwordMinLengthNote": "Las contraseñas tienen al menos 12 caracteres. Si un sitio tiene un límite más corto, copia los primeros caracteres que necesites.",
   "excludeAmbiguousChars": "Excluir caracteres ambiguos (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Crea tu vault para empezar.",

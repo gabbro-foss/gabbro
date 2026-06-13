@@ -209,6 +209,101 @@ void main() {
     });
   });
 
+  group('GeneratorWidget - min-length note is classic-only', () {
+    testWidgets('classic mode shows the min-length note', (tester) async {
+      await tester.pumpWidget(_wrap(_stubWidget()));
+      expect(find.textContaining('at least 12 characters'), findsOneWidget);
+    });
+
+    testWidgets('passphrase mode hides the min-length note', (tester) async {
+      await tester.pumpWidget(_wrap(_stubWidget()));
+      await tester.tap(find.text('Passphrase'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('at least 12 characters'), findsNothing,
+          reason: 'the character-length note is meaningless for passphrases');
+    });
+  });
+
+  group('GeneratorWidget - classic length minimum (12)', () {
+    testWidgets('length slider minimum is 12', (tester) async {
+      await tester.pumpWidget(_wrap(_stubWidget()));
+      final slider =
+          tester.widget<Slider>(find.byKey(const Key('length_slider')));
+      expect(slider.min, 12);
+    });
+
+    testWidgets('dragging the slider to its minimum generates a 12-char value',
+        (tester) async {
+      await tester.pumpWidget(_wrap(_stubWidget()));
+      await tester.pumpAndSettle();
+      await tester.drag(
+          find.byKey(const Key('length_slider')), const Offset(-1000, 0));
+      await tester.pumpAndSettle();
+      final value = await _revealedValue(tester);
+      expect(value.length, 12);
+    });
+  });
+
+  group('GeneratorWidget - capitalise toggle for caseless CJK scripts', () {
+    Future<void> switchToPassphrase(WidgetTester tester) async {
+      await tester.tap(find.text('Passphrase'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('Japanese app language: capitalise toggle is disabled',
+        (tester) async {
+      await tester.pumpWidget(
+          _wrapWithApp(_scriptWidget(), language: LanguageChoice.ja));
+      await tester.pumpAndSettle();
+      // UI is localised to Japanese; the passphrase mode label is パスフレーズ.
+      await tester.tap(find.text('パスフレーズ'));
+      await tester.pumpAndSettle();
+      final sw =
+          tester.widget<Switch>(find.byKey(const Key('toggle_capitalise')));
+      expect(sw.onChanged, isNull,
+          reason: 'Capitalise has no meaning for caseless CJK scripts');
+      expect(sw.value, isFalse,
+          reason: 'Capitalise is shown off for caseless CJK scripts');
+    });
+
+    testWidgets('non-CJK language: capitalise toggle stays enabled',
+        (tester) async {
+      await tester.pumpWidget(_wrap(_stubWidget()));
+      await switchToPassphrase(tester);
+      final sw =
+          tester.widget<Switch>(find.byKey(const Key('toggle_capitalise')));
+      expect(sw.onChanged, isNotNull);
+    });
+
+    testWidgets('CJK passphrase language never sends capitalise=true to Rust',
+        (tester) async {
+      PassphraseConfig? captured;
+      await tester.pumpWidget(_wrapWithApp(
+        GeneratorWidget(
+          generatePasswordFn: _stubPasswordScript,
+          generatePassphraseFn: (config) async {
+            captured = config;
+            return _stubPassphrase(config);
+          },
+          passphraseEntropyBitsFn: _stubEntropyBits,
+          entropyBitsFn: _stubEntropy,
+        ),
+        language: LanguageChoice.ja,
+      ));
+      await tester.pumpAndSettle();
+      // UI is localised to Japanese; the passphrase mode label is パスフレーズ.
+      await tester.tap(find.text('パスフレーズ'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('generate_button')));
+      await tester.pumpAndSettle();
+
+      expect(captured, isNotNull);
+      expect(captured!.language, Language.japanese);
+      expect(captured!.capitalise, isFalse,
+          reason: 'CJK generation must request capitalise=false');
+    });
+  });
+
   // ---------------------------------------------------------------------------
   // Language-to-script wiring — requires GabbroApp in the widget tree so that
   // didChangeDependencies can resolve the app language into a Language variant.

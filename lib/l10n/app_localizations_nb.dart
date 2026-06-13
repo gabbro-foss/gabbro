@@ -1568,7 +1568,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Passord er minst 32 tegn. Hvis et nettsted har en kortere grense, kopier de første nødvendige tegnene.';
+      'Passord er minst 12 tegn. Hvis et nettsted har en kortere grense, kopier de første nødvendige tegnene.';
 
   @override
   String get excludeAmbiguousChars => 'Utelat tvetydige tegn (0, O, l, 1, I)';

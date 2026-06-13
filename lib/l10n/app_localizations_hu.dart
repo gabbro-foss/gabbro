@@ -1571,7 +1571,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'A jelszavak legalább 32 karakteresek. Ha egy webhelyen rövidebb korlát érvényes, másold az első szükséges karaktereket.';
+      'A jelszavak legalább 12 karakteresek. Ha egy webhelyen rövidebb korlát érvényes, másold az első szükséges karaktereket.';
 
   @override
   String get excludeAmbiguousChars =>

@@ -1533,7 +1533,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'パスワードは少なくとも32文字です。ウェブサイトにより短い制限がある場合は、必要な数の最初の文字をコピーしてください。';
+      'パスワードは少なくとも12文字です。ウェブサイトにより短い制限がある場合は、必要な数の最初の文字をコピーしてください。';
 
   @override
   String get excludeAmbiguousChars => '曖昧な文字を除外 (0, O, l, 1, I)';

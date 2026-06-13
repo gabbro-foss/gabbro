@@ -1568,7 +1568,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Lösenord är minst 32 tecken. Om en webbplats har en kortare gräns, kopiera de första nödvändiga tecknen.';
+      'Lösenord är minst 12 tecken. Om en webbplats har en kortare gräns, kopiera de första nödvändiga tecknen.';
 
   @override
   String get excludeAmbiguousChars =>

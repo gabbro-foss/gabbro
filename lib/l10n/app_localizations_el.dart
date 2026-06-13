@@ -1582,7 +1582,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Οι κωδικοί έχουν τουλάχιστον 32 χαρακτήρες. Αν η ιστοσελίδα έχει μικρότερο όριο, αντιγράψτε τον απαιτούμενο αριθμό πρώτων χαρακτήρων.';
+      'Οι κωδικοί έχουν τουλάχιστον 12 χαρακτήρες. Αν η ιστοσελίδα έχει μικρότερο όριο, αντιγράψτε τον απαιτούμενο αριθμό πρώτων χαρακτήρων.';
 
   @override
   String get excludeAmbiguousChars =>

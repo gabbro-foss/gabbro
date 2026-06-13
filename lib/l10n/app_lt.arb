@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Pasirinkite bent vieną simbolių rinkinį",
-  "passwordMinLengthNote": "Slaptažodžiai turi mažiausiai 32 simbolius. Jei svetainė turi trumpesnę ribą, nukopijuokite pirmuosius reikiamus simbolius.",
+  "passwordMinLengthNote": "Slaptažodžiai turi mažiausiai 12 simbolius. Jei svetainė turi trumpesnę ribą, nukopijuokite pirmuosius reikiamus simbolius.",
   "tooltipShow": "Rodyti",
   "tooltipCopied": "Nukopijuota!",
   "tooltipCopy": "Kopijuoti",

@@ -726,7 +726,7 @@
     }
   },
   "selectAtLeastOneCharSet": "Selecteer ten minste één tekenset",
-  "passwordMinLengthNote": "Wachtwoorden zijn minimaal 32 tekens. Als een website een kortere limiet heeft, kopieer dan de eerste tekens die u nodig heeft.",
+  "passwordMinLengthNote": "Wachtwoorden zijn minimaal 12 tekens. Als een website een kortere limiet heeft, kopieer dan de eerste tekens die u nodig heeft.",
   "tooltipShow": "Tonen",
   "tooltipCopied": "Gekopieerd!",
   "tooltipCopy": "Kopiëren",

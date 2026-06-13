@@ -1574,7 +1574,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get passwordMinLengthNote =>
-      'Slaptažodžiai turi mažiausiai 32 simbolius. Jei svetainė turi trumpesnę ribą, nukopijuokite pirmuosius reikiamus simbolius.';
+      'Slaptažodžiai turi mažiausiai 12 simbolius. Jei svetainė turi trumpesnę ribą, nukopijuokite pirmuosius reikiamus simbolius.';
 
   @override
   String get excludeAmbiguousChars =>
