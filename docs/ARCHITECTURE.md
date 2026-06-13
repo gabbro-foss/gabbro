@@ -87,7 +87,7 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next active task
+### Next task
 
 **Wayland/bubblewrap file-picker hardening + sandbox launch docs.**
 

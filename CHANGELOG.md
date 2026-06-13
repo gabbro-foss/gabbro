@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Password generator: classic minimum length lowered from 32 to 12 characters.** The length slider now bottoms out at 12 (default stays 32, max 256) and Rust's `MIN_LENGTH` matches. The "Passwords are at least N characters" note updates to 12 across all 37 locales (a numeric-only edit, no translation change) and is now shown **only in classic mode** — it was meaningless in passphrase (word-based) mode, so it is hidden there. Generator widget + Rust unit tests cover the new lower bound and the note's mode-gating. Hardware-verified on Linux and Android.
+- **Password generator: "Capitalise words" is disabled for caseless CJK passphrase languages.** Japanese, Korean, and Chinese (Simplified/Traditional) scripts have no letter case, so the option (Rust's `to_uppercase()` is a no-op there) is now shown off and disabled whenever the selected passphrase language is CJK, derived from the language rather than mutating stored state. Widget tests pin the disabled state and that CJK generation never requests capitalisation. Hardware-verified on Linux and Android.
+- **Onboarding: a "Fair" passphrase can now create a vault, and a too-weak one explains itself.** The strength gate dropped from Strong to Fair-and-above: a Fair passphrase enables the Create button while its "Fair" strength label stays visible as the warning. A Weak/Terrible passphrase keeps the button disabled **and** now shows an explicit "Passphrase is too weak" line under the strength meter, instead of a silently greyed-out button with no explanation. Widget tests cover each tier. Hardware-verified on Linux and Android.
+
 ## [0.1.0-alpha.7] – 2026-06-13
 
 ### Security
