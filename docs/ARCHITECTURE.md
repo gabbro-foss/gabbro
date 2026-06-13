@@ -89,57 +89,32 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**Wayland/bubblewrap file-picker hardening + sandbox launch docs.**
+**R-04 — Linux core-dump hardening.**
 
-A Debian/Wayland tester (running under a bubblewrap sandbox) surfaced two distinct
-problems. Only one is fixable in our binary:
+Stop a crash from writing a core dump that could contain decrypted vault
+material (keys, plaintext entries). Per `AI_SECURITY_AUDIT_REVIEW.md`: disable
+core dumps for the process via `PR_SET_DUMPABLE(0)` (prctl) and `RLIMIT_CORE = 0`
+(setrlimit), applied **early at startup, before any secret is ever in memory**.
+Belt-and-suspenders: `RLIMIT_CORE` stops the kernel writing a core file;
+`PR_SET_DUMPABLE(0)` also blocks `ptrace` / `/proc/<pid>/mem` reads by other
+same-uid processes.
 
-1. **Boot needs `WAYLAND_DISPLAY` (packaging, not code).** The sandbox didn't
-   forward the Wayland socket, so GTK found no display and the app never reached
-   Dart; the tester worked around it with `--setenv WAYLAND_DISPLAY "/tmp/wayland-0"`.
-   This is *before any Dart runs* → cannot be fixed in `app_paths.dart`. **Doc only.**
-2. **File save/open crashes with `SocketException` (our bug).** `file_picker` on
-   Linux talks *only* to the XDG Desktop Portal over the DBus **session** bus. In
-   the sandbox `/run/user/1000/bus` isn't bound in, so `DBusClient._openSocket`
-   throws `SocketException`, which propagates **unhandled** out of
-   `FilePicker.saveFile`/`pickFiles` and crashes the isolate. Same crash lurks at
-   every picker call site: `path_field.dart:_pick`, `export_screen.dart`
-   (`getDirectoryPath`), `entry_detail_screen.dart` (`saveFile`),
-   `create_entry_screen.dart` (`pickFiles`), `vault_list_screen.dart` (`pickFiles`),
-   `unlock_screen.dart` (restore-from-file `pickFiles`). Editable path fields are
-   already the manual fallback (`path_field_test.dart`), but only if you *type*
-   instead of *clicking* — clicking the folder icon still crashes.
+Scope: **Linux desktop only** (these are Linux syscalls; Android production
+processes are already non-dumpable). Lives in Rust (secrets live in Rust) —
+likely a small `harden_process()` in `rust/src/` called from app/bridge init.
 
-**Code + docs landed (code-green, NOT yet hardware-verified):**
-- New `lib/safe_file_picker.dart`: `FilePickerUnavailable` (carries the cause),
-  `runPicker<T>` (passes through value/`null`-cancel, converts any thrown
-  `Exception` -> `FilePickerUnavailable`), and `showPickerUnavailable(context,
-  {hasManualEntry})`. Two ARB keys: `filePickerUnavailable` (flows with an
-  editable path field -> "type or paste the path instead") and
-  `filePickerNoPortal` (picker-only flows -> "system file portal isn't
-  reachable"), both in all 37 locales.
-- All 6 call sites guarded: `path_field` and `export_screen`/`entry_detail`/
-  `create_entry`/`vault_list` wrap the picker in `runPicker` at the call site;
-  `unlock_screen` wraps inside `_defaultRestoreFromFile` (the seam bundles
-  pick+restore, so a portal failure is distinguished from an invalid vault).
-- 15 new tests (option b: dedicated widget tests for every site), `flutter test`
-  808 green, `flutter analyze` clean.
-- `BUILD_AND_RELEASE.md` -> "Running under a Wayland/bubblewrap sandbox": the
-  `WAYLAND_DISPLAY` setenv + the `--ro-bind` for the DBus session bus +
-  xdg-desktop-portal (closes problem 1, which is doc-only).
+Open design points to settle first:
+- crate: `libc` (raw `prctl`/`setrlimit`) vs `rustix` (safer wrappers) — check
+  what's already in the dependency tree.
+- exact call site: earliest possible on the Rust side so it runs before any
+  KDF/unlock work; confirm it is hit on both the normal launch and any
+  autofill/secondary entrypoint.
+- verification: syscall effects can't be meaningfully unit-tested — plan a Rust
+  test that the call returns Ok, plus a Linux hardware check (force a crash,
+  confirm no core file is produced and `cat /proc/<pid>/limits` shows
+  `Max core file size = 0`). Real hardware = done.
 
-**STILL OPEN (the only thing between here and done):** the Debian/Wayland tester
-must confirm on real hardware that (a) the documented `bwrap` binds let file
-pick/save work, and (b) with the portal still missing, the app shows the SnackBar
-instead of crashing. Component-green is not done — see the "real hardware = done"
-rule. Until then this task stays in Current Focus.
-
-**Shipped for that test:** cut as **v0.1.0-alpha.7 (2026-06-13)** after the full
-release gate passed green (flutter 808, cargo 514, both integration suites,
-backward-compat gate, fuzzer, Android build). The release exists *so* the
-Debian/Wayland tester can run the bwrap matrix above — it does not close the task.
-
-After this: **R-04 — Linux core-dump hardening** (now in the bikeshed Security list).
+TDD: present the test-scenario list and STOP for review before writing code.
 
 ### Open from the security audit
 
@@ -172,7 +147,6 @@ release process (pre-flight gate, build, publish) live in their own document:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Security (pre-v1 gates)
-- **R-04 Linux core-dump hardening** — `PR_SET_DUMPABLE(0)` + `RLIMIT_CORE(0)`, following `AI_SECURITY_AUDIT_REVIEW.md`. Stops a crash from writing a core file that could contain decrypted vault material. Next security item after the Wayland/file-picker task.
 - **F-03 X-Wing combiner** — migrate the hybrid KEM combiner to a transcript-binding (X-Wing-style) construction (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). No single verifiable-against-spec answer → genuinely needs a human cryptographer's judgement. Would require VERSION 8.
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
 - Test on de-Googled Android (GrapheneOS/CalyxOS) before v1 — find a willing community tester, don't buy hardware.
