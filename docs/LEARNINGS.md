@@ -4130,3 +4130,17 @@ so direct use adds zero supply-chain surface. Declared `cfg(target_os = "linux")
 Testing: effects are observable in-process (`prctl(PR_GET_DUMPABLE)` → 0, `getrlimit` → `{0,0}`,
 idempotent). But the real sign-off is hardware: `/proc/<pid>/limits` core size 0, and `kill -SEGV`
 produces no core (`coredumpctl`) — verify against an unhardened control so the check isn't vacuous.
+
+---
+
+## i18n — never confirm a destructive action by matching free text the user types
+
+A "type DELETE to confirm" gate is English-only (hostile to other keyboards). The obvious fixes are
+both worse than they look: translating the magic word, or "type the vault's name", still rely on
+**string equality against text the user types** — and Dart's `==` compares UTF-16 code units, with
+**no built-in Unicode normalizer**. So a visually-correct entry can fail to match on NFC-vs-NFD
+(Korean Hangul, accented Latin) or full-width-vs-half-width IME output, leaving the button disabled
+with no explanation. Use a gate that needs **no text match**: an "I understand…" checkbox (or
+hold-to-delete). Reliable in every script, one translatable sentence, and the friction still sits on
+top of the existing warning + YubiKey steps. General rule: don't gate on `typed == expected` for
+locale-dependent input.
