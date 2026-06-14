@@ -1,7 +1,7 @@
 # Gabbro — Security Overview
 
 **Version:** pre-v1 (0.1.0-alpha)  
-**Last updated:** 2026-06-05  
+**Last updated:** 2026-06-14  
 **Status: this codebase has not been reviewed by an external cryptographer or security auditor.**
 
 ---
@@ -304,6 +304,8 @@ manager. The protections available depend on which mode you use.
 - Coercion (the attacker forces you to unlock the vault).
 - Side-channel attacks at the hardware or micro-architecture level.
 - Physical extraction of RAM from an *unlocked* running process.
+- Key material paged to **swap** before it is zeroized — use encrypted swap (or disable swap) on the host. (`mlock`/`madvise` hardening is deferred to the planned expert review.)
+- Vault paths and aliases in the local registry (`vaults.jsonc`) are readable by anyone with local file access — metadata only, no secrets.
 - A malicious build of the application distributed as a fake update.
 
 ---

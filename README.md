@@ -84,7 +84,7 @@ vault.gabbro         — the encrypted vault
 vault.gabbro.sha256  — detached SHA-256 hash
 ```
 
-To verify the export has not been corrupted or tampered with:
+To verify the export has not been corrupted in transit or storage:
 
 ```bash
 sha256sum -c vault.gabbro.sha256
@@ -94,9 +94,10 @@ A clean result prints `vault.gabbro: OK`. This follows the same
 convention as Linux ISO verification and can be run before decryption
 using any standard tool — no Gabbro installation required.
 
-Note: AES-256-GCM's authentication tag already detects tampering
-during decryption. The detached hash is a UX complement that allows
-verification *before* opening the vault.
+Note: the detached hash detects accidental corruption, not tampering —
+anyone who alters the file can recompute it. Tamper detection is
+AES-256-GCM's authentication tag, checked during decryption. The hash is
+a UX complement that allows a corruption check *before* opening the vault.
 
 ---
 

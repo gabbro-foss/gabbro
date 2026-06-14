@@ -90,9 +90,11 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**Continue closing `AI_SECURITY_AUDIT_REVIEW.md` issues** — remaining: R-05,
-R-06, R-07. Pick the next one with [user] at session start; per-finding detail
-and status are in that document's remediation table.
+**R-06 — GUI-process memory forensics** (last open `AI_SECURITY_AUDIT_REVIEW.md`
+issue): extend `scripts/mem_forensics.sh` to the real GUI process — unlock, view
+an entry, lock, `gcore`, grep for canaries — and document the measured Dart-heap
+residual rather than assuming it. Fold in the S-1 doc update. Per-finding detail
+is in that document's remediation table.
 
 ### Open from the security audit
 
@@ -103,7 +105,7 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 
 A second-pass review (`AI_SECURITY_AUDIT_REVIEW.md`, 2026-06-11) added findings
 **R-01…R-07**; per-finding status lives in that document's remediation table.
-Still open: **R-05, R-06, R-07**.
+Still open: **R-06**.
 
 **UI locales deferred** (RTL layout work required): Hebrew, Arabic.
 

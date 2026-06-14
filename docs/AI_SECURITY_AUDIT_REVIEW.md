@@ -19,9 +19,9 @@
 | **R-02** Android Auto Backup silently uploads the vault to Google Drive | Medium | **Fixed** (commit `90a2095`, 2026-06-11) — `allowBackup="false"` + `dataExtractionRules` + `fullBackupContent` (all domains excluded), 3 Robolectric merged-manifest tests, APK verified via `aapt dump xmltree`; hardware-verified on device (`pkgFlags` has no `ALLOW_BACKUP`; `bmgr backupnow` → "Backup is not allowed"; upgrade-in-place, unlock, autofill unaffected) |
 | **R-03** no pre-save vault backup rotation (availability gap) | Medium | **Fixed** (branch `r03-vault-backup-rework`, 2026-06-12) — automatic `.bak` safety copy (= last *verified* save) + corruption-recovery UX + restore-from-backup-file. Claude Fable 5's first pass was component-green but failed the hardware matrix; diagnosed and reworked by Claude Opus 4.8 + Rob. Linux hardware 14/14; Android emulator verified. See R-03 below. |
 | **R-04** Linux process is dumpable; no `PR_SET_DUMPABLE(0)` / `RLIMIT_CORE(0)` | Low | **Fixed** (2026-06-14) — `harden_process()` in `rust/src/hardening.rs`, called from `init_app()`; unit-tested + hardware-verified on Linux (unlocked vault, `SIGSEGV` → no core dump, non-dumpable). |
-| **R-05** no stated position on swap exposure of key material | Low | **Open** |
+| **R-05** no stated position on swap exposure of key material | Low | **Fixed** (2026-06-14) — `SECURITY.md` threat model recommends encrypted swap; `mlock`/`madvise` deferred to expert review. |
 | **R-06** Dart-heap secret exposure undocumented; GUI-process forensics pending | Low | **Open** |
-| **R-07** minor items: `.gabbro.sha256` wording, tapjacking, `vaults.jsonc` metadata | Info | **Open** |
+| **R-07** minor items: `.gabbro.sha256` wording, tapjacking, `vaults.jsonc` metadata | Info | **Fixed** (2026-06-14) — README `.sha256` no longer claims tamper detection; `vaults.jsonc` metadata visibility noted in `SECURITY.md`. Tapjacking verification deferred to the Android autofill session. |
 
 ---
 
@@ -332,11 +332,11 @@ minimise secret lifetime in Dart, and *measure* it.
 
 ## Priority order (most user-safety per hour of work)
 
-Done: **R-02** (backup manifest), **R-03** (vault safety copy + recovery), **R-04** (core-dump hardening), **R-01** (audit correction note) — see the status table.
+Done: **R-01** (audit correction), **R-02** (backup manifest), **R-03** (vault safety copy + recovery), **R-04** (core-dump hardening), **R-05** (swap position), **R-07** (minor doc items) — see the status table.
 
 Outstanding:
 1. **R-06** — GUI-process forensics run (measure, then decide).
-2. **R-05**, **R-07**, **S-1** doc updates — fold into the same docs session.
+2. **S-1** doc update — fold into the R-06 session.
 
 None of these need a cryptographer; all are the kind of thing the eventual
 human reviewer will check first.
