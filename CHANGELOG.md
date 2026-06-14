@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **Linux core-dump hardening (audit finding R-04).** At startup the process disables core dumps (`RLIMIT_CORE=0`) and `ptrace`/`/proc/<pid>/mem` snooping (`PR_SET_DUMPABLE(0)`), so an unlocked vault's in-RAM secrets can't leak via a crash dump or another same-uid process. Linux-only; no-op elsewhere. Hardware-verified on Linux.
+
 ### Changed
 - **Password generator: classic minimum length lowered from 32 to 12 characters.** The length slider now bottoms out at 12 (default stays 32, max 256) and Rust's `MIN_LENGTH` matches. The "Passwords are at least N characters" note updates to 12 across all 37 locales (a numeric-only edit, no translation change) and is now shown **only in classic mode** — it was meaningless in passphrase (word-based) mode, so it is hidden there. Generator widget + Rust unit tests cover the new lower bound and the note's mode-gating. Hardware-verified on Linux and Android.
 - **Password generator: "Capitalise words" is disabled for caseless CJK passphrase languages.** Japanese, Korean, and Chinese (Simplified/Traditional) scripts have no letter case, so the option (Rust's `to_uppercase()` is a no-op there) is now shown off and disabled whenever the selected passphrase language is CJK, derived from the language rather than mutating stored state. Widget tests pin the disabled state and that CJK generation never requests capitalisation. Hardware-verified on Linux and Android.

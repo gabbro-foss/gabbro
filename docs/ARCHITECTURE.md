@@ -49,6 +49,7 @@ gabbro/
 │   ├── vault/            # Domain model: entry, file_format, io, serialization, session
 │   ├── fido/             # FIDO2/libfido2 FFI (Linux only)
 │   ├── import/           # enpass, bitwarden, google_pm, dashlane, csv
+│   ├── hardening.rs      # Process hardening (R-04): core-dump + ptrace/mem disable (Linux)
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics; wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroAutofillService, UnlockActivity, YubiKeyManager, BiometricHelper (+ Robolectric tests)
@@ -67,7 +68,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 514 | 8 |
+| Rust (`cargo test -q`) | 518 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 808 | 0 |
@@ -89,32 +90,9 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**R-04 — Linux core-dump hardening.**
-
-Stop a crash from writing a core dump that could contain decrypted vault
-material (keys, plaintext entries). Per `AI_SECURITY_AUDIT_REVIEW.md`: disable
-core dumps for the process via `PR_SET_DUMPABLE(0)` (prctl) and `RLIMIT_CORE = 0`
-(setrlimit), applied **early at startup, before any secret is ever in memory**.
-Belt-and-suspenders: `RLIMIT_CORE` stops the kernel writing a core file;
-`PR_SET_DUMPABLE(0)` also blocks `ptrace` / `/proc/<pid>/mem` reads by other
-same-uid processes.
-
-Scope: **Linux desktop only** (these are Linux syscalls; Android production
-processes are already non-dumpable). Lives in Rust (secrets live in Rust) —
-likely a small `harden_process()` in `rust/src/` called from app/bridge init.
-
-Open design points to settle first:
-- crate: `libc` (raw `prctl`/`setrlimit`) vs `rustix` (safer wrappers) — check
-  what's already in the dependency tree.
-- exact call site: earliest possible on the Rust side so it runs before any
-  KDF/unlock work; confirm it is hit on both the normal launch and any
-  autofill/secondary entrypoint.
-- verification: syscall effects can't be meaningfully unit-tested — plan a Rust
-  test that the call returns Ok, plus a Linux hardware check (force a crash,
-  confirm no core file is produced and `cat /proc/<pid>/limits` shows
-  `Max core file size = 0`). Real hardware = done.
-
-TDD: present the test-scenario list and STOP for review before writing code.
+**Continue closing `AI_SECURITY_AUDIT_REVIEW.md` issues** — remaining: R-01,
+R-05, R-06, R-07. Pick the next one with [user] at session start; per-finding
+detail and status are in that document's remediation table.
 
 ### Open from the security audit
 
@@ -124,11 +102,8 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - **F-10** — eTLD+1 autofill matching; post-v1 "Strict FQDN" toggle.
 
 A second-pass review (`AI_SECURITY_AUDIT_REVIEW.md`, 2026-06-11) added findings
-**R-01…R-07** (per-finding status lives in that document's remediation table).
-**R-02** (Android Auto Backup uploaded the vault to Google Drive) and **R-03**
-(automatic `.bak` safety copy + corruption-recovery UX + restore-from-backup-file)
-are **fixed** — remaining priorities: **R-04** Linux core-dump hardening, then
-R-01/R-05/R-06/R-07.
+**R-01…R-07**; per-finding status lives in that document's remediation table.
+Still open: **R-01, R-05, R-06, R-07**.
 
 **UI locales deferred** (RTL layout work required): Hebrew, Arabic.
 

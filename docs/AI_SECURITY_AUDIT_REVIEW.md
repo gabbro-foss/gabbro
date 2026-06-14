@@ -18,7 +18,7 @@
 | **R-01** original audit's "no exploitable defect" claim falsified by fuzzer; needs a correction note | Doc | **Open** |
 | **R-02** Android Auto Backup silently uploads the vault to Google Drive | Medium | **Fixed** (commit `90a2095`, 2026-06-11) — `allowBackup="false"` + `dataExtractionRules` + `fullBackupContent` (all domains excluded), 3 Robolectric merged-manifest tests, APK verified via `aapt dump xmltree`; hardware-verified on device (`pkgFlags` has no `ALLOW_BACKUP`; `bmgr backupnow` → "Backup is not allowed"; upgrade-in-place, unlock, autofill unaffected) |
 | **R-03** no pre-save vault backup rotation (availability gap) | Medium | **Fixed** (branch `r03-vault-backup-rework`, 2026-06-12) — automatic `.bak` safety copy (= last *verified* save) + corruption-recovery UX + restore-from-backup-file. Claude Fable 5's first pass was component-green but failed the hardware matrix; diagnosed and reworked by Claude Opus 4.8 + Rob. Linux hardware 14/14; Android emulator verified. See R-03 below. |
-| **R-04** Linux process is dumpable; no `PR_SET_DUMPABLE(0)` / `RLIMIT_CORE(0)` | Low | **Open** |
+| **R-04** Linux process is dumpable; no `PR_SET_DUMPABLE(0)` / `RLIMIT_CORE(0)` | Low | **Fixed** (2026-06-14) — `harden_process()` in `rust/src/hardening.rs`, called from `init_app()`; unit-tested + hardware-verified on Linux (unlocked vault, `SIGSEGV` → no core dump, non-dumpable). |
 | **R-05** no stated position on swap exposure of key material | Low | **Open** |
 | **R-06** Dart-heap secret exposure undocumented; GUI-process forensics pending | Low | **Open** |
 | **R-07** minor items: `.gabbro.sha256` wording, tapjacking, `vaults.jsonc` metadata | Info | **Open** |
@@ -332,13 +332,12 @@ minimise secret lifetime in Dart, and *measure* it.
 
 ## Priority order (most user-safety per hour of work)
 
-Done: **R-02** (backup manifest) and **R-03** (vault safety copy + recovery) — see the status table.
+Done: **R-02** (backup manifest), **R-03** (vault safety copy + recovery), **R-04** (core-dump hardening) — see the status table.
 
 Outstanding:
-1. **R-04** — `PR_SET_DUMPABLE(0)` + `RLIMIT_CORE(0)`.
-2. **R-01** — correction note, so the original document stays honest.
-3. **R-06** — GUI-process forensics run (measure, then decide).
-4. **R-05**, **R-07**, **S-1** doc updates — fold into the same docs session.
+1. **R-01** — correction note, so the original document stays honest.
+2. **R-06** — GUI-process forensics run (measure, then decide).
+3. **R-05**, **R-07**, **S-1** doc updates — fold into the same docs session.
 
 None of these need a cryptographer; all are the kind of thing the eventual
 human reviewer will check first.

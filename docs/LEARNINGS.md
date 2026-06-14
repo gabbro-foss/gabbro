@@ -4107,3 +4107,26 @@ restore, so wrapping the whole thing would mislabel an invalid-vault error as a 
 declaration is "effectively final" for cross-closure promotion. Two fixes: use `x!` inside the
 closure, or bind a fresh `final y = x;` after the guard (its inferred type is already the promoted
 non-null type) and use `y` in the closure.
+
+---
+
+## Process hardening — stop in-RAM secrets escaping to disk or another process (R-04)
+
+The vault *file* is always encrypted; the exposure is the **decrypted** material in RAM while
+unlocked. Two escape routes, two Linux syscalls (`rust/src/hardening.rs`):
+
+- `setrlimit(RLIMIT_CORE, {0,0})` — kernel never writes a crash core dump. Zero the *hard* limit
+  too so nothing can raise it back.
+- `prctl(PR_SET_DUMPABLE, 0)` — blocks `ptrace` / `/proc/<pid>/mem` reads by same-uid processes
+  (and also gates core dumps at the kernel level — belt-and-suspenders).
+
+Call once, early, before any secret is in memory: the flutter_rust_bridge `#[frb(init)]` hook
+(`init_app()`) is the single site every Dart entrypoint reaches before `runApp`/unlock. Failure is
+logged, not fatal. `harden_process()` is a no-op off Linux (Android is already non-dumpable).
+
+Crate: `libc`, not `rustix` — `libc` is already a transitive dep (`cargo tree -e normal -i libc`),
+so direct use adds zero supply-chain surface. Declared `cfg(target_os = "linux")`-only.
+
+Testing: effects are observable in-process (`prctl(PR_GET_DUMPABLE)` → 0, `getrlimit` → `{0,0}`,
+idempotent). But the real sign-off is hardware: `/proc/<pid>/limits` core size 0, and `kill -SEGV`
+produces no core (`coredumpctl`) — verify against an unhardened control so the check isn't vacuous.
