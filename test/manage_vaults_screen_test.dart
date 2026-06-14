@@ -261,10 +261,10 @@ void main() {
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
       expect(find.text('Are you sure?'), findsOneWidget);
-      expect(find.text('Type DELETE to confirm'), findsOneWidget);
+      expect(find.textContaining('permanently deletes'), findsOneWidget);
     });
 
-    testWidgets('step 2 confirm button disabled until DELETE is typed',
+    testWidgets('step 2 confirm button disabled until checkbox ticked',
         (tester) async {
       await tester.pumpWidget(_buildScreen(registry: registry));
       await tester.tap(find.byIcon(Icons.delete_outlined).first);
@@ -277,17 +277,14 @@ void main() {
       expect(confirmButton.onPressed, isNull);
     });
 
-    testWidgets('step 2 confirm button enabled when DELETE is typed',
+    testWidgets('step 2 confirm button enabled when checkbox ticked',
         (tester) async {
       await tester.pumpWidget(_buildScreen(registry: registry));
       await tester.tap(find.byIcon(Icons.delete_outlined).first);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
-      await tester.enterText(
-        find.byKey(const Key('delete_vault_confirm_field')),
-        'DELETE',
-      );
+      await tester.tap(find.byKey(const Key('delete_vault_confirm_checkbox')));
       await tester.pumpAndSettle();
       final confirmButton = tester.widget<TextButton>(
         find.widgetWithText(TextButton, 'Confirm'),
@@ -321,10 +318,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
-      await tester.enterText(
-        find.byKey(const Key('delete_vault_confirm_field')),
-        'DELETE',
-      );
+      await tester.tap(find.byKey(const Key('delete_vault_confirm_checkbox')));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Confirm'));
       await tester.pumpAndSettle();
@@ -341,10 +335,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Continue'));
       await tester.pumpAndSettle();
-      await tester.enterText(
-        find.byKey(const Key('delete_vault_confirm_field')),
-        'DELETE',
-      );
+      await tester.tap(find.byKey(const Key('delete_vault_confirm_checkbox')));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Confirm'));
       await tester.pumpAndSettle();
@@ -360,10 +351,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
-    await tester.enterText(
-      find.byKey(const Key('delete_vault_confirm_field')),
-      'DELETE',
-    );
+    await tester.tap(find.byKey(const Key('delete_vault_confirm_checkbox')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Confirm'));
     await tester.pumpAndSettle();

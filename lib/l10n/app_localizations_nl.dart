@@ -754,10 +754,26 @@ class AppLocalizationsNl extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Weet u het zeker?';
 
   @override
-  String get typeDeleteToConfirm => 'Typ VERWIJDEREN om te bevestigen';
+  String deleteVaultUnderstand(String alias) {
+    return 'Ik begrijp dat hiermee \"$alias\" permanent wordt verwijderd en dit niet ongedaan kan worden gemaakt.';
+  }
 
   @override
-  String get typeDeleteWord => 'VERWIJDEREN';
+  String get noBackupFidoDeviceFound =>
+      'Geen back-up-FIDO2-apparaat gevonden. Plaats uw back-up-YubiKey.';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey-bewerking mislukt.';
+
+  @override
+  String get unlockFailed => 'Ontgrendelen mislukt.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Wijs ten minste Titel of URL toe zodat vermeldingen een naam hebben.';
+
+  @override
+  String get pickAFile => 'Kies een bestand.';
 
   @override
   String get touchYourYubiKey => 'Raak uw YubiKey aan';

@@ -52,10 +52,9 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
   }
 
   Future<void> _import() async {
+    final l = AppLocalizations.of(context);
     if (_titleCol == null && _urlCol == null) {
-      setState(
-        () => _error = 'Map at least Title or URL so entries have a name.',
-      );
+      setState(() => _error = l.csvMapTitleOrUrl);
       return;
     }
     setState(() {

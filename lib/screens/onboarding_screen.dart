@@ -68,10 +68,7 @@ Future<void> _linuxInitVaultWithYubikey(
 ) async {
   final primaryDevices = fidoListDevices();
   if (primaryDevices.isEmpty) {
-    throw PlatformException(
-      code: 'NO_FIDO2_DEVICE',
-      message: 'No FIDO2 device found. Insert your YubiKey and try again.',
-    );
+    throw PlatformException(code: 'NO_FIDO2_DEVICE');
   }
   final primaryDevicePath = primaryDevices.first;
 
@@ -94,10 +91,7 @@ Future<void> _linuxInitVaultWithYubikey(
   // Re-scan: user should have swapped to their backup key
   final backupDevices = fidoListDevices();
   if (backupDevices.isEmpty) {
-    throw PlatformException(
-      code: 'NO_FIDO2_DEVICE',
-      message: 'No backup FIDO2 device found. Insert your backup YubiKey.',
-    );
+    throw PlatformException(code: 'NO_BACKUP_FIDO2_DEVICE');
   }
   final backupDevicePath = backupDevices.first;
 
@@ -483,10 +477,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final l = AppLocalizations.of(context);
         setState(() {
-          _error = e is PlatformException
-              ? (e.message ?? 'YubiKey operation failed.')
-              : e.toString();
+          _error = switch (e) {
+            PlatformException(code: 'NO_FIDO2_DEVICE') => l.noFidoDeviceFound,
+            PlatformException(code: 'NO_BACKUP_FIDO2_DEVICE') =>
+              l.noBackupFidoDeviceFound,
+            PlatformException() => e.message ?? l.yubikeyOperationFailed,
+            _ => e.toString(),
+          };
           _yubikeyStep = 0;
         });
       }

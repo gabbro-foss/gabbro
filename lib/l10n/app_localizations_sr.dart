@@ -756,10 +756,26 @@ class AppLocalizationsSr extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Da li ste sigurni?';
 
   @override
-  String get typeDeleteToConfirm => 'Unesite DELETE za potvrdu';
+  String deleteVaultUnderstand(String alias) {
+    return 'Разумем да ово трајно брише \"$alias\" и не може се опозвати.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Резервни FIDO2 уређај није пронађен. Уметните резервни YubiKey.';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey операција није успела.';
+
+  @override
+  String get unlockFailed => 'Откључавање није успело.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Мапирајте бар Наслов или URL да би уноси имали име.';
+
+  @override
+  String get pickAFile => 'Изаберите датотеку.';
 
   @override
   String get touchYourYubiKey => 'Dodirnite vaš YubiKey';
@@ -2681,10 +2697,26 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get deleteVaultConfirmTitle => 'Da li ste sigurni?';
 
   @override
-  String get typeDeleteToConfirm => 'Unesite DELETE za potvrdu';
+  String deleteVaultUnderstand(String alias) {
+    return 'Razumem da ovo trajno briše \"$alias\" i ne može se opozvati.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Rezervni FIDO2 uređaj nije pronađen. Umetnite rezervni YubiKey.';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey operacija nije uspela.';
+
+  @override
+  String get unlockFailed => 'Otključavanje nije uspelo.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Mapirajte bar Naslov ili URL da bi unosi imali ime.';
+
+  @override
+  String get pickAFile => 'Izaberite datoteku.';
 
   @override
   String get touchYourYubiKey => 'Dodirnite vaš YubiKey';

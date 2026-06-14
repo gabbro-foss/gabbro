@@ -753,10 +753,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Are you sure?';
 
   @override
-  String get typeDeleteToConfirm => 'Type DELETE to confirm';
+  String deleteVaultUnderstand(String alias) {
+    return 'I understand this permanently deletes \"$alias\" and cannot be undone.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'No backup FIDO2 device found. Insert your backup YubiKey.';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey operation failed.';
+
+  @override
+  String get unlockFailed => 'Unlock failed.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Map at least Title or URL so entries have a name.';
+
+  @override
+  String get pickAFile => 'Please pick a file.';
 
   @override
   String get touchYourYubiKey => 'Touch your YubiKey';

@@ -24,6 +24,7 @@ class _AutofillUnlockScreenState extends State<AutofillUnlockScreen> {
   }
 
   Future<void> _unlock() async {
+    final l = AppLocalizations.of(context);
     setState(() {
       _loading = true;
       _error = null;
@@ -32,7 +33,7 @@ class _AutofillUnlockScreenState extends State<AutofillUnlockScreen> {
       await _channel.invokeMethod('unlock', {'passphrase': _controller.text});
     } on PlatformException catch (e) {
       setState(() {
-        _error = e.message ?? 'Unlock failed';
+        _error = e.message ?? l.unlockFailed;
         _loading = false;
       });
     }

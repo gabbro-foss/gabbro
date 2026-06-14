@@ -258,8 +258,12 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
     if (step1 != true) return;
     if (!mounted) return;
 
-    // Step 2 — type DELETE to confirm
-    final confirmController = TextEditingController();
+    // Step 2 — tick the "I understand" checkbox to confirm. A checkbox, not a
+    // typed magic word: a word to type is either English-only (hostile to other
+    // keyboards) or, if localised/the vault name, breaks on Unicode
+    // normalisation and full/half-width input. A checkbox is reliable in every
+    // script and needs only one translatable sentence.
+    bool understood = false;
     final step2 = await showDialog<bool>(
       context: context,
       builder: (ctx) => StatefulBuilder(
@@ -267,20 +271,13 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
           final l = AppLocalizations.of(ctx);
           return AlertDialog(
             title: Text(l.deleteVaultConfirmTitle),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l.typeDeleteToConfirm),
-                const SizedBox(height: 12),
-                TextField(
-                  key: const Key('delete_vault_confirm_field'),
-                  controller: confirmController,
-                  autofocus: true,
-                  decoration: const InputDecoration(border: OutlineInputBorder()),
-                  onChanged: (_) => setDialogState(() {}),
-                ),
-              ],
+            content: CheckboxListTile(
+              key: const Key('delete_vault_confirm_checkbox'),
+              value: understood,
+              onChanged: (v) => setDialogState(() => understood = v ?? false),
+              contentPadding: EdgeInsets.zero,
+              controlAffinity: ListTileControlAffinity.leading,
+              title: Text(l.deleteVaultUnderstand(record.alias)),
             ),
             actions: [
               TextButton(
@@ -288,9 +285,8 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                 child: Text(l.cancel),
               ),
               TextButton(
-                onPressed: confirmController.text == l.typeDeleteWord
-                    ? () => Navigator.of(ctx).pop(true)
-                    : null,
+                onPressed:
+                    understood ? () => Navigator.of(ctx).pop(true) : null,
                 style: TextButton.styleFrom(
                   foregroundColor: Theme.of(ctx).colorScheme.error,
                 ),
@@ -301,7 +297,6 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
         },
       ),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) => confirmController.dispose());
     if (step2 != true) return;
     if (!mounted) return;
 

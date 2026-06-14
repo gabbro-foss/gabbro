@@ -743,10 +743,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteVaultConfirmTitle => '确定吗？';
 
   @override
-  String get typeDeleteToConfirm => '输入 DELETE 确认';
+  String deleteVaultUnderstand(String alias) {
+    return '我了解这将永久删除 \"$alias\" 且无法撤销。';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound => '未找到备用 FIDO2 设备。请插入您的备用 YubiKey。';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey 操作失败。';
+
+  @override
+  String get unlockFailed => '解锁失败。';
+
+  @override
+  String get csvMapTitleOrUrl => '请至少映射标题或 URL，以便条目具有名称。';
+
+  @override
+  String get pickAFile => '请选择一个文件。';
 
   @override
   String get touchYourYubiKey => '触碰您的 YubiKey';
@@ -2580,10 +2594,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get deleteVaultConfirmTitle => '确定吗？';
 
   @override
-  String get typeDeleteToConfirm => '输入 DELETE 确认';
+  String deleteVaultUnderstand(String alias) {
+    return '我了解这将永久删除 \"$alias\" 且无法撤销。';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound => '未找到备用 FIDO2 设备。请插入您的备用 YubiKey。';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey 操作失败。';
+
+  @override
+  String get unlockFailed => '解锁失败。';
+
+  @override
+  String get csvMapTitleOrUrl => '请至少映射标题或 URL，以便条目具有名称。';
+
+  @override
+  String get pickAFile => '请选择一个文件。';
 
   @override
   String get touchYourYubiKey => '触碰您的 YubiKey';
@@ -4417,10 +4445,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get deleteVaultConfirmTitle => '確定嗎？';
 
   @override
-  String get typeDeleteToConfirm => '輸入 DELETE 確認';
+  String deleteVaultUnderstand(String alias) {
+    return '我了解這將永久刪除 \"$alias\" 且無法復原。';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound => '找不到備用 FIDO2 裝置。請插入您的備用 YubiKey。';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey 操作失敗。';
+
+  @override
+  String get unlockFailed => '解鎖失敗。';
+
+  @override
+  String get csvMapTitleOrUrl => '請至少對應標題或 URL，讓項目具有名稱。';
+
+  @override
+  String get pickAFile => '請選擇一個檔案。';
 
   @override
   String get touchYourYubiKey => '碰觸您的 YubiKey';

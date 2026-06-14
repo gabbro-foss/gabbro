@@ -754,10 +754,26 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Tem certeza?';
 
   @override
-  String get typeDeleteToConfirm => 'Digite DELETE para confirmar';
+  String deleteVaultUnderstand(String alias) {
+    return 'Entendo que isso exclui permanentemente \"$alias\" e não pode ser desfeito.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Nenhum dispositivo FIDO2 de backup encontrado. Insira seu YubiKey de backup.';
+
+  @override
+  String get yubikeyOperationFailed => 'Falha na operação do YubiKey.';
+
+  @override
+  String get unlockFailed => 'Falha ao desbloquear.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Mapeie pelo menos Título ou URL para que as entradas tenham nome.';
+
+  @override
+  String get pickAFile => 'Selecione um arquivo.';
 
   @override
   String get touchYourYubiKey => 'Toque na sua YubiKey';
@@ -2681,10 +2697,26 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get deleteVaultConfirmTitle => 'Tem certeza?';
 
   @override
-  String get typeDeleteToConfirm => 'Digite DELETE para confirmar';
+  String deleteVaultUnderstand(String alias) {
+    return 'Entendo que isso exclui permanentemente \"$alias\" e não pode ser desfeito.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Nenhum dispositivo FIDO2 de backup encontrado. Insira seu YubiKey de backup.';
+
+  @override
+  String get yubikeyOperationFailed => 'Falha na operação do YubiKey.';
+
+  @override
+  String get unlockFailed => 'Falha ao desbloquear.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Mapeie pelo menos Título ou URL para que as entradas tenham nome.';
+
+  @override
+  String get pickAFile => 'Selecione um arquivo.';
 
   @override
   String get touchYourYubiKey => 'Toque na sua YubiKey';
@@ -4606,10 +4638,26 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get deleteVaultConfirmTitle => 'Tem a certeza?';
 
   @override
-  String get typeDeleteToConfirm => 'Escreva DELETE para confirmar';
+  String deleteVaultUnderstand(String alias) {
+    return 'Compreendo que isto elimina permanentemente \"$alias\" e não pode ser anulado.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Nenhum dispositivo FIDO2 de cópia de segurança encontrado. Insira a sua YubiKey de cópia de segurança.';
+
+  @override
+  String get yubikeyOperationFailed => 'Falha na operação da YubiKey.';
+
+  @override
+  String get unlockFailed => 'Falha ao desbloquear.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Mapeie pelo menos Título ou URL para que as entradas tenham nome.';
+
+  @override
+  String get pickAFile => 'Selecione um ficheiro.';
 
   @override
   String get touchYourYubiKey => 'Toque na sua YubiKey';

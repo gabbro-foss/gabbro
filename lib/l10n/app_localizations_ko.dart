@@ -746,10 +746,25 @@ class AppLocalizationsKo extends AppLocalizations {
   String get deleteVaultConfirmTitle => '확실하십니까?';
 
   @override
-  String get typeDeleteToConfirm => '확인을 위해 DELETE를 입력하세요';
+  String deleteVaultUnderstand(String alias) {
+    return '이 작업은 \"$alias\"을(를) 영구적으로 삭제하며 되돌릴 수 없음을 이해합니다.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      '백업 FIDO2 장치를 찾을 수 없습니다. 백업 YubiKey를 삽입하세요.';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey 작업에 실패했습니다.';
+
+  @override
+  String get unlockFailed => '잠금 해제에 실패했습니다.';
+
+  @override
+  String get csvMapTitleOrUrl => '항목에 이름이 있도록 제목 또는 URL을 하나 이상 매핑하세요.';
+
+  @override
+  String get pickAFile => '파일을 선택하세요.';
 
   @override
   String get touchYourYubiKey => 'YubiKey에 터치하세요';

@@ -753,10 +753,26 @@ class AppLocalizationsHu extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Biztos vagy benne?';
 
   @override
-  String get typeDeleteToConfirm => 'Írd be a DELETE szót a megerősítéshez';
+  String deleteVaultUnderstand(String alias) {
+    return 'Megértem, hogy ez véglegesen törli a következőt: \"$alias\", és nem vonható vissza.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Nem található tartalék FIDO2-eszköz. Helyezze be a tartalék YubiKey-t.';
+
+  @override
+  String get yubikeyOperationFailed => 'A YubiKey-művelet sikertelen.';
+
+  @override
+  String get unlockFailed => 'A feloldás sikertelen.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Rendeljen hozzá legalább Címet vagy URL-t, hogy a bejegyzéseknek legyen nevük.';
+
+  @override
+  String get pickAFile => 'Kérjük, válasszon egy fájlt.';
 
   @override
   String get touchYourYubiKey => 'Érintsd meg a YubiKey-edet';

@@ -753,10 +753,26 @@ class AppLocalizationsSv extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Är du säker?';
 
   @override
-  String get typeDeleteToConfirm => 'Skriv DELETE för att bekräfta';
+  String deleteVaultUnderstand(String alias) {
+    return 'Jag förstår att detta permanent raderar \"$alias\" och inte kan ångras.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Ingen FIDO2-reservenhet hittades. Anslut din reserv-YubiKey.';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey-åtgärden misslyckades.';
+
+  @override
+  String get unlockFailed => 'Upplåsning misslyckades.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Mappa minst Titel eller URL så att posterna har ett namn.';
+
+  @override
+  String get pickAFile => 'Välj en fil.';
 
   @override
   String get touchYourYubiKey => 'Rör vid din YubiKey';

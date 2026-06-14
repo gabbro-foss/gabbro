@@ -405,7 +405,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     if (widget.entryType == 'File' && _pickedFileBytes == null) {
-      setState(() => _error = 'Please pick a file.');
+      setState(() => _error = AppLocalizations.of(context).pickAFile);
       return;
     }
     setState(() {

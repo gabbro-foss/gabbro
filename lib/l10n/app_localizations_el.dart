@@ -758,10 +758,26 @@ class AppLocalizationsEl extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Είστε σίγουροι;';
 
   @override
-  String get typeDeleteToConfirm => 'Πληκτρολογήστε DELETE για επιβεβαίωση';
+  String deleteVaultUnderstand(String alias) {
+    return 'Κατανοώ ότι αυτό διαγράφει οριστικά το \"$alias\" και δεν μπορεί να αναιρεθεί.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Δεν βρέθηκε εφεδρική συσκευή FIDO2. Συνδέστε το εφεδρικό σας YubiKey.';
+
+  @override
+  String get yubikeyOperationFailed => 'Η λειτουργία YubiKey απέτυχε.';
+
+  @override
+  String get unlockFailed => 'Το ξεκλείδωμα απέτυχε.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Αντιστοιχίστε τουλάχιστον Τίτλο ή URL ώστε οι καταχωρίσεις να έχουν όνομα.';
+
+  @override
+  String get pickAFile => 'Παρακαλώ επιλέξτε ένα αρχείο.';
 
   @override
   String get touchYourYubiKey => 'Αγγίξτε το YubiKey σας';

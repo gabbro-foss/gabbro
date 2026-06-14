@@ -754,10 +754,26 @@ class AppLocalizationsHr extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Jeste li sigurni?';
 
   @override
-  String get typeDeleteToConfirm => 'Upišite DELETE za potvrdu';
+  String deleteVaultUnderstand(String alias) {
+    return 'Razumijem da se time trajno briše \"$alias\" i da se ne može poništiti.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Nije pronađen rezervni FIDO2 uređaj. Umetnite rezervni YubiKey.';
+
+  @override
+  String get yubikeyOperationFailed => 'Operacija s YubiKeyjem nije uspjela.';
+
+  @override
+  String get unlockFailed => 'Otključavanje nije uspjelo.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Mapirajte barem Naslov ili URL kako bi unosi imali naziv.';
+
+  @override
+  String get pickAFile => 'Molimo odaberite datoteku.';
 
   @override
   String get touchYourYubiKey => 'Dodirnite vaš YubiKey';

@@ -33,10 +33,8 @@ Future<void> _defaultConfirmYubikey(
   if (Platform.isLinux) {
     final devices = fidoListDevices();
     if (devices.isEmpty) {
-      throw PlatformException(
-        code: 'NO_FIDO2_DEVICE',
-        message: 'No FIDO2 device found. Insert your YubiKey and try again.',
-      );
+      // No English message: catch sites localize via the code (l.noFidoDeviceFound).
+      throw PlatformException(code: 'NO_FIDO2_DEVICE');
     }
     await fidoGetHmacSecret(
       devicePath: devices.first,
@@ -60,10 +58,8 @@ Future<void> _defaultConfirmAnyYubikey(
   if (Platform.isLinux) {
     final devices = fidoListDevices();
     if (devices.isEmpty) {
-      throw PlatformException(
-        code: 'NO_FIDO2_DEVICE',
-        message: 'No FIDO2 device found. Insert your YubiKey and try again.',
-      );
+      // No English message: catch sites localize via the code (l.noFidoDeviceFound).
+      throw PlatformException(code: 'NO_FIDO2_DEVICE');
     }
     await fidoGetHmacSecretAny(
       devicePath: devices.first,

@@ -756,10 +756,26 @@ class AppLocalizationsCs extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Jste si jistý(-á)?';
 
   @override
-  String get typeDeleteToConfirm => 'Zadejte DELETE pro potvrzení';
+  String deleteVaultUnderstand(String alias) {
+    return 'Rozumím, že tím se trvale odstraní \"$alias\" a nelze to vrátit zpět.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Nebylo nalezeno záložní zařízení FIDO2. Vložte svůj záložní YubiKey.';
+
+  @override
+  String get yubikeyOperationFailed => 'Operace s YubiKey selhala.';
+
+  @override
+  String get unlockFailed => 'Odemknutí se nezdařilo.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Namapujte alespoň Název nebo URL, aby měly položky jméno.';
+
+  @override
+  String get pickAFile => 'Vyberte prosím soubor.';
 
   @override
   String get touchYourYubiKey => 'Dotkněte se svého klíče YubiKey';

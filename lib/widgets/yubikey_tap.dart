@@ -42,10 +42,8 @@ Future<YubikeyHmacMatch> getAnyYubikeyHmacSecret({
   if (isLinuxForTapDispatch()) {
     final devices = fidoListDevices();
     if (devices.isEmpty) {
-      throw PlatformException(
-        code: 'NO_FIDO2_DEVICE',
-        message: 'No FIDO2 device found. Insert your YubiKey and try again.',
-      );
+      // No English message: catch sites localize via the code (l.noFidoDeviceFound).
+      throw PlatformException(code: 'NO_FIDO2_DEVICE');
     }
     final match = await fidoGetHmacSecretAny(
       devicePath: devices.first,
@@ -88,10 +86,8 @@ Future<List<int>> getYubikeyHmacSecret({
   if (isLinuxForTapDispatch()) {
     final devices = fidoListDevices();
     if (devices.isEmpty) {
-      throw PlatformException(
-        code: 'NO_FIDO2_DEVICE',
-        message: 'No FIDO2 device found. Insert your YubiKey and try again.',
-      );
+      // No English message: catch sites localize via the code (l.noFidoDeviceFound).
+      throw PlatformException(code: 'NO_FIDO2_DEVICE');
     }
     return fidoGetHmacSecret(
       devicePath: devices.first,

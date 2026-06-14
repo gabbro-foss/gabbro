@@ -755,10 +755,26 @@ class AppLocalizationsLt extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Ar tikrai?';
 
   @override
-  String get typeDeleteToConfirm => 'Įveskite DELETE patvirtinimui';
+  String deleteVaultUnderstand(String alias) {
+    return 'Suprantu, kad tai visam laikui ištrina \"$alias\" ir negali būti atšaukta.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Atsarginis FIDO2 įrenginys nerastas. Įdėkite atsarginį YubiKey.';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey operacija nepavyko.';
+
+  @override
+  String get unlockFailed => 'Atrakinti nepavyko.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Susiekite bent Pavadinimą arba URL, kad įrašai turėtų pavadinimą.';
+
+  @override
+  String get pickAFile => 'Pasirinkite failą.';
 
   @override
   String get touchYourYubiKey => 'Palieskite YubiKey raktą';

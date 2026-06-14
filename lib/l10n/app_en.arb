@@ -328,8 +328,17 @@
   "renameVaultTitle": "Rename vault",
   "deleteVaultTitle": "Delete vault?",
   "deleteVaultConfirmTitle": "Are you sure?",
-  "typeDeleteToConfirm": "Type DELETE to confirm",
-  "typeDeleteWord": "DELETE",
+  "deleteVaultUnderstand": "I understand this permanently deletes \"{alias}\" and cannot be undone.",
+  "@deleteVaultUnderstand": {
+    "placeholders": {
+      "alias": { "type": "String" }
+    }
+  },
+  "noBackupFidoDeviceFound": "No backup FIDO2 device found. Insert your backup YubiKey.",
+  "yubikeyOperationFailed": "YubiKey operation failed.",
+  "unlockFailed": "Unlock failed.",
+  "csvMapTitleOrUrl": "Map at least Title or URL so entries have a name.",
+  "pickAFile": "Please pick a file.",
   "touchYourYubiKey": "Touch your YubiKey",
   "noVaultsRegisteredText": "No vaults registered.",
 

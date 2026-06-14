@@ -754,10 +754,26 @@ class AppLocalizationsEu extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Ziur zaude?';
 
   @override
-  String get typeDeleteToConfirm => 'Berresteko DELETE idatzi';
+  String deleteVaultUnderstand(String alias) {
+    return 'Ulertzen dut honek \"$alias\" behin betiko ezabatzen duela eta ezin dela desegin.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Ez da aurkitu babeskopia FIDO2 gailurik. Sartu zure babeskopia YubiKey-a.';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey eragiketak huts egin du.';
+
+  @override
+  String get unlockFailed => 'Desblokeatzeak huts egin du.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Esleitu gutxienez Izenburua edo URLa, sarrerek izena izan dezaten.';
+
+  @override
+  String get pickAFile => 'Mesedez, aukeratu fitxategi bat.';
 
   @override
   String get touchYourYubiKey => 'Ukitu zure YubiKey';

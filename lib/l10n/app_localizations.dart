@@ -1549,17 +1549,41 @@ abstract class AppLocalizations {
   /// **'Are you sure?'**
   String get deleteVaultConfirmTitle;
 
-  /// No description provided for @typeDeleteToConfirm.
+  /// No description provided for @deleteVaultUnderstand.
   ///
   /// In en, this message translates to:
-  /// **'Type DELETE to confirm'**
-  String get typeDeleteToConfirm;
+  /// **'I understand this permanently deletes \"{alias}\" and cannot be undone.'**
+  String deleteVaultUnderstand(String alias);
 
-  /// No description provided for @typeDeleteWord.
+  /// No description provided for @noBackupFidoDeviceFound.
   ///
   /// In en, this message translates to:
-  /// **'DELETE'**
-  String get typeDeleteWord;
+  /// **'No backup FIDO2 device found. Insert your backup YubiKey.'**
+  String get noBackupFidoDeviceFound;
+
+  /// No description provided for @yubikeyOperationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'YubiKey operation failed.'**
+  String get yubikeyOperationFailed;
+
+  /// No description provided for @unlockFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock failed.'**
+  String get unlockFailed;
+
+  /// No description provided for @csvMapTitleOrUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Map at least Title or URL so entries have a name.'**
+  String get csvMapTitleOrUrl;
+
+  /// No description provided for @pickAFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Please pick a file.'**
+  String get pickAFile;
 
   /// No description provided for @touchYourYubiKey.
   ///

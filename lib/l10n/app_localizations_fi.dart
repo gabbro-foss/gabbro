@@ -755,10 +755,26 @@ class AppLocalizationsFi extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Oletko varma?';
 
   @override
-  String get typeDeleteToConfirm => 'Kirjoita DELETE vahvistaaksesi';
+  String deleteVaultUnderstand(String alias) {
+    return 'Ymmärrän, että tämä poistaa pysyvästi kohteen \"$alias\" eikä sitä voi kumota.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Varmuus-FIDO2-laitetta ei löytynyt. Liitä vara-YubiKey.';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey-toiminto epäonnistui.';
+
+  @override
+  String get unlockFailed => 'Lukituksen avaaminen epäonnistui.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Liitä vähintään Otsikko tai URL, jotta merkinnöillä on nimi.';
+
+  @override
+  String get pickAFile => 'Valitse tiedosto.';
 
   @override
   String get touchYourYubiKey => 'Kosketa YubiKey-avaintasi';

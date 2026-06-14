@@ -752,10 +752,26 @@ class AppLocalizationsYo extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Ṣe o da ọ loju?';
 
   @override
-  String get typeDeleteToConfirm => 'Tẹ DELETE lati jẹrisi';
+  String deleteVaultUnderstand(String alias) {
+    return 'Mo ye mi pé èyí á pa \"$alias\" rẹ́ pátápátá kò sì ṣe é dá padà.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Kò sí ẹ̀rọ FIDO2 ìpamọ́ tí a rí. Fi YubiKey ìpamọ́ rẹ sí i.';
+
+  @override
+  String get yubikeyOperationFailed => 'Iṣẹ́ YubiKey kùnà.';
+
+  @override
+  String get unlockFailed => 'Ìṣílẹ̀kùn kùnà.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'So Àkòlé tàbí URL pọ̀ ó kéré tán kí àwọn àkọsílẹ̀ lè ní orúkọ.';
+
+  @override
+  String get pickAFile => 'Jọ̀wọ́ yan fáìlì kan.';
 
   @override
   String get touchYourYubiKey => 'Fọwọ kan YubiKey rẹ';

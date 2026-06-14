@@ -753,10 +753,26 @@ class AppLocalizationsLv extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Vai esat pārliecināts?';
 
   @override
-  String get typeDeleteToConfirm => 'Ierakstiet DELETE apstiprināšanai';
+  String deleteVaultUnderstand(String alias) {
+    return 'Es saprotu, ka tas neatgriezeniski dzēš \"$alias\" un to nevar atsaukt.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Rezerves FIDO2 ierīce nav atrasta. Ievietojiet rezerves YubiKey.';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey darbība neizdevās.';
+
+  @override
+  String get unlockFailed => 'Atbloķēšana neizdevās.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Kartējiet vismaz Nosaukumu vai URL, lai ierakstiem būtu nosaukums.';
+
+  @override
+  String get pickAFile => 'Lūdzu, izvēlieties failu.';
 
   @override
   String get touchYourYubiKey => 'Pieskarieties YubiKey atslēgai';

@@ -751,10 +751,26 @@ class AppLocalizationsKk extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Сенімдісіз бе?';
 
   @override
-  String get typeDeleteToConfirm => 'Растау үшін DELETE деп енгізіңіз';
+  String deleteVaultUnderstand(String alias) {
+    return 'Бұл \"$alias\" біржола жоятынын және қайтаруға болмайтынын түсінемін.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Сақтық FIDO2 құрылғысы табылмады. Сақтық YubiKey кілтіңізді салыңыз.';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey операциясы сәтсіз аяқталды.';
+
+  @override
+  String get unlockFailed => 'Құлыпты ашу сәтсіз аяқталды.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Жазбаларда атау болуы үшін кемінде Тақырып немесе URL сәйкестендіріңіз.';
+
+  @override
+  String get pickAFile => 'Файлды таңдаңыз.';
 
   @override
   String get touchYourYubiKey => 'YubiKey кілтіңізді басыңыз';

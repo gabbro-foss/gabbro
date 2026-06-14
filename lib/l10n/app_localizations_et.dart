@@ -754,10 +754,26 @@ class AppLocalizationsEt extends AppLocalizations {
   String get deleteVaultConfirmTitle => 'Oled kindel?';
 
   @override
-  String get typeDeleteToConfirm => 'Kinnita kirjutades DELETE';
+  String deleteVaultUnderstand(String alias) {
+    return 'Saan aru, et see kustutab jäädavalt \"$alias\" ja seda ei saa tagasi võtta.';
+  }
 
   @override
-  String get typeDeleteWord => 'DELETE';
+  String get noBackupFidoDeviceFound =>
+      'Varundus-FIDO2-seadet ei leitud. Sisesta oma varu-YubiKey.';
+
+  @override
+  String get yubikeyOperationFailed => 'YubiKey toiming ebaõnnestus.';
+
+  @override
+  String get unlockFailed => 'Avamine ebaõnnestus.';
+
+  @override
+  String get csvMapTitleOrUrl =>
+      'Vasta vähemalt Pealkiri või URL, et kirjetel oleks nimi.';
+
+  @override
+  String get pickAFile => 'Palun vali fail.';
 
   @override
   String get touchYourYubiKey => 'Puuduta oma YubiKey\'t';
