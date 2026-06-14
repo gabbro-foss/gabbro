@@ -294,6 +294,7 @@ void main() {
       // UI is localised to Japanese; the passphrase mode label is パスフレーズ.
       await tester.tap(find.text('パスフレーズ'));
       await tester.pumpAndSettle();
+      await tester.ensureVisible(find.byKey(const Key('generate_button')));
       await tester.tap(find.byKey(const Key('generate_button')));
       await tester.pumpAndSettle();
 
