@@ -32,6 +32,8 @@ The Executive summary and findings below are the **original 2026-05-31 pass**, k
 
 **Still open:** F-03 (→ human crypto review), F-10 (→ post-v1). Everything else is fixed or by-design.
 
+**Correction (2026-06-10).** The Executive summary's "no exploitable defect identified" and the OWASP "binary header parser bounds-checks every field" row were both falsified within scope: the `from_bytes` parse fuzzer found a crash-on-open integer overflow in `rust/src/vault/file_format.rs` (a malformed `.gabbro` body-length field), a DoS-grade defect the static read missed. Fixed by a `checked_add` (`file_format.rs:378`) and guarded by `rust/tests/vault_parse_fuzz.rs`. Recorded so a human reviewer can calibrate what the static AI pass missed (review finding R-01).
+
 ---
 
 ## Executive summary
@@ -50,7 +52,7 @@ The Executive summary and findings below are the **original 2026-05-31 pass**, k
 | AEAD header binding (AAD)      | **Absent.** All key-relevant headers cause decryption failure on tamper, but `alias` (plaintext metadata) is unauthenticated. |
 | Argon2id parameters            | Significantly exceed OWASP / RFC 9106 minimums (m=64 MiB, t=25, p=4) |
 
-**No exploitable defect identified in this pass.** Findings are recommendations / hardening / spec-alignment improvements.
+**No exploitable defect identified in this pass.** Findings are recommendations / hardening / spec-alignment improvements. _(Later falsified — see the 2026-06-10 correction under Remediation status: the parse fuzzer found an in-scope crash-on-open overflow.)_
 
 ---
 
@@ -456,7 +458,7 @@ No CI workflows exist yet (`.github/` contains only `FUNDING.yml`). When CI is a
 
 | Category                              | Gabbro stance                                                                          |
 |---------------------------------------|----------------------------------------------------------------------------------------|
-| Input validation                      | CardEntry length validation present; binary header parser bounds-checks every field.   |
+| Input validation                      | CardEntry length validation present; binary header parser length-guards its fields — **except** a body-length integer overflow the static read missed (found later by the parse fuzzer, fixed via `checked_add`; see the 2026-06-10 correction). |
 | Injection (SQL/NoSQL)                 | N/A — no database. JSON serialization is via `serde_json`, no string concatenation.    |
 | Authentication / session              | Argon2id + FIDO2 hmac-secret; min 2 keys (ADR-010). Master key never crosses bridge.   |
 | Access control                        | Single-user local app; vault-level access only.                                        |
