@@ -41,6 +41,12 @@ libfido2-sys = "0.5.1"
 [target.'cfg(target_os = "android")'.dependencies]
 jni = { version = "0.21", features = ["invocation"] }
 
+# Core-dump hardening (R-04) uses prctl/setrlimit. libc is already a transitive
+# dependency of every build (via flutter_rust_bridge, rand, the crypto crates);
+# this just lets our Linux code call it directly. No net supply-chain addition.
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = "0.2"
+
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
 
