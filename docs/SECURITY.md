@@ -224,6 +224,19 @@ A long, randomly generated passphrase (use the built-in generator) substantially
 raises the cost of a brute-force attack, but cannot match the categorical
 protection of a hardware second factor. **If you have a YubiKey, use it.**
 
+### Secrets in the Flutter (UI) layer
+
+All key material and decryption live in Rust and are zeroized on lock (verified by
+the gcore self-test). But the master passphrase is **typed into** Flutter, and any
+password you **view, generate, or autofill** must reach the UI in plaintext to be
+shown. These live in the Dart heap, which is garbage-collected and cannot be
+zeroized: a root memory dump of the unlocked app finds them, and they can linger
+after lock until garbage collection (measured 2026-06-14). This is inherent to any
+GUI password manager — the master **keys** never enter Flutter, so a vault you
+never opened stays protected. As of the core-dump hardening (R-04) a same-user
+process can no longer dump the app's memory; the residual needs root, swap, or a
+cold-boot attack. Bounded further by auto-lock and clipboard auto-clear.
+
 ### Header integrity (fixed in VERSION 7)
 
 Since VERSION 7, every byte of the `.gabbro` plaintext header — Argon2id
@@ -291,7 +304,9 @@ manager. The protections available depend on which mode you use.
   detected on the next decrypt attempt. YubiKey credential IDs remain visible in
   the header (by design) but cannot be silently modified.
 - Local file permissions: `0600` prevents other local users from reading the file.
-- Memory after lock: `Zeroizing` scrubs secrets; verified by `gcore` self-test.
+- Memory after lock: `Zeroizing` scrubs Rust-side secrets; verified by `gcore`
+  self-test. The Flutter UI heap retains typed/viewed secrets — see *Secrets in
+  the Flutter (UI) layer*.
 
 **In scope — YubiKey mode (additional protection):**
 - Offline brute-force: blocked by hardware. The HMAC-secret is unavailable without

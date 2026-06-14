@@ -29,6 +29,7 @@ The Executive summary and findings below are the **original 2026-05-31 pass**, k
 | **F-10** eTLD+1 autofill matching | Info | **Open** — post-v1 "Strict FQDN" toggle. |
 | **F-11** decrypted body not zeroized | Low | **Fixed** 2026-06-01 (found by the memory-forensics self-test). |
 | **L-6** memory-forensics test | — | **Done** 2026-06-01 (`scripts/mem_forensics.sh`). |
+| **F-12** typed/viewed secrets persist in Dart heap | Low | **Documented** (2026-06-14) — measured by root gcore of the GUI; inherent to GUI password managers, bounded by auto-lock + GC, same-uid dump blocked by R-04. |
 
 **Still open:** F-03 (→ human crypto review), F-10 (→ post-v1). Everything else is fixed or by-design.
 
@@ -344,6 +345,18 @@ The temp-file-then-rename pattern from F-08 already mitigates the write-time rac
 
 ---
 
+### F-12 (Low) — Typed/viewed secrets persist in the Flutter (Dart) heap
+
+**Status — DOCUMENTED (2026-06-14).** Measured, not fixable: inherent to any GUI password manager.
+
+**Where:** `unlock_screen.dart` (passphrase input); `entry_detail_screen.dart` / generator screens (viewed and generated passwords); the autofill JSON (F-04).
+
+**Detail.** Keys and decryption live in Rust and are zeroized on lock (the gcore self-test proves it). The Dart side cannot follow: the master passphrase is typed into an immutable, GC-managed Dart `String`, and any password the user views, generates, or autofills must cross the bridge in plaintext to be displayed. A root `gcore` of the live release GUI (2026-06-14) found the passphrase and a viewed entry password present while unlocked (3 / 5 hits) and **still present after lock** (3 / 4) — `Zeroize` cannot reach Dart strings and GC is non-deterministic. The master key never enters Dart, so this bounds rather than breaks "keys live in Rust." R-04 (`PR_SET_DUMPABLE(0)`) closes the same-uid dump path; the residual needs root, swap, or cold-boot.
+
+**Mitigations (already present).** Auto-lock clears the navigation stack (disposing the detail screen) and clipboard auto-clear bounds lifetime. No cheap framework-level fix exists. Documented honestly in `SECURITY.md`.
+
+---
+
 ## Lessons from Proton Pass audit (Recurity Labs 526.2501)
 
 This section maps each finding in the **Recurity Labs Proton Pass Security Assessment & Retests** (project 526.2501, v1.1, 2026-05-07, 57 pages — available at `docs/artefacts/526.2501-Recurity_Labs-Report-Proton_Pass-v1.pdf`) to gabbro's posture. Proton Pass is a fundamentally different stack (Electron / V8 / backend API / multi-account / SQLite-on-Android) so many findings don't apply directly — but the lessons generalise.
@@ -470,6 +483,18 @@ No CI workflows exist yet (`.github/` contains only `FUNDING.yml`). When CI is a
 
 ---
 
+## Unaudited surfaces (added 2026-06-14)
+
+For scope honesty — this pass focused on `rust/src/crypto/` and `rust/src/vault/`. The following were **not** systematically read; silence here is not coverage:
+
+- the Flutter/Dart layer, including everywhere secrets exist in Dart (see **F-12**);
+- `rust/src/import/` parsers consuming untrusted files (CSV / Enpass / Bitwarden / Dashlane / Google PM); the post-audit fuzzer covers `.gabbro` parsing only;
+- `rust/src/api/` bridge surface (only partially touched, via F-11);
+- the Kotlin layer (autofill, unlock, biometric — only F-10 touches it);
+- `rust/src/fido/` (deferred per ADR-010).
+
+---
+
 ## Appendix A — `cargo audit` output (2026-05-31)
 
 Database: RustSec advisory-db, 1099 advisories.
@@ -521,7 +546,7 @@ This AI audit is informational. The Bikeshed pre-v1 gate still requires:
 3. **Formal model** of the multi-key vault state machine (`seal_vault_with_keys`, `add_key_to_sealed`, `remove_key_from_sealed`, `change_vault_passphrase_with_keys`) to verify the invariant "any single registered key unlocks; passphrase change does not invalidate any key_blob".
 4. **External cryptographic audit** as listed in ARCHITECTURE.md → Bikeshed → "Security (pre-v1 gates)".
 5. **Hardware-attested testing** on de-Googled Android (GrapheneOS / CalyxOS) for the FIDO2 hmac-secret path. Out of scope of this static review.
-6. **Memory-forensics testing of gabbro itself** — **DONE (2026-06-01).** Implemented as a reproducible self-test: `rust/scripts/mem_forensics.sh` + the `--features forensics` harness (`rust/src/bin/mem_forensics.rs`). It seals a vault with two distinct high-entropy canaries (master passphrase + a Login entry's password), takes a `gcore` dump while unlocked (canaries present) and after lock (must be absent), and reports PASS/FAIL. The first run surfaced **F-11** (entry password lingered in the decrypted-body buffer); after the fix, 12/12 runs PASS. Reviewers can reproduce it. Still recommended before v1: extend to the YubiKey-unlock path and run under the real GUI process.
+6. **Memory-forensics testing of gabbro itself** — **DONE (2026-06-01).** Implemented as a reproducible self-test: `rust/scripts/mem_forensics.sh` + the `--features forensics` harness (`rust/src/bin/mem_forensics.rs`). It seals a vault with two distinct high-entropy canaries (master passphrase + a Login entry's password), takes a `gcore` dump while unlocked (canaries present) and after lock (must be absent), and reports PASS/FAIL. The first run surfaced **F-11** (entry password lingered in the decrypted-body buffer); after the fix, 12/12 runs PASS. Reviewers can reproduce it. The GUI-process run is now done (2026-06-14 — see **F-12**: typed/viewed secrets persist in the Dart heap). Still recommended before v1: extend to the YubiKey-unlock path.
 
 ---
 

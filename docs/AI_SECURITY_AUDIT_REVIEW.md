@@ -20,7 +20,7 @@
 | **R-03** no pre-save vault backup rotation (availability gap) | Medium | **Fixed** (branch `r03-vault-backup-rework`, 2026-06-12) — automatic `.bak` safety copy (= last *verified* save) + corruption-recovery UX + restore-from-backup-file. Claude Fable 5's first pass was component-green but failed the hardware matrix; diagnosed and reworked by Claude Opus 4.8 + Rob. Linux hardware 14/14; Android emulator verified. See R-03 below. |
 | **R-04** Linux process is dumpable; no `PR_SET_DUMPABLE(0)` / `RLIMIT_CORE(0)` | Low | **Fixed** (2026-06-14) — `harden_process()` in `rust/src/hardening.rs`, called from `init_app()`; unit-tested + hardware-verified on Linux (unlocked vault, `SIGSEGV` → no core dump, non-dumpable). |
 | **R-05** no stated position on swap exposure of key material | Low | **Fixed** (2026-06-14) — `SECURITY.md` threat model recommends encrypted swap; `mlock`/`madvise` deferred to expert review. |
-| **R-06** Dart-heap secret exposure undocumented; GUI-process forensics pending | Low | **Open** |
+| **R-06** Dart-heap secret exposure undocumented; GUI-process forensics pending | Low | **Fixed** (2026-06-14) — measured by root gcore of the live GUI: passphrase + viewed password present unlocked (3/5) and after lock (3/4); documented as F-12 in `AI_SECURITY_AUDIT.md` + `SECURITY.md`. Same-uid dump path closed by R-04. |
 | **R-07** minor items: `.gabbro.sha256` wording, tapjacking, `vaults.jsonc` metadata | Info | **Fixed** (2026-06-14) — README `.sha256` no longer claims tamper detection; `vaults.jsonc` metadata visibility noted in `SECURITY.md`. Tapjacking verification deferred to the Android autofill session. |
 
 ---
@@ -332,11 +332,7 @@ minimise secret lifetime in Dart, and *measure* it.
 
 ## Priority order (most user-safety per hour of work)
 
-Done: **R-01** (audit correction), **R-02** (backup manifest), **R-03** (vault safety copy + recovery), **R-04** (core-dump hardening), **R-05** (swap position), **R-07** (minor doc items) — see the status table.
-
-Outstanding:
-1. **R-06** — GUI-process forensics run (measure, then decide).
-2. **S-1** doc update — fold into the R-06 session.
+**All review findings (R-01…R-07) and the S-1/S-3 scope notes are closed** — see the status table. Remaining audit items live in `AI_SECURITY_AUDIT.md`: F-03 (human cryptographer) and F-10 (post-v1).
 
 None of these need a cryptographer; all are the kind of thing the eventual
 human reviewer will check first.

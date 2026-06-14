@@ -6,7 +6,7 @@ A post-quantum password manager built with security as core DNA.
 Named after the intrusive igneous rock — hard, stable, enduring.
 Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
-**Core principle:** if it touches a secret, it lives in Rust. Everything else lives in Flutter. Secrets never cross the Flutter/Rust bridge in plaintext.
+**Core principle:** all keys and cryptography live in Rust; the vault is decrypted there and the master keys never cross the bridge. Secrets the user actively views, generates, or autofills do reach Flutter in plaintext to be displayed (bounded by auto-lock; the Dart heap retains them until GC — see SECURITY.md / audit F-12) — the keys never do.
 
 ## General Information
 
@@ -90,11 +90,10 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**R-06 — GUI-process memory forensics** (last open `AI_SECURITY_AUDIT_REVIEW.md`
-issue): extend `scripts/mem_forensics.sh` to the real GUI process — unlock, view
-an entry, lock, `gcore`, grep for canaries — and document the measured Dart-heap
-residual rather than assuming it. Fold in the S-1 doc update. Per-finding detail
-is in that document's remediation table.
+**To agree with [user].** The `AI_SECURITY_AUDIT_REVIEW.md` R-series (R-01…R-07)
+is now fully closed. Remaining audit items are externally gated: F-03 (human
+cryptographer) and F-10 (post-v1). Pick the next direction with [user] —
+likely a return to features/UX or the pre-v1 crypto-review outreach.
 
 ### Open from the security audit
 
@@ -104,17 +103,15 @@ Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 - **F-10** — eTLD+1 autofill matching; post-v1 "Strict FQDN" toggle.
 
 A second-pass review (`AI_SECURITY_AUDIT_REVIEW.md`, 2026-06-11) added findings
-**R-01…R-07**; per-finding status lives in that document's remediation table.
-Still open: **R-06**.
-
-**UI locales deferred** (RTL layout work required): Hebrew, Arabic.
+**R-01…R-07**; per-finding status lives in that document's remediation table. All
+now closed.
 
 ---
 
 ## Build & Release
 
 Build-environment notes (Android/Kotlin/Java setup, SAF export) and the full
-release process (pre-flight gate, build, publish) live in their own document:
+release process live in their own document:
 [BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md).
 
 ---
@@ -155,6 +152,7 @@ release process (pre-flight gate, build, publish) live in their own document:
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer
+- UI locales deferred (RTL layout work required): Hebrew, Arabic.
 - Passphrase wordlists — not viable without significant pipeline work: `yo` Yoruba (no frequency ordering, complex tonal diacritics); `sr_Latn` Serbian Latin (only Cyrillic corpora; needs transliteration pipeline); `lb` Luxembourgish (small speaker base); `wa` Walloon (nothing usable, French covers Wallonia).
 - Autofill via `auto-type` (desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
 - Passkey (WebAuthn discoverable credential) support.
