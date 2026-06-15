@@ -90,7 +90,24 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-Autofill match quality (Android)
+**Autofill field detection (Android) — the "recognises nothing on most pages" miss.**
+Domain matching is done + device-verified (no false-positives). Remaining pain: on
+web-apps/SPAs `ParsedStructure.collectIds` only reads autofill-hints + Android `inputType`,
+which those fields often leave blank — but Chrome carries the real signal in
+`node.htmlInfo` HTML attributes (`type=password`, `autocomplete=...`), which we ignore.
+
+Plan (smallest change, canon-TDD): pull the per-field decision out of the framework
+walk into a pure `classifyField(...)` (same pure-decision pattern as `postDeleteRoute`),
+add HTML attributes as a new signal; `collectIds` extracts signals (incl. `htmlInfo`) and
+calls it. Unit-test `classifyField` (fast lane); the thin ViewNode glue is device-verified.
+
+Agreed test list for `classifyField`: (1) hint username (2) hint password — both preserved;
+(3) **HTML type=password, no hints, inputType 0 -> Password** (the web miss); (4) HTML
+type=email -> Username; (5) autocomplete current-/new-password -> Password; (6) autocomplete
+username -> Username; (7) inputType password variation (8) inputType email variation — both
+preserved; (9) keyword password in name/id -> Password; (10) keyword email/username/login/
+phone in hint/idEntry/name/id -> Username; (11) nothing -> None; (12) precedence: HTML
+type=password beats a stray "username" keyword. Then native-app matching (backlog) last.
 
 ### Open from the security audit
 
@@ -123,18 +140,12 @@ release process live in their own document:
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
-- **Autofill match quality (Android) — remaining slices.** Domain matching (websites)
-  is done: PSL-backed eTLD+1 (`PublicSuffixList`) replaced the naive last-two-labels rule,
-  closing the false-positive collision (audit F-10). Still open, the false-negative side:
-  (1) **field detection** — `ParsedStructure.collectIds` heuristics (autofill hints →
-  inputType → hint/idEntry keywords) miss many real login forms, especially SPA/Chromium
-  DOM-to-AssistStructure shapes → "offers nothing"; widen the signals (read `htmlInfo`
-  attributes, lone-password-field heuristic);
-  (2) **native-app matching** — `extractAppToken` + `summary.url.contains(token)` substring
-  match is far too loose (e.g. token `paypal` matches any URL) → wrong entry. Safe fix:
-  match only on an explicit recorded package id / exact domain (needs a small entry field);
-  Digital Asset Links is the heavier "correct" path. Reuses the PSL eTLD+1.
-  Touches the autofill security surface — design-then-implement with on-device verification.
+- **Autofill native-app matching (Android) — the last slice.** `extractAppToken` +
+  `summary.url.contains(token)` substring match is far too loose (e.g. token `paypal` matches
+  any URL) → wrong entry. Safe fix: match only on an explicit recorded package id / exact
+  domain (needs a small entry field); Digital Asset Links is the heavier "correct" path.
+  Reuses the PSL eTLD+1. Security surface — design-then-implement with on-device verification.
+  (Domain matching done; field detection is the active Next task.)
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 
