@@ -31,6 +31,9 @@ import android.widget.RemoteViews
  */
 class GabbroAutofillService : AutofillService() {
 
+    // Loaded once from the vendored asset on first match. Backs eTLD+1 matching.
+    private val publicSuffixList: PublicSuffixList by lazy { PublicSuffixList.fromAsset(this) }
+
     override fun onFillRequest(
         request: FillRequest,
         cancellationSignal: CancellationSignal,
@@ -206,10 +209,12 @@ class GabbroAutofillService : AutofillService() {
             ?.lowercase()
             ?.trimEnd('.')
             ?: return null
-        if (host.split(".").all { it.toIntOrNull() != null }) return null
-        val labels = host.split(".")
-        return if (labels.size >= 2) "${labels[labels.size - 2]}.${labels.last()}"
-        else host
+        if (host.split(".").all { it.toIntOrNull() != null }) return null // reject IPs
+        publicSuffixList.registrableDomain(host)?.let { return it }
+        // No registrable domain (host is a public suffix, or a single private label
+        // like "localhost"). Keep a single-label private host as-is for intranet
+        // matching; drop anything that is itself a real public suffix.
+        return host.takeIf { it.split(".").size == 1 && !publicSuffixList.isListedSuffix(it) }
     }
 
     /** Parse summaries JSON into lightweight stubs — no password fetch. */

@@ -52,12 +52,23 @@ class GabbroAutofillServiceRobolectricTest {
     }
 
     @Test
-    fun extractRegistrableDomain_multipart_tld_is_naive_eTLD_plus_1() {
-        // KNOWN LIMITATION — audit finding F-10. The "last two labels" rule does not
-        // consult the Public Suffix List, so a real registrable domain under a
-        // multi-part TLD collapses to the public suffix itself. This test pins the
-        // CURRENT behaviour; tightening it is the deferred "Strict FQDN" toggle.
-        assertEquals("co.uk", service.extractRegistrableDomain("https://login.example.co.uk"))
+    fun extractRegistrableDomain_multipart_tld_keeps_registrable_label() {
+        // Audit F-10 fixed: PSL-backed eTLD+1 keeps the real registrable label under
+        // a multi-part public suffix instead of collapsing to the suffix itself.
+        assertEquals("example.co.uk", service.extractRegistrableDomain("https://login.example.co.uk"))
+    }
+
+    @Test
+    fun extractRegistrableDomain_unrelated_sites_under_shared_suffix_differ() {
+        // The false-positive these fixes guard against: two unrelated real sites that
+        // used to collapse to "co.uk" and cross-match. Now they stay distinct.
+        assertEquals("bbc.co.uk", service.extractRegistrableDomain("https://bbc.co.uk"))
+        assertEquals("hsbc.co.uk", service.extractRegistrableDomain("https://hsbc.co.uk"))
+    }
+
+    @Test
+    fun extractRegistrableDomain_bare_public_suffix_is_null() {
+        assertNull(service.extractRegistrableDomain("https://co.uk"))
     }
 
     @Test
