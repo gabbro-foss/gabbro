@@ -1,7 +1,10 @@
 # ADR-012: Vault Deletion and Privacy-Mode Multi-Vault Access
 
 ## Status
-Accepted
+Superseded by ADR-014 (2026-06-14). The `show_vault_list` privacy toggle and the
+active-vault deletion *block* described below are removed; the deletion
+*authorization* gates (confirmation checkbox + mandatory YubiKey) are retained.
+Kept for history.
 
 ## Date
 2026-06-09
@@ -75,9 +78,9 @@ special-casing.
 
 Authorization to delete a vault matches the protection the user chose for it:
 
-- **Passphrase-only vaults:** a warning step + a `type DELETE` confirmation.
-  This is *intent confirmation* (foot-gun prevention), not cryptographic
-  re-authentication.
+- **Passphrase-only vaults:** a warning step + an explicit confirmation
+  checkbox. This is *intent confirmation* (foot-gun prevention), not
+  cryptographic re-authentication.
 - **Passphrase + YubiKey vaults:** the above **plus a mandatory YubiKey tap**.
   Any *registered* key authorizes (single-key vaults via `onConfirmYubikey`,
   multi-key via `onConfirmAnyYubikey`); deletion does not proceed unless the key

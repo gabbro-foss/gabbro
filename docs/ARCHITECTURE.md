@@ -71,8 +71,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 518 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 819 | 0 |
-| Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
+| Flutter (`flutter test`) | 816 | 0 |
+| Flutter integration (`flutter drive … -d linux --profile`) | 10 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 26 | 17 |
 
 **Test isolation (non-negotiable):** no test may touch the user's real settings or
@@ -88,12 +88,25 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
+### Awaiting hardware verify (two unrelated uncommitted changes)
+
+**1. R-04 portal regression fixed (2026-06-15).** `PR_SET_DUMPABLE(0)` had broken
+every Linux file dialog (portal can't read a non-dumpable process's `/proc`);
+now raised only around an open dialog (ref-counted in `runPicker`). Verify on
+Linux: a file dialog (sync/export/import) opens **and** `kill -SEGV` still writes
+no core dump. *(Portal + no-core-dump already hardware-confirmed 2026-06-15.)*
+
+**2. `show_vault_list` toggle removed (ADR-014, 2026-06-15).** Login always lists
+vaults; active-vault delete unblocked, routing to remaining last-used vault (or
+onboarding when none remain); deletion auth gates unchanged; old configs ignore
+`show_vault_list`. flutter test 816 + new `integration_test/vault_delete_routing_test.dart`
+(real-FFI routing, 3) + analyze all green. Verify on Linux: delete the active
+vault with a sibling lands on the remaining vault's unlock; delete the sole vault
+lands on onboarding.
+
 ### Next task
 
-**To agree with [user].** The `AI_SECURITY_AUDIT_REVIEW.md` R-series (R-01…R-07)
-is now fully closed. Remaining audit items are externally gated: F-03 (human
-cryptographer) and F-10 (post-v1). Pick the next direction with [user] —
-likely a return to features/UX or the pre-v1 crypto-review outreach.
+Ensure the full testing suite runs offline - no test run in the background should need an internet connection anway as gabbro works fully offline.
 
 ### Open from the security audit
 
@@ -127,9 +140,6 @@ release process live in their own document:
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
-- Privacy-safe "open existing vault by path" (ADR-012 Option B) — a future relaxation of the
-  vault-deletion privacy rules under `show_vault_list` OFF. Dead on Android app-private
-  storage, low priority.
 - **Autofill match quality (Android) — needs a serious dedicated session.** On-device
   reality (2026-06-09, S23): on most sites autofill offers nothing, on some it fills the
   *wrong* credential ("wrong password"), on very few it works. Three suspects, all now

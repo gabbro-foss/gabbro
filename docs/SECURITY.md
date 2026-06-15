@@ -235,7 +235,11 @@ after lock until garbage collection (measured 2026-06-14). This is inherent to a
 GUI password manager — the master **keys** never enter Flutter, so a vault you
 never opened stays protected. As of the core-dump hardening (R-04) a same-user
 process can no longer dump the app's memory; the residual needs root, swap, or a
-cold-boot attack. Bounded further by auto-lock and clipboard auto-clear.
+cold-boot attack. (The non-dumpable flag is briefly raised only while a native
+file dialog is open, since `xdg-desktop-portal` must read the process's `/proc`
+to serve it; the kernel's yama `ptrace_scope`≥1 still blocks a same-user tracer
+during that window. The no-core-dump `RLIMIT_CORE=0` guarantee is never relaxed.)
+Bounded further by auto-lock and clipboard auto-clear.
 
 ### Header integrity (fixed in VERSION 7)
 
