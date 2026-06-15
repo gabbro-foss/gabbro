@@ -268,6 +268,104 @@ data class CredentialSummary(
 )
 
 // -----------------------------------------------------------------------------
+// classifyField — pure per-field decision
+// -----------------------------------------------------------------------------
+
+/** How a single field should be filled. */
+enum class FieldKind { USERNAME, PASSWORD, NONE }
+
+/**
+ * Decide whether one field is a username, password, or neither, from the signals
+ * carried on its ViewNode. Pulled out of the AssistStructure walk so it can be
+ * unit-tested without the framework (the `android.*` constants below are
+ * compile-time-inlined). `collectIds` extracts the signals — including the HTML
+ * attributes Chromium browsers carry in `htmlInfo` — and calls this.
+ *
+ * Signals are weighed most- to least-reliable: explicit autofill hints, then
+ * HTML attributes (the web-page truth that SPAs otherwise leave blank on the
+ * Android side), then the `inputType` bitmask, then a keyword fallback over the
+ * field's metadata. The first tier to match wins — so e.g. an HTML
+ * `type=password` outranks a stray "username" in the field id.
+ */
+internal fun classifyField(
+    autofillHints: List<String>?,
+    inputType: Int,
+    htmlType: String?,
+    htmlAutocomplete: String?,
+    hint: String?,
+    idEntry: String?,
+    htmlName: String?,
+): FieldKind {
+    // Tier 1: explicit autofill hints. Covers Android constants and the HTML
+    // autocomplete values Chromium maps into hints (e.g. "email", "username").
+    autofillHints?.let { hints ->
+        if (hints.any {
+                it.equals(android.view.View.AUTOFILL_HINT_USERNAME, ignoreCase = true) ||
+                    it.equals(android.view.View.AUTOFILL_HINT_EMAIL_ADDRESS, ignoreCase = true) ||
+                    it.equals("email", ignoreCase = true) ||
+                    it.equals("username", ignoreCase = true)
+            }
+        ) {
+            return FieldKind.USERNAME
+        }
+        if (hints.any {
+                it.equals(android.view.View.AUTOFILL_HINT_PASSWORD, ignoreCase = true) ||
+                    it.equals("current-password", ignoreCase = true) ||
+                    it.equals("new-password", ignoreCase = true)
+            }
+        ) {
+            return FieldKind.PASSWORD
+        }
+    }
+
+    // Tier 2: HTML attributes — the signal web-apps/SPAs carry in htmlInfo but
+    // leave off the Android autofill hints / inputType.
+    val htmlT = htmlType?.lowercase()
+    val autocomplete = htmlAutocomplete?.lowercase()
+    if (htmlT == "password" ||
+        autocomplete == "current-password" ||
+        autocomplete == "new-password" ||
+        autocomplete == "password"
+    ) {
+        return FieldKind.PASSWORD
+    }
+    if (htmlT == "email" || autocomplete == "username" || autocomplete == "email") {
+        return FieldKind.USERNAME
+    }
+
+    // Tier 3: inputType bitmask — most native apps that declare no hints.
+    if (inputType and android.text.InputType.TYPE_MASK_CLASS ==
+        android.text.InputType.TYPE_CLASS_TEXT
+    ) {
+        when (inputType and android.text.InputType.TYPE_MASK_VARIATION) {
+            android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD,
+            android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
+            android.text.InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD,
+            -> return FieldKind.PASSWORD
+
+            android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+            android.text.InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS,
+            -> return FieldKind.USERNAME
+        }
+    }
+
+    // Tier 4: keyword fallback. Password only from the more reliable name/id
+    // (a free-text "hint" of "password" is too noisy); username also from hint.
+    val nameId = listOfNotNull(idEntry, htmlName).map { it.lowercase() }
+    if (nameId.any { it.contains("password") }) return FieldKind.PASSWORD
+    val userSources = listOfNotNull(hint, idEntry, htmlName).map { it.lowercase() }
+    if (userSources.any {
+            it.contains("email") || it.contains("username") ||
+                it.contains("login") || it.contains("phone")
+        }
+    ) {
+        return FieldKind.USERNAME
+    }
+
+    return FieldKind.NONE
+}
+
+// -----------------------------------------------------------------------------
 // ParsedStructure — walks AssistStructure, collects AutofillIds by hint type
 // -----------------------------------------------------------------------------
 
@@ -318,62 +416,31 @@ data class ParsedStructure(
                 webDomainOut[0] = node.webDomain?.takeIf { it.isNotBlank() }
             }
 
-            val hints = node.autofillHints
             val id = node.autofillId
 
             if (id != null) {
-                when {
-                    // Explicit autofill hints — most reliable signal.
-                    // Covers both Android constants and HTML autocomplete attribute values
-                    // (e.g. "email", "username") used by Chromium-based browsers.
-                    hints != null && hints.any {
-                        it.equals(android.view.View.AUTOFILL_HINT_USERNAME, ignoreCase = true) ||
-                        it.equals(android.view.View.AUTOFILL_HINT_EMAIL_ADDRESS, ignoreCase = true) ||
-                        it.equals("email", ignoreCase = true) ||
-                        it.equals("username", ignoreCase = true)
-                    } -> usernameIds.add(id)
+                // Chromium browsers carry the real field truth in htmlInfo HTML
+                // attributes (type=password, autocomplete=...) that web-apps/SPAs
+                // often leave off the Android hints/inputType — extract them as a
+                // signal for classifyField.
+                val htmlAttrs = node.htmlInfo?.attributes
+                fun htmlAttr(name: String): String? =
+                    htmlAttrs?.firstOrNull { it.first.equals(name, ignoreCase = true) }?.second
 
-                    hints != null && hints.any {
-                        it.equals(android.view.View.AUTOFILL_HINT_PASSWORD, ignoreCase = true) ||
-                        it.equals("current-password", ignoreCase = true) ||
-                        it.equals("new-password", ignoreCase = true)
-                    } -> passwordIds.add(id)
-
-                    // Fallback: inputType bitmask — used by most native apps
-                    // that don't declare explicit autofill hints.
-                    else -> {
-                        val inputType = node.inputType
-                        val typeClass = inputType and android.text.InputType.TYPE_MASK_CLASS
-                        val typeVariation = inputType and android.text.InputType.TYPE_MASK_VARIATION
-
-                        if (typeClass == android.text.InputType.TYPE_CLASS_TEXT) {
-                            when (typeVariation) {
-                                android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD,
-                                android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD,
-                                android.text.InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD ->
-                                    passwordIds.add(id)
-
-                                android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
-                                android.text.InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS ->
-                                    usernameIds.add(id)
-
-                                else -> {
-                                    // Last resort: check the field's hint text for
-                                    // username/email keywords. Catches fields like
-                                    // PayPal's email_or_phone_input (inputType=1,
-                                    // variation=0, hint="Email").
-                                    val hint = node.hint?.lowercase() ?: ""
-                                    val entryId = node.idEntry?.lowercase() ?: ""
-                                    if (hint.contains("email") || hint.contains("username") ||
-                                        hint.contains("login") || hint.contains("phone") ||
-                                        entryId.contains("email") || entryId.contains("username") ||
-                                        entryId.contains("login") || entryId.contains("phone")) {
-                                        usernameIds.add(id)
-                                    }
-                                }
-                            }
-                        }
-                    }
+                when (
+                    classifyField(
+                        autofillHints = node.autofillHints?.toList(),
+                        inputType = node.inputType,
+                        htmlType = htmlAttr("type"),
+                        htmlAutocomplete = htmlAttr("autocomplete"),
+                        hint = node.hint,
+                        idEntry = node.idEntry,
+                        htmlName = htmlAttr("name"),
+                    )
+                ) {
+                    FieldKind.USERNAME -> usernameIds.add(id)
+                    FieldKind.PASSWORD -> passwordIds.add(id)
+                    FieldKind.NONE -> {}
                 }
             }
 
