@@ -71,8 +71,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 518 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 816 | 0 |
-| Flutter integration (`flutter drive … -d linux --profile`) | 10 | 0 |
+| Flutter (`flutter test`) | 819 | 0 |
+| Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 26 | 17 |
 
 **Test isolation (non-negotiable):** no test may touch the user's real settings or

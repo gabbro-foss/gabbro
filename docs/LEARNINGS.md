@@ -4189,11 +4189,14 @@ bridge calls *on mount* — `UnlockScreen._probeVault` awaits `onVaultIsReadable
 path awaits `deleteVaultFiles` (FFI). Under plain `flutter test` there is **no Rust isolate**, so
 those futures never complete and `pumpAndSettle`/the awaited call never returns. Plain navigation
 tests that only touch in-memory state pass; the moment routing reaches an FFI-backed screen they
-can't. Two fixes, both legitimate: (1) **extract the pure decision** ("given wasActive + the
-post-delete registry, which screen?") into a function and unit-test *that* — no widgets, no FFI; or
-(2) **put it in `integration_test/`** and run under `flutter drive … --profile`, where `RustLib.init()`
-loads the real lib so the FFI completes — we chose this for ADR-014's routing. Two traps when you do
-(2): native dialogs/FFI make `pumpAndSettle`'s hang look like a flaky test, so add a per-test
-`timeout` so it *fails fast* instead of stalling the run; and `flutter_test_config.dart`'s sandbox
-does **not** apply under `flutter drive`, so set `GabbroPaths.sandboxRoot` yourself in `setUp` or the
-test writes the user's real `~/.config/gabbro`.
+can't. We first moved ADR-014's routing test to `integration_test/` (under `flutter drive … --profile`,
+where `RustLib.init()` makes the FFI complete) — it passed standalone but **crashed under gate load**
+(`DriverError: Service has disappeared`, preceded by an OpenGL-frame timeout): pumping the full
+`GabbroApp` UI through the headless GL driver is inherently fragile, and a flaky gate test is worse
+than none. The robust answer is **(1): extract the pure decision** — `postDeleteRoute(wasActive,
+hasRemaining)` returning a screen enum — and unit-test *that* under `flutter test` (deterministic, no
+FFI, no GL). The thin navigation wiring that consumes the enum is left to the manage-vaults widget
+tests plus a hardware pass. General rule: test the *decision* in the fast lane; don't drag a full
+real-FFI UI through a driver just to assert which screen you land on. (If you ever do need the
+integration route: `flutter_test_config.dart`'s sandbox does **not** apply under `flutter drive`, so
+set `GabbroPaths.sandboxRoot` in `setUp` or the test writes the user's real `~/.config/gabbro`.)
