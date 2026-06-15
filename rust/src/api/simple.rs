@@ -16,3 +16,13 @@ pub fn init_app() {
     // Default utilities - feel free to customize
     flutter_rust_bridge::setup_default_user_utils();
 }
+
+/// Raise (`true`) or lower (`false`) the process `PR_SET_DUMPABLE` flag.
+///
+/// The Linux picker layer raises it only while a native file dialog is open so
+/// `xdg-desktop-portal` can read `/proc/<pid>` to service the request, then
+/// lowers it again. No-op on non-Linux targets. See
+/// `crate::hardening::set_process_dumpable`.
+pub fn set_process_dumpable(dumpable: bool) -> Result<(), String> {
+    crate::hardening::set_process_dumpable(dumpable)
+}

@@ -8,3 +8,12 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 String greet({required String name}) =>
     RustLib.instance.api.crateApiSimpleGreet(name: name);
+
+/// Raise (`true`) or lower (`false`) the process `PR_SET_DUMPABLE` flag.
+///
+/// The Linux picker layer raises it only while a native file dialog is open so
+/// `xdg-desktop-portal` can read `/proc/<pid>` to service the request, then
+/// lowers it again. No-op on non-Linux targets. See
+/// `crate::hardening::set_process_dumpable`.
+Future<void> setProcessDumpable({required bool dumpable}) =>
+    RustLib.instance.api.crateApiSimpleSetProcessDumpable(dumpable: dumpable);

@@ -48,4 +48,50 @@ void main() {
       }
     });
   });
+
+  // R-04 keeps the process non-dumpable so a same-uid peer cannot ptrace it.
+  // But xdg-desktop-portal must read /proc/<pid> to open a native dialog, which
+  // a non-dumpable process forbids. runPicker therefore raises dumpability for
+  // the picker window and lowers it again afterwards.
+  group('runPicker dumpable window', () {
+    tearDown(resetDumpableToggle);
+
+    test('raises dumpable before the op and lowers it after success', () async {
+      final events = <String>[];
+      dumpableToggle = (raise) async => events.add(raise ? 'raise' : 'lower');
+      await runPicker<String>(() async {
+        events.add('op');
+        return '/home/u/v.gabbro';
+      });
+      expect(events, ['raise', 'op', 'lower']);
+    });
+
+    test('lowers dumpable even when the op throws', () async {
+      final events = <String>[];
+      dumpableToggle = (raise) async => events.add(raise ? 'raise' : 'lower');
+      await expectLater(
+        runPicker<String>(() async {
+          events.add('op');
+          throw Exception('boom');
+        }),
+        throwsA(isA<FilePickerUnavailable>()),
+      );
+      expect(events, ['raise', 'op', 'lower']);
+    });
+
+    test('nested calls keep dumpable raised until the outermost completes',
+        () async {
+      final events = <String>[];
+      dumpableToggle = (raise) async => events.add(raise ? 'raise' : 'lower');
+      await runPicker<String>(() async {
+        events.add('outer');
+        await runPicker<String>(() async {
+          events.add('inner');
+          return null;
+        });
+        return null;
+      });
+      expect(events, ['raise', 'outer', 'inner', 'lower']);
+    });
+  });
 }
