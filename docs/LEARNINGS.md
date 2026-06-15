@@ -4139,7 +4139,9 @@ window the kernel's yama `ptrace_scope` (≥1 on Debian/Mint and Arch defaults) 
 non-ancestor same-uid tracer, so exposure is negligible; `RLIMIT_CORE=0` is untouched and the
 no-core-dump guarantee holds continuously. The regression guard is a fork-based unit test in
 `hardening.rs`: a same-uid parent can `read_link` a child's `/proc/<pid>/root` iff the child is
-dumpable — reproducing the exact portal-EACCES cause with no flaky GUI.
+dumpable — reproducing the exact portal-EACCES cause with no flaky GUI. (That deny-half is
+unprivileged-only: root holds `CAP_SYS_PTRACE` and bypasses the gate, so it's skipped under the
+gate's `unshare -r` runner; the flag mechanics stay covered by the other tests.)
 
 Crate: `libc`, not `rustix` — `libc` is already a transitive dep (`cargo tree -e normal -i libc`),
 so direct use adds zero supply-chain surface. Declared `cfg(target_os = "linux")`-only.

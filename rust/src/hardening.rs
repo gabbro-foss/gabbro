@@ -103,6 +103,17 @@ mod tests {
         unsafe { libc::prctl(libc::PR_GET_DUMPABLE) }
     }
 
+    /// True when the caller is (effectively) root. A privileged caller holds
+    /// `CAP_SYS_PTRACE` and so bypasses the dumpable-based `/proc/<pid>` access
+    /// gate the kernel enforces only against unprivileged same-uid peers. The
+    /// offline release gate runs the Rust leg under `unshare -r` (caller uid
+    /// mapped to 0 to obtain a network namespace), so this is true there.
+    fn caller_is_privileged() -> bool {
+        // SAFETY: geteuid takes no arguments and cannot fail.
+        let euid = unsafe { libc::geteuid() };
+        euid == 0
+    }
+
     fn current_core_rlimit() -> libc::rlimit {
         let mut lim = libc::rlimit {
             rlim_cur: 0,
@@ -170,8 +181,14 @@ mod tests {
         harden_process().expect("harden failed");
         set_process_dumpable(true).expect("raise failed");
         let lim = current_core_rlimit();
-        assert_eq!(lim.rlim_cur, 0, "core rlimit soft must stay 0 while dumpable");
-        assert_eq!(lim.rlim_max, 0, "core rlimit hard must stay 0 while dumpable");
+        assert_eq!(
+            lim.rlim_cur, 0,
+            "core rlimit soft must stay 0 while dumpable"
+        );
+        assert_eq!(
+            lim.rlim_max, 0,
+            "core rlimit hard must stay 0 while dumpable"
+        );
         set_process_dumpable(false).expect("restore failed");
     }
 
@@ -228,11 +245,25 @@ mod tests {
     #[test]
     #[serial]
     fn proc_root_access_tracks_dumpable_flag() {
-        assert!(
-            !child_proc_root_accessible(false),
-            "a non-dumpable process must NOT be same-uid /proc/<pid>/root \
-             accessible (this is exactly why the XDG portal fails while hardened)"
-        );
+        // The negative half (non-dumpable -> NOT accessible) is an
+        // unprivileged-only kernel rule: a caller with CAP_SYS_PTRACE (i.e.
+        // root) bypasses the dumpable gate and can always reach
+        // /proc/<pid>/root. Only assert it when we are actually unprivileged,
+        // otherwise it would spuriously fail under the offline gate's
+        // `unshare -r` (uid mapped to 0). The dumpable-flag mechanics
+        // themselves stay covered by the other tests, which pass either way.
+        if caller_is_privileged() {
+            eprintln!(
+                "skipping the non-dumpable denial assertion: caller is root \
+                 (CAP_SYS_PTRACE bypasses the /proc dumpable gate)"
+            );
+        } else {
+            assert!(
+                !child_proc_root_accessible(false),
+                "a non-dumpable process must NOT be same-uid /proc/<pid>/root \
+                 accessible (this is exactly why the XDG portal fails while hardened)"
+            );
+        }
         assert!(
             child_proc_root_accessible(true),
             "a dumpable process must be same-uid /proc/<pid>/root accessible so \
