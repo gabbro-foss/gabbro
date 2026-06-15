@@ -26,12 +26,12 @@ The Executive summary and findings below are the **original 2026-05-31 pass**, k
 | **F-07** kdf.rs doc drift | Info | **Fixed** (Round 1; realigned 2026-06-01 with F-02). |
 | **F-08** vault files not `0600` | Low | **Fixed** (Round 1). |
 | **F-09** no symlink validation | Low | **Fixed** (Round 1). |
-| **F-10** eTLD+1 autofill matching | Info | **Open** — post-v1 "Strict FQDN" toggle. |
+| **F-10** eTLD+1 autofill matching | Info | **Fixed (2026-06-15)** — PSL-backed registrable-domain matcher; optional "Strict FQDN" toggle remains post-v1 polish. |
 | **F-11** decrypted body not zeroized | Low | **Fixed** 2026-06-01 (found by the memory-forensics self-test). |
 | **L-6** memory-forensics test | — | **Done** 2026-06-01 (`scripts/mem_forensics.sh`). |
 | **F-12** typed/viewed secrets persist in Dart heap | Low | **Documented** (2026-06-14) — measured by root gcore of the GUI; inherent to GUI password managers, bounded by auto-lock + GC, same-uid dump blocked by R-04. |
 
-**Still open:** F-03 (→ human crypto review), F-10 (→ post-v1). Everything else is fixed or by-design.
+**Still open:** F-03 (→ human crypto review). Everything else is fixed or by-design.
 
 **Correction (2026-06-10).** The Executive summary's "no exploitable defect identified" and the OWASP "binary header parser bounds-checks every field" row were both falsified within scope: the `from_bytes` parse fuzzer found a crash-on-open integer overflow in `rust/src/vault/file_format.rs` (a malformed `.gabbro` body-length field), a DoS-grade defect the static read missed. Fixed by a `checked_add` (`file_format.rs:378`) and guarded by `rust/tests/vault_parse_fuzz.rs`. Recorded so a human reviewer can calibrate what the static AI pass missed (review finding R-01).
 
@@ -320,6 +320,8 @@ The temp-file-then-rename pattern from F-08 already mitigates the write-time rac
 ---
 
 ### F-10 (Info) — Android autofill uses eTLD+1 (registrable domain) matching, not strict FQDN
+
+**Status — FIXED (2026-06-15).** The original concern was a *deliberate* eTLD+1 UX tradeoff; the real defect was that the eTLD+1 was computed naively (last two labels), collapsing multi-part suffixes (`*.co.uk` → `co.uk`) so unrelated sites cross-matched. Replaced with a PSL-backed registrable-domain matcher (`PublicSuffixList`, vendored `public_suffix_list.dat`). The "Strict FQDN toggle" recommendation below is now optional polish, not a correctness fix.
 
 **Where:**
 - `android/app/src/main/kotlin/app/gabbro/gabbro/UnlockActivity.kt:90, :167`

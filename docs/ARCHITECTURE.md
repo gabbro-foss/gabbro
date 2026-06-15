@@ -55,7 +55,7 @@ gabbro/
 ├── android/…/kotlin/…/   # GabbroAutofillService, UnlockActivity, YubiKeyManager, BiometricHelper (+ Robolectric tests)
 ├── docs/                 # ARCHITECTURE, LEARNINGS, SECURITY, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/  test_driver/   # Flutter widget/unit + Linux real-FFI device suites
-├── assets/               # fonts, images, help/ (in-app help screenshots)
+├── assets/               # fonts, images, help/; public_suffix_list.dat (autofill eTLD+1)
 ├── challenge/            # crack-me challenge vault + rules
 └── CHANGELOG.md  README.md
 ```
@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 819 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 26 | 17 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 37 | 17 |
 
 **Test isolation (non-negotiable):** no test may touch the user's real settings or
 vault folders. All config/data directories resolve through `GabbroPaths`
@@ -97,7 +97,6 @@ Autofill match quality (Android)
 Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 
 - **F-03** — X-Wing transcript-binding combiner; gated on a human cryptographer (no verifiable-against-spec answer).
-- **F-10** — eTLD+1 autofill matching; post-v1 "Strict FQDN" toggle.
 
 A second-pass review (`AI_SECURITY_AUDIT_REVIEW.md`, 2026-06-11) added findings
 **R-01…R-07**; per-finding status lives in that document's remediation table. All
@@ -124,21 +123,18 @@ release process live in their own document:
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
-- **Autofill match quality (Android) — needs a serious dedicated session.** On-device
-  reality (2026-06-09, S23): on most sites autofill offers nothing, on some it fills the
-  *wrong* credential ("wrong password"), on very few it works. Three suspects, all now
-  pinned by Robolectric tests in `GabbroAutofillServiceRobolectricTest`:
+- **Autofill match quality (Android) — remaining slices.** Domain matching (websites)
+  is done: PSL-backed eTLD+1 (`PublicSuffixList`) replaced the naive last-two-labels rule,
+  closing the false-positive collision (audit F-10). Still open, the false-negative side:
   (1) **field detection** — `ParsedStructure.collectIds` heuristics (autofill hints →
   inputType → hint/idEntry keywords) miss many real login forms, especially SPA/Chromium
-  DOM-to-AssistStructure shapes → "offers nothing";
-  (2) **domain matching** — `extractRegistrableDomain`'s naive last-two-labels eTLD+1
-  (audit **F-10**) collapses e.g. `*.co.uk` to `co.uk`, so unrelated sites can collide →
-  "wrong password"; needs the Public Suffix List;
-  (3) **native-app matching** — `extractAppToken` + `summary.url.contains(token)` substring
-  match is far too loose (e.g. token `paypal` matches any URL containing it) → wrong entry.
-  Plan it as: PSL-backed eTLD+1, a real form-field model, and tightened app matching
-  (package-name mapping, see the V2+ item). Touches the Android autofill security surface,
-  so design-then-implement with on-device verification.
+  DOM-to-AssistStructure shapes → "offers nothing"; widen the signals (read `htmlInfo`
+  attributes, lone-password-field heuristic);
+  (2) **native-app matching** — `extractAppToken` + `summary.url.contains(token)` substring
+  match is far too loose (e.g. token `paypal` matches any URL) → wrong entry. Safe fix:
+  match only on an explicit recorded package id / exact domain (needs a small entry field);
+  Digital Asset Links is the heavier "correct" path. Reuses the PSL eTLD+1.
+  Touches the autofill security surface — design-then-implement with on-device verification.
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 

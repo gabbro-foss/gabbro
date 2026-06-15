@@ -4200,3 +4200,16 @@ tests plus a hardware pass. General rule: test the *decision* in the fast lane; 
 real-FFI UI through a driver just to assert which screen you land on. (If you ever do need the
 integration route: `flutter_test_config.dart`'s sandbox does **not** apply under `flutter drive`, so
 set `GabbroPaths.sandboxRoot` in `setUp` or the test writes the user's real `~/.config/gabbro`.)
+
+## Public Suffix List matching — correct eTLD+1 needs more than "last two labels"
+
+Autofill must answer "what is the registrable domain of this host?" so unrelated sites under a
+shared suffix (`bbc.co.uk` vs `hsbc.co.uk`) don't cross-match. The naive "last two labels" rule
+collapses both to `co.uk` — a false-positive (wrong credential offered). The correct answer needs
+the Public Suffix List (publicsuffix.org), applied with its real algorithm: **exception rules
+(`!www.ck`) win outright; else the longest matching rule, where a wildcard label (`*.ck`) matches
+any one label; if nothing matches, the implicit `*` makes the last label the suffix.** Registrable
+domain = public suffix + one more label; a host that *is* a public suffix has none (→ null). The
+list is vendored (`assets/public_suffix_list.dat`), never fetched at build/run — a periodic-refresh
+item (`docs/MAINTENANCE.md`). Gabbro's rule: false-negatives (offer nothing) are acceptable;
+false-positives (offer the wrong credential) are not — so matching errs toward not offering.
