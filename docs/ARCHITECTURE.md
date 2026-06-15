@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 819 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 37 | 17 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 49 | 17 |
 
 **Test isolation (non-negotiable):** no test may touch the user's real settings or
 vault folders. All config/data directories resolve through `GabbroPaths`
@@ -90,24 +90,15 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**Autofill field detection (Android) — the "recognises nothing on most pages" miss.**
-Domain matching is done + device-verified (no false-positives). Remaining pain: on
-web-apps/SPAs `ParsedStructure.collectIds` only reads autofill-hints + Android `inputType`,
-which those fields often leave blank — but Chrome carries the real signal in
-`node.htmlInfo` HTML attributes (`type=password`, `autocomplete=...`), which we ignore.
-
-Plan (smallest change, canon-TDD): pull the per-field decision out of the framework
-walk into a pure `classifyField(...)` (same pure-decision pattern as `postDeleteRoute`),
-add HTML attributes as a new signal; `collectIds` extracts signals (incl. `htmlInfo`) and
-calls it. Unit-test `classifyField` (fast lane); the thin ViewNode glue is device-verified.
-
-Agreed test list for `classifyField`: (1) hint username (2) hint password — both preserved;
-(3) **HTML type=password, no hints, inputType 0 -> Password** (the web miss); (4) HTML
-type=email -> Username; (5) autocomplete current-/new-password -> Password; (6) autocomplete
-username -> Username; (7) inputType password variation (8) inputType email variation — both
-preserved; (9) keyword password in name/id -> Password; (10) keyword email/username/login/
-phone in hint/idEntry/name/id -> Username; (11) nothing -> None; (12) precedence: HTML
-type=password beats a stray "username" keyword. Then native-app matching (backlog) last.
+**Autofill field detection — diagnose the remaining web misses.** The HTML-attribute
+classifier shipped: per-field decision is now the pure, unit-tested `classifyField`
+(autofill hints -> HTML `htmlInfo` attributes -> `inputType` -> keyword fallback), fed by
+`collectIds`. Device-verified gain (anibis, biofarm, justgiving now match). Remaining miss:
+on some pages (esp. SPAs — aur.archlinux.org, t.coros, app.moneypark) Brave/Chromium hands
+the Android Autofill framework **no field structure at all**, so nothing is offered and
+`classifyField` never runs. Next: a logcat capture of one failing page to see what (if
+anything) the browser exposes — may be a browser-exposure limit outside our control. Then
+native-app matching (Bikeshed).
 
 ### Open from the security audit
 
@@ -145,7 +136,7 @@ release process live in their own document:
   any URL) → wrong entry. Safe fix: match only on an explicit recorded package id / exact
   domain (needs a small entry field); Digital Asset Links is the heavier "correct" path.
   Reuses the PSL eTLD+1. Security surface — design-then-implement with on-device verification.
-  (Domain matching done; field detection is the active Next task.)
+  (Domain matching done; HTML-attribute field detection shipped — see Current Focus.)
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 
