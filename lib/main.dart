@@ -149,6 +149,23 @@ Future<void> main() async {
   );
 }
 
+/// Where to go after a vault is deleted from Manage Vaults (ADR-014).
+enum PostDeleteRoute { stayOnManageVaults, onboarding, remainingVault }
+
+/// Pure routing decision for [GabbroAppState.deleteVaultFromManager]. Active-vault
+/// deletion leaves the screen — to the remaining last-used vault's unlock screen,
+/// or onboarding when none remain; non-active deletion stays put. Kept pure (no
+/// FFI/widgets) so it is unit-testable; the navigation itself stays in the State.
+PostDeleteRoute postDeleteRoute({
+  required bool wasActive,
+  required bool hasRemaining,
+}) {
+  if (!wasActive) return PostDeleteRoute.stayOnManageVaults;
+  return hasRemaining
+      ? PostDeleteRoute.remainingVault
+      : PostDeleteRoute.onboarding;
+}
+
 /// Public interface for descendant widgets to read settings and push updates.
 abstract class GabbroAppState {
   AppSettings get settings;
@@ -535,33 +552,42 @@ class _GabbroAppState extends State<GabbroApp>
     } catch (_) {}
     final updated = _registry.remove(path);
     await updated.save();
-    if (wasActive) {
-      // ADR-014: the active vault can now be deleted even with siblings. Route
-      // to the remaining last-used vault's unlock screen, or onboarding when
-      // none remain — the same shape as removeVault (the corrupt-vault path).
-      // Direct field mutation (no setState) to avoid racing pushAndRemoveUntil.
-      _registry = updated;
-      try {
-        lockVault();
-      } catch (_) {}
-      final remaining = updated.lastUsed;
-      _navigatorKey.currentState?.pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (_) => remaining == null
-              ? OnboardingScreen(
-                  postDeletionMessage:
-                      'Your vault has been deleted. Create a new one to continue.',
-                  blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
-                  onVaultCreated: _onVaultCreated,
-                )
-              : _buildUnlockScreen(remaining.path, remaining.alias),
-        ),
-        (_) => false,
-      );
-    } else {
-      // Non-active vault deleted from Manage Vaults: stay on the screen, the
-      // current unlocked session is unaffected (ADR-014 decision).
-      setState(() => _registry = updated);
+    final remaining = updated.lastUsed;
+    switch (postDeleteRoute(
+      wasActive: wasActive,
+      hasRemaining: remaining != null,
+    )) {
+      case PostDeleteRoute.stayOnManageVaults:
+        // Non-active delete: the current unlocked session is unaffected.
+        setState(() => _registry = updated);
+      case PostDeleteRoute.onboarding:
+        // Direct field mutation (no setState) to avoid racing pushAndRemoveUntil.
+        _registry = updated;
+        try {
+          lockVault();
+        } catch (_) {}
+        _navigatorKey.currentState?.pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => OnboardingScreen(
+              postDeletionMessage:
+                  'Your vault has been deleted. Create a new one to continue.',
+              blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+              onVaultCreated: _onVaultCreated,
+            ),
+          ),
+          (_) => false,
+        );
+      case PostDeleteRoute.remainingVault:
+        _registry = updated;
+        try {
+          lockVault();
+        } catch (_) {}
+        _navigatorKey.currentState?.pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => _buildUnlockScreen(remaining!.path, remaining.alias),
+          ),
+          (_) => false,
+        );
     }
   }
 
