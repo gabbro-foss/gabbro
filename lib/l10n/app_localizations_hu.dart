@@ -200,9 +200,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Jelmondat másolása/beillesztése';
 
   @override
-  String get sectionVaultList => 'Széflista';
-
-  @override
   String get sectionClipboardClear => 'Vágólap törlése';
 
   @override
@@ -382,17 +379,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Másolás/beillesztés tiltása';
-
-  @override
-  String get vaultListDescription =>
-      'Az összes széf listájának megjelenítése a bejelentkezési képernyőn, hogy anélkül választhass, melyiket nyisd fel, hogy a Széfek kezelése menübe kellene menned.';
-
-  @override
-  String get showVaultListTitle => 'Széflista megjelenítése bejelentkezéskor';
-
-  @override
-  String get vaultListNote =>
-      'Biztonsági megjegyzés: ha ez KI van kapcsolva, a bejelentkezési képernyő csak az utoljára használt széfet mutatja — nincs utalás más széfek létezésére. Kompromisszum: a széf váltásához először fel kell oldani a zárolást, majd a Menü → Széfek kezelése menübe kell menni.';
 
   @override
   String get clipboardClearDescription =>
@@ -1467,10 +1453,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Széf törlése';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Nyisson meg egy másik széfet ennek törléséhez';
 
   @override
   String get backupEmergencyHeading =>

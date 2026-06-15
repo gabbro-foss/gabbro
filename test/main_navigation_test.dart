@@ -3,10 +3,11 @@
 // belong in `flutter test`: the app shell mounts via injectable constructor args
 // and the target screens build without the native lib.
 //
-// `onActiveVaultDeleted` is intentionally NOT covered here. Its post-delete
-// navigation is known-suspect pending the privacy-mode vault-delete ADR (see
-// ARCHITECTURE.md Bikeshed -> Features & UX); pinning it now would cement the alias
-// leak we identified. It gets coverage once the ADR settles the intended behaviour.
+// Vault-deletion routing (`deleteVaultFromManager`, ADR-014) is NOT covered here:
+// its post-delete navigation builds real FFI-backed screens (UnlockScreen's
+// readability probe, etc.) which cannot run under `flutter test` (no Rust
+// isolate). It is covered against real FFI in
+// integration_test/vault_delete_routing_test.dart.
 //
 // All file I/O is sandboxed globally by test/flutter_test_config.dart, so nothing
 // here can reach the user's real settings or vault folders.

@@ -200,9 +200,6 @@ class AppLocalizationsKk extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Кілт фразасын көшіру/қою';
 
   @override
-  String get sectionVaultList => 'Сейфтер тізімі';
-
-  @override
   String get sectionClipboardClear => 'Алмасу буферін тазалау';
 
   @override
@@ -382,17 +379,6 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Көшіруді/қоюды блоктау';
-
-  @override
-  String get vaultListDescription =>
-      'Кіру экранында барлық сейфтердің тізімін көрсету, «Сейфтерді басқаруға» кірмей қайсысын ашу керектігін таңдауға мүмкіндік береді.';
-
-  @override
-  String get showVaultListTitle => 'Кіру кезінде сейфтер тізімін көрсету';
-
-  @override
-  String get vaultListNote =>
-      'Қауіпсіздік ескертпесі: бұл ӨШІРІЛІП тұрса, кіру экраны тек соңғы пайдаланылған сейфті көрсетеді — басқалардың бар екенін білдірмейді. Ымыра: сейфті ауыстыру үшін алдымен бекітуді ашу, содан кейін Мәзір → Сейфтерді басқаруға өту керек.';
 
   @override
   String get clipboardClearDescription =>
@@ -1469,9 +1455,6 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Сейфті жою';
-
-  @override
-  String get deleteActiveVaultBlocked => 'Мұны жою үшін басқа қойманы ашыңыз';
 
   @override
   String get backupEmergencyHeading => 'Сақтық көшірмелер және төтенше жою';

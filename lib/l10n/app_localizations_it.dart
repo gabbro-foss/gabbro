@@ -200,9 +200,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Copia/incolla passphrase';
 
   @override
-  String get sectionVaultList => 'Lista archivi';
-
-  @override
   String get sectionClipboardClear => 'Pulizia appunti';
 
   @override
@@ -383,17 +380,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Blocca copia/incolla';
-
-  @override
-  String get vaultListDescription =>
-      'Mostra un menu a discesa di tutti gli archivi nella schermata di accesso per scegliere quale sbloccare senza andare in Gestisci archivi.';
-
-  @override
-  String get showVaultListTitle => 'Mostra lista archivi al login';
-
-  @override
-  String get vaultListNote =>
-      'Nota di sicurezza: quando questa opzione è DISATTIVATA, la schermata di accesso mostra solo l\'ultimo archivio usato — nessun indizio che altri archivi esistano. Per cambiare archivio bisogna prima sbloccare, poi andare in Menu → Gestisci archivi.';
 
   @override
   String get clipboardClearDescription =>
@@ -1473,10 +1459,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Elimina archivio';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Apri un\'altra cassaforte per eliminare questa';
 
   @override
   String get backupEmergencyHeading => 'Backup ed eliminazione di emergenza';

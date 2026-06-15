@@ -253,33 +253,16 @@ void main() {
     });
   });
 
-  // ── showVaultList ─────────────────────────────────────────────────────────
+  // ── Vault list section removed (ADR-014) ──────────────────────────────────
 
-  group('showVaultList', () {
-    testWidgets('vault list section header is present', (tester) async {
+  group('Vault list section removed (ADR-014)', () {
+    testWidgets('no Vault list section is rendered', (tester) async {
       await tester.pumpWidget(_buildScreen());
-      await tester.scrollUntilVisible(find.text('Vault list'), 300);
-      expect(find.text('Vault list'), findsOneWidget);
-    });
-
-    testWidgets('show vault list toggle is off by default', (tester) async {
-      await tester.pumpWidget(_buildScreen());
-      await tester.scrollUntilVisible(
-        find.widgetWithText(SwitchListTile, 'Show vault list on login'), 300);
-      final tile = tester.widget<SwitchListTile>(
+      expect(find.text('Vault list'), findsNothing);
+      expect(
         find.widgetWithText(SwitchListTile, 'Show vault list on login'),
+        findsNothing,
       );
-      expect(tile.value, isFalse);
-    });
-
-    testWidgets('tapping show vault list toggle calls onUpdate with true', (tester) async {
-      AppSettings? updated;
-      await tester.pumpWidget(_buildScreen(onUpdate: (s) => updated = s));
-      await tester.scrollUntilVisible(
-        find.widgetWithText(SwitchListTile, 'Show vault list on login'), 300);
-      await tester.tap(find.widgetWithText(SwitchListTile, 'Show vault list on login'));
-      await tester.pumpAndSettle();
-      expect(updated?.showVaultList, isTrue);
     });
   });
 }

@@ -200,9 +200,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Kopiëren/plakken van wachtwoordzin';
 
   @override
-  String get sectionVaultList => 'Kluislijst';
-
-  @override
   String get sectionClipboardClear => 'Klembord wissen';
 
   @override
@@ -383,17 +380,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Kopiëren/plakken blokkeren';
-
-  @override
-  String get vaultListDescription =>
-      'Toon een keuzelijst van alle kluizen op het inlogscherm, zodat u kunt kiezen welke u wilt ontgrendelen zonder naar Kluizen beheren te gaan.';
-
-  @override
-  String get showVaultListTitle => 'Kluislijst tonen bij inloggen';
-
-  @override
-  String get vaultListNote =>
-      'Beveiligingsopmerking: wanneer dit UIT is, toont het inlogscherm alleen de laatst gebruikte kluis — geen aanwijzing dat er andere kluizen bestaan. Afweging: om van kluis te wisselen, moet u eerst ontgrendelen en daarna naar Menu → Kluizen beheren gaan.';
 
   @override
   String get clipboardClearDescription =>
@@ -1473,10 +1459,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Kluis verwijderen';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Open een andere kluis om deze te verwijderen';
 
   @override
   String get backupEmergencyHeading => 'Back-ups en noodwissing';

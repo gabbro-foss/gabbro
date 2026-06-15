@@ -200,9 +200,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Copiar/pegar contraseña maestra';
 
   @override
-  String get sectionVaultList => 'Lista de almacenes';
-
-  @override
   String get sectionClipboardClear => 'Borrado del portapapeles';
 
   @override
@@ -383,17 +380,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Bloquear copiar/pegar';
-
-  @override
-  String get vaultListDescription =>
-      'Mostrar un desplegable con todos los almacenes en la pantalla de inicio para elegir cuál desbloquear sin ir a Gestionar almacenes.';
-
-  @override
-  String get showVaultListTitle => 'Mostrar lista de almacenes al iniciar';
-
-  @override
-  String get vaultListNote =>
-      'Nota de alta seguridad: cuando esta opción está DESACTIVADA, la pantalla de inicio solo muestra el último almacén usado — sin pistas de que existan otros. Para cambiar de almacén hay que desbloquear primero y luego ir a Menú → Gestionar almacenes.';
 
   @override
   String get clipboardClearDescription =>
@@ -1476,10 +1462,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Eliminar almacén';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Abre otra caja fuerte para eliminar esta';
 
   @override
   String get backupEmergencyHeading =>

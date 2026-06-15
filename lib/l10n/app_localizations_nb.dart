@@ -200,9 +200,6 @@ class AppLocalizationsNb extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Kopier/lim passfrase';
 
   @override
-  String get sectionVaultList => 'Hvelvliste';
-
-  @override
   String get sectionClipboardClear => 'Tøm utklippstavle';
 
   @override
@@ -382,17 +379,6 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Blokker kopier/lim';
-
-  @override
-  String get vaultListDescription =>
-      'Vis en liste over alle hvelvinger på innloggingsskjermen slik at du kan velge hvilket du vil låse opp uten å gå til Administrer hvelvinger.';
-
-  @override
-  String get showVaultListTitle => 'Vis hvelvliste ved innlogging';
-
-  @override
-  String get vaultListNote =>
-      'Sikkerhetsnotat: Når dette er AV, viser innloggingsskjermen bare det sist brukte hvelvet — ingen indikasjon på at andre hvelvinger finnes. Kompromiss: For å bytte hvelv må du først låse opp og deretter gå til Meny → Administrer hvelvinger.';
 
   @override
   String get clipboardClearDescription =>
@@ -1467,10 +1453,6 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Slett hvelv';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Åpne et annet hvelv for å slette dette';
 
   @override
   String get backupEmergencyHeading => 'Sikkerhetskopier og nødsletting';

@@ -200,9 +200,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Ieejas frāzes kopēšana/ielīmēšana';
 
   @override
-  String get sectionVaultList => 'Seifu saraksts';
-
-  @override
   String get sectionClipboardClear => 'Notīrīt starpliktuvi';
 
   @override
@@ -382,17 +379,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Bloķēt kopēšanu/ielīmēšanu';
-
-  @override
-  String get vaultListDescription =>
-      'Rādīt visu seifu sarakstu pieteikšanās ekrānā, lai varētu izvēlēties, kuru atbloķēt, neejot uz Pārvaldīt seifus.';
-
-  @override
-  String get showVaultListTitle => 'Rādīt seifu sarakstu pieteikšanās laikā';
-
-  @override
-  String get vaultListNote =>
-      'Drošības piezīme: ja tas ir IZSLĒGTS, pieteikšanās ekrānā tiek rādīts tikai pēdējais izmantotais seifs — nav norādes par citu seifu esamību. Kompromiss: lai mainītu seifu, vispirms jāatbloķē, tad jādodas uz Izvēlne → Pārvaldīt seifus.';
 
   @override
   String get clipboardClearDescription =>
@@ -1471,9 +1457,6 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Dzēst seifu';
-
-  @override
-  String get deleteActiveVaultBlocked => 'Atveriet citu seifu, lai izdzēstu šo';
 
   @override
   String get backupEmergencyHeading => 'Dublējumkopijas un ārkārtas dzēšana';

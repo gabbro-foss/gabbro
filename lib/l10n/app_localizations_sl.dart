@@ -201,9 +201,6 @@ class AppLocalizationsSl extends AppLocalizations {
       'Kopiranje/lepljenje gesla za dostop';
 
   @override
-  String get sectionVaultList => 'Seznam trezorjev';
-
-  @override
   String get sectionClipboardClear => 'Brisanje odložišča';
 
   @override
@@ -383,17 +380,6 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Blokiraj kopiranje/lepljenje';
-
-  @override
-  String get vaultListDescription =>
-      'Prikaži seznam vseh trezorjev na zaslonu za prijavo, da lahko izberete, katerega odkleniti, brez prehoda v «Upravljanje trezorjev».';
-
-  @override
-  String get showVaultListTitle => 'Prikaži seznam trezorjev ob prijavi';
-
-  @override
-  String get vaultListNote =>
-      'Varnostna opomba: ko je to IZKLOPLJENO, zaslon za prijavo prikaže samo zadnji uporabljen trezor — brez namigov o obstoju drugih. Kompromis: za zamenjavo trezorja morate najprej odkleniti in nato iti v Meni → Upravljanje trezorjev.';
 
   @override
   String get clipboardClearDescription =>
@@ -1475,10 +1461,6 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Izbriši trezor';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Odprite drug trezor, da izbrišete tega';
 
   @override
   String get backupEmergencyHeading => 'Varnostne kopije in zasilni izbris';

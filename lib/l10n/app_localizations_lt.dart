@@ -201,9 +201,6 @@ class AppLocalizationsLt extends AppLocalizations {
       'Slaptafrazės kopijavimas / įklijavimas';
 
   @override
-  String get sectionVaultList => 'Saugyklų sąrašas';
-
-  @override
   String get sectionClipboardClear => 'Išvalyti iškarpinę';
 
   @override
@@ -384,17 +381,6 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Blokuoti kopijavimą / įklijavimą';
-
-  @override
-  String get vaultListDescription =>
-      'Rodyti visų saugyklų sąrašą prisijungimo ekrane, kad galėtumėte pasirinkti, kurią atrakinti, neeidami į Tvarkyti saugyklas.';
-
-  @override
-  String get showVaultListTitle => 'Rodyti saugyklų sąrašą prisijungiant';
-
-  @override
-  String get vaultListNote =>
-      'Saugumo pastaba: kai tai IŠJUNGTA, prisijungimo ekranas rodo tik paskutinę naudotą saugyklą — jokio užuominos apie kitas saugyklas. Kompromisas: norint perjungti saugyklą, pirmiausia reikia atrakinti, tada eiti į Meniu → Tvarkyti saugyklas.';
 
   @override
   String get clipboardClearDescription =>
@@ -1473,10 +1459,6 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Ištrinti saugyklą';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Atidarykite kitą saugyklą, kad ištrintumėte šią';
 
   @override
   String get backupEmergencyHeading =>

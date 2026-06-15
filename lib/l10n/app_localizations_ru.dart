@@ -200,9 +200,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Копирование/вставка кодовой фразы';
 
   @override
-  String get sectionVaultList => 'Список хранилищ';
-
-  @override
   String get sectionClipboardClear => 'Очистка буфера обмена';
 
   @override
@@ -383,17 +380,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Блокировать копирование/вставку';
-
-  @override
-  String get vaultListDescription =>
-      'Показывать список всех хранилищ на экране входа, чтобы можно было выбрать, какое разблокировать, не заходя в «Управление хранилищами».';
-
-  @override
-  String get showVaultListTitle => 'Показывать список хранилищ при входе';
-
-  @override
-  String get vaultListNote =>
-      'Примечание по безопасности: когда это ОТКЛЮЧЕНО, экран входа показывает только последнее использованное хранилище — без намёков на существование других. Компромисс: для смены хранилища нужно сначала разблокировать, затем перейти в Меню → Управление хранилищами.';
 
   @override
   String get clipboardClearDescription =>
@@ -1473,10 +1459,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Удалить хранилище';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Откройте другое хранилище, чтобы удалить это';
 
   @override
   String get backupEmergencyHeading => 'Резервные копии и экстренное удаление';

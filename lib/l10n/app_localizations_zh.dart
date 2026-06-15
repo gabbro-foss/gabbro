@@ -200,9 +200,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get sectionPassphraseCopyPaste => '密码短语复制/粘贴';
 
   @override
-  String get sectionVaultList => '保险库列表';
-
-  @override
   String get sectionClipboardClear => '剪贴板清除';
 
   @override
@@ -377,16 +374,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => '阻止复制/粘贴';
-
-  @override
-  String get vaultListDescription => '在登录屏幕显示所有保险库列表，以便选择要解锁的保险库，而无需进入«管理保险库»。';
-
-  @override
-  String get showVaultListTitle => '登录时显示保险库列表';
-
-  @override
-  String get vaultListNote =>
-      '安全说明：关闭此选项时，登录屏幕只显示最后使用的保险库。权衡：要切换保险库，必须先解锁，然后转到菜单 → 管理保险库。';
 
   @override
   String get clipboardClearDescription => '复制密码后清除剪贴板。注意：剪贴板管理器可能保留副本。';
@@ -1424,9 +1411,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => '删除保险库';
-
-  @override
-  String get deleteActiveVaultBlocked => '打开另一个保险库以删除此保险库';
 
   @override
   String get backupEmergencyHeading => '备份与紧急清除';
@@ -2051,9 +2035,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get sectionPassphraseCopyPaste => '密码短语复制/粘贴';
 
   @override
-  String get sectionVaultList => '保险库列表';
-
-  @override
   String get sectionClipboardClear => '剪贴板清除';
 
   @override
@@ -2228,16 +2209,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get blockCopyPasteTitle => '阻止复制/粘贴';
-
-  @override
-  String get vaultListDescription => '在登录屏幕显示所有保险库列表，以便选择要解锁的保险库，而无需进入«管理保险库»。';
-
-  @override
-  String get showVaultListTitle => '登录时显示保险库列表';
-
-  @override
-  String get vaultListNote =>
-      '安全说明：关闭此选项时，登录屏幕只显示最后使用的保险库 — 不会暗示其他保险库的存在。权衡：要切换保险库，必须先解锁，然后转到菜单 → 管理保险库。';
 
   @override
   String get clipboardClearDescription => '复制密码后清除剪贴板。注意：剪贴板管理器可能保留副本。';
@@ -3277,9 +3248,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get deleteVaultTooltip => '删除保险库';
 
   @override
-  String get deleteActiveVaultBlocked => '打开另一个保险库以删除此保险库';
-
-  @override
   String get backupEmergencyHeading => '备份与紧急清除';
 
   @override
@@ -3902,9 +3870,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get sectionPassphraseCopyPaste => '密碼片語複製/貼上';
 
   @override
-  String get sectionVaultList => '保險庫清單';
-
-  @override
   String get sectionClipboardClear => '剪貼簿清除';
 
   @override
@@ -4079,16 +4044,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get blockCopyPasteTitle => '阻止複製/貼上';
-
-  @override
-  String get vaultListDescription => '在登入畫面顯示所有保險庫清單，以便選擇要解鎖的保險庫，而無需進入«管理保險庫»。';
-
-  @override
-  String get showVaultListTitle => '登入時顯示保險庫清單';
-
-  @override
-  String get vaultListNote =>
-      '安全說明：關閉此選項時，登入畫面只顯示最後使用的保險庫。取捨：要切換保險庫，必須先解鎖，然後前往選單 → 管理保險庫。';
 
   @override
   String get clipboardClearDescription => '複製密碼後清除剪貼簿。注意：剪貼簿管理程式可能保留副本。';
@@ -5126,9 +5081,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get deleteVaultTooltip => '刪除保險庫';
-
-  @override
-  String get deleteActiveVaultBlocked => '開啟另一個保險庫以刪除此保險庫';
 
   @override
   String get backupEmergencyHeading => '備份與緊急清除';

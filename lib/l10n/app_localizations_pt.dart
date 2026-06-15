@@ -200,9 +200,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Copiar/colar frase secreta';
 
   @override
-  String get sectionVaultList => 'Lista de cofres';
-
-  @override
   String get sectionClipboardClear => 'Limpar área de transferência';
 
   @override
@@ -383,17 +380,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Bloquear copiar/colar';
-
-  @override
-  String get vaultListDescription =>
-      'Mostrar uma lista suspensa de todos os cofres na tela de login para escolher qual desbloquear sem ir a Gerenciar cofres.';
-
-  @override
-  String get showVaultListTitle => 'Mostrar lista de cofres no login';
-
-  @override
-  String get vaultListNote =>
-      'Nota de segurança: quando está DESATIVADO, a tela de login mostra apenas o último cofre usado — sem indicação de que existem outros cofres. Contrapartida: para trocar de cofre é necessário primeiro desbloquear e depois ir a Menu → Gerenciar cofres.';
 
   @override
   String get clipboardClearDescription =>
@@ -1473,9 +1459,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deleteVaultTooltip => 'Excluir cofre';
 
   @override
-  String get deleteActiveVaultBlocked => 'Abra outro cofre para eliminar este';
-
-  @override
   String get backupEmergencyHeading =>
       'Cópias de segurança e limpeza de emergência';
 
@@ -2143,9 +2126,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get sectionPassphraseCopyPaste => 'Copiar/colar frase secreta';
 
   @override
-  String get sectionVaultList => 'Lista de cofres';
-
-  @override
   String get sectionClipboardClear => 'Limpar área de transferência';
 
   @override
@@ -2326,17 +2306,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get blockCopyPasteTitle => 'Bloquear copiar/colar';
-
-  @override
-  String get vaultListDescription =>
-      'Mostrar uma lista suspensa de todos os cofres na tela de login para escolher qual desbloquear sem ir a Gerenciar cofres.';
-
-  @override
-  String get showVaultListTitle => 'Mostrar lista de cofres no login';
-
-  @override
-  String get vaultListNote =>
-      'Nota de segurança: quando está DESATIVADO, a tela de login mostra apenas o último cofre usado — sem indicação de que existem outros cofres. Contrapartida: para trocar de cofre é necessário primeiro desbloquear e depois ir a Menu → Gerenciar cofres.';
 
   @override
   String get clipboardClearDescription =>
@@ -3416,9 +3385,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get deleteVaultTooltip => 'Excluir cofre';
 
   @override
-  String get deleteActiveVaultBlocked => 'Abra outro cofre para excluir este';
-
-  @override
   String get backupEmergencyHeading => 'Backups e limpeza de emergência';
 
   @override
@@ -4083,9 +4049,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get sectionPassphraseCopyPaste => 'Copiar/colar frase-passe';
 
   @override
-  String get sectionVaultList => 'Lista de cofres';
-
-  @override
   String get sectionClipboardClear => 'Limpar área de transferência';
 
   @override
@@ -4266,18 +4229,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get blockCopyPasteTitle => 'Bloquear copiar/colar';
-
-  @override
-  String get vaultListDescription =>
-      'Mostrar uma lista de todos os cofres no ecrã de início de sessão para escolher qual desbloquear sem ir a Gerir cofres.';
-
-  @override
-  String get showVaultListTitle =>
-      'Mostrar lista de cofres no início de sessão';
-
-  @override
-  String get vaultListNote =>
-      'Nota de segurança: quando está DESATIVADO, o ecrã de início de sessão mostra apenas o último cofre utilizado — sem indicação de que existem outros cofres. Contrapartida: para mudar de cofre é necessário primeiro desbloquear e depois ir a Menu → Gerir cofres.';
 
   @override
   String get clipboardClearDescription =>
@@ -5357,9 +5308,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get deleteVaultTooltip => 'Eliminar cofre';
-
-  @override
-  String get deleteActiveVaultBlocked => 'Abra outro cofre para eliminar este';
 
   @override
   String get backupEmergencyHeading =>

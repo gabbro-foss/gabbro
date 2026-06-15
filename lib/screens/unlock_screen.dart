@@ -186,12 +186,10 @@ class UnlockScreen extends StatefulWidget {
   /// Vault alias shown below the app title. Null = no alias displayed.
   final String? vaultAlias;
 
-  /// Registry used to populate the vault dropdown when [showVaultList] is true.
+  /// Registry used to populate the vault dropdown. When it holds 2+ vaults the
+  /// login screen shows an inline switcher above the passphrase field (ADR-014:
+  /// the login screen always lists registered vaults).
   final VaultRegistry? registry;
-
-  /// When true and [registry] has 2+ vaults, shows an inline dropdown above
-  /// the passphrase field so the user can pick which vault to unlock.
-  final bool showVaultList;
 
   /// Called when the user selects a different vault from the dropdown.
   /// Null → falls back to GabbroApp.maybeOf(context)?.switchToVault(…).
@@ -258,7 +256,6 @@ class UnlockScreen extends StatefulWidget {
     this.onUnlockWithAnyYubikey = _defaultUnlockWithAnyYubikey,
     this.vaultAlias,
     this.registry,
-    this.showVaultList = false,
     this.onVaultSwitch,
     this.biometricEnabled = false,
     this.onBiometricIsEnrolled = _defaultBiometricIsEnrolled,
@@ -300,9 +297,7 @@ class _UnlockScreenState extends State<UnlockScreen>
   bool get _isYubikeyMode => _yubikeyRecords.isNotEmpty;
 
   bool get _showDropdown =>
-      widget.showVaultList &&
-      widget.registry != null &&
-      widget.registry!.records.length > 1;
+      widget.registry != null && widget.registry!.records.length > 1;
 
   @override
   void initState() {

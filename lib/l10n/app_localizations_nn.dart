@@ -200,9 +200,6 @@ class AppLocalizationsNn extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Kopier/lim passfrase';
 
   @override
-  String get sectionVaultList => 'Kvelvliste';
-
-  @override
   String get sectionClipboardClear => 'Tøm utklippstavle';
 
   @override
@@ -382,17 +379,6 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Blokker kopier/lim';
-
-  @override
-  String get vaultListDescription =>
-      'Vis ei liste over alle kvelv på innloggingsskjermen slik at du kan velje kva du vil låse opp utan å gå til Administrer kvelv.';
-
-  @override
-  String get showVaultListTitle => 'Vis kvelvliste ved innlogging';
-
-  @override
-  String get vaultListNote =>
-      'Tryggleiksnotat: Når dette er AV, viser innloggingsskjermen berre det sist brukte kvelvet — ingen indikasjon på at andre kvelv finst. Kompromiss: For å bytte kvelv må du først låse opp og deretter gå til Meny → Administrer kvelv.';
 
   @override
   String get clipboardClearDescription =>
@@ -1467,10 +1453,6 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Slett kvelv';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Opn eit anna kvelv for å slette dette';
 
   @override
   String get backupEmergencyHeading => 'Tryggingskopiar og naudsletting';

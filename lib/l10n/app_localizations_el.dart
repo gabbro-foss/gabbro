@@ -201,9 +201,6 @@ class AppLocalizationsEl extends AppLocalizations {
       'Αντιγραφή/επικόλληση φράσης πρόσβασης';
 
   @override
-  String get sectionVaultList => 'Λίστα θησαυροφυλακίων';
-
-  @override
   String get sectionClipboardClear => 'Εκκαθάριση προχείρου';
 
   @override
@@ -384,18 +381,6 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Αποκλεισμός αντιγραφής/επικόλλησης';
-
-  @override
-  String get vaultListDescription =>
-      'Εμφάνιση λίστας όλων των θησαυροφυλακίων στην οθόνη σύνδεσης για επιλογή χωρίς μετάβαση στη «Διαχείριση θησαυροφυλακίων».';
-
-  @override
-  String get showVaultListTitle =>
-      'Εμφάνιση λίστας θησαυροφυλακίων κατά σύνδεση';
-
-  @override
-  String get vaultListNote =>
-      'Σημείωση ασφαλείας: όταν είναι ΑΠΕΝΕΡΓΟΠΟΙΗΜΕΝΟ, η οθόνη σύνδεσης εμφανίζει μόνο το τελευταίο χρησιμοποιηθέν θησαυροφυλάκιο. Συμβιβασμός: για αλλαγή θησαυροφυλακίου πρέπει πρώτα να ξεκλειδώσετε και μετά να πάτε στο Μενού → Διαχείριση θησαυροφυλακίων.';
 
   @override
   String get clipboardClearDescription =>
@@ -1480,10 +1465,6 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Διαγραφή θησαυροφυλακίου';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Ανοίξτε ένα άλλο θησαυροφυλάκιο για να διαγράψετε αυτό';
 
   @override
   String get backupEmergencyHeading =>

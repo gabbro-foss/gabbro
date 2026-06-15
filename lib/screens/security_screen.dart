@@ -306,22 +306,6 @@ class _SecurityScreenState extends State<SecurityScreen> {
               Text(l.passphraseCopyPasteNote, style: const TextStyle(fontSize: 11)),
               const SizedBox(height: 32),
 
-              // ── Vault list ─────────────────────────────────────────────
-              SectionHeader(label: l.sectionVaultList),
-              const SizedBox(height: 4),
-              Text(l.vaultListDescription, style: const TextStyle(fontSize: 12)),
-              const SizedBox(height: 8),
-              SwitchListTile(
-                title: Text(l.showVaultListTitle),
-                value: _settings.showVaultList,
-                onChanged: (v) =>
-                    _update(_settings.copyWith(showVaultList: v)),
-                contentPadding: EdgeInsets.zero,
-              ),
-              const SizedBox(height: 4),
-              Text(l.vaultListNote, style: const TextStyle(fontSize: 11)),
-              const SizedBox(height: 32),
-
               // ── Biometric unlock (Android only) ───────────────────────
               if (widget.isAndroid) ...[
                 SectionHeader(label: l.sectionBiometricUnlock),

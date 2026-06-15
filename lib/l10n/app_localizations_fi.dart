@@ -201,9 +201,6 @@ class AppLocalizationsFi extends AppLocalizations {
       'Salauslauseen kopiointi/liittäminen';
 
   @override
-  String get sectionVaultList => 'Holvilista';
-
-  @override
   String get sectionClipboardClear => 'Tyhjennä leikepöytä';
 
   @override
@@ -384,17 +381,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Estä kopiointi/liittäminen';
-
-  @override
-  String get vaultListDescription =>
-      'Näytä luettelo kaikista holveista kirjautumisnäytöllä, jotta voit valita avattavan holvin ilman siirtymistä Hallinnoi holveja -näyttöön.';
-
-  @override
-  String get showVaultListTitle => 'Näytä holvilista kirjautumisessa';
-
-  @override
-  String get vaultListNote =>
-      'Turvallisuushuomio: Kun tämä on POIS, kirjautumisnäyttö näyttää vain viimeksi käytetyn holvin — ei vihjettä muiden holvien olemassaolosta. Kompromissi: Holvin vaihtamiseksi on ensin avattava lukitus ja siirryttävä Valikko → Hallinnoi holveja.';
 
   @override
   String get clipboardClearDescription =>
@@ -1471,9 +1457,6 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Poista holvi';
-
-  @override
-  String get deleteActiveVaultBlocked => 'Avaa toinen holvi poistaaksesi tämän';
 
   @override
   String get backupEmergencyHeading => 'Varmuuskopiot ja hätätyhjennys';

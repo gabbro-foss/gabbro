@@ -930,8 +930,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
           vaultPath: widget.vaultPath,
           vaultAlias: widget.vaultAlias,
           blockPassphraseCopyPaste: settings.blockPassphraseCopyPaste,
-          registry: settings.showVaultList ? appState.registry : null,
-          showVaultList: settings.showVaultList,
+          registry: appState.registry,
           biometricEnabled: settings.biometricUnlock,
           onBiometricInvalidated: () => appState.updateSettings(
             settings.copyWith(biometricUnlock: false),

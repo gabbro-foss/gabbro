@@ -201,9 +201,6 @@ class AppLocalizationsBg extends AppLocalizations {
       'Копиране/поставяне на паролна фраза';
 
   @override
-  String get sectionVaultList => 'Списък с трезори';
-
-  @override
   String get sectionClipboardClear => 'Изчистване на клипборд';
 
   @override
@@ -384,17 +381,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Блокирай копиране/поставяне';
-
-  @override
-  String get vaultListDescription =>
-      'Показвай списък с всички трезори на екрана за вход, за да можеш да избереш кой да отключиш, без да отиваш в «Управление на трезори».';
-
-  @override
-  String get showVaultListTitle => 'Покажи списък с трезори при вход';
-
-  @override
-  String get vaultListNote =>
-      'Бележка за сигурност: когато е ИЗКЛЮЧЕНО, екранът за вход показва само последно използвания трезор — без намек за съществуването на други. Компромис: за смяна на трезора трябва първо да отключиш, след което да отидеш в Меню → Управление на трезори.';
 
   @override
   String get clipboardClearDescription =>
@@ -1471,10 +1457,6 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Изтрий трезор';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Отворете друг сейф, за да изтриете този';
 
   @override
   String get backupEmergencyHeading => 'Резервни копия и аварийно изтриване';

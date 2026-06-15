@@ -172,6 +172,11 @@ abstract class GabbroAppState {
   /// user can recover them). Routes to the next vault, or onboarding if none
   /// remain — so a single corrupt vault never strands the user.
   Future<void> removeVault(String path, {required bool deleteFiles});
+  /// ADR-014: delete [path] from Manage Vaults (its file + `.bak` are removed).
+  /// If it was the active vault, route to the remaining last-used vault's unlock
+  /// screen (or onboarding when none remain); otherwise stay on Manage Vaults
+  /// with the active session intact.
+  Future<void> deleteVaultFromManager(String path);
 }
 
 ThemeData gabbroLightTheme({required bool highContrast}) {
@@ -438,8 +443,7 @@ class _GabbroAppState extends State<GabbroApp>
     vaultPath: path,
     vaultAlias: alias,
     blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
-    registry: _settings.showVaultList ? _registry : null,
-    showVaultList: _settings.showVaultList,
+    registry: _registry,
     biometricEnabled: _settings.biometricUnlock,
     onBiometricInvalidated: () => updateSettings(
       _settings.copyWith(biometricUnlock: false),
@@ -521,12 +525,48 @@ class _GabbroAppState extends State<GabbroApp>
     );
   }
 
+  @override
+  Future<void> deleteVaultFromManager(String path) async {
+    final wasActive = path == _registry.lastUsed?.path;
+    // R-03: removes the vault AND its .bak safety copy. Tolerant like
+    // removeVault so a missing/failed file delete still updates the registry.
+    try {
+      await deleteVaultFiles(path);
+    } catch (_) {}
+    final updated = _registry.remove(path);
+    await updated.save();
+    if (wasActive) {
+      // ADR-014: the active vault can now be deleted even with siblings. Route
+      // to the remaining last-used vault's unlock screen, or onboarding when
+      // none remain — the same shape as removeVault (the corrupt-vault path).
+      // Direct field mutation (no setState) to avoid racing pushAndRemoveUntil.
+      _registry = updated;
+      try {
+        lockVault();
+      } catch (_) {}
+      final remaining = updated.lastUsed;
+      _navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => remaining == null
+              ? OnboardingScreen(
+                  postDeletionMessage:
+                      'Your vault has been deleted. Create a new one to continue.',
+                  blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
+                  onVaultCreated: _onVaultCreated,
+                )
+              : _buildUnlockScreen(remaining.path, remaining.alias),
+        ),
+        (_) => false,
+      );
+    } else {
+      // Non-active vault deleted from Manage Vaults: stay on the screen, the
+      // current unlocked session is unaffected (ADR-014 decision).
+      setState(() => _registry = updated);
+    }
+  }
 
   ManageVaultsScreen _buildManageVaultsScreen() => ManageVaultsScreen(
     registry: _registry,
-    // The currently unlocked vault. Deleting it is blocked when others exist
-    // (ADR-012), so the active vault can only be deleted when it is the sole one.
-    activeVaultPath: _registry.lastUsed?.path,
     onConfirmYubikey: confirmYubikey,
     onConfirmAnyYubikey: confirmAnyYubikey,
     onRename: (path, alias) async {
@@ -539,36 +579,7 @@ class _GabbroAppState extends State<GabbroApp>
       await updated.save();
       setState(() => _registry = updated);
     },
-    onDelete: (path) async {
-      final isActive = path == _registry.lastUsed?.path;
-      // R-03: removes the vault AND its .bak safety copy.
-      await deleteVaultFiles(path);
-      final updated = _registry.remove(path);
-      await updated.save();
-      if (isActive) {
-        // The active vault can only be deleted when it is the SOLE vault
-        // (ADR-012 — deleting it while others exist is blocked in the UI), so
-        // nothing remains and we fall back to onboarding. No "route to the
-        // remaining vault" path exists, which is what previously leaked the
-        // remaining vault's alias under show_vault_list = OFF.
-        // Direct field mutation (no setState) to avoid racing pushAndRemoveUntil.
-        _registry = updated;
-        try { lockVault(); } catch (_) {}
-        _navigatorKey.currentState?.pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => OnboardingScreen(
-              postDeletionMessage:
-                  'Your vault has been deleted. Create a new one to continue.',
-              blockPassphraseCopyPaste: _settings.blockPassphraseCopyPaste,
-              onVaultCreated: _onVaultCreated,
-            ),
-          ),
-          (_) => false,
-        );
-      } else {
-        setState(() => _registry = updated);
-      }
-    },
+    onDelete: deleteVaultFromManager,
     onAddVault: () {
       _navigatorKey.currentState?.push(
         MaterialPageRoute(

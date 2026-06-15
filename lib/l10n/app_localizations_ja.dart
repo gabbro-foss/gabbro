@@ -200,9 +200,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'パスフレーズのコピー/貼り付け';
 
   @override
-  String get sectionVaultList => 'ボルトリスト';
-
-  @override
   String get sectionClipboardClear => 'クリップボードのクリア';
 
   @override
@@ -378,17 +375,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'コピー/貼り付けをブロック';
-
-  @override
-  String get vaultListDescription =>
-      'ログイン画面にすべてのボルトのリストを表示し、«ボルトの管理»に移動せずにどれをロック解除するか選択できるようにします。';
-
-  @override
-  String get showVaultListTitle => 'ログイン時にボルトリストを表示';
-
-  @override
-  String get vaultListNote =>
-      'セキュリティノート: これがOFFの場合、ログイン画面には最後に使用したボルトのみが表示されます。トレードオフ: ボルトを切り替えるには、まずロック解除してからメニュー → ボルトの管理に移動する必要があります。';
 
   @override
   String get clipboardClearDescription =>
@@ -1437,9 +1423,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'ボルトを削除';
-
-  @override
-  String get deleteActiveVaultBlocked => 'これを削除するには別のボールトを開いてください';
 
   @override
   String get backupEmergencyHeading => 'バックアップと緊急消去';

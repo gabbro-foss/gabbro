@@ -201,9 +201,6 @@ class AppLocalizationsSk extends AppLocalizations {
       'Kopírovanie/vkladanie prístupovej frázy';
 
   @override
-  String get sectionVaultList => 'Zoznam trezorov';
-
-  @override
   String get sectionClipboardClear => 'Vymazanie schránky';
 
   @override
@@ -383,17 +380,6 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Blokovať kopírovanie/vkladanie';
-
-  @override
-  String get vaultListDescription =>
-      'Zobraziť zoznam všetkých trezorov na prihlasovacej obrazovke, aby ste mohli vybrať, ktorý odomknúť, bez prechodu do «Správy trezorov».';
-
-  @override
-  String get showVaultListTitle => 'Zobraziť zoznam trezorov pri prihlásení';
-
-  @override
-  String get vaultListNote =>
-      'Bezpečnostná poznámka: keď je toto VYPNUTÉ, prihlasovacia obrazovka zobrazuje iba naposledy použitý trezor — bez náznaku existencie iných. Kompromis: pre zmenu trezora musíte najprv odomknúť a potom prejsť do Menu → Správa trezorov.';
 
   @override
   String get clipboardClearDescription =>
@@ -1472,10 +1458,6 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Vymazať trezor';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Otvorte iný trezor, aby ste tento odstránili';
 
   @override
   String get backupEmergencyHeading => 'Zálohy a núdzové vymazanie';

@@ -200,9 +200,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get sectionPassphraseCopyPaste => '암호 문구 복사/붙여넣기';
 
   @override
-  String get sectionVaultList => '볼트 목록';
-
-  @override
   String get sectionClipboardClear => '클립보드 지우기';
 
   @override
@@ -378,17 +375,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => '복사/붙여넣기 차단';
-
-  @override
-  String get vaultListDescription =>
-      '로그인 화면에 모든 볼트 목록을 표시하여 «볼트 관리»로 이동하지 않고도 잠금 해제할 볼트를 선택할 수 있습니다.';
-
-  @override
-  String get showVaultListTitle => '로그인 시 볼트 목록 표시';
-
-  @override
-  String get vaultListNote =>
-      '보안 참고: 이것이 꺼져 있으면 로그인 화면에는 마지막으로 사용한 볼트만 표시됩니다. 트레이드오프: 볼트를 변경하려면 먼저 잠금을 해제한 후 메뉴 → 볼트 관리로 이동해야 합니다.';
 
   @override
   String get clipboardClearDescription =>
@@ -1440,9 +1426,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => '볼트 삭제';
-
-  @override
-  String get deleteActiveVaultBlocked => '이 보관함을 삭제하려면 다른 보관함을 여세요';
 
   @override
   String get backupEmergencyHeading => '백업 및 긴급 삭제';

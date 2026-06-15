@@ -200,9 +200,6 @@ class AppLocalizationsYo extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Daakọ/lẹmọ gbolohun ọrọ igbaniwọle';
 
   @override
-  String get sectionVaultList => 'Atokọ vọọliti';
-
-  @override
   String get sectionClipboardClear => 'Sare paapo';
 
   @override
@@ -382,17 +379,6 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Dena daakọ/lẹmọ';
-
-  @override
-  String get vaultListDescription =>
-      'Fi atokọ gbogbo awọn vọọliti han lori iboju wiwọle lati yan ewo lati ṣii laisi lilọ si «Ṣakoso vọọliti».';
-
-  @override
-  String get showVaultListTitle => 'Fi atokọ vọọliti han nigba wiwọle';
-
-  @override
-  String get vaultListNote =>
-      'Akiyesi aabo: nigba ti eyi PADE, iboju wiwọle nikan n ṣe afihan vọọliti to kẹhin ti a lo. Iṣowo: lati yipada vọọliti, o gbọdọ kọkọ ṣii lẹhinna lọ si Mẹnu → Ṣakoso awọn vọọliti.';
 
   @override
   String get clipboardClearDescription =>
@@ -1468,10 +1454,6 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Pa vọọliti rẹ';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Ṣí àpótí ìṣúra mìíràn láti pa èyí rẹ́';
 
   @override
   String get backupEmergencyHeading => 'Àwọn àdàkọ ìpamọ́ àti ìpasẹ́ pàjáwìrì';

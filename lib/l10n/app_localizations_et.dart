@@ -200,9 +200,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Pääsulause kopeerimine/kleepimine';
 
   @override
-  String get sectionVaultList => 'Seifide loend';
-
-  @override
   String get sectionClipboardClear => 'Tühjenda lõikelaud';
 
   @override
@@ -383,17 +380,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Blokeeri kopeerimine/kleepimine';
-
-  @override
-  String get vaultListDescription =>
-      'Kuva kõigi seifide loend sisselogimisekraanil, et saaksid valida avatava seifi ilma Halda seife juurde minekuta.';
-
-  @override
-  String get showVaultListTitle => 'Kuva seifide loend sisselogimisel';
-
-  @override
-  String get vaultListNote =>
-      'Turvalisuse märkus: kui see on VÄLJAS, kuvatakse sisselogimisekraanil ainult viimati kasutatud seif — vihjeid teiste seifide olemasolust pole. Kompromiss: seifi vahetamiseks tuleb esmalt lukustus avada ja seejärel minna Menüü → Halda seife.';
 
   @override
   String get clipboardClearDescription =>
@@ -1470,10 +1456,6 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Kustuta seif';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Selle kustutamiseks avage teine hoidla';
 
   @override
   String get backupEmergencyHeading =>

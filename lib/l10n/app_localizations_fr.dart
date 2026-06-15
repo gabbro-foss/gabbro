@@ -201,9 +201,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Copier/coller le mot de passe principal';
 
   @override
-  String get sectionVaultList => 'Liste des coffres';
-
-  @override
   String get sectionClipboardClear => 'Effacement du presse-papiers';
 
   @override
@@ -384,18 +381,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Bloquer le copier/coller';
-
-  @override
-  String get vaultListDescription =>
-      'Afficher un menu déroulant de tous les coffres sur l\'écran de connexion pour choisir lequel déverrouiller sans aller dans Gérer les coffres.';
-
-  @override
-  String get showVaultListTitle =>
-      'Afficher la liste des coffres à la connexion';
-
-  @override
-  String get vaultListNote =>
-      'Note de haute sécurité : lorsque cette option est DÉSACTIVÉE, l\'écran de connexion n\'affiche que le dernier coffre utilisé — aucun indice que d\'autres coffres existent. Pour changer de coffre, déverrouillez d\'abord, puis allez dans Menu → Gérer les coffres.';
 
   @override
   String get clipboardClearDescription =>
@@ -1486,10 +1471,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Supprimer le coffre';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Ouvrez un autre coffre pour supprimer celui-ci';
 
   @override
   String get backupEmergencyHeading => 'Sauvegardes et effacement d\'urgence';

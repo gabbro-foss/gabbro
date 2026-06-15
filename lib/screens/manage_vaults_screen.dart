@@ -90,12 +90,6 @@ List<YubikeyRecordData> _defaultListYubikeyRecords(String path) {
 class ManageVaultsScreen extends StatefulWidget {
   final VaultRegistry registry;
 
-  /// Path of the currently unlocked vault, or null. Deleting the active vault is
-  /// blocked while other vaults exist (ADR-012): the active vault can only be
-  /// deleted when it is the sole one (→ onboarding). Prevents the active-delete
-  /// navigation that leaked a remaining vault's alias under show_vault_list OFF.
-  final String? activeVaultPath;
-
   final Future<void> Function(String path, String alias) onRename;
   final Future<void> Function(String path) onDelete;
   final VoidCallback onAddVault;
@@ -112,7 +106,6 @@ class ManageVaultsScreen extends StatefulWidget {
   const ManageVaultsScreen({
     super.key,
     required this.registry,
-    this.activeVaultPath,
     required this.onRename,
     required this.onDelete,
     required this.onAddVault,
@@ -200,26 +193,17 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
     );
   }
 
-  /// Delete button for a vault row. Disabled (greyed, tap explains) for the
-  /// active vault while other vaults exist — ADR-012: the active vault may only
-  /// be deleted when it is the sole one, so deletion never navigates toward
-  /// another vault and cannot leak its alias.
+  /// Delete button for a vault row. ADR-014 removed the active-vault delete
+  /// block (and the show_vault_list privacy toggle it protected), so any vault
+  /// can be deleted; post-deletion routing lives in main.dart's onDelete.
   Widget _deleteButton(VaultRecord record, AppLocalizations l) {
-    final blockDelete = record.path == widget.activeVaultPath &&
-        widget.registry.records.length > 1;
     return IconButton(
       icon: Icon(
         Icons.delete_outlined,
-        color: blockDelete
-            ? Theme.of(context).disabledColor
-            : Theme.of(context).colorScheme.error,
+        color: Theme.of(context).colorScheme.error,
       ),
-      tooltip: blockDelete ? l.deleteActiveVaultBlocked : l.deleteVaultTooltip,
-      onPressed: blockDelete
-          ? () => ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l.deleteActiveVaultBlocked)),
-              )
-          : () => _showDeleteDialog(record),
+      tooltip: l.deleteVaultTooltip,
+      onPressed: () => _showDeleteDialog(record),
     );
   }
 

@@ -200,9 +200,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Kopiera/klistra lösenfras';
 
   @override
-  String get sectionVaultList => 'Valvlista';
-
-  @override
   String get sectionClipboardClear => 'Rensa urklipp';
 
   @override
@@ -382,17 +379,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Blockera kopiera/klistra';
-
-  @override
-  String get vaultListDescription =>
-      'Visa en lista över alla valv på inloggningsskärmen så att du kan välja vilket du vill låsa upp utan att gå till Hantera valv.';
-
-  @override
-  String get showVaultListTitle => 'Visa valvlista vid inloggning';
-
-  @override
-  String get vaultListNote =>
-      'Säkerhetsnotering: När detta är AV visar inloggningsskärmen bara det senast använda valvet — ingen indikation på att andra valv finns. Avvägning: För att byta valv måste du först låsa upp och sedan gå till Meny → Hantera valv.';
 
   @override
   String get clipboardClearDescription =>
@@ -1467,10 +1453,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Ta bort valv';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Öppna ett annat valv för att ta bort detta';
 
   @override
   String get backupEmergencyHeading => 'Säkerhetskopior och nödradering';

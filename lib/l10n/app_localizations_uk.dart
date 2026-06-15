@@ -201,9 +201,6 @@ class AppLocalizationsUk extends AppLocalizations {
       'Копіювання/вставлення кодової фрази';
 
   @override
-  String get sectionVaultList => 'Список сховищ';
-
-  @override
   String get sectionClipboardClear => 'Очищення буфера обміну';
 
   @override
@@ -384,17 +381,6 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Блокувати копіювання/вставлення';
-
-  @override
-  String get vaultListDescription =>
-      'Показувати список усіх сховищ на екрані входу, щоб можна було вибрати, яке розблокувати, не переходячи до «Керування сховищами».';
-
-  @override
-  String get showVaultListTitle => 'Показувати список сховищ при вході';
-
-  @override
-  String get vaultListNote =>
-      'Примітка з безпеки: коли це ВИМКНЕНО, екран входу показує лише останнє використане сховище — без натяків на існування інших. Компроміс: для зміни сховища потрібно спочатку розблокувати, потім перейти до Меню → Керування сховищами.';
 
   @override
   String get clipboardClearDescription =>
@@ -1473,10 +1459,6 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Видалити сховище';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Відкрийте інше сховище, щоб видалити це';
 
   @override
   String get backupEmergencyHeading => 'Резервні копії та екстрене стирання';

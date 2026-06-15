@@ -200,9 +200,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Passphrase copy/paste';
 
   @override
-  String get sectionVaultList => 'Vault list';
-
-  @override
   String get sectionClipboardClear => 'Clipboard clear';
 
   @override
@@ -382,17 +379,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Block copy/paste';
-
-  @override
-  String get vaultListDescription =>
-      'Show a dropdown of all vaults on the login screen so you can pick which one to unlock without going to Manage vaults.';
-
-  @override
-  String get showVaultListTitle => 'Show vault list on login';
-
-  @override
-  String get vaultListNote =>
-      'High-security note: when this is OFF, the login screen shows only the last-used vault — no hint that other vaults exist. Trade-off: to switch vaults you must first unlock, then go to Menu → Manage vaults.';
 
   @override
   String get clipboardClearDescription =>
@@ -1464,10 +1450,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Delete vault';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Open another vault to delete this one';
 
   @override
   String get backupEmergencyHeading => 'Backups & emergency wipe';

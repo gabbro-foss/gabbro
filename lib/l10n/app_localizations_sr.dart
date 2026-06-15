@@ -201,9 +201,6 @@ class AppLocalizationsSr extends AppLocalizations {
       'Kopiranje/lepljenje pristupne fraze';
 
   @override
-  String get sectionVaultList => 'Lista trezora';
-
-  @override
   String get sectionClipboardClear => 'Brisanje privremene memorije';
 
   @override
@@ -383,17 +380,6 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Blokiraj kopiranje/lepljenje';
-
-  @override
-  String get vaultListDescription =>
-      'Prikaži listu svih trezora na ekranu za prijavu kako biste mogli da izaberete koji da otključate bez odlaska u «Upravljanje trezorima».';
-
-  @override
-  String get showVaultListTitle => 'Prikaži listu trezora pri prijavi';
-
-  @override
-  String get vaultListNote =>
-      'Bezbednosna napomena: kad je OVO ISKLJUČENO, ekran za prijavu prikazuje samo poslednji korišćeni trezor — bez naznake postojanja ostalih. Kompromis: za promenu trezora morate prvo otključati pa otići u Meni → Upravljanje trezorima.';
 
   @override
   String get clipboardClearDescription =>
@@ -1476,10 +1462,6 @@ class AppLocalizationsSr extends AppLocalizations {
   String get deleteVaultTooltip => 'Obriši trezor';
 
   @override
-  String get deleteActiveVaultBlocked =>
-      'Отворите други сеф да бисте обрисали овај';
-
-  @override
   String get backupEmergencyHeading => 'Резервне копије и хитно брисање';
 
   @override
@@ -2142,9 +2124,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
       'Kopiranje/lepljenje pristupne fraze';
 
   @override
-  String get sectionVaultList => 'Lista trezora';
-
-  @override
   String get sectionClipboardClear => 'Brisanje privremene memorije';
 
   @override
@@ -2324,17 +2303,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get blockCopyPasteTitle => 'Blokiraj kopiranje/lepljenje';
-
-  @override
-  String get vaultListDescription =>
-      'Prikaži listu svih trezora na ekranu za prijavu kako biste mogli da izaberete koji da otključate bez odlaska u «Upravljanje trezorima».';
-
-  @override
-  String get showVaultListTitle => 'Prikaži listu trezora pri prijavi';
-
-  @override
-  String get vaultListNote =>
-      'Bezbednosna napomena: kad je OVO ISKLJUČENO, ekran za prijavu prikazuje samo poslednji korišćeni trezor — bez naznake postojanja ostalih. Kompromis: za promenu trezora morate prvo otključati pa otići u Meni → Upravljanje trezorima.';
 
   @override
   String get clipboardClearDescription =>
@@ -3415,10 +3383,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get deleteVaultTooltip => 'Obriši trezor';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Otvorite drugi sef da biste obrisali ovaj';
 
   @override
   String get backupEmergencyHeading => 'Rezervne kopije i hitno brisanje';

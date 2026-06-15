@@ -200,9 +200,6 @@ class AppLocalizationsDa extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Kopiér/indsæt adgangssætning';
 
   @override
-  String get sectionVaultList => 'Hvælvingliste';
-
-  @override
   String get sectionClipboardClear => 'Ryd udklipsholder';
 
   @override
@@ -381,17 +378,6 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Bloker kopiér/indsæt';
-
-  @override
-  String get vaultListDescription =>
-      'Vis en liste over alle hvælvinger på loginskærmen, så du kan vælge hvilken du vil låse op uden at gå til Administrér hvælvinger.';
-
-  @override
-  String get showVaultListTitle => 'Vis hvælvingliste ved login';
-
-  @override
-  String get vaultListNote =>
-      'Sikkerhedsbemærkning: Når dette er SLÅET FRA, viser loginskærmen kun den senest brugte hvælving — ingen indikation af at andre hvælvinger findes. Kompromis: For at skifte hvælving skal du først låse op og derefter gå til Menu → Administrér hvælvinger.';
 
   @override
   String get clipboardClearDescription =>
@@ -1472,10 +1458,6 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Slet hvælving';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Åbn en anden boks for at slette denne';
 
   @override
   String get backupEmergencyHeading => 'Sikkerhedskopier og nødsletning';

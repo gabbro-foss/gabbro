@@ -201,9 +201,6 @@ class AppLocalizationsPl extends AppLocalizations {
       'Kopiowanie/wklejanie hasła głównego';
 
   @override
-  String get sectionVaultList => 'Lista skarbców';
-
-  @override
   String get sectionClipboardClear => 'Czyszczenie schowka';
 
   @override
@@ -384,17 +381,6 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Blokuj kopiowanie/wklejanie';
-
-  @override
-  String get vaultListDescription =>
-      'Pokaż listę wszystkich skarbców na ekranie logowania, aby móc wybrać, który odblokować, bez przechodzenia do «Zarządzaj skarbcami».';
-
-  @override
-  String get showVaultListTitle => 'Pokaż listę skarbców przy logowaniu';
-
-  @override
-  String get vaultListNote =>
-      'Uwaga bezpieczeństwa: gdy to jest WYŁĄCZONE, ekran logowania pokazuje tylko ostatnio używany skarbiec — bez wskazówki o istnieniu innych. Kompromis: aby zmienić skarbiec, najpierw odblokuj, potem przejdź do Menu → Zarządzaj skarbcami.';
 
   @override
   String get clipboardClearDescription =>
@@ -1476,9 +1462,6 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Usuń skarbiec';
-
-  @override
-  String get deleteActiveVaultBlocked => 'Otwórz inny sejf, aby usunąć ten';
 
   @override
   String get backupEmergencyHeading => 'Kopie zapasowe i awaryjne wymazanie';

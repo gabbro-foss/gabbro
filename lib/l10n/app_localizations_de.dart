@@ -200,9 +200,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Passphrase kopieren/einfügen';
 
   @override
-  String get sectionVaultList => 'Tresorliste';
-
-  @override
   String get sectionClipboardClear => 'Zwischenablage leeren';
 
   @override
@@ -383,17 +380,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Kopieren/Einfügen blockieren';
-
-  @override
-  String get vaultListDescription =>
-      'Auf dem Anmeldebildschirm eine Dropdown-Liste aller Tresore anzeigen, damit der richtige Tresor ohne Umweg über «Tresore verwalten» ausgewählt werden kann.';
-
-  @override
-  String get showVaultListTitle => 'Tresorliste bei Anmeldung anzeigen';
-
-  @override
-  String get vaultListNote =>
-      'Sicherheitshinweis: Wenn diese Option AUS ist, zeigt der Anmeldebildschirm nur den zuletzt verwendeten Tresor — kein Hinweis auf andere Tresore. Um den Tresor zu wechseln, erst entsperren, dann Menü → Tresore verwalten aufrufen.';
 
   @override
   String get clipboardClearDescription =>
@@ -1473,10 +1459,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Tresor löschen';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Öffnen Sie einen anderen Tresor, um diesen zu löschen';
 
   @override
   String get backupEmergencyHeading => 'Backups und Notfall-Löschung';

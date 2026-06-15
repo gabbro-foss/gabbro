@@ -18,7 +18,6 @@ class AppSettings {
   final PasswordHistoryExpiry passwordHistoryExpiry;
   final AlphabetBarPosition alphabetBarPosition;
   final bool blockPassphraseCopyPaste;
-  final bool showVaultList;
   final LanguageChoice language;
   final bool biometricUnlock;
   final double tabletListPaneWidth;
@@ -39,7 +38,6 @@ class AppSettings {
     this.passwordHistoryExpiry = PasswordHistoryExpiry.thirtyDays,
     this.alphabetBarPosition = AlphabetBarPosition.left,
     this.blockPassphraseCopyPaste = true,
-    this.showVaultList = false,
     this.language = LanguageChoice.system,
     this.biometricUnlock = false,
     this.tabletListPaneWidth = 260.0,
@@ -60,7 +58,6 @@ class AppSettings {
     'password_history_expiry': passwordHistoryExpiry.name,
     'alphabet_bar_position': alphabetBarPosition.name,
     'block_passphrase_copy_paste': blockPassphraseCopyPaste,
-    'show_vault_list': showVaultList,
     'language': language.name,
     'biometric_unlock': biometricUnlock,
     'tablet_list_pane_width': tabletListPaneWidth,
@@ -90,7 +87,6 @@ class AppSettings {
         json['alphabet_bar_position'] as String? ?? 'left',
       ),
       blockPassphraseCopyPaste: json['block_passphrase_copy_paste'] as bool? ?? true,
-      showVaultList: json['show_vault_list'] as bool? ?? false,
       language: LanguageChoice.values.byName(
         json['language'] as String? ?? 'system',
       ),
@@ -113,7 +109,6 @@ class AppSettings {
     PasswordHistoryExpiry? passwordHistoryExpiry,
     AlphabetBarPosition? alphabetBarPosition,
     bool? blockPassphraseCopyPaste,
-    bool? showVaultList,
     LanguageChoice? language,
     bool? biometricUnlock,
     double? tabletListPaneWidth,
@@ -128,7 +123,6 @@ class AppSettings {
     passwordHistoryExpiry: passwordHistoryExpiry ?? this.passwordHistoryExpiry,
     alphabetBarPosition: alphabetBarPosition ?? this.alphabetBarPosition,
     blockPassphraseCopyPaste: blockPassphraseCopyPaste ?? this.blockPassphraseCopyPaste,
-    showVaultList: showVaultList ?? this.showVaultList,
     language: language ?? this.language,
     biometricUnlock: biometricUnlock ?? this.biometricUnlock,
     tabletListPaneWidth: tabletListPaneWidth ?? this.tabletListPaneWidth,
@@ -205,10 +199,6 @@ class AppSettings {
   // Block copy/paste on master passphrase fields.
   // Options: true | false
   "block_passphrase_copy_paste": $blockPassphraseCopyPaste,
-
-  // Show vault list on the login screen instead of the last-used vault only.
-  // Options: true | false
-  "show_vault_list": $showVaultList,
 
   // Override the system language for the app UI.
   // Options: "system" | "bg" | "cs" | "da" | "de" | "el" | "en" | "es" | "et" | "fi" | "fr"

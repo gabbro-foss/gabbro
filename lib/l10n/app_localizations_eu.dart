@@ -200,9 +200,6 @@ class AppLocalizationsEu extends AppLocalizations {
   String get sectionPassphraseCopyPaste => 'Pasaesaldia kopiatu/itsatsi';
 
   @override
-  String get sectionVaultList => 'Gandegi zerrenda';
-
-  @override
   String get sectionClipboardClear => 'Arbelaren garbiketa';
 
   @override
@@ -383,17 +380,6 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get blockCopyPasteTitle => 'Kopiatzea/itsastea blokeatu';
-
-  @override
-  String get vaultListDescription =>
-      'Saioa hasteko pantailan gandegi guztien zerrenda erakutsi, «Gandegiak kudeatu»-ra joan gabe zein desblokeatu aukeratzeko.';
-
-  @override
-  String get showVaultListTitle => 'Saioa hastean gandegi-zerrenda erakutsi';
-
-  @override
-  String get vaultListNote =>
-      'Segurtasun oharra: hau ITZALITA dagoenean, saioa hasteko pantailak azken erabilitako gandegiak soilik erakusten ditu. Konpromisoa: gandegiak aldatzeko, lehenik desblokeatu eta gero Menu → Gandegiak kudeatu joan behar da.';
 
   @override
   String get clipboardClearDescription =>
@@ -1469,10 +1455,6 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get deleteVaultTooltip => 'Gandegi ezabatu';
-
-  @override
-  String get deleteActiveVaultBlocked =>
-      'Ireki beste kutxa gotor bat hau ezabatzeko';
 
   @override
   String get backupEmergencyHeading => 'Babeskopiak eta larrialdiko ezabaketa';

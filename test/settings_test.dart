@@ -287,35 +287,27 @@ void main() {
     });
   });
 
-  // ── showVaultList ─────────────────────────────────────────────────────────
+  // ── show_vault_list removed (ADR-014) ─────────────────────────────────────
 
-  group('showVaultList', () {
-    test('defaults to false', () {
-      final s = AppSettings.fromJson({});
-      expect(s.showVaultList, isFalse);
+  group('show_vault_list removed (ADR-014)', () {
+    test('toJson no longer emits show_vault_list', () {
+      expect(
+        const AppSettings().toJson().containsKey('show_vault_list'),
+        isFalse,
+      );
     });
 
-    test('round-trips true through fromJson', () {
+    // Backward-compat: a settings.jsonc written by an older build carries
+    // show_vault_list (ON or OFF). Loading it must not throw; the key is
+    // ignored and never re-serialised.
+    test('fromJson ignores a legacy show_vault_list = true', () {
       final s = AppSettings.fromJson({'show_vault_list': true});
-      expect(s.showVaultList, isTrue);
+      expect(s.toJson().containsKey('show_vault_list'), isFalse);
     });
 
-    test('round-trips false through fromJson', () {
+    test('fromJson ignores a legacy show_vault_list = false', () {
       final s = AppSettings.fromJson({'show_vault_list': false});
-      expect(s.showVaultList, isFalse);
-    });
-
-    test('serialises to toJson', () {
-      const s = AppSettings(showVaultList: true);
-      expect(s.toJson()['show_vault_list'], isTrue);
-    });
-
-    test('copyWith overrides showVaultList only', () {
-      const original = AppSettings();
-      final updated = original.copyWith(showVaultList: true);
-      expect(updated.showVaultList, isTrue);
-      expect(updated.theme, original.theme);
-      expect(updated.blockPassphraseCopyPaste, original.blockPassphraseCopyPaste);
+      expect(s.toJson().containsKey('show_vault_list'), isFalse);
     });
   });
 

@@ -51,7 +51,6 @@ Widget _buildScreen({
       onUnlockWithAnyYubikey,
   String? vaultAlias,
   VaultRegistry? registry,
-  bool showVaultList = false,
   void Function(String path, String alias)? onVaultSwitch,
   bool biometricEnabled = false,
   Future<bool> Function(String)? onBiometricIsEnrolled,
@@ -76,7 +75,6 @@ Widget _buildScreen({
       onUnlockWithAnyYubikey: onUnlockWithAnyYubikey ?? (a, b, c, d, e) async {},
       vaultAlias: vaultAlias,
       registry: registry,
-      showVaultList: showVaultList,
       onVaultSwitch: onVaultSwitch,
       biometricEnabled: biometricEnabled,
       onBiometricIsEnrolled: onBiometricIsEnrolled ?? (_) async => false,
@@ -260,8 +258,6 @@ void main() {
     expect(singleCalled, isFalse);
   });
 
-  // ── Vault dropdown (showVaultList=true) ───────────────────────────────────
-
   // ── biometric button ──────────────────────────────────────────────────────
 
   group('biometric button', () {
@@ -392,24 +388,13 @@ void main() {
       _vaultRecord(path: '/tmp/b.gabbro', alias: 'Beta'),
     ]);
 
-    testWidgets('shows dropdown when showVaultList=true and registry has 2+ vaults',
-        (tester) async {
+    testWidgets('shows dropdown when registry has 2+ vaults', (tester) async {
       await tester.pumpWidget(_buildScreen(
         vaultPath: '/tmp/a.gabbro',
         vaultAlias: 'Alpha',
-        showVaultList: true,
         registry: twoVaultRegistry,
       ));
       expect(find.byType(DropdownButton<String>), findsOneWidget);
-    });
-
-    testWidgets('no dropdown when showVaultList=false', (tester) async {
-      await tester.pumpWidget(_buildScreen(
-        vaultPath: '/tmp/a.gabbro',
-        showVaultList: false,
-        registry: twoVaultRegistry,
-      ));
-      expect(find.byType(DropdownButton<String>), findsNothing);
     });
 
     testWidgets('no dropdown when registry has only one vault', (tester) async {
@@ -418,14 +403,13 @@ void main() {
       ]);
       await tester.pumpWidget(_buildScreen(
         vaultPath: '/tmp/a.gabbro',
-        showVaultList: true,
         registry: singleRegistry,
       ));
       expect(find.byType(DropdownButton<String>), findsNothing);
     });
 
     testWidgets('no dropdown when registry is null', (tester) async {
-      await tester.pumpWidget(_buildScreen(showVaultList: true, registry: null));
+      await tester.pumpWidget(_buildScreen(registry: null));
       expect(find.byType(DropdownButton<String>), findsNothing);
     });
 
@@ -433,7 +417,6 @@ void main() {
       await tester.pumpWidget(_buildScreen(
         vaultPath: '/tmp/a.gabbro',
         vaultAlias: 'Alpha',
-        showVaultList: true,
         registry: twoVaultRegistry,
       ));
       // Current vault alias shown in collapsed dropdown
@@ -446,7 +429,6 @@ void main() {
       await tester.pumpWidget(_buildScreen(
         vaultPath: '/tmp/a.gabbro',
         vaultAlias: 'Alpha',
-        showVaultList: true,
         registry: twoVaultRegistry,
         onVaultSwitch: (p, a) {
           switchedPath = p;

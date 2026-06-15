@@ -541,12 +541,6 @@ abstract class AppLocalizations {
   /// **'Passphrase copy/paste'**
   String get sectionPassphraseCopyPaste;
 
-  /// No description provided for @sectionVaultList.
-  ///
-  /// In en, this message translates to:
-  /// **'Vault list'**
-  String get sectionVaultList;
-
   /// No description provided for @sectionClipboardClear.
   ///
   /// In en, this message translates to:
@@ -894,24 +888,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Block copy/paste'**
   String get blockCopyPasteTitle;
-
-  /// No description provided for @vaultListDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Show a dropdown of all vaults on the login screen so you can pick which one to unlock without going to Manage vaults.'**
-  String get vaultListDescription;
-
-  /// No description provided for @showVaultListTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Show vault list on login'**
-  String get showVaultListTitle;
-
-  /// No description provided for @vaultListNote.
-  ///
-  /// In en, this message translates to:
-  /// **'High-security note: when this is OFF, the login screen shows only the last-used vault — no hint that other vaults exist. Trade-off: to switch vaults you must first unlock, then go to Menu → Manage vaults.'**
-  String get vaultListNote;
 
   /// No description provided for @clipboardClearDescription.
   ///
@@ -2808,12 +2784,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete vault'**
   String get deleteVaultTooltip;
-
-  /// No description provided for @deleteActiveVaultBlocked.
-  ///
-  /// In en, this message translates to:
-  /// **'Open another vault to delete this one'**
-  String get deleteActiveVaultBlocked;
 
   /// No description provided for @backupEmergencyHeading.
   ///
