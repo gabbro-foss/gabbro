@@ -296,11 +296,18 @@ substring-match vault URLs (approximate, can false-positive, but standard). A `S
 failure crashes the service silently and Android stops invoking it until re-enabled — verify the
 `.so` name (`unzip -l app-release.apk | grep so`).
 
+### Chromium browsers expose the HTML truth in `htmlInfo`, not in hints/inputType
+Brave/Chromium set `inputType=0x0` on web fields and carry the real signal as HTML attributes
+(`type`/`name`/`id`/`autocomplete`) — so web detection rides on `htmlInfo`. Read html `id` too
+(`name="user"` won't keyword-match but `id="id_username"` does); and trust html name/id only when
+an html `type` is present, else a `<form name="login">` container gets mis-classified as a field.
+
 ### `logcat` as a TDD proxy for untestable platform code
 The autofill service + auth activity need a real device/OS session. Add `Log.d("GabbroAutofill",
 ...)` at each decision point, trigger on hardware, read logcat to see which branch fired, fix,
-re-run, strip the logging before commit. The log output is the "test result".
-[[feedback_android_hardware_before_commit]]
+re-run. The log output is the "test result". A full structure dump kept behind `BuildConfig.DEBUG`
+(compiled out of release) is the reusable form — pure formatter unit-tested, emission
+device-verified. [[feedback_android_hardware_before_commit]]
 
 ### Robolectric for framework-dependent Kotlin helpers
 Plain JVM tests hit `android.jar` stubs (`throw "Stub!"`), so helpers touching `android.net.Uri`,

@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 819 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 49 | 17 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 57 | 17 |
 
 **Test isolation (non-negotiable):** no test may touch the user's real settings or
 vault folders. All config/data directories resolve through `GabbroPaths`
@@ -90,15 +90,19 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**Autofill field detection — diagnose the remaining web misses.** The HTML-attribute
-classifier shipped: per-field decision is now the pure, unit-tested `classifyField`
-(autofill hints -> HTML `htmlInfo` attributes -> `inputType` -> keyword fallback), fed by
-`collectIds`. Device-verified gain (anibis, biofarm, justgiving now match). Remaining miss:
-on some pages (esp. SPAs — aur.archlinux.org, t.coros, app.moneypark) Brave/Chromium hands
-the Android Autofill framework **no field structure at all**, so nothing is offered and
-`classifyField` never runs. Next: a logcat capture of one failing page to see what (if
-anything) the browser exposes — may be a browser-exposure limit outside our control. Then
-native-app matching (Bikeshed).
+**Autofill field detection — extend the diagnose-and-fix loop to installed native apps.**
+The web side is solved and device-verified. A debug-only structure dump
+(`ParsedStructure.dumpStructure`, gated by `BuildConfig.DEBUG`, tag `GabbroAutofill`,
+compiled out of release) showed Brave/Chromium actually exposes full HTML attributes
+(`type`/`name`/`id`) on every page tested — the earlier "browser exposes no fields" theory
+was wrong. Two classifier bugs were fixed in `classifyField`: (1) read the html `id`
+attribute (so `id_username` matches where `name="user"` is too short); (2) trust html
+`name`/`id` only on real form controls (`htmlType` present), so a `<form name="login">`
+container is no longer mis-classified as a username field. Verified across aur/bbs/wiki/
+github/netplus/saucony (all now `usernames=1 passwords=1`). Next: point the same dump at
+installed native apps (`inputType`/`idEntry`-driven, no `htmlInfo`) and tighten the
+keyword tiers + package matching the same way. Native-app **entry matching** is still the
+loose `extractAppToken` substring (Bikeshed).
 
 ### Open from the security audit
 
