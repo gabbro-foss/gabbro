@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 838 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 80 | 17 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 89 | 17 |
 
 **Test isolation (non-negotiable):** no test may touch the user's real settings or
 vault folders. All config/data directories resolve through `GabbroPaths`
@@ -88,14 +88,41 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task
+### Next task — build the autofill locked-vault unlock, then verify tonight's matching on it
 
-**No agreed next task — pick from the Bikeshed.** The autofill arc is in a good place:
-web HTML-attribute field detection, native-app `app_id` matching, and the Login `email`
-field with email/username fill-routing all shipped and device-verified (see CHANGELOG). The
-natural security follow-up is the **`UnlockActivity` locked-path matching hardening**
-(Bikeshed → Security) — it still uses the old loose app-token + naive eTLD+1. Other autofill
-candidates: `onSaveRequest`, silent no-match toast. Confirm direction with [user].
+**Done tonight (2026-06-16, committed):** autofill *matching* hardened + de-duplicated.
+Both the unlocked path (`GabbroAutofillService`) and the locked path (`UnlockActivity`)
+now call one shared `matchingCredentials` (PSL eTLD+1 for web, exact `app_id` for native;
+match-before-decrypt). Robolectric-green.
+
+**Blocker found on hardware:** the locked-vault autofill **unlock flow does not exist**, so
+the locked path never reaches matching. (My matching change is not the cause — it runs only
+after unlock.) What's missing:
+- `RustBridge` (autofill JNI surface) exposes only `isVaultUnlocked` / `listLoginSummaries` /
+  `getEntry` — **no unlock function**.
+- `AutofillUnlockScreen` collects a passphrase; the Kotlin `"unlock"` handler **ignores it**
+  and calls `buildFillIntent()`, which needs an already-unlocked session.
+- **No YubiKey/FIDO2 step** (mandatory for Gabbro vaults).
+- `UnlockActivity` has **no NFC handling** — reader-mode + `skipNdefCheck` NDEF suppression
+  lives only in `MainActivity`, so an NFC YubiKey tap on the autofill screen escapes to the
+  browser (`demo.yubico.com`).
+
+**Tomorrow — do in order, hardware-test each step before the next:**
+1. Expose vault unlock over the autofill JNI (`RustBridge`): passphrase + YubiKey input →
+   real Rust unlock, mirroring the main app.
+2. Add the YubiKey step to `AutofillUnlockScreen` (USB + NFC) and port `MainActivity`'s NFC
+   reader-mode/`skipNdefCheck`/foreground-dispatch suppression into `UnlockActivity`.
+3. Wire the Kotlin `"unlock"` handler to actually unlock (passphrase + YubiKey result), then
+   call `buildFillIntent()` only on success.
+4. Test in order: (a) locked-vault autofill unlocks on device — passphrase + YubiKey (USB
+   **and** NFC), no `demo.yubico.com` escape; (b) re-run tonight's locked-path matching
+   matrix (web correct fill, native exact `app_id`, no-match dialog) on the now-functional path.
+
+**Verifiable now, independent of the above:** the *unlocked* path uses the new shared matcher
+— open app → unlock → trigger autofill without locking → it should fill correctly (confirms
+tonight's `GabbroAutofillService` refactor didn't regress the working path).
+
+After this lands, remaining autofill candidates: `onSaveRequest`, silent no-match toast.
 
 ### Open from the security audit
 
@@ -126,7 +153,6 @@ release process live in their own document:
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
 - Test on de-Googled Android (GrapheneOS/CalyxOS) before v1 — find a willing community tester, don't buy hardware.
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
-- **`UnlockActivity` autofill matching is unhardened (locked-vault path).** The service (`GabbroAutofillService`) matches natively by exact `app_id` and web by the PSL eTLD+1, but `UnlockActivity` — which does the matching *after* an unlock from a locked vault — still uses the old loose `extractAppToken` substring and a naive last-two-labels eTLD+1. So a locked-vault autofill can false-positive natively and hit the F-10 cross-match on the web (wrong credential offered). Bring it to parity with the service (reuse `nativeAppIdMatches` / the PSL matcher); ideally de-duplicate the matching logic so the two paths can't drift again.
 
 ### Features & UX
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
