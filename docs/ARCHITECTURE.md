@@ -68,12 +68,12 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 523 | 8 |
+| Rust (`cargo test -q`) | 526 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 833 | 0 |
+| Flutter (`flutter test`) | 838 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 71 | 17 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 80 | 17 |
 
 **Test isolation (non-negotiable):** no test may touch the user's real settings or
 vault folders. All config/data directories resolve through `GabbroPaths`
@@ -90,19 +90,12 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**Login `email` field + autofill email/username routing.** Add an optional `email` to Login
-(alongside `username`); make both optional (only `title` + `password` compulsory); autofill
-routes `email` -> email-typed fields and `username` -> username-typed fields, each falling
-back to the other when the entry has only one (so single-identifier entries and
-either-accepting fields keep working).
-
-Staged (TDD per stage): **E1 Rust model (DONE** — `email: Option<String>` on `LoginEntry`,
-`#[serde(default)]`, no VERSION bump). E2 autofill engine (new `FieldKind.EMAIL`, separate
-`emailIds`, `email` in summary JSON, fill chooser with fallback). E3 FRB DTO + regen +
-Flutter editor (email field, username now optional, label "Username (optional)") + detail +
-review + overflow-safe + l10n (reuse `fieldEmail`). E4 device-verify, then commit.
-
-(Native-app `app_id` matching + vault-list keyboard-overflow fix shipped — see CHANGELOG.)
+**No agreed next task — pick from the Bikeshed.** The autofill arc is in a good place:
+web HTML-attribute field detection, native-app `app_id` matching, and the Login `email`
+field with email/username fill-routing all shipped and device-verified (see CHANGELOG). The
+natural security follow-up is the **`UnlockActivity` locked-path matching hardening**
+(Bikeshed → Security) — it still uses the old loose app-token + naive eTLD+1. Other autofill
+candidates: `onSaveRequest`, silent no-match toast. Confirm direction with [user].
 
 ### Open from the security audit
 
