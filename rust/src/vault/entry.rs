@@ -70,6 +70,11 @@ pub struct LoginEntry {
     pub attachments: Vec<EntryAttachment>,
     /// Previous password value, retained for typo recovery.
     pub previous_password: Option<PreviousSecret>,
+    /// Android application id (package name, e.g. "dupont.nolio") this login
+    /// belongs to, for native-app autofill matching. `None` until the user sets
+    /// it; an unset value matches no app (no loose substring matching).
+    #[serde(default)]
+    pub app_id: Option<String>,
 }
 
 /// Holds one previous value of a sensitive field, for typo recovery.
@@ -293,6 +298,7 @@ mod tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         };
 
         assert_eq!(entry.title, "GitHub");
@@ -313,6 +319,7 @@ mod tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         };
 
         assert!(entry.notes.is_none());
@@ -330,6 +337,7 @@ mod tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         };
 
         assert!(entry.notes.is_some());
@@ -353,11 +361,72 @@ mod tests {
             custom_fields: vec![field],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         };
 
         assert_eq!(entry.custom_fields.len(), 1);
         assert_eq!(entry.custom_fields[0].label, "Recovery email");
         assert!(!entry.custom_fields[0].hidden);
+    }
+
+    #[test]
+    fn login_entry_can_store_app_id() {
+        let entry = LoginEntry {
+            meta: default_meta(),
+            title: String::from("Nolio"),
+            url: String::from("https://nolio.example"),
+            username: String::from("rob"),
+            password: String::from("s3cr3t"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+            app_id: Some(String::from("dupont.nolio")),
+        };
+        assert_eq!(entry.app_id, Some(String::from("dupont.nolio")));
+    }
+
+    #[test]
+    fn login_entry_app_id_round_trips_through_json() {
+        let entry = LoginEntry {
+            meta: default_meta(),
+            title: String::from("Threema"),
+            url: String::from("https://threema.example"),
+            username: String::from("rob"),
+            password: String::from("s3cr3t"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+            app_id: Some(String::from("ch.threema.app")),
+        };
+        let json = serde_json::to_string(&entry).unwrap();
+        let back: LoginEntry = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.app_id, Some(String::from("ch.threema.app")));
+    }
+
+    #[test]
+    fn login_entry_deserializes_old_json_without_app_id_to_none() {
+        // A vault entry serialized before app_id existed must still load: the
+        // missing field deserializes to None (serde default), never an error.
+        let json = r#"{
+            "meta": {
+                "id": "x",
+                "created_at": "2025-01-01T00:00:00Z",
+                "updated_at": "2025-01-01T00:00:00Z",
+                "folder": "Personal"
+            },
+            "title": "GitHub",
+            "url": "https://github.com",
+            "username": "rob",
+            "password": "hunter2",
+            "notes": null,
+            "custom_fields": [],
+            "attachments": [],
+            "previous_password": null
+        }"#;
+        let entry: LoginEntry = serde_json::from_str(json).unwrap();
+        assert!(entry.app_id.is_none());
     }
 
     #[test]
@@ -627,6 +696,7 @@ mod tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         };
         assert!(entry.previous_password.is_none());
     }
@@ -665,6 +735,7 @@ mod tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: Some(prev),
+            app_id: None,
         };
         assert!(entry.previous_password.is_some());
         assert_eq!(

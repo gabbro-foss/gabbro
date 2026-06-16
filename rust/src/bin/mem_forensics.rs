@@ -68,6 +68,7 @@ fn main() {
                 notes: None,
                 custom_fields: Vec::new(),
                 previous_password: None,
+                app_id: None,
             });
             block_on(rust_lib_gabbro::api::vault_bridge::create_entry(login))
                 .expect("create_entry failed");

@@ -161,6 +161,7 @@ mod tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
         let legacy_bytes = serde_json::to_vec(&vec![legacy_entry]).unwrap();
         let body = deserialize_vault_body(&legacy_bytes).unwrap();
@@ -197,6 +198,7 @@ mod tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
         let body = VaultBody {
             folders: DEFAULT_FOLDERS.map(String::from).to_vec(),
@@ -232,6 +234,7 @@ mod tests {
                 }],
                 attachments: vec![],
                 previous_password: None,
+                app_id: None,
             }),
             VaultEntry::Note(NoteEntry {
                 meta: default_meta("id-002"),

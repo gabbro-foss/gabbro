@@ -1417,6 +1417,7 @@ mod assign_folder_tests {
                 custom_fields: vec![],
                 attachments: vec![],
                 previous_password: None,
+                app_id: None,
             }),
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
@@ -1880,6 +1881,7 @@ mod autofill_tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
         let note = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -1958,6 +1960,7 @@ mod autofill_tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
         let note = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -2262,6 +2265,7 @@ mod tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
 
         let summary = entry_to_summary(&entry);
@@ -2291,6 +2295,7 @@ mod tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
 
         let summary = entry_to_summary(&entry);
@@ -2366,6 +2371,7 @@ mod tests {
                 saved_at: String::from("2025-01-01T00:00:00Z"),
                 expires_at: None,
             }),
+            app_id: None,
         });
 
         save_vault(
@@ -2422,6 +2428,7 @@ mod tests {
                 saved_at: String::from("2025-01-01T00:00:00Z"),
                 expires_at: None,
             }),
+            app_id: None,
         });
 
         save_vault(
@@ -2490,6 +2497,7 @@ mod tests {
                 saved_at: String::from("2025-01-01T00:00:00Z"),
                 expires_at: None,
             }),
+            app_id: None,
         });
 
         save_vault(
@@ -2542,6 +2550,7 @@ mod tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
 
         save_vault(
@@ -2591,6 +2600,7 @@ mod tests {
                 saved_at: String::from("2025-01-01T00:00:00Z"),
                 expires_at: Some(String::from("2099-12-31T00:00:00Z")),
             }),
+            app_id: None,
         });
 
         save_vault(
@@ -2647,6 +2657,7 @@ mod tests {
                 saved_at: String::from("2025-01-01T00:00:00Z"),
                 expires_at: None,
             }),
+            app_id: None,
         });
 
         save_vault(
@@ -2704,6 +2715,7 @@ mod tests {
                 saved_at: String::from("2000-01-01T00:00:00Z"),
                 expires_at: Some(String::from("2000-01-02T00:00:00Z")),
             }),
+            app_id: None,
         });
 
         save_vault(
@@ -3469,6 +3481,7 @@ mod json_export_tests {
                 custom_fields: vec![],
                 attachments: vec![],
                 previous_password: None,
+                app_id: None,
             }),
         ];
 
@@ -3556,6 +3569,7 @@ mod json_export_tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
         let s = entry_to_summary(&entry);
         assert!(
@@ -3586,6 +3600,7 @@ mod json_export_tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
         let s = entry_to_summary(&entry);
         assert!(
@@ -3612,6 +3627,7 @@ mod json_export_tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
         let s = entry_to_summary(&entry);
         assert!(
@@ -3642,6 +3658,7 @@ mod json_export_tests {
             }],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
         let s = entry_to_summary(&entry);
         assert!(
@@ -3676,6 +3693,7 @@ mod json_export_tests {
             }],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
         let s = entry_to_summary(&entry);
         assert!(
@@ -3798,6 +3816,7 @@ mod json_export_tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         });
         let s = entry_to_summary(&entry);
         assert_eq!(

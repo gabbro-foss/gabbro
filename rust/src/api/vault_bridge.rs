@@ -224,6 +224,8 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                     saved_at: p.saved_at,
                     expires_at: p.expires_at,
                 }),
+            // Wired to d.app_id in Stage 2 (bridge surface); None for now.
+            app_id: None,
         })),
         VaultEntryData::Note(d) => Ok(VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -1327,6 +1329,7 @@ mod tests {
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
+            app_id: None,
         })];
 
         save_vault(
@@ -1457,6 +1460,7 @@ mod tests {
                 custom_fields: vec![],
                 attachments: vec![],
                 previous_password: None,
+                app_id: None,
             }),
         ];
 

@@ -212,6 +212,7 @@ fn convert_login(
         custom_fields,
         attachments: vec![],
         previous_password: None,
+        app_id: None,
     })
 }
 
