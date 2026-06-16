@@ -90,14 +90,19 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**(A) Autofill fills the username into email-typed fields.** A Login has a single
-`username`; email fields are classified USERNAME and receive it, which is wrong when the app
-wants an email (seen on coros). Pre-existing fill/data-model limitation, newly visible now
-that native autofill fires. Decide approach: guidance to store email-as-username vs a
-separate email field on Login entries.
+**Login `email` field + autofill email/username routing.** Add an optional `email` to Login
+(alongside `username`); make both optional (only `title` + `password` compulsory); autofill
+routes `email` -> email-typed fields and `username` -> username-typed fields, each falling
+back to the other when the entry has only one (so single-identifier entries and
+either-accepting fields keep working).
 
-(Native-app `app_id` matching shipped + device-verified; vault-list keyboard overflow fixed
-with `resizeToAvoidBottomInset: false` + a phone/tablet overflow test matrix — see CHANGELOG.)
+Staged (TDD per stage): **E1 Rust model (DONE** — `email: Option<String>` on `LoginEntry`,
+`#[serde(default)]`, no VERSION bump). E2 autofill engine (new `FieldKind.EMAIL`, separate
+`emailIds`, `email` in summary JSON, fill chooser with fallback). E3 FRB DTO + regen +
+Flutter editor (email field, username now optional, label "Username (optional)") + detail +
+review + overflow-safe + l10n (reuse `fieldEmail`). E4 device-verify, then commit.
+
+(Native-app `app_id` matching + vault-list keyboard-overflow fix shipped — see CHANGELOG.)
 
 ### Open from the security audit
 
