@@ -93,7 +93,7 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 **Autofill native-app entry matching — explicit `app_id`.** Native field *detection*
 already works (device-dumped: Instagram, Nolio both `usernames=1 passwords=1` via
 `autofillHints`/`inputType`). The real gap is *matching* the app to a vault entry:
-`extractAppToken` picks the wrong package segment (`dupont.nolio` -> `dupont`) and its
+`extractAppToken` picks the wrong package segment (`com.vendor.app` -> `vendor`) and its
 substring match is a false-positive risk. Decided: add an explicit `app_id` (package name)
 to Login entries, match `packageName` exactly, and **drop `extractAppToken`** (zero false
 positives — the cardinal rule). Plus capture+suggest: the autofill service records native
@@ -151,6 +151,7 @@ release process live in their own document:
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 
 ### Code Quality
+- **Scrub real app names and personal names from test data.** Tests across the suite use real apps the user runs (e.g. github) and the user's name as placeholder usernames. Test data must be generic (`com.company.app`, `https://example.com`, `user`/`alice`/`bob`) — never a real app the user has installed or a real person's name. Audit all of `rust/`, `android/`, `test/`, `integration_test/` and replace.
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 - **Offline test gate — Android leg still online.** `gabbro_test` runs flutter/cargo/rust fully offline (rootless netns), but the Android `./gradlew :app:testDebugUnitTest` leg runs online: the Flutter `integration_test` plugin declares a dynamic transitive dep (`androidx.test:runner:1.2+`) that gradle won't resolve `--offline`. `dependencyLocking` on `:app` doesn't pin that plugin's config; the netns also needs `JAVA_TOOL_OPTIONS=-Duser.home=/home/gamer` (uid-0 remap → JVM home `/root`). Likely fix: force a concrete `androidx.test:runner` version across all projects (or lock every project), then move the leg into the offline block.
 
