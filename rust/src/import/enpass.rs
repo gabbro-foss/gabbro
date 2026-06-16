@@ -227,6 +227,7 @@ fn convert_login(
         attachments,
         previous_password: None,
         app_id: None,
+        email: None,
     }
 }
 

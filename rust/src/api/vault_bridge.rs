@@ -226,6 +226,8 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                     expires_at: p.expires_at,
                 }),
             app_id: d.app_id,
+            // Wired to d.email in E3 (DTO gains the field with the regen); None now.
+            email: None,
         })),
         VaultEntryData::Note(d) => Ok(VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -1330,6 +1332,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         })];
 
         save_vault(
@@ -1461,6 +1464,7 @@ mod tests {
                 attachments: vec![],
                 previous_password: None,
                 app_id: None,
+                email: None,
             }),
         ];
 
@@ -1824,6 +1828,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: Some(String::from("com.company.app")),
+            email: None,
         });
         // entry -> DTO -> entry preserves app_id: the editor's read + write path.
         let data = vault_entry_to_data(&entry);

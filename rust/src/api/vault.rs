@@ -317,6 +317,7 @@ pub fn create_login_entry(
         attachments: vec![],
         previous_password: None,
         app_id: None,
+        email: None,
     };
     login_entry_to_data(&entry)
 }
@@ -722,6 +723,7 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
             attachments: e.attachments.clone(),
             previous_password: e.previous_password.clone(),
             app_id: e.app_id.clone(),
+            email: e.email.clone(),
         }),
         VaultEntry::Card(e) => VaultEntry::Card(CardEntry {
             meta: e.meta.clone(),
@@ -1971,6 +1973,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         })];
 
         let result = list_entries(&entries, false);
@@ -2000,6 +2003,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         })];
 
         let result = list_entries(&entries, true);
@@ -2083,6 +2087,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         })];
 
         let result = list_entries(&entries, true);
@@ -2116,6 +2121,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         })];
 
         let updated = VaultEntry::Login(LoginEntry {
@@ -2129,6 +2135,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
 
         update_entry(&mut entries, updated, Some(30)).unwrap();
@@ -2168,6 +2175,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         })];
 
         let updated = VaultEntry::Login(LoginEntry {
@@ -2181,6 +2189,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
 
         update_entry(&mut entries, updated, None).unwrap();
@@ -2225,6 +2234,7 @@ mod tests {
             attachments: vec![],
             previous_password: Some(existing_prev),
             app_id: None,
+            email: None,
         })];
 
         let updated = VaultEntry::Login(LoginEntry {
@@ -2238,6 +2248,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
 
         update_entry(&mut entries, updated, Some(30)).unwrap();

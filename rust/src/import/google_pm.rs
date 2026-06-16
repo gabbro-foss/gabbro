@@ -126,6 +126,7 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         }));
         let _ = &failures; // suppress unused-variable warning while failures stays empty
     }

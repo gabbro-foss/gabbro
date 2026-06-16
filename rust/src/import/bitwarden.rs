@@ -213,6 +213,7 @@ fn convert_login(
         attachments: vec![],
         previous_password: None,
         app_id: None,
+        email: None,
     })
 }
 

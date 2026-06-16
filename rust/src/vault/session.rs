@@ -1444,6 +1444,7 @@ mod assign_folder_tests {
                 attachments: vec![],
                 previous_password: None,
                 app_id: None,
+                email: None,
             }),
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
@@ -1908,6 +1909,7 @@ mod autofill_tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
         let note = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -1987,6 +1989,7 @@ mod autofill_tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
         let note = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -2328,6 +2331,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
 
         let summary = entry_to_summary(&entry);
@@ -2358,6 +2362,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
 
         let summary = entry_to_summary(&entry);
@@ -2434,6 +2439,7 @@ mod tests {
                 expires_at: None,
             }),
             app_id: None,
+            email: None,
         });
 
         save_vault(
@@ -2491,6 +2497,7 @@ mod tests {
                 expires_at: None,
             }),
             app_id: None,
+            email: None,
         });
 
         save_vault(
@@ -2560,6 +2567,7 @@ mod tests {
                 expires_at: None,
             }),
             app_id: None,
+            email: None,
         });
 
         save_vault(
@@ -2613,6 +2621,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
 
         save_vault(
@@ -2663,6 +2672,7 @@ mod tests {
                 expires_at: Some(String::from("2099-12-31T00:00:00Z")),
             }),
             app_id: None,
+            email: None,
         });
 
         save_vault(
@@ -2720,6 +2730,7 @@ mod tests {
                 expires_at: None,
             }),
             app_id: None,
+            email: None,
         });
 
         save_vault(
@@ -2778,6 +2789,7 @@ mod tests {
                 expires_at: Some(String::from("2000-01-02T00:00:00Z")),
             }),
             app_id: None,
+            email: None,
         });
 
         save_vault(
@@ -3544,6 +3556,7 @@ mod json_export_tests {
                 attachments: vec![],
                 previous_password: None,
                 app_id: None,
+                email: None,
             }),
         ];
 
@@ -3632,6 +3645,7 @@ mod json_export_tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
         let s = entry_to_summary(&entry);
         assert!(
@@ -3663,6 +3677,7 @@ mod json_export_tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
         let s = entry_to_summary(&entry);
         assert!(
@@ -3690,6 +3705,7 @@ mod json_export_tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
         let s = entry_to_summary(&entry);
         assert!(
@@ -3721,6 +3737,7 @@ mod json_export_tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
         let s = entry_to_summary(&entry);
         assert!(
@@ -3756,6 +3773,7 @@ mod json_export_tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
         let s = entry_to_summary(&entry);
         assert!(
@@ -3879,6 +3897,7 @@ mod json_export_tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
         let s = entry_to_summary(&entry);
         assert_eq!(

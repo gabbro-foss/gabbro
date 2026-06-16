@@ -123,6 +123,7 @@ pub async fn import_from_csv(
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
         session::session_add_entry_no_save(entry)?;
     }
@@ -1124,6 +1125,7 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
 
         let stamped = stamp_timestamps(entry, "2025-01-01T00:00:00Z");
@@ -1156,6 +1158,7 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         });
 
         let stamped = stamp_timestamps(entry, "2025-01-01T00:00:00Z");

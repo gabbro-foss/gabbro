@@ -75,6 +75,10 @@ pub struct LoginEntry {
     /// it; an unset value matches no app (no loose substring matching).
     #[serde(default)]
     pub app_id: Option<String>,
+    /// Optional email/identifier, separate from `username`. Autofill routes it to
+    /// email-typed fields. `None` if unset.
+    #[serde(default)]
+    pub email: Option<String>,
 }
 
 /// Holds one previous value of a sensitive field, for typo recovery.
@@ -299,6 +303,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         };
 
         assert_eq!(entry.title, "GitHub");
@@ -320,6 +325,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         };
 
         assert!(entry.notes.is_none());
@@ -338,6 +344,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         };
 
         assert!(entry.notes.is_some());
@@ -362,6 +369,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         };
 
         assert_eq!(entry.custom_fields.len(), 1);
@@ -382,6 +390,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: Some(String::from("com.company.app")),
+            email: None,
         };
         assert_eq!(entry.app_id, Some(String::from("com.company.app")));
     }
@@ -399,6 +408,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: Some(String::from("com.example.app")),
+            email: None,
         };
         let json = serde_json::to_string(&entry).unwrap();
         let back: LoginEntry = serde_json::from_str(&json).unwrap();
@@ -427,6 +437,68 @@ mod tests {
         }"#;
         let entry: LoginEntry = serde_json::from_str(json).unwrap();
         assert!(entry.app_id.is_none());
+    }
+
+    #[test]
+    fn login_entry_can_store_email() {
+        let entry = LoginEntry {
+            meta: default_meta(),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
+            password: String::from("secret"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+            app_id: None,
+            email: Some(String::from("user@example.com")),
+        };
+        assert_eq!(entry.email, Some(String::from("user@example.com")));
+    }
+
+    #[test]
+    fn login_entry_email_round_trips_through_json() {
+        let entry = LoginEntry {
+            meta: default_meta(),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
+            password: String::from("secret"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+            app_id: None,
+            email: Some(String::from("user@example.com")),
+        };
+        let json = serde_json::to_string(&entry).unwrap();
+        let back: LoginEntry = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.email, Some(String::from("user@example.com")));
+    }
+
+    #[test]
+    fn login_entry_deserializes_old_json_without_email_to_none() {
+        // A vault entry serialized before email existed must still load: the
+        // missing field deserializes to None (serde default), never an error.
+        let json = r#"{
+            "meta": {
+                "id": "x",
+                "created_at": "2025-01-01T00:00:00Z",
+                "updated_at": "2025-01-01T00:00:00Z",
+                "folder": "Personal"
+            },
+            "title": "Example",
+            "url": "https://example.com",
+            "username": "user",
+            "password": "secret",
+            "notes": null,
+            "custom_fields": [],
+            "attachments": [],
+            "previous_password": null
+        }"#;
+        let entry: LoginEntry = serde_json::from_str(json).unwrap();
+        assert!(entry.email.is_none());
     }
 
     #[test]
@@ -697,6 +769,7 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: None,
+            email: None,
         };
         assert!(entry.previous_password.is_none());
     }
@@ -736,6 +809,7 @@ mod tests {
             attachments: vec![],
             previous_password: Some(prev),
             app_id: None,
+            email: None,
         };
         assert!(entry.previous_password.is_some());
         assert_eq!(

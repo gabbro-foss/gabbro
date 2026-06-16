@@ -77,6 +77,7 @@ fn canary_entry() -> rust_lib_gabbro::vault::entry::VaultEntry {
         attachments: vec![],
         previous_password: None,
         app_id: None,
+        email: None,
     })
 }
 
