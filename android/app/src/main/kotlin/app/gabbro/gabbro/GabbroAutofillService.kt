@@ -151,6 +151,10 @@ class GabbroAutofillService : AutofillService() {
                 UnlockActivity.EXTRA_PASSWORD_IDS,
                 ArrayList(parsed.passwordIds),
             )
+            putParcelableArrayListExtra(
+                UnlockActivity.EXTRA_EMAIL_IDS,
+                ArrayList(parsed.emailIds),
+            )
             putExtra(UnlockActivity.EXTRA_WEB_DOMAIN, parsed.webDomain)
             putExtra(UnlockActivity.EXTRA_PACKAGE_NAME, parsed.packageName)
         }
@@ -163,10 +167,7 @@ class GabbroAutofillService : AutofillService() {
 
         val datasetBuilder = Dataset.Builder()
 
-        parsed.usernameIds.forEach { id ->
-            datasetBuilder.setValue(id, AutofillValue.forText(""), presentation)
-        }
-        parsed.passwordIds.forEach { id ->
+        (parsed.usernameIds + parsed.emailIds + parsed.passwordIds).forEach { id ->
             datasetBuilder.setValue(id, AutofillValue.forText(""), presentation)
         }
 
@@ -190,7 +191,12 @@ class GabbroAutofillService : AutofillService() {
             val presentation = RemoteViews(packageName, R.layout.autofill_unlock_item)
             val datasetBuilder = Dataset.Builder()
             parsed.usernameIds.forEach { id ->
-                datasetBuilder.setValue(id, AutofillValue.forText(cred.username), presentation)
+                val v = fillValueFor(FieldKind.USERNAME, cred.username, cred.email)
+                datasetBuilder.setValue(id, AutofillValue.forText(v), presentation)
+            }
+            parsed.emailIds.forEach { id ->
+                val v = fillValueFor(FieldKind.EMAIL, cred.username, cred.email)
+                datasetBuilder.setValue(id, AutofillValue.forText(v), presentation)
             }
             parsed.passwordIds.forEach { id ->
                 datasetBuilder.setValue(id, AutofillValue.forText(cred.password), presentation)
@@ -235,6 +241,7 @@ class GabbroAutofillService : AutofillService() {
                     url = obj.getString("url"),
                     password = "",
                     appId = obj.optString("app_id", ""),
+                    email = obj.optString("email", ""),
                 )
             }
         } catch (_: Exception) {
@@ -272,7 +279,21 @@ data class CredentialSummary(
     val password: String,
     /// Recorded Android package name for native-app matching; "" when unset.
     val appId: String = "",
+    /// Email/identifier routed to email-typed fields; "" when unset.
+    val email: String = "",
 )
+
+/**
+ * The value to fill into a field of the given [kind], from an entry's [username]
+ * and [email]. Each falls back to the other when blank, so single-identifier
+ * entries (and fields that accept either) still fill correctly.
+ */
+internal fun fillValueFor(kind: FieldKind, username: String, email: String): String =
+    when (kind) {
+        FieldKind.EMAIL -> email.ifBlank { username }
+        FieldKind.USERNAME -> username.ifBlank { email }
+        else -> ""
+    }
 
 // -----------------------------------------------------------------------------
 // Native-app matching + capture — pure helpers (unit-tested without the framework)
@@ -337,7 +358,7 @@ object RecentAutofillApps {
 // -----------------------------------------------------------------------------
 
 /** How a single field should be filled. */
-enum class FieldKind { USERNAME, PASSWORD, NONE }
+enum class FieldKind { USERNAME, EMAIL, PASSWORD, NONE }
 
 /**
  * Decide whether one field is a username, password, or neither, from the signals
@@ -362,13 +383,18 @@ internal fun classifyField(
     htmlName: String?,
     htmlId: String?,
 ): FieldKind {
-    // Tier 1: explicit autofill hints. Covers Android constants and the HTML
-    // autocomplete values Chromium maps into hints (e.g. "email", "username").
+    // Tier 1: explicit autofill hints. Email signals route to EMAIL, username
+    // signals to USERNAME (so the fill can put the email in email fields).
     autofillHints?.let { hints ->
         if (hints.any {
+                it.equals(android.view.View.AUTOFILL_HINT_EMAIL_ADDRESS, ignoreCase = true) ||
+                    it.equals("email", ignoreCase = true)
+            }
+        ) {
+            return FieldKind.EMAIL
+        }
+        if (hints.any {
                 it.equals(android.view.View.AUTOFILL_HINT_USERNAME, ignoreCase = true) ||
-                    it.equals(android.view.View.AUTOFILL_HINT_EMAIL_ADDRESS, ignoreCase = true) ||
-                    it.equals("email", ignoreCase = true) ||
                     it.equals("username", ignoreCase = true)
             }
         ) {
@@ -395,9 +421,8 @@ internal fun classifyField(
     ) {
         return FieldKind.PASSWORD
     }
-    if (htmlT == "email" || autocomplete == "username" || autocomplete == "email") {
-        return FieldKind.USERNAME
-    }
+    if (htmlT == "email" || autocomplete == "email") return FieldKind.EMAIL
+    if (autocomplete == "username") return FieldKind.USERNAME
 
     // Tier 3: inputType bitmask — most native apps that declare no hints.
     if (inputType and android.text.InputType.TYPE_MASK_CLASS ==
@@ -411,7 +436,7 @@ internal fun classifyField(
 
             android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
             android.text.InputType.TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS,
-            -> return FieldKind.USERNAME
+            -> return FieldKind.EMAIL
         }
     }
 
@@ -422,13 +447,13 @@ internal fun classifyField(
     val htmlFieldKeywords = if (htmlType != null) listOfNotNull(htmlName, htmlId) else emptyList()
 
     // Password only from the more reliable name/id (a free-text "hint" of
-    // "password" is too noisy); username also from hint.
+    // "password" is too noisy); email/username also from hint.
     val passwordSources = (listOfNotNull(idEntry) + htmlFieldKeywords).map { it.lowercase() }
     if (passwordSources.any { it.contains("password") }) return FieldKind.PASSWORD
     val userSources = (listOfNotNull(hint, idEntry) + htmlFieldKeywords).map { it.lowercase() }
+    if (userSources.any { it.contains("email") }) return FieldKind.EMAIL
     if (userSources.any {
-            it.contains("email") || it.contains("username") ||
-                it.contains("login") || it.contains("phone")
+            it.contains("username") || it.contains("login") || it.contains("phone")
         }
     ) {
         return FieldKind.USERNAME
@@ -500,12 +525,15 @@ data class ParsedStructure(
     val passwordIds: List<AutofillId>,
     val webDomain: String?,
     val packageName: String?,
+    val emailIds: List<AutofillId> = emptyList(),
 ) {
-    fun isEmpty(): Boolean = usernameIds.isEmpty() && passwordIds.isEmpty()
+    fun isEmpty(): Boolean =
+        usernameIds.isEmpty() && emailIds.isEmpty() && passwordIds.isEmpty()
 
     companion object {
         fun from(structure: AssistStructure): ParsedStructure {
             val usernameIds = mutableListOf<AutofillId>()
+            val emailIds = mutableListOf<AutofillId>()
             val passwordIds = mutableListOf<AutofillId>()
             var webDomain: String? = null
             var packageName: String? = null
@@ -520,11 +548,17 @@ data class ParsedStructure(
                         ?.takeIf { it.contains(".") }
                 }
                 val foundDomain = arrayOfNulls<String>(1)
-                collectIds(root, usernameIds, passwordIds, foundDomain)
+                collectIds(root, usernameIds, emailIds, passwordIds, foundDomain)
                 if (webDomain == null) webDomain = foundDomain[0]
             }
 
-            return ParsedStructure(usernameIds, passwordIds, webDomain, packageName)
+            return ParsedStructure(
+                usernameIds = usernameIds,
+                passwordIds = passwordIds,
+                webDomain = webDomain,
+                packageName = packageName,
+                emailIds = emailIds,
+            )
         }
 
         /**
@@ -574,6 +608,7 @@ data class ParsedStructure(
         private fun collectIds(
             node: AssistStructure.ViewNode,
             usernameIds: MutableList<AutofillId>,
+            emailIds: MutableList<AutofillId>,
             passwordIds: MutableList<AutofillId>,
             webDomainOut: Array<String?>,
         ) {
@@ -606,13 +641,14 @@ data class ParsedStructure(
                     )
                 ) {
                     FieldKind.USERNAME -> usernameIds.add(id)
+                    FieldKind.EMAIL -> emailIds.add(id)
                     FieldKind.PASSWORD -> passwordIds.add(id)
                     FieldKind.NONE -> {}
                 }
             }
 
             for (i in 0 until node.childCount) {
-                collectIds(node.getChildAt(i), usernameIds, passwordIds, webDomainOut)
+                collectIds(node.getChildAt(i), usernameIds, emailIds, passwordIds, webDomainOut)
             }
         }
     }

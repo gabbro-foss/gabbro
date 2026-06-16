@@ -36,6 +36,7 @@ class UnlockActivity : FlutterActivity() {
     companion object {
         private const val CHANNEL = "app.gabbro.gabbro/autofill"
         const val EXTRA_USERNAME_IDS = "app.gabbro.gabbro.EXTRA_USERNAME_IDS"
+        const val EXTRA_EMAIL_IDS = "app.gabbro.gabbro.EXTRA_EMAIL_IDS"
         const val EXTRA_PASSWORD_IDS = "app.gabbro.gabbro.EXTRA_PASSWORD_IDS"
         const val EXTRA_WEB_DOMAIN = "app.gabbro.gabbro.EXTRA_WEB_DOMAIN"
         const val EXTRA_PACKAGE_NAME = "app.gabbro.gabbro.EXTRA_PACKAGE_NAME"
@@ -111,7 +112,15 @@ class UnlockActivity : FlutterActivity() {
                 intent?.getParcelableArrayListExtra(EXTRA_PASSWORD_IDS)
             } ?: arrayListOf()
 
-        if (usernameIds.isEmpty() && passwordIds.isEmpty()) return null
+        val emailIds: ArrayList<android.view.autofill.AutofillId> =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent?.getParcelableArrayListExtra(EXTRA_EMAIL_IDS, android.view.autofill.AutofillId::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent?.getParcelableArrayListExtra(EXTRA_EMAIL_IDS)
+            } ?: arrayListOf()
+
+        if (usernameIds.isEmpty() && emailIds.isEmpty() && passwordIds.isEmpty()) return null
 
         val webDomain = intent?.getStringExtra(EXTRA_WEB_DOMAIN)
         val appPackageName = intent?.getStringExtra(EXTRA_PACKAGE_NAME)
@@ -137,7 +146,12 @@ class UnlockActivity : FlutterActivity() {
         val presentation = RemoteViews(packageName, R.layout.autofill_unlock_item)
         val datasetBuilder = Dataset.Builder()
         usernameIds.forEach { id ->
-            datasetBuilder.setValue(id, AutofillValue.forText(cred.username), presentation)
+            val v = fillValueFor(FieldKind.USERNAME, cred.username, cred.email)
+            datasetBuilder.setValue(id, AutofillValue.forText(v), presentation)
+        }
+        emailIds.forEach { id ->
+            val v = fillValueFor(FieldKind.EMAIL, cred.username, cred.email)
+            datasetBuilder.setValue(id, AutofillValue.forText(v), presentation)
         }
         passwordIds.forEach { id ->
             datasetBuilder.setValue(id, AutofillValue.forText(cred.password), presentation)
@@ -199,6 +213,8 @@ class UnlockActivity : FlutterActivity() {
                     username = obj.getString("username"),
                     url = obj.getString("url"),
                     password = password,
+                    appId = obj.optString("app_id", ""),
+                    email = obj.optString("email", ""),
                 )
             }
         } catch (_: Exception) {

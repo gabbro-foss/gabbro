@@ -109,10 +109,10 @@ class GabbroAutofillServiceTest {
         assertEquals(FieldKind.PASSWORD, classify(htmlType = "password", inputType = 0))
     }
 
-    // (4) HTML type=email -> Username
+    // (4) HTML type=email -> Email (routed to the entry's email value)
     @Test
-    fun classifyField_html_type_email_is_username() {
-        assertEquals(FieldKind.USERNAME, classify(htmlType = "email"))
+    fun classifyField_html_type_email_is_email() {
+        assertEquals(FieldKind.EMAIL, classify(htmlType = "email"))
     }
 
     // (5) autocomplete current-/new-password -> Password
@@ -134,10 +134,10 @@ class GabbroAutofillServiceTest {
         assertEquals(FieldKind.PASSWORD, classify(inputType = passwordInputType))
     }
 
-    // (8) inputType email variation — preserved
+    // (8) inputType email variation -> Email
     @Test
-    fun classifyField_inputtype_email_variation_is_username() {
-        assertEquals(FieldKind.USERNAME, classify(inputType = emailInputType))
+    fun classifyField_inputtype_email_variation_is_email() {
+        assertEquals(FieldKind.EMAIL, classify(inputType = emailInputType))
     }
 
     // (9) keyword password in name/id -> Password. html name/id are only trusted
@@ -149,13 +149,28 @@ class GabbroAutofillServiceTest {
         assertEquals(FieldKind.PASSWORD, classify(htmlName = "user_password", htmlType = "text"))
     }
 
-    // (10) keyword email/username/login/phone in hint/idEntry/name/id -> Username
+    // (10) keyword username/login/phone -> Username (email keyword is EMAIL, below)
     @Test
     fun classifyField_keyword_user_signals_are_username() {
-        assertEquals(FieldKind.USERNAME, classify(hint = "Email or phone"))
         assertEquals(FieldKind.USERNAME, classify(idEntry = "user_login"))
         assertEquals(FieldKind.USERNAME, classify(htmlName = "username_field", htmlType = "text"))
         assertEquals(FieldKind.USERNAME, classify(hint = "Phone number"))
+    }
+
+    // (10b) email keyword/signals -> Email
+    @Test
+    fun classifyField_email_signals_are_email() {
+        assertEquals(FieldKind.EMAIL, classify(hints = listOf("emailAddress")))
+        assertEquals(FieldKind.EMAIL, classify(htmlAutocomplete = "email"))
+        assertEquals(FieldKind.EMAIL, classify(hint = "Email or phone"))
+        assertEquals(FieldKind.EMAIL, classify(idEntry = "user_email"))
+        assertEquals(FieldKind.EMAIL, classify(htmlName = "email_field", htmlType = "text"))
+    }
+
+    // (10c) email keyword outranks a username keyword on the same field
+    @Test
+    fun classifyField_email_keyword_outranks_username_keyword() {
+        assertEquals(FieldKind.EMAIL, classify(idEntry = "login_email"))
     }
 
     // (13) html id carries the username truth where name is too short to match
@@ -355,5 +370,36 @@ class GabbroAutofillServiceTest {
             listOf("d.app", "c.app", "b.app"),
             recentAppsUpdated(listOf("c.app", "b.app", "a.app"), "d.app", 3),
         )
+    }
+
+    // ── fillValueFor ──────────────────────────────────────────────────────────
+    // Routes the right identifier to a field, each falling back to the other.
+
+    @Test
+    fun fillValueFor_email_field_uses_email() {
+        assertEquals("user@example.com",
+            fillValueFor(FieldKind.EMAIL, "user", "user@example.com"))
+    }
+
+    @Test
+    fun fillValueFor_email_field_falls_back_to_username_when_no_email() {
+        assertEquals("user", fillValueFor(FieldKind.EMAIL, "user", ""))
+    }
+
+    @Test
+    fun fillValueFor_username_field_uses_username() {
+        assertEquals("user",
+            fillValueFor(FieldKind.USERNAME, "user", "user@example.com"))
+    }
+
+    @Test
+    fun fillValueFor_username_field_falls_back_to_email_when_no_username() {
+        assertEquals("user@example.com", fillValueFor(FieldKind.USERNAME, "", "user@example.com"))
+    }
+
+    @Test
+    fun fillValueFor_both_blank_is_empty() {
+        assertEquals("", fillValueFor(FieldKind.EMAIL, "", ""))
+        assertEquals("", fillValueFor(FieldKind.USERNAME, "", ""))
     }
 }

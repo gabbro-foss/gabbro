@@ -160,6 +160,18 @@ class GabbroAutofillServiceRobolectricTest {
         assertEquals("", service.parseSummariesJson(json)[0].appId)
     }
 
+    @Test
+    fun parseSummariesJson_reads_email_field() {
+        val json = """[{"id":"1","username":"alice","url":"https://a.com","email":"alice@example.com"}]"""
+        assertEquals("alice@example.com", service.parseSummariesJson(json)[0].email)
+    }
+
+    @Test
+    fun parseSummariesJson_missing_email_defaults_to_empty() {
+        val json = """[{"id":"1","username":"alice","url":"https://a.com"}]"""
+        assertEquals("", service.parseSummariesJson(json)[0].email)
+    }
+
     // ── RecentAutofillApps (capture store) ────────────────────────────────────
 
     @Test
