@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
+import 'package:gabbro/screens/review_changes_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
@@ -64,8 +65,13 @@ Widget _buildEditScreen(VaultEntryData existing) => testApp(CreateEntryScreen(
 void main() {
   testWidgets('required field validation fires on empty save', (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Login'));
+    await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.text('Save'));
+    await tester.scrollUntilVisible(
+      find.text('Save'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Save'));
     await tester.pump();
@@ -900,4 +906,111 @@ void main() {
   });
 
   // ── End custom field tests ────────────────────────────────────────────────
+
+  // ── Android app ID (native-app autofill matching) ─────────────────────────
+
+  testWidgets('login form shows the Android app ID field and helper note',
+      (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Login'));
+    expect(
+      find.widgetWithText(TextFormField, 'Android app ID (optional)'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Only an exact match works'), findsOneWidget);
+  });
+
+  testWidgets('login app ID is passed to onCreateEntry', (tester) async {
+    VaultEntryData? captured;
+    await tester.pumpWidget(
+      _buildCreateScreen('Login', onCreateEntry: (e) async => captured = e),
+    );
+    await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Example');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Username'), 'user');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'secret');
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Android app ID (optional)'),
+      'com.company.app',
+    );
+    await tester.pump();
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(captured, isA<VaultEntryData_Login>());
+    expect((captured! as VaultEntryData_Login).field0.appId, equals('com.company.app'));
+  });
+
+  testWidgets('login app ID pre-populates in edit mode', (tester) async {
+    final login = LoginEntryData(
+      id: 'id-1',
+      title: 'Example',
+      url: '',
+      username: 'user',
+      password: 'secret',
+      notes: null,
+      customFields: [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+      appId: 'com.company.app',
+    );
+    await tester.pumpWidget(_buildEditScreen(VaultEntryData.login(login)));
+    final field = tester.widget<TextFormField>(
+      find.widgetWithText(TextFormField, 'com.company.app'),
+    );
+    expect(field.controller?.text, equals('com.company.app'));
+  });
+
+  testWidgets('recent app chips render and fill the app ID field',
+      (tester) async {
+    await tester.pumpWidget(testApp(CreateEntryScreen(
+      entryType: 'Login',
+      onCreateEntry: (_) async {},
+      onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
+      recentAppsFetcher: () async => ['com.company.app', 'com.other.app'],
+    )));
+    await tester.pumpAndSettle();
+    expect(find.text('Recently used apps'), findsOneWidget);
+    await tester.ensureVisible(find.widgetWithText(ActionChip, 'com.other.app'));
+    await tester.tap(find.widgetWithText(ActionChip, 'com.other.app'));
+    await tester.pump();
+    final field = tester.widget<TextFormField>(
+      find.widgetWithText(TextFormField, 'com.other.app'),
+    );
+    expect(field.controller?.text, equals('com.other.app'));
+  });
+
+  testWidgets('changing only the Android app ID is detected as a change',
+      (tester) async {
+    await tester.pumpWidget(_buildEditScreen(VaultEntryData.login(_loginEntry())));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Android app ID (optional)'),
+      'com.company.app',
+    );
+    await tester.pump();
+    await tester.scrollUntilVisible(
+      find.text('Review →'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Review →'));
+    await tester.pumpAndSettle();
+    // The app-id change must be detected — not dismissed as "no changes".
+    expect(find.byType(SnackBar), findsNothing);
+    expect(find.byType(ReviewChangesScreen), findsOneWidget);
+  });
+
+  testWidgets('no recent app chips when the list is empty', (tester) async {
+    await tester.pumpWidget(testApp(CreateEntryScreen(
+      entryType: 'Login',
+      onCreateEntry: (_) async {},
+      onGetEntry: (_) => VaultEntryData.login(_loginEntry()),
+      recentAppsFetcher: () async => const [],
+    )));
+    await tester.pumpAndSettle();
+    expect(find.text('Recently used apps'), findsNothing);
+    expect(find.byType(ActionChip), findsNothing);
+  });
 }

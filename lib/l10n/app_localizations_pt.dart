@@ -906,6 +906,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fieldUrl => 'URL (opcional)';
 
   @override
+  String get fieldAndroidAppId => 'ID da aplicação Android (opcional)';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'Preenche este início de sessão numa aplicação Android. Só funciona uma correspondência exata. Encontre o ID no link da aplicação na Play Store, depois de id= (ex.: id=com.company.app).';
+
+  @override
+  String get recentlyUsedApps => 'Aplicações usadas recentemente';
+
+  @override
   String get fieldUsername => 'Usuário';
 
   @override
@@ -2832,6 +2842,16 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get fieldUrl => 'URL (opcional)';
 
   @override
+  String get fieldAndroidAppId => 'ID do app Android (opcional)';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'Preenche este login em um app Android. Apenas uma correspondência exata funciona. Encontre o ID no link do app na Play Store, após id= (ex.: id=com.company.app).';
+
+  @override
+  String get recentlyUsedApps => 'Apps usados recentemente';
+
+  @override
   String get fieldUsername => 'Usuário';
 
   @override
@@ -4753,6 +4773,16 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get fieldUrl => 'URL (opcional)';
+
+  @override
+  String get fieldAndroidAppId => 'ID da aplicação Android (opcional)';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'Preenche este início de sessão numa aplicação Android. Só funciona uma correspondência exata. Encontre o ID no link da aplicação na Play Store, depois de id= (ex.: id=com.company.app).';
+
+  @override
+  String get recentlyUsedApps => 'Aplicações usadas recentemente';
 
   @override
   String get fieldUsername => 'Nome de utilizador';

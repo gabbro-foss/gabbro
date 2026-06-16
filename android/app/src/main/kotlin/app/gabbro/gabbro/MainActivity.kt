@@ -24,6 +24,7 @@ class MainActivity : FlutterFragmentActivity() {
         const val CHANNEL = "app.gabbro.gabbro/yubikey"
         const val BIOMETRIC_CHANNEL = "app.gabbro.gabbro/biometric"
         const val EXPORT_CHANNEL = "app.gabbro.gabbro/export"
+        const val AUTOFILL_CHANNEL = "app.gabbro.gabbro/autofill"
 
         // A YubiKey tap blocks until a key is presented; bound the wait so a
         // stalled tap (no key) cannot strand the UI on an endless spinner.
@@ -151,6 +152,16 @@ class MainActivity : FlutterFragmentActivity() {
                         BiometricHelper.unenroll(this)
                         result.success(null)
                     }
+                    else -> result.notImplemented()
+                }
+            }
+
+        // Suggestion chips for the entry editor's app-id field: native apps that
+        // requested autofill but matched no entry (app-private, capped).
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, AUTOFILL_CHANNEL)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "getRecentApps" -> result.success(RecentAutofillApps.recent(this))
                     else -> result.notImplemented()
                 }
             }

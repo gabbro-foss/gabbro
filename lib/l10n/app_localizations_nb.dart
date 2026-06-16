@@ -906,6 +906,16 @@ class AppLocalizationsNb extends AppLocalizations {
   String get fieldUrl => 'URL (valgfritt)';
 
   @override
+  String get fieldAndroidAppId => 'Android-app-ID (valgfritt)';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'Fyller ut denne innloggingen i en Android-app. Bare nøyaktig treff fungerer. Finn ID-en i appens Play Store-lenke etter id= (f.eks. id=com.company.app).';
+
+  @override
+  String get recentlyUsedApps => 'Nylig brukte apper';
+
+  @override
   String get fieldUsername => 'Brukernavn';
 
   @override

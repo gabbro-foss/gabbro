@@ -145,6 +145,22 @@ LoginEntryData _updatedUrlOnly() => LoginEntryData(
       previousPassword: null,
     );
 
+// Generic login differing only in app_id, to isolate the app-id diff.
+LoginEntryData _appIdLogin({String? appId}) => LoginEntryData(
+      id: 'test-id-1',
+      title: 'Example',
+      url: 'https://example.com',
+      username: 'user',
+      password: 'secret',
+      notes: null,
+      customFields: [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+      previousPassword: null,
+      appId: appId,
+    );
+
 // ── Widget helper ─────────────────────────────────────────────────────────────
 
 Widget _buildReviewScreen({
@@ -195,6 +211,15 @@ void main() {
 
     expect(find.text('https://github.com'), findsOneWidget);
     expect(find.text('https://github.com/login'), findsOneWidget);
+  });
+
+  testWidgets('shows the Android app ID change in the diff', (tester) async {
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.login(_appIdLogin()),
+      updated: VaultEntryData.login(_appIdLogin(appId: 'com.company.app')),
+    ));
+
+    expect(find.text('com.company.app'), findsOneWidget);
   });
 
   testWidgets('does not show unchanged fields in diff', (tester) async {

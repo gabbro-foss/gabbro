@@ -909,6 +909,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String get fieldUrl => 'URL (необязательно)';
 
   @override
+  String get fieldAndroidAppId =>
+      'Идентификатор приложения Android (необязательно)';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'Заполняет эти данные для входа в приложении Android. Работает только точное совпадение. Найдите идентификатор в ссылке приложения в Play Store, после id= (напр. id=com.company.app).';
+
+  @override
+  String get recentlyUsedApps => 'Недавно использованные приложения';
+
+  @override
   String get fieldUsername => 'Имя пользователя';
 
   @override

@@ -910,6 +910,17 @@ class AppLocalizationsUk extends AppLocalizations {
   String get fieldUrl => 'URL (необов\'язково)';
 
   @override
+  String get fieldAndroidAppId =>
+      'Ідентифікатор додатка Android (необов\'язково)';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'Заповнює ці дані для входу в додатку Android. Працює лише точний збіг. Знайдіть ідентифікатор у посиланні додатка в Play Store, після id= (напр. id=com.company.app).';
+
+  @override
+  String get recentlyUsedApps => 'Нещодавно використані додатки';
+
+  @override
   String get fieldUsername => 'Ім\'я користувача';
 
   @override

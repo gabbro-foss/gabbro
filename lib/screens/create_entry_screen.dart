@@ -16,6 +16,19 @@ typedef PickedFile = ({String name, Uint8List? bytes});
 
 Future<void> _defaultCreate(VaultEntryData entry) => createEntry(entry: entry);
 VaultEntryData _defaultGetEntry(String id) => getEntry(id: id);
+
+/// Native apps that asked Gabbro to autofill but matched no entry — surfaced as
+/// tap-to-fill suggestions for the app-id field. Android only; empty elsewhere.
+Future<List<String>> _defaultRecentApps() async {
+  if (defaultTargetPlatform != TargetPlatform.android) return const [];
+  try {
+    const channel = MethodChannel('app.gabbro.gabbro/autofill');
+    final list = await channel.invokeMethod<List<dynamic>>('getRecentApps');
+    return list?.cast<String>() ?? const [];
+  } catch (_) {
+    return const [];
+  }
+}
 List<String> _defaultListFolders() => listFolders();
 
 Future<PickedFile?> _defaultPickFile() async {
@@ -41,6 +54,10 @@ class CreateEntryScreen extends StatefulWidget {
   /// when the file portal is unavailable (sandbox).
   final Future<PickedFile?> Function() pickFile;
 
+  /// Test seam: fetch recently-seen native app ids for the suggestion chips.
+  /// Defaults to the Android autofill MethodChannel; empty off-Android.
+  final Future<List<String>> Function() recentAppsFetcher;
+
   const CreateEntryScreen({
     super.key,
     required this.entryType,
@@ -50,6 +67,7 @@ class CreateEntryScreen extends StatefulWidget {
     this.onGetEntry = _defaultGetEntry,
     this.listFolders,
     this.pickFile = _defaultPickFile,
+    this.recentAppsFetcher = _defaultRecentApps,
   });
 
   @override
@@ -62,6 +80,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   String? _error;
   late String _selectedFolder;
   List<String> _folders = [];
+  List<String> _recentApps = const [];
 
   // ── Login fields ────────────────────────────────────────────────────────────
   late final TextEditingController _loginTitleController;
@@ -70,6 +89,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   late final TextEditingController _passwordController;
   bool _passwordObscured = true;
   late final TextEditingController _loginNotesController;
+  late final TextEditingController _appIdController;
   final List<_CustomFieldState> _loginCustomFields = [];
   final FocusNode _loginTitleFocus = FocusNode();
   final FocusNode _urlFocus = FocusNode();
@@ -155,6 +175,10 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     } catch (_) {
       _folders = [];
     }
+    // Suggestion chips for the app-id field (login form only).
+    widget.recentAppsFetcher().then((apps) {
+      if (mounted) setState(() => _recentApps = apps);
+    });
   }
 
   String _existingFolder() {
@@ -180,6 +204,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _usernameController = TextEditingController(text: field0.username);
       _passwordController = TextEditingController(text: field0.password);
       _loginNotesController = TextEditingController(text: field0.notes ?? '');
+      _appIdController = TextEditingController(text: field0.appId ?? '');
       for (final f in field0.customFields) {
         _loginCustomFields.add(
           _CustomFieldState(
@@ -195,6 +220,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _usernameController = TextEditingController();
       _passwordController = TextEditingController();
       _loginNotesController = TextEditingController();
+      _appIdController = TextEditingController();
     }
 
     // ── Note ───────────────────────────────────────────────────────────────
@@ -338,6 +364,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _usernameController.dispose();
     _passwordController.dispose();
     _loginNotesController.dispose();
+    _appIdController.dispose();
     for (final f in _loginCustomFields) {
       f.dispose();
     }
@@ -453,7 +480,11 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
 
   /// Derives expiry days from AppSettings.passwordHistoryExpiry.
   int? _expiryDays() {
-    final expiry = GabbroApp.of(context).settings.passwordHistoryExpiry;
+    // maybeOf for test-safety (no GabbroApp ancestor under bare testApp);
+    // production always has the ancestor, so behaviour is unchanged.
+    final app = GabbroApp.maybeOf(context);
+    if (app == null) return null;
+    final expiry = app.settings.passwordHistoryExpiry;
     return switch (expiry) {
       PasswordHistoryExpiry.sevenDays => 7,
       PasswordHistoryExpiry.thirtyDays => 30,
@@ -474,6 +505,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             field0.username != u.username ||
             field0.password != u.password ||
             field0.notes != u.notes ||
+            field0.appId != u.appId ||
             !listEquals(field0.customFields, u.customFields) ||
             field0.folder != u.folder;
       case (
@@ -534,6 +566,13 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     }
   }
 
+  /// The trimmed app-id field value, or null when blank — an unset app id
+  /// matches no native app (zero false positives).
+  String? _appIdOrNull() {
+    final v = _appIdController.text.trim();
+    return v.isEmpty ? null : v;
+  }
+
   /// Builds the updated VaultEntryData from current form state.
   /// Returns null if the entry type is not supported.
   VaultEntryData? _buildUpdated() {
@@ -562,6 +601,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                 )
                 .toList(),
             previousPassword: field0.previousPassword,
+            appId: _appIdOrNull(),
           ),
         );
       case VaultEntryData_Note(:final field0):
@@ -727,6 +767,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                     ),
                   )
                   .toList(),
+              appId: _appIdOrNull(),
             ),
           ),
         );
@@ -1056,6 +1097,38 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       focusNode: _loginNotesFocus,
       maxLines: 3,
     ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _appIdController,
+      decoration: InputDecoration(
+        labelText: l.fieldAndroidAppId,
+        helperText: l.fieldAndroidAppIdHelper,
+        helperMaxLines: 4,
+        border: const OutlineInputBorder(),
+      ),
+    ),
+    if (_recentApps.isNotEmpty) ...[
+      const SizedBox(height: 8),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          l.recentlyUsedApps,
+          style: Theme.of(context).textTheme.labelMedium,
+        ),
+      ),
+      const SizedBox(height: 4),
+      Wrap(
+        spacing: 8,
+        runSpacing: 4,
+        children: [
+          for (final pkg in _recentApps)
+            ActionChip(
+              label: Text(pkg),
+              onPressed: () => setState(() => _appIdController.text = pkg),
+            ),
+        ],
+      ),
+    ],
     const SizedBox(height: 16),
     _customFieldsSection(
       fields: _loginCustomFields,

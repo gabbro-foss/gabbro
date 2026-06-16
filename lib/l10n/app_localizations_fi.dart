@@ -907,6 +907,16 @@ class AppLocalizationsFi extends AppLocalizations {
   String get fieldUrl => 'URL (valinnainen)';
 
   @override
+  String get fieldAndroidAppId => 'Android-sovelluksen tunnus (valinnainen)';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'Täyttää nämä kirjautumistiedot Android-sovelluksessa. Vain tarkka vastaavuus toimii. Löydät tunnuksen sovelluksen Play Store -linkistä kohdan id= jälkeen (esim. id=com.company.app).';
+
+  @override
+  String get recentlyUsedApps => 'Viimeksi käytetyt sovellukset';
+
+  @override
   String get fieldUsername => 'Käyttäjänimi';
 
   @override

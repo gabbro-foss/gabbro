@@ -408,6 +408,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           ),
         ),
         if (e.notes != null) _field(l.reviewFieldNotes, e.notes!, l),
+        if (e.appId != null && e.appId!.isNotEmpty)
+          _field(l.fieldAndroidAppId, e.appId!, l),
         if (e.customFields.isNotEmpty) ...[
           const SizedBox(height: 8),
           _sectionHeader(l.fieldCustomFields),

@@ -896,6 +896,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get fieldUrl => 'URL (任意)';
 
   @override
+  String get fieldAndroidAppId => 'Android アプリ ID（任意）';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'このログイン情報を Android アプリで自動入力します。完全一致のみが機能します。ID はアプリの Play Store リンクの id= の後にあります（例: id=com.company.app）。';
+
+  @override
+  String get recentlyUsedApps => '最近使用したアプリ';
+
+  @override
   String get fieldUsername => 'ユーザー名';
 
   @override

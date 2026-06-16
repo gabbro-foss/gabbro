@@ -909,6 +909,16 @@ class AppLocalizationsBg extends AppLocalizations {
   String get fieldUrl => 'URL (незадължително)';
 
   @override
+  String get fieldAndroidAppId => 'ID на приложение за Android (по избор)';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'Попълва тези данни за вход в приложение за Android. Работи само точно съвпадение. Намерете ID във връзката на приложението в Play Store, след id= (напр. id=com.company.app).';
+
+  @override
+  String get recentlyUsedApps => 'Наскоро използвани приложения';
+
+  @override
   String get fieldUsername => 'Потребителско ime';
 
   @override

@@ -449,6 +449,9 @@ class LoginEntryData {
   /// Previous password, masked by default. `None` if no history exists.
   final PreviousSecretData? previousPassword;
 
+  /// Android application id for native-app autofill matching; `None` if unset.
+  final String? appId;
+
   const LoginEntryData({
     required this.id,
     required this.createdAt,
@@ -461,6 +464,7 @@ class LoginEntryData {
     this.notes,
     required this.customFields,
     this.previousPassword,
+    this.appId,
   });
 
   @override
@@ -475,7 +479,8 @@ class LoginEntryData {
       password.hashCode ^
       notes.hashCode ^
       customFields.hashCode ^
-      previousPassword.hashCode;
+      previousPassword.hashCode ^
+      appId.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -492,7 +497,8 @@ class LoginEntryData {
           password == other.password &&
           notes == other.notes &&
           customFields == other.customFields &&
-          previousPassword == other.previousPassword;
+          previousPassword == other.previousPassword &&
+          appId == other.appId;
 }
 
 /// Summary returned to Flutter after a vault merge operation.

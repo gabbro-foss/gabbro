@@ -78,6 +78,7 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                 saved_at: p.saved_at.clone(),
                 expires_at: p.expires_at.clone(),
             }),
+            app_id: e.app_id.clone(),
         }),
         VaultEntry::Note(e) => VaultEntryData::Note(NoteEntryData {
             id: e.meta.id.clone(),
@@ -224,8 +225,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                     saved_at: p.saved_at,
                     expires_at: p.expires_at,
                 }),
-            // Wired to d.app_id in Stage 2 (bridge surface); None for now.
-            app_id: None,
+            app_id: d.app_id,
         })),
         VaultEntryData::Note(d) => Ok(VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -1801,6 +1801,38 @@ mod tests {
                 assert!(e.custom_fields[1].hidden);
             }
             _ => panic!("expected Card variant"),
+        }
+    }
+
+    #[test]
+    fn login_app_id_survives_data_roundtrip() {
+        use crate::vault::entry::{EntryMeta, LoginEntry};
+
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("login-appid-001"),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::from(""),
+            },
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
+            password: String::from("secret"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+            app_id: Some(String::from("com.company.app")),
+        });
+        // entry -> DTO -> entry preserves app_id: the editor's read + write path.
+        let data = vault_entry_to_data(&entry);
+        let back = vault_entry_from_data(data).unwrap();
+        match back {
+            VaultEntry::Login(ref e) => {
+                assert_eq!(e.app_id, Some(String::from("com.company.app")));
+            }
+            _ => panic!("expected Login variant"),
         }
     }
 

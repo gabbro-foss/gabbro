@@ -3039,8 +3039,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LoginEntryData dco_decode_login_entry_data(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 11)
-      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    if (arr.length != 12)
+      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
     return LoginEntryData(
       id: dco_decode_String(arr[0]),
       createdAt: dco_decode_String(arr[1]),
@@ -3055,6 +3055,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       previousPassword: dco_decode_opt_box_autoadd_previous_secret_data(
         arr[10],
       ),
+      appId: dco_decode_opt_String(arr[11]),
     );
   }
 
@@ -3917,6 +3918,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_previousPassword = sse_decode_opt_box_autoadd_previous_secret_data(
       deserializer,
     );
+    var var_appId = sse_decode_opt_String(deserializer);
     return LoginEntryData(
       id: var_id,
       createdAt: var_createdAt,
@@ -3929,6 +3931,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       notes: var_notes,
       customFields: var_customFields,
       previousPassword: var_previousPassword,
+      appId: var_appId,
     );
   }
 
@@ -4740,6 +4743,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       self.previousPassword,
       serializer,
     );
+    sse_encode_opt_String(self.appId, serializer);
   }
 
   @protected

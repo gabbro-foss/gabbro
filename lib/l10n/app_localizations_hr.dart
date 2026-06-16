@@ -907,6 +907,16 @@ class AppLocalizationsHr extends AppLocalizations {
   String get fieldUrl => 'URL (neobavezno)';
 
   @override
+  String get fieldAndroidAppId => 'ID Android aplikacije (neobavezno)';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'Ispunjava ovu prijavu u Android aplikaciji. Radi samo točno podudaranje. ID pronađite u poveznici aplikacije na Play Storeu, nakon id= (npr. id=com.company.app).';
+
+  @override
+  String get recentlyUsedApps => 'Nedavno korištene aplikacije';
+
+  @override
   String get fieldUsername => 'Korisničko ime';
 
   @override

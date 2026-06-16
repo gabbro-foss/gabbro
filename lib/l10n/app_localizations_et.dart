@@ -907,6 +907,16 @@ class AppLocalizationsEt extends AppLocalizations {
   String get fieldUrl => 'URL (valikuline)';
 
   @override
+  String get fieldAndroidAppId => 'Androidi rakenduse ID (valikuline)';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'Täidab selle sisselogimise Androidi rakenduses. Töötab ainult täpne vaste. Leia ID rakenduse Play Store\'i lingilt pärast id= (nt id=com.company.app).';
+
+  @override
+  String get recentlyUsedApps => 'Hiljuti kasutatud rakendused';
+
+  @override
   String get fieldUsername => 'Kasutajanimi';
 
   @override

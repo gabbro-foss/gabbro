@@ -904,6 +904,17 @@ class AppLocalizationsKk extends AppLocalizations {
   String get fieldUrl => 'URL (міндетті емес)';
 
   @override
+  String get fieldAndroidAppId =>
+      'Android қолданба идентификаторы (міндетті емес)';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'Бұл кіру деректерін Android қолданбасында толтырады. Тек дәл сәйкестік жұмыс істейді. Идентификаторды қолданбаның Play Store сілтемесінен id= кейін табасыз (мысалы, id=com.company.app).';
+
+  @override
+  String get recentlyUsedApps => 'Жақында пайдаланылған қолданбалар';
+
+  @override
   String get fieldUsername => 'Пайдаланушы аты';
 
   @override

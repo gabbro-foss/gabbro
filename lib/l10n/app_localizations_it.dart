@@ -907,6 +907,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get fieldUrl => 'URL (facoltativo)';
 
   @override
+  String get fieldAndroidAppId => 'ID app Android (facoltativo)';
+
+  @override
+  String get fieldAndroidAppIdHelper =>
+      'Compila questo accesso in un\'app Android. Funziona solo una corrispondenza esatta. Trova l\'ID nel link Play Store dell\'app, dopo id= (es. id=com.company.app).';
+
+  @override
+  String get recentlyUsedApps => 'App usate di recente';
+
+  @override
   String get fieldUsername => 'Nome utente';
 
   @override

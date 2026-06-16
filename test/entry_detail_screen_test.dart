@@ -578,4 +578,28 @@ void main() {
     expect(find.text('secret_token'), findsOneWidget);
     expect(find.text('••••••••'), findsNothing);
   });
+
+  testWidgets('login detail shows the Android app ID when set', (tester) async {
+    final entry = LoginEntryData(
+      id: 'test-id-1',
+      title: 'Example',
+      url: 'https://example.com',
+      username: 'user',
+      password: 'secret',
+      notes: null,
+      customFields: [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+      appId: 'com.company.app',
+    );
+    await tester.pumpWidget(_buildScreen(VaultEntryData.login(entry)));
+    expect(find.text('com.company.app'), findsOneWidget);
+  });
+
+  testWidgets('login detail omits the Android app ID when unset',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(VaultEntryData.login(_loginEntry())));
+    expect(find.text('Android app ID (optional)'), findsNothing);
+  });
 }
