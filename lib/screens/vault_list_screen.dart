@@ -999,6 +999,10 @@ class _VaultListScreenState extends State<VaultListScreen> {
     }
 
     return Scaffold(
+      // Search field sits at the top; let the keyboard overlay the scrollable
+      // list rather than shrink the body (which overflowed the header). The
+      // search field stays visible above the keyboard.
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
           _isSelecting
