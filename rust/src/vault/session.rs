@@ -781,6 +781,8 @@ pub struct LoginAutofillSummary {
     pub url: String,
     /// Recorded Android package name for native-app matching; `None` if unset.
     pub app_id: Option<String>,
+    /// Email/identifier routed to email-typed fields; `None` if unset.
+    pub email: Option<String>,
 }
 
 /// Serialize autofill summaries to the JSON array the autofill service reads.
@@ -795,11 +797,12 @@ pub fn login_summaries_json(summaries: &[LoginAutofillSummary]) -> String {
         .map(|s| {
             let esc = |v: &str| v.replace('"', "\\\"");
             format!(
-                "{{\"id\":\"{}\",\"username\":\"{}\",\"url\":\"{}\",\"app_id\":\"{}\"}}",
+                "{{\"id\":\"{}\",\"username\":\"{}\",\"url\":\"{}\",\"app_id\":\"{}\",\"email\":\"{}\"}}",
                 esc(&s.id),
                 esc(&s.username),
                 esc(&s.url),
                 esc(s.app_id.as_deref().unwrap_or("")),
+                esc(s.email.as_deref().unwrap_or("")),
             )
         })
         .collect();
@@ -824,6 +827,7 @@ pub fn login_summaries_for_autofill() -> Result<Vec<LoginAutofillSummary>, Strin
                     username: login.username.clone(),
                     url: login.url.clone(),
                     app_id: login.app_id.clone(),
+                    email: login.email.clone(),
                 })
             } else {
                 None
@@ -2022,8 +2026,9 @@ mod autofill_tests {
         assert_eq!(summaries[0].id, "af-login-001");
         assert_eq!(summaries[0].username, "rob");
         assert_eq!(summaries[0].url, "https://github.com/login");
-        // app_id is carried through (None here; set-case covered by the unit test below).
+        // app_id/email carried through (None here; set-case covered by the unit test below).
         assert_eq!(summaries[0].app_id, None);
+        assert_eq!(summaries[0].email, None);
 
         teardown(&path);
     }
@@ -2038,12 +2043,14 @@ mod autofill_tests {
                 username: String::from("user"),
                 url: String::from("https://example.com"),
                 app_id: Some(String::from("com.company.app")),
+                email: Some(String::from("user@example.com")),
             },
             LoginAutofillSummary {
                 id: String::from("id2"),
                 username: String::from("a\"b"),
                 url: String::from("https://other.example"),
                 app_id: None,
+                email: None,
             },
         ];
         let json = login_summaries_json(&summaries);
@@ -2054,6 +2061,14 @@ mod autofill_tests {
         assert!(
             json.contains("\"app_id\":\"\""),
             "app_id None must serialize as empty string: {json}"
+        );
+        assert!(
+            json.contains("\"email\":\"user@example.com\""),
+            "email must be present when set: {json}"
+        );
+        assert!(
+            json.contains("\"email\":\"\""),
+            "email None must serialize as empty string: {json}"
         );
         assert!(json.contains("a\\\"b"), "quotes must stay escaped: {json}");
         assert!(
