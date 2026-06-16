@@ -102,9 +102,13 @@ apps that fired but matched nothing, and the Login editor offers them as tap-to-
 the work must not block it.
 
 Staged (TDD per stage): **S1 Rust model (DONE** — `app_id: Option<String>` on `LoginEntry`,
-`#[serde(default)]`, no VERSION bump — body field, not envelope). S2 bridge surface
-(entry read/write + login-summary JSON). S3 Kotlin exact match + capture store. S4 Flutter
-editor field + zero-false-positive note + suggest chips + l10n (37 locales).
+`#[serde(default)]`, no VERSION bump — body field, not envelope). **S2 autofill-summary JSON
+carries `app_id` (DONE** — `LoginAutofillSummary` + `login_summaries_json` helper; pure JNI
+path, no FRB). S3 Kotlin exact `packageName == app_id` match + capture store. **S4** (all FRB
+work together — the DTO change must travel with the regen): `LoginEntryData.app_id` +
+`to_data`/`from_data` wiring + regen + Flutter editor field + zero-false-positive note +
+suggest chips + l10n (37 locales). Import/sync stay on the `VaultEntry` domain (serde), never
+the DTO — `app_id` rides along, no regression.
 
 ### Open from the security audit
 
