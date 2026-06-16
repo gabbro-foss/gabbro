@@ -2032,20 +2032,20 @@ mod autofill_tests {
         let summaries = vec![
             LoginAutofillSummary {
                 id: String::from("id1"),
-                username: String::from("rob"),
-                url: String::from("https://github.com"),
-                app_id: Some(String::from("dupont.nolio")),
+                username: String::from("user"),
+                url: String::from("https://example.com"),
+                app_id: Some(String::from("com.company.app")),
             },
             LoginAutofillSummary {
                 id: String::from("id2"),
                 username: String::from("a\"b"),
-                url: String::from("https://x.example"),
+                url: String::from("https://other.example"),
                 app_id: None,
             },
         ];
         let json = login_summaries_json(&summaries);
         assert!(
-            json.contains("\"app_id\":\"dupont.nolio\""),
+            json.contains("\"app_id\":\"com.company.app\""),
             "app_id must be present when set: {json}"
         );
         assert!(

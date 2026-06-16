@@ -70,7 +70,7 @@ pub struct LoginEntry {
     pub attachments: Vec<EntryAttachment>,
     /// Previous password value, retained for typo recovery.
     pub previous_password: Option<PreviousSecret>,
-    /// Android application id (package name, e.g. "dupont.nolio") this login
+    /// Android application id (package name, e.g. "com.company.app") this login
     /// belongs to, for native-app autofill matching. `None` until the user sets
     /// it; an unset value matches no app (no loose substring matching).
     #[serde(default)]
@@ -373,36 +373,36 @@ mod tests {
     fn login_entry_can_store_app_id() {
         let entry = LoginEntry {
             meta: default_meta(),
-            title: String::from("Nolio"),
-            url: String::from("https://nolio.example"),
-            username: String::from("rob"),
-            password: String::from("s3cr3t"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
+            password: String::from("secret"),
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
-            app_id: Some(String::from("dupont.nolio")),
+            app_id: Some(String::from("com.company.app")),
         };
-        assert_eq!(entry.app_id, Some(String::from("dupont.nolio")));
+        assert_eq!(entry.app_id, Some(String::from("com.company.app")));
     }
 
     #[test]
     fn login_entry_app_id_round_trips_through_json() {
         let entry = LoginEntry {
             meta: default_meta(),
-            title: String::from("Threema"),
-            url: String::from("https://threema.example"),
-            username: String::from("rob"),
-            password: String::from("s3cr3t"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
+            password: String::from("secret"),
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
-            app_id: Some(String::from("ch.threema.app")),
+            app_id: Some(String::from("com.example.app")),
         };
         let json = serde_json::to_string(&entry).unwrap();
         let back: LoginEntry = serde_json::from_str(&json).unwrap();
-        assert_eq!(back.app_id, Some(String::from("ch.threema.app")));
+        assert_eq!(back.app_id, Some(String::from("com.example.app")));
     }
 
     #[test]
@@ -416,10 +416,10 @@ mod tests {
                 "updated_at": "2025-01-01T00:00:00Z",
                 "folder": "Personal"
             },
-            "title": "GitHub",
-            "url": "https://github.com",
-            "username": "rob",
-            "password": "hunter2",
+            "title": "Example",
+            "url": "https://example.com",
+            "username": "user",
+            "password": "secret",
             "notes": null,
             "custom_fields": [],
             "attachments": [],
