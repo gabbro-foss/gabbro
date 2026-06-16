@@ -363,6 +363,16 @@ whole batch on one bad record).
 
 ## Flutter / Dart
 
+### Adding a field to a vault entry touches many surfaces — miss one and it silently drops
+Checklist (learned adding `app_id` then `email` to Login): Rust `entry.rs` (`#[serde(default)]`
++ every construction site — let `rustc` enumerate them) -> FRB DTO in `api/vault.rs` + both
+converters (`*_to_data`/`from_data`) -> **regen** (Rust+Dart codec must match or it corrupts
+at runtime) -> editor create AND edit builds -> **`_hasChanges`** (else an edit-only-this-field
+reads as "no changes") -> **review diff** + **detail view** (else it's invisible) -> l10n ->
+autofill summary JSON + fill. The first three Flutter surfaces (`_hasChanges`/review/detail)
+were the ones missed and only caught on-device. Import/sync ride serde and need no DTO work.
+Adding an optional `Option<T>` body field is no VERSION bump (serde-default, forward/back compat).
+
 ### App lifecycle & auto-lock
 `WidgetsBindingObserver` mixin: register in `initState`, deregister in `dispose`, override
 `didChangeAppLifecycleState`. The same action fires different states per platform: Android
