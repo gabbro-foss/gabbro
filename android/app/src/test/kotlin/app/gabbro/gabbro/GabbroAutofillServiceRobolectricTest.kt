@@ -146,4 +146,36 @@ class GabbroAutofillServiceRobolectricTest {
         assertEquals(1, result.size)
         assertEquals(CredentialSummary("1", "alice", "https://a.com", ""), result[0])
     }
+
+    @Test
+    fun parseSummariesJson_reads_app_id_field() {
+        val json = """[{"id":"1","username":"alice","url":"https://a.com","app_id":"com.company.app"}]"""
+        val result = service.parseSummariesJson(json)
+        assertEquals("com.company.app", result[0].appId)
+    }
+
+    @Test
+    fun parseSummariesJson_missing_app_id_defaults_to_empty() {
+        val json = """[{"id":"1","username":"alice","url":"https://a.com"}]"""
+        assertEquals("", service.parseSummariesJson(json)[0].appId)
+    }
+
+    // ── RecentAutofillApps (capture store) ────────────────────────────────────
+
+    @Test
+    fun recentAutofillApps_records_and_reads_back_most_recent_first() {
+        val ctx = service.applicationContext
+        RecentAutofillApps.record(ctx, "a.app")
+        RecentAutofillApps.record(ctx, "b.app")
+        assertEquals(listOf("b.app", "a.app"), RecentAutofillApps.recent(ctx))
+    }
+
+    @Test
+    fun recentAutofillApps_caps_stored_entries() {
+        val ctx = service.applicationContext
+        for (i in 1..(RecentAutofillApps.CAP + 5)) {
+            RecentAutofillApps.record(ctx, "app$i")
+        }
+        assertEquals(RecentAutofillApps.CAP, RecentAutofillApps.recent(ctx).size)
+    }
 }

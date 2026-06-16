@@ -92,17 +92,20 @@ class GabbroAutofillService : AutofillService() {
                 extractRegistrableDomain(summary.url) == requestDomain
             }
         } else {
-            // Native app context — extract app name from package and check
-            // if any vault entry URL contains it as a substring.
-            val packageName = parseResult.packageName ?: ""
-            val appToken = extractAppToken(packageName)
-            if (appToken == null) {
-                callback.onSuccess(null)
-                return
+            // Native app context — match the requesting package against entries
+            // that explicitly recorded it (exact equality; no loose matching).
+            val requestPackage = parseResult.packageName
+            val nativeMatches = parseSummariesJson(summariesJson).filter { summary ->
+                nativeAppIdMatches(summary.appId, requestPackage)
             }
-            parseSummariesJson(summariesJson).filter { summary ->
-                summary.url.contains(appToken, ignoreCase = true)
+            // No match: record the package (login fields were detected here) so the
+            // Login editor can offer it as a tap-to-fill app-id suggestion.
+            if (nativeMatches.isEmpty() &&
+                shouldRecordPackage(requestPackage, applicationContext.packageName)
+            ) {
+                RecentAutofillApps.record(applicationContext, requestPackage!!.trim())
             }
+            nativeMatches
         }
 
         if (matches.isEmpty()) {
@@ -201,19 +204,6 @@ class GabbroAutofillService : AutofillService() {
     // Helpers
     // -------------------------------------------------------------------------
 
-    /**
-     * Extracts a matchable token from an Android package name.
-     * e.g. "com.paypal.android.p2pmobile" → "paypal"
-     * Drops known TLD-like prefixes (com, org, net, app, co, io)
-     * and takes the first remaining segment.
-     * Returns null if no usable token can be extracted.
-     */
-    private fun extractAppToken(packageName: String): String? {
-        val skipSegments = setOf("com", "org", "net", "app", "co", "io", "uk", "de", "fr", "ch")
-        return packageName.split(".")
-            .firstOrNull { it.length > 2 && it !in skipSegments }
-    }
-
     // `internal` (not `private`) so same-module JVM unit tests can exercise the
     // real domain-matching logic under Robolectric. No runtime behaviour change.
     internal fun extractRegistrableDomain(input: String?): String? {
@@ -244,6 +234,7 @@ class GabbroAutofillService : AutofillService() {
                     username = obj.getString("username"),
                     url = obj.getString("url"),
                     password = "",
+                    appId = obj.optString("app_id", ""),
                 )
             }
         } catch (_: Exception) {
@@ -279,7 +270,67 @@ data class CredentialSummary(
     val username: String,
     val url: String,
     val password: String,
+    /// Recorded Android package name for native-app matching; "" when unset.
+    val appId: String = "",
 )
+
+// -----------------------------------------------------------------------------
+// Native-app matching + capture — pure helpers (unit-tested without the framework)
+// -----------------------------------------------------------------------------
+
+/**
+ * Whether a vault entry's recorded app id matches the app requesting autofill.
+ * EXACT package-name equality only. An unset (blank) app id matches nothing —
+ * the cardinal rule for a password manager: never a loose/substring guess that
+ * could offer the wrong credential.
+ */
+internal fun nativeAppIdMatches(appId: String?, packageName: String?): Boolean {
+    val a = appId?.trim().orEmpty()
+    val p = packageName?.trim().orEmpty()
+    return a.isNotEmpty() && a == p
+}
+
+/**
+ * Whether a native package should be recorded for the "recently seen apps"
+ * suggestion list: a non-blank third-party package, never our own app.
+ */
+internal fun shouldRecordPackage(packageName: String?, ownPackage: String): Boolean {
+    val p = packageName?.trim().orEmpty()
+    return p.isNotEmpty() && p != ownPackage
+}
+
+/**
+ * Pure list update for the recent-apps store: put `pkg` first, drop any prior
+ * occurrence (most-recent-first, no duplicates), and cap the size (oldest fall
+ * off the end).
+ */
+internal fun recentAppsUpdated(existing: List<String>, pkg: String, cap: Int): List<String> {
+    return (listOf(pkg) + existing.filter { it != pkg }).take(cap)
+}
+
+/**
+ * App-private store of native apps that requested autofill but matched no entry,
+ * surfaced by the Login editor as tap-to-fill suggestions for the app-id field
+ * (so users need not hunt for a package name). Metadata only — package names,
+ * no secrets — capped and clearable.
+ */
+object RecentAutofillApps {
+    private const val PREFS = "gabbro_recent_autofill_apps"
+    private const val KEY = "packages"
+    const val CAP = 10
+
+    fun record(context: android.content.Context, packageName: String) {
+        val prefs = context.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
+        val updated = recentAppsUpdated(read(prefs), packageName, CAP)
+        prefs.edit().putString(KEY, updated.joinToString("\n")).apply()
+    }
+
+    fun recent(context: android.content.Context): List<String> =
+        read(context.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE))
+
+    private fun read(prefs: android.content.SharedPreferences): List<String> =
+        prefs.getString(KEY, "").orEmpty().split("\n").filter { it.isNotBlank() }
+}
 
 // -----------------------------------------------------------------------------
 // classifyField — pure per-field decision
