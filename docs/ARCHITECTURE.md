@@ -90,19 +90,21 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**Autofill field detection — extend the diagnose-and-fix loop to installed native apps.**
-The web side is solved and device-verified. A debug-only structure dump
-(`ParsedStructure.dumpStructure`, gated by `BuildConfig.DEBUG`, tag `GabbroAutofill`,
-compiled out of release) showed Brave/Chromium actually exposes full HTML attributes
-(`type`/`name`/`id`) on every page tested — the earlier "browser exposes no fields" theory
-was wrong. Two classifier bugs were fixed in `classifyField`: (1) read the html `id`
-attribute (so `id_username` matches where `name="user"` is too short); (2) trust html
-`name`/`id` only on real form controls (`htmlType` present), so a `<form name="login">`
-container is no longer mis-classified as a username field. Verified across aur/bbs/wiki/
-github/netplus/saucony (all now `usernames=1 passwords=1`). Next: point the same dump at
-installed native apps (`inputType`/`idEntry`-driven, no `htmlInfo`) and tighten the
-keyword tiers + package matching the same way. Native-app **entry matching** is still the
-loose `extractAppToken` substring (Bikeshed).
+**Autofill native-app entry matching — explicit `app_id`.** Native field *detection*
+already works (device-dumped: Instagram, Nolio both `usernames=1 passwords=1` via
+`autofillHints`/`inputType`). The real gap is *matching* the app to a vault entry:
+`extractAppToken` picks the wrong package segment (`dupont.nolio` -> `dupont`) and its
+substring match is a false-positive risk. Decided: add an explicit `app_id` (package name)
+to Login entries, match `packageName` exactly, and **drop `extractAppToken`** (zero false
+positives — the cardinal rule). Plus capture+suggest: the autofill service records native
+apps that fired but matched nothing, and the Login editor offers them as tap-to-fill chips
+(so users don't have to hunt for the package id). `onSaveRequest` stays in the Bikeshed but
+the work must not block it.
+
+Staged (TDD per stage): **S1 Rust model (DONE** — `app_id: Option<String>` on `LoginEntry`,
+`#[serde(default)]`, no VERSION bump — body field, not envelope). S2 bridge surface
+(entry read/write + login-summary JSON). S3 Kotlin exact match + capture store. S4 Flutter
+editor field + zero-false-positive note + suggest chips + l10n (37 locales).
 
 ### Open from the security audit
 
