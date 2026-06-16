@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Vault deletion is confirmed with a checkbox, not by typing `DELETE`.** The typed English word excluded non-Latin keyboards (and a typed name/translated word would break on Unicode normalization); the "I understand…" checkbox is reliable in every script. Widget-tested.
 
 ### Fixed
+- **Vault list no longer overflows ("BOTTOM OVERFLOWED") when the search keyboard opens.** The screen kept full height under the keyboard (`resizeToAvoidBottomInset: false`) so the fixed search/filter header no longer exceeds the shrunk body; the scrollable list simply extends under the keyboard, search stays visible on top. Guarded by a phone/tablet overflow-test matrix (alphabet bar left/right, FAB, portrait/landscape, dragged list-pane width), each with the keyboard open.
 - **User-facing strings that were hardcoded in English are now localized across all 37 locales.** The vault-delete confirmation, the YubiKey "no device found" errors on Linux (which had overridden the existing translation), and the CSV-mapping / file-pick / unlock / YubiKey-operation fallbacks. Best-effort translations; community refinement welcome.
 
 ## [0.1.0-alpha.7] – 2026-06-13

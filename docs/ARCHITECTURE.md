@@ -71,7 +71,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 523 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 828 | 0 |
+| Flutter (`flutter test`) | 833 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 71 | 17 |
 
@@ -90,18 +90,14 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**Two fixes surfaced by on-device testing.** Native-app autofill matching by explicit
-`app_id` shipped and is device-verified (match works, incomplete id = no false positive,
-capture+suggest chips work — see CHANGELOG). Two pre-existing issues it surfaced are next:
+**(A) Autofill fills the username into email-typed fields.** A Login has a single
+`username`; email fields are classified USERNAME and receive it, which is wrong when the app
+wants an email (seen on coros). Pre-existing fill/data-model limitation, newly visible now
+that native autofill fires. Decide approach: guidance to store email-as-username vs a
+separate email field on Login entries.
 
-- **(B) Vault-list keyboard overflow.** "BOTTOM OVERFLOWED" above the FAB on the vault-list
-  screen when the search keyboard opens. Pre-existing; a non-scrolling layout under the
-  keyboard inset. (`vault_list_screen.dart` — untouched by the autofill work.)
-- **(A) Autofill fills the username into email-typed fields.** A Login has a single
-  `username`; email fields are classified USERNAME and receive it, which is wrong when the
-  app wants an email (seen on coros). Pre-existing fill/data-model limitation, newly visible
-  now that native autofill fires. Decide approach: guidance to store email-as-username vs a
-  separate email field on Login entries.
+(Native-app `app_id` matching shipped + device-verified; vault-list keyboard overflow fixed
+with `resizeToAvoidBottomInset: false` + a phone/tablet overflow test matrix — see CHANGELOG.)
 
 ### Open from the security audit
 
