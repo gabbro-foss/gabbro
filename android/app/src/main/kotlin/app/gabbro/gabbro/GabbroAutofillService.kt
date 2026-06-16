@@ -50,6 +50,20 @@ class GabbroAutofillService : AutofillService() {
 
         // Walk the view tree to collect all username/password AutofillIds.
         val parseResult = ParsedStructure.from(structure)
+
+        // Debug builds only: dump the raw structure to logcat so a failing page
+        // (esp. a Chromium SPA exposing no fields) can be diagnosed. Compiled out
+        // of release. Metadata only — never field values.
+        if (BuildConfig.DEBUG) {
+            ParsedStructure.dumpStructure(structure)
+            android.util.Log.d(
+                "GabbroAutofill",
+                "parse result: usernames=${parseResult.usernameIds.size} " +
+                    "passwords=${parseResult.passwordIds.size} " +
+                    "web=${parseResult.webDomain} pkg=${parseResult.packageName}",
+            )
+        }
+
         if (parseResult.isEmpty()) {
             // No autofillable fields found on this screen — nothing to offer.
             callback.onSuccess(null)
@@ -295,6 +309,7 @@ internal fun classifyField(
     hint: String?,
     idEntry: String?,
     htmlName: String?,
+    htmlId: String?,
 ): FieldKind {
     // Tier 1: explicit autofill hints. Covers Android constants and the HTML
     // autocomplete values Chromium maps into hints (e.g. "email", "username").
@@ -349,11 +364,17 @@ internal fun classifyField(
         }
     }
 
-    // Tier 4: keyword fallback. Password only from the more reliable name/id
-    // (a free-text "hint" of "password" is too noisy); username also from hint.
-    val nameId = listOfNotNull(idEntry, htmlName).map { it.lowercase() }
-    if (nameId.any { it.contains("password") }) return FieldKind.PASSWORD
-    val userSources = listOfNotNull(hint, idEntry, htmlName).map { it.lowercase() }
+    // Tier 4: keyword fallback. The html name/id attributes are only trusted on a
+    // real form control (htmlType present) — a <form name="login"> container also
+    // carries an html name but no type, and must not be matched as a field.
+    // idEntry/hint stay unconditional (native apps have no htmlInfo).
+    val htmlFieldKeywords = if (htmlType != null) listOfNotNull(htmlName, htmlId) else emptyList()
+
+    // Password only from the more reliable name/id (a free-text "hint" of
+    // "password" is too noisy); username also from hint.
+    val passwordSources = (listOfNotNull(idEntry) + htmlFieldKeywords).map { it.lowercase() }
+    if (passwordSources.any { it.contains("password") }) return FieldKind.PASSWORD
+    val userSources = (listOfNotNull(hint, idEntry) + htmlFieldKeywords).map { it.lowercase() }
     if (userSources.any {
             it.contains("email") || it.contains("username") ||
                 it.contains("login") || it.contains("phone")
@@ -363,6 +384,56 @@ internal fun classifyField(
     }
 
     return FieldKind.NONE
+}
+
+// -----------------------------------------------------------------------------
+// formatNodeDiagnostic — pure log-line formatter for the debug structure dump
+// -----------------------------------------------------------------------------
+
+/**
+ * Render one ViewNode's signals into a single stable diagnostic line. Used only
+ * by the debug-gated [dumpStructure] so a logcat capture on a failing page (esp.
+ * a Chromium SPA that hands the framework no field structure) shows exactly what,
+ * if anything, the browser exposed.
+ *
+ * Pure so it can be unit-tested without the framework. Logs structural metadata
+ * only — never an AutofillValue / typed text.
+ */
+internal fun formatNodeDiagnostic(
+    className: String?,
+    hasAutofillId: Boolean,
+    autofillHints: List<String>?,
+    inputType: Int,
+    htmlType: String?,
+    htmlName: String?,
+    htmlAutocomplete: String?,
+    htmlId: String?,
+    webDomain: String?,
+    idEntry: String?,
+    hint: String?,
+    childCount: Int,
+): String {
+    val htmlAttrs = listOf(
+        "type" to htmlType,
+        "name" to htmlName,
+        "autocomplete" to htmlAutocomplete,
+        "id" to htmlId,
+    ).filter { !it.second.isNullOrBlank() }
+        .joinToString(",") { "${it.first}=${it.second}" }
+
+    val hints = autofillHints?.filter { it.isNotBlank() }?.joinToString(",").orEmpty()
+
+    return buildString {
+        append(className ?: "?")
+        append(" afId=").append(if (hasAutofillId) "yes" else "no")
+        append(" inputType=0x").append(Integer.toHexString(inputType))
+        append(" html[").append(htmlAttrs).append("]")
+        append(" hints[").append(hints).append("]")
+        if (!idEntry.isNullOrBlank()) append(" idEntry=").append(idEntry)
+        if (!hint.isNullOrBlank()) append(" hint=").append(hint)
+        if (!webDomain.isNullOrBlank()) append(" web=").append(webDomain)
+        append(" children=").append(childCount)
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -405,6 +476,50 @@ data class ParsedStructure(
             return ParsedStructure(usernameIds, passwordIds, webDomain, packageName)
         }
 
+        /**
+         * Debug-only: walk every node and emit its raw signals to logcat
+         * (`adb logcat -s GabbroAutofill`). Gated by the caller behind
+         * BuildConfig.DEBUG so it is compiled out of release builds. Diagnoses
+         * pages where `from()` finds no fields — shows whether the browser
+         * exposed any structure at all. Metadata only, never field values.
+         */
+        fun dumpStructure(structure: AssistStructure) {
+            android.util.Log.d(LOG_TAG, "=== AssistStructure dump: windows=${structure.windowNodeCount} ===")
+            for (i in 0 until structure.windowNodeCount) {
+                val windowNode = structure.getWindowNodeAt(i)
+                android.util.Log.d(LOG_TAG, "window[$i] title=${windowNode.title}")
+                dumpNode(windowNode.rootViewNode, 0)
+            }
+        }
+
+        private fun dumpNode(node: AssistStructure.ViewNode, depth: Int) {
+            val htmlAttrs = node.htmlInfo?.attributes
+            fun htmlAttr(name: String): String? =
+                htmlAttrs?.firstOrNull { it.first.equals(name, ignoreCase = true) }?.second
+
+            val line = formatNodeDiagnostic(
+                className = node.className,
+                hasAutofillId = node.autofillId != null,
+                autofillHints = node.autofillHints?.toList(),
+                inputType = node.inputType,
+                htmlType = htmlAttr("type"),
+                htmlName = htmlAttr("name"),
+                htmlAutocomplete = htmlAttr("autocomplete"),
+                htmlId = htmlAttr("id"),
+                webDomain = node.webDomain,
+                idEntry = node.idEntry,
+                hint = node.hint,
+                childCount = node.childCount,
+            )
+            android.util.Log.d(LOG_TAG, "  ".repeat(depth) + line)
+
+            for (i in 0 until node.childCount) {
+                dumpNode(node.getChildAt(i), depth + 1)
+            }
+        }
+
+        private const val LOG_TAG = "GabbroAutofill"
+
         private fun collectIds(
             node: AssistStructure.ViewNode,
             usernameIds: MutableList<AutofillId>,
@@ -436,6 +551,7 @@ data class ParsedStructure(
                         hint = node.hint,
                         idEntry = node.idEntry,
                         htmlName = htmlAttr("name"),
+                        htmlId = htmlAttr("id"),
                     )
                 ) {
                     FieldKind.USERNAME -> usernameIds.add(id)

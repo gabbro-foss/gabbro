@@ -20,6 +20,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
 
+    buildFeatures {
+        // Generates BuildConfig (with DEBUG) — gates the debug-only autofill
+        // structure dump so it compiles out of release APKs.
+        buildConfig = true
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "app.gabbro.gabbro"
@@ -44,6 +50,13 @@ android {
         release {
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        debug {
+            // Sign debug builds with the release key so a debug APK
+            // (BuildConfig.DEBUG=true, autofill dump active) can update an
+            // already-installed release build in place without wiping the
+            // on-device vault. Debug-only; release signing is unaffected.
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
