@@ -133,6 +133,7 @@ release process live in their own document:
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
 - Test on de-Googled Android (GrapheneOS/CalyxOS) before v1 — find a willing community tester, don't buy hardware.
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
+- **`UnlockActivity` autofill matching is unhardened (locked-vault path).** The service (`GabbroAutofillService`) matches natively by exact `app_id` and web by the PSL eTLD+1, but `UnlockActivity` — which does the matching *after* an unlock from a locked vault — still uses the old loose `extractAppToken` substring and a naive last-two-labels eTLD+1. So a locked-vault autofill can false-positive natively and hit the F-10 cross-match on the web (wrong credential offered). Bring it to parity with the service (reuse `nativeAppIdMatches` / the PSL matcher); ideally de-duplicate the matching logic so the two paths can't drift again.
 
 ### Features & UX
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
