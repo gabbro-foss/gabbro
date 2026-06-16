@@ -918,7 +918,7 @@ class AppLocalizationsSk extends AppLocalizations {
   String get recentlyUsedApps => 'Nedávno použité aplikácie';
 
   @override
-  String get fieldUsername => 'Používateľské meno';
+  String get fieldUsername => 'Používateľské meno (voliteľné)';
 
   @override
   String get fieldPassword => 'Heslo';

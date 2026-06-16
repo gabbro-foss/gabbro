@@ -918,7 +918,7 @@ class AppLocalizationsLt extends AppLocalizations {
   String get recentlyUsedApps => 'Neseniai naudotos programos';
 
   @override
-  String get fieldUsername => 'Vartotojo vardas';
+  String get fieldUsername => 'Vartotojo vardas (nebūtinas)';
 
   @override
   String get fieldPassword => 'Slaptažodis';

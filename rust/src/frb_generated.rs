@@ -3126,6 +3126,7 @@ impl SseDecode for crate::api::vault::LoginEntryData {
         let mut var_previousPassword =
             <Option<crate::api::vault::PreviousSecretData>>::sse_decode(deserializer);
         let mut var_appId = <Option<String>>::sse_decode(deserializer);
+        let mut var_email = <Option<String>>::sse_decode(deserializer);
         return crate::api::vault::LoginEntryData {
             id: var_id,
             created_at: var_createdAt,
@@ -3139,6 +3140,7 @@ impl SseDecode for crate::api::vault::LoginEntryData {
             custom_fields: var_customFields,
             previous_password: var_previousPassword,
             app_id: var_appId,
+            email: var_email,
         };
     }
 }
@@ -4143,6 +4145,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::LoginEntryData {
             self.custom_fields.into_into_dart().into_dart(),
             self.previous_password.into_into_dart().into_dart(),
             self.app_id.into_into_dart().into_dart(),
+            self.email.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4884,6 +4887,7 @@ impl SseEncode for crate::api::vault::LoginEntryData {
             serializer,
         );
         <Option<String>>::sse_encode(self.app_id, serializer);
+        <Option<String>>::sse_encode(self.email, serializer);
     }
 }
 

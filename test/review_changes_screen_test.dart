@@ -145,8 +145,8 @@ LoginEntryData _updatedUrlOnly() => LoginEntryData(
       previousPassword: null,
     );
 
-// Generic login differing only in app_id, to isolate the app-id diff.
-LoginEntryData _appIdLogin({String? appId}) => LoginEntryData(
+// Generic login to isolate a single-field diff (app_id or email).
+LoginEntryData _appIdLogin({String? appId, String? email}) => LoginEntryData(
       id: 'test-id-1',
       title: 'Example',
       url: 'https://example.com',
@@ -159,6 +159,7 @@ LoginEntryData _appIdLogin({String? appId}) => LoginEntryData(
       folder: 'Personal',
       previousPassword: null,
       appId: appId,
+      email: email,
     );
 
 // ── Widget helper ─────────────────────────────────────────────────────────────
@@ -220,6 +221,15 @@ void main() {
     ));
 
     expect(find.text('com.company.app'), findsOneWidget);
+  });
+
+  testWidgets('shows the email change in the diff', (tester) async {
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.login(_appIdLogin()),
+      updated: VaultEntryData.login(_appIdLogin(email: 'user@example.com')),
+    ));
+
+    expect(find.text('user@example.com'), findsOneWidget);
   });
 
   testWidgets('does not show unchanged fields in diff', (tester) async {

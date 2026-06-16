@@ -393,7 +393,7 @@
   "fieldAndroidAppId": "ID app Android (facoltativo)",
   "fieldAndroidAppIdHelper": "Compila questo accesso in un'app Android. Funziona solo una corrispondenza esatta. Trova l'ID nel link Play Store dell'app, dopo id= (es. id=com.company.app).",
   "recentlyUsedApps": "App usate di recente",
-  "fieldUsername": "Nome utente",
+  "fieldUsername": "Nome utente (facoltativo)",
   "fieldPassword": "Password",
   "fieldSeparator": "Separatore",
   "fieldFolder": "Cartella",

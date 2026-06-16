@@ -919,7 +919,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get recentlyUsedApps => 'Наскоро използвани приложения';
 
   @override
-  String get fieldUsername => 'Потребителско ime';
+  String get fieldUsername => 'Потребителско ime (незадължително)';
 
   @override
   String get fieldPassword => 'Парола';

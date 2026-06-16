@@ -189,6 +189,7 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
         _addDiff(diffs, l.fieldTitle, field0.title, u.title);
         _addDiff(diffs, l.reviewFieldUrl, field0.url, u.url);
         _addDiff(diffs, l.fieldUsername, field0.username, u.username);
+        _addDiff(diffs, l.fieldEmail, field0.email ?? '', u.email ?? '');
         _addDiff(diffs, l.reviewFieldNotes, field0.notes ?? '', u.notes ?? '');
         _addDiff(diffs, l.fieldAndroidAppId, field0.appId ?? '', u.appId ?? '');
         _addDiff(diffs, l.fieldFolder, field0.folder, u.folder);

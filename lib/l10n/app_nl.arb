@@ -393,7 +393,7 @@
   "fieldAndroidAppId": "Android-app-ID (optioneel)",
   "fieldAndroidAppIdHelper": "Vult deze login in in een Android-app. Alleen een exacte overeenkomst werkt. Vind de ID in de Play Store-link van de app, na id= (bijv. id=com.company.app).",
   "recentlyUsedApps": "Onlangs gebruikte apps",
-  "fieldUsername": "Gebruikersnaam",
+  "fieldUsername": "Gebruikersnaam (optioneel)",
   "fieldPassword": "Wachtwoord",
   "fieldSeparator": "Scheidingsteken",
   "fieldFolder": "Map",

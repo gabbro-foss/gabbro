@@ -918,7 +918,7 @@ class AppLocalizationsSr extends AppLocalizations {
   String get recentlyUsedApps => 'Недавно коришћене апликације';
 
   @override
-  String get fieldUsername => 'Korisničko ime';
+  String get fieldUsername => 'Korisničko ime (neobavezno)';
 
   @override
   String get fieldPassword => 'Lozinka';
@@ -2851,7 +2851,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get recentlyUsedApps => 'Nedavno korišćene aplikacije';
 
   @override
-  String get fieldUsername => 'Korisničko ime';
+  String get fieldUsername => 'Korisničko ime (neobavezno)';
 
   @override
   String get fieldPassword => 'Lozinka';

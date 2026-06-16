@@ -916,7 +916,7 @@ class AppLocalizationsDa extends AppLocalizations {
   String get recentlyUsedApps => 'Senest brugte apps';
 
   @override
-  String get fieldUsername => 'Brugernavn';
+  String get fieldUsername => 'Brugernavn (valgfrit)';
 
   @override
   String get fieldPassword => 'Adgangskode';

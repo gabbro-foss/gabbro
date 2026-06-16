@@ -393,7 +393,7 @@
   "fieldAndroidAppId": "Androidi rakenduse ID (valikuline)",
   "fieldAndroidAppIdHelper": "Täidab selle sisselogimise Androidi rakenduses. Töötab ainult täpne vaste. Leia ID rakenduse Play Store'i lingilt pärast id= (nt id=com.company.app).",
   "recentlyUsedApps": "Hiljuti kasutatud rakendused",
-  "fieldUsername": "Kasutajanimi",
+  "fieldUsername": "Kasutajanimi (valikuline)",
   "fieldPassword": "Parool",
   "fieldSeparator": "Eraldaja",
   "fieldFolder": "Kaust",

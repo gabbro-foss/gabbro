@@ -917,7 +917,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get recentlyUsedApps => 'Nedavno korištene aplikacije';
 
   @override
-  String get fieldUsername => 'Korisničko ime';
+  String get fieldUsername => 'Korisničko ime (neobavezno)';
 
   @override
   String get fieldPassword => 'Lozinka';

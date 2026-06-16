@@ -917,7 +917,7 @@ class AppLocalizationsEt extends AppLocalizations {
   String get recentlyUsedApps => 'Hiljuti kasutatud rakendused';
 
   @override
-  String get fieldUsername => 'Kasutajanimi';
+  String get fieldUsername => 'Kasutajanimi (valikuline)';
 
   @override
   String get fieldPassword => 'Parool';

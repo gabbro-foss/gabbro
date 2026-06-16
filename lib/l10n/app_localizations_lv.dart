@@ -915,7 +915,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get recentlyUsedApps => 'Nesen lietotās lietotnes';
 
   @override
-  String get fieldUsername => 'Lietotājvārds';
+  String get fieldUsername => 'Lietotājvārds (neobligāts)';
 
   @override
   String get fieldPassword => 'Parole';

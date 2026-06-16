@@ -393,7 +393,7 @@
   "fieldAndroidAppId": "ID aplikacije za Android (izbirno)",
   "fieldAndroidAppIdHelper": "Izpolni to prijavo v aplikaciji za Android. Deluje samo natančno ujemanje. ID poiščite v povezavi aplikacije v trgovini Play Store, za id= (npr. id=com.company.app).",
   "recentlyUsedApps": "Nedavno uporabljene aplikacije",
-  "fieldUsername": "Uporabniško ime",
+  "fieldUsername": "Uporabniško ime (neobvezno)",
   "fieldPassword": "Geslo",
   "fieldSeparator": "Ločilo",
   "fieldFolder": "Mapa",

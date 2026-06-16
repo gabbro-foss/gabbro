@@ -916,7 +916,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get recentlyUsedApps => 'Nemrég használt alkalmazások';
 
   @override
-  String get fieldUsername => 'Felhasználónév';
+  String get fieldUsername => 'Felhasználónév (opcionális)';
 
   @override
   String get fieldPassword => 'Jelszó';

@@ -452,6 +452,9 @@ class LoginEntryData {
   /// Android application id for native-app autofill matching; `None` if unset.
   final String? appId;
 
+  /// Email/identifier routed to email-typed fields; `None` if unset.
+  final String? email;
+
   const LoginEntryData({
     required this.id,
     required this.createdAt,
@@ -465,6 +468,7 @@ class LoginEntryData {
     required this.customFields,
     this.previousPassword,
     this.appId,
+    this.email,
   });
 
   @override
@@ -480,7 +484,8 @@ class LoginEntryData {
       notes.hashCode ^
       customFields.hashCode ^
       previousPassword.hashCode ^
-      appId.hashCode;
+      appId.hashCode ^
+      email.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -498,7 +503,8 @@ class LoginEntryData {
           notes == other.notes &&
           customFields == other.customFields &&
           previousPassword == other.previousPassword &&
-          appId == other.appId;
+          appId == other.appId &&
+          email == other.email;
 }
 
 /// Summary returned to Flutter after a vault merge operation.

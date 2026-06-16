@@ -916,7 +916,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get recentlyUsedApps => 'Nylig brukte apper';
 
   @override
-  String get fieldUsername => 'Brukernavn';
+  String get fieldUsername => 'Brukernavn (valgfritt)';
 
   @override
   String get fieldPassword => 'Passord';

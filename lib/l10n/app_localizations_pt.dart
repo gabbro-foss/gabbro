@@ -916,7 +916,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get recentlyUsedApps => 'Aplicações usadas recentemente';
 
   @override
-  String get fieldUsername => 'Usuário';
+  String get fieldUsername => 'Usuário (opcional)';
 
   @override
   String get fieldPassword => 'Senha';
@@ -2852,7 +2852,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get recentlyUsedApps => 'Apps usados recentemente';
 
   @override
-  String get fieldUsername => 'Usuário';
+  String get fieldUsername => 'Usuário (opcional)';
 
   @override
   String get fieldPassword => 'Senha';
@@ -4785,7 +4785,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get recentlyUsedApps => 'Aplicações usadas recentemente';
 
   @override
-  String get fieldUsername => 'Nome de utilizador';
+  String get fieldUsername => 'Nome de utilizador (opcional)';
 
   @override
   String get fieldPassword => 'Palavra-passe';

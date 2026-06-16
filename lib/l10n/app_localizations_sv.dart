@@ -917,7 +917,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get recentlyUsedApps => 'Nyligen använda appar';
 
   @override
-  String get fieldUsername => 'Användarnamn';
+  String get fieldUsername => 'Användarnamn (valfritt)';
 
   @override
   String get fieldPassword => 'Lösenord';

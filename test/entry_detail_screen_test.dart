@@ -602,4 +602,22 @@ void main() {
     await tester.pumpWidget(_buildScreen(VaultEntryData.login(_loginEntry())));
     expect(find.text('Android app ID (optional)'), findsNothing);
   });
+
+  testWidgets('login detail shows the email when set', (tester) async {
+    final entry = LoginEntryData(
+      id: 'test-id-1',
+      title: 'Example',
+      url: 'https://example.com',
+      username: 'user',
+      password: 'secret',
+      notes: null,
+      customFields: [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+      email: 'user@example.com',
+    );
+    await tester.pumpWidget(_buildScreen(VaultEntryData.login(entry)));
+    expect(find.text('user@example.com'), findsOneWidget);
+  });
 }

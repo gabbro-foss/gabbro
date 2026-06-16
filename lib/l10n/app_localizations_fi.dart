@@ -917,7 +917,7 @@ class AppLocalizationsFi extends AppLocalizations {
   String get recentlyUsedApps => 'Viimeksi käytetyt sovellukset';
 
   @override
-  String get fieldUsername => 'Käyttäjänimi';
+  String get fieldUsername => 'Käyttäjänimi (valinnainen)';
 
   @override
   String get fieldPassword => 'Salasana';

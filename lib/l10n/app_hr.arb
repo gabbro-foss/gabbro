@@ -393,7 +393,7 @@
   "fieldAndroidAppId": "ID Android aplikacije (neobavezno)",
   "fieldAndroidAppIdHelper": "Ispunjava ovu prijavu u Android aplikaciji. Radi samo točno podudaranje. ID pronađite u poveznici aplikacije na Play Storeu, nakon id= (npr. id=com.company.app).",
   "recentlyUsedApps": "Nedavno korištene aplikacije",
-  "fieldUsername": "Korisničko ime",
+  "fieldUsername": "Korisničko ime (neobavezno)",
   "fieldPassword": "Lozinka",
   "fieldSeparator": "Separator",
   "fieldFolder": "Mapa",

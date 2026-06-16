@@ -1852,7 +1852,7 @@ abstract class AppLocalizations {
   /// No description provided for @fieldUsername.
   ///
   /// In en, this message translates to:
-  /// **'Username'**
+  /// **'Username (optional)'**
   String get fieldUsername;
 
   /// No description provided for @fieldPassword.

@@ -915,7 +915,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get recentlyUsedApps => 'Жақында пайдаланылған қолданбалар';
 
   @override
-  String get fieldUsername => 'Пайдаланушы аты';
+  String get fieldUsername => 'Пайдаланушы аты (міндетті емес)';
 
   @override
   String get fieldPassword => 'Құпия сөз';

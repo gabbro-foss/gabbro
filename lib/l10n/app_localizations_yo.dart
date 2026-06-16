@@ -916,7 +916,7 @@ class AppLocalizationsYo extends AppLocalizations {
   String get recentlyUsedApps => 'Àwọn app tí a lò láìpẹ́';
 
   @override
-  String get fieldUsername => 'Orukọ olumulo';
+  String get fieldUsername => 'Orukọ olumulo (aṣayan)';
 
   @override
   String get fieldPassword => 'Ọrọ igbaniwọle';

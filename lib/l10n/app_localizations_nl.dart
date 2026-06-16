@@ -917,7 +917,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get recentlyUsedApps => 'Onlangs gebruikte apps';
 
   @override
-  String get fieldUsername => 'Gebruikersnaam';
+  String get fieldUsername => 'Gebruikersnaam (optioneel)';
 
   @override
   String get fieldPassword => 'Wachtwoord';

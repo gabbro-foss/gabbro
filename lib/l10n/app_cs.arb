@@ -393,7 +393,7 @@
   "fieldAndroidAppId": "ID aplikace pro Android (volitelné)",
   "fieldAndroidAppIdHelper": "Vyplní toto přihlášení v aplikaci pro Android. Funguje pouze přesná shoda. ID najdete v odkazu aplikace na Play Store, za id= (např. id=com.company.app).",
   "recentlyUsedApps": "Naposledy použité aplikace",
-  "fieldUsername": "Uživatelské jméno",
+  "fieldUsername": "Uživatelské jméno (volitelné)",
   "fieldPassword": "Heslo",
   "fieldSeparator": "Oddělovač",
   "fieldFolder": "Složka",

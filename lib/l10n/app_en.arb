@@ -406,7 +406,7 @@
   "fieldAndroidAppId": "Android app ID (optional)",
   "fieldAndroidAppIdHelper": "Fills this login in an Android app. Only an exact match works. Find the ID in the app's Play Store link, after id= (e.g. id=com.company.app).",
   "recentlyUsedApps": "Recently used apps",
-  "fieldUsername": "Username",
+  "fieldUsername": "Username (optional)",
   "fieldPassword": "Password",
   "fieldSeparator": "Separator",
   "fieldFolder": "Folder",

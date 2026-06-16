@@ -79,6 +79,7 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                 expires_at: p.expires_at.clone(),
             }),
             app_id: e.app_id.clone(),
+            email: e.email.clone(),
         }),
         VaultEntry::Note(e) => VaultEntryData::Note(NoteEntryData {
             id: e.meta.id.clone(),
@@ -226,8 +227,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                     expires_at: p.expires_at,
                 }),
             app_id: d.app_id,
-            // Wired to d.email in E3 (DTO gains the field with the regen); None now.
-            email: None,
+            email: d.email,
         })),
         VaultEntryData::Note(d) => Ok(VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
@@ -1828,14 +1828,15 @@ mod tests {
             attachments: vec![],
             previous_password: None,
             app_id: Some(String::from("com.company.app")),
-            email: None,
+            email: Some(String::from("user@example.com")),
         });
-        // entry -> DTO -> entry preserves app_id: the editor's read + write path.
+        // entry -> DTO -> entry preserves app_id + email: the editor read/write path.
         let data = vault_entry_to_data(&entry);
         let back = vault_entry_from_data(data).unwrap();
         match back {
             VaultEntry::Login(ref e) => {
                 assert_eq!(e.app_id, Some(String::from("com.company.app")));
+                assert_eq!(e.email, Some(String::from("user@example.com")));
             }
             _ => panic!("expected Login variant"),
         }

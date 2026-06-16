@@ -920,7 +920,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get recentlyUsedApps => 'Applications récemment utilisées';
 
   @override
-  String get fieldUsername => 'Nom d\'utilisateur';
+  String get fieldUsername => 'Nom d\'utilisateur (facultatif)';
 
   @override
   String get fieldPassword => 'Mot de passe';

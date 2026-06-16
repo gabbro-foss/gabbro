@@ -921,7 +921,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get recentlyUsedApps => 'Ostatnio używane aplikacje';
 
   @override
-  String get fieldUsername => 'Nazwa użytkownika';
+  String get fieldUsername => 'Nazwa użytkownika (opcjonalnie)';
 
   @override
   String get fieldPassword => 'Hasło';

@@ -53,6 +53,8 @@ pub struct LoginEntryData {
     pub previous_password: Option<PreviousSecretData>,
     /// Android application id for native-app autofill matching; `None` if unset.
     pub app_id: Option<String>,
+    /// Email/identifier routed to email-typed fields; `None` if unset.
+    pub email: Option<String>,
 }
 
 /// A note entry as seen by Flutter.
@@ -197,6 +199,7 @@ fn login_entry_to_data(e: &LoginEntry) -> LoginEntryData {
         custom_fields: e.custom_fields.iter().map(custom_field_to_data).collect(),
         previous_password: e.previous_password.as_ref().map(previous_secret_to_data),
         app_id: e.app_id.clone(),
+        email: e.email.clone(),
     }
 }
 

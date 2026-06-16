@@ -393,7 +393,7 @@
   "fieldAndroidAppId": "Android-app-id (valgfrit)",
   "fieldAndroidAppIdHelper": "Udfylder dette login i en Android-app. Kun et nøjagtigt match virker. Find id'et i appens Play Store-link efter id= (f.eks. id=com.company.app).",
   "recentlyUsedApps": "Senest brugte apps",
-  "fieldUsername": "Brugernavn",
+  "fieldUsername": "Brugernavn (valgfrit)",
   "fieldPassword": "Adgangskode",
   "fieldSeparator": "Adskiller",
   "fieldFolder": "Mappe",

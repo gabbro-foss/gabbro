@@ -917,7 +917,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get recentlyUsedApps => 'Zuletzt verwendete Apps';
 
   @override
-  String get fieldUsername => 'Benutzername';
+  String get fieldUsername => 'Benutzername (optional)';
 
   @override
   String get fieldPassword => 'Passwort';

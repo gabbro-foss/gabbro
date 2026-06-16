@@ -906,7 +906,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get recentlyUsedApps => '最近使用したアプリ';
 
   @override
-  String get fieldUsername => 'ユーザー名';
+  String get fieldUsername => 'ユーザー名 (任意)';
 
   @override
   String get fieldPassword => 'パスワード';

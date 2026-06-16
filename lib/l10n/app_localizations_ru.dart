@@ -920,7 +920,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get recentlyUsedApps => 'Недавно использованные приложения';
 
   @override
-  String get fieldUsername => 'Имя пользователя';
+  String get fieldUsername => 'Имя пользователя (необязательно)';
 
   @override
   String get fieldPassword => 'Пароль';

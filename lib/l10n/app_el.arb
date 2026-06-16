@@ -393,7 +393,7 @@
   "fieldAndroidAppId": "Αναγνωριστικό εφαρμογής Android (προαιρετικό)",
   "fieldAndroidAppIdHelper": "Συμπληρώνει αυτά τα στοιχεία σύνδεσης σε μια εφαρμογή Android. Λειτουργεί μόνο ακριβής αντιστοίχιση. Βρείτε το αναγνωριστικό στον σύνδεσμο Play Store της εφαρμογής, μετά το id= (π.χ. id=com.company.app).",
   "recentlyUsedApps": "Πρόσφατα χρησιμοποιημένες εφαρμογές",
-  "fieldUsername": "Όνομα χρήστη",
+  "fieldUsername": "Όνομα χρήστη (προαιρετικό)",
   "fieldPassword": "Κωδικός",
   "fieldSeparator": "Διαχωριστής",
   "fieldFolder": "Φάκελος",

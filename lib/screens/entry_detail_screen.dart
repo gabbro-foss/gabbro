@@ -342,6 +342,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
         _field(l.fieldTitle, e.title, l),
         _urlField(e.url, l),
         _field(l.fieldUsername, e.username, l),
+        if (e.email != null && e.email!.isNotEmpty)
+          _field(l.fieldEmail, e.email!, l),
         _toggleField(
           label: l.fieldPassword,
           value: e.password,

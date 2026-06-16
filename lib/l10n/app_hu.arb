@@ -393,7 +393,7 @@
   "fieldAndroidAppId": "Android-alkalmazás azonosító (nem kötelező)",
   "fieldAndroidAppIdHelper": "Kitölti ezt a bejelentkezést egy Android-alkalmazásban. Csak a pontos egyezés működik. Az azonosítót az alkalmazás Play Store-linkjében találja, az id= után (pl. id=com.company.app).",
   "recentlyUsedApps": "Nemrég használt alkalmazások",
-  "fieldUsername": "Felhasználónév",
+  "fieldUsername": "Felhasználónév (opcionális)",
   "fieldPassword": "Jelszó",
   "fieldSeparator": "Elválasztó",
   "fieldFolder": "Mappa",

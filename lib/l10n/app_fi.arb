@@ -393,7 +393,7 @@
   "fieldAndroidAppId": "Android-sovelluksen tunnus (valinnainen)",
   "fieldAndroidAppIdHelper": "Täyttää nämä kirjautumistiedot Android-sovelluksessa. Vain tarkka vastaavuus toimii. Löydät tunnuksen sovelluksen Play Store -linkistä kohdan id= jälkeen (esim. id=com.company.app).",
   "recentlyUsedApps": "Viimeksi käytetyt sovellukset",
-  "fieldUsername": "Käyttäjänimi",
+  "fieldUsername": "Käyttäjänimi (valinnainen)",
   "fieldPassword": "Salasana",
   "fieldSeparator": "Erotin",
   "fieldFolder": "Kansio",

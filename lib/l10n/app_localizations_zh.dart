@@ -903,7 +903,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get recentlyUsedApps => '最近使用的应用';
 
   @override
-  String get fieldUsername => '用户名';
+  String get fieldUsername => '用户名（可选）';
 
   @override
   String get fieldPassword => '密码';
@@ -2748,7 +2748,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get recentlyUsedApps => '最近使用的应用';
 
   @override
-  String get fieldUsername => '用户名';
+  String get fieldUsername => '用户名（可选）';
 
   @override
   String get fieldPassword => '密码';
@@ -4593,7 +4593,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get recentlyUsedApps => '最近使用的應用程式';
 
   @override
-  String get fieldUsername => '使用者名稱';
+  String get fieldUsername => '使用者名稱（選填）';
 
   @override
   String get fieldPassword => '密碼';

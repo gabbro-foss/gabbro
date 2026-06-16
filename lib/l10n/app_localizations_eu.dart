@@ -917,7 +917,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get recentlyUsedApps => 'Azkenaldian erabilitako aplikazioak';
 
   @override
-  String get fieldUsername => 'Erabiltzaile-izena';
+  String get fieldUsername => 'Erabiltzaile-izena (aukerakoa)';
 
   @override
   String get fieldPassword => 'Pasahitza';

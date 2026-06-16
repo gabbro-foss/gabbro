@@ -907,7 +907,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get recentlyUsedApps => '최근 사용한 앱';
 
   @override
-  String get fieldUsername => '사용자 이름';
+  String get fieldUsername => '사용자 이름 (선택사항)';
 
   @override
   String get fieldPassword => '비밀번호';

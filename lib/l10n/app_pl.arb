@@ -393,7 +393,7 @@
   "fieldAndroidAppId": "Identyfikator aplikacji Android (opcjonalnie)",
   "fieldAndroidAppIdHelper": "Wypełnia te dane logowania w aplikacji Android. Działa tylko dokładne dopasowanie. Identyfikator znajdziesz w linku aplikacji w Play Store, po id= (np. id=com.company.app).",
   "recentlyUsedApps": "Ostatnio używane aplikacje",
-  "fieldUsername": "Nazwa użytkownika",
+  "fieldUsername": "Nazwa użytkownika (opcjonalnie)",
   "fieldPassword": "Hasło",
   "fieldSeparator": "Separator",
   "fieldFolder": "Folder",

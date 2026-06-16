@@ -921,7 +921,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get recentlyUsedApps => 'Нещодавно використані додатки';
 
   @override
-  String get fieldUsername => 'Ім\'я користувача';
+  String get fieldUsername => 'Ім\'я користувача (необов\'язково)';
 
   @override
   String get fieldPassword => 'Пароль';

@@ -393,7 +393,7 @@
   "fieldAndroidAppId": "Android アプリ ID（任意）",
   "fieldAndroidAppIdHelper": "このログイン情報を Android アプリで自動入力します。完全一致のみが機能します。ID はアプリの Play Store リンクの id= の後にあります（例: id=com.company.app）。",
   "recentlyUsedApps": "最近使用したアプリ",
-  "fieldUsername": "ユーザー名",
+  "fieldUsername": "ユーザー名 (任意)",
   "fieldPassword": "パスワード",
   "fieldSeparator": "区切り文字",
   "fieldFolder": "フォルダ",

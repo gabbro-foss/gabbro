@@ -77,8 +77,9 @@ void main() {
     await tester.pump();
 
     expect(find.text('Title is required'), findsOneWidget);
-    expect(find.text('Username is required'), findsOneWidget);
     expect(find.text('Password is required'), findsOneWidget);
+    // Username is optional now — it must NOT be required.
+    expect(find.text('Username is required'), findsNothing);
   });
 
   testWidgets('edit mode pre-populates fields', (tester) async {
@@ -365,7 +366,7 @@ void main() {
       'https://obsidian.example.com',
     );
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'Username'),
+      find.widgetWithText(TextFormField, 'Username (optional)'),
       'rob',
     );
     await tester.enterText(
@@ -402,7 +403,7 @@ void main() {
       'Basalt Computer',
     );
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'Username'),
+      find.widgetWithText(TextFormField, 'Username (optional)'),
       'rob',
     );
     await tester.enterText(
@@ -439,7 +440,7 @@ void main() {
       'https://schist.example.com',
     );
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'Username'),
+      find.widgetWithText(TextFormField, 'Username (optional)'),
       'testuser',
     );
     await tester.enterText(
@@ -485,7 +486,7 @@ void main() {
 
     await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Granite');
     await tester.enterText(find.widgetWithText(TextFormField, 'URL (optional)'), 'https://granite.example.com');
-    await tester.enterText(find.widgetWithText(TextFormField, 'Username'), 'rob');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Username (optional)'), 'rob');
     await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'p@ss');
     await tester.pump();
     await tester.ensureVisible(find.text('Save'));
@@ -511,7 +512,7 @@ void main() {
     // Leave folder as None
     await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Pumice');
     await tester.enterText(find.widgetWithText(TextFormField, 'URL (optional)'), 'https://pumice.example.com');
-    await tester.enterText(find.widgetWithText(TextFormField, 'Username'), 'rob');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Username (optional)'), 'rob');
     await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'p@ss');
     await tester.pump();
     await tester.ensureVisible(find.text('Save'));
@@ -686,7 +687,7 @@ void main() {
       'GitHub',
     );
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'Username'),
+      find.widgetWithText(TextFormField, 'Username (optional)'),
       'rob',
     );
     await tester.enterText(
@@ -925,7 +926,7 @@ void main() {
       _buildCreateScreen('Login', onCreateEntry: (e) async => captured = e),
     );
     await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Example');
-    await tester.enterText(find.widgetWithText(TextFormField, 'Username'), 'user');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Username (optional)'), 'user');
     await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'secret');
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Android app ID (optional)'),
@@ -1012,5 +1013,59 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Recently used apps'), findsNothing);
     expect(find.byType(ActionChip), findsNothing);
+  });
+
+  // ── Login email field ─────────────────────────────────────────────────────
+
+  testWidgets('login form shows the email field', (tester) async {
+    await tester.pumpWidget(_buildCreateScreen('Login'));
+    expect(find.widgetWithText(TextFormField, 'Email (optional)'), findsOneWidget);
+  });
+
+  testWidgets('login can be saved with no username (now optional)',
+      (tester) async {
+    VaultEntryData? captured;
+    await tester.pumpWidget(
+      _buildCreateScreen('Login', onCreateEntry: (e) async => captured = e),
+    );
+    await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Example');
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Email (optional)'),
+      'user@example.com',
+    );
+    await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'secret');
+    await tester.scrollUntilVisible(
+      find.text('Save'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(captured, isA<VaultEntryData_Login>());
+    final login = (captured! as VaultEntryData_Login).field0;
+    expect(login.username, isEmpty);
+    expect(login.email, equals('user@example.com'));
+  });
+
+  testWidgets('login email pre-populates in edit mode', (tester) async {
+    final login = LoginEntryData(
+      id: 'id-1',
+      title: 'Example',
+      url: '',
+      username: 'user',
+      password: 'secret',
+      notes: null,
+      customFields: [],
+      createdAt: '2025-01-01T00:00:00Z',
+      updatedAt: '2025-01-01T00:00:00Z',
+      folder: 'Personal',
+      email: 'user@example.com',
+    );
+    await tester.pumpWidget(_buildEditScreen(VaultEntryData.login(login)));
+    final field = tester.widget<TextFormField>(
+      find.widgetWithText(TextFormField, 'user@example.com'),
+    );
+    expect(field.controller?.text, equals('user@example.com'));
   });
 }

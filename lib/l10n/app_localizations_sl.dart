@@ -921,7 +921,7 @@ class AppLocalizationsSl extends AppLocalizations {
   String get recentlyUsedApps => 'Nedavno uporabljene aplikacije';
 
   @override
-  String get fieldUsername => 'Uporabniško ime';
+  String get fieldUsername => 'Uporabniško ime (neobvezno)';
 
   @override
   String get fieldPassword => 'Geslo';

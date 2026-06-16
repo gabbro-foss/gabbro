@@ -918,7 +918,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get recentlyUsedApps => 'Naposledy použité aplikace';
 
   @override
-  String get fieldUsername => 'Uživatelské jméno';
+  String get fieldUsername => 'Uživatelské jméno (volitelné)';
 
   @override
   String get fieldPassword => 'Heslo';

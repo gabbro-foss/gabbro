@@ -86,6 +86,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
   late final TextEditingController _loginTitleController;
   late final TextEditingController _urlController;
   late final TextEditingController _usernameController;
+  late final TextEditingController _loginEmailController;
   late final TextEditingController _passwordController;
   bool _passwordObscured = true;
   late final TextEditingController _loginNotesController;
@@ -202,6 +203,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _loginTitleController = TextEditingController(text: field0.title);
       _urlController = TextEditingController(text: field0.url);
       _usernameController = TextEditingController(text: field0.username);
+      _loginEmailController = TextEditingController(text: field0.email ?? '');
       _passwordController = TextEditingController(text: field0.password);
       _loginNotesController = TextEditingController(text: field0.notes ?? '');
       _appIdController = TextEditingController(text: field0.appId ?? '');
@@ -218,6 +220,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
       _loginTitleController = TextEditingController();
       _urlController = TextEditingController();
       _usernameController = TextEditingController();
+      _loginEmailController = TextEditingController();
       _passwordController = TextEditingController();
       _loginNotesController = TextEditingController();
       _appIdController = TextEditingController();
@@ -362,6 +365,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     _loginTitleController.dispose();
     _urlController.dispose();
     _usernameController.dispose();
+    _loginEmailController.dispose();
     _passwordController.dispose();
     _loginNotesController.dispose();
     _appIdController.dispose();
@@ -506,6 +510,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
             field0.password != u.password ||
             field0.notes != u.notes ||
             field0.appId != u.appId ||
+            field0.email != u.email ||
             !listEquals(field0.customFields, u.customFields) ||
             field0.folder != u.folder;
       case (
@@ -573,6 +578,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     return v.isEmpty ? null : v;
   }
 
+  /// The trimmed login email, or null when blank (the field is optional).
+  String? _loginEmailOrNull() {
+    final v = _loginEmailController.text.trim();
+    return v.isEmpty ? null : v;
+  }
+
   /// Builds the updated VaultEntryData from current form state.
   /// Returns null if the entry type is not supported.
   VaultEntryData? _buildUpdated() {
@@ -602,6 +613,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                 .toList(),
             previousPassword: field0.previousPassword,
             appId: _appIdOrNull(),
+            email: _loginEmailOrNull(),
           ),
         );
       case VaultEntryData_Note(:final field0):
@@ -768,6 +780,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   )
                   .toList(),
               appId: _appIdOrNull(),
+              email: _loginEmailOrNull(),
             ),
           ),
         );
@@ -1032,10 +1045,15 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: l.fieldUsername,
         border: const OutlineInputBorder(),
       ),
-      validator: (v) =>
-          (v == null || v.isEmpty) ? l.validatorUsernameRequired : null,
-      onFieldSubmitted: (_) =>
-          FocusScope.of(context).requestFocus(_passwordFocus),
+    ),
+    const SizedBox(height: 12),
+    TextFormField(
+      controller: _loginEmailController,
+      keyboardType: TextInputType.emailAddress,
+      decoration: InputDecoration(
+        labelText: l.fieldEmail,
+        border: const OutlineInputBorder(),
+      ),
     ),
     const SizedBox(height: 12),
     TextFormField(

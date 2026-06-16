@@ -923,7 +923,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get recentlyUsedApps => 'Πρόσφατα χρησιμοποιημένες εφαρμογές';
 
   @override
-  String get fieldUsername => 'Όνομα χρήστη';
+  String get fieldUsername => 'Όνομα χρήστη (προαιρετικό)';
 
   @override
   String get fieldPassword => 'Κωδικός';
