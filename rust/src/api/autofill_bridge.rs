@@ -56,7 +56,8 @@ pub mod jni {
 
     /// Returns a JSON string encoding all Login entry summaries in the session.
     ///
-    /// Shape: `[{"id":"...","username":"...","url":"..."}]`
+    /// Shape: `[{"id":"...","username":"...","url":"...","app_id":"..."}]`
+    /// (`app_id` is the empty string when unset). See `login_summaries_json`.
     /// Returns an empty array `[]` if the vault is locked or the session is empty.
     /// Kotlin parses this with org.json.JSONArray — no new Android dependency needed.
     #[no_mangle]
@@ -64,23 +65,10 @@ pub mod jni {
         mut env: JNIEnv<'local>,
         _class: JClass<'local>,
     ) -> jni::objects::JString<'local> {
-        use crate::vault::session::login_summaries_for_autofill;
+        use crate::vault::session::{login_summaries_for_autofill, login_summaries_json};
 
         let json = match login_summaries_for_autofill() {
-            Ok(summaries) => {
-                let entries: Vec<String> = summaries
-                    .iter()
-                    .map(|s| {
-                        format!(
-                            "{{\"id\":\"{}\",\"username\":\"{}\",\"url\":\"{}\"}}",
-                            s.id.replace('"', "\\\""),
-                            s.username.replace('"', "\\\""),
-                            s.url.replace('"', "\\\""),
-                        )
-                    })
-                    .collect();
-                format!("[{}]", entries.join(","))
-            }
+            Ok(summaries) => login_summaries_json(&summaries),
             Err(_) => String::from("[]"),
         };
 

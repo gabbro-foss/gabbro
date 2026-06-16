@@ -779,6 +779,31 @@ pub struct LoginAutofillSummary {
     pub id: String,
     pub username: String,
     pub url: String,
+    /// Recorded Android package name for native-app matching; `None` if unset.
+    pub app_id: Option<String>,
+}
+
+/// Serialize autofill summaries to the JSON array the autofill service reads.
+///
+/// Shape: `[{"id","username","url","app_id"}]`. `app_id` is the empty string
+/// when unset (Kotlin treats empty as "no native-app match"). Extracted from
+/// the JNI bridge so it is host-compiled and unit-testable. Kotlin parses this
+/// with `org.json.JSONArray` — no new Android dependency.
+pub fn login_summaries_json(summaries: &[LoginAutofillSummary]) -> String {
+    let entries: Vec<String> = summaries
+        .iter()
+        .map(|s| {
+            let esc = |v: &str| v.replace('"', "\\\"");
+            format!(
+                "{{\"id\":\"{}\",\"username\":\"{}\",\"url\":\"{}\",\"app_id\":\"{}\"}}",
+                esc(&s.id),
+                esc(&s.username),
+                esc(&s.url),
+                esc(s.app_id.as_deref().unwrap_or("")),
+            )
+        })
+        .collect();
+    format!("[{}]", entries.join(","))
 }
 
 /// Return lightweight summaries of all Login entries in the session.
@@ -798,6 +823,7 @@ pub fn login_summaries_for_autofill() -> Result<Vec<LoginAutofillSummary>, Strin
                     id: login.meta.id.clone(),
                     username: login.username.clone(),
                     url: login.url.clone(),
+                    app_id: login.app_id.clone(),
                 })
             } else {
                 None
@@ -1993,8 +2019,44 @@ mod autofill_tests {
         assert_eq!(summaries[0].id, "af-login-001");
         assert_eq!(summaries[0].username, "rob");
         assert_eq!(summaries[0].url, "https://github.com/login");
+        // app_id is carried through (None here; set-case covered by the unit test below).
+        assert_eq!(summaries[0].app_id, None);
 
         teardown(&path);
+    }
+
+    // Pure JSON formatter for the autofill summary list — no session needed, so
+    // it runs in the fast lane (the session-backed test above does Argon2).
+    #[test]
+    fn login_summaries_json_includes_app_id_and_escapes() {
+        let summaries = vec![
+            LoginAutofillSummary {
+                id: String::from("id1"),
+                username: String::from("rob"),
+                url: String::from("https://github.com"),
+                app_id: Some(String::from("dupont.nolio")),
+            },
+            LoginAutofillSummary {
+                id: String::from("id2"),
+                username: String::from("a\"b"),
+                url: String::from("https://x.example"),
+                app_id: None,
+            },
+        ];
+        let json = login_summaries_json(&summaries);
+        assert!(
+            json.contains("\"app_id\":\"dupont.nolio\""),
+            "app_id must be present when set: {json}"
+        );
+        assert!(
+            json.contains("\"app_id\":\"\""),
+            "app_id None must serialize as empty string: {json}"
+        );
+        assert!(json.contains("a\\\"b"), "quotes must stay escaped: {json}");
+        assert!(
+            json.starts_with('[') && json.ends_with(']'),
+            "array shape: {json}"
+        );
     }
 }
 
