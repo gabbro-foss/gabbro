@@ -78,34 +78,24 @@ class GabbroAutofillService : AutofillService() {
             return
         }
 
-        // Vault is unlocked — find Login entries whose domain matches the
-        // domain of the screen requesting autofill.
+        // Vault is unlocked — find Login entries that match the screen requesting
+        // autofill, using the shared matcher (the same one UnlockActivity uses on the
+        // locked-vault path). Matching runs on password-free summaries — no secret is
+        // decrypted until a match is found.
         val summariesJson = RustBridge.listLoginSummaries()
-        val matches = if (parseResult.webDomain != null) {
-            // Browser context — exact eTLD+1 domain match.
-            val requestDomain = extractRegistrableDomain(parseResult.webDomain)
-            if (requestDomain == null) {
-                callback.onSuccess(null)
-                return
-            }
-            parseSummariesJson(summariesJson).filter { summary ->
-                extractRegistrableDomain(summary.url) == requestDomain
-            }
-        } else {
-            // Native app context — match the requesting package against entries
-            // that explicitly recorded it (exact equality; no loose matching).
-            val requestPackage = parseResult.packageName
-            val nativeMatches = parseSummariesJson(summariesJson).filter { summary ->
-                nativeAppIdMatches(summary.appId, requestPackage)
-            }
-            // No match: record the package (login fields were detected here) so the
-            // Login editor can offer it as a tap-to-fill app-id suggestion.
-            if (nativeMatches.isEmpty() &&
-                shouldRecordPackage(requestPackage, applicationContext.packageName)
-            ) {
-                RecentAutofillApps.record(applicationContext, requestPackage!!.trim())
-            }
-            nativeMatches
+        val matches = matchingCredentials(
+            parseSummariesJson(summariesJson),
+            parseResult.webDomain,
+            parseResult.packageName,
+            publicSuffixList,
+        )
+
+        // Native no-match: record the package (login fields were detected here) so the
+        // Login editor can offer it as a tap-to-fill app-id suggestion.
+        if (matches.isEmpty() && parseResult.webDomain == null &&
+            shouldRecordPackage(parseResult.packageName, applicationContext.packageName)
+        ) {
+            RecentAutofillApps.record(applicationContext, parseResult.packageName!!.trim())
         }
 
         if (matches.isEmpty()) {
@@ -207,64 +197,95 @@ class GabbroAutofillService : AutofillService() {
     }
 
     // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
-
-    // `internal` (not `private`) so same-module JVM unit tests can exercise the
-    // real domain-matching logic under Robolectric. No runtime behaviour change.
-    internal fun extractRegistrableDomain(input: String?): String? {
-        if (input.isNullOrBlank()) return null
-        val withScheme = if (input.contains("://")) input else "https://$input"
-        val host = android.net.Uri.parse(withScheme).host
-            ?.lowercase()
-            ?.trimEnd('.')
-            ?: return null
-        if (host.split(".").all { it.toIntOrNull() != null }) return null // reject IPs
-        publicSuffixList.registrableDomain(host)?.let { return it }
-        // No registrable domain (host is a public suffix, or a single private label
-        // like "localhost"). Keep a single-label private host as-is for intranet
-        // matching; drop anything that is itself a real public suffix.
-        return host.takeIf { it.split(".").size == 1 && !publicSuffixList.isListedSuffix(it) }
-    }
-
-    /** Parse summaries JSON into lightweight stubs — no password fetch. */
-    // `internal` (not `private`) for the same unit-test reason as
-    // extractRegistrableDomain above. No runtime behaviour change.
-    internal fun parseSummariesJson(json: String): List<CredentialSummary> {
-        return try {
-            val array = org.json.JSONArray(json)
-            (0 until array.length()).map { i ->
-                val obj = array.getJSONObject(i)
-                CredentialSummary(
-                    id = obj.getString("id"),
-                    username = obj.getString("username"),
-                    url = obj.getString("url"),
-                    password = "",
-                    appId = obj.optString("app_id", ""),
-                    email = obj.optString("email", ""),
-                )
-            }
-        } catch (_: Exception) {
-            emptyList()
-        }
-    }
-
-    /** Fetch the real password for a single matched credential. */
-    private fun fetchPassword(id: String): String {
-        return try {
-            val entryJson = RustBridge.getEntry(id)
-            org.json.JSONObject(entryJson).optString("password", "")
-        } catch (_: Exception) {
-            ""
-        }
-    }
-
-    // -------------------------------------------------------------------------
     // Companion
     // -------------------------------------------------------------------------
 
     companion object {
         private const val REQUEST_CODE_UNLOCK = 1001
+    }
+}
+
+// -----------------------------------------------------------------------------
+// Shared autofill matching — the single source of truth for both the unlocked
+// path (GabbroAutofillService) and the locked-vault path (UnlockActivity), so the
+// two can never drift apart again. All pure top-level functions: `internal` so the
+// same-module Robolectric unit tests exercise the real logic, and free of the
+// service instance so UnlockActivity reuses them unchanged.
+// -----------------------------------------------------------------------------
+
+/**
+ * Login entries that match the screen requesting autofill. Web context (webDomain
+ * non-null): PSL eTLD+1 equality, so unrelated sites under a shared suffix never
+ * collide (bbc.co.uk vs hsbc.co.uk — audit F-10). Native context: EXACT app_id
+ * equality — never a loose/substring guess that could offer the wrong credential.
+ *
+ * [credentials] must be password-free summaries (see [parseSummariesJson]): matching
+ * runs entirely on metadata, so no secret is decrypted until a match is found.
+ */
+internal fun matchingCredentials(
+    credentials: List<CredentialSummary>,
+    webDomain: String?,
+    packageName: String?,
+    psl: PublicSuffixList,
+): List<CredentialSummary> {
+    return if (webDomain != null) {
+        val requestDomain = extractRegistrableDomain(webDomain, psl) ?: return emptyList()
+        credentials.filter { summary ->
+            extractRegistrableDomain(summary.url, psl) == requestDomain
+        }
+    } else {
+        credentials.filter { summary ->
+            nativeAppIdMatches(summary.appId, packageName)
+        }
+    }
+}
+
+/**
+ * Registrable domain (eTLD+1) of a URL or bare host, using the Public Suffix List.
+ * Returns null for blank/malformed input, a bare public suffix, or an IP address.
+ * A single-label private host (e.g. "localhost") is kept as-is for intranet matching.
+ */
+internal fun extractRegistrableDomain(input: String?, psl: PublicSuffixList): String? {
+    if (input.isNullOrBlank()) return null
+    val withScheme = if (input.contains("://")) input else "https://$input"
+    val host = android.net.Uri.parse(withScheme).host
+        ?.lowercase()
+        ?.trimEnd('.')
+        ?: return null
+    if (host.split(".").all { it.toIntOrNull() != null }) return null // reject IPs
+    psl.registrableDomain(host)?.let { return it }
+    // No registrable domain (host is a public suffix, or a single private label like
+    // "localhost"). Keep a single-label private host as-is; drop a real public suffix.
+    return host.takeIf { it.split(".").size == 1 && !psl.isListedSuffix(it) }
+}
+
+/** Parse the login-summary JSON feed into lightweight stubs — never a password. */
+internal fun parseSummariesJson(json: String): List<CredentialSummary> {
+    return try {
+        val array = org.json.JSONArray(json)
+        (0 until array.length()).map { i ->
+            val obj = array.getJSONObject(i)
+            CredentialSummary(
+                id = obj.getString("id"),
+                username = obj.getString("username"),
+                url = obj.getString("url"),
+                password = "",
+                appId = obj.optString("app_id", ""),
+                email = obj.optString("email", ""),
+            )
+        }
+    } catch (_: Exception) {
+        emptyList()
+    }
+}
+
+/** Decrypt the real password for a single matched credential. Called only after a match. */
+internal fun fetchPassword(id: String): String {
+    return try {
+        val entryJson = RustBridge.getEntry(id)
+        org.json.JSONObject(entryJson).optString("password", "")
+    } catch (_: Exception) {
+        ""
     }
 }
 

@@ -5,10 +5,11 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-// extractAppToken, extractRegistrableDomain, and parseSummariesJson are private
-// instance methods on GabbroAutofillService (an Android Service) — they cannot
-// be called from JVM unit tests without Robolectric or production-code refactoring.
-// The pure-Kotlin helpers below cover the data-model layer only.
+// extractRegistrableDomain, parseSummariesJson, and matchingCredentials depend on
+// real framework classes (android.net.Uri, org.json) that are stubbed to throw in
+// plain JVM unit tests — they are exercised under Robolectric in
+// GabbroAutofillServiceRobolectricTest. The pure-Kotlin helpers below need no
+// framework and cover the data-model + classification layer only.
 
 class GabbroAutofillServiceTest {
 

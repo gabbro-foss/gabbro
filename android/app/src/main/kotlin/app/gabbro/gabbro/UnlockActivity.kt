@@ -42,6 +42,9 @@ class UnlockActivity : FlutterActivity() {
         const val EXTRA_PACKAGE_NAME = "app.gabbro.gabbro.EXTRA_PACKAGE_NAME"
     }
 
+    // Backs eTLD+1 matching — the same vendored list the autofill service loads.
+    private val publicSuffixList: PublicSuffixList by lazy { PublicSuffixList.fromAsset(this) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
@@ -62,11 +65,10 @@ class UnlockActivity : FlutterActivity() {
                         } else {
                             // No matching credentials — show a dismissible
                             // dialog explaining why, then cancel.
-                            val appPackageName = intent?.getStringExtra(EXTRA_PACKAGE_NAME)
-                            val token = appPackageName?.let { extractAppToken(it) } ?: appPackageName ?: "unknown"
+                            val appPackageName = intent?.getStringExtra(EXTRA_PACKAGE_NAME) ?: "unknown"
                             android.app.AlertDialog.Builder(this)
                                 .setTitle("No credentials found")
-                                .setMessage("No Gabbro credentials match this app ($token). If you trust it, copy/paste your credentials manually. Note: the app identifier may differ from its display name.")
+                                .setMessage("No Gabbro credentials match this app ($appPackageName). If you trust it, copy/paste your credentials manually. Note: the app identifier may differ from its display name.")
                                 .setPositiveButton("Dismiss") { _, _ ->
                                     setResult(RESULT_CANCELED)
                                     finish()
@@ -88,12 +90,13 @@ class UnlockActivity : FlutterActivity() {
      * app package name as intent extras when building the PendingIntent for
      * the auth wall. We read those extras here — no AssistStructure needed.
      *
-     * Browser context: eTLD+1 domain match against vault entry URLs.
-     * Native app context: package token substring match against vault entry URLs.
-     * Multiple matches: first match wins (v2: picker UI).
+     * Matching uses the shared matchingCredentials — identical to the unlocked
+     * GabbroAutofillService path (browser: PSL eTLD+1; native: exact app_id), so the
+     * two can't drift. Matching runs on password-free summaries; only the chosen
+     * entry's password is decrypted. Multiple matches: first match wins (v2: picker).
      *
-     * Returns null if extras are missing, no token can be extracted, or no
-     * Login entries match — caller sets RESULT_CANCELED in that case.
+     * Returns null if extras are missing or no Login entries match — caller sets
+     * RESULT_CANCELED in that case.
      */
     private fun buildFillIntent(): Intent? {
         val usernameIds: ArrayList<android.view.autofill.AutofillId> =
@@ -126,23 +129,17 @@ class UnlockActivity : FlutterActivity() {
         val appPackageName = intent?.getStringExtra(EXTRA_PACKAGE_NAME)
 
         val summariesJson = RustBridge.listLoginSummaries()
-        val allCredentials = parseSummariesJson(summariesJson)
-
-        val matches = if (webDomain != null) {
-            val requestDomain = extractRegistrableDomain(webDomain) ?: return null
-            allCredentials.filter { summary ->
-                extractRegistrableDomain(summary.url) == requestDomain
-            }
-        } else {
-            val token = appPackageName?.let { extractAppToken(it) } ?: return null
-            allCredentials.filter { summary ->
-                summary.url.contains(token, ignoreCase = true)
-            }
-        }
+        val matches = matchingCredentials(
+            parseSummariesJson(summariesJson),
+            webDomain,
+            appPackageName,
+            publicSuffixList,
+        )
 
         if (matches.isEmpty()) return null
 
-        val cred = matches.first()
+        // Decrypt only the chosen entry's password — never the whole vault.
+        val cred = matches.first().let { it.copy(password = fetchPassword(it.id)) }
         val presentation = RemoteViews(packageName, R.layout.autofill_unlock_item)
         val datasetBuilder = Dataset.Builder()
         usernameIds.forEach { id ->
@@ -163,62 +160,6 @@ class UnlockActivity : FlutterActivity() {
 
         return Intent().apply {
             putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT, fillResponse)
-        }
-    }
-
-    /**
-     * Extracts a matchable token from an Android package name.
-     * e.g. "com.paypal.android.p2pmobile" → "paypal"
-     * Mirrors the logic in GabbroAutofillService exactly.
-     */
-    private fun extractAppToken(packageName: String): String? {
-        val skipSegments = setOf("com", "org", "net", "app", "co", "io", "uk", "de", "fr", "ch")
-        return packageName.split(".")
-            .firstOrNull { it.length > 2 && it !in skipSegments }
-    }
-
-    /**
-     * Extracts the eTLD+1 registrable domain from a URL or bare hostname.
-     * Mirrors the logic in GabbroAutofillService exactly.
-     */
-    private fun extractRegistrableDomain(input: String?): String? {
-        if (input.isNullOrBlank()) return null
-        val withScheme = if (input.contains("://")) input else "https://$input"
-        val host = android.net.Uri.parse(withScheme).host
-            ?.lowercase()
-            ?.trimEnd('.')
-            ?: return null
-        if (host.split(".").all { it.toIntOrNull() != null }) return null
-        val labels = host.split(".")
-        return if (labels.size >= 2) "${labels[labels.size - 2]}.${labels.last()}"
-        else host
-    }
-
-    /**
-     * Parses the JSON array returned by RustBridge.listLoginSummaries().
-     * Mirrors the logic in GabbroAutofillService exactly.
-     */
-    private fun parseSummariesJson(json: String): List<CredentialSummary> {
-        return try {
-            val array = org.json.JSONArray(json)
-            (0 until array.length()).map { i ->
-                val obj = array.getJSONObject(i)
-                val id = obj.getString("id")
-                val entryJson = RustBridge.getEntry(id)
-                val password = try {
-                    org.json.JSONObject(entryJson).optString("password", "")
-                } catch (_: Exception) { "" }
-                CredentialSummary(
-                    id = id,
-                    username = obj.getString("username"),
-                    url = obj.getString("url"),
-                    password = password,
-                    appId = obj.optString("app_id", ""),
-                    email = obj.optString("email", ""),
-                )
-            }
-        } catch (_: Exception) {
-            emptyList()
         }
     }
 
