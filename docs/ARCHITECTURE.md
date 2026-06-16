@@ -68,12 +68,12 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 518 | 8 |
+| Rust (`cargo test -q`) | 523 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 819 | 0 |
+| Flutter (`flutter test`) | 828 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 57 | 17 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 71 | 17 |
 
 **Test isolation (non-negotiable):** no test may touch the user's real settings or
 vault folders. All config/data directories resolve through `GabbroPaths`
@@ -90,25 +90,18 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**Autofill native-app entry matching — explicit `app_id`.** Native field *detection*
-already works (device-dumped: Instagram, Nolio both `usernames=1 passwords=1` via
-`autofillHints`/`inputType`). The real gap is *matching* the app to a vault entry:
-`extractAppToken` picks the wrong package segment (`com.vendor.app` -> `vendor`) and its
-substring match is a false-positive risk. Decided: add an explicit `app_id` (package name)
-to Login entries, match `packageName` exactly, and **drop `extractAppToken`** (zero false
-positives — the cardinal rule). Plus capture+suggest: the autofill service records native
-apps that fired but matched nothing, and the Login editor offers them as tap-to-fill chips
-(so users don't have to hunt for the package id). `onSaveRequest` stays in the Bikeshed but
-the work must not block it.
+**Two fixes surfaced by on-device testing.** Native-app autofill matching by explicit
+`app_id` shipped and is device-verified (match works, incomplete id = no false positive,
+capture+suggest chips work — see CHANGELOG). Two pre-existing issues it surfaced are next:
 
-Staged (TDD per stage): **S1 Rust model (DONE** — `app_id: Option<String>` on `LoginEntry`,
-`#[serde(default)]`, no VERSION bump — body field, not envelope). **S2 autofill-summary JSON
-carries `app_id` (DONE** — `LoginAutofillSummary` + `login_summaries_json` helper; pure JNI
-path, no FRB). S3 Kotlin exact `packageName == app_id` match + capture store. **S4** (all FRB
-work together — the DTO change must travel with the regen): `LoginEntryData.app_id` +
-`to_data`/`from_data` wiring + regen + Flutter editor field + zero-false-positive note +
-suggest chips + l10n (37 locales). Import/sync stay on the `VaultEntry` domain (serde), never
-the DTO — `app_id` rides along, no regression.
+- **(B) Vault-list keyboard overflow.** "BOTTOM OVERFLOWED" above the FAB on the vault-list
+  screen when the search keyboard opens. Pre-existing; a non-scrolling layout under the
+  keyboard inset. (`vault_list_screen.dart` — untouched by the autofill work.)
+- **(A) Autofill fills the username into email-typed fields.** A Login has a single
+  `username`; email fields are classified USERNAME and receive it, which is wrong when the
+  app wants an email (seen on coros). Pre-existing fill/data-model limitation, newly visible
+  now that native autofill fires. Decide approach: guidance to store email-as-username vs a
+  separate email field on Login entries.
 
 ### Open from the security audit
 
@@ -141,17 +134,11 @@ release process live in their own document:
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
-- **Autofill native-app matching (Android) — the last slice.** `extractAppToken` +
-  `summary.url.contains(token)` substring match is far too loose (e.g. token `paypal` matches
-  any URL) → wrong entry. Safe fix: match only on an explicit recorded package id / exact
-  domain (needs a small entry field); Digital Asset Links is the heavier "correct" path.
-  Reuses the PSL eTLD+1. Security surface — design-then-implement with on-device verification.
-  (Domain matching done; HTML-attribute field detection shipped — see Current Focus.)
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 
 ### Code Quality
-- **Scrub real app names and personal names from test data.** Tests across the suite use real apps the user runs (e.g. github) and the user's name as placeholder usernames. Test data must be generic (`com.company.app`, `https://example.com`, `user`/`alice`/`bob`) — never a real app the user has installed or a real person's name. Audit all of `rust/`, `android/`, `test/`, `integration_test/` and replace.
+- **Scrub real app names and personal names from test data.** Tests across the suite use real apps the user runs (e.g. github) and the user's name as placeholder usernames. Test data must be generic (`com.company.app`, `https://example.com`, `user`/`alice`/`bob`) — never a real app the user has installed or a real person's name. Audit all of `rust/`, `android/`, `test/`, `integration_test/` and replace. commit message will not surface this information: it will only say `code cleanup`
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 - **Offline test gate — Android leg still online.** `gabbro_test` runs flutter/cargo/rust fully offline (rootless netns), but the Android `./gradlew :app:testDebugUnitTest` leg runs online: the Flutter `integration_test` plugin declares a dynamic transitive dep (`androidx.test:runner:1.2+`) that gradle won't resolve `--offline`. `dependencyLocking` on `:app` doesn't pin that plugin's config; the netns also needs `JAVA_TOOL_OPTIONS=-Duser.home=/home/gamer` (uid-0 remap → JVM home `/root`). Likely fix: force a concrete `androidx.test:runner` version across all projects (or lock every project), then move the leg into the offline block.
 
