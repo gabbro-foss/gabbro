@@ -195,15 +195,48 @@ class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
           vaultAlias: _aliasFor(_vaultPath),
           registry: widget.registry,
           onVaultSwitch: (path, alias) => setState(() => _vaultPath = path),
-          onUnlocked: () async {
-            await widget.channel.invokeMethod('unlock');
-          },
+          onUnlocked: _onUnlocked,
           blockPassphraseCopyPaste: widget.settings.blockPassphraseCopyPaste,
           biometricEnabled: widget.settings.biometricUnlock,
         ),
       ),
     );
   }
+
+  /// After unlock, ask the native side to build the fill response. It returns
+  /// whether a credential matched; on no match we show a localized dialog here
+  /// (a native AlertDialog could not be localized against the Flutter ARBs) and
+  /// then cancel.
+  Future<void> _onUnlocked() async {
+    final matched = await widget.channel.invokeMethod<bool>('unlock');
+    if (matched == true || !mounted) return;
+    await showAutofillNoMatchDialog(context, widget.channel);
+  }
+}
+
+/// The autofill "no credentials found" dialog (localized). Shown by the unlock
+/// flow when the vault unlocks but nothing matches the requesting app/site. On
+/// dismiss it tells the native side to cancel (deliver nothing to the field).
+Future<void> showAutofillNoMatchDialog(
+  BuildContext context,
+  MethodChannel channel,
+) async {
+  final l = AppLocalizations.of(context);
+  await showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (ctx) => AlertDialog(
+      title: Text(l.autofillNoMatchTitle),
+      content: Text(l.autofillNoMatchBody),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(),
+          child: Text(l.dismiss),
+        ),
+      ],
+    ),
+  );
+  await channel.invokeMethod('cancel');
 }
 
 /// Autofill SAVE entrypoint (Android). The OS launches `SaveActivity` after the

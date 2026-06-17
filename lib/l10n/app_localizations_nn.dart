@@ -58,6 +58,13 @@ class AppLocalizationsNn extends AppLocalizations {
       'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
 
   @override
+  String get autofillNoMatchTitle => 'No credentials found';
+
+  @override
+  String get autofillNoMatchBody =>
+      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+
+  @override
   String get add => 'Legg til';
 
   @override

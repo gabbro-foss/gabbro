@@ -93,4 +93,34 @@ void main() {
       '/tmp/b.gabbro',
     );
   });
+
+  testWidgets('no-match dialog shows localized text and cancels on dismiss',
+      (tester) async {
+    final calls = <String>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call) async {
+      calls.add(call.method);
+      return null;
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null));
+
+    await tester.pumpWidget(MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Builder(
+        builder: (context) => ElevatedButton(
+          onPressed: () => showAutofillNoMatchDialog(context, channel),
+          child: const Text('go'),
+        ),
+      ),
+    ));
+
+    await tester.tap(find.text('go'));
+    await tester.pumpAndSettle();
+    expect(find.text('No credentials found'), findsOneWidget);
+
+    await tester.tap(find.text('Dismiss'));
+    await tester.pumpAndSettle();
+    expect(calls, contains('cancel'));
+  });
 }

@@ -138,8 +138,9 @@ Build order (Canon TDD red-first; net-first pins first; Android hardware test be
   passphrase + YubiKey, and already-unlocked), changed-password update + history, create-new,
   pick-another, cancel, dismiss/no-double-save, resume-refresh of the open vault list, + a
   "lock first to switch vault" hint on the already-unlocked path
-- [ ] F2 fix "No credentials found" → localized Flutter dialog (shares F's Flutter-autofill UI)
-- [ ] G l10n: translate the new save-flow ARB keys into the other 36 locales (currently EN-only)
+- [x] F2 "No credentials found" → localized Flutter dialog: `UnlockActivity` returns `matched`,
+  Dart shows `showAutofillNoMatchDialog` + `cancel`. Code + widget test green, compiles; **HW-pending**
+- [ ] G l10n: translate the new save-flow + no-match ARB keys into the other 36 locales (EN-only now)
 - [ ] (deferred unless picked up) chip-label `values-XX/` l10n
 
 *(Prior: locked-vault autofill unlock shipped, hardware-verified 2026-06-17; see CHANGELOG.

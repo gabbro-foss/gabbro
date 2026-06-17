@@ -253,6 +253,18 @@ abstract class AppLocalizations {
   /// **'Saving to the currently unlocked vault. To save to a different vault, lock this one first.'**
   String get saveConfirmSwitchVaultHint;
 
+  /// Title of the autofill dialog shown after unlock when no saved login matches the requesting app or website.
+  ///
+  /// In en, this message translates to:
+  /// **'No credentials found'**
+  String get autofillNoMatchTitle;
+
+  /// Body of the autofill no-match dialog, advising the user to paste credentials manually.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.'**
+  String get autofillNoMatchBody;
+
   /// No description provided for @add.
   ///
   /// In en, this message translates to:

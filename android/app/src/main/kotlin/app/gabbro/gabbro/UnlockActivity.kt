@@ -56,26 +56,22 @@ class UnlockActivity : GabbroUnlockHostActivity() {
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "unlock" -> {
-                        // Flutter has already unlocked the shared vault session;
-                        // build the fill response for the requested fields.
+                        // Flutter has already unlocked the shared vault session; build the
+                        // fill response. Return whether a credential matched so Dart can show
+                        // a localized "no credentials" dialog itself — a native AlertDialog
+                        // cannot be localized against the Flutter ARBs.
                         val fillIntent = buildFillIntent()
                         if (fillIntent != null) {
                             setResult(RESULT_OK, fillIntent)
                             finish()
+                            result.success(true)
                         } else {
-                            // No matching credentials — show a dismissible
-                            // dialog explaining why, then cancel.
-                            val appPackageName = intent?.getStringExtra(EXTRA_PACKAGE_NAME) ?: "unknown"
-                            android.app.AlertDialog.Builder(this)
-                                .setTitle("No credentials found")
-                                .setMessage("No Gabbro credentials match this app ($appPackageName). If you trust it, copy/paste your credentials manually. Note: the app identifier may differ from its display name.")
-                                .setPositiveButton("Dismiss") { _, _ ->
-                                    setResult(RESULT_CANCELED)
-                                    finish()
-                                }
-                                .setCancelable(false)
-                                .show()
+                            result.success(false)
                         }
+                    }
+                    "cancel" -> {
+                        setResult(RESULT_CANCELED)
+                        finish()
                         result.success(null)
                     }
                     else -> result.notImplemented()
