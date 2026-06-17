@@ -199,7 +199,8 @@ class VaultListScreen extends StatefulWidget {
   State<VaultListScreen> createState() => _VaultListScreenState();
 }
 
-class _VaultListScreenState extends State<VaultListScreen> {
+class _VaultListScreenState extends State<VaultListScreen>
+    with WidgetsBindingObserver {
   static const _filters = [
     'All',
     'Password',
@@ -244,10 +245,20 @@ class _VaultListScreenState extends State<VaultListScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
     _loadEntries();
     _chipScrollController.addListener(_updateChevrons);
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateChevrons());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // Reload on resume so changes made while backgrounded — e.g. a login saved by
+    // the autofill SaveActivity into the shared session — appear without a manual
+    // refresh or a lock/unlock cycle.
+    if (state == AppLifecycleState.resumed) _loadEntries();
   }
 
   @override
@@ -258,6 +269,7 @@ class _VaultListScreenState extends State<VaultListScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
     _chipScrollController.removeListener(_updateChevrons);
     _chipScrollController.dispose();
