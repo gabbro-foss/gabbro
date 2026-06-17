@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
+import 'package:gabbro/screens/save_confirm_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart' show confirmYubikey, confirmAnyYubikey;
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -200,6 +202,152 @@ class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
           biometricEnabled: widget.settings.biometricUnlock,
         ),
       ),
+    );
+  }
+}
+
+/// Autofill SAVE entrypoint (Android). The OS launches `SaveActivity` after the
+/// user submits a login the vault lacks (or a changed password). Mirrors
+/// [autofillUnlockMain]'s shell: reuses [UnlockScreen] when the vault is locked,
+/// then shows [SaveConfirmScreen]. The captured login + suggested action come from
+/// Kotlin via the `getSaveContext` channel call (matching is computed there).
+@pragma('vm:entry-point')
+Future<void> autofillSaveMain() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await RustLib.init();
+  final registry = await VaultRegistry.load();
+  final lastUsed = registry.lastUsed;
+  final String initialVaultPath;
+  if (lastUsed != null) {
+    initialVaultPath = lastUsed.path;
+  } else {
+    final dataDir = await GabbroPaths.dataDir();
+    initialVaultPath = '$dataDir/gabbro.gabbro';
+  }
+  final settings = await AppSettings.load();
+  const channel = MethodChannel('app.gabbro.gabbro/autofill_save');
+  final alreadyUnlocked = await channel.invokeMethod<bool>('isUnlocked') ?? false;
+  runApp(buildAutofillSaveApp(
+    settings: settings,
+    registry: registry,
+    initialVaultPath: initialVaultPath,
+    alreadyUnlocked: alreadyUnlocked,
+  ));
+}
+
+/// The autofill save app. Reuses the unlock flow when the vault is locked, then
+/// shows the confirm screen. [fetchSaveContextJson] defaults to the `getSaveContext`
+/// channel call; widget tests inject it.
+Widget buildAutofillSaveApp({
+  required AppSettings settings,
+  required VaultRegistry registry,
+  required String initialVaultPath,
+  required bool alreadyUnlocked,
+  MethodChannel channel = const MethodChannel('app.gabbro.gabbro/autofill_save'),
+  Future<String> Function()? fetchSaveContextJson,
+}) =>
+    _AutofillSaveApp(
+      settings: settings,
+      registry: registry,
+      initialVaultPath: initialVaultPath,
+      alreadyUnlocked: alreadyUnlocked,
+      channel: channel,
+      fetchSaveContextJson: fetchSaveContextJson ??
+          () async => (await channel.invokeMethod<String>('getSaveContext')) ?? '{}',
+    );
+
+class _AutofillSaveApp extends StatefulWidget {
+  final AppSettings settings;
+  final VaultRegistry registry;
+  final String initialVaultPath;
+  final bool alreadyUnlocked;
+  final MethodChannel channel;
+  final Future<String> Function() fetchSaveContextJson;
+
+  const _AutofillSaveApp({
+    required this.settings,
+    required this.registry,
+    required this.initialVaultPath,
+    required this.alreadyUnlocked,
+    required this.channel,
+    required this.fetchSaveContextJson,
+  });
+
+  @override
+  State<_AutofillSaveApp> createState() => _AutofillSaveAppState();
+}
+
+class _AutofillSaveAppState extends State<_AutofillSaveApp> {
+  late String _vaultPath = widget.initialVaultPath;
+  late bool _unlocked = widget.alreadyUnlocked;
+  SaveContext? _context;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_unlocked) _loadContext();
+  }
+
+  Future<void> _loadContext() async {
+    final json = await widget.fetchSaveContextJson();
+    if (!mounted) return;
+    setState(() =>
+        _context = SaveContext.fromJson(jsonDecode(json) as Map<String, dynamic>));
+  }
+
+  String? _aliasFor(String path) {
+    for (final r in widget.registry.records) {
+      if (r.path == path) return r.alias;
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hc = widget.settings.highContrast;
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        textScaler: TextScaler.linear(textScaleFor(widget.settings.textSize)),
+      ),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: gabbroLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: widget.settings.language == LanguageChoice.system
+            ? null
+            : localeFor(widget.settings.language),
+        themeMode: themeModeFor(widget.settings.theme),
+        theme: gabbroLightTheme(highContrast: hc),
+        darkTheme: gabbroDarkTheme(highContrast: hc),
+        home: _home(),
+      ),
+    );
+  }
+
+  Widget _home() {
+    if (!_unlocked) {
+      return UnlockScreen(
+        key: ValueKey(_vaultPath),
+        vaultPath: _vaultPath,
+        vaultAlias: _aliasFor(_vaultPath),
+        registry: widget.registry,
+        onVaultSwitch: (path, alias) => setState(() => _vaultPath = path),
+        onUnlocked: () async {
+          setState(() => _unlocked = true);
+          await _loadContext();
+        },
+        blockPassphraseCopyPaste: widget.settings.blockPassphraseCopyPaste,
+        biometricEnabled: widget.settings.biometricUnlock,
+      );
+    }
+    final ctx = _context;
+    if (ctx == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    return SaveConfirmScreen(
+      saveContext: ctx,
+      onDone: () => widget.channel.invokeMethod('done'),
+      onCancel: () => widget.channel.invokeMethod('cancel'),
     );
   }
 }

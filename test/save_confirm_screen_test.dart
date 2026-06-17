@@ -176,4 +176,36 @@ void main() {
     expect(expiryDaysFor(PasswordHistoryExpiry.ninetyDays), 90);
     expect(expiryDaysFor(PasswordHistoryExpiry.keepForever), isNull);
   });
+
+  test('SaveContext.fromJson parses an update with candidates', () {
+    final ctx = SaveContext.fromJson(const {
+      'captured': {
+        'username': 'a',
+        'email': 'e',
+        'password': 'p',
+        'url': 'u',
+        'appId': 'app',
+      },
+      'decision': {'action': 'update', 'matchedId': 'id-1'},
+      'candidates': [
+        {'id': 'id-2', 'label': 'bob'}
+      ],
+    });
+    expect(ctx.action, SaveActionKind.update);
+    expect(ctx.matchedId, 'id-1');
+    expect(ctx.candidates.single.id, 'id-2');
+    expect(ctx.username, 'a');
+    expect(ctx.appId, 'app');
+  });
+
+  test('SaveContext.fromJson defaults to create on unknown/absent action', () {
+    final ctx = SaveContext.fromJson(const {
+      'captured': <String, dynamic>{},
+      'decision': <String, dynamic>{},
+      'candidates': <dynamic>[],
+    });
+    expect(ctx.action, SaveActionKind.create);
+    expect(ctx.username, '');
+    expect(ctx.candidates, isEmpty);
+  });
 }
