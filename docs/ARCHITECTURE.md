@@ -134,12 +134,12 @@ Build order (Canon TDD red-first; net-first pins first; Android hardware test be
   *(JNI write fns dropped — write via Dart bridge + `passwordHistoryExpiry`)*
 - [x] E `onSaveRequest` (Kotlin): `shouldOfferSave` guard (green) + `CapturedSaveRequest` value-walk
   + launch `SaveActivity` with extras — written, compiles; value-walk is **hardware-verified**
-- [x] F `SaveActivity` flow **wired end-to-end (code)** — Dart (FD1-6 + routing + entrypoint, green)
-  and Kotlin (`SaveActivity` + `/autofill_save` channel + manifest, compiles). **HW-unverified**
+- [x] F `SaveActivity` flow **hardware-verified** (Brave, 2026-06-17): new-login (locked unlock via
+  passphrase + YubiKey, and already-unlocked), changed-password update + history, create-new,
+  pick-another, cancel, dismiss/no-double-save, resume-refresh of the open vault list, + a
+  "lock first to switch vault" hint on the already-unlocked path
 - [ ] F2 fix "No credentials found" → localized Flutter dialog (shares F's Flutter-autofill UI)
-- [ ] G l10n: new ARB keys ×37 for the confirm screen + no-match dialog
-- [ ] HW (Brave): new-login save (locked→unlock→confirm→create); changed-password update + history
-  kept; create-new-instead; pick-another; cancel writes nothing
+- [ ] G l10n: translate the new save-flow ARB keys into the other 36 locales (currently EN-only)
 - [ ] (deferred unless picked up) chip-label `values-XX/` l10n
 
 *(Prior: locked-vault autofill unlock shipped, hardware-verified 2026-06-17; see CHANGELOG.
