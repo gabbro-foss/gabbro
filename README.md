@@ -101,22 +101,6 @@ a UX complement that allows a corruption check *before* opening the vault.
 
 ---
 
-## Project Structure
-
-```
-gabbro/
-├── lib/          # Flutter UI (Dart)
-├── rust/         # Cryptography and secrets (Rust)
-├── rust_builder/ # Cargokit build integration (do not edit)
-├── docs/         # Architecture docs and ADRs
-│   └── decisions/
-└── ...           # Platform folders (android, linux, windows)
-```
-
-Full details in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
-
----
-
 ## Contributors
 
 - [Robert Leckenby](https://github.com/Zabamund/) — project owner,
@@ -229,8 +213,8 @@ flutter test integration_test/
 ## Documentation
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — full architecture reference
-- [`docs/LEARNINGS.md`](docs/LEARNINGS.md) — concepts and decisions explained
 - [`docs/AI_SECURITY_AUDIT.md`](docs/AI_SECURITY_AUDIT.md) — AI-assisted security review of the crypto and vault modules (Claude Opus 4.7, 2026-05-31)
+- [`docs/AI_SECURITY_AUDIT_REVIEW.md`](docs/AI_SECURITY_AUDIT.md) — AI-assissted review of previous audit with higher capability model (Claude Fable 5, 2026-06-11)
 - [`docs/decisions/`](docs/decisions/) — architectural decision records (ADRs)
 
 ---
