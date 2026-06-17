@@ -90,6 +90,20 @@
             android:windowSoftInputMode="adjustResize" />
 
         <!--
+            SaveActivity — the autofill SAVE counterpart to UnlockActivity. Launched
+            by GabbroAutofillService.onSaveRequest after a login is submitted. Runs the
+            autofillSaveMain entrypoint (unlock if needed, then the SaveConfirmScreen)
+            and writes the new/changed login via the Dart bridge.
+        -->
+        <activity
+            android:name=".SaveActivity"
+            android:exported="false"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!--
             AutofillSettingsActivity — reachable from Android Settings →
             Autofill service → Settings (via autofill_service_config.xml).
             Renders the Flutter autofill settings route.

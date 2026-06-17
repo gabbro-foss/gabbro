@@ -132,12 +132,10 @@ Build order (Canon TDD red-first; net-first pins first; Android hardware test be
 - [x] C *suggested* save action: `effectiveIdentifier` + `matchSaveTarget` + `decideSave` — green
 - [x] D Rust: `update_keeps_only_the_most_recent_previous_password` (single-slot) — green
   *(JNI write fns dropped — write via Dart bridge + `passwordHistoryExpiry`)*
-- [~] E `onSaveRequest` (Kotlin): E1 `shouldOfferSave` launch-guard green; E2-E4 launch wiring +
-  AssistStructure value-walk remain (Robolectric/hardware)
-- [~] F `SaveActivity` flow: **Dart side done & green** — F1 `saveContextJson` handoff,
-  `SaveConfirmScreen` (FD1-6, full-screen scrollable agency), `buildAutofillSaveApp` routing +
-  `autofillSaveMain` entrypoint + `SaveContext.fromJson`. Remaining = `SaveActivity` Kotlin +
-  `/autofill_save` channel handlers (`isUnlocked`/`getSaveContext`/`done`/`cancel`) + manifest (hardware)
+- [x] E `onSaveRequest` (Kotlin): `shouldOfferSave` guard (green) + `CapturedSaveRequest` value-walk
+  + launch `SaveActivity` with extras — written, compiles; value-walk is **hardware-verified**
+- [x] F `SaveActivity` flow **wired end-to-end (code)** — Dart (FD1-6 + routing + entrypoint, green)
+  and Kotlin (`SaveActivity` + `/autofill_save` channel + manifest, compiles). **HW-unverified**
 - [ ] F2 fix "No credentials found" → localized Flutter dialog (shares F's Flutter-autofill UI)
 - [ ] G l10n: new ARB keys ×37 for the confirm screen + no-match dialog
 - [ ] HW (Brave): new-login save (locked→unlock→confirm→create); changed-password update + history

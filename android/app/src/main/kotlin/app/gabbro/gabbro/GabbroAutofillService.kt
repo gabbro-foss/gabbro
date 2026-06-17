@@ -113,9 +113,42 @@ class GabbroAutofillService : AutofillService() {
     }
 
     override fun onSaveRequest(request: SaveRequest, callback: SaveCallback) {
-        // Save requests deferred to a dedicated session.
+        val structure = request.fillContexts.lastOrNull()?.structure
+        if (structure == null) {
+            callback.onSuccess()
+            return
+        }
+
+        val capture = CapturedSaveRequest.from(structure)
+        val captured = capturedLoginFrom(capture.fields)
+
+        // Web context wins over the host app's package: a login submitted in a
+        // browser belongs to the site, never to the browser's own package id.
+        val isWeb = capture.webDomain.isNotBlank()
+        val url = if (isWeb) capture.webDomain else ""
+        val appId = if (isWeb) "" else capture.packageName
+
+        if (!shouldOfferSave(captured, url, appId)) {
+            // No password, or no context to match on later — drop silently.
+            callback.onSuccess()
+            return
+        }
+
+        // The confirm + write happen in SaveActivity (after unlock); onSaveRequest
+        // only captures and hands off. Callback is satisfied immediately.
+        startActivity(buildSaveIntent(captured!!, url, appId))
         callback.onSuccess()
     }
+
+    private fun buildSaveIntent(captured: CapturedLogin, url: String, appId: String): Intent =
+        Intent(this, SaveActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            putExtra(SaveActivity.EXTRA_USERNAME, captured.username)
+            putExtra(SaveActivity.EXTRA_EMAIL, captured.email)
+            putExtra(SaveActivity.EXTRA_PASSWORD, captured.password)
+            putExtra(SaveActivity.EXTRA_URL, url)
+            putExtra(SaveActivity.EXTRA_APP_ID, appId)
+        }
 
     // -------------------------------------------------------------------------
     // Authentication wall
@@ -850,6 +883,78 @@ data class ParsedStructure(
 
             for (i in 0 until node.childCount) {
                 collectIds(node.getChildAt(i), usernameIds, emailIds, passwordIds, webDomainOut)
+            }
+        }
+    }
+}
+
+// -----------------------------------------------------------------------------
+// CapturedSaveRequest — walks a SaveRequest AssistStructure collecting the typed
+// field *values* (the save-path counterpart to ParsedStructure, which collects
+// AutofillIds). Classification reuses the shared classifyField; only the value
+// read (autofillValue) differs. The pure assembly lives in capturedLoginFrom.
+// -----------------------------------------------------------------------------
+
+data class CapturedSaveRequest(
+    val fields: List<Pair<FieldKind, String>>,
+    val webDomain: String,
+    val packageName: String,
+) {
+    companion object {
+        fun from(structure: AssistStructure): CapturedSaveRequest {
+            val fields = mutableListOf<Pair<FieldKind, String>>()
+            var webDomain: String? = null
+            var packageName: String? = null
+            for (i in 0 until structure.windowNodeCount) {
+                val windowNode = structure.getWindowNodeAt(i)
+                if (packageName == null) {
+                    packageName = windowNode.title
+                        ?.toString()
+                        ?.substringBefore("/")
+                        ?.trim()
+                        ?.takeIf { it.contains(".") }
+                }
+                val domainOut = arrayOfNulls<String>(1)
+                collect(windowNode.rootViewNode, fields, domainOut)
+                if (webDomain == null) webDomain = domainOut[0]
+            }
+            return CapturedSaveRequest(fields, webDomain.orEmpty(), packageName.orEmpty())
+        }
+
+        private fun collect(
+            node: AssistStructure.ViewNode,
+            fields: MutableList<Pair<FieldKind, String>>,
+            webDomainOut: Array<String?>,
+        ) {
+            if (webDomainOut[0] == null) {
+                webDomainOut[0] = node.webDomain?.takeIf { it.isNotBlank() }
+            }
+
+            if (node.autofillId != null) {
+                val htmlAttrs = node.htmlInfo?.attributes
+                fun htmlAttr(name: String): String? =
+                    htmlAttrs?.firstOrNull { it.first.equals(name, ignoreCase = true) }?.second
+
+                val kind = classifyField(
+                    autofillHints = node.autofillHints?.toList(),
+                    inputType = node.inputType,
+                    htmlType = htmlAttr("type"),
+                    htmlAutocomplete = htmlAttr("autocomplete"),
+                    hint = node.hint,
+                    idEntry = node.idEntry,
+                    htmlName = htmlAttr("name"),
+                    htmlId = htmlAttr("id"),
+                )
+                if (kind != FieldKind.NONE) {
+                    val value = node.autofillValue
+                        ?.let { if (it.isText) it.textValue.toString() else null }
+                        .orEmpty()
+                    fields.add(kind to value)
+                }
+            }
+
+            for (i in 0 until node.childCount) {
+                collect(node.getChildAt(i), fields, webDomainOut)
             }
         }
     }
