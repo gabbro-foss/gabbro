@@ -52,7 +52,7 @@ gabbro/
 │   ├── hardening.rs      # Process hardening (R-04): core-dump + ptrace/mem disable (Linux)
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics; wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + frozen golden fixtures (FIXTURES.md)
-├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper (+ Robolectric tests)
+├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper (+ Robolectric tests)
 ├── docs/                 # ARCHITECTURE, LEARNINGS, SECURITY, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/  test_driver/   # Flutter widget/unit + Linux real-FFI device suites
 ├── assets/               # fonts, images, help/; public_suffix_list.dat (autofill eTLD+1)
@@ -88,64 +88,15 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### In progress — autofill `onSaveRequest` (save new/changed logins from the OS prompt)
+### Next task — autofill silent no-match (unlocked path)
 
-**Status (2026-06-17):** A–D done & green (A/B/C Kotlin uncommitted pending hardware test; D
-committed). **Next: the E/F design pass** — `SaveActivity` + Flutter confirm screen, then build.
+When the vault is **already unlocked** and a fill request matches nothing, the user gets no feedback
+— unlike the locked path, which now shows a localized "No credentials found" dialog after unlock.
+Decide whether to surface a no-match indication on the unlocked path and how, given that a native
+toast can't be localized against the Flutter ARBs (the wall that pushed the autofill dialogs into
+Flutter). Wraps up the listed features/UX items.
 
-Design settled (2026-06-17). `onSaveRequest` is a no-op today; goal: on form submit the OS offers
-to save a new/changed login into the vault. **Login entries only.** Full unlock-then-save: a new
-`SaveActivity` (symmetric to `UnlockActivity`) unlocks (picker + YubiKey/biometric), then a Flutter
-confirm screen writes — so save works even from a locked vault.
-
-Decisions:
-- **Match key** = (eTLD+1 *or* app_id) + identifier; identifier compared **case-insensitive +
-  trimmed** (username, else email). Same site + identifier + new password ⇒ update, not a duplicate.
-- **User agency, never a silent overwrite.** The match only *suggests* a default; the confirm
-  screen always offers **Update (suggested) / Save as new / Choose another login (picker) / Cancel**.
-- **Confirm UI = Flutter screen**, not a native dialog: native can't be cleanly localized against
-  the 37-locale ARB pipeline. A new entrypoint `SaveActivity` runs after unlock (mirrors how
-  `UnlockActivity` reuses `UnlockScreen`); writes via a method channel.
-- **Update** records `previous_password` via the existing single-slot history (the older previous
-  is dropped: new `y`, previous becomes `x`, prior last is lost). Retention = `expiry_days` from
-  `settings.passwordHistoryExpiry` (`security_screen > password_history`), same mapping as
-  `create_entry_screen.dart`.
-- `SaveInfo` on **both** fill and auth `FillResponse`s — without it the OS never calls
-  `onSaveRequest`; on both so changed-password save also works on the locked→unlock path.
-- **No new write bridge fns.** The write runs from the Dart confirm screen via the existing
-  `create_entry` / `update_entry` bridge — the only clean way to read the Dart-side
-  `passwordHistoryExpiry`, and it reuses proven, tested write paths. Matching stays in Kotlin
-  (single source of truth, runs post-unlock) and feeds the confirm screen the suggestion + picker.
-- **No-context save → silent drop.** `onSaveRequest` with no password OR no usable context
-  (blank eTLD+1 *and* blank app_id) → `onSuccess()`, no UI. Rare (the OS gives package/webDomain).
-  New `/autofill_save` channel (separate from fill); `SaveActivity` skips unlock when already
-  unlocked. l10n keys (confirm screen + no-match dialog) self-translated ×37.
-- **Fix shipped bug**: `UnlockActivity`'s "No credentials found" native dialog is hardcoded English
-  — move it to a localized Flutter dialog (same l10n reason). Net-first: it's on the shipped
-  locked-unlock path, so pin first + hardware re-test.
-- **Chip label** `autofill_unlock_label` is OS-rendered (RemoteViews, no Flutter engine) so it's
-  irreducibly an Android resource — localizing it needs `values-XX/` (separate; translation source TBD).
-
-Build order (Canon TDD red-first; net-first pins first; Android hardware test before commit):
-- [x] A `SaveInfo` on fill + auth responses (A1/A2 pin, A3/A4 red) — done, Android unit green
-- [x] B capture typed values from `SaveRequest` (pure) — `capturedLoginFrom`, green
-- [x] C *suggested* save action: `effectiveIdentifier` + `matchSaveTarget` + `decideSave` — green
-- [x] D Rust: `update_keeps_only_the_most_recent_previous_password` (single-slot) — green
-  *(JNI write fns dropped — write via Dart bridge + `passwordHistoryExpiry`)*
-- [x] E `onSaveRequest` (Kotlin): `shouldOfferSave` guard (green) + `CapturedSaveRequest` value-walk
-  + launch `SaveActivity` with extras — written, compiles; value-walk is **hardware-verified**
-- [x] F `SaveActivity` flow **hardware-verified** (Brave, 2026-06-17): new-login (locked unlock via
-  passphrase + YubiKey, and already-unlocked), changed-password update + history, create-new,
-  pick-another, cancel, dismiss/no-double-save, resume-refresh of the open vault list, + a
-  "lock first to switch vault" hint on the already-unlocked path
-- [x] F2 "No credentials found" → localized Flutter dialog: `UnlockActivity` returns `matched`,
-  Dart shows `showAutofillNoMatchDialog` + `cancel`. Code + widget test green, compiles; **HW-pending**
-- [x] G l10n: save-flow + no-match keys translated into all 36 locales (vault/lock terms matched to
-  each app's existing strings; `eu`/`kk`/`yo` are best-effort, flagged for native review)
-- [ ] (deferred unless picked up) chip-label `values-XX/` l10n
-
-*(Prior: locked-vault autofill unlock shipped, hardware-verified 2026-06-17; see CHANGELOG.
-Also open: silent no-match toast for the unlocked path — Bikeshed.)*
+*(Prior: autofill save — `onSaveRequest` — shipped end-to-end, see CHANGELOG.)*
 
 ### Open from the security audit
 
@@ -178,10 +129,13 @@ release process live in their own document:
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
-- Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
 
 ### Code Quality
 - Audit the full code base for dead-code
+- **Autofill save loose ends.** Hardware-verify the localized "No credentials found" dialog (F2,
+  fill path, no match). Native review of the best-effort `eu`/`kk`/`yo` save-flow translations.
+  The OS autofill chip label (`autofill_unlock_label`) stays English — RemoteViews, no Flutter
+  engine, so localizing it needs `values-XX/`.
 - **Deprecated `Dataset.Builder.setValue` (autofill).** `setValue(AutofillId, AutofillValue,
   RemoteViews)` is deprecated; replace with `setField(AutofillId, Field)` (Field carries the
   value + a `Presentations`/`RemoteViews`). Call sites: `GabbroAutofillService.buildAuthResponse`
