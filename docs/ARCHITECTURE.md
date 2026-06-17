@@ -92,26 +92,41 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 Design settled (2026-06-17). `onSaveRequest` is a no-op today; goal: on form submit the OS offers
 to save a new/changed login into the vault. **Login entries only.** Full unlock-then-save: a new
-`SaveActivity` (symmetric to `UnlockActivity`) unlocks (picker + YubiKey/biometric) then writes —
-so save works even from a locked vault.
+`SaveActivity` (symmetric to `UnlockActivity`) unlocks (picker + YubiKey/biometric), then a Flutter
+confirm screen writes — so save works even from a locked vault.
 
 Decisions:
-- **Match key** = (eTLD+1 *or* app_id) + username. Same site + username + new password ⇒ update,
-  not a duplicate.
+- **Match key** = (eTLD+1 *or* app_id) + identifier; identifier compared **case-insensitive +
+  trimmed** (username, else email). Same site + identifier + new password ⇒ update, not a duplicate.
+- **User agency, never a silent overwrite.** The match only *suggests* a default; the confirm
+  screen always offers **Update (suggested) / Save as new / Choose another login (picker) / Cancel**.
+- **Confirm UI = Flutter screen**, not a native dialog: native can't be cleanly localized against
+  the 37-locale ARB pipeline. A new entrypoint `SaveActivity` runs after unlock (mirrors how
+  `UnlockActivity` reuses `UnlockScreen`); writes via a method channel.
 - **Update** records `previous_password` via the existing single-slot history (the older previous
   is dropped: new `y`, previous becomes `x`, prior last is lost).
 - `SaveInfo` on **both** fill and auth `FillResponse`s — without it the OS never calls
   `onSaveRequest`; on both so changed-password save also works on the locked→unlock path.
 - **Two** new bridge fns: `create_login_for_autofill` + `update_login_password_for_autofill`
   (locked → error; persist; update records history).
+- **Fix shipped bug**: `UnlockActivity`'s "No credentials found" native dialog is hardcoded English
+  — move it to a localized Flutter dialog (same l10n reason). Net-first: it's on the shipped
+  locked-unlock path, so pin first + hardware re-test.
+- **Chip label** `autofill_unlock_label` is OS-rendered (RemoteViews, no Flutter engine) so it's
+  irreducibly an Android resource — localizing it needs `values-XX/` (separate; translation source TBD).
 
 Build order (Canon TDD red-first; net-first pins first; Android hardware test before commit):
-- [ ] A `SaveInfo` on fill + auth responses (A1/A2 pin, A3/A4 red)
-- [ ] B capture typed values from `SaveRequest` (pure)
-- [ ] C create-vs-update decision (pure)
-- [ ] D Rust bridge: create + update-password (+ locked→error)
-- [ ] E `onSaveRequest` extract+launch `SaveActivity`; `SaveActivity` unlock→write; cancel→no write
-- [ ] HW: real save prompt in Brave; locked-vault save; changed-password update; cancel no-op
+- [x] A `SaveInfo` on fill + auth responses (A1/A2 pin, A3/A4 red) — done, Android unit green
+- [x] B capture typed values from `SaveRequest` (pure) — `capturedLoginFrom`, green
+- [ ] C *suggested* save action (pure): `matchSaveTarget` + `decideSave` → Create/Update/NoOp default
+- [ ] D Rust bridge: create + update-password (+ locked→error) + Rust tests
+- [ ] E `onSaveRequest`: capture + web/app context → launch `SaveActivity`
+- [ ] F `SaveActivity`: unlock → Flutter confirm screen (agency: update/save-new/pick/cancel) → write
+- [ ] F2 fix "No credentials found" → localized Flutter dialog (shares F's Flutter-autofill UI)
+- [ ] G l10n: new ARB keys ×37 for the confirm screen + no-match dialog
+- [ ] HW (Brave): new-login save (locked→unlock→confirm→create); changed-password update + history
+  kept; create-new-instead; pick-another; cancel writes nothing
+- [ ] (deferred unless picked up) chip-label `values-XX/` l10n
 
 *(Prior: locked-vault autofill unlock shipped, hardware-verified 2026-06-17; see CHANGELOG.
 Also open: silent no-match toast for the unlocked path — Bikeshed.)*
@@ -170,7 +185,7 @@ release process live in their own document:
 ### V2+ / Defer
 - UI locales deferred (RTL layout work required): Hebrew, Arabic.
 - Passphrase wordlists — not viable without significant pipeline work: `yo` Yoruba (no frequency ordering, complex tonal diacritics); `sr_Latn` Serbian Latin (only Cyrillic corpora; needs transliteration pipeline); `lb` Luxembourgish (small speaker base); `wa` Walloon (nothing usable, French covers Wallonia).
-- Autofill via `auto-type` (desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
+- Autofill via `auto-type` (Linux/desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
 - Passkey (WebAuthn discoverable credential) support.
 - Vault sync across devices.
 - Data breach alerts / HaveIBeenPwned integration.
