@@ -28,7 +28,8 @@ import android.widget.RemoteViews
  *       tapping it opens UnlockActivity, which unlocks the vault and returns
  *       the credential directly to the target field.
  *   3b. Vault unlocked → domain-match Login entries and return one Dataset
- *       per match. Returns null if no matches found.
+ *       per match. No match → a SaveInfo-only response (no datasets), so no
+ *       suggestion chip shows: the unlocked no-match path is silent by design.
  */
 class GabbroAutofillService : AutofillService() {
 
@@ -100,8 +101,11 @@ class GabbroAutofillService : AutofillService() {
         }
 
         if (matches.isEmpty()) {
-            // Unlocked but nothing matched: still offer to SAVE a brand-new login
-            // (a fill response carrying only SaveInfo, no datasets).
+            // Unlocked but nothing matched: silent by design — no no-match indicator is
+            // surfaced. No chip shows (the Android convention when nothing matches), the user
+            // took no Gabbro action, and there is no Flutter engine on this path to localize a
+            // message against the ARBs. We still offer to SAVE a brand-new login (a FillResponse
+            // carrying only SaveInfo, no datasets).
             callback.onSuccess(buildSaveOnlyResponse(parseResult))
             return
         }
