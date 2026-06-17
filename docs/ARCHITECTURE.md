@@ -88,23 +88,32 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task — autofill `onSaveRequest` (save new/changed logins from the OS prompt)
+### In progress — autofill `onSaveRequest` (save new/changed logins from the OS prompt)
 
-`GabbroAutofillService.onSaveRequest` is a no-op today. Goal: when the user submits a login form
-with credentials Gabbro lacks (or a changed password), the OS offers to save them into the vault.
-The fill path (incl. locked-vault unlock) is done — this is the inbound counterpart.
+Design settled (2026-06-17). `onSaveRequest` is a no-op today; goal: on form submit the OS offers
+to save a new/changed login into the vault. **Login entries only.** Full unlock-then-save: a new
+`SaveActivity` (symmetric to `UnlockActivity`) unlocks (picker + YubiKey/biometric) then writes —
+so save works even from a locked vault.
 
-**Starts with a design pass (Canon TDD list-first). Open questions to settle first:**
-- Saving needs an **unlocked session** — reuse the `UnlockActivity` unlock flow, or only offer
-  save when already unlocked? And **which vault** (picker, like unlock)?
-- **Create vs update** — new entry vs a changed password on an existing matched login.
-- Parse username/email/password from the `SaveRequest` `AssistStructure` (mirror the fill-path
-  `classifyField`); set `SaveInfo` on the fill `FillResponse` so the OS shows the save prompt.
-- Web vs native: record `url` (eTLD+1) / `app_id` so the saved entry matches next time.
+Decisions:
+- **Match key** = (eTLD+1 *or* app_id) + username. Same site + username + new password ⇒ update,
+  not a duplicate.
+- **Update** records `previous_password` via the existing single-slot history (the older previous
+  is dropped: new `y`, previous becomes `x`, prior last is lost).
+- `SaveInfo` on **both** fill and auth `FillResponse`s — without it the OS never calls
+  `onSaveRequest`; on both so changed-password save also works on the locked→unlock path.
+- **Two** new bridge fns: `create_login_for_autofill` + `update_login_password_for_autofill`
+  (locked → error; persist; update records history).
 
-Net-first as before: pin current behaviour, build red-first, Android hardware test before commit.
+Build order (Canon TDD red-first; net-first pins first; Android hardware test before commit):
+- [ ] A `SaveInfo` on fill + auth responses (A1/A2 pin, A3/A4 red)
+- [ ] B capture typed values from `SaveRequest` (pure)
+- [ ] C create-vs-update decision (pure)
+- [ ] D Rust bridge: create + update-password (+ locked→error)
+- [ ] E `onSaveRequest` extract+launch `SaveActivity`; `SaveActivity` unlock→write; cancel→no write
+- [ ] HW: real save prompt in Brave; locked-vault save; changed-password update; cancel no-op
 
-*(Just shipped — locked-vault autofill unlock, hardware-verified 2026-06-17; see CHANGELOG.
+*(Prior: locked-vault autofill unlock shipped, hardware-verified 2026-06-17; see CHANGELOG.
 Also open: silent no-match toast for the unlocked path — Bikeshed.)*
 
 ### Open from the security audit
