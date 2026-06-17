@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/safe_file_picker.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
@@ -90,6 +92,43 @@ Widget _buildScreen({
       onRemoveVaultFromList: onRemoveVaultFromList ?? (_) async {},
       onDeleteVaultFile: onDeleteVaultFile ?? (_) async {},
     ));
+
+// ── Net B appearance shell (top-level per test-helper convention) ──────────────
+// Mirrors main.dart's MaterialApp wiring so the screen is exercised under the
+// user's real theme / high-contrast / text size / locale — not the test default.
+
+Widget _appShell(
+  Widget home, {
+  ThemeMode mode = ThemeMode.light,
+  bool highContrast = false,
+  Locale? locale,
+  TextScaler textScaler = TextScaler.noScaling,
+}) =>
+    MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: locale,
+      themeMode: mode,
+      theme: gabbroLightTheme(highContrast: highContrast),
+      darkTheme: gabbroDarkTheme(highContrast: highContrast),
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaler: textScaler),
+        child: child!,
+      ),
+      home: home,
+    );
+
+// A bare UnlockScreen with only the mount-safe seams overridden (no real FFI on
+// mount); appearance tests render it, they never tap unlock.
+UnlockScreen _bareUnlock({List<YubikeyRecordData> yubikeyRecords = const []}) =>
+    UnlockScreen(
+      vaultPath: '/tmp/test.gabbro',
+      onEstimateEntropy: _fakeEntropy,
+      yubikeyRecords: yubikeyRecords,
+      onVaultIsReadable: (_) async => true,
+      onBackupUsable: (_) async => false,
+      onBiometricIsEnrolled: (_) async => false,
+    );
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -298,6 +337,49 @@ void main() {
       expect(tester.takeException(), isNull,
           reason: 'short viewport must scroll, never overflow');
     }
+  });
+
+  // ── Net B: appearance + language ────────────────────────────────────────────
+
+  group('Net B appearance + language', () {
+    testWidgets('renders under light/dark themes, plain and high-contrast',
+        (tester) async {
+      for (final mode in [ThemeMode.light, ThemeMode.dark]) {
+        for (final hc in [false, true]) {
+          await tester.pumpWidget(
+            _appShell(_bareUnlock(), mode: mode, highContrast: hc),
+          );
+          await tester.pump();
+          expect(find.byType(GabbroLogo), findsOneWidget);
+          expect(find.text('Unlock'), findsOneWidget);
+          expect(tester.takeException(), isNull,
+              reason: 'mode=$mode highContrast=$hc must render cleanly');
+        }
+      }
+    });
+
+    testWidgets('renders at 2x text scale without overflow (both modes)',
+        (tester) async {
+      for (final records in [<YubikeyRecordData>[], [_fakeRecord()]]) {
+        await tester.pumpWidget(_appShell(
+          _bareUnlock(yubikeyRecords: records),
+          textScaler: const TextScaler.linear(2.0),
+        ));
+        await tester.pumpAndSettle();
+        expect(find.text('Unlock'), findsOneWidget);
+        expect(tester.takeException(), isNull,
+            reason: 'large text must scroll, never overflow');
+      }
+    });
+
+    testWidgets('renders under a long-string locale (de) without overflow',
+        (tester) async {
+      await tester.pumpWidget(_appShell(_bareUnlock(), locale: const Locale('de')));
+      await tester.pumpAndSettle();
+      expect(find.byType(GabbroLogo), findsOneWidget);
+      expect(find.byType(FilledButton), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   });
 
   // ── Safe area ─────────────────────────────────────────────────────────────
