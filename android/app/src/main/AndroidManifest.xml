@@ -76,9 +76,10 @@
 
         <!--
             UnlockActivity — shown by the OS when a fill request arrives and
-            the vault is locked. A thin FlutterActivity subclass that renders
-            the /autofill-unlock route, collects the passphrase, and returns
-            the requested credential to the OS on success.
+            the vault is locked. A GabbroUnlockHostActivity subclass that runs
+            the autofillUnlockMain entrypoint (reused UnlockScreen: vault picker,
+            passphrase, YubiKey, biometric) and returns the requested credential
+            to the OS once the vault session is unlocked.
         -->
         <activity
             android:name=".UnlockActivity"

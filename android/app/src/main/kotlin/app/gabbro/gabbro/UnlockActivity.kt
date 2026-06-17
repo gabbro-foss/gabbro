@@ -1,15 +1,12 @@
 package app.gabbro.gabbro
 
 import android.content.Intent
-import android.view.WindowManager
 import android.os.Build
-import android.os.Bundle
 import android.service.autofill.Dataset
 import android.service.autofill.FillResponse
 import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
-import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
@@ -21,17 +18,21 @@ import io.flutter.plugin.common.MethodChannel
  *
  * Flow:
  *   1. OS launches this activity via the IntentSender from buildAuthResponse().
- *   2. We show the Flutter /autofill-unlock route (passphrase entry).
- *   3a. User unlocks successfully → Flutter calls back into Kotlin via a
- *       MethodChannel (wired in a later session), we build a FillResponse
- *       with the requested credential and finish with RESULT_OK.
- *   3b. User cancels / back-presses → finish with RESULT_CANCELED.
- *       The OS delivers nothing to the target field.
+ *   2. We run the `autofillUnlockMain` Flutter entrypoint, which shows the full
+ *      reused UnlockScreen (vault picker, passphrase, YubiKey, biometric).
+ *   3a. Flutter unlocks the shared vault session (generated bridge) and then calls
+ *       the `"unlock"` method here; we build a FillResponse with the requested
+ *       credential and finish with RESULT_OK.
+ *   3b. User cancels / back-presses → finish with RESULT_CANCELED. The OS
+ *       delivers nothing to the target field.
  *
- * This activity must never finish with RESULT_OK unless the vault is
+ * Inherits the YubiKey + biometric channels, NFC NDEF suppression, and FLAG_SECURE
+ * from [GabbroUnlockHostActivity] — so YubiKey (USB + NFC) and biometric unlock
+ * work here exactly as in the main app, and an NFC OTP tap cannot escape to the
+ * browser. This activity must never finish with RESULT_OK unless the vault is
  * confirmed unlocked and a valid credential has been selected.
  */
-class UnlockActivity : FlutterActivity() {
+class UnlockActivity : GabbroUnlockHostActivity() {
 
     companion object {
         private const val CHANNEL = "app.gabbro.gabbro/autofill"
@@ -45,19 +46,18 @@ class UnlockActivity : FlutterActivity() {
     // Backs eTLD+1 matching — the same vendored list the autofill service loads.
     private val publicSuffixList: PublicSuffixList by lazy { PublicSuffixList.fromAsset(this) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-    }
-
     override fun getDartEntrypointFunctionName(): String = "autofillUnlockMain"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        // Registers the shared YubiKey + biometric channels and NFC suppression.
         super.configureFlutterEngine(flutterEngine)
+
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "unlock" -> {
+                        // Flutter has already unlocked the shared vault session;
+                        // build the fill response for the requested fields.
                         val fillIntent = buildFillIntent()
                         if (fillIntent != null) {
                             setResult(RESULT_OK, fillIntent)
