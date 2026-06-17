@@ -104,11 +104,15 @@ Decisions:
   the 37-locale ARB pipeline. A new entrypoint `SaveActivity` runs after unlock (mirrors how
   `UnlockActivity` reuses `UnlockScreen`); writes via a method channel.
 - **Update** records `previous_password` via the existing single-slot history (the older previous
-  is dropped: new `y`, previous becomes `x`, prior last is lost).
+  is dropped: new `y`, previous becomes `x`, prior last is lost). Retention = `expiry_days` from
+  `settings.passwordHistoryExpiry` (`security_screen > password_history`), same mapping as
+  `create_entry_screen.dart`.
 - `SaveInfo` on **both** fill and auth `FillResponse`s — without it the OS never calls
   `onSaveRequest`; on both so changed-password save also works on the locked→unlock path.
-- **Two** new bridge fns: `create_login_for_autofill` + `update_login_password_for_autofill`
-  (locked → error; persist; update records history).
+- **No new write bridge fns.** The write runs from the Dart confirm screen via the existing
+  `create_entry` / `update_entry` bridge — the only clean way to read the Dart-side
+  `passwordHistoryExpiry`, and it reuses proven, tested write paths. Matching stays in Kotlin
+  (single source of truth, runs post-unlock) and feeds the confirm screen the suggestion + picker.
 - **Fix shipped bug**: `UnlockActivity`'s "No credentials found" native dialog is hardcoded English
   — move it to a localized Flutter dialog (same l10n reason). Net-first: it's on the shipped
   locked-unlock path, so pin first + hardware re-test.
@@ -118,10 +122,12 @@ Decisions:
 Build order (Canon TDD red-first; net-first pins first; Android hardware test before commit):
 - [x] A `SaveInfo` on fill + auth responses (A1/A2 pin, A3/A4 red) — done, Android unit green
 - [x] B capture typed values from `SaveRequest` (pure) — `capturedLoginFrom`, green
-- [ ] C *suggested* save action (pure): `matchSaveTarget` + `decideSave` → Create/Update/NoOp default
-- [ ] D Rust bridge: create + update-password (+ locked→error) + Rust tests
-- [ ] E `onSaveRequest`: capture + web/app context → launch `SaveActivity`
-- [ ] F `SaveActivity`: unlock → Flutter confirm screen (agency: update/save-new/pick/cancel) → write
+- [x] C *suggested* save action: `effectiveIdentifier` + `matchSaveTarget` + `decideSave` — green
+- [ ] D Rust: `update_keeps_only_the_most_recent_previous_password` (single-slot) on existing
+  `update_entry` coverage *(JNI write fns dropped — write via Dart bridge + `passwordHistoryExpiry`)*
+- [ ] E `onSaveRequest` (Kotlin): capture login + web/app context → launch `SaveActivity`
+- [ ] F `SaveActivity`: unlock → Kotlin matching → Flutter confirm screen (agency: update/save-new/
+  pick/cancel) → Dart `create_entry`/`update_entry` (+ `passwordHistoryExpiry`)
 - [ ] F2 fix "No credentials found" → localized Flutter dialog (shares F's Flutter-autofill UI)
 - [ ] G l10n: new ARB keys ×37 for the confirm screen + no-match dialog
 - [ ] HW (Brave): new-login save (locked→unlock→confirm→create); changed-password update + history
