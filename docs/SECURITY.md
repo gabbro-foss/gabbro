@@ -293,6 +293,19 @@ review must answer before v1.0.
   `change_vault_passphrase_with_keys` (invariant: any registered key can always
   unlock; passphrase change does not invalidate existing keys).
 
+### Developer/build environment — analysis tools run dependency code
+
+A developer-side, not end-user, surface. To give accurate analysis, **rust-analyzer
+runs `build.rs` build scripts and expands procedural macros by default** — i.e. it
+executes code from the crate *and its dependencies* at edit time, before any explicit
+`cargo build`. The compiled build does the same. So a malicious dependency could run
+code on a contributor's machine. Mitigation is dependency hygiene, not disabling the
+tooling (Gabbro relies on proc-macros — `serde`, `thiserror`, `flutter_rust_bridge`):
+deps are pinned (`Cargo.lock` / `pubspec.lock`) and lockfile diffs reviewed on update
+(see `MAINTENANCE.md`). `flutter pub get` / `cargo` fetches are the only online steps
+and are run deliberately (IDE auto-fetch prompts disabled). Note: `pub get` itself does
+not execute package code; the Rust toolchain (build scripts/proc-macros) does.
+
 ---
 
 ## Threat model
