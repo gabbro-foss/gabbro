@@ -102,10 +102,13 @@ YubiKey (USB/NFC), PIN, multi-key, biometric.
   `VaultListScreen`); main app behaviour unchanged when the hook is absent.
 - `UnlockActivity` → `FlutterFragmentActivity` hosting the same `…/yubikey` + `…/biometric`
   channels + NFC suppression as `MainActivity`, extracted to a shared base (DRY).
-- `autofillUnlockMain` loads `VaultRegistry` (picker — user chooses which vault) and mirrors
-  `main.dart`'s `MaterialApp` wiring (locale/theme/textScaler). Fixes a latent bug: the
-  entrypoint builds a bare `MaterialApp`; current tests pass only because `testApp()` injects
-  the delegates the production entrypoint lacks.
+- `autofillUnlockMain` (the real entrypoint is `main.dart:89` — verified; the default
+  entrypoint library) already reused `UnlockScreen` and wired delegates/locale/theme. Net D
+  added the vault picker (`registry` + local `onVaultSwitch`), the missing `textScaler`, and
+  routed success through the `onUnlocked` hook (so YubiKey/biometric unlocks signal Kotlin too,
+  not just passphrase). Deleted a dead duplicate (`autofill_unlock_main.dart` +
+  `AutofillUnlockScreen`, referenced only by a test) — the earlier "bare MaterialApp" finding
+  was read off that dead file.
 
 **Rule: a regression net is written and green against *current* code before any production change.**
 
@@ -126,8 +129,9 @@ Net C — accessibility (broad sweep): **DONE** (3 pins; tap-target ✓, contras
 focus order ✓). `labeledTapTargetGuideline` waived — found unlabelled eye toggles (Bikeshed).
 - [x] tap-target, text-contrast (light+dark), focus order (large-text reflow covered by Net B)
 
-Net D — autofill entrypoint:
-- [ ] extract testable `buildAutofillUnlockApp(settings, registry)`; assert it wires delegates/locale/theme/textScaler
+Net D — autofill entrypoint: **DONE** (4 pins; `buildAutofillUnlockApp` extracted; picker +
+textScaler + `onUnlocked` routing added; dead duplicate deleted). Red-first.
+- [x] `buildAutofillUnlockApp(settings, registry, initialVaultPath)` wires delegates/locale/theme/textScaler, reuses `UnlockScreen` with picker + `onUnlocked` + biometric
 
 Net E — Kotlin tap-flow (Robolectric):
 - [ ] exactly one of timeout/cancel/success/error completes; cancel→`TAP_CANCELLED`; retry-once; transport dispatch
@@ -136,7 +140,7 @@ Net E — Kotlin tap-flow (Robolectric):
 **Then production (each step, then device-test):**
 - [x] `onUnlocked` hook on `UnlockScreen` (success calls hook instead of nav; default
   navigation preserved — both pinned, red-first)
-- [ ] autofill entrypoint reuses `UnlockScreen` (picker + appearance/locale wiring)
+- [x] autofill entrypoint reuses `UnlockScreen` (picker + appearance/locale/textScaler wiring)
 - [ ] `UnlockActivity` → FragmentActivity + shared host extraction (yubikey/biometric/NFC)
 - [ ] device gate: locked autofill unlocks (passphrase / YubiKey USB+NFC with no `demo.yubico.com`
   escape / biometric); picker chooses a non-default vault; locked-path matching matrix; main-app
@@ -181,6 +185,7 @@ release process live in their own document:
 - Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 
 ### Code Quality
+- Audit the full code base for dead-code
 - **A11y: unlabelled show/hide eye toggles.** The passphrase/PIN visibility `IconButton`s
   (UnlockScreen, likely also onboarding / change-passphrase / generator) carry no semantic
   label — `labeledTapTargetGuideline` fails; screen readers announce a bare "button". Fix:
