@@ -157,6 +157,12 @@ bool _listEqual(List<int> a, List<int> b) {
 class UnlockScreen extends StatefulWidget {
   final String vaultPath;
   final Future<void> Function(List<int> passphrase, String path) onUnlock;
+
+  /// Called after a successful unlock instead of navigating to VaultListScreen.
+  /// The autofill activity sets this to signal the native side to build the
+  /// fill response. Null (the default) keeps the in-app behaviour: navigate.
+  final Future<void> Function()? onUnlocked;
+
   final EntropyResult Function(String password) onEstimateEntropy;
   final bool blockPassphraseCopyPaste;
 
@@ -249,6 +255,7 @@ class UnlockScreen extends StatefulWidget {
     super.key,
     required this.vaultPath,
     this.onUnlock = _defaultUnlock,
+    this.onUnlocked,
     this.onEstimateEntropy = _defaultEstimateEntropy,
     this.blockPassphraseCopyPaste = true,
     this.yubikeyRecords,
@@ -577,14 +584,20 @@ class _UnlockScreenState extends State<UnlockScreen>
       }
       if (mounted) {
         GabbroApp.maybeOf(context)?.touchVaultLastUsed(widget.vaultPath);
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => VaultListScreen(
-              vaultPath: widget.vaultPath,
-              vaultAlias: widget.vaultAlias,
+        // Autofill activity supplies onUnlocked to signal the native side
+        // (build the fill response) instead of opening the vault list.
+        if (widget.onUnlocked != null) {
+          await widget.onUnlocked!();
+        } else {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => VaultListScreen(
+                vaultPath: widget.vaultPath,
+                vaultAlias: widget.vaultAlias,
+              ),
             ),
-          ),
-        );
+          );
+        }
       }
     } catch (e) {
       if (!mounted) return;

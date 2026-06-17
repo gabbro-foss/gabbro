@@ -46,6 +46,7 @@ VaultRecord _vaultRecord({
 Widget _buildScreen({
   String vaultPath = '/tmp/test.gabbro',
   Future<void> Function(List<int>, String)? onUnlock,
+  Future<void> Function()? onUnlocked,
   bool blockPassphraseCopyPaste = true,
   List<YubikeyRecordData>? yubikeyRecords,
   Future<void> Function(List<int>, List<int>, List<int>, String, String, String)?
@@ -71,6 +72,7 @@ Widget _buildScreen({
     testApp(UnlockScreen(
       vaultPath: vaultPath,
       onUnlock: onUnlock ?? (a, b) async {},
+      onUnlocked: onUnlocked,
       onEstimateEntropy: _fakeEntropy,
       blockPassphraseCopyPaste: blockPassphraseCopyPaste,
       yubikeyRecords: yubikeyRecords ?? [],
@@ -202,6 +204,24 @@ void main() {
 
     expect(find.byType(VaultListScreen), findsOneWidget);
     expect(find.byType(UnlockScreen), findsNothing);
+  });
+
+  testWidgets(
+      'onUnlocked hook fires on success and suppresses VaultListScreen navigation',
+      (tester) async {
+    bool hookCalled = false;
+    await tester.pumpWidget(_buildScreen(
+      onUnlock: (a, b) async {},
+      onUnlocked: () async => hookCalled = true,
+    ));
+
+    await tester.enterText(find.byType(TextField), 'anypassphrase');
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(hookCalled, isTrue);
+    expect(find.byType(VaultListScreen), findsNothing);
+    expect(find.byType(UnlockScreen), findsOneWidget);
   });
 
   testWidgets('Net A: successful YubiKey unlock navigates to VaultListScreen',
