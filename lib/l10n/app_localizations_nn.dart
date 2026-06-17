@@ -54,6 +54,10 @@ class AppLocalizationsNn extends AppLocalizations {
       'This login is already saved with this password.';
 
   @override
+  String get saveConfirmSwitchVaultHint =>
+      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+
+  @override
   String get add => 'Legg til';
 
   @override

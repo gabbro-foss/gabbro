@@ -101,6 +101,10 @@ class SaveConfirmScreen extends StatefulWidget {
   final VoidCallback onDone;
   final VoidCallback onCancel;
 
+  /// True when the vault was already unlocked (no vault picker was shown), so we
+  /// hint that locking first is how to save into a different vault.
+  final bool showSwitchVaultHint;
+
   const SaveConfirmScreen({
     super.key,
     required this.saveContext,
@@ -109,6 +113,7 @@ class SaveConfirmScreen extends StatefulWidget {
     this.onCreate = _defaultCreate,
     this.onGetEntry = _defaultGetEntry,
     this.onUpdate = _defaultUpdate,
+    this.showSwitchVaultHint = false,
   });
 
   @override
@@ -235,6 +240,14 @@ class _SaveConfirmScreenState extends State<SaveConfirmScreen> {
                   child: Text(identifier, style: theme.textTheme.bodyLarge),
                 ),
               const SizedBox(height: 28),
+              if (widget.showSwitchVaultHint)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: Text(
+                    l.saveConfirmSwitchVaultHint,
+                    style: theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
+                  ),
+                ),
               ..._actions(l, c),
             ],
           ),

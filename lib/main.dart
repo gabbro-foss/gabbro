@@ -346,6 +346,7 @@ class _AutofillSaveAppState extends State<_AutofillSaveApp> {
     }
     return SaveConfirmScreen(
       saveContext: ctx,
+      showSwitchVaultHint: widget.alreadyUnlocked,
       onDone: () => widget.channel.invokeMethod('done'),
       onCancel: () => widget.channel.invokeMethod('cancel'),
     );

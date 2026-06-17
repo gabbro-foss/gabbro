@@ -188,6 +188,29 @@ void main() {
     expect(creates, 1);
   });
 
+  testWidgets('switch-vault hint shows only when already unlocked', (tester) async {
+    await _pump(
+      tester,
+      SaveConfirmScreen(
+        saveContext: _ctx(action: SaveActionKind.create),
+        showSwitchVaultHint: true,
+        onDone: () {},
+        onCancel: () {},
+      ),
+    );
+    expect(find.textContaining('lock this one first'), findsOneWidget);
+
+    await _pump(
+      tester,
+      SaveConfirmScreen(
+        saveContext: _ctx(action: SaveActionKind.create),
+        onDone: () {},
+        onCancel: () {},
+      ),
+    );
+    expect(find.textContaining('lock this one first'), findsNothing);
+  });
+
   test('FD6 expiryDaysFor maps the retention setting', () {
     expect(expiryDaysFor(PasswordHistoryExpiry.sevenDays), 7);
     expect(expiryDaysFor(PasswordHistoryExpiry.thirtyDays), 30);

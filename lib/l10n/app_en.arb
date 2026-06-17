@@ -40,6 +40,10 @@
   "@saveConfirmAlreadySaved": {
     "description": "Shown when the submitted password already matches the stored one, so there is nothing to update."
   },
+  "saveConfirmSwitchVaultHint": "Saving to the currently unlocked vault. To save to a different vault, lock this one first.",
+  "@saveConfirmSwitchVaultHint": {
+    "description": "Hint on the save screen when the vault was already unlocked (no vault picker was shown), telling the user how to target a different vault."
+  },
   "add": "Add",
   "remove": "Remove",
   "rename": "Rename",

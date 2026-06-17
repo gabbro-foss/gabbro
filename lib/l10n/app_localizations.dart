@@ -247,6 +247,12 @@ abstract class AppLocalizations {
   /// **'This login is already saved with this password.'**
   String get saveConfirmAlreadySaved;
 
+  /// Hint on the save screen when the vault was already unlocked (no vault picker was shown), telling the user how to target a different vault.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving to the currently unlocked vault. To save to a different vault, lock this one first.'**
+  String get saveConfirmSwitchVaultHint;
+
   /// No description provided for @add.
   ///
   /// In en, this message translates to:
