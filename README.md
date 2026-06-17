@@ -214,7 +214,7 @@ flutter test integration_test/
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — full architecture reference
 - [`docs/AI_SECURITY_AUDIT.md`](docs/AI_SECURITY_AUDIT.md) — AI-assisted security review of the crypto and vault modules (Claude Opus 4.7, 2026-05-31)
-- [`docs/AI_SECURITY_AUDIT_REVIEW.md`](docs/AI_SECURITY_AUDIT.md) — AI-assissted review of previous audit with higher capability model (Claude Fable 5, 2026-06-11)
+- [`docs/AI_SECURITY_AUDIT_REVIEW.md`](docs/AI_SECURITY_AUDIT.md) — AI-assisted review of previous audit with higher capability model (Claude Fable 5, 2026-06-11)
 - [`docs/decisions/`](docs/decisions/) — architectural decision records (ADRs)
 
 ---
