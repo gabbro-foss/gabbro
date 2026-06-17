@@ -134,7 +134,8 @@ Net E — Kotlin tap-flow (Robolectric):
 - [ ] `MainActivity` still wires export + getRecentApps after extraction
 
 **Then production (each step, then device-test):**
-- [ ] `onUnlocked` hook on `UnlockScreen`
+- [x] `onUnlocked` hook on `UnlockScreen` (success calls hook instead of nav; default
+  navigation preserved — both pinned, red-first)
 - [ ] autofill entrypoint reuses `UnlockScreen` (picker + appearance/locale wiring)
 - [ ] `UnlockActivity` → FragmentActivity + shared host extraction (yubikey/biometric/NFC)
 - [ ] device gate: locked autofill unlocks (passphrase / YubiKey USB+NFC with no `demo.yubico.com`
