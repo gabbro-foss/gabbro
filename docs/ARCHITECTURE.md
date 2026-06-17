@@ -118,8 +118,9 @@ on the `isAndroid` seam, red-first — USB/NFC is Android-only).
 - [x] keyboard submit unlocks; loading disables controls; biometric+YubiKey hint shown
 - [x] no overflow in a short viewport with an error showing (both modes)
 
-Net B — appearance/language:
-- [ ] renders under light/dark/system + high-contrast; large `textScaler`; non-English + long-string locale
+Net B — appearance/language: **DONE** (3 pins; screen robust, no prod change — entrypoint
+wiring is Net D).
+- [x] renders under light/dark + high-contrast; 2x `textScaler`; long-string locale (de) — no overflow
 
 Net C — accessibility (broad sweep):
 - [ ] tap-target + labeled-target, text-contrast (light+dark), focus order, large-text reflow
