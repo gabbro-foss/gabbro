@@ -52,7 +52,7 @@ gabbro/
 │   ├── hardening.rs      # Process hardening (R-04): core-dump + ptrace/mem disable (Linux)
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics; wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + frozen golden fixtures (FIXTURES.md)
-├── android/…/kotlin/…/   # GabbroAutofillService, UnlockActivity, YubiKeyManager, BiometricHelper (+ Robolectric tests)
+├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper (+ Robolectric tests)
 ├── docs/                 # ARCHITECTURE, LEARNINGS, SECURITY, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/  test_driver/   # Flutter widget/unit + Linux real-FFI device suites
 ├── assets/               # fonts, images, help/; public_suffix_list.dat (autofill eTLD+1)
@@ -88,71 +88,24 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task — locked-vault autofill unlock (reuse the main `UnlockScreen`)
+### Next task — autofill `onSaveRequest` (save new/changed logins from the OS prompt)
 
-**Goal:** the locked autofill path has no unlock flow, so it never reaches matching. Build it
-by **reusing the main `UnlockScreen`** in the autofill activity — vault picker, passphrase,
-YubiKey (USB/NFC), PIN, multi-key, biometric.
+`GabbroAutofillService.onSaveRequest` is a no-op today. Goal: when the user submits a login form
+with credentials Gabbro lacks (or a changed password), the OS offers to save them into the vault.
+The fill path (incl. locked-vault unlock) is done — this is the inbound counterpart.
 
-**Design (decided with Rob):**
-- No new JNI unlock. `autofillUnlockMain` already calls `RustLib.init()`, so the generated
-  Flutter bridge drives the same shared `VAULT_SESSION`; Flutter unlocks directly, then
-  signals Kotlin to `buildFillIntent()`.
-- Add an `onUnlocked` hook to `UnlockScreen` (autofill signals Kotlin instead of navigating to
-  `VaultListScreen`); main app behaviour unchanged when the hook is absent.
-- `UnlockActivity` → `FlutterFragmentActivity` hosting the same `…/yubikey` + `…/biometric`
-  channels + NFC suppression as `MainActivity`, extracted to a shared base (DRY).
-- `autofillUnlockMain` (the real entrypoint is `main.dart:89` — verified; the default
-  entrypoint library) already reused `UnlockScreen` and wired delegates/locale/theme. Net D
-  added the vault picker (`registry` + local `onVaultSwitch`), the missing `textScaler`, and
-  routed success through the `onUnlocked` hook (so YubiKey/biometric unlocks signal Kotlin too,
-  not just passphrase). Deleted a dead duplicate (`autofill_unlock_main.dart` +
-  `AutofillUnlockScreen`, referenced only by a test) — the earlier "bare MaterialApp" finding
-  was read off that dead file.
+**Starts with a design pass (Canon TDD list-first). Open questions to settle first:**
+- Saving needs an **unlocked session** — reuse the `UnlockActivity` unlock flow, or only offer
+  save when already unlocked? And **which vault** (picker, like unlock)?
+- **Create vs update** — new entry vs a changed password on an existing matched login.
+- Parse username/email/password from the `SaveRequest` `AssistStructure` (mirror the fill-path
+  `classifyField`); set `SaveInfo` on the fill `FillResponse` so the OS shows the save prompt.
+- Web vs native: record `url` (eTLD+1) / `app_id` so the saved entry matches next time.
 
-**Rule: a regression net is written and green against *current* code before any production change.**
+Net-first as before: pin current behaviour, build red-first, Android hardware test before commit.
 
-Net A — `UnlockScreen` behaviour: **DONE** (9 pins green; transport selector re-gated
-on the `isAndroid` seam, red-first — USB/NFC is Android-only).
-- [x] success (passphrase, then YubiKey) → navigates to `VaultListScreen`
-- [x] transport: default `usb`; selecting NFC passes `nfc`
-- [x] PIN copy/paste blocked (vault-switch re-detect is `main.dart`/`switchToVault`, out of
-  blast radius — existing `onVaultSwitch` pin covers the wiring)
-- [x] keyboard submit unlocks; loading disables controls; biometric+YubiKey hint shown
-- [x] no overflow in a short viewport with an error showing (both modes)
-
-Net B — appearance/language: **DONE** (3 pins; screen robust, no prod change — entrypoint
-wiring is Net D).
-- [x] renders under light/dark + high-contrast; 2x `textScaler`; long-string locale (de) — no overflow
-
-Net C — accessibility (broad sweep): **DONE** (3 pins; tap-target ✓, contrast light+dark ✓,
-focus order ✓). `labeledTapTargetGuideline` waived — found unlabelled eye toggles (Bikeshed).
-- [x] tap-target, text-contrast (light+dark), focus order (large-text reflow covered by Net B)
-
-Net D — autofill entrypoint: **DONE** (4 pins; `buildAutofillUnlockApp` extracted; picker +
-textScaler + `onUnlocked` routing added; dead duplicate deleted). Red-first.
-- [x] `buildAutofillUnlockApp(settings, registry, initialVaultPath)` wires delegates/locale/theme/textScaler, reuses `UnlockScreen` with picker + `onUnlocked` + biometric
-
-Net E — Kotlin tap-flow (Robolectric): **DONE** (8 `TapFlowTest` pins; full Android unit
-suite green; tap-flow lifted into a testable `TapFlow`).
-- [x] exactly one of timeout/cancel/success/error completes; cancel→`TAP_CANCELLED`; retry-once; transport dispatch
-- [x] `MainActivity` still wires export + getRecentApps after extraction
-
-**Then production (each step, then device-test):**
-- [x] `onUnlocked` hook on `UnlockScreen` (success calls hook instead of nav; default
-  navigation preserved — both pinned, red-first)
-- [x] autofill entrypoint reuses `UnlockScreen` (picker + appearance/locale/textScaler wiring)
-- [x] `UnlockActivity` → FragmentActivity + shared host extraction (yubikey/biometric/NFC):
-  `GabbroUnlockHostActivity` base holds yubikey+biometric channels + NFC suppression + `TapFlow`;
-  `MainActivity`/`UnlockActivity` extend it; `UnlockActivity` is now a FragmentActivity.
-- [x] device gate (Rob, on device, 2026-06-17 — all pass): locked autofill unlocks (passphrase /
-  YubiKey USB+NFC, no `demo.yubico.com` escape / biometric); picker chose a non-default vault;
-  matching matrix (web/native/no-match dialog); main-app regression (YubiKey USB/NFC + biometric +
-  export) all still work after the extraction.
-
-**Verifiable now (independent):** unlocked path — open → unlock → autofill without locking → fills.
-
-After this lands, remaining autofill candidates: `onSaveRequest`, silent no-match toast.
+*(Just shipped — locked-vault autofill unlock, hardware-verified 2026-06-17; see CHANGELOG.
+Also open: silent no-match toast for the unlocked path — Bikeshed.)*
 
 ### Open from the security audit
 
@@ -186,7 +139,6 @@ release process live in their own document:
 
 ### Features & UX
 - Autofill silent no-match (unlocked path): decide whether to surface a notification/toast.
-- Autofill save requests (`onSaveRequest` — full design in a dedicated session).
 
 ### Code Quality
 - Audit the full code base for dead-code
@@ -212,7 +164,6 @@ release process live in their own document:
 - Autofill via `auto-type` (desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
 - Passkey (WebAuthn discoverable credential) support.
 - Vault sync across devices.
-- Autofill save requests (`onSaveRequest`) — see also Features & UX above.
 - Data breach alerts / HaveIBeenPwned integration.
 - Panic button / app hiding on mobile.
 - Remote app / vault deletion.

@@ -281,6 +281,16 @@ read `settings.biometricUnlock`) so the toggle reflects the open vault.
 `class MainActivity : FlutterFragmentActivity()` — drop-in (extends AppCompatActivity ->
 FragmentActivity); NFC/platform channels unaffected.
 
+### A custom `FlutterActivity` entrypoint resolves to `lib/main.dart` by default
+`getDartEntrypointFunctionName()` names the Dart function; with no
+`getDartEntrypointLibraryUri()` override it is looked up in the app's **main library**
+(`lib/main.dart`). So `UnlockActivity`'s `"autofillUnlockMain"` runs `main.dart`'s function — a
+same-named `autofillUnlockMain` sitting in any other file (e.g. a leftover
+`lib/autofill_unlock_main.dart`) is **dead code**, never invoked. This cost a misdiagnosis: a
+reported "bare-MaterialApp bug" was read off the dead duplicate while the real entrypoint was
+already wired. Verify which entrypoint actually runs (`grep -rn <name> lib/` + check the
+Activity) before reasoning about it.
+
 ### `EXTRA_ASSIST_STRUCTURE` is not forwarded to autofill auth activities
 The framework does NOT deliver `EXTRA_ASSIST_STRUCTURE` to the activity launched via a `Dataset`
 auth `PendingIntent` (undocumented) -> `getParcelableExtra(...)` is null. Fix: pack everything the
