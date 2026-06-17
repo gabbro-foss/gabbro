@@ -2,6 +2,7 @@ package app.gabbro.gabbro
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -402,5 +403,144 @@ class GabbroAutofillServiceTest {
     fun fillValueFor_both_blank_is_empty() {
         assertEquals("", fillValueFor(FieldKind.EMAIL, "", ""))
         assertEquals("", fillValueFor(FieldKind.USERNAME, "", ""))
+    }
+
+    // ── Layer B: capturedLoginFrom (typed values out of a SaveRequest) ─────────
+    // Faithful capture: username and email kept separate (no cross-fallback here —
+    // the effective-identifier fallback lives in the create-vs-update decision).
+    // Password is mandatory: no password means nothing worth saving as a Login.
+
+    @Test
+    fun capturedLogin_maps_username_email_password_fields() {
+        val captured = capturedLoginFrom(
+            listOf(
+                FieldKind.USERNAME to "alice",
+                FieldKind.EMAIL to "alice@example.com",
+                FieldKind.PASSWORD to "secret",
+            ),
+        )
+        assertEquals(CapturedLogin("alice", "alice@example.com", "secret"), captured)
+    }
+
+    @Test
+    fun capturedLogin_email_only_leaves_username_blank() {
+        val captured = capturedLoginFrom(
+            listOf(
+                FieldKind.EMAIL to "alice@example.com",
+                FieldKind.PASSWORD to "secret",
+            ),
+        )
+        assertEquals(CapturedLogin("", "alice@example.com", "secret"), captured)
+    }
+
+    @Test
+    fun capturedLogin_without_password_is_null() {
+        assertNull(capturedLoginFrom(listOf(FieldKind.USERNAME to "alice")))
+    }
+
+    @Test
+    fun capturedLogin_blank_password_is_null() {
+        assertNull(
+            capturedLoginFrom(
+                listOf(FieldKind.USERNAME to "alice", FieldKind.PASSWORD to "   "),
+            ),
+        )
+    }
+
+    @Test
+    fun capturedLogin_ignores_none_and_takes_first_nonblank_of_each_kind() {
+        val captured = capturedLoginFrom(
+            listOf(
+                FieldKind.NONE to "junk",
+                FieldKind.PASSWORD to "",
+                FieldKind.PASSWORD to "secret",
+                FieldKind.USERNAME to "",
+                FieldKind.USERNAME to "alice",
+            ),
+        )
+        assertEquals(CapturedLogin("alice", "", "secret"), captured)
+    }
+
+    // ── Layer C: suggested save action (create / update / no-op) ──────────────
+    // Pure decision only — never a write. The suggestion pre-selects a default in the
+    // Flutter confirm screen, which the user can always override (save-new / pick / cancel).
+
+    @Test
+    fun effectiveIdentifier_uses_username_when_present() {
+        assertEquals("alice", effectiveIdentifier("  Alice ", "a@b.com"))
+    }
+
+    @Test
+    fun effectiveIdentifier_falls_back_to_email_when_username_blank() {
+        assertEquals("a@b.com", effectiveIdentifier("", "A@B.com"))
+    }
+
+    @Test
+    fun effectiveIdentifier_both_blank_is_empty() {
+        assertEquals("", effectiveIdentifier("", "  "))
+    }
+
+    @Test
+    fun decideSave_creates_when_no_match() {
+        assertEquals(SaveDecision.Create, decideSave(null, null, "secret"))
+    }
+
+    @Test
+    fun decideSave_updates_when_password_differs() {
+        assertEquals(SaveDecision.Update("id-1"), decideSave("id-1", "old", "new"))
+    }
+
+    @Test
+    fun decideSave_noop_when_password_identical() {
+        assertEquals(SaveDecision.NoOp, decideSave("id-1", "same", "same"))
+    }
+
+    // ── Layer E: shouldOfferSave (onSaveRequest launch guard) ─────────────────
+    // The single drop-or-launch decision: a save needs a captured password AND a
+    // usable context (web eTLD+1 or app_id) to be matchable later. No password or
+    // no context -> drop silently (onSuccess, no SaveActivity).
+
+    @Test
+    fun shouldOfferSave_false_when_no_password() {
+        assertFalse(shouldOfferSave(null, "example.com", "com.company.app"))
+    }
+
+    @Test
+    fun shouldOfferSave_false_when_no_context() {
+        val captured = CapturedLogin("alice", "", "secret")
+        assertFalse(shouldOfferSave(captured, "", ""))
+    }
+
+    @Test
+    fun shouldOfferSave_true_with_web_context() {
+        val captured = CapturedLogin("alice", "", "secret")
+        assertTrue(shouldOfferSave(captured, "example.com", ""))
+    }
+
+    @Test
+    fun shouldOfferSave_true_with_app_context() {
+        val captured = CapturedLogin("alice", "", "secret")
+        assertTrue(shouldOfferSave(captured, "", "com.company.app"))
+    }
+
+    // candidateLabel — picker display label for an existing login.
+    @Test
+    fun candidateLabel_prefers_username_then_email_then_url() {
+        assertEquals(
+            "alice",
+            candidateLabel(
+                CredentialSummary("1", "alice", "https://example.com", "", email = "alice@example.com"),
+            ),
+        )
+        assertEquals(
+            "bob@example.com",
+            candidateLabel(
+                CredentialSummary("2", "", "https://example.com", "", email = "bob@example.com"),
+            ),
+        )
+        assertEquals(
+            "https://example.com",
+            candidateLabel(CredentialSummary("3", "", "https://example.com", "")),
+        )
     }
 }

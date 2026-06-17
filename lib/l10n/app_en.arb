@@ -19,6 +19,27 @@
   "close": "Close",
   "ok": "OK",
   "edit": "Edit",
+
+  "saveConfirmTitle": "Save to Gabbro",
+  "@saveConfirmTitle": {
+    "description": "App bar title of the autofill save-confirmation screen."
+  },
+  "saveConfirmUpdate": "Update this login",
+  "@saveConfirmUpdate": {
+    "description": "Button: update the matched existing login's password with the just-submitted one."
+  },
+  "saveConfirmAsNew": "Save as a new login",
+  "@saveConfirmAsNew": {
+    "description": "Button: save the submitted credentials as a brand-new login entry."
+  },
+  "saveConfirmChooseAnother": "Choose another login",
+  "@saveConfirmChooseAnother": {
+    "description": "Button and picker title: choose a different existing login on this site/app to update instead."
+  },
+  "saveConfirmAlreadySaved": "This login is already saved with this password.",
+  "@saveConfirmAlreadySaved": {
+    "description": "Shown when the submitted password already matches the stored one, so there is nothing to update."
+  },
   "add": "Add",
   "remove": "Remove",
   "rename": "Rename",

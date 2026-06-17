@@ -38,6 +38,22 @@ class AppLocalizationsSr extends AppLocalizations {
   String get edit => 'Uredi';
 
   @override
+  String get saveConfirmTitle => 'Save to Gabbro';
+
+  @override
+  String get saveConfirmUpdate => 'Update this login';
+
+  @override
+  String get saveConfirmAsNew => 'Save as a new login';
+
+  @override
+  String get saveConfirmChooseAnother => 'Choose another login';
+
+  @override
+  String get saveConfirmAlreadySaved =>
+      'This login is already saved with this password.';
+
+  @override
   String get add => 'Dodaj';
 
   @override

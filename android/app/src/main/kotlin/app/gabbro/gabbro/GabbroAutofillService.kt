@@ -11,6 +11,7 @@ import android.service.autofill.FillContext
 import android.service.autofill.FillRequest
 import android.service.autofill.FillResponse
 import android.service.autofill.SaveCallback
+import android.service.autofill.SaveInfo
 import android.service.autofill.SaveRequest
 import android.view.autofill.AutofillId
 import android.view.autofill.AutofillValue
@@ -129,7 +130,7 @@ class GabbroAutofillService : AutofillService() {
      * placeholder empty string.  The real values are delivered by
      * UnlockActivity after the vault is unlocked.
      */
-    private fun buildAuthResponse(parsed: ParsedStructure): FillResponse {
+    internal fun buildAuthResponse(parsed: ParsedStructure): FillResponse {
         val presentation = RemoteViews(packageName, R.layout.autofill_unlock_item)
 
         val unlockIntent = Intent(this, UnlockActivity::class.java).apply {
@@ -163,16 +164,40 @@ class GabbroAutofillService : AutofillService() {
 
         datasetBuilder.setAuthentication(pendingIntent.intentSender)
 
-        return FillResponse.Builder()
+        val responseBuilder = FillResponse.Builder()
             .addDataset(datasetBuilder.build())
-            .build()
+        attachSaveInfo(responseBuilder, parsed)
+        return responseBuilder.build()
+    }
+
+    // -------------------------------------------------------------------------
+    // SaveInfo — the seam that makes the OS call onSaveRequest
+    // -------------------------------------------------------------------------
+
+    /**
+     * Attach a SaveInfo so the OS offers to save after the user submits the form.
+     * The password field is the required trigger; username/email are optional.
+     * With no password field there is nothing worth saving as a Login (and
+     * SaveInfo.Builder rejects an empty required-ids array), so none is attached.
+     * Set on both the fill and the auth FillResponse, so a changed password saved
+     * on the locked -> unlock -> fill path triggers a save too.
+     */
+    private fun attachSaveInfo(builder: FillResponse.Builder, parsed: ParsedStructure) {
+        if (parsed.passwordIds.isEmpty()) return
+        val saveInfo = SaveInfo.Builder(
+            SaveInfo.SAVE_DATA_TYPE_USERNAME or SaveInfo.SAVE_DATA_TYPE_PASSWORD,
+            parsed.passwordIds.toTypedArray(),
+        )
+        val optional = (parsed.usernameIds + parsed.emailIds).toTypedArray()
+        if (optional.isNotEmpty()) saveInfo.setOptionalIds(optional)
+        builder.setSaveInfo(saveInfo.build())
     }
 
     // -------------------------------------------------------------------------
     // Fill response — matched credentials
     // -------------------------------------------------------------------------
 
-    private fun buildFillResponse(
+    internal fun buildFillResponse(
         parsed: ParsedStructure,
         matches: List<CredentialSummary>,
     ): FillResponse {
@@ -193,6 +218,7 @@ class GabbroAutofillService : AutofillService() {
             }
             responseBuilder.addDataset(datasetBuilder.build())
         }
+        attachSaveInfo(responseBuilder, parsed)
         return responseBuilder.build()
     }
 
@@ -315,6 +341,160 @@ internal fun fillValueFor(kind: FieldKind, username: String, email: String): Str
         FieldKind.USERNAME -> username.ifBlank { email }
         else -> ""
     }
+
+// -----------------------------------------------------------------------------
+// capturedLoginFrom — typed values out of a SaveRequest (the save-path inverse of
+// the fill path's ParsedStructure)
+// -----------------------------------------------------------------------------
+
+/**
+ * A login captured from a SaveRequest: the typed username/email/password. Faithful
+ * to the submitted form — username and email stay separate; the effective identifier
+ * is resolved later, in the create-vs-update decision. The web/app context (url /
+ * app_id) is recorded alongside by the caller.
+ */
+data class CapturedLogin(
+    val username: String,
+    val email: String,
+    val password: String,
+)
+
+/**
+ * Assemble a [CapturedLogin] from classified `(FieldKind, typed-value)` pairs pulled
+ * from the SaveRequest's AssistStructure (classified by the same [classifyField] the
+ * fill path uses). Password is mandatory — with none, or only blank, there is nothing
+ * worth saving as a Login, so returns null. First non-blank value of each kind wins;
+ * NONE fields are ignored.
+ */
+internal fun capturedLoginFrom(fields: List<Pair<FieldKind, String>>): CapturedLogin? {
+    fun firstNonBlank(kind: FieldKind): String =
+        fields.firstOrNull { it.first == kind && it.second.isNotBlank() }?.second.orEmpty()
+
+    val password = firstNonBlank(FieldKind.PASSWORD)
+    if (password.isBlank()) return null
+    return CapturedLogin(
+        username = firstNonBlank(FieldKind.USERNAME),
+        email = firstNonBlank(FieldKind.EMAIL),
+        password = password,
+    )
+}
+
+// -----------------------------------------------------------------------------
+// Layer C: which existing login a save would update, and create vs update vs no-op.
+// Suggestion only — never a write. The user always confirms (and can override) in the
+// Flutter save screen, so a save can never silently overwrite the wrong entry.
+// -----------------------------------------------------------------------------
+
+/** The suggested action for a captured login; the user can always override it. */
+sealed class SaveDecision {
+    /** No existing entry matched — offer to create a new login. */
+    object Create : SaveDecision()
+
+    /** An existing login matched and its password changed — offer to update it. */
+    data class Update(val id: String) : SaveDecision()
+
+    /** An existing login matched and the password is unchanged — nothing to save. */
+    object NoOp : SaveDecision()
+}
+
+/**
+ * The identifier used to tell two logins on the same site apart: the username, or the
+ * email when there is no username. Trimmed and lowercased so casing/whitespace never
+ * splits one account into two (emails are case-insensitive; usernames are in practice).
+ */
+internal fun effectiveIdentifier(username: String, email: String): String =
+    username.ifBlank { email }.trim().lowercase()
+
+/**
+ * The existing login a save would update: the same-site/app entry (strict fill matcher
+ * — PSL eTLD+1 / exact app_id) whose identifier equals the captured one. Returns null
+ * when nothing matches, or when the captured login carries no identifier to disambiguate
+ * by — a blank identifier never auto-targets an entry. Operates on password-free
+ * summaries, so no secret is decrypted while resolving the target.
+ */
+internal fun matchSaveTarget(
+    captured: CapturedLogin,
+    summaries: List<CredentialSummary>,
+    webDomain: String?,
+    packageName: String?,
+    psl: PublicSuffixList,
+): CredentialSummary? {
+    val wantId = effectiveIdentifier(captured.username, captured.email)
+    if (wantId.isBlank()) return null
+    return matchingCredentials(summaries, webDomain, packageName, psl)
+        .firstOrNull { effectiveIdentifier(it.username, it.email) == wantId }
+}
+
+/**
+ * The suggested [SaveDecision] from a resolved match: Create when nothing matched,
+ * NoOp when the matched entry's current password already equals the captured one,
+ * else Update. A suggestion only — the confirm screen can still override it.
+ */
+internal fun decideSave(
+    matchedId: String?,
+    matchedPassword: String?,
+    capturedPassword: String,
+): SaveDecision = when {
+    matchedId == null -> SaveDecision.Create
+    matchedPassword == capturedPassword -> SaveDecision.NoOp
+    else -> SaveDecision.Update(matchedId)
+}
+
+/**
+ * Whether `onSaveRequest` should offer to save: it needs a captured password
+ * ([captured] non-null) AND a usable context to match the entry on later (a web
+ * eTLD+1 or an app_id). Missing either, the save is dropped silently — the rare
+ * no-context case (the OS almost always supplies a package or web domain) is not
+ * worth a stored entry that could never be matched again.
+ */
+internal fun shouldOfferSave(captured: CapturedLogin?, url: String, appId: String): Boolean =
+    captured != null && (url.isNotBlank() || appId.isNotBlank())
+
+/** Picker display label for an existing login: username, else email, else url. */
+internal fun candidateLabel(summary: CredentialSummary): String =
+    summary.username.ifBlank { summary.email }.ifBlank { summary.url }
+
+/**
+ * The `/autofill_save` channel payload handed to the Dart confirm screen post-unlock:
+ * the captured login + web/app context, the suggested [SaveDecision], and the same-site
+ * `candidates` for the "choose another login" picker. The captured password crosses to
+ * Dart because the write (and its `passwordHistoryExpiry`) happens there; matching and
+ * the decision are computed in Kotlin (the single source of truth).
+ */
+internal fun saveContextJson(
+    captured: CapturedLogin,
+    url: String,
+    appId: String,
+    decision: SaveDecision,
+    candidates: List<CredentialSummary>,
+): String {
+    val capturedObj = org.json.JSONObject()
+        .put("username", captured.username)
+        .put("email", captured.email)
+        .put("password", captured.password)
+        .put("url", url)
+        .put("appId", appId)
+
+    val decisionObj = org.json.JSONObject()
+    when (decision) {
+        is SaveDecision.Create -> decisionObj.put("action", "create")
+        is SaveDecision.Update -> decisionObj.put("action", "update").put("matchedId", decision.id)
+        is SaveDecision.NoOp -> decisionObj.put("action", "noop")
+    }
+
+    val candidatesArr = org.json.JSONArray()
+    candidates.forEach { c ->
+        candidatesArr.put(
+            org.json.JSONObject().put("id", c.id).put("label", candidateLabel(c)),
+        )
+    }
+
+    return org.json.JSONObject()
+        .put("captured", capturedObj)
+        .put("decision", decisionObj)
+        .put("candidates", candidatesArr)
+        .toString()
+}
 
 // -----------------------------------------------------------------------------
 // Native-app matching + capture — pure helpers (unit-tested without the framework)

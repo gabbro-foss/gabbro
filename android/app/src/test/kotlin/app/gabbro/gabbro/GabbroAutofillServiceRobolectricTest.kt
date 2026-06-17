@@ -1,6 +1,11 @@
 package app.gabbro.gabbro
 
+import android.service.autofill.Dataset
+import android.service.autofill.FillResponse
+import android.service.autofill.SaveInfo
+import android.view.autofill.AutofillId
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -285,5 +290,224 @@ class GabbroAutofillServiceRobolectricTest {
         val matches = matchingCredentials(creds, null, "com.company.app", psl)
         assertTrue(matches.isNotEmpty())
         assertTrue(matches.all { it.password.isEmpty() })
+    }
+
+    // ── Layer A: SaveInfo on the fill + auth FillResponses ─────────────────────
+    // SaveInfo is the seam that makes onSaveRequest fire at all — without it the OS
+    // never calls back. FillResponse/SaveInfo/Dataset have no compile-visible getters
+    // (their accessors are @hide), so the assertions reflect on the real framework
+    // classes Robolectric supplies. buildFillResponse/buildAuthResponse are internal
+    // so these same-module tests can call them directly.
+
+    // Mint a real AutofillId off a View under Robolectric (no public ctor exists).
+    private fun newAutofillId(): AutofillId {
+        val v = android.widget.EditText(service)
+        v.id = android.view.View.generateViewId()
+        return v.autofillId!!
+    }
+
+    private fun saveInfoOf(response: FillResponse): Any? =
+        FillResponse::class.java.getMethod("getSaveInfo").invoke(response)
+
+    private fun saveTypeOf(saveInfo: Any): Int =
+        saveInfo.javaClass.getMethod("getType").invoke(saveInfo) as Int
+
+    private fun idsVia(saveInfo: Any, getter: String): List<AutofillId> {
+        val arr = saveInfo.javaClass.getMethod(getter).invoke(saveInfo) as Array<*>?
+        return arr?.filterIsInstance<AutofillId>() ?: emptyList()
+    }
+
+    private fun datasetsOf(response: FillResponse): List<Dataset> {
+        @Suppress("UNCHECKED_CAST")
+        return (FillResponse::class.java.getMethod("getDatasets").invoke(response)
+            as? List<Dataset>) ?: emptyList()
+    }
+
+    private fun fieldIdsOf(dataset: Dataset): List<AutofillId> {
+        @Suppress("UNCHECKED_CAST")
+        return (Dataset::class.java.getMethod("getFieldIds").invoke(dataset)
+            as? List<AutofillId>) ?: emptyList()
+    }
+
+    // The locked path attaches the unlock IntentSender at the Dataset level (the OS
+    // renders it as one tappable chip), not on the FillResponse — so reflect the
+    // Dataset's @hide getAuthentication().
+    private fun datasetAuthOf(dataset: Dataset): Any? =
+        Dataset::class.java.getMethod("getAuthentication").invoke(dataset)
+
+    private val usernamePasswordType =
+        SaveInfo.SAVE_DATA_TYPE_USERNAME or SaveInfo.SAVE_DATA_TYPE_PASSWORD
+
+    // A1 (pin): the unlocked fill path still puts a dataset on the matched fields.
+    @Test
+    fun buildFillResponse_fills_matched_username_and_password_datasets() {
+        val uId = newAutofillId()
+        val pId = newAutofillId()
+        val parsed = ParsedStructure(listOf(uId), listOf(pId), "https://example.com", null)
+        val cred = CredentialSummary("1", "alice", "https://example.com", "secret")
+        val datasets = datasetsOf(service.buildFillResponse(parsed, listOf(cred)))
+        assertEquals(1, datasets.size)
+        assertEquals(listOf(uId, pId), fieldIdsOf(datasets[0]))
+    }
+
+    // A2 (pin): the locked auth path still sets the unlock IntentSender + covers fields.
+    @Test
+    fun buildAuthResponse_sets_authentication_intent_and_covers_fields() {
+        val uId = newAutofillId()
+        val pId = newAutofillId()
+        val parsed = ParsedStructure(listOf(uId), listOf(pId), "https://example.com", null)
+        val response = service.buildAuthResponse(parsed)
+        val datasets = datasetsOf(response)
+        assertEquals(1, datasets.size)
+        assertNotNull(datasetAuthOf(datasets[0]))
+        assertEquals(listOf(uId, pId), fieldIdsOf(datasets[0]))
+    }
+
+    // A3 (red): the fill response carries SaveInfo — password required, user/email optional.
+    @Test
+    fun buildFillResponse_carries_saveinfo_password_required_user_optional() {
+        val uId = newAutofillId()
+        val eId = newAutofillId()
+        val pId = newAutofillId()
+        val parsed = ParsedStructure(
+            usernameIds = listOf(uId),
+            passwordIds = listOf(pId),
+            webDomain = "https://example.com",
+            packageName = null,
+            emailIds = listOf(eId),
+        )
+        val cred = CredentialSummary("1", "alice", "https://example.com", "secret")
+        val saveInfo = saveInfoOf(service.buildFillResponse(parsed, listOf(cred)))
+        assertNotNull("FillResponse must carry SaveInfo or the OS never calls onSaveRequest", saveInfo)
+        assertEquals(usernamePasswordType, saveTypeOf(saveInfo!!))
+        assertEquals(listOf(pId), idsVia(saveInfo, "getRequiredIds"))
+        assertEquals(setOf(uId, eId), idsVia(saveInfo, "getOptionalIds").toSet())
+    }
+
+    // A4 (red): the auth (locked) response carries the same SaveInfo, so a changed
+    // password saved on the locked -> unlock -> fill path still triggers a save.
+    @Test
+    fun buildAuthResponse_carries_saveinfo() {
+        val uId = newAutofillId()
+        val pId = newAutofillId()
+        val parsed = ParsedStructure(listOf(uId), listOf(pId), "https://example.com", null)
+        val saveInfo = saveInfoOf(service.buildAuthResponse(parsed))
+        assertNotNull(saveInfo)
+        assertEquals(usernamePasswordType, saveTypeOf(saveInfo!!))
+        assertEquals(listOf(pId), idsVia(saveInfo, "getRequiredIds"))
+    }
+
+    // A5 (guard): no password field means nothing worth saving — no SaveInfo attached
+    // (also avoids SaveInfo.Builder rejecting an empty required-ids array).
+    @Test
+    fun buildFillResponse_without_password_field_has_no_saveinfo() {
+        val uId = newAutofillId()
+        val parsed = ParsedStructure(listOf(uId), emptyList(), "https://example.com", null)
+        val cred = CredentialSummary("1", "alice", "https://example.com", "secret")
+        assertNull(saveInfoOf(service.buildFillResponse(parsed, listOf(cred))))
+    }
+
+    // ── Layer C: matchSaveTarget (which existing login a save would update) ────
+    // Reuses the strict fill matcher (PSL eTLD+1 / exact app_id) then narrows to the
+    // captured identifier — so a save never targets an entry from another site/app
+    // (zero false-positive), and a blank identifier never auto-targets anything.
+
+    private fun loginCred(id: String, url: String, username: String, appId: String = "") =
+        CredentialSummary(id = id, username = username, url = url, password = "", appId = appId)
+
+    @Test
+    fun matchSaveTarget_web_same_domain_and_identifier_returns_entry() {
+        val captured = CapturedLogin("alice", "", "newpw")
+        val summaries = listOf(loginCred("1", "https://example.com", "alice"))
+        val match = matchSaveTarget(captured, summaries, "https://login.example.com", null, psl)
+        assertEquals("1", match?.id)
+    }
+
+    @Test
+    fun matchSaveTarget_web_identifier_match_is_case_insensitive() {
+        val captured = CapturedLogin("Alice", "", "newpw")
+        val summaries = listOf(loginCred("1", "https://example.com", "alice"))
+        assertEquals("1", matchSaveTarget(captured, summaries, "https://example.com", null, psl)?.id)
+    }
+
+    @Test
+    fun matchSaveTarget_web_same_site_different_identifier_returns_null() {
+        val captured = CapturedLogin("bob", "", "newpw")
+        val summaries = listOf(loginCred("1", "https://example.com", "alice"))
+        assertNull(matchSaveTarget(captured, summaries, "https://example.com", null, psl))
+    }
+
+    @Test
+    fun matchSaveTarget_native_app_id_and_identifier_returns_entry() {
+        val captured = CapturedLogin("alice", "", "newpw")
+        val summaries =
+            listOf(loginCred("1", "https://example.com", "alice", appId = "com.company.app"))
+        assertEquals("1", matchSaveTarget(captured, summaries, null, "com.company.app", psl)?.id)
+    }
+
+    @Test
+    fun matchSaveTarget_different_site_returns_null() {
+        val captured = CapturedLogin("alice", "", "newpw")
+        val summaries = listOf(loginCred("1", "https://other.com", "alice"))
+        assertNull(matchSaveTarget(captured, summaries, "https://example.com", null, psl))
+    }
+
+    @Test
+    fun matchSaveTarget_multiple_same_site_returns_identifier_match() {
+        val captured = CapturedLogin("bob", "", "newpw")
+        val summaries = listOf(
+            loginCred("1", "https://example.com", "alice"),
+            loginCred("2", "https://example.com", "bob"),
+        )
+        assertEquals("2", matchSaveTarget(captured, summaries, "https://example.com", null, psl)?.id)
+    }
+
+    @Test
+    fun matchSaveTarget_blank_identifier_never_auto_targets() {
+        val captured = CapturedLogin("", "", "newpw")
+        val summaries = listOf(loginCred("1", "https://example.com", ""))
+        assertNull(matchSaveTarget(captured, summaries, "https://example.com", null, psl))
+    }
+
+    // ── F1: saveContextJson (the /autofill_save Kotlin -> Dart handoff) ────────
+    // org.json is stubbed to throw in plain JVM tests, so these run under Robolectric.
+
+    @Test
+    fun saveContextJson_create_serializes_captured_and_candidates() {
+        val captured = CapturedLogin("alice", "alice@example.com", "secret")
+        val candidates = listOf(loginCred("1", "https://example.com", "alice"))
+        val json = org.json.JSONObject(
+            saveContextJson(captured, "example.com", "", SaveDecision.Create, candidates),
+        )
+        val cap = json.getJSONObject("captured")
+        assertEquals("alice", cap.getString("username"))
+        assertEquals("alice@example.com", cap.getString("email"))
+        assertEquals("secret", cap.getString("password"))
+        assertEquals("example.com", cap.getString("url"))
+        assertEquals("", cap.getString("appId"))
+        assertEquals("create", json.getJSONObject("decision").getString("action"))
+        val cands = json.getJSONArray("candidates")
+        assertEquals(1, cands.length())
+        assertEquals("1", cands.getJSONObject(0).getString("id"))
+        assertEquals("alice", cands.getJSONObject(0).getString("label"))
+    }
+
+    @Test
+    fun saveContextJson_update_includes_matched_id() {
+        val captured = CapturedLogin("alice", "", "secret")
+        val dec = org.json.JSONObject(
+            saveContextJson(captured, "example.com", "", SaveDecision.Update("id-9"), emptyList()),
+        ).getJSONObject("decision")
+        assertEquals("update", dec.getString("action"))
+        assertEquals("id-9", dec.getString("matchedId"))
+    }
+
+    @Test
+    fun saveContextJson_noop_action() {
+        val captured = CapturedLogin("alice", "", "secret")
+        val json = org.json.JSONObject(
+            saveContextJson(captured, "example.com", "", SaveDecision.NoOp, emptyList()),
+        )
+        assertEquals("noop", json.getJSONObject("decision").getString("action"))
     }
 }

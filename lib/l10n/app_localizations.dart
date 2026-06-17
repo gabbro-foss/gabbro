@@ -217,6 +217,36 @@ abstract class AppLocalizations {
   /// **'Edit'**
   String get edit;
 
+  /// App bar title of the autofill save-confirmation screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to Gabbro'**
+  String get saveConfirmTitle;
+
+  /// Button: update the matched existing login's password with the just-submitted one.
+  ///
+  /// In en, this message translates to:
+  /// **'Update this login'**
+  String get saveConfirmUpdate;
+
+  /// Button: save the submitted credentials as a brand-new login entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as a new login'**
+  String get saveConfirmAsNew;
+
+  /// Button and picker title: choose a different existing login on this site/app to update instead.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose another login'**
+  String get saveConfirmChooseAnother;
+
+  /// Shown when the submitted password already matches the stored one, so there is nothing to update.
+  ///
+  /// In en, this message translates to:
+  /// **'This login is already saved with this password.'**
+  String get saveConfirmAlreadySaved;
+
   /// No description provided for @add.
   ///
   /// In en, this message translates to:
