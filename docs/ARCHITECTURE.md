@@ -123,8 +123,8 @@ Build order (Canon TDD red-first; net-first pins first; Android hardware test be
 - [x] A `SaveInfo` on fill + auth responses (A1/A2 pin, A3/A4 red) — done, Android unit green
 - [x] B capture typed values from `SaveRequest` (pure) — `capturedLoginFrom`, green
 - [x] C *suggested* save action: `effectiveIdentifier` + `matchSaveTarget` + `decideSave` — green
-- [ ] D Rust: `update_keeps_only_the_most_recent_previous_password` (single-slot) on existing
-  `update_entry` coverage *(JNI write fns dropped — write via Dart bridge + `passwordHistoryExpiry`)*
+- [x] D Rust: `update_keeps_only_the_most_recent_previous_password` (single-slot) — green
+  *(JNI write fns dropped — write via Dart bridge + `passwordHistoryExpiry`)*
 - [ ] E `onSaveRequest` (Kotlin): capture login + web/app context → launch `SaveActivity`
 - [ ] F `SaveActivity`: unlock → Kotlin matching → Flutter confirm screen (agency: update/save-new/
   pick/cancel) → Dart `create_entry`/`update_entry` (+ `passwordHistoryExpiry`)

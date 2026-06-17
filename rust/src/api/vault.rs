@@ -2271,6 +2271,70 @@ mod tests {
     }
 
     #[test]
+    fn update_keeps_only_the_most_recent_previous_password() {
+        // Single-slot history: an entry that already holds a previous password, then
+        // one password change, keeps exactly one previous (the value it just replaced)
+        // and drops the pre-existing one — history is a slot, not a growing stack.
+        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
+
+        let meta = EntryMeta {
+            id: String::from("id-001"),
+            created_at: String::from("2025-01-01T00:00:00Z"),
+            updated_at: String::from("2025-01-01T00:00:00Z"),
+            folder: String::from("Personal"),
+        };
+        let pre_existing = PreviousSecret {
+            value: String::from("older_pw"),
+            saved_at: String::from("2024-12-01T00:00:00Z"),
+            expires_at: Some(String::from("2024-12-31T00:00:00Z")),
+        };
+        let mut entries = vec![VaultEntry::Login(LoginEntry {
+            meta: meta.clone(),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("alice"),
+            password: String::from("current_pw"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: Some(pre_existing),
+            app_id: None,
+            email: None,
+        })];
+
+        let updated = VaultEntry::Login(LoginEntry {
+            meta: meta.clone(),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("alice"),
+            password: String::from("new_pw"),
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+            app_id: None,
+            email: None,
+        });
+
+        update_entry(&mut entries, updated, Some(30)).unwrap();
+
+        match &entries[0] {
+            VaultEntry::Login(e) => {
+                assert_eq!(e.password, "new_pw");
+                let prev = e
+                    .previous_password
+                    .as_ref()
+                    .expect("previous_password should hold the just-replaced value");
+                // The just-replaced current becomes the one previous...
+                assert_eq!(prev.value, "current_pw");
+                // ...and the pre-existing previous is dropped (single slot, not a stack).
+                assert_ne!(prev.value, "older_pw");
+            }
+            _ => panic!("Expected Login variant"),
+        }
+    }
+
+    #[test]
     fn list_entries_masked_does_not_alter_note() {
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
 
