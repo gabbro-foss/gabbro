@@ -85,47 +85,123 @@ const List<LocalizationsDelegate<dynamic>> gabbroLocalizationsDelegates = [
   GlobalWidgetsLocalizations.delegate,
 ];
 
+/// Maps the theme setting to a Flutter ThemeMode. Single source for both the
+/// main app shell and the autofill unlock shell.
+ThemeMode themeModeFor(ThemeChoice choice) => switch (choice) {
+  ThemeChoice.system => ThemeMode.system,
+  ThemeChoice.light => ThemeMode.light,
+  ThemeChoice.dark => ThemeMode.dark,
+};
+
+/// Maps the text-size setting to a linear text-scale factor.
+double textScaleFor(TextSizeChoice choice) => switch (choice) {
+  TextSizeChoice.small => 0.85,
+  TextSizeChoice.regular => 1.0,
+  TextSizeChoice.large => 1.15,
+  TextSizeChoice.extraLarge => 1.3,
+  TextSizeChoice.xxLarge => 1.5,
+};
+
 @pragma('vm:entry-point')
 Future<void> autofillUnlockMain() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
   final registry = await VaultRegistry.load();
   final lastUsed = registry.lastUsed;
-  final String vaultPath;
+  final String initialVaultPath;
   if (lastUsed != null) {
-    vaultPath = lastUsed.path;
+    initialVaultPath = lastUsed.path;
   } else {
     final dataDir = await GabbroPaths.dataDir();
-    vaultPath = '$dataDir/gabbro.gabbro';
+    initialVaultPath = '$dataDir/gabbro.gabbro';
   }
-  const channel = MethodChannel('app.gabbro.gabbro/autofill');
   final settings = await AppSettings.load();
-  final hc = settings.highContrast;
-  runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: gabbroLocalizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: settings.language == LanguageChoice.system
-          ? null
-          : localeFor(settings.language),
-      themeMode: switch (settings.theme) {
-        ThemeChoice.system => ThemeMode.system,
-        ThemeChoice.light  => ThemeMode.light,
-        ThemeChoice.dark   => ThemeMode.dark,
-      },
-      theme: gabbroLightTheme(highContrast: hc),
-      darkTheme: gabbroDarkTheme(highContrast: hc),
-      home: UnlockScreen(
-        vaultPath: vaultPath,
-        onUnlock: (passphrase, path) async {
-          await unlockVault(passphrase: passphrase, path: path);
-          await channel.invokeMethod('unlock');
-        },
-        blockPassphraseCopyPaste: settings.blockPassphraseCopyPaste,
+  runApp(buildAutofillUnlockApp(
+    settings: settings,
+    registry: registry,
+    initialVaultPath: initialVaultPath,
+  ));
+}
+
+/// The autofill unlock app. Mirrors [main]'s MaterialApp shell (localization
+/// delegates / locale / theme / text scale) and reuses [UnlockScreen] so the
+/// autofill prompt offers the full unlock flow — vault picker, passphrase,
+/// YubiKey, biometric. After the shared vault session unlocks, [onUnlocked]
+/// signals the native side (the `unlock` method) to build the fill response.
+Widget buildAutofillUnlockApp({
+  required AppSettings settings,
+  required VaultRegistry registry,
+  required String initialVaultPath,
+  MethodChannel channel = const MethodChannel('app.gabbro.gabbro/autofill'),
+}) =>
+    _AutofillUnlockApp(
+      settings: settings,
+      registry: registry,
+      initialVaultPath: initialVaultPath,
+      channel: channel,
+    );
+
+class _AutofillUnlockApp extends StatefulWidget {
+  final AppSettings settings;
+  final VaultRegistry registry;
+  final String initialVaultPath;
+  final MethodChannel channel;
+
+  const _AutofillUnlockApp({
+    required this.settings,
+    required this.registry,
+    required this.initialVaultPath,
+    required this.channel,
+  });
+
+  @override
+  State<_AutofillUnlockApp> createState() => _AutofillUnlockAppState();
+}
+
+class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
+  late String _vaultPath = widget.initialVaultPath;
+
+  String? _aliasFor(String path) {
+    for (final r in widget.registry.records) {
+      if (r.path == path) return r.alias;
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hc = widget.settings.highContrast;
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        textScaler: TextScaler.linear(textScaleFor(widget.settings.textSize)),
       ),
-    ),
-  );
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: gabbroLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: widget.settings.language == LanguageChoice.system
+            ? null
+            : localeFor(widget.settings.language),
+        themeMode: themeModeFor(widget.settings.theme),
+        theme: gabbroLightTheme(highContrast: hc),
+        darkTheme: gabbroDarkTheme(highContrast: hc),
+        // ValueKey forces a fresh UnlockScreen on vault switch so it re-detects
+        // the newly selected vault's YubiKey records.
+        home: UnlockScreen(
+          key: ValueKey(_vaultPath),
+          vaultPath: _vaultPath,
+          vaultAlias: _aliasFor(_vaultPath),
+          registry: widget.registry,
+          onVaultSwitch: (path, alias) => setState(() => _vaultPath = path),
+          onUnlocked: () async {
+            await widget.channel.invokeMethod('unlock');
+          },
+          blockPassphraseCopyPaste: widget.settings.blockPassphraseCopyPaste,
+          biometricEnabled: widget.settings.biometricUnlock,
+        ),
+      ),
+    );
+  }
 }
 
 Future<void> main() async {
