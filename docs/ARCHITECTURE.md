@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 853 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 97 | 17 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 101 | 17 |
 
 **Test isolation (non-negotiable):** no test may touch the user's real settings or
 vault folders. All config/data directories resolve through `GabbroPaths`
@@ -88,15 +88,7 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task — autofill silent no-match (unlocked path)
-
-When the vault is **already unlocked** and a fill request matches nothing, the user gets no feedback
-— unlike the locked path, which now shows a localized "No credentials found" dialog after unlock.
-Decide whether to surface a no-match indication on the unlocked path and how, given that a native
-toast can't be localized against the Flutter ARBs (the wall that pushed the autofill dialogs into
-Flutter). Wraps up the listed features/UX items.
-
-*(Prior: autofill save — `onSaveRequest` — shipped end-to-end, see CHANGELOG.)*
+### Next task — to be decided
 
 ### Open from the security audit
 
@@ -134,8 +126,6 @@ release process live in their own document:
 - Audit the full code base for dead-code
 - **Autofill save loose ends.** Hardware-verify the localized "No credentials found" dialog (F2,
   fill path, no match). Native review of the best-effort `eu`/`kk`/`yo` save-flow translations.
-  The OS autofill chip label (`autofill_unlock_label`) stays English — RemoteViews, no Flutter
-  engine, so localizing it needs `values-XX/`.
 - **Deprecated `Dataset.Builder.setValue` (autofill).** `setValue(AutofillId, AutofillValue,
   RemoteViews)` is deprecated; replace with `setField(AutofillId, Field)` (Field carries the
   value + a `Presentations`/`RemoteViews`). Call sites: `GabbroAutofillService.buildAuthResponse`
