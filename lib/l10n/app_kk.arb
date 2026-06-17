@@ -1,5 +1,13 @@
 {
   "@@locale": "kk",
+  "saveConfirmTitle": "Gabbro-ға сақтау",
+  "saveConfirmUpdate": "Бұл кіруді жаңарту",
+  "saveConfirmAsNew": "Жаңа кіру ретінде сақтау",
+  "saveConfirmChooseAnother": "Басқа кіруді таңдау",
+  "saveConfirmAlreadySaved": "Осы құпия сөзбен сақталған.",
+  "saveConfirmSwitchVaultHint": "Басқа сейфке сақтау үшін алдымен мұны бекітіңіз.",
+  "autofillNoMatchTitle": "Тіркелгі деректері табылмады",
+  "autofillNoMatchBody": "Бұл қолданбаға немесе сайтқа сәйкес сақталған кіру жоқ. Сенсеңіз, деректеріңізді қолмен қойыңыз.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

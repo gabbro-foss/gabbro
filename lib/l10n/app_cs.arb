@@ -1,5 +1,13 @@
 {
   "@@locale": "cs",
+  "saveConfirmTitle": "Uložit do Gabbro",
+  "saveConfirmUpdate": "Aktualizovat toto přihlášení",
+  "saveConfirmAsNew": "Uložit jako nové přihlášení",
+  "saveConfirmChooseAnother": "Vybrat jiné přihlášení",
+  "saveConfirmAlreadySaved": "Již uloženo s tímto heslem.",
+  "saveConfirmSwitchVaultHint": "Chcete-li uložit do jiného trezoru, nejprve zamkněte tento.",
+  "autofillNoMatchTitle": "Nebyly nalezeny žádné přihlašovací údaje",
+  "autofillNoMatchBody": "Žádné uložené přihlášení neodpovídá této aplikaci ani webu. Pokud mu důvěřujete, vložte své údaje ručně.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

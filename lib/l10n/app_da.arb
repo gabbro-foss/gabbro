@@ -1,5 +1,13 @@
 {
   "@@locale": "da",
+  "saveConfirmTitle": "Gem i Gabbro",
+  "saveConfirmUpdate": "Opdater dette login",
+  "saveConfirmAsNew": "Gem som nyt login",
+  "saveConfirmChooseAnother": "Vælg et andet login",
+  "saveConfirmAlreadySaved": "Allerede gemt med denne adgangskode.",
+  "saveConfirmSwitchVaultHint": "Lås denne hvælving først for at gemme i en anden hvælving.",
+  "autofillNoMatchTitle": "Ingen loginoplysninger fundet",
+  "autofillNoMatchBody": "Intet gemt login matcher denne app eller dette websted. Hvis du stoler på det, kan du indsætte dine loginoplysninger manuelt.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

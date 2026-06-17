@@ -38,31 +38,30 @@ class AppLocalizationsHr extends AppLocalizations {
   String get edit => 'Uredi';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Spremi u Gabbro';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Ažuriraj ovu prijavu';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Spremi kao novu prijavu';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Odaberi drugu prijavu';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Već spremljeno s ovom lozinkom.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Za spremanje u drugi trezor najprije zaključaj ovaj.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Nisu pronađene vjerodajnice';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Nijedna spremljena prijava ne odgovara ovoj aplikaciji ili web-mjestu. Ako joj vjerujete, ručno zalijepite svoje vjerodajnice.';
 
   @override
   String get add => 'Dodaj';

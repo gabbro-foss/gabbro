@@ -36,11 +36,11 @@
   "@saveConfirmChooseAnother": {
     "description": "Button and picker title: choose a different existing login on this site/app to update instead."
   },
-  "saveConfirmAlreadySaved": "This login is already saved with this password.",
+  "saveConfirmAlreadySaved": "Already saved with this password.",
   "@saveConfirmAlreadySaved": {
     "description": "Shown when the submitted password already matches the stored one, so there is nothing to update."
   },
-  "saveConfirmSwitchVaultHint": "Saving to the currently unlocked vault. To save to a different vault, lock this one first.",
+  "saveConfirmSwitchVaultHint": "To save to a different vault, lock this one first.",
   "@saveConfirmSwitchVaultHint": {
     "description": "Hint on the save screen when the vault was already unlocked (no vault picker was shown), telling the user how to target a different vault."
   },
@@ -48,7 +48,7 @@
   "@autofillNoMatchTitle": {
     "description": "Title of the autofill dialog shown after unlock when no saved login matches the requesting app or website."
   },
-  "autofillNoMatchBody": "No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.",
+  "autofillNoMatchBody": "No saved login matches this app or site. If you trust it, paste your credentials manually.",
   "@autofillNoMatchBody": {
     "description": "Body of the autofill no-match dialog, advising the user to paste credentials manually."
   },

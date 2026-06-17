@@ -38,31 +38,30 @@ class AppLocalizationsSr extends AppLocalizations {
   String get edit => 'Uredi';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Sačuvaj u Gabbro';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Ažuriraj ovu prijavu';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Sačuvaj kao novu prijavu';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Izaberi drugu prijavu';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Već sačuvano sa ovom lozinkom.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Da sačuvate u drugi trezor, prvo zaključajte ovaj.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Nisu pronađeni akreditivi';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Nijedna sačuvana prijava ne odgovara ovoj aplikaciji ili sajtu. Ako mu verujete, ručno nalepite svoje akreditive.';
 
   @override
   String get add => 'Dodaj';
@@ -1996,6 +1995,32 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get edit => 'Uredi';
+
+  @override
+  String get saveConfirmTitle => 'Sačuvaj u Gabbro';
+
+  @override
+  String get saveConfirmUpdate => 'Ažuriraj ovu prijavu';
+
+  @override
+  String get saveConfirmAsNew => 'Sačuvaj kao novu prijavu';
+
+  @override
+  String get saveConfirmChooseAnother => 'Izaberi drugu prijavu';
+
+  @override
+  String get saveConfirmAlreadySaved => 'Već sačuvano sa ovom lozinkom.';
+
+  @override
+  String get saveConfirmSwitchVaultHint =>
+      'Da sačuvate u drugi trezor, prvo zaključajte ovaj.';
+
+  @override
+  String get autofillNoMatchTitle => 'Nisu pronađeni akreditivi';
+
+  @override
+  String get autofillNoMatchBody =>
+      'Nijedna sačuvana prijava ne odgovara ovoj aplikaciji ili sajtu. Ako mu verujete, ručno nalepite svoje akreditive.';
 
   @override
   String get add => 'Dodaj';

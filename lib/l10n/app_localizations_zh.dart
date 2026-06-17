@@ -38,31 +38,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String get edit => '编辑';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => '保存到 Gabbro';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => '更新此登录信息';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => '另存为新登录信息';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => '选择其他登录信息';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => '已使用此密码保存。';
 
   @override
-  String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+  String get saveConfirmSwitchVaultHint => '若要保存到其他保险库，请先锁定此保险库。';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => '未找到凭据';
 
   @override
-  String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+  String get autofillNoMatchBody => '没有与此应用或网站匹配的已保存登录信息。如果您信任它，请手动粘贴您的凭据。';
 
   @override
   String get add => '添加';
@@ -1910,6 +1907,30 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get edit => '编辑';
 
   @override
+  String get saveConfirmTitle => '保存到 Gabbro';
+
+  @override
+  String get saveConfirmUpdate => '更新此登录信息';
+
+  @override
+  String get saveConfirmAsNew => '另存为新登录信息';
+
+  @override
+  String get saveConfirmChooseAnother => '选择其他登录信息';
+
+  @override
+  String get saveConfirmAlreadySaved => '已使用此密码保存。';
+
+  @override
+  String get saveConfirmSwitchVaultHint => '若要保存到其他保险库，请先锁定此保险库。';
+
+  @override
+  String get autofillNoMatchTitle => '未找到凭据';
+
+  @override
+  String get autofillNoMatchBody => '没有与此应用或网站匹配的已保存登录信息。如果您信任它，请手动粘贴您的凭据。';
+
+  @override
   String get add => '添加';
 
   @override
@@ -3753,6 +3774,30 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get edit => '編輯';
+
+  @override
+  String get saveConfirmTitle => '儲存到 Gabbro';
+
+  @override
+  String get saveConfirmUpdate => '更新此登入資訊';
+
+  @override
+  String get saveConfirmAsNew => '另存為新登入資訊';
+
+  @override
+  String get saveConfirmChooseAnother => '選擇其他登入資訊';
+
+  @override
+  String get saveConfirmAlreadySaved => '已使用此密碼儲存。';
+
+  @override
+  String get saveConfirmSwitchVaultHint => '若要儲存到其他保險庫，請先鎖定此保險庫。';
+
+  @override
+  String get autofillNoMatchTitle => '找不到憑證';
+
+  @override
+  String get autofillNoMatchBody => '沒有與此應用程式或網站相符的已儲存登入資訊。如果您信任它，請手動貼上您的憑證。';
 
   @override
   String get add => '新增';

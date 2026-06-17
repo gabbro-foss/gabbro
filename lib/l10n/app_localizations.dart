@@ -244,13 +244,13 @@ abstract class AppLocalizations {
   /// Shown when the submitted password already matches the stored one, so there is nothing to update.
   ///
   /// In en, this message translates to:
-  /// **'This login is already saved with this password.'**
+  /// **'Already saved with this password.'**
   String get saveConfirmAlreadySaved;
 
   /// Hint on the save screen when the vault was already unlocked (no vault picker was shown), telling the user how to target a different vault.
   ///
   /// In en, this message translates to:
-  /// **'Saving to the currently unlocked vault. To save to a different vault, lock this one first.'**
+  /// **'To save to a different vault, lock this one first.'**
   String get saveConfirmSwitchVaultHint;
 
   /// Title of the autofill dialog shown after unlock when no saved login matches the requesting app or website.
@@ -262,7 +262,7 @@ abstract class AppLocalizations {
   /// Body of the autofill no-match dialog, advising the user to paste credentials manually.
   ///
   /// In en, this message translates to:
-  /// **'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.'**
+  /// **'No saved login matches this app or site. If you trust it, paste your credentials manually.'**
   String get autofillNoMatchBody;
 
   /// No description provided for @add.

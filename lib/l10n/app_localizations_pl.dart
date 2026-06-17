@@ -38,31 +38,30 @@ class AppLocalizationsPl extends AppLocalizations {
   String get edit => 'Edytuj';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Zapisz w Gabbro';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Zaktualizuj to logowanie';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Zapisz jako nowe logowanie';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Wybierz inne logowanie';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Już zapisano z tym hasłem.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Aby zapisać w innym skarbcu, najpierw zablokuj ten.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Nie znaleziono danych logowania';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Żadne zapisane logowanie nie pasuje do tej aplikacji ani witryny. Jeśli jej ufasz, wklej swoje dane ręcznie.';
 
   @override
   String get add => 'Dodaj';

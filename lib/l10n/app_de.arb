@@ -1,5 +1,13 @@
 {
   "@@locale": "de",
+  "saveConfirmTitle": "In Gabbro speichern",
+  "saveConfirmUpdate": "Diese Anmeldung aktualisieren",
+  "saveConfirmAsNew": "Als neue Anmeldung speichern",
+  "saveConfirmChooseAnother": "Andere Anmeldung wählen",
+  "saveConfirmAlreadySaved": "Bereits mit diesem Passwort gespeichert.",
+  "saveConfirmSwitchVaultHint": "Um in einem anderen Tresor zu speichern, sperren Sie zuerst diesen.",
+  "autofillNoMatchTitle": "Keine Zugangsdaten gefunden",
+  "autofillNoMatchBody": "Keine gespeicherte Anmeldung passt zu dieser App oder Website. Wenn Sie ihr vertrauen, fügen Sie Ihre Zugangsdaten manuell ein.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

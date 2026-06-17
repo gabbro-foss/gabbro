@@ -1,5 +1,13 @@
 {
   "@@locale": "sl",
+  "saveConfirmTitle": "Shrani v Gabbro",
+  "saveConfirmUpdate": "Posodobi to prijavo",
+  "saveConfirmAsNew": "Shrani kot novo prijavo",
+  "saveConfirmChooseAnother": "Izberi drugo prijavo",
+  "saveConfirmAlreadySaved": "Že shranjeno s tem geslom.",
+  "saveConfirmSwitchVaultHint": "Za shranjevanje v drug trezor najprej zakleni tega.",
+  "autofillNoMatchTitle": "Poverilnic ni mogoče najti",
+  "autofillNoMatchBody": "Nobena shranjena prijava se ne ujema s to aplikacijo ali spletnim mestom. Če mu zaupate, ročno prilepite svoje poverilnice.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

@@ -1,5 +1,13 @@
 {
   "@@locale": "it",
+  "saveConfirmTitle": "Salva in Gabbro",
+  "saveConfirmUpdate": "Aggiorna questo accesso",
+  "saveConfirmAsNew": "Salva come nuovo accesso",
+  "saveConfirmChooseAnother": "Scegli un altro accesso",
+  "saveConfirmAlreadySaved": "Già salvato con questa password.",
+  "saveConfirmSwitchVaultHint": "Per salvare in un altro archivio, blocca prima questo.",
+  "autofillNoMatchTitle": "Nessuna credenziale trovata",
+  "autofillNoMatchBody": "Nessun accesso salvato corrisponde a questa app o sito. Se ti fidi, incolla le tue credenziali manualmente.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

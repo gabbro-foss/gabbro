@@ -50,19 +50,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveConfirmChooseAnother => 'Choose another login';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Already saved with this password.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'To save to a different vault, lock this one first.';
 
   @override
   String get autofillNoMatchTitle => 'No credentials found';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'No saved login matches this app or site. If you trust it, paste your credentials manually.';
 
   @override
   String get add => 'Add';

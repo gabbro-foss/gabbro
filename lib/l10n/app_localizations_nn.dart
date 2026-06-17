@@ -38,31 +38,30 @@ class AppLocalizationsNn extends AppLocalizations {
   String get edit => 'Rediger';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Lagre i Gabbro';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Oppdater denne innlogginga';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Lagre som ny innlogging';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Vel ei anna innlogging';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Allereie lagra med dette passordet.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Lås dette kvelvet først for å lagre i eit anna kvelv.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Ingen innloggingsdetaljar funne';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Inga lagra innlogging samsvarar med denne appen eller denne nettstaden. Viss du stolar på han, kan du lime inn innloggingsinformasjonen manuelt.';
 
   @override
   String get add => 'Legg til';

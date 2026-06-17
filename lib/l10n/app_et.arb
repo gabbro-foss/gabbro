@@ -1,5 +1,13 @@
 {
   "@@locale": "et",
+  "saveConfirmTitle": "Salvesta Gabbrosse",
+  "saveConfirmUpdate": "Värskenda seda sisselogimist",
+  "saveConfirmAsNew": "Salvesta uue sisselogimisena",
+  "saveConfirmChooseAnother": "Vali teine sisselogimine",
+  "saveConfirmAlreadySaved": "Juba salvestatud selle parooliga.",
+  "saveConfirmSwitchVaultHint": "Teise seifi salvestamiseks lukusta esmalt see.",
+  "autofillNoMatchTitle": "Mandaate ei leitud",
+  "autofillNoMatchBody": "Ükski salvestatud sisselogimine ei sobi selle rakenduse või saidiga. Kui usaldad seda, kleebi oma andmed käsitsi.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

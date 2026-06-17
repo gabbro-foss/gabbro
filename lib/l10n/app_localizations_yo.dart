@@ -38,31 +38,30 @@ class AppLocalizationsYo extends AppLocalizations {
   String get edit => 'Ṣatunkọ';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Fi pamọ́ sí Gabbro';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Ṣe imudojuiwọn wọlé yìí';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Fi pamọ́ gẹ́gẹ́ bí wọlé tuntun';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Yan wọlé mìíràn';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Ti fi pamọ́ pẹ̀lú ọ̀rọ̀ aṣínà yìí.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Láti fi pamọ́ sí vọọliti mìíràn, kọ́kọ́ tì vọọliti yìí.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Kò sí ìwé-ẹ̀rí tí a rí';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Kò sí wọlé tí a fi pamọ́ tí ó bá app tàbí ojú-òpó yìí mu. Tí o bá gbẹ́kẹ̀lé e, lẹ̀ ìwé-ẹ̀rí rẹ pẹ̀lú ọwọ́.';
 
   @override
   String get add => 'Fi kun';

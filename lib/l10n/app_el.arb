@@ -1,5 +1,13 @@
 {
   "@@locale": "el",
+  "saveConfirmTitle": "Αποθήκευση στο Gabbro",
+  "saveConfirmUpdate": "Ενημέρωση αυτής της σύνδεσης",
+  "saveConfirmAsNew": "Αποθήκευση ως νέα σύνδεση",
+  "saveConfirmChooseAnother": "Επιλογή άλλης σύνδεσης",
+  "saveConfirmAlreadySaved": "Έχει ήδη αποθηκευτεί με αυτόν τον κωδικό.",
+  "saveConfirmSwitchVaultHint": "Για αποθήκευση σε άλλο θησαυροφυλάκιο, κλειδώστε πρώτα αυτό.",
+  "autofillNoMatchTitle": "Δεν βρέθηκαν διαπιστευτήρια",
+  "autofillNoMatchBody": "Καμία αποθηκευμένη σύνδεση δεν ταιριάζει με αυτήν την εφαρμογή ή τον ιστότοπο. Αν την εμπιστεύεστε, επικολλήστε τα στοιχεία σας χειροκίνητα.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

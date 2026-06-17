@@ -38,31 +38,30 @@ class AppLocalizationsLv extends AppLocalizations {
   String get edit => 'Rediģēt';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Saglabāt Gabbro';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Atjaunināt šo pieteikšanos';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Saglabāt kā jaunu pieteikšanos';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Izvēlēties citu pieteikšanos';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Jau saglabāts ar šo paroli.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Lai saglabātu citā seifā, vispirms bloķējiet šo.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Akreditācijas dati nav atrasti';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Neviena saglabāta pieteikšanās neatbilst šai lietotnei vai vietnei. Ja tai uzticaties, ielīmējiet datus manuāli.';
 
   @override
   String get add => 'Pievienot';

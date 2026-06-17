@@ -1,5 +1,13 @@
 {
   "@@locale": "uk",
+  "saveConfirmTitle": "Зберегти в Gabbro",
+  "saveConfirmUpdate": "Оновити цей вхід",
+  "saveConfirmAsNew": "Зберегти як новий вхід",
+  "saveConfirmChooseAnother": "Вибрати інший вхід",
+  "saveConfirmAlreadySaved": "Уже збережено з цим паролем.",
+  "saveConfirmSwitchVaultHint": "Щоб зберегти в інше сховище, спочатку заблокуйте це.",
+  "autofillNoMatchTitle": "Облікові дані не знайдено",
+  "autofillNoMatchBody": "Жоден збережений вхід не відповідає цьому застосунку чи сайту. Якщо ви йому довіряєте, вставте свої дані вручну.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

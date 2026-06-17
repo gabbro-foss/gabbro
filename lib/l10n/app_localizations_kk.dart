@@ -38,31 +38,30 @@ class AppLocalizationsKk extends AppLocalizations {
   String get edit => 'Өңдеу';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Gabbro-ға сақтау';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Бұл кіруді жаңарту';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Жаңа кіру ретінде сақтау';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Басқа кіруді таңдау';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Осы құпия сөзбен сақталған.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Басқа сейфке сақтау үшін алдымен мұны бекітіңіз.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Тіркелгі деректері табылмады';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Бұл қолданбаға немесе сайтқа сәйкес сақталған кіру жоқ. Сенсеңіз, деректеріңізді қолмен қойыңыз.';
 
   @override
   String get add => 'Қосу';

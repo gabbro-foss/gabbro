@@ -1,5 +1,13 @@
 {
   "@@locale": "lv",
+  "saveConfirmTitle": "Saglabāt Gabbro",
+  "saveConfirmUpdate": "Atjaunināt šo pieteikšanos",
+  "saveConfirmAsNew": "Saglabāt kā jaunu pieteikšanos",
+  "saveConfirmChooseAnother": "Izvēlēties citu pieteikšanos",
+  "saveConfirmAlreadySaved": "Jau saglabāts ar šo paroli.",
+  "saveConfirmSwitchVaultHint": "Lai saglabātu citā seifā, vispirms bloķējiet šo.",
+  "autofillNoMatchTitle": "Akreditācijas dati nav atrasti",
+  "autofillNoMatchBody": "Neviena saglabāta pieteikšanās neatbilst šai lietotnei vai vietnei. Ja tai uzticaties, ielīmējiet datus manuāli.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

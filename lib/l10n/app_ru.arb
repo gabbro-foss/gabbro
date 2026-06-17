@@ -1,5 +1,13 @@
 {
   "@@locale": "ru",
+  "saveConfirmTitle": "Сохранить в Gabbro",
+  "saveConfirmUpdate": "Обновить этот вход",
+  "saveConfirmAsNew": "Сохранить как новый вход",
+  "saveConfirmChooseAnother": "Выбрать другой вход",
+  "saveConfirmAlreadySaved": "Уже сохранено с этим паролем.",
+  "saveConfirmSwitchVaultHint": "Чтобы сохранить в другое хранилище, сначала заблокируйте это.",
+  "autofillNoMatchTitle": "Учётные данные не найдены",
+  "autofillNoMatchBody": "Ни один сохранённый вход не подходит для этого приложения или сайта. Если вы ему доверяете, вставьте свои данные вручную.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

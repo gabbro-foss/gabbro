@@ -1,5 +1,13 @@
 {
   "@@locale": "hu",
+  "saveConfirmTitle": "Mentés a Gabbróba",
+  "saveConfirmUpdate": "Bejelentkezés frissítése",
+  "saveConfirmAsNew": "Mentés új bejelentkezésként",
+  "saveConfirmChooseAnother": "Másik bejelentkezés választása",
+  "saveConfirmAlreadySaved": "Már mentve ezzel a jelszóval.",
+  "saveConfirmSwitchVaultHint": "Másik széfbe mentéshez előbb zárolja ezt.",
+  "autofillNoMatchTitle": "Nem található hitelesítő adat",
+  "autofillNoMatchBody": "Egyetlen mentett bejelentkezés sem egyezik ezzel az alkalmazással vagy webhellyel. Ha megbízik benne, illessze be az adatait kézzel.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

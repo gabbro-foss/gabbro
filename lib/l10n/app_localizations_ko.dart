@@ -38,31 +38,29 @@ class AppLocalizationsKo extends AppLocalizations {
   String get edit => '편집';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Gabbro에 저장';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => '이 로그인 업데이트';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => '새 로그인으로 저장';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => '다른 로그인 선택';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => '이 비밀번호로 이미 저장됨.';
 
   @override
-  String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+  String get saveConfirmSwitchVaultHint => '다른 볼트에 저장하려면 먼저 이 볼트를 잠그세요.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => '자격 증명을 찾을 수 없음';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      '이 앱이나 사이트와 일치하는 저장된 로그인이 없습니다. 신뢰한다면 자격 증명을 수동으로 붙여넣으세요.';
 
   @override
   String get add => '추가';

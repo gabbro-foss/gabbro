@@ -1,5 +1,13 @@
 {
   "@@locale": "zh_CN",
+  "saveConfirmTitle": "保存到 Gabbro",
+  "saveConfirmUpdate": "更新此登录信息",
+  "saveConfirmAsNew": "另存为新登录信息",
+  "saveConfirmChooseAnother": "选择其他登录信息",
+  "saveConfirmAlreadySaved": "已使用此密码保存。",
+  "saveConfirmSwitchVaultHint": "若要保存到其他保险库，请先锁定此保险库。",
+  "autofillNoMatchTitle": "未找到凭据",
+  "autofillNoMatchBody": "没有与此应用或网站匹配的已保存登录信息。如果您信任它，请手动粘贴您的凭据。",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

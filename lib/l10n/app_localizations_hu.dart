@@ -38,31 +38,30 @@ class AppLocalizationsHu extends AppLocalizations {
   String get edit => 'Szerkesztés';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Mentés a Gabbróba';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Bejelentkezés frissítése';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Mentés új bejelentkezésként';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Másik bejelentkezés választása';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Már mentve ezzel a jelszóval.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Másik széfbe mentéshez előbb zárolja ezt.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Nem található hitelesítő adat';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Egyetlen mentett bejelentkezés sem egyezik ezzel az alkalmazással vagy webhellyel. Ha megbízik benne, illessze be az adatait kézzel.';
 
   @override
   String get add => 'Hozzáadás';

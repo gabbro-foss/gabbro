@@ -38,31 +38,30 @@ class AppLocalizationsEt extends AppLocalizations {
   String get edit => 'Muuda';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Salvesta Gabbrosse';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Värskenda seda sisselogimist';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Salvesta uue sisselogimisena';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Vali teine sisselogimine';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Juba salvestatud selle parooliga.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Teise seifi salvestamiseks lukusta esmalt see.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Mandaate ei leitud';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Ükski salvestatud sisselogimine ei sobi selle rakenduse või saidiga. Kui usaldad seda, kleebi oma andmed käsitsi.';
 
   @override
   String get add => 'Lisa';

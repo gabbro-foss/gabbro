@@ -1,5 +1,13 @@
 {
   "@@locale": "fr",
+  "saveConfirmTitle": "Enregistrer dans Gabbro",
+  "saveConfirmUpdate": "Mettre à jour cet identifiant",
+  "saveConfirmAsNew": "Enregistrer comme nouvel identifiant",
+  "saveConfirmChooseAnother": "Choisir un autre identifiant",
+  "saveConfirmAlreadySaved": "Déjà enregistré avec ce mot de passe.",
+  "saveConfirmSwitchVaultHint": "Pour enregistrer dans un autre coffre, verrouillez d'abord celui-ci.",
+  "autofillNoMatchTitle": "Aucun identifiant trouvé",
+  "autofillNoMatchBody": "Aucun identifiant enregistré ne correspond à cette application ou à ce site. Si vous lui faites confiance, collez vos identifiants manuellement.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

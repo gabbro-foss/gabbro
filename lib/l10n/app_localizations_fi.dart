@@ -38,31 +38,30 @@ class AppLocalizationsFi extends AppLocalizations {
   String get edit => 'Muokkaa';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Tallenna Gabbroon';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Päivitä tämä kirjautuminen';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Tallenna uutena kirjautumisena';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Valitse toinen kirjautuminen';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Tallennettu jo tällä salasanalla.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Tallenna toiseen holviin lukitsemalla ensin tämä.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Kirjautumistietoja ei löytynyt';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Mikään tallennettu kirjautuminen ei vastaa tätä sovellusta tai sivustoa. Jos luotat siihen, liitä tietosi manuaalisesti.';
 
   @override
   String get add => 'Lisää';

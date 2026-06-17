@@ -38,31 +38,30 @@ class AppLocalizationsPt extends AppLocalizations {
   String get edit => 'Editar';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Guardar no Gabbro';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Atualizar este início de sessão';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Guardar como novo início de sessão';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Escolher outro início de sessão';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Já guardado com esta palavra-passe.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Para guardar noutro cofre, bloqueie primeiro este.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Nenhuma credencial encontrada';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Nenhum início de sessão guardado corresponde a esta aplicação ou site. Se confia nele, cole as suas credenciais manualmente.';
 
   @override
   String get add => 'Adicionar';
@@ -2001,6 +2000,32 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get edit => 'Editar';
 
   @override
+  String get saveConfirmTitle => 'Salvar no Gabbro';
+
+  @override
+  String get saveConfirmUpdate => 'Atualizar este login';
+
+  @override
+  String get saveConfirmAsNew => 'Salvar como novo login';
+
+  @override
+  String get saveConfirmChooseAnother => 'Escolher outro login';
+
+  @override
+  String get saveConfirmAlreadySaved => 'Já salvo com esta senha.';
+
+  @override
+  String get saveConfirmSwitchVaultHint =>
+      'Para salvar em outro cofre, bloqueie este primeiro.';
+
+  @override
+  String get autofillNoMatchTitle => 'Nenhuma credencial encontrada';
+
+  @override
+  String get autofillNoMatchBody =>
+      'Nenhum login salvo corresponde a este app ou site. Se você confia nele, cole suas credenciais manualmente.';
+
+  @override
   String get add => 'Adicionar';
 
   @override
@@ -3932,6 +3957,32 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get edit => 'Editar';
+
+  @override
+  String get saveConfirmTitle => 'Guardar no Gabbro';
+
+  @override
+  String get saveConfirmUpdate => 'Atualizar este início de sessão';
+
+  @override
+  String get saveConfirmAsNew => 'Guardar como novo início de sessão';
+
+  @override
+  String get saveConfirmChooseAnother => 'Escolher outro início de sessão';
+
+  @override
+  String get saveConfirmAlreadySaved => 'Já guardado com esta palavra-passe.';
+
+  @override
+  String get saveConfirmSwitchVaultHint =>
+      'Para guardar noutro cofre, bloqueie primeiro este.';
+
+  @override
+  String get autofillNoMatchTitle => 'Nenhuma credencial encontrada';
+
+  @override
+  String get autofillNoMatchBody =>
+      'Nenhum início de sessão guardado corresponde a esta aplicação ou site. Se confia nele, cole as suas credenciais manualmente.';
 
   @override
   String get add => 'Adicionar';

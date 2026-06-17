@@ -38,31 +38,31 @@ class AppLocalizationsEl extends AppLocalizations {
   String get edit => 'Επεξεργασία';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Αποθήκευση στο Gabbro';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Ενημέρωση αυτής της σύνδεσης';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Αποθήκευση ως νέα σύνδεση';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Επιλογή άλλης σύνδεσης';
 
   @override
   String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+      'Έχει ήδη αποθηκευτεί με αυτόν τον κωδικό.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Για αποθήκευση σε άλλο θησαυροφυλάκιο, κλειδώστε πρώτα αυτό.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Δεν βρέθηκαν διαπιστευτήρια';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Καμία αποθηκευμένη σύνδεση δεν ταιριάζει με αυτήν την εφαρμογή ή τον ιστότοπο. Αν την εμπιστεύεστε, επικολλήστε τα στοιχεία σας χειροκίνητα.';
 
   @override
   String get add => 'Προσθήκη';

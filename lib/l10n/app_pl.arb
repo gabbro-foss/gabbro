@@ -1,5 +1,13 @@
 {
   "@@locale": "pl",
+  "saveConfirmTitle": "Zapisz w Gabbro",
+  "saveConfirmUpdate": "Zaktualizuj to logowanie",
+  "saveConfirmAsNew": "Zapisz jako nowe logowanie",
+  "saveConfirmChooseAnother": "Wybierz inne logowanie",
+  "saveConfirmAlreadySaved": "Już zapisano z tym hasłem.",
+  "saveConfirmSwitchVaultHint": "Aby zapisać w innym skarbcu, najpierw zablokuj ten.",
+  "autofillNoMatchTitle": "Nie znaleziono danych logowania",
+  "autofillNoMatchBody": "Żadne zapisane logowanie nie pasuje do tej aplikacji ani witryny. Jeśli jej ufasz, wklej swoje dane ręcznie.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

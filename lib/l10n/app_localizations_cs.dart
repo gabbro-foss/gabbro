@@ -38,31 +38,30 @@ class AppLocalizationsCs extends AppLocalizations {
   String get edit => 'Upravit';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Uložit do Gabbro';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'Aktualizovat toto přihlášení';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => 'Uložit jako nové přihlášení';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => 'Vybrat jiné přihlášení';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'Již uloženo s tímto heslem.';
 
   @override
   String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+      'Chcete-li uložit do jiného trezoru, nejprve zamkněte tento.';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => 'Nebyly nalezeny žádné přihlašovací údaje';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'Žádné uložené přihlášení neodpovídá této aplikaci ani webu. Pokud mu důvěřujete, vložte své údaje ručně.';
 
   @override
   String get add => 'Přidat';

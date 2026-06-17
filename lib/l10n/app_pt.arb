@@ -1,5 +1,13 @@
 {
   "@@locale": "pt",
+  "saveConfirmTitle": "Guardar no Gabbro",
+  "saveConfirmUpdate": "Atualizar este início de sessão",
+  "saveConfirmAsNew": "Guardar como novo início de sessão",
+  "saveConfirmChooseAnother": "Escolher outro início de sessão",
+  "saveConfirmAlreadySaved": "Já guardado com esta palavra-passe.",
+  "saveConfirmSwitchVaultHint": "Para guardar noutro cofre, bloqueie primeiro este.",
+  "autofillNoMatchTitle": "Nenhuma credencial encontrada",
+  "autofillNoMatchBody": "Nenhum início de sessão guardado corresponde a esta aplicação ou site. Se confia nele, cole as suas credenciais manualmente.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

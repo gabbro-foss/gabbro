@@ -38,31 +38,29 @@ class AppLocalizationsJa extends AppLocalizations {
   String get edit => '編集';
 
   @override
-  String get saveConfirmTitle => 'Save to Gabbro';
+  String get saveConfirmTitle => 'Gabbro に保存';
 
   @override
-  String get saveConfirmUpdate => 'Update this login';
+  String get saveConfirmUpdate => 'このログインを更新';
 
   @override
-  String get saveConfirmAsNew => 'Save as a new login';
+  String get saveConfirmAsNew => '新しいログインとして保存';
 
   @override
-  String get saveConfirmChooseAnother => 'Choose another login';
+  String get saveConfirmChooseAnother => '別のログインを選択';
 
   @override
-  String get saveConfirmAlreadySaved =>
-      'This login is already saved with this password.';
+  String get saveConfirmAlreadySaved => 'このパスワードで既に保存済みです。';
 
   @override
-  String get saveConfirmSwitchVaultHint =>
-      'Saving to the currently unlocked vault. To save to a different vault, lock this one first.';
+  String get saveConfirmSwitchVaultHint => '別のボルトに保存するには、まずこのボルトをロックしてください。';
 
   @override
-  String get autofillNoMatchTitle => 'No credentials found';
+  String get autofillNoMatchTitle => '認証情報が見つかりません';
 
   @override
   String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, copy and paste your credentials manually — the app identifier can differ from its display name.';
+      'このアプリまたはサイトに一致する保存済みログインはありません。信頼できる場合は、認証情報を手動で貼り付けてください。';
 
   @override
   String get add => '追加';

@@ -1,5 +1,13 @@
 {
   "@@locale": "ja",
+  "saveConfirmTitle": "Gabbro に保存",
+  "saveConfirmUpdate": "このログインを更新",
+  "saveConfirmAsNew": "新しいログインとして保存",
+  "saveConfirmChooseAnother": "別のログインを選択",
+  "saveConfirmAlreadySaved": "このパスワードで既に保存済みです。",
+  "saveConfirmSwitchVaultHint": "別のボルトに保存するには、まずこのボルトをロックしてください。",
+  "autofillNoMatchTitle": "認証情報が見つかりません",
+  "autofillNoMatchBody": "このアプリまたはサイトに一致する保存済みログインはありません。信頼できる場合は、認証情報を手動で貼り付けてください。",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
