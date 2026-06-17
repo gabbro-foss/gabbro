@@ -133,18 +133,22 @@ Net D — autofill entrypoint: **DONE** (4 pins; `buildAutofillUnlockApp` extrac
 textScaler + `onUnlocked` routing added; dead duplicate deleted). Red-first.
 - [x] `buildAutofillUnlockApp(settings, registry, initialVaultPath)` wires delegates/locale/theme/textScaler, reuses `UnlockScreen` with picker + `onUnlocked` + biometric
 
-Net E — Kotlin tap-flow (Robolectric):
-- [ ] exactly one of timeout/cancel/success/error completes; cancel→`TAP_CANCELLED`; retry-once; transport dispatch
-- [ ] `MainActivity` still wires export + getRecentApps after extraction
+Net E — Kotlin tap-flow (Robolectric): **DONE** (8 `TapFlowTest` pins; full Android unit
+suite green; tap-flow lifted into a testable `TapFlow`).
+- [x] exactly one of timeout/cancel/success/error completes; cancel→`TAP_CANCELLED`; retry-once; transport dispatch
+- [x] `MainActivity` still wires export + getRecentApps after extraction
 
 **Then production (each step, then device-test):**
 - [x] `onUnlocked` hook on `UnlockScreen` (success calls hook instead of nav; default
   navigation preserved — both pinned, red-first)
 - [x] autofill entrypoint reuses `UnlockScreen` (picker + appearance/locale/textScaler wiring)
-- [ ] `UnlockActivity` → FragmentActivity + shared host extraction (yubikey/biometric/NFC)
-- [ ] device gate: locked autofill unlocks (passphrase / YubiKey USB+NFC with no `demo.yubico.com`
-  escape / biometric); picker chooses a non-default vault; locked-path matching matrix; main-app
-  YubiKey/biometric/export regression
+- [x] `UnlockActivity` → FragmentActivity + shared host extraction (yubikey/biometric/NFC):
+  `GabbroUnlockHostActivity` base holds yubikey+biometric channels + NFC suppression + `TapFlow`;
+  `MainActivity`/`UnlockActivity` extend it; `UnlockActivity` is now a FragmentActivity.
+- [x] device gate (Rob, on device, 2026-06-17 — all pass): locked autofill unlocks (passphrase /
+  YubiKey USB+NFC, no `demo.yubico.com` escape / biometric); picker chose a non-default vault;
+  matching matrix (web/native/no-match dialog); main-app regression (YubiKey USB/NFC + biometric +
+  export) all still work after the extraction.
 
 **Verifiable now (independent):** unlocked path — open → unlock → autofill without locking → fills.
 
@@ -186,6 +190,13 @@ release process live in their own document:
 
 ### Code Quality
 - Audit the full code base for dead-code
+- **Deprecated `Dataset.Builder.setValue` (autofill).** `setValue(AutofillId, AutofillValue,
+  RemoteViews)` is deprecated; replace with `setField(AutofillId, Field)` (Field carries the
+  value + a `Presentations`/`RemoteViews`). Call sites: `GabbroAutofillService.buildAuthResponse`
+  + `buildFillResponse`, `UnlockActivity.buildFillIntent`. The replacement is API 34 (Android
+  14)+, so it needs a `Build.VERSION.SDK_INT` gate against minSdk (keep the deprecated path for
+  older devices) — don't blanket-replace. (Don't let training-era deprecated APIs persist; fix
+  when next touching autofill.)
 - **A11y: unlabelled show/hide eye toggles.** The passphrase/PIN visibility `IconButton`s
   (UnlockScreen, likely also onboarding / change-passphrase / generator) carry no semantic
   label — `labeledTapTargetGuideline` fails; screen readers announce a bare "button". Fix:
