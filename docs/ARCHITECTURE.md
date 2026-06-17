@@ -109,12 +109,14 @@ YubiKey (USB/NFC), PIN, multi-key, biometric.
 
 **Rule: a regression net is written and green against *current* code before any production change.**
 
-Net A — `UnlockScreen` behaviour:
-- [ ] success (passphrase, then YubiKey) → navigates to `VaultListScreen`
-- [ ] transport seam: default `usb`; selecting NFC passes `nfc`
-- [ ] PIN copy/paste blocked; vault-switch re-detects YubiKey records
-- [ ] keyboard submit unlocks; loading disables controls; biometric+YubiKey hint shown
-- [ ] no overflow with keyboard inset (both modes, error showing)
+Net A — `UnlockScreen` behaviour: **DONE** (9 pins green; transport selector re-gated
+on the `isAndroid` seam, red-first — USB/NFC is Android-only).
+- [x] success (passphrase, then YubiKey) → navigates to `VaultListScreen`
+- [x] transport: default `usb`; selecting NFC passes `nfc`
+- [x] PIN copy/paste blocked (vault-switch re-detect is `main.dart`/`switchToVault`, out of
+  blast radius — existing `onVaultSwitch` pin covers the wiring)
+- [x] keyboard submit unlocks; loading disables controls; biometric+YubiKey hint shown
+- [x] no overflow in a short viewport with an error showing (both modes)
 
 Net B — appearance/language:
 - [ ] renders under light/dark/system + high-contrast; large `textScaler`; non-English + long-string locale
