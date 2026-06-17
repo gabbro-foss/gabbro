@@ -116,6 +116,10 @@ Decisions:
   `create_entry` / `update_entry` bridge — the only clean way to read the Dart-side
   `passwordHistoryExpiry`, and it reuses proven, tested write paths. Matching stays in Kotlin
   (single source of truth, runs post-unlock) and feeds the confirm screen the suggestion + picker.
+- **No-context save → silent drop.** `onSaveRequest` with no password OR no usable context
+  (blank eTLD+1 *and* blank app_id) → `onSuccess()`, no UI. Rare (the OS gives package/webDomain).
+  New `/autofill_save` channel (separate from fill); `SaveActivity` skips unlock when already
+  unlocked. l10n keys (confirm screen + no-match dialog) self-translated ×37.
 - **Fix shipped bug**: `UnlockActivity`'s "No credentials found" native dialog is hardcoded English
   — move it to a localized Flutter dialog (same l10n reason). Net-first: it's on the shipped
   locked-unlock path, so pin first + hardware re-test.
