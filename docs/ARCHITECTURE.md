@@ -90,6 +90,9 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### In progress — autofill `onSaveRequest` (save new/changed logins from the OS prompt)
 
+**Status (2026-06-17):** A–D done & green (A/B/C Kotlin uncommitted pending hardware test; D
+committed). **Next: the E/F design pass** — `SaveActivity` + Flutter confirm screen, then build.
+
 Design settled (2026-06-17). `onSaveRequest` is a no-op today; goal: on form submit the OS offers
 to save a new/changed login into the vault. **Login entries only.** Full unlock-then-save: a new
 `SaveActivity` (symmetric to `UnlockActivity`) unlocks (picker + YubiKey/biometric), then a Flutter
