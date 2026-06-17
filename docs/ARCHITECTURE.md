@@ -88,39 +88,57 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task — build the autofill locked-vault unlock, then verify tonight's matching on it
+### Next task — locked-vault autofill unlock (reuse the main `UnlockScreen`)
 
-**Done tonight (2026-06-16, committed):** autofill *matching* hardened + de-duplicated.
-Both the unlocked path (`GabbroAutofillService`) and the locked path (`UnlockActivity`)
-now call one shared `matchingCredentials` (PSL eTLD+1 for web, exact `app_id` for native;
-match-before-decrypt). Robolectric-green.
+**Goal:** the locked autofill path has no unlock flow, so it never reaches matching. Build it
+by **reusing the main `UnlockScreen`** in the autofill activity — vault picker, passphrase,
+YubiKey (USB/NFC), PIN, multi-key, biometric.
 
-**Blocker found on hardware:** the locked-vault autofill **unlock flow does not exist**, so
-the locked path never reaches matching. (My matching change is not the cause — it runs only
-after unlock.) What's missing:
-- `RustBridge` (autofill JNI surface) exposes only `isVaultUnlocked` / `listLoginSummaries` /
-  `getEntry` — **no unlock function**.
-- `AutofillUnlockScreen` collects a passphrase; the Kotlin `"unlock"` handler **ignores it**
-  and calls `buildFillIntent()`, which needs an already-unlocked session.
-- **No YubiKey/FIDO2 step** (mandatory for Gabbro vaults).
-- `UnlockActivity` has **no NFC handling** — reader-mode + `skipNdefCheck` NDEF suppression
-  lives only in `MainActivity`, so an NFC YubiKey tap on the autofill screen escapes to the
-  browser (`demo.yubico.com`).
+**Design (decided with Rob):**
+- No new JNI unlock. `autofillUnlockMain` already calls `RustLib.init()`, so the generated
+  Flutter bridge drives the same shared `VAULT_SESSION`; Flutter unlocks directly, then
+  signals Kotlin to `buildFillIntent()`.
+- Add an `onUnlocked` hook to `UnlockScreen` (autofill signals Kotlin instead of navigating to
+  `VaultListScreen`); main app behaviour unchanged when the hook is absent.
+- `UnlockActivity` → `FlutterFragmentActivity` hosting the same `…/yubikey` + `…/biometric`
+  channels + NFC suppression as `MainActivity`, extracted to a shared base (DRY).
+- `autofillUnlockMain` loads `VaultRegistry` (picker — user chooses which vault) and mirrors
+  `main.dart`'s `MaterialApp` wiring (locale/theme/textScaler). Fixes a latent bug: the
+  entrypoint builds a bare `MaterialApp`; current tests pass only because `testApp()` injects
+  the delegates the production entrypoint lacks.
 
-**Tomorrow — do in order, hardware-test each step before the next:**
-1. Expose vault unlock over the autofill JNI (`RustBridge`): passphrase + YubiKey input →
-   real Rust unlock, mirroring the main app.
-2. Add the YubiKey step to `AutofillUnlockScreen` (USB + NFC) and port `MainActivity`'s NFC
-   reader-mode/`skipNdefCheck`/foreground-dispatch suppression into `UnlockActivity`.
-3. Wire the Kotlin `"unlock"` handler to actually unlock (passphrase + YubiKey result), then
-   call `buildFillIntent()` only on success.
-4. Test in order: (a) locked-vault autofill unlocks on device — passphrase + YubiKey (USB
-   **and** NFC), no `demo.yubico.com` escape; (b) re-run tonight's locked-path matching
-   matrix (web correct fill, native exact `app_id`, no-match dialog) on the now-functional path.
+**Rule: a regression net is written and green against *current* code before any production change.**
 
-**Verifiable now, independent of the above:** the *unlocked* path uses the new shared matcher
-— open app → unlock → trigger autofill without locking → it should fill correctly (confirms
-tonight's `GabbroAutofillService` refactor didn't regress the working path).
+Net A — `UnlockScreen` behaviour:
+- [ ] success (passphrase, then YubiKey) → navigates to `VaultListScreen`
+- [ ] transport seam: default `usb`; selecting NFC passes `nfc`
+- [ ] PIN copy/paste blocked; vault-switch re-detects YubiKey records
+- [ ] keyboard submit unlocks; loading disables controls; biometric+YubiKey hint shown
+- [ ] no overflow with keyboard inset (both modes, error showing)
+
+Net B — appearance/language:
+- [ ] renders under light/dark/system + high-contrast; large `textScaler`; non-English + long-string locale
+
+Net C — accessibility (broad sweep):
+- [ ] tap-target + labeled-target, text-contrast (light+dark), focus order, large-text reflow
+  (contrast may surface a real finding — fix or waive, don't weaken the check)
+
+Net D — autofill entrypoint:
+- [ ] extract testable `buildAutofillUnlockApp(settings, registry)`; assert it wires delegates/locale/theme/textScaler
+
+Net E — Kotlin tap-flow (Robolectric):
+- [ ] exactly one of timeout/cancel/success/error completes; cancel→`TAP_CANCELLED`; retry-once; transport dispatch
+- [ ] `MainActivity` still wires export + getRecentApps after extraction
+
+**Then production (each step, then device-test):**
+- [ ] `onUnlocked` hook on `UnlockScreen`
+- [ ] autofill entrypoint reuses `UnlockScreen` (picker + appearance/locale wiring)
+- [ ] `UnlockActivity` → FragmentActivity + shared host extraction (yubikey/biometric/NFC)
+- [ ] device gate: locked autofill unlocks (passphrase / YubiKey USB+NFC with no `demo.yubico.com`
+  escape / biometric); picker chooses a non-default vault; locked-path matching matrix; main-app
+  YubiKey/biometric/export regression
+
+**Verifiable now (independent):** unlocked path — open → unlock → autofill without locking → fills.
 
 After this lands, remaining autofill candidates: `onSaveRequest`, silent no-match toast.
 
