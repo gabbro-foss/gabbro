@@ -170,6 +170,24 @@ void main() {
     expect(wrote, isFalse);
   });
 
+  testWidgets('a second tap cannot trigger a second write', (tester) async {
+    var creates = 0;
+    await _pump(
+      tester,
+      SaveConfirmScreen(
+        saveContext: _ctx(action: SaveActionKind.create),
+        onCreate: (e) async => creates++,
+        onDone: () {},
+        onCancel: () {},
+      ),
+    );
+    await tester.tap(find.text('Save as a new login'));
+    await tester.tap(find.text('Save as a new login'));
+    await tester.pumpAndSettle();
+
+    expect(creates, 1);
+  });
+
   test('FD6 expiryDaysFor maps the retention setting', () {
     expect(expiryDaysFor(PasswordHistoryExpiry.sevenDays), 7);
     expect(expiryDaysFor(PasswordHistoryExpiry.thirtyDays), 30);

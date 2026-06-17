@@ -100,7 +100,9 @@ class GabbroAutofillService : AutofillService() {
         }
 
         if (matches.isEmpty()) {
-            callback.onSuccess(null)
+            // Unlocked but nothing matched: still offer to SAVE a brand-new login
+            // (a fill response carrying only SaveInfo, no datasets).
+            callback.onSuccess(buildSaveOnlyResponse(parseResult))
             return
         }
 
@@ -224,6 +226,19 @@ class GabbroAutofillService : AutofillService() {
         val optional = (parsed.usernameIds + parsed.emailIds).toTypedArray()
         if (optional.isNotEmpty()) saveInfo.setOptionalIds(optional)
         builder.setSaveInfo(saveInfo.build())
+    }
+
+    /**
+     * A FillResponse carrying only SaveInfo (no datasets) — returned when the vault is
+     * unlocked but nothing matched, so the OS still offers to SAVE a brand-new login the
+     * user types. Null when there is no password field (nothing worth saving), in which
+     * case the caller passes null to onSuccess.
+     */
+    internal fun buildSaveOnlyResponse(parsed: ParsedStructure): FillResponse? {
+        if (parsed.passwordIds.isEmpty()) return null
+        val builder = FillResponse.Builder()
+        attachSaveInfo(builder, parsed)
+        return builder.build()
     }
 
     // -------------------------------------------------------------------------

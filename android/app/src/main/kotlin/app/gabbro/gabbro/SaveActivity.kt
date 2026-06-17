@@ -47,14 +47,17 @@ class SaveActivity : GabbroUnlockHostActivity() {
                 when (call.method) {
                     "isUnlocked" -> result.success(RustBridge.isVaultUnlocked())
                     "getSaveContext" -> result.success(buildSaveContext())
+                    // finishAndRemoveTask (not finish): onSaveRequest launches us in our
+                    // own task (FLAG_ACTIVITY_NEW_TASK), so a bare finish() leaves the task
+                    // behind and re-focusing Gabbro resurfaces this screen.
                     "done" -> {
                         setResult(RESULT_OK)
-                        finish()
+                        finishAndRemoveTask()
                         result.success(null)
                     }
                     "cancel" -> {
                         setResult(RESULT_CANCELED)
-                        finish()
+                        finishAndRemoveTask()
                         result.success(null)
                     }
                     else -> result.notImplemented()

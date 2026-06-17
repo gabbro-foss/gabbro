@@ -116,12 +116,18 @@ class SaveConfirmScreen extends StatefulWidget {
 }
 
 class _SaveConfirmScreenState extends State<SaveConfirmScreen> {
+  // Guards against a double write: once an action starts, the buttons disable so a
+  // second tap (e.g. if the screen is slow to dismiss) cannot save again.
+  bool _submitting = false;
+
   int? _expiryDays() {
     final app = GabbroApp.maybeOf(context);
     return app == null ? null : expiryDaysFor(app.settings.passwordHistoryExpiry);
   }
 
   Future<void> _create() async {
+    if (_submitting) return;
+    setState(() => _submitting = true);
     final c = widget.saveContext;
     final entry = VaultEntryData.login(
       LoginEntryData(
@@ -140,16 +146,24 @@ class _SaveConfirmScreenState extends State<SaveConfirmScreen> {
         email: c.email.isEmpty ? null : c.email,
       ),
     );
-    await widget.onCreate(entry);
-    widget.onDone();
+    try {
+      await widget.onCreate(entry);
+      widget.onDone();
+    } catch (_) {
+      // Write failed — re-enable the buttons so the user can retry or cancel
+      // rather than being stranded on a frozen screen.
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 
   Future<void> _update(String id) async {
+    if (_submitting) return;
     final existing = widget.onGetEntry(id);
     if (existing is! VaultEntryData_Login) {
       widget.onCancel();
       return;
     }
+    setState(() => _submitting = true);
     final f = existing.field0;
     final updated = VaultEntryData.login(
       LoginEntryData(
@@ -168,11 +182,16 @@ class _SaveConfirmScreenState extends State<SaveConfirmScreen> {
         email: f.email,
       ),
     );
-    await widget.onUpdate(updated, _expiryDays());
-    widget.onDone();
+    try {
+      await widget.onUpdate(updated, _expiryDays());
+      widget.onDone();
+    } catch (_) {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 
   Future<void> _pickAnother() async {
+    if (_submitting) return;
     final l = AppLocalizations.of(context);
     final chosen = await showDialog<String>(
       context: context,
@@ -225,16 +244,17 @@ class _SaveConfirmScreenState extends State<SaveConfirmScreen> {
   }
 
   List<Widget> _actions(AppLocalizations l, SaveContext c) {
+    final busy = _submitting;
     final cancel = TextButton(
-      onPressed: widget.onCancel,
+      onPressed: busy ? null : widget.onCancel,
       child: Text(l.cancel),
     );
     final saveAsNew = OutlinedButton(
-      onPressed: _create,
+      onPressed: busy ? null : _create,
       child: Text(l.saveConfirmAsNew),
     );
     final chooseAnother = TextButton(
-      onPressed: _pickAnother,
+      onPressed: busy ? null : _pickAnother,
       child: Text(l.saveConfirmChooseAnother),
     );
     final hasCandidates = c.candidates.isNotEmpty;
@@ -243,7 +263,7 @@ class _SaveConfirmScreenState extends State<SaveConfirmScreen> {
       case SaveActionKind.update:
         return [
           ElevatedButton(
-            onPressed: () => _update(c.matchedId!),
+            onPressed: busy ? null : () => _update(c.matchedId!),
             child: Text(l.saveConfirmUpdate),
           ),
           const SizedBox(height: 8),
@@ -253,7 +273,10 @@ class _SaveConfirmScreenState extends State<SaveConfirmScreen> {
         ];
       case SaveActionKind.create:
         return [
-          ElevatedButton(onPressed: _create, child: Text(l.saveConfirmAsNew)),
+          ElevatedButton(
+            onPressed: busy ? null : _create,
+            child: Text(l.saveConfirmAsNew),
+          ),
           if (hasCandidates) chooseAnother,
           cancel,
         ];

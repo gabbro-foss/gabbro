@@ -407,6 +407,27 @@ class GabbroAutofillServiceRobolectricTest {
         assertNull(saveInfoOf(service.buildFillResponse(parsed, listOf(cred))))
     }
 
+    // Unlocked + no match must still let the OS offer to SAVE a brand-new login:
+    // a response carrying only SaveInfo (no datasets). Without a password field there
+    // is nothing to save, so null.
+    @Test
+    fun buildSaveOnlyResponse_has_saveinfo_and_no_datasets_with_password() {
+        val uId = newAutofillId()
+        val pId = newAutofillId()
+        val parsed = ParsedStructure(listOf(uId), listOf(pId), "https://example.com", null)
+        val response = service.buildSaveOnlyResponse(parsed)
+        assertNotNull(response)
+        assertNotNull(saveInfoOf(response!!))
+        assertTrue(datasetsOf(response).isEmpty())
+    }
+
+    @Test
+    fun buildSaveOnlyResponse_null_without_password_field() {
+        val uId = newAutofillId()
+        val parsed = ParsedStructure(listOf(uId), emptyList(), "https://example.com", null)
+        assertNull(service.buildSaveOnlyResponse(parsed))
+    }
+
     // ── Layer C: matchSaveTarget (which existing login a save would update) ────
     // Reuses the strict fill matcher (PSL eTLD+1 / exact app_id) then narrows to the
     // captured identifier — so a save never targets an entry from another site/app
