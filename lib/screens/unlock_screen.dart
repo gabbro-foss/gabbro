@@ -917,7 +917,10 @@ class _UnlockScreenState extends State<UnlockScreen>
                           ),
                         ),
                       ),
-                      if (!Platform.isLinux) ...[
+                      // USB vs NFC is an Android-only choice: desktop (Linux)
+                      // uses libfido2 over USB only, no NFC path. Gated on the
+                      // injectable `onAndroid` seam so the selector is testable.
+                      if (onAndroid) ...[
                         const SizedBox(height: 12),
                         SegmentedRow<String>(
                           values: const ['usb', 'nfc'],

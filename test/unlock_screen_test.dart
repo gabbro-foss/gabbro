@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
+import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/vault_registry.dart';
@@ -145,6 +146,158 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(called, isTrue);
+  });
+
+  // ── Net A regression pins ───────────────────────────────────────────────────
+  // Lock the *current* unlock-flow behaviour before the autofill `onUnlocked`
+  // hook is introduced, so any regression from the reuse/extraction is caught.
+
+  testWidgets(
+      'Net A: successful passphrase unlock navigates to VaultListScreen',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(onUnlock: (a, b) async {}));
+
+    await tester.enterText(find.byType(TextField), 'anypassphrase');
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(VaultListScreen), findsOneWidget);
+    expect(find.byType(UnlockScreen), findsNothing);
+  });
+
+  testWidgets('Net A: successful YubiKey unlock navigates to VaultListScreen',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      onUnlockWithYubikey: (a, b, c, d, e, f) async {},
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.enterText(find.byType(TextField).last, '123456');
+    await tester.ensureVisible(find.text('Unlock'));
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(VaultListScreen), findsOneWidget);
+    expect(find.byType(UnlockScreen), findsNothing);
+  });
+
+  testWidgets('Net A: YubiKey unlock passes the default usb transport',
+      (tester) async {
+    String? transport;
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      onUnlockWithYubikey: (a, b, c, d, path, t) async => transport = t,
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.enterText(find.byType(TextField).last, '123456');
+    await tester.ensureVisible(find.text('Unlock'));
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(transport, 'usb');
+  });
+
+  testWidgets('Net A: selecting NFC passes the nfc transport (Android)',
+      (tester) async {
+    String? transport;
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      isAndroid: true,
+      onUnlockWithYubikey: (a, b, c, d, path, t) async => transport = t,
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.enterText(find.byType(TextField).last, '123456');
+    await tester.ensureVisible(find.text('NFC'));
+    await tester.tap(find.text('NFC'));
+    await tester.pump();
+    await tester.ensureVisible(find.text('Unlock'));
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(transport, 'nfc');
+  });
+
+  testWidgets('Net A: PIN field blocks selection when blockPassphraseCopyPaste is true',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      blockPassphraseCopyPaste: true,
+    ));
+
+    // Two fields in yubikey mode: passphrase then PIN. The PIN (last) must
+    // honour the same copy/paste block as the passphrase field.
+    final pin = tester.widgetList<TextField>(find.byType(TextField)).last;
+    expect(pin.enableInteractiveSelection, isFalse);
+  });
+
+  testWidgets('Net A: keyboard submit (done action) triggers unlock',
+      (tester) async {
+    bool called = false;
+    await tester.pumpWidget(_buildScreen(onUnlock: (a, b) async => called = true));
+
+    await tester.enterText(find.byType(TextField), 'anypassphrase');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(called, isTrue);
+  });
+
+  testWidgets('Net A: unlock button is disabled with a spinner while unlocking',
+      (tester) async {
+    final gate = Completer<void>();
+    await tester.pumpWidget(_buildScreen(onUnlock: (a, b) => gate.future));
+
+    await tester.enterText(find.byType(TextField), 'anypassphrase');
+    await tester.tap(find.text('Unlock'));
+    await tester.pump(); // enter the unlocking state
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    final button = tester.widget<FilledButton>(find.byType(FilledButton));
+    expect(button.onPressed, isNull);
+
+    gate.complete();
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('Net A: biometric+YubiKey hint shown in yubikey mode when enrolled',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      biometricEnabled: true,
+      onBiometricIsEnrolled: (_) async => true,
+    ));
+    await tester.pump(); // enrollment probe settles
+
+    expect(
+      find.text('Enter your YubiKey PIN below, then tap Use biometrics, '
+          'then tap your YubiKey.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Net A: no overflow in a short viewport with an error showing '
+      '(passphrase-only and yubikey modes)', (tester) async {
+    tester.view.physicalSize = const Size(400, 340);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.reset());
+
+    for (final records in [<YubikeyRecordData>[], [_fakeRecord()]]) {
+      await tester.pumpWidget(_buildScreen(
+        yubikeyRecords: records,
+        onUnlock: (a, b) async => throw Exception('wrong'),
+        onUnlockWithYubikey: (a, b, c, d, e, f) async => throw Exception('wrong'),
+      ));
+      await tester.enterText(find.byType(TextField).first, 'wrongpassphrase');
+      await tester.ensureVisible(find.text('Unlock'));
+      await tester.tap(find.text('Unlock'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull,
+          reason: 'short viewport must scroll, never overflow');
+    }
   });
 
   // ── Safe area ─────────────────────────────────────────────────────────────
