@@ -32,7 +32,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Licence:** GPL-3.0-only (ADR-004). Play Store one-time payment is licence-compatible; F-Droid free build coexists without conflict.
 
-**Version control:** private GitHub repo at https://github.com/Zabamund/gabbro. SSH auth. `chat_info/` is git-ignored.
+**Version control:** private GitHub repo at https://github.com/Zabamund/gabbro. SSH auth.
 
 ## Project Structure
 
@@ -68,10 +68,10 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 526 | 8 |
+| Rust (`cargo test -q`) | 532 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 853 | 0 |
+| Flutter (`flutter test`) | 868 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 101 | 17 |
 
@@ -90,15 +90,13 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task — to be decided
 
+[empty]
+
 ### Open from the security audit
 
 Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 
 - **F-03** — X-Wing transcript-binding combiner; gated on a human cryptographer (no verifiable-against-spec answer).
-
-A second-pass review (`AI_SECURITY_AUDIT_REVIEW.md`, 2026-06-11) added findings
-**R-01…R-07**; per-finding status lives in that document's remediation table. All
-now closed.
 
 ---
 
@@ -121,6 +119,8 @@ release process live in their own document:
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
+
+[empty]
 
 ### Code Quality
 - Audit the full code base for dead-code

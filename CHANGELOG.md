@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.8] – 2026-06-18
+
 ### Security
 - **Autofill matching unified into one shared matcher (audit F-10 follow-up).** The locked-vault `UnlockActivity` and the unlocked-path service now share `matchingCredentials` (PSL eTLD+1 for web, exact `app_id` for native; match on password-free summaries, decrypt only the chosen entry), replacing `UnlockActivity`'s drifted naive eTLD+1 (F-10) and loose substring matcher. Both paths are now device-verified — the locked-vault unlock flow is built (see Added).
 - **Autofill website matching now uses the Public Suffix List (audit finding F-10).** The old eTLD+1 took a host's last two labels, collapsing every `*.co.uk` site to `co.uk` so unrelated entries cross-matched and the *wrong* credential could be offered. A vendored `public_suffix_list.dat` (publicsuffix.org) now computes the real registrable domain — `bbc.co.uk` and `hsbc.co.uk` no longer collide; bare public suffixes match nothing. List is vendored, never fetched at build/run; refresh procedure in `docs/MAINTENANCE.md`. Covered by a pure-JVM matcher test (normal/wildcard/exception rules) and end-to-end Robolectric tests against the real list. Hardware-verified on Android: no false-positives, correct credential when the form's fields are detected (field detection on non-standard/SPA pages is tracked separately).
