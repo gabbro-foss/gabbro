@@ -21,6 +21,27 @@ operational reference for building and shipping.
 
 ---
 
+## Runtime dependencies (Linux)
+
+The release bundle is self-contained except for a few **system shared libraries** it
+links at runtime. A full desktop install has these already; a *minimal* install
+(noticed on a second Arch box where `libfido2` was missing) does not. `libfido2-sys`
+is built without the `vendored` feature, so it dynamically links the system
+`libfido2` (and its chain: `libcbor`, `openssl`, `libudev`; `pcsclite` + a running
+`pcscd` for NFC). The Flutter GTK runner needs the GTK 3 stack. File dialogs need
+the XDG desktop portal (see below).
+
+- **Arch:** `pacman -S libfido2 libcbor pcsclite gtk3 xdg-desktop-portal xdg-desktop-portal-gtk`
+  (openssl, glib2, systemd-libs are part of base).
+- **Debian / Mint:** `apt install libfido2-1 libcbor0 libpcsclite1 libgtk-3-0 xdg-desktop-portal xdg-desktop-portal-gtk`
+
+Bare window managers (e.g. qtile) install the portal packages but never activate
+`graphical-session.target`, so the portal's `Requisite=graphical-session.target`
+blocks it — file dialogs fall back to the type-the-path path. Fix is session-side
+(have the WM activate the target), not a Gabbro or package issue.
+
+---
+
 ## Running under a Wayland/bubblewrap sandbox
 
 Gabbro is a normal GTK/Flutter Linux app. Launched directly it just works. The

@@ -26,7 +26,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text size, high-contrast, alphabet bar position.
 
-**Platforms:** v1: Linux (Arch + Mint/deb), Android (F-Droid + Play Store). Later: Windows.
+**Platforms:** v1: Linux (Arch + Mint/deb), Android (F-Droid + Play Store). Later: Windows. Android smoke-tested on GrapheneOS (2026-06-20): onboarding, vault sync, web autofill, l10n, settings all work — not yet exhaustive.
 
 **Versioning:** SemVer (semver.org/spec/v2.0.0.html); the current version lives in `pubspec.yaml` (single source of truth). `1.0` is a public trust commitment; don't ship it prematurely. CHANGELOG.md follows Keep a Changelog 1.0.0.
 
@@ -115,14 +115,13 @@ release process live in their own document:
 ### Security (pre-v1 gates)
 - **F-03 X-Wing combiner** — migrate the hybrid KEM combiner to a transcript-binding (X-Wing-style) construction (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). No single verifiable-against-spec answer → genuinely needs a human cryptographer's judgement. Would require VERSION 8.
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
-- Test on de-Googled Android (GrapheneOS/CalyxOS) before v1 — find a willing community tester, don't buy hardware.
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
-
-[empty]
+- Anonymous user feedback -> two wordclouds (one "what works", one "to improve"), in the teachtogether.tech formative-feedback spirit, published on GitHub. Must stay OUT of the app (no in-app network call - offline/no-telemetry DNA): external link to a no-login form (CryptPad/Framaforms/Nextcloud Forms) -> manual export -> generate two PNGs -> commit + embed in README. Needs moderation (anon free text = spam/abuse): cap to single words, profanity filter, curate before publishing.
 
 ### Code Quality
+- **Linux file picker regression (qtile box).** Portal-backed file dialogs used to work, now fall back to type-the-path. `xdg-desktop-portal` is blocked because `graphical-session.target` is never active under qtile (portal has `Requisite=graphical-session.target`). Packages present; it's a session-setup regression - find what changed (pkg update / qtile config), then have qtile activate the target (custom `qtile-session.target` + `dbus-update-activation-environment` in autostart). Not a Gabbro bug; app already degrades gracefully.
 - Audit the full code base for dead-code
 - **Autofill save loose ends.** Hardware-verify the localized "No credentials found" dialog (F2,
   fill path, no match). Native review of the best-effort `eu`/`kk`/`yo` save-flow translations.

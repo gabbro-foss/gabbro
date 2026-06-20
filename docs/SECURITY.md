@@ -1,7 +1,7 @@
 # Gabbro — Security Overview
 
 **Version:** pre-v1 (0.1.0-alpha)  
-**Last updated:** 2026-06-14  
+**Last updated:** 2026-06-20  
 **Status: this codebase has not been reviewed by an external cryptographer or security auditor.**
 
 ---
@@ -338,7 +338,10 @@ manager. The protections available depend on which mode you use.
 - Physical extraction of RAM from an *unlocked* running process.
 - Key material paged to **swap** before it is zeroized — use encrypted swap (or disable swap) on the host. (`mlock`/`madvise` hardening is deferred to the planned expert review.)
 - Vault paths and aliases in the local registry (`vaults.jsonc`) are readable by anyone with local file access — metadata only, no secrets.
-- A malicious build of the application distributed as a fake update.
+- A malicious build of the application distributed as a fake update. *Partially
+  mitigated:* the Android signing certificate's public SHA-256 fingerprint is
+  published (README → "Verify the APK is genuine"), so users who check it (e.g. via
+  GrapheneOS AppVerifier) can detect a repackaged APK.
 
 ---
 
@@ -387,6 +390,8 @@ Gabbro is fully open source under GPL-3.0. You can:
   (requires `gcore`, builds the `--features forensics` binary).
 - Read the AI-assisted security audit: `docs/AI_SECURITY_AUDIT.md`.
 - Run the full test suite: `cargo test -q` and `flutter test`.
+- Confirm an Android APK is an official build by checking its signing certificate
+  against the published SHA-256 fingerprint (README → "Verify the APK is genuine").
 
 If you find a problem, please report it. There is no bug bounty programme yet,
 but findings will be credited and taken seriously.

@@ -138,7 +138,25 @@ You can place the `bundle/` directory anywhere; the app is self-contained.
 2. Transfer `gabbro-v0.1.0-alpha.1-android.apk` to your device (USB, email, or file transfer).
 3. Tap the APK file in your file manager to install.
 
-Tested on Android 11+. YubiKey authentication requires a YubiKey 5 series key (USB-A/C for all devices; NFC where supported).
+Tested on Android 11+ (including GrapheneOS). YubiKey authentication requires a YubiKey 5 series key (USB-A/C for all devices; NFC where supported).
+
+#### Verify the APK is genuine
+
+Before installing, confirm the APK was signed by the project's key — this proves
+it has not been tampered with or repackaged. The signing certificate's public
+SHA-256 fingerprint is:
+
+```
+Package: app.gabbro.gabbro
+SHA-256: 0F:0A:B8:1B:9B:B8:F0:21:68:25:83:73:17:C6:49:F3:64:F4:47:B0:D0:93:5B:FA:1B:67:82:A9:FF:3A:1D:2C
+```
+
+- **GrapheneOS / Accrescent users:** install [AppVerifier](https://github.com/soupslurpr/AppVerifier),
+  open it, pick Gabbro (or the APK file), and check the reported hash matches the one above.
+- **Any platform:** run `apksigner verify --print-certs gabbro-<ver>-android.apk` and compare the
+  `SHA-256` certificate digest.
+
+A mismatch means the file is **not** an official Gabbro build — do not install it.
 
 ---
 
