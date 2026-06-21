@@ -139,7 +139,7 @@ real fix.
 4. Commit, then `git tag -a v0.1.0-alpha.N -m "v0.1.0-alpha.N" && git push origin v0.1.0-alpha.N`.
 
 **Build:**
-- **Linux:** `flutter build linux --release` → self-contained bundle in `build/linux/x64/release/bundle/`; package with `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.)
+- **Linux:** `flutter build linux --release` → self-contained bundle in `build/linux/x64/release/bundle/`; package with `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.) Then sign the tarball: `gpg --detach-sign --armor gabbro-<ver>-linux-x86_64.tar.gz` → `.tar.gz.asc` (asks for the key passphrase). Signing key fingerprint `369B E2CE CFD0 A528 7155 895A 4775 4EEE 7F9A ABFC`; public key + verify steps are in README.
 - **Android:** `flutter build apk --release` → `build/app/outputs/flutter-apk/app-release.apk`; rename to `gabbro-<ver>-android.apk`. The signing keystore (`android/app/gabbro-upload.jks`) and `android/key.properties` are already configured and gitignored.
 
 **Publish (manual — no `gh` CLI on the build box):** after the tag is pushed, create
@@ -148,7 +148,7 @@ the release by hand on github.com:
 1. Repo → **Releases** → **Draft a new release**.
 2. **Choose the existing tag** `v0.1.0-alpha.N` (do not create a new one).
 3. Title **Gabbro v0.1.0-alpha.N**; tick **Set as a pre-release**.
-4. Attach both artifacts: the Linux `.tar.gz` and the renamed `.apk`.
+4. Attach the artifacts: the Linux `.tar.gz` **and its `.tar.gz.asc` signature**, plus the renamed `.apk`.
 5. Body: the changelog section for this version, plus the disclaimer: *"Alpha — for
    invited testers only. The cryptographic implementation has not undergone external
    review. Do not store passwords you cannot afford to lose."*

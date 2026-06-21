@@ -56,6 +56,17 @@ app.*.map.json
 *.tar.gz
 *.apk
 
+# GPG / OpenPGP key material — NEVER commit private keys or revocation certs.
+# Live keys stay in ~/.gnupg (outside the repo); this is a belt-and-suspenders
+# guard against a stray `gpg --export-secret-keys` landing in the working tree.
+# Note: plain *.asc is intentionally NOT ignored — the PUBLIC signing key may be
+# committed deliberately. Only private/secret/revocation material is blocked.
+*.key
+*.gpg
+*.rev
+*private*.asc
+*secret*.asc
+
 # Third-party audit PDFs (e.g. Recurity Labs Proton Pass report) — referenced by
 # docs/AI_SECURITY_AUDIT.md but not redistributed in the repo. Keep local only.
 docs/artefacts/*.pdf

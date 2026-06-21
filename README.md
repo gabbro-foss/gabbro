@@ -131,6 +131,53 @@ tar -xzf gabbro-v0.1.0-alpha.1-linux-x86_64.tar.gz
 
 You can place the `bundle/` directory anywhere; the app is self-contained.
 
+#### Verify the Linux build is genuine
+
+The Linux tarball is signed with the project's OpenPGP (GPG) key — the same way
+the Arch ISO is. Each release ships a detached signature file
+(`gabbro-<ver>-linux-x86_64.tar.gz.asc`) alongside the tarball.
+
+The signing key's fingerprint is:
+
+```
+369B E2CE CFD0 A528 7155  895A 4775 4EEE 7F9A ABFC
+```
+
+Import the public key, confirm the fingerprint matches, then verify the download:
+
+```bash
+# 1. Import the public signing key
+gpg --import <<'KEY'
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mDMEajgxtBYJKwYBBAHaRw8BAQdAG3DemW7XMQSbcWx5koOsGKaBrkF4HMTq+73w
+e3t2Fli0IUdhYmJybyBSZWxlYXNlcyA8Z2FiYnJvQHR1dGEuY29tPoiWBBMWCgA+
+FiEENpvizs/QpShxVYlaR3VO7n+aq/wFAmo4MbQCGwMFCQPCZwAFCwkIBwIGFQoJ
+CAsCBBYCAwECHgECF4AACgkQR3VO7n+aq/z/8QEA3uN7NLlAOOuBr/K7ReMALsxn
+QWIUZ395/gfdwJJCsNcA/17lsivsdnCGt8uQogCXF/DUwCwupmT4Fe5+fCOrHbgH
+uDgEajgxtBIKKwYBBAGXVQEFAQEHQDvu7ROg/IQiWFO7EH/kUvFQi0/RipJPdEJ9
+xgH07nR1AwEIB4h+BBgWCgAmFiEENpvizs/QpShxVYlaR3VO7n+aq/wFAmo4MbQC
+GwwFCQPCZwAACgkQR3VO7n+aq/wc8AEA8n4s8olL3l5l28uAHhpwxTUyo7D3TzIq
+emmgXWd/v3wA/32c5BlwHzo6dt803Q0tK2neIwrFqKr5dBCZM2nDDK4E
+=lC0o
+-----END PGP PUBLIC KEY BLOCK-----
+KEY
+
+# 2. Confirm the fingerprint printed matches the one above
+gpg --fingerprint gabbro@tuta.com
+
+# 3. Verify the tarball against its signature
+gpg --verify gabbro-<ver>-linux-x86_64.tar.gz.asc gabbro-<ver>-linux-x86_64.tar.gz
+```
+
+A `Good signature` line means the build is authentic. GPG may add a warning that
+the key is "not certified with a trusted signature" — that is expected and not a
+failure; it only means you have not personally signed the key. The fingerprint
+match above is your trust anchor.
+
+A bad or missing signature means the file is **not** an official Gabbro build —
+do not run it.
+
 ### Android
 
 1. Enable **Install from unknown sources** on your device:

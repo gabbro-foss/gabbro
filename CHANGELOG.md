@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **Linux release tarballs are now OpenPGP-signed.** Each release ships a detached signature (`.tar.gz.asc`) so testers can verify the build is authentic, the same way the Android APK signature is checked. README documents the signing-key fingerprint, the inline public key, and the `gpg --verify` steps.
+
 ## [0.1.0-alpha.8] – 2026-06-18
 
 ### Security
