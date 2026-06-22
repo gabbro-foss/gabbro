@@ -12,7 +12,12 @@ that let the 2026-06-08 brick through).
 
 | File | VERSION | Sealed by | Shape |
 |------|---------|-----------|-------|
-| `v7_passphrase.gabbro` | 7 | current build (`master`) | passphrase only |
+| `v6_passphrase.gabbro` | 6 | `v0.1.0-alpha.4` | passphrase only |
+| `v6_multikey_2keys.gabbro` | 6 | `v0.1.0-alpha.4` | passphrase + YK1 + YK2 |
+| `v7_passphrase.gabbro` | 7 | `master` (pre-v8) | passphrase only |
+| `v7_multikey_2keys.gabbro` | 7 | `master` (pre-v8) | passphrase + YK1 + YK2 |
+| `v8_passphrase.gabbro` | 8 | current `master` (transcript-bound combiner) | passphrase only |
+| `v8_multikey_2keys.gabbro` | 8 | current `master` | passphrase + YK1 + YK2 |
 
 (Table grows as the harness grows — see the test list at the top of
 `../vault_backward_compat.rs`.)

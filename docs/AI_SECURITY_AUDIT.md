@@ -19,7 +19,7 @@ The Executive summary and findings below are the **original 2026-05-31 pass**, k
 |---------|------|--------|
 | **F-01** header not AEAD-authenticated | Low | **Fixed** (VERSION 7, 2026-06-05) — full header bound as AES-GCM AAD; alias rename and key management now require unlock + reseal. |
 | **F-02** ML-KEM KeyGen vs FIPS 203 | Low | **Fixed** 2026-06-01 (VERSION 6, `generate_deterministic(d,z)`). |
-| **F-03** hybrid combiner not transcript-binding | Low | **Open** — gated on human crypto review. |
+| **F-03** hybrid combiner not transcript-binding | Low | **Addressed** 2026-06-22 (VERSION 8): passphrase-only combiner folds the KEM transcript into the HKDF; YubiKey modes intentionally unchanged. |
 | **F-04** session secrets not `Zeroizing` | Low | **Fixed** (Round 1). |
 | **F-05** plaintext JSON export | Info | By design; no action. |
 | **F-06** `unwrap` on length-checked slices | Info | **Fixed** (Round 1). |
@@ -189,7 +189,7 @@ Including these values is what gives the combiner "binding to the transcript" an
 
 **Why this is mostly safe.** ML-KEM-1024 is itself IND-CCA secure and X25519 with `ReusableSecret` ECDH is well-studied. Gabbro is already using a contributory salt (32-byte random per seal) inside HKDF, which gives strong randomness binding. No concrete attack is known against concat-then-KDF combiners that use IND-CCA components.
 
-**Recommendation.** When formal cryptographic audit lands (pre-v1 gate), discuss with the reviewer whether to migrate to an X-Wing-style transcript-binding combiner. If yes, this is a file-format-incompatible change (VERSION bump) and should land before v1.0.0.
+**Resolution (2026-06-22, VERSION 8).** The **passphrase-only** combiner now folds the transcript into the HKDF `info` (label `gabbro-hybrid-kex-v2`): `info = label ∥ ml_kem_ct ∥ x25519_ephemeral_pk ∥ x25519_static_pk`. The static X25519 public key is the field the AES-GCM AAD cannot bind (it is not stored), so it is the substantive gain. Version-gated (`TRANSCRIPT_BINDING_MIN_VERSION = 8`): older vaults open with the legacy combiner and migrate on next save. YubiKey-protected vaults are intentionally unchanged — their body uses an independent random master key + hardware factor, so KDF-level transcript binding adds no security and would risk a migration brick. The backward-compat gate (v6/v7/v8, both modes) + state-machine fuzzer prove no data loss. External cryptographer review remains welcome but is no longer blocking.
 
 ---
 

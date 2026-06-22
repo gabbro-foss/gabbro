@@ -267,26 +267,27 @@ to fail immediately.
 Existing vaults (VERSION ≤ 6) gain this protection automatically on the next save,
 CRUD operation, or key management action.
 
-### F-03 — Hybrid KEM combiner is not transcript-binding
+### F-03 — Hybrid KEM combiner transcript binding (addressed for passphrase-only, VERSION 8)
 
-The Phase 1 combiner `HKDF(hkdf_salt, ml_kem_ss ∥ x25519_ss, "gabbro-hybrid-kex-v1")`
-does not include the KEM ciphertext or public keys in the key material, as
-recommended by X-Wing and the IETF hybrid-design drafts. Modern analysis of
-hybrid constructions recommends transcript-binding for provable IND-CCA security.
+The Phase 1 combiner was `HKDF(hkdf_salt, ml_kem_ss ∥ x25519_ss, "gabbro-hybrid-kex-v1")`,
+binding the KEM transcript only via the AES-GCM AAD. As of vault format **VERSION 8** the
+**passphrase-only** combiner folds the transcript
+(`ml_kem_ct ∥ x25519_ephemeral_pk ∥ x25519_static_pk`) into the HKDF `info`
+(`"gabbro-hybrid-kex-v2"`), so the key is transcript-bound from inside the KDF. The static
+X25519 public key — which the AAD cannot bind, as it is not stored in the file — is the
+substantive gain. This is defence-in-depth, not a fix for a known attack; post-quantum
+security at rest still comes from AES-256-GCM + Argon2id, not the KEM layer.
 
-No concrete attack against the current construction is known — both ML-KEM-1024
-and X25519 are IND-CCA secure components, and the combiner uses a fresh random
-salt per seal. However, the construction has not been assessed by a cryptographer
-against a formal security model. This is one of the questions the planned expert
-review must answer before v1.0.
+**YubiKey-protected vaults are intentionally unchanged.** Their body uses an independent
+random master key plus the hardware `hmac-secret` factor, so the combiner only wraps the
+passphrase key-slot there — KDF-level binding would add no security and would risk a
+migration brick. The combiner is version-gated: older vaults open unchanged and migrate on
+next save.
 
-### What a future expert reviewer should look at
+### What a future expert reviewer could still look at
 
-- The full hybrid construction in `rust/src/crypto/` — in particular the two-step
-  HKDF combiner design (Phase 1 + YubiKey phase) and the multi-key vault state
-  machine.
-- Whether to upgrade to an X-Wing-style transcript-binding combiner (F-03) before
-  the 1.0 file format is frozen.
+- The full hybrid construction in `rust/src/crypto/` — the two-step HKDF combiner
+  (passphrase + YubiKey phases) and the multi-key vault state machine.
 - Side-channel behaviour of the Argon2id / X25519 / ML-KEM call sites at the
   compiled-code level.
 - The formal correctness of `add_key_to_sealed` / `remove_key_from_sealed` /
@@ -377,7 +378,7 @@ Gabbro has not. This is the most significant gap in the table.
 | YubiKey binding | Second HKDF pass after the hybrid combiner | Passphrase alone | Adds a hardware factor that blocks offline brute-force entirely, independent of passphrase strength. |
 | Symmetric cipher | AES-256-GCM | AES-256-CBC + HMAC, or ChaCha20-Poly1305 | AES-256-GCM is an AEAD — it authenticates as well as encrypts in a single pass. ChaCha20-Poly1305 would be an equally valid choice; AES-GCM was chosen for FIPS alignment. |
 | KDF combiner | HKDF-SHA256 (RFC 5869) | Concatenation + hash | HKDF is a standard, well-studied PRF. The random per-seal salt means even identical passphrases produce different vault keys. |
-| Combiner transcript binding | Not yet (see F-03) | X-Wing-style (includes ciphertext + pubkeys) | Known open question, not an oversight. Deferred to the expert review before v1.0. |
+| Combiner transcript binding | Yes for passphrase-only (VERSION 8); via AEAD AAD for YubiKey modes | X-Wing-style (includes ciphertext + pubkeys) | Passphrase-only combiner folds the transcript into the HKDF (F-03 addressed). YubiKey modes bind it via the AES-GCM AAD and use an independent master key, so KDF-level binding adds nothing there. |
 
 ---
 

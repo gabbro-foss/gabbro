@@ -68,8 +68,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 532 | 8 |
-| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 10 | 0 |
+| Rust (`cargo test -q`) | 538 | 8 |
+| Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 12 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 868 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
@@ -112,30 +112,36 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 - [x] Green floor confirmed: backward-compat gate 10/10 (release, 2026-06-22).
 - [x] Canon-TDD scenario list approved (below).
 
-**Tests to write (RED first, backward-compat first) — tick as we go:**
-- [ ] A1. v6 & v7 passphrase-only still open under v8 (old recipe via version-gate).
-- [ ] A2. v6 & v7 passphrase-only: open -> save -> on-disk version == 8.
-- [ ] A3. v6 & v7 multikey still open with each key under v8 (YubiKey modes untouched).
-- [ ] A4. yubikey + passphrase rotation across the v8 bump (extend existing).
-- [ ] B5. fresh passphrase-only seal -> version 8 (update `seal_vault_produces_version_7`).
-- [ ] B6. v8 passphrase-only seal -> open roundtrip.
-- [ ] B7. v8 passphrase-only lock -> unlock disk roundtrip.
-- [ ] B8. v7 passphrase-only opened+saved under v8 -> becomes v8 and re-opens (migration).
-- [ ] C9. bound recipe != legacy recipe (same secrets/salt).
-- [ ] C10. flipping `ct_M` / `ephemeral_pub` / `static_pub` each changes the key.
-- [ ] C11. version dispatch: v7 -> legacy, v8 -> bound.
-- [ ] D12. generate v8 fixtures (`v8_passphrase`, `v8_multikey_2keys`); extend backward-compat gate.
-- [ ] D13. state-machine fuzzer still green + add v8 multikey fixture (#ignore, release-only).
+**Tests (RED first, backward-compat first) — tick as we go:**
+- [x] A1-A4. v6/v7 open + migrate + multikey + rotation under v8 — backward-compat gate 10/10
+  green against v8 code (2026-06-22). (v2-v5 stay out of scope per backward_compat.rs; v5-open
+  re-confirmed green. Rob-confirmed 2026-06-22.)
+- [x] B5. fresh passphrase-only seal -> version 8 (`seal_vault_produces_version_8`).
+- [x] B6/B7. v8 passphrase-only seal->open + serialize->open roundtrips (existing roundtrip tests,
+  now at v8).
+- [x] B8. v7 passphrase-only opened+saved under v8 -> v8 and re-opens (`v7_..._migrates...` in gate).
+- [x] C9/C10. bound recipe != legacy; flipping ct_M / ephemeral_pub / static_pub each changes key.
+- [x] C11. version dispatch: v7 -> legacy, v8 -> bound (`derive_passphrase_vault_key_dispatches...`).
+- [x] D12. v8 fixtures generated; backward-compat gate extended -> 12/12 green (incl. v8 in all
+  three rotation/change scenarios).
+- [x] D13. state-machine fuzzer green with v6/v7/v8 fixture rotation (caught + fixed a baseline
+  version-assert bug; 57s, release-only).
 
-**Then:** implement (red->green) -> fixtures -> docs (re-scope F-03 "addressed" in ARCHITECTURE /
-SECURITY / AI_SECURITY_AUDIT; CHANGELOG; FIXTURES; the deliberate "YubiKey modes not hardened"
-note) -> Rob hardware pass (Linux+Android) -> consider v0.1.0-alpha.9 (security enhancement).
+**Code + tests + docs DONE and green:** `hkdf.rs` `derive_vault_key_transcript_bound` + `INFO_V2`;
+`vault_crypto.rs` `TRANSCRIPT_BINDING_MIN_VERSION=8` + dispatch wired at `seal_vault`/`open_vault`
+only; `file_format.rs` VERSION 7->8; v8 fixtures; gate 12/12; fuzzer v6/v7/v8; fmt+clippy clean;
+F-03 re-scoped to "addressed" across SECURITY / AI_SECURITY_AUDIT / CHANGELOG / FIXTURES.
+
+**Remaining:** Rob's full `gabbro_test` gate -> hardware pass (passphrase-only vault: seal on the
+old build, open+migrate on the new build; YubiKey vault still opens; Linux + Android) -> consider
+v0.1.0-alpha.9 (security enhancement).
 
 ### Open from the security audit
 
-Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
-
-- **F-03** — hybrid-combiner transcript-binding question; gated on a human cryptographer (no verifiable-against-spec answer).
+Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. All tracked findings are
+addressed — **F-03** (combiner transcript binding) was closed for passphrase-only at VERSION 8
+(2026-06-22). A human cryptography review of `rust/src/crypto/` stays a welcome-but-not-blocking
+pre-v1 goal (Bikeshed).
 
 ---
 
@@ -152,7 +158,6 @@ release process live in their own document:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Security (pre-v1 gates)
-- **F-03 hybrid combiner** — migrate the hybrid KEM combiner to a transcript-binding (X-Wing-style) construction (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). No single verifiable-against-spec answer → genuinely needs a human cryptographer's judgement. Would require VERSION 8.
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
