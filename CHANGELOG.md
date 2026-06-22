@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.9] – 2026-06-22
+
 ### Security
-- **Passphrase-only vault key is now transcript-bound (vault format VERSION 8, audit F-03).** The passphrase-only combiner folds the KEM transcript (ML-KEM ciphertext + both X25519 public keys) into the HKDF, binding the key to the transcript inside the derivation rather than only via the AES-GCM AAD — defence-in-depth, not a fix for a known attack (post-quantum security at rest still comes from AES-256-GCM + Argon2id, untouched). YubiKey vaults are intentionally unchanged; v6/v7 vaults open unchanged and migrate to v8 on next save, proven by the backward-compat gate + state-machine fuzzer. Awaiting a hardware pass.
+- **Passphrase-only vault key is now transcript-bound (vault format VERSION 8, audit F-03).** The passphrase-only combiner folds the KEM transcript (ML-KEM ciphertext + both X25519 public keys) into the HKDF, binding the key to the transcript inside the derivation rather than only via the AES-GCM AAD — defence-in-depth, not a fix for a known attack (post-quantum security at rest still comes from AES-256-GCM + Argon2id, untouched). YubiKey vaults are intentionally unchanged; v6/v7 vaults open unchanged and migrate to v8 on next save, proven by the backward-compat gate + state-machine fuzzer and hardware-verified on Linux and Android.
 - **Linux release tarballs are now OpenPGP-signed.** Each release ships a detached signature (`.tar.gz.asc`) so testers can verify the build is authentic, the same way the Android APK signature is checked. README documents the signing-key fingerprint, the inline public key, and the `gpg --verify` steps.
 
 ## [0.1.0-alpha.8] – 2026-06-18
