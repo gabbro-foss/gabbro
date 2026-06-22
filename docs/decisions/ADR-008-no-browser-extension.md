@@ -3,6 +3,9 @@
 ## Status
 Accepted
 
+## Date
+2026-05-13
+
 ## Context
 Browser autofill on desktop platforms (Linux, Windows, macOS) is typically
 delivered via a browser extension. Extensions run inside the browser process,

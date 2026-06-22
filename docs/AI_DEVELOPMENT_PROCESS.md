@@ -98,7 +98,7 @@ one expert's eyes*:
 - **An explicit AI security audit** (`AI_SECURITY_AUDIT.md`) with per-finding
   tracking, and findings that are *still open and gated on a human*.
 - **A standing rule that the cryptography is not "done" until a human expert
-  reviews it.** The X-Wing combiner change (F-03) is deferred specifically
+  reviews it.** The hybrid combiner change (F-03) is deferred specifically
   because there is "no single verifiable-against-spec answer → genuinely needs a
   human cryptographer's judgement." That is the inverse of vibe coding: the
   project refuses to ship the part it can't yet verify.

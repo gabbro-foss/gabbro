@@ -35,10 +35,10 @@ the XDG desktop portal (see below).
   (openssl, glib2, systemd-libs are part of base).
 - **Debian / Mint:** `apt install libfido2-1 libcbor0 libpcsclite1 libgtk-3-0 xdg-desktop-portal xdg-desktop-portal-gtk`
 
-Bare window managers (e.g. qtile) install the portal packages but never activate
-`graphical-session.target`, so the portal's `Requisite=graphical-session.target`
-blocks it — file dialogs fall back to the type-the-path path. Fix is session-side
-(have the WM activate the target), not a Gabbro or package issue.
+Bare window managers (e.g. qtile) install the portal packages but never start the
+portal, so file dialogs fall back to the type-the-path path. Fix is session-side:
+start the portal from session init — e.g. in `~/.xinitrc`, `/usr/lib/xdg-desktop-portal &`.
+Not a Gabbro or package issue.
 
 ---
 

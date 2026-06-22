@@ -4,6 +4,10 @@
 
 Accepted
 
+## Date
+
+2026-05-15 (created); 2026-06-22 (edited)
+
 ## Context
 
 Passkey managers such as Bitwarden store FIDO2 private keys encrypted in the
@@ -17,9 +21,10 @@ Gabbro will not implement software passkey storage, now or in future versions.
 
 ## Rationale
 
-Gabbro requires a FIDO2 hardware key (YubiKey) for vault access (ADR-005). Any
-Gabbro user already possesses a hardware passkey authenticator that is strictly
-stronger than software storage.
+Gabbro supports and strongly recommends a FIDO2 hardware key (YubiKey) for vault
+access (ADR-010), though a passphrase-only vault is also allowed. A user who opts
+into hardware-key protection already possesses a passkey authenticator that is
+strictly stronger than software storage.
 
 The security distinction is codified in NIST SP 800-63B-4, which defines
 Authenticator Assurance Levels (AALs):

@@ -14,7 +14,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Encryption (at rest):** Argon2id KDF → X25519 + ML-KEM-1024 hybrid key exchange → HKDF-SHA256 combiner → AES-256-GCM. Post-quantum: belt and suspenders.
 
-**Authentication (app access):** Mandatory FIDO2/WebAuthn hardware key (YubiKey). v1 uses Ed25519 (hardware constraint); target ML-DSA-44 once Yubico ships PQ-capable hardware (ADR-005). Min 2 keys (primary + backup), max 4. Auto-lock: 30s default, configurable.
+**Authentication (app access):** Passphrase always; a FIDO2/WebAuthn hardware key (YubiKey) is strongly recommended but **not enforced** — a passphrase-only vault is the default. When keys are used: v1 Ed25519 (hardware constraint), target ML-DSA-44 once Yubico ships PQ-capable hardware (ADR-005), min 2 keys (primary + backup), max 4. Auto-lock: 30s default, configurable.
 
 **YubiKey NFC / NDEF OTP:** a YubiKey's OTP slot 1 (an NDEF URI) would open a browser when tapped on Android. Gabbro suppresses this via `NfcConfiguration().skipNdefCheck(true)` and by re-arming foreground dispatch after `stopNfcDiscovery`; OTP slot 1 can stay enabled (no `ykman` workaround). Full diagnosis in LEARNINGS.md.
 
@@ -88,15 +88,43 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task — to be decided
+### Next task — F-03: harden the hybrid combiner (transcript-binding) + document
 
-[empty]
+**Decision (2026-06-22):** do the F2 hardening ourselves, then document; defer reviewer
+outreach. Reasoning:
+- Our combiner is `HKDF-SHA256(ss_M ‖ ss_X)`, salted, ML-KEM-1024 — **not X-Wing**
+  (naming fixed this session). Sound in isolation (Finding 1).
+- The transcript (`ct_M`, ephemeral pubkey) is currently bound only via the AES-GCM AAD
+  (Finding 2). Harden: also fold it into the HKDF so the derived key is transcript-bound
+  independent of the AEAD.
+- For passphrase-derived vaults the ML-KEM+X25519 layer adds no brute-force resistance
+  beyond Argon2id (everything derives from the passphrase), and Argon2id->AES-256-GCM is
+  already PQ-secure at rest (Finding 3). **Keep it anyway** for defence-in-depth + any
+  future encrypt-to-pubkey feature; document honestly that AES-256+Argon2id (not the KEM)
+  is what makes Gabbro PQ at rest. The YubiKey path is sound and separate.
+- Doing this ourselves downgrades F-03 from "gated on a human" to "addressed; external
+  review welcome, not blocking" — unblocks publishing.
+
+**Phased plan (tick as we go):**
+- [ ] 1. Net-first sweep: grep ALL callers of `derive_vault_key` in `rust/src/` (incl.
+  test-only — `cargo build` misses them); list every seal/open/change-passphrase/reseal
+  path that must not regress.
+- [ ] 2. Design decision (Rob confirms): what to fold into the binding. Proposal:
+  `ct_M ‖ ephemeral_x25519_pub ‖ static_x25519_pub` into the HKDF `info`.
+- [ ] 3. Canon-TDD scenario list; STOP for Rob review before any test code.
+- [ ] 4. Red->green: backward-compat first (every v2–v7 fixture still opens), v8 round-trip,
+  tampered-transcript fails to open.
+- [ ] 5. Fixtures + gate: generate `v8_passphrase.gabbro` + `v8_multikey_2keys.gabbro`;
+  extend the backward-compat gate.
+- [ ] 6. Docs: re-scope F-03 to "addressed" (ARCHITECTURE / SECURITY / AI_SECURITY_AUDIT);
+  CHANGELOG; FIXTURES; capture the keep-ML-KEM rationale.
+- [ ] 7. Rob hardware pass -> consider v0.1.0-alpha.9 (security enhancement).
 
 ### Open from the security audit
 
 Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. Still open:
 
-- **F-03** — X-Wing transcript-binding combiner; gated on a human cryptographer (no verifiable-against-spec answer).
+- **F-03** — hybrid-combiner transcript-binding question; gated on a human cryptographer (no verifiable-against-spec answer).
 
 ---
 
@@ -113,7 +141,7 @@ release process live in their own document:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Security (pre-v1 gates)
-- **F-03 X-Wing combiner** — migrate the hybrid KEM combiner to a transcript-binding (X-Wing-style) construction (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). No single verifiable-against-spec answer → genuinely needs a human cryptographer's judgement. Would require VERSION 8.
+- **F-03 hybrid combiner** — migrate the hybrid KEM combiner to a transcript-binding (X-Wing-style) construction (`ikm = ml_kem_ss ∥ x25519_ss ∥ ml_kem_ct ∥ x25519_pubkey`). No single verifiable-against-spec answer → genuinely needs a human cryptographer's judgement. Would require VERSION 8.
 - Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
@@ -121,7 +149,6 @@ release process live in their own document:
 - Anonymous user feedback -> two wordclouds (one "what works", one "to improve"), in the teachtogether.tech formative-feedback spirit, published on GitHub. Must stay OUT of the app (no in-app network call - offline/no-telemetry DNA): external link to a no-login form (CryptPad/Framaforms/Nextcloud Forms) -> manual export -> generate two PNGs -> commit + embed in README. Needs moderation (anon free text = spam/abuse): cap to single words, profanity filter, curate before publishing.
 
 ### Code Quality
-- **Linux file picker regression (qtile box).** Portal-backed file dialogs used to work, now fall back to type-the-path. `xdg-desktop-portal` is blocked because `graphical-session.target` is never active under qtile (portal has `Requisite=graphical-session.target`). Packages present; it's a session-setup regression - find what changed (pkg update / qtile config), then have qtile activate the target (custom `qtile-session.target` + `dbus-update-activation-environment` in autostart). Not a Gabbro bug; app already degrades gracefully.
 - Audit the full code base for dead-code
 - **Autofill save loose ends.** Hardware-verify the localized "No credentials found" dialog (F2,
   fill path, no match). Native review of the best-effort `eu`/`kk`/`yo` save-flow translations.

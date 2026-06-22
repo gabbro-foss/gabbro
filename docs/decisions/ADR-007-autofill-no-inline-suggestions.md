@@ -3,6 +3,9 @@
 ## Status
 Accepted
 
+## Date
+2026-05-12
+
 ## Context
 Android 11 introduced inline autofill suggestions — credentials appear as
 chips in the keyboard suggestion bar rather than as a floating overlay below

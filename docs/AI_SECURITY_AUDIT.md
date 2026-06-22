@@ -19,7 +19,7 @@ The Executive summary and findings below are the **original 2026-05-31 pass**, k
 |---------|------|--------|
 | **F-01** header not AEAD-authenticated | Low | **Fixed** (VERSION 7, 2026-06-05) — full header bound as AES-GCM AAD; alias rename and key management now require unlock + reseal. |
 | **F-02** ML-KEM KeyGen vs FIPS 203 | Low | **Fixed** 2026-06-01 (VERSION 6, `generate_deterministic(d,z)`). |
-| **F-03** hybrid combiner not transcript-binding | Low | **Open** — gated on human crypto review (X-Wing). |
+| **F-03** hybrid combiner not transcript-binding | Low | **Open** — gated on human crypto review. |
 | **F-04** session secrets not `Zeroizing` | Low | **Fixed** (Round 1). |
 | **F-05** plaintext JSON export | Info | By design; no action. |
 | **F-06** `unwrap` on length-checked slices | Info | **Fixed** (Round 1). |
