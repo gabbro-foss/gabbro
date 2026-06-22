@@ -54,6 +54,7 @@ app.*.map.json
 
 # Release artifacts (ephemeral — upload to GitHub releases then delete)
 *.tar.gz
+*.tar.gz.asc
 *.apk
 
 # GPG / OpenPGP key material — NEVER commit private keys or revocation certs.
