@@ -136,11 +136,13 @@ real fix.
      the search with `GABBRO_FUZZ_CASES=64`.
    - The ignored Rust + Kotlin tests are hardware-only (YubiKey /
      biometric / AndroidKeyStore) and cannot run without the devices.
-4. Commit, then `git tag -a v0.1.0-alpha.N -m "v0.1.0-alpha.N" && git push origin v0.1.0-alpha.N`.
+4. Commit the version + CHANGELOG bump. **The tag is pushed last** — after the artifacts are built (see Tag, below).
 
 **Build:**
 - **Linux:** `flutter build linux --release` → self-contained bundle in `build/linux/x64/release/bundle/`; package with `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.) Then sign the tarball: `gpg --detach-sign --armor gabbro-<ver>-linux-x86_64.tar.gz` → `.tar.gz.asc` (asks for the key passphrase). Signing key fingerprint `369B E2CE CFD0 A528 7155 895A 4775 4EEE 7F9A ABFC`; public key + verify steps are in README.
 - **Android:** `flutter build apk --release` → `build/app/outputs/flutter-apk/app-release.apk`; rename to `gabbro-<ver>-android.apk`. The signing keystore (`android/app/gabbro-upload.jks`) and `android/key.properties` are already configured and gitignored.
+
+**Tag (last — only after the artifacts above exist and verify):** `git tag -a v0.1.0-alpha.N -m "v0.1.0-alpha.N" && git push origin v0.1.0-alpha.N`. Never push the tag before the build + sign succeed: a pushed tag forces every clone to re-fetch, so it goes last.
 
 **Publish (manual — no `gh` CLI on the build box):** after the tag is pushed, create
 the release by hand on github.com:
