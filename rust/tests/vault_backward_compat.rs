@@ -136,6 +136,22 @@ fn v7_passphrase_only_opens() {
 }
 
 #[test]
+fn v8_passphrase_only_opens() {
+    // A v8 passphrase-only vault (transcript-bound combiner) must open under the
+    // current build and yield the canary — proving v8 seal/open round-trips through
+    // a frozen on-disk file, not just an in-process re-seal.
+    let p = fixture("v8_passphrase.gabbro");
+    assert_eq!(
+        read_vault(&p).unwrap().version,
+        8,
+        "fixture must be VERSION 8"
+    );
+    let body = load_vault(FIXTURE_PASSPHRASE, &p)
+        .expect("current build must open the v8 passphrase-only golden vault");
+    assert_canary(&body);
+}
+
+#[test]
 fn v7_passphrase_only_migrates_to_current_version() {
     // Open the v7 passphrase fixture, then re-seal it the way the app does on any
     // CRUD save (save_vault re-derives from the passphrase). The re-sealed file
@@ -204,6 +220,21 @@ fn v6_multikey_opens_with_each_registered_key() {
         read_vault(&p).unwrap().version,
         6,
         "fixture must be VERSION 6"
+    );
+    assert_opens_with(&p, YK1_HMAC, YK1_CRED, "YK1");
+    assert_opens_with(&p, YK2_HMAC, YK2_CRED, "YK2");
+}
+
+#[test]
+fn v8_multikey_opens_with_each_registered_key() {
+    // A v8 passphrase + YK1 + YK2 vault must open with EITHER registered key.
+    // YubiKey-mode derivation is unchanged at v8, so this also confirms the
+    // version bump alone didn't disturb the keyslots.
+    let p = fixture("v8_multikey_2keys.gabbro");
+    assert_eq!(
+        read_vault(&p).unwrap().version,
+        8,
+        "fixture must be VERSION 8"
     );
     assert_opens_with(&p, YK1_HMAC, YK1_CRED, "YK1");
     assert_opens_with(&p, YK2_HMAC, YK2_CRED, "YK2");
@@ -290,6 +321,7 @@ fn yubikey_rotation_survives_key_loss_and_version_bumps() {
     // born at (and regardless of the version bumps applied along the way).
     run_rotation_scenario("v6_multikey_2keys.gabbro");
     run_rotation_scenario("v7_multikey_2keys.gabbro");
+    run_rotation_scenario("v8_multikey_2keys.gabbro");
 }
 
 #[test]
@@ -380,6 +412,7 @@ fn passphrase_change_survives_and_migrates() {
     // Proven from both a genuine v6 and a genuine v7 passphrase-only golden vault.
     run_passphrase_change_scenario("v6_passphrase.gabbro");
     run_passphrase_change_scenario("v7_passphrase.gabbro");
+    run_passphrase_change_scenario("v8_passphrase.gabbro");
 }
 
 #[test]
@@ -525,4 +558,5 @@ fn passphrase_rotation_interleaved_with_key_loss() {
     // The vault-B headline guarantee, proven from both a v6 and a v7 golden vault.
     run_passphrase_rotation_scenario("v6_multikey_2keys.gabbro");
     run_passphrase_rotation_scenario("v7_multikey_2keys.gabbro");
+    run_passphrase_rotation_scenario("v8_multikey_2keys.gabbro");
 }

@@ -14,7 +14,7 @@ use x25519_dalek::PublicKey as X25519PublicKey;
 use zeroize::Zeroizing;
 
 use crate::crypto::aes_gcm;
-use crate::crypto::hkdf::{combine_yubikey, derive_vault_key};
+use crate::crypto::hkdf::{combine_yubikey, derive_vault_key, derive_vault_key_transcript_bound};
 use crate::crypto::kdf::{derive_key, Argon2idParams};
 use crate::crypto::keypair::X25519Keypair;
 use crate::crypto::ml_kem::MlKemKeypair;
@@ -31,6 +31,13 @@ const FIPS_KEYGEN_MIN_VERSION: u8 = 6;
 /// with an authentication error.
 const AAD_MIN_VERSION: u8 = 7;
 
+/// First file-format version whose passphrase-only hybrid combiner folds the KEM
+/// transcript (ct_M ‖ ephemeral_x25519_pub ‖ static_x25519_pub) into the HKDF
+/// `info`, binding the vault key to the transcript from inside the KDF. Vaults
+/// below this derive the passphrase-only key with the legacy combiner so older
+/// vaults still open. YubiKey-mode derivation is unaffected at every version (F-03).
+const TRANSCRIPT_BINDING_MIN_VERSION: u8 = 8;
+
 /// Derives the ML-KEM keypair using the path that matches a vault's file
 /// version: VERSION 6+ uses FIPS keygen, VERSION 2–5 use the legacy path so
 /// vaults sealed by older builds still open. Seal paths pass [`VERSION`] (new
@@ -40,6 +47,36 @@ fn ml_kem_keypair_for_version(version: u8, kdf_output: &[u8; 96]) -> MlKemKeypai
         MlKemKeypair::from_kdf_output_fips(kdf_output)
     } else {
         MlKemKeypair::from_kdf_output_legacy(kdf_output)
+    }
+}
+
+/// Derives the passphrase-only vault key using the combiner that matches a
+/// vault's file version: VERSION 8+ folds the KEM transcript into the HKDF `info`
+/// (transcript-bound); v2–7 use the legacy combiner so older vaults still open.
+/// Seal paths pass [`VERSION`]; open paths pass the parsed `sealed.version`. Only
+/// the passphrase-only path (`seal_vault` / `open_vault`) uses this; YubiKey paths
+/// keep `derive_vault_key` unchanged at every version.
+#[allow(clippy::too_many_arguments)]
+fn derive_passphrase_vault_key_for_version(
+    version: u8,
+    ml_kem_secret: &[u8; 32],
+    x25519_secret: &[u8; 32],
+    salt: &[u8; 32],
+    ml_kem_ciphertext: &[u8],
+    ephemeral_x25519_pub: &[u8; 32],
+    static_x25519_pub: &[u8; 32],
+) -> [u8; 32] {
+    if version >= TRANSCRIPT_BINDING_MIN_VERSION {
+        derive_vault_key_transcript_bound(
+            ml_kem_secret,
+            x25519_secret,
+            salt,
+            ml_kem_ciphertext,
+            ephemeral_x25519_pub,
+            static_x25519_pub,
+        )
+    } else {
+        derive_vault_key(ml_kem_secret, x25519_secret, salt)
     }
 }
 
@@ -85,10 +122,14 @@ pub fn seal_vault(
             .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
     );
     let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
-    let vault_key = Zeroizing::new(derive_vault_key(
+    let vault_key = Zeroizing::new(derive_passphrase_vault_key_for_version(
+        VERSION,
         &ml_kem_secret_bytes,
         &x25519_secret_bytes,
         &hkdf_salt,
+        ml_kem_ciphertext.as_ref(),
+        ephemeral_public.as_bytes(),
+        x25519_keypair.public.as_bytes(),
     ));
 
     // Step 6: AES-256-GCM encrypt, binding the plaintext header as AAD for V7+.
@@ -148,10 +189,14 @@ pub fn open_vault(passphrase: &[u8], sealed: &SealedVault) -> Result<Vec<u8>, St
             .map_err(|_| "ML-KEM shared secret is not 32 bytes".to_string())?,
     );
     let x25519_secret_bytes = Zeroizing::new(*x25519_secret.as_bytes());
-    let vault_key = Zeroizing::new(derive_vault_key(
+    let vault_key = Zeroizing::new(derive_passphrase_vault_key_for_version(
+        sealed.version,
         &ml_kem_secret_bytes,
         &x25519_secret_bytes,
         &sealed.hkdf_salt,
+        &sealed.ml_kem_ciphertext,
+        &sealed.x25519_ephemeral_public,
+        x25519_keypair.public.as_bytes(),
     ));
 
     // Step 5: AES-256-GCM decrypt — V7+ verifies header integrity via AAD.
@@ -810,11 +855,41 @@ mod tests {
     }
 
     #[test]
-    fn seal_vault_produces_version_7() {
+    fn seal_vault_produces_version_8() {
         let sealed = seal_vault(b"pass", b"data", None).unwrap();
         assert_eq!(
-            sealed.version, 7,
-            "new vaults are sealed as VERSION 7 (FIPS + AAD)"
+            sealed.version, 8,
+            "new vaults are sealed as VERSION 8 (FIPS + AAD + transcript-bound passphrase-only combiner)"
+        );
+    }
+
+    #[test]
+    fn derive_passphrase_vault_key_dispatches_on_version() {
+        let ml_kem = [1u8; 32];
+        let x = [2u8; 32];
+        let salt = [3u8; 32];
+        let ct_m = vec![0x55u8; 1568];
+        let eph = [0x66u8; 32];
+        let stat = [0x77u8; 32];
+
+        // v7 -> legacy combiner (transcript ignored).
+        let v7 = derive_passphrase_vault_key_for_version(7, &ml_kem, &x, &salt, &ct_m, &eph, &stat);
+        assert_eq!(
+            v7,
+            derive_vault_key(&ml_kem, &x, &salt),
+            "v7 must use the legacy combiner"
+        );
+
+        // v8 -> transcript-bound combiner.
+        let v8 = derive_passphrase_vault_key_for_version(8, &ml_kem, &x, &salt, &ct_m, &eph, &stat);
+        assert_eq!(
+            v8,
+            derive_vault_key_transcript_bound(&ml_kem, &x, &salt, &ct_m, &eph, &stat),
+            "v8 must use the transcript-bound combiner"
+        );
+        assert_ne!(
+            v7, v8,
+            "v7 and v8 must derive different keys from the same inputs"
         );
     }
 
@@ -1544,7 +1619,7 @@ mod tests {
         let passphrase = b"integrity test";
         let plaintext = b"secret vault body";
         let sealed = seal_vault(passphrase, plaintext, None).unwrap();
-        assert_eq!(sealed.version, 7, "new vaults are VERSION 7");
+        assert_eq!(sealed.version, 8, "new vaults are VERSION 8");
 
         // Tamper with the alias in the serialised vault bytes.
         let mut bytes = sealed.to_bytes();

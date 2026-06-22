@@ -42,7 +42,12 @@
 //!   body decryption to fail with an authentication error (F-01 / header integrity).
 //!   `set_vault_alias` and all other header-mutating operations now require an
 //!   active session so the body can be re-sealed with the updated AAD.
-//! Reads v2–7; always writes VERSION 7.
+//! VERSION 8 (current): identical header LAYOUT to VERSION 7. The only change is
+//!   the passphrase-only hybrid combiner: the HKDF `info` now folds in the KEM
+//!   transcript (ct_M ‖ ephemeral_x25519_pub ‖ static_x25519_pub), so the
+//!   passphrase-only vault key is transcript-bound from inside the KDF, not only
+//!   via the AAD. YubiKey-mode key derivation is unchanged (F-03).
+//! Reads v2–8; always writes VERSION 8.
 
 use crate::crypto::kdf::Argon2idParams;
 
@@ -62,7 +67,7 @@ pub struct YubiKeyRecord {
 pub const MAGIC: &[u8; 6] = b"GABBRO";
 
 /// Current file format version (written by this build).
-pub const VERSION: u8 = 7;
+pub const VERSION: u8 = 8;
 
 /// Oldest version this build can still read.
 const VERSION_MIN_READABLE: u8 = 2;
@@ -608,9 +613,9 @@ mod tests {
     }
 
     #[test]
-    fn fresh_vault_is_version_7() {
-        assert_eq!(VERSION, 7);
-        assert_eq!(test_vault().version, 7);
+    fn fresh_vault_is_version_8() {
+        assert_eq!(VERSION, 8);
+        assert_eq!(test_vault().version, 8);
     }
 
     #[test]

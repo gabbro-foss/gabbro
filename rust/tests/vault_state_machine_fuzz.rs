@@ -154,15 +154,10 @@ impl Model {
 /// key opens the vault under the current passphrase with the canary intact (the
 /// core brick-prevention property). `log` is the running operation history, printed
 /// verbatim if any assertion blows so the failure is reproducible.
-fn assert_invariants(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[String]) {
-    let on_disk = read_vault(path)
-        .unwrap_or_else(|e| panic!("read_vault failed after [{}]: {e}", log.join(" -> ")));
-    assert_eq!(
-        on_disk.version,
-        VERSION,
-        "version must be current after every mutation; history: [{}]",
-        log.join(" -> ")
-    );
+/// Every registered key opens the vault under the current passphrase with the
+/// canary intact (the core brick-prevention property), regardless of on-disk
+/// VERSION. Used at baseline, where a pre-current fixture is not yet migrated.
+fn assert_unlockable(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[String]) {
     for &r in &model.registered {
         let k = &pool[r];
         let (body, _m, _w) = load_vault_with_key_record(&model.passphrase, k.hmac, k.cred, path)
@@ -180,6 +175,18 @@ fn assert_invariants(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[Stri
             log.join(" -> ")
         );
     }
+}
+
+fn assert_invariants(path: &Path, model: &Model, pool: &[KeyMat; 4], log: &[String]) {
+    let on_disk = read_vault(path)
+        .unwrap_or_else(|e| panic!("read_vault failed after [{}]: {e}", log.join(" -> ")));
+    assert_eq!(
+        on_disk.version,
+        VERSION,
+        "version must be current after every mutation; history: [{}]",
+        log.join(" -> ")
+    );
+    assert_unlockable(path, model, pool, log);
 }
 
 /// End-of-sequence negative checks: nothing that should be locked out can open it.
@@ -219,14 +226,25 @@ fn random_op_sequences_preserve_unlockability() {
     let pool = key_pool();
     let mut rng = StdRng::seed_from_u64(FIXED_SEED);
 
+    // Rotate the starting fixture across versions so random op-orders also exercise
+    // the v6/v7 -> v8 migration paths (v8 has the transcript-bound passphrase combiner).
+    const FIXTURES: [&str; 3] = [
+        "v6_multikey_2keys.gabbro",
+        "v7_multikey_2keys.gabbro",
+        "v8_multikey_2keys.gabbro",
+    ];
+
     for case in 0..cases {
-        let tv = temp_copy("v7_multikey_2keys.gabbro", case);
+        let fixture_name = FIXTURES[case % FIXTURES.len()];
+        let tv = temp_copy(fixture_name, case);
         let path = tv.path.as_path();
         let mut model = Model::fresh();
-        let mut log: Vec<String> = vec![format!("case#{case} start(YK1,YK2)")];
+        let mut log: Vec<String> = vec![format!("case#{case} start({fixture_name}: YK1,YK2)")];
 
-        // Baseline: the freshly-copied fixture already satisfies the invariants.
-        assert_invariants(path, &model, &pool, &log);
+        // Baseline: the freshly-copied fixture opens with every key. Its on-disk
+        // VERSION may be pre-current (v6/v7) until the first mutation migrates it,
+        // so check unlockability only here, not the version.
+        assert_unlockable(path, &model, &pool, &log);
 
         let steps = rng.gen_range(1..=MAX_STEPS);
         for _ in 0..steps {
