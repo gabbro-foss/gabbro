@@ -3,9 +3,9 @@
 **Date:** 2026-05-31
 **Auditor:** Claude Opus 4.7 (AI-assisted review)
 **Scope:** `rust/src/crypto/` and `rust/src/vault/` (per ARCHITECTURE.md Current Focus)
-**Status:** Pre-v1 informational review. **Not a substitute for human expert cryptography review** (see Bikeshed → "Security (pre-v1 gates)").
+**Status:** Pre-v1 informational review. **Not a substitute for human expert cryptography review** (see Bikeshed → "Security (pre-v1)").
 
-> **Reading note.** This is a findings report. Remediation is a separate session. Severities are AI estimates and should be re-rated by a human cryptographer. Nothing here unblocks the pre-v1 gate that requires academic / RustCrypto / formal audit sign-off.
+> **Reading note.** This is a findings report. Remediation is a separate session. Severities are AI estimates and should be re-rated by a human cryptographer. As of 2026-06-22 the one open design question (F-03) is addressed at VERSION 8; external academic / RustCrypto / formal review is welcome as defence-in-depth but is no longer a blocking pre-v1 gate.
 
 > **Second-pass review (2026-06-11).** This audit was critically reviewed by Claude Fable 5 — see [AI_SECURITY_AUDIT_REVIEW.md](AI_SECURITY_AUDIT_REVIEW.md) for a verdict on this document, its structural blind spots (scope asymmetry, availability, Dart heap), and seven new findings (R-01…R-07) on surfaces this audit did not cover.
 
@@ -31,7 +31,7 @@ The Executive summary and findings below are the **original 2026-05-31 pass**, k
 | **L-6** memory-forensics test | — | **Done** 2026-06-01 (`scripts/mem_forensics.sh`). |
 | **F-12** typed/viewed secrets persist in Dart heap | Low | **Documented** (2026-06-14) — measured by root gcore of the GUI; inherent to GUI password managers, bounded by auto-lock + GC, same-uid dump blocked by R-04. |
 
-**Still open:** F-03 (→ human crypto review). Everything else is fixed or by-design.
+**Nothing open.** F-03 addressed at VERSION 8 (2026-06-22, software-gate + hardware-verified on Linux and Android); everything else is fixed or by-design. External cryptography review is welcome as defence-in-depth but is no longer a blocking pre-v1 gate.
 
 **Correction (2026-06-10).** The Executive summary's "no exploitable defect identified" and the OWASP "binary header parser bounds-checks every field" row were both falsified within scope: the `from_bytes` parse fuzzer found a crash-on-open integer overflow in `rust/src/vault/file_format.rs` (a malformed `.gabbro` body-length field), a DoS-grade defect the static read missed. Fixed by a `checked_add` (`file_format.rs:378`) and guarded by `rust/tests/vault_parse_fuzz.rs`. Recorded so a human reviewer can calibrate what the static AI pass missed (review finding R-01).
 
@@ -461,7 +461,7 @@ No CI workflows exist yet (`.github/` contains only `FUNDING.yml`). When CI is a
 | HKDF-SHA256              | RFC 5869 / NIST SP 800-56C | ✓ Standard salt + info usage; domain separation present. |
 | X25519                   | RFC 7748, FIPS 186-5      | ✓ Standard ECDH; ephemeral on sealer side.              |
 | ML-KEM-1024              | FIPS 203                  | ✓ `KeyGen(d, z)` as of VERSION 6 (F-02 remediated 2026-06-01); legacy path retained to read VERSION ≤5 vaults. |
-| Hybrid combiner          | (no FIPS, IETF drafts)    | ⚠ Two-step: Phase 1 `HKDF(hkdf_salt, ml_kem_ss ∥ x25519_ss, "gabbro-hybrid-kex-v1")` → `intermediate_key`; YubiKey mode adds Phase 2 `HKDF(yubikey_salt, intermediate_key ∥ hmac_secret, "gabbro-yubikey-v1")` → `vault_key`. Phase 1 is a concat-then-KDF without transcript binding — see F-03. |
+| Hybrid combiner          | (no FIPS, IETF drafts)    | ✓ Two-step: Phase 1 `HKDF(hkdf_salt, ml_kem_ss ∥ x25519_ss, info)` → `intermediate_key`; YubiKey mode adds Phase 2 `HKDF(yubikey_salt, intermediate_key ∥ hmac_secret, "gabbro-yubikey-v1")` → `vault_key`. Passphrase-only Phase 1 is transcript-bound at VERSION 8 (`info = "gabbro-hybrid-kex-v2" ∥ ml_kem_ct ∥ x25519_ephemeral_pk ∥ x25519_static_pk`); YubiKey modes bind the transcript via the AES-GCM AAD and use an independent master key. See F-03 (addressed). |
 | FIDO2 / hmac-secret      | CTAP 2.1, FIDO Alliance   | ✓ Out of scope for this audit (see ADR-010).             |
 | RBG / RNG                | NIST SP 800-90A           | ✓ `OsRng` for all fresh material (Linux `getrandom`).    |
 
@@ -477,7 +477,7 @@ No CI workflows exist yet (`.github/` contains only `FUNDING.yml`). When CI is a
 | Injection (SQL/NoSQL)                 | N/A — no database. JSON serialization is via `serde_json`, no string concatenation.    |
 | Authentication / session              | Argon2id + FIDO2 hmac-secret; min 2 keys (ADR-010). Master key never crosses bridge.   |
 | Access control                        | Single-user local app; vault-level access only.                                        |
-| Cryptography                          | See NIST alignment table; F-01 fixed (VERSION 7); F-03 open (transcript binding, human reviewer).  |
+| Cryptography                          | See NIST alignment table; F-01 fixed (VERSION 7); F-03 addressed (passphrase-only transcript binding, VERSION 8).  |
 | Data flow                             | Secrets live in Rust; Flutter receives `EntrySummaryData` (no passwords) for list view. Autofill JSON is a documented, narrowly-scoped exception (F-04). |
 | Business logic                        | Multi-key invariant (≥2 keys); passphrase change preserves all key_blobs; legacy V2 path explicit. |
 | Configuration / deployment            | Keystore + key.properties git-ignored and verified absent from history.                |
@@ -539,14 +539,16 @@ Crates scanned: 211. **CVEs / RUSTSEC vulnerabilities: 0.** Warnings: 4 (informa
 
 ---
 
-## Appendix C — Items deferred to human cryptography review
+## Appendix C — Items for external review (welcome, not blocking)
 
-This AI audit is informational. The Bikeshed pre-v1 gate still requires:
+This AI audit is informational. F-03 — the one open design question — is addressed at
+VERSION 8 (2026-06-22). The following external reviews remain welcome as defence-in-depth
+but are no longer a blocking pre-v1 gate:
 
-1. **Academic / RustCrypto-maintainer review** of the hybrid construction in `vault_crypto.rs`. F-03 (transcript-binding combiner) is the primary open question. F-01 and F-02 are fixed; the reviewer should verify the implementations but no design questions remain for those.
+1. **Academic / RustCrypto-maintainer review** of the hybrid construction in `vault_crypto.rs`. F-01, F-02 and F-03 are addressed; a reviewer's confirmation of the implementations is welcome, but no open design questions remain.
 2. **Side-channel analysis** of the Argon2id / X25519 / ML-KEM call sites against the chosen target hardware. AI cannot reason about timing/cache leakage at compiled-code level.
 3. **Formal model** of the multi-key vault state machine (`seal_vault_with_keys`, `add_key_to_sealed`, `remove_key_from_sealed`, `change_vault_passphrase_with_keys`) to verify the invariant "any single registered key unlocks; passphrase change does not invalidate any key_blob".
-4. **External cryptographic audit** as listed in ARCHITECTURE.md → Bikeshed → "Security (pre-v1 gates)".
+4. **External cryptographic audit** as listed in ARCHITECTURE.md → Bikeshed → "Security (pre-v1)".
 5. **Hardware-attested testing** on de-Googled Android (GrapheneOS / CalyxOS) for the FIDO2 hmac-secret path. Out of scope of this static review.
 6. **Memory-forensics testing of gabbro itself** — **DONE (2026-06-01).** Implemented as a reproducible self-test: `rust/scripts/mem_forensics.sh` + the `--features forensics` harness (`rust/src/bin/mem_forensics.rs`). It seals a vault with two distinct high-entropy canaries (master passphrase + a Login entry's password), takes a `gcore` dump while unlocked (canaries present) and after lock (must be absent), and reports PASS/FAIL. The first run surfaced **F-11** (entry password lingered in the decrypted-body buffer); after the fix, 12/12 runs PASS. Reviewers can reproduce it. The GUI-process run is now done (2026-06-14 — see **F-12**: typed/viewed secrets persist in the Dart heap). Still recommended before v1: extend to the YubiKey-unlock path.
 

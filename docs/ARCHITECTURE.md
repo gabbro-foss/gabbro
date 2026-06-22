@@ -55,6 +55,7 @@ gabbro/
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper (+ Robolectric tests)
 ├── docs/                 # ARCHITECTURE, LEARNINGS, SECURITY, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/  test_driver/   # Flutter widget/unit + Linux real-FFI device suites
+├── test_data/            # Sample import files + migration_vaults/ (hardware migration corpus, one vault per VERSION + MIGRATION_TESTS.md)
 ├── assets/               # fonts, images, help/; public_suffix_list.dat (autofill eTLD+1)
 ├── challenge/            # crack-me challenge vault + rules
 └── CHANGELOG.md  README.md
@@ -88,60 +89,9 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task — F-03: harden the passphrase-only combiner (transcript binding), VERSION v7->v8
+### Next task
 
-**Plan approved 2026-06-22** (`~/.claude/plans/rustling-painting-papert.md`).
-
-**Decisions (locked):**
-- Scope = **passphrase-only ONLY**. YubiKey modes (single + multi-key) are sound and left
-  UNCHANGED — independent hardware factor; multi-key body uses a random master key. This also
-  avoids the only brick surface (multi-key `passphrase_blob` rewrap). Document as deliberate.
-- Fold `ct_M ‖ ephemeral_x25519_pub ‖ static_x25519_pub` into the HKDF `info`; label ->
-  `gabbro-hybrid-kex-v2`. Keep ML-KEM-1024. Argon2id untouched. New version = 8.
-- Why: closes F-03 ourselves ("gated on a human" -> "addressed; review welcome, not blocking");
-  PQ-safety at rest = AES-256+Argon2id (unaffected); belt-and-braces, no live hole.
-
-**Mechanism:** add `derive_vault_key_transcript_bound` in `hkdf.rs`; new const
-`TRANSCRIPT_BINDING_MIN_VERSION=8`; version-gate ONLY `seal_vault` + `open_vault` (the 6 other
-`derive_vault_key` callers stay unchanged); `combine_yubikey` unchanged. Migration: passphrase-only
-= fresh re-seal on save; YubiKey = version-byte bump only (proven v6->v7 path). `write_vault` atomic.
-
-**Progress:**
-- [x] Net-first sweep (all `derive_vault_key` callers mapped).
-- [x] Design decision (Option 1; passphrase-only scope).
-- [x] Green floor confirmed: backward-compat gate 10/10 (release, 2026-06-22).
-- [x] Canon-TDD scenario list approved (below).
-
-**Tests (RED first, backward-compat first) — tick as we go:**
-- [x] A1-A4. v6/v7 open + migrate + multikey + rotation under v8 — backward-compat gate 10/10
-  green against v8 code (2026-06-22). (v2-v5 stay out of scope per backward_compat.rs; v5-open
-  re-confirmed green. Rob-confirmed 2026-06-22.)
-- [x] B5. fresh passphrase-only seal -> version 8 (`seal_vault_produces_version_8`).
-- [x] B6/B7. v8 passphrase-only seal->open + serialize->open roundtrips (existing roundtrip tests,
-  now at v8).
-- [x] B8. v7 passphrase-only opened+saved under v8 -> v8 and re-opens (`v7_..._migrates...` in gate).
-- [x] C9/C10. bound recipe != legacy; flipping ct_M / ephemeral_pub / static_pub each changes key.
-- [x] C11. version dispatch: v7 -> legacy, v8 -> bound (`derive_passphrase_vault_key_dispatches...`).
-- [x] D12. v8 fixtures generated; backward-compat gate extended -> 12/12 green (incl. v8 in all
-  three rotation/change scenarios).
-- [x] D13. state-machine fuzzer green with v6/v7/v8 fixture rotation (caught + fixed a baseline
-  version-assert bug; 57s, release-only).
-
-**Code + tests + docs DONE and green:** `hkdf.rs` `derive_vault_key_transcript_bound` + `INFO_V2`;
-`vault_crypto.rs` `TRANSCRIPT_BINDING_MIN_VERSION=8` + dispatch wired at `seal_vault`/`open_vault`
-only; `file_format.rs` VERSION 7->8; v8 fixtures; gate 12/12; fuzzer v6/v7/v8; fmt+clippy clean;
-F-03 re-scoped to "addressed" across SECURITY / AI_SECURITY_AUDIT / CHANGELOG / FIXTURES.
-
-**Remaining:** Rob's full `gabbro_test` gate -> hardware pass (passphrase-only vault: seal on the
-old build, open+migrate on the new build; YubiKey vault still opens; Linux + Android) -> consider
-v0.1.0-alpha.9 (security enhancement).
-
-### Open from the security audit
-
-Full per-finding status and detail live in `AI_SECURITY_AUDIT.md`. All tracked findings are
-addressed — **F-03** (combiner transcript binding) was closed for passphrase-only at VERSION 8
-(2026-06-22). A human cryptography review of `rust/src/crypto/` stays a welcome-but-not-blocking
-pre-v1 goal (Bikeshed).
+_(none agreed — set at session start)_
 
 ---
 
@@ -157,8 +107,8 @@ release process live in their own document:
 
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
-### Security (pre-v1 gates)
-- Human expert cryptography review of `rust/src/crypto/` (ETH/EPFL academic outreach, RustCrypto maintainers, or formal audit).
+### Security (pre-v1)
+- Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX

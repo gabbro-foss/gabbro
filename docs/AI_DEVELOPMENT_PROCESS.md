@@ -96,12 +96,14 @@ one expert's eyes*:
   build can still read them — a release gate that does not depend on anyone
   reading the diff correctly.
 - **An explicit AI security audit** (`AI_SECURITY_AUDIT.md`) with per-finding
-  tracking, and findings that are *still open and gated on a human*.
-- **A standing rule that the cryptography is not "done" until a human expert
-  reviews it.** The hybrid combiner change (F-03) is deferred specifically
-  because there is "no single verifiable-against-spec answer → genuinely needs a
-  human cryptographer's judgement." That is the inverse of vibe coding: the
-  project refuses to ship the part it can't yet verify.
+  tracking. Every tracked finding is now addressed or by-design.
+- **A standing rule that the cryptography is treated as unverified until it is
+  either fixed in-house with tests or reviewed by a human expert.** The one
+  finding that needed design judgment — the hybrid combiner (F-03) — was hardened
+  in-house at VERSION 8 (transcript binding), proven by the backward-compat gate
+  and hardware migration tests before shipping; external cryptographer review
+  remains welcome as defence-in-depth but is no longer a blocking gate. That is
+  the inverse of vibe coding: the project verifies before it ships.
 - **Honest alpha labelling.** Releases ship with: *"The cryptographic
   implementation has not undergone external review. Do not store passwords you
   cannot afford to lose."* No false confidence is sold to users.
@@ -109,8 +111,9 @@ one expert's eyes*:
 So the fair statement is: Gabbro is **AI-written but not vibe-coded**, because the
 two things vibe coding discards — design direction and review — are both present.
 Direction is fully human; review is real but *mediated* — through tests, an audit
-process, incident-driven safety nets, and an explicit pre-v1 human-cryptographer
-gate — rather than resting on the author's unaided mastery of four languages.
+process, incident-driven safety nets, and a standing invitation to external
+cryptographer review — rather than resting on the author's unaided mastery of four
+languages.
 
 ---
 
@@ -125,12 +128,13 @@ Gentoo's concern is sharpest for crypto, and rightly. Two things matter here:
    routine. Gabbro's novel surface is *composition* — how vetted pieces are wired
    together — not primitive implementation.
 
-2. **The composition is exactly what's gated on human review.** The combiner
+2. **The composition is exactly what the audit scrutinised most.** The combiner
    construction, transcript binding, and KDF wiring are the things the security
-   audit and the deferred-to-a-cryptographer items target. The project's posture
-   is to treat its own crypto wiring as unverified until a specialist signs off —
-   which is the responsible reading of Gentoo's warning, not a contradiction of
-   it.
+   audit targeted; the one open design question (F-03) was hardened in-house and
+   pinned by the backward-compat gate + hardware tests. The project's posture is
+   to verify its own crypto wiring with frozen-fixture and migration gates and to
+   keep external specialist review open — which is the responsible reading of
+   Gentoo's warning, not a contradiction of it.
 
 A reasonable critic could still say: "until that external review happens, I
 wouldn't ship it." That is a defensible position, and it is *the same position

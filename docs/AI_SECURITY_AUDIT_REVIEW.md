@@ -3,7 +3,7 @@
 **Date:** 2026-06-11
 **Auditor:** Claude Fable 5 (AI-assisted review of an AI-assisted review)
 **Scope:** Critical assessment of `AI_SECURITY_AUDIT.md` (Claude Opus 4.7, 2026-05-31) plus targeted code verification of its claims and of surfaces it did not cover (AndroidManifest, `lib/` Flutter layer, process hardening).
-**Status:** Pre-v1 informational review. Same caveats as the original: severities are AI estimates; nothing here unblocks the human-cryptographer pre-v1 gate.
+**Status:** Pre-v1 informational review. Same caveats as the original: severities are AI estimates. The one open design question (F-03) is since addressed at VERSION 8 (2026-06-22), so human-cryptographer review is welcome as defence-in-depth but no longer a blocking pre-v1 gate.
 
 > **Reading note.** This is a findings report complementing `AI_SECURITY_AUDIT.md`,
 > not replacing it. Finding IDs here use the **R-** prefix to avoid collision with
@@ -332,7 +332,7 @@ minimise secret lifetime in Dart, and *measure* it.
 
 ## Priority order (most user-safety per hour of work)
 
-**All review findings (R-01…R-07) and the S-1/S-3 scope notes are closed** — see the status table. Remaining audit items live in `AI_SECURITY_AUDIT.md`: F-03 (human cryptographer) and F-10 (post-v1).
+**All review findings (R-01…R-07) and the S-1/S-3 scope notes are closed** — see the status table. The two items `AI_SECURITY_AUDIT.md` once listed as remaining are also resolved: F-03 addressed (VERSION 8), F-10 fixed (optional Strict-FQDN toggle is post-v1 polish). Nothing blocks v1.
 
 None of these need a cryptographer; all are the kind of thing the eventual
 human reviewer will check first.
