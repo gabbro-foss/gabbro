@@ -88,37 +88,48 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task — F-03: harden the hybrid combiner (transcript-binding) + document
+### Next task — F-03: harden the passphrase-only combiner (transcript binding), VERSION v7->v8
 
-**Decision (2026-06-22):** do the F2 hardening ourselves, then document; defer reviewer
-outreach. Reasoning:
-- Our combiner is `HKDF-SHA256(ss_M ‖ ss_X)`, salted, ML-KEM-1024 — **not X-Wing**
-  (naming fixed this session). Sound in isolation (Finding 1).
-- The transcript (`ct_M`, ephemeral pubkey) is currently bound only via the AES-GCM AAD
-  (Finding 2). Harden: also fold it into the HKDF so the derived key is transcript-bound
-  independent of the AEAD.
-- For passphrase-derived vaults the ML-KEM+X25519 layer adds no brute-force resistance
-  beyond Argon2id (everything derives from the passphrase), and Argon2id->AES-256-GCM is
-  already PQ-secure at rest (Finding 3). **Keep it anyway** for defence-in-depth + any
-  future encrypt-to-pubkey feature; document honestly that AES-256+Argon2id (not the KEM)
-  is what makes Gabbro PQ at rest. The YubiKey path is sound and separate.
-- Doing this ourselves downgrades F-03 from "gated on a human" to "addressed; external
-  review welcome, not blocking" — unblocks publishing.
+**Plan approved 2026-06-22** (`~/.claude/plans/rustling-painting-papert.md`).
 
-**Phased plan (tick as we go):**
-- [ ] 1. Net-first sweep: grep ALL callers of `derive_vault_key` in `rust/src/` (incl.
-  test-only — `cargo build` misses them); list every seal/open/change-passphrase/reseal
-  path that must not regress.
-- [ ] 2. Design decision (Rob confirms): what to fold into the binding. Proposal:
-  `ct_M ‖ ephemeral_x25519_pub ‖ static_x25519_pub` into the HKDF `info`.
-- [ ] 3. Canon-TDD scenario list; STOP for Rob review before any test code.
-- [ ] 4. Red->green: backward-compat first (every v2–v7 fixture still opens), v8 round-trip,
-  tampered-transcript fails to open.
-- [ ] 5. Fixtures + gate: generate `v8_passphrase.gabbro` + `v8_multikey_2keys.gabbro`;
-  extend the backward-compat gate.
-- [ ] 6. Docs: re-scope F-03 to "addressed" (ARCHITECTURE / SECURITY / AI_SECURITY_AUDIT);
-  CHANGELOG; FIXTURES; capture the keep-ML-KEM rationale.
-- [ ] 7. Rob hardware pass -> consider v0.1.0-alpha.9 (security enhancement).
+**Decisions (locked):**
+- Scope = **passphrase-only ONLY**. YubiKey modes (single + multi-key) are sound and left
+  UNCHANGED — independent hardware factor; multi-key body uses a random master key. This also
+  avoids the only brick surface (multi-key `passphrase_blob` rewrap). Document as deliberate.
+- Fold `ct_M ‖ ephemeral_x25519_pub ‖ static_x25519_pub` into the HKDF `info`; label ->
+  `gabbro-hybrid-kex-v2`. Keep ML-KEM-1024. Argon2id untouched. New version = 8.
+- Why: closes F-03 ourselves ("gated on a human" -> "addressed; review welcome, not blocking");
+  PQ-safety at rest = AES-256+Argon2id (unaffected); belt-and-braces, no live hole.
+
+**Mechanism:** add `derive_vault_key_transcript_bound` in `hkdf.rs`; new const
+`TRANSCRIPT_BINDING_MIN_VERSION=8`; version-gate ONLY `seal_vault` + `open_vault` (the 6 other
+`derive_vault_key` callers stay unchanged); `combine_yubikey` unchanged. Migration: passphrase-only
+= fresh re-seal on save; YubiKey = version-byte bump only (proven v6->v7 path). `write_vault` atomic.
+
+**Progress:**
+- [x] Net-first sweep (all `derive_vault_key` callers mapped).
+- [x] Design decision (Option 1; passphrase-only scope).
+- [x] Green floor confirmed: backward-compat gate 10/10 (release, 2026-06-22).
+- [x] Canon-TDD scenario list approved (below).
+
+**Tests to write (RED first, backward-compat first) — tick as we go:**
+- [ ] A1. v6 & v7 passphrase-only still open under v8 (old recipe via version-gate).
+- [ ] A2. v6 & v7 passphrase-only: open -> save -> on-disk version == 8.
+- [ ] A3. v6 & v7 multikey still open with each key under v8 (YubiKey modes untouched).
+- [ ] A4. yubikey + passphrase rotation across the v8 bump (extend existing).
+- [ ] B5. fresh passphrase-only seal -> version 8 (update `seal_vault_produces_version_7`).
+- [ ] B6. v8 passphrase-only seal -> open roundtrip.
+- [ ] B7. v8 passphrase-only lock -> unlock disk roundtrip.
+- [ ] B8. v7 passphrase-only opened+saved under v8 -> becomes v8 and re-opens (migration).
+- [ ] C9. bound recipe != legacy recipe (same secrets/salt).
+- [ ] C10. flipping `ct_M` / `ephemeral_pub` / `static_pub` each changes the key.
+- [ ] C11. version dispatch: v7 -> legacy, v8 -> bound.
+- [ ] D12. generate v8 fixtures (`v8_passphrase`, `v8_multikey_2keys`); extend backward-compat gate.
+- [ ] D13. state-machine fuzzer still green + add v8 multikey fixture (#ignore, release-only).
+
+**Then:** implement (red->green) -> fixtures -> docs (re-scope F-03 "addressed" in ARCHITECTURE /
+SECURITY / AI_SECURITY_AUDIT; CHANGELOG; FIXTURES; the deliberate "YubiKey modes not hardened"
+note) -> Rob hardware pass (Linux+Android) -> consider v0.1.0-alpha.9 (security enhancement).
 
 ### Open from the security audit
 
