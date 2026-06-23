@@ -152,25 +152,6 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
                 val pin = call.argument<String>("pin")?.toCharArray()
                 val transport = call.argument<String>("transport") ?: "usb"
                 when (call.method) {
-                    "register_and_get_hmac" -> {
-                        val saltHex = call.argument<String>("salt")
-                        if (saltHex == null) {
-                            result.error("BAD_ARGS", "salt required", null)
-                            return@setMethodCallHandler
-                        }
-                        tapFlow.run(result, transport, "REGISTER_HMAC_FAILED") { conn, onOk, onErr ->
-                            YubiKeyManager.registerAndGetHmac(
-                                conn, saltHex.fromHex(), pin,
-                                onSuccess = { credId, hmacSecret ->
-                                    onOk(mapOf(
-                                        "credentialId" to credId.toHex(),
-                                        "hmacSecret" to hmacSecret.toHex(),
-                                    ))
-                                },
-                                onError = onErr,
-                            )
-                        }
-                    }
                     "register" -> {
                         tapFlow.run(result, transport, "REGISTER_FAILED") { conn, onOk, onErr ->
                             YubiKeyManager.register(

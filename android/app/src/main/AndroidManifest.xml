@@ -103,18 +103,6 @@
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize" />
 
-        <!--
-            AutofillSettingsActivity — reachable from Android Settings →
-            Autofill service → Settings (via autofill_service_config.xml).
-            Renders the Flutter autofill settings route.
-        -->
-        <activity
-            android:name=".AutofillSettingsActivity"
-            android:exported="true"
-            android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
