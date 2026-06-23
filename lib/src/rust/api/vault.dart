@@ -6,8 +6,8 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `add_days_to_timestamp`, `card_entry_to_data`, `custom_entry_to_data`, `custom_field_to_data`, `days_from_ymd`, `days_to_ymd`, `entry_id`, `file_entry_to_data`, `identity_entry_to_data`, `is_expired`, `is_leap`, `login_entry_to_data`, `mask_entry`, `note_entry_to_data`, `previous_secret_to_data`, `purge_expired_history`, `write_sha256_companion`
-// These functions are ignored (category: IgnoreBecauseExplicitAttribute): `add_yubikey_to_vault`, `build_passphrase_only_bytes`, `change_passphrase_with_keys`, `change_passphrase`, `delete_entry`, `delete_whole_vault`, `export_vault_preserving`, `export_vault`, `get_entry_by_id`, `list_entries`, `load_vault_with_key_record`, `load_vault_with_yubikey`, `load_vault`, `remove_yubikey_from_vault`, `reseal_vault_body`, `save_vault_with_keys`, `save_vault_with_yubikey`, `save_vault`, `sha256_line`, `update_entry`
+// These functions are ignored because they are not marked as `pub`: `add_days_to_timestamp`, `custom_field_to_data`, `days_from_ymd`, `days_to_ymd`, `entry_id`, `is_expired`, `is_leap`, `login_entry_to_data`, `mask_entry`, `previous_secret_to_data`, `purge_expired_history`, `write_sha256_companion`
+// These functions are ignored (category: IgnoreBecauseExplicitAttribute): `add_yubikey_to_vault`, `build_passphrase_only_bytes`, `change_passphrase_with_keys`, `change_passphrase`, `delete_entry`, `delete_whole_vault`, `export_vault_preserving`, `export_vault`, `list_entries`, `load_vault_with_key_record`, `load_vault_with_yubikey`, `load_vault`, `remove_yubikey_from_vault`, `reseal_vault_body`, `save_vault_with_keys`, `save_vault_with_yubikey`, `save_vault`, `sha256_line`, `update_entry`
 
 /// Creates a new login entry with a generated UUID and current timestamp.
 ///
@@ -29,97 +29,6 @@ Future<LoginEntryData> createLoginEntry({
   password: password,
   notes: notes,
   customFields: customFields,
-);
-
-/// Creates a new note entry with a generated UUID and current timestamp.
-Future<NoteEntryData> createNoteEntry({
-  required String folder,
-  required String title,
-  required String content,
-  required List<CustomFieldData> customFields,
-}) => RustLib.instance.api.crateApiVaultCreateNoteEntry(
-  folder: folder,
-  title: title,
-  content: content,
-  customFields: customFields,
-);
-
-/// Creates a new identity entry with a generated UUID and current timestamp.
-Future<IdentityEntryData> createIdentityEntry({
-  required String folder,
-  required String firstName,
-  required String lastName,
-  required String email,
-  String? phone,
-  String? address,
-}) => RustLib.instance.api.crateApiVaultCreateIdentityEntry(
-  folder: folder,
-  firstName: firstName,
-  lastName: lastName,
-  email: email,
-  phone: phone,
-  address: address,
-);
-
-/// Creates a new card entry with a generated UUID and current timestamp.
-///
-/// Returns an error if the card number does not contain 12-19 digits.
-Future<CardEntryData> createCardEntry({
-  required String folder,
-  String? cardName,
-  required String status,
-  required String cardholderName,
-  required String cardNumber,
-  required String expiry,
-  required String cvv,
-  String? creditLimit,
-  String? cardAccountNumber,
-  String? paymentNetwork,
-  String? pin,
-  String? bankName,
-  String? transactionPassword,
-  String? notes,
-}) => RustLib.instance.api.crateApiVaultCreateCardEntry(
-  folder: folder,
-  cardName: cardName,
-  status: status,
-  cardholderName: cardholderName,
-  cardNumber: cardNumber,
-  expiry: expiry,
-  cvv: cvv,
-  creditLimit: creditLimit,
-  cardAccountNumber: cardAccountNumber,
-  paymentNetwork: paymentNetwork,
-  pin: pin,
-  bankName: bankName,
-  transactionPassword: transactionPassword,
-  notes: notes,
-);
-
-/// Creates a new file entry with a generated UUID and current timestamp.
-Future<FileEntryData> createFileEntry({
-  required String folder,
-  required String filename,
-  required List<int> data,
-  String? notes,
-  required List<CustomFieldData> customFields,
-}) => RustLib.instance.api.crateApiVaultCreateFileEntry(
-  folder: folder,
-  filename: filename,
-  data: data,
-  notes: notes,
-  customFields: customFields,
-);
-
-/// Creates a new custom entry with a generated UUID and current timestamp.
-Future<CustomEntryData> createCustomEntry({
-  required String folder,
-  required String title,
-  required List<CustomFieldData> fields,
-}) => RustLib.instance.api.crateApiVaultCreateCustomEntry(
-  folder: folder,
-  title: title,
-  fields: fields,
 );
 
 /// Returns the current UTC time as an ISO 8601 string.

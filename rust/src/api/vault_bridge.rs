@@ -548,14 +548,6 @@ pub async fn restore_vault_from_file(path: String, source: String) -> Result<(),
     )
 }
 
-/// R-03: delete the `.bak` safety copy without touching the vault.
-///
-/// For the case where the backup itself is corrupt and the user chooses to
-/// discard it — on Android, app-private storage offers no other way to do so.
-pub async fn delete_vault_backup(path: String) -> Result<(), String> {
-    crate::vault::io::remove_backup(std::path::Path::new(&path))
-}
-
 /// Clear the previous password history for a Login entry and persist.
 ///
 /// Async — triggers a full vault save.
@@ -840,44 +832,6 @@ pub async fn init_vault_with_keys(
     )
 }
 
-/// Create a new empty vault at `path`, sealed with both passphrase and YubiKey.
-///
-/// `alias` is stored in the VERSION 5 plaintext header and travels with the file.
-/// Called during onboarding when the user opts in to YubiKey protection.
-/// After creation, unlocks into session immediately.
-/// `hmac_secret` must be exactly 32 bytes. `hkdf_salt` must be exactly 32 bytes.
-/// Async — runs Argon2id + encryption.
-pub async fn init_vault_with_yubikey(
-    passphrase: Vec<u8>,
-    hmac_secret: Vec<u8>,
-    credential_id: Vec<u8>,
-    hkdf_salt: Vec<u8>,
-    path: String,
-    alias: Option<String>,
-) -> Result<(), String> {
-    use crate::crypto::vault_crypto::seal_vault_with_yubikey;
-    use crate::vault::io::write_vault;
-    use crate::vault::serialization::{serialize_vault_body, VaultBody};
-    let secret: [u8; 32] = hmac_secret
-        .try_into()
-        .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
-    let salt: [u8; 32] = hkdf_salt
-        .try_into()
-        .map_err(|_| "hkdf_salt must be exactly 32 bytes".to_string())?;
-    let vault_path = PathBuf::from(&path);
-    let plaintext = serialize_vault_body(&VaultBody::empty())?;
-    let sealed = seal_vault_with_yubikey(
-        &passphrase,
-        &secret,
-        credential_id.clone(),
-        salt,
-        &plaintext,
-        alias,
-    )?;
-    write_vault(&sealed, &vault_path)?;
-    session::unlock_vault_with_yubikey(&passphrase, &secret, credential_id, &salt, vault_path)
-}
-
 // ── YubiKey key-management bridge ─────────────────────────────────────────────
 
 /// Alias record for one registered YubiKey, returned by `list_yubikey_aliases`.
@@ -1034,9 +988,6 @@ mod tests {
 
         // R-03 P3: a rotted .bak must report not usable — the offer cannot lie.
         std::fs::write(&bak, b"rotted backup").unwrap();
-        assert!(!run(vault_backup_usable(path_s.clone())));
-
-        run(delete_vault_backup(path_s.clone())).expect("delete backup must succeed");
         assert!(!run(vault_backup_usable(path_s)));
 
         let _ = std::fs::remove_file(&path);
@@ -1572,43 +1523,6 @@ mod tests {
         assert_eq!(summaries.len(), 0, "empty vault must have no entries");
 
         lock_vault().unwrap();
-        let _ = std::fs::remove_file(&path);
-        let _ = std::fs::remove_file(format!("{}.bak", path.display()));
-    }
-
-    #[test]
-    #[serial]
-    fn init_vault_with_yubikey_creates_and_unlocks() {
-        use std::env::temp_dir;
-
-        let mut path = temp_dir();
-        path.push("gabbro_bridge_yubikey_init_test.gabbro");
-        let pass = b"init-yubikey-pass";
-        let hmac_secret = [0x55u8; 32];
-        let credential_id = vec![0xEFu8; 32];
-        let hkdf_salt = [0x33u8; 32];
-
-        run(init_vault_with_yubikey(
-            pass.to_vec(),
-            hmac_secret.to_vec(),
-            credential_id.clone(),
-            hkdf_salt.to_vec(),
-            path.to_str().unwrap().to_string(),
-            None,
-        ))
-        .unwrap();
-
-        // Session is live after init
-        let summaries = list_entry_summaries().unwrap();
-        assert_eq!(summaries.len(), 0, "fresh vault must be empty");
-
-        lock_vault().unwrap();
-
-        // Vault file must carry the YubiKey record
-        let records = list_vault_yubikey_records(path.to_str().unwrap().to_string()).unwrap();
-        assert_eq!(records.len(), 1, "init must write YubiKey record");
-        assert_eq!(records[0].credential_id, credential_id);
-
         let _ = std::fs::remove_file(&path);
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
     }

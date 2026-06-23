@@ -6,9 +6,6 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-String greet({required String name}) =>
-    RustLib.instance.api.crateApiSimpleGreet(name: name);
-
 /// Raise (`true`) or lower (`false`) the process `PR_SET_DUMPABLE` flag.
 ///
 /// The Linux picker layer raises it only while a native file dialog is open so

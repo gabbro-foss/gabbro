@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Autofill service configuration for GabbroAutofillService.
-    android:settingsActivity points to the Flutter screen the user reaches
-    from Android Settings → Autofill service → Settings.
+    No per-service settings screen is exposed; all settings live in the main app.
     See: https://developer.android.com/reference/android/service/autofill/AutofillService
 -->
 <autofill-service
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:settingsActivity="app.gabbro.gabbro.AutofillSettingsActivity" />
+    xmlns:android="http://schemas.android.com/apk/res/android" />
