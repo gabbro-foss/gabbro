@@ -69,7 +69,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 538 | 8 |
+| Rust (`cargo test -q`) | 523 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 12 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 868 | 0 |
@@ -91,7 +91,13 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-_(none agreed — set at session start)_
+Dead-code audit (branch `dead-code-audit`). Removed redundant Rust FFI: `EntryType`,
+`greet`, 5 `create_*_entry` wrappers + their DTO helpers, `get_entry_by_id`,
+`delete_vault_backup`, legacy single-key `init_vault_with_yubikey`; plus 5 unused logo
+PNGs (`_96`/`_128`). Bridge regenerated; `cargo build`/`clippy --all-targets`/`flutter
+analyze` green; coverage proven preserved (entry.rs struct tests + bridge roundtrip).
+**Pending: full gate + Linux/Android hardware matrix before merge to master.** Kotlin
+dead path + autofill-settings crash bug deferred to Bikeshed.
 
 ---
 
@@ -116,8 +122,14 @@ release process live in their own document:
 - Anonymous user feedback -> two wordclouds (one "what works", one "to improve"), in the teachtogether.tech formative-feedback spirit, published on GitHub. Must stay OUT of the app (no in-app network call - offline/no-telemetry DNA): external link to a no-login form (CryptPad/Framaforms/Nextcloud Forms) -> manual export -> generate two PNGs -> commit + embed in README. Needs moderation (anon free text = spam/abuse): cap to single words, profanity filter, curate before publishing.
 
 ### Code Quality
-- Audit the full code base for dead-code
 - Audit the code base for data leaks and attack surfaces
+- **Dead Kotlin path (`register_and_get_hmac`).** The channel branch +
+  `YubiKeyManager.registerAndGetHmac` + its 4 unit tests are unreachable — Dart registers
+  via separate `register` + `get_hmac_secret`. Remove in an Android hardware session.
+- **`AutofillSettingsActivity` missing class (crash bug).** `AndroidManifest.xml` +
+  `autofill_service_config.xml` reference `app.gabbro.gabbro.AutofillSettingsActivity` but
+  no Kotlin class exists -> `ActivityNotFoundException` if the user opens the autofill
+  service's settings. Either implement it or drop the `settingsActivity`/manifest entry.
 - **Autofill save loose ends.** Hardware-verify the localized "No credentials found" dialog (F2,
   fill path, no match). Native review of the best-effort `eu`/`kk`/`yo` save-flow translations.
 - **Deprecated `Dataset.Builder.setValue` (autofill).** `setValue(AutofillId, AutofillValue,
