@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Removed
-- Dead-code audit cleanup: unused Rust FFI (`EntryType`, demo `greet`, the redundant typed `create_*_entry` constructors superseded by the generic `createEntry`, `get_entry_by_id`, `delete_vault_backup`, legacy single-key `init_vault_with_yubikey`) and 5 unreferenced logo PNGs. No behaviour change; bridge regenerated and test coverage preserved.
+- Dead-code audit cleanup: unused Rust FFI (`EntryType`, demo `greet`, the redundant typed `create_*_entry` constructors superseded by the generic `createEntry`, `get_entry_by_id`, `delete_vault_backup`, legacy single-key `init_vault_with_yubikey`), the unreachable Kotlin `register_and_get_hmac` path, a dangling `AutofillSettingsActivity` manifest/config reference (an exported activity declared for a non-existent class), and 5 unreferenced logo PNGs. No behaviour change; bridge regenerated and test coverage preserved.
 
 ## [0.1.0-alpha.9] – 2026-06-22
 
