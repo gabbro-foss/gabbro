@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Managing folders no longer throws an unhandled exception when a rename, add, or delete fails (e.g. a name that already exists) — the error is shown in a SnackBar. Renaming a folder to its unchanged name is now a no-op instead of an error.
+
 ### Removed
 - Dead-code audit cleanup: unused Rust FFI (`EntryType`, demo `greet`, the redundant typed `create_*_entry` constructors superseded by the generic `createEntry`, `get_entry_by_id`, `delete_vault_backup`, legacy single-key `init_vault_with_yubikey`), the unreachable Kotlin `register_and_get_hmac` path, a dangling `AutofillSettingsActivity` manifest/config reference (an exported activity declared for a non-existent class), and 5 unreferenced logo PNGs. No behaviour change; bridge regenerated and test coverage preserved.
 
