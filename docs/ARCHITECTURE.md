@@ -91,15 +91,11 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-Dead-code audit (branch `dead-code-audit`). Removed redundant Rust FFI (`EntryType`,
-`greet`, 5 `create_*_entry` wrappers + DTO helpers, `get_entry_by_id`,
-`delete_vault_backup`, legacy single-key `init_vault_with_yubikey`), the unreachable
-Kotlin `register_and_get_hmac` path (channel branch + `YubiKeyManager.registerAndGetHmac`;
-cross-transport hardware-test stubs re-pointed to the live `register()`), the dangling
-`AutofillSettingsActivity` manifest/config reference, and 5 unused logo PNGs. Bridge
-regenerated. `cargo build`/`clippy --all-targets`/`flutter analyze`/Kotlin compile green;
-coverage proven preserved (entry.rs struct tests + bridge roundtrip).
-**Pending: full gate + Linux/Android hardware matrix before merge to master.**
+_(none agreed — set at session start)_
+
+Dead-code audit DONE 2026-06-23: merged to master; gate + Linux/Android hardware matrix
+green for all changed-code areas. The matrix surfaced 3 **pre-existing** bugs (not
+regressions) -> filed under Bikeshed / Bugs.
 
 ---
 
@@ -115,6 +111,21 @@ release process live in their own document:
 
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
+### Bugs (found 2026-06-23 hardware matrix; all pre-existing, not from the dead-code change)
+- **Autofill no-match shows the wrong message.** Triggering autofill on a site with no
+  matching credential unlocks the vault, then reports "could not unlock vault (wrong
+  credentials)" (false — unlock succeeded) instead of a "no matching credential" message.
+  Seen with the app in French, so likely tangled with l10n of the no-match path. (This is
+  the concrete failure of the old "hardware-verify the No credentials found dialog F2" item.)
+- **Biometric fails after a passphrase change (Android).** After changing the passphrase,
+  biometric unlock no longer works; the user must unlock with the new passphrase, then
+  disable + re-enable biometric. The stored biometric secret is bound to the old passphrase
+  and isn't re-wrapped on change.
+- **Folder rename to a duplicate name throws an unhandled exception.**
+  `manage_folders_screen.dart:141` calls `renameFolder` with no `try/catch`, so the Rust
+  `Err("Folder already exists")` becomes an unhandled exception. Wrap it like the entry
+  screens do and surface a SnackBar. (Both platforms.)
+
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
@@ -125,8 +136,8 @@ release process live in their own document:
 
 ### Code Quality
 - Audit the code base for data leaks and attack surfaces
-- **Autofill save loose ends.** Hardware-verify the localized "No credentials found" dialog (F2,
-  fill path, no match). Native review of the best-effort `eu`/`kk`/`yo` save-flow translations.
+- **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
+  translations. (The no-match dialog was hardware-verified and is broken -> see Bikeshed / Bugs.)
 - **Deprecated `Dataset.Builder.setValue` (autofill).** `setValue(AutofillId, AutofillValue,
   RemoteViews)` is deprecated; replace with `setField(AutofillId, Field)` (Field carries the
   value + a `Presentations`/`RemoteViews`). Call sites: `GabbroAutofillService.buildAuthResponse`
