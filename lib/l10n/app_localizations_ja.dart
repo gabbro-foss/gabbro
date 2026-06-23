@@ -59,8 +59,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get autofillNoMatchTitle => '認証情報が見つかりません';
 
   @override
-  String get autofillNoMatchBody =>
-      'このアプリまたはサイトに一致する保存済みログインはありません。信頼できる場合は、認証情報を手動で貼り付けてください。';
+  String get autofillNoMatchBody => 'このアプリまたはサイトに一致する保存済みのログインはありません。';
 
   @override
   String get add => '追加';

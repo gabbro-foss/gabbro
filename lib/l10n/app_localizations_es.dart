@@ -61,7 +61,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Ningún inicio de sesión guardado coincide con esta app o sitio. Si confías en él, pega tus credenciales manualmente.';
+      'Ningún inicio de sesión guardado coincide con esta app o sitio.';
 
   @override
   String get add => 'Añadir';

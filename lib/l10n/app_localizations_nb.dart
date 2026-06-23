@@ -61,7 +61,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Ingen lagret innlogging samsvarer med denne appen eller dette nettstedet. Hvis du stoler på det, kan du lime inn påloggingsinformasjonen manuelt.';
+      'Ingen lagret pålogging samsvarer med denne appen eller dette nettstedet.';
 
   @override
   String get add => 'Legg til';

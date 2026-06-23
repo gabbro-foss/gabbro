@@ -61,7 +61,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Żadne zapisane logowanie nie pasuje do tej aplikacji ani witryny. Jeśli jej ufasz, wklej swoje dane ręcznie.';
+      'Żadne zapisane dane logowania nie pasują do tej aplikacji ani witryny.';
 
   @override
   String get add => 'Dodaj';

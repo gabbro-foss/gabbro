@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Već sačuvano sa ovom lozinkom.",
   "saveConfirmSwitchVaultHint": "Da sačuvate u drugi trezor, prvo zaključajte ovaj.",
   "autofillNoMatchTitle": "Nisu pronađeni akreditivi",
-  "autofillNoMatchBody": "Nijedna sačuvana prijava ne odgovara ovoj aplikaciji ili sajtu. Ako mu verujete, ručno nalepite svoje akreditive.",
+  "autofillNoMatchBody": "Nijedna sačuvana prijava ne odgovara ovoj aplikaciji ili sajtu.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

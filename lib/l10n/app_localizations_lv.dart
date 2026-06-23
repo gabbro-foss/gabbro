@@ -61,7 +61,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Neviena saglabāta pieteikšanās neatbilst šai lietotnei vai vietnei. Ja tai uzticaties, ielīmējiet datus manuāli.';
+      'Neviena saglabātā pieteikšanās neatbilst šai lietotnei vai vietnei.';
 
   @override
   String get add => 'Pievienot';

@@ -61,7 +61,7 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Kò sí wọlé tí a fi pamọ́ tí ó bá app tàbí ojú-òpó yìí mu. Tí o bá gbẹ́kẹ̀lé e, lẹ̀ ìwé-ẹ̀rí rẹ pẹ̀lú ọwọ́.';
+      'Kò sí ìwọlé tí a fipamọ́ tí ó bá ohun-èlò tàbí ojú-òpó yìí mu.';
 
   @override
   String get add => 'Fi kun';

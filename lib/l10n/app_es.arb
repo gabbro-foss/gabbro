@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Ya guardado con esta contraseña.",
   "saveConfirmSwitchVaultHint": "Para guardar en otro almacén, bloquea este primero.",
   "autofillNoMatchTitle": "No se encontraron credenciales",
-  "autofillNoMatchBody": "Ningún inicio de sesión guardado coincide con esta app o sitio. Si confías en él, pega tus credenciales manualmente.",
+  "autofillNoMatchBody": "Ningún inicio de sesión guardado coincide con esta app o sitio.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

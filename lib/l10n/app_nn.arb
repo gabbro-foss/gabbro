@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Allereie lagra med dette passordet.",
   "saveConfirmSwitchVaultHint": "Lås dette kvelvet først for å lagre i eit anna kvelv.",
   "autofillNoMatchTitle": "Ingen innloggingsdetaljar funne",
-  "autofillNoMatchBody": "Inga lagra innlogging samsvarar med denne appen eller denne nettstaden. Viss du stolar på han, kan du lime inn innloggingsinformasjonen manuelt.",
+  "autofillNoMatchBody": "Inga lagra innlogging samsvarar med denne appen eller dette nettstadet.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

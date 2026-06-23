@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Juba salvestatud selle parooliga.",
   "saveConfirmSwitchVaultHint": "Teise seifi salvestamiseks lukusta esmalt see.",
   "autofillNoMatchTitle": "Mandaate ei leitud",
-  "autofillNoMatchBody": "Ükski salvestatud sisselogimine ei sobi selle rakenduse või saidiga. Kui usaldad seda, kleebi oma andmed käsitsi.",
+  "autofillNoMatchBody": "Ükski salvestatud sisselogimine ei vasta sellele rakendusele ega saidile.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

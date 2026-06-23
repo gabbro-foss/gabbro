@@ -61,7 +61,7 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Žiadne uložené prihlásenie nezodpovedá tejto aplikácii ani webu. Ak mu dôverujete, vložte svoje údaje ručne.';
+      'Žiadne uložené prihlásenie nezodpovedá tejto aplikácii ani webu.';
 
   @override
   String get add => 'Pridať';

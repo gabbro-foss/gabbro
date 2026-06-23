@@ -61,7 +61,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Nobena shranjena prijava se ne ujema s to aplikacijo ali spletnim mestom. Če mu zaupate, ročno prilepite svoje poverilnice.';
+      'Nobena shranjena prijava se ne ujema s to aplikacijo ali spletnim mestom.';
 
   @override
   String get add => 'Dodaj';

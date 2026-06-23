@@ -61,7 +61,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Mikään tallennettu kirjautuminen ei vastaa tätä sovellusta tai sivustoa. Jos luotat siihen, liitä tietosi manuaalisesti.';
+      'Mikään tallennettu kirjautuminen ei vastaa tätä sovellusta tai sivustoa.';
 
   @override
   String get add => 'Lisää';

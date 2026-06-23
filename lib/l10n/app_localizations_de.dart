@@ -62,7 +62,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Keine gespeicherte Anmeldung passt zu dieser App oder Website. Wenn Sie ihr vertrauen, fügen Sie Ihre Zugangsdaten manuell ein.';
+      'Keine gespeicherte Anmeldung passt zu dieser App oder Website.';
 
   @override
   String get add => 'Hinzufügen';

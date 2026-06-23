@@ -61,7 +61,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Intet gemt login matcher denne app eller dette websted. Hvis du stoler på det, kan du indsætte dine loginoplysninger manuelt.';
+      'Ingen gemt login matcher denne app eller dette websted.';
 
   @override
   String get add => 'Tilføj';

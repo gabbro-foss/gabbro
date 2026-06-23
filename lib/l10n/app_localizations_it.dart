@@ -61,7 +61,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Nessun accesso salvato corrisponde a questa app o sito. Se ti fidi, incolla le tue credenziali manualmente.';
+      'Nessun accesso salvato corrisponde a questa app o sito.';
 
   @override
   String get add => 'Aggiungi';

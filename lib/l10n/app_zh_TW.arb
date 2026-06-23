@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "已使用此密碼儲存。",
   "saveConfirmSwitchVaultHint": "若要儲存到其他保險庫，請先鎖定此保險庫。",
   "autofillNoMatchTitle": "找不到憑證",
-  "autofillNoMatchBody": "沒有與此應用程式或網站相符的已儲存登入資訊。如果您信任它，請手動貼上您的憑證。",
+  "autofillNoMatchBody": "沒有與此應用程式或網站相符的已儲存登入資訊。",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

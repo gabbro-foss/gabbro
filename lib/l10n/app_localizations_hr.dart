@@ -61,7 +61,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Nijedna spremljena prijava ne odgovara ovoj aplikaciji ili web-mjestu. Ako joj vjerujete, ručno zalijepite svoje vjerodajnice.';
+      'Nijedna spremljena prijava ne odgovara ovoj aplikaciji ili web-mjestu.';
 
   @override
   String get add => 'Dodaj';

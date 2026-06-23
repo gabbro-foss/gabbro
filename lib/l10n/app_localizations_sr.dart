@@ -61,7 +61,7 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Nijedna sačuvana prijava ne odgovara ovoj aplikaciji ili sajtu. Ako mu verujete, ručno nalepite svoje akreditive.';
+      'Ниједна сачувана пријава не одговара овој апликацији или сајту.';
 
   @override
   String get add => 'Dodaj';
@@ -2024,7 +2024,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get autofillNoMatchBody =>
-      'Nijedna sačuvana prijava ne odgovara ovoj aplikaciji ili sajtu. Ako mu verujete, ručno nalepite svoje akreditive.';
+      'Nijedna sačuvana prijava ne odgovara ovoj aplikaciji ili sajtu.';
 
   @override
   String get add => 'Dodaj';

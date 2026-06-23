@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Уже сохранено с этим паролем.",
   "saveConfirmSwitchVaultHint": "Чтобы сохранить в другое хранилище, сначала заблокируйте это.",
   "autofillNoMatchTitle": "Учётные данные не найдены",
-  "autofillNoMatchBody": "Ни один сохранённый вход не подходит для этого приложения или сайта. Если вы ему доверяете, вставьте свои данные вручную.",
+  "autofillNoMatchBody": "Нет сохранённого входа, соответствующего этому приложению или сайту.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

@@ -61,7 +61,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Geen opgeslagen login komt overeen met deze app of site. Als je deze vertrouwt, plak je je inloggegevens handmatig.';
+      'Geen opgeslagen login komt overeen met deze app of site.';
 
   @override
   String get add => 'Toevoegen';

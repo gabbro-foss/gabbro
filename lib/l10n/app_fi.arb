@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Tallennettu jo tällä salasanalla.",
   "saveConfirmSwitchVaultHint": "Tallenna toiseen holviin lukitsemalla ensin tämä.",
   "autofillNoMatchTitle": "Kirjautumistietoja ei löytynyt",
-  "autofillNoMatchBody": "Mikään tallennettu kirjautuminen ei vastaa tätä sovellusta tai sivustoa. Jos luotat siihen, liitä tietosi manuaalisesti.",
+  "autofillNoMatchBody": "Mikään tallennettu kirjautuminen ei vastaa tätä sovellusta tai sivustoa.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",

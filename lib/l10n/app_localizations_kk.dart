@@ -61,7 +61,7 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Бұл қолданбаға немесе сайтқа сәйкес сақталған кіру жоқ. Сенсеңіз, деректеріңізді қолмен қойыңыз.';
+      'Бұл қолданбаға немесе сайтқа сәйкес келетін сақталған кіру деректері жоқ.';
 
   @override
   String get add => 'Қосу';

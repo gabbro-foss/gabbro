@@ -61,7 +61,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Aucun identifiant enregistré ne correspond à cette application ou à ce site. Si vous lui faites confiance, collez vos identifiants manuellement.';
+      'Aucun identifiant enregistré ne correspond à cette application ou à ce site.';
 
   @override
   String get add => 'Ajouter';

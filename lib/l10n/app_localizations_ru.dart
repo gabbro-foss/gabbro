@@ -61,7 +61,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Ни один сохранённый вход не подходит для этого приложения или сайта. Если вы ему доверяете, вставьте свои данные вручную.';
+      'Нет сохранённого входа, соответствующего этому приложению или сайту.';
 
   @override
   String get add => 'Добавить';

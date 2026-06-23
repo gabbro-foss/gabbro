@@ -61,7 +61,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Joks įrašytas prisijungimas neatitinka šios programos ar svetainės. Jei ja pasitikite, įklijuokite duomenis rankiniu būdu.';
+      'Nėra išsaugoto prisijungimo, atitinkančio šią programą ar svetainę.';
 
   @override
   String get add => 'Pridėti';

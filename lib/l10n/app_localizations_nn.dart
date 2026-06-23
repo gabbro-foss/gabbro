@@ -61,7 +61,7 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Inga lagra innlogging samsvarar med denne appen eller denne nettstaden. Viss du stolar på han, kan du lime inn innloggingsinformasjonen manuelt.';
+      'Inga lagra innlogging samsvarar med denne appen eller dette nettstadet.';
 
   @override
   String get add => 'Legg til';

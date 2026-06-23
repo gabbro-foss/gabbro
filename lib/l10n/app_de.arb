@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Bereits mit diesem Passwort gespeichert.",
   "saveConfirmSwitchVaultHint": "Um in einem anderen Tresor zu speichern, sperren Sie zuerst diesen.",
   "autofillNoMatchTitle": "Keine Zugangsdaten gefunden",
-  "autofillNoMatchBody": "Keine gespeicherte Anmeldung passt zu dieser App oder Website. Wenn Sie ihr vertrauen, fügen Sie Ihre Zugangsdaten manuell ein.",
+  "autofillNoMatchBody": "Keine gespeicherte Anmeldung passt zu dieser App oder Website.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
