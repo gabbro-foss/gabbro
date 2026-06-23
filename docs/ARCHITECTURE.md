@@ -91,32 +91,26 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-Fix the pre-existing bugs surfaced by the dead-code hardware matrix (2026-06-23). All exist
-on master independent of the dead-code change. **Fixed on branch `matrix-bugfixes` (Dart-only,
-`flutter test` 885 green); pending one batched Android+Linux hardware cycle, then merge to master.**
+`matrix-bugfixes` branch: 6 fixes for pre-existing bugs surfaced by the dead-code hardware
+matrix (2026-06-23) — all Dart/l10n, independent of the dead-code change. `flutter test` 885
+green, analyze clean. **Hardware matrix GREEN on Linux + Android — all A/B/C rows, incl. the
+shared-unlock-path regression + the 3 follow-ups re-verified.**
 
-- **Folder rename/add/delete error handling** — wrapped the three `manage_folders_screen.dart`
-  bridge calls in try/catch -> localized SnackBar (reused `errorPrefix`); rename-to-unchanged-name
-  is now a no-op. Was: duplicate name -> unhandled exception.
-- **Autofill no-match wrong message** — two defects: the no-match dialog was shown from a context
-  above the `MaterialApp`'s Navigator (`showDialog` threw), and that throw was caught by the
-  unlock auth try/catch and mis-reported as "wrong credentials". Fixed via a `navigatorKey` for
-  the dialog (D1) + moving post-unlock work out of the auth try/catch (D2). Not an l10n bug.
-- **Biometric stale after passphrase change** — approach B: a successful passphrase change now
-  unenrolls biometric + clears `biometricUnlock` + informs the user (new key
-  `changePassphraseBiometricDisabled`, 37 ARBs). The stored biometric secret held the old
-  passphrase. (A — seamless re-enroll — deliberately not pursued; YAGNI.)
-- **Change-passphrase strength gate aligned with onboarding** (found during the matrix). It
-  required Strong+; now accepts Fair-and-above like onboarding, with an explicit "too weak" line
-  under the meter for Weak/Terrible. Mirrors commit 7222fb1 (`_meetsMinimum`).
+**NEXT SESSION — read gate results first.** Rob is running the full `gabbro_test` gate on
+`matrix-bugfixes`. If GREEN: merge `matrix-bugfixes` -> master (`--no-ff`), push, delete the
+branch (local-only, never pushed), refresh memory + clear this Next task. If RED: triage.
 
-**Hardware matrix PASSED** (Linux + Android, 2026-06-23) for all 3 fixes + the shared-unlock-path
-regression sweep. Two refinements applied from the matrix (need a quick re-verify + full gate
-before merge):
-- Biometric disable is now gated on **per-vault enrollment** (`isEnrolled`), not the global
-  `biometricUnlock` flag — a vault that isn't enrolled no longer shows the disable message.
-- The autofill no-match dialog body is trimmed to one sentence (the 2nd was a dead end); fresh
-  best-effort single-sentence translations across 37 ARBs.
+Fixes (committed on the branch):
+- **Folder rename/add/delete** — try/catch -> localized SnackBar (`errorPrefix`);
+  rename-to-unchanged-name is a no-op. Was: duplicate name -> unhandled exception.
+- **Autofill no-match** — `navigatorKey` for the dialog (was shown above the Navigator -> threw)
+  + post-unlock work moved out of the unlock auth try/catch (D2, so a successful unlock never
+  reports "wrong credentials"); dialog body trimmed to one sentence (37 ARBs).
+- **Biometric stale after passphrase change** — approach B: unenroll + clear `biometricUnlock`
+  + inform (key `changePassphraseBiometricDisabled`); gated on **per-vault enrollment**
+  (`isEnrolled`), not the global flag. (A — seamless re-enroll — not pursued; YAGNI.)
+- **Change-passphrase strength gate** — accepts Fair-and-above like onboarding (was Strong+) +
+  explicit too-weak line; mirrors commit 7222fb1 (`_meetsMinimum`).
 
 ---
 
