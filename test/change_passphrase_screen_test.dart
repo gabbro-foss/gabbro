@@ -13,6 +13,15 @@ EntropyResult _fakeStrongEntropy(String ignored) => EntropyResult(
       tier: StrengthTier.veryStrong,
     );
 
+EntropyResult _fakeFairEntropy(String ignored) =>
+    EntropyResult(bits: 40, tier: StrengthTier.fair);
+
+EntropyResult _fakeWeakEntropy(String ignored) =>
+    EntropyResult(bits: 20, tier: StrengthTier.weak);
+
+EntropyResult _fakeTerribleEntropy(String ignored) =>
+    EntropyResult(bits: 5, tier: StrengthTier.terrible);
+
 // ── Fake YubiKey record ───────────────────────────────────────────────────────
 
 YubikeyRecordData _fakeRecord() => YubikeyRecordData(
@@ -30,17 +39,20 @@ ChangePassphraseScreen _screen({
   Future<void> Function(List<YubikeyRecordData>, String, String)? onConfirmAnyYubikey,
   bool biometricEnabled = false,
   Future<void> Function()? onDisableBiometric,
+  Future<bool> Function(String)? onBiometricIsEnrolled,
+  EntropyResult Function(String)? onEstimateEntropy,
 }) =>
     ChangePassphraseScreen(
       vaultPath: '/tmp/test.gabbro',
       onChangePassphrase: onChangePassphrase ?? (_, _) async {},
-      onEstimateEntropy: _fakeStrongEntropy,
+      onEstimateEntropy: onEstimateEntropy ?? _fakeStrongEntropy,
       blockPassphraseCopyPaste: blockPassphraseCopyPaste,
       yubikeyRecords: yubikeyRecords ?? [],
       onConfirmYubikey: onConfirmYubikey ?? (_, _, _, _) async {},
       onConfirmAnyYubikey: onConfirmAnyYubikey ?? (_, _, _) async {},
       biometricEnabled: biometricEnabled,
       onDisableBiometric: onDisableBiometric ?? () async {},
+      onBiometricIsEnrolled: onBiometricIsEnrolled ?? (_) async => false,
     );
 
 Widget _buildScreen({
@@ -51,6 +63,8 @@ Widget _buildScreen({
   Future<void> Function(List<YubikeyRecordData>, String, String)? onConfirmAnyYubikey,
   bool biometricEnabled = false,
   Future<void> Function()? onDisableBiometric,
+  Future<bool> Function(String)? onBiometricIsEnrolled,
+  EntropyResult Function(String)? onEstimateEntropy,
 }) =>
     testApp(_screen(
       onChangePassphrase: onChangePassphrase,
@@ -60,6 +74,8 @@ Widget _buildScreen({
       onConfirmAnyYubikey: onConfirmAnyYubikey,
       biometricEnabled: biometricEnabled,
       onDisableBiometric: onDisableBiometric,
+      onBiometricIsEnrolled: onBiometricIsEnrolled,
+      onEstimateEntropy: onEstimateEntropy,
     ));
 
 // testApp uses home: (a root route) which the success path's Navigator.pop can't
@@ -267,6 +283,7 @@ void main() {
     var disableCalled = false;
     await tester.pumpWidget(_buildScreen(
       biometricEnabled: true,
+      onBiometricIsEnrolled: (_) async => true,
       onChangePassphrase: (_, _) async => throw Exception('change failed'),
       onDisableBiometric: () async => disableCalled = true,
     ));
@@ -277,11 +294,32 @@ void main() {
   });
 
   testWidgets(
+      'N4: biometric ON globally but NOT enrolled for this vault -> no disable, normal success',
+      (tester) async {
+    var disableCalled = false;
+    await _pumpPushed(tester, _screen(
+      biometricEnabled: true, // global flag on...
+      onBiometricIsEnrolled: (_) async => false, // ...but this vault isn't enrolled
+      onDisableBiometric: () async => disableCalled = true,
+    ));
+    await _fillAndSubmit(tester);
+
+    expect(disableCalled, isFalse);
+    expect(find.text('Passphrase changed successfully'), findsOneWidget);
+    expect(
+      find.text(
+          'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.'),
+      findsNothing,
+    );
+  });
+
+  testWidgets(
       'R1: passphrase-only success with biometric ON disables biometric and informs the user',
       (tester) async {
     var disableCalled = false;
     await _pumpPushed(tester, _screen(
       biometricEnabled: true,
+      onBiometricIsEnrolled: (_) async => true,
       onDisableBiometric: () async => disableCalled = true,
     ));
     await _fillAndSubmit(tester);
@@ -292,5 +330,50 @@ void main() {
           'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.'),
       findsOneWidget,
     );
+  });
+
+  // ── Strength gate: align with onboarding (Fair-and-above) ─────────────────────
+
+  testWidgets('R5: a Fair passphrase is accepted (matches onboarding)',
+      (tester) async {
+    var changeCalled = false;
+    await _pumpPushed(tester, _screen(
+      onEstimateEntropy: _fakeFairEntropy,
+      onChangePassphrase: (_, _) async => changeCalled = true,
+    ));
+    await _fillAndSubmit(tester);
+
+    expect(changeCalled, isTrue);
+    expect(find.text('Passphrase is too weak'), findsNothing);
+  });
+
+  testWidgets('N5: a Weak passphrase is blocked', (tester) async {
+    var changeCalled = false;
+    await tester.pumpWidget(_buildScreen(
+      onEstimateEntropy: _fakeWeakEntropy,
+      onChangePassphrase: (_, _) async => changeCalled = true,
+    ));
+    await _fillAndSubmit(tester);
+
+    expect(changeCalled, isFalse);
+  });
+
+  testWidgets('N5b: a Terrible passphrase is blocked', (tester) async {
+    var changeCalled = false;
+    await tester.pumpWidget(_buildScreen(
+      onEstimateEntropy: _fakeTerribleEntropy,
+      onChangePassphrase: (_, _) async => changeCalled = true,
+    ));
+    await _fillAndSubmit(tester);
+
+    expect(changeCalled, isFalse);
+  });
+
+  testWidgets('R6: a Weak passphrase shows an explicit too-weak line',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(onEstimateEntropy: _fakeWeakEntropy));
+    await _fillAndSubmit(tester);
+
+    expect(find.text('Passphrase is too weak'), findsOneWidget);
   });
 }
