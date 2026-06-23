@@ -153,13 +153,6 @@ Future<void> restoreVaultFromFile({
   source: source,
 );
 
-/// R-03: delete the `.bak` safety copy without touching the vault.
-///
-/// For the case where the backup itself is corrupt and the user chooses to
-/// discard it — on Android, app-private storage offers no other way to do so.
-Future<void> deleteVaultBackup({required String path}) =>
-    RustLib.instance.api.crateApiVaultBridgeDeleteVaultBackup(path: path);
-
 /// Clear the previous password history for a Login entry and persist.
 ///
 /// Async — triggers a full vault save.
@@ -308,29 +301,6 @@ Future<void> initVaultWithKeys({
 }) => RustLib.instance.api.crateApiVaultBridgeInitVaultWithKeys(
   passphrase: passphrase,
   keys: keys,
-  path: path,
-  alias: alias,
-);
-
-/// Create a new empty vault at `path`, sealed with both passphrase and YubiKey.
-///
-/// `alias` is stored in the VERSION 5 plaintext header and travels with the file.
-/// Called during onboarding when the user opts in to YubiKey protection.
-/// After creation, unlocks into session immediately.
-/// `hmac_secret` must be exactly 32 bytes. `hkdf_salt` must be exactly 32 bytes.
-/// Async — runs Argon2id + encryption.
-Future<void> initVaultWithYubikey({
-  required List<int> passphrase,
-  required List<int> hmacSecret,
-  required List<int> credentialId,
-  required List<int> hkdfSalt,
-  required String path,
-  String? alias,
-}) => RustLib.instance.api.crateApiVaultBridgeInitVaultWithYubikey(
-  passphrase: passphrase,
-  hmacSecret: hmacSecret,
-  credentialId: credentialId,
-  hkdfSalt: hkdfSalt,
   path: path,
   alias: alias,
 );

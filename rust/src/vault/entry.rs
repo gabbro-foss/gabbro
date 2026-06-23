@@ -7,20 +7,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
-/// The six entry types Gabbro support.
-/// Not yet referenced outside this module — will be used for vault
-/// filtering and sorting. Suppressing dead_code until that layer is built.
-#[allow(dead_code)]
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum EntryType {
-    Login,
-    Note,
-    Identity,
-    Card,
-    File,
-    Custom,
-}
-
 /// Common metadata shared by every entry, regardless of type.
 #[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct EntryMeta {
