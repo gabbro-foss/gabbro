@@ -123,4 +123,48 @@ void main() {
     await tester.pumpAndSettle();
     expect(calls, contains('cancel'));
   });
+
+  // D1: the *real* path — unlocking with no match must show the localized
+  // no-match dialog (not silently fail / not a false auth error). Regression
+  // for the dialog being shown from a context above the MaterialApp's Navigator.
+  testWidgets(
+      'real path: unlock with no match shows the no-match dialog, not an auth error',
+      (tester) async {
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call) async {
+      if (call.method == 'unlock') return false; // unlocked, but nothing matched
+      return null; // 'cancel' etc.
+    });
+    addTearDown(() => tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null));
+
+    await tester.pumpWidget(buildAutofillUnlockApp(
+      settings: AppSettings(),
+      registry: _twoVaults(),
+      initialVaultPath: '/tmp/a.gabbro',
+      channel: channel,
+      onUnlock: (a, b) async {}, // unlock succeeds (test seam)
+    ));
+    await tester.pump();
+
+    // Tap Unlock directly (Unlock is enabled even with an empty passphrase; the
+    // injected onUnlock succeeds). Avoids the passphrase field's onChanged ->
+    // estimateEntropy FFI, which isn't initialized in a widget test.
+    // Use explicit pumps, not pumpAndSettle: _doUnlock awaits the open dialog, so
+    // the Unlock spinner keeps animating and pumpAndSettle would never settle.
+    await tester.tap(find.text('Unlock'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('No credentials found'), findsOneWidget);
+    expect(
+      find.text('Could not unlock vault. Check your passphrase.'),
+      findsNothing,
+    );
+
+    // Dismiss to let the unlock flow finish (channel 'cancel') and the spinner stop.
+    await tester.tap(find.text('Dismiss'));
+    await tester.pumpAndSettle();
+  });
 }

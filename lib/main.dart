@@ -135,12 +135,15 @@ Widget buildAutofillUnlockApp({
   required VaultRegistry registry,
   required String initialVaultPath,
   MethodChannel channel = const MethodChannel('app.gabbro.gabbro/autofill'),
+  // Test seam: defaults to the real bridge unlock; widget tests inject a fake.
+  Future<void> Function(List<int>, String) onUnlock = defaultUnlock,
 }) =>
     _AutofillUnlockApp(
       settings: settings,
       registry: registry,
       initialVaultPath: initialVaultPath,
       channel: channel,
+      onUnlock: onUnlock,
     );
 
 class _AutofillUnlockApp extends StatefulWidget {
@@ -148,12 +151,14 @@ class _AutofillUnlockApp extends StatefulWidget {
   final VaultRegistry registry;
   final String initialVaultPath;
   final MethodChannel channel;
+  final Future<void> Function(List<int>, String) onUnlock;
 
   const _AutofillUnlockApp({
     required this.settings,
     required this.registry,
     required this.initialVaultPath,
     required this.channel,
+    required this.onUnlock,
   });
 
   @override
@@ -162,6 +167,7 @@ class _AutofillUnlockApp extends StatefulWidget {
 
 class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
   late String _vaultPath = widget.initialVaultPath;
+  final _navigatorKey = GlobalKey<NavigatorState>();
 
   String? _aliasFor(String path) {
     for (final r in widget.registry.records) {
@@ -187,6 +193,7 @@ class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
         themeMode: themeModeFor(widget.settings.theme),
         theme: gabbroLightTheme(highContrast: hc),
         darkTheme: gabbroDarkTheme(highContrast: hc),
+        navigatorKey: _navigatorKey,
         // ValueKey forces a fresh UnlockScreen on vault switch so it re-detects
         // the newly selected vault's YubiKey records.
         home: UnlockScreen(
@@ -195,6 +202,7 @@ class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
           vaultAlias: _aliasFor(_vaultPath),
           registry: widget.registry,
           onVaultSwitch: (path, alias) => setState(() => _vaultPath = path),
+          onUnlock: widget.onUnlock,
           onUnlocked: _onUnlocked,
           blockPassphraseCopyPaste: widget.settings.blockPassphraseCopyPaste,
           biometricEnabled: widget.settings.biometricUnlock,
@@ -210,7 +218,12 @@ class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
   Future<void> _onUnlocked() async {
     final matched = await widget.channel.invokeMethod<bool>('unlock');
     if (matched == true || !mounted) return;
-    await showAutofillNoMatchDialog(context, widget.channel);
+    // Show the dialog from a context UNDER the MaterialApp's Navigator/Overlay.
+    // This State's own `context` sits above MaterialApp, where showDialog can find
+    // neither an Overlay nor MaterialLocalizations and would throw.
+    final navContext = _navigatorKey.currentContext;
+    if (navContext == null || !navContext.mounted) return;
+    await showAutofillNoMatchDialog(navContext, widget.channel);
   }
 }
 
