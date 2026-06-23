@@ -61,7 +61,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Nijedna spremljena prijava ne odgovara ovoj aplikaciji ili web-mjestu. Ako joj vjerujete, ručno zalijepite svoje vjerodajnice.';
+      'Nijedna spremljena prijava ne odgovara ovoj aplikaciji ili web-mjestu.';
 
   @override
   String get add => 'Dodaj';
@@ -988,6 +988,10 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Pristupna fraza promijenjena';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Promijeni pristupnu frazu';

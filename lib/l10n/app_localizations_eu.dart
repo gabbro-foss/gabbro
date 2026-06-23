@@ -61,7 +61,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Ez dago gordetako saio-hasierarik aplikazio edo gune honetarako. Fidagarria bada, itsatsi zure kredentzialak eskuz.';
+      'Ez dago aplikazio edo gune honekin bat datorren gordetako sarrerarik.';
 
   @override
   String get add => 'Gehitu';
@@ -989,6 +989,10 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Pasaesaldia aldatuta';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Pasaesaldia aldatu';

@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "이 비밀번호로 이미 저장됨.",
   "saveConfirmSwitchVaultHint": "다른 볼트에 저장하려면 먼저 이 볼트를 잠그세요.",
   "autofillNoMatchTitle": "자격 증명을 찾을 수 없음",
-  "autofillNoMatchBody": "이 앱이나 사이트와 일치하는 저장된 로그인이 없습니다. 신뢰한다면 자격 증명을 수동으로 붙여넣으세요.",
+  "autofillNoMatchBody": "이 앱 또는 사이트와 일치하는 저장된 로그인이 없습니다.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "일반 CSV",
 
   "changePassphraseSuccess": "암호 문구가 변경됐습니다",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "암호 문구 변경",
 
   "continueLabel": "계속",

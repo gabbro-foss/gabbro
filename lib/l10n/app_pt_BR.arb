@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Já salvo com esta senha.",
   "saveConfirmSwitchVaultHint": "Para salvar em outro cofre, bloqueie este primeiro.",
   "autofillNoMatchTitle": "Nenhuma credencial encontrada",
-  "autofillNoMatchBody": "Nenhum login salvo corresponde a este app ou site. Se você confia nele, cole suas credenciais manualmente.",
+  "autofillNoMatchBody": "Nenhum login salvo corresponde a este app ou site.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "CSV genérico",
 
   "changePassphraseSuccess": "Frase secreta alterada com sucesso",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Alterar frase secreta",
 
   "continueLabel": "Continuar",

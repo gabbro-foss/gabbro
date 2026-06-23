@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Уже збережено з цим паролем.",
   "saveConfirmSwitchVaultHint": "Щоб зберегти в інше сховище, спочатку заблокуйте це.",
   "autofillNoMatchTitle": "Облікові дані не знайдено",
-  "autofillNoMatchBody": "Жоден збережений вхід не відповідає цьому застосунку чи сайту. Якщо ви йому довіряєте, вставте свої дані вручну.",
+  "autofillNoMatchBody": "Немає збереженого входу, що відповідає цьому застосунку або сайту.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "Звичайний CSV",
 
   "changePassphraseSuccess": "Кодову фразу змінено",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Змінити кодову фразу",
 
   "continueLabel": "Продовжити",

@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Już zapisano z tym hasłem.",
   "saveConfirmSwitchVaultHint": "Aby zapisać w innym skarbcu, najpierw zablokuj ten.",
   "autofillNoMatchTitle": "Nie znaleziono danych logowania",
-  "autofillNoMatchBody": "Żadne zapisane logowanie nie pasuje do tej aplikacji ani witryny. Jeśli jej ufasz, wklej swoje dane ręcznie.",
+  "autofillNoMatchBody": "Żadne zapisane dane logowania nie pasują do tej aplikacji ani witryny.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "Ogólny CSV",
 
   "changePassphraseSuccess": "Hasło główne zostało zmienione",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Zmień hasło główne",
 
   "continueLabel": "Kontynuuj",

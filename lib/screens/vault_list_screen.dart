@@ -68,6 +68,7 @@ Future<String?> _defaultPickSyncFile() async {
 }
 
 const _yubikeyChannel = MethodChannel('app.gabbro.gabbro/yubikey');
+const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');
 
 String _toHex(List<int> bytes) =>
     bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
@@ -867,6 +868,19 @@ class _VaultListScreenState extends State<VaultListScreen>
               vaultPath: widget.vaultPath,
               blockPassphraseCopyPaste:
                   cpAppState.settings.blockPassphraseCopyPaste,
+              biometricEnabled: cpAppState.settings.biometricUnlock,
+              // Biometric stores the old passphrase; a change makes it stale, so
+              // unenroll it and clear the setting (the screen informs the user).
+              onDisableBiometric: () async {
+                if (Platform.isAndroid) {
+                  try {
+                    await _biometricChannel.invokeMethod<void>('unenroll');
+                  } catch (_) {}
+                }
+                cpAppState.updateSettings(
+                  cpAppState.settings.copyWith(biometricUnlock: false),
+                );
+              },
             ),
           ),
         );

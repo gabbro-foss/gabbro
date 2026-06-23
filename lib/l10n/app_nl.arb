@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Al opgeslagen met dit wachtwoord.",
   "saveConfirmSwitchVaultHint": "Vergrendel deze kluis eerst om in een andere kluis op te slaan.",
   "autofillNoMatchTitle": "Geen inloggegevens gevonden",
-  "autofillNoMatchBody": "Geen opgeslagen login komt overeen met deze app of site. Als je deze vertrouwt, plak je je inloggegevens handmatig.",
+  "autofillNoMatchBody": "Geen opgeslagen login komt overeen met deze app of site.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "Algemene CSV",
 
   "changePassphraseSuccess": "Wachtwoordzin succesvol gewijzigd",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Wachtwoordzin wijzigen",
 
   "continueLabel": "Doorgaan",

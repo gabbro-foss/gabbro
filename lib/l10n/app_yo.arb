@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Ti fi pamọ́ pẹ̀lú ọ̀rọ̀ aṣínà yìí.",
   "saveConfirmSwitchVaultHint": "Láti fi pamọ́ sí vọọliti mìíràn, kọ́kọ́ tì vọọliti yìí.",
   "autofillNoMatchTitle": "Kò sí ìwé-ẹ̀rí tí a rí",
-  "autofillNoMatchBody": "Kò sí wọlé tí a fi pamọ́ tí ó bá app tàbí ojú-òpó yìí mu. Tí o bá gbẹ́kẹ̀lé e, lẹ̀ ìwé-ẹ̀rí rẹ pẹ̀lú ọwọ́.",
+  "autofillNoMatchBody": "Kò sí ìwọlé tí a fipamọ́ tí ó bá ohun-èlò tàbí ojú-òpó yìí mu.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "CSV gbogbogbo",
 
   "changePassphraseSuccess": "Gbolohun ọrọ igbaniwọle ti yipada",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Yipada gbolohun ọrọ igbaniwọle",
 
   "continueLabel": "Tẹsiwaju",

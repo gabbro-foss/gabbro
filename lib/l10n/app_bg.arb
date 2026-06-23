@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Вече е запазено с тази парола.",
   "saveConfirmSwitchVaultHint": "За да запазите в друг трезор, първо заключете този.",
   "autofillNoMatchTitle": "Не са намерени идентификационни данни",
-  "autofillNoMatchBody": "Няма запазен вход за това приложение или сайт. Ако му имате доверие, поставете данните си ръчно.",
+  "autofillNoMatchBody": "Няма запазен вход, който да съответства на това приложение или сайт.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "Общ CSV",
 
   "changePassphraseSuccess": "Паролната фраза е променена",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Промени паролна фраза",
 
   "continueLabel": "Продължи",

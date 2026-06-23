@@ -61,7 +61,7 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Žiadne uložené prihlásenie nezodpovedá tejto aplikácii ani webu. Ak mu dôverujete, vložte svoje údaje ručne.';
+      'Žiadne uložené prihlásenie nezodpovedá tejto aplikácii ani webu.';
 
   @override
   String get add => 'Pridať';
@@ -990,6 +990,10 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Prístupová fráza zmenená';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Zmeniť prístupovú frázu';

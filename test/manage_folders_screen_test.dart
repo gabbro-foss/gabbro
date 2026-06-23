@@ -225,5 +225,108 @@ void main() {
       expect(renamedFrom, 'Work');
       expect(renamedTo, 'Career');
     });
+
+    // ── Net (pin currently-untested guards; green against current code) ──────────
+    testWidgets('N1: rename with empty/whitespace name does not call renameFolder',
+        (tester) async {
+      var called = false;
+      await tester.pumpWidget(_buildScreen(
+        folders: ['Work'],
+        renameFolder: (a, b) async {
+          called = true;
+        },
+      ));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.edit_outlined));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField), '   ');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      expect(called, isFalse);
+    });
+
+    testWidgets('N2: add with empty/whitespace name does not call createFolder',
+        (tester) async {
+      var called = false;
+      await tester.pumpWidget(_buildScreen(
+        createFolder: (_) async {
+          called = true;
+        },
+      ));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.add));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField), '   ');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      expect(called, isFalse);
+    });
+
+    // ── New behaviour (red against current code) ─────────────────────────────────
+    testWidgets('R1: a failing rename shows a SnackBar and is handled (no throw)',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        folders: ['Work', 'Private'],
+        renameFolder: (a, b) async =>
+            throw Exception('Folder already exists: Private'),
+      ));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.edit_outlined).first);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField), 'Private');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.byType(SnackBar), findsOneWidget);
+    });
+
+    testWidgets('R2: a failing add shows a SnackBar and is handled (no throw)',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        folders: ['Work'],
+        createFolder: (_) async => throw Exception('Folder already exists: Work'),
+      ));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.add));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextFormField), 'Work');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.byType(SnackBar), findsOneWidget);
+    });
+
+    testWidgets('R3: renaming to the unchanged name does not call renameFolder',
+        (tester) async {
+      var called = false;
+      await tester.pumpWidget(_buildScreen(
+        folders: ['Work'],
+        renameFolder: (a, b) async {
+          called = true;
+        },
+      ));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.edit_outlined));
+      await tester.pumpAndSettle();
+      // Save without editing the pre-filled current name.
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      expect(called, isFalse);
+    });
+
+    testWidgets('R4: a failing delete shows a SnackBar and is handled (no throw)',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        folders: ['Work'],
+        deleteFolder: (a, b) async => throw Exception('boom'),
+      ));
+      await tester.pump();
+      await tester.tap(find.byIcon(Icons.delete_outline));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.byType(SnackBar), findsOneWidget);
+    });
   });
 }

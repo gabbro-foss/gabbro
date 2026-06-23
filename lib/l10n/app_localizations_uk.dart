@@ -61,7 +61,7 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Жоден збережений вхід не відповідає цьому застосунку чи сайту. Якщо ви йому довіряєте, вставте свої дані вручну.';
+      'Немає збереженого входу, що відповідає цьому застосунку або сайту.';
 
   @override
   String get add => 'Додати';
@@ -992,6 +992,10 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Кодову фразу змінено';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Змінити кодову фразу';

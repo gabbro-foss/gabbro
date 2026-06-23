@@ -62,7 +62,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Keine gespeicherte Anmeldung passt zu dieser App oder Website. Wenn Sie ihr vertrauen, fügen Sie Ihre Zugangsdaten manuell ein.';
+      'Keine gespeicherte Anmeldung passt zu dieser App oder Website.';
 
   @override
   String get add => 'Hinzufügen';
@@ -990,6 +990,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Passphrase erfolgreich geändert';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Passphrase ändern';

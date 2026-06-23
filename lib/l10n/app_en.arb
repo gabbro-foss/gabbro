@@ -48,7 +48,7 @@
   "@autofillNoMatchTitle": {
     "description": "Title of the autofill dialog shown after unlock when no saved login matches the requesting app or website."
   },
-  "autofillNoMatchBody": "No saved login matches this app or site. If you trust it, paste your credentials manually.",
+  "autofillNoMatchBody": "No saved login matches this app or site.",
   "@autofillNoMatchBody": {
     "description": "Body of the autofill no-match dialog, advising the user to paste credentials manually."
   },
@@ -462,6 +462,7 @@
   "genericCsvSection": "Generic CSV",
 
   "changePassphraseSuccess": "Passphrase changed successfully",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Change passphrase",
 
   "continueLabel": "Continue",

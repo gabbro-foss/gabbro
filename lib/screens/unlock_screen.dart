@@ -16,7 +16,8 @@ import 'package:gabbro/widgets/yubikey_tap.dart';
 
 // ── Bridge defaults ───────────────────────────────────────────────────────────
 
-Future<void> _defaultUnlock(List<int> passphrase, String path) =>
+// Public so the autofill unlock shell can reuse it as its injectable default.
+Future<void> defaultUnlock(List<int> passphrase, String path) =>
     unlockVault(passphrase: passphrase, path: path);
 
 // R-03: probe whether the vault file parses at all. Only a parse failure may
@@ -254,7 +255,7 @@ class UnlockScreen extends StatefulWidget {
   const UnlockScreen({
     super.key,
     required this.vaultPath,
-    this.onUnlock = _defaultUnlock,
+    this.onUnlock = defaultUnlock,
     this.onUnlocked,
     this.onEstimateEntropy = _defaultEstimateEntropy,
     this.blockPassphraseCopyPaste = true,
@@ -582,23 +583,6 @@ class _UnlockScreenState extends State<UnlockScreen>
       } else {
         await widget.onUnlock(passphrase, widget.vaultPath);
       }
-      if (mounted) {
-        GabbroApp.maybeOf(context)?.touchVaultLastUsed(widget.vaultPath);
-        // Autofill activity supplies onUnlocked to signal the native side
-        // (build the fill response) instead of opening the vault list.
-        if (widget.onUnlocked != null) {
-          await widget.onUnlocked!();
-        } else {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => VaultListScreen(
-                vaultPath: widget.vaultPath,
-                vaultAlias: widget.vaultAlias,
-              ),
-            ),
-          );
-        }
-      }
     } catch (e) {
       if (!mounted) return;
       // The user cancelled the tap: just drop back to the unlock form, no error.
@@ -634,6 +618,32 @@ class _UnlockScreenState extends State<UnlockScreen>
               : l.unlockErrorPassphrase,
         };
       });
+      return;
+    }
+    // ── Unlock succeeded ── The post-success work below is NOT inside the auth
+    // try/catch, so a failure here can never be reported as an authentication
+    // error (e.g. the autofill onUnlocked signaling failing must not read as a
+    // wrong passphrase).
+    if (!mounted) return;
+    GabbroApp.maybeOf(context)?.touchVaultLastUsed(widget.vaultPath);
+    if (widget.onUnlocked != null) {
+      // Autofill activity supplies onUnlocked to signal the native side (build
+      // the fill response) instead of opening the vault list. Its failure is its
+      // own concern, never an unlock error.
+      try {
+        await widget.onUnlocked!();
+      } catch (_) {
+        // Post-unlock signaling failed; nothing to surface as an auth error.
+      }
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => VaultListScreen(
+            vaultPath: widget.vaultPath,
+            vaultAlias: widget.vaultAlias,
+          ),
+        ),
+      );
     }
   }
 

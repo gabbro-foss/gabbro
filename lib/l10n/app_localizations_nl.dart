@@ -61,7 +61,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Geen opgeslagen login komt overeen met deze app of site. Als je deze vertrouwt, plak je je inloggegevens handmatig.';
+      'Geen opgeslagen login komt overeen met deze app of site.';
 
   @override
   String get add => 'Toevoegen';
@@ -988,6 +988,10 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Wachtwoordzin succesvol gewijzigd';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Wachtwoordzin wijzigen';

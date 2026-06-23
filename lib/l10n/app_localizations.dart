@@ -262,7 +262,7 @@ abstract class AppLocalizations {
   /// Body of the autofill no-match dialog, advising the user to paste credentials manually.
   ///
   /// In en, this message translates to:
-  /// **'No saved login matches this app or site. If you trust it, paste your credentials manually.'**
+  /// **'No saved login matches this app or site.'**
   String get autofillNoMatchBody;
 
   /// No description provided for @add.
@@ -1986,6 +1986,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Passphrase changed successfully'**
   String get changePassphraseSuccess;
+
+  /// No description provided for @changePassphraseBiometricDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.'**
+  String get changePassphraseBiometricDisabled;
 
   /// No description provided for @changePassphraseButton.
   ///

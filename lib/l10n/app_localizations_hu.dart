@@ -61,7 +61,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Egyetlen mentett bejelentkezés sem egyezik ezzel az alkalmazással vagy webhellyel. Ha megbízik benne, illessze be az adatait kézzel.';
+      'Egyetlen mentett bejelentkezés sem felel meg ennek az alkalmazásnak vagy webhelynek.';
 
   @override
   String get add => 'Hozzáadás';
@@ -987,6 +987,10 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Jelmondat módosítva';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Jelmondat módosítása';

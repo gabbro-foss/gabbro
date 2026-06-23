@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Već spremljeno s ovom lozinkom.",
   "saveConfirmSwitchVaultHint": "Za spremanje u drugi trezor najprije zaključaj ovaj.",
   "autofillNoMatchTitle": "Nisu pronađene vjerodajnice",
-  "autofillNoMatchBody": "Nijedna spremljena prijava ne odgovara ovoj aplikaciji ili web-mjestu. Ako joj vjerujete, ručno zalijepite svoje vjerodajnice.",
+  "autofillNoMatchBody": "Nijedna spremljena prijava ne odgovara ovoj aplikaciji ili web-mjestu.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "Generički CSV",
 
   "changePassphraseSuccess": "Pristupna fraza promijenjena",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Promijeni pristupnu frazu",
 
   "continueLabel": "Nastavi",

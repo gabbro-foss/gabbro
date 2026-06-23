@@ -62,7 +62,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Καμία αποθηκευμένη σύνδεση δεν ταιριάζει με αυτήν την εφαρμογή ή τον ιστότοπο. Αν την εμπιστεύεστε, επικολλήστε τα στοιχεία σας χειροκίνητα.';
+      'Κανένα αποθηκευμένο στοιχείο σύνδεσης δεν ταιριάζει με αυτήν την εφαρμογή ή τον ιστότοπο.';
 
   @override
   String get add => 'Προσθήκη';
@@ -996,6 +996,10 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Η φράση πρόσβασης άλλαξε';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Αλλαγή φράσης πρόσβασης';

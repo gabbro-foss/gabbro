@@ -61,7 +61,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Ingen sparad inloggning matchar denna app eller webbplats. Om du litar på den kan du klistra in dina uppgifter manuellt.';
+      'Ingen sparad inloggning matchar den här appen eller webbplatsen.';
 
   @override
   String get add => 'Lägg till';
@@ -988,6 +988,10 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Lösenfras ändrad';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Byt lösenfras';

@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Už uložené s týmto heslom.",
   "saveConfirmSwitchVaultHint": "Ak chcete uložiť do iného trezoru, najprv zamknite tento.",
   "autofillNoMatchTitle": "Nenašli sa žiadne prihlasovacie údaje",
-  "autofillNoMatchBody": "Žiadne uložené prihlásenie nezodpovedá tejto aplikácii ani webu. Ak mu dôverujete, vložte svoje údaje ručne.",
+  "autofillNoMatchBody": "Žiadne uložené prihlásenie nezodpovedá tejto aplikácii ani webu.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "Všeobecný CSV",
 
   "changePassphraseSuccess": "Prístupová fráza zmenená",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Zmeniť prístupovú frázu",
 
   "continueLabel": "Pokračovať",

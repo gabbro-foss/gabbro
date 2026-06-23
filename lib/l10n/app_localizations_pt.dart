@@ -61,7 +61,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Nenhum início de sessão guardado corresponde a esta aplicação ou site. Se confia nele, cole as suas credenciais manualmente.';
+      'Nenhuma credencial guardada corresponde a esta aplicação ou site.';
 
   @override
   String get add => 'Adicionar';
@@ -987,6 +987,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Frase secreta alterada com sucesso';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Alterar frase secreta';
@@ -2023,7 +2027,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get autofillNoMatchBody =>
-      'Nenhum login salvo corresponde a este app ou site. Se você confia nele, cole suas credenciais manualmente.';
+      'Nenhum login salvo corresponde a este app ou site.';
 
   @override
   String get add => 'Adicionar';
@@ -2949,6 +2953,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get changePassphraseSuccess => 'Frase secreta alterada com sucesso';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Alterar frase secreta';
@@ -3982,7 +3990,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get autofillNoMatchBody =>
-      'Nenhum início de sessão guardado corresponde a esta aplicação ou site. Se confia nele, cole as suas credenciais manualmente.';
+      'Nenhuma credencial guardada corresponde a esta aplicação ou site.';
 
   @override
   String get add => 'Adicionar';
@@ -4908,6 +4916,10 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get changePassphraseSuccess => 'Frase-passe alterada com sucesso';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Alterar frase-passe';

@@ -61,7 +61,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Ningún inicio de sesión guardado coincide con esta app o sitio. Si confías en él, pega tus credenciales manualmente.';
+      'Ningún inicio de sesión guardado coincide con esta app o sitio.';
 
   @override
   String get add => 'Añadir';
@@ -988,6 +988,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Contraseña maestra cambiada con éxito';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Cambiar contraseña maestra';

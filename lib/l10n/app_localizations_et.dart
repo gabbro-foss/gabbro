@@ -61,7 +61,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Ükski salvestatud sisselogimine ei sobi selle rakenduse või saidiga. Kui usaldad seda, kleebi oma andmed käsitsi.';
+      'Ükski salvestatud sisselogimine ei vasta sellele rakendusele ega saidile.';
 
   @override
   String get add => 'Lisa';
@@ -988,6 +988,10 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Pääslause muudetud';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Muuda pääsulauset';

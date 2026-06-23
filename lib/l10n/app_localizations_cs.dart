@@ -61,7 +61,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Žádné uložené přihlášení neodpovídá této aplikaci ani webu. Pokud mu důvěřujete, vložte své údaje ručně.';
+      'Žádné uložené přihlášení neodpovídá této aplikaci ani webu.';
 
   @override
   String get add => 'Přidat';
@@ -990,6 +990,10 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Přístupová fráze změněna';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Změnit přístupovou frázi';

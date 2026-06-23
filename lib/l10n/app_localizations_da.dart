@@ -61,7 +61,7 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Intet gemt login matcher denne app eller dette websted. Hvis du stoler på det, kan du indsætte dine loginoplysninger manuelt.';
+      'Ingen gemt login matcher denne app eller dette websted.';
 
   @override
   String get add => 'Tilføj';
@@ -987,6 +987,10 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Adgangssætning ændret';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Skift adgangssætning';

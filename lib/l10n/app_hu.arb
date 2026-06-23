@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Már mentve ezzel a jelszóval.",
   "saveConfirmSwitchVaultHint": "Másik széfbe mentéshez előbb zárolja ezt.",
   "autofillNoMatchTitle": "Nem található hitelesítő adat",
-  "autofillNoMatchBody": "Egyetlen mentett bejelentkezés sem egyezik ezzel az alkalmazással vagy webhellyel. Ha megbízik benne, illessze be az adatait kézzel.",
+  "autofillNoMatchBody": "Egyetlen mentett bejelentkezés sem felel meg ennek az alkalmazásnak vagy webhelynek.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "Általános CSV",
 
   "changePassphraseSuccess": "Jelmondat módosítva",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Jelmondat módosítása",
 
   "continueLabel": "Folytatás",

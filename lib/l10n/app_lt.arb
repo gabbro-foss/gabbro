@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Jau įrašyta su šiuo slaptažodžiu.",
   "saveConfirmSwitchVaultHint": "Norėdami įrašyti į kitą saugyklą, pirma užrakinkite šią.",
   "autofillNoMatchTitle": "Prisijungimo duomenų nerasta",
-  "autofillNoMatchBody": "Joks įrašytas prisijungimas neatitinka šios programos ar svetainės. Jei ja pasitikite, įklijuokite duomenis rankiniu būdu.",
+  "autofillNoMatchBody": "Nėra išsaugoto prisijungimo, atitinkančio šią programą ar svetainę.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "Bendrasis CSV",
 
   "changePassphraseSuccess": "Slaptafrazė pakeista",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Keisti slaptafrazę",
 
   "continueLabel": "Tęsti",

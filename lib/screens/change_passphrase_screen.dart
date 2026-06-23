@@ -79,6 +79,21 @@ Future<void> _defaultConfirmAnyYubikey(
   );
 }
 
+const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');
+
+Future<void> _defaultDisableBiometric() async {}
+
+Future<bool> _defaultBiometricIsEnrolled(String vaultPath) async {
+  if (!Platform.isAndroid) return false;
+  try {
+    return await _biometricChannel.invokeMethod<bool>(
+          'isEnrolled', {'vaultPath': vaultPath}) ??
+        false;
+  } catch (_) {
+    return false;
+  }
+}
+
 class ChangePassphraseScreen extends StatefulWidget {
   final String vaultPath;
   final Future<void> Function(List<int> oldPassphrase, List<int> newPassphrase)
@@ -99,6 +114,20 @@ class ChangePassphraseScreen extends StatefulWidget {
   final Future<void> Function(List<YubikeyRecordData> records, String pin, String transport)
       onConfirmAnyYubikey;
 
+  /// Whether biometric unlock is currently enabled for this vault
+  /// (`settings.biometricUnlock`). When true, a successful passphrase change
+  /// disables biometric via [onDisableBiometric] — its stored secret is bound to
+  /// the old passphrase — and informs the user.
+  final bool biometricEnabled;
+
+  /// Disables biometric unlock (unenroll + clear the setting). Wired by the parent.
+  final Future<void> Function() onDisableBiometric;
+
+  /// Per-vault biometric enrollment check. `biometricEnabled` is the global
+  /// setting; the secret is stored per vault, so disable only fires when *this*
+  /// vault is actually enrolled.
+  final Future<bool> Function(String vaultPath) onBiometricIsEnrolled;
+
   const ChangePassphraseScreen({
     super.key,
     required this.vaultPath,
@@ -108,6 +137,9 @@ class ChangePassphraseScreen extends StatefulWidget {
     this.yubikeyRecords,
     this.onConfirmYubikey = _defaultConfirmYubikey,
     this.onConfirmAnyYubikey = _defaultConfirmAnyYubikey,
+    this.biometricEnabled = false,
+    this.onDisableBiometric = _defaultDisableBiometric,
+    this.onBiometricIsEnrolled = _defaultBiometricIsEnrolled,
   });
 
   @override
@@ -131,6 +163,8 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
   bool? _confirmMatches;
   late final List<YubikeyRecordData> _yubikeyRecords;
   final _pinController = TextEditingController();
+  // Whether biometric is enrolled for THIS vault (resolved on mount).
+  bool _biometricEnrolled = false;
 
   bool get _isYubikeyMode => _yubikeyRecords.isNotEmpty;
 
@@ -138,6 +172,11 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
   void initState() {
     super.initState();
     _yubikeyRecords = widget.yubikeyRecords ?? _detectYubikeyRecords();
+    if (widget.biometricEnabled) {
+      widget.onBiometricIsEnrolled(widget.vaultPath).then((enrolled) {
+        if (mounted) setState(() => _biometricEnrolled = enrolled);
+      });
+    }
   }
 
   List<YubikeyRecordData> _detectYubikeyRecords() {
@@ -162,11 +201,12 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
     setState(() => _entropy = result);
   }
 
-  bool get _strongEnough =>
+  /// A passphrase may be changed once it reaches the `Fair` tier (matches
+  /// onboarding); Weak/Terrible are blocked with a visible explanation.
+  bool get _meetsMinimum =>
       _entropy != null &&
-      (_entropy!.tier == StrengthTier.strong ||
-          _entropy!.tier == StrengthTier.veryStrong ||
-          _entropy!.tier == StrengthTier.centuries);
+      _entropy!.tier != StrengthTier.terrible &&
+      _entropy!.tier != StrengthTier.weak;
 
   Color _tierColor(StrengthTier tier) => switch (tier) {
     StrengthTier.terrible => Colors.red,
@@ -231,10 +271,23 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
         _newController.text.codeUnits,
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context).changePassphraseSuccess)),
-        );
-        Navigator.of(context).pop();
+        final messenger = ScaffoldMessenger.of(context);
+        final l = AppLocalizations.of(context);
+        // Biometric stores the OLD passphrase, so after a successful change its
+        // secret is stale: disable it (best-effort) and tell the user to re-enable.
+        var message = l.changePassphraseSuccess;
+        if (_biometricEnrolled) {
+          try {
+            await widget.onDisableBiometric();
+          } catch (_) {
+            // best-effort; the passphrase change already succeeded.
+          }
+          message = l.changePassphraseBiometricDisabled;
+        }
+        if (mounted) {
+          messenger.showSnackBar(SnackBar(content: Text(message)));
+          Navigator.of(context).pop();
+        }
       }
     } catch (e) {
       setState(() => _error = e.toString());
@@ -366,7 +419,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return l.newPassphraseRequired;
-                      if (!_strongEnough) return l.passphraseTooWeak;
+                      if (!_meetsMinimum) return l.passphraseTooWeak;
                       return null;
                     },
                   ),
@@ -395,6 +448,18 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                         color: _tierColor(_entropy!.tier),
                       ),
                     ),
+                    // Below the minimum: make the disabled button's reason
+                    // explicit rather than leaving it silently greyed out.
+                    if (!_meetsMinimum) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        l.passphraseTooWeak,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ],
                   ],
                   const SizedBox(height: 16),
                   TextFormField(
@@ -453,7 +518,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                       ),
                     ),
                   FilledButton(
-                    onPressed: (_isChanging || !_strongEnough)
+                    onPressed: (_isChanging || !_meetsMinimum)
                         ? null
                         : _changePassphrase,
                     child: _isChanging

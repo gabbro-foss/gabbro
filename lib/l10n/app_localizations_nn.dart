@@ -61,7 +61,7 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Inga lagra innlogging samsvarar med denne appen eller denne nettstaden. Viss du stolar på han, kan du lime inn innloggingsinformasjonen manuelt.';
+      'Inga lagra innlogging samsvarar med denne appen eller dette nettstadet.';
 
   @override
   String get add => 'Legg til';
@@ -987,6 +987,10 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Passfrase endra';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Byt passfrase';

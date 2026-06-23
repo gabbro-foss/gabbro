@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Dagoeneko gordeta pasahitz honekin.",
   "saveConfirmSwitchVaultHint": "Beste gandegi batean gordetzeko, blokeatu lehenbizi hau.",
   "autofillNoMatchTitle": "Ez da kredentzialik aurkitu",
-  "autofillNoMatchBody": "Ez dago gordetako saio-hasierarik aplikazio edo gune honetarako. Fidagarria bada, itsatsi zure kredentzialak eskuz.",
+  "autofillNoMatchBody": "Ez dago aplikazio edo gune honekin bat datorren gordetako sarrerarik.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "CSV generikoa",
 
   "changePassphraseSuccess": "Pasaesaldia aldatuta",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Pasaesaldia aldatu",
 
   "continueLabel": "Jarraitu",

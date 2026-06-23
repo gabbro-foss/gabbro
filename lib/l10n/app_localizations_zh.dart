@@ -59,7 +59,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get autofillNoMatchTitle => '未找到凭据';
 
   @override
-  String get autofillNoMatchBody => '没有与此应用或网站匹配的已保存登录信息。如果您信任它，请手动粘贴您的凭据。';
+  String get autofillNoMatchBody => '没有与此应用或网站匹配的已保存登录信息。';
 
   @override
   String get add => '添加';
@@ -972,6 +972,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => '密码短语已更改';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => '更改密码短语';
@@ -1928,7 +1932,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get autofillNoMatchTitle => '未找到凭据';
 
   @override
-  String get autofillNoMatchBody => '没有与此应用或网站匹配的已保存登录信息。如果您信任它，请手动粘贴您的凭据。';
+  String get autofillNoMatchBody => '没有与此应用或网站匹配的已保存登录信息。';
 
   @override
   String get add => '添加';
@@ -2841,6 +2845,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get changePassphraseSuccess => '密码短语已更改';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => '更改密码短语';
@@ -3797,7 +3805,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get autofillNoMatchTitle => '找不到憑證';
 
   @override
-  String get autofillNoMatchBody => '沒有與此應用程式或網站相符的已儲存登入資訊。如果您信任它，請手動貼上您的憑證。';
+  String get autofillNoMatchBody => '沒有與此應用程式或網站相符的已儲存登入資訊。';
 
   @override
   String get add => '新增';
@@ -4710,6 +4718,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get changePassphraseSuccess => '密碼片語已變更';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => '變更密碼片語';

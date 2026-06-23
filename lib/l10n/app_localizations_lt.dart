@@ -61,7 +61,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Joks įrašytas prisijungimas neatitinka šios programos ar svetainės. Jei ja pasitikite, įklijuokite duomenis rankiniu būdu.';
+      'Nėra išsaugoto prisijungimo, atitinkančio šią programą ar svetainę.';
 
   @override
   String get add => 'Pridėti';
@@ -989,6 +989,10 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Slaptafrazė pakeista';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Keisti slaptafrazę';

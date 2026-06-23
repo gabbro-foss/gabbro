@@ -60,8 +60,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get autofillNoMatchTitle => 'No credentials found';
 
   @override
-  String get autofillNoMatchBody =>
-      'No saved login matches this app or site. If you trust it, paste your credentials manually.';
+  String get autofillNoMatchBody => 'No saved login matches this app or site.';
 
   @override
   String get add => 'Add';
@@ -986,6 +985,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Passphrase changed successfully';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Change passphrase';

@@ -224,6 +224,26 @@ void main() {
     expect(find.byType(UnlockScreen), findsOneWidget);
   });
 
+  // D2: once the vault is unlocked, a failure in the post-unlock work (the
+  // autofill onUnlocked signaling) must NOT be reported as an auth failure.
+  testWidgets(
+      'D2: a successful unlock never shows an auth error, even if onUnlocked throws',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      onUnlock: (a, b) async {}, // unlock succeeds
+      onUnlocked: () async => throw Exception('post-unlock boom'),
+    ));
+
+    await tester.enterText(find.byType(TextField), 'correct-passphrase');
+    await tester.tap(find.text('Unlock'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Could not unlock vault. Check your passphrase.'),
+      findsNothing,
+    );
+  });
+
   testWidgets('Net A: successful YubiKey unlock navigates to VaultListScreen',
       (tester) async {
     await tester.pumpWidget(_buildScreen(

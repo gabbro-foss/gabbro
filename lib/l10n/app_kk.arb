@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Осы құпия сөзбен сақталған.",
   "saveConfirmSwitchVaultHint": "Басқа сейфке сақтау үшін алдымен мұны бекітіңіз.",
   "autofillNoMatchTitle": "Тіркелгі деректері табылмады",
-  "autofillNoMatchBody": "Бұл қолданбаға немесе сайтқа сәйкес сақталған кіру жоқ. Сенсеңіз, деректеріңізді қолмен қойыңыз.",
+  "autofillNoMatchBody": "Бұл қолданбаға немесе сайтқа сәйкес келетін сақталған кіру деректері жоқ.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "Жалпы CSV",
 
   "changePassphraseSuccess": "Кілт фразасы өзгертілді",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Кілт фразасын өзгерту",
 
   "continueLabel": "Жалғастыру",

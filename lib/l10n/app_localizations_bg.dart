@@ -61,7 +61,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get autofillNoMatchBody =>
-      'Няма запазен вход за това приложение или сайт. Ако му имате доверие, поставете данните си ръчно.';
+      'Няма запазен вход, който да съответства на това приложение или сайт.';
 
   @override
   String get add => 'Добави';
@@ -990,6 +990,10 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => 'Паролната фраза е променена';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Промени паролна фраза';

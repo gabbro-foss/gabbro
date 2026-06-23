@@ -102,8 +102,17 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
       },
     );
     if (confirmed == true) {
-      await widget.deleteFolder(folder, reassignTarget);
-      if (mounted) await _load();
+      if (!mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+      final l = AppLocalizations.of(context);
+      try {
+        await widget.deleteFolder(folder, reassignTarget);
+        if (mounted) await _load();
+      } catch (e) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(l.errorPrefix(e.toString()))),
+        );
+      }
     }
   }
 
@@ -138,8 +147,19 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
       },
     );
     if (confirmed == true && newName.trim().isNotEmpty) {
-      await widget.renameFolder(folder, newName.trim());
-      if (mounted) await _load();
+      final trimmed = newName.trim();
+      if (trimmed == folder) return; // unchanged name: nothing to do
+      if (!mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+      final l = AppLocalizations.of(context);
+      try {
+        await widget.renameFolder(folder, trimmed);
+        if (mounted) await _load();
+      } catch (e) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(l.errorPrefix(e.toString()))),
+        );
+      }
     }
   }
 
@@ -170,8 +190,17 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
       },
     );
     if (confirmed == true && newName.trim().isNotEmpty) {
-      await widget.createFolder(newName.trim());
-      if (mounted) await _load();
+      if (!mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
+      final l = AppLocalizations.of(context);
+      try {
+        await widget.createFolder(newName.trim());
+        if (mounted) await _load();
+      } catch (e) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(l.errorPrefix(e.toString()))),
+        );
+      }
     }
   }
 

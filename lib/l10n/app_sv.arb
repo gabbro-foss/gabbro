@@ -7,7 +7,7 @@
   "saveConfirmAlreadySaved": "Redan sparad med detta lösenord.",
   "saveConfirmSwitchVaultHint": "Lås detta valv först för att spara i ett annat valv.",
   "autofillNoMatchTitle": "Inga inloggningsuppgifter hittades",
-  "autofillNoMatchBody": "Ingen sparad inloggning matchar denna app eller webbplats. Om du litar på den kan du klistra in dina uppgifter manuellt.",
+  "autofillNoMatchBody": "Ingen sparad inloggning matchar den här appen eller webbplatsen.",
 
   "appName": "Gabbro",
   "filePickerUnavailable": "File dialog unavailable here. Type or paste the path instead.",
@@ -424,6 +424,7 @@
   "genericCsvSection": "Generisk CSV",
 
   "changePassphraseSuccess": "Lösenfras ändrad",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Byt lösenfras",
 
   "continueLabel": "Fortsätt",

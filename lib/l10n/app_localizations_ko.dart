@@ -59,8 +59,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get autofillNoMatchTitle => '자격 증명을 찾을 수 없음';
 
   @override
-  String get autofillNoMatchBody =>
-      '이 앱이나 사이트와 일치하는 저장된 로그인이 없습니다. 신뢰한다면 자격 증명을 수동으로 붙여넣으세요.';
+  String get autofillNoMatchBody => '이 앱 또는 사이트와 일치하는 저장된 로그인이 없습니다.';
 
   @override
   String get add => '추가';
@@ -977,6 +976,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get changePassphraseSuccess => '암호 문구가 변경됐습니다';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => '암호 문구 변경';
