@@ -72,7 +72,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 523 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 12 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 874 | 0 |
+| Flutter (`flutter test`) | 876 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 101 | 15 |
 
@@ -94,19 +94,25 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 Fix the pre-existing bugs surfaced by the dead-code hardware matrix (2026-06-23). All exist
 on master independent of the dead-code change.
 
-DONE: **Folder rename/add/delete error handling** (Dart-only, `flutter test` green). Wrapped
-the three bridge calls in `manage_folders_screen.dart` in try/catch -> localized SnackBar
-(reused `errorPrefix`); renaming a folder to its unchanged name is now a no-op. Was:
-duplicate name -> unhandled exception.
+Branch `matrix-bugfixes`; final Android hardware verification rides one batched cycle before merge.
 
-Remaining, in order:
-1. **Autofill no-match shows the wrong message** (Android, highest impact, needs hardware
-   verify). On a no-match site the vault unlocks, then reports "could not unlock vault
-   (wrong credentials)" (false — unlock succeeded) instead of a "no matching credential"
-   message; seen in French, so likely tangled with l10n of the no-match path.
-2. **Biometric fails after a passphrase change** (Android, needs hardware verify). After a
+DONE (Dart-only, `flutter test` green):
+- **Folder rename/add/delete error handling** — wrapped the three `manage_folders_screen.dart`
+  bridge calls in try/catch -> localized SnackBar (reused `errorPrefix`); rename-to-unchanged-name
+  is now a no-op. Was: duplicate name -> unhandled exception.
+- **Autofill no-match shows the wrong message** — two defects: the no-match dialog was shown
+  from a context above the `MaterialApp`'s Navigator (`showDialog` threw), and that throw was
+  caught by the unlock auth try/catch and mis-reported as "wrong credentials". Fixed via a
+  `navigatorKey` for the dialog (D1) + moving post-unlock work out of the auth try/catch so a
+  successful unlock can never report an auth failure (D2). Not an l10n bug.
+
+Remaining:
+1. **Biometric fails after a passphrase change** (Android, needs hardware verify). After a
    passphrase change biometric unlock no longer works until disable + re-enable; the stored
-   biometric secret is bound to the old passphrase and isn't re-wrapped on change.
+   biometric secret is bound to the old passphrase and isn't re-wrapped on change. Two fixes to
+   choose from: **B** = auto-disable + inform on passphrase change (cheap; `unenroll` plumbing
+   already exists); **A** = seamless re-enroll (premium, harder — needs a biometric prompt in
+   the change-passphrase flow).
 
 ---
 
