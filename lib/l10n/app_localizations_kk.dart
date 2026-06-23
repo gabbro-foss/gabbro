@@ -988,6 +988,10 @@ class AppLocalizationsKk extends AppLocalizations {
   String get changePassphraseSuccess => 'Кілт фразасы өзгертілді';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Кілт фразасын өзгерту';
 
   @override

@@ -992,6 +992,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get changePassphraseSuccess => 'Přístupová fráze změněna';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Změnit přístupovou frázi';
 
   @override

@@ -424,6 +424,7 @@
   "genericCsvSection": "Splošni CSV",
 
   "changePassphraseSuccess": "Geslo za dostop spremenjeno",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Spremeni geslo za dostop",
 
   "continueLabel": "Nadaljuj",

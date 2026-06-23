@@ -79,6 +79,8 @@ Future<void> _defaultConfirmAnyYubikey(
   );
 }
 
+Future<void> _defaultDisableBiometric() async {}
+
 class ChangePassphraseScreen extends StatefulWidget {
   final String vaultPath;
   final Future<void> Function(List<int> oldPassphrase, List<int> newPassphrase)
@@ -99,6 +101,15 @@ class ChangePassphraseScreen extends StatefulWidget {
   final Future<void> Function(List<YubikeyRecordData> records, String pin, String transport)
       onConfirmAnyYubikey;
 
+  /// Whether biometric unlock is currently enabled for this vault
+  /// (`settings.biometricUnlock`). When true, a successful passphrase change
+  /// disables biometric via [onDisableBiometric] — its stored secret is bound to
+  /// the old passphrase — and informs the user.
+  final bool biometricEnabled;
+
+  /// Disables biometric unlock (unenroll + clear the setting). Wired by the parent.
+  final Future<void> Function() onDisableBiometric;
+
   const ChangePassphraseScreen({
     super.key,
     required this.vaultPath,
@@ -108,6 +119,8 @@ class ChangePassphraseScreen extends StatefulWidget {
     this.yubikeyRecords,
     this.onConfirmYubikey = _defaultConfirmYubikey,
     this.onConfirmAnyYubikey = _defaultConfirmAnyYubikey,
+    this.biometricEnabled = false,
+    this.onDisableBiometric = _defaultDisableBiometric,
   });
 
   @override
@@ -231,10 +244,23 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
         _newController.text.codeUnits,
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context).changePassphraseSuccess)),
-        );
-        Navigator.of(context).pop();
+        final messenger = ScaffoldMessenger.of(context);
+        final l = AppLocalizations.of(context);
+        // Biometric stores the OLD passphrase, so after a successful change its
+        // secret is stale: disable it (best-effort) and tell the user to re-enable.
+        var message = l.changePassphraseSuccess;
+        if (widget.biometricEnabled) {
+          try {
+            await widget.onDisableBiometric();
+          } catch (_) {
+            // best-effort; the passphrase change already succeeded.
+          }
+          message = l.changePassphraseBiometricDisabled;
+        }
+        if (mounted) {
+          messenger.showSnackBar(SnackBar(content: Text(message)));
+          Navigator.of(context).pop();
+        }
       }
     } catch (e) {
       setState(() => _error = e.toString());

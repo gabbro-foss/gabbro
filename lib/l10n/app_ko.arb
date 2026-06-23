@@ -424,6 +424,7 @@
   "genericCsvSection": "일반 CSV",
 
   "changePassphraseSuccess": "암호 문구가 변경됐습니다",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "암호 문구 변경",
 
   "continueLabel": "계속",

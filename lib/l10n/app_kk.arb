@@ -424,6 +424,7 @@
   "genericCsvSection": "Жалпы CSV",
 
   "changePassphraseSuccess": "Кілт фразасы өзгертілді",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Кілт фразасын өзгерту",
 
   "continueLabel": "Жалғастыру",

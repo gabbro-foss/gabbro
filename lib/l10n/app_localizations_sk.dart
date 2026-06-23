@@ -992,6 +992,10 @@ class AppLocalizationsSk extends AppLocalizations {
   String get changePassphraseSuccess => 'Prístupová fráza zmenená';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Zmeniť prístupovú frázu';
 
   @override

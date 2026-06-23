@@ -1987,6 +1987,12 @@ abstract class AppLocalizations {
   /// **'Passphrase changed successfully'**
   String get changePassphraseSuccess;
 
+  /// No description provided for @changePassphraseBiometricDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.'**
+  String get changePassphraseBiometricDisabled;
+
   /// No description provided for @changePassphraseButton.
   ///
   /// In en, this message translates to:

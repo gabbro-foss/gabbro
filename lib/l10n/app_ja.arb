@@ -424,6 +424,7 @@
   "genericCsvSection": "汎用CSV",
 
   "changePassphraseSuccess": "パスフレーズを変更しました",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "パスフレーズを変更",
 
   "continueLabel": "続行",

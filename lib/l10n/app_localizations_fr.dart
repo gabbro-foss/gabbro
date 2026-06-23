@@ -995,6 +995,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Mot de passe principal changé avec succès';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Changer le mot de passe principal';
 
   @override

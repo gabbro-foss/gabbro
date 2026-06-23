@@ -424,6 +424,7 @@
   "genericCsvSection": "通用 CSV",
 
   "changePassphraseSuccess": "密码短语已更改",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "更改密码短语",
 
   "continueLabel": "继续",

@@ -989,6 +989,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get changePassphraseSuccess => 'Frase secreta alterada com sucesso';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Alterar frase secreta';
 
   @override
@@ -2951,6 +2955,10 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get changePassphraseSuccess => 'Frase secreta alterada com sucesso';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Alterar frase secreta';
 
   @override
@@ -4908,6 +4916,10 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get changePassphraseSuccess => 'Frase-passe alterada com sucesso';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Alterar frase-passe';

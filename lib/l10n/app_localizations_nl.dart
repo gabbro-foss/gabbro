@@ -990,6 +990,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get changePassphraseSuccess => 'Wachtwoordzin succesvol gewijzigd';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Wachtwoordzin wijzigen';
 
   @override

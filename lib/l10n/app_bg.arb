@@ -424,6 +424,7 @@
   "genericCsvSection": "Общ CSV",
 
   "changePassphraseSuccess": "Паролната фраза е променена",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Промени паролна фраза",
 
   "continueLabel": "Продължи",

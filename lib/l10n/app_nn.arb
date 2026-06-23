@@ -424,6 +424,7 @@
   "genericCsvSection": "Generisk CSV",
 
   "changePassphraseSuccess": "Passfrase endra",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Byt passfrase",
 
   "continueLabel": "Hald fram",

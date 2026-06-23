@@ -989,6 +989,10 @@ class AppLocalizationsLv extends AppLocalizations {
   String get changePassphraseSuccess => 'Ieejas frāze nomainīta';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Mainīt ieejas frāzi';
 
   @override

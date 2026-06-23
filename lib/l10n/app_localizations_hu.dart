@@ -989,6 +989,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get changePassphraseSuccess => 'Jelmondat módosítva';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Jelmondat módosítása';
 
   @override

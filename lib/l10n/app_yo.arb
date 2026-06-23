@@ -424,6 +424,7 @@
   "genericCsvSection": "CSV gbogbogbo",
 
   "changePassphraseSuccess": "Gbolohun ọrọ igbaniwọle ti yipada",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Yipada gbolohun ọrọ igbaniwọle",
 
   "continueLabel": "Tẹsiwaju",

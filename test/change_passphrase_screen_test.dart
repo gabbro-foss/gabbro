@@ -22,14 +22,16 @@ YubikeyRecordData _fakeRecord() => YubikeyRecordData(
 
 // ── Widget helper ─────────────────────────────────────────────────────────────
 
-Widget _buildScreen({
+ChangePassphraseScreen _screen({
   Future<void> Function(List<int>, List<int>)? onChangePassphrase,
   bool blockPassphraseCopyPaste = true,
   List<YubikeyRecordData>? yubikeyRecords,
   Future<void> Function(List<int>, List<int>, String, String)? onConfirmYubikey,
   Future<void> Function(List<YubikeyRecordData>, String, String)? onConfirmAnyYubikey,
+  bool biometricEnabled = false,
+  Future<void> Function()? onDisableBiometric,
 }) =>
-    testApp(ChangePassphraseScreen(
+    ChangePassphraseScreen(
       vaultPath: '/tmp/test.gabbro',
       onChangePassphrase: onChangePassphrase ?? (_, _) async {},
       onEstimateEntropy: _fakeStrongEntropy,
@@ -37,7 +39,62 @@ Widget _buildScreen({
       yubikeyRecords: yubikeyRecords ?? [],
       onConfirmYubikey: onConfirmYubikey ?? (_, _, _, _) async {},
       onConfirmAnyYubikey: onConfirmAnyYubikey ?? (_, _, _) async {},
+      biometricEnabled: biometricEnabled,
+      onDisableBiometric: onDisableBiometric ?? () async {},
+    );
+
+Widget _buildScreen({
+  Future<void> Function(List<int>, List<int>)? onChangePassphrase,
+  bool blockPassphraseCopyPaste = true,
+  List<YubikeyRecordData>? yubikeyRecords,
+  Future<void> Function(List<int>, List<int>, String, String)? onConfirmYubikey,
+  Future<void> Function(List<YubikeyRecordData>, String, String)? onConfirmAnyYubikey,
+  bool biometricEnabled = false,
+  Future<void> Function()? onDisableBiometric,
+}) =>
+    testApp(_screen(
+      onChangePassphrase: onChangePassphrase,
+      blockPassphraseCopyPaste: blockPassphraseCopyPaste,
+      yubikeyRecords: yubikeyRecords,
+      onConfirmYubikey: onConfirmYubikey,
+      onConfirmAnyYubikey: onConfirmAnyYubikey,
+      biometricEnabled: biometricEnabled,
+      onDisableBiometric: onDisableBiometric,
     ));
+
+// testApp uses home: (a root route) which the success path's Navigator.pop can't
+// pop cleanly — and popping disposes the screen's Scaffold + its SnackBar. Push
+// the screen above a host Scaffold so pop returns there and the ScaffoldMessenger
+// SnackBar survives. Use for tests that exercise a successful change.
+Future<void> _pumpPushed(WidgetTester tester, ChangePassphraseScreen screen) async {
+  await tester.pumpWidget(testApp(const Scaffold(body: SizedBox.shrink())));
+  Navigator.of(tester.element(find.byType(Scaffold)))
+      .push(MaterialPageRoute<void>(builder: (_) => screen));
+  await tester.pumpAndSettle();
+}
+
+const _newPass = 'correct horse battery staple one two three four';
+
+// Fill the 3 (or 4, with YubiKey) fields and tap Change passphrase.
+Future<void> _fillAndSubmit(WidgetTester tester, {String? yubikeyPin}) async {
+  await tester.enterText(
+      find.widgetWithText(TextFormField, 'Current passphrase'), 'oldpass');
+  await tester.pump();
+  await tester.enterText(
+      find.widgetWithText(TextFormField, 'New passphrase'), _newPass);
+  await tester.pump();
+  await tester.enterText(
+      find.widgetWithText(TextFormField, 'Confirm new passphrase'), _newPass);
+  await tester.pump();
+  if (yubikeyPin != null) {
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'YubiKey PIN'), yubikeyPin);
+    await tester.pump();
+  }
+  await tester.ensureVisible(find.widgetWithText(FilledButton, 'Change passphrase'));
+  await tester.tap(find.widgetWithText(FilledButton, 'Change passphrase'));
+  await tester.pumpAndSettle();
+}
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
@@ -173,5 +230,67 @@ void main() {
 
     expect(confirmAnyCalled, isTrue);
     expect(find.textContaining('stop'), findsOneWidget);
+  });
+
+  // ── Approach B: disable biometric on a successful passphrase change ───────────
+
+  testWidgets(
+      'N1: passphrase-only success with biometric off shows success, does not disable biometric',
+      (tester) async {
+    var disableCalled = false;
+    await _pumpPushed(tester, _screen(
+      onDisableBiometric: () async => disableCalled = true,
+    ));
+    await _fillAndSubmit(tester);
+
+    expect(disableCalled, isFalse);
+    expect(find.text('Passphrase changed successfully'), findsOneWidget);
+  });
+
+  testWidgets(
+      'N2: YubiKey-mode success with biometric off shows success, does not disable biometric',
+      (tester) async {
+    var disableCalled = false;
+    await _pumpPushed(tester, _screen(
+      yubikeyRecords: [_fakeRecord()],
+      onDisableBiometric: () async => disableCalled = true,
+    ));
+    await _fillAndSubmit(tester, yubikeyPin: '123456');
+
+    expect(disableCalled, isFalse);
+    expect(find.text('Passphrase changed successfully'), findsOneWidget);
+  });
+
+  testWidgets(
+      'N3: a FAILED change never disables biometric (even when enabled)',
+      (tester) async {
+    var disableCalled = false;
+    await tester.pumpWidget(_buildScreen(
+      biometricEnabled: true,
+      onChangePassphrase: (_, _) async => throw Exception('change failed'),
+      onDisableBiometric: () async => disableCalled = true,
+    ));
+    await _fillAndSubmit(tester);
+
+    expect(disableCalled, isFalse);
+    expect(find.text('Passphrase changed successfully'), findsNothing);
+  });
+
+  testWidgets(
+      'R1: passphrase-only success with biometric ON disables biometric and informs the user',
+      (tester) async {
+    var disableCalled = false;
+    await _pumpPushed(tester, _screen(
+      biometricEnabled: true,
+      onDisableBiometric: () async => disableCalled = true,
+    ));
+    await _fillAndSubmit(tester);
+
+    expect(disableCalled, isTrue);
+    expect(
+      find.text(
+          'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.'),
+      findsOneWidget,
+    );
   });
 }

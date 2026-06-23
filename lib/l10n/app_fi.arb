@@ -424,6 +424,7 @@
   "genericCsvSection": "Yleinen CSV",
 
   "changePassphraseSuccess": "Salauslause vaihdettu",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Vaihda salauslause",
 
   "continueLabel": "Jatka",

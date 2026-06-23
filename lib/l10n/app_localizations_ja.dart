@@ -978,6 +978,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get changePassphraseSuccess => 'パスフレーズを変更しました';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'パスフレーズを変更';
 
   @override

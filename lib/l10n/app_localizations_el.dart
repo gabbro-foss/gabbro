@@ -998,6 +998,10 @@ class AppLocalizationsEl extends AppLocalizations {
   String get changePassphraseSuccess => 'Η φράση πρόσβασης άλλαξε';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Αλλαγή φράσης πρόσβασης';
 
   @override

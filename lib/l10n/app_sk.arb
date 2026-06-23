@@ -424,6 +424,7 @@
   "genericCsvSection": "Všeobecný CSV",
 
   "changePassphraseSuccess": "Prístupová fráza zmenená",
+  "changePassphraseBiometricDisabled": "Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.",
   "changePassphraseButton": "Zmeniť prístupovú frázu",
 
   "continueLabel": "Pokračovať",

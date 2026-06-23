@@ -974,6 +974,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get changePassphraseSuccess => '密码短语已更改';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => '更改密码短语';
 
   @override
@@ -2843,6 +2847,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get changePassphraseSuccess => '密码短语已更改';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => '更改密码短语';
 
   @override
@@ -4710,6 +4718,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get changePassphraseSuccess => '密碼片語已變更';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => '變更密碼片語';

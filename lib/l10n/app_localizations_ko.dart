@@ -979,6 +979,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get changePassphraseSuccess => '암호 문구가 변경됐습니다';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => '암호 문구 변경';
 
   @override

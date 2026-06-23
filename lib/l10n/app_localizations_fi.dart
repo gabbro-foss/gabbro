@@ -990,6 +990,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get changePassphraseSuccess => 'Salauslause vaihdettu';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Vaihda salauslause';
 
   @override

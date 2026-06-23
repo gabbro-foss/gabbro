@@ -993,6 +993,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get changePassphraseSuccess => 'Кодовая фраза изменена';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Изменить кодовую фразу';
 
   @override

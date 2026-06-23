@@ -991,6 +991,10 @@ class AppLocalizationsSr extends AppLocalizations {
   String get changePassphraseSuccess => 'Pristupna fraza promenjena';
 
   @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
+
+  @override
   String get changePassphraseButton => 'Promeni pristupnu frazu';
 
   @override
@@ -2948,6 +2952,10 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get changePassphraseSuccess => 'Pristupna fraza promenjena';
+
+  @override
+  String get changePassphraseBiometricDisabled =>
+      'Passphrase changed. Biometric unlock was turned off; re-enable it in Settings.';
 
   @override
   String get changePassphraseButton => 'Promeni pristupnu frazu';
