@@ -112,10 +112,12 @@ release process live in their own document:
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
+- When syncing from a vault file, we need to add a user-facing message to tap the yubikey for yubikey-protected vaults
 - Anonymous user feedback -> two wordclouds (one "what works", one "to improve"), in the teachtogether.tech formative-feedback spirit, published on GitHub. Must stay OUT of the app (no in-app network call - offline/no-telemetry DNA): external link to a no-login form (CryptPad/Framaforms/Nextcloud Forms) -> manual export -> generate two PNGs -> commit + embed in README. Needs moderation (anon free text = spam/abuse): cap to single words, profanity filter, curate before publishing.
 
 ### Code Quality
 - Audit the full code base for dead-code
+- Audit the code base for data leaks and attack surfaces
 - **Autofill save loose ends.** Hardware-verify the localized "No credentials found" dialog (F2,
   fill path, no match). Native review of the best-effort `eu`/`kk`/`yo` save-flow translations.
 - **Deprecated `Dataset.Builder.setValue` (autofill).** `setValue(AutofillId, AutofillValue,
