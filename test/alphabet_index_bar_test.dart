@@ -11,6 +11,9 @@ Future<void> pumpBar(
   required double height,
   required Set<String> presentLetters,
   String? initialLetter,
+  List<String>? letters,
+  String? scrollUpLabel,
+  String? scrollDownLabel,
   void Function(String)? onLetterSelected,
 }) async {
   tester.view.physicalSize = Size(400, height);
@@ -18,15 +21,25 @@ Future<void> pumpBar(
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
 
-  await tester.pumpWidget(
-    MaterialApp(
-      home: AlphabetIndexBar(
-        presentLetters: presentLetters,
-        initialLetter: initialLetter,
-        onLetterSelected: onLetterSelected ?? (_) {},
-      ),
-    ),
-  );
+  // Omit `letters` to exercise the widget's default (Latin) canon.
+  final bar = letters == null
+      ? AlphabetIndexBar(
+          presentLetters: presentLetters,
+          initialLetter: initialLetter,
+          scrollUpLabel: scrollUpLabel ?? 'Scroll up',
+          scrollDownLabel: scrollDownLabel ?? 'Scroll down',
+          onLetterSelected: onLetterSelected ?? (_) {},
+        )
+      : AlphabetIndexBar(
+          letters: letters,
+          presentLetters: presentLetters,
+          initialLetter: initialLetter,
+          scrollUpLabel: scrollUpLabel ?? 'Scroll up',
+          scrollDownLabel: scrollDownLabel ?? 'Scroll down',
+          onLetterSelected: onLetterSelected ?? (_) {},
+        );
+
+  await tester.pumpWidget(MaterialApp(home: bar));
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -70,6 +83,89 @@ void main() {
     await tester.pump();
 
     expect(selected, isNull);
+  });
+
+  // ── Greying contract ──────────────────────────────────────────────────────
+
+  testWidgets('full canon is rendered even when only one letter is present',
+      (tester) async {
+    await pumpBar(tester, height: 756, presentLetters: {'A'});
+
+    // Absent letters are still drawn (greyed), not omitted.
+    expect(find.text('Z'), findsOneWidget);
+    expect(find.text('M'), findsOneWidget);
+  });
+
+  testWidgets('absent letters render dimmer than present letters',
+      (tester) async {
+    await pumpBar(tester, height: 756, presentLetters: {'A'});
+
+    Color colorOf(String letter) {
+      final text = tester.widget<Text>(find.text(letter));
+      return text.style!.color!;
+    }
+
+    // 'A' is present (full opacity); 'B' is absent (dimmed to alpha 0.25).
+    expect(colorOf('A').a, greaterThan(colorOf('B').a));
+  });
+
+  // ── A11y semantics ────────────────────────────────────────────────────────
+
+  testWidgets('present letter slot is a button labelled with its letter',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    await pumpBar(tester, height: 756, presentLetters: {'A'});
+
+    expect(find.bySemanticsLabel('A'), findsOneWidget);
+    final node = tester.getSemantics(find.bySemanticsLabel('A'));
+    expect(node.flagsCollection.isButton, isTrue);
+    handle.dispose();
+  });
+
+  testWidgets('absent letter slot is excluded from semantics', (tester) async {
+    final handle = tester.ensureSemantics();
+    await pumpBar(tester, height: 756, presentLetters: {'A'});
+
+    expect(find.bySemanticsLabel('B'), findsNothing);
+    handle.dispose();
+  });
+
+  testWidgets('# slot is labelled with the # glyph', (tester) async {
+    final handle = tester.ensureSemantics();
+    await pumpBar(tester, height: 756, presentLetters: {'A', '#'});
+
+    expect(find.bySemanticsLabel('#'), findsOneWidget);
+    handle.dispose();
+  });
+
+  testWidgets('chevrons expose the provided scroll labels', (tester) async {
+    final handle = tester.ensureSemantics();
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'Z'},
+      scrollUpLabel: 'EARLIER',
+      scrollDownLabel: 'LATER',
+    );
+
+    expect(find.bySemanticsLabel('EARLIER'), findsOneWidget);
+    expect(find.bySemanticsLabel('LATER'), findsOneWidget);
+    handle.dispose();
+  });
+
+  // ── Custom letter set (Cycle 1: locale-driven canon) ──────────────────────
+
+  testWidgets('letters param drives the slot set (Cyrillic)', (tester) async {
+    await pumpBar(
+      tester,
+      height: 756,
+      letters: const ['А', 'Б', 'В', 'Г', 'Д', '#'],
+      presentLetters: {'Б'},
+    );
+
+    expect(find.text('Б'), findsOneWidget); // present
+    expect(find.text('А'), findsOneWidget); // greyed, still rendered
+    expect(find.text('Q'), findsNothing); // no Latin canon
   });
 
   // ── Full mode ─────────────────────────────────────────────────────────────

@@ -1,29 +1,38 @@
 import 'package:flutter/material.dart';
 
-const _kAllLetters = [
+// Default (Latin) canon used when no locale-specific alphabet is supplied.
+const _kLatinCanon = [
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
   'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '#',
 ];
 
 // Minimum slot height that keeps letters readable.
 const _kMinSlotHeight = 28.0;
-// Total height needed to show all 27 letters at minimum slot height.
-const _kFullModeThreshold = _kMinSlotHeight * 27; // 756dp
 // Height consumed by one chevron button (including its SizedBox wrapper).
 const _kChevronHeight = 32.0;
 
 class AlphabetIndexBar extends StatefulWidget {
+  // Ordered canonical slot set (locale's alphabet + '#'). The full set is always
+  // rendered; absent letters are greyed. Defaults to the Latin canon.
+  final List<String> letters;
   final Set<String> presentLetters;
   final void Function(String letter) onLetterSelected;
   // The letter the window should be centred on at first build.
   // Defaults to the first present letter if null.
   final String? initialLetter;
+  // A11y labels for the windowed-mode scroll chevrons. The screen passes
+  // localized strings; the English defaults are for the widget in isolation.
+  final String scrollUpLabel;
+  final String scrollDownLabel;
 
   const AlphabetIndexBar({
     super.key,
+    this.letters = _kLatinCanon,
     required this.presentLetters,
     required this.onLetterSelected,
     this.initialLetter,
+    this.scrollUpLabel = 'Scroll up',
+    this.scrollDownLabel = 'Scroll down',
   });
 
   @override
@@ -49,14 +58,14 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
   // windowSize from LayoutBuilder.
   int _initialWindowStart(int windowSize) {
     final anchor = widget.initialLetter ??
-        _kAllLetters.firstWhere(
+        widget.letters.firstWhere(
           (l) => widget.presentLetters.contains(l),
-          orElse: () => 'A',
+          orElse: () => widget.letters.first,
         );
-    final anchorIndex = _kAllLetters.indexOf(anchor);
+    final anchorIndex = widget.letters.indexOf(anchor);
     final half = windowSize ~/ 2;
     final maxStart =
-        (_kAllLetters.length - windowSize).clamp(0, _kAllLetters.length - 1);
+        (widget.letters.length - windowSize).clamp(0, widget.letters.length - 1);
     return (anchorIndex - half).clamp(0, maxStart);
   }
 
@@ -67,18 +76,18 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
   int _windowSize(double availableHeight) {
     final forLetters =
         availableHeight - 2 * _kChevronHeight - 2 * _kMinSlotHeight;
-    return (forLetters / _kMinSlotHeight).floor().clamp(1, _kAllLetters.length);
+    return (forLetters / _kMinSlotHeight).floor().clamp(1, widget.letters.length);
   }
 
   List<String> _windowedLetters(int size) {
-    final end = (_windowStart + size).clamp(0, _kAllLetters.length);
-    return _kAllLetters.sublist(_windowStart, end);
+    final end = (_windowStart + size).clamp(0, widget.letters.length);
+    return widget.letters.sublist(_windowStart, end);
   }
 
   void _shiftWindow(bool down, int windowSize) {
     final step = (windowSize ~/ 2).clamp(1, windowSize);
     final maxStart =
-        (_kAllLetters.length - windowSize).clamp(0, _kAllLetters.length - 1);
+        (widget.letters.length - windowSize).clamp(0, widget.letters.length - 1);
     setState(() {
       _windowStart = down
           ? (_windowStart + step).clamp(0, maxStart)
@@ -88,7 +97,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
 
   bool get _canScrollUp => _windowStart > 0;
   bool _canScrollDown(int windowSize) =>
-      _windowStart + windowSize < _kAllLetters.length;
+      _windowStart + windowSize < widget.letters.length;
 
   void _handleLetterTap(String letter) {
     if (!widget.presentLetters.contains(letter)) return;
@@ -103,7 +112,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
     final isActive = letter == _activeLetter;
     final isPresent = widget.presentLetters.contains(letter);
     final circleSize = (slotHeight * 0.85).clamp(20.0, 36.0);
-    return SizedBox(
+    final slot = SizedBox(
       height: slotHeight,
       child: Center(
         child: GestureDetector(
@@ -140,16 +149,33 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
         ),
       ),
     );
+
+    // Absent letters are skipped by screen readers; present ones announce as a
+    // button labelled with the letter (the visual glyph is excluded so it is
+    // not read twice).
+    if (!isPresent) return ExcludeSemantics(child: slot);
+    return Semantics(
+      button: true,
+      label: letter,
+      excludeSemantics: true,
+      child: slot,
+    );
   }
 
   Widget _chevron({
     required bool up,
     required bool enabled,
+    required String label,
     required VoidCallback onTap,
   }) {
     final icon = up ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down;
     final primary = Theme.of(context).colorScheme.primary;
-    return SizedBox(
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: label,
+      excludeSemantics: true,
+      child: SizedBox(
       height: _kChevronHeight,
       child: Center(
         child: GestureDetector(
@@ -168,6 +194,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
             ),
           ),
         ),
+      ),
       ),
     );
   }
@@ -223,15 +250,16 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
       final availableHeight = constraints.maxHeight;
 
       // ── Full mode ──────────────────────────────────────────────────────────
-      // Distribute available height evenly across all 27 slots so children
-      // exactly fill the box — no overflow possible.
-      if (availableHeight >= _kFullModeThreshold) {
-        final slotHeight = availableHeight / _kAllLetters.length;
+      // Enough room to show every slot: distribute available height evenly
+      // across all of them so children exactly fill the box — no overflow.
+      final fullModeThreshold = widget.letters.length * _kMinSlotHeight;
+      if (availableHeight >= fullModeThreshold) {
+        final slotHeight = availableHeight / widget.letters.length;
         return Column(
           mainAxisSize: MainAxisSize.max,
-          children: _kAllLetters
+          children: widget.letters
               .map((l) => _letterSlot(l, primary, slotHeight,
-                  winSize: _kAllLetters.length))
+                  winSize: widget.letters.length))
               .toList(),
         );
       }
@@ -247,7 +275,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
 
       // Clamp in case availableHeight shrank (e.g. rotation).
       final maxStart =
-          (_kAllLetters.length - winSize).clamp(0, _kAllLetters.length - 1);
+          (widget.letters.length - winSize).clamp(0, widget.letters.length - 1);
       if (_windowStart > maxStart) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) setState(() => _windowStart = maxStart);
@@ -275,6 +303,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
           _chevron(
             up: true,
             enabled: _canScrollUp,
+            label: widget.scrollUpLabel,
             onTap: () => _shiftWindowAndNotify(false, winSize),
           ),
           if (showEllipsisTop)
@@ -290,6 +319,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
           _chevron(
             up: false,
             enabled: _canScrollDown(winSize),
+            label: widget.scrollDownLabel,
             onTap: () => _shiftWindowAndNotify(true, winSize),
           ),
         ],

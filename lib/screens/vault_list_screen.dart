@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
+import 'package:gabbro/screens/section_index.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/import_screen.dart';
@@ -234,6 +235,9 @@ class _VaultListScreenState extends State<VaultListScreen>
   final ScrollController _chipScrollController = ScrollController();
   bool _showLeftChevron = false;
   bool _showRightChevron = false;
+  // Active UI locale; picks the index alphabet (script). Set in
+  // didChangeDependencies so it tracks locale changes.
+  Locale _locale = const Locale('en');
 
   List<YubikeyRecordData> _detectYubikeyRecords() {
     try {
@@ -265,6 +269,7 @@ class _VaultListScreenState extends State<VaultListScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _locale = Localizations.localeOf(context);
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateChevrons());
   }
 
@@ -417,19 +422,11 @@ class _VaultListScreenState extends State<VaultListScreen>
     return map;
   }
 
-  String _sectionLetter(EntrySummaryData entry) {
-    final title = _displayTitle(entry);
-    if (title.isEmpty) return '#';
-    final first = title[0];
-    return RegExp(r'[A-Za-z]').hasMatch(first) ? first.toUpperCase() : '#';
-  }
+  String _sectionLetter(EntrySummaryData entry) =>
+      sectionBucket(_displayTitle(entry), _locale);
 
-  int _sortKey(EntrySummaryData entry) {
-    final title = _displayTitle(entry);
-    if (title.isEmpty) return 1;
-    final first = title[0];
-    return RegExp(r'[A-Za-z]').hasMatch(first) ? 0 : 1;
-  }
+  int _sortKey(EntrySummaryData entry) =>
+      sectionSortRank(_displayTitle(entry), _locale);
 
   List<dynamic> get _groupedEntries {
     final sorted = List<EntrySummaryData>.from(_filteredEntries)
@@ -440,6 +437,10 @@ class _VaultListScreenState extends State<VaultListScreen>
           a,
         ).toLowerCase().compareTo(_displayTitle(b).toLowerCase());
       });
+
+    // Non-indexable locales (ja/zh) get a flat title-sorted list with no
+    // section headers — there is no human-orderable bucket to label.
+    if (!isIndexableLocale(_locale)) return sorted;
 
     final result = <dynamic>[];
     String? currentLetter;
@@ -1271,6 +1272,8 @@ class _VaultListScreenState extends State<VaultListScreen>
               groupedEntries: _groupedEntries,
               filteredEntries: _filteredEntries,
               letterIndex: _letterIndex,
+              barLetters: canonicalAlphabet(_locale),
+              showIndexBar: isIndexableLocale(_locale),
               onLetterSelected: _scrollToLetter,
               displayTitle: (e) => _localizedDisplayTitle(e, l),
               displayType: (t) => _displayType(t, l),
@@ -1418,21 +1421,30 @@ class _VaultListScreenState extends State<VaultListScreen>
                             // Index bar — fixed width column. Position (left or
                             // right) is read from settings or the test override.
                             if (_searchQuery.isEmpty &&
+                                isIndexableLocale(_locale) &&
                                 _alphabetBarPosition ==
                                     AlphabetBarPosition.left)
                               SizedBox(
                                 width: 48,
                                 child: AlphabetIndexBar(
+                                  letters: canonicalAlphabet(_locale),
                                   presentLetters: _letterIndex.keys.toSet(),
+                                  scrollUpLabel: l.tooltipPreviousPage,
+                                  scrollDownLabel: l.tooltipNextPage,
                                   onLetterSelected: _scrollToLetter,
                                 ),
                               ),
                             // List takes all remaining width.
                             Expanded(
                               child: ScrollConfiguration(
-                                behavior: ScrollConfiguration.of(
-                                  context,
-                                ).copyWith(scrollbars: false),
+                                // Indexable locales hide the scrollbar (the bar
+                                // navigates); ja/zh keep the platform default
+                                // (desktop thumb, mobile flick).
+                                behavior: ScrollConfiguration.of(context)
+                                    .copyWith(
+                                  scrollbars:
+                                      isIndexableLocale(_locale) ? false : null,
+                                ),
                                 child: ScrollablePositionedList.builder(
                                   itemScrollController: _itemScrollController,
                                   padding: const EdgeInsets.only(bottom: 80),
@@ -1531,6 +1543,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                               ),
                             ),
                             if (_searchQuery.isEmpty &&
+                                isIndexableLocale(_locale) &&
                                 _alphabetBarPosition ==
                                     AlphabetBarPosition.right)
                               Padding(
@@ -1538,7 +1551,10 @@ class _VaultListScreenState extends State<VaultListScreen>
                                 child: SizedBox(
                                   width: 48,
                                   child: AlphabetIndexBar(
+                                    letters: canonicalAlphabet(_locale),
                                     presentLetters: _letterIndex.keys.toSet(),
+                                    scrollUpLabel: l.tooltipPreviousPage,
+                                    scrollDownLabel: l.tooltipNextPage,
                                     onLetterSelected: _scrollToLetter,
                                   ),
                                 ),

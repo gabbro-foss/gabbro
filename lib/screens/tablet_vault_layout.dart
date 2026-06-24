@@ -5,6 +5,7 @@ import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
+import 'package:gabbro/screens/section_index.dart';
 import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -35,6 +36,12 @@ class TabletVaultLayout extends StatefulWidget {
 
   /// Letter → index map for the alphabet bar.
   final Map<String, int> letterIndex;
+
+  /// Canonical alphabet (locale's script) for the index bar. Null = Latin.
+  final List<String>? barLetters;
+
+  /// Whether the locale's script supports an index bar (false for ja/zh).
+  final bool showIndexBar;
 
   /// Called when the alphabet bar taps a letter.
   final void Function(String) onLetterSelected;
@@ -90,6 +97,8 @@ class TabletVaultLayout extends StatefulWidget {
     required this.groupedEntries,
     required this.filteredEntries,
     required this.letterIndex,
+    this.barLetters,
+    this.showIndexBar = true,
     required this.onLetterSelected,
     required this.displayTitle,
     required this.displayType,
@@ -235,11 +244,16 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
               : Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (widget.searchActive == false)
+                    if (widget.searchActive == false && widget.showIndexBar)
                       SizedBox(
                         width: 48,
                         child: AlphabetIndexBar(
+                          letters: widget.barLetters ?? canonicalAlphabet(null),
                           presentLetters: widget.letterIndex.keys.toSet(),
+                          scrollUpLabel:
+                              AppLocalizations.of(context).tooltipPreviousPage,
+                          scrollDownLabel:
+                              AppLocalizations.of(context).tooltipNextPage,
                           onLetterSelected: (letter) {
                             final index = widget.letterIndex[letter];
                             if (index == null) return;
@@ -253,9 +267,10 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                       ),
                     Expanded(
                       child: ScrollConfiguration(
-                        behavior: ScrollConfiguration.of(
-                          context,
-                        ).copyWith(scrollbars: false),
+                        // No bar (ja/zh) -> keep the platform-default scrollbar.
+                        behavior: ScrollConfiguration.of(context).copyWith(
+                          scrollbars: widget.showIndexBar ? false : null,
+                        ),
                         child: ScrollablePositionedList.builder(
                           itemScrollController: _itemScrollController,
                           padding: const EdgeInsets.only(bottom: 16),
