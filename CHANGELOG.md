@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- The alphabet index bar is now script-aware and follows the UI locale: Latin, Greek (accents folded), Cyrillic (Russian/Ukrainian/Bulgarian/Kazakh, each its own alphabet) and Korean (by leading consonant) get their script's letters instead of everything collapsing under "#". Japanese and Chinese have no human-orderable index, so those locales drop the bar for a plain title-sorted list (scrollbar on desktop, flick-scroll on mobile). Bar slots and chevrons now carry screen-reader labels. Non-Latin alphabets are best-effort and unreviewed by native speakers.
 - Accessibility: the show/hide eye toggles (passphrase, PIN, password, CVV) across 12 screens now carry screen-reader labels, alongside the browse, folder add/edit/delete, vault-list add/delete/close and Help prev/next buttons — they previously announced a bare "button". Enforced per screen by `labeledTapTargetGuideline`.
 
 ### Fixed

@@ -72,7 +72,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 527 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 12 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 908 | 0 |
+| Flutter (`flutter test`) | 969 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 101 | 15 |
 
@@ -91,11 +91,14 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**Alphabet index bar rework.** `alphabet_index_bar.dart` is hardcoded Latin
-`A-Z`+`#` with `[A-Za-z]`->letter else `#` bucketing — so non-Latin titles (CJK,
-Greek, Cyrillic, Arabic) all collapse into `#` and the bar is useless there; its
-letter slots also carry no a11y label. Needs script-aware bucketing + localized
-headers + semantic labels.
+**Alphabet index bar rework — code complete, pending hardware verification.**
+Index bucketing is now locale-driven (`lib/screens/section_index.dart`): Latin,
+Greek (accent-folded), Cyrillic (ru/uk/bg/kk), and Korean (jamo) each get their
+script's alphabet; Japanese/Chinese have no human-orderable bar, so those locales
+drop it for a plain title-sorted list with the platform-default scrollbar. Bar
+slots carry button/letter a11y semantics; chevrons reuse the translated
+page tooltips. **Needs Rob's hardware pass** (Linux + Android) to confirm
+non-Latin rendering and the CJK scrollbar before this clears. Next task TBD.
 
 ---
 
