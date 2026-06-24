@@ -250,10 +250,11 @@ fn make_blob(parts: &[&str]) -> String {
         .join(" ")
 }
 
-/// Appends custom field labels and, for non-hidden fields, values to `parts`.
+/// Appends non-hidden custom field values to `parts`. Field labels are
+/// intentionally excluded: full-text search matches values, not labels (so an
+/// empty field labelled "Phone" never matches a "phone" search).
 fn push_custom_fields<'a>(parts: &mut Vec<&'a str>, fields: &'a [CustomField]) {
     for f in fields {
-        parts.push(&f.label);
         if !f.hidden {
             parts.push(&f.value);
         }
@@ -270,9 +271,10 @@ fn push_custom_fields<'a>(parts: &mut Vec<&'a str>, fields: &'a [CustomField]) {
 /// - File:     `filename`
 /// - Custom:   `title` field
 ///
-/// `search_blob` is a lowercase union of all searchable non-secret fields.
-/// Passwords, card numbers, CVVs, PINs, and hidden custom field values
-/// are excluded.
+/// `search_blob` is a lowercase union of all searchable non-secret field
+/// *values*. Field labels (incl. custom field labels) are excluded so search
+/// matches values, not labels. Passwords, card numbers, CVVs, PINs, and hidden
+/// custom field values are excluded.
 fn entry_to_summary(entry: &VaultEntry) -> EntrySummaryData {
     match entry {
         VaultEntry::Login(e) => {
@@ -353,7 +355,6 @@ fn entry_to_summary(entry: &VaultEntry) -> EntrySummaryData {
         VaultEntry::Custom(e) => {
             let mut parts: Vec<&str> = vec![&e.title];
             for f in e.fields.values() {
-                parts.push(&f.label);
                 if !f.hidden {
                     parts.push(&f.value);
                 }
@@ -3730,7 +3731,7 @@ mod json_export_tests {
     }
 
     #[test]
-    fn search_blob_for_login_includes_visible_custom_field_value() {
+    fn search_blob_for_login_includes_value_excludes_custom_field_label() {
         use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
@@ -3755,9 +3756,11 @@ mod json_export_tests {
             email: None,
         });
         let s = entry_to_summary(&entry);
+        // Full-text search matches values, not field labels: searching "email"
+        // must not match an entry merely because it has an email-labelled field.
         assert!(
-            s.search_blob.contains("recovery email"),
-            "blob must include custom field label"
+            !s.search_blob.contains("recovery email"),
+            "blob must NOT include custom field labels (values only)"
         );
         assert!(
             s.search_blob.contains("backup@example.com"),
@@ -3796,8 +3799,8 @@ mod json_export_tests {
             "blob must not include hidden custom field value"
         );
         assert!(
-            s.search_blob.contains("secret token"),
-            "blob must still include hidden field label"
+            !s.search_blob.contains("secret token"),
+            "blob must not include custom field labels (values only)"
         );
     }
 
@@ -3891,6 +3894,166 @@ mod json_export_tests {
             "blob must not include card number"
         );
         assert!(!s.search_blob.contains("999"), "blob must not include cvv");
+    }
+
+    #[test]
+    fn search_blob_excludes_empty_labelled_fields_enpass_regression() {
+        // Enpass templates carry typed fields (Email, Phone, ...) that import as
+        // empty-valued custom fields. Their labels must not make a full-text
+        // search for the label word match the entry. (2026-06-24 regression.)
+        use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: "id-blob-enpass".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            title: "Acme account".to_string(),
+            url: "".to_string(),
+            username: "user".to_string(),
+            password: "pw".to_string(),
+            notes: None,
+            custom_fields: vec![
+                CustomField {
+                    label: "Phone".to_string(),
+                    value: "".to_string(),
+                    hidden: false,
+                },
+                CustomField {
+                    label: "Email".to_string(),
+                    value: "".to_string(),
+                    hidden: false,
+                },
+            ],
+            attachments: vec![],
+            previous_password: None,
+            app_id: None,
+            email: None,
+        });
+        let s = entry_to_summary(&entry);
+        assert!(
+            !s.search_blob.contains("phone"),
+            "empty Phone-labelled field must not match a 'phone' search"
+        );
+        assert!(
+            !s.search_blob.contains("email"),
+            "empty Email-labelled field must not match an 'email' search"
+        );
+    }
+
+    #[test]
+    fn search_blob_matches_word_in_free_text_notes() {
+        // The flip side of values-not-labels: a word in free-text notes is
+        // content and must match, even when no field is labelled with it.
+        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
+        let entry = VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: "id-blob-notes2".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            title: "Acme account".to_string(),
+            url: "".to_string(),
+            username: "user".to_string(),
+            password: "pw".to_string(),
+            notes: Some("reset link is sent to your email".to_string()),
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_password: None,
+            app_id: None,
+            email: None,
+        });
+        let s = entry_to_summary(&entry);
+        assert!(
+            s.search_blob.contains("email"),
+            "a word in free-text notes must match"
+        );
+    }
+
+    #[test]
+    fn search_blob_for_custom_excludes_field_labels() {
+        // values-not-labels applies to Custom entries too: a field labelled
+        // "Router" must not match a "router" search; its value still matches.
+        use crate::vault::entry::{CustomField, CustomEntry, EntryMeta, VaultEntry};
+        use std::collections::HashMap;
+        let mut fields = HashMap::new();
+        fields.insert(
+            "f1".to_string(),
+            CustomField {
+                label: "Router".to_string(),
+                value: "10.0.0.1".to_string(),
+                hidden: false,
+            },
+        );
+        let entry = VaultEntry::Custom(CustomEntry {
+            meta: EntryMeta {
+                id: "id-blob-custom2".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            title: "Home network".to_string(),
+            fields,
+            attachments: vec![],
+        });
+        let s = entry_to_summary(&entry);
+        assert!(
+            !s.search_blob.contains("router"),
+            "Custom field label must not be searchable"
+        );
+        assert!(
+            s.search_blob.contains("10.0.0.1"),
+            "Custom field value must remain searchable"
+        );
+    }
+
+    #[test]
+    fn search_blob_for_custom_includes_title_and_visible_values_excludes_hidden() {
+        // Net-first pin: the Custom-entry blob must keep its title and non-hidden
+        // field values searchable, and never leak hidden values. (Independent of
+        // whether field labels are folded in.)
+        use crate::vault::entry::{CustomField, CustomEntry, EntryMeta, VaultEntry};
+        use std::collections::HashMap;
+        let mut fields = HashMap::new();
+        fields.insert(
+            "f1".to_string(),
+            CustomField {
+                label: "Router".to_string(),
+                value: "192.168.1.1".to_string(),
+                hidden: false,
+            },
+        );
+        fields.insert(
+            "f2".to_string(),
+            CustomField {
+                label: "Passcode".to_string(),
+                value: "hidden_value_zzz".to_string(),
+                hidden: true,
+            },
+        );
+        let entry = VaultEntry::Custom(CustomEntry {
+            meta: EntryMeta {
+                id: "id-blob-custom".to_string(),
+                created_at: "".to_string(),
+                updated_at: "".to_string(),
+                folder: "".to_string(),
+            },
+            title: "Home network".to_string(),
+            fields,
+            attachments: vec![],
+        });
+        let s = entry_to_summary(&entry);
+        assert!(s.search_blob.contains("home network"), "blob must include title");
+        assert!(
+            s.search_blob.contains("192.168.1.1"),
+            "blob must include non-hidden field value"
+        );
+        assert!(
+            !s.search_blob.contains("hidden_value_zzz"),
+            "blob must not include hidden field value"
+        );
     }
 
     #[test]
