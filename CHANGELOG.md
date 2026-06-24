@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Accessibility: the show/hide eye toggles (passphrase, PIN, password, CVV) across 12 screens now carry screen-reader labels, alongside the browse, folder add/edit/delete, vault-list add/delete/close and Help prev/next buttons — they previously announced a bare "button". Enforced per screen by `labeledTapTargetGuideline`.
 
 ### Fixed
+- Full-text search ("search all fields") now matches field *values*, not field labels. Entries imported from Enpass carry empty typed fields (Email, Phone, ...) whose labels made every such entry falsely match a search for "email"/"phone"; that no longer happens, while a word in free-text notes still matches.
 - Managing folders no longer throws an unhandled exception when a rename, add, or delete fails (e.g. a name that already exists) — the error is shown in a SnackBar. Renaming a folder to its unchanged name is now a no-op instead of an error.
 - Autofill: when the vault unlocks but no saved login matches the site/app, it now shows the localized "no credentials found" dialog instead of a false "could not unlock — wrong credentials" error.
 - Biometric unlock no longer silently fails after a passphrase change: changing the passphrase now turns biometric off (its stored secret was tied to the old passphrase) and tells you to re-enable it in Settings.
