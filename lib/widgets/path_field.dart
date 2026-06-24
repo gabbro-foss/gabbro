@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:gabbro/l10n/app_localizations.dart';
 
 import '../safe_file_picker.dart';
 
@@ -114,6 +115,7 @@ class _PathFieldState extends State<PathField> {
             ? null
             : IconButton(
                 icon: const Icon(Icons.folder_open),
+                tooltip: AppLocalizations.of(context).tooltipBrowse,
                 onPressed: _pick,
               ),
       ),

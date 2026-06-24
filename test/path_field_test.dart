@@ -55,6 +55,25 @@ void main() {
       expect(find.byIcon(Icons.folder_open), findsOneWidget);
     });
 
+    // A11y: the browse (folder) button must carry a semantic label so screen
+    // readers announce it, not a bare "button".
+    testWidgets('browse button meets labelled-tap-target guideline',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        testApp(Scaffold(
+          body: PathField(
+            mode: PathFieldMode.open,
+            hint: 'Select a file',
+            onPathSelected: (_) {},
+          ),
+        )),
+      );
+      await tester.pumpAndSettle();
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      handle.dispose();
+    });
+
     // The user must be able to type or paste a path directly, not only pick it
     // via the native dialog - the dialog can be unavailable under a Wayland
     // bubblewrap sandbox, and typing is the escape hatch.

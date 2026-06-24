@@ -175,6 +175,8 @@
   "tooltipShow": "表示",
   "tooltipHide": "非表示",
   "tooltipBrowse": "参照",
+  "tooltipPreviousPage": "前のページ",
+  "tooltipNextPage": "次のページ",
   "tooltipEditAlias": "エイリアスを編集",
   "tooltipRemoveField": "フィールドを削除",
   "tooltipRename": "名前変更",

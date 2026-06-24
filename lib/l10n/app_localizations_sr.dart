@@ -508,6 +508,12 @@ class AppLocalizationsSr extends AppLocalizations {
   String get tooltipBrowse => 'Pretraži';
 
   @override
+  String get tooltipPreviousPage => 'Претходна страница';
+
+  @override
+  String get tooltipNextPage => 'Следећа страница';
+
+  @override
   String get tooltipEditAlias => 'Uredi alias';
 
   @override
@@ -2469,6 +2475,12 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get tooltipBrowse => 'Pretraži';
+
+  @override
+  String get tooltipPreviousPage => 'Prethodna stranica';
+
+  @override
+  String get tooltipNextPage => 'Sledeća stranica';
 
   @override
   String get tooltipEditAlias => 'Uredi alias';

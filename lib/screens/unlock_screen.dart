@@ -888,6 +888,7 @@ class _UnlockScreenState extends State<UnlockScreen>
                                 ? Icons.visibility_off
                                 : Icons.visibility,
                           ),
+                          tooltip: _obscured ? l.tooltipShow : l.tooltipHide,
                           onPressed: () =>
                               setState(() => _obscured = !_obscured),
                         ),
@@ -935,6 +936,9 @@ class _UnlockScreenState extends State<UnlockScreen>
                                   ? Icons.visibility_off
                                   : Icons.visibility,
                             ),
+                            tooltip: _pinObscured
+                                ? l.tooltipShowPin
+                                : l.tooltipHidePin,
                             onPressed: () =>
                                 setState(() => _pinObscured = !_pinObscured),
                           ),

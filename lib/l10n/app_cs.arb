@@ -175,6 +175,8 @@
   "tooltipShow": "Zobrazit",
   "tooltipHide": "Skrýt",
   "tooltipBrowse": "Procházet",
+  "tooltipPreviousPage": "Předchozí stránka",
+  "tooltipNextPage": "Další stránka",
   "tooltipEditAlias": "Upravit alias",
   "tooltipRemoveField": "Odebrat pole",
   "tooltipRename": "Přejmenovat",
@@ -682,8 +684,6 @@
   "emergencyWipeAndroidBody": "Chcete-li okamžitě zničit všechna data Gabbro v zařízení — bez ověření, nevratně — otevřete Nastavení zařízení, najděte Gabbro v seznamu aplikací a zvolte Vymazat data.",
   "emergencyWipeLinuxBody": "Chcete-li okamžitě zničit všechna data Gabbro v zařízení — bez ověření, nevratně — odstraňte tyto složky v terminálu. Trezory uložené na jiných místech se v těchto složkách nenacházejí a je nutné je odstranit samostatně.",
 
-  "navVault": "Trezor",
-  "navAbout": "O aplikaci",
 
   "yubiKeySecurityWarning": "Bezpečnostní varování",
   "removeYubiKeyTitle": "Odebrat YubiKey",
@@ -738,9 +738,6 @@
   },
   "selectAtLeastOneCharSet": "Vyberte alespoň jednu sadu znaků",
   "passwordMinLengthNote": "Hesla mají alespoň 12 znaků. Pokud má web kratší limit, zkopírujte potřebný počet prvních znaků.",
-  "tooltipShow": "Zobrazit",
-  "tooltipCopied": "Zkopírováno!",
-  "tooltipCopy": "Kopírovat",
   "excludeAmbiguousChars": "Vyloučit nejednoznačné znaky (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Vytvořte svůj trezor pro začátek.",

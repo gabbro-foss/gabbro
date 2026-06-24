@@ -509,6 +509,12 @@ class AppLocalizationsUk extends AppLocalizations {
   String get tooltipBrowse => 'Огляд';
 
   @override
+  String get tooltipPreviousPage => 'Попередня сторінка';
+
+  @override
+  String get tooltipNextPage => 'Наступна сторінка';
+
+  @override
   String get tooltipEditAlias => 'Змінити псевдонім';
 
   @override

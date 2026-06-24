@@ -508,6 +508,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tooltipBrowse => 'Обзор';
 
   @override
+  String get tooltipPreviousPage => 'Предыдущая страница';
+
+  @override
+  String get tooltipNextPage => 'Следующая страница';
+
+  @override
   String get tooltipEditAlias => 'Изменить псевдоним';
 
   @override

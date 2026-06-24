@@ -101,6 +101,28 @@ void main() {
       expect(find.text('/tmp/other.gabbro'), findsOneWidget);
     });
 
+    // Net-first: pin the passphrase show/hide eye toggle so the later a11y
+    // label work cannot regress the flip. Field starts obscured -> the eye
+    // icon offers "show" (Icons.visibility); tapping flips to visibility_off.
+    testWidgets('passphrase eye toggle flips in the sync dialog', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        pickedPath: '/tmp/other.gabbro',
+        mergeVault: (_, _) async => _summary(),
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.visibility), findsOneWidget);
+      expect(find.byIcon(Icons.visibility_off), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.visibility));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+      expect(find.byIcon(Icons.visibility), findsNothing);
+    });
+
     testWidgets('Cancel dismisses dialog without calling mergeVault',
         (tester) async {
       bool mergeCalled = false;
@@ -346,6 +368,41 @@ void main() {
         findsNWidgets(2),
       );
       expect(find.text('YubiKey PIN'), findsOneWidget);
+    });
+
+    // Net-first: pin the PIN eye toggle (key-protected mode adds a second eye
+    // below the passphrase eye). Both start showing Icons.visibility; tapping
+    // the PIN one (last) flips it to visibility_off, leaving the passphrase eye.
+    testWidgets('PIN eye toggle flips independently of the passphrase eye',
+        (tester) async {
+      await tester.pumpWidget(buildKeyProtectedScreen(
+        mergeVaultWithKey: (_, _, _, _) async => _summary(added: 1),
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.visibility), findsNWidgets(2));
+
+      await tester.tap(find.byIcon(Icons.visibility).last);
+      await tester.pump();
+
+      expect(find.byIcon(Icons.visibility), findsOneWidget);
+      expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+    });
+
+    // A11y: the passphrase + PIN eye toggles in the sync dialog (and the
+    // add-entry FAB behind it) must carry semantic labels.
+    testWidgets('sync dialog meets labelled-tap-target guideline', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(buildKeyProtectedScreen(
+        mergeVaultWithKey: (_, _, _, _) async => _summary(added: 1),
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      handle.dispose();
     });
 
     testWidgets('keyed merge receives tapped key material', (tester) async {

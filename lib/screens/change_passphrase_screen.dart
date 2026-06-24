@@ -352,6 +352,9 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                                 ? Icons.visibility_off
                                 : Icons.visibility,
                           ),
+                          tooltip: _pinObscured
+                              ? l.tooltipShowPin
+                              : l.tooltipHidePin,
                           onPressed: () =>
                               setState(() => _pinObscured = !_pinObscured),
                         ),
@@ -390,6 +393,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                               ? Icons.visibility_off
                               : Icons.visibility,
                         ),
+                        tooltip: _oldObscured ? l.tooltipShow : l.tooltipHide,
                         onPressed: () =>
                             setState(() => _oldObscured = !_oldObscured),
                       ),
@@ -413,6 +417,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                               ? Icons.visibility_off
                               : Icons.visibility,
                         ),
+                        tooltip: _newObscured ? l.tooltipShow : l.tooltipHide,
                         onPressed: () =>
                             setState(() => _newObscured = !_newObscured),
                       ),
@@ -483,6 +488,9 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                               ? Icons.visibility_off
                               : Icons.visibility,
                         ),
+                        tooltip: _confirmObscured
+                            ? l.tooltipShow
+                            : l.tooltipHide,
                         onPressed: () => setState(
                           () => _confirmObscured = !_confirmObscured,
                         ),

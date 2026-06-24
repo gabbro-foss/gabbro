@@ -742,6 +742,25 @@ void main() {
     expect(find.byIcon(Icons.visibility), findsWidgets);
   });
 
+  // A11y: every show/hide eye toggle must carry a semantic label so screen
+  // readers announce it, not a bare "button" (Login password + Card CVV/PIN).
+
+  testWidgets('Login type meets labelled-tap-target guideline', (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(_buildCreateScreen('Login'));
+    await tester.pumpAndSettle();
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    handle.dispose();
+  });
+
+  testWidgets('Card type meets labelled-tap-target guideline', (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(_buildCreateScreen('Card'));
+    await tester.pumpAndSettle();
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    handle.dispose();
+  });
+
   // ── Custom field deletion ─────────────────────────────────────────────────
 
   testWidgets('custom field can be removed after being added', (tester) async {

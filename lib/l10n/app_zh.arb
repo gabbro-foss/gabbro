@@ -175,6 +175,8 @@
   "tooltipShow": "显示",
   "tooltipHide": "隐藏",
   "tooltipBrowse": "浏览",
+  "tooltipPreviousPage": "上一页",
+  "tooltipNextPage": "下一页",
   "tooltipEditAlias": "编辑别名",
   "tooltipRemoveField": "移除字段",
   "tooltipRename": "重命名",

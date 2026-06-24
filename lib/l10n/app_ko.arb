@@ -175,6 +175,8 @@
   "tooltipShow": "표시",
   "tooltipHide": "숨기기",
   "tooltipBrowse": "찾아보기",
+  "tooltipPreviousPage": "이전 페이지",
+  "tooltipNextPage": "다음 페이지",
   "tooltipEditAlias": "별칭 편집",
   "tooltipRemoveField": "필드 제거",
   "tooltipRename": "이름 변경",

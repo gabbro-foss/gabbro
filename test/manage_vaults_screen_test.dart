@@ -394,6 +394,39 @@ void main() {
       );
     });
 
+    // Net-first: pin the PIN eye toggle in the step-3 dialog so the later a11y
+    // label work cannot regress the flip. PIN starts obscured (visibility_off).
+    testWidgets('step 3 PIN eye toggle flips', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        registry: ykRegistry,
+        listYubikeyRecords: (_) => [_fakeYkRecord()],
+      ));
+      await throughStep2(tester);
+
+      expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+      expect(find.byIcon(Icons.visibility), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.visibility_off));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.visibility), findsOneWidget);
+      expect(find.byIcon(Icons.visibility_off), findsNothing);
+    });
+
+    // A11y: the PIN eye toggle in the step-3 dialog must carry a semantic label
+    // so screen readers announce it, not a bare "button".
+    testWidgets('step 3 dialog meets labelled-tap-target guideline',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(_buildScreen(
+        registry: ykRegistry,
+        listYubikeyRecords: (_) => [_fakeYkRecord()],
+      ));
+      await throughStep2(tester);
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      handle.dispose();
+    });
+
     testWidgets('passphrase vault skips step 3', (tester) async {
       var deleteCalled = false;
       await tester.pumpWidget(_buildScreen(

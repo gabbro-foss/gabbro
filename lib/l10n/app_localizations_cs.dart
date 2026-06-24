@@ -508,6 +508,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tooltipBrowse => 'Procházet';
 
   @override
+  String get tooltipPreviousPage => 'Předchozí stránka';
+
+  @override
+  String get tooltipNextPage => 'Další stránka';
+
+  @override
   String get tooltipEditAlias => 'Upravit alias';
 
   @override

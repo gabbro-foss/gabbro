@@ -57,4 +57,17 @@ void main() {
     expect(iconBtn.onPressed, isNull,
         reason: 'back button must be disabled on the first slide');
   });
+
+  // A11y: the prev/next chevrons must carry a semantic label so screen readers
+  // announce them, not a bare "button". Advance one slide so both are enabled.
+  testWidgets('navigation chevrons meet labelled-tap-target guideline',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(testApp(const HelpScreen()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.chevron_right));
+    await tester.pumpAndSettle();
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    handle.dispose();
+  });
 }

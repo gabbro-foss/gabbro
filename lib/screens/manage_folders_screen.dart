@@ -211,6 +211,7 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
       appBar: AppBar(title: Text(l.manageFoldersTitle)),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,
+        tooltip: l.addFolderTitle,
         child: const Icon(Icons.add),
       ),
       body: _loading
@@ -241,10 +242,12 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
                     children: [
                       IconButton(
                         icon: const Icon(Icons.edit_outlined),
+                        tooltip: l.rename,
                         onPressed: () => _showRenameDialog(folder),
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete_outline),
+                        tooltip: l.delete,
                         onPressed: () => _showDeleteDialog(folder),
                       ),
                     ],

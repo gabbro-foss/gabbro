@@ -109,6 +109,29 @@ void main() {
     },
   );
 
+  // A11y: the selection-mode app-bar actions (delete, close) carry semantic
+  // labels (tooltips). A full labelledTapTargetGuideline assertion is NOT made
+  // here: selection mode also exposes the per-row checkboxes and the alphabet
+  // index bar as unlabelled tappables — deeper a11y debt tracked in the Bikeshed,
+  // out of scope for the show/hide-eye-toggle work.
+  testWidgets('selection-mode delete and close actions carry tooltips',
+      (tester) async {
+    _setNarrow(tester);
+    await tester.pumpWidget(_buildScreen(_twoEntries));
+
+    await tester.tap(find.byIcon(Icons.checklist));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.delete)).tooltip,
+      isNotNull,
+    );
+    expect(
+      tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.close)).tooltip,
+      isNotNull,
+    );
+  });
+
   testWidgets(
     'wide: long-pressing a tile enters selection mode and selects that tile',
     (tester) async {

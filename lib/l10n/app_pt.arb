@@ -175,6 +175,8 @@
   "tooltipShow": "Mostrar",
   "tooltipHide": "Ocultar",
   "tooltipBrowse": "Navegar",
+  "tooltipPreviousPage": "Página anterior",
+  "tooltipNextPage": "Próxima página",
   "tooltipEditAlias": "Editar apelido",
   "tooltipRemoveField": "Remover campo",
   "tooltipRename": "Renomear",
@@ -682,8 +684,6 @@
   "emergencyWipeAndroidBody": "Para destruir imediatamente todos os dados do Gabbro no dispositivo — sem autenticação, irreversível — abra as Definições do dispositivo, encontre o Gabbro na lista de aplicações e escolha Limpar dados.",
   "emergencyWipeLinuxBody": "Para destruir imediatamente todos os dados do Gabbro no dispositivo — sem autenticação, irreversível — elimine estas pastas num terminal. Os cofres que guardou noutras localizações não estão nestas pastas e têm de ser eliminados separadamente.",
 
-  "navVault": "Cofre",
-  "navAbout": "Sobre",
 
   "yubiKeySecurityWarning": "Aviso de segurança",
   "removeYubiKeyTitle": "Remover YubiKey",
@@ -738,9 +738,6 @@
   },
   "selectAtLeastOneCharSet": "Selecione pelo menos um conjunto de caracteres",
   "passwordMinLengthNote": "As senhas têm pelo menos 12 caracteres. Se um site tiver um limite menor, copie os primeiros caracteres necessários.",
-  "tooltipShow": "Mostrar",
-  "tooltipCopied": "Copiado!",
-  "tooltipCopy": "Copiar",
   "excludeAmbiguousChars": "Excluir caracteres ambíguos (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Crie seu cofre para começar.",

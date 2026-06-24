@@ -436,10 +436,18 @@ void main() {
       handle.dispose();
     });
 
-    // NOTE: labeledTapTargetGuideline is intentionally NOT asserted here. The
-    // sweep found the show/hide eye toggles (passphrase + PIN suffixIcon) carry
-    // no semantic label — known pre-existing a11y debt, waived for now and
-    // tracked in the Bikeshed (not a regression from the autofill-unlock work).
+    // The show/hide eye toggles (passphrase + PIN suffixIcon) must carry a
+    // semantic label so screen readers announce them, not a bare "button".
+    testWidgets('meets Android labelled-tap-target guideline (passphrase + yubikey modes)',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      for (final records in [<YubikeyRecordData>[], [_fakeRecord()]]) {
+        await tester.pumpWidget(_appShell(_bareUnlock(yubikeyRecords: records)));
+        await tester.pumpAndSettle();
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      }
+      handle.dispose();
+    });
 
     testWidgets('meets text-contrast guideline in light and dark themes',
         (tester) async {

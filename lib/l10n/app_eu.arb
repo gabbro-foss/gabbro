@@ -175,6 +175,8 @@
   "tooltipShow": "Erakutsi",
   "tooltipHide": "Ezkutatu",
   "tooltipBrowse": "Arakatu",
+  "tooltipPreviousPage": "Aurreko orria",
+  "tooltipNextPage": "Hurrengo orria",
   "tooltipEditAlias": "Ezizena editatu",
   "tooltipRemoveField": "Eremua kendu",
   "tooltipRename": "Berrizendatu",

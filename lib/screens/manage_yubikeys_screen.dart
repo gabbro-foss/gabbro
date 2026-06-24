@@ -556,6 +556,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
                 suffixIcon: IconButton(
                   icon:
                       Icon(obscure ? Icons.visibility_off : Icons.visibility),
+                  tooltip: obscure ? l.tooltipShowPin : l.tooltipHidePin,
                   onPressed: () => setLocal(() => obscure = !obscure),
                 ),
               ),
@@ -623,6 +624,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
                     suffixIcon: IconButton(
                       icon: Icon(
                           obscure ? Icons.visibility_off : Icons.visibility),
+                      tooltip: obscure ? l.tooltipShowPin : l.tooltipHidePin,
                       onPressed: () => setLocal(() => obscure = !obscure),
                     ),
                   ),

@@ -376,4 +376,49 @@ void main() {
 
     expect(find.text('Passphrase is too weak'), findsOneWidget);
   });
+
+  // ── Visibility toggles (net-first: pin current flip behaviour) ──────────────
+  // Pins the show/hide eye toggles so the later a11y label work cannot regress
+  // the flip. Passphrase-only mode has 3 toggles (old/new/confirm); YubiKey mode
+  // adds a 4th (PIN).
+
+  testWidgets('passphrase-only mode starts with three obscured fields and flips one',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen());
+
+    expect(find.byIcon(Icons.visibility_off), findsNWidgets(3));
+    expect(find.byIcon(Icons.visibility), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.visibility_off).first);
+    await tester.pump();
+
+    expect(find.byIcon(Icons.visibility), findsOneWidget);
+    expect(find.byIcon(Icons.visibility_off), findsNWidgets(2));
+  });
+
+  testWidgets('yubikey mode adds a fourth (PIN) toggle that flips independently',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+
+    // old + new + confirm + PIN = 4 obscured fields.
+    expect(find.byIcon(Icons.visibility_off), findsNWidgets(4));
+
+    // PIN field is the first one rendered (above the passphrase fields).
+    await tester.tap(find.byIcon(Icons.visibility_off).first);
+    await tester.pump();
+
+    expect(find.byIcon(Icons.visibility), findsOneWidget);
+    expect(find.byIcon(Icons.visibility_off), findsNWidgets(3));
+  });
+
+  // A11y: every show/hide eye toggle must carry a semantic label so screen
+  // readers announce it, not a bare "button".
+  testWidgets('meets labelled-tap-target guideline (yubikey mode, all toggles)',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+    await tester.pumpAndSettle();
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    handle.dispose();
+  });
 }

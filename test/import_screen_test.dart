@@ -366,5 +366,15 @@ void main() {
       // After toggle, passphrase visible → visibility_off icon shown.
       expect(find.byIcon(Icons.visibility_off), findsOneWidget);
     });
+
+    // A11y: the passphrase show/hide eye toggle must carry a semantic label so
+    // screen readers announce it, not a bare "button".
+    testWidgets('meets labelled-tap-target guideline', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(buildScreen());
+      await tester.pumpAndSettle();
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      handle.dispose();
+    });
   });
 }

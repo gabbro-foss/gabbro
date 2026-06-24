@@ -508,6 +508,12 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tooltipBrowse => 'Pretraži';
 
   @override
+  String get tooltipPreviousPage => 'Prethodna stranica';
+
+  @override
+  String get tooltipNextPage => 'Sljedeća stranica';
+
+  @override
   String get tooltipEditAlias => 'Uredi alias';
 
   @override

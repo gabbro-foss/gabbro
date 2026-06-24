@@ -106,6 +106,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.chevron_left),
+                    tooltip: l.tooltipPreviousPage,
                     onPressed: _currentPage > 0 ? () => _goTo(_currentPage - 1) : null,
                   ),
                   // ── Dot indicators ────────────────────────────────────────
@@ -129,6 +130,7 @@ class _HelpScreenState extends State<HelpScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.chevron_right),
+                    tooltip: l.tooltipNextPage,
                     onPressed: _currentPage < count - 1 ? () => _goTo(_currentPage + 1) : null,
                   ),
                 ],

@@ -501,6 +501,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tooltipBrowse => '찾아보기';
 
   @override
+  String get tooltipPreviousPage => '이전 페이지';
+
+  @override
+  String get tooltipNextPage => '다음 페이지';
+
+  @override
   String get tooltipEditAlias => '별칭 편집';
 
   @override

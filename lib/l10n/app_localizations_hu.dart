@@ -507,6 +507,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tooltipBrowse => 'Böngészés';
 
   @override
+  String get tooltipPreviousPage => 'Előző oldal';
+
+  @override
+  String get tooltipNextPage => 'Következő oldal';
+
+  @override
   String get tooltipEditAlias => 'Alias szerkesztése';
 
   @override

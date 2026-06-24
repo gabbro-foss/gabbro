@@ -508,6 +508,12 @@ class AppLocalizationsSk extends AppLocalizations {
   String get tooltipBrowse => 'Prehľadávať';
 
   @override
+  String get tooltipPreviousPage => 'Predchádzajúca strana';
+
+  @override
+  String get tooltipNextPage => 'Ďalšia strana';
+
+  @override
   String get tooltipEditAlias => 'Upraviť alias';
 
   @override

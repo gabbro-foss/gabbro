@@ -510,6 +510,12 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tooltipBrowse => 'Αναζήτηση';
 
   @override
+  String get tooltipPreviousPage => 'Προηγούμενη σελίδα';
+
+  @override
+  String get tooltipNextPage => 'Επόμενη σελίδα';
+
+  @override
   String get tooltipEditAlias => 'Επεξεργασία ψευδωνύμου';
 
   @override

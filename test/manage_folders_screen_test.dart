@@ -41,6 +41,16 @@ void main() {
       expect(find.byIcon(Icons.delete_outline), findsOneWidget);
     });
 
+    // A11y: the add (FAB), edit and delete icon buttons must carry a semantic
+    // label so screen readers announce them, not a bare "button".
+    testWidgets('meets labelled-tap-target guideline', (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(_buildScreen(folders: ['Work']));
+      await tester.pumpAndSettle();
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      handle.dispose();
+    });
+
     testWidgets('tapping edit opens rename dialog with pre-filled name', (tester) async {
       await tester.pumpWidget(_buildScreen(folders: ['Work']));
       await tester.pump();

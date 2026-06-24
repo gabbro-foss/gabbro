@@ -175,6 +175,8 @@
   "tooltipShow": "Vis",
   "tooltipHide": "Skjul",
   "tooltipBrowse": "Bla gjennom",
+  "tooltipPreviousPage": "Forrige side",
+  "tooltipNextPage": "Neste side",
   "tooltipEditAlias": "Rediger alias",
   "tooltipRemoveField": "Fjern felt",
   "tooltipRename": "Endre navn",
@@ -682,8 +684,6 @@
   "emergencyWipeAndroidBody": "For å ødelegge alle Gabbro-data på enheten umiddelbart — uten autentisering, ugjenkallelig — åpne enhetens Innstillinger, finn Gabbro i applisten og velg Tøm data.",
   "emergencyWipeLinuxBody": "For å ødelegge alle Gabbro-data på enheten umiddelbart — uten autentisering, ugjenkallelig — slett disse mappene i en terminal. Hvelv du har lagret andre steder, ligger ikke i disse mappene og må slettes separat.",
 
-  "navVault": "Hvelv",
-  "navAbout": "Om",
 
   "yubiKeySecurityWarning": "Sikkerhetsadvarsel",
   "removeYubiKeyTitle": "Fjern YubiKey",
@@ -738,9 +738,6 @@
   },
   "selectAtLeastOneCharSet": "Velg minst ett tegnsett",
   "passwordMinLengthNote": "Passord er minst 12 tegn. Hvis et nettsted har en kortere grense, kopier de første nødvendige tegnene.",
-  "tooltipShow": "Vis",
-  "tooltipCopied": "Kopiert!",
-  "tooltipCopy": "Kopier",
   "excludeAmbiguousChars": "Utelat tvetydige tegn (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Opprett hvelvet ditt for å komme i gang.",

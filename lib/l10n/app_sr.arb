@@ -175,6 +175,8 @@
   "tooltipShow": "Prikaži",
   "tooltipHide": "Sakrij",
   "tooltipBrowse": "Pretraži",
+  "tooltipPreviousPage": "Претходна страница",
+  "tooltipNextPage": "Следећа страница",
   "tooltipEditAlias": "Uredi alias",
   "tooltipRemoveField": "Ukloni polje",
   "tooltipRename": "Preimenuj",

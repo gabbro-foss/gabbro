@@ -784,6 +784,19 @@ void main() {
     expect(find.byIcon(Icons.visibility), findsOneWidget);
   });
 
+  // A11y: every show/hide eye toggle (passphrase, confirm, both PINs) must
+  // carry a semantic label so screen readers announce it, not a bare "button".
+  testWidgets('meets labelled-tap-target guideline with PIN fields shown',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(_buildScreen(showYubikey: true, isAndroid: true));
+    await tester.ensureVisible(find.byType(SwitchListTile));
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pumpAndSettle();
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    handle.dispose();
+  });
+
   // ── Passphrase strength gate (Fair-and-above allows creation) ──────────────
 
   group('passphrase strength gate', () {

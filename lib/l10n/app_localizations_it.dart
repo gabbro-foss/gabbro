@@ -508,6 +508,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tooltipBrowse => 'Sfoglia';
 
   @override
+  String get tooltipPreviousPage => 'Pagina precedente';
+
+  @override
+  String get tooltipNextPage => 'Pagina successiva';
+
+  @override
   String get tooltipEditAlias => 'Modifica alias';
 
   @override

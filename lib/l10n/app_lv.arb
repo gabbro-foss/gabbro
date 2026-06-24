@@ -175,6 +175,8 @@
   "tooltipShow": "Rādīt",
   "tooltipHide": "Slēpt",
   "tooltipBrowse": "Pārlūkot",
+  "tooltipPreviousPage": "Iepriekšējā lapa",
+  "tooltipNextPage": "Nākamā lapa",
   "tooltipEditAlias": "Rediģēt aizstājvārdu",
   "tooltipRemoveField": "Noņemt lauku",
   "tooltipRename": "Pārdēvēt",
@@ -682,8 +684,6 @@
   "emergencyWipeAndroidBody": "Lai nekavējoties iznīcinātu visus ierīcē esošos Gabbro datus — bez autentifikācijas, neatgriezeniski — atveriet ierīces Iestatījumus, atrodiet Gabbro lietotņu sarakstā un izvēlieties Notīrīt datus.",
   "emergencyWipeLinuxBody": "Lai nekavējoties iznīcinātu visus ierīcē esošos Gabbro datus — bez autentifikācijas, neatgriezeniski — izdzēsiet šīs mapes terminālī. Citās vietās saglabātie seifi neatrodas šajās mapēs, un tie jādzēš atsevišķi.",
 
-  "navVault": "Seifs",
-  "navAbout": "Par",
 
   "yubiKeySecurityWarning": "Drošības brīdinājums",
   "removeYubiKeyTitle": "Noņemt YubiKey",
@@ -738,9 +738,6 @@
   },
   "selectAtLeastOneCharSet": "Izvēlieties vismaz vienu rakstzīmju kopu",
   "passwordMinLengthNote": "Paroles ir vismaz 12 rakstzīmes garas. Ja vietnei ir īsāks ierobežojums, nokopējiet nepieciešamās pirmās rakstzīmes.",
-  "tooltipShow": "Rādīt",
-  "tooltipCopied": "Nokopēts!",
-  "tooltipCopy": "Kopēt",
   "excludeAmbiguousChars": "Izlaist neviennozīmīgas rakstzīmes (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Izveidojiet seifu, lai sāktu.",

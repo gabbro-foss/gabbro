@@ -175,6 +175,8 @@
   "tooltipShow": "Visa",
   "tooltipHide": "Dölj",
   "tooltipBrowse": "Bläddra",
+  "tooltipPreviousPage": "Föregående sida",
+  "tooltipNextPage": "Nästa sida",
   "tooltipEditAlias": "Redigera alias",
   "tooltipRemoveField": "Ta bort fält",
   "tooltipRename": "Byt namn",
@@ -682,8 +684,6 @@
   "emergencyWipeAndroidBody": "För att omedelbart förstöra all Gabbro-data på enheten — utan autentisering, oåterkalleligt — öppna enhetens Inställningar, hitta Gabbro i applistan och välj Rensa data.",
   "emergencyWipeLinuxBody": "För att omedelbart förstöra all Gabbro-data på enheten — utan autentisering, oåterkalleligt — ta bort dessa mappar i en terminal. Valv som du sparat på andra platser finns inte i dessa mappar och måste tas bort separat.",
 
-  "navVault": "Valv",
-  "navAbout": "Om",
 
   "yubiKeySecurityWarning": "Säkerhetsvarning",
   "removeYubiKeyTitle": "Ta bort YubiKey",
@@ -738,9 +738,6 @@
   },
   "selectAtLeastOneCharSet": "Välj minst en teckenuppsättning",
   "passwordMinLengthNote": "Lösenord är minst 12 tecken. Om en webbplats har en kortare gräns, kopiera de första nödvändiga tecknen.",
-  "tooltipShow": "Visa",
-  "tooltipCopied": "Kopierat!",
-  "tooltipCopy": "Kopiera",
   "excludeAmbiguousChars": "Uteslut tvetydiga tecken (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Skapa ditt valv för att komma igång.",

@@ -175,6 +175,8 @@
   "tooltipShow": "Megjelenítés",
   "tooltipHide": "Elrejtés",
   "tooltipBrowse": "Böngészés",
+  "tooltipPreviousPage": "Előző oldal",
+  "tooltipNextPage": "Következő oldal",
   "tooltipEditAlias": "Alias szerkesztése",
   "tooltipRemoveField": "Mező eltávolítása",
   "tooltipRename": "Átnevezés",
@@ -682,8 +684,6 @@
   "emergencyWipeAndroidBody": "Az eszközön lévő összes Gabbro-adat azonnali megsemmisítéséhez — hitelesítés nélkül, visszafordíthatatlanul — nyissa meg az eszköz Beállításait, keresse meg a Gabbrót az alkalmazások listájában, és válassza az Adatok törlése lehetőséget.",
   "emergencyWipeLinuxBody": "Az eszközön lévő összes Gabbro-adat azonnali megsemmisítéséhez — hitelesítés nélkül, visszafordíthatatlanul — törölje ezeket a mappákat egy terminálban. A más helyekre mentett széfek nem ezekben a mappákban találhatók, és külön kell törölni őket.",
 
-  "navVault": "Széf",
-  "navAbout": "Névjegy",
 
   "yubiKeySecurityWarning": "Biztonsági figyelmeztetés",
   "removeYubiKeyTitle": "YubiKey eltávolítása",
@@ -738,9 +738,6 @@
   },
   "selectAtLeastOneCharSet": "Válassz legalább egy karakterkészletet",
   "passwordMinLengthNote": "A jelszavak legalább 12 karakteresek. Ha egy webhelyen rövidebb korlát érvényes, másold az első szükséges karaktereket.",
-  "tooltipShow": "Megjelenítés",
-  "tooltipCopied": "Másolva!",
-  "tooltipCopy": "Másolás",
   "excludeAmbiguousChars": "Félreérthető karakterek kizárása (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Hozd létre a széfedet a kezdéshez.",

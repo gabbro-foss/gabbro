@@ -251,6 +251,53 @@ void main() {
       await tester.pumpAndSettle();
       expect(updated, isNull);
     });
+
+    // Net-first: pin the passphrase eye toggle in the enroll passphrase dialog
+    // (switch on -> Continue -> passphrase prompt) so the later a11y label work
+    // cannot regress the flip. Field starts obscured (Icons.visibility_off).
+    testWidgets('enroll passphrase dialog eye toggle flips', (tester) async {
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        onBiometricAvailable: () async => true,
+      ));
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      await tester.tap(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+      expect(find.byIcon(Icons.visibility), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.visibility_off));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.visibility), findsOneWidget);
+      expect(find.byIcon(Icons.visibility_off), findsNothing);
+    });
+
+    // A11y: the passphrase eye toggle in the enroll dialog must carry a semantic
+    // label so screen readers announce it, not a bare "button".
+    testWidgets('enroll passphrase dialog meets labelled-tap-target guideline',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        onBiometricAvailable: () async => true,
+      ));
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      await tester.tap(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      handle.dispose();
+    });
   });
 
   // ── Vault list section removed (ADR-014) ──────────────────────────────────

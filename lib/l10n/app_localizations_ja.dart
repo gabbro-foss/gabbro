@@ -501,6 +501,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get tooltipBrowse => '参照';
 
   @override
+  String get tooltipPreviousPage => '前のページ';
+
+  @override
+  String get tooltipNextPage => '次のページ';
+
+  @override
   String get tooltipEditAlias => 'エイリアスを編集';
 
   @override

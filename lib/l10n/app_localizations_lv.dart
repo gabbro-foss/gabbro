@@ -507,6 +507,12 @@ class AppLocalizationsLv extends AppLocalizations {
   String get tooltipBrowse => 'Pārlūkot';
 
   @override
+  String get tooltipPreviousPage => 'Iepriekšējā lapa';
+
+  @override
+  String get tooltipNextPage => 'Nākamā lapa';
+
+  @override
   String get tooltipEditAlias => 'Rediģēt aizstājvārdu';
 
   @override

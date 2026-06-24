@@ -532,6 +532,7 @@ class _ImportScreenState extends State<ImportScreen> {
               icon: Icon(
                 _showPassphrase ? Icons.visibility_off : Icons.visibility,
               ),
+              tooltip: _showPassphrase ? l.tooltipHide : l.tooltipShow,
               onPressed: () =>
                   setState(() => _showPassphrase = !_showPassphrase),
             ),
@@ -564,6 +565,9 @@ class _ImportScreenState extends State<ImportScreen> {
                 icon: Icon(
                   _yubikeyPinObscured ? Icons.visibility : Icons.visibility_off,
                 ),
+                tooltip: _yubikeyPinObscured
+                    ? l.tooltipShowPin
+                    : l.tooltipHidePin,
                 onPressed: () => setState(
                     () => _yubikeyPinObscured = !_yubikeyPinObscured),
               ),

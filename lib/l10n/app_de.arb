@@ -175,6 +175,8 @@
   "tooltipShow": "Anzeigen",
   "tooltipHide": "Ausblenden",
   "tooltipBrowse": "Durchsuchen",
+  "tooltipPreviousPage": "Vorherige Seite",
+  "tooltipNextPage": "Nächste Seite",
   "tooltipEditAlias": "Alias bearbeiten",
   "tooltipRemoveField": "Feld entfernen",
   "tooltipRename": "Umbenennen",

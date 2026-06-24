@@ -175,6 +175,8 @@
   "tooltipShow": "Näytä",
   "tooltipHide": "Piilota",
   "tooltipBrowse": "Selaa",
+  "tooltipPreviousPage": "Edellinen sivu",
+  "tooltipNextPage": "Seuraava sivu",
   "tooltipEditAlias": "Muokkaa aliasta",
   "tooltipRemoveField": "Poista kenttä",
   "tooltipRename": "Nimeä uudelleen",
@@ -682,8 +684,6 @@
   "emergencyWipeAndroidBody": "Tuhotaksesi kaikki laitteella olevat Gabbron tiedot välittömästi — ilman todennusta, peruuttamattomasti — avaa laitteen Asetukset, etsi Gabbro sovellusluettelosta ja valitse Tyhjennä tiedot.",
   "emergencyWipeLinuxBody": "Tuhotaksesi kaikki laitteella olevat Gabbron tiedot välittömästi — ilman todennusta, peruuttamattomasti — poista nämä kansiot päätteessä. Muihin sijainteihin tallentamasi holvit eivät ole näissä kansioissa, ja ne on poistettava erikseen.",
 
-  "navVault": "Holvi",
-  "navAbout": "Tietoja",
 
   "yubiKeySecurityWarning": "Turvallisuusvaroitus",
   "removeYubiKeyTitle": "Poista YubiKey",
@@ -738,9 +738,6 @@
   },
   "selectAtLeastOneCharSet": "Valitse vähintään yksi merkistö",
   "passwordMinLengthNote": "Salasanat ovat vähintään 12 merkkiä. Jos sivustolla on lyhyempi raja, kopioi tarvittavat ensimmäiset merkit.",
-  "tooltipShow": "Näytä",
-  "tooltipCopied": "Kopioitu!",
-  "tooltipCopy": "Kopioi",
   "excludeAmbiguousChars": "Sulje pois epäselvät merkit (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Luo holvisi aloittaaksesi.",

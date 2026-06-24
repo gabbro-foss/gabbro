@@ -507,6 +507,12 @@ class AppLocalizationsKk extends AppLocalizations {
   String get tooltipBrowse => 'Шолу';
 
   @override
+  String get tooltipPreviousPage => 'Алдыңғы бет';
+
+  @override
+  String get tooltipNextPage => 'Келесі бет';
+
+  @override
   String get tooltipEditAlias => 'Бүркеншік атын өңдеу';
 
   @override

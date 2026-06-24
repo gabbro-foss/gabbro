@@ -175,6 +175,8 @@
   "tooltipShow": "Pokaż",
   "tooltipHide": "Ukryj",
   "tooltipBrowse": "Przeglądaj",
+  "tooltipPreviousPage": "Poprzednia strona",
+  "tooltipNextPage": "Następna strona",
   "tooltipEditAlias": "Edytuj alias",
   "tooltipRemoveField": "Usuń pole",
   "tooltipRename": "Zmień nazwę",
@@ -682,8 +684,6 @@
   "emergencyWipeAndroidBody": "Aby natychmiast zniszczyć wszystkie dane Gabbro na urządzeniu — bez uwierzytelniania, nieodwracalnie — otwórz Ustawienia urządzenia, znajdź Gabbro na liście aplikacji i wybierz Wyczyść dane.",
   "emergencyWipeLinuxBody": "Aby natychmiast zniszczyć wszystkie dane Gabbro na urządzeniu — bez uwierzytelniania, nieodwracalnie — usuń te foldery w terminalu. Sejfy zapisane w innych lokalizacjach nie znajdują się w tych folderach i należy je usunąć osobno.",
 
-  "navVault": "Skarbiec",
-  "navAbout": "O aplikacji",
 
   "yubiKeySecurityWarning": "Ostrzeżenie bezpieczeństwa",
   "removeYubiKeyTitle": "Usuń YubiKey",
@@ -738,9 +738,6 @@
   },
   "selectAtLeastOneCharSet": "Wybierz co najmniej jeden zestaw znaków",
   "passwordMinLengthNote": "Hasła mają co najmniej 12 znaki. Jeśli strona ma krótszy limit, skopiuj wymaganą liczbę pierwszych znaków.",
-  "tooltipShow": "Pokaż",
-  "tooltipCopied": "Skopiowano!",
-  "tooltipCopy": "Kopiuj",
   "excludeAmbiguousChars": "Wyklucz niejednoznaczne znaki (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Utwórz skarbiec, aby rozpocząć.",

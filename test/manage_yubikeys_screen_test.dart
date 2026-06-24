@@ -359,6 +359,44 @@ void main() {
     expect(registered, isFalse);
   });
 
+  // Net-first: pin the PIN eye toggle in the Linux add-key PIN dialog so the
+  // later a11y label work cannot regress the flip. PIN starts obscured.
+  testWidgets('add key Linux: PIN dialog eye toggle flips', (tester) async {
+    await tester.pumpWidget(_buildScreen(
+      records: [_record('10')],
+      onFidoListDevices: () => ['/dev/hidraw0'],
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle(); // PIN dialog appears
+
+    expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+    expect(find.byIcon(Icons.visibility), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.visibility_off));
+    await tester.pump();
+
+    expect(find.byIcon(Icons.visibility), findsOneWidget);
+    expect(find.byIcon(Icons.visibility_off), findsNothing);
+  });
+
+  // A11y: the PIN eye toggle in the Linux add-key dialog must carry a semantic
+  // label so screen readers announce it, not a bare "button".
+  testWidgets('add key Linux: PIN dialog meets labelled-tap-target guideline',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(_buildScreen(
+      records: [_record('10')],
+      onFidoListDevices: () => ['/dev/hidraw0'],
+    ));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle(); // PIN dialog appears
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    handle.dispose();
+  });
+
   testWidgets('add key Linux: success path calls onAddYubikey and shows snackbar',
       (tester) async {
     bool addedKey = false;
@@ -518,6 +556,51 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(addCalled, isFalse);
+  });
+
+  // Net-first: pin the PIN eye toggle in the Android add-key (PIN + transport)
+  // dialog so the later a11y label work cannot regress the flip.
+  testWidgets('add key Android: PIN+transport dialog eye toggle flips',
+      (tester) async {
+    _setChannelMock((_) async => _fakeCredIdHex);
+    addTearDown(_clearChannelMock);
+
+    await tester.pumpWidget(_buildScreen(
+      records: [_record('60')],
+      isAndroid: true,
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle(); // _promptPinAndTransport dialog appears
+
+    expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+    expect(find.byIcon(Icons.visibility), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.visibility_off));
+    await tester.pump();
+
+    expect(find.byIcon(Icons.visibility), findsOneWidget);
+    expect(find.byIcon(Icons.visibility_off), findsNothing);
+  });
+
+  // A11y: the PIN eye toggle in the Android add-key (PIN + transport) dialog
+  // must carry a semantic label so screen readers announce it.
+  testWidgets('add key Android: PIN+transport dialog meets labelled-tap-target guideline',
+      (tester) async {
+    _setChannelMock((_) async => _fakeCredIdHex);
+    addTearDown(_clearChannelMock);
+
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(_buildScreen(
+      records: [_record('60')],
+      isAndroid: true,
+    ));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle(); // _promptPinAndTransport dialog appears
+    await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+    handle.dispose();
   });
 
   testWidgets('add key Android: success via USB calls onAddYubikey and shows snackbar',

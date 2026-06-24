@@ -508,6 +508,12 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tooltipBrowse => 'Sirvi';
 
   @override
+  String get tooltipPreviousPage => 'Eelmine leht';
+
+  @override
+  String get tooltipNextPage => 'Järgmine leht';
+
+  @override
   String get tooltipEditAlias => 'Muuda aliast';
 
   @override

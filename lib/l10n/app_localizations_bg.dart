@@ -509,6 +509,12 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tooltipBrowse => 'Преглед';
 
   @override
+  String get tooltipPreviousPage => 'Предишна страница';
+
+  @override
+  String get tooltipNextPage => 'Следваща страница';
+
+  @override
   String get tooltipEditAlias => 'Редактирай псевдоним';
 
   @override

@@ -509,6 +509,12 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tooltipBrowse => 'Selaa';
 
   @override
+  String get tooltipPreviousPage => 'Edellinen sivu';
+
+  @override
+  String get tooltipNextPage => 'Seuraava sivu';
+
+  @override
   String get tooltipEditAlias => 'Muokkaa aliasta';
 
   @override

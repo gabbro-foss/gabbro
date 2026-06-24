@@ -1241,10 +1241,12 @@ class _VaultListScreenState extends State<VaultListScreen>
               ),
             IconButton(
               icon: const Icon(Icons.delete),
+              tooltip: l.delete,
               onPressed: () => _confirmDelete(_selectedIds),
             ),
             IconButton(
               icon: const Icon(Icons.close),
+              tooltip: l.close,
               onPressed: () => setState(() {
                 _selectedIds.clear();
                 _selectionMode = false;
@@ -1259,6 +1261,7 @@ class _VaultListScreenState extends State<VaultListScreen>
           ? null
           : FloatingActionButton(
               onPressed: _showTypePicker,
+              tooltip: l.newEntryTitle,
               child: const Icon(Icons.add),
             ),
       body: LayoutBuilder(
@@ -1643,6 +1646,7 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
                   icon: Icon(
                     _showPass ? Icons.visibility_off : Icons.visibility,
                   ),
+                  tooltip: _showPass ? l.tooltipHide : l.tooltipShow,
                   onPressed: () => setState(() => _showPass = !_showPass),
                 ),
               ),
@@ -1677,6 +1681,9 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
                     icon: Icon(
                       _pinObscured ? Icons.visibility : Icons.visibility_off,
                     ),
+                    tooltip: _pinObscured
+                        ? l.tooltipShowPin
+                        : l.tooltipHidePin,
                     onPressed: () =>
                         setState(() => _pinObscured = !_pinObscured),
                   ),

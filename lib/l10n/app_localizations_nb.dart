@@ -507,6 +507,12 @@ class AppLocalizationsNb extends AppLocalizations {
   String get tooltipBrowse => 'Bla gjennom';
 
   @override
+  String get tooltipPreviousPage => 'Forrige side';
+
+  @override
+  String get tooltipNextPage => 'Neste side';
+
+  @override
   String get tooltipEditAlias => 'Rediger alias';
 
   @override

@@ -175,6 +175,8 @@
   "tooltipShow": "Rodyti",
   "tooltipHide": "Slėpti",
   "tooltipBrowse": "Naršyti",
+  "tooltipPreviousPage": "Ankstesnis puslapis",
+  "tooltipNextPage": "Kitas puslapis",
   "tooltipEditAlias": "Redaguoti slapyvardį",
   "tooltipRemoveField": "Pašalinti lauką",
   "tooltipRename": "Pervadinti",
@@ -682,8 +684,6 @@
   "emergencyWipeAndroidBody": "Norėdami nedelsiant sunaikinti visus įrenginyje esančius Gabbro duomenis — be autentifikavimo, negrįžtamai — atidarykite įrenginio Nustatymus, raskite Gabbro programų sąraše ir pasirinkite Išvalyti duomenis.",
   "emergencyWipeLinuxBody": "Norėdami nedelsiant sunaikinti visus įrenginyje esančius Gabbro duomenis — be autentifikavimo, negrįžtamai — ištrinkite šiuos aplankus terminale. Kitose vietose išsaugotos saugyklos nėra šiuose aplankuose ir turi būti ištrintos atskirai.",
 
-  "navVault": "Saugykla",
-  "navAbout": "Apie",
 
   "yubiKeySecurityWarning": "Saugumo įspėjimas",
   "removeYubiKeyTitle": "Pašalinti YubiKey",
@@ -738,9 +738,6 @@
   },
   "selectAtLeastOneCharSet": "Pasirinkite bent vieną simbolių rinkinį",
   "passwordMinLengthNote": "Slaptažodžiai turi mažiausiai 12 simbolius. Jei svetainė turi trumpesnę ribą, nukopijuokite pirmuosius reikiamus simbolius.",
-  "tooltipShow": "Rodyti",
-  "tooltipCopied": "Nukopijuota!",
-  "tooltipCopy": "Kopijuoti",
   "excludeAmbiguousChars": "Neįtraukti dviprasmiškų simbolių (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Sukurkite saugyklą, kad pradėtumėte.",

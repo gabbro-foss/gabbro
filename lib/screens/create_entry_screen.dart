@@ -1068,6 +1068,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
           icon: Icon(
             _passwordObscured ? Icons.visibility_off : Icons.visibility,
           ),
+          tooltip: _passwordObscured ? l.tooltipShow : l.tooltipHide,
           onPressed: () =>
               setState(() => _passwordObscured = !_passwordObscured),
         ),
@@ -1414,6 +1415,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                 icon: Icon(
                   _cvvObscured ? Icons.visibility_off : Icons.visibility,
                 ),
+                tooltip: _cvvObscured ? l.tooltipShow : l.tooltipHide,
                 onPressed: () => setState(() => _cvvObscured = !_cvvObscured),
               ),
             ),

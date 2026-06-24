@@ -175,6 +175,8 @@
   "tooltipShow": "Εμφάνιση",
   "tooltipHide": "Απόκρυψη",
   "tooltipBrowse": "Αναζήτηση",
+  "tooltipPreviousPage": "Προηγούμενη σελίδα",
+  "tooltipNextPage": "Επόμενη σελίδα",
   "tooltipEditAlias": "Επεξεργασία ψευδωνύμου",
   "tooltipRemoveField": "Κατάργηση πεδίου",
   "tooltipRename": "Μετονομασία",

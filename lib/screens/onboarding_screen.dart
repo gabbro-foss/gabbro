@@ -911,6 +911,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       ? Icons.visibility_off
                                       : Icons.visibility,
                                 ),
+                                tooltip: _passphraseObscured
+                                    ? l.tooltipShow
+                                    : l.tooltipHide,
                                 onPressed: () => setState(
                                   () => _passphraseObscured =
                                       !_passphraseObscured,
@@ -989,6 +992,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       ? Icons.visibility_off
                                       : Icons.visibility,
                                 ),
+                                tooltip: _confirmObscured
+                                    ? l.tooltipShow
+                                    : l.tooltipHide,
                                 onPressed: () => setState(
                                   () => _confirmObscured = !_confirmObscured,
                                 ),
@@ -1050,6 +1056,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                             ? Icons.visibility_off
                                             : Icons.visibility,
                                       ),
+                                      tooltip: _pinObscured[i]
+                                          ? l.tooltipShowPin
+                                          : l.tooltipHidePin,
                                       onPressed: () => setState(
                                         () =>
                                             _pinObscured[i] = !_pinObscured[i],

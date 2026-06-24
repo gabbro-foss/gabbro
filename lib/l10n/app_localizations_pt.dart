@@ -508,6 +508,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tooltipBrowse => 'Navegar';
 
   @override
+  String get tooltipPreviousPage => 'Página anterior';
+
+  @override
+  String get tooltipNextPage => 'Próxima página';
+
+  @override
   String get tooltipEditAlias => 'Editar apelido';
 
   @override
@@ -2474,6 +2480,12 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get tooltipBrowse => 'Navegar';
 
   @override
+  String get tooltipPreviousPage => 'Página anterior';
+
+  @override
+  String get tooltipNextPage => 'Próxima página';
+
+  @override
   String get tooltipEditAlias => 'Editar apelido';
 
   @override
@@ -4435,6 +4447,12 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get tooltipBrowse => 'Navegar';
+
+  @override
+  String get tooltipPreviousPage => 'Página anterior';
+
+  @override
+  String get tooltipNextPage => 'Página seguinte';
 
   @override
   String get tooltipEditAlias => 'Editar alias';

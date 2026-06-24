@@ -507,6 +507,12 @@ class AppLocalizationsYo extends AppLocalizations {
   String get tooltipBrowse => 'Ṣagbero';
 
   @override
+  String get tooltipPreviousPage => 'Ojú-ìwé tó kọjá';
+
+  @override
+  String get tooltipNextPage => 'Ojú-ìwé tó kàn';
+
+  @override
   String get tooltipEditAlias => 'Ṣatunkọ orukọ apejuwe';
 
   @override

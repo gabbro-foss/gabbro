@@ -499,6 +499,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tooltipBrowse => '浏览';
 
   @override
+  String get tooltipPreviousPage => '上一页';
+
+  @override
+  String get tooltipNextPage => '下一页';
+
+  @override
   String get tooltipEditAlias => '编辑别名';
 
   @override
@@ -2372,6 +2378,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get tooltipBrowse => '浏览';
 
   @override
+  String get tooltipPreviousPage => '上一页';
+
+  @override
+  String get tooltipNextPage => '下一页';
+
+  @override
   String get tooltipEditAlias => '编辑别名';
 
   @override
@@ -4243,6 +4255,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get tooltipBrowse => '瀏覽';
+
+  @override
+  String get tooltipPreviousPage => '上一頁';
+
+  @override
+  String get tooltipNextPage => '下一頁';
 
   @override
   String get tooltipEditAlias => '編輯別名';

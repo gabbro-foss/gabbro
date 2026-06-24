@@ -175,6 +175,8 @@
   "tooltipShow": "Zobraziť",
   "tooltipHide": "Skryť",
   "tooltipBrowse": "Prehľadávať",
+  "tooltipPreviousPage": "Predchádzajúca strana",
+  "tooltipNextPage": "Ďalšia strana",
   "tooltipEditAlias": "Upraviť alias",
   "tooltipRemoveField": "Odstrániť pole",
   "tooltipRename": "Premenovať",

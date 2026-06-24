@@ -175,6 +175,8 @@
   "tooltipShow": "Kuva",
   "tooltipHide": "Peida",
   "tooltipBrowse": "Sirvi",
+  "tooltipPreviousPage": "Eelmine leht",
+  "tooltipNextPage": "Järgmine leht",
   "tooltipEditAlias": "Muuda aliast",
   "tooltipRemoveField": "Eemalda väli",
   "tooltipRename": "Nimeta ümber",
@@ -682,8 +684,6 @@
   "emergencyWipeAndroidBody": "Kõigi seadmes olevate Gabbro andmete kohe hävitamiseks — ilma autentimiseta, pöördumatult — avage seadme Seaded, leidke rakenduste loendist Gabbro ja valige Kustuta andmed.",
   "emergencyWipeLinuxBody": "Kõigi seadmes olevate Gabbro andmete kohe hävitamiseks — ilma autentimiseta, pöördumatult — kustutage need kaustad terminalis. Teistesse asukohtadesse salvestatud hoidlad ei asu nendes kaustades ja need tuleb eraldi kustutada.",
 
-  "navVault": "Seif",
-  "navAbout": "Teave",
 
   "yubiKeySecurityWarning": "Turvahoiatus",
   "removeYubiKeyTitle": "Eemalda YubiKey",
@@ -738,9 +738,6 @@
   },
   "selectAtLeastOneCharSet": "Vali vähemalt üks märgistik",
   "passwordMinLengthNote": "Paroolid on vähemalt 12 tähemärki pikad. Kui saidil on lühem limiit, kopeeri vajalikud esimesed tähemärgid.",
-  "tooltipShow": "Kuva",
-  "tooltipCopied": "Kopeeritud!",
-  "tooltipCopy": "Kopeeri",
   "excludeAmbiguousChars": "Jäta välja ebaselged tähemärgid (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Loo oma seif alustamiseks.",

@@ -175,6 +175,8 @@
   "tooltipShow": "Tonen",
   "tooltipHide": "Verbergen",
   "tooltipBrowse": "Bladeren",
+  "tooltipPreviousPage": "Vorige pagina",
+  "tooltipNextPage": "Volgende pagina",
   "tooltipEditAlias": "Alias bewerken",
   "tooltipRemoveField": "Veld verwijderen",
   "tooltipRename": "Hernoemen",
@@ -682,8 +684,6 @@
   "emergencyWipeAndroidBody": "Om alle Gabbro-gegevens op het apparaat onmiddellijk te vernietigen — zonder authenticatie, onomkeerbaar — open de Instellingen van het apparaat, zoek Gabbro in de lijst met apps en kies Gegevens wissen.",
   "emergencyWipeLinuxBody": "Om alle Gabbro-gegevens op het apparaat onmiddellijk te vernietigen — zonder authenticatie, onomkeerbaar — verwijder deze mappen in een terminal. Kluizen die je op andere locaties hebt opgeslagen, staan niet in deze mappen en moeten apart worden verwijderd.",
 
-  "navVault": "Kluis",
-  "navAbout": "Over",
 
   "yubiKeySecurityWarning": "Beveiligingswaarschuwing",
   "removeYubiKeyTitle": "YubiKey verwijderen",
@@ -738,9 +738,6 @@
   },
   "selectAtLeastOneCharSet": "Selecteer ten minste één tekenset",
   "passwordMinLengthNote": "Wachtwoorden zijn minimaal 12 tekens. Als een website een kortere limiet heeft, kopieer dan de eerste tekens die u nodig heeft.",
-  "tooltipShow": "Tonen",
-  "tooltipCopied": "Gekopieerd!",
-  "tooltipCopy": "Kopiëren",
   "excludeAmbiguousChars": "Dubbelzinnige tekens uitsluiten (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Maak uw kluis aan om te beginnen.",

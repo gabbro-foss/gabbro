@@ -508,6 +508,12 @@ class AppLocalizationsEu extends AppLocalizations {
   String get tooltipBrowse => 'Arakatu';
 
   @override
+  String get tooltipPreviousPage => 'Aurreko orria';
+
+  @override
+  String get tooltipNextPage => 'Hurrengo orria';
+
+  @override
   String get tooltipEditAlias => 'Ezizena editatu';
 
   @override

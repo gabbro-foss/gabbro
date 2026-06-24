@@ -509,6 +509,12 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tooltipBrowse => 'Naršyti';
 
   @override
+  String get tooltipPreviousPage => 'Ankstesnis puslapis';
+
+  @override
+  String get tooltipNextPage => 'Kitas puslapis';
+
+  @override
   String get tooltipEditAlias => 'Redaguoti slapyvardį';
 
   @override

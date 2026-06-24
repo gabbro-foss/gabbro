@@ -318,6 +318,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                         icon: Icon(
                           obscurePin ? Icons.visibility_off : Icons.visibility,
                         ),
+                        tooltip: obscurePin ? l.tooltipShowPin : l.tooltipHidePin,
                         onPressed: () => setDialogState(() => obscurePin = !obscurePin),
                       ),
                     ),

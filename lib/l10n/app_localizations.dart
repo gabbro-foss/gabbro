@@ -1135,6 +1135,18 @@ abstract class AppLocalizations {
   /// **'Browse'**
   String get tooltipBrowse;
 
+  /// No description provided for @tooltipPreviousPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous page'**
+  String get tooltipPreviousPage;
+
+  /// No description provided for @tooltipNextPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Next page'**
+  String get tooltipNextPage;
+
   /// No description provided for @tooltipEditAlias.
   ///
   /// In en, this message translates to:

@@ -507,6 +507,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tooltipBrowse => 'Bläddra';
 
   @override
+  String get tooltipPreviousPage => 'Föregående sida';
+
+  @override
+  String get tooltipNextPage => 'Nästa sida';
+
+  @override
   String get tooltipEditAlias => 'Redigera alias';
 
   @override

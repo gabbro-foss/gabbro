@@ -208,6 +208,8 @@
   "tooltipShow": "Show",
   "tooltipHide": "Hide",
   "tooltipBrowse": "Browse",
+  "tooltipPreviousPage": "Previous page",
+  "tooltipNextPage": "Next page",
   "tooltipEditAlias": "Edit alias",
   "tooltipRemoveField": "Remove field",
   "tooltipRename": "Rename",
@@ -720,8 +722,6 @@
   "emergencyWipeAndroidBody": "To destroy all on-device Gabbro data immediately — no authentication, irreversible — open your device Settings, find Gabbro in the apps list, and choose Clear data.",
   "emergencyWipeLinuxBody": "To destroy all on-device Gabbro data immediately — no authentication, irreversible — delete these folders in a terminal. Vaults you saved to other locations are not in these folders and must be deleted separately.",
 
-  "navVault": "Vault",
-  "navAbout": "About",
 
   "yubiKeySecurityWarning": "Security warning",
   "removeYubiKeyTitle": "Remove YubiKey",
@@ -776,9 +776,6 @@
   },
   "selectAtLeastOneCharSet": "Select at least one character set",
   "passwordMinLengthNote": "Passwords are at least 12 characters. If a site has a shorter limit, copy the first characters you need.",
-  "tooltipShow": "Show",
-  "tooltipCopied": "Copied!",
-  "tooltipCopy": "Copy",
   "excludeAmbiguousChars": "Exclude ambiguous characters (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Create your vault to get started.",

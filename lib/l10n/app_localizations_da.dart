@@ -506,6 +506,12 @@ class AppLocalizationsDa extends AppLocalizations {
   String get tooltipBrowse => 'Gennemse';
 
   @override
+  String get tooltipPreviousPage => 'Forrige side';
+
+  @override
+  String get tooltipNextPage => 'Næste side';
+
+  @override
   String get tooltipEditAlias => 'Rediger alias';
 
   @override

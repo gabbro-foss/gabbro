@@ -196,6 +196,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                     icon: Icon(
                       obscured ? Icons.visibility_off : Icons.visibility,
                     ),
+                    tooltip: obscured ? l.tooltipShow : l.tooltipHide,
                     onPressed: () => setDialogState(() => obscured = !obscured),
                   ),
                 ),

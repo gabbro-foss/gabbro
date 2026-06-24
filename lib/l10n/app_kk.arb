@@ -175,6 +175,8 @@
   "tooltipShow": "Көрсету",
   "tooltipHide": "Жасыру",
   "tooltipBrowse": "Шолу",
+  "tooltipPreviousPage": "Алдыңғы бет",
+  "tooltipNextPage": "Келесі бет",
   "tooltipEditAlias": "Бүркеншік атын өңдеу",
   "tooltipRemoveField": "Өрісті жою",
   "tooltipRename": "Атауын өзгерту",

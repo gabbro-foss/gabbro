@@ -175,6 +175,8 @@
   "tooltipShow": "Vis",
   "tooltipHide": "Skjul",
   "tooltipBrowse": "Gennemse",
+  "tooltipPreviousPage": "Forrige side",
+  "tooltipNextPage": "Næste side",
   "tooltipEditAlias": "Rediger alias",
   "tooltipRemoveField": "Fjern felt",
   "tooltipRename": "Omdøb",
@@ -682,8 +684,6 @@
   "emergencyWipeAndroidBody": "For at ødelægge alle Gabbro-data på enheden med det samme — uden godkendelse, uigenkaldeligt — åbn enhedens Indstillinger, find Gabbro på listen over apps, og vælg Ryd data.",
   "emergencyWipeLinuxBody": "For at ødelægge alle Gabbro-data på enheden med det samme — uden godkendelse, uigenkaldeligt — slet disse mapper i en terminal. Bokse, du har gemt andre steder, findes ikke i disse mapper og skal slettes separat.",
 
-  "navVault": "Hvælving",
-  "navAbout": "Om",
 
   "yubiKeySecurityWarning": "Sikkerhedsadvarsel",
   "removeYubiKeyTitle": "Fjern YubiKey",
@@ -738,9 +738,6 @@
   },
   "selectAtLeastOneCharSet": "Vælg mindst ét tegnsæt",
   "passwordMinLengthNote": "Adgangskoder er mindst 12 tegn. Hvis et websted har en kortere grænse, kopiér de første nødvendige tegn.",
-  "tooltipShow": "Vis",
-  "tooltipCopied": "Kopieret!",
-  "tooltipCopy": "Kopiér",
   "excludeAmbiguousChars": "Udeluk tvetydige tegn (0, O, l, 1, I)",
 
   "onboardingGetStarted": "Opret din hvælving for at komme i gang.",
