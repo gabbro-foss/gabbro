@@ -72,7 +72,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 523 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 12 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 885 | 0 |
+| Flutter (`flutter test`) | 908 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 101 | 15 |
 
@@ -91,9 +91,9 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-None agreed. `matrix-bugfixes` (6 hardware-matrix bugfixes) merged to master `--no-ff`
-2026-06-23 after a GREEN `gabbro_test` gate (Flutter 885, Rust 523/12/1, integration 7,
-Android 101, clippy clean); branch deleted. alpha.9 release decision pending Rob.
+None agreed. Show/hide eye toggles + bonus icon buttons now carry screen-reader
+labels (12 screens, `labeledTapTargetGuideline` per screen). alpha.9 release
+decision pending Rob.
 
 ---
 
@@ -122,6 +122,10 @@ release process live in their own document:
 - Anonymous user feedback -> two wordclouds (one "what works", one "to improve"), in the teachtogether.tech formative-feedback spirit, published on GitHub. Must stay OUT of the app (no in-app network call - offline/no-telemetry DNA): external link to a no-login form (CryptPad/Framaforms/Nextcloud Forms) -> manual export -> generate two PNGs -> commit + embed in README. Needs moderation (anon free text = spam/abuse): cap to single words, profanity filter, curate before publishing.
 
 ### Code Quality
+- **Full-text search returns false positives.** In the vault list with "search all fields"
+  on, typing a term (e.g. "phone") returns entries that contain it in neither labels nor
+  content. The all-fields matcher is over-matching — investigate what field/normalisation it
+  searches. (Found 2026-06-24.)
 - Audit the code base for data leaks and attack surfaces
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
   translations. (The no-match dialog was hardware-verified and is broken -> being fixed, see Current Focus.)
@@ -132,11 +136,15 @@ release process live in their own document:
   14)+, so it needs a `Build.VERSION.SDK_INT` gate against minSdk (keep the deprecated path for
   older devices) — don't blanket-replace. (Don't let training-era deprecated APIs persist; fix
   when next touching autofill.)
-- **A11y: unlabelled show/hide eye toggles.** The passphrase/PIN visibility `IconButton`s
-  (UnlockScreen, likely also onboarding / change-passphrase / generator) carry no semantic
-  label — `labeledTapTargetGuideline` fails; screen readers announce a bare "button". Fix:
-  `tooltip`/`Semantics` labels + l10n (×37). Found by the Net C a11y sweep (2026-06-17);
-  waived to keep scope on the autofill-unlock work.
+- **A11y: vault-list selection mode.** The per-row selection `Checkbox`es carry no
+  semantic label (screen reader says "checkbox" with no entry name); the search `clear`
+  button is also unlabelled. Needs custom `Semantics` wrapping. (Surfaced by the eye-toggle
+  a11y sweep 2026-06-24; out of scope there.)
+- **Alphabet index bar rework.** `alphabet_index_bar.dart` is hardcoded Latin `A-Z`+`#`,
+  and bucketing is `[A-Za-z]`->letter else `#` — so every non-Latin title (CJK, Greek,
+  Cyrillic, Arabic) collapses into `#` and the bar is useless there. Plus its letter slots
+  carry no a11y label. Needs a dedicated session: script-aware bucketing + localized
+  headers + semantic labels.
 - **Scrub real app names and personal names from test data.** Tests across the suite use real apps the user runs (e.g. github) and the user's name as placeholder usernames. Test data must be generic (`com.company.app`, `https://example.com`, `user`/`alice`/`bob`) — never a real app the user has installed or a real person's name. Audit all of `rust/`, `android/`, `test/`, `integration_test/` and replace. commit message will not surface this information: it will only say `code cleanup`
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 - **Offline test gate — Android leg still online.** `gabbro_test` runs flutter/cargo/rust fully offline (rootless netns), but the Android `./gradlew :app:testDebugUnitTest` leg runs online: the Flutter `integration_test` plugin declares a dynamic transitive dep (`androidx.test:runner:1.2+`) that gradle won't resolve `--offline`. `dependencyLocking` on `:app` doesn't pin that plugin's config; the netns also needs `JAVA_TOOL_OPTIONS=-Duser.home=/home/gamer` (uid-0 remap → JVM home `/root`). Likely fix: force a concrete `androidx.test:runner` version across all projects (or lock every project), then move the leg into the offline block.

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Accessibility: the show/hide eye toggles (passphrase, PIN, password, CVV) across 12 screens now carry screen-reader labels, alongside the browse, folder add/edit/delete, vault-list add/delete/close and Help prev/next buttons — they previously announced a bare "button". Enforced per screen by `labeledTapTargetGuideline`.
+
 ### Fixed
 - Managing folders no longer throws an unhandled exception when a rename, add, or delete fails (e.g. a name that already exists) — the error is shown in a SnackBar. Renaming a folder to its unchanged name is now a no-op instead of an error.
 - Autofill: when the vault unlocks but no saved login matches the site/app, it now shows the localized "no credentials found" dialog instead of a false "could not unlock — wrong credentials" error.
