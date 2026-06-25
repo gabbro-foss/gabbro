@@ -72,7 +72,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 527 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 12 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 976 | 0 |
+| Flutter (`flutter test`) | 980 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 101 | 15 |
 
@@ -91,13 +91,9 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**A11y: vault-list selection mode.** Two unlabelled controls remain on the
-vault list. The per-row selection `Checkbox` (phone
-`vault_list_screen.dart:1478`, tablet `tablet_vault_layout.dart:317`) announces
-a bare "checkbox" with no entry name; the search `clear` `IconButton` (phone +
-tablet, `vault_list_screen.dart`) has no tooltip. Wrap the checkbox in
-`Semantics` carrying the entry title (+ checked state) and give clear a
-localized tooltip, across both layouts. Confirmed still open 2026-06-25.
+None agreed. Vault-list selection-mode a11y (checkbox title labels + search
+`clear` tooltip) shipped and hardware-verified 2026-06-25. Pick the next item
+from the Bikeshed with Rob.
 
 ---
 
