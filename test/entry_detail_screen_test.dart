@@ -17,7 +17,7 @@ LoginEntryData _loginEntry() => LoginEntryData(
       id: 'test-id-1',
       title: 'Gneiss Bank',
       url: 'https://gneiss.example.com',
-      username: 'rob@example.com',
+      username: 'user@example.com',
       password: 's3cr3tP@ss',
       notes: null,
       customFields: [],
@@ -38,7 +38,7 @@ NoteEntryData _noteEntry() => NoteEntryData(
 
 CardEntryData _cardEntry() => CardEntryData(
       id: 'card-id-1',
-      cardholderName: 'Rob Bastian',
+      cardholderName: 'Alex Doe',
       cardNumber: '4111111111111111',
       expiry: '12/28',
       cvv: '123',
@@ -104,7 +104,7 @@ void main() {
     );
 
     expect(find.text('Gneiss Bank'), findsWidgets);
-    expect(find.text('rob@example.com'), findsOneWidget);
+    expect(find.text('user@example.com'), findsOneWidget);
     expect(find.text('••••••••'), findsOneWidget);
     expect(find.text('s3cr3tP@ss'), findsNothing);
   });
@@ -201,7 +201,7 @@ void main() {
       id: 'test-id-folder',
       title: 'Schist Service',
       url: 'https://schist.example.com',
-      username: 'rob@example.com',
+      username: 'user@example.com',
       password: 'p@ss',
       notes: null,
       customFields: [],
@@ -418,7 +418,7 @@ void main() {
       (tester) async {
     final entry = IdentityEntryData(
       id: 'test-id-3',
-      firstName: 'Rob',
+      firstName: 'Alex',
       lastName: 'Example',
       email: '',
       phone: null,
@@ -453,7 +453,7 @@ void main() {
       _buildScreen(VaultEntryData.card(_cardEntry())),
     );
 
-    expect(find.text('Rob Bastian'), findsWidgets);
+    expect(find.text('Alex Doe'), findsWidgets);
     // Both card number and CVV start obscured.
     expect(find.text('••••••••'), findsNWidgets(2));
     expect(find.text('4111111111111111'), findsNothing);
@@ -536,7 +536,7 @@ void main() {
       id: 'no-url-id',
       title: 'No URL Login',
       url: '',
-      username: 'rob',
+      username: 'user',
       password: 'pw',
       notes: null,
       customFields: const [],

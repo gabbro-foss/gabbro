@@ -39,10 +39,10 @@ pub struct EntryAttachment {
 pub struct LoginEntry {
     /// Shared metadata (id, timestamp, folder).
     pub meta: EntryMeta,
-    /// Human-readable item title (e.g. "GitHub", "Netflix").
+    /// Human-readable item title (e.g. "Example", "Sample").
     /// Distinct from the URL — used as the primary display label in list views.
     pub title: String,
-    /// The URL this login belongs to (e.g. "https://github.com").
+    /// The URL this login belongs to (e.g. "https://example.com").
     pub url: String,
     /// The username or email address.
     pub username: String,
@@ -280,9 +280,9 @@ mod tests {
     fn login_entry_stores_basic_fields() {
         let entry = LoginEntry {
             meta: default_meta(),
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("hunter2"),
             notes: None,
             custom_fields: vec![],
@@ -292,9 +292,9 @@ mod tests {
             email: None,
         };
 
-        assert_eq!(entry.title, "GitHub");
-        assert_eq!(entry.url, "https://github.com");
-        assert_eq!(entry.username, "rob");
+        assert_eq!(entry.title, "Example");
+        assert_eq!(entry.url, "https://example.com");
+        assert_eq!(entry.username, "user");
         assert_eq!(entry.meta.id, "test-id-001");
     }
 
@@ -304,7 +304,7 @@ mod tests {
             meta: default_meta(),
             title: String::from("Example"),
             url: String::from("https://example.com"),
-            username: String::from("rob"),
+            username: String::from("user"),
             password: String::from("s3cr3t"),
             notes: None,
             custom_fields: vec![],
@@ -323,9 +323,9 @@ mod tests {
             meta: default_meta(),
             title: String::from("Example"),
             url: String::from("https://example.com"),
-            username: String::from("rob"),
+            username: String::from("user"),
             password: String::from("s3cr3t"),
-            notes: Some(String::from("my github account")),
+            notes: Some(String::from("my example account")),
             custom_fields: vec![],
             attachments: vec![],
             previous_password: None,
@@ -334,21 +334,21 @@ mod tests {
         };
 
         assert!(entry.notes.is_some());
-        assert_eq!(entry.notes.clone().unwrap(), "my github account");
+        assert_eq!(entry.notes.clone().unwrap(), "my example account");
     }
 
     #[test]
     fn login_entry_supports_custom_fields() {
         let field = CustomField {
             label: String::from("Recovery email"),
-            value: String::from("rob@example.com"),
+            value: String::from("user@example.com"),
             hidden: false,
         };
         let entry = LoginEntry {
             meta: default_meta(),
             title: String::from("Example"),
             url: String::from("https://example.com"),
-            username: String::from("rob"),
+            username: String::from("user"),
             password: String::from("s3cr3t"),
             notes: None,
             custom_fields: vec![field],
@@ -525,16 +525,16 @@ mod tests {
     fn identity_entry_optional_fields_can_be_absent() {
         let entry = IdentityEntry {
             meta: default_meta(),
-            first_name: String::from("Rob"),
+            first_name: String::from("Alex"),
             last_name: String::from("Smith"),
-            email: String::from("rob@example.com"),
+            email: String::from("user@example.com"),
             phone: None,
             address: None,
             custom_fields: vec![],
             attachments: vec![],
         };
 
-        assert_eq!(entry.first_name, "Rob");
+        assert_eq!(entry.first_name, "Alex");
         assert!(entry.phone.is_none());
         assert!(entry.address.is_none());
         assert!(entry.custom_fields.is_empty());
@@ -546,7 +546,7 @@ mod tests {
             default_meta(),
             Some(String::from("Visa Platinum")),
             String::from("active"),
-            String::from("Rob Smith"),
+            String::from("Alex Smith"),
             String::from("4111111111111111"), // 16 digits
             String::from("12/28"),
             String::from("123"),
@@ -564,7 +564,7 @@ mod tests {
         )
         .unwrap();
 
-        assert_eq!(entry.cardholder_name, "Rob Smith");
+        assert_eq!(entry.cardholder_name, "Alex Smith");
         assert_eq!(entry.expiry, "12/28");
         assert_eq!(entry.status, "active");
         assert_eq!(entry.card_name, Some(String::from("Visa Platinum")));
@@ -576,7 +576,7 @@ mod tests {
             default_meta(),
             None,
             String::from("active"),
-            String::from("Rob Smith"),
+            String::from("Alex Smith"),
             String::from("123456"), // 6 digits — minimum for debit cards
             String::from("12/28"),
             String::from("123"),
@@ -601,7 +601,7 @@ mod tests {
             default_meta(),
             None,
             String::from("active"),
-            String::from("Rob Smith"),
+            String::from("Alex Smith"),
             String::from("1234"),
             String::from("12/28"),
             String::from("123"),
@@ -661,7 +661,7 @@ mod tests {
             default_meta(),
             None,
             String::from("active"),
-            String::from("Rob Smith"),
+            String::from("Alex Smith"),
             String::from("4111111111111111"),
             String::from("12/28"),
             String::from(""), // empty CVV — should be accepted for debit cards
@@ -686,7 +686,7 @@ mod tests {
             default_meta(),
             None,
             String::from("active"),
-            String::from("Rob Smith"),
+            String::from("Alex Smith"),
             String::from("12345678901234567890"), // 20 digits
             String::from("12/28"),
             String::from("123"),
@@ -746,9 +746,9 @@ mod tests {
     fn previous_secret_is_none_by_default_on_login() {
         let entry = LoginEntry {
             meta: default_meta(),
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("hunter2"),
             notes: None,
             custom_fields: vec![],
@@ -786,9 +786,9 @@ mod tests {
         };
         let entry = LoginEntry {
             meta: default_meta(),
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("new_hunter2"),
             notes: None,
             custom_fields: vec![],
@@ -810,7 +810,7 @@ mod tests {
             default_meta(),
             None,
             String::from("active"),
-            String::from("Rob Smith"),
+            String::from("Alex Smith"),
             String::from("4111111111111111"),
             String::from("12/28"),
             String::from("999"),
@@ -841,7 +841,7 @@ mod tests {
             default_meta(),
             None,
             String::from("active"),
-            String::from("Rob Smith"),
+            String::from("Alex Smith"),
             String::from("4111111111111111"),
             String::from("12/28"),
             String::from("123"),

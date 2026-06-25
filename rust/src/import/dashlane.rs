@@ -145,8 +145,8 @@ mod tests {
 
     const SAMPLE_CSV: &str = "\
 username,username2,username3,url,category,note,password,title
-rob@example.com,,,https://github.com,Work,my github account,hunter2,GitHub
-user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
+user@example.com,,,https://example.com,Work,my example account,hunter2,Example
+user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample";
 
     #[test]
     fn parse_basic_entries() {
@@ -161,11 +161,11 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
         let VaultEntry::Login(ref e) = entries[0] else {
             panic!("expected Login")
         };
-        assert_eq!(e.title, "GitHub");
-        assert_eq!(e.url, "https://github.com");
-        assert_eq!(e.username, "rob@example.com");
+        assert_eq!(e.title, "Example");
+        assert_eq!(e.url, "https://example.com");
+        assert_eq!(e.username, "user@example.com");
         assert_eq!(e.password, "hunter2");
-        assert_eq!(e.notes, Some("my github account".to_string()));
+        assert_eq!(e.notes, Some("my example account".to_string()));
     }
 
     #[test]
@@ -186,7 +186,7 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
         assert!(
             e.custom_fields
                 .iter()
-                .any(|f| f.label == "username2" && f.value == "backup@gmail.com"),
+                .any(|f| f.label == "username2" && f.value == "backup@example.com"),
             "non-empty username2 should become a custom field"
         );
     }
@@ -218,7 +218,7 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
 
     #[test]
     fn missing_title_falls_back_to_url() {
-        let csv = "username,username2,username3,url,category,note,password,title\nrob,,, https://example.com,,,s3cr3t,";
+        let csv = "username,username2,username3,url,category,note,password,title\nuser,,, https://example.com,,,s3cr3t,";
         let (entries, _) = parse(csv.as_bytes()).unwrap();
         let VaultEntry::Login(ref e) = entries[0] else {
             panic!("expected Login")
@@ -231,7 +231,7 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
     #[test]
     fn missing_title_and_url_gives_missing_title() {
         let csv =
-            "username,username2,username3,url,category,note,password,title\nrob,,,,,, s3cr3t,";
+            "username,username2,username3,url,category,note,password,title\nuser,,,,,, s3cr3t,";
         let (entries, _) = parse(csv.as_bytes()).unwrap();
         let VaultEntry::Login(ref e) = entries[0] else {
             panic!("expected Login")
@@ -241,26 +241,26 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
 
     #[test]
     fn empty_rows_are_skipped() {
-        let csv = "username,username2,username3,url,category,note,password,title\nrob,,,https://github.com,,,hunter2,GitHub\n\n\nuser,,,https://google.com,,,s3cr3t,Google";
+        let csv = "username,username2,username3,url,category,note,password,title\nuser,,,https://example.com,,,hunter2,Example\n\n\nuser,,,https://example.net,,,s3cr3t,Sample";
         let (entries, _) = parse(csv.as_bytes()).unwrap();
         assert_eq!(entries.len(), 2);
     }
 
     #[test]
     fn utf8_bom_is_stripped() {
-        let csv = "\u{FEFF}username,username2,username3,url,category,note,password,title\nrob,,,https://github.com,,,hunter2,GitHub";
+        let csv = "\u{FEFF}username,username2,username3,url,category,note,password,title\nuser,,,https://example.com,,,hunter2,Example";
         let (entries, _) = parse(csv.as_bytes()).unwrap();
         assert_eq!(entries.len(), 1);
         let VaultEntry::Login(ref e) = entries[0] else {
             panic!("expected Login")
         };
-        assert_eq!(e.title, "GitHub");
+        assert_eq!(e.title, "Example");
     }
 
     #[test]
     fn missing_required_column_returns_err() {
         // No 'password' column
-        let csv = "username,url,title\nrob,https://github.com,GitHub";
+        let csv = "username,url,title\nuser,https://example.com,Example";
         let result = parse(csv.as_bytes());
         assert!(result.is_err(), "missing 'password' column must return Err");
     }
@@ -279,7 +279,7 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
 
     #[test]
     fn quoted_field_with_comma_is_handled() {
-        let csv = "username,username2,username3,url,category,note,password,title\nrob@example.com,,,https://bank.com,,,s3cr3t,\"Bank, Gold Card\"";
+        let csv = "username,username2,username3,url,category,note,password,title\nuser@example.com,,,https://bank.com,,,s3cr3t,\"Bank, Gold Card\"";
         let (entries, _) = parse(csv.as_bytes()).unwrap();
         let VaultEntry::Login(ref e) = entries[0] else {
             panic!("expected Login")
@@ -290,14 +290,14 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
     #[test]
     fn minimal_export_without_optional_columns_parses_ok() {
         // Some Dashlane export variants omit username2/username3/note
-        let csv = "username,url,password,title\nrob,https://github.com,hunter2,GitHub";
+        let csv = "username,url,password,title\nuser,https://example.com,hunter2,Example";
         let (entries, failures) = parse(csv.as_bytes()).unwrap();
         assert_eq!(entries.len(), 1);
         assert!(failures.is_empty());
         let VaultEntry::Login(ref e) = entries[0] else {
             panic!("expected Login")
         };
-        assert_eq!(e.title, "GitHub");
+        assert_eq!(e.title, "Example");
         assert_eq!(e.notes, None);
     }
 }

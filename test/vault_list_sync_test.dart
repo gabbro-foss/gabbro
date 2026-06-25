@@ -255,7 +255,7 @@ void main() {
         pickedPath: '/tmp/other.gabbro',
         mergeVault: (_, _) async => _summary(
           pendingDeletes: [
-            const PendingDeleteItem(id: 'uuid-1', title: 'GitHub'),
+            const PendingDeleteItem(id: 'uuid-1', title: 'Example'),
           ],
         ),
       ));
@@ -276,7 +276,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 350));
 
       expect(find.text('Delete entry?'), findsOneWidget);
-      expect(find.textContaining("'GitHub'"), findsOneWidget);
+      expect(find.textContaining("'Example'"), findsOneWidget);
       expect(find.text('Keep'), findsOneWidget);
       expect(find.text('Delete'), findsOneWidget);
     });

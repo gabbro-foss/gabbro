@@ -1,9 +1,9 @@
 name,url,username,password,note,type
-GitHub,https://github.com,rob@example.com,h0rs3-b4tt3ry-st4pl3,Normal entry,password
-,https://fallback.example.com,rob,s3cr3t,,password
-,,rob@example.com,n0-title-n0-url,Entry with no name or URL at all,password
-"Service, Premium",https://premium.example.com,rob@example.com,Qu0t3d-C0mm4-N4me,Title contains a comma,password
+Example,https://example.com,user@example.com,h0rs3-b4tt3ry-st4pl3,Normal entry,password
+,https://fallback.example.com,user,s3cr3t,,password
+,,user@example.com,n0-title-n0-url,Entry with no name or URL at all,password
+"Service, Premium",https://premium.example.com,user@example.com,Qu0t3d-C0mm4-N4me,Title contains a comma,password
 Unicode Site,https://münchen.example.com,rôb@exàmple.com,Ünïcödé-Pässwörd,Accented characters in all fields,password
 SSH Server,https://ssh.example.com,root,correct-horse-battery-staple,Long note: this server hosts the production database — do not reboot without approval from ops team,password
-Empty Password,https://nopass.example.com,rob,,No password stored here,password
+Empty Password,https://nopass.example.com,user,,No password stored here,password
 Work System,https://work.example.com,DOMAIN\rsmith,C0rp0r4t3!,Windows domain login with backslash in username,password

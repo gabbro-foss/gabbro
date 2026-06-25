@@ -15,9 +15,9 @@ TabletVaultLayout _layout({
   final entry = EntrySummaryData(
     id: 'e1',
     entryType: 'Login',
-    title: 'GitHub',
+    title: 'Example',
     folder: '',
-    searchBlob: 'github',
+    searchBlob: 'example',
   );
   return TabletVaultLayout(
     groupedEntries: [entry],
@@ -52,7 +52,7 @@ void main() {
     )));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('GitHub'));
+    await tester.tap(find.text('Example'));
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull,

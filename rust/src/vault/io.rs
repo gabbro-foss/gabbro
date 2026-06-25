@@ -333,7 +333,7 @@ mod tests {
         assert!(result.is_err());
     }
 
-    // R-03 (discovered, Rob-approved): if the post-credential-change refresh
+    // R-03 (discovered, maintainer-approved): if the post-credential-change refresh
     // fails, the stale .bak (old credentials) must be removed and the error
     // must say the change itself succeeded
     #[cfg(unix)]

@@ -15,7 +15,7 @@ CardEntryData _cardEntry({String? pin}) => CardEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      cardholderName: 'Rob Bastian',
+      cardholderName: 'Alex Doe',
       cardNumber: '4111111111111111',
       expiry: '12/28',
       cvv: '123',
@@ -28,7 +28,7 @@ LoginEntryData _loginEntry() => LoginEntryData(
       id: 'test-id-1',
       title: 'Gneiss Bank',
       url: 'https://gneiss.example.com',
-      username: 'rob@example.com',
+      username: 'user@example.com',
       password: 's3cr3tP@ss',
       notes: null,
       customFields: [],
@@ -93,7 +93,7 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.widgetWithText(TextFormField, 'rob@example.com'),
+      find.widgetWithText(TextFormField, 'user@example.com'),
       findsOneWidget,
     );
   });
@@ -159,7 +159,7 @@ void main() {
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Cardholder name'),
-      'Rob Bastian',
+      'Alex Doe',
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Card number'),
@@ -211,7 +211,7 @@ void main() {
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Cardholder name'),
-      'Rob Bastian',
+      'Alex Doe',
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Card number'),
@@ -242,7 +242,7 @@ void main() {
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Cardholder name'),
-      'Rob Bastian',
+      'Alex Doe',
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Card number'),
@@ -273,7 +273,7 @@ void main() {
       id: 'test-id-2',
       title: 'Basalt Blog',
       url: 'https://basalt.example.com',
-      username: 'rob',
+      username: 'user',
       password: 'p@ss',
       notes: 'remember to update this annually',
       customFields: [],
@@ -304,7 +304,7 @@ void main() {
       id: 'test-id-3',
       title: 'Gabbro Vault',
       url: 'https://gabbro.example.com',
-      username: 'rob',
+      username: 'user',
       password: 'p@ss',
       notes: 'do not delete',
       customFields: [],
@@ -367,7 +367,7 @@ void main() {
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Username (optional)'),
-      'rob',
+      'user',
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Password'),
@@ -404,7 +404,7 @@ void main() {
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Username (optional)'),
-      'rob',
+      'user',
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Password'),
@@ -486,7 +486,7 @@ void main() {
 
     await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Granite');
     await tester.enterText(find.widgetWithText(TextFormField, 'URL (optional)'), 'https://granite.example.com');
-    await tester.enterText(find.widgetWithText(TextFormField, 'Username (optional)'), 'rob');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Username (optional)'), 'user');
     await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'p@ss');
     await tester.pump();
     await tester.ensureVisible(find.text('Save'));
@@ -512,7 +512,7 @@ void main() {
     // Leave folder as None
     await tester.enterText(find.widgetWithText(TextFormField, 'Title'), 'Pumice');
     await tester.enterText(find.widgetWithText(TextFormField, 'URL (optional)'), 'https://pumice.example.com');
-    await tester.enterText(find.widgetWithText(TextFormField, 'Username (optional)'), 'rob');
+    await tester.enterText(find.widgetWithText(TextFormField, 'Username (optional)'), 'user');
     await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'p@ss');
     await tester.pump();
     await tester.ensureVisible(find.text('Save'));
@@ -684,11 +684,11 @@ void main() {
 
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Title'),
-      'GitHub',
+      'Example',
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Username (optional)'),
-      'rob',
+      'user',
     );
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Password'),

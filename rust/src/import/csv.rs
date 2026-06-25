@@ -175,8 +175,8 @@ mod tests {
     const SAMPLE_CSV: &str = "\
 uid, name, login, password, type, number, comments, favourite
 001, \"Visa\", None, \"secret sauce\", \"card\", \"123456781298\", \"active\", None
-002, \"google\", \"joe.black@google.com\", \"my supa dupa secret\", \"login\", None, None, \"yes\"
-003, \"github\", \"ssh\", \"ssh public key\", \"login\", None, \"my github repo\", 1";
+002, \"sample\", \"joe.black@example.net\", \"my supa dupa secret\", \"login\", None, None, \"yes\"
+003, \"example\", \"ssh\", \"ssh public key\", \"login\", None, \"my example repo\", 1";
 
     #[test]
     fn sniff_returns_correct_headers() {

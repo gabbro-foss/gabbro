@@ -42,10 +42,10 @@ void main() {
 
   testWidgets('card prefill populates cardholder name field', (tester) async {
     await tester.pumpWidget(
-      _buildCardScreenWithPrefill({'cardholder_name': 'Rob Bastian'}),
+      _buildCardScreenWithPrefill({'cardholder_name': 'Alex Doe'}),
     );
     expect(
-      find.widgetWithText(TextFormField, 'Rob Bastian'),
+      find.widgetWithText(TextFormField, 'Alex Doe'),
       findsOneWidget,
     );
   });
@@ -71,13 +71,13 @@ void main() {
     await tester.pumpWidget(
       _buildCardScreenWithPrefill({
         'card_number': '1234',
-        'cardholder_name': 'Rob Bastian',
+        'cardholder_name': 'Alex Doe',
         'expiry': '06/27',
         'cvv': '999',
       }),
     );
     expect(find.widgetWithText(TextFormField, '1234'), findsOneWidget);
-    expect(find.widgetWithText(TextFormField, 'Rob Bastian'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'Alex Doe'), findsOneWidget);
     expect(find.widgetWithText(TextFormField, '06/27'), findsOneWidget);
   });
 
@@ -104,7 +104,7 @@ void main() {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      cardholderName: 'Rob Bastian',
+      cardholderName: 'Alex Doe',
       cardNumber: '4111111111111111',
       expiry: '12/28',
       cvv: '123',

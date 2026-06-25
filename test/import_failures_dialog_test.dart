@@ -15,7 +15,7 @@ ImportFailureData _cardFailure({
       title: title,
       category: category,
       reason: reason,
-      rawFields: rawFields ?? [('card_number', '1234'), ('cardholder_name', 'Rob')],
+      rawFields: rawFields ?? [('card_number', '1234'), ('cardholder_name', 'Alex')],
     );
 
 /// Pumps a minimal app that immediately shows the failures dialog.

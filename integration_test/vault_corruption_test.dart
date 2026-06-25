@@ -13,7 +13,7 @@
 // error to an EMPTY vault. That is impossible at the crypto layer — garbage cannot
 // pass the AES-GCM auth tag, and there is no auto-create fallback on the load path
 // (load_vault / load_vault_with_yubikey both go through SealedVault::from_bytes).
-// This suite scripts Rob's exact sequence end-to-end through real FFI on the
+// This suite scripts the maintainer's exact sequence end-to-end through real FFI on the
 // passphrase path and pins the invariant: garbage on disk -> unlock FAILS, and no
 // empty session is left behind. If this stays green while the device failed, the
 // device failure was environmental (a stale build, or the file `ls`/`printf`
@@ -54,7 +54,7 @@ void main() {
 
   test('garbaging BOTH main and .bak makes unlock fail — never an empty vault',
       () async {
-    // Rob's exact sequence: init passphrase vault -> create entry -> edit it ->
+    // the maintainer's exact sequence: init passphrase vault -> create entry -> edit it ->
     // lock -> overwrite both files with garbage -> attempt unlock.
     await initVault(passphrase: passphrase, path: vaultPath, alias: 'IT');
     final login = await createLoginEntry(
@@ -100,7 +100,7 @@ void main() {
     expect(File(bakPath).existsSync(), isTrue,
         reason: 'create + edit (>=2 saves) must have left a .bak beside it');
 
-    // Rob's `printf rubbish` into both files.
+    // the maintainer's `printf rubbish` into both files.
     File(vaultPath).writeAsBytesSync(utf8.encode('rubbish'));
     File(bakPath).writeAsBytesSync(utf8.encode('rubbish too'));
 

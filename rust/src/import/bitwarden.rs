@@ -363,7 +363,7 @@ mod tests {
       "id": "item-uuid-0001",
       "folderId": "folder-uuid-0001",
       "type": 1,
-      "name": "My Gmail",
+      "name": "My Mail",
       "notes": "Personal email account",
       "favorite": true,
       "fields": [
@@ -371,10 +371,10 @@ mod tests {
         { "name": "secret-answer",  "value": "fluffy",             "type": 1 }
       ],
       "login": {
-        "uris": [{ "match": null, "uri": "https://mail.google.com" }],
-        "username": "rob@example.com",
+        "uris": [{ "match": null, "uri": "https://mail.example.net" }],
+        "username": "user@example.com",
         "password": "hunter2",
-        "totp": "otpauth://totp/gmail?secret=ABC123"
+        "totp": "otpauth://totp/mail?secret=ABC123"
       }
     },
     {
@@ -396,7 +396,7 @@ mod tests {
       "favorite": false,
       "fields": [],
       "card": {
-        "cardholderName": "Rob Example",
+        "cardholderName": "Alex Example",
         "brand": "Visa",
         "number": "4111111111111111",
         "expMonth": "9",
@@ -408,14 +408,14 @@ mod tests {
       "id": "item-uuid-0004",
       "folderId": null,
       "type": 4,
-      "name": "Rob Example",
+      "name": "Alex Example",
       "notes": "My identity",
       "favorite": false,
       "fields": [],
       "identity": {
-        "firstName": "Rob",
+        "firstName": "Alex",
         "lastName":  "Example",
-        "email":     "rob@example.com",
+        "email":     "user@example.com",
         "phone":     "+41 22 000 0000",
         "company":   "Example SA"
       }
@@ -447,9 +447,9 @@ mod tests {
             })
             .expect("no login entry found");
 
-        assert_eq!(login.title, "My Gmail");
-        assert_eq!(login.url, "https://mail.google.com");
-        assert_eq!(login.username, "rob@example.com");
+        assert_eq!(login.title, "My Mail");
+        assert_eq!(login.url, "https://mail.example.net");
+        assert_eq!(login.username, "user@example.com");
         assert_eq!(login.password, "hunter2");
         assert_eq!(login.notes, Some("Personal email account".to_string()));
         assert_eq!(login.meta.folder, "Work");
@@ -489,7 +489,7 @@ mod tests {
             })
             .expect("no card entry found");
 
-        assert_eq!(card.cardholder_name, "Rob Example");
+        assert_eq!(card.cardholder_name, "Alex Example");
         assert_eq!(card.card_number, "4111111111111111");
         assert_eq!(card.expiry, "09/27");
         assert_eq!(card.cvv, "123");
@@ -511,10 +511,10 @@ mod tests {
             })
             .expect("no custom entry found");
 
-        assert_eq!(custom.title, "Rob Example");
+        assert_eq!(custom.title, "Alex Example");
         assert!(custom.fields.contains_key("First name"));
-        assert_eq!(custom.fields["First name"].value, "Rob");
-        assert_eq!(custom.fields["Email"].value, "rob@example.com");
+        assert_eq!(custom.fields["First name"].value, "Alex");
+        assert_eq!(custom.fields["Email"].value, "user@example.com");
         assert_eq!(custom.fields["Company"].value, "Example SA");
     }
 

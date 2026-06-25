@@ -8,9 +8,9 @@ import 'package:gabbro/src/rust/api/vault.dart';
 
 LoginEntryData _entryWithHistory() => LoginEntryData(
       id: 'test-id-1',
-      title: 'GitHub',
-      url: 'https://github.com',
-      username: 'rob@example.com',
+      title: 'Example',
+      url: 'https://example.com',
+      username: 'user@example.com',
       password: '********',
       notes: null,
       customFields: [],
@@ -26,9 +26,9 @@ LoginEntryData _entryWithHistory() => LoginEntryData(
 
 LoginEntryData _entryWithoutHistory() => LoginEntryData(
       id: 'test-id-2',
-      title: 'GitHub',
-      url: 'https://github.com',
-      username: 'rob@example.com',
+      title: 'Example',
+      url: 'https://example.com',
+      username: 'user@example.com',
       password: '********',
       notes: null,
       customFields: [],

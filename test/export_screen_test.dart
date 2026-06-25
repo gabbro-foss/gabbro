@@ -58,7 +58,7 @@ void main() {
     });
 
     test('strips non-alphanum except hyphen and underscore', () {
-      expect(sanitiseAlias("Rob's Vault!"), 'Robs_Vault');
+      expect(sanitiseAlias("Alex's Vault!"), 'Alexs_Vault');
     });
 
     test('preserves hyphens and underscores', () {
@@ -159,10 +159,10 @@ void main() {
 
     testWidgets('android .gabbro: filename uses sanitised alias', (tester) async {
       final cap = _SafCapture();
-      await tester.pumpWidget(_androidGabbroScreen(cap, vaultAlias: "Rob's Vault!"));
+      await tester.pumpWidget(_androidGabbroScreen(cap, vaultAlias: "Alex's Vault!"));
       await tester.tap(find.text('Export'));
       await tester.pumpAndSettle();
-      expect(cap.filename, startsWith('Robs_Vault_'));
+      expect(cap.filename, startsWith('Alexs_Vault_'));
       expect(cap.filename, endsWith('.gabbro'));
     });
 

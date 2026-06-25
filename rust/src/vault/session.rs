@@ -1440,9 +1440,9 @@ mod assign_folder_tests {
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from(""),
                 },
-                title: String::from("GitHub"),
-                url: String::from("https://github.com"),
-                username: String::from("rob"),
+                title: String::from("Example"),
+                url: String::from("https://example.com"),
+                username: String::from("user"),
                 password: String::from("hunter2"),
                 notes: None,
                 custom_fields: vec![],
@@ -1905,9 +1905,9 @@ mod autofill_tests {
                 updated_at: String::from("2025-01-01T00:00:00Z"),
                 folder: String::from("Personal"),
             },
-            title: String::from("GitHub"),
-            url: String::from("https://github.com/login"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com/login"),
+            username: String::from("user"),
             password: String::from("s3cr3t"),
             notes: None,
             custom_fields: vec![],
@@ -1955,7 +1955,7 @@ mod autofill_tests {
             "JSON must contain a username key"
         );
         assert!(
-            json.contains("\"rob\""),
+            json.contains("\"user\""),
             "JSON must contain the correct username value"
         );
         assert!(json.contains("\"id\""), "JSON must contain an id key");
@@ -1985,9 +1985,9 @@ mod autofill_tests {
                 updated_at: String::from("2025-01-01T00:00:00Z"),
                 folder: String::from("Personal"),
             },
-            title: String::from("GitHub"),
-            url: String::from("https://github.com/login"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com/login"),
+            username: String::from("user"),
             password: String::from("s3cr3t"),
             notes: None,
             custom_fields: vec![],
@@ -2025,8 +2025,8 @@ mod autofill_tests {
 
         assert_eq!(summaries.len(), 1, "only Login entries should be returned");
         assert_eq!(summaries[0].id, "af-login-001");
-        assert_eq!(summaries[0].username, "rob");
-        assert_eq!(summaries[0].url, "https://github.com/login");
+        assert_eq!(summaries[0].username, "user");
+        assert_eq!(summaries[0].url, "https://example.com/login");
         // app_id/email carried through (None here; set-case covered by the unit test below).
         assert_eq!(summaries[0].app_id, None);
         assert_eq!(summaries[0].email, None);
@@ -2338,9 +2338,9 @@ mod tests {
                 updated_at: String::from("2025-01-01T00:00:00Z"),
                 folder: String::from("Personal"),
             },
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("hunter2"),
             notes: None,
             custom_fields: vec![],
@@ -2352,7 +2352,7 @@ mod tests {
 
         let summary = entry_to_summary(&entry);
         assert_eq!(
-            summary.title, "GitHub",
+            summary.title, "Example",
             "summary title should use LoginEntry.title, not url or username"
         );
     }
@@ -2371,7 +2371,7 @@ mod tests {
             },
             title: String::from(""),
             url: String::from("https://example.com"),
-            username: String::from("rob"),
+            username: String::from("user"),
             password: String::from("s3cr3t"),
             notes: None,
             custom_fields: vec![],
@@ -2402,7 +2402,7 @@ mod tests {
             },
             card_name: Some(String::from("Visa Platinum")),
             status: String::from("active"),
-            cardholder_name: String::from("Rob Smith"),
+            cardholder_name: String::from("Alex Smith"),
             card_number: String::from("4111111111111111"),
             expiry: String::from("12/28"),
             cvv: String::from("123"),
@@ -2442,9 +2442,9 @@ mod tests {
                 updated_at: String::from("2025-01-01T00:00:00Z"),
                 folder: String::from("Personal"),
             },
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("current_password"),
             notes: None,
             custom_fields: vec![],
@@ -2500,9 +2500,9 @@ mod tests {
                 updated_at: String::from("2025-01-01T00:00:00Z"),
                 folder: String::from("Personal"),
             },
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("current_password"),
             notes: None,
             custom_fields: vec![],
@@ -2570,9 +2570,9 @@ mod tests {
                 updated_at: String::from("2025-01-01T00:00:00Z"),
                 folder: String::from("Personal"),
             },
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("current_password"),
             notes: None,
             custom_fields: vec![],
@@ -2628,9 +2628,9 @@ mod tests {
                 updated_at: String::from("2025-01-01T00:00:00Z"),
                 folder: String::from("Personal"),
             },
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("current_password"),
             notes: None,
             custom_fields: vec![],
@@ -2677,7 +2677,7 @@ mod tests {
             },
             title: String::from("Unexpired"),
             url: String::from("https://example.com"),
-            username: String::from("rob"),
+            username: String::from("user"),
             password: String::from("current"),
             notes: None,
             custom_fields: vec![],
@@ -2735,7 +2735,7 @@ mod tests {
             },
             title: String::from("Forever"),
             url: String::from("https://example.com"),
-            username: String::from("rob"),
+            username: String::from("user"),
             password: String::from("current"),
             notes: None,
             custom_fields: vec![],
@@ -2794,7 +2794,7 @@ mod tests {
             },
             title: String::from("Expired"),
             url: String::from("https://example.com"),
-            username: String::from("rob"),
+            username: String::from("user"),
             password: String::from("current"),
             notes: None,
             custom_fields: vec![],
@@ -2852,7 +2852,7 @@ mod tests {
             },
             card_name: None,
             status: String::from("active"),
-            cardholder_name: String::from("Rob Smith"),
+            cardholder_name: String::from("Alex Smith"),
             card_number: String::from("4111111111111111"),
             expiry: String::from("12/28"),
             cvv: String::from("123"),
@@ -2871,7 +2871,7 @@ mod tests {
 
         let summary = entry_to_summary(&entry);
         assert_eq!(
-            summary.title, "Rob Smith",
+            summary.title, "Alex Smith",
             "summary should fall back to cardholder_name when card_name is absent"
         );
     }
@@ -3563,9 +3563,9 @@ mod json_export_tests {
                     updated_at: String::from("2025-01-01T00:00:00Z"),
                     folder: String::from("Work"),
                 },
-                title: String::from("GitHub"),
-                url: String::from("https://github.com"),
-                username: String::from("rob"),
+                title: String::from("Example"),
+                url: String::from("https://example.com"),
+                username: String::from("user"),
                 password: String::from("s3cr3t"),
                 notes: None,
                 custom_fields: vec![],
@@ -3652,9 +3652,9 @@ mod json_export_tests {
                 updated_at: "".to_string(),
                 folder: "".to_string(),
             },
-            title: "GitHub".to_string(),
-            url: "https://github.com".to_string(),
-            username: "rob@example.com".to_string(),
+            title: "Example".to_string(),
+            url: "https://example.com".to_string(),
+            username: "user@example.com".to_string(),
             password: "s3cr3t".to_string(),
             notes: None,
             custom_fields: vec![],
@@ -3665,11 +3665,11 @@ mod json_export_tests {
         });
         let s = entry_to_summary(&entry);
         assert!(
-            s.search_blob.contains("rob@example.com"),
+            s.search_blob.contains("user@example.com"),
             "blob must include username"
         );
         assert!(
-            s.search_blob.contains("github.com"),
+            s.search_blob.contains("example.com"),
             "blob must include url"
         );
     }
@@ -3684,9 +3684,9 @@ mod json_export_tests {
                 updated_at: "".to_string(),
                 folder: "".to_string(),
             },
-            title: "GitHub".to_string(),
-            url: "https://github.com".to_string(),
-            username: "rob".to_string(),
+            title: "Example".to_string(),
+            url: "https://example.com".to_string(),
+            username: "user".to_string(),
             password: "s3cr3t_password_xyz".to_string(),
             notes: None,
             custom_fields: vec![],
@@ -3714,7 +3714,7 @@ mod json_export_tests {
             },
             title: "Work VPN".to_string(),
             url: "".to_string(),
-            username: "rob".to_string(),
+            username: "user".to_string(),
             password: "pw".to_string(),
             notes: Some("corporate access only".to_string()),
             custom_fields: vec![],
@@ -3742,7 +3742,7 @@ mod json_export_tests {
             },
             title: "Example".to_string(),
             url: "".to_string(),
-            username: "rob".to_string(),
+            username: "user".to_string(),
             password: "pw".to_string(),
             notes: None,
             custom_fields: vec![CustomField {
@@ -3780,7 +3780,7 @@ mod json_export_tests {
             },
             title: "Example".to_string(),
             url: "".to_string(),
-            username: "rob".to_string(),
+            username: "user".to_string(),
             password: "pw".to_string(),
             notes: None,
             custom_fields: vec![CustomField {
@@ -3867,7 +3867,7 @@ mod json_export_tests {
             },
             card_name: Some("Visa Platinum".to_string()),
             status: "active".to_string(),
-            cardholder_name: "Rob Smith".to_string(),
+            cardholder_name: "Alex Smith".to_string(),
             card_number: "4111999988887777".to_string(),
             expiry: "12/28".to_string(),
             cvv: "999".to_string(),
@@ -3885,7 +3885,7 @@ mod json_export_tests {
         });
         let s = entry_to_summary(&entry);
         assert!(
-            s.search_blob.contains("rob smith"),
+            s.search_blob.contains("alex smith"),
             "blob must include cardholder name"
         );
         assert!(s.search_blob.contains("ubs"), "blob must include bank name");
@@ -3976,7 +3976,7 @@ mod json_export_tests {
     fn search_blob_for_custom_excludes_field_labels() {
         // values-not-labels applies to Custom entries too: a field labelled
         // "Router" must not match a "router" search; its value still matches.
-        use crate::vault::entry::{CustomField, CustomEntry, EntryMeta, VaultEntry};
+        use crate::vault::entry::{CustomEntry, CustomField, EntryMeta, VaultEntry};
         use std::collections::HashMap;
         let mut fields = HashMap::new();
         fields.insert(
@@ -4014,7 +4014,7 @@ mod json_export_tests {
         // Net-first pin: the Custom-entry blob must keep its title and non-hidden
         // field values searchable, and never leak hidden values. (Independent of
         // whether field labels are folded in.)
-        use crate::vault::entry::{CustomField, CustomEntry, EntryMeta, VaultEntry};
+        use crate::vault::entry::{CustomEntry, CustomField, EntryMeta, VaultEntry};
         use std::collections::HashMap;
         let mut fields = HashMap::new();
         fields.insert(
@@ -4045,7 +4045,10 @@ mod json_export_tests {
             attachments: vec![],
         });
         let s = entry_to_summary(&entry);
-        assert!(s.search_blob.contains("home network"), "blob must include title");
+        assert!(
+            s.search_blob.contains("home network"),
+            "blob must include title"
+        );
         assert!(
             s.search_blob.contains("192.168.1.1"),
             "blob must include non-hidden field value"
@@ -4068,7 +4071,7 @@ mod json_export_tests {
             },
             title: "UPPERCASE TITLE".to_string(),
             url: "https://EXAMPLE.COM".to_string(),
-            username: "Rob@Example.Com".to_string(),
+            username: "User@Example.Com".to_string(),
             password: "pw".to_string(),
             notes: None,
             custom_fields: vec![],

@@ -1,9 +1,9 @@
 name,url,username,password,note
-GitHub,https://github.com,rob@example.com,h0rs3-b4tt3ry-st4pl3,Work account for personal projects
-Google,https://accounts.google.com,rob.smith@gmail.com,c0rr3ct-h0rs3-b4tt3ry,
-Netflix,https://www.netflix.com,rob@example.com,Tr0ub4dor&3,Shared with partner — 2 screens
-Online Banking,https://bank.example.com,rob.smith,X!9kLmP#2qRv7nZw,
+Example,https://example.com,user@example.com,h0rs3-b4tt3ry-st4pl3,Work account for personal projects
+Sample,https://accounts.example.net,user@example.com,c0rr3ct-h0rs3-b4tt3ry,
+Sample,https://www.example.net,user@example.com,Tr0ub4dor&3,Shared with partner — 2 screens
+Online Banking,https://bank.example.com,user,X!9kLmP#2qRv7nZw,
 SSH Jump Host,https://jump.example.com,admin,-----BEGIN RSA PRIVATE KEY-----,Passphrase for key not the key itself
-"Bank, Gold Card",https://visa.example.com,rob@example.com,G0ld-C4rd-P4ss,Card portal login — not the PIN
+"Bank, Gold Card",https://visa.example.com,user@example.com,G0ld-C4rd-P4ss,Card portal login — not the PIN
 Work VPN,https://vpn.corp.example.com,rsmith,Wint3r2024!,Rotate every 90 days
 Forum Account,https://forum.example.com,rsmith_42,p4ssw0rd123,Old account from 2019

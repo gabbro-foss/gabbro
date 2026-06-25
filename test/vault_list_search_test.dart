@@ -32,12 +32,12 @@ List<EntrySummaryData> _folderEntries() => [
 ];
 
 List<EntrySummaryData> _blobEntries() => [
-  _entry('1', 'GitHub', 'Login',
-      searchBlob: 'github rob@example.com https://github.com'),
+  _entry('1', 'Example', 'Login',
+      searchBlob: 'example user@example.com https://example.com'),
   _entry('2', 'Bank note', 'Note',
       searchBlob: 'bank note savings account transfers'),
   _entry('3', 'Alice Smith', 'Identity',
-      searchBlob: 'alice smith alice@corp.com'),
+      searchBlob: 'alice smith alice@example.com'),
 ];
 
 // ── Widget helper ─────────────────────────────────────────────────────────────
@@ -356,7 +356,7 @@ void main() {
       find.descendant(of: find.byType(ListTile), matching: find.text('Bank note')),
       findsOneWidget,
     );
-    expect(find.text('GitHub'), findsNothing);
+    expect(find.text('Example'), findsNothing);
     expect(find.text('Alice Smith'), findsNothing);
   });
 

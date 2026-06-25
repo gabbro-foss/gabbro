@@ -40,7 +40,7 @@ pub struct LoginEntryData {
     pub created_at: String,
     pub updated_at: String,
     pub folder: String,
-    /// Human-readable item title (e.g. "GitHub", "Netflix").
+    /// Human-readable item title (e.g. "Example", "Sample").
     /// Distinct from the URL — used as the primary display label in list views.
     pub title: String,
     pub url: String,
@@ -1054,7 +1054,7 @@ mod tests {
             "setup sanity: the entry must be present"
         );
 
-        // Rob's printf scenario: overwrite the sealed bytes with garbage.
+        // the maintainer's printf scenario: overwrite the sealed bytes with garbage.
         std::fs::write(&path, b"rubbish").unwrap();
 
         let result = load_vault_with_yubikey(passphrase, &hmac_secret, &salt, &path);
@@ -1071,18 +1071,18 @@ mod tests {
     fn create_login_entry_returns_correct_fields() {
         let entry = create_login_entry(
             String::from("Personal"),
-            String::from("GitHub"),
-            String::from("https://github.com"),
-            String::from("rob"),
+            String::from("Example"),
+            String::from("https://example.com"),
+            String::from("user"),
             String::from("hunter2"),
             None,
             vec![],
         );
 
-        assert_eq!(entry.title, "GitHub");
+        assert_eq!(entry.title, "Example");
         assert_eq!(entry.folder, "Personal");
-        assert_eq!(entry.url, "https://github.com");
-        assert_eq!(entry.username, "rob");
+        assert_eq!(entry.url, "https://example.com");
+        assert_eq!(entry.username, "user");
         assert_eq!(entry.password, "hunter2");
         assert!(entry.notes.is_none());
     }
@@ -1114,14 +1114,14 @@ mod tests {
     fn create_login_entry_with_notes_and_custom_fields() {
         let field = CustomFieldData {
             label: String::from("Recovery email"),
-            value: String::from("rob@example.com"),
+            value: String::from("user@example.com"),
             hidden: false,
         };
         let entry = create_login_entry(
             String::from("Personal"),
             String::from("Example"),
             String::from("https://example.com"),
-            String::from("rob"),
+            String::from("user"),
             String::from("s3cr3t"),
             Some(String::from("main account")),
             vec![field],
@@ -1414,7 +1414,7 @@ mod tests {
             },
             title: String::from("Example"),
             url: String::from("https://example.com"),
-            username: String::from("rob"),
+            username: String::from("user"),
             password: String::from("s3cr3t"),
             notes: None,
             custom_fields: vec![],
@@ -1444,7 +1444,7 @@ mod tests {
             },
             title: String::from("Example"),
             url: String::from("https://example.com"),
-            username: String::from("rob"),
+            username: String::from("user"),
             password: String::from("correct horst battery staple"),
             notes: None,
             custom_fields: vec![],
@@ -1458,7 +1458,7 @@ mod tests {
         match &result[0] {
             VaultEntry::Login(e) => {
                 assert_eq!(e.password, MASKED_VALUE);
-                assert_eq!(e.username, "rob"); // non-sensitive field unchanged
+                assert_eq!(e.username, "user"); // non-sensitive field unchanged
             }
             _ => panic!("Expected Login variant"),
         }
@@ -1477,7 +1477,7 @@ mod tests {
             },
             card_name: Some(String::from("Visa Platinum")),
             status: String::from("active"),
-            cardholder_name: String::from("Rob Smith"),
+            cardholder_name: String::from("Alex Smith"),
             card_number: String::from("4111111111111111"),
             expiry: String::from("12/28"),
             cvv: String::from("123"),
@@ -1517,7 +1517,7 @@ mod tests {
             },
             title: String::from("Example"),
             url: String::from("https://example.com"),
-            username: String::from("rob"),
+            username: String::from("user"),
             password: String::from("s3cr3t"),
             notes: None,
             custom_fields: vec![
@@ -1560,9 +1560,9 @@ mod tests {
         };
         let mut entries = vec![VaultEntry::Login(LoginEntry {
             meta: meta.clone(),
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("old_password"),
             notes: None,
             custom_fields: vec![],
@@ -1574,9 +1574,9 @@ mod tests {
 
         let updated = VaultEntry::Login(LoginEntry {
             meta: meta.clone(),
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("new_password"),
             notes: None,
             custom_fields: vec![],
@@ -1614,9 +1614,9 @@ mod tests {
         };
         let mut entries = vec![VaultEntry::Login(LoginEntry {
             meta: meta.clone(),
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("old_password"),
             notes: None,
             custom_fields: vec![],
@@ -1628,9 +1628,9 @@ mod tests {
 
         let updated = VaultEntry::Login(LoginEntry {
             meta: meta.clone(),
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("new_password"),
             notes: None,
             custom_fields: vec![],
@@ -1673,9 +1673,9 @@ mod tests {
         };
         let mut entries = vec![VaultEntry::Login(LoginEntry {
             meta: meta.clone(),
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("same_password"),
             notes: None,
             custom_fields: vec![],
@@ -1687,9 +1687,9 @@ mod tests {
 
         let updated = VaultEntry::Login(LoginEntry {
             meta: meta.clone(),
-            title: String::from("GitHub — updated title"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example — updated title"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("same_password"),
             notes: None,
             custom_fields: vec![],
@@ -1703,7 +1703,7 @@ mod tests {
 
         match &entries[0] {
             VaultEntry::Login(e) => {
-                assert_eq!(e.title, "GitHub — updated title");
+                assert_eq!(e.title, "Example — updated title");
                 // password unchanged — existing history must be preserved as-is
                 let prev = e
                     .previous_password
@@ -1863,7 +1863,7 @@ mod tests {
                 },
                 CustomField {
                     label: String::from("Author"),
-                    value: String::from("Rob"),
+                    value: String::from("Alex"),
                     hidden: false,
                 },
             ],
@@ -1873,7 +1873,7 @@ mod tests {
         match &result[0] {
             VaultEntry::File(e) => {
                 assert_eq!(e.custom_fields[0].value, MASKED_VALUE);
-                assert_eq!(e.custom_fields[1].value, "Rob");
+                assert_eq!(e.custom_fields[1].value, "Alex");
             }
             _ => panic!("Expected File variant"),
         }

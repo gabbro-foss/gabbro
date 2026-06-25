@@ -8,13 +8,13 @@
       "id": "bw-001",
       "folderId": "f-001",
       "type": 1,
-      "name": "GitHub",
+      "name": "Example",
       "notes": "my dev account",
       "favorite": true,
       "fields": [],
       "login": {
-        "uris": [{"uri": "https://github.com"}],
-        "username": "rob",
+        "uris": [{"uri": "https://example.com"}],
+        "username": "user",
         "password": "hunter2"
       }
     },
@@ -27,7 +27,7 @@
       "favorite": false,
       "fields": [],
       "card": {
-        "cardholderName": "Rob Bastian",
+        "cardholderName": "Alex Doe",
         "brand": "Visa",
         "number": "4111111111111111",
         "expMonth": "12",

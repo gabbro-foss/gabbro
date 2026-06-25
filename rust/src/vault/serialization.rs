@@ -155,7 +155,7 @@ mod tests {
             meta: default_meta("id-legacy"),
             title: String::from("Legacy"),
             url: String::from("https://example.com"),
-            username: String::from("rob"),
+            username: String::from("user"),
             password: String::from("s3cr3t"),
             notes: None,
             custom_fields: vec![],
@@ -191,9 +191,9 @@ mod tests {
     fn single_login_entry_roundtrips() {
         let entry = VaultEntry::Login(LoginEntry {
             meta: default_meta("id-001"),
-            title: String::from("GitHub"),
-            url: String::from("https://github.com"),
-            username: String::from("rob"),
+            title: String::from("Example"),
+            url: String::from("https://example.com"),
+            username: String::from("user"),
             password: String::from("correct horst battery staple"),
             notes: None,
             custom_fields: vec![],
@@ -212,8 +212,8 @@ mod tests {
         assert_eq!(recovered.entries.len(), 1);
         match &recovered.entries[0] {
             VaultEntry::Login(e) => {
-                assert_eq!(e.username, "rob");
-                assert_eq!(e.url, "https://github.com");
+                assert_eq!(e.username, "user");
+                assert_eq!(e.url, "https://example.com");
             }
             _ => panic!("Expected Login variant"),
         }
@@ -226,7 +226,7 @@ mod tests {
                 meta: default_meta("id-001"),
                 title: String::from("Example"),
                 url: String::from("https://example.com"),
-                username: String::from("rob"),
+                username: String::from("user"),
                 password: String::from("s3cr3t"),
                 notes: None,
                 custom_fields: vec![CustomField {

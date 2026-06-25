@@ -505,17 +505,17 @@ mod tests {
 
     const SAMPLE_CSV: &str = "\
 name,url,login,password,comments,favourite
-GitHub,https://github.com,rob,hunter2,my github,yes
-Google,https://google.com,rob@gmail.com,s3cr3t,,no";
+Example,https://example.com,user,hunter2,my example,yes
+Sample,https://example.net,user@example.com,s3cr3t,,no";
 
     const BITWARDEN_JSON: &str = r#"{
         "encrypted": false,
         "folders": [],
         "items": [
-            {"id":"bw-001","folderId":null,"type":1,"name":"GitHub","notes":null,"favorite":false,"fields":[],"login":{"uris":[{"uri":"https://github.com"}],"username":"rob","password":"hunter2"}},
+            {"id":"bw-001","folderId":null,"type":1,"name":"Example","notes":null,"favorite":false,"fields":[],"login":{"uris":[{"uri":"https://example.com"}],"username":"user","password":"hunter2"}},
             {"id":"bw-002","folderId":null,"type":2,"name":"SSH Key","notes":"my key passphrase","favorite":false,"fields":[],"secureNote":{}},
-            {"id":"bw-003","folderId":null,"type":3,"name":"Visa","notes":null,"favorite":false,"fields":[],"card":{"cardholderName":"Rob","brand":"Visa","number":"4111111111111111","expMonth":"12","expYear":"2028","code":"123"}},
-            {"id":"bw-004","folderId":null,"type":4,"name":"Rob Example","notes":null,"favorite":false,"fields":[],"identity":{"firstName":"Rob","lastName":"Example","email":"rob@example.com","phone":null,"company":null}},
+            {"id":"bw-003","folderId":null,"type":3,"name":"Visa","notes":null,"favorite":false,"fields":[],"card":{"cardholderName":"Alex","brand":"Visa","number":"4111111111111111","expMonth":"12","expYear":"2028","code":"123"}},
+            {"id":"bw-004","folderId":null,"type":4,"name":"Alex Example","notes":null,"favorite":false,"fields":[],"identity":{"firstName":"Alex","lastName":"Example","email":"user@example.com","phone":null,"company":null}},
             {"id":"bw-005","folderId":null,"type":99,"name":"Unknown","notes":null,"favorite":false,"fields":[]}
         ]
     }"#;
@@ -523,16 +523,16 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
     const ENPASS_JSON: &str = r#"{
         "items": [{
             "uuid": "enp-001",
-            "title": "GitHub",
+            "title": "Example",
             "category": "login",
             "note": "",
             "favorite": 0,
             "archived": 0,
             "trashed": 0,
             "fields": [
-                {"label":"Username","type":"username","value":"rob","sensitive":0,"deleted":0},
+                {"label":"Username","type":"username","value":"user","sensitive":0,"deleted":0},
                 {"label":"Password","type":"password","value":"hunter2","sensitive":1,"deleted":0},
-                {"label":"Website","type":"url","value":"https://github.com","sensitive":0,"deleted":0}
+                {"label":"Website","type":"url","value":"https://example.com","sensitive":0,"deleted":0}
             ],
             "attachments": []
         }]
@@ -752,7 +752,7 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
             "trashed": 0,
             "fields": [
                 {"label":"Card Number","type":"ccNumber","value":"1234","sensitive":0,"deleted":0},
-                {"label":"Name on Card","type":"ccName","value":"Rob","sensitive":0,"deleted":0}
+                {"label":"Name on Card","type":"ccName","value":"Alex","sensitive":0,"deleted":0}
             ],
             "attachments": []
         }]
@@ -887,13 +887,13 @@ Google,https://google.com,rob@gmail.com,s3cr3t,,no";
 
     const GOOGLE_PM_CSV: &str = "\
 name,url,username,password,note
-GitHub,https://github.com,rob,hunter2,my github
-Google,https://google.com,rob@gmail.com,s3cr3t,";
+Example,https://example.com,user,hunter2,my example
+Sample,https://example.net,user@example.com,s3cr3t,";
 
     const DASHLANE_CSV: &str = "\
 username,username2,username3,url,category,note,password,title
-rob@example.com,,,https://github.com,Work,my github,hunter2,GitHub
-user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
+user@example.com,,,https://example.com,Work,my example,hunter2,Example
+user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample";
 
     #[test]
     #[serial]
@@ -1220,9 +1220,9 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
                 updated_at: String::new(),
                 folder: String::new(),
             },
-            first_name: String::from("Rob"),
+            first_name: String::from("Alex"),
             last_name: String::from("Example"),
-            email: String::from("rob@example.com"),
+            email: String::from("user@example.com"),
             phone: None,
             address: None,
             custom_fields: vec![],
@@ -1231,7 +1231,7 @@ user@gmail.com,backup@gmail.com,,https://google.com,Personal,,s3cr3t,Google";
 
         let (id, title) = entry_id_and_title(&entry);
         assert_eq!(id, "id-001");
-        assert_eq!(title, "Rob Example");
+        assert_eq!(title, "Alex Example");
     }
 
     #[test]

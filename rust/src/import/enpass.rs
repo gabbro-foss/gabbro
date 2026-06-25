@@ -421,16 +421,16 @@ mod tests {
         r#"{
           "items": [{
             "uuid": "aaa-111",
-            "title": "GitHub",
+            "title": "Example",
             "category": "login",
             "note": "",
             "favorite": 0,
             "archived": 0,
             "trashed": 0,
             "fields": [
-              {"label": "Username", "type": "username", "value": "rob", "sensitive": 0, "deleted": 0},
+              {"label": "Username", "type": "username", "value": "user", "sensitive": 0, "deleted": 0},
               {"label": "Password", "type": "password", "value": "h4x0r", "sensitive": 1, "deleted": 0},
-              {"label": "Website",  "type": "url",      "value": "https://github.com", "sensitive": 0, "deleted": 0}
+              {"label": "Website",  "type": "url",      "value": "https://example.com", "sensitive": 0, "deleted": 0}
             ]
           }]
         }"#
@@ -447,7 +447,7 @@ mod tests {
             "archived": 0,
             "trashed": 0,
             "fields": [
-              {"label": "Name on card", "type": "ccName",   "value": "Rob Smith",        "sensitive": 0, "deleted": 0},
+              {"label": "Name on card", "type": "ccName",   "value": "Alex Smith",        "sensitive": 0, "deleted": 0},
               {"label": "Card number",  "type": "ccNumber", "value": "4111111111111111", "sensitive": 1, "deleted": 0},
               {"label": "Expiry",       "type": "ccExpiry", "value": "12/28",            "sensitive": 0, "deleted": 0},
               {"label": "CVV",          "type": "ccCvc",    "value": "123",              "sensitive": 1, "deleted": 0}
@@ -464,10 +464,10 @@ mod tests {
             panic!("expected Login")
         };
         assert_eq!(e.meta.id, "aaa-111");
-        assert_eq!(e.title, "GitHub");
-        assert_eq!(e.username, "rob");
+        assert_eq!(e.title, "Example");
+        assert_eq!(e.username, "user");
         assert_eq!(e.password, "h4x0r");
-        assert_eq!(e.url, "https://github.com");
+        assert_eq!(e.url, "https://example.com");
     }
 
     #[test]
@@ -479,7 +479,7 @@ mod tests {
         };
         assert_eq!(e.meta.id, "bbb-222");
         assert_eq!(e.card_name, Some(String::from("Visa Platinum")));
-        assert_eq!(e.cardholder_name, "Rob Smith");
+        assert_eq!(e.cardholder_name, "Alex Smith");
         assert_eq!(e.card_number, "4111111111111111");
     }
 
@@ -514,7 +514,7 @@ mod tests {
             "uuid": "eee-555", "title": "Test", "category": "login",
             "note": "", "favorite": 0, "archived": 0, "trashed": 0,
             "fields": [
-              {"label": "Username", "type": "username", "value": "rob",   "sensitive": 0, "deleted": 0},
+              {"label": "Username", "type": "username", "value": "user",   "sensitive": 0, "deleted": 0},
               {"label": "Old pass", "type": "password", "value": "old",   "sensitive": 1, "deleted": 1},
               {"label": "New pass", "type": "password", "value": "new",   "sensitive": 1, "deleted": 0}
             ]
@@ -604,7 +604,7 @@ mod tests {
             "uuid": "f01-004", "title": "My Bank", "category": "login",
             "note": "", "favorite": 0, "archived": 0, "trashed": 0,
             "fields": [
-              {"label": "Username", "type": "username", "value": "rob",                    "sensitive": 0, "deleted": 0},
+              {"label": "Username", "type": "username", "value": "user",                    "sensitive": 0, "deleted": 0},
               {"label": "Password", "type": "password", "value": "s3cr3t",                 "sensitive": 1, "deleted": 0},
               {"label": "Website",  "type": "url",      "value": "https://mybank.example", "sensitive": 0, "deleted": 0}
             ]
@@ -663,7 +663,7 @@ mod tests {
             "uuid": "f01-006", "title": "E-Banking", "category": "finance",
             "note": "", "favorite": 0, "archived": 0, "trashed": 0,
             "fields": [
-              {"label": "Username", "type": "username", "value": "rob",    "sensitive": 0, "deleted": 0},
+              {"label": "Username", "type": "username", "value": "user",    "sensitive": 0, "deleted": 0},
               {"label": "Password", "type": "password", "value": "s3cr3t", "sensitive": 1, "deleted": 0}
             ]
           }]
@@ -682,11 +682,11 @@ mod tests {
             "uuid": "f02-001", "title": "Visa", "category": "creditcard",
             "note": "", "favorite": 0, "archived": 0, "trashed": 0,
             "fields": [
-              {"label": "Name on card", "type": "ccName",   "value": "Rob Smith",        "sensitive": 0, "deleted": 0},
+              {"label": "Name on card", "type": "ccName",   "value": "Alex Smith",        "sensitive": 0, "deleted": 0},
               {"label": "Card number",  "type": "ccNumber", "value": "4111111111111111", "sensitive": 1, "deleted": 0},
               {"label": "Expiry",       "type": "ccExpiry", "value": "12/28",            "sensitive": 0, "deleted": 0},
               {"label": "CVV",          "type": "ccCvc",    "value": "123",              "sensitive": 1, "deleted": 0},
-              {"label": "Portal user",  "type": "username", "value": "rob",              "sensitive": 0, "deleted": 0},
+              {"label": "Portal user",  "type": "username", "value": "user",              "sensitive": 0, "deleted": 0},
               {"label": "Portal pass",  "type": "password", "value": "s3cr3t",           "sensitive": 1, "deleted": 0}
             ]
           }]
@@ -695,7 +695,7 @@ mod tests {
         let VaultEntry::Card(ref e) = entries[0] else {
             panic!("expected Card")
         };
-        assert_eq!(e.cardholder_name, "Rob Smith");
+        assert_eq!(e.cardholder_name, "Alex Smith");
         assert_eq!(e.card_number, "4111111111111111");
         assert!(
             e.custom_fields.iter().any(|f| f.label == "Portal user"),
@@ -716,7 +716,7 @@ mod tests {
             "uuid": "f03-001", "title": "Passport", "category": "travel",
             "note": "", "favorite": 0, "archived": 0, "trashed": 0,
             "fields": [
-              {"label": "Full name",     "type": "text", "value": "Rob Smith", "sensitive": 0, "deleted": 0},
+              {"label": "Full name",     "type": "text", "value": "Alex Smith", "sensitive": 0, "deleted": 0},
               {"label": "Passport no.",  "type": "text", "value": "X1234567",  "sensitive": 1, "deleted": 0}
             ]
           }]
@@ -735,7 +735,7 @@ mod tests {
             "uuid": "f04-001", "title": "Bank Account", "category": "finance",
             "note": "", "favorite": 0, "archived": 0, "trashed": 0,
             "fields": [
-              {"label": "Username",       "type": "username", "value": "rob",        "sensitive": 0, "deleted": 0},
+              {"label": "Username",       "type": "username", "value": "user",        "sensitive": 0, "deleted": 0},
               {"label": "Password",       "type": "password", "value": "s3cr3t",     "sensitive": 1, "deleted": 0},
               {"label": "Account number", "type": "numeric",  "value": "123456789",  "sensitive": 1, "deleted": 0}
             ]
@@ -758,7 +758,7 @@ mod tests {
             "uuid": "f05-001", "title": "Test", "category": "login",
             "note": "", "favorite": 0, "archived": 0, "trashed": 0,
             "fields": [
-              {"label": "Username",      "type": "username", "value": "rob",          "sensitive": 0, "deleted": 0},
+              {"label": "Username",      "type": "username", "value": "user",          "sensitive": 0, "deleted": 0},
               {"label": "Password",      "type": "password", "value": "s3cr3t",       "sensitive": 1, "deleted": 0},
               {"label": "Section header","type": "section",  "value": "Extra fields", "sensitive": 0, "deleted": 0}
             ]
@@ -781,7 +781,7 @@ mod tests {
             "uuid": "f06-001", "title": "Test", "category": "login",
             "note": "", "favorite": 0, "archived": 0, "trashed": 0,
             "fields": [
-              {"label": "Username", "type": "username", "value": "rob",            "sensitive": 0, "deleted": 0},
+              {"label": "Username", "type": "username", "value": "user",            "sensitive": 0, "deleted": 0},
               {"label": "Password", "type": "password", "value": "s3cr3t",         "sensitive": 1, "deleted": 0},
               {"label": "TOTP",     "type": "totp",     "value": "otpauth://...",   "sensitive": 1, "deleted": 0}
             ]
@@ -804,7 +804,7 @@ mod tests {
             "uuid": "f08-001", "title": "Visa", "category": "creditcard",
             "note": "", "favorite": 0, "archived": 0, "trashed": 0,
             "fields": [
-              {"label": "Name on card", "type": "ccName",   "value": "Rob Smith",        "sensitive": 0, "deleted": 0},
+              {"label": "Name on card", "type": "ccName",   "value": "Alex Smith",        "sensitive": 0, "deleted": 0},
               {"label": "Card number",  "type": "ccNumber", "value": "4111111111111111", "sensitive": 1, "deleted": 0},
               {"label": "Expiry",       "type": "ccExpiry", "value": "12/2028",          "sensitive": 0, "deleted": 0},
               {"label": "CVV",          "type": "ccCvc",    "value": "123",              "sensitive": 1, "deleted": 0}
@@ -829,7 +829,7 @@ mod tests {
             "uuid": "f07-001", "title": "Test", "category": "login",
             "note": "", "favorite": 0, "archived": 0, "trashed": 0,
             "fields": [
-              {"label": "Username", "type": "username", "value": "rob",    "sensitive": 0, "deleted": 0},
+              {"label": "Username", "type": "username", "value": "user",    "sensitive": 0, "deleted": 0},
               {"label": "Password", "type": "password", "value": "s3cr3t", "sensitive": 1, "deleted": 0}
             ],
             "attachments": [{

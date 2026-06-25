@@ -12,7 +12,7 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 CardEntryData _originalCard() => CardEntryData(
       id: 'card-id-1',
       cardName: 'Granite Visa',
-      cardholderName: 'Rob Example',
+      cardholderName: 'Alex Example',
       cardNumber: '4111111111111111',
       expiry: '12/26',
       cvv: '123',
@@ -33,7 +33,7 @@ CardEntryData _originalCard() => CardEntryData(
 CardEntryData _updatedCardCvvAndPin() => CardEntryData(
       id: 'card-id-1',
       cardName: 'Granite Visa',
-      cardholderName: 'Rob Example',
+      cardholderName: 'Alex Example',
       cardNumber: '4111111111111111',
       expiry: '12/26',
       cvv: '999',
@@ -53,7 +53,7 @@ CardEntryData _updatedCardCvvAndPin() => CardEntryData(
 
 IdentityEntryData _originalIdentity() => IdentityEntryData(
       id: 'identity-id-1',
-      firstName: 'Rob',
+      firstName: 'Alex',
       lastName: 'Example',
       email: '',
       phone: null,
@@ -68,7 +68,7 @@ IdentityEntryData _originalIdentity() => IdentityEntryData(
 
 IdentityEntryData _updatedIdentityCustomField() => IdentityEntryData(
       id: 'identity-id-1',
-      firstName: 'Rob',
+      firstName: 'Alex',
       lastName: 'Example',
       email: '',
       phone: null,
@@ -105,9 +105,9 @@ CustomEntryData _updatedCustomField() => CustomEntryData(
 
 LoginEntryData _original() => LoginEntryData(
       id: 'test-id-1',
-      title: 'GitHub',
-      url: 'https://github.com',
-      username: 'rob@example.com',
+      title: 'Example',
+      url: 'https://example.com',
+      username: 'user@example.com',
       password: 'old_password',
       notes: null,
       customFields: [],
@@ -119,9 +119,9 @@ LoginEntryData _original() => LoginEntryData(
 
 LoginEntryData _updatedPasswordAndUrl() => LoginEntryData(
       id: 'test-id-1',
-      title: 'GitHub',
-      url: 'https://github.com/login',
-      username: 'rob@example.com',
+      title: 'Example',
+      url: 'https://example.com/login',
+      username: 'user@example.com',
       password: 'new_password',
       notes: null,
       customFields: [],
@@ -133,9 +133,9 @@ LoginEntryData _updatedPasswordAndUrl() => LoginEntryData(
 
 LoginEntryData _updatedUrlOnly() => LoginEntryData(
       id: 'test-id-1',
-      title: 'GitHub',
-      url: 'https://github.com/login',
-      username: 'rob@example.com',
+      title: 'Example',
+      url: 'https://example.com/login',
+      username: 'user@example.com',
       password: 'old_password',
       notes: null,
       customFields: [],
@@ -210,8 +210,8 @@ void main() {
       updated: VaultEntryData.login(_updatedUrlOnly()),
     ));
 
-    expect(find.text('https://github.com'), findsOneWidget);
-    expect(find.text('https://github.com/login'), findsOneWidget);
+    expect(find.text('https://example.com'), findsOneWidget);
+    expect(find.text('https://example.com/login'), findsOneWidget);
   });
 
   testWidgets('shows the Android app ID change in the diff', (tester) async {
@@ -375,7 +375,7 @@ void main() {
     final updated = CardEntryData(
       id: 'card-id-1',
       cardName: 'Granite Visa',
-      cardholderName: 'Rob Example',
+      cardholderName: 'Alex Example',
       cardNumber: '5500000000000004',
       expiry: '12/26',
       cvv: '123',
@@ -406,7 +406,7 @@ void main() {
     final updated = CardEntryData(
       id: 'card-id-1',
       cardName: 'Granite Visa',
-      cardholderName: 'Rob Example',
+      cardholderName: 'Alex Example',
       cardNumber: '4111111111111111',
       expiry: '12/26',
       cvv: '123',
@@ -437,7 +437,7 @@ void main() {
     final updated = CardEntryData(
       id: 'card-id-1',
       cardName: 'Granite Visa',
-      cardholderName: 'Rob Example',
+      cardholderName: 'Alex Example',
       cardNumber: '4111111111111111',
       expiry: '12/26',
       cvv: '123',
@@ -573,9 +573,9 @@ void main() {
   testWidgets('Login diff shows changed custom field', (tester) async {
     final original = LoginEntryData(
       id: 'test-id-1',
-      title: 'GitHub',
-      url: 'https://github.com',
-      username: 'rob',
+      title: 'Example',
+      url: 'https://example.com',
+      username: 'user',
       password: 'pass',
       notes: null,
       customFields: const [
@@ -588,9 +588,9 @@ void main() {
     );
     final updated = LoginEntryData(
       id: 'test-id-1',
-      title: 'GitHub',
-      url: 'https://github.com',
-      username: 'rob',
+      title: 'Example',
+      url: 'https://example.com',
+      username: 'user',
       password: 'pass',
       notes: null,
       customFields: const [
@@ -616,7 +616,7 @@ void main() {
     final updated = CardEntryData(
       id: 'card-id-1',
       cardName: 'Granite Visa',
-      cardholderName: 'Rob Example',
+      cardholderName: 'Alex Example',
       cardNumber: '4111111111111111',
       expiry: '12/26',
       cvv: '123',
@@ -649,7 +649,7 @@ void main() {
     final updated = CardEntryData(
       id: 'card-id-1',
       cardName: 'Granite Visa',
-      cardholderName: 'Rob Example',
+      cardholderName: 'Alex Example',
       cardNumber: '4111111111111111',
       expiry: '12/26',
       cvv: '123',
@@ -679,7 +679,7 @@ void main() {
     final original = CardEntryData(
       id: 'card-id-1',
       cardName: 'Granite Visa',
-      cardholderName: 'Rob Example',
+      cardholderName: 'Alex Example',
       cardNumber: '4111111111111111',
       expiry: '12/26',
       cvv: '123',
@@ -701,7 +701,7 @@ void main() {
     final updated = CardEntryData(
       id: 'card-id-1',
       cardName: 'Granite Visa',
-      cardholderName: 'Rob Example',
+      cardholderName: 'Alex Example',
       cardNumber: '4111111111111111',
       expiry: '12/26',
       cvv: '123',
@@ -735,15 +735,15 @@ void main() {
 
   testWidgets('folder change appears in diff for Login entry', (tester) async {
     final original = LoginEntryData(
-      id: 'test-id-1', title: 'GitHub', url: 'https://github.com',
-      username: 'rob@example.com', password: 'old_password', notes: null,
+      id: 'test-id-1', title: 'Example', url: 'https://example.com',
+      username: 'user@example.com', password: 'old_password', notes: null,
       customFields: [], createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z', folder: 'Work',
       previousPassword: null,
     );
     final updated = LoginEntryData(
-      id: 'test-id-1', title: 'GitHub', url: 'https://github.com',
-      username: 'rob@example.com', password: 'old_password', notes: null,
+      id: 'test-id-1', title: 'Example', url: 'https://example.com',
+      username: 'user@example.com', password: 'old_password', notes: null,
       customFields: [], createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z', folder: 'Personal',
       previousPassword: null,
