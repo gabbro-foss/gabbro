@@ -1099,6 +1099,12 @@ abstract class AppLocalizations {
   /// **'Deselect all'**
   String get tooltipDeselectAll;
 
+  /// No description provided for @tooltipClearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get tooltipClearSearch;
+
   /// No description provided for @tooltipMenu.
   ///
   /// In en, this message translates to:

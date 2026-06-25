@@ -490,6 +490,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get tooltipDeselectAll => 'Zrušiť výber';
 
   @override
+  String get tooltipClearSearch => 'Vymazať hľadanie';
+
+  @override
   String get tooltipMenu => 'Ponuka';
 
   @override

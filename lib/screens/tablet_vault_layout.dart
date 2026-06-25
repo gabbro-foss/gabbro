@@ -314,13 +314,22 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                 child: ListTile(
                                 dense: true,
                                 leading: widget.selectionMode
-                                    ? Checkbox(
-                                        visualDensity: VisualDensity.compact,
-                                        value: widget.selectedIds.contains(
-                                          entry.id,
+                                    // Label the checkbox with the entry title so
+                                    // a screen reader names the row, not a bare
+                                    // "tick box".
+                                    ? MergeSemantics(
+                                        child: Semantics(
+                                          label: widget.displayTitle(entry),
+                                          child: Checkbox(
+                                            visualDensity:
+                                                VisualDensity.compact,
+                                            value: widget.selectedIds.contains(
+                                              entry.id,
+                                            ),
+                                            onChanged: (_) => widget
+                                                .onToggleSelection(entry.id),
+                                          ),
                                         ),
-                                        onChanged: (_) =>
-                                            widget.onToggleSelection(entry.id),
                                       )
                                     : Icon(
                                         widget.entryTypeIcon(entry.entryType),

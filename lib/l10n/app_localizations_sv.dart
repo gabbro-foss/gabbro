@@ -489,6 +489,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tooltipDeselectAll => 'Avmarkera alla';
 
   @override
+  String get tooltipClearSearch => 'Rensa sökning';
+
+  @override
   String get tooltipMenu => 'Meny';
 
   @override

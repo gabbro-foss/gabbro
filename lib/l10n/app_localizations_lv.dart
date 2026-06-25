@@ -489,6 +489,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get tooltipDeselectAll => 'Noņemt visu atlasi';
 
   @override
+  String get tooltipClearSearch => 'Notīrīt meklēšanu';
+
+  @override
   String get tooltipMenu => 'Izvēlne';
 
   @override

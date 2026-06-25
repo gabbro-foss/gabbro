@@ -489,6 +489,9 @@ class AppLocalizationsYo extends AppLocalizations {
   String get tooltipDeselectAll => 'Yọ yiyan gbogbo';
 
   @override
+  String get tooltipClearSearch => 'Nu àwárí kúrò';
+
+  @override
   String get tooltipMenu => 'Mẹnu';
 
   @override

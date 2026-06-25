@@ -489,6 +489,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get tooltipDeselectAll => 'Fjern alle valg';
 
   @override
+  String get tooltipClearSearch => 'Tøm søk';
+
+  @override
   String get tooltipMenu => 'Meny';
 
   @override

@@ -491,6 +491,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tooltipDeselectAll => 'Atšaukti visus pasirinkimus';
 
   @override
+  String get tooltipClearSearch => 'Išvalyti paiešką';
+
+  @override
   String get tooltipMenu => 'Meniu';
 
   @override

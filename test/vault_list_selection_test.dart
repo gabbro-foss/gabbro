@@ -1,3 +1,5 @@
+import 'dart:ui' show CheckedState;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
@@ -300,4 +302,56 @@ void main() {
       expect(deleteCallCount, 0, reason: 'Cancel must not call delete');
     },
   );
+
+  // ── A11y: selection checkbox carries the entry title ──────────────────────
+  // Without a label a screen reader announces a bare "tick box" with no entry
+  // name. The checkbox role + checked state come free from the Checkbox; we add
+  // the entry title so the reader says e.g. "Gabbro, tick box, not ticked".
+
+  testWidgets('narrow: selection checkbox is labelled with the entry title',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    _setNarrow(tester);
+    await tester.pumpWidget(_buildScreen(_twoEntries));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.checklist));
+    await tester.pumpAndSettle();
+
+    final cb = find.descendant(
+      of: find.ancestor(
+          of: find.text('Gabbro'), matching: find.byType(ListTile)),
+      matching: find.byType(Checkbox),
+    );
+    final node = tester.getSemantics(cb);
+    expect(node.label, 'Gabbro');
+    expect(node.flagsCollection.isChecked, isNot(CheckedState.none),
+        reason: 'checkbox role must survive the Semantics wrapper');
+    handle.dispose();
+  });
+
+  testWidgets('wide: selection checkbox is labelled with the entry title',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    _setWide(tester);
+    await tester.pumpWidget(_buildScreen(_twoEntries));
+    await tester.pumpAndSettle();
+
+    // The two-pane layout also renders the title in the detail pane, so scope
+    // to the master ListTile (the only 'Gabbro' inside a ListTile).
+    final gabbroTile = find.ancestor(
+      of: find.text('Gabbro'),
+      matching: find.byType(ListTile),
+    );
+    await tester.longPress(gabbroTile);
+    await tester.pumpAndSettle();
+
+    final cb =
+        find.descendant(of: gabbroTile, matching: find.byType(Checkbox));
+    final node = tester.getSemantics(cb);
+    expect(node.label, 'Gabbro');
+    expect(node.flagsCollection.isChecked, isNot(CheckedState.none),
+        reason: 'checkbox role must survive the Semantics wrapper');
+    handle.dispose();
+  });
 }

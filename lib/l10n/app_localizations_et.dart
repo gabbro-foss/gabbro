@@ -490,6 +490,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tooltipDeselectAll => 'Tühista kõigi valik';
 
   @override
+  String get tooltipClearSearch => 'Tühjenda otsing';
+
+  @override
   String get tooltipMenu => 'Menüü';
 
   @override

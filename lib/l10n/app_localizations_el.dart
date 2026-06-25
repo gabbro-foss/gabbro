@@ -492,6 +492,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tooltipDeselectAll => 'Αποεπιλογή όλων';
 
   @override
+  String get tooltipClearSearch => 'Εκκαθάριση αναζήτησης';
+
+  @override
   String get tooltipMenu => 'Μενού';
 
   @override

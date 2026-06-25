@@ -490,6 +490,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tooltipDeselectAll => 'Zrušit výběr';
 
   @override
+  String get tooltipClearSearch => 'Vymazat hledání';
+
+  @override
   String get tooltipMenu => 'Nabídka';
 
   @override

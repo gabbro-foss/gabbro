@@ -490,6 +490,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get tooltipDeselectAll => 'Poništi izbor';
 
   @override
+  String get tooltipClearSearch => 'Obriši pretragu';
+
+  @override
   String get tooltipMenu => 'Meni';
 
   @override
@@ -2457,6 +2460,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get tooltipDeselectAll => 'Poništi izbor';
+
+  @override
+  String get tooltipClearSearch => 'Obriši pretragu';
 
   @override
   String get tooltipMenu => 'Meni';

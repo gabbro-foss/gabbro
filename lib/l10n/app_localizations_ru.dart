@@ -490,6 +490,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tooltipDeselectAll => 'Снять все выделения';
 
   @override
+  String get tooltipClearSearch => 'Очистить поиск';
+
+  @override
   String get tooltipMenu => 'Меню';
 
   @override

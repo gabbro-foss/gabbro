@@ -489,6 +489,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get tooltipDeselectAll => 'Барлығының таңдауын алу';
 
   @override
+  String get tooltipClearSearch => 'Іздеуді тазалау';
+
+  @override
   String get tooltipMenu => 'Мәзір';
 
   @override

@@ -490,6 +490,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tooltipDeselectAll => 'Poništi odabir';
 
   @override
+  String get tooltipClearSearch => 'Očisti pretragu';
+
+  @override
   String get tooltipMenu => 'Izbornik';
 
   @override

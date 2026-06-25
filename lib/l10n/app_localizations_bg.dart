@@ -491,6 +491,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tooltipDeselectAll => 'Премахни всички избирания';
 
   @override
+  String get tooltipClearSearch => 'Изчисти търсенето';
+
+  @override
   String get tooltipMenu => 'Меню';
 
   @override

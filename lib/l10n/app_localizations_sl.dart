@@ -490,6 +490,9 @@ class AppLocalizationsSl extends AppLocalizations {
   String get tooltipDeselectAll => 'Prekliči izbor';
 
   @override
+  String get tooltipClearSearch => 'Počisti iskanje';
+
+  @override
   String get tooltipMenu => 'Meni';
 
   @override

@@ -489,6 +489,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tooltipDeselectAll => 'Összes kijelölés megszüntetése';
 
   @override
+  String get tooltipClearSearch => 'Keresés törlése';
+
+  @override
   String get tooltipMenu => 'Menü';
 
   @override

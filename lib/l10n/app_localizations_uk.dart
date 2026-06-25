@@ -491,6 +491,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get tooltipDeselectAll => 'Зняти всі позначки';
 
   @override
+  String get tooltipClearSearch => 'Очистити пошук';
+
+  @override
   String get tooltipMenu => 'Меню';
 
   @override

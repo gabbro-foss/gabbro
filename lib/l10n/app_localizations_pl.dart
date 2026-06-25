@@ -491,6 +491,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get tooltipDeselectAll => 'Odznacz wszystkie';
 
   @override
+  String get tooltipClearSearch => 'Wyczyść wyszukiwanie';
+
+  @override
   String get tooltipMenu => 'Menu';
 
   @override

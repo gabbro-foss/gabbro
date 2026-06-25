@@ -491,6 +491,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tooltipDeselectAll => 'Poista kaikkien valinta';
 
   @override
+  String get tooltipClearSearch => 'Tyhjennä haku';
+
+  @override
   String get tooltipMenu => 'Valikko';
 
   @override

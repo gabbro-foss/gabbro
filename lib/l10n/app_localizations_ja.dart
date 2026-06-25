@@ -483,6 +483,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get tooltipDeselectAll => 'すべて選択解除';
 
   @override
+  String get tooltipClearSearch => '検索をクリア';
+
+  @override
   String get tooltipMenu => 'メニュー';
 
   @override

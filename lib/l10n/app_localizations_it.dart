@@ -490,6 +490,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tooltipDeselectAll => 'Deseleziona tutto';
 
   @override
+  String get tooltipClearSearch => 'Cancella ricerca';
+
+  @override
   String get tooltipMenu => 'Menu';
 
   @override

@@ -483,6 +483,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tooltipDeselectAll => '모두 선택 해제';
 
   @override
+  String get tooltipClearSearch => '검색 지우기';
+
+  @override
   String get tooltipMenu => '메뉴';
 
   @override

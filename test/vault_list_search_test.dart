@@ -391,4 +391,43 @@ void main() {
     // Same query now finds nothing (title 'Bank note' doesn't contain 'savings account')
     expect(find.text('No entries match your search.'), findsOneWidget);
   });
+
+  // ── A11y: search clear button carries a tooltip ───────────────────────────
+  // The bare clear (x) IconButton announced only "button"; it now has a
+  // localized tooltip on both phone and tablet layouts.
+
+  testWidgets('narrow: clear button has a tooltip when search has text',
+      (tester) async {
+    _setNarrow(tester);
+    await tester.pumpWidget(_buildScreen(_threeEntries));
+
+    await tester.enterText(find.byType(TextField), 'musc');
+    await tester.pump();
+
+    final clear = find.ancestor(
+      of: find.byIcon(Icons.clear),
+      matching: find.byType(IconButton),
+    );
+    expect(tester.widget<IconButton>(clear).tooltip, 'Clear search');
+    expect(find.byTooltip('Clear search'), findsOneWidget);
+  });
+
+  testWidgets('wide: clear button has a tooltip when search has text',
+      (tester) async {
+    tester.view.physicalSize = const Size(800, 600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(_buildScreen(_threeEntries));
+
+    await tester.enterText(find.byType(TextField), 'musc');
+    await tester.pump();
+
+    final clear = find.ancestor(
+      of: find.byIcon(Icons.clear),
+      matching: find.byType(IconButton),
+    );
+    expect(tester.widget<IconButton>(clear).tooltip, 'Clear search');
+    expect(find.byTooltip('Clear search'), findsOneWidget);
+  });
 }

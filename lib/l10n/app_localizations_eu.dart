@@ -490,6 +490,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get tooltipDeselectAll => 'Denak desautatu';
 
   @override
+  String get tooltipClearSearch => 'Garbitu bilaketa';
+
+  @override
   String get tooltipMenu => 'Menua';
 
   @override

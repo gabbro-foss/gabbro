@@ -968,6 +968,29 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
   }
 
+  // Selection-mode checkbox labelled with the entry title, so a screen reader
+  // announces "<title>, tick box, ticked" instead of a bare "tick box". The
+  // checkbox role + checked state come from Checkbox; MergeSemantics folds the
+  // label into that one node.
+  Widget _selectionCheckbox(EntrySummaryData entry, String label) {
+    return MergeSemantics(
+      child: Semantics(
+        label: label,
+        child: Checkbox(
+          visualDensity: VisualDensity.compact,
+          value: _selectedIds.contains(entry.id),
+          onChanged: (_) => setState(() {
+            if (_selectedIds.contains(entry.id)) {
+              _selectedIds.remove(entry.id);
+            } else {
+              _selectedIds.add(entry.id);
+            }
+          }),
+        ),
+      ),
+    );
+  }
+
   Widget _buildFilterChipRow() {
     final l = AppLocalizations.of(context);
     return Stack(
@@ -1301,6 +1324,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear),
+                            tooltip: l.tooltipClearSearch,
                             onPressed: () => setState(() {
                               _searchQuery = '';
                               _searchController.clear();
@@ -1384,6 +1408,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear),
+                              tooltip: l.tooltipClearSearch,
                               onPressed: () => setState(() {
                                 _searchQuery = '';
                                 _searchController.clear();
@@ -1475,21 +1500,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                                     return ListTile(
                                       dense: true,
                                       leading: _isSelecting
-                                          ? Checkbox(
-                                              visualDensity:
-                                                  VisualDensity.compact,
-                                              value: _selectedIds.contains(
-                                                entry.id,
-                                              ),
-                                              onChanged: (_) => setState(() {
-                                                if (_selectedIds.contains(
-                                                  entry.id,
-                                                )) {
-                                                  _selectedIds.remove(entry.id);
-                                                } else {
-                                                  _selectedIds.add(entry.id);
-                                                }
-                                              }),
+                                          ? _selectionCheckbox(
+                                              entry,
+                                              _localizedDisplayTitle(entry, el),
                                             )
                                           : Icon(
                                               _entryTypeIcon(entry.entryType),

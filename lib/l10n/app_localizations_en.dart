@@ -488,6 +488,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tooltipDeselectAll => 'Deselect all';
 
   @override
+  String get tooltipClearSearch => 'Clear search';
+
+  @override
   String get tooltipMenu => 'Menu';
 
   @override

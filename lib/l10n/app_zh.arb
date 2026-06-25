@@ -169,6 +169,7 @@
   "tooltipLockVault": "锁定保险库",
   "tooltipSelectAll": "全选",
   "tooltipDeselectAll": "取消全选",
+  "tooltipClearSearch": "清除搜索",
   "tooltipMenu": "菜单",
   "tooltipCopy": "复制",
   "tooltipCopied": "已复制！",

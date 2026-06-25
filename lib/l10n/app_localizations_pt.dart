@@ -490,6 +490,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tooltipDeselectAll => 'Desselecionar tudo';
 
   @override
+  String get tooltipClearSearch => 'Limpar pesquisa';
+
+  @override
   String get tooltipMenu => 'Menu';
 
   @override
@@ -2462,6 +2465,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get tooltipDeselectAll => 'Desselecionar tudo';
 
   @override
+  String get tooltipClearSearch => 'Limpar pesquisa';
+
+  @override
   String get tooltipMenu => 'Menu';
 
   @override
@@ -4429,6 +4435,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get tooltipDeselectAll => 'Desselecionar tudo';
+
+  @override
+  String get tooltipClearSearch => 'Limpar pesquisa';
 
   @override
   String get tooltipMenu => 'Menu';

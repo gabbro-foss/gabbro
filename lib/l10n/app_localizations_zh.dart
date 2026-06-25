@@ -481,6 +481,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tooltipDeselectAll => '取消全选';
 
   @override
+  String get tooltipClearSearch => '清除搜索';
+
+  @override
   String get tooltipMenu => '菜单';
 
   @override
@@ -2360,6 +2363,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get tooltipDeselectAll => '取消全选';
 
   @override
+  String get tooltipClearSearch => '清除搜索';
+
+  @override
   String get tooltipMenu => '菜单';
 
   @override
@@ -4237,6 +4243,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get tooltipDeselectAll => '取消全選';
+
+  @override
+  String get tooltipClearSearch => '清除搜尋';
 
   @override
   String get tooltipMenu => '選單';
