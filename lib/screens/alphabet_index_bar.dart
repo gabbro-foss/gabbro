@@ -170,31 +170,36 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
   }) {
     final icon = up ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down;
     final primary = Theme.of(context).colorScheme.primary;
+    // The Tooltip sits inside the excludeSemantics wrapper so the label shows on
+    // desktop hover/long-press without being announced twice by a screen reader.
     return Semantics(
       button: true,
       enabled: enabled,
       label: label,
       excludeSemantics: true,
-      child: SizedBox(
-      height: _kChevronHeight,
-      child: Center(
-        child: GestureDetector(
-          onTap: enabled ? onTap : null,
-          child: Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: enabled ? primary : primary.withValues(alpha: 0.25),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              size: 18,
-              color: Theme.of(context).colorScheme.onPrimary,
+      child: Tooltip(
+        message: label,
+        child: SizedBox(
+          height: _kChevronHeight,
+          child: Center(
+            child: GestureDetector(
+              onTap: enabled ? onTap : null,
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: enabled ? primary : primary.withValues(alpha: 0.25),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
   }

@@ -105,22 +105,34 @@ class _PasswordBreakdownSheetState extends State<PasswordBreakdownSheet> {
 
   Widget _scrollChevron({
     required IconData icon,
+    required String label,
     required Color primary,
     required Color onPrimary,
     required VoidCallback onTap,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            color: primary,
-            shape: BoxShape.circle,
+    // Button semantics + a desktop hover tooltip, matching the alphabet index
+    // bar. The Tooltip sits inside the excludeSemantics wrapper so the label is
+    // announced once, not twice.
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      child: Tooltip(
+        message: label,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: GestureDetector(
+            onTap: onTap,
+            child: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: primary,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 16, color: onPrimary),
+            ),
           ),
-          child: Icon(icon, size: 16, color: onPrimary),
         ),
       ),
     );
@@ -172,6 +184,7 @@ class _PasswordBreakdownSheetState extends State<PasswordBreakdownSheet> {
                   ignoring: !_showLeft,
                   child: _scrollChevron(
                     icon: Icons.chevron_left,
+                    label: l.tooltipPreviousPage,
                     primary: cs.primary,
                     onPrimary: cs.onPrimary,
                     onTap: () => _scrollByViewport(-1),
@@ -214,6 +227,7 @@ class _PasswordBreakdownSheetState extends State<PasswordBreakdownSheet> {
                   ignoring: !_showRight,
                   child: _scrollChevron(
                     icon: Icons.chevron_right,
+                    label: l.tooltipNextPage,
                     primary: cs.primary,
                     onPrimary: cs.onPrimary,
                     onTap: () => _scrollByViewport(1),

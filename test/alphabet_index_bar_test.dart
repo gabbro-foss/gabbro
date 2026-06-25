@@ -153,6 +153,40 @@ void main() {
     handle.dispose();
   });
 
+  testWidgets('chevrons expose a hover tooltip with the scroll label',
+      (tester) async {
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'Z'},
+      scrollUpLabel: 'EARLIER',
+      scrollDownLabel: 'LATER',
+    );
+
+    // Desktop discoverability: the bare arrow icons surface their label on
+    // hover/long-press as a Tooltip popup, not only via a screen reader.
+    expect(find.byTooltip('EARLIER'), findsOneWidget);
+    expect(find.byTooltip('LATER'), findsOneWidget);
+  });
+
+  testWidgets('chevron tooltip does not double-up screen-reader semantics',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    await pumpBar(
+      tester,
+      height: 400,
+      presentLetters: {'A', 'Z'},
+      scrollUpLabel: 'EARLIER',
+      scrollDownLabel: 'LATER',
+    );
+
+    // The Tooltip sits inside the existing excludeSemantics wrapper, so each
+    // label still announces exactly once.
+    expect(find.bySemanticsLabel('EARLIER'), findsOneWidget);
+    expect(find.bySemanticsLabel('LATER'), findsOneWidget);
+    handle.dispose();
+  });
+
   // ── Custom letter set (Cycle 1: locale-driven canon) ──────────────────────
 
   testWidgets('letters param drives the slot set (Cyrillic)', (tester) async {

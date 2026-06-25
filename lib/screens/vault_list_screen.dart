@@ -1003,6 +1003,7 @@ class _VaultListScreenState extends State<VaultListScreen>
             right: 0,
             child: _ChipRowFadeEdge(
               alignment: Alignment.centerRight,
+              label: l.tooltipNextPage,
               onTap: () => _scrollChips(true),
             ),
           ),
@@ -1011,6 +1012,7 @@ class _VaultListScreenState extends State<VaultListScreen>
             left: 0,
             child: _ChipRowFadeEdge(
               alignment: Alignment.centerLeft,
+              label: l.tooltipPreviousPage,
               onTap: () => _scrollChips(false),
             ),
           ),
@@ -1759,37 +1761,53 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
 
 class _ChipRowFadeEdge extends StatelessWidget {
   final Alignment alignment;
+  final String label;
   final VoidCallback onTap;
-  const _ChipRowFadeEdge({required this.alignment, required this.onTap});
+  const _ChipRowFadeEdge({
+    required this.alignment,
+    required this.label,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isRight = alignment == Alignment.centerRight;
     final color = Theme.of(context).scaffoldBackgroundColor;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: isRight ? Alignment.centerLeft : Alignment.centerRight,
-            end: isRight ? Alignment.centerRight : Alignment.centerLeft,
-            colors: [color.withValues(alpha: 0), color],
-          ),
-        ),
-        child: Center(
+    // Button semantics + a desktop hover tooltip, matching the alphabet index
+    // bar. The Tooltip sits inside the excludeSemantics wrapper so the label is
+    // announced once, not twice.
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      child: Tooltip(
+        message: label,
+        child: GestureDetector(
+          onTap: onTap,
           child: Container(
-            width: 28,
-            height: 28,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
-              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: isRight ? Alignment.centerLeft : Alignment.centerRight,
+                end: isRight ? Alignment.centerRight : Alignment.centerLeft,
+                colors: [color.withValues(alpha: 0), color],
+              ),
             ),
-            child: Icon(
-              isRight ? Icons.chevron_right : Icons.chevron_left,
-              color: Theme.of(context).colorScheme.onPrimary,
-              size: 20,
+            child: Center(
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  isRight ? Icons.chevron_right : Icons.chevron_left,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  size: 20,
+                ),
+              ),
             ),
           ),
         ),

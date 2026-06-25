@@ -140,6 +140,60 @@ void main() {
       expect(controller.offset, lessThan(afterRight));
     });
 
+    testWidgets('right chevron carries a tooltip and a button label',
+        (tester) async {
+      const password = 'Abcdefgh1234!@#\$Abcdefgh1234!@#\$';
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(
+        testApp(Scaffold(
+          body: SizedBox(
+            width: 300,
+            child: PasswordBreakdownSheet(password: password),
+          ),
+        )),
+      );
+      // Settle the fade-in: the chevron starts at opacity 0 (semantics dropped)
+      // and only animates in once overflow is detected.
+      await tester.pumpAndSettle();
+
+      // Desktop hover discoverability + screen-reader label, consistent with
+      // the alphabet index bar. Same translated strings.
+      expect(find.byTooltip('Next page'), findsOneWidget);
+      expect(find.bySemanticsLabel('Next page'), findsOneWidget);
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Next page')).flagsCollection
+            .isButton,
+        isTrue,
+      );
+      handle.dispose();
+    });
+
+    testWidgets('left chevron carries a tooltip and a button label once shown',
+        (tester) async {
+      const password = 'Abcdefgh1234!@#\$Abcdefgh1234!@#\$';
+      final handle = tester.ensureSemantics();
+
+      await tester.pumpWidget(
+        testApp(Scaffold(
+          body: SizedBox(
+            width: 300,
+            child: PasswordBreakdownSheet(password: password),
+          ),
+        )),
+      );
+      await tester.pump();
+
+      // Scroll right so the left chevron is no longer hidden (opacity 0 drops
+      // it from the semantics tree until it appears).
+      await tester.tap(find.byIcon(Icons.chevron_right));
+      await tester.pumpAndSettle();
+
+      expect(find.byTooltip('Previous page'), findsOneWidget);
+      expect(find.bySemanticsLabel('Previous page'), findsOneWidget);
+      handle.dispose();
+    });
+
     testWidgets('classifies CJK characters as letter, not symbol',
         (tester) async {
       // 字 (U+5B57) is Unicode category Lo — has no case.
