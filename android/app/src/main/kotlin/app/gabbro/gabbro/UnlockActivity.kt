@@ -2,10 +2,8 @@ package app.gabbro.gabbro
 
 import android.content.Intent
 import android.os.Build
-import android.service.autofill.Dataset
 import android.service.autofill.FillResponse
 import android.view.autofill.AutofillManager
-import android.view.autofill.AutofillValue
 import android.widget.RemoteViews
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -137,21 +135,10 @@ class UnlockActivity : GabbroUnlockHostActivity() {
         // Decrypt only the chosen entry's password — never the whole vault.
         val cred = matches.first().let { it.copy(password = fetchPassword(it.id)) }
         val presentation = RemoteViews(packageName, R.layout.autofill_unlock_item)
-        val datasetBuilder = Dataset.Builder()
-        usernameIds.forEach { id ->
-            val v = fillValueFor(FieldKind.USERNAME, cred.username, cred.email)
-            datasetBuilder.setValue(id, AutofillValue.forText(v), presentation)
-        }
-        emailIds.forEach { id ->
-            val v = fillValueFor(FieldKind.EMAIL, cred.username, cred.email)
-            datasetBuilder.setValue(id, AutofillValue.forText(v), presentation)
-        }
-        passwordIds.forEach { id ->
-            datasetBuilder.setValue(id, AutofillValue.forText(cred.password), presentation)
-        }
+        val dataset = buildFillDataset(usernameIds, emailIds, passwordIds, cred, presentation)
 
         val fillResponse = FillResponse.Builder()
-            .addDataset(datasetBuilder.build())
+            .addDataset(dataset)
             .build()
 
         return Intent().apply {

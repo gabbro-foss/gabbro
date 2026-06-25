@@ -3,13 +3,16 @@ package app.gabbro.gabbro
 import android.app.PendingIntent
 import android.app.assist.AssistStructure
 import android.content.Intent
+import android.os.Build
 import android.os.CancellationSignal
 import android.service.autofill.AutofillService
 import android.service.autofill.Dataset
+import android.service.autofill.Field
 import android.service.autofill.FillCallback
 import android.service.autofill.FillContext
 import android.service.autofill.FillRequest
 import android.service.autofill.FillResponse
+import android.service.autofill.Presentations
 import android.service.autofill.SaveCallback
 import android.service.autofill.SaveInfo
 import android.service.autofill.SaveRequest
@@ -198,7 +201,7 @@ class GabbroAutofillService : AutofillService() {
         val datasetBuilder = Dataset.Builder()
 
         (parsed.usernameIds + parsed.emailIds + parsed.passwordIds).forEach { id ->
-            datasetBuilder.setValue(id, AutofillValue.forText(""), presentation)
+            datasetBuilder.fillField(id, AutofillValue.forText(""), presentation)
         }
 
         datasetBuilder.setAuthentication(pendingIntent.intentSender)
@@ -256,19 +259,15 @@ class GabbroAutofillService : AutofillService() {
         val responseBuilder = FillResponse.Builder()
         matches.forEach { cred ->
             val presentation = RemoteViews(packageName, R.layout.autofill_unlock_item)
-            val datasetBuilder = Dataset.Builder()
-            parsed.usernameIds.forEach { id ->
-                val v = fillValueFor(FieldKind.USERNAME, cred.username, cred.email)
-                datasetBuilder.setValue(id, AutofillValue.forText(v), presentation)
-            }
-            parsed.emailIds.forEach { id ->
-                val v = fillValueFor(FieldKind.EMAIL, cred.username, cred.email)
-                datasetBuilder.setValue(id, AutofillValue.forText(v), presentation)
-            }
-            parsed.passwordIds.forEach { id ->
-                datasetBuilder.setValue(id, AutofillValue.forText(cred.password), presentation)
-            }
-            responseBuilder.addDataset(datasetBuilder.build())
+            responseBuilder.addDataset(
+                buildFillDataset(
+                    parsed.usernameIds,
+                    parsed.emailIds,
+                    parsed.passwordIds,
+                    cred,
+                    presentation,
+                ),
+            )
         }
         attachSaveInfo(responseBuilder, parsed)
         return responseBuilder.build()
@@ -393,6 +392,64 @@ internal fun fillValueFor(kind: FieldKind, username: String, email: String): Str
         FieldKind.USERNAME -> username.ifBlank { email }
         else -> ""
     }
+
+/**
+ * Build the fill Dataset for one matched credential: each parsed field id receives
+ * the value for its kind (username/email/password, with the username<->email
+ * fallback in [fillValueFor]) and the dropdown [presentation]. Shared by both fill
+ * paths — the unlocked service ([GabbroAutofillService.buildFillResponse]) and the
+ * locked-vault activity ([UnlockActivity.buildFillIntent]) — so the two can never
+ * fill differently. At least one id must be present: the callers' isEmpty() guards
+ * ensure this, and Dataset.Builder.build() rejects an empty field set.
+ */
+internal fun buildFillDataset(
+    usernameIds: List<AutofillId>,
+    emailIds: List<AutofillId>,
+    passwordIds: List<AutofillId>,
+    cred: CredentialSummary,
+    presentation: RemoteViews,
+): Dataset {
+    val builder = Dataset.Builder()
+    usernameIds.forEach { id ->
+        val v = fillValueFor(FieldKind.USERNAME, cred.username, cred.email)
+        builder.fillField(id, AutofillValue.forText(v), presentation)
+    }
+    emailIds.forEach { id ->
+        val v = fillValueFor(FieldKind.EMAIL, cred.username, cred.email)
+        builder.fillField(id, AutofillValue.forText(v), presentation)
+    }
+    passwordIds.forEach { id ->
+        builder.fillField(id, AutofillValue.forText(cred.password), presentation)
+    }
+    return builder.build()
+}
+
+/**
+ * Set [value] (and the dropdown [presentation]) on field [id], using the API the
+ * running device supports. `Dataset.Builder.setField(AutofillId, Field)` arrived in
+ * Android 14 (API 34) and is the non-deprecated path; below that, the only available
+ * call is the deprecated three-arg `setValue` — which still works and must stay, or
+ * autofill breaks on every device from Android 8 (the oldest with autofill) to 13.
+ * The single gate for all fill sites, so the version check lives in exactly one place.
+ */
+internal fun Dataset.Builder.fillField(
+    id: AutofillId,
+    value: AutofillValue,
+    presentation: RemoteViews,
+) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+        val field = Field.Builder()
+            .setValue(value)
+            .setPresentations(
+                Presentations.Builder().setMenuPresentation(presentation).build(),
+            )
+            .build()
+        setField(id, field)
+    } else {
+        @Suppress("DEPRECATION")
+        setValue(id, value, presentation)
+    }
+}
 
 // -----------------------------------------------------------------------------
 // capturedLoginFrom — typed values out of a SaveRequest (the save-path inverse of

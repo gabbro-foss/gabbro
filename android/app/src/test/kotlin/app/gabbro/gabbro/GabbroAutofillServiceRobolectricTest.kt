@@ -4,6 +4,7 @@ import android.service.autofill.Dataset
 import android.service.autofill.FillResponse
 import android.service.autofill.SaveInfo
 import android.view.autofill.AutofillId
+import android.view.autofill.AutofillValue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -13,6 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Robolectric-backed tests for the autofill matching helpers that depend on real
@@ -329,6 +331,20 @@ class GabbroAutofillServiceRobolectricTest {
             as? List<AutofillId>) ?: emptyList()
     }
 
+    private fun fieldValuesOf(dataset: Dataset): List<AutofillValue?> {
+        @Suppress("UNCHECKED_CAST")
+        return (Dataset::class.java.getMethod("getFieldValues").invoke(dataset)
+            as? List<AutofillValue?>) ?: emptyList()
+    }
+
+    // The filled value placed on each field id — the contract that must survive the
+    // setValue -> setField migration (the existing fieldIds-only assertions don't
+    // prove a value was attached, only that the field was targeted).
+    private fun valueByIdOf(dataset: Dataset): Map<AutofillId, AutofillValue?> =
+        fieldIdsOf(dataset).zip(fieldValuesOf(dataset)).toMap()
+
+    private fun text(s: String): AutofillValue = AutofillValue.forText(s)
+
     // The locked path attaches the unlock IntentSender at the Dataset level (the OS
     // renders it as one tappable chip), not on the FillResponse — so reflect the
     // Dataset's @hide getAuthentication().
@@ -426,6 +442,101 @@ class GabbroAutofillServiceRobolectricTest {
         val uId = newAutofillId()
         val parsed = ParsedStructure(listOf(uId), emptyList(), "https://example.com", null)
         assertNull(service.buildSaveOnlyResponse(parsed))
+    }
+
+    // ── Layer B: the filled VALUE on each field (the setValue -> setField contract) ──
+    // The migration swaps the dataset-build mechanism; these pin that each field still
+    // receives the right value. Run at the Robolectric default SDK (34, the setField
+    // branch after migration); the legacy setValue branch is guarded by the sdk=33
+    // variants below. Green against the current setValue code first (net-first).
+
+    // B1: the unlocked fill path puts username -> username field, email -> email field,
+    // password -> password field (with fillValueFor's username<->email fallback).
+    @Test
+    fun buildFillResponse_fills_correct_value_per_field_kind() {
+        val uId = newAutofillId()
+        val eId = newAutofillId()
+        val pId = newAutofillId()
+        val parsed = ParsedStructure(
+            usernameIds = listOf(uId),
+            passwordIds = listOf(pId),
+            webDomain = "https://example.com",
+            packageName = null,
+            emailIds = listOf(eId),
+        )
+        val cred = CredentialSummary("1", "alice", "https://example.com", "secret", email = "alice@example.com")
+        val byId = valueByIdOf(datasetsOf(service.buildFillResponse(parsed, listOf(cred)))[0])
+        assertEquals(text("alice"), byId[uId])
+        assertEquals(text("alice@example.com"), byId[eId])
+        assertEquals(text("secret"), byId[pId])
+    }
+
+    // B2: the locked auth path puts a placeholder empty value on every field (the real
+    // values arrive from UnlockActivity after unlock); A2 already pins ids + auth intent.
+    @Test
+    fun buildAuthResponse_sets_empty_placeholder_value_on_each_field() {
+        val uId = newAutofillId()
+        val pId = newAutofillId()
+        val parsed = ParsedStructure(listOf(uId), listOf(pId), "https://example.com", null)
+        val byId = valueByIdOf(datasetsOf(service.buildAuthResponse(parsed))[0])
+        assertEquals(text(""), byId[uId])
+        assertEquals(text(""), byId[pId])
+    }
+
+    private fun presentation() =
+        android.widget.RemoteViews(service.packageName, R.layout.autofill_unlock_item)
+
+    // B3: the shared dataset builder used by BOTH fill paths (the unlocked service and
+    // the locked-vault UnlockActivity, which had no prior coverage) fills correctly.
+    private fun assertBuildFillDatasetFillsCorrectly() {
+        val uId = newAutofillId()
+        val eId = newAutofillId()
+        val pId = newAutofillId()
+        val cred = CredentialSummary("1", "alice", "https://example.com", "secret", email = "alice@example.com")
+        val dataset = buildFillDataset(listOf(uId), listOf(eId), listOf(pId), cred, presentation())
+        assertEquals(listOf(uId, eId, pId), fieldIdsOf(dataset))
+        val byId = valueByIdOf(dataset)
+        assertEquals(text("alice"), byId[uId])
+        assertEquals(text("alice@example.com"), byId[eId])
+        assertEquals(text("secret"), byId[pId])
+    }
+
+    // Default Robolectric SDK (34): the API 34+ setField branch.
+    @Test
+    fun buildFillDataset_fills_correct_value_per_field_kind() {
+        assertBuildFillDatasetFillsCorrectly()
+    }
+
+    // Pre-34 device: the legacy setValue branch must fill identically (Android 8-13).
+    @Test
+    @Config(sdk = [33])
+    fun buildFillDataset_fills_correct_value_on_legacy_device() {
+        assertBuildFillDatasetFillsCorrectly()
+    }
+
+    // ── Layer C: fillField — the single gated primitive both branches share ─────
+    // Directly pins that the value reaches the field on each side of the SDK gate, so
+    // a future edit to the version check can never silently drop the value on one side.
+
+    private fun assertFillFieldRoundTrips() {
+        val id = newAutofillId()
+        val builder = Dataset.Builder()
+        builder.fillField(id, text("hunter2"), presentation())
+        val dataset = builder.build()
+        assertEquals(listOf(id), fieldIdsOf(dataset))
+        assertEquals(text("hunter2"), valueByIdOf(dataset)[id])
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun fillField_sets_value_on_api34_setField_branch() {
+        assertFillFieldRoundTrips()
+    }
+
+    @Test
+    @Config(sdk = [33])
+    fun fillField_sets_value_on_legacy_setValue_branch() {
+        assertFillFieldRoundTrips()
     }
 
     // ── Layer C: matchSaveTarget (which existing login a save would update) ────
