@@ -1,5 +1,7 @@
 {
   "@@locale": "lt",
+  "importSizeLimitNote": "Didžiausias failo dydis: {textLimit} (CSV, Bitwarden, Dashlane, Google) arba {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Šis failas viršija {limit} ribą.",
   "saveConfirmTitle": "Įrašyti į Gabbro",
   "saveConfirmUpdate": "Atnaujinti šį prisijungimą",
   "saveConfirmAsNew": "Įrašyti kaip naują prisijungimą",

@@ -1,5 +1,7 @@
 {
   "@@locale": "ja",
+  "importSizeLimitNote": "最大ファイルサイズ：{textLimit}（CSV、Bitwarden、Dashlane、Google）または {enpassLimit}（Enpass）。",
+  "importFileTooLarge": "このファイルは {limit} の上限を超えています。",
   "saveConfirmTitle": "Gabbro に保存",
   "saveConfirmUpdate": "このログインを更新",
   "saveConfirmAsNew": "新しいログインとして保存",

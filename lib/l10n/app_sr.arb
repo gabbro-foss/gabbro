@@ -1,5 +1,7 @@
 {
   "@@locale": "sr",
+  "importSizeLimitNote": "Највећа величина датотеке: {textLimit} (CSV, Bitwarden, Dashlane, Google) или {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Ова датотека прекорачује ограничење од {limit}.",
   "saveConfirmTitle": "Sačuvaj u Gabbro",
   "saveConfirmUpdate": "Ažuriraj ovu prijavu",
   "saveConfirmAsNew": "Sačuvaj kao novu prijavu",

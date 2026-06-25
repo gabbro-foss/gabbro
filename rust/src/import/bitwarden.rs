@@ -111,6 +111,12 @@ pub(crate) struct ParseFailure {
 /// Items that fail domain validation are collected into `failures` rather
 /// than aborting the whole import.
 pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>), String> {
+    if data.len() > super::TEXT_IMPORT_MAX_BYTES {
+        return Err(format!(
+            "Bitwarden file exceeds {} MB limit",
+            super::TEXT_IMPORT_MAX_BYTES / (1024 * 1024)
+        ));
+    }
     let export: BwExport =
         serde_json::from_slice(data).map_err(|e| format!("Bitwarden JSON parse error: {e}"))?;
 
@@ -352,6 +358,17 @@ fn convert_identity(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn oversized_input_returns_err() {
+        // S-02: an input over the text-import cap is rejected before parsing.
+        let big = vec![b'a'; crate::import::TEXT_IMPORT_MAX_BYTES + 1];
+        let err = parse(&big).err().expect("expected size-limit error");
+        assert!(
+            err.contains("exceeds"),
+            "expected size-limit error, got: {err}"
+        );
+    }
 
     const BITWARDEN_EXPORT: &str = r#"{
   "encrypted": false,

@@ -1,5 +1,7 @@
 {
   "@@locale": "fr",
+  "importSizeLimitNote": "Taille de fichier maximale : {textLimit} (CSV, Bitwarden, Dashlane, Google) ou {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Ce fichier dépasse la limite de {limit}.",
   "saveConfirmTitle": "Enregistrer dans Gabbro",
   "saveConfirmUpdate": "Mettre à jour cet identifiant",
   "saveConfirmAsNew": "Enregistrer comme nouvel identifiant",

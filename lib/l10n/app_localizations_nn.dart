@@ -1482,6 +1482,16 @@ class AppLocalizationsNn extends AppLocalizations {
       'CSV-eksport frå Dashlane (Innstillingar → Eksporter data → Påloggingsinformasjon)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Maksimal filstorleik: $textLimit (CSV, Bitwarden, Dashlane, Google) eller $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Denne fila overskrid grensa på $limit.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Eit kvelv med namnet \"$alias\" finst allereie.';
   }

@@ -789,7 +789,10 @@ data class ParsedStructure(
             val emailIds = mutableListOf<AutofillId>()
             val passwordIds = mutableListOf<AutofillId>()
             var webDomain: String? = null
-            var packageName: String? = null
+            // S-05: prefer the OS-attested requesting package over the window
+            // title (which an app can shape) for native-app credential matching;
+            // the title is only a fallback when the OS doesn't provide it.
+            var packageName: String? = structure.activityComponent?.packageName
             for (i in 0 until structure.windowNodeCount) {
                 val windowNode = structure.getWindowNodeAt(i)
                 val root = windowNode.rootViewNode
@@ -923,7 +926,9 @@ data class CapturedSaveRequest(
         fun from(structure: AssistStructure): CapturedSaveRequest {
             val fields = mutableListOf<Pair<FieldKind, String>>()
             var webDomain: String? = null
-            var packageName: String? = null
+            // S-05: prefer the OS-attested requesting package over the window
+            // title for the saved entry's app_id; title is only a fallback.
+            var packageName: String? = structure.activityComponent?.packageName
             for (i in 0 until structure.windowNodeCount) {
                 val windowNode = structure.getWindowNodeAt(i)
                 if (packageName == null) {

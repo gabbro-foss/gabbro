@@ -1,5 +1,7 @@
 {
   "@@locale": "it",
+  "importSizeLimitNote": "Dimensione massima del file: {textLimit} (CSV, Bitwarden, Dashlane, Google) o {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Questo file supera il limite di {limit}.",
   "saveConfirmTitle": "Salva in Gabbro",
   "saveConfirmUpdate": "Aggiorna questo accesso",
   "saveConfirmAsNew": "Salva come nuovo accesso",

@@ -1,5 +1,7 @@
 {
   "@@locale": "da",
+  "importSizeLimitNote": "Maksimal filstørrelse: {textLimit} (CSV, Bitwarden, Dashlane, Google) eller {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Denne fil overskrider grænsen på {limit}.",
   "saveConfirmTitle": "Gem i Gabbro",
   "saveConfirmUpdate": "Opdater dette login",
   "saveConfirmAsNew": "Gem som nyt login",

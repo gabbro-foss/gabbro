@@ -43,12 +43,14 @@ pub mod jni {
             Err(_) => return env.new_string("{}").expect("failed to allocate JString"),
         };
 
+        // Zeroizing<String>: the plaintext password is scrubbed from the Rust
+        // heap once the JNI copy below completes (S-06).
         let json = match get_entry_for_autofill(&id_str) {
             Ok(j) => j,
-            Err(_) => String::from("{}"),
+            Err(_) => zeroize::Zeroizing::new(String::from("{}")),
         };
 
-        env.new_string(json).unwrap_or_else(|_| {
+        env.new_string(&*json).unwrap_or_else(|_| {
             env.new_string("{}")
                 .expect("failed to allocate fallback JString")
         })
@@ -62,7 +64,7 @@ pub mod jni {
     /// Kotlin parses this with org.json.JSONArray — no new Android dependency needed.
     #[no_mangle]
     pub extern "system" fn Java_app_gabbro_gabbro_RustBridge_listLoginSummaries<'local>(
-        mut env: JNIEnv<'local>,
+        env: JNIEnv<'local>,
         _class: JClass<'local>,
     ) -> jni::objects::JString<'local> {
         use crate::vault::session::{login_summaries_for_autofill, login_summaries_json};

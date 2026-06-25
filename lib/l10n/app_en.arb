@@ -695,6 +695,19 @@
   "importCsvSubtitle": "CSV export from any password manager",
   "importGooglePmSubtitle": "CSV export from Google Password Manager (passwords.google.com → Download)",
   "importDashlaneSubtitle": "CSV export from Dashlane (Settings → Export Data → Credentials)",
+  "importSizeLimitNote": "Maximum file size: {textLimit} (CSV, Bitwarden, Dashlane, Google) or {enpassLimit} (Enpass).",
+  "@importSizeLimitNote": {
+    "placeholders": {
+      "textLimit": {"type": "String"},
+      "enpassLimit": {"type": "String"}
+    }
+  },
+  "importFileTooLarge": "This file exceeds the {limit} limit.",
+  "@importFileTooLarge": {
+    "placeholders": {
+      "limit": {"type": "String"}
+    }
+  },
 
   "vaultNameAlreadyExists": "A vault named \"{alias}\" already exists.",
   "@vaultNameAlreadyExists": {

@@ -1500,6 +1500,16 @@ class AppLocalizationsFr extends AppLocalizations {
       'Export CSV de Dashlane (Paramètres → Exporter les données → Identifiants)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Taille de fichier maximale : $textLimit (CSV, Bitwarden, Dashlane, Google) ou $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Ce fichier dépasse la limite de $limit.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Un coffre nommé « $alias » existe déjà.';
   }

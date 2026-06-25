@@ -1486,6 +1486,16 @@ class AppLocalizationsBg extends AppLocalizations {
       'CSV експорт от Dashlane (Настройки → Експортиране на данни → Идентификационни данни)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Максимален размер на файла: $textLimit (CSV, Bitwarden, Dashlane, Google) или $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Този файл надвишава ограничението от $limit.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Вече съществува трезор с името «$alias».';
   }

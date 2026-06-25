@@ -34,6 +34,12 @@ pub(crate) struct ParseFailure {
 /// or missing the required `name`/`password` columns). Individual rows
 /// that have no parseable data are silently skipped.
 pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>), String> {
+    if data.len() > super::TEXT_IMPORT_MAX_BYTES {
+        return Err(format!(
+            "Google Password Manager file exceeds {} MB limit",
+            super::TEXT_IMPORT_MAX_BYTES / (1024 * 1024)
+        ));
+    }
     let text =
         std::str::from_utf8(data).map_err(|e| format!("Google PM CSV is not valid UTF-8: {e}"))?;
     let text = text.strip_prefix('\u{FEFF}').unwrap_or(text);
@@ -139,6 +145,17 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn oversized_input_returns_err() {
+        // S-02: an input over the text-import cap is rejected before parsing.
+        let big = vec![b'a'; crate::import::TEXT_IMPORT_MAX_BYTES + 1];
+        let err = parse(&big).err().expect("expected size-limit error");
+        assert!(
+            err.contains("exceeds"),
+            "expected size-limit error, got: {err}"
+        );
+    }
 
     const SAMPLE_CSV: &str = "\
 name,url,username,password,note

@@ -1,5 +1,7 @@
 {
   "@@locale": "pt_PT",
+  "importSizeLimitNote": "Tamanho máximo do ficheiro: {textLimit} (CSV, Bitwarden, Dashlane, Google) ou {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Este ficheiro excede o limite de {limit}.",
   "saveConfirmTitle": "Guardar no Gabbro",
   "saveConfirmUpdate": "Atualizar este início de sessão",
   "saveConfirmAsNew": "Guardar como novo início de sessão",

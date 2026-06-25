@@ -1486,6 +1486,16 @@ class AppLocalizationsLv extends AppLocalizations {
       'CSV eksports no Dashlane (Iestatījumi → Eksportēt datus → Akreditācijas dati)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Maksimālais faila izmērs: $textLimit (CSV, Bitwarden, Dashlane, Google) vai $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Šis fails pārsniedz $limit ierobežojumu.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Seifs ar nosaukumu \"$alias\" jau pastāv.';
   }

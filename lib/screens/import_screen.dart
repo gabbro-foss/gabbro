@@ -11,6 +11,20 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 
+/// Import size caps, mirrored from `rust/src/import/mod.rs` — keep in sync. A
+/// malicious export file could otherwise exhaust memory while being read, before
+/// the Rust parser's own cap is reached, so we reject oversized files here too
+/// (before reading them) and announce the limits on screen (S-02).
+const int kTextImportMaxBytes = 25 * 1024 * 1024;
+const int kEnpassImportMaxBytes = 128 * 1024 * 1024;
+
+/// Whether a file of [sizeBytes] exceeds the import cap for its format.
+bool importSizeExceeded(int sizeBytes, {required bool isEnpass}) =>
+    sizeBytes > (isEnpass ? kEnpassImportMaxBytes : kTextImportMaxBytes);
+
+/// Human-readable MB label for a cap, e.g. `25 * 1024 * 1024` -> "25 MB".
+String importLimitLabel(int bytes) => '${bytes ~/ (1024 * 1024)} MB';
+
 Future<ImportResult> _defaultImportEnpass(List<int> data) =>
     importFromEnpass(data: data);
 Future<ImportResult> _defaultImportBitwarden(List<int> data) =>
@@ -159,6 +173,11 @@ class _ImportScreenState extends State<ImportScreen> {
       setState(() => _enpassError = AppLocalizations.of(context).importFileNotFound);
       return;
     }
+    if (importSizeExceeded(file.lengthSync(), isEnpass: true)) {
+      setState(() => _enpassError = AppLocalizations.of(context)
+          .importFileTooLarge(importLimitLabel(kEnpassImportMaxBytes)));
+      return;
+    }
     setState(() {
       _isImportingEnpass = true;
       _enpassError = null;
@@ -192,6 +211,11 @@ class _ImportScreenState extends State<ImportScreen> {
     final file = File(path);
     if (!file.existsSync()) {
       setState(() => _bitwardenError = AppLocalizations.of(context).importFileNotFound);
+      return;
+    }
+    if (importSizeExceeded(file.lengthSync(), isEnpass: false)) {
+      setState(() => _bitwardenError = AppLocalizations.of(context)
+          .importFileTooLarge(importLimitLabel(kTextImportMaxBytes)));
       return;
     }
     setState(() {
@@ -229,6 +253,11 @@ class _ImportScreenState extends State<ImportScreen> {
       setState(() => _googlePmError = AppLocalizations.of(context).importFileNotFound);
       return;
     }
+    if (importSizeExceeded(file.lengthSync(), isEnpass: false)) {
+      setState(() => _googlePmError = AppLocalizations.of(context)
+          .importFileTooLarge(importLimitLabel(kTextImportMaxBytes)));
+      return;
+    }
     setState(() {
       _isImportingGooglePm = true;
       _googlePmError = null;
@@ -262,6 +291,11 @@ class _ImportScreenState extends State<ImportScreen> {
     final file = File(path);
     if (!file.existsSync()) {
       setState(() => _dashlaneError = AppLocalizations.of(context).importFileNotFound);
+      return;
+    }
+    if (importSizeExceeded(file.lengthSync(), isEnpass: false)) {
+      setState(() => _dashlaneError = AppLocalizations.of(context)
+          .importFileTooLarge(importLimitLabel(kTextImportMaxBytes)));
       return;
     }
     setState(() {
@@ -358,6 +392,11 @@ class _ImportScreenState extends State<ImportScreen> {
       setState(() => _csvError = l.importFileNotFound);
       return;
     }
+    if (importSizeExceeded(file.lengthSync(), isEnpass: false)) {
+      setState(() =>
+          _csvError = l.importFileTooLarge(importLimitLabel(kTextImportMaxBytes)));
+      return;
+    }
     setState(() {
       _isSniffingCsv = true;
       _csvError = null;
@@ -427,6 +466,14 @@ class _ImportScreenState extends State<ImportScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _duplicateWarningBanner(context),
+              const SizedBox(height: 12),
+              Text(
+                l.importSizeLimitNote(
+                  importLimitLabel(kTextImportMaxBytes),
+                  importLimitLabel(kEnpassImportMaxBytes),
+                ),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
               const SizedBox(height: 20),
               _gabbroSection(l),
               const SizedBox(height: 24),

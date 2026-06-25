@@ -38,11 +38,15 @@ pub(crate) fn atomic_write_0600(path: &Path, data: &[u8]) -> Result<(), String> 
         tmp_name.push(".tmp");
         let tmp = PathBuf::from(tmp_name);
 
+        // O_NOFOLLOW so a pre-planted symlink at `<path>.tmp` fails closed
+        // instead of redirecting the write to an attacker-chosen target (S-04).
+        // A stale *regular* temp is still overwritten (create + truncate).
         let mut f = fs::OpenOptions::new()
             .write(true)
             .create(true)
             .truncate(true)
             .mode(0o600)
+            .custom_flags(libc::O_NOFOLLOW)
             .open(&tmp)
             .map_err(|e| format!("Failed to create temp file: {e}"))?;
         f.write_all(data)
@@ -854,6 +858,38 @@ mod tests {
         let mode = fs::metadata(&path).unwrap().permissions().mode() & 0o777;
         let _ = fs::remove_file(&path);
         assert_eq!(mode, 0o600, "expected 0600, got {:#o}", mode);
+    }
+
+    // S-04: the export/JSON-export write path goes through atomic_write_0600,
+    // which must not follow a pre-planted symlink at `<path>.tmp` and write the
+    // (plaintext, for JSON export) bytes through to an attacker-chosen target.
+    #[cfg(unix)]
+    #[test]
+    fn atomic_write_0600_refuses_symlinked_temp() {
+        use std::os::unix::fs::symlink;
+
+        let dir = temp_dir();
+        let target = dir.join("gabbro_io_atomic_target.json");
+        let tmp = dir.join("gabbro_io_atomic_target.json.tmp");
+        let victim = dir.join("gabbro_io_atomic_victim");
+        let _ = fs::remove_file(&target);
+        let _ = fs::remove_file(&tmp);
+        let _ = fs::remove_file(&victim);
+        fs::write(&victim, b"original").unwrap();
+        symlink(&victim, &tmp).unwrap();
+
+        let res = atomic_write_0600(&target, b"secret export bytes");
+        let victim_after = fs::read(&victim).unwrap_or_default();
+
+        let _ = fs::remove_file(&target);
+        let _ = fs::remove_file(&tmp);
+        let _ = fs::remove_file(&victim);
+
+        assert!(
+            res.is_err(),
+            "must refuse to write through a symlinked temp"
+        );
+        assert_eq!(victim_after, b"original", "victim file must be untouched");
     }
 
     // F-09: vault write must reject symlinks

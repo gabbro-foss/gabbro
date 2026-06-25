@@ -376,5 +376,27 @@ void main() {
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
       handle.dispose();
     });
+
+    testWidgets('announces import size limits', (tester) async {
+      await tester.pumpWidget(buildScreen());
+      expect(find.textContaining('Maximum file size'), findsOneWidget);
+      expect(find.textContaining('25 MB'), findsOneWidget);
+      expect(find.textContaining('128 MB'), findsOneWidget);
+    });
+
+    test('importSizeExceeded enforces per-format caps', () {
+      // Text formats reject above 25 MiB; Enpass allows up to 128 MiB.
+      expect(importSizeExceeded(kTextImportMaxBytes, isEnpass: false), isFalse);
+      expect(importSizeExceeded(kTextImportMaxBytes + 1, isEnpass: false), isTrue);
+      expect(importSizeExceeded(kEnpassImportMaxBytes, isEnpass: true), isFalse);
+      expect(importSizeExceeded(kEnpassImportMaxBytes + 1, isEnpass: true), isTrue);
+      // A file over the text cap but under the Enpass cap is fine for Enpass.
+      expect(importSizeExceeded(kTextImportMaxBytes + 1, isEnpass: true), isFalse);
+    });
+
+    test('importLimitLabel formats bytes as MB', () {
+      expect(importLimitLabel(kTextImportMaxBytes), '25 MB');
+      expect(importLimitLabel(kEnpassImportMaxBytes), '128 MB');
+    });
   });
 }

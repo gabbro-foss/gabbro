@@ -2845,6 +2845,18 @@ abstract class AppLocalizations {
   /// **'CSV export from Dashlane (Settings → Export Data → Credentials)'**
   String get importDashlaneSubtitle;
 
+  /// No description provided for @importSizeLimitNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum file size: {textLimit} (CSV, Bitwarden, Dashlane, Google) or {enpassLimit} (Enpass).'**
+  String importSizeLimitNote(String textLimit, String enpassLimit);
+
+  /// No description provided for @importFileTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'This file exceeds the {limit} limit.'**
+  String importFileTooLarge(String limit);
+
   /// No description provided for @vaultNameAlreadyExists.
   ///
   /// In en, this message translates to:

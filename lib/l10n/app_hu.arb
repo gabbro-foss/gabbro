@@ -1,5 +1,7 @@
 {
   "@@locale": "hu",
+  "importSizeLimitNote": "Maximális fájlméret: {textLimit} (CSV, Bitwarden, Dashlane, Google) vagy {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Ez a fájl meghaladja a(z) {limit} korlátot.",
   "saveConfirmTitle": "Mentés a Gabbróba",
   "saveConfirmUpdate": "Bejelentkezés frissítése",
   "saveConfirmAsNew": "Mentés új bejelentkezésként",

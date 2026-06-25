@@ -1,5 +1,7 @@
 {
   "@@locale": "ru",
+  "importSizeLimitNote": "Максимальный размер файла: {textLimit} (CSV, Bitwarden, Dashlane, Google) или {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Этот файл превышает ограничение в {limit}.",
   "saveConfirmTitle": "Сохранить в Gabbro",
   "saveConfirmUpdate": "Обновить этот вход",
   "saveConfirmAsNew": "Сохранить как новый вход",

@@ -1489,6 +1489,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'CSV-Export aus Dashlane (Einstellungen → Daten exportieren → Anmeldedaten)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Maximale Dateigröße: $textLimit (CSV, Bitwarden, Dashlane, Google) oder $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Diese Datei überschreitet das Limit von $limit.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Ein Tresor namens «$alias» existiert bereits.';
   }

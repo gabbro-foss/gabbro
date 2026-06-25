@@ -1,5 +1,7 @@
 {
   "@@locale": "el",
+  "importSizeLimitNote": "Μέγιστο μέγεθος αρχείου: {textLimit} (CSV, Bitwarden, Dashlane, Google) ή {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Αυτό το αρχείο υπερβαίνει το όριο των {limit}.",
   "saveConfirmTitle": "Αποθήκευση στο Gabbro",
   "saveConfirmUpdate": "Ενημέρωση αυτής της σύνδεσης",
   "saveConfirmAsNew": "Αποθήκευση ως νέα σύνδεση",

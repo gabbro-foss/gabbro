@@ -1,5 +1,7 @@
 {
   "@@locale": "cs",
+  "importSizeLimitNote": "Maximální velikost souboru: {textLimit} (CSV, Bitwarden, Dashlane, Google) nebo {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Tento soubor překračuje limit {limit}.",
   "saveConfirmTitle": "Uložit do Gabbro",
   "saveConfirmUpdate": "Aktualizovat toto přihlášení",
   "saveConfirmAsNew": "Uložit jako nové přihlášení",

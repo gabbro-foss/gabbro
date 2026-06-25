@@ -1496,6 +1496,16 @@ class AppLocalizationsEl extends AppLocalizations {
       'Εξαγωγή CSV από Dashlane (Ρυθμίσεις → Εξαγωγή δεδομένων → Διαπιστευτήρια)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Μέγιστο μέγεθος αρχείου: $textLimit (CSV, Bitwarden, Dashlane, Google) ή $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Αυτό το αρχείο υπερβαίνει το όριο των $limit.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Υπάρχει ήδη θησαυροφυλάκιο με το όνομα «$alias».';
   }

@@ -1,5 +1,7 @@
 {
   "@@locale": "eu",
+  "importSizeLimitNote": "Fitxategiaren gehienezko tamaina: {textLimit} (CSV, Bitwarden, Dashlane, Google) edo {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Fitxategi honek {limit} muga gainditzen du.",
   "saveConfirmTitle": "Gabbron gorde",
   "saveConfirmUpdate": "Eguneratu saio-hasiera hau",
   "saveConfirmAsNew": "Gorde saio-hasiera berri gisa",

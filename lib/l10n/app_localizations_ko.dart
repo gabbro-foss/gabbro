@@ -1453,6 +1453,16 @@ class AppLocalizationsKo extends AppLocalizations {
       'Dashlane에서 CSV 내보내기 (설정 → 데이터 내보내기 → 자격 증명)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return '최대 파일 크기: $textLimit(CSV, Bitwarden, Dashlane, Google) 또는 $enpassLimit(Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return '이 파일은 $limit 제한을 초과합니다.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return '이름이 «$alias»인 볼트가 이미 존재합니다.';
   }

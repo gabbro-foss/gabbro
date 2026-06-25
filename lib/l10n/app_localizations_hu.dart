@@ -1482,6 +1482,16 @@ class AppLocalizationsHu extends AppLocalizations {
       'CSV-exportálás a Dashlane-ből (Beállítások → Adatok exportálása → Hitelesítő adatok)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Maximális fájlméret: $textLimit (CSV, Bitwarden, Dashlane, Google) vagy $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Ez a fájl meghaladja a(z) $limit korlátot.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Már létezik «$alias» nevű széf.';
   }

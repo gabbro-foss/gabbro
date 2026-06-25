@@ -1486,6 +1486,16 @@ class AppLocalizationsFi extends AppLocalizations {
       'CSV-vienti Dashlane-palvelusta (Asetukset → Vie tiedot → Tunnistetiedot)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Tiedoston enimmäiskoko: $textLimit (CSV, Bitwarden, Dashlane, Google) tai $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Tämä tiedosto ylittää $limit rajan.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Holvi nimeltä \"$alias\" on jo olemassa.';
   }

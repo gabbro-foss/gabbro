@@ -1489,6 +1489,16 @@ class AppLocalizationsRu extends AppLocalizations {
       'CSV-экспорт из Dashlane (Настройки → Экспорт данных → Учётные данные)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Максимальный размер файла: $textLimit (CSV, Bitwarden, Dashlane, Google) или $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Этот файл превышает ограничение в $limit.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Хранилище с именем «$alias» уже существует.';
   }

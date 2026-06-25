@@ -1,5 +1,7 @@
 {
   "@@locale": "fi",
+  "importSizeLimitNote": "Tiedoston enimmäiskoko: {textLimit} (CSV, Bitwarden, Dashlane, Google) tai {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Tämä tiedosto ylittää {limit} rajan.",
   "saveConfirmTitle": "Tallenna Gabbroon",
   "saveConfirmUpdate": "Päivitä tämä kirjautuminen",
   "saveConfirmAsNew": "Tallenna uutena kirjautumisena",

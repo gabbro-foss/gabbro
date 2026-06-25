@@ -1,5 +1,7 @@
 {
   "@@locale": "et",
+  "importSizeLimitNote": "Faili maksimaalne suurus: {textLimit} (CSV, Bitwarden, Dashlane, Google) või {enpassLimit} (Enpass).",
+  "importFileTooLarge": "See fail ületab {limit} piiri.",
   "saveConfirmTitle": "Salvesta Gabbrosse",
   "saveConfirmUpdate": "Värskenda seda sisselogimist",
   "saveConfirmAsNew": "Salvesta uue sisselogimisena",

@@ -1488,6 +1488,16 @@ class AppLocalizationsNl extends AppLocalizations {
       'CSV-export vanuit Dashlane (Instellingen → Gegevens exporteren → Inloggegevens)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Maximale bestandsgrootte: $textLimit (CSV, Bitwarden, Dashlane, Google) of $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Dit bestand overschrijdt de limiet van $limit.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Er bestaat al een kluis met de naam \"$alias\".';
   }

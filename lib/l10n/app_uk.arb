@@ -1,5 +1,7 @@
 {
   "@@locale": "uk",
+  "importSizeLimitNote": "Максимальний розмір файлу: {textLimit} (CSV, Bitwarden, Dashlane, Google) або {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Цей файл перевищує обмеження {limit}.",
   "saveConfirmTitle": "Зберегти в Gabbro",
   "saveConfirmUpdate": "Оновити цей вхід",
   "saveConfirmAsNew": "Зберегти як новий вхід",

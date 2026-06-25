@@ -1483,6 +1483,16 @@ class AppLocalizationsYo extends AppLocalizations {
       'Igbasilẹ CSV lati Dashlane (Ìtòlẹsẹẹsẹ → Gbé àwọn data jáde → Àwọn ẹrí)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Iwọn faili to pọ̀ jù: $textLimit (CSV, Bitwarden, Dashlane, Google) tàbí $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Faili yìí ré ààlà $limit kọjá.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Vọọliti ti a npè ni «$alias» ti wa tẹlẹ.';
   }

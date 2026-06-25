@@ -1,5 +1,7 @@
 {
   "@@locale": "zh_CN",
+  "importSizeLimitNote": "最大文件大小：{textLimit}（CSV、Bitwarden、Dashlane、Google）或 {enpassLimit}（Enpass）。",
+  "importFileTooLarge": "此文件超过 {limit} 的限制。",
   "saveConfirmTitle": "保存到 Gabbro",
   "saveConfirmUpdate": "更新此登录信息",
   "saveConfirmAsNew": "另存为新登录信息",

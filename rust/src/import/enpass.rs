@@ -94,6 +94,12 @@ pub(crate) struct ParseFailure {
 /// fail domain validation are collected into the second element of the tuple
 /// rather than aborting the whole import.
 pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>), String> {
+    if data.len() > super::ENPASS_IMPORT_MAX_BYTES {
+        return Err(format!(
+            "Enpass file exceeds {} MB limit",
+            super::ENPASS_IMPORT_MAX_BYTES / (1024 * 1024)
+        ));
+    }
     let export: EnpassExport =
         serde_json::from_slice(data).map_err(|e| format!("Failed to parse Enpass JSON: {}", e))?;
 
@@ -321,16 +327,30 @@ fn convert_custom(
 /// skipped — a corrupt attachment should not fail the whole import.
 fn decode_attachments(raw: &[EnpassAttachment]) -> Vec<EntryAttachment> {
     raw.iter()
-        .filter_map(|a| match BASE64.decode(&a.data) {
-            Ok(bytes) => Some(EntryAttachment {
-                uuid: a.uuid.clone(),
-                name: a.name.clone(),
-                kind: a.kind.clone(),
-                data: bytes,
-            }),
-            Err(e) => {
-                eprintln!("[enpass import] skipping attachment {}: {}", a.name, e);
-                None
+        .filter_map(|a| {
+            // Bound decoded size before allocating (S-03): base64 decodes to
+            // ~3/4 of its length. Skip anything that would exceed the cap so one
+            // absurd attachment can't drive a huge allocation.
+            let approx_decoded = a.data.len() / 4 * 3;
+            if approx_decoded > super::ENPASS_ATTACHMENT_MAX_BYTES {
+                eprintln!(
+                    "[enpass import] skipping oversized attachment {} (~{} MB)",
+                    a.name,
+                    approx_decoded / (1024 * 1024)
+                );
+                return None;
+            }
+            match BASE64.decode(&a.data) {
+                Ok(bytes) => Some(EntryAttachment {
+                    uuid: a.uuid.clone(),
+                    name: a.name.clone(),
+                    kind: a.kind.clone(),
+                    data: bytes,
+                }),
+                Err(e) => {
+                    eprintln!("[enpass import] skipping attachment {}: {}", a.name, e);
+                    None
+                }
             }
         })
         .collect()
@@ -404,11 +424,15 @@ fn make_meta(uuid: &str) -> EntryMeta {
 /// If the format is already `MM/YY` or unrecognised, returns it unchanged.
 fn normalise_expiry(expiry: &str) -> String {
     let parts: Vec<&str> = expiry.splitn(2, '/').collect();
-    if parts.len() == 2 && parts[1].len() == 4 {
-        format!("{}/{}", parts[0], &parts[1][2..])
-    } else {
-        expiry.to_string()
+    // Only collapse a 4-ASCII-digit year (MM/YYYY -> MM/YY). Slicing by byte
+    // index on a 4-*byte* non-ASCII value panics on a char boundary (S-01), so
+    // anything that isn't exactly four ASCII digits is returned unchanged.
+    if let [month, year] = parts.as_slice() {
+        if year.len() == 4 && year.bytes().all(|b| b.is_ascii_digit()) {
+            return format!("{}/{}", month, &year[2..]);
+        }
     }
+    expiry.to_string()
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -872,6 +896,79 @@ mod tests {
         assert_eq!(normalise_expiry(""), "");
         assert_eq!(normalise_expiry("bad"), "bad");
         assert_eq!(normalise_expiry("01/202"), "01/202"); // 3-digit year → unchanged
+    }
+
+    #[test]
+    fn normalise_expiry_4_byte_non_ascii_year_does_not_panic() {
+        // S-01: the year part is 4 *bytes* but not 4 ASCII digits, and byte index
+        // 2 lands mid-codepoint. Must return unchanged, never panic.
+        assert_eq!(normalise_expiry("1/2\u{20AC}"), "1/2\u{20AC}"); // "2€" = 4 bytes
+        assert_eq!(normalise_expiry("9/\u{20AC}x"), "9/\u{20AC}x"); // "€x" = 4 bytes
+        assert_eq!(normalise_expiry("12/20\u{20AC}"), "12/20\u{20AC}"); // 5 bytes, mixed
+    }
+
+    #[test]
+    fn card_with_multibyte_expiry_does_not_panic() {
+        // S-01 end-to-end: a creditcard item whose ccExpiry is a 4-byte non-digit
+        // year must import without panicking; the malformed expiry is kept as-is.
+        let json = r#"{
+          "items": [{
+            "uuid": "c-1", "title": "Card", "category": "creditcard",
+            "note": "", "favorite": 0, "archived": 0, "trashed": 0,
+            "fields": [
+              {"label": "Number", "type": "ccNumber", "value": "4111111111111111", "sensitive": 1, "deleted": 0},
+              {"label": "Expiry", "type": "ccExpiry", "value": "1/2€", "sensitive": 0, "deleted": 0}
+            ]
+          }]
+        }"#;
+        // S-01 is about not panicking on the malformed expiry; the fix makes
+        // this return Ok (whether the card imports or is recorded as a failure
+        // is orthogonal). Before the fix it panicked on a non-char boundary.
+        assert!(
+            parse(json.as_bytes()).is_ok(),
+            "import must not panic on a malformed multibyte expiry"
+        );
+    }
+
+    #[test]
+    fn oversized_enpass_input_returns_err() {
+        // S-02: an input over the Enpass cap is rejected before parsing.
+        let big = vec![b'a'; crate::import::ENPASS_IMPORT_MAX_BYTES + 1];
+        let err = parse(&big).err().expect("expected size-limit error");
+        assert!(
+            err.contains("exceeds"),
+            "expected size-limit error, got: {err}"
+        );
+    }
+
+    #[test]
+    fn oversized_attachment_is_skipped() {
+        // S-03: a base64 blob whose decoded size exceeds the per-attachment cap is
+        // skipped (not decoded/imported); a small valid attachment still imports.
+        let encoded_len = (crate::import::ENPASS_ATTACHMENT_MAX_BYTES / 3 + 1) * 4;
+        let big_b64 = "A".repeat(encoded_len);
+        let json = format!(
+            r#"{{ "items": [{{
+              "uuid": "a-1", "title": "T", "category": "login",
+              "note": "", "favorite": 0, "archived": 0, "trashed": 0,
+              "fields": [{{"label": "U", "type": "username", "value": "u", "sensitive": 0, "deleted": 0}}],
+              "attachments": [
+                {{"uuid": "big", "name": "big.bin", "kind": "application/octet-stream", "data": "{big}"}},
+                {{"uuid": "ok",  "name": "ok.txt",  "kind": "text/plain",               "data": "aGVsbG8="}}
+              ]
+            }}]}}"#,
+            big = big_b64
+        );
+        let (entries, _) = parse(json.as_bytes()).unwrap();
+        let VaultEntry::Login(ref e) = entries[0] else {
+            panic!("expected Login")
+        };
+        assert_eq!(
+            e.attachments.len(),
+            1,
+            "oversized attachment must be skipped"
+        );
+        assert_eq!(e.attachments[0].name, "ok.txt");
     }
 
     #[test]

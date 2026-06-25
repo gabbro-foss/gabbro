@@ -36,6 +36,12 @@ pub(crate) struct ParseFailure {
 /// Returns `Err` only if the CSV is structurally invalid (missing required
 /// columns). Individual empty rows are silently skipped.
 pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>), String> {
+    if data.len() > super::TEXT_IMPORT_MAX_BYTES {
+        return Err(format!(
+            "Dashlane file exceeds {} MB limit",
+            super::TEXT_IMPORT_MAX_BYTES / (1024 * 1024)
+        ));
+    }
     let text =
         std::str::from_utf8(data).map_err(|e| format!("Dashlane CSV is not valid UTF-8: {e}"))?;
     let text = text.strip_prefix('\u{FEFF}').unwrap_or(text);
@@ -142,6 +148,17 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn oversized_input_returns_err() {
+        // S-02: an input over the text-import cap is rejected before parsing.
+        let big = vec![b'a'; crate::import::TEXT_IMPORT_MAX_BYTES + 1];
+        let err = parse(&big).err().expect("expected size-limit error");
+        assert!(
+            err.contains("exceeds"),
+            "expected size-limit error, got: {err}"
+        );
+    }
 
     const SAMPLE_CSV: &str = "\
 username,username2,username3,url,category,note,password,title

@@ -1,5 +1,7 @@
 {
   "@@locale": "yo",
+  "importSizeLimitNote": "Iwọn faili to pọ̀ jù: {textLimit} (CSV, Bitwarden, Dashlane, Google) tàbí {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Faili yìí ré ààlà {limit} kọjá.",
   "saveConfirmTitle": "Fi pamọ́ sí Gabbro",
   "saveConfirmUpdate": "Ṣe imudojuiwọn wọlé yìí",
   "saveConfirmAsNew": "Fi pamọ́ gẹ́gẹ́ bí wọlé tuntun",

@@ -1490,6 +1490,16 @@ class AppLocalizationsSl extends AppLocalizations {
       'CSV izvoz iz Dashlane (Nastavitve → Izvozi podatke → Poverilnice)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Največja velikost datoteke: $textLimit (CSV, Bitwarden, Dashlane, Google) ali $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Ta datoteka presega omejitev $limit.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Trezor z imenom «$alias» že obstaja.';
   }

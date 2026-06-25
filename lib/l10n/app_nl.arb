@@ -1,5 +1,7 @@
 {
   "@@locale": "nl",
+  "importSizeLimitNote": "Maximale bestandsgrootte: {textLimit} (CSV, Bitwarden, Dashlane, Google) of {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Dit bestand overschrijdt de limiet van {limit}.",
   "saveConfirmTitle": "Opslaan in Gabbro",
   "saveConfirmUpdate": "Deze login bijwerken",
   "saveConfirmAsNew": "Opslaan als nieuwe login",

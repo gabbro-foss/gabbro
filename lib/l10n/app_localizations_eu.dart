@@ -1484,6 +1484,16 @@ class AppLocalizationsEu extends AppLocalizations {
       'CSV esportazioa Dashlane-tik (Ezarpenak → Esportatu datuak → Kredentzialak)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Fitxategiaren gehienezko tamaina: $textLimit (CSV, Bitwarden, Dashlane, Google) edo $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Fitxategi honek $limit muga gainditzen du.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return '«$alias» izeneko gandegiak dagoeneko badago.';
   }

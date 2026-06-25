@@ -1439,6 +1439,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importDashlaneSubtitle => '从 Dashlane 导出 CSV（设置 → 导出数据 → 凭据）';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return '最大文件大小：$textLimit（CSV、Bitwarden、Dashlane、Google）或 $enpassLimit（Enpass）。';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return '此文件超过 $limit 的限制。';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return '名为«$alias»的保险库已存在。';
   }
@@ -3321,6 +3331,16 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get importDashlaneSubtitle => '从 Dashlane 导出 CSV（设置 → 导出数据 → 凭据）';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return '最大文件大小：$textLimit（CSV、Bitwarden、Dashlane、Google）或 $enpassLimit（Enpass）。';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return '此文件超过 $limit 的限制。';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return '名为«$alias»的保险库已存在。';
   }
@@ -5201,6 +5221,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get importDashlaneSubtitle => '從 Dashlane 匯出 CSV（設定 → 匯出資料 → 憑證）';
+
+  @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return '檔案大小上限：$textLimit（CSV、Bitwarden、Dashlane、Google）或 $enpassLimit（Enpass）。';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return '此檔案超過 $limit 的限制。';
+  }
 
   @override
   String vaultNameAlreadyExists(String alias) {

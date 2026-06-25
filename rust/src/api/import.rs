@@ -94,6 +94,8 @@ pub async fn import_from_csv(
         notes_col: config.notes_col,
     };
 
+    // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
+    let input = zeroize::Zeroizing::new(input);
     let entries = import_csv(&input, &csv_config)?;
     let count = entries.len();
 
@@ -185,6 +187,8 @@ fn entry_id_and_title(entry: &crate::vault::entry::VaultEntry) -> (String, Strin
 ///
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
 pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<ImportResult, String> {
+    // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
+    let data = zeroize::Zeroizing::new(data);
     let (entries, failures) = bitwarden::parse(&data)?;
     let existing_ids = session::session_entry_ids()?;
 
@@ -231,6 +235,8 @@ pub async fn import_from_bitwarden(data: Vec<u8>) -> Result<ImportResult, String
 ///
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
 pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
+    // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
+    let data = zeroize::Zeroizing::new(data);
     let (entries, failures) = enpass::parse(&data)?;
     let existing_ids = session::session_entry_ids()?;
 
@@ -274,6 +280,8 @@ pub async fn import_from_enpass(data: Vec<u8>) -> Result<ImportResult, String> {
 ///
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
 pub async fn import_from_google_pm(data: Vec<u8>) -> Result<ImportResult, String> {
+    // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
+    let data = zeroize::Zeroizing::new(data);
     let (entries, failures) = google_pm::parse(&data)?;
     let existing_ids = session::session_entry_ids()?;
 
@@ -320,6 +328,8 @@ pub async fn import_from_google_pm(data: Vec<u8>) -> Result<ImportResult, String
 ///
 /// Async — triggers a single vault save (Argon2id + encryption) at the end.
 pub async fn import_from_dashlane(data: Vec<u8>) -> Result<ImportResult, String> {
+    // Scrub the raw import buffer (holds plaintext secrets) on drop (S-06).
+    let data = zeroize::Zeroizing::new(data);
     let (entries, failures) = dashlane::parse(&data)?;
     let existing_ids = session::session_entry_ids()?;
 

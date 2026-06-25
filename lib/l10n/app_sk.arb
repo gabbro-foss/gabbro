@@ -1,5 +1,7 @@
 {
   "@@locale": "sk",
+  "importSizeLimitNote": "Maximálna veľkosť súboru: {textLimit} (CSV, Bitwarden, Dashlane, Google) alebo {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Tento súbor prekračuje limit {limit}.",
   "saveConfirmTitle": "Uložiť do Gabbro",
   "saveConfirmUpdate": "Aktualizovať toto prihlásenie",
   "saveConfirmAsNew": "Uložiť ako nové prihlásenie",

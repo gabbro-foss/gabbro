@@ -733,7 +733,9 @@ pub fn session_export_vault_json(export_path: PathBuf) -> Result<(), String> {
         entries: &session.entries,
     };
 
-    let json = serde_json::to_string_pretty(&export).map_err(|e| e.to_string())?;
+    // Zeroize the plaintext-secrets buffer on drop (S-06). The on-disk file is
+    // unencrypted by design (0600); this only scrubs the in-RAM copy.
+    let json = Zeroizing::new(serde_json::to_string_pretty(&export).map_err(|e| e.to_string())?);
     crate::vault::io::atomic_write_0600(&export_path, json.as_bytes())?;
     Ok(())
 }
@@ -793,21 +795,22 @@ pub struct LoginAutofillSummary {
 /// the JNI bridge so it is host-compiled and unit-testable. Kotlin parses this
 /// with `org.json.JSONArray` — no new Android dependency.
 pub fn login_summaries_json(summaries: &[LoginAutofillSummary]) -> String {
-    let entries: Vec<String> = summaries
+    // Build with serde_json so backslashes and control characters are escaped
+    // correctly (S-07): a hand-rolled escaper that only handled `"` produced
+    // invalid JSON for a username/url containing `\` or a control char.
+    let arr: Vec<serde_json::Value> = summaries
         .iter()
         .map(|s| {
-            let esc = |v: &str| v.replace('"', "\\\"");
-            format!(
-                "{{\"id\":\"{}\",\"username\":\"{}\",\"url\":\"{}\",\"app_id\":\"{}\",\"email\":\"{}\"}}",
-                esc(&s.id),
-                esc(&s.username),
-                esc(&s.url),
-                esc(s.app_id.as_deref().unwrap_or("")),
-                esc(s.email.as_deref().unwrap_or("")),
-            )
+            serde_json::json!({
+                "id": s.id,
+                "username": s.username,
+                "url": s.url,
+                "app_id": s.app_id.as_deref().unwrap_or(""),
+                "email": s.email.as_deref().unwrap_or(""),
+            })
         })
         .collect();
-    format!("[{}]", entries.join(","))
+    serde_json::Value::Array(arr).to_string()
 }
 
 /// Return lightweight summaries of all Login entries in the session.
@@ -846,7 +849,7 @@ pub fn login_summaries_for_autofill() -> Result<Vec<LoginAutofillSummary>, Strin
 ///
 /// Returns `Err` if the vault is locked, the id is not found, or the entry
 /// is not a Login entry.
-pub fn get_entry_for_autofill(id: &str) -> Result<String, String> {
+pub fn get_entry_for_autofill(id: &str) -> Result<Zeroizing<String>, String> {
     let session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
     let session = session.as_ref().ok_or("Vault is locked")?;
     let entry = session
@@ -856,21 +859,23 @@ pub fn get_entry_for_autofill(id: &str) -> Result<String, String> {
         .ok_or_else(|| format!("No entry found with id: {id}"))?;
     match entry {
         VaultEntry::Login(e) => {
-            let mut map = serde_json::Map::new();
-            map.insert(
-                "id".to_string(),
-                serde_json::Value::String(e.meta.id.clone()),
-            );
-            map.insert(
-                "username".to_string(),
-                serde_json::Value::String(e.username.clone()),
-            );
-            map.insert(
-                "password".to_string(),
-                serde_json::Value::String(e.password.clone()),
-            );
-            let json = serde_json::Value::Object(map).to_string();
-            Ok(json)
+            // Serialize from borrowed fields (no password clone into a map) and
+            // return the carrier in a Zeroizing<String> so it is scrubbed on
+            // drop once the JNI side has copied it (S-06). serde_json escapes
+            // correctly, unlike a hand-rolled formatter (cf. S-07).
+            #[derive(serde::Serialize)]
+            struct AutofillEntry<'a> {
+                id: &'a str,
+                username: &'a str,
+                password: &'a str,
+            }
+            let json = serde_json::to_string(&AutofillEntry {
+                id: &e.meta.id,
+                username: &e.username,
+                password: &e.password,
+            })
+            .map_err(|err| err.to_string())?;
+            Ok(Zeroizing::new(json))
         }
         _ => Err(format!("Entry {id} is not a Login entry")),
     }
@@ -2075,6 +2080,25 @@ mod autofill_tests {
         assert!(
             json.starts_with('[') && json.ends_with(']'),
             "array shape: {json}"
+        );
+    }
+
+    #[test]
+    fn login_summaries_json_escapes_backslash_and_control_chars() {
+        // S-07: a backslash or control char in a summary field must produce
+        // valid JSON that round-trips, not a broken/misparsed string.
+        let summaries = vec![LoginAutofillSummary {
+            id: String::from("id"),
+            username: String::from("a\\b\tc"), // backslash + tab
+            url: String::from("u"),
+            app_id: None,
+            email: None,
+        }];
+        let json = login_summaries_json(&summaries);
+        let parsed: serde_json::Value = serde_json::from_str(&json).expect("must be valid JSON");
+        assert_eq!(
+            parsed[0]["username"], "a\\b\tc",
+            "value must round-trip: {json}"
         );
     }
 }

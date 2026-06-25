@@ -1,5 +1,7 @@
 {
   "@@locale": "lv",
+  "importSizeLimitNote": "Maksimālais faila izmērs: {textLimit} (CSV, Bitwarden, Dashlane, Google) vai {enpassLimit} (Enpass).",
+  "importFileTooLarge": "Šis fails pārsniedz {limit} ierobežojumu.",
   "saveConfirmTitle": "Saglabāt Gabbro",
   "saveConfirmUpdate": "Atjaunināt šo pieteikšanos",
   "saveConfirmAsNew": "Saglabāt kā jaunu pieteikšanos",

@@ -33,8 +33,11 @@ pub struct CsvEntry {
 /// Import all rows from a CSV string using the provided field mapping.
 /// Returns one [`CsvEntry`] per data row.
 pub fn import_csv(input: &str, config: &CsvImportConfig) -> Result<Vec<CsvEntry>, String> {
-    if input.len() > 10 * 1024 * 1024 {
-        return Err("CSV file exceeds 10 MB limit".to_string());
+    if input.len() > super::TEXT_IMPORT_MAX_BYTES {
+        return Err(format!(
+            "CSV file exceeds {} MB limit",
+            super::TEXT_IMPORT_MAX_BYTES / (1024 * 1024)
+        ));
     }
 
     let input = input.strip_prefix('\u{FEFF}').unwrap_or(input);
@@ -315,7 +318,7 @@ uid, name, login, password, type, number, comments, favourite
 
     #[test]
     fn import_rejects_oversized_input() {
-        let big = "a".repeat(11 * 1024 * 1024);
+        let big = "a".repeat(crate::import::TEXT_IMPORT_MAX_BYTES + 1);
         let result = import_csv(&big, &default_config());
         assert!(result.is_err(), "expected error for oversized input");
     }

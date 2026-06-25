@@ -1485,6 +1485,16 @@ class AppLocalizationsEt extends AppLocalizations {
       'CSV-eksport Dashlane\'ist (Seaded → Ekspordi andmed → Mandaadid)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Faili maksimaalne suurus: $textLimit (CSV, Bitwarden, Dashlane, Google) või $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'See fail ületab $limit piiri.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Seif nimega \"$alias\" on juba olemas.';
   }

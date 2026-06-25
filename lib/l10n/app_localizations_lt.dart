@@ -1488,6 +1488,16 @@ class AppLocalizationsLt extends AppLocalizations {
       'CSV eksportas iš Dashlane (Nustatymai → Eksportuoti duomenis → Kredencialai)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Didžiausias failo dydis: $textLimit (CSV, Bitwarden, Dashlane, Google) arba $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Šis failas viršija $limit ribą.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Saugykla pavadinimu «$alias» jau egzistuoja.';
   }

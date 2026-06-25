@@ -1486,6 +1486,16 @@ class AppLocalizationsPt extends AppLocalizations {
       'Exportação CSV do Dashlane (Configurações → Exportar dados → Credenciais)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Tamanho máximo do arquivo: $textLimit (CSV, Bitwarden, Dashlane, Google) ou $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Este arquivo excede o limite de $limit.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Já existe um cofre com o nome \"$alias\".';
   }
@@ -3461,6 +3471,16 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Exportação CSV do Dashlane (Configurações → Exportar dados → Credenciais)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Tamanho máximo do arquivo: $textLimit (CSV, Bitwarden, Dashlane, Google) ou $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Este arquivo excede o limite de $limit.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return 'Já existe um cofre com o nome \"$alias\".';
   }
@@ -5433,6 +5453,16 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get importDashlaneSubtitle =>
       'Exportação CSV do Dashlane (Definições → Exportar dados → Credenciais)';
+
+  @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Tamanho máximo do ficheiro: $textLimit (CSV, Bitwarden, Dashlane, Google) ou $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Este ficheiro excede o limite de $limit.';
+  }
 
   @override
   String vaultNameAlreadyExists(String alias) {

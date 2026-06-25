@@ -1485,6 +1485,16 @@ class AppLocalizationsKk extends AppLocalizations {
       'Dashlane-ден CSV экспорты (Параметрлер → Деректерді экспорттау → Тіркелгі деректері)';
 
   @override
+  String importSizeLimitNote(String textLimit, String enpassLimit) {
+    return 'Файлдың ең үлкен өлшемі: $textLimit (CSV, Bitwarden, Dashlane, Google) немесе $enpassLimit (Enpass).';
+  }
+
+  @override
+  String importFileTooLarge(String limit) {
+    return 'Бұл файл $limit шегінен асып кетті.';
+  }
+
+  @override
   String vaultNameAlreadyExists(String alias) {
     return '«$alias» атты сейф бар.';
   }
