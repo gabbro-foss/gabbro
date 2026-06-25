@@ -74,7 +74,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 983 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 101 | 15 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
 **Test isolation (non-negotiable):** no test may touch the user's real settings or
 vault folders. All config/data directories resolve through `GabbroPaths`
@@ -91,11 +91,15 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**Deprecated `Dataset.Builder.setValue` (autofill).** Replace with
-`setField(AutofillId, Field)` at the 7 sites in `GabbroAutofillService`
-(`buildAuthResponse`, `buildFillResponse`) + `UnlockActivity.buildFillIntent`.
-`setField` is API 34+ — gate with `Build.VERSION.SDK_INT`, keep the deprecated
-path for older devices; don't blanket-replace.
+**Offline test gate — bring the Android leg offline.** `gabbro_test` runs
+flutter/cargo/rust fully offline (rootless netns) but the Android
+`./gradlew :app:testDebugUnitTest` leg runs online: the Flutter `integration_test`
+plugin pulls a dynamic transitive `androidx.test:runner:1.2+` that gradle won't
+resolve `--offline`, and `dependencyLocking` on `:app` doesn't pin that plugin's
+config. The netns also needs `JAVA_TOOL_OPTIONS=-Duser.home=/home/gamer` (uid-0
+remap → JVM home `/root`). Likely fix: force a concrete `androidx.test:runner`
+across all projects (or lock every project), then move the leg into the offline
+block.
 
 ---
 
@@ -127,7 +131,6 @@ release process live in their own document:
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
   translations. (The no-match dialog was hardware-verified and is broken -> being fixed, see Current Focus.)
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
-- **Offline test gate — Android leg still online.** `gabbro_test` runs flutter/cargo/rust fully offline (rootless netns), but the Android `./gradlew :app:testDebugUnitTest` leg runs online: the Flutter `integration_test` plugin declares a dynamic transitive dep (`androidx.test:runner:1.2+`) that gradle won't resolve `--offline`. `dependencyLocking` on `:app` doesn't pin that plugin's config; the netns also needs `JAVA_TOOL_OPTIONS=-Duser.home=/home/gamer` (uid-0 remap → JVM home `/root`). Likely fix: force a concrete `androidx.test:runner` version across all projects (or lock every project), then move the leg into the offline block.
 
 ### V2+ / Defer
 - UI locales deferred (RTL layout work required): Hebrew, Arabic.

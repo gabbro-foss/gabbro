@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Biometric unlock no longer silently fails after a passphrase change: changing the passphrase now turns biometric off (its stored secret was tied to the old passphrase) and tells you to re-enable it in Settings.
 - Changing the passphrase now accepts a "Fair" passphrase, matching onboarding (it previously required a stronger one); weaker passphrases show an explicit "too weak" line.
 
+### Changed
+- Android autofill now fills fields through the current `setField` API on Android 14+, keeping the deprecated `setValue` path for Android 8–13 — so Gabbro keeps building cleanly against newer Android SDKs with no change to how autofill behaves. Hardware-verified on Android 16 (web + native app, locked + unlocked vault).
+
 ### Removed
 - Dead-code audit cleanup: unused Rust FFI (`EntryType`, demo `greet`, the redundant typed `create_*_entry` constructors superseded by the generic `createEntry`, `get_entry_by_id`, `delete_vault_backup`, legacy single-key `init_vault_with_yubikey`), the unreachable Kotlin `register_and_get_hmac` path, a dangling `AutofillSettingsActivity` manifest/config reference (an exported activity declared for a non-existent class), and 5 unreferenced logo PNGs. No behaviour change; bridge regenerated and test coverage preserved.
 
