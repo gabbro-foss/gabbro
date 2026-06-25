@@ -69,10 +69,10 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 527 | 8 |
+| Rust (`cargo test -q`) | 541 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 12 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 980 | 0 |
+| Flutter (`flutter test`) | 983 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 101 | 15 |
 
@@ -91,9 +91,11 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-None agreed. Vault-list selection-mode a11y (checkbox title labels + search
-`clear` tooltip) shipped and hardware-verified 2026-06-25. Pick the next item
-from the Bikeshed with Rob.
+**Deprecated `Dataset.Builder.setValue` (autofill).** Replace with
+`setField(AutofillId, Field)` at the 7 sites in `GabbroAutofillService`
+(`buildAuthResponse`, `buildFillResponse`) + `UnlockActivity.buildFillIntent`.
+`setField` is API 34+ — gate with `Build.VERSION.SDK_INT`, keep the deprecated
+path for older devices; don't blanket-replace.
 
 ---
 
@@ -122,16 +124,8 @@ release process live in their own document:
 - Anonymous user feedback -> two wordclouds (one "what works", one "to improve"), in the teachtogether.tech formative-feedback spirit, published on GitHub. Must stay OUT of the app (no in-app network call - offline/no-telemetry DNA): external link to a no-login form (CryptPad/Framaforms/Nextcloud Forms) -> manual export -> generate two PNGs -> commit + embed in README. Needs moderation (anon free text = spam/abuse): cap to single words, profanity filter, curate before publishing.
 
 ### Code Quality
-- Audit the code base for data leaks and attack surfaces
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
   translations. (The no-match dialog was hardware-verified and is broken -> being fixed, see Current Focus.)
-- **Deprecated `Dataset.Builder.setValue` (autofill).** `setValue(AutofillId, AutofillValue,
-  RemoteViews)` is deprecated; replace with `setField(AutofillId, Field)` (Field carries the
-  value + a `Presentations`/`RemoteViews`). Call sites: `GabbroAutofillService.buildAuthResponse`
-  + `buildFillResponse`, `UnlockActivity.buildFillIntent`. The replacement is API 34 (Android
-  14)+, so it needs a `Build.VERSION.SDK_INT` gate against minSdk (keep the deprecated path for
-  older devices) — don't blanket-replace. (Don't let training-era deprecated APIs persist; fix
-  when next touching autofill.)
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 - **Offline test gate — Android leg still online.** `gabbro_test` runs flutter/cargo/rust fully offline (rootless netns), but the Android `./gradlew :app:testDebugUnitTest` leg runs online: the Flutter `integration_test` plugin declares a dynamic transitive dep (`androidx.test:runner:1.2+`) that gradle won't resolve `--offline`. `dependencyLocking` on `:app` doesn't pin that plugin's config; the netns also needs `JAVA_TOOL_OPTIONS=-Duser.home=/home/gamer` (uid-0 remap → JVM home `/root`). Likely fix: force a concrete `androidx.test:runner` version across all projects (or lock every project), then move the leg into the offline block.
 

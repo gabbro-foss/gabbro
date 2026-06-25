@@ -2,9 +2,8 @@
 
 A post-quantum password manager built with security as core DNA.
 
-> **Status: Alpha — v0.1.0-alpha.6 released.**
-> All vault operations are implemented and tested in Rust.
-> Flutter UI implemented. 664 Flutter + 480 Rust tests passing.
+> **Status: Alpha.**
+> All vault operations implemented and tested in Rust; Flutter UI complete.
 
 ---
 
@@ -22,14 +21,14 @@ Named after the intrusive igneous rock — hard, stable, enduring.
 - **Post-quantum cryptography** — ML-KEM (NIST standard) alongside
   AES-256-GCM; belt and suspenders against both classical and quantum
   threats
-- **Hardware key required** (optional but recommended) — FIDO2/YubiKey authentication; minimum
-  two keys (primary + backup)
+- **Hardware key (optional, recommended)** — FIDO2/YubiKey authentication; passphrase-only
+  by default, with a minimum of two keys when keys are used (primary + backup)
 - **Rust for all secrets** — every cryptographic operation lives in
   Rust; secrets never cross the Flutter/Rust bridge in plaintext
 - **Local-first** — your vault lives on your device; sync is your
   choice and your responsibility
-- **Localised** — UI available in 33 languages (EN, FR, DE, IT, ES, and 28 more); follows system locale with in-app override
-- **Multi-language passphrase generator** — 29-language wordlist library; classic generator uses language-native character pools (Greek, Cyrillic, Hiragana/Katakana, Hangul, CJK)
+- **Localised** — UI available in many languages (EN, FR, DE, IT, ES, and more); follows system locale with in-app override
+- **Multi-language passphrase generator** — wordlist library covering many languages; classic generator uses language-native character pools (Greek, Cyrillic, Hiragana/Katakana, Hangul, CJK)
 - **In-app help** — offline help carousel; no external website or internet connection required
 - **FOSS** — GPL-3.0-only licensed
 
@@ -103,7 +102,7 @@ a UX complement that allows a corruption check *before* opening the vault.
 
 ## Contributors
 
-- [Robert Leckenby](https://github.com/Zabamund/) — project owner,
+- [Zabamund](https://github.com/Zabamund/) — project owner,
   architect, and lead developer
 - [Claude.ai](https://claude.ai) — AI development partner
 
@@ -125,7 +124,7 @@ Requires glibc ≥ 2.34 — satisfied by all current Arch, Debian stable,
 and Mint installations.
 
 ```bash
-tar -xzf gabbro-v0.1.0-alpha.1-linux-x86_64.tar.gz
+tar -xzf gabbro-<version>-linux-x86_64.tar.gz
 ./bundle/gabbro
 ```
 
@@ -135,7 +134,7 @@ You can place the `bundle/` directory anywhere; the app is self-contained.
 
 The Linux tarball is signed with the project's OpenPGP (GPG) key — the same way
 the Arch ISO is. Each release ships a detached signature file
-(`gabbro-<ver>-linux-x86_64.tar.gz.asc`) alongside the tarball.
+(`gabbro-<version>-linux-x86_64.tar.gz.asc`) alongside the tarball.
 
 The signing key's fingerprint is:
 
@@ -167,7 +166,7 @@ KEY
 gpg --fingerprint gabbro@tuta.com
 
 # 3. Verify the tarball against its signature
-gpg --verify gabbro-<ver>-linux-x86_64.tar.gz.asc gabbro-<ver>-linux-x86_64.tar.gz
+gpg --verify gabbro-<version>-linux-x86_64.tar.gz.asc gabbro-<version>-linux-x86_64.tar.gz
 ```
 
 A `Good signature` line means the build is authentic. GPG may add a warning that
@@ -182,7 +181,7 @@ do not run it.
 
 1. Enable **Install from unknown sources** on your device:
    - Android 8+: Settings → Apps → Special app access → Install unknown apps → select your file manager → Allow
-2. Transfer `gabbro-v0.1.0-alpha.1-android.apk` to your device (USB, email, or file transfer).
+2. Transfer `gabbro-<version>-android.apk` to your device (USB, email, or file transfer).
 3. Tap the APK file in your file manager to install.
 
 Tested on Android 11+ (including GrapheneOS). YubiKey authentication requires a YubiKey 5 series key (USB-A/C for all devices; NFC where supported).
@@ -200,7 +199,7 @@ SHA-256: 0F:0A:B8:1B:9B:B8:F0:21:68:25:83:73:17:C6:49:F3:64:F4:47:B0:D0:93:5B:FA
 
 - **GrapheneOS / Accrescent users:** install [AppVerifier](https://github.com/soupslurpr/AppVerifier),
   open it, pick Gabbro (or the APK file), and check the reported hash matches the one above.
-- **Any platform:** run `apksigner verify --print-certs gabbro-<ver>-android.apk` and compare the
+- **Any platform:** run `apksigner verify --print-certs gabbro-<version>-android.apk` and compare the
   `SHA-256` certificate digest.
 
 A mismatch means the file is **not** an official Gabbro build — do not install it.
@@ -279,7 +278,8 @@ flutter test integration_test/
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — full architecture reference
 - [`docs/AI_SECURITY_AUDIT.md`](docs/AI_SECURITY_AUDIT.md) — AI-assisted security review of the crypto and vault modules (Claude Opus 4.7, 2026-05-31)
-- [`docs/AI_SECURITY_AUDIT_REVIEW.md`](docs/AI_SECURITY_AUDIT.md) — AI-assisted review of previous audit with higher capability model (Claude Fable 5, 2026-06-11)
+- [`docs/AI_SECURITY_AUDIT_REVIEW.md`](docs/AI_SECURITY_AUDIT_REVIEW.md) — second-pass review of that audit (Claude Fable 5, 2026-06-11)
+- [`docs/AI_SECURITY_AUDIT_3.md`](docs/AI_SECURITY_AUDIT_3.md) — third pass: import parsers, FFI/JNI bridge, Kotlin, Dart leak channels (Claude Opus 4.8, 2026-06-25)
 - [`docs/decisions/`](docs/decisions/) — architectural decision records (ADRs)
 
 ---

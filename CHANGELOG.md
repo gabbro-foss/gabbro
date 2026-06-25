@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **Import hardening (audit pass 3).** Import parsers now cap file size (25 MB text formats, 128 MB Enpass — announced on the import screen), bound Enpass attachment decoding, and no longer crash on a crafted Enpass expiry. A new fuzzer covers all five parsers.
+- **Defence-in-depth.** Export writes can't be redirected via a symlinked temp file; the autofill summary list uses a real JSON encoder; plaintext import/export/autofill buffers are zeroized after use; native-app autofill matches the OS-attested package, not the window title.
+
 ### Added
 - The alphabet index bar is now script-aware and follows the UI locale: Latin, Greek (accents folded), Cyrillic (Russian/Ukrainian/Bulgarian/Kazakh, each its own alphabet) and Korean (by leading consonant) get their script's letters instead of everything collapsing under "#". Japanese and Chinese have no human-orderable index, so those locales drop the bar for a plain title-sorted list (scrollbar on desktop, flick-scroll on mobile). Bar slots and chevrons now carry screen-reader labels, and the scroll chevrons show their label as a desktop hover tooltip. Non-Latin alphabets are best-effort and unreviewed by native speakers.
 - Accessibility: the show/hide eye toggles (passphrase, PIN, password, CVV) across 12 screens now carry screen-reader labels, alongside the browse, folder add/edit/delete, vault-list add/delete/close and Help prev/next buttons — they previously announced a bare "button". Enforced per screen by `labeledTapTargetGuideline`. A sweep of every chevron control gave the remaining bare scroll chevrons — the entry-type filter row and the password-breakdown sheet (left/right) — screen-reader labels and a desktop hover tooltip too (the help-screen page chevrons already had them). Vault-list selection checkboxes now announce the entry title instead of a bare "tick box", and the search clear button has a "Clear search" tooltip (new string, all 37 locales).
