@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Security
+- **Android release dependencies locked + supply-chain scanned.** The release runtime dependency graph is pinned in `android/app/gradle.lockfile` (reproducible builds) and scanned with `osv-scanner` — 0 known vulnerabilities. Closes the one open supply-chain gap from audit pass 3 (Gradle deps were not previously lockfile-scannable).
 - **Import hardening (audit pass 3).** Import parsers now cap file size (25 MB text formats, 128 MB Enpass — announced on the import screen), bound Enpass attachment decoding, and no longer crash on a crafted Enpass expiry. A new fuzzer covers all five parsers.
 - **Defence-in-depth.** Export writes can't be redirected via a symlinked temp file; the autofill summary list uses a real JSON encoder; plaintext import/export/autofill buffers are zeroized after use; native-app autofill matches the OS-attested package, not the window title.
 

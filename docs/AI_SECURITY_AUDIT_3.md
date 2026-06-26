@@ -24,8 +24,11 @@ estimates, not a substitute for human review. Findings use the **S-** prefix.
   0 warnings** (209 crates). The four informational warnings from 2026-06-01 cleared via
   dependency bumps (`adler`→`adler2 2.0.1`, `rand 0.8.6`, `tokio 1.52.3`, `futures-util 0.3.32`).
 - `osv-scanner` over `pubspec.lock` (109 pkgs) and `Cargo.lock` (cross-check): **0 issues**.
-- Android/Gradle deps: no lockfiles (dependency locking not enabled — see Bikeshed),
-  so not lockfile-scannable this pass.
+- Android/Gradle deps: ~~no lockfiles~~ **Resolved 2026-06-26** — release dependency
+  locking enabled (`android/app/gradle.lockfile`, `releaseRuntimeClasspath`);
+  `osv-scanner` over it: **0 issues** (72 pkgs). (The vulnerable `guava 28.1-android`
+  / `junit 4.12` osv flagged are `debugRuntimeClasspath`-only dev tooling and never
+  ship.) Regenerate per BUILD_AND_RELEASE.md after any dependency change.
 
 **No supply-chain findings.**
 
