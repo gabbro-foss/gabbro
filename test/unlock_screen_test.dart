@@ -8,6 +8,7 @@ import 'test_helpers.dart';
 import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
@@ -280,6 +281,8 @@ void main() {
 
   testWidgets('Net A: selecting NFC passes the nfc transport (Android)',
       (tester) async {
+    nfcAvailable = true; // device has NFC -> the USB/NFC selector is offered
+    addTearDown(() => nfcAvailable = false);
     String? transport;
     await tester.pumpWidget(_buildScreen(
       yubikeyRecords: [_fakeRecord()],
@@ -297,6 +300,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(transport, 'nfc');
+  });
+
+  testWidgets('NFC transport is not offered on an Android device without NFC',
+      (tester) async {
+    nfcAvailable = false; // non-NFC tablet
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      isAndroid: true,
+    ));
+    await tester.pumpAndSettle();
+    expect(find.text('NFC'), findsNothing);
+    expect(find.text('USB'), findsNothing);
   });
 
   testWidgets('Net A: PIN field blocks selection when blockPassphraseCopyPaste is true',

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -363,7 +364,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                           ? l.yubiKeyPinRequired
                           : null,
                     ),
-                    if (!Platform.isLinux) ...[
+                    if (!Platform.isLinux && nfcAvailable) ...[
                       const SizedBox(height: 12),
                       SegmentedRow<String>(
                         values: const ['usb', 'nfc'],

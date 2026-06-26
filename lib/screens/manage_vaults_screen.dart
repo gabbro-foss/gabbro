@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
@@ -324,7 +325,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                     ),
                     onChanged: (_) => setDialogState(() {}),
                   ),
-                  if (!Platform.isLinux) ...[
+                  if (!Platform.isLinux && nfcAvailable) ...[
                     const SizedBox(height: 12),
                     SegmentedRow<String>(
                       values: const ['usb', 'nfc'],

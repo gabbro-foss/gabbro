@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/app_paths.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/language_screen.dart';
@@ -134,7 +135,7 @@ Future<void> _defaultInitVaultWithYubikey(
   void Function() onStep3,
   Future<void> Function() onAwaitBackupKey,
   void Function() onStep4,
-  String transport,
+  List<String> transports,
   String? alias,
 ) async {
   if (Platform.isLinux) {
@@ -157,7 +158,7 @@ Future<void> _defaultInitVaultWithYubikey(
   // Tap 1: register primary key
   final credId1Hex = await _yubikeyChannel.invokeMethod<String>('register', {
     'pin': pins[0],
-    'transport': transport,
+    'transport': transports[0],
   });
   if (credId1Hex == null) {
     throw Exception('YubiKey registration returned no credential');
@@ -174,7 +175,7 @@ Future<void> _defaultInitVaultWithYubikey(
         'credentialId': credId1Hex,
         'salt': _toHex(salt1),
         'pin': pins[0],
-        'transport': transport,
+        'transport': transports[0],
       });
   if (hmac1Hex == null) {
     throw Exception('YubiKey activation returned no secret');
@@ -187,7 +188,7 @@ Future<void> _defaultInitVaultWithYubikey(
   // Tap 3: register backup key (fresh discovery — accepts the backup key now presented)
   final credId2Hex = await _yubikeyChannel.invokeMethod<String>('register', {
     'pin': pins[1],
-    'transport': transport,
+    'transport': transports[1],
   });
   if (credId2Hex == null) {
     throw Exception('YubiKey registration returned no credential');
@@ -204,7 +205,7 @@ Future<void> _defaultInitVaultWithYubikey(
         'credentialId': credId2Hex,
         'salt': _toHex(salt2),
         'pin': pins[1],
-        'transport': transport,
+        'transport': transports[1],
       });
   if (hmac2Hex == null) {
     throw Exception('YubiKey activation returned no secret');
@@ -254,7 +255,7 @@ class OnboardingScreen extends StatefulWidget {
     void Function() onStep3,
     Future<void> Function() onAwaitBackupKey,
     void Function() onStep4,
-    String transport,
+    List<String> transports,
     String? alias,
   )
   onInitVaultWithYubikey;
@@ -315,7 +316,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   EntropyResult? _entropy;
   bool? _confirmMatches;
   bool _useYubikey = false;
-  String _transport = 'usb';
+  // One transport per key (index 0 = primary, 1 = backup). Android-only; Linux
+  // ignores it (libfido2 is USB). Lets a USB key + an NFC key be enrolled
+  // together.
+  final List<String> _transports = ['usb', 'usb'];
   // 0 = idle, 1 = tap 1 (register key 1), 2 = tap 2 (activate key 1),
   // 3 = swap key (user presses Continue), 4 = tap 3 (register key 2),
   // 5 = tap 4 (activate key 2)
@@ -454,7 +458,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           () {
             if (mounted) setState(() => _yubikeyStep = 5);
           },
-          _transport,
+          _transports,
           alias.isEmpty ? null : alias,
         );
       } else {
@@ -1069,16 +1073,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       ? l.yubiKeyPinRequired
                                       : null,
                                 ),
-                              ],
-                              if (widget.isAndroid) ...[
-                                const SizedBox(height: 12),
-                                SegmentedRow<String>(
-                                  values: const ['usb', 'nfc'],
-                                  selected: _transport,
-                                  label: (v) => v.toUpperCase(),
-                                  onSelected: (v) =>
-                                      setState(() => _transport = v),
-                                ),
+                                // Per-key transport (Android + NFC hardware
+                                // only): lets a USB key + an NFC key be enrolled
+                                // together. Hidden without NFC (stays USB).
+                                if (widget.isAndroid && nfcAvailable) ...[
+                                  const SizedBox(height: 8),
+                                  SegmentedRow<String>(
+                                    values: const ['usb', 'nfc'],
+                                    selected: _transports[i],
+                                    label: (v) => v.toUpperCase(),
+                                    onSelected: (v) =>
+                                        setState(() => _transports[i] = v),
+                                  ),
+                                ],
                               ],
                               const SizedBox(height: 8),
                               if (_isCreating)

@@ -9,6 +9,7 @@ import 'test_helpers.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -379,6 +380,34 @@ void main() {
           mergeVaultWithKey: mergeVaultWithKey,
           isAndroid: isAndroid,
         ));
+
+    testWidgets('transport selector follows NFC capability (Android)',
+        (tester) async {
+      addTearDown(() => nfcAvailable = false);
+
+      nfcAvailable = false; // non-NFC tablet -> no USB/NFC selector
+      await tester.pumpWidget(buildKeyProtectedScreen(
+        mergeVaultWithKey: (_, _, _, _) async => _summary(added: 1),
+        isAndroid: true,
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+      expect(find.text('NFC'), findsNothing);
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      nfcAvailable = true; // NFC present -> selector appears
+      await tester.pumpWidget(buildKeyProtectedScreen(
+        mergeVaultWithKey: (_, _, _, _) async => _summary(added: 1),
+        isAndroid: true,
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+      expect(find.text('NFC'), findsOneWidget);
+    });
 
     testWidgets('key-protected source prompts for YubiKey PIN', (tester) async {
       await tester.pumpWidget(buildKeyProtectedScreen(

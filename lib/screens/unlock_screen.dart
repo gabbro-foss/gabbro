@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -945,9 +946,9 @@ class _UnlockScreenState extends State<UnlockScreen>
                         ),
                       ),
                       // USB vs NFC is an Android-only choice: desktop (Linux)
-                      // uses libfido2 over USB only, no NFC path. Gated on the
-                      // injectable `onAndroid` seam so the selector is testable.
-                      if (onAndroid) ...[
+                      // uses libfido2 over USB only, no NFC path. Also gated on
+                      // NFC hardware presence so non-NFC devices don't offer it.
+                      if (onAndroid && nfcAvailable) ...[
                         const SizedBox(height: 12),
                         SegmentedRow<String>(
                           values: const ['usb', 'nfc'],

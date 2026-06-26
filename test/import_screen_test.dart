@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/import_screen.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
 import 'package:gabbro/src/rust/api/import.dart';
@@ -170,6 +171,33 @@ void main() {
       await tester.ensureVisible(find.text('YubiKey PIN'));
       expect(find.text('YubiKey PIN'), findsOneWidget);
       expect(find.textContaining('protected by a YubiKey'), findsOneWidget);
+    });
+
+    testWidgets('transport selector follows NFC capability (Android, key-protected)',
+        (tester) async {
+      final tmp = tempGabbroFile();
+      addTearDown(() => nfcAvailable = false);
+
+      // No NFC hardware: the USB/NFC selector is not offered.
+      nfcAvailable = false;
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: true,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [fakeRecord()],
+      )));
+      await tester.pumpAndSettle();
+      expect(find.text('NFC'), findsNothing);
+
+      // NFC present: the selector appears.
+      nfcAvailable = true;
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: true,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [fakeRecord()],
+      )));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('NFC'));
+      expect(find.text('NFC'), findsOneWidget);
     });
 
     testWidgets('passphrase-only source shows no YubiKey fields', (tester) async {

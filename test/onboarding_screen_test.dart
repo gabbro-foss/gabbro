@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/app_paths.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
@@ -34,7 +35,7 @@ Widget _buildScreen({
   bool blockPassphraseCopyPaste = true,
   bool isAndroid = false,
   bool? showYubikey,
-  Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), String, String?)? onInitVaultWithYubikey,
+  Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), List<String>, String?)? onInitVaultWithYubikey,
   Future<void> Function(String path, String alias)? onVaultCreated,
   String? initialPath = '/tmp/test.gabbro',
   Future<String> Function()? resolveDataDir,
@@ -285,6 +286,95 @@ void main() {
     expect(capturedPins![1], 'pin-backup');
   });
 
+  // ── Per-key transport (Android + NFC) ─────────────────────────────────────────
+
+  // Drives the full YubiKey onboarding form and taps Create, returning the
+  // transports passed to the init callback. [tapBackupNfc] selects NFC on the
+  // backup key's selector before creating.
+  Future<List<String>?> createAndCaptureTransports(
+    WidgetTester tester, {
+    bool tapBackupNfc = false,
+  }) async {
+    List<String>? captured;
+    await tester.pumpWidget(_buildScreen(
+      isAndroid: true,
+      onInitVaultWithYubikey:
+          (a, pins, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t, alias) async {
+        captured = t;
+      },
+    ));
+    await tester.enterText(find.widgetWithText(TextFormField, 'Alias'), 'Test');
+    await tester.pump();
+    const passphrase = 'correct horse battery staple one two three four';
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
+    await tester.pump();
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
+    await tester.pump();
+    await tester.ensureVisible(find.byType(SwitchListTile));
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pump();
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Primary key PIN'), '111111');
+    await tester.pump();
+    await tester.enterText(
+        find.widgetWithText(TextFormField, 'Backup key PIN'), '222222');
+    await tester.pump();
+    if (tapBackupNfc) {
+      // Two selectors render (one per key); the last NFC is the backup key's.
+      await tester.ensureVisible(find.text('NFC').last);
+      await tester.tap(find.text('NFC').last);
+      await tester.pump();
+    }
+    await tester.ensureVisible(find.text('Create vault'));
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Create vault'));
+      await Future.delayed(const Duration(milliseconds: 300));
+    });
+    await tester.pump();
+    return captured;
+  }
+
+  testWidgets('two transport selectors render, one per key (Android + NFC)',
+      (tester) async {
+    nfcAvailable = true;
+    addTearDown(() => nfcAvailable = false);
+    await tester.pumpWidget(_buildScreen(isAndroid: true));
+    await tester.ensureVisible(find.byType(SwitchListTile));
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pumpAndSettle();
+    expect(find.text('NFC'), findsNWidgets(2));
+    expect(find.text('USB'), findsNWidgets(2));
+  });
+
+  testWidgets('no transport selectors when the device lacks NFC',
+      (tester) async {
+    nfcAvailable = false;
+    await tester.pumpWidget(_buildScreen(isAndroid: true));
+    await tester.ensureVisible(find.byType(SwitchListTile));
+    await tester.tap(find.byType(SwitchListTile));
+    await tester.pumpAndSettle();
+    expect(find.text('NFC'), findsNothing);
+    expect(find.text('USB'), findsNothing);
+  });
+
+  testWidgets('transports default to usb for both keys', (tester) async {
+    nfcAvailable = true;
+    addTearDown(() => nfcAvailable = false);
+    final transports = await createAndCaptureTransports(tester);
+    expect(transports, ['usb', 'usb']);
+  });
+
+  testWidgets('per-key transport: USB primary + NFC backup is passed through',
+      (tester) async {
+    nfcAvailable = true;
+    addTearDown(() => nfcAvailable = false);
+    final transports =
+        await createAndCaptureTransports(tester, tapBackupNfc: true);
+    expect(transports, ['usb', 'nfc']);
+  });
+
   testWidgets('vault creation with yubikey calls onInitVaultWithYubikey',
       (tester) async {
     bool called = false;
@@ -341,7 +431,7 @@ void main() {
 
   Future<void> fillAndSubmitYubikey(
     WidgetTester tester,
-    Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), String, String?) onInitVaultWithYubikey,
+    Future<void> Function(List<int>, List<String>, String, void Function(), void Function(), Future<void> Function(), void Function(), List<String>, String?) onInitVaultWithYubikey,
   ) async {
     await tester.pumpWidget(_buildScreen(
       isAndroid: true,

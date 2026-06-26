@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -595,26 +596,30 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l.transportLabel),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    ChoiceChip(
-                      label: Text(l.transportUsb),
-                      selected: selectedTransport == 'usb',
-                      onSelected: (_) =>
-                          setLocal(() => selectedTransport = 'usb'),
-                    ),
-                    const SizedBox(width: 8),
-                    ChoiceChip(
-                      label: Text(l.transportNfc),
-                      selected: selectedTransport == 'nfc',
-                      onSelected: (_) =>
-                          setLocal(() => selectedTransport = 'nfc'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
+                // Transport choice only when the device has NFC; otherwise the
+                // single USB option is implicit (selectedTransport stays 'usb').
+                if (nfcAvailable) ...[
+                  Text(l.transportLabel),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      ChoiceChip(
+                        label: Text(l.transportUsb),
+                        selected: selectedTransport == 'usb',
+                        onSelected: (_) =>
+                            setLocal(() => selectedTransport = 'usb'),
+                      ),
+                      const SizedBox(width: 8),
+                      ChoiceChip(
+                        label: Text(l.transportNfc),
+                        selected: selectedTransport == 'nfc',
+                        onSelected: (_) =>
+                            setLocal(() => selectedTransport = 'nfc'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                ],
                 TextField(
                   controller: controller,
                   autofocus: true,

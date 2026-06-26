@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
 import 'package:gabbro/screens/section_index.dart';
@@ -1766,7 +1767,7 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
                   ),
                 ),
               ),
-              if (widget.isAndroid) ...[
+              if (widget.isAndroid && nfcAvailable) ...[
                 const SizedBox(height: 12),
                 Row(
                   children: [
@@ -1775,20 +1776,24 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     const SizedBox(width: 12),
-                    SegmentedButton<String>(
-                      segments: [
-                        ButtonSegment(
-                          value: 'usb',
-                          label: Text(l.transportUsb),
-                        ),
-                        ButtonSegment(
-                          value: 'nfc',
-                          label: Text(l.transportNfc),
-                        ),
-                      ],
-                      selected: {_transport},
-                      onSelectionChanged: (s) =>
-                          setState(() => _transport = s.first),
+                    // Expanded so the segmented button fits the narrow dialog
+                    // width instead of overflowing the Row.
+                    Expanded(
+                      child: SegmentedButton<String>(
+                        segments: [
+                          ButtonSegment(
+                            value: 'usb',
+                            label: Text(l.transportUsb),
+                          ),
+                          ButtonSegment(
+                            value: 'nfc',
+                            label: Text(l.transportNfc),
+                          ),
+                        ],
+                        selected: {_transport},
+                        onSelectionChanged: (s) =>
+                            setState(() => _transport = s.first),
+                      ),
                     ),
                   ],
                 ),

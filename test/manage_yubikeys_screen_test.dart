@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/manage_yubikeys_screen.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -588,6 +589,8 @@ void main() {
   // must carry a semantic label so screen readers announce it.
   testWidgets('add key Android: PIN+transport dialog meets labelled-tap-target guideline',
       (tester) async {
+    nfcAvailable = true; // exercise the USB/NFC transport chips' labels
+    addTearDown(() => nfcAvailable = false);
     _setChannelMock((_) async => _fakeCredIdHex);
     addTearDown(_clearChannelMock);
 
@@ -663,8 +666,28 @@ void main() {
     expect(find.textContaining('Failed to activate'), findsOneWidget);
   });
 
+  testWidgets('add key Android: no NFC chip when the device lacks NFC',
+      (tester) async {
+    nfcAvailable = false; // non-NFC tablet
+    _setChannelMock((_) async => _fakeCredIdHex);
+    addTearDown(_clearChannelMock);
+
+    await tester.pumpWidget(_buildScreen(
+      records: [_record('65')],
+      isAndroid: true,
+    ));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle(); // add-key dialog
+
+    expect(find.text('NFC'), findsNothing);
+    expect(find.text('USB'), findsNothing);
+  });
+
   testWidgets('add key Android: NFC chip can be selected before registering',
       (tester) async {
+    nfcAvailable = true; // device has NFC -> the USB/NFC chips are offered
+    addTearDown(() => nfcAvailable = false);
     String? capturedTransport;
     _setChannelMock((call) async {
       capturedTransport = (call.arguments as Map)['transport'] as String?;

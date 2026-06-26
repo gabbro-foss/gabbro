@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/save_confirm_screen.dart';
@@ -108,6 +109,7 @@ double textScaleFor(TextSizeChoice choice) => switch (choice) {
 Future<void> autofillUnlockMain() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
+  await initNfcCapability();
   final registry = await VaultRegistry.load();
   final lastUsed = registry.lastUsed;
   final String initialVaultPath;
@@ -261,6 +263,7 @@ Future<void> showAutofillNoMatchDialog(
 Future<void> autofillSaveMain() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
+  await initNfcCapability();
   final registry = await VaultRegistry.load();
   final lastUsed = registry.lastUsed;
   final String initialVaultPath;
@@ -408,6 +411,7 @@ Future<void> main() async {
     ));
   }
   await RustLib.init();
+  await initNfcCapability();
   final registry = await VaultRegistry.load();
   final lastUsed = registry.lastUsed;
   final settings = await AppSettings.load();

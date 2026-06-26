@@ -209,6 +209,11 @@ abstract class GabbroUnlockHostActivity : FlutterFragmentActivity() {
                         tapFlow.cancel()
                         result.success(null)
                     }
+                    "has_nfc" -> {
+                        // Hardware presence (not enabled-state): drives whether the
+                        // UI offers the NFC transport at all. Null adapter = no NFC.
+                        result.success(NfcAdapter.getDefaultAdapter(this) != null)
+                    }
                     else -> result.notImplemented()
                 }
             }

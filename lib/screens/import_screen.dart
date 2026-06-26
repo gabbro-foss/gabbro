@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
 import 'package:gabbro/screens/import_failures_dialog.dart';
 import 'package:gabbro/screens/import_skipped_dialog.dart';
@@ -620,7 +621,7 @@ class _ImportScreenState extends State<ImportScreen> {
               ),
             ),
           ),
-          if (widget.isAndroid) ...[
+          if (widget.isAndroid && nfcAvailable) ...[
             const SizedBox(height: 12),
             Row(
               children: [
