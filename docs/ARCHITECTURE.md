@@ -113,7 +113,7 @@ release process live in their own document:
 
 ### Code Quality
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
-  translations. (The no-match dialog was hardware-verified and is broken -> being fixed, see Current Focus.)
+  translations.
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer

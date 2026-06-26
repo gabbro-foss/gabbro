@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.0-alpha.10] – 2026-06-26
 
 ### Security
 - **Android release dependencies locked + supply-chain scanned.** The release runtime dependency graph is pinned in `android/app/gradle.lockfile` (reproducible builds) and scanned with `osv-scanner` — 0 known vulnerabilities. Closes the one open supply-chain gap from audit pass 3 (Gradle deps were not previously lockfile-scannable).
@@ -15,8 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - The alphabet index bar is now script-aware and follows the UI locale: Latin, Greek (accents folded), Cyrillic (Russian/Ukrainian/Bulgarian/Kazakh, each its own alphabet) and Korean (by leading consonant) get their script's letters instead of everything collapsing under "#". Japanese and Chinese have no human-orderable index, so those locales drop the bar for a plain title-sorted list (scrollbar on desktop, flick-scroll on mobile). Bar slots and chevrons now carry screen-reader labels, and the scroll chevrons show their label as a desktop hover tooltip. Non-Latin alphabets are best-effort and unreviewed by native speakers.
 - Accessibility: the show/hide eye toggles (passphrase, PIN, password, CVV) across 12 screens now carry screen-reader labels, alongside the browse, folder add/edit/delete, vault-list add/delete/close and Help prev/next buttons — they previously announced a bare "button". Enforced per screen by `labeledTapTargetGuideline`. A sweep of every chevron control gave the remaining bare scroll chevrons — the entry-type filter row and the password-breakdown sheet (left/right) — screen-reader labels and a desktop hover tooltip too (the help-screen page chevrons already had them). Vault-list selection checkboxes now announce the entry title instead of a bare "tick box", and the search clear button has a "Clear search" tooltip (new string, all 37 locales).
-
-### Added
 - YubiKey onboarding now allows a different transport per key (Android): a USB-only key and an NFC-only key can be enrolled together, instead of forcing both onto one transport.
 
 ### Fixed
