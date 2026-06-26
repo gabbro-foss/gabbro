@@ -679,6 +679,8 @@ class _VaultListScreenState extends State<VaultListScreen>
         filePath: path,
         isKeyProtected: isKeyProtected,
         isAndroid: widget.isAndroid,
+        sourceRecords: sourceRecords,
+        onGetYubikeyHmac: widget.onGetSyncYubikeyHmac,
       ),
     );
     if (creds == null || !mounted) return;
@@ -688,17 +690,13 @@ class _VaultListScreenState extends State<VaultListScreen>
     try {
       final MergeSummary summary;
       if (isKeyProtected) {
-        // Tap a registered key to open the key-protected source, then merge.
-        final match = await widget.onGetSyncYubikeyHmac(
-          sourceRecords,
-          creds.pin,
-          creds.transport,
-        );
+        // The dialog already tapped the key (showing the inline tap note); use
+        // the returned material to open the key-protected source and merge.
         summary = await widget.mergeVaultWithKey(
           path,
           passphraseBytes,
-          match.hmac,
-          match.credentialId,
+          creds.hmac!,
+          creds.credentialId!,
         );
       } else {
         summary = await widget.mergeVault(path, passphraseBytes);
@@ -1597,10 +1595,16 @@ class _SyncCredentials {
   final String passphrase;
   final String pin;
   final String transport;
+  // Tapped key material — non-null only for a key-protected source, where the
+  // dialog runs the YubiKey tap itself (so it can show the inline tap note).
+  final List<int>? hmac;
+  final List<int>? credentialId;
   const _SyncCredentials({
     required this.passphrase,
     this.pin = '',
     this.transport = 'usb',
+    this.hmac,
+    this.credentialId,
   });
 }
 
@@ -1608,8 +1612,19 @@ class _SyncPassphraseDialog extends StatefulWidget {
   final String filePath;
   final bool isKeyProtected;
   final bool isAndroid;
+  // For a key-protected source the dialog taps the key itself so the inline
+  // "tap now" note can sit under the PIN field (mirroring the import screen).
+  final List<YubikeyRecordData> sourceRecords;
+  final Future<YubikeyHmacMatch> Function(
+    List<YubikeyRecordData> records,
+    String pin,
+    String transport,
+  )
+  onGetYubikeyHmac;
   const _SyncPassphraseDialog({
     required this.filePath,
+    required this.sourceRecords,
+    required this.onGetYubikeyHmac,
     this.isKeyProtected = false,
     this.isAndroid = false,
   });
@@ -1625,6 +1640,9 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
   bool _pinObscured = true;
   String _transport = 'usb';
   String? _error;
+  // True while the YubiKey tap is in flight (key-protected source only); drives
+  // the inline tap note and disables the buttons.
+  bool _tapping = false;
 
   @override
   void dispose() {
@@ -1633,19 +1651,47 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
+    // Passphrase-only source: no key tap, return the passphrase straight away.
+    if (!widget.isKeyProtected) {
+      Navigator.of(context).pop(_SyncCredentials(passphrase: _ctrl.text));
+      return;
+    }
     // A key-protected source needs a YubiKey PIN to run the CTAP2 assertion.
-    if (widget.isKeyProtected && _pinCtrl.text.isEmpty) {
+    if (_pinCtrl.text.isEmpty) {
       setState(() => _error = AppLocalizations.of(context).yubiKeyPinRequired);
       return;
     }
-    Navigator.of(context).pop(
-      _SyncCredentials(
-        passphrase: _ctrl.text,
-        pin: _pinCtrl.text,
-        transport: _transport,
-      ),
-    );
+    // Tap the key while the dialog stays open, showing the inline note, then
+    // return the tapped material with the creds for the merge. A failed tap
+    // keeps the dialog open with the error rather than aborting the whole flow.
+    setState(() {
+      _tapping = true;
+      _error = null;
+    });
+    try {
+      final match = await widget.onGetYubikeyHmac(
+        widget.sourceRecords,
+        _pinCtrl.text,
+        _transport,
+      );
+      if (!mounted) return;
+      Navigator.of(context).pop(
+        _SyncCredentials(
+          passphrase: _ctrl.text,
+          pin: _pinCtrl.text,
+          transport: _transport,
+          hmac: match.hmac,
+          credentialId: match.credentialId,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _tapping = false;
+        _error = e.toString();
+      });
+    }
   }
 
   @override
@@ -1748,6 +1794,26 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
                 ),
               ],
             ],
+            if (_tapping) ...[
+              const SizedBox(height: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.touch_app,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l.tapYubiKeyNow,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ],
+              ),
+            ],
             if (_error != null) ...[
               const SizedBox(height: 8),
               Text(
@@ -1763,10 +1829,10 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: _tapping ? null : () => Navigator.of(context).pop(),
           child: Text(l.cancel),
         ),
-        TextButton(onPressed: _submit, child: Text(l.sync)),
+        TextButton(onPressed: _tapping ? null : _submit, child: Text(l.sync)),
       ],
     );
   }

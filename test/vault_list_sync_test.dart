@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -316,6 +317,34 @@ void main() {
       expect(find.textContaining('Work'), findsWidgets);
       expect(find.textContaining('Personal'), findsWidgets);
     });
+
+    // A passphrase-only source never taps a YubiKey, so the "tap now" note must
+    // not appear while the merge is in flight.
+    testWidgets('passphrase-only sync shows no tap note', (tester) async {
+      final mergeGate = Completer<MergeSummary>();
+      await tester.pumpWidget(_buildScreen(
+        pickedPath: '/tmp/other.gabbro',
+        mergeVault: (_, _) => mergeGate.future,
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+        'passphrase',
+      );
+      await tester.tap(find.text('Sync'));
+      await tester.pump();
+
+      expect(find.text('Tap your YubiKey now…'), findsNothing);
+
+      mergeGate.complete(_summary());
+      await tester.pumpAndSettle();
+    });
   });
 
   // ── ADR-013: key-protected source sync ──────────────────────────────────────
@@ -466,6 +495,73 @@ void main() {
       expect(mergeCalled, isFalse);
       // The dialog stays open with a PIN-required error.
       expect(find.text('Sync'), findsOneWidget);
+    });
+
+    // The key tap runs while the sync dialog stays open; mirror the import
+    // screen by showing the inline "tap your YubiKey now" note under the PIN
+    // field, then clearing it once the tap returns and the merge runs.
+    testWidgets('key-protected sync shows the tap note then clears it',
+        (tester) async {
+      final tapGate = Completer<YubikeyHmacMatch>();
+      await tester.pumpWidget(buildKeyProtectedScreen(
+        onGetSyncYubikeyHmac: (_, _, _) => tapGate.future,
+        mergeVaultWithKey: (_, _, _, _) async => _summary(added: 1),
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      final fields = find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      );
+      await tester.enterText(fields.at(0), 'sharedpass');
+      await tester.enterText(fields.at(1), '123456');
+      await tester.tap(find.text('Sync'));
+      await tester.pump();
+
+      // The note shows inside the still-open dialog while the tap is awaited.
+      expect(find.text('Tap your YubiKey now…'), findsOneWidget);
+      expect(find.byType(AlertDialog), findsOneWidget);
+
+      tapGate.complete((hmac: const [0x11], credentialId: const [0xA1]));
+      await tester.pumpAndSettle();
+
+      // Tap done: note gone, dialog closed, merge reported.
+      expect(find.text('Tap your YubiKey now…'), findsNothing);
+      expect(find.textContaining('Vault synced'), findsOneWidget);
+    });
+
+    // A failed tap (no key, wrong PIN, timeout) must clear the note, keep the
+    // dialog open with the error, and never reach the merge.
+    testWidgets('tap failure clears the note and shows the error in the dialog',
+        (tester) async {
+      bool mergeCalled = false;
+      await tester.pumpWidget(buildKeyProtectedScreen(
+        onGetSyncYubikeyHmac: (_, _, _) async =>
+            throw Exception('no key tapped'),
+        mergeVaultWithKey: (_, _, _, _) async {
+          mergeCalled = true;
+          return _summary(added: 1);
+        },
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      final fields = find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      );
+      await tester.enterText(fields.at(0), 'sharedpass');
+      await tester.enterText(fields.at(1), '123456');
+      await tester.tap(find.text('Sync'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Tap your YubiKey now…'), findsNothing);
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.textContaining('no key tapped'), findsOneWidget);
+      expect(mergeCalled, isFalse);
     });
   });
 }
