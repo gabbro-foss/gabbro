@@ -73,6 +73,20 @@ flutter {
     source = "../.."
 }
 
+// Dependency locking (app module): pins the SHIPPED release runtime dependency
+// graph — including external libraries pulled in transitively via plugin
+// subprojects — into gradle.lockfile, so the release APK is reproducible and its
+// tree is osv-scannable (supply-chain audit). Scoped to releaseRuntimeClasspath
+// only: that is what users receive, and it keeps the scan free of debug-only
+// tooling (e.g. guava/junit pulled into debugRuntimeClasspath) that never ships
+// and would otherwise mask a real future finding. The offline test gate's
+// resolution is untouched. Regenerate after any dependency change with
+// `./gradlew :app:dependencies --write-locks --configuration releaseRuntimeClasspath`
+// (see BUILD_AND_RELEASE.md).
+configurations.matching { it.name == "releaseRuntimeClasspath" }.configureEach {
+    resolutionStrategy.activateDependencyLocking()
+}
+
 dependencies {
     implementation("com.yubico.yubikit:android:3.1.0")
     implementation("com.yubico.yubikit:fido:3.1.0")
