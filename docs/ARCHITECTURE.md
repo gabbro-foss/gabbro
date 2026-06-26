@@ -133,4 +133,3 @@ release process live in their own document:
 - No-telemetry verification guide (ripgrep scan, Wireshark, NetGuard).
 - Support model (GitHub Issues + SUPPORT.md for v1; revisit when user base exists).
 - Import: content-hash deduplication and entry-level merge.
-- Native app autofill matching by package name (v2).
