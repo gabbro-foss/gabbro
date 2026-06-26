@@ -72,7 +72,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 541 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 12 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 986 | 0 |
+| Flutter (`flutter test`) | 998 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -91,11 +91,6 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**YubiKey onboarding can't mix transports.** Creating a YubiKey vault registers
-both keys on one transport — you can't switch USB<->NFC mid-onboarding, so a
-USB-only + NFC-only key pair can't both be enrolled at creation (found 2026-06-23
-hardware matrix A2.1). Allow per-key transport choice during onboarding
-(Linux + Android).
 
 ---
 
@@ -121,7 +116,7 @@ release process live in their own document:
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer
-- UI locales deferred (RTL layout work required): Hebrew, Arabic.
+- UI locales deferred (RTL layout work required): Hebrew, Kurdish.
 - Passphrase wordlists — not viable without significant pipeline work: `yo` Yoruba (no frequency ordering, complex tonal diacritics); `sr_Latn` Serbian Latin (only Cyrillic corpora; needs transliteration pipeline); `lb` Luxembourgish (small speaker base); `wa` Walloon (nothing usable, French covers Wallonia).
 - Autofill via `auto-type` (Linux/desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
 - Passkey (WebAuthn discoverable credential) support.
