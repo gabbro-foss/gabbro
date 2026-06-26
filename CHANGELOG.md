@@ -222,9 +222,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - YubiKey OTP NDEF URI no longer opens a browser tab during NFC unlock; `skipNdefCheck` and re-armed foreground dispatch suppress NDEF dispatch while the app is foreground — `ykman config nfc --disable OTP` is no longer required
 - Enpass import: entries land in the "None" folder (the category name was incorrectly used as the folder name)
-
-[0.1.0-alpha.5]: https://github.com/Zabamund/gabbro/compare/v0.1.0-alpha.4...v0.1.0-alpha.5
-[0.1.0-alpha.4]: https://github.com/Zabamund/gabbro/compare/v0.1.0-alpha.3...v0.1.0-alpha.4
-[0.1.0-alpha.3]: https://github.com/Zabamund/gabbro/compare/v0.1.0-alpha.2...v0.1.0-alpha.3
-[0.1.0-alpha.2]: https://github.com/Zabamund/gabbro/compare/v0.1.0-alpha.1...v0.1.0-alpha.2
-[0.1.0-alpha.1]: https://github.com/Zabamund/gabbro/releases/tag/v0.1.0-alpha.1
