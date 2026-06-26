@@ -91,6 +91,11 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
+v1 direction agreed (2026-06-26): ship-soon on an honest posture; pursue free
+external crypto review with a narrow ask (the construction only: hybrid combiner /
+transcript binding / header AAD / vault format, not the whole codebase); lean on the
+`challenge/` crack-me vault as a public trust signal. Draft the review outreach next
+session.
 
 ---
 
