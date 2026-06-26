@@ -91,15 +91,10 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**Offline test gate — bring the Android leg offline.** `gabbro_test` runs
-flutter/cargo/rust fully offline (rootless netns) but the Android
-`./gradlew :app:testDebugUnitTest` leg runs online: the Flutter `integration_test`
-plugin pulls a dynamic transitive `androidx.test:runner:1.2+` that gradle won't
-resolve `--offline`, and `dependencyLocking` on `:app` doesn't pin that plugin's
-config. The netns also needs `JAVA_TOOL_OPTIONS=-Duser.home=/home/gamer` (uid-0
-remap → JVM home `/root`). Likely fix: force a concrete `androidx.test:runner`
-across all projects (or lock every project), then move the leg into the offline
-block.
+**Sync-from-file: prompt for a YubiKey tap on key-protected vaults.** When
+syncing/merging from a vault file whose source is YubiKey-protected, the user gets
+no "tap your key" prompt. Add a user-facing tap message to the sync-from-file flow
+(Linux + Android).
 
 ---
 
@@ -120,12 +115,10 @@ release process live in their own document:
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
 
 ### Features & UX
-- When syncing from a vault file, we need to add a user-facing message to tap the yubikey for yubikey-protected vaults
 - **YubiKey onboarding can't mix transports.** Creating a YubiKey vault registers both keys on
   one transport — you can't switch USB<->NFC mid-onboarding, so a USB-only + NFC-only key pair
   can't both be enrolled at creation (found 2026-06-23 hardware matrix A2.1). Vault creation
   with keys otherwise works on Linux + Android. Allow per-key transport choice during onboarding.
-- Anonymous user feedback -> two wordclouds (one "what works", one "to improve"), in the teachtogether.tech formative-feedback spirit, published on GitHub. Must stay OUT of the app (no in-app network call - offline/no-telemetry DNA): external link to a no-login form (CryptPad/Framaforms/Nextcloud Forms) -> manual export -> generate two PNGs -> commit + embed in README. Needs moderation (anon free text = spam/abuse): cap to single words, profanity filter, curate before publishing.
 
 ### Code Quality
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
