@@ -72,7 +72,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 541 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 12 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 983 | 0 |
+| Flutter (`flutter test`) | 986 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -91,9 +91,10 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-**Sync-from-file: prompt for a YubiKey tap on key-protected vaults.** When
-syncing/merging from a vault file whose source is YubiKey-protected, the user gets
-no "tap your key" prompt. Add a user-facing tap message to the sync-from-file flow
+**YubiKey onboarding can't mix transports.** Creating a YubiKey vault registers
+both keys on one transport — you can't switch USB<->NFC mid-onboarding, so a
+USB-only + NFC-only key pair can't both be enrolled at creation (found 2026-06-23
+hardware matrix A2.1). Allow per-key transport choice during onboarding
 (Linux + Android).
 
 ---
@@ -113,12 +114,6 @@ release process live in their own document:
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 - Pin CI Actions to commit SHAs; add `cargo audit` + `osv-scanner --lockfile pubspec.lock` steps (once CI exists). See Track A Phase 1 audit in `AI_SECURITY_AUDIT.md`.
-
-### Features & UX
-- **YubiKey onboarding can't mix transports.** Creating a YubiKey vault registers both keys on
-  one transport — you can't switch USB<->NFC mid-onboarding, so a USB-only + NFC-only key pair
-  can't both be enrolled at creation (found 2026-06-23 hardware matrix A2.1). Vault creation
-  with keys otherwise works on Linux + Android. Allow per-key transport choice during onboarding.
 
 ### Code Quality
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
