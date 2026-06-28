@@ -91,11 +91,26 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 ### Next task
 
-v1 direction agreed (2026-06-26): ship-soon on an honest posture; pursue free
-external crypto review with a narrow ask (the construction only: hybrid combiner /
-transcript binding / header AAD / vault format, not the whole codebase); lean on the
-`challenge/` crack-me vault as a public trust signal. Draft the review outreach next
-session.
+**Redesign vault sync — it is fundamentally broken (critical).** Today's merge is
+whole-entry last-writer-wins on a single second-precision `meta.updated_at`; there are
+no per-field timestamps (`session.rs` `do_merge`, ~1293). Two failures:
+- False "no differences": the summary is entry-granular and `session.rs:1328` keeps
+  local silently when timestamps are equal.
+- Cannot merge independent field edits across devices — the newer *whole* entry wins
+  and the other side's field change is silently lost. Data loss.
+
+Fix needs a new vault format version (v8 -> v9): per-field modification timestamps,
+field-level LWW (a *cleared* field is a real edit, not "empty loses"), migration + new
+backward-compat fixtures + gate. Net-first; failing backward-compat test before any
+production change (vault format is the bricking-risk area). Dedicated design session first.
+
+Recovery context (maintainer's 3-device case, full notes in `.scratchpad`): the
+hypothesis — export each device, import all three into a fresh vault so divergent
+same-title entries land separately = zero loss — is FALSE. Gabbro import dedups by UUID and silently drops
+same-UUID losers (first file imported wins): `import.rs:439` `merge_source_into_session`
+keys on `meta.id`, never compares content. Lossless route: JSON-export each device
+(`session.rs:717`, full plaintext dump) + reconcile per-field by hand; import is only
+safe for entries unique to one device.
 
 ---
 
@@ -111,8 +126,18 @@ release process live in their own document:
 
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
+### Bugs
+- **Android tablet biometric toggle doesn't persist.** Fresh alpha.10 install on an
+  Android tablet: enabling biometrics doesn't stick — after logout no biometric is
+  offered. Not yet investigated.
+- **DuckDuckGo browser autofill not working** (Android). Likely DDG blocking autofill
+  modifications, not a Gabbro bug — probably WONTFIX/YAGNI; confirm before closing.
+
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
+- Draft the free external crypto-review outreach (narrow ask: the construction only —
+  hybrid combiner / transcript binding / header AAD / vault format). Deferred behind the
+  sync redesign (which reshapes the vault format anyway). v1 direction in commit 9f158b5.
 
 ### Features & UX
 
