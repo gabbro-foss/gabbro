@@ -40,7 +40,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 gabbro/
 ├── lib/                  # Flutter app
 │   ├── screens/          # unlock, vault list, export, import, generator, settings, manage vaults/folders, …
-│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, …
+│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
 │   └── *.dart            # main, app_paths (GabbroPaths), settings, vault_registry, safe_file_picker
 ├── rust/src/
@@ -137,21 +137,23 @@ resolution *model* above is NOT yet what the code does. On branch `granular-sync
   prompt, the fuzz harness (3 devices, varied order), the FFI bridge, and the 3-vault
   test corpus (`test_data/sync_test_vaults/`, distinct per-device edit times, varied-order
   convergence proven).
-- Additive review (visibility + drop): `MergeSummary` now LISTS each added entry and each
+- Additive review (visibility + drop): `MergeSummary` LISTS each added entry and each
   brought-over field/pair/attachment (old + new value), not just counts them. Drop reuses
   existing calls: new entry -> `deleteEntry`; field/pair -> `resolve_field_conflict` with the
-  old value; attachment -> `resolve_item_delete`. Rust half done + green; the Flutter
-  one-by-one review UI is still to do.
+  old value; attachment -> `resolve_item_delete`.
+- Flutter one-by-one review UI (`lib/widgets/sync_review.dart`, option A): steps through
+  incoming changes **one entry per step** (new entries, brought-over values keep/drop,
+  clashes picked, item-deletes, whole-entry deletes, folder picks), keep by default, secrets
+  masked, clashes block until picked. Replaces the old four sequential dialogs. Zero new
+  l10n strings (reuses existing). Built + green (widget + grouping unit tests). Option A and
+  the dropped option B both consume the same `MergeSummary`, so swapping the widget after
+  hardware testing touches no Rust.
 - Diverges from the agreed model, still to do:
-  1. Flutter review UI: step through incoming changes **one entry per step** (all of that
-     entry's new/changed fields, conflicts, item-deletes together), keep by default, drop
-     reverts, conflicts force a pick. Same one-by-one flow on Linux and Android (no room for
-     a full list on a phone).
-  2. Per-entry history for ANY replaced field value (generalise beyond `previous_password`).
-  3. Deletion keep/delete prompt: keep the pre-existing entry-level one and the new per-item
-     one; verify both still work.
+  1. Per-entry history for ANY replaced field value (generalise beyond `previous_password`).
+  2. Maintainer hardware verification of the whole sync flow on MOCK vaults (Linux + Android),
+     then a release decision (A may be revisited vs B after that run).
 
-Next: the Flutter one-by-one review UI (item 1), net-first then red-first per the model.
+Next: per-entry history (item 1), then hardware verification.
 
 Note: import (`import.rs` `merge_source_into_session`) stays first-wins by UUID; the sync
 model above is scoped to the sync path only.
