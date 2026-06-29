@@ -1781,6 +1781,70 @@ pub(crate) fn merge_entry_pair(
 mod field_merge_tests {
     use super::*;
 
+    // Loads the SAME three divergent vaults shipped for hardware testing
+    // (test_data/sync_test_vaults/ — see its README) and proves the merge converges:
+    // independent field/pair edits survive, the same-field edit clashes, the delete
+    // is flagged. Read-only + cheap Argon2 params, so it runs in the normal suite.
+    #[test]
+    fn sync_test_corpus_converges_without_loss() {
+        use crate::vault::serialization::VaultBody;
+        let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .join("test_data/sync_test_vaults");
+        let pass = b"0123456789a";
+        let load = |n: &str| {
+            crate::api::vault::load_vault(pass, &dir.join(format!("sync_test_{n}.gabbro")))
+                .unwrap_or_else(|e| panic!("load {n}: {e}"))
+        };
+        let a = load("A");
+        let b = load("B");
+        let c = load("C");
+        fn find<'a>(body: &'a VaultBody, id: &str) -> &'a VaultEntry {
+            body.entries.iter().find(|e| meta_of(e).id == id).unwrap()
+        }
+
+        // Email: merge A -> B -> C. Different fields merge; the same field clashes.
+        let (m1, _, _) = merge_entry_pair(find(&a, "email-1"), find(&b, "email-1"));
+        let (m2, clashes, _) = merge_entry_pair(&m1, find(&c, "email-1"));
+        match &m2 {
+            VaultEntry::Login(e) => {
+                assert_eq!(e.username, "alice-from-B", "B's username edit survived");
+                assert_eq!(
+                    e.password, "p0-from-A",
+                    "A's password kept pending the clash"
+                );
+            }
+            _ => panic!("expected Login"),
+        }
+        assert!(
+            clashes.iter().any(|f| f.field == "password"),
+            "A and C edited the same field -> must surface a clash"
+        );
+
+        // Server: A's "API key" edit and B's added "Port" both survive.
+        let (s, _, _) = merge_entry_pair(find(&a, "server-1"), find(&b, "server-1"));
+        match &s {
+            VaultEntry::Login(e) => {
+                let by: std::collections::HashMap<_, _> = e
+                    .custom_fields
+                    .iter()
+                    .map(|f| (f.label.as_str(), f.value.as_str()))
+                    .collect();
+                assert_eq!(by.get("API key"), Some(&"k0-from-A"));
+                assert_eq!(by.get("Port"), Some(&"8080"));
+            }
+            _ => panic!("expected Login"),
+        }
+
+        // Wifi: C deleted "Draft" -> surfaces as a pending item-delete (item kept).
+        let (_w, _, pending) = merge_entry_pair(find(&a, "wifi-1"), find(&c, "wifi-1"));
+        assert!(
+            pending.iter().any(|d| d.field == "custom_fields:Draft"),
+            "the deleted item must surface as a pending delete"
+        );
+    }
+
     fn meta(id: &str, updated_at: &str, times: &[(&str, u64)]) -> EntryMeta {
         let mut ft = std::collections::BTreeMap::new();
         for (k, v) in times {
