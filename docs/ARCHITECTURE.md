@@ -89,48 +89,64 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Active task: granular vault sync (v8 -> v9)
+### Active task: additive, field-level vault sync
 
-**Why:** today's merge is whole-entry last-writer-wins on a single second-precision
-`meta.updated_at` (`session.rs` `do_merge`, ~1293) — independent field edits on two
-devices silently lose one side, and equal-second edits report a false "nothing to sync".
-Data loss; sync is not credible.
+**Why.** The old merge is whole-entry last-writer-wins on one coarse `updated_at`:
+independent field edits on two devices silently lose one side, and equal-time edits report
+a false "nothing to sync". Gabbro has no server, so sync is file-to-file and must be
+additive and user-reviewed, with nothing lost.
 
-**Approach (don't reinvent):** copy KeePass's offline file-to-file merge (permanent
-per-item id, newer change wins, loser kept) and go one level finer — merge per scalar
-field and per custom k:v pair. Each mergeable thing carries a change-time stored as an
-**integer millisecond** (std `SystemTime`, **no new dependency**; the `chrono_now` name is
-misleading — it uses no date crate). Genuine clashes (same thing, same instant, different
-value) are surfaced for the user (keep mine / theirs / both / merge), never silently
-dropped. Transport (moving the file between devices) stays out of scope — users use
-Syncthing/Nextcloud/Synology/USB. Net-first + canon-TDD; failing backward-compat test
-before any format change.
+**The model (agreed 2026-06-29).** Sync runs one direction at a time (A into B), additive,
+and you review it; running B into A afterwards converges both sides. For each entry
+(matched by a permanent id), compared per field and per custom pair:
 
-**v8 -> v9 safety:** new app reads v8 and migrates on save (no loss); an old app *refuses*
-a v9 file (fail-safe, never strips data). Hardware tests run on **mock vaults only** until
-trust is rebuilt — the fuzz proof must be green first.
+```
+entry only on A ............ NEW: added to B by default, shown to you, you can drop it.
+entry only on B ............ stays. additive never auto-removes.
+a field changed only on A .. A's value comes over; B's replaced value -> entry history.
+a field same on both ....... nothing to do.
+a field changed on BOTH .... CONFLICT: both values shown, you pick one; the value not
+                             picked -> entry history. NEVER auto-picked by timestamp.
+item/entry the other device
+   deleted ................. keep-or-delete prompt (predates this branch; now per-item too).
 
-Checklist (tick as completed):
-- [x] 1. Net-first: pin current merge tests green (baseline).
-- [x] 2. Schema: `field_times` (ms) on `EntryMeta` (covers scalars + custom pairs keyed by label + attachments by uuid); hand Zeroize. Custom-field identity = its label, so `CustomField` is unchanged (also gives the rename-surfaces-to-user semantics for free).
-- [x] 3. Stamping: ms `now()` (std-only) + `update_entry` stamps only changed fields/pairs (old entry is source of truth; field_times accumulates).
-- [x] 4. Granular merge: field/pair/attachment LWW + clash detection + per-item delete tombstones (`merge_entry_pair`/`FieldMerger`; deletions via a `del:` key prefix in `field_times`, no new schema field). `do_merge` uses it; 13 fast unit tests. Clashes + pending item-deletes are produced but not yet surfaced through the bridge — done with task 8 regen (kept-local/kept-item meanwhile, never silent loss).
-- [x] 5. Sync summary: `MergeSummary` gains `field_conflicts` + `pending_item_deletes`; `do_merge` populates them; flutter_rust_bridge regenerated (Dart `fieldConflicts`/`pendingItemDeletes`/`PendingItemDeleteItem`).
-- [x] 6. Format v8 -> v9: `VERSION=9` + fail-closed "newer Gabbro, please update" message (crypto byte-identical to v8); v9 gate fixtures + gate extended (v6-v9 open/migrate verified); `migration_vaults/v9.gabbro` + docs. Full re-seal gate scenarios (Argon2) left for the maintainer's gate run.
-- [x] 7. Fuzz proof (`session.rs` `sync_fuzz`): 12-entry/all-6-types base, 3 divergent copies, random edits/adds/deletes across EVERY field (all scalars incl. notes/password/card fields/data, custom pairs, AND attachments) + random sync orders, deterministic seed; asserts no-loss vs an independent oracle, order-independence, convergence. 120 passes, ~0.7s. Bug-injection verified it catches a mishandled field.
-- [x] 8. Flutter: bridge regen + clash prompt (keep mine / use theirs) & item-delete prompt (keep / delete); fixed false "nothing to sync"; 2 new strings across all 37 locales; widget test. (Clash-string translations for et/eu/kk/sr/sr_Latn/yo are best-effort — verify.)
-- [x] 9. Docs: ARCHITECTURE checklist, CHANGELOG ([Unreleased]), MIGRATION_TESTS (v9 row + pending hardware), FIXTURES.
+result on B = (A + B) minus what you dropped.
+nothing overwritten is lost: every replaced value lives in that entry's history.
+```
 
-**Build complete and green** on branch `granular-sync-v9`. Remaining before merge/release:
-maintainer **hardware verification on MOCK vaults only** — load the three divergent vaults in
-`test_data/sync_test_vaults/` (one per device) and sync (procedure + expected result in its
-README; the same files back the automated `sync_test_corpus_converges_without_loss` test).
-Format backward-compat has its own corpus (`test_data/migration_vaults/`, MIGRATION_TESTS).
-Then the release decision + the full Rust gate (the maintainer runs it).
+Four properties this gives: **granularity** (per field/pair), **visibility** (every
+incoming change shown before it lands), **control** (drop anything; pick on a real
+conflict), **fallback** (replaced values kept in per-entry history, recoverable later).
 
-Note: import (`import.rs:439` `merge_source_into_session`) stays first-wins by UUID — it
-brings a foreign lineage with no shared change-time provenance; field-level merge is scoped
-to the sync path only.
+Change-times (`field_times`, integer ms) are used only to detect WHICH side edited a
+field, never to pick a winner. A same-field divergence is always a user choice, because
+device clocks are not trustworthy.
+
+**v8 -> v9 / safety.** A new app reads v8 and migrates on save (no loss); an old app
+*refuses* a v9 file (fail-safe, never strips data). Hardware tests run on **mock vaults
+only** until trust is rebuilt. Transport (moving the file between devices) is out of scope;
+users use Syncthing/Nextcloud/USB.
+
+**Status — honest.** The field-level *engine* and the v9 *format* are built; the
+resolution *model* above is NOT yet what the code does. On branch `granular-sync-v9`:
+
+- Built: per-field diff/merge (`merge_entry_pair`), `field_times` schema + stamping,
+  format v8->v9 with the backward-compat gate (v6-v9 open/migrate green), item-delete
+  tombstones + keep/delete prompt, the fuzz harness, the FFI bridge, and the 3-vault
+  test corpus (`test_data/sync_test_vaults/`).
+- Diverges from the agreed model, still to do:
+  1. A same-field difference must ALWAYS become a user conflict. Today it only conflicts
+     on an equal timestamp and otherwise keeps the newer value silently (trusts the clock).
+  2. Additive review/visibility: show the incoming changes (new entries, brought-over field
+     values) so the user can drop any, instead of merging non-conflicts silently.
+  3. Per-entry history for ANY replaced field value (generalise beyond `previous_password`).
+  4. Deletion keep/delete prompt: keep the pre-existing entry-level one and the new per-item
+     one; verify both still work.
+
+Next: net-first, then the test list for review, then code, per the model above.
+
+Note: import (`import.rs` `merge_source_into_session`) stays first-wins by UUID; the sync
+model above is scoped to the sync path only.
 
 ---
 
