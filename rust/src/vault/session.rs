@@ -1799,7 +1799,7 @@ mod field_merge_tests {
     #[test]
     fn sync_test_corpus_converges_without_loss() {
         use crate::vault::serialization::VaultBody;
-        use std::collections::BTreeMap;
+        use std::collections::{BTreeMap, BTreeSet};
         let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .unwrap()
@@ -1809,132 +1809,138 @@ mod field_merge_tests {
             crate::api::vault::load_vault(pass, &dir.join(format!("sync_test_{n}.gabbro")))
                 .unwrap_or_else(|e| panic!("load {n}: {e}"))
         };
-        let bodies: [VaultBody; 3] = [load("A"), load("B"), load("C")];
+        let a = load("A");
+        let b = load("B");
+        let c = load("C");
 
-        // Converge by id: union + field-level merge (the real merge_entry_pair).
-        let mut acc: BTreeMap<String, VaultEntry> = bodies[0]
-            .entries
-            .iter()
-            .map(|e| (meta_of(e).id.clone(), e.clone()))
-            .collect();
-        let mut clashes: Vec<FieldConflictItem> = Vec::new();
-        let mut pending: Vec<PendingItemDeleteItem> = Vec::new();
-        for body in &bodies[1..] {
-            for e in &body.entries {
-                let id = meta_of(e).id.clone();
-                if let Some(local) = acc.get(&id) {
-                    let (m, mut cs, mut ps) = merge_entry_pair(local, e);
-                    clashes.append(&mut cs);
-                    pending.append(&mut ps);
-                    acc.insert(id, m);
-                } else {
-                    acc.insert(id, e.clone());
+        // Converge a given sync order: union + the real field-level merge, collecting
+        // the (id, field) collisions surfaced and the pending item-deletes.
+        let converge = |order: &[&VaultBody]| {
+            let mut acc: BTreeMap<String, VaultEntry> = order[0]
+                .entries
+                .iter()
+                .map(|e| (meta_of(e).id.clone(), e.clone()))
+                .collect();
+            let mut collisions: BTreeSet<(String, String)> = BTreeSet::new();
+            let mut pending: Vec<PendingItemDeleteItem> = Vec::new();
+            for body in &order[1..] {
+                for e in &body.entries {
+                    let id = meta_of(e).id.clone();
+                    if let Some(local) = acc.get(&id) {
+                        let (m, cs, mut ps) = merge_entry_pair(local, e);
+                        for cc in cs {
+                            collisions.insert((cc.id, cc.field));
+                        }
+                        pending.append(&mut ps);
+                        acc.insert(id, m);
+                    } else {
+                        acc.insert(id, e.clone());
+                    }
                 }
             }
-        }
-
-        // No entry lost: all 12 still present.
-        assert_eq!(acc.len(), 12, "all entries must survive the merge");
-
-        // Helpers to read a merged entry's fields.
-        let login = |id: &str| match &acc[id] {
-            VaultEntry::Login(e) => e.clone(),
-            _ => panic!("{id} not a Login"),
+            (acc, collisions, pending)
         };
+
+        let expected_collisions: BTreeSet<(String, String)> = [
+            ("login-co", "password"),
+            ("note-co", "content"),
+            ("id-co", "last_name"),
+            ("card-co", "cvv"),
+            ("file-co", "data"),
+            ("custom-co", "custom_fields:token"),
+        ]
+        .iter()
+        .map(|(i, f)| (i.to_string(), f.to_string()))
+        .collect();
+
         let pairs = |cfs: &[CustomField]| -> std::collections::HashMap<String, String> {
             cfs.iter()
                 .map(|f| (f.label.clone(), f.value.clone()))
                 .collect()
         };
 
-        // ── Non-colliding edits: every device's change to a DIFFERENT field survives.
-        // Login (login-nc): A username, B password, C url.
-        let l = login("login-nc");
-        assert_eq!(l.username, "alice-A");
-        assert_eq!(l.password, "p0-B");
-        assert_eq!(l.url, "https://mail-C.example.com");
+        // Several sync orders, like the backward-compat harness — the result must not
+        // depend on which direction you sync first.
+        for order in [[&a, &b, &c], [&c, &b, &a], [&b, &a, &c], [&c, &a, &b]] {
+            let (acc, collisions, pending) = converge(&order);
 
-        // Note (note-nc): A title, B content, C adds custom "Tag".
-        match &acc["note-nc"] {
-            VaultEntry::Note(e) => {
-                assert_eq!(e.title, "Shopping-A");
-                assert_eq!(e.content, "milk-B");
-                assert_eq!(
-                    pairs(&e.custom_fields).get("Tag").map(String::as_str),
-                    Some("tag-C")
-                );
-            }
-            _ => panic!(),
-        }
-        // Identity (id-nc): A phone, B email, C address.
-        match &acc["id-nc"] {
-            VaultEntry::Identity(e) => {
-                assert_eq!(e.phone.as_deref(), Some("+31-A"));
-                assert_eq!(e.email, "alex-B@example.com");
-                assert_eq!(e.address.as_deref(), Some("addr-C"));
-            }
-            _ => panic!(),
-        }
-        // Card (card-nc): A cvv, B expiry, C bank_name.
-        match &acc["card-nc"] {
-            VaultEntry::Card(e) => {
-                assert_eq!(e.cvv, "456");
-                assert_eq!(e.expiry, "06/29");
-                assert_eq!(e.bank_name.as_deref(), Some("ING-C"));
-            }
-            _ => panic!(),
-        }
-        // File (file-nc): A filename, B notes, C data.
-        match &acc["file-nc"] {
-            VaultEntry::File(e) => {
-                assert_eq!(e.filename, "passport-A.txt");
-                assert_eq!(e.notes.as_deref(), Some("notes-B"));
-                assert_eq!(e.data, b"original-C");
-            }
-            _ => panic!(),
-        }
-        // Custom (custom-nc): A edits api_key, B adds env, C edits title.
-        match &acc["custom-nc"] {
-            VaultEntry::Custom(e) => {
-                assert_eq!(e.title, "API creds (C)");
-                assert_eq!(
-                    e.fields.get("api_key").map(|f| f.value.as_str()),
-                    Some("k0-A")
-                );
-                assert_eq!(
-                    e.fields.get("env").map(|f| f.value.as_str()),
-                    Some("prod-B")
-                );
-            }
-            _ => panic!(),
-        }
+            assert_eq!(acc.len(), 12, "all entries survive");
+            assert_eq!(
+                collisions, expected_collisions,
+                "the same six collisions must surface regardless of sync order"
+            );
 
-        // ── Colliding edits: every type's *-co entry clashes on the shared field.
-        let has_clash =
-            |id: &str, field: &str| clashes.iter().any(|f| f.id == id && f.field == field);
-        assert!(has_clash("login-co", "password"));
-        assert!(has_clash("note-co", "content"));
-        assert!(has_clash("id-co", "last_name"));
-        assert!(has_clash("card-co", "cvv"));
-        assert!(has_clash("file-co", "data"));
-        assert!(has_clash("custom-co", "custom_fields:token"));
-        let seen: Vec<String> = clashes
-            .iter()
-            .map(|f| format!("{}:{}", f.id, f.field))
-            .collect();
-        assert_eq!(clashes.len(), 6, "exactly one clash per type, got {seen:?}");
+            // Non-colliding edits converge to the same values in EVERY order.
+            match &acc["login-nc"] {
+                VaultEntry::Login(e) => {
+                    assert_eq!(e.username, "alice-A");
+                    assert_eq!(e.password, "p0-B");
+                    assert_eq!(e.url, "https://mail-C.example.com");
+                    assert!(
+                        pairs(&e.custom_fields).contains_key("OldNote"),
+                        "deleted item kept until confirmed"
+                    );
+                }
+                _ => panic!("login-nc not a Login"),
+            }
+            match &acc["note-nc"] {
+                VaultEntry::Note(e) => {
+                    assert_eq!(e.title, "Shopping-A");
+                    assert_eq!(e.content, "milk-B");
+                    assert_eq!(
+                        pairs(&e.custom_fields).get("Tag").map(String::as_str),
+                        Some("tag-C")
+                    );
+                }
+                _ => panic!(),
+            }
+            match &acc["id-nc"] {
+                VaultEntry::Identity(e) => {
+                    assert_eq!(e.phone.as_deref(), Some("+31-A"));
+                    assert_eq!(e.email, "alex-B@example.com");
+                    assert_eq!(e.address.as_deref(), Some("addr-C"));
+                }
+                _ => panic!(),
+            }
+            match &acc["card-nc"] {
+                VaultEntry::Card(e) => {
+                    assert_eq!(e.cvv, "456");
+                    assert_eq!(e.expiry, "06/29");
+                    assert_eq!(e.bank_name.as_deref(), Some("ING-C"));
+                }
+                _ => panic!(),
+            }
+            match &acc["file-nc"] {
+                VaultEntry::File(e) => {
+                    assert_eq!(e.filename, "passport-A.txt");
+                    assert_eq!(e.notes.as_deref(), Some("notes-B"));
+                    assert_eq!(e.data, b"original-C");
+                }
+                _ => panic!(),
+            }
+            match &acc["custom-nc"] {
+                VaultEntry::Custom(e) => {
+                    assert_eq!(e.title, "API creds (C)");
+                    assert_eq!(
+                        e.fields.get("api_key").map(|f| f.value.as_str()),
+                        Some("k0-A")
+                    );
+                    assert_eq!(
+                        e.fields.get("env").map(|f| f.value.as_str()),
+                        Some("prod-B")
+                    );
+                }
+                _ => panic!(),
+            }
 
-        // ── Item-delete: C deleted login-nc's "OldNote" -> surfaced (kept meanwhile).
-        assert!(
-            pending
-                .iter()
-                .any(|d| d.id == "login-nc" && d.field == "custom_fields:OldNote"),
-            "the deleted item must surface as a pending delete"
-        );
-        assert!(
-            pairs(&login("login-nc").custom_fields).contains_key("OldNote"),
-            "the item is kept until the user confirms the delete"
-        );
+            // The deleted item surfaces as a pending delete in every order.
+            assert!(
+                pending
+                    .iter()
+                    .any(|d| d.id == "login-nc" && d.field == "custom_fields:OldNote"),
+                "the deleted item must surface as a pending delete"
+            );
+        }
     }
 
     fn meta(id: &str, updated_at: &str, times: &[(&str, u64)]) -> EntryMeta {
