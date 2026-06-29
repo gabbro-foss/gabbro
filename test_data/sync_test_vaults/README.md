@@ -16,11 +16,27 @@ Shared base (all three): **Email** (user `alice`, pw `p0-orig`), **Server**
 | `sync_test_B.gabbro` | Email username → `alice-from-B`; Server adds custom `Port`=`8080` |
 | `sync_test_C.gabbro` | Email password → `p0-from-C` (same field as A); deletes Wifi `Draft` |
 
-## Hardware procedure
+## How to run it
 
-1. On each of three devices, create a fresh empty vault.
-2. Import/sync one file into each: A → device 1, B → device 2, C → device 3.
-3. Sync the three vaults together (each into the others, in any order).
+All three files use passphrase `0123456789a`. **Sync from file** only merges vaults that
+share a passphrase, so give every vault you create that same passphrase.
+
+### Single device (fastest — exercises the full merge, no file copying)
+
+1. Create a new vault, passphrase `0123456789a`.
+2. **Import entries** → **Gabbro vault** section → pick `sync_test_A.gabbro`, type
+   `0123456789a` in **Vault passphrase**, tap **Sync from vault** (loads A's entries with
+   their per-field change-times).
+3. Menu → **Sync from file** → `sync_test_B.gabbro`, passphrase `0123456789a`.
+4. Menu → **Sync from file** → `sync_test_C.gabbro`, passphrase `0123456789a`.
+
+Watch for the prompts in steps 3–4, then check the entries against the expected result below.
+
+### Three devices (load one file per device, then sync)
+
+On each device do steps 1–2 with A / B / C respectively. Then on any device, **Sync from
+file** the other two files (passphrase `0123456789a`) to bring everything together — the
+merge result is identical.
 
 ## Expected result — nothing lost
 
