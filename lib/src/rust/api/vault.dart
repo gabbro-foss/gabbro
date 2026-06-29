@@ -6,7 +6,7 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `add_days_to_timestamp`, `custom_field_to_data`, `days_from_ymd`, `days_to_ymd`, `entry_id`, `is_expired`, `is_leap`, `login_entry_to_data`, `mask_entry`, `previous_secret_to_data`, `purge_expired_history`, `write_sha256_companion`
+// These functions are ignored because they are not marked as `pub`: `add_days_to_timestamp`, `changed_field_keys`, `custom_field_to_data`, `days_from_ymd`, `days_to_ymd`, `entry_id`, `entry_meta_mut`, `entry_meta`, `is_expired`, `is_leap`, `item_keys`, `login_entry_to_data`, `mask_entry`, `previous_secret_to_data`, `purge_expired_history`, `write_sha256_companion`
 // These functions are ignored (category: IgnoreBecauseExplicitAttribute): `add_yubikey_to_vault`, `build_passphrase_only_bytes`, `change_passphrase_with_keys`, `change_passphrase`, `delete_entry`, `delete_whole_vault`, `export_vault_preserving`, `export_vault`, `list_entries`, `load_vault_with_key_record`, `load_vault_with_yubikey`, `load_vault`, `remove_yubikey_from_vault`, `reseal_vault_body`, `save_vault_with_keys`, `save_vault_with_yubikey`, `save_vault`, `sha256_line`, `update_entry`
 
 /// Creates a new login entry with a generated UUID and current timestamp.
@@ -30,6 +30,11 @@ Future<LoginEntryData> createLoginEntry({
   notes: notes,
   customFields: customFields,
 );
+
+/// Current time in milliseconds since the Unix epoch. Std-only (no date crate):
+/// per-field change-times are only ever generated and compared as integers, never
+/// parsed, so a real date library buys nothing here.
+Future<BigInt> nowMs() => RustLib.instance.api.crateApiVaultNowMs();
 
 /// Returns the current UTC time as an ISO 8601 string.
 /// Uses std only — no chrono dependency needed at this stage.
@@ -200,6 +205,46 @@ class CustomFieldData {
           hidden == other.hidden;
 }
 
+/// A true field-level clash discovered during vault merge: the same field of the
+/// same entry was changed on both devices at the same instant to different values.
+/// The local value is kept; Flutter prompts the user to keep mine / keep theirs.
+/// `local_value` / `incoming_value` are decrypted plaintext — mask in the UI like
+/// any other secret. `field` is the field key (e.g. "password", "custom_fields:PIN").
+class FieldConflictItem {
+  final String id;
+  final String title;
+  final String field;
+  final String localValue;
+  final String incomingValue;
+
+  const FieldConflictItem({
+    required this.id,
+    required this.title,
+    required this.field,
+    required this.localValue,
+    required this.incomingValue,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      title.hashCode ^
+      field.hashCode ^
+      localValue.hashCode ^
+      incomingValue.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FieldConflictItem &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title &&
+          field == other.field &&
+          localValue == other.localValue &&
+          incomingValue == other.incomingValue;
+}
+
 /// A file entry as seen by Flutter.
 class FileEntryData {
   final String id;
@@ -346,7 +391,7 @@ class LoginEntryData {
   final String updatedAt;
   final String folder;
 
-  /// Human-readable item title (e.g. "GitHub", "Netflix").
+  /// Human-readable item title (e.g. "Example", "Sample").
   /// Distinct from the URL — used as the primary display label in list views.
   final String title;
   final String url;
@@ -432,11 +477,21 @@ class MergeSummary {
   /// Flutter prompts the user to pick which folder to keep.
   final List<FolderConflictItem> folderConflicts;
 
+  /// True field-level clashes (same field, same instant, different value). The
+  /// local value is kept; Flutter prompts keep mine / keep theirs.
+  final List<FieldConflictItem> fieldConflicts;
+
+  /// Items (custom pairs / attachments) the other device deleted more recently
+  /// than this side edited them. The item is kept; Flutter prompts keep / delete.
+  final List<PendingItemDeleteItem> pendingItemDeletes;
+
   const MergeSummary({
     required this.added,
     required this.updated,
     required this.pendingDeletes,
     required this.folderConflicts,
+    required this.fieldConflicts,
+    required this.pendingItemDeletes,
   });
 
   @override
@@ -444,7 +499,9 @@ class MergeSummary {
       added.hashCode ^
       updated.hashCode ^
       pendingDeletes.hashCode ^
-      folderConflicts.hashCode;
+      folderConflicts.hashCode ^
+      fieldConflicts.hashCode ^
+      pendingItemDeletes.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -454,7 +511,9 @@ class MergeSummary {
           added == other.added &&
           updated == other.updated &&
           pendingDeletes == other.pendingDeletes &&
-          folderConflicts == other.folderConflicts;
+          folderConflicts == other.folderConflicts &&
+          fieldConflicts == other.fieldConflicts &&
+          pendingItemDeletes == other.pendingItemDeletes;
 }
 
 /// A note entry as seen by Flutter.
@@ -521,6 +580,34 @@ class PendingDeleteItem {
           runtimeType == other.runtimeType &&
           id == other.id &&
           title == other.title;
+}
+
+/// An item (custom pair / attachment) the incoming side deleted more recently than
+/// the local side last changed it. Surfaced as a keep/delete prompt; the item is
+/// kept until the user confirms — never silently dropped. `field` is the item key
+/// ("custom_fields:<label>" or "attachments:<uuid>").
+class PendingItemDeleteItem {
+  final String id;
+  final String title;
+  final String field;
+
+  const PendingItemDeleteItem({
+    required this.id,
+    required this.title,
+    required this.field,
+  });
+
+  @override
+  int get hashCode => id.hashCode ^ title.hashCode ^ field.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PendingItemDeleteItem &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title &&
+          field == other.field;
 }
 
 /// A previous sensitive value as seen by Flutter.

@@ -1266,7 +1266,7 @@ fn entry_display_title(entry: &VaultEntry) -> String {
 
 // ── Granular (field-level) merge of a same-UUID entry pair (v9) ───────────────
 
-use crate::api::vault::FieldConflictItem;
+use crate::api::vault::{FieldConflictItem, PendingItemDeleteItem};
 use crate::vault::entry::{
     CardEntry, CustomEntry, EntryAttachment, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
     NoteEntry,
@@ -1337,19 +1337,6 @@ fn decide_field(
     }
 }
 
-/// A removed custom pair / attachment that the other device deleted more recently
-/// than this side last changed it. Surfaced as a keep/delete prompt (Flutter task 8);
-/// the item is kept until the user confirms — never silently dropped.
-// Fields are read by tests now and by the bridge-surfacing path (task 8); allow
-// dead_code until that lands so the lib target stays warning-clean.
-#[allow(dead_code)]
-pub(crate) struct PendingItemDelete {
-    pub id: String,
-    pub title: String,
-    /// Item key: "custom_fields:<label>" or "attachments:<uuid>".
-    pub key: String,
-}
-
 /// Accumulates the per-field decisions for one entry pair: the merged field-times,
 /// any clashes to surface, and any pending item deletions.
 struct FieldMerger<'a> {
@@ -1359,7 +1346,7 @@ struct FieldMerger<'a> {
     im: &'a EntryMeta,
     times: std::collections::BTreeMap<String, u64>,
     conflicts: Vec<FieldConflictItem>,
-    pending: Vec<PendingItemDelete>,
+    pending: Vec<PendingItemDeleteItem>,
 }
 
 impl<'a> FieldMerger<'a> {
@@ -1433,10 +1420,10 @@ impl<'a> FieldMerger<'a> {
         let item_ts = present_meta.field_times.get(key).copied().unwrap_or(0);
         if let Some(del_ts) = other_meta.field_times.get(&del_key).copied() {
             if del_ts > item_ts {
-                self.pending.push(PendingItemDelete {
+                self.pending.push(PendingItemDeleteItem {
                     id: self.id.clone(),
                     title: self.title.clone(),
-                    key: key.to_string(),
+                    field: key.to_string(),
                 });
             }
         }
@@ -1527,7 +1514,7 @@ impl<'a> FieldMerger<'a> {
 pub(crate) fn merge_entry_pair(
     local: &VaultEntry,
     incoming: &VaultEntry,
-) -> (VaultEntry, Vec<FieldConflictItem>, Vec<PendingItemDelete>) {
+) -> (VaultEntry, Vec<FieldConflictItem>, Vec<PendingItemDeleteItem>) {
     let lm = meta_of(local);
     let im = meta_of(incoming);
     let title = entry_display_title(local);
@@ -1909,7 +1896,7 @@ mod field_merge_tests {
         let incoming = note_cf("n1", vec![], &[("del:custom_fields:PIN", 200)]);
         let (merged, _conflicts, dels) = merge_entry_pair(&local, &incoming);
         assert_eq!(dels.len(), 1, "a newer delete must surface as pending");
-        assert_eq!(dels[0].key, "custom_fields:PIN");
+        assert_eq!(dels[0].field, "custom_fields:PIN");
         assert_eq!(dels[0].id, "n1");
         assert_eq!(dels[0].title, "T");
         // Item is kept (never silently dropped) until the user confirms.
@@ -1999,6 +1986,8 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
     let mut updated: u32 = 0;
     let mut pending_deletes: Vec<crate::api::vault::PendingDeleteItem> = Vec::new();
     let mut folder_conflicts: Vec<crate::api::vault::FolderConflictItem> = Vec::new();
+    let mut field_conflicts: Vec<FieldConflictItem> = Vec::new();
+    let mut pending_item_deletes: Vec<PendingItemDeleteItem> = Vec::new();
 
     // Build lookup maps.
     let local_by_id: std::collections::HashMap<&str, &VaultEntry> =
@@ -2031,12 +2020,14 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
             }
             // Field-level merge: each field's newer change-time wins; falls back
             // to whole-entry LWW when neither side has per-field times (pre-v9).
-            // Clashes are detected but not yet surfaced through the bridge — see
-            // the NOTE on MergeSummary (Flutter task 8).
-            let (merged, _conflicts, _item_deletes) = merge_entry_pair(local_entry, inc_entry);
+            // Genuine clashes and newer-deletes are surfaced to the user.
+            let (merged, mut conflicts, mut item_deletes) =
+                merge_entry_pair(local_entry, inc_entry);
             if merged != *local_entry {
                 updated += 1;
             }
+            field_conflicts.append(&mut conflicts);
+            pending_item_deletes.append(&mut item_deletes);
             result_entries.push(merged);
         } else if incoming_deletions.contains_key(id) {
             // Incoming tombstone — requires user consent before deletion; keep entry for now.
@@ -2097,6 +2088,8 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
         updated,
         pending_deletes,
         folder_conflicts,
+        field_conflicts,
+        pending_item_deletes,
     }
 }
 

@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.12.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1691002437;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 391031612;
 
 // Section: executor
 
@@ -1597,6 +1597,38 @@ fn wire__crate__api__vault_bridge__merge_vault_from_file_with_key_impl(
         },
     )
 }
+fn wire__crate__api__vault__now_ms_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "now_ms",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end();
+            move |context| {
+                transform_result_sse::<_, ()>((move || {
+                    let output_ok = Result::<_, ()>::Ok(crate::api::vault::now_ms())?;
+                    Ok(output_ok)
+                })())
+            }
+        },
+    )
+}
 fn wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -2416,6 +2448,24 @@ impl SseDecode for crate::api::fido_bridge::FidoRecordInput {
     }
 }
 
+impl SseDecode for crate::api::vault::FieldConflictItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <String>::sse_decode(deserializer);
+        let mut var_title = <String>::sse_decode(deserializer);
+        let mut var_field = <String>::sse_decode(deserializer);
+        let mut var_localValue = <String>::sse_decode(deserializer);
+        let mut var_incomingValue = <String>::sse_decode(deserializer);
+        return crate::api::vault::FieldConflictItem {
+            id: var_id,
+            title: var_title,
+            field: var_field,
+            local_value: var_localValue,
+            incoming_value: var_incomingValue,
+        };
+    }
+}
+
 impl SseDecode for crate::api::vault::FileEntryData {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2629,6 +2679,20 @@ impl SseDecode for Vec<crate::api::fido_bridge::FidoRecordInput> {
     }
 }
 
+impl SseDecode for Vec<crate::api::vault::FieldConflictItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::vault::FieldConflictItem>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::api::vault::FolderConflictItem> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2676,6 +2740,20 @@ impl SseDecode for Vec<crate::api::vault::PendingDeleteItem> {
         let mut ans_ = Vec::with_capacity(len_ as usize);
         for idx_ in 0..len_ {
             ans_.push(<crate::api::vault::PendingDeleteItem>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::vault::PendingItemDeleteItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::vault::PendingItemDeleteItem>::sse_decode(
                 deserializer,
             ));
         }
@@ -2808,11 +2886,17 @@ impl SseDecode for crate::api::vault::MergeSummary {
             <Vec<crate::api::vault::PendingDeleteItem>>::sse_decode(deserializer);
         let mut var_folderConflicts =
             <Vec<crate::api::vault::FolderConflictItem>>::sse_decode(deserializer);
+        let mut var_fieldConflicts =
+            <Vec<crate::api::vault::FieldConflictItem>>::sse_decode(deserializer);
+        let mut var_pendingItemDeletes =
+            <Vec<crate::api::vault::PendingItemDeleteItem>>::sse_decode(deserializer);
         return crate::api::vault::MergeSummary {
             added: var_added,
             updated: var_updated,
             pending_deletes: var_pendingDeletes,
             folder_conflicts: var_folderConflicts,
+            field_conflicts: var_fieldConflicts,
+            pending_item_deletes: var_pendingItemDeletes,
         };
     }
 }
@@ -2927,6 +3011,20 @@ impl SseDecode for crate::api::vault::PendingDeleteItem {
     }
 }
 
+impl SseDecode for crate::api::vault::PendingItemDeleteItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <String>::sse_decode(deserializer);
+        let mut var_title = <String>::sse_decode(deserializer);
+        let mut var_field = <String>::sse_decode(deserializer);
+        return crate::api::vault::PendingItemDeleteItem {
+            id: var_id,
+            title: var_title,
+            field: var_field,
+        };
+    }
+}
+
 impl SseDecode for crate::api::vault::PreviousSecretData {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2982,6 +3080,13 @@ impl SseDecode for u32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         deserializer.cursor.read_u32::<NativeEndian>().unwrap()
+    }
+}
+
+impl SseDecode for u64 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_u64::<NativeEndian>().unwrap()
     }
 }
 
@@ -3211,61 +3316,62 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        43 => wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
+        43 => wire__crate__api__vault__now_ms_impl(port, ptr, rust_vec_len, data_len),
+        44 => wire__crate__api__passphrase_generator__passphrase_entropy_bits_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        45 => {
+        46 => {
             wire__crate__api__vault_bridge__remove_yubikey_impl(port, ptr, rust_vec_len, data_len)
         }
-        46 => wire__crate__api__vault_bridge__rename_folder_impl(port, ptr, rust_vec_len, data_len),
-        47 => wire__crate__api__vault_bridge__restore_vault_backup_impl(
+        47 => wire__crate__api__vault_bridge__rename_folder_impl(port, ptr, rust_vec_len, data_len),
+        48 => wire__crate__api__vault_bridge__restore_vault_backup_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        48 => wire__crate__api__vault_bridge__restore_vault_from_file_impl(
+        49 => wire__crate__api__vault_bridge__restore_vault_from_file_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        49 => wire__crate__api__vault_bridge__session_clear_password_history_impl(
+        50 => wire__crate__api__vault_bridge__session_clear_password_history_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        50 => wire__crate__api__vault_bridge__session_revert_password_impl(
+        51 => wire__crate__api__vault_bridge__session_revert_password_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        51 => {
+        52 => {
             wire__crate__api__simple__set_process_dumpable_impl(port, ptr, rust_vec_len, data_len)
         }
-        52 => {
+        53 => {
             wire__crate__api__vault_bridge__set_vault_alias_impl(port, ptr, rust_vec_len, data_len)
         }
-        53 => wire__crate__api__vault_bridge__set_yubikey_alias_impl(
+        54 => wire__crate__api__vault_bridge__set_yubikey_alias_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        55 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
-        56 => wire__crate__api__vault_bridge__unlock_vault_with_yubikey_impl(
+        56 => wire__crate__api__vault_bridge__unlock_vault_impl(port, ptr, rust_vec_len, data_len),
+        57 => wire__crate__api__vault_bridge__unlock_vault_with_yubikey_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        57 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
-        58 => wire__crate__api__vault_bridge__vault_backup_usable_impl(
+        58 => wire__crate__api__vault_bridge__update_entry_impl(port, ptr, rust_vec_len, data_len),
+        59 => wire__crate__api__vault_bridge__vault_backup_usable_impl(
             port,
             ptr,
             rust_vec_len,
@@ -3305,8 +3411,8 @@ fn pde_ffi_dispatcher_sync_impl(
             wire__crate__api__vault_bridge__list_yubikey_aliases_impl(ptr, rust_vec_len, data_len)
         }
         40 => wire__crate__api__vault_bridge__lock_vault_impl(ptr, rust_vec_len, data_len),
-        44 => wire__crate__api__vault_bridge__read_vault_header_impl(ptr, rust_vec_len, data_len),
-        54 => wire__crate__api__import__sniff_csv_file_impl(ptr, rust_vec_len, data_len),
+        45 => wire__crate__api__vault_bridge__read_vault_header_impl(ptr, rust_vec_len, data_len),
+        55 => wire__crate__api__import__sniff_csv_file_impl(ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -3574,6 +3680,30 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::fido_bridge::FidoRecordInput>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::vault::FieldConflictItem {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.title.into_into_dart().into_dart(),
+            self.field.into_into_dart().into_dart(),
+            self.local_value.into_into_dart().into_dart(),
+            self.incoming_value.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::vault::FieldConflictItem
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::FieldConflictItem>
+    for crate::api::vault::FieldConflictItem
+{
+    fn into_into_dart(self) -> crate::api::vault::FieldConflictItem {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::vault::FileEntryData {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -3803,6 +3933,8 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::MergeSummary {
             self.updated.into_into_dart().into_dart(),
             self.pending_deletes.into_into_dart().into_dart(),
             self.folder_conflicts.into_into_dart().into_dart(),
+            self.field_conflicts.into_into_dart().into_dart(),
+            self.pending_item_deletes.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -3912,6 +4044,28 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::PendingDeleteItem>
     for crate::api::vault::PendingDeleteItem
 {
     fn into_into_dart(self) -> crate::api::vault::PendingDeleteItem {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::vault::PendingItemDeleteItem {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.title.into_into_dart().into_dart(),
+            self.field.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::vault::PendingItemDeleteItem
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::PendingItemDeleteItem>
+    for crate::api::vault::PendingItemDeleteItem
+{
+    fn into_into_dart(self) -> crate::api::vault::PendingItemDeleteItem {
         self
     }
 }
@@ -4246,6 +4400,17 @@ impl SseEncode for crate::api::fido_bridge::FidoRecordInput {
     }
 }
 
+impl SseEncode for crate::api::vault::FieldConflictItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.title, serializer);
+        <String>::sse_encode(self.field, serializer);
+        <String>::sse_encode(self.local_value, serializer);
+        <String>::sse_encode(self.incoming_value, serializer);
+    }
+}
+
 impl SseEncode for crate::api::vault::FileEntryData {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4403,6 +4568,16 @@ impl SseEncode for Vec<crate::api::fido_bridge::FidoRecordInput> {
     }
 }
 
+impl SseEncode for Vec<crate::api::vault::FieldConflictItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::vault::FieldConflictItem>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::api::vault::FolderConflictItem> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4439,6 +4614,16 @@ impl SseEncode for Vec<crate::api::vault::PendingDeleteItem> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::api::vault::PendingDeleteItem>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::vault::PendingItemDeleteItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::vault::PendingItemDeleteItem>::sse_encode(item, serializer);
         }
     }
 }
@@ -4532,6 +4717,11 @@ impl SseEncode for crate::api::vault::MergeSummary {
         <u32>::sse_encode(self.updated, serializer);
         <Vec<crate::api::vault::PendingDeleteItem>>::sse_encode(self.pending_deletes, serializer);
         <Vec<crate::api::vault::FolderConflictItem>>::sse_encode(self.folder_conflicts, serializer);
+        <Vec<crate::api::vault::FieldConflictItem>>::sse_encode(self.field_conflicts, serializer);
+        <Vec<crate::api::vault::PendingItemDeleteItem>>::sse_encode(
+            self.pending_item_deletes,
+            serializer,
+        );
     }
 }
 
@@ -4610,6 +4800,15 @@ impl SseEncode for crate::api::vault::PendingDeleteItem {
     }
 }
 
+impl SseEncode for crate::api::vault::PendingItemDeleteItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.title, serializer);
+        <String>::sse_encode(self.field, serializer);
+    }
+}
+
 impl SseEncode for crate::api::vault::PreviousSecretData {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4659,6 +4858,13 @@ impl SseEncode for u32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         serializer.cursor.write_u32::<NativeEndian>(self).unwrap();
+    }
+}
+
+impl SseEncode for u64 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_u64::<NativeEndian>(self).unwrap();
     }
 }
 

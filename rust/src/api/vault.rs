@@ -151,6 +151,16 @@ pub struct FieldConflictItem {
     pub incoming_value: String,
 }
 
+/// An item (custom pair / attachment) the incoming side deleted more recently than
+/// the local side last changed it. Surfaced as a keep/delete prompt; the item is
+/// kept until the user confirms — never silently dropped. `field` is the item key
+/// ("custom_fields:<label>" or "attachments:<uuid>").
+pub struct PendingItemDeleteItem {
+    pub id: String,
+    pub title: String,
+    pub field: String,
+}
+
 /// A folder assignment conflict discovered during vault merge.
 ///
 /// Returned when the same entry UUID exists in both vaults assigned to different
@@ -174,10 +184,12 @@ pub struct MergeSummary {
     /// Same-UUID entries with different folder assignments on each device.
     /// Flutter prompts the user to pick which folder to keep.
     pub folder_conflicts: Vec<FolderConflictItem>,
-    // NOTE: field-level clashes (FieldConflictItem) are produced by the merge
-    // (session::merge_entry_pair) but not yet surfaced here — adding them to this
-    // bridge type requires a flutter_rust_bridge regen, done with the Flutter UI
-    // work (granular-sync task 8). Until then a clash safely keeps the local value.
+    /// True field-level clashes (same field, same instant, different value). The
+    /// local value is kept; Flutter prompts keep mine / keep theirs.
+    pub field_conflicts: Vec<FieldConflictItem>,
+    /// Items (custom pairs / attachments) the other device deleted more recently
+    /// than this side edited them. The item is kept; Flutter prompts keep / delete.
+    pub pending_item_deletes: Vec<PendingItemDeleteItem>,
 }
 
 // ── Conversion helpers (internal → DTO) ──────────────────────────────────────

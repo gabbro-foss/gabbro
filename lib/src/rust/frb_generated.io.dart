@@ -107,6 +107,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FidoRecordInput dco_decode_fido_record_input(dynamic raw);
 
   @protected
+  FieldConflictItem dco_decode_field_conflict_item(dynamic raw);
+
+  @protected
   FileEntryData dco_decode_file_entry_data(dynamic raw);
 
   @protected
@@ -143,6 +146,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<FidoRecordInput> dco_decode_list_fido_record_input(dynamic raw);
 
   @protected
+  List<FieldConflictItem> dco_decode_list_field_conflict_item(dynamic raw);
+
+  @protected
   List<FolderConflictItem> dco_decode_list_folder_conflict_item(dynamic raw);
 
   @protected
@@ -153,6 +159,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<PendingDeleteItem> dco_decode_list_pending_delete_item(dynamic raw);
+
+  @protected
+  List<PendingItemDeleteItem> dco_decode_list_pending_item_delete_item(
+    dynamic raw,
+  );
 
   @protected
   List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
@@ -205,6 +216,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   PendingDeleteItem dco_decode_pending_delete_item(dynamic raw);
 
   @protected
+  PendingItemDeleteItem dco_decode_pending_item_delete_item(dynamic raw);
+
+  @protected
   PreviousSecretData dco_decode_previous_secret_data(dynamic raw);
 
   @protected
@@ -218,6 +232,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   int dco_decode_u_32(dynamic raw);
+
+  @protected
+  BigInt dco_decode_u_64(dynamic raw);
 
   @protected
   int dco_decode_u_8(dynamic raw);
@@ -348,6 +365,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FidoRecordInput sse_decode_fido_record_input(SseDeserializer deserializer);
 
   @protected
+  FieldConflictItem sse_decode_field_conflict_item(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   FileEntryData sse_decode_file_entry_data(SseDeserializer deserializer);
 
   @protected
@@ -398,6 +420,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<FieldConflictItem> sse_decode_list_field_conflict_item(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<FolderConflictItem> sse_decode_list_folder_conflict_item(
     SseDeserializer deserializer,
   );
@@ -412,6 +439,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<PendingDeleteItem> sse_decode_list_pending_delete_item(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<PendingItemDeleteItem> sse_decode_list_pending_item_delete_item(
     SseDeserializer deserializer,
   );
 
@@ -478,6 +510,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  PendingItemDeleteItem sse_decode_pending_item_delete_item(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   PreviousSecretData sse_decode_previous_secret_data(
     SseDeserializer deserializer,
   );
@@ -495,6 +532,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   int sse_decode_u_32(SseDeserializer deserializer);
+
+  @protected
+  BigInt sse_decode_u_64(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_8(SseDeserializer deserializer);
@@ -658,6 +698,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_field_conflict_item(
+    FieldConflictItem self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_file_entry_data(FileEntryData self, SseSerializer serializer);
 
   @protected
@@ -715,6 +761,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_field_conflict_item(
+    List<FieldConflictItem> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_folder_conflict_item(
     List<FolderConflictItem> self,
     SseSerializer serializer,
@@ -735,6 +787,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_pending_delete_item(
     List<PendingDeleteItem> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_pending_item_delete_item(
+    List<PendingItemDeleteItem> self,
     SseSerializer serializer,
   );
 
@@ -820,6 +878,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_pending_item_delete_item(
+    PendingItemDeleteItem self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_previous_secret_data(
     PreviousSecretData self,
     SseSerializer serializer,
@@ -842,6 +906,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_u_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_u_64(BigInt self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_8(int self, SseSerializer serializer);
