@@ -103,6 +103,7 @@ pub async fn import_from_csv(
         let now = chrono_now();
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: Uuid::new_v4().to_string(),
                 created_at: now.clone(),
                 updated_at: now,
@@ -485,6 +486,7 @@ mod tests {
         path.push("gabbro_import_test.gabbro");
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("existing-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -777,6 +779,7 @@ Sample,https://example.net,user@example.com,s3cr3t,,no";
         let entries = vec![
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("existing-001"), // already in session
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -789,6 +792,7 @@ Sample,https://example.net,user@example.com,s3cr3t,,no";
             }),
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("new-entry-001"), // not in session
                     created_at: String::from("2025-02-01T00:00:00Z"),
                     updated_at: String::from("2025-02-01T00:00:00Z"),
@@ -1033,6 +1037,7 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
             folders: vec![],
             entries: vec![VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("from-vault-a-001"),
                     created_at: String::from("2025-03-01T00:00:00Z"),
                     updated_at: String::from("2025-03-01T00:00:00Z"),
@@ -1121,6 +1126,7 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
 
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("test-id"),
                 created_at: String::new(),
                 updated_at: String::new(),
@@ -1154,6 +1160,7 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
 
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("test-id"),
                 created_at: String::from("2024-01-01T00:00:00Z"),
                 updated_at: String::from("2024-06-01T00:00:00Z"),
@@ -1193,6 +1200,7 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
 
         let entry = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("note-id"),
                 created_at: String::new(),
                 updated_at: String::new(),
@@ -1225,6 +1233,7 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
 
         let entry = VaultEntry::Identity(IdentityEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::new(),
                 updated_at: String::new(),
@@ -1250,6 +1259,7 @@ user@example.com,backup@example.com,,https://example.net,Personal,,s3cr3t,Sample
 
         let entry = VaultEntry::File(FileEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("file-001"),
                 created_at: String::new(),
                 updated_at: String::new(),

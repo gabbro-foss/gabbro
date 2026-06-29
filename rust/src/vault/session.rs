@@ -1225,18 +1225,6 @@ pub fn session_list_yubikey_aliases() -> Result<std::collections::HashMap<String
 
 // ── Vault sync merge ──────────────────────────────────────────────────────────
 
-/// Return the `updated_at` timestamp of any entry variant.
-fn entry_updated_at(entry: &VaultEntry) -> &str {
-    match entry {
-        VaultEntry::Login(e) => &e.meta.updated_at,
-        VaultEntry::Note(e) => &e.meta.updated_at,
-        VaultEntry::Identity(e) => &e.meta.updated_at,
-        VaultEntry::Card(e) => &e.meta.updated_at,
-        VaultEntry::File(e) => &e.meta.updated_at,
-        VaultEntry::Custom(e) => &e.meta.updated_at,
-    }
-}
-
 /// Return the folder of any entry variant.
 fn entry_folder(entry: &VaultEntry) -> &str {
     match entry {
@@ -1273,6 +1261,722 @@ fn entry_display_title(entry: &VaultEntry) -> String {
             .to_string(),
         VaultEntry::File(e) => e.filename.clone(),
         VaultEntry::Custom(e) => e.title.clone(),
+    }
+}
+
+// ── Granular (field-level) merge of a same-UUID entry pair (v9) ───────────────
+
+use crate::api::vault::FieldConflictItem;
+use crate::vault::entry::{
+    CardEntry, CustomEntry, EntryAttachment, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
+    NoteEntry,
+};
+
+#[derive(Clone, Copy)]
+enum Side {
+    Local,
+    Incoming,
+}
+
+fn meta_of(e: &VaultEntry) -> &EntryMeta {
+    match e {
+        VaultEntry::Login(x) => &x.meta,
+        VaultEntry::Note(x) => &x.meta,
+        VaultEntry::Identity(x) => &x.meta,
+        VaultEntry::Card(x) => &x.meta,
+        VaultEntry::File(x) => &x.meta,
+        VaultEntry::Custom(x) => &x.meta,
+    }
+}
+
+fn meta_of_mut(e: &mut VaultEntry) -> &mut EntryMeta {
+    match e {
+        VaultEntry::Login(x) => &mut x.meta,
+        VaultEntry::Note(x) => &mut x.meta,
+        VaultEntry::Identity(x) => &mut x.meta,
+        VaultEntry::Card(x) => &mut x.meta,
+        VaultEntry::File(x) => &mut x.meta,
+        VaultEntry::Custom(x) => &mut x.meta,
+    }
+}
+
+/// Core last-writer-wins decision for one field. Returns the winning side, the
+/// timestamp to record (if any), and whether this is a true clash (equal time,
+/// different value) that must be surfaced rather than silently resolved.
+fn decide_field(
+    lt: Option<u64>,
+    it: Option<u64>,
+    l_updated: &str,
+    i_updated: &str,
+    values_equal: bool,
+) -> (Side, Option<u64>, bool) {
+    match (lt, it) {
+        (Some(l), Some(i)) => {
+            if i > l {
+                (Side::Incoming, Some(i), false)
+            } else if l > i || values_equal {
+                (Side::Local, Some(l), false)
+            } else {
+                (Side::Local, Some(l), true) // tie + different value -> clash, keep local
+            }
+        }
+        // A field stamped on one side only was edited there post-v9; an absent
+        // stamp counts as "oldest", so the stamped side wins.
+        (Some(l), None) => (Side::Local, Some(l), false),
+        (None, Some(i)) => (Side::Incoming, Some(i), false),
+        // Pre-v9 fallback: whole-entry updated_at (lexicographic == temporal).
+        (None, None) => {
+            if i_updated > l_updated {
+                (Side::Incoming, None, false)
+            } else if l_updated > i_updated || values_equal {
+                (Side::Local, None, false)
+            } else {
+                (Side::Local, None, true)
+            }
+        }
+    }
+}
+
+/// A removed custom pair / attachment that the other device deleted more recently
+/// than this side last changed it. Surfaced as a keep/delete prompt (Flutter task 8);
+/// the item is kept until the user confirms — never silently dropped.
+// Fields are read by tests now and by the bridge-surfacing path (task 8); allow
+// dead_code until that lands so the lib target stays warning-clean.
+#[allow(dead_code)]
+pub(crate) struct PendingItemDelete {
+    pub id: String,
+    pub title: String,
+    /// Item key: "custom_fields:<label>" or "attachments:<uuid>".
+    pub key: String,
+}
+
+/// Accumulates the per-field decisions for one entry pair: the merged field-times,
+/// any clashes to surface, and any pending item deletions.
+struct FieldMerger<'a> {
+    id: String,
+    title: String,
+    lm: &'a EntryMeta,
+    im: &'a EntryMeta,
+    times: std::collections::BTreeMap<String, u64>,
+    conflicts: Vec<FieldConflictItem>,
+    pending: Vec<PendingItemDelete>,
+}
+
+impl<'a> FieldMerger<'a> {
+    fn new(lm: &'a EntryMeta, im: &'a EntryMeta, title: String) -> Self {
+        FieldMerger {
+            id: lm.id.clone(),
+            title,
+            lm,
+            im,
+            times: std::collections::BTreeMap::new(),
+            conflicts: Vec::new(),
+            pending: Vec::new(),
+        }
+    }
+
+    fn decide(&mut self, key: &str, equal: bool, l_disp: &str, i_disp: &str) -> Side {
+        let lt = self.lm.field_times.get(key).copied();
+        let it = self.im.field_times.get(key).copied();
+        let (side, ts, clash) =
+            decide_field(lt, it, &self.lm.updated_at, &self.im.updated_at, equal);
+        if let Some(t) = ts {
+            self.times.insert(key.to_string(), t);
+        }
+        if clash {
+            self.conflicts.push(FieldConflictItem {
+                id: self.id.clone(),
+                title: self.title.clone(),
+                field: key.to_string(),
+                local_value: l_disp.to_string(),
+                incoming_value: i_disp.to_string(),
+            });
+        }
+        side
+    }
+
+    fn pick_str(&mut self, key: &str, lv: &str, iv: &str) -> String {
+        match self.decide(key, lv == iv, lv, iv) {
+            Side::Local => lv.to_string(),
+            Side::Incoming => iv.to_string(),
+        }
+    }
+
+    fn pick_opt(&mut self, key: &str, lv: &Option<String>, iv: &Option<String>) -> Option<String> {
+        let l_disp = lv.clone().unwrap_or_default();
+        let i_disp = iv.clone().unwrap_or_default();
+        match self.decide(key, lv == iv, &l_disp, &i_disp) {
+            Side::Local => lv.clone(),
+            Side::Incoming => iv.clone(),
+        }
+    }
+
+    // Carry an item that exists on only one side (an add, or this side is newer);
+    // preserve its recorded change-time.
+    fn carry_one_sided(&mut self, key: &str, from_incoming: bool) {
+        let src = if from_incoming { self.im } else { self.lm };
+        if let Some(t) = src.field_times.get(key).copied() {
+            self.times.insert(key.to_string(), t);
+        }
+    }
+
+    // An item present on only one side: keep it, but if the OTHER side deleted it
+    // (a "del:<key>" tombstone) more recently than this side last changed it,
+    // record a pending delete for the user to confirm. Never auto-drops.
+    fn carry_or_flag_delete(&mut self, key: &str, present_on_incoming: bool) {
+        let del_key = format!("del:{key}");
+        let (present_meta, other_meta) = if present_on_incoming {
+            (self.im, self.lm)
+        } else {
+            (self.lm, self.im)
+        };
+        let item_ts = present_meta.field_times.get(key).copied().unwrap_or(0);
+        if let Some(del_ts) = other_meta.field_times.get(&del_key).copied() {
+            if del_ts > item_ts {
+                self.pending.push(PendingItemDelete {
+                    id: self.id.clone(),
+                    title: self.title.clone(),
+                    key: key.to_string(),
+                });
+            }
+        }
+        self.carry_one_sided(key, present_on_incoming);
+    }
+
+    fn merge_custom(
+        &mut self,
+        local: &[CustomField],
+        incoming: &[CustomField],
+    ) -> Vec<CustomField> {
+        let local_by: std::collections::HashMap<&str, &CustomField> =
+            local.iter().map(|f| (f.label.as_str(), f)).collect();
+        let inc_by: std::collections::HashMap<&str, &CustomField> =
+            incoming.iter().map(|f| (f.label.as_str(), f)).collect();
+        let mut seen = std::collections::HashSet::new();
+        let mut out = Vec::new();
+        for f in local.iter().chain(incoming.iter()) {
+            if !seen.insert(f.label.clone()) {
+                continue;
+            }
+            let key = format!("custom_fields:{}", f.label);
+            match (local_by.get(f.label.as_str()), inc_by.get(f.label.as_str())) {
+                (Some(lf), Some(inf)) => {
+                    let equal = lf.value == inf.value && lf.hidden == inf.hidden;
+                    out.push(match self.decide(&key, equal, &lf.value, &inf.value) {
+                        Side::Local => (*lf).clone(),
+                        Side::Incoming => (*inf).clone(),
+                    });
+                }
+                (Some(lf), None) => {
+                    self.carry_or_flag_delete(&key, false);
+                    out.push((*lf).clone());
+                }
+                (None, Some(inf)) => {
+                    self.carry_or_flag_delete(&key, true);
+                    out.push((*inf).clone());
+                }
+                (None, None) => unreachable!(),
+            }
+        }
+        out
+    }
+
+    fn merge_attachments(
+        &mut self,
+        local: &[EntryAttachment],
+        incoming: &[EntryAttachment],
+    ) -> Vec<EntryAttachment> {
+        let local_by: std::collections::HashMap<&str, &EntryAttachment> =
+            local.iter().map(|a| (a.uuid.as_str(), a)).collect();
+        let inc_by: std::collections::HashMap<&str, &EntryAttachment> =
+            incoming.iter().map(|a| (a.uuid.as_str(), a)).collect();
+        let mut seen = std::collections::HashSet::new();
+        let mut out = Vec::new();
+        for a in local.iter().chain(incoming.iter()) {
+            if !seen.insert(a.uuid.clone()) {
+                continue;
+            }
+            let key = format!("attachments:{}", a.uuid);
+            match (local_by.get(a.uuid.as_str()), inc_by.get(a.uuid.as_str())) {
+                (Some(la), Some(ia)) => {
+                    let equal = la.name == ia.name && la.kind == ia.kind && la.data == ia.data;
+                    out.push(match self.decide(&key, equal, &la.name, &ia.name) {
+                        Side::Local => (*la).clone(),
+                        Side::Incoming => (*ia).clone(),
+                    });
+                }
+                (Some(la), None) => {
+                    self.carry_or_flag_delete(&key, false);
+                    out.push((*la).clone());
+                }
+                (None, Some(ia)) => {
+                    self.carry_or_flag_delete(&key, true);
+                    out.push((*ia).clone());
+                }
+                (None, None) => unreachable!(),
+            }
+        }
+        out
+    }
+}
+
+/// Merge two same-UUID entries field by field. The newer change-time wins each
+/// field; a cleared-but-newer value still wins; a true clash (same field, same
+/// instant, different value) is recorded and the local value kept. Derived secrets
+/// (`previous_*`) follow their parent field's winner.
+pub(crate) fn merge_entry_pair(
+    local: &VaultEntry,
+    incoming: &VaultEntry,
+) -> (VaultEntry, Vec<FieldConflictItem>, Vec<PendingItemDelete>) {
+    let lm = meta_of(local);
+    let im = meta_of(incoming);
+    let title = entry_display_title(local);
+    let mut m = FieldMerger::new(lm, im, title);
+
+    let mut merged = match (local, incoming) {
+        (VaultEntry::Login(l), VaultEntry::Login(i)) => {
+            let pw_side = m.decide(
+                "password",
+                l.password == i.password,
+                &l.password,
+                &i.password,
+            );
+            let (password, previous_password) = match pw_side {
+                Side::Local => (l.password.clone(), l.previous_password.clone()),
+                Side::Incoming => (i.password.clone(), i.previous_password.clone()),
+            };
+            VaultEntry::Login(LoginEntry {
+                meta: lm.clone(),
+                title: m.pick_str("title", &l.title, &i.title),
+                url: m.pick_str("url", &l.url, &i.url),
+                username: m.pick_str("username", &l.username, &i.username),
+                password,
+                notes: m.pick_opt("notes", &l.notes, &i.notes),
+                custom_fields: m.merge_custom(&l.custom_fields, &i.custom_fields),
+                attachments: m.merge_attachments(&l.attachments, &i.attachments),
+                previous_password,
+                app_id: m.pick_opt("app_id", &l.app_id, &i.app_id),
+                email: m.pick_opt("email", &l.email, &i.email),
+            })
+        }
+        (VaultEntry::Note(l), VaultEntry::Note(i)) => VaultEntry::Note(NoteEntry {
+            meta: lm.clone(),
+            title: m.pick_str("title", &l.title, &i.title),
+            content: m.pick_str("content", &l.content, &i.content),
+            custom_fields: m.merge_custom(&l.custom_fields, &i.custom_fields),
+            attachments: m.merge_attachments(&l.attachments, &i.attachments),
+        }),
+        (VaultEntry::Identity(l), VaultEntry::Identity(i)) => VaultEntry::Identity(IdentityEntry {
+            meta: lm.clone(),
+            first_name: m.pick_str("first_name", &l.first_name, &i.first_name),
+            last_name: m.pick_str("last_name", &l.last_name, &i.last_name),
+            email: m.pick_str("email", &l.email, &i.email),
+            phone: m.pick_opt("phone", &l.phone, &i.phone),
+            address: m.pick_opt("address", &l.address, &i.address),
+            custom_fields: m.merge_custom(&l.custom_fields, &i.custom_fields),
+            attachments: m.merge_attachments(&l.attachments, &i.attachments),
+        }),
+        (VaultEntry::Card(l), VaultEntry::Card(i)) => {
+            let cvv_side = m.decide("cvv", l.cvv == i.cvv, &l.cvv, &i.cvv);
+            let (cvv, previous_cvv) = match cvv_side {
+                Side::Local => (l.cvv.clone(), l.previous_cvv.clone()),
+                Side::Incoming => (i.cvv.clone(), i.previous_cvv.clone()),
+            };
+            let l_pin = l.pin.clone().unwrap_or_default();
+            let i_pin = i.pin.clone().unwrap_or_default();
+            let pin_side = m.decide("pin", l.pin == i.pin, &l_pin, &i_pin);
+            let (pin, previous_pin) = match pin_side {
+                Side::Local => (l.pin.clone(), l.previous_pin.clone()),
+                Side::Incoming => (i.pin.clone(), i.previous_pin.clone()),
+            };
+            VaultEntry::Card(CardEntry {
+                meta: lm.clone(),
+                card_name: m.pick_opt("card_name", &l.card_name, &i.card_name),
+                status: m.pick_str("status", &l.status, &i.status),
+                cardholder_name: m.pick_str(
+                    "cardholder_name",
+                    &l.cardholder_name,
+                    &i.cardholder_name,
+                ),
+                card_number: m.pick_str("card_number", &l.card_number, &i.card_number),
+                expiry: m.pick_str("expiry", &l.expiry, &i.expiry),
+                cvv,
+                credit_limit: m.pick_opt("credit_limit", &l.credit_limit, &i.credit_limit),
+                card_account_number: m.pick_opt(
+                    "card_account_number",
+                    &l.card_account_number,
+                    &i.card_account_number,
+                ),
+                payment_network: m.pick_opt(
+                    "payment_network",
+                    &l.payment_network,
+                    &i.payment_network,
+                ),
+                pin,
+                bank_name: m.pick_opt("bank_name", &l.bank_name, &i.bank_name),
+                transaction_password: m.pick_opt(
+                    "transaction_password",
+                    &l.transaction_password,
+                    &i.transaction_password,
+                ),
+                notes: m.pick_opt("notes", &l.notes, &i.notes),
+                custom_fields: m.merge_custom(&l.custom_fields, &i.custom_fields),
+                attachments: m.merge_attachments(&l.attachments, &i.attachments),
+                previous_cvv,
+                previous_pin,
+            })
+        }
+        (VaultEntry::File(l), VaultEntry::File(i)) => {
+            let data = match m.decide("data", l.data == i.data, "<binary>", "<binary>") {
+                Side::Local => l.data.clone(),
+                Side::Incoming => i.data.clone(),
+            };
+            VaultEntry::File(FileEntry {
+                meta: lm.clone(),
+                filename: m.pick_str("filename", &l.filename, &i.filename),
+                data,
+                notes: m.pick_opt("notes", &l.notes, &i.notes),
+                custom_fields: m.merge_custom(&l.custom_fields, &i.custom_fields),
+            })
+        }
+        (VaultEntry::Custom(l), VaultEntry::Custom(i)) => {
+            let mut fields = std::collections::HashMap::new();
+            let mut keys: Vec<&String> = l.fields.keys().chain(i.fields.keys()).collect();
+            keys.sort();
+            keys.dedup();
+            for k in keys {
+                let key = format!("custom_fields:{k}");
+                match (l.fields.get(k), i.fields.get(k)) {
+                    (Some(lf), Some(inf)) => {
+                        let equal = lf.value == inf.value
+                            && lf.hidden == inf.hidden
+                            && lf.label == inf.label;
+                        fields.insert(
+                            k.clone(),
+                            match m.decide(&key, equal, &lf.value, &inf.value) {
+                                Side::Local => lf.clone(),
+                                Side::Incoming => inf.clone(),
+                            },
+                        );
+                    }
+                    (Some(lf), None) => {
+                        m.carry_or_flag_delete(&key, false);
+                        fields.insert(k.clone(), lf.clone());
+                    }
+                    (None, Some(inf)) => {
+                        m.carry_or_flag_delete(&key, true);
+                        fields.insert(k.clone(), inf.clone());
+                    }
+                    (None, None) => unreachable!(),
+                }
+            }
+            VaultEntry::Custom(CustomEntry {
+                meta: lm.clone(),
+                title: m.pick_str("title", &l.title, &i.title),
+                fields,
+                attachments: m.merge_attachments(&l.attachments, &i.attachments),
+            })
+        }
+        // Same id, different type (defensive): fall back to whole-entry LWW.
+        _ => {
+            let winner = if im.updated_at > lm.updated_at {
+                incoming
+            } else {
+                local
+            };
+            return (winner.clone(), Vec::new(), Vec::new());
+        }
+    };
+
+    let merged_updated = std::cmp::max(lm.updated_at.clone(), im.updated_at.clone());
+    let conflicts = std::mem::take(&mut m.conflicts);
+    let pending = std::mem::take(&mut m.pending);
+    let mut times = std::mem::take(&mut m.times);
+    // Propagate per-item deletion tombstones from both sides (newer wins) so a
+    // delete is not lost on the next merge.
+    for (k, v) in lm.field_times.iter().chain(im.field_times.iter()) {
+        if let Some(stripped) = k.strip_prefix("del:") {
+            // Drop a tombstone the merged entry has since re-added (the item is
+            // present and its change is at least as new as the deletion).
+            if times.contains_key(stripped) && times.get(stripped) >= Some(v) {
+                continue;
+            }
+            let e = times.entry(k.clone()).or_insert(*v);
+            if *v > *e {
+                *e = *v;
+            }
+        }
+    }
+    {
+        let meta = meta_of_mut(&mut merged);
+        meta.updated_at = merged_updated;
+        meta.field_times = times;
+    }
+    (merged, conflicts, pending)
+}
+
+#[cfg(test)]
+mod field_merge_tests {
+    use super::*;
+
+    fn meta(id: &str, updated_at: &str, times: &[(&str, u64)]) -> EntryMeta {
+        let mut ft = std::collections::BTreeMap::new();
+        for (k, v) in times {
+            ft.insert((*k).to_string(), *v);
+        }
+        EntryMeta {
+            id: id.to_string(),
+            created_at: String::from("2025-01-01T00:00:00Z"),
+            updated_at: updated_at.to_string(),
+            folder: String::new(),
+            field_times: ft,
+        }
+    }
+
+    fn note(
+        id: &str,
+        title: &str,
+        content: &str,
+        updated: &str,
+        times: &[(&str, u64)],
+    ) -> VaultEntry {
+        VaultEntry::Note(NoteEntry {
+            meta: meta(id, updated, times),
+            title: title.to_string(),
+            content: content.to_string(),
+            custom_fields: vec![],
+            attachments: vec![],
+        })
+    }
+
+    fn note_content(e: &VaultEntry) -> &str {
+        match e {
+            VaultEntry::Note(n) => &n.content,
+            _ => panic!("not a note"),
+        }
+    }
+    fn note_title(e: &VaultEntry) -> &str {
+        match e {
+            VaultEntry::Note(n) => &n.title,
+            _ => panic!("not a note"),
+        }
+    }
+
+    #[test]
+    fn merge_two_devices_edit_different_fields_keeps_both() {
+        // local edited title, incoming edited content — the headline fix.
+        let local = note("n1", "T-local", "C", "t", &[("title", 200)]);
+        let incoming = note("n1", "T", "C-remote", "t", &[("content", 300)]);
+        let (merged, conflicts, _dels) = merge_entry_pair(&local, &incoming);
+        assert_eq!(note_title(&merged), "T-local");
+        assert_eq!(note_content(&merged), "C-remote");
+        assert!(conflicts.is_empty());
+    }
+
+    #[test]
+    fn merge_newer_field_value_wins_per_field() {
+        let local = note("n1", "T", "A", "t", &[("content", 100)]);
+        let incoming = note("n1", "T", "B", "t", &[("content", 200)]);
+        let (merged, _, _) = merge_entry_pair(&local, &incoming);
+        assert_eq!(note_content(&merged), "B");
+    }
+
+    #[test]
+    fn merge_cleared_field_with_newer_ts_beats_stale_nonempty() {
+        // A cleared (empty) value with a newer stamp must win — never "empty loses".
+        let local = note("n1", "T", "text", "t", &[("content", 100)]);
+        let incoming = note("n1", "T", "", "t", &[("content", 200)]);
+        let (merged, _, _) = merge_entry_pair(&local, &incoming);
+        assert_eq!(note_content(&merged), "");
+    }
+
+    #[test]
+    fn merge_equal_field_ts_different_value_is_clash_keeps_local() {
+        let local = note("n1", "T", "A", "t", &[("content", 100)]);
+        let incoming = note("n1", "T", "B", "t", &[("content", 100)]);
+        let (merged, conflicts, _dels) = merge_entry_pair(&local, &incoming);
+        assert_eq!(note_content(&merged), "A", "clash keeps local");
+        assert_eq!(conflicts.len(), 1);
+        assert_eq!(conflicts[0].field, "content");
+        assert_eq!(conflicts[0].local_value, "A");
+        assert_eq!(conflicts[0].incoming_value, "B");
+    }
+
+    #[test]
+    fn merge_both_without_field_times_falls_back_to_updated_at() {
+        // Pre-v9 vaults: no per-field times -> whole-entry updated_at decides.
+        let local = note("n1", "T", "A", "2025-01-01T00:00:01Z", &[]);
+        let incoming = note("n1", "T", "B", "2025-01-01T00:00:02Z", &[]);
+        let (merged, conflicts, _dels) = merge_entry_pair(&local, &incoming);
+        assert_eq!(note_content(&merged), "B", "newer whole entry wins");
+        assert!(conflicts.is_empty());
+    }
+
+    #[test]
+    fn merge_both_without_field_times_equal_updated_at_different_value_is_clash() {
+        let local = note("n1", "T", "A", "2025-01-01T00:00:01Z", &[]);
+        let incoming = note("n1", "T", "B", "2025-01-01T00:00:01Z", &[]);
+        let (merged, conflicts, _dels) = merge_entry_pair(&local, &incoming);
+        assert_eq!(note_content(&merged), "A");
+        assert_eq!(conflicts.len(), 1, "equal-time divergence must surface");
+    }
+
+    #[test]
+    fn merge_is_commutative_for_independent_field_edits() {
+        let a = note("n1", "T-a", "C", "t", &[("title", 200)]);
+        let b = note("n1", "T", "C-b", "t", &[("content", 300)]);
+        let (ab, _, _) = merge_entry_pair(&a, &b);
+        let (ba, _, _) = merge_entry_pair(&b, &a);
+        assert_eq!(ab, ba, "merge order must not change the result");
+    }
+
+    #[test]
+    fn merge_custom_pair_edits_on_different_labels_both_survive() {
+        use crate::vault::entry::CustomField;
+        let cf = |label: &str, value: &str| CustomField {
+            label: label.to_string(),
+            value: value.to_string(),
+            hidden: false,
+        };
+        let login = |custom: Vec<CustomField>, times: &[(&str, u64)]| {
+            VaultEntry::Login(LoginEntry {
+                meta: meta("l1", "t", times),
+                title: String::from("Acct"),
+                url: String::new(),
+                username: String::from("u"),
+                password: String::from("p"),
+                notes: None,
+                custom_fields: custom,
+                attachments: vec![],
+                previous_password: None,
+                app_id: None,
+                email: None,
+            })
+        };
+        // local edited PIN's value; incoming added a different pair "Recovery".
+        let local = login(vec![cf("PIN", "2222")], &[("custom_fields:PIN", 200)]);
+        let incoming = login(
+            vec![cf("PIN", "1111"), cf("Recovery", "x@example.com")],
+            &[("custom_fields:Recovery", 300)],
+        );
+        let (merged, _, _) = merge_entry_pair(&local, &incoming);
+        match &merged {
+            VaultEntry::Login(e) => {
+                let by: std::collections::HashMap<_, _> = e
+                    .custom_fields
+                    .iter()
+                    .map(|f| (f.label.clone(), f.value.clone()))
+                    .collect();
+                assert_eq!(
+                    by.get("PIN").map(String::as_str),
+                    Some("2222"),
+                    "local PIN edit kept"
+                );
+                assert_eq!(
+                    by.get("Recovery").map(String::as_str),
+                    Some("x@example.com"),
+                    "incoming-added pair kept"
+                );
+            }
+            _ => panic!("expected Login"),
+        }
+    }
+
+    fn note_cf(
+        id: &str,
+        custom: Vec<crate::vault::entry::CustomField>,
+        times: &[(&str, u64)],
+    ) -> VaultEntry {
+        VaultEntry::Note(NoteEntry {
+            meta: meta(id, "t", times),
+            title: String::from("T"),
+            content: String::from("C"),
+            custom_fields: custom,
+            attachments: vec![],
+        })
+    }
+
+    #[test]
+    fn merge_item_deleted_on_one_side_surfaces_pending_delete() {
+        use crate::vault::entry::CustomField;
+        let cf = CustomField {
+            label: String::from("PIN"),
+            value: String::from("1"),
+            hidden: false,
+        };
+        // local still has PIN (last changed at 100); incoming deleted it at 200.
+        let local = note_cf("n1", vec![cf], &[("custom_fields:PIN", 100)]);
+        let incoming = note_cf("n1", vec![], &[("del:custom_fields:PIN", 200)]);
+        let (merged, _conflicts, dels) = merge_entry_pair(&local, &incoming);
+        assert_eq!(dels.len(), 1, "a newer delete must surface as pending");
+        assert_eq!(dels[0].key, "custom_fields:PIN");
+        assert_eq!(dels[0].id, "n1");
+        assert_eq!(dels[0].title, "T");
+        // Item is kept (never silently dropped) until the user confirms.
+        match &merged {
+            VaultEntry::Note(n) => assert_eq!(n.custom_fields.len(), 1),
+            _ => panic!("expected Note"),
+        }
+    }
+
+    #[test]
+    fn merge_item_edited_after_delete_keeps_item_no_pending() {
+        use crate::vault::entry::CustomField;
+        let cf = CustomField {
+            label: String::from("PIN"),
+            value: String::from("2"),
+            hidden: false,
+        };
+        // local edited PIN at 300, AFTER incoming's delete at 200 -> edit wins.
+        let local = note_cf("n1", vec![cf], &[("custom_fields:PIN", 300)]);
+        let incoming = note_cf("n1", vec![], &[("del:custom_fields:PIN", 200)]);
+        let (merged, _conflicts, dels) = merge_entry_pair(&local, &incoming);
+        assert!(
+            dels.is_empty(),
+            "edit newer than delete -> no pending delete"
+        );
+        match &merged {
+            VaultEntry::Note(n) => assert_eq!(n.custom_fields.len(), 1),
+            _ => panic!("expected Note"),
+        }
+    }
+
+    #[test]
+    fn merge_previous_password_follows_password_winner() {
+        use crate::vault::entry::PreviousSecret;
+        let login = |pw: &str, prev: &str, times: &[(&str, u64)]| {
+            VaultEntry::Login(LoginEntry {
+                meta: meta("l1", "t", times),
+                title: String::from("Acct"),
+                url: String::new(),
+                username: String::from("u"),
+                password: pw.to_string(),
+                notes: None,
+                custom_fields: vec![],
+                attachments: vec![],
+                previous_password: Some(PreviousSecret {
+                    value: prev.to_string(),
+                    saved_at: String::from("2025-01-01T00:00:00Z"),
+                    expires_at: None,
+                }),
+                app_id: None,
+                email: None,
+            })
+        };
+        let local = login("new-local", "old-local", &[("password", 200)]);
+        let incoming = login("new-remote", "old-remote", &[("password", 300)]);
+        let (merged, _, _) = merge_entry_pair(&local, &incoming);
+        match &merged {
+            VaultEntry::Login(e) => {
+                assert_eq!(e.password, "new-remote", "incoming password wins");
+                assert_eq!(
+                    e.previous_password.as_ref().unwrap().value,
+                    "old-remote",
+                    "history follows the winning password"
+                );
+            }
+            _ => panic!("expected Login"),
+        }
     }
 }
 
@@ -1325,12 +2029,15 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
                     incoming_folder: incoming_folder.to_string(),
                 });
             }
-            if entry_updated_at(inc_entry) > entry_updated_at(local_entry) {
-                result_entries.push((*inc_entry).clone());
+            // Field-level merge: each field's newer change-time wins; falls back
+            // to whole-entry LWW when neither side has per-field times (pre-v9).
+            // Clashes are detected but not yet surfaced through the bridge — see
+            // the NOTE on MergeSummary (Flutter task 8).
+            let (merged, _conflicts, _item_deletes) = merge_entry_pair(local_entry, inc_entry);
+            if merged != *local_entry {
                 updated += 1;
-            } else {
-                result_entries.push(local_entry.clone());
             }
+            result_entries.push(merged);
         } else if incoming_deletions.contains_key(id) {
             // Incoming tombstone — requires user consent before deletion; keep entry for now.
             pending_deletes.push(crate::api::vault::PendingDeleteItem {
@@ -1440,6 +2147,7 @@ mod assign_folder_tests {
         let entries = vec![
             VaultEntry::Login(LoginEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("id-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1458,6 +2166,7 @@ mod assign_folder_tests {
             }),
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("id-002"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1612,6 +2321,7 @@ mod folder_tests {
         // Add an entry in "Work"
         let entry = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("rename-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1709,6 +2419,7 @@ mod folder_tests {
 
         let entry = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("del-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1761,6 +2472,7 @@ mod folder_tests {
 
         let entry = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("del-002"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1846,6 +2558,7 @@ mod autofill_tests {
         path.push("gabbro_autofill_test.gabbro");
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("af-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1905,6 +2618,7 @@ mod autofill_tests {
 
         let login = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("af-login-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1923,6 +2637,7 @@ mod autofill_tests {
         });
         let note = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("af-note-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1985,6 +2700,7 @@ mod autofill_tests {
 
         let login = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("af-login-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2003,6 +2719,7 @@ mod autofill_tests {
         });
         let note = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("af-note-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2116,6 +2833,7 @@ mod tests {
         path.push("gabbro_session_test.gabbro");
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2215,6 +2933,7 @@ mod tests {
 
         let new_entry = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-002"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2290,6 +3009,7 @@ mod tests {
 
         let new_entry = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-bak-crud"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2357,6 +3077,7 @@ mod tests {
 
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-login-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2388,6 +3109,7 @@ mod tests {
 
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-login-002"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2419,6 +3141,7 @@ mod tests {
 
         let entry = VaultEntry::Card(CardEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-card-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2461,6 +3184,7 @@ mod tests {
 
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("login-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2519,6 +3243,7 @@ mod tests {
 
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("login-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2589,6 +3314,7 @@ mod tests {
 
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("login-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2647,6 +3373,7 @@ mod tests {
 
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("login-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2694,6 +3421,7 @@ mod tests {
         // expires_at is far in the future — 2099-12-31
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("login-unexp-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2752,6 +3480,7 @@ mod tests {
 
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("login-forever-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2811,6 +3540,7 @@ mod tests {
         // expires_at is in the past — 2000-01-01
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("login-exp-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2869,6 +3599,7 @@ mod tests {
 
         let entry = VaultEntry::Card(CardEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-card-002"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2921,6 +3652,7 @@ mod yubikey_session_tests {
             folders: vec![],
             entries: vec![VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("yk-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -3001,6 +3733,7 @@ mod yubikey_session_tests {
         // Add an entry and save — must re-seal with YubiKey
         let new_entry = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("yk-002"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -3064,6 +3797,7 @@ mod yubikey_session_tests {
             folders: vec![],
             entries: vec![VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("v4-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -3215,6 +3949,7 @@ mod yubikey_mgmt_tests {
             folders: vec![],
             entries: vec![VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("mgmt-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -3570,6 +4305,7 @@ mod json_export_tests {
         let entries = vec![
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("je-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -3582,6 +4318,7 @@ mod json_export_tests {
             }),
             VaultEntry::Login(LoginEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("je-002"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -3671,6 +4408,7 @@ mod json_export_tests {
         use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-1".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -3703,6 +4441,7 @@ mod json_export_tests {
         use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-2".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -3731,6 +4470,7 @@ mod json_export_tests {
         use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-3".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -3759,6 +4499,7 @@ mod json_export_tests {
         use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-4".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -3797,6 +4538,7 @@ mod json_export_tests {
         use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-5".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -3833,6 +4575,7 @@ mod json_export_tests {
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
         let entry = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-6".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -3855,6 +4598,7 @@ mod json_export_tests {
         use crate::vault::entry::{EntryMeta, IdentityEntry, VaultEntry};
         let entry = VaultEntry::Identity(IdentityEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-7".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -3884,6 +4628,7 @@ mod json_export_tests {
         use crate::vault::entry::{CardEntry, EntryMeta, VaultEntry};
         let entry = VaultEntry::Card(CardEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-8".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -3928,6 +4673,7 @@ mod json_export_tests {
         use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-enpass".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -3973,6 +4719,7 @@ mod json_export_tests {
         use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-notes2".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -4013,6 +4760,7 @@ mod json_export_tests {
         );
         let entry = VaultEntry::Custom(CustomEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-custom2".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -4059,6 +4807,7 @@ mod json_export_tests {
         );
         let entry = VaultEntry::Custom(CustomEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-custom".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -4088,6 +4837,7 @@ mod json_export_tests {
         use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: "id-blob-9".to_string(),
                 created_at: "".to_string(),
                 updated_at: "".to_string(),
@@ -4124,6 +4874,7 @@ mod merge_tests {
     fn note(id: &str, title: &str, updated_at: &str) -> VaultEntry {
         VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: id.to_string(),
                 created_at: String::from("2026-01-01T00:00:00Z"),
                 updated_at: updated_at.to_string(),
@@ -4139,6 +4890,7 @@ mod merge_tests {
     fn note_with_folder(id: &str, title: &str, updated_at: &str, folder: &str) -> VaultEntry {
         VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: id.to_string(),
                 created_at: String::from("2026-01-01T00:00:00Z"),
                 updated_at: updated_at.to_string(),
@@ -4719,6 +5471,7 @@ mod export_sync_tests {
     fn note(id: &str, updated_at: &str) -> VaultEntry {
         VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: id.to_string(),
                 created_at: String::from("2026-01-01T00:00:00Z"),
                 updated_at: updated_at.to_string(),
@@ -4734,6 +5487,7 @@ mod export_sync_tests {
     fn note_in_folder(id: &str, folder: &str) -> VaultEntry {
         VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: id.to_string(),
                 created_at: String::from("2026-01-01T00:00:00Z"),
                 updated_at: String::from("2026-01-01T00:00:00Z"),
@@ -4904,5 +5658,585 @@ mod export_sync_tests {
         );
 
         teardown(&[vault_a, vault_b, export_path]);
+    }
+}
+
+// ── Multi-device sync fuzz proof (granular sync, v9) ──────────────────────────
+//
+// Deterministic fuzzer for the field-level merge. Each pass starts from a fixed
+// 12-entry base (all 6 types), forks 3 device copies, and applies random divergent
+// edits/adds/deletes with globally-unique timestamps across EVERY mergeable field:
+// scalars (title, password, notes, card fields, ...), custom k:v pairs, AND
+// attachments. The copies are then converged in two random orders. Invariants:
+//   * no loss / correct LWW: converged values equal an INDEPENDENT oracle
+//     (newest value per field, computed directly from device states, not via merge);
+//   * order-independent: both convergence orders give the same result;
+//   * convergence: re-merging the converged set with any device is stable.
+// Field keys match exactly what `merge_entry_pair` reads, so this exercises the
+// real per-field decisions. Runs in the normal (fast) suite — no crypto.
+#[cfg(test)]
+mod sync_fuzz {
+    use super::*;
+    use crate::vault::entry::{
+        CardEntry, CustomEntry, CustomField, EntryAttachment, FileEntry, IdentityEntry, LoginEntry,
+        NoteEntry,
+    };
+    use std::collections::{BTreeMap, HashMap, HashSet};
+
+    // SplitMix64 — deterministic, dependency-free.
+    struct Rng(u64);
+    impl Rng {
+        fn next(&mut self) -> u64 {
+            self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
+            let mut z = self.0;
+            z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+            z ^ (z >> 31)
+        }
+        fn below(&mut self, n: usize) -> usize {
+            (self.next() % n as u64) as usize
+        }
+    }
+
+    fn ts_str(ts: u64) -> String {
+        format!("{ts:020}")
+    }
+    fn cf(label: &str, value: &str) -> CustomField {
+        CustomField {
+            label: label.to_string(),
+            value: value.to_string(),
+            hidden: false,
+        }
+    }
+    // Distinguish Option::None from any real Some(_) in the value oracle.
+    fn opt_repr(o: &Option<String>) -> String {
+        match o {
+            None => String::from("\u{1}NONE"),
+            Some(s) => s.clone(),
+        }
+    }
+
+    // Scalar field names per type — identical to the keys merge_entry_pair uses.
+    fn scalar_keys(e: &VaultEntry) -> &'static [&'static str] {
+        match e {
+            VaultEntry::Login(_) => &[
+                "title", "url", "username", "password", "notes", "app_id", "email",
+            ],
+            VaultEntry::Note(_) => &["title", "content"],
+            VaultEntry::Identity(_) => &["first_name", "last_name", "email", "phone", "address"],
+            VaultEntry::Card(_) => &[
+                "card_name",
+                "status",
+                "cardholder_name",
+                "card_number",
+                "expiry",
+                "cvv",
+                "credit_limit",
+                "card_account_number",
+                "payment_network",
+                "pin",
+                "bank_name",
+                "transaction_password",
+                "notes",
+            ],
+            VaultEntry::File(_) => &["filename", "data", "notes"],
+            VaultEntry::Custom(_) => &["title"],
+        }
+    }
+
+    fn scalar_repr(e: &VaultEntry, key: &str) -> String {
+        match e {
+            VaultEntry::Login(x) => match key {
+                "title" => x.title.clone(),
+                "url" => x.url.clone(),
+                "username" => x.username.clone(),
+                "password" => x.password.clone(),
+                "notes" => opt_repr(&x.notes),
+                "app_id" => opt_repr(&x.app_id),
+                "email" => opt_repr(&x.email),
+                _ => unreachable!(),
+            },
+            VaultEntry::Note(x) => match key {
+                "title" => x.title.clone(),
+                "content" => x.content.clone(),
+                _ => unreachable!(),
+            },
+            VaultEntry::Identity(x) => match key {
+                "first_name" => x.first_name.clone(),
+                "last_name" => x.last_name.clone(),
+                "email" => x.email.clone(),
+                "phone" => opt_repr(&x.phone),
+                "address" => opt_repr(&x.address),
+                _ => unreachable!(),
+            },
+            VaultEntry::Card(x) => match key {
+                "card_name" => opt_repr(&x.card_name),
+                "status" => x.status.clone(),
+                "cardholder_name" => x.cardholder_name.clone(),
+                "card_number" => x.card_number.clone(),
+                "expiry" => x.expiry.clone(),
+                "cvv" => x.cvv.clone(),
+                "credit_limit" => opt_repr(&x.credit_limit),
+                "card_account_number" => opt_repr(&x.card_account_number),
+                "payment_network" => opt_repr(&x.payment_network),
+                "pin" => opt_repr(&x.pin),
+                "bank_name" => opt_repr(&x.bank_name),
+                "transaction_password" => opt_repr(&x.transaction_password),
+                "notes" => opt_repr(&x.notes),
+                _ => unreachable!(),
+            },
+            VaultEntry::File(x) => match key {
+                "filename" => x.filename.clone(),
+                "data" => format!("{:?}", x.data),
+                "notes" => opt_repr(&x.notes),
+                _ => unreachable!(),
+            },
+            VaultEntry::Custom(x) => match key {
+                "title" => x.title.clone(),
+                _ => unreachable!(),
+            },
+        }
+    }
+
+    fn set_scalar(e: &mut VaultEntry, key: &str, value: &str) {
+        let s = value.to_string();
+        let some = Some(value.to_string());
+        match e {
+            VaultEntry::Login(x) => match key {
+                "title" => x.title = s,
+                "url" => x.url = s,
+                "username" => x.username = s,
+                "password" => x.password = s,
+                "notes" => x.notes = some,
+                "app_id" => x.app_id = some,
+                "email" => x.email = some,
+                _ => unreachable!(),
+            },
+            VaultEntry::Note(x) => match key {
+                "title" => x.title = s,
+                "content" => x.content = s,
+                _ => unreachable!(),
+            },
+            VaultEntry::Identity(x) => match key {
+                "first_name" => x.first_name = s,
+                "last_name" => x.last_name = s,
+                "email" => x.email = s,
+                "phone" => x.phone = some,
+                "address" => x.address = some,
+                _ => unreachable!(),
+            },
+            VaultEntry::Card(x) => match key {
+                "card_name" => x.card_name = some,
+                "status" => x.status = s,
+                "cardholder_name" => x.cardholder_name = s,
+                "card_number" => x.card_number = s,
+                "expiry" => x.expiry = s,
+                "cvv" => x.cvv = s,
+                "credit_limit" => x.credit_limit = some,
+                "card_account_number" => x.card_account_number = some,
+                "payment_network" => x.payment_network = some,
+                "pin" => x.pin = some,
+                "bank_name" => x.bank_name = some,
+                "transaction_password" => x.transaction_password = some,
+                "notes" => x.notes = some,
+                _ => unreachable!(),
+            },
+            VaultEntry::File(x) => match key {
+                "filename" => x.filename = s,
+                "data" => x.data = value.as_bytes().to_vec(),
+                "notes" => x.notes = some,
+                _ => unreachable!(),
+            },
+            VaultEntry::Custom(x) => match key {
+                "title" => x.title = s,
+                _ => unreachable!(),
+            },
+        }
+    }
+
+    fn has_attachments(e: &VaultEntry) -> bool {
+        !matches!(e, VaultEntry::File(_))
+    }
+    fn att_vec(e: &VaultEntry) -> &[EntryAttachment] {
+        match e {
+            VaultEntry::Login(x) => &x.attachments,
+            VaultEntry::Note(x) => &x.attachments,
+            VaultEntry::Identity(x) => &x.attachments,
+            VaultEntry::Card(x) => &x.attachments,
+            VaultEntry::Custom(x) => &x.attachments,
+            VaultEntry::File(_) => &[],
+        }
+    }
+    fn att_vec_mut(e: &mut VaultEntry) -> &mut Vec<EntryAttachment> {
+        match e {
+            VaultEntry::Login(x) => &mut x.attachments,
+            VaultEntry::Note(x) => &mut x.attachments,
+            VaultEntry::Identity(x) => &mut x.attachments,
+            VaultEntry::Card(x) => &mut x.attachments,
+            VaultEntry::Custom(x) => &mut x.attachments,
+            VaultEntry::File(_) => unreachable!(),
+        }
+    }
+    fn attachment_name(e: &VaultEntry, uuid: &str) -> Option<String> {
+        att_vec(e)
+            .iter()
+            .find(|a| a.uuid == uuid)
+            .map(|a| a.name.clone())
+    }
+    fn set_att(e: &mut VaultEntry, uuid: &str, name: &str) {
+        let v = att_vec_mut(e);
+        if let Some(a) = v.iter_mut().find(|a| a.uuid == uuid) {
+            a.name = name.to_string();
+        } else {
+            v.push(EntryAttachment {
+                uuid: uuid.to_string(),
+                name: name.to_string(),
+                kind: String::from("text"),
+                data: vec![],
+            });
+        }
+    }
+
+    fn entry_pairs(e: &VaultEntry) -> BTreeMap<String, String> {
+        let mut m = BTreeMap::new();
+        match e {
+            VaultEntry::Custom(x) => {
+                for (k, f) in &x.fields {
+                    m.insert(k.clone(), f.value.clone());
+                }
+            }
+            VaultEntry::Login(x) => collect(&x.custom_fields, &mut m),
+            VaultEntry::Note(x) => collect(&x.custom_fields, &mut m),
+            VaultEntry::Identity(x) => collect(&x.custom_fields, &mut m),
+            VaultEntry::Card(x) => collect(&x.custom_fields, &mut m),
+            VaultEntry::File(x) => collect(&x.custom_fields, &mut m),
+        }
+        m
+    }
+    fn collect(v: &[CustomField], m: &mut BTreeMap<String, String>) {
+        for f in v {
+            m.insert(f.label.clone(), f.value.clone());
+        }
+    }
+    fn custom_vec_mut(e: &mut VaultEntry) -> &mut Vec<CustomField> {
+        match e {
+            VaultEntry::Login(x) => &mut x.custom_fields,
+            VaultEntry::Note(x) => &mut x.custom_fields,
+            VaultEntry::Identity(x) => &mut x.custom_fields,
+            VaultEntry::Card(x) => &mut x.custom_fields,
+            VaultEntry::File(x) => &mut x.custom_fields,
+            VaultEntry::Custom(_) => unreachable!(),
+        }
+    }
+    fn set_pair(e: &mut VaultEntry, label: &str, value: &str) {
+        if let VaultEntry::Custom(x) = e {
+            x.fields.insert(label.to_string(), cf(label, value));
+        } else {
+            let v = custom_vec_mut(e);
+            if let Some(f) = v.iter_mut().find(|f| f.label == label) {
+                f.value = value.to_string();
+            } else {
+                v.push(cf(label, value));
+            }
+        }
+    }
+    fn del_pair(e: &mut VaultEntry, label: &str) {
+        if let VaultEntry::Custom(x) = e {
+            x.fields.remove(label);
+        } else {
+            custom_vec_mut(e).retain(|f| f.label != label);
+        }
+    }
+    fn del_att(e: &mut VaultEntry, uuid: &str) {
+        att_vec_mut(e).retain(|a| a.uuid != uuid);
+    }
+
+    // Every field key currently on an entry: scalars + present pairs + attachments.
+    fn all_field_keys(e: &VaultEntry) -> Vec<String> {
+        let mut keys: Vec<String> = scalar_keys(e).iter().map(|s| s.to_string()).collect();
+        for label in entry_pairs(e).keys() {
+            keys.push(format!("custom_fields:{label}"));
+        }
+        for a in att_vec(e) {
+            keys.push(format!("attachments:{}", a.uuid));
+        }
+        keys
+    }
+
+    // Uniform value getter: scalars always present; collection items only if present.
+    fn field_value(e: &VaultEntry, key: &str) -> Option<String> {
+        if let Some(label) = key.strip_prefix("custom_fields:") {
+            return entry_pairs(e).get(label).cloned();
+        }
+        if let Some(uuid) = key.strip_prefix("attachments:") {
+            return attachment_name(e, uuid);
+        }
+        Some(scalar_repr(e, key))
+    }
+
+    fn stamp_all(e: &mut VaultEntry, ts: u64) {
+        let keys = all_field_keys(e);
+        let meta = meta_of_mut(e);
+        for k in keys {
+            meta.field_times.insert(k, ts);
+        }
+    }
+
+    fn base_vault() -> Vec<VaultEntry> {
+        let pairs = || vec![cf("k0", "v0"), cf("k1", "v1")];
+        let att = || {
+            vec![EntryAttachment {
+                uuid: String::from("a0"),
+                name: String::from("att0"),
+                kind: String::from("text"),
+                data: vec![],
+            }]
+        };
+        let blank_meta = |id: &str| EntryMeta {
+            id: id.to_string(),
+            created_at: ts_str(1),
+            updated_at: ts_str(1),
+            folder: String::new(),
+            field_times: BTreeMap::new(),
+        };
+        let mut out = Vec::new();
+        for i in 0..2 {
+            out.push(VaultEntry::Login(LoginEntry {
+                meta: blank_meta(&format!("login-{i}")),
+                title: String::from("L"),
+                url: String::from("http://x"),
+                username: String::from("u"),
+                password: String::from("p"),
+                notes: None,
+                custom_fields: pairs(),
+                attachments: att(),
+                previous_password: None,
+                app_id: None,
+                email: None,
+            }));
+            out.push(VaultEntry::Note(NoteEntry {
+                meta: blank_meta(&format!("note-{i}")),
+                title: String::from("N"),
+                content: String::from("c"),
+                custom_fields: pairs(),
+                attachments: att(),
+            }));
+            out.push(VaultEntry::Identity(IdentityEntry {
+                meta: blank_meta(&format!("identity-{i}")),
+                first_name: String::from("F"),
+                last_name: String::from("L"),
+                email: String::from("e@example.com"),
+                phone: None,
+                address: None,
+                custom_fields: pairs(),
+                attachments: att(),
+            }));
+            out.push(VaultEntry::Card(CardEntry {
+                meta: blank_meta(&format!("card-{i}")),
+                card_name: None,
+                status: String::from("active"),
+                cardholder_name: String::from("CH"),
+                card_number: String::from("4111111111111111"),
+                expiry: String::from("12/28"),
+                cvv: String::from("123"),
+                credit_limit: None,
+                card_account_number: None,
+                payment_network: None,
+                pin: None,
+                bank_name: None,
+                transaction_password: None,
+                notes: None,
+                custom_fields: pairs(),
+                attachments: att(),
+                previous_cvv: None,
+                previous_pin: None,
+            }));
+            out.push(VaultEntry::File(FileEntry {
+                meta: blank_meta(&format!("file-{i}")),
+                filename: String::from("f.bin"),
+                data: vec![1, 2, 3],
+                notes: None,
+                custom_fields: pairs(),
+            }));
+            let mut fields = HashMap::new();
+            fields.insert(String::from("k0"), cf("k0", "v0"));
+            fields.insert(String::from("k1"), cf("k1", "v1"));
+            out.push(VaultEntry::Custom(CustomEntry {
+                meta: blank_meta(&format!("custom-{i}")),
+                title: String::from("C"),
+                fields,
+                attachments: att(),
+            }));
+        }
+        // Stamp every base field at ts=1 so the oracle is pure max-timestamp.
+        for e in out.iter_mut() {
+            stamp_all(e, 1);
+        }
+        out
+    }
+
+    fn set_field(e: &mut VaultEntry, key: &str, value: &str, ts: u64) {
+        if let Some(label) = key.strip_prefix("custom_fields:") {
+            set_pair(e, label, value);
+        } else if let Some(uuid) = key.strip_prefix("attachments:") {
+            set_att(e, uuid, value);
+        } else {
+            set_scalar(e, key, value);
+        }
+        let meta = meta_of_mut(e);
+        meta.field_times.insert(key.to_string(), ts);
+        meta.field_times.remove(&format!("del:{key}"));
+        meta.updated_at = ts_str(ts);
+    }
+    fn del_field(e: &mut VaultEntry, key: &str, ts: u64) {
+        if let Some(label) = key.strip_prefix("custom_fields:") {
+            del_pair(e, label);
+        } else if let Some(uuid) = key.strip_prefix("attachments:") {
+            del_att(e, uuid);
+        }
+        let meta = meta_of_mut(e);
+        meta.field_times.insert(format!("del:{key}"), ts);
+        meta.field_times.remove(key);
+        meta.updated_at = ts_str(ts);
+    }
+
+    fn mutate(dev: &mut [VaultEntry], rng: &mut Rng, counter: &mut u64) {
+        let ei = rng.below(dev.len());
+        let mut cands = all_field_keys(&dev[ei]);
+        cands.push(String::from("custom_fields:k2"));
+        cands.push(String::from("custom_fields:k3"));
+        if has_attachments(&dev[ei]) {
+            cands.push(String::from("attachments:a2"));
+            cands.push(String::from("attachments:a3"));
+        }
+        let key = cands[rng.below(cands.len())].clone();
+        *counter += 1;
+        let ts = *counter;
+        let is_collection = key.starts_with("custom_fields:") || key.starts_with("attachments:");
+        if is_collection && rng.below(10) < 3 {
+            del_field(&mut dev[ei], &key, ts);
+        } else {
+            set_field(&mut dev[ei], &key, &format!("val-{ts}"), ts);
+        }
+    }
+
+    fn sync_sets(a: &[VaultEntry], b: &[VaultEntry]) -> Vec<VaultEntry> {
+        let a_by: HashMap<&str, &VaultEntry> =
+            a.iter().map(|e| (meta_of(e).id.as_str(), e)).collect();
+        let b_by: HashMap<&str, &VaultEntry> =
+            b.iter().map(|e| (meta_of(e).id.as_str(), e)).collect();
+        let mut ids = Vec::new();
+        let mut seen = HashSet::new();
+        for e in a.iter().chain(b.iter()) {
+            let id = meta_of(e).id.clone();
+            if seen.insert(id.clone()) {
+                ids.push(id);
+            }
+        }
+        let mut out = Vec::new();
+        for id in &ids {
+            match (a_by.get(id.as_str()), b_by.get(id.as_str())) {
+                (Some(x), Some(y)) => out.push(merge_entry_pair(x, y).0),
+                (Some(x), None) => out.push((*x).clone()),
+                (None, Some(y)) => out.push((*y).clone()),
+                (None, None) => {}
+            }
+        }
+        out
+    }
+    fn converge(devices: &[Vec<VaultEntry>], order: &[usize]) -> Vec<VaultEntry> {
+        let mut acc = devices[order[0]].clone();
+        for &i in &order[1..] {
+            acc = sync_sets(&acc, &devices[i]);
+        }
+        acc
+    }
+
+    // INDEPENDENT oracle: newest value per (entry, field) across device states,
+    // computed directly (max field-time), never via merge_entry_pair.
+    fn expected_values(devices: &[Vec<VaultEntry>]) -> BTreeMap<(String, String), String> {
+        let mut best: HashMap<(String, String), (u64, String)> = HashMap::new();
+        for dev in devices {
+            for e in dev {
+                let id = meta_of(e).id.clone();
+                let ft = &meta_of(e).field_times;
+                for key in all_field_keys(e) {
+                    if let Some(value) = field_value(e, &key) {
+                        let ts = ft.get(&key).copied().unwrap_or(0);
+                        let k = (id.clone(), key);
+                        let better = best.get(&k).map(|(b, _)| ts > *b).unwrap_or(true);
+                        if better {
+                            best.insert(k, (ts, value));
+                        }
+                    }
+                }
+            }
+        }
+        best.into_iter().map(|(k, (_, v))| (k, v)).collect()
+    }
+    fn result_values(entries: &[VaultEntry]) -> BTreeMap<(String, String), String> {
+        let mut m = BTreeMap::new();
+        for e in entries {
+            let id = meta_of(e).id.clone();
+            for key in all_field_keys(e) {
+                if let Some(value) = field_value(e, &key) {
+                    m.insert((id.clone(), key), value);
+                }
+            }
+        }
+        m
+    }
+
+    fn perm(n: usize, rng: &mut Rng) -> Vec<usize> {
+        let mut v: Vec<usize> = (0..n).collect();
+        for i in (1..n).rev() {
+            let j = rng.below(i + 1);
+            v.swap(i, j);
+        }
+        v
+    }
+
+    #[test]
+    fn fuzz_multi_device_sync_converges_without_loss() {
+        const SEED: u64 = 0x6761_6262_726f_5379; // "gabbrSy"
+        const PASSES: usize = 120;
+        const DEVICES: usize = 3;
+
+        for pass in 0..PASSES {
+            let mut rng = Rng(SEED ^ (pass as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            let mut counter = 100u64;
+            let mut devices: Vec<Vec<VaultEntry>> = (0..DEVICES).map(|_| base_vault()).collect();
+
+            for dev in devices.iter_mut() {
+                let edits = 3 + rng.below(8);
+                for _ in 0..edits {
+                    mutate(dev, &mut rng, &mut counter);
+                }
+            }
+
+            let expected = expected_values(&devices);
+            let order1 = perm(DEVICES, &mut rng);
+            let order2 = perm(DEVICES, &mut rng);
+            let r1 = converge(&devices, &order1);
+            let r2 = converge(&devices, &order2);
+
+            assert_eq!(
+                result_values(&r1),
+                expected,
+                "pass {pass}: converged result must match the independent oracle (no loss / correct LWW)"
+            );
+            assert_eq!(
+                result_values(&r2),
+                expected,
+                "pass {pass}: a different sync order must give the same result (order-independent)"
+            );
+            for (d, dev) in devices.iter().enumerate() {
+                assert_eq!(
+                    result_values(&sync_sets(&r1, dev)),
+                    expected,
+                    "pass {pass}: converged set must be stable when re-merged with device {d}"
+                );
+            }
+        }
     }
 }

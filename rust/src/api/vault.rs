@@ -138,6 +138,19 @@ pub struct PendingDeleteItem {
     pub title: String,
 }
 
+/// A true field-level clash discovered during vault merge: the same field of the
+/// same entry was changed on both devices at the same instant to different values.
+/// The local value is kept; Flutter prompts the user to keep mine / keep theirs.
+/// `local_value` / `incoming_value` are decrypted plaintext — mask in the UI like
+/// any other secret. `field` is the field key (e.g. "password", "custom_fields:PIN").
+pub struct FieldConflictItem {
+    pub id: String,
+    pub title: String,
+    pub field: String,
+    pub local_value: String,
+    pub incoming_value: String,
+}
+
 /// A folder assignment conflict discovered during vault merge.
 ///
 /// Returned when the same entry UUID exists in both vaults assigned to different
@@ -161,6 +174,10 @@ pub struct MergeSummary {
     /// Same-UUID entries with different folder assignments on each device.
     /// Flutter prompts the user to pick which folder to keep.
     pub folder_conflicts: Vec<FolderConflictItem>,
+    // NOTE: field-level clashes (FieldConflictItem) are produced by the merge
+    // (session::merge_entry_pair) but not yet surfaced here — adding them to this
+    // bridge type requires a flutter_rust_bridge regen, done with the Flutter UI
+    // work (granular-sync task 8). Until then a clash safely keeps the local value.
 }
 
 // ── Conversion helpers (internal → DTO) ──────────────────────────────────────
@@ -219,6 +236,7 @@ pub fn create_login_entry(
 ) -> LoginEntryData {
     let now = chrono_now();
     let meta = EntryMeta {
+        field_times: Default::default(),
         id: Uuid::new_v4().to_string(),
         created_at: now.clone(),
         updated_at: now,
@@ -267,6 +285,215 @@ fn entry_id(entry: &VaultEntry) -> &str {
     }
 }
 
+/// Current time in milliseconds since the Unix epoch. Std-only (no date crate):
+/// per-field change-times are only ever generated and compared as integers, never
+/// parsed, so a real date library buys nothing here.
+pub fn now_ms() -> u64 {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0)
+}
+
+fn entry_meta(entry: &VaultEntry) -> &crate::vault::entry::EntryMeta {
+    match entry {
+        VaultEntry::Login(e) => &e.meta,
+        VaultEntry::Note(e) => &e.meta,
+        VaultEntry::Identity(e) => &e.meta,
+        VaultEntry::Card(e) => &e.meta,
+        VaultEntry::File(e) => &e.meta,
+        VaultEntry::Custom(e) => &e.meta,
+    }
+}
+
+fn entry_meta_mut(entry: &mut VaultEntry) -> &mut crate::vault::entry::EntryMeta {
+    match entry {
+        VaultEntry::Login(e) => &mut e.meta,
+        VaultEntry::Note(e) => &mut e.meta,
+        VaultEntry::Identity(e) => &mut e.meta,
+        VaultEntry::Card(e) => &mut e.meta,
+        VaultEntry::File(e) => &mut e.meta,
+        VaultEntry::Custom(e) => &mut e.meta,
+    }
+}
+
+/// Field keys that differ between `old` and `new` (assumed same entry type).
+/// Scalar fields are keyed by their serde name; custom pairs by
+/// "custom_fields:<label>"; attachments by "attachments:<uuid>". Derived secrets
+/// (`previous_*`) are intentionally excluded — they follow their parent field.
+fn changed_field_keys(old: &VaultEntry, new: &VaultEntry) -> Vec<String> {
+    use crate::vault::entry::{CustomField, EntryAttachment};
+
+    fn push_if(out: &mut Vec<String>, key: &str, changed: bool) {
+        if changed {
+            out.push(key.to_string());
+        }
+    }
+
+    // Custom pairs are identified by label: an added or value/hidden-changed pair
+    // stamps "custom_fields:<label>". (Removal is handled by the merge layer.)
+    fn diff_custom(old: &[CustomField], new: &[CustomField], out: &mut Vec<String>) {
+        let by: std::collections::HashMap<&str, &CustomField> =
+            old.iter().map(|f| (f.label.as_str(), f)).collect();
+        for nf in new {
+            let unchanged = by
+                .get(nf.label.as_str())
+                .map(|of| of.value == nf.value && of.hidden == nf.hidden)
+                .unwrap_or(false);
+            if !unchanged {
+                out.push(format!("custom_fields:{}", nf.label));
+            }
+        }
+    }
+
+    fn diff_attachments(old: &[EntryAttachment], new: &[EntryAttachment], out: &mut Vec<String>) {
+        let by: std::collections::HashMap<&str, &EntryAttachment> =
+            old.iter().map(|a| (a.uuid.as_str(), a)).collect();
+        for na in new {
+            let unchanged = by
+                .get(na.uuid.as_str())
+                .map(|oa| oa.name == na.name && oa.kind == na.kind && oa.data == na.data)
+                .unwrap_or(false);
+            if !unchanged {
+                out.push(format!("attachments:{}", na.uuid));
+            }
+        }
+    }
+
+    let mut out = Vec::new();
+    match (old, new) {
+        (VaultEntry::Login(o), VaultEntry::Login(n)) => {
+            push_if(&mut out, "title", o.title != n.title);
+            push_if(&mut out, "url", o.url != n.url);
+            push_if(&mut out, "username", o.username != n.username);
+            push_if(&mut out, "password", o.password != n.password);
+            push_if(&mut out, "notes", o.notes != n.notes);
+            push_if(&mut out, "app_id", o.app_id != n.app_id);
+            push_if(&mut out, "email", o.email != n.email);
+            diff_custom(&o.custom_fields, &n.custom_fields, &mut out);
+            diff_attachments(&o.attachments, &n.attachments, &mut out);
+        }
+        (VaultEntry::Note(o), VaultEntry::Note(n)) => {
+            push_if(&mut out, "title", o.title != n.title);
+            push_if(&mut out, "content", o.content != n.content);
+            diff_custom(&o.custom_fields, &n.custom_fields, &mut out);
+            diff_attachments(&o.attachments, &n.attachments, &mut out);
+        }
+        (VaultEntry::Identity(o), VaultEntry::Identity(n)) => {
+            push_if(&mut out, "first_name", o.first_name != n.first_name);
+            push_if(&mut out, "last_name", o.last_name != n.last_name);
+            push_if(&mut out, "email", o.email != n.email);
+            push_if(&mut out, "phone", o.phone != n.phone);
+            push_if(&mut out, "address", o.address != n.address);
+            diff_custom(&o.custom_fields, &n.custom_fields, &mut out);
+            diff_attachments(&o.attachments, &n.attachments, &mut out);
+        }
+        (VaultEntry::Card(o), VaultEntry::Card(n)) => {
+            push_if(&mut out, "card_name", o.card_name != n.card_name);
+            push_if(&mut out, "status", o.status != n.status);
+            push_if(
+                &mut out,
+                "cardholder_name",
+                o.cardholder_name != n.cardholder_name,
+            );
+            push_if(&mut out, "card_number", o.card_number != n.card_number);
+            push_if(&mut out, "expiry", o.expiry != n.expiry);
+            push_if(&mut out, "cvv", o.cvv != n.cvv);
+            push_if(&mut out, "credit_limit", o.credit_limit != n.credit_limit);
+            push_if(
+                &mut out,
+                "card_account_number",
+                o.card_account_number != n.card_account_number,
+            );
+            push_if(
+                &mut out,
+                "payment_network",
+                o.payment_network != n.payment_network,
+            );
+            push_if(&mut out, "pin", o.pin != n.pin);
+            push_if(&mut out, "bank_name", o.bank_name != n.bank_name);
+            push_if(
+                &mut out,
+                "transaction_password",
+                o.transaction_password != n.transaction_password,
+            );
+            push_if(&mut out, "notes", o.notes != n.notes);
+            diff_custom(&o.custom_fields, &n.custom_fields, &mut out);
+            diff_attachments(&o.attachments, &n.attachments, &mut out);
+        }
+        (VaultEntry::File(o), VaultEntry::File(n)) => {
+            push_if(&mut out, "filename", o.filename != n.filename);
+            push_if(&mut out, "data", o.data != n.data);
+            push_if(&mut out, "notes", o.notes != n.notes);
+            diff_custom(&o.custom_fields, &n.custom_fields, &mut out);
+        }
+        (VaultEntry::Custom(o), VaultEntry::Custom(n)) => {
+            push_if(&mut out, "title", o.title != n.title);
+            for (k, nf) in &n.fields {
+                let unchanged = o
+                    .fields
+                    .get(k)
+                    .map(|of| {
+                        of.value == nf.value && of.hidden == nf.hidden && of.label == nf.label
+                    })
+                    .unwrap_or(false);
+                if !unchanged {
+                    out.push(format!("custom_fields:{k}"));
+                }
+            }
+            diff_attachments(&o.attachments, &n.attachments, &mut out);
+        }
+        _ => {}
+    }
+    out
+}
+
+/// All item keys ("custom_fields:<label>" / "attachments:<uuid>") present on an
+/// entry — used to detect item deletions for granular-sync tombstones.
+fn item_keys(entry: &VaultEntry) -> std::collections::HashSet<String> {
+    use crate::vault::entry::{CustomField, EntryAttachment};
+    fn add_custom(keys: &mut std::collections::HashSet<String>, fields: &[CustomField]) {
+        for f in fields {
+            keys.insert(format!("custom_fields:{}", f.label));
+        }
+    }
+    fn add_att(keys: &mut std::collections::HashSet<String>, atts: &[EntryAttachment]) {
+        for a in atts {
+            keys.insert(format!("attachments:{}", a.uuid));
+        }
+    }
+    let mut keys = std::collections::HashSet::new();
+    match entry {
+        VaultEntry::Login(e) => {
+            add_custom(&mut keys, &e.custom_fields);
+            add_att(&mut keys, &e.attachments);
+        }
+        VaultEntry::Note(e) => {
+            add_custom(&mut keys, &e.custom_fields);
+            add_att(&mut keys, &e.attachments);
+        }
+        VaultEntry::Identity(e) => {
+            add_custom(&mut keys, &e.custom_fields);
+            add_att(&mut keys, &e.attachments);
+        }
+        VaultEntry::Card(e) => {
+            add_custom(&mut keys, &e.custom_fields);
+            add_att(&mut keys, &e.attachments);
+        }
+        VaultEntry::File(e) => {
+            add_custom(&mut keys, &e.custom_fields);
+        }
+        VaultEntry::Custom(e) => {
+            for k in e.fields.keys() {
+                keys.insert(format!("custom_fields:{k}"));
+            }
+            add_att(&mut keys, &e.attachments);
+        }
+    }
+    keys
+}
+
 /// Replace an existing entry in the vault with an updated version.
 ///
 /// Matches by UUID — the updated entry must carry the same id as the
@@ -290,6 +517,25 @@ pub fn update_entry(
 
     let now = chrono_now();
     let expires_at = expiry_days.map(|days| add_days_to_timestamp(&now, days));
+
+    // Per-field change-times (granular sync, v9). Flutter does not round-trip
+    // field_times across the bridge, so the existing entry is the source of truth:
+    // start from its map and stamp only the fields whose value actually changed.
+    let now_ms = now_ms();
+    let mut new_field_times = entry_meta(&entries[pos]).field_times.clone();
+    for key in changed_field_keys(&entries[pos], &updated) {
+        new_field_times.insert(key, now_ms);
+    }
+    // Per-item deletion tombstones: an item (custom pair / attachment) present
+    // before but gone now is a deletion; a re-added item clears its tombstone.
+    let old_items = item_keys(&entries[pos]);
+    let new_items = item_keys(&updated);
+    for removed in old_items.difference(&new_items) {
+        new_field_times.insert(format!("del:{removed}"), now_ms);
+    }
+    for present in &new_items {
+        new_field_times.remove(&format!("del:{present}"));
+    }
 
     // Snapshot sensitive fields that have changed, then stamp updated_at.
     match (&entries[pos], &mut updated) {
@@ -342,6 +588,7 @@ pub fn update_entry(
         _ => return Err(String::from("Entry type mismatch during update")),
     }
 
+    entry_meta_mut(&mut updated).field_times = new_field_times;
     entries[pos] = updated;
     Ok(())
 }
@@ -1021,6 +1268,7 @@ mod tests {
         let body = VaultBody {
             entries: vec![VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("p0-note-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1153,6 +1401,7 @@ mod tests {
 
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1216,6 +1465,7 @@ mod tests {
 
         let mut entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1229,6 +1479,7 @@ mod tests {
 
         let updated = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1257,6 +1508,7 @@ mod tests {
 
         let mut entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1270,6 +1522,7 @@ mod tests {
 
         let updated = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1288,12 +1541,219 @@ mod tests {
         }
     }
 
+    // ── per-field change-time stamping (granular sync, v9) ────────────────────
+
+    fn note_with(id: &str, title: &str, content: &str) -> crate::vault::entry::VaultEntry {
+        use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+        VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                id: id.to_string(),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::new(),
+                ..Default::default()
+            },
+            title: title.to_string(),
+            content: content.to_string(),
+            custom_fields: vec![],
+            attachments: vec![],
+        })
+    }
+
+    fn note_field_times(
+        e: &crate::vault::entry::VaultEntry,
+    ) -> std::collections::BTreeMap<String, u64> {
+        match e {
+            crate::vault::entry::VaultEntry::Note(n) => n.meta.field_times.clone(),
+            _ => panic!("expected Note"),
+        }
+    }
+
+    #[test]
+    fn update_entry_stamps_field_time_for_changed_scalar() {
+        let mut entries = vec![note_with("id-1", "Title", "old")];
+        let updated = note_with("id-1", "Title", "new");
+        update_entry(&mut entries, updated, None).unwrap();
+        let times = note_field_times(&entries[0]);
+        assert!(times.contains_key("content"), "changed content must stamp");
+        assert!(*times.get("content").unwrap() > 0);
+    }
+
+    #[test]
+    fn update_entry_does_not_stamp_unchanged_scalar() {
+        let mut entries = vec![note_with("id-1", "Title", "old")];
+        let updated = note_with("id-1", "Title", "new");
+        update_entry(&mut entries, updated, None).unwrap();
+        let times = note_field_times(&entries[0]);
+        assert!(
+            !times.contains_key("title"),
+            "unchanged title must not stamp"
+        );
+    }
+
+    #[test]
+    fn update_entry_stamps_only_the_changed_field() {
+        let mut entries = vec![note_with("id-1", "Title", "old")];
+        let updated = note_with("id-1", "Title", "new");
+        update_entry(&mut entries, updated, None).unwrap();
+        let times = note_field_times(&entries[0]);
+        assert_eq!(times.len(), 1, "exactly one field changed");
+        assert!(times.contains_key("content"));
+    }
+
+    #[test]
+    fn update_entry_preserves_prior_field_times() {
+        // A field stamped on an earlier edit must survive a later edit to a
+        // different field — field_times accumulates, it is never reset.
+        let mut entries = vec![note_with("id-1", "Title", "old")];
+        if let crate::vault::entry::VaultEntry::Note(n) = &mut entries[0] {
+            n.meta.field_times.insert(String::from("title"), 100);
+        }
+        let updated = note_with("id-1", "Title", "new");
+        update_entry(&mut entries, updated, None).unwrap();
+        let times = note_field_times(&entries[0]);
+        assert_eq!(times.get("title"), Some(&100), "prior stamp preserved");
+        assert!(times.contains_key("content"), "new change stamped");
+    }
+
+    #[test]
+    fn update_entry_stamps_custom_pair_by_label() {
+        use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
+        let base_login = |cf_value: &str| {
+            VaultEntry::Login(LoginEntry {
+                meta: EntryMeta {
+                    id: String::from("login-1"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::new(),
+                    ..Default::default()
+                },
+                title: String::from("Acct"),
+                url: String::new(),
+                username: String::from("user"),
+                password: String::from("pw"),
+                notes: None,
+                custom_fields: vec![CustomField {
+                    label: String::from("PIN"),
+                    value: cf_value.to_string(),
+                    hidden: true,
+                }],
+                attachments: vec![],
+                previous_password: None,
+                app_id: None,
+                email: None,
+            })
+        };
+        let mut entries = vec![base_login("1234")];
+        update_entry(&mut entries, base_login("5678"), None).unwrap();
+        match &entries[0] {
+            VaultEntry::Login(e) => {
+                assert!(
+                    e.meta.field_times.contains_key("custom_fields:PIN"),
+                    "changed custom pair must stamp by label, got {:?}",
+                    e.meta.field_times
+                );
+            }
+            _ => panic!("expected Login"),
+        }
+    }
+
+    #[test]
+    fn update_entry_removing_custom_pair_stamps_deletion_tombstone() {
+        use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
+        let login = |custom: Vec<CustomField>| {
+            VaultEntry::Login(LoginEntry {
+                meta: EntryMeta {
+                    id: String::from("l1"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::new(),
+                    ..Default::default()
+                },
+                title: String::from("Acct"),
+                url: String::new(),
+                username: String::from("u"),
+                password: String::from("p"),
+                notes: None,
+                custom_fields: custom,
+                attachments: vec![],
+                previous_password: None,
+                app_id: None,
+                email: None,
+            })
+        };
+        let mut entries = vec![login(vec![CustomField {
+            label: String::from("PIN"),
+            value: String::from("1"),
+            hidden: true,
+        }])];
+        update_entry(&mut entries, login(vec![]), None).unwrap();
+        match &entries[0] {
+            VaultEntry::Login(e) => assert!(
+                e.meta.field_times.contains_key("del:custom_fields:PIN"),
+                "removal stamps a tombstone, got {:?}",
+                e.meta.field_times
+            ),
+            _ => panic!("expected Login"),
+        }
+    }
+
+    #[test]
+    fn update_entry_readding_item_clears_deletion_tombstone() {
+        use crate::vault::entry::{CustomField, EntryMeta, LoginEntry, VaultEntry};
+        let login = |custom: Vec<CustomField>| {
+            VaultEntry::Login(LoginEntry {
+                meta: EntryMeta {
+                    id: String::from("l1"),
+                    created_at: String::from("2025-01-01T00:00:00Z"),
+                    updated_at: String::from("2025-01-01T00:00:00Z"),
+                    folder: String::new(),
+                    ..Default::default()
+                },
+                title: String::from("Acct"),
+                url: String::new(),
+                username: String::from("u"),
+                password: String::from("p"),
+                notes: None,
+                custom_fields: custom,
+                attachments: vec![],
+                previous_password: None,
+                app_id: None,
+                email: None,
+            })
+        };
+        let mut entries = vec![login(vec![])];
+        if let VaultEntry::Login(e) = &mut entries[0] {
+            e.meta
+                .field_times
+                .insert(String::from("del:custom_fields:PIN"), 100);
+        }
+        update_entry(
+            &mut entries,
+            login(vec![CustomField {
+                label: String::from("PIN"),
+                value: String::from("1"),
+                hidden: true,
+            }]),
+            None,
+        )
+        .unwrap();
+        match &entries[0] {
+            VaultEntry::Login(e) => assert!(
+                !e.meta.field_times.contains_key("del:custom_fields:PIN"),
+                "re-adding clears the tombstone"
+            ),
+            _ => panic!("expected Login"),
+        }
+    }
+
     #[test]
     fn update_entry_missing_id_returns_error() {
         use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
 
         let mut entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1307,6 +1767,7 @@ mod tests {
 
         let ghost = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("does-not-exist"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1328,6 +1789,7 @@ mod tests {
         let mut entries = vec![
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("id-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1340,6 +1802,7 @@ mod tests {
             }),
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("id-002"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1366,6 +1829,7 @@ mod tests {
 
         let mut entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1407,6 +1871,7 @@ mod tests {
 
         let entries = vec![VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1437,6 +1902,7 @@ mod tests {
 
         let entries = vec![VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1470,6 +1936,7 @@ mod tests {
 
         let entries = vec![VaultEntry::Card(CardEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1510,6 +1977,7 @@ mod tests {
 
         let entries = vec![VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1553,6 +2021,7 @@ mod tests {
         use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
 
         let meta = EntryMeta {
+            field_times: Default::default(),
             id: String::from("id-001"),
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1607,6 +2076,7 @@ mod tests {
         use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
 
         let meta = EntryMeta {
+            field_times: Default::default(),
             id: String::from("id-001"),
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1661,6 +2131,7 @@ mod tests {
         use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
 
         let meta = EntryMeta {
+            field_times: Default::default(),
             id: String::from("id-001"),
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1723,6 +2194,7 @@ mod tests {
         use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
 
         let meta = EntryMeta {
+            field_times: Default::default(),
             id: String::from("id-001"),
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1785,6 +2257,7 @@ mod tests {
 
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1809,6 +2282,7 @@ mod tests {
 
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1847,6 +2321,7 @@ mod tests {
 
         let entries = vec![VaultEntry::File(FileEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1889,6 +2364,7 @@ mod tests {
 
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1945,6 +2421,7 @@ mod tests {
             ],
             entries: vec![VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from("id-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2000,6 +2477,7 @@ mod tests {
 
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2057,6 +2535,7 @@ mod tests {
 
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
+                field_times: Default::default(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2103,6 +2582,7 @@ mod tests {
         VaultBody {
             entries: vec![VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
+                    field_times: Default::default(),
                     id: String::from(id),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),

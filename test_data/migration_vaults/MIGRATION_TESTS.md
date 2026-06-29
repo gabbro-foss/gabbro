@@ -31,6 +31,7 @@ holding one login: title **`Migration Test Login`**, user `test-user`, pw `migra
 | `v6.gabbro` | v6 (alpha.3/4 era) | `320bf719e782` |
 | `v7.gabbro` | v7 (alpha.5-8) | `926d8d2401e2` |
 | `v8.gabbro` | v8 (transcript-binding) | `03732cd9b1b4` |
+| `v9.gabbro` | v9 (granular sync) | `947a82e7b933` |
 
 > To test, copy the files where the file picker can reach them — any folder on Linux;
 > on Android, push to **Downloads** (`adb push v7.gabbro /sdcard/Download/`). Sync only
@@ -55,6 +56,7 @@ transcript-bound seal/open running on real hardware.)
 | Dest-v6 created + lock/unlock | p | p |
 | Dest-v7 created + lock/unlock | p | p |
 | Dest-v8 created + lock/unlock | p | p |
+| Dest-v9 created + lock/unlock | — | — |
 
 ### S2 — Sync from each old-format file (backward-compat read on device)
 For each format, with its destination vault unlocked:
@@ -74,6 +76,7 @@ appears. Proves the v8 build decrypted a v6 / v7 / v8 file through real FFI on d
 | `v6.gabbro` -> Dest-v6 | p | p |
 | `v7.gabbro` -> Dest-v7 | p | p |
 | `v8.gabbro` -> Dest-v8 | p | p |
+| `v9.gabbro` -> Dest-v9 | — | — |
 
 ### S3 — Synced entry survives lock + restart
 1. After S2, **lock** Dest-v7, fully close Gabbro, relaunch.
@@ -120,6 +123,12 @@ platform tap path or the FFI/import wiring, not the crypto.)_
 ### 2026-06-22 — v8 run
 All scenarios pass on Linux and Android (see cells above). F-03 passphrase-only
 transcript-binding (VERSION 8) verified end-to-end.
+
+### 2026-06-29 — v9 added (granular sync), hardware run pending
+`v9.gabbro` added to the corpus (granular field-level sync; crypto byte-identical
+to v8). Software gate green (v6/v7/v8/v9 open + migrate under the v9 build). Hardware
+matrix cells left blank — to be run on **throwaway/mock vaults only** until the
+sync-redesign work has earned that back; the automated fuzz proof is green first.
 
 ---
 

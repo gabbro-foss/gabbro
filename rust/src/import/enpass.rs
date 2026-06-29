@@ -413,6 +413,7 @@ fn non_empty(s: &str) -> Option<String> {
 /// Timestamps are left empty — Rust will stamp them on first save.
 fn make_meta(uuid: &str) -> EntryMeta {
     EntryMeta {
+        field_times: Default::default(),
         id: uuid.to_string(),
         created_at: String::new(),
         updated_at: String::new(),

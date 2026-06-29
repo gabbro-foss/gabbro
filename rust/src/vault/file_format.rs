@@ -42,12 +42,18 @@
 //!   body decryption to fail with an authentication error (F-01 / header integrity).
 //!   `set_vault_alias` and all other header-mutating operations now require an
 //!   active session so the body can be re-sealed with the updated AAD.
-//! VERSION 8 (current): identical header LAYOUT to VERSION 7. The only change is
+//! VERSION 8: identical header LAYOUT to VERSION 7. The only change is
 //!   the passphrase-only hybrid combiner: the HKDF `info` now folds in the KEM
 //!   transcript (ct_M ‖ ephemeral_x25519_pub ‖ static_x25519_pub), so the
 //!   passphrase-only vault key is transcript-bound from inside the KDF, not only
 //!   via the AAD. YubiKey-mode key derivation is unchanged (F-03).
-//! Reads v2–8; always writes VERSION 8.
+//! VERSION 9 (current): identical header LAYOUT and cryptography to VERSION 8 —
+//!   crypto is byte-for-byte unchanged. The only change is in the encrypted body
+//!   JSON: each entry's metadata gains `field_times` (per-field change-times) for
+//!   granular, field-level sync. The bump exists so an OLDER build refuses a v9
+//!   vault (fail-closed) instead of opening it and silently stripping the new
+//!   per-field times on its next save.
+//! Reads v2–9; always writes VERSION 9.
 
 use crate::crypto::kdf::Argon2idParams;
 
@@ -67,7 +73,7 @@ pub struct YubiKeyRecord {
 pub const MAGIC: &[u8; 6] = b"GABBRO";
 
 /// Current file format version (written by this build).
-pub const VERSION: u8 = 8;
+pub const VERSION: u8 = 9;
 
 /// Oldest version this build can still read.
 const VERSION_MIN_READABLE: u8 = 2;
@@ -222,8 +228,16 @@ impl SealedVault {
             return Err("File truncated at version byte".to_string());
         }
         let version = data[pos];
-        if !(VERSION_MIN_READABLE..=VERSION).contains(&version) {
-            return Err(format!("Unsupported version: {}", version));
+        if version > VERSION {
+            // Fail closed: a newer-format vault is refused rather than opened and
+            // silently downgraded (which would strip data this build doesn't know).
+            return Err(format!(
+                "This vault was created by a newer version of Gabbro (format v{version}). \
+                 Please update Gabbro to open it."
+            ));
+        }
+        if version < VERSION_MIN_READABLE {
+            return Err(format!("Unsupported version: {version}"));
         }
         let is_v3 = version >= 3;
         let is_v4 = version >= 4;
@@ -613,9 +627,9 @@ mod tests {
     }
 
     #[test]
-    fn fresh_vault_is_version_8() {
-        assert_eq!(VERSION, 8);
-        assert_eq!(test_vault().version, 8);
+    fn fresh_vault_is_version_9() {
+        assert_eq!(VERSION, 9);
+        assert_eq!(test_vault().version, 9);
     }
 
     #[test]

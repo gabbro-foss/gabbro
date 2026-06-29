@@ -45,16 +45,15 @@
 //!
 //! # Test list (canon TDD — implement one at a time, red → green → refactor)
 //!
-//!   ✓ v7_passphrase_only_opens
+//!   ✓ v{7,8,9}_passphrase_only_opens
 //!   ✓ v7_passphrase_only_migrates_to_current_version
 //!   ✓ v6_passphrase_only_opens_and_migrates
-//!   ✓ v6_multikey_opens_with_each_registered_key
-//!   ✓ v7_multikey_opens_with_each_registered_key
-//!   ✓ yubikey_rotation_survives_key_loss_and_version_bumps   (from v6 and v7)
+//!   ✓ v{6,7,8,9}_multikey_opens_with_each_registered_key
+//!   ✓ yubikey_rotation_survives_key_loss_and_version_bumps   (from v6–v9)
 //!   ✓ cannot_remove_the_last_yubikey
-//!   ✓ passphrase_change_survives_and_migrates                (vault A, from v6 and v7)
+//!   ✓ passphrase_change_survives_and_migrates                (vault A, from v6–v9)
 //!   ✓ wrong_old_passphrase_rejected_and_vault_left_openable
-//!   ✓ passphrase_rotation_interleaved_with_key_loss          (vault B, from v6 and v7)
+//!   ✓ passphrase_rotation_interleaved_with_key_loss          (vault B, from v6–v9)
 //!
 //! See also the opt-in (`#[ignore]`'d) state-machine fuzzer in
 //! `tests/vault_state_machine_fuzz.rs`, which randomises the ORDER of
@@ -240,6 +239,35 @@ fn v8_multikey_opens_with_each_registered_key() {
     assert_opens_with(&p, YK2_HMAC, YK2_CRED, "YK2");
 }
 
+#[test]
+fn v9_passphrase_only_opens() {
+    // A v9 passphrase-only vault (crypto byte-identical to v8; the body JSON gains
+    // per-field change-times) must open under the current build and yield the
+    // canary — proving v9 seal/open round-trips through a frozen on-disk file.
+    let p = fixture("v9_passphrase.gabbro");
+    assert_eq!(
+        read_vault(&p).unwrap().version,
+        9,
+        "fixture must be VERSION 9"
+    );
+    let body = load_vault(FIXTURE_PASSPHRASE, &p)
+        .expect("current build must open the v9 passphrase-only golden vault");
+    assert_canary(&body);
+}
+
+#[test]
+fn v9_multikey_opens_with_each_registered_key() {
+    // A v9 passphrase + YK1 + YK2 vault must open with EITHER registered key.
+    let p = fixture("v9_multikey_2keys.gabbro");
+    assert_eq!(
+        read_vault(&p).unwrap().version,
+        9,
+        "fixture must be VERSION 9"
+    );
+    assert_opens_with(&p, YK1_HMAC, YK1_CRED, "YK1");
+    assert_opens_with(&p, YK2_HMAC, YK2_CRED, "YK2");
+}
+
 /// Walks the full key-loss / key-rotation journey on a temp copy of `fixture_name`,
 /// driving the *real* bridge functions the Flutter app calls. Every add/remove
 /// routes through `reseal_vault_body`, which re-binds the body to the new header
@@ -322,6 +350,7 @@ fn yubikey_rotation_survives_key_loss_and_version_bumps() {
     run_rotation_scenario("v6_multikey_2keys.gabbro");
     run_rotation_scenario("v7_multikey_2keys.gabbro");
     run_rotation_scenario("v8_multikey_2keys.gabbro");
+    run_rotation_scenario("v9_multikey_2keys.gabbro");
 }
 
 #[test]
@@ -413,6 +442,7 @@ fn passphrase_change_survives_and_migrates() {
     run_passphrase_change_scenario("v6_passphrase.gabbro");
     run_passphrase_change_scenario("v7_passphrase.gabbro");
     run_passphrase_change_scenario("v8_passphrase.gabbro");
+    run_passphrase_change_scenario("v9_passphrase.gabbro");
 }
 
 #[test]
@@ -559,4 +589,5 @@ fn passphrase_rotation_interleaved_with_key_loss() {
     run_passphrase_rotation_scenario("v6_multikey_2keys.gabbro");
     run_passphrase_rotation_scenario("v7_multikey_2keys.gabbro");
     run_passphrase_rotation_scenario("v8_multikey_2keys.gabbro");
+    run_passphrase_rotation_scenario("v9_multikey_2keys.gabbro");
 }

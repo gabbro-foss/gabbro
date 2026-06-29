@@ -136,6 +136,7 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
             .unwrap_or_default();
 
         let meta = EntryMeta {
+            field_times: Default::default(),
             id: item.id.clone(),
             created_at: crate::api::vault::chrono_now(),
             updated_at: crate::api::vault::chrono_now(),

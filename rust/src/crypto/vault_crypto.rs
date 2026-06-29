@@ -855,11 +855,11 @@ mod tests {
     }
 
     #[test]
-    fn seal_vault_produces_version_8() {
+    fn seal_vault_produces_version_9() {
         let sealed = seal_vault(b"pass", b"data", None).unwrap();
         assert_eq!(
-            sealed.version, 8,
-            "new vaults are sealed as VERSION 8 (FIPS + AAD + transcript-bound passphrase-only combiner)"
+            sealed.version, 9,
+            "new vaults are sealed as VERSION 9 (crypto identical to v8; body gains per-field change-times)"
         );
     }
 

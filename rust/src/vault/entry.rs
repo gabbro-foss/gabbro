@@ -4,11 +4,11 @@
 //! these types directly — it calls API functions that build them.
 
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// Common metadata shared by every entry, regardless of type.
-#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub struct EntryMeta {
     /// Stable unique identifier - never reused, even after deletion.
     pub id: String,
@@ -18,12 +18,35 @@ pub struct EntryMeta {
     pub updated_at: String,
     /// Which folder this entry belongs to (e.g. "Personal").
     pub folder: String,
+    /// Per-field last-change times for granular sync (v9+): field key -> ms since
+    /// the Unix epoch. Scalar fields are keyed by their serde name (e.g. "password");
+    /// custom pairs by "custom_fields:<label>"; attachments by "attachments:<uuid>".
+    /// Empty on pre-v9 vaults — an absent key counts as "oldest", so merge falls back
+    /// to the whole-entry `updated_at` (today's behaviour).
+    #[serde(default)]
+    pub field_times: BTreeMap<String, u64>,
 }
+
+// Hand-written Zeroize: BTreeMap has no Zeroize impl, so the derive cannot be used.
+// Mirrors the pattern on CustomEntry below.
+impl Zeroize for EntryMeta {
+    fn zeroize(&mut self) {
+        self.id.zeroize();
+        self.created_at.zeroize();
+        self.updated_at.zeroize();
+        self.folder.zeroize();
+        // clear() drops all keys and values; timestamps are not secret, but keep
+        // the metadata tidy and consistent with the rest of the zeroize discipline.
+        self.field_times.clear();
+    }
+}
+
+impl ZeroizeOnDrop for EntryMeta {}
 
 /// A binary attachment belonging to a vault entry.
 ///
 /// Imported from Enpass exports; data is base64-decoded on import.
-#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct EntryAttachment {
     pub uuid: String,
     pub name: String,
@@ -35,7 +58,7 @@ pub struct EntryAttachment {
 
 /// A login entry - the most common entry type
 /// Stores credentials for a website or application
-#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct LoginEntry {
     /// Shared metadata (id, timestamp, folder).
     pub meta: EntryMeta,
@@ -68,7 +91,7 @@ pub struct LoginEntry {
 }
 
 /// Holds one previous value of a sensitive field, for typo recovery.
-#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct PreviousSecret {
     /// The previous secret value.
     pub value: String,
@@ -80,7 +103,7 @@ pub struct PreviousSecret {
 }
 
 /// A single user-defined key/value field on an entry.
-#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct CustomField {
     pub label: String,
     pub value: String,
@@ -89,7 +112,7 @@ pub struct CustomField {
 }
 
 /// A secure note - free-text content with no credential fields.
-#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct NoteEntry {
     pub meta: EntryMeta,
     pub title: String,
@@ -100,7 +123,7 @@ pub struct NoteEntry {
 }
 
 /// A personal identity entry - name, address, contact details.
-#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct IdentityEntry {
     pub meta: EntryMeta,
     pub first_name: String,
@@ -115,7 +138,7 @@ pub struct IdentityEntry {
 }
 
 /// A payment card entry.
-#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct CardEntry {
     pub meta: EntryMeta,
     /// User's own label for this card (e.g. "Visa Platinum"). Optional —
@@ -216,7 +239,7 @@ impl CardEntry {
 }
 
 /// A file attachment entry - stores a binary payload.
-#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct FileEntry {
     pub meta: EntryMeta,
     pub filename: String,
@@ -228,7 +251,7 @@ pub struct FileEntry {
 }
 
 /// A fully custom entry - user-defined fields only.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CustomEntry {
     pub meta: EntryMeta,
     pub title: String,
@@ -252,7 +275,7 @@ impl ZeroizeOnDrop for CustomEntry {}
 ///
 /// This is the type that gets serialized to JSON and encrypted into
 /// the vault body. A `Vec<VaultEntry>` represents the full vault contents.
-#[derive(Debug, Clone, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 #[allow(clippy::large_enum_variant)]
 pub enum VaultEntry {
     Login(LoginEntry),
@@ -273,7 +296,43 @@ mod tests {
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
             folder: String::from("Personal"),
+            ..Default::default()
         }
+    }
+
+    // ── per-field change-times for granular sync (v9) ─────────────────────────
+
+    #[test]
+    fn field_times_defaults_empty_when_absent_from_json() {
+        // Pre-v9 vaults have no field_times: the missing field deserializes to an
+        // empty map (serde default), never an error.
+        let json = r#"{
+            "id": "x",
+            "created_at": "2025-01-01T00:00:00Z",
+            "updated_at": "2025-01-01T00:00:00Z",
+            "folder": "Personal"
+        }"#;
+        let meta: EntryMeta = serde_json::from_str(json).unwrap();
+        assert!(meta.field_times.is_empty());
+    }
+
+    #[test]
+    fn field_times_round_trips_through_json() {
+        let mut meta = default_meta();
+        meta.field_times
+            .insert(String::from("password"), 1_700_000_000_123);
+        let json = serde_json::to_string(&meta).unwrap();
+        let back: EntryMeta = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.field_times.get("password"), Some(&1_700_000_000_123));
+    }
+
+    #[test]
+    fn entrymeta_zeroize_clears_field_times() {
+        let mut meta = default_meta();
+        meta.field_times.insert(String::from("password"), 42);
+        meta.zeroize();
+        assert!(meta.field_times.is_empty());
+        assert!(meta.id.is_empty());
     }
 
     #[test]
