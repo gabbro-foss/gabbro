@@ -131,16 +131,17 @@ users use Syncthing/Nextcloud/USB.
 resolution *model* above is NOT yet what the code does. On branch `granular-sync-v9`:
 
 - Built: per-field diff/merge (`merge_entry_pair`), `field_times` schema + stamping,
-  format v8->v9 with the backward-compat gate (v6-v9 open/migrate green), item-delete
-  tombstones + keep/delete prompt, the fuzz harness, the FFI bridge, and the 3-vault
-  test corpus (`test_data/sync_test_vaults/`).
+  presence-based collisions (a field edited on both sides ALWAYS becomes a user conflict;
+  the clock is only an edit-mark, never picks a winner), format v8->v9 with the
+  backward-compat gate (v6-v9 open/migrate green), item-delete tombstones + keep/delete
+  prompt, the fuzz harness (3 devices, varied order), the FFI bridge, and the 3-vault
+  test corpus (`test_data/sync_test_vaults/`, distinct per-device edit times, varied-order
+  convergence proven).
 - Diverges from the agreed model, still to do:
-  1. A same-field difference must ALWAYS become a user conflict. Today it only conflicts
-     on an equal timestamp and otherwise keeps the newer value silently (trusts the clock).
-  2. Additive review/visibility: show the incoming changes (new entries, brought-over field
+  1. Additive review/visibility: show the incoming changes (new entries, brought-over field
      values) so the user can drop any, instead of merging non-conflicts silently.
-  3. Per-entry history for ANY replaced field value (generalise beyond `previous_password`).
-  4. Deletion keep/delete prompt: keep the pre-existing entry-level one and the new per-item
+  2. Per-entry history for ANY replaced field value (generalise beyond `previous_password`).
+  3. Deletion keep/delete prompt: keep the pre-existing entry-level one and the new per-item
      one; verify both still work.
 
 Next: net-first, then the test list for review, then code, per the model above.

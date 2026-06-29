@@ -8,7 +8,13 @@ edits, for hardware-testing N-device granular sync.
 
 The **same files** back the automated test
 `rust/src/vault/session.rs::sync_test_corpus_converges_without_loss`, so software and
-hardware exercise the identical artifacts.
+hardware exercise the identical artifacts. The test converges them in **several different
+sync orders** and asserts the same result every time (order must not matter).
+
+Each device stamps its edits at a **different time** (A oldest, then B, then C), so a
+colliding field genuinely differs in time — a real two-device clash, not an artificial
+same-millisecond tie. A clash is raised because **both sides edited the field**, never
+because the times match; the newer time is not used to silently pick a winner.
 
 ## The 12-entry base (identical on all three)
 
