@@ -679,6 +679,77 @@ pub fn session_revert_password(id: &str) -> Result<(), String> {
     Ok(())
 }
 
+/// Apply a field-conflict resolution. If `keep_incoming`, the field takes the
+/// incoming value; either way the field's change-time is bumped to now so the
+/// choice wins future merges (otherwise the equal-timestamp clash would recur).
+pub fn session_resolve_field_conflict(
+    id: String,
+    field: String,
+    keep_incoming: bool,
+    incoming_value: String,
+) -> Result<(), String> {
+    let (body, passphrase, path, yubikey) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        let entry = session
+            .entries
+            .iter_mut()
+            .find(|e| entry_id(e) == id)
+            .ok_or_else(|| format!("No entry found with id: {id}"))?;
+        if keep_incoming {
+            crate::api::vault::set_entry_field_by_key(entry, &field, &incoming_value);
+        }
+        let meta = meta_of_mut(entry);
+        meta.field_times.insert(field, crate::api::vault::now_ms());
+        meta.updated_at = crate::api::vault::chrono_now();
+        let body = build_body(session);
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            session.passphrase.clone(),
+            session.path.clone(),
+            yubikey,
+        )
+    };
+    do_save(&body, &passphrase, &path, yubikey)?;
+    Ok(())
+}
+
+/// Apply a pending item-delete resolution. If `delete`, the item is removed and a
+/// tombstone stamped; otherwise the item's change-time is bumped so it stops being
+/// re-flagged on future merges.
+pub fn session_resolve_item_delete(id: String, field: String, delete: bool) -> Result<(), String> {
+    let (body, passphrase, path, yubikey) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        let entry = session
+            .entries
+            .iter_mut()
+            .find(|e| entry_id(e) == id)
+            .ok_or_else(|| format!("No entry found with id: {id}"))?;
+        let now_ms = crate::api::vault::now_ms();
+        if delete {
+            crate::api::vault::remove_entry_item_by_key(entry, &field);
+            let meta = meta_of_mut(entry);
+            meta.field_times.insert(format!("del:{field}"), now_ms);
+            meta.field_times.remove(&field);
+        } else {
+            meta_of_mut(entry).field_times.insert(field, now_ms);
+        }
+        meta_of_mut(entry).updated_at = crate::api::vault::chrono_now();
+        let body = build_body(session);
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            session.passphrase.clone(),
+            session.path.clone(),
+            yubikey,
+        )
+    };
+    do_save(&body, &passphrase, &path, yubikey)?;
+    Ok(())
+}
+
 /// Write .gabbro + .gabbro.sha256, preserving the vault's protection (ADR-013).
 ///
 /// The default export copies the sealed on-disk vault byte-for-byte, so a
@@ -1514,7 +1585,11 @@ impl<'a> FieldMerger<'a> {
 pub(crate) fn merge_entry_pair(
     local: &VaultEntry,
     incoming: &VaultEntry,
-) -> (VaultEntry, Vec<FieldConflictItem>, Vec<PendingItemDeleteItem>) {
+) -> (
+    VaultEntry,
+    Vec<FieldConflictItem>,
+    Vec<PendingItemDeleteItem>,
+) {
     let lm = meta_of(local);
     let im = meta_of(incoming);
     let title = entry_display_title(local);

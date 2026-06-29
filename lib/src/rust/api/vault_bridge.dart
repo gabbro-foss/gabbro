@@ -364,6 +364,33 @@ Future<MergeSummary> mergeVaultFromFile({
   passphrase: passphrase,
 );
 
+/// Resolve one field-level clash surfaced by a merge (`MergeSummary.field_conflicts`).
+/// `keep_incoming` true applies the other device's value; either way the choice is
+/// stamped so it wins future merges. Persists (async — vault save).
+Future<void> resolveFieldConflict({
+  required String id,
+  required String field,
+  required bool keepIncoming,
+  required String incomingValue,
+}) => RustLib.instance.api.crateApiVaultBridgeResolveFieldConflict(
+  id: id,
+  field: field,
+  keepIncoming: keepIncoming,
+  incomingValue: incomingValue,
+);
+
+/// Resolve one pending item-delete surfaced by a merge (`MergeSummary.pending_item_deletes`).
+/// `delete` true removes the item; false keeps it. Persists (async — vault save).
+Future<void> resolveItemDelete({
+  required String id,
+  required String field,
+  required bool delete,
+}) => RustLib.instance.api.crateApiVaultBridgeResolveItemDelete(
+  id: id,
+  field: field,
+  delete: delete,
+);
+
 /// Merge a **key-protected** incoming `.gabbro` file into the current session (ADR-013).
 ///
 /// The analogue of [`merge_vault_from_file`] for a source created with YubiKey

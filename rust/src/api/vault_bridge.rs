@@ -914,6 +914,24 @@ pub async fn merge_vault_from_file(
     session::session_merge_vault_from_body(incoming_body)
 }
 
+/// Resolve one field-level clash surfaced by a merge (`MergeSummary.field_conflicts`).
+/// `keep_incoming` true applies the other device's value; either way the choice is
+/// stamped so it wins future merges. Persists (async — vault save).
+pub async fn resolve_field_conflict(
+    id: String,
+    field: String,
+    keep_incoming: bool,
+    incoming_value: String,
+) -> Result<(), String> {
+    session::session_resolve_field_conflict(id, field, keep_incoming, incoming_value)
+}
+
+/// Resolve one pending item-delete surfaced by a merge (`MergeSummary.pending_item_deletes`).
+/// `delete` true removes the item; false keeps it. Persists (async — vault save).
+pub async fn resolve_item_delete(id: String, field: String, delete: bool) -> Result<(), String> {
+    session::session_resolve_item_delete(id, field, delete)
+}
+
 /// Merge a **key-protected** incoming `.gabbro` file into the current session (ADR-013).
 ///
 /// The analogue of [`merge_vault_from_file`] for a source created with YubiKey

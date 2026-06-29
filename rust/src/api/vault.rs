@@ -506,6 +506,148 @@ fn item_keys(entry: &VaultEntry) -> std::collections::HashSet<String> {
     keys
 }
 
+/// Mutable access to an entry's `custom_fields` vec (None for Custom, which keys
+/// its fields in a map).
+fn entry_custom_fields_mut(
+    entry: &mut VaultEntry,
+) -> Option<&mut Vec<crate::vault::entry::CustomField>> {
+    match entry {
+        VaultEntry::Login(e) => Some(&mut e.custom_fields),
+        VaultEntry::Note(e) => Some(&mut e.custom_fields),
+        VaultEntry::Identity(e) => Some(&mut e.custom_fields),
+        VaultEntry::Card(e) => Some(&mut e.custom_fields),
+        VaultEntry::File(e) => Some(&mut e.custom_fields),
+        VaultEntry::Custom(_) => None,
+    }
+}
+
+/// Set a scalar field by its serde-name key. Unknown keys are ignored; Option
+/// fields become `Some(value)`. File `data` (binary) is intentionally not set here.
+fn set_entry_scalar(entry: &mut VaultEntry, key: &str, value: &str) {
+    let s = value.to_string();
+    match entry {
+        VaultEntry::Login(e) => match key {
+            "title" => e.title = s,
+            "url" => e.url = s,
+            "username" => e.username = s,
+            "password" => e.password = s,
+            "notes" => e.notes = Some(s),
+            "app_id" => e.app_id = Some(s),
+            "email" => e.email = Some(s),
+            _ => {}
+        },
+        VaultEntry::Note(e) => match key {
+            "title" => e.title = s,
+            "content" => e.content = s,
+            _ => {}
+        },
+        VaultEntry::Identity(e) => match key {
+            "first_name" => e.first_name = s,
+            "last_name" => e.last_name = s,
+            "email" => e.email = s,
+            "phone" => e.phone = Some(s),
+            "address" => e.address = Some(s),
+            _ => {}
+        },
+        VaultEntry::Card(e) => match key {
+            "card_name" => e.card_name = Some(s),
+            "status" => e.status = s,
+            "cardholder_name" => e.cardholder_name = s,
+            "card_number" => e.card_number = s,
+            "expiry" => e.expiry = s,
+            "cvv" => e.cvv = s,
+            "credit_limit" => e.credit_limit = Some(s),
+            "card_account_number" => e.card_account_number = Some(s),
+            "payment_network" => e.payment_network = Some(s),
+            "pin" => e.pin = Some(s),
+            "bank_name" => e.bank_name = Some(s),
+            "transaction_password" => e.transaction_password = Some(s),
+            "notes" => e.notes = Some(s),
+            _ => {}
+        },
+        VaultEntry::File(e) => match key {
+            "filename" => e.filename = s,
+            "notes" => e.notes = Some(s),
+            _ => {}
+        },
+        VaultEntry::Custom(e) => {
+            if key == "title" {
+                e.title = s;
+            }
+        }
+    }
+}
+
+/// Apply a value to an entry field by merge key (a scalar name or
+/// "custom_fields:<label>"). "attachments:<uuid>" and File "data" carry no
+/// applyable string and are left unchanged. Used by "keep theirs" resolution.
+pub(crate) fn set_entry_field_by_key(entry: &mut VaultEntry, key: &str, value: &str) {
+    use crate::vault::entry::CustomField;
+    if let Some(label) = key.strip_prefix("custom_fields:") {
+        match entry {
+            VaultEntry::Custom(e) => {
+                e.fields
+                    .entry(label.to_string())
+                    .and_modify(|f| f.value = value.to_string())
+                    .or_insert_with(|| CustomField {
+                        label: label.to_string(),
+                        value: value.to_string(),
+                        hidden: false,
+                    });
+            }
+            _ => {
+                if let Some(v) = entry_custom_fields_mut(entry) {
+                    if let Some(f) = v.iter_mut().find(|f| f.label == label) {
+                        f.value = value.to_string();
+                    } else {
+                        v.push(CustomField {
+                            label: label.to_string(),
+                            value: value.to_string(),
+                            hidden: false,
+                        });
+                    }
+                }
+            }
+        }
+        return;
+    }
+    if key.starts_with("attachments:") {
+        return;
+    }
+    set_entry_scalar(entry, key, value);
+}
+
+/// Remove an item (custom pair / attachment) from an entry by merge key. Used by
+/// the "delete" resolution of a pending item-delete.
+pub(crate) fn remove_entry_item_by_key(entry: &mut VaultEntry, key: &str) {
+    if let Some(label) = key.strip_prefix("custom_fields:") {
+        match entry {
+            VaultEntry::Custom(e) => {
+                e.fields.remove(label);
+            }
+            _ => {
+                if let Some(v) = entry_custom_fields_mut(entry) {
+                    v.retain(|f| f.label != label);
+                }
+            }
+        }
+        return;
+    }
+    if let Some(uuid) = key.strip_prefix("attachments:") {
+        let atts = match entry {
+            VaultEntry::Login(e) => Some(&mut e.attachments),
+            VaultEntry::Note(e) => Some(&mut e.attachments),
+            VaultEntry::Identity(e) => Some(&mut e.attachments),
+            VaultEntry::Card(e) => Some(&mut e.attachments),
+            VaultEntry::Custom(e) => Some(&mut e.attachments),
+            VaultEntry::File(_) => None,
+        };
+        if let Some(atts) = atts {
+            atts.retain(|a| a.uuid != uuid);
+        }
+    }
+}
+
 /// Replace an existing entry in the vault with an updated version.
 ///
 /// Matches by UUID — the updated entry must carry the same id as the
@@ -1755,6 +1897,87 @@ mod tests {
                 !e.meta.field_times.contains_key("del:custom_fields:PIN"),
                 "re-adding clears the tombstone"
             ),
+            _ => panic!("expected Login"),
+        }
+    }
+
+    fn sample_login_for_resolve() -> crate::vault::entry::VaultEntry {
+        use crate::vault::entry::{
+            CustomField, EntryAttachment, EntryMeta, LoginEntry, VaultEntry,
+        };
+        VaultEntry::Login(LoginEntry {
+            meta: EntryMeta {
+                id: String::from("l"),
+                created_at: String::new(),
+                updated_at: String::new(),
+                folder: String::new(),
+                ..Default::default()
+            },
+            title: String::from("T"),
+            url: String::new(),
+            username: String::from("u"),
+            password: String::from("old"),
+            notes: None,
+            custom_fields: vec![CustomField {
+                label: String::from("PIN"),
+                value: String::from("1234"),
+                hidden: true,
+            }],
+            attachments: vec![EntryAttachment {
+                uuid: String::from("att-1"),
+                name: String::from("a"),
+                kind: String::from("text"),
+                data: vec![],
+            }],
+            previous_password: None,
+            app_id: None,
+            email: None,
+        })
+    }
+
+    #[test]
+    fn set_entry_field_by_key_sets_scalar() {
+        let mut e = sample_login_for_resolve();
+        set_entry_field_by_key(&mut e, "password", "new-pw");
+        match &e {
+            VaultEntry::Login(l) => assert_eq!(l.password, "new-pw"),
+            _ => panic!("expected Login"),
+        }
+    }
+
+    #[test]
+    fn set_entry_field_by_key_sets_custom_pair() {
+        let mut e = sample_login_for_resolve();
+        set_entry_field_by_key(&mut e, "custom_fields:PIN", "9999");
+        match &e {
+            VaultEntry::Login(l) => assert_eq!(
+                l.custom_fields
+                    .iter()
+                    .find(|f| f.label == "PIN")
+                    .unwrap()
+                    .value,
+                "9999"
+            ),
+            _ => panic!("expected Login"),
+        }
+    }
+
+    #[test]
+    fn remove_entry_item_by_key_removes_custom_pair() {
+        let mut e = sample_login_for_resolve();
+        remove_entry_item_by_key(&mut e, "custom_fields:PIN");
+        match &e {
+            VaultEntry::Login(l) => assert!(l.custom_fields.iter().all(|f| f.label != "PIN")),
+            _ => panic!("expected Login"),
+        }
+    }
+
+    #[test]
+    fn remove_entry_item_by_key_removes_attachment() {
+        let mut e = sample_login_for_resolve();
+        remove_entry_item_by_key(&mut e, "attachments:att-1");
+        match &e {
+            VaultEntry::Login(l) => assert!(l.attachments.is_empty()),
             _ => panic!("expected Login"),
         }
     }
