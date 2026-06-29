@@ -1371,9 +1371,19 @@ fn meta_of_mut(e: &mut VaultEntry) -> &mut EntryMeta {
     }
 }
 
-/// Core last-writer-wins decision for one field. Returns the winning side, the
-/// timestamp to record (if any), and whether this is a true clash (equal time,
-/// different value) that must be surfaced rather than silently resolved.
+/// Decide one field, by EDIT-MARK PRESENCE, not by timestamp value. A field that
+/// was edited carries a change-stamp (`Some`); an untouched field does not (`None`).
+/// Returns the winning side, the stamp to record on the merged field, and whether
+/// this is a collision the user must resolve.
+///
+/// Rules (values that are equal are never a collision):
+/// - both sides edited it (both stamped), values differ -> COLLISION, keep local.
+///   A clock is never used to pick a winner (a real same-instant edit is near
+///   impossible; the realistic case is two edits at different times, both kept
+///   until the user chooses).
+/// - exactly one side edited it -> take that side's value (additive), no prompt.
+/// - neither side carries a stamp (pre-v9, or both untouched): fall back to the
+///   whole-entry `updated_at`; an exact tie with differing values is a collision.
 fn decide_field(
     lt: Option<u64>,
     it: Option<u64>,
@@ -1381,25 +1391,25 @@ fn decide_field(
     i_updated: &str,
     values_equal: bool,
 ) -> (Side, Option<u64>, bool) {
+    // Stamp recorded on the merged field: stay "edited" if either side was, using
+    // the max for deterministic convergence. Decisions use only PRESENCE below.
+    let merged_stamp = match (lt, it) {
+        (Some(l), Some(i)) => Some(l.max(i)),
+        (Some(l), None) => Some(l),
+        (None, Some(i)) => Some(i),
+        (None, None) => None,
+    };
+    if values_equal {
+        return (Side::Local, merged_stamp, false);
+    }
     match (lt, it) {
-        (Some(l), Some(i)) => {
-            if i > l {
-                (Side::Incoming, Some(i), false)
-            } else if l > i || values_equal {
-                (Side::Local, Some(l), false)
-            } else {
-                (Side::Local, Some(l), true) // tie + different value -> clash, keep local
-            }
-        }
-        // A field stamped on one side only was edited there post-v9; an absent
-        // stamp counts as "oldest", so the stamped side wins.
-        (Some(l), None) => (Side::Local, Some(l), false),
-        (None, Some(i)) => (Side::Incoming, Some(i), false),
-        // Pre-v9 fallback: whole-entry updated_at (lexicographic == temporal).
+        (Some(_), Some(_)) => (Side::Local, merged_stamp, true), // both edited -> collision
+        (Some(_), None) => (Side::Local, merged_stamp, false),   // only local edited
+        (None, Some(_)) => (Side::Incoming, merged_stamp, false), // only incoming edited
         (None, None) => {
             if i_updated > l_updated {
                 (Side::Incoming, None, false)
-            } else if l_updated > i_updated || values_equal {
+            } else if l_updated > i_updated {
                 (Side::Local, None, false)
             } else {
                 (Side::Local, None, true)
@@ -1982,20 +1992,44 @@ mod field_merge_tests {
     }
 
     #[test]
-    fn merge_newer_field_value_wins_per_field() {
+    fn merge_same_field_edited_on_both_is_conflict_regardless_of_timestamp() {
+        // Realistic collision: both devices edited the same field, at DIFFERENT
+        // times. The newer one is NOT auto-picked; it is surfaced for the user.
         let local = note("n1", "T", "A", "t", &[("content", 100)]);
-        let incoming = note("n1", "T", "B", "t", &[("content", 200)]);
-        let (merged, _, _) = merge_entry_pair(&local, &incoming);
-        assert_eq!(note_content(&merged), "B");
+        let incoming = note("n1", "T", "B", "t", &[("content", 999)]);
+        let (merged, conflicts, _) = merge_entry_pair(&local, &incoming);
+        assert_eq!(
+            note_content(&merged),
+            "A",
+            "keeps local pending the user's pick"
+        );
+        assert!(
+            conflicts.iter().any(|f| f.field == "content"),
+            "both edited the same field -> conflict, never an auto-pick by clock"
+        );
     }
 
     #[test]
-    fn merge_cleared_field_with_newer_ts_beats_stale_nonempty() {
-        // A cleared (empty) value with a newer stamp must win — never "empty loses".
-        let local = note("n1", "T", "text", "t", &[("content", 100)]);
+    fn merge_field_edited_on_one_side_only_comes_over() {
+        // Only incoming edited content (to empty); local never touched it. The edit
+        // comes over additively, no prompt. Empty does not lose.
+        let local = note("n1", "T", "text", "t", &[]);
         let incoming = note("n1", "T", "", "t", &[("content", 200)]);
-        let (merged, _, _) = merge_entry_pair(&local, &incoming);
+        let (merged, conflicts, _) = merge_entry_pair(&local, &incoming);
         assert_eq!(note_content(&merged), "");
+        assert!(
+            conflicts.is_empty(),
+            "one-sided edit is additive, no conflict"
+        );
+    }
+
+    #[test]
+    fn merge_field_edited_only_on_local_is_kept() {
+        let local = note("n1", "T", "A", "t", &[("content", 100)]);
+        let incoming = note("n1", "T", "base", "t", &[]);
+        let (merged, conflicts, _) = merge_entry_pair(&local, &incoming);
+        assert_eq!(note_content(&merged), "A");
+        assert!(conflicts.is_empty(), "local-only edit kept, no conflict");
     }
 
     #[test]
@@ -2150,7 +2184,7 @@ mod field_merge_tests {
     }
 
     #[test]
-    fn merge_previous_password_follows_password_winner() {
+    fn merge_collision_keeps_local_password_and_its_history() {
         use crate::vault::entry::PreviousSecret;
         let login = |pw: &str, prev: &str, times: &[(&str, u64)]| {
             VaultEntry::Login(LoginEntry {
@@ -2171,20 +2205,19 @@ mod field_merge_tests {
                 email: None,
             })
         };
+        // Both devices edited the password (different times) -> collision. Local is
+        // kept pending the user's choice, and its history follows the kept value.
         let local = login("new-local", "old-local", &[("password", 200)]);
         let incoming = login("new-remote", "old-remote", &[("password", 300)]);
-        let (merged, _, _) = merge_entry_pair(&local, &incoming);
+        let (merged, conflicts, _) = merge_entry_pair(&local, &incoming);
         match &merged {
             VaultEntry::Login(e) => {
-                assert_eq!(e.password, "new-remote", "incoming password wins");
-                assert_eq!(
-                    e.previous_password.as_ref().unwrap().value,
-                    "old-remote",
-                    "history follows the winning password"
-                );
+                assert_eq!(e.password, "new-local");
+                assert_eq!(e.previous_password.as_ref().unwrap().value, "old-local");
             }
             _ => panic!("expected Login"),
         }
+        assert!(conflicts.iter().any(|f| f.field == "password"));
     }
 }
 
@@ -5895,7 +5928,7 @@ mod sync_fuzz {
         CardEntry, CustomEntry, CustomField, EntryAttachment, FileEntry, IdentityEntry, LoginEntry,
         NoteEntry,
     };
-    use std::collections::{BTreeMap, HashMap, HashSet};
+    use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
     // SplitMix64 — deterministic, dependency-free.
     struct Rng(u64);
@@ -6334,7 +6367,10 @@ mod sync_fuzz {
         }
     }
 
-    fn sync_sets(a: &[VaultEntry], b: &[VaultEntry]) -> Vec<VaultEntry> {
+    // Sync b into a: union by id, granular merge for shared ids. Returns the merged
+    // set AND the (id, field) collisions surfaced by the merge.
+    type FieldKey = (String, String);
+    fn sync_sets(a: &[VaultEntry], b: &[VaultEntry]) -> (Vec<VaultEntry>, Vec<FieldKey>) {
         let a_by: HashMap<&str, &VaultEntry> =
             a.iter().map(|e| (meta_of(e).id.as_str(), e)).collect();
         let b_by: HashMap<&str, &VaultEntry> =
@@ -6348,45 +6384,83 @@ mod sync_fuzz {
             }
         }
         let mut out = Vec::new();
+        let mut conflicts = Vec::new();
         for id in &ids {
             match (a_by.get(id.as_str()), b_by.get(id.as_str())) {
-                (Some(x), Some(y)) => out.push(merge_entry_pair(x, y).0),
+                (Some(x), Some(y)) => {
+                    let (m, cs, _pending) = merge_entry_pair(x, y);
+                    for c in cs {
+                        conflicts.push((c.id.clone(), c.field.clone()));
+                    }
+                    out.push(m);
+                }
                 (Some(x), None) => out.push((*x).clone()),
                 (None, Some(y)) => out.push((*y).clone()),
                 (None, None) => {}
             }
         }
-        out
+        (out, conflicts)
     }
-    fn converge(devices: &[Vec<VaultEntry>], order: &[usize]) -> Vec<VaultEntry> {
+    fn converge(
+        devices: &[Vec<VaultEntry>],
+        order: &[usize],
+    ) -> (Vec<VaultEntry>, BTreeSet<FieldKey>) {
         let mut acc = devices[order[0]].clone();
+        let mut conflicts = BTreeSet::new();
         for &i in &order[1..] {
-            acc = sync_sets(&acc, &devices[i]);
+            let (next, cs) = sync_sets(&acc, &devices[i]);
+            conflicts.extend(cs);
+            acc = next;
         }
-        acc
+        (acc, conflicts)
     }
 
-    // INDEPENDENT oracle: newest value per (entry, field) across device states,
-    // computed directly (max field-time), never via merge_entry_pair.
-    fn expected_values(devices: &[Vec<VaultEntry>]) -> BTreeMap<(String, String), String> {
-        let mut best: HashMap<(String, String), (u64, String)> = HashMap::new();
+    // INDEPENDENT oracle, computed straight from device states (never via the merge):
+    // for each (entry, field), look at which devices EDITED it (carry an edit-stamp)
+    // and their values.
+    //   edited on 0 or 1 distinct value -> agreed/additive: one expected value.
+    //   edited to 2+ distinct values    -> a collision the merge must surface.
+    #[allow(clippy::type_complexity)]
+    fn oracle(
+        devices: &[Vec<VaultEntry>],
+    ) -> (
+        BTreeMap<FieldKey, String>,
+        BTreeSet<FieldKey>,
+        HashMap<FieldKey, HashSet<String>>,
+    ) {
+        let mut any_vals: HashMap<FieldKey, HashSet<String>> = HashMap::new();
+        let mut editor_vals: HashMap<FieldKey, HashSet<String>> = HashMap::new();
         for dev in devices {
             for e in dev {
                 let id = meta_of(e).id.clone();
                 let ft = &meta_of(e).field_times;
                 for key in all_field_keys(e) {
-                    if let Some(value) = field_value(e, &key) {
-                        let ts = ft.get(&key).copied().unwrap_or(0);
-                        let k = (id.clone(), key);
-                        let better = best.get(&k).map(|(b, _)| ts > *b).unwrap_or(true);
-                        if better {
-                            best.insert(k, (ts, value));
+                    if let Some(v) = field_value(e, &key) {
+                        let k = (id.clone(), key.clone());
+                        any_vals.entry(k.clone()).or_default().insert(v.clone());
+                        if ft.contains_key(&key) {
+                            editor_vals.entry(k).or_default().insert(v);
                         }
                     }
                 }
             }
         }
-        best.into_iter().map(|(k, (_, v))| (k, v)).collect()
+        let mut single = BTreeMap::new();
+        let mut conflicts = BTreeSet::new();
+        let mut allowed = HashMap::new();
+        for (k, anyset) in any_vals {
+            let evals = editor_vals.remove(&k).unwrap_or_default();
+            if evals.len() >= 2 {
+                conflicts.insert(k.clone());
+                allowed.insert(k, evals);
+            } else if evals.len() == 1 {
+                single.insert(k, evals.into_iter().next().unwrap());
+            } else {
+                // never edited: the base value (identical across devices).
+                single.insert(k, anyset.into_iter().next().unwrap());
+            }
+        }
+        (single, conflicts, allowed)
     }
     fn result_values(entries: &[VaultEntry]) -> BTreeMap<(String, String), String> {
         let mut m = BTreeMap::new();
@@ -6428,28 +6502,59 @@ mod sync_fuzz {
                 }
             }
 
-            let expected = expected_values(&devices);
+            let (single, collisions, allowed) = oracle(&devices);
             let order1 = perm(DEVICES, &mut rng);
             let order2 = perm(DEVICES, &mut rng);
-            let r1 = converge(&devices, &order1);
-            let r2 = converge(&devices, &order2);
+            let (r1, c1) = converge(&devices, &order1);
+            let (r2, c2) = converge(&devices, &order2);
+            let rv1 = result_values(&r1);
+            let rv2 = result_values(&r2);
 
-            assert_eq!(
-                result_values(&r1),
-                expected,
-                "pass {pass}: converged result must match the independent oracle (no loss / correct LWW)"
-            );
-            assert_eq!(
-                result_values(&r2),
-                expected,
-                "pass {pass}: a different sync order must give the same result (order-independent)"
-            );
-            for (d, dev) in devices.iter().enumerate() {
-                assert_eq!(
-                    result_values(&sync_sets(&r1, dev)),
-                    expected,
-                    "pass {pass}: converged set must be stable when re-merged with device {d}"
+            // 1. The set of collisions is exactly the expected one, in BOTH orders
+            //    (order-independence of what gets surfaced).
+            assert_eq!(c1, collisions, "pass {pass}: order1 collisions");
+            assert_eq!(c2, collisions, "pass {pass}: order2 collisions");
+
+            // 2. Every agreed / one-sided field converges to its value, both orders,
+            //    and is not falsely flagged as a collision.
+            for (k, v) in &single {
+                assert_eq!(rv1.get(k), Some(v), "pass {pass}: {k:?} did not converge");
+                assert_eq!(rv2.get(k), Some(v), "pass {pass}: {k:?} order-dependent");
+                assert!(
+                    !collisions.contains(k),
+                    "pass {pass}: {k:?} falsely a collision"
                 );
+            }
+
+            // 3. Every collision keeps ONE of the contended values (never lost, never
+            //    invented) on each side.
+            for k in &collisions {
+                let v1 = rv1
+                    .get(k)
+                    .unwrap_or_else(|| panic!("pass {pass}: {k:?} missing"));
+                let v2 = rv2
+                    .get(k)
+                    .unwrap_or_else(|| panic!("pass {pass}: {k:?} missing"));
+                assert!(
+                    allowed[k].contains(v1),
+                    "pass {pass}: {k:?} invented a value"
+                );
+                assert!(
+                    allowed[k].contains(v2),
+                    "pass {pass}: {k:?} invented a value"
+                );
+            }
+
+            // 4. Stability: re-merging the converged set with any device surfaces no
+            //    NEW collision beyond the known set.
+            for dev in &devices {
+                let (_again, cs) = sync_sets(&r1, dev);
+                for c in cs {
+                    assert!(
+                        collisions.contains(&c),
+                        "pass {pass}: new collision {c:?} on re-merge"
+                    );
+                }
             }
         }
     }
