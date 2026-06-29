@@ -25,6 +25,26 @@ pub struct EntryMeta {
     /// to the whole-entry `updated_at` (today's behaviour).
     #[serde(default)]
     pub field_times: BTreeMap<String, u64>,
+    /// Values replaced during sync resolution, kept so the user can recover them
+    /// (the sync model's fallback property). Each record names the field key the
+    /// value belonged to. Empty on vaults written before this was added.
+    #[serde(default)]
+    pub history: Vec<HistoryRecord>,
+}
+
+/// A value that was overwritten (e.g. the losing side of a sync clash, or a
+/// brought-over edit the user kept) and retained so it can be recovered later.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
+pub struct HistoryRecord {
+    /// Field key the value belonged to ("password", "custom_fields:Tag", ...).
+    pub field: String,
+    /// The replaced value (may be a secret — treat accordingly).
+    pub value: String,
+    /// ISO 8601 timestamp: when the current value replaced this one.
+    pub saved_at: String,
+    /// ISO 8601 timestamp: when this record auto-purges.
+    /// `None` means keep until manually deleted.
+    pub expires_at: Option<String>,
 }
 
 // Hand-written Zeroize: BTreeMap has no Zeroize impl, so the derive cannot be used.
@@ -38,6 +58,10 @@ impl Zeroize for EntryMeta {
         // clear() drops all keys and values; timestamps are not secret, but keep
         // the metadata tidy and consistent with the rest of the zeroize discipline.
         self.field_times.clear();
+        for h in &mut self.history {
+            h.zeroize();
+        }
+        self.history.clear();
     }
 }
 
@@ -333,6 +357,48 @@ mod tests {
         meta.zeroize();
         assert!(meta.field_times.is_empty());
         assert!(meta.id.is_empty());
+    }
+
+    fn sample_history(value: &str) -> HistoryRecord {
+        HistoryRecord {
+            field: String::from("password"),
+            value: value.to_string(),
+            saved_at: String::from("2026-01-01T00:00:00Z"),
+            expires_at: None,
+        }
+    }
+
+    #[test]
+    fn history_defaults_empty_when_absent_from_json() {
+        // Vaults written before history existed deserialize to an empty list
+        // (serde default), never an error.
+        let json = r#"{
+            "id": "x",
+            "created_at": "2025-01-01T00:00:00Z",
+            "updated_at": "2025-01-01T00:00:00Z",
+            "folder": "Personal"
+        }"#;
+        let meta: EntryMeta = serde_json::from_str(json).unwrap();
+        assert!(meta.history.is_empty());
+    }
+
+    #[test]
+    fn history_round_trips_through_json() {
+        let mut meta = default_meta();
+        meta.history.push(sample_history("old-pw"));
+        let json = serde_json::to_string(&meta).unwrap();
+        let back: EntryMeta = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.history.len(), 1);
+        assert_eq!(back.history[0].value, "old-pw");
+        assert_eq!(back.history[0].field, "password");
+    }
+
+    #[test]
+    fn entrymeta_zeroize_clears_history() {
+        let mut meta = default_meta();
+        meta.history.push(sample_history("secret"));
+        meta.zeroize();
+        assert!(meta.history.is_empty());
     }
 
     #[test]

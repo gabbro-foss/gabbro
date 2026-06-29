@@ -11,6 +11,7 @@ import 'package:gabbro/safe_file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
 import 'package:gabbro/screens/password_history_screen.dart';
+import 'package:gabbro/screens/recovery_history_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
@@ -65,6 +66,12 @@ Future<void> _defaultClearHistory(String id) =>
     sessionClearPasswordHistory(id: id);
 Future<void> _defaultRevertPassword(String id) =>
     sessionRevertPassword(id: id);
+Future<List<HistoryRecordData>> _defaultFetchHistory(String id) =>
+    getEntryHistory(id: id);
+Future<void> _defaultRestoreHistory(String id, int index) =>
+    restoreHistory(id: id, index: index);
+Future<void> _defaultDeleteHistory(String id, int index) =>
+    deleteHistory(id: id, index: index);
 
 class EntryDetailScreen extends StatefulWidget {
   final VaultEntryData entry;
@@ -73,6 +80,12 @@ class EntryDetailScreen extends StatefulWidget {
   final ClipboardClearTimeout clipboardClearTimeout;
   final Future<void> Function(String id) onClearPasswordHistory;
   final Future<void> Function(String id) onRevertPassword;
+
+  /// Recovery history (values replaced during sync). Injectable for tests; the
+  /// fetch is best-effort and failures simply hide the section.
+  final Future<List<HistoryRecordData>> Function(String id) onFetchHistory;
+  final Future<void> Function(String id, int index) onRestoreHistory;
+  final Future<void> Function(String id, int index) onDeleteHistory;
 
   /// Optional callback invoked after a successful delete, in place of
   /// [Navigator.pop]. Used by the tablet layout to clear the detail pane
@@ -97,6 +110,9 @@ class EntryDetailScreen extends StatefulWidget {
     this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
     this.onClearPasswordHistory = _defaultClearHistory,
     this.onRevertPassword = _defaultRevertPassword,
+    this.onFetchHistory = _defaultFetchHistory,
+    this.onRestoreHistory = _defaultRestoreHistory,
+    this.onDeleteHistory = _defaultDeleteHistory,
     this.onLaunchUrl = _defaultLaunchUrl,
     this.onDeleted,
     this.onEdited,
@@ -116,10 +132,22 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   bool _cvvObscured = true;
   final Set<String> _revealedFields = {};
 
+  List<HistoryRecordData> _history = const [];
+
   @override
   void initState() {
     super.initState();
     _entry = widget.entry;
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    try {
+      final h = await widget.onFetchHistory(_entryId());
+      if (mounted) setState(() => _history = h);
+    } catch (_) {
+      // Best-effort: a fetch failure simply hides the recovery-history section.
+    }
   }
 
   @override
@@ -906,6 +934,36 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
               ),
             ],
           ),
+          if (_history.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.history),
+                title: Text(
+                  l.historyPrevious,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                trailing: const Icon(Icons.chevron_right, size: 18),
+                onTap: () async {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => RecoveryHistoryScreen(
+                        records: _history,
+                        onRestore: (i) async {
+                          await widget.onRestoreHistory(_entryId(), i);
+                          final fresh = getEntry(id: _entryId());
+                          if (mounted) setState(() => _entry = fresh);
+                        },
+                        onDelete: (i) =>
+                            widget.onDeleteHistory(_entryId(), i),
+                      ),
+                    ),
+                  );
+                  await _loadHistory();
+                },
+              ),
+            ),
         ],
       ),
     );

@@ -392,6 +392,36 @@ class FolderConflictItem {
           incomingFolder == other.incomingFolder;
 }
 
+/// A recovery-history record for Flutter: a value replaced during sync, kept so
+/// the user can restore it. `value` is plaintext — Flutter masks secret fields.
+class HistoryRecordData {
+  final String field;
+  final String value;
+  final String savedAt;
+  final String? expiresAt;
+
+  const HistoryRecordData({
+    required this.field,
+    required this.value,
+    required this.savedAt,
+    this.expiresAt,
+  });
+
+  @override
+  int get hashCode =>
+      field.hashCode ^ value.hashCode ^ savedAt.hashCode ^ expiresAt.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HistoryRecordData &&
+          runtimeType == other.runtimeType &&
+          field == other.field &&
+          value == other.value &&
+          savedAt == other.savedAt &&
+          expiresAt == other.expiresAt;
+}
+
 /// An identity entry as seen by Flutter.
 class IdentityEntryData {
   final String id;

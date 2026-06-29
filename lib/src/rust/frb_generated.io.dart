@@ -125,6 +125,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   GabbroImportResult dco_decode_gabbro_import_result(dynamic raw);
 
   @protected
+  HistoryRecordData dco_decode_history_record_data(dynamic raw);
+
+  @protected
   int dco_decode_i_32(dynamic raw);
 
   @protected
@@ -162,6 +165,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<FolderConflictItem> dco_decode_list_folder_conflict_item(dynamic raw);
+
+  @protected
+  List<HistoryRecordData> dco_decode_list_history_record_data(dynamic raw);
 
   @protected
   List<ImportFailureData> dco_decode_list_import_failure_data(dynamic raw);
@@ -401,6 +407,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  HistoryRecordData sse_decode_history_record_data(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
@@ -454,6 +465,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<FolderConflictItem> sse_decode_list_folder_conflict_item(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<HistoryRecordData> sse_decode_list_history_record_data(
     SseDeserializer deserializer,
   );
 
@@ -759,6 +775,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_history_record_data(
+    HistoryRecordData self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
 
   @protected
@@ -821,6 +843,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_folder_conflict_item(
     List<FolderConflictItem> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_history_record_data(
+    List<HistoryRecordData> self,
     SseSerializer serializer,
   );
 

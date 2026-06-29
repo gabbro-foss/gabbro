@@ -200,6 +200,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
         VaultEntryData::Login(d) => Ok(VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: d.id,
                 created_at: d.created_at,
                 updated_at: d.updated_at,
@@ -233,6 +234,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
         VaultEntryData::Note(d) => Ok(VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: d.id,
                 created_at: d.created_at,
                 updated_at: d.updated_at,
@@ -254,6 +256,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
         VaultEntryData::Identity(d) => Ok(VaultEntry::Identity(IdentityEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: d.id,
                 created_at: d.created_at,
                 updated_at: d.updated_at,
@@ -278,6 +281,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
         VaultEntryData::Card(d) => {
             let meta = EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: d.id,
                 created_at: d.created_at,
                 updated_at: d.updated_at,
@@ -317,6 +321,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
         VaultEntryData::File(d) => Ok(VaultEntry::File(FileEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: d.id,
                 created_at: d.created_at,
                 updated_at: d.updated_at,
@@ -338,6 +343,7 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
         VaultEntryData::Custom(d) => Ok(VaultEntry::Custom(CustomEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: d.id,
                 created_at: d.created_at,
                 updated_at: d.updated_at,
@@ -932,6 +938,36 @@ pub async fn resolve_item_delete(id: String, field: String, delete: bool) -> Res
     session::session_resolve_item_delete(id, field, delete)
 }
 
+/// Set `field` to `new_value` and keep `replaced_value` in the entry's recovery
+/// history. Used when a kept brought-over edit or a clash-resolved-to-theirs
+/// overwrites a local value. Persists (async — vault save).
+pub async fn replace_field_with_history(
+    id: String,
+    field: String,
+    new_value: String,
+    replaced_value: String,
+) -> Result<(), String> {
+    session::session_replace_field_with_history(id, field, new_value, replaced_value)
+}
+
+/// Restore a recovery-history record (`index` into the entry's history): set its
+/// field back to the saved value and remove the record. Persists.
+pub async fn restore_history(id: String, index: u32) -> Result<(), String> {
+    session::session_restore_history(id, index)
+}
+
+/// Delete a recovery-history record (`index`) without restoring it. Persists.
+pub async fn delete_history(id: String, index: u32) -> Result<(), String> {
+    session::session_delete_history(id, index)
+}
+
+/// Read an entry's recovery-history records (replaced values kept for restore).
+pub async fn get_entry_history(
+    id: String,
+) -> Result<Vec<crate::api::vault::HistoryRecordData>, String> {
+    session::session_get_entry_history(id)
+}
+
 /// Merge a **key-protected** incoming `.gabbro` file into the current session (ADR-013).
 ///
 /// The analogue of [`merge_vault_from_file`] for a source created with YubiKey
@@ -1080,6 +1116,7 @@ mod tests {
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1295,6 +1332,7 @@ mod tests {
         let entries = vec![VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1366,6 +1404,7 @@ mod tests {
                 entries: vec![VaultEntry::Note(NoteEntry {
                     meta: EntryMeta {
                         field_times: Default::default(),
+                        history: Vec::new(),
                         id: String::from("bje-001"),
                         created_at: String::from("2025-01-01T00:00:00Z"),
                         updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1417,6 +1456,7 @@ mod tests {
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
                     field_times: Default::default(),
+                    history: Vec::new(),
                     id: String::from("note-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1430,6 +1470,7 @@ mod tests {
             VaultEntry::Login(LoginEntry {
                 meta: EntryMeta {
                     field_times: Default::default(),
+                    history: Vec::new(),
                     id: String::from("login-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1758,6 +1799,7 @@ mod tests {
         let entry = VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("login-appid-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2250,6 +2292,7 @@ mod tests {
             entries: vec![VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
                     field_times: Default::default(),
+                    history: Vec::new(),
                     id: String::from("from-vault-a-001"),
                     created_at: String::from("2025-03-01T00:00:00Z"),
                     updated_at: String::from("2025-03-01T00:00:00Z"),
@@ -2281,6 +2324,7 @@ mod tests {
                 entries: vec![VaultEntry::Note(NoteEntry {
                     meta: EntryMeta {
                         field_times: Default::default(),
+                        history: Vec::new(),
                         id: String::from("vault-b-own-001"),
                         created_at: String::from("2025-01-01T00:00:00Z"),
                         updated_at: String::from("2025-01-01T00:00:00Z"),

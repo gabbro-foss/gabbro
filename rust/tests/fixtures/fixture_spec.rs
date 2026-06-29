@@ -63,6 +63,7 @@ fn canary_entry() -> rust_lib_gabbro::vault::entry::VaultEntry {
     use rust_lib_gabbro::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
     VaultEntry::Login(LoginEntry {
         meta: EntryMeta { field_times: Default::default(),
+            history: Vec::new(),
             id: "00000000-0000-0000-0000-000000000001".to_string(),
             created_at: "2026-01-01T00:00:00Z".to_string(),
             updated_at: "2026-01-01T00:00:00Z".to_string(),

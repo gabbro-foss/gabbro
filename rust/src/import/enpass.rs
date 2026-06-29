@@ -414,6 +414,7 @@ fn non_empty(s: &str) -> Option<String> {
 fn make_meta(uuid: &str) -> EntryMeta {
     EntryMeta {
         field_times: Default::default(),
+        history: Vec::new(),
         id: uuid.to_string(),
         created_at: String::new(),
         updated_at: String::new(),

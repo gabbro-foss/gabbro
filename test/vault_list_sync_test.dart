@@ -40,6 +40,8 @@ Widget _buildScreen({
   Future<String?> Function()? onPickSyncFile,
   Future<void> Function(String, String, bool, String)? onResolveFieldConflict,
   Future<void> Function(String, String, bool)? onResolveItemDelete,
+  Future<void> Function(String, String, String, String)?
+  onReplaceFieldWithHistory,
   Future<void> Function(String)? onDeleteEntryFn,
   Future<void> Function(List<String>, String)? onAssignFolderFn,
 }) => testApp(
@@ -52,6 +54,8 @@ Widget _buildScreen({
     // No-op by default so tests never reach the real FFI resolution path.
     onResolveFieldConflict: onResolveFieldConflict ?? (_, _, _, _) async {},
     onResolveItemDelete: onResolveItemDelete ?? (_, _, _) async {},
+    onReplaceFieldWithHistory:
+        onReplaceFieldWithHistory ?? (_, _, _, _) async {},
     onDeleteEntryFn: onDeleteEntryFn,
     onAssignFolderFn: onAssignFolderFn,
   ),
@@ -540,9 +544,12 @@ void main() {
       },
     );
 
-    testWidgets('a kept brought-over field needs no resolution call', (
+    testWidgets('a kept brought-over edit retains the old value in history', (
       tester,
     ) async {
+      String? field;
+      String? newV;
+      String? replaced;
       var resolveCalled = false;
       await tester.pumpWidget(
         _buildScreen(
@@ -559,12 +566,89 @@ void main() {
             ],
           ),
           onResolveFieldConflict: (_, _, _, _) async => resolveCalled = true,
+          onReplaceFieldWithHistory: (id, f, n, r) async {
+            field = f;
+            newV = n;
+            replaced = r;
+          },
         ),
       );
       await _startSync(tester);
-      await tester.tap(find.text('OK'));
+      await tester.tap(find.text('OK')); // keep (default)
       await _settle(tester);
       expect(resolveCalled, isFalse);
+      expect(field, 'url');
+      expect(newV, 'b');
+      expect(replaced, 'a', reason: 'old value goes to recovery history');
+    });
+
+    testWidgets('use-theirs keeps the losing local value in history', (
+      tester,
+    ) async {
+      String? field;
+      String? newV;
+      String? replaced;
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(
+            fieldConflicts: [
+              const FieldConflictItem(
+                id: 'x',
+                title: 'Note',
+                field: 'content',
+                localValue: 'mine',
+                incomingValue: 'theirs',
+              ),
+            ],
+          ),
+          onReplaceFieldWithHistory: (id, f, n, r) async {
+            field = f;
+            newV = n;
+            replaced = r;
+          },
+        ),
+      );
+      await _startSync(tester);
+      await tester.tap(find.textContaining("Use the other device's value"));
+      await _settle(tester);
+      await tester.tap(find.text('OK'));
+      await _settle(tester);
+      expect(field, 'content');
+      expect(newV, 'theirs');
+      expect(replaced, 'mine', reason: 'the losing local value is recoverable');
+    });
+
+    testWidgets('dropping a brought-over added pair removes it', (tester) async {
+      String? delField;
+      bool? delDo;
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(
+            broughtOver: [
+              const BroughtOverItem(
+                id: 'x',
+                title: 'Mail',
+                field: 'custom_fields:Tag',
+                oldValue: '', // empty old -> a newly added pair
+                newValue: 'blue',
+              ),
+            ],
+          ),
+          onResolveItemDelete: (id, f, d) async {
+            delField = f;
+            delDo = d;
+          },
+        ),
+      );
+      await _startSync(tester);
+      await tester.tap(find.byType(CheckboxListTile)); // uncheck = drop
+      await _settle(tester);
+      await tester.tap(find.text('OK'));
+      await _settle(tester);
+      expect(delField, 'custom_fields:Tag');
+      expect(delDo, true, reason: 'a dropped add is removed, not restored');
     });
 
     testWidgets('a brought-over attachment shows its name', (tester) async {

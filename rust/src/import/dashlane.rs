@@ -122,6 +122,7 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
         entries.push(VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: Uuid::new_v4().to_string(),
                 created_at: String::new(),
                 updated_at: String::new(),

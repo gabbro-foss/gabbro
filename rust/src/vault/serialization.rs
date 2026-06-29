@@ -117,6 +117,7 @@ mod tests {
     fn default_meta(id: &str) -> EntryMeta {
         EntryMeta {
             field_times: Default::default(),
+            history: Vec::new(),
             id: id.to_string(),
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),

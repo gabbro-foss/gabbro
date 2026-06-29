@@ -391,6 +391,36 @@ Future<void> resolveItemDelete({
   delete: delete,
 );
 
+/// Set `field` to `new_value` and keep `replaced_value` in the entry's recovery
+/// history. Used when a kept brought-over edit or a clash-resolved-to-theirs
+/// overwrites a local value. Persists (async — vault save).
+Future<void> replaceFieldWithHistory({
+  required String id,
+  required String field,
+  required String newValue,
+  required String replacedValue,
+}) => RustLib.instance.api.crateApiVaultBridgeReplaceFieldWithHistory(
+  id: id,
+  field: field,
+  newValue: newValue,
+  replacedValue: replacedValue,
+);
+
+/// Restore a recovery-history record (`index` into the entry's history): set its
+/// field back to the saved value and remove the record. Persists.
+Future<void> restoreHistory({required String id, required int index}) => RustLib
+    .instance
+    .api
+    .crateApiVaultBridgeRestoreHistory(id: id, index: index);
+
+/// Delete a recovery-history record (`index`) without restoring it. Persists.
+Future<void> deleteHistory({required String id, required int index}) =>
+    RustLib.instance.api.crateApiVaultBridgeDeleteHistory(id: id, index: index);
+
+/// Read an entry's recovery-history records (replaced values kept for restore).
+Future<List<HistoryRecordData>> getEntryHistory({required String id}) =>
+    RustLib.instance.api.crateApiVaultBridgeGetEntryHistory(id: id);
+
 /// Merge a **key-protected** incoming `.gabbro` file into the current session (ADR-013).
 ///
 /// The analogue of [`merge_vault_from_file`] for a source created with YubiKey

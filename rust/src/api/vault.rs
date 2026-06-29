@@ -34,6 +34,15 @@ pub struct PreviousSecretData {
     pub expires_at: Option<String>,
 }
 
+/// A recovery-history record for Flutter: a value replaced during sync, kept so
+/// the user can restore it. `value` is plaintext — Flutter masks secret fields.
+pub struct HistoryRecordData {
+    pub field: String,
+    pub value: String,
+    pub saved_at: String,
+    pub expires_at: Option<String>,
+}
+
 /// A login entry as seen by Flutter.
 pub struct LoginEntryData {
     pub id: String,
@@ -279,6 +288,7 @@ pub fn create_login_entry(
     let now = chrono_now();
     let meta = EntryMeta {
         field_times: Default::default(),
+        history: Vec::new(),
         id: Uuid::new_v4().to_string(),
         created_at: now.clone(),
         updated_at: now,
@@ -1379,6 +1389,10 @@ pub(crate) fn purge_expired_history(entries: &mut [VaultEntry]) {
             }
             _ => {}
         }
+        // General sync recovery history (all entry types): drop expired records.
+        entry_meta_mut(entry)
+            .history
+            .retain(|h| !is_expired(h.expires_at.as_deref()));
     }
 }
 
@@ -1387,6 +1401,47 @@ pub(crate) fn purge_expired_history(entries: &mut [VaultEntry]) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn purge_drops_expired_general_history_keeps_others() {
+        use crate::vault::entry::{EntryMeta, HistoryRecord, NoteEntry};
+        let rec = |v: &str, exp: Option<&str>| HistoryRecord {
+            field: String::from("content"),
+            value: v.to_string(),
+            saved_at: String::from("2025-01-01T00:00:00Z"),
+            expires_at: exp.map(String::from),
+        };
+        let meta = EntryMeta {
+            id: String::from("n1"),
+            created_at: String::from("2025-01-01T00:00:00Z"),
+            updated_at: String::from("2025-01-01T00:00:00Z"),
+            folder: String::new(),
+            field_times: Default::default(),
+            history: vec![
+                rec("keep", None),
+                rec("future", Some("2999-01-01T00:00:00Z")),
+                rec("gone", Some("2000-01-01T00:00:00Z")),
+            ],
+        };
+        let mut entries = vec![VaultEntry::Note(NoteEntry {
+            meta,
+            title: String::new(),
+            content: String::new(),
+            custom_fields: vec![],
+            attachments: vec![],
+        })];
+        purge_expired_history(&mut entries);
+        let hist = match &entries[0] {
+            VaultEntry::Note(n) => &n.meta.history,
+            _ => panic!(),
+        };
+        let vals: Vec<&str> = hist.iter().map(|r| r.value.as_str()).collect();
+        assert_eq!(
+            vals,
+            vec!["keep", "future"],
+            "only the past-expiry record is purged"
+        );
+    }
 
     // R-03: deleting a vault must not leak a copy via the .bak sibling
     #[test]
@@ -1453,6 +1508,7 @@ mod tests {
             entries: vec![VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
                     field_times: Default::default(),
+                    history: Vec::new(),
                     id: String::from("p0-note-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1586,6 +1642,7 @@ mod tests {
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1650,6 +1707,7 @@ mod tests {
         let mut entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1664,6 +1722,7 @@ mod tests {
         let updated = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1693,6 +1752,7 @@ mod tests {
         let mut entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -1707,6 +1767,7 @@ mod tests {
         let updated = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2019,6 +2080,7 @@ mod tests {
         let mut entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2033,6 +2095,7 @@ mod tests {
         let ghost = VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("does-not-exist"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2055,6 +2118,7 @@ mod tests {
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
                     field_times: Default::default(),
+                    history: Vec::new(),
                     id: String::from("id-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2068,6 +2132,7 @@ mod tests {
             VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
                     field_times: Default::default(),
+                    history: Vec::new(),
                     id: String::from("id-002"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2095,6 +2160,7 @@ mod tests {
         let mut entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2137,6 +2203,7 @@ mod tests {
         let entries = vec![VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2168,6 +2235,7 @@ mod tests {
         let entries = vec![VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2202,6 +2270,7 @@ mod tests {
         let entries = vec![VaultEntry::Card(CardEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2243,6 +2312,7 @@ mod tests {
         let entries = vec![VaultEntry::Login(LoginEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2287,6 +2357,7 @@ mod tests {
 
         let meta = EntryMeta {
             field_times: Default::default(),
+            history: Vec::new(),
             id: String::from("id-001"),
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2342,6 +2413,7 @@ mod tests {
 
         let meta = EntryMeta {
             field_times: Default::default(),
+            history: Vec::new(),
             id: String::from("id-001"),
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2397,6 +2469,7 @@ mod tests {
 
         let meta = EntryMeta {
             field_times: Default::default(),
+            history: Vec::new(),
             id: String::from("id-001"),
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2460,6 +2533,7 @@ mod tests {
 
         let meta = EntryMeta {
             field_times: Default::default(),
+            history: Vec::new(),
             id: String::from("id-001"),
             created_at: String::from("2025-01-01T00:00:00Z"),
             updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2523,6 +2597,7 @@ mod tests {
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2548,6 +2623,7 @@ mod tests {
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2587,6 +2663,7 @@ mod tests {
         let entries = vec![VaultEntry::File(FileEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2630,6 +2707,7 @@ mod tests {
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2687,6 +2765,7 @@ mod tests {
             entries: vec![VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
                     field_times: Default::default(),
+                    history: Vec::new(),
                     id: String::from("id-001"),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2743,6 +2822,7 @@ mod tests {
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2801,6 +2881,7 @@ mod tests {
         let entries = vec![VaultEntry::Note(NoteEntry {
             meta: EntryMeta {
                 field_times: Default::default(),
+                history: Vec::new(),
                 id: String::from("id-001"),
                 created_at: String::from("2025-01-01T00:00:00Z"),
                 updated_at: String::from("2025-01-01T00:00:00Z"),
@@ -2848,6 +2929,7 @@ mod tests {
             entries: vec![VaultEntry::Note(NoteEntry {
                 meta: EntryMeta {
                     field_times: Default::default(),
+                    history: Vec::new(),
                     id: String::from(id),
                     created_at: String::from("2025-01-01T00:00:00Z"),
                     updated_at: String::from("2025-01-01T00:00:00Z"),

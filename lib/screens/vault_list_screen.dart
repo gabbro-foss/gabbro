@@ -67,6 +67,18 @@ Future<void> _defaultResolveFieldConflict(
 Future<void> _defaultResolveItemDelete(String id, String field, bool delete) =>
     resolveItemDelete(id: id, field: field, delete: delete);
 
+Future<void> _defaultReplaceFieldWithHistory(
+  String id,
+  String field,
+  String newValue,
+  String replacedValue,
+) => replaceFieldWithHistory(
+  id: id,
+  field: field,
+  newValue: newValue,
+  replacedValue: replacedValue,
+);
+
 /// Reads the source vault's YubiKey records to decide whether a key is required.
 /// Non-empty means key-protected. Sync — header read only.
 List<YubikeyRecordData> _defaultDetectSyncSourceRecords(String path) =>
@@ -203,6 +215,16 @@ class VaultListScreen extends StatefulWidget {
   final Future<void> Function(String id, String field, bool delete)
   onResolveItemDelete;
 
+  /// Sets a field and keeps the replaced value in recovery history (kept brought-
+  /// over edit / clash resolved to theirs). Injectable for tests.
+  final Future<void> Function(
+    String id,
+    String field,
+    String newValue,
+    String replacedValue,
+  )
+  onReplaceFieldWithHistory;
+
   /// Pre-injected YubiKey records. `null` = auto-detect from vault file at
   /// construction time. Pass `[]` to force passphrase-only mode (tests).
   final List<YubikeyRecordData>? yubikeyRecords;
@@ -225,6 +247,7 @@ class VaultListScreen extends StatefulWidget {
     this.onAssignFolderFn,
     this.onResolveFieldConflict = _defaultResolveFieldConflict,
     this.onResolveItemDelete = _defaultResolveItemDelete,
+    this.onReplaceFieldWithHistory = _defaultReplaceFieldWithHistory,
     this.yubikeyRecords,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
@@ -768,6 +791,14 @@ class _VaultListScreenState extends State<VaultListScreen>
               f.field,
               f.keepIncoming,
               f.value,
+            );
+          }
+          for (final h in decisions.historyReplacements) {
+            await widget.onReplaceFieldWithHistory(
+              h.id,
+              h.field,
+              h.newValue,
+              h.replacedValue,
             );
           }
           for (final d in decisions.itemDeletes) {
