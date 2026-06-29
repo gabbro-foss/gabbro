@@ -121,10 +121,12 @@ Checklist (tick as completed):
 - [x] 8. Flutter: bridge regen + clash prompt (keep mine / use theirs) & item-delete prompt (keep / delete); fixed false "nothing to sync"; 2 new strings across all 37 locales; widget test. (Clash-string translations for et/eu/kk/sr/sr_Latn/yo are best-effort — verify.)
 - [x] 9. Docs: ARCHITECTURE checklist, CHANGELOG ([Unreleased]), MIGRATION_TESTS (v9 row + pending hardware), FIXTURES.
 
-**Build complete and green** on branch `granular-sync-v9` (all 9 steps; ~8 commits). Remaining
-before merge/release: maintainer **hardware verification on MOCK vaults only** (MIGRATION_TESTS
-S1–S5, Linux + S23 + GrapheneOS), then the release decision. The full Rust gate (slow Argon2
-re-seal scenarios now covering v9) is the maintainer's to run.
+**Build complete and green** on branch `granular-sync-v9`. Remaining before merge/release:
+maintainer **hardware verification on MOCK vaults only** — load the three divergent vaults in
+`test_data/sync_test_vaults/` (one per device) and sync (procedure + expected result in its
+README; the same files back the automated `sync_test_corpus_converges_without_loss` test).
+Format backward-compat has its own corpus (`test_data/migration_vaults/`, MIGRATION_TESTS).
+Then the release decision + the full Rust gate (the maintainer runs it).
 
 Note: import (`import.rs:439` `merge_source_into_session`) stays first-wins by UUID — it
 brings a foreign lineage with no shared change-time provenance; field-level merge is scoped
