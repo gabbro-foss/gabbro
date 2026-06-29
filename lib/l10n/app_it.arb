@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Assegna a cartella",
   "folderConflictTitle": "Conflitto di cartella",
+  "syncFieldConflictContent": "«{title}» ha un valore diverso per {field} su ciascun dispositivo. Mantenere il proprio valore o usare quello dell'altro dispositivo?",
+  "syncFieldConflictUseIncoming": "Usa il valore dell'altro dispositivo",
   "syncFailedTitle": "Sincronizzazione fallita",
   "syncFromFileTitle": "Sincronizza da file",
   "nothingToSync": "Niente da sincronizzare — entrambi gli archivi sono già aggiornati.",

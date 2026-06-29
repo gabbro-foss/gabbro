@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Hozzárendelés mappához",
   "folderConflictTitle": "Mappaütközés",
+  "syncFieldConflictContent": "A(z) „{title}” eltérő értékkel rendelkezik a(z) {field} mezőhöz minden eszközön. Megtartja a saját értékét, vagy a másik eszközét használja?",
+  "syncFieldConflictUseIncoming": "A másik eszköz értékének használata",
   "syncFailedTitle": "Szinkronizálás sikertelen",
   "syncFromFileTitle": "Szinkronizálás fájlból",
   "nothingToSync": "Nincs szinkronizálnivaló — mindkét széf már naprakész.",

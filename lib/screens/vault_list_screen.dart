@@ -51,6 +51,30 @@ Future<MergeSummary> _defaultMergeVaultWithKey(
   credentialId: credentialId,
 );
 
+Future<void> _defaultResolveFieldConflict(
+  String id,
+  String field,
+  bool keepIncoming,
+  String incomingValue,
+) => resolveFieldConflict(
+  id: id,
+  field: field,
+  keepIncoming: keepIncoming,
+  incomingValue: incomingValue,
+);
+
+Future<void> _defaultResolveItemDelete(String id, String field, bool delete) =>
+    resolveItemDelete(id: id, field: field, delete: delete);
+
+/// Friendly label for a merge field key: strips the "custom_fields:"/"attachments:"
+/// prefix (so a custom pair shows its label); scalar keys are shown as-is.
+String _fieldLabel(String field) {
+  for (final prefix in const ['custom_fields:', 'attachments:']) {
+    if (field.startsWith(prefix)) return field.substring(prefix.length);
+  }
+  return field;
+}
+
 /// Reads the source vault's YubiKey records to decide whether a key is required.
 /// Non-empty means key-protected. Sync — header read only.
 List<YubikeyRecordData> _defaultDetectSyncSourceRecords(String path) =>
@@ -174,6 +198,19 @@ class VaultListScreen extends StatefulWidget {
   final Future<void> Function(List<String> ids, String folder)?
   onAssignFolderFn;
 
+  /// Applies a field-clash resolution (keep mine / use theirs). Injectable for tests.
+  final Future<void> Function(
+    String id,
+    String field,
+    bool keepIncoming,
+    String incomingValue,
+  )
+  onResolveFieldConflict;
+
+  /// Applies a pending item-delete resolution (keep / delete). Injectable for tests.
+  final Future<void> Function(String id, String field, bool delete)
+  onResolveItemDelete;
+
   /// Pre-injected YubiKey records. `null` = auto-detect from vault file at
   /// construction time. Pass `[]` to force passphrase-only mode (tests).
   final List<YubikeyRecordData>? yubikeyRecords;
@@ -194,6 +231,8 @@ class VaultListScreen extends StatefulWidget {
     this.onRefreshFn,
     this.alphabetBarPosition,
     this.onAssignFolderFn,
+    this.onResolveFieldConflict = _defaultResolveFieldConflict,
+    this.onResolveItemDelete = _defaultResolveItemDelete,
     this.yubikeyRecords,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
@@ -708,7 +747,9 @@ class _VaultListScreenState extends State<VaultListScreen>
           summary.added == 0 &&
           summary.updated == 0 &&
           summary.pendingDeletes.isEmpty &&
-          summary.folderConflicts.isEmpty;
+          summary.folderConflicts.isEmpty &&
+          summary.fieldConflicts.isEmpty &&
+          summary.pendingItemDeletes.isEmpty;
 
       if (isIdentical) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -804,7 +845,77 @@ class _VaultListScreenState extends State<VaultListScreen>
         }
       }
 
-      if (deletedCount > 0 || summary.folderConflicts.isNotEmpty) {
+      // --- Field clashes: keep mine (default) or use the other device's value ---
+      for (final c in summary.fieldConflicts) {
+        if (!mounted) break;
+        final useTheirs = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) {
+            final l = AppLocalizations.of(ctx);
+            return AlertDialog(
+              content: Text(
+                l.syncFieldConflictContent(c.title, _fieldLabel(c.field)),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                  child: Text(l.keep),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                  child: Text(l.syncFieldConflictUseIncoming),
+                ),
+              ],
+            );
+          },
+        );
+        if (useTheirs != null) {
+          await widget.onResolveFieldConflict(
+            c.id,
+            c.field,
+            useTheirs,
+            c.incomingValue,
+          );
+        }
+      }
+
+      // --- Pending item-deletes: an item another device removed; keep or delete ---
+      for (final item in summary.pendingItemDeletes) {
+        if (!mounted) break;
+        final del = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) {
+            final l = AppLocalizations.of(ctx);
+            return AlertDialog(
+              title: Text(l.deleteEntryTitle),
+              content: Text(l.syncDeleteEntryContent(_fieldLabel(item.field))),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                  child: Text(l.keep),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(ctx).colorScheme.error,
+                  ),
+                  child: Text(l.delete),
+                ),
+              ],
+            );
+          },
+        );
+        if (del != null) {
+          await widget.onResolveItemDelete(item.id, item.field, del);
+        }
+      }
+
+      if (deletedCount > 0 ||
+          summary.folderConflicts.isNotEmpty ||
+          summary.fieldConflicts.isNotEmpty ||
+          summary.pendingItemDeletes.isNotEmpty) {
         _loadEntries();
       }
 

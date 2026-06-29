@@ -1110,6 +1110,15 @@ class AppLocalizationsNn extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '\'$title\' har ulik verdi for $field på kvar eining. Behald din verdi, eller bruk den andre eininga sin?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'Bruk verdien frå den andre eininga';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Behald utan mappe';
 
   @override

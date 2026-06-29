@@ -1111,6 +1111,15 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '«$title» tiene un valor distinto para $field en cada dispositivo. ¿Mantener tu valor o usar el del otro dispositivo?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'Usar el valor del otro dispositivo';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Conservar sin carpeta';
 
   @override

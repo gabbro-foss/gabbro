@@ -1119,6 +1119,15 @@ class AppLocalizationsEl extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return 'Το \'$title\' έχει διαφορετική τιμή για το $field σε κάθε συσκευή. Διατήρηση της δικής σας τιμής ή χρήση της τιμής της άλλης συσκευής;';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'Χρήση της τιμής της άλλης συσκευής';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Διατήρηση χωρίς φάκελο';
 
   @override

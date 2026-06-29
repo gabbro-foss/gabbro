@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Ordner zuweisen",
   "folderConflictTitle": "Ordnerkonflikt",
+  "syncFieldConflictContent": "„{title}“ hat auf jedem Gerät einen anderen Wert für {field}. Eigenen Wert behalten oder den des anderen Geräts verwenden?",
+  "syncFieldConflictUseIncoming": "Wert des anderen Geräts verwenden",
   "syncFailedTitle": "Synchronisierung fehlgeschlagen",
   "syncFromFileTitle": "Aus Datei synchronisieren",
   "nothingToSync": "Nichts zu synchronisieren — beide Tresore sind bereits aktuell.",

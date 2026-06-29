@@ -1090,6 +1090,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '\'$title\' 在每台设备上的 $field 值不同。保留你的值，还是使用另一台设备的值？';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => '使用另一台设备的值';
+
+  @override
   String get folderConflictKeepUnfoldered => '无文件夹保留';
 
   @override
@@ -2982,6 +2990,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '\'$title\' 在每台设备上的 $field 值不同。保留你的值，还是使用另一台设备的值？';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => '使用另一台设备的值';
+
+  @override
   String get folderConflictKeepUnfoldered => '无文件夹保留';
 
   @override
@@ -4872,6 +4888,14 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String folderConflictContent(String title, String local, String incoming) {
     return '«$title»在兩台裝置上位於不同資料夾中。\n\n此裝置：$local\n另一台裝置：$incoming';
   }
+
+  @override
+  String syncFieldConflictContent(String title, String field) {
+    return '\'$title\' 在每台裝置上的 $field 值不同。保留你的值，還是使用另一台裝置的值？';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => '使用另一台裝置的值';
 
   @override
   String get folderConflictKeepUnfoldered => '無資料夾保留';

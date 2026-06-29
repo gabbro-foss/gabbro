@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Piešķirt mapei",
   "folderConflictTitle": "Mapju konflikts",
+  "syncFieldConflictContent": "Laukam {field} ierakstā “{title}” katrā ierīcē ir atšķirīga vērtība. Paturēt savu vērtību vai izmantot otras ierīces vērtību?",
+  "syncFieldConflictUseIncoming": "Izmantot otras ierīces vērtību",
   "syncFailedTitle": "Sinhronizācija neizdevās",
   "syncFromFileTitle": "Sinhronizēt no faila",
   "nothingToSync": "Nav ko sinhronizēt — abi seifi jau ir atjaunināti.",

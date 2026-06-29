@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Ανάθεση σε φάκελο",
   "folderConflictTitle": "Διένεξη φακέλων",
+  "syncFieldConflictContent": "Το '{title}' έχει διαφορετική τιμή για το {field} σε κάθε συσκευή. Διατήρηση της δικής σας τιμής ή χρήση της τιμής της άλλης συσκευής;",
+  "syncFieldConflictUseIncoming": "Χρήση της τιμής της άλλης συσκευής",
   "syncFailedTitle": "Αποτυχία συγχρονισμού",
   "syncFromFileTitle": "Συγχρονισμός από αρχείο",
   "nothingToSync": "Δεν υπάρχει τίποτα για συγχρονισμό — και τα δύο θησαυροφυλάκια είναι ήδη ενημερωμένα.",

@@ -1112,6 +1112,14 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '\'$title\' elementuak $field eremurako balio desberdina du gailu bakoitzean. Zure balioa mantendu edo beste gailuarena erabili?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => 'Erabili beste gailuaren balioa';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Karpetarik gabe gorde';
 
   @override

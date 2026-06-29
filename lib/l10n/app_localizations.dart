@@ -2179,6 +2179,18 @@ abstract class AppLocalizations {
   /// **'\'{title}\' is in different folders on each device.\n\nThis device: {local}\nOther device: {incoming}'**
   String folderConflictContent(String title, String local, String incoming);
 
+  /// No description provided for @syncFieldConflictContent.
+  ///
+  /// In en, this message translates to:
+  /// **'\'{title}\' has a different value for {field} on each device. Keep your value, or use the other device\'s?'**
+  String syncFieldConflictContent(String title, String field);
+
+  /// No description provided for @syncFieldConflictUseIncoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the other device\'s value'**
+  String get syncFieldConflictUseIncoming;
+
   /// No description provided for @folderConflictKeepUnfoldered.
   ///
   /// In en, this message translates to:

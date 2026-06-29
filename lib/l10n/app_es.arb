@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Asignar a carpeta",
   "folderConflictTitle": "Conflicto de carpeta",
+  "syncFieldConflictContent": "«{title}» tiene un valor distinto para {field} en cada dispositivo. ¿Mantener tu valor o usar el del otro dispositivo?",
+  "syncFieldConflictUseIncoming": "Usar el valor del otro dispositivo",
   "syncFailedTitle": "Error de sincronización",
   "syncFromFileTitle": "Sincronizar desde archivo",
   "nothingToSync": "Nada que sincronizar — ambos almacenes ya están actualizados.",

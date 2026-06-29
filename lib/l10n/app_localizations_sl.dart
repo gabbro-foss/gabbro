@@ -1118,6 +1118,14 @@ class AppLocalizationsSl extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '\'$title\' ima na vsaki napravi drugačno vrednost za $field. Ohraniti svojo vrednost ali uporabiti vrednost druge naprave?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => 'Uporabi vrednost druge naprave';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Obdrži brez mape';
 
   @override

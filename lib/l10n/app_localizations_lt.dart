@@ -1113,6 +1113,14 @@ class AppLocalizationsLt extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return 'Lauko $field reikšmė įraše „$title“ kiekviename įrenginyje skiriasi. Palikti savo reikšmę ar naudoti kito įrenginio?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => 'Naudoti kito įrenginio reikšmę';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Palikti be aplanko';
 
   @override

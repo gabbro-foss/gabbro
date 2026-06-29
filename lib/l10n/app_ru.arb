@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Назначить папку",
   "folderConflictTitle": "Конфликт папок",
+  "syncFieldConflictContent": "«{title}» имеет разное значение поля {field} на устройствах. Оставить ваше значение или использовать значение другого устройства?",
+  "syncFieldConflictUseIncoming": "Использовать значение другого устройства",
   "syncFailedTitle": "Синхронизация не удалась",
   "syncFromFileTitle": "Синхронизировать из файла",
   "nothingToSync": "Нечего синхронизировать — оба хранилища уже актуальны.",

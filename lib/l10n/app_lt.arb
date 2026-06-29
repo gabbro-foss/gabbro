@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Priskirti aplanką",
   "folderConflictTitle": "Aplankų konfliktas",
+  "syncFieldConflictContent": "Lauko {field} reikšmė įraše „{title}“ kiekviename įrenginyje skiriasi. Palikti savo reikšmę ar naudoti kito įrenginio?",
+  "syncFieldConflictUseIncoming": "Naudoti kito įrenginio reikšmę",
   "syncFailedTitle": "Sinchronizavimas nepavyko",
   "syncFromFileTitle": "Sinchronizuoti iš failo",
   "nothingToSync": "Nėra ko sinchronizuoti — abi saugyklos jau atnaujintos.",

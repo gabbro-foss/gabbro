@@ -1109,6 +1109,14 @@ class AppLocalizationsYo extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '\'$title\' ní iye tó yàtọ̀ fún $field lórí ẹ̀rọ kọ̀ọ̀kan. Pa iye tìrẹ mọ́, tàbí lo ti ẹ̀rọ òmíràn?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => 'Lo iye ẹ̀rọ òmíràn';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Tọju laisi folda';
 
   @override

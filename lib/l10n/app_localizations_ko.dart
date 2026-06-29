@@ -1094,6 +1094,14 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '\'$title\'의 $field 값이 기기마다 다릅니다. 내 값을 유지할까요, 아니면 다른 기기의 값을 사용할까요?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => '다른 기기의 값 사용';
+
+  @override
   String get folderConflictKeepUnfoldered => '폴더 없이 유지';
 
   @override

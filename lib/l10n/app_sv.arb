@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Tilldela till mapp",
   "folderConflictTitle": "Mappkonflikt",
+  "syncFieldConflictContent": "'{title}' har olika värde för {field} på varje enhet. Behåll ditt värde eller använd den andra enhetens?",
+  "syncFieldConflictUseIncoming": "Använd den andra enhetens värde",
   "syncFailedTitle": "Synkronisering misslyckades",
   "syncFromFileTitle": "Synkronisera från fil",
   "nothingToSync": "Inget att synkronisera — båda valven är redan uppdaterade.",

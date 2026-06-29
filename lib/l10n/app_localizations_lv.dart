@@ -1110,6 +1110,14 @@ class AppLocalizationsLv extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return 'Laukam $field ierakstā “$title” katrā ierīcē ir atšķirīga vērtība. Paturēt savu vērtību vai izmantot otras ierīces vērtību?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => 'Izmantot otras ierīces vērtību';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Paturēt bez mapes';
 
   @override

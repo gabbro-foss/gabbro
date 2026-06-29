@@ -1111,6 +1111,14 @@ class AppLocalizationsEt extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return 'Väljal $field on kirjel \'$title\' igas seadmes erinev väärtus. Kas säilitada oma väärtus või kasutada teise seadme oma?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => 'Kasuta teise seadme väärtust';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Hoia ilma kaustata';
 
   @override

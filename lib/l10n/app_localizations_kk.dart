@@ -1108,6 +1108,14 @@ class AppLocalizationsKk extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '«$title» әр құрылғыда $field үшін әртүрлі мәнге ие. Өз мәніңізді сақтайсыз ба, әлде басқа құрылғының мәнін қолданасыз ба?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => 'Басқа құрылғының мәнін қолдану';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Қалтасыз сақтау';
 
   @override

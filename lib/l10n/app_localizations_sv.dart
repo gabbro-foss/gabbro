@@ -1111,6 +1111,14 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '\'$title\' har olika värde för $field på varje enhet. Behåll ditt värde eller använd den andra enhetens?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => 'Använd den andra enhetens värde';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Behåll utan mapp';
 
   @override

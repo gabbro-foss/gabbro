@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Määritä kansioon",
   "folderConflictTitle": "Kansioristiriita",
+  "syncFieldConflictContent": "Kohteella '{title}' on eri arvo kentälle {field} kullakin laitteella. Säilytetäänkö oma arvo vai käytetäänkö toisen laitteen arvoa?",
+  "syncFieldConflictUseIncoming": "Käytä toisen laitteen arvoa",
   "syncFailedTitle": "Synkronointi epäonnistui",
   "syncFromFileTitle": "Synkronoi tiedostosta",
   "nothingToSync": "Ei synkronoitavaa — molemmat holvit ovat jo ajan tasalla.",

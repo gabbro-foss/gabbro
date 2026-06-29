@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Назначи в папка",
   "folderConflictTitle": "Конфликт на папки",
+  "syncFieldConflictContent": "„{title}“ има различна стойност за {field} на всяко устройство. Да запазите ли своята стойност, или да използвате тази от другото устройство?",
+  "syncFieldConflictUseIncoming": "Използвай стойността от другото устройство",
   "syncFailedTitle": "Синхронизацията не успя",
   "syncFromFileTitle": "Синхронизирай от файл",
   "nothingToSync": "Няма какво да се синхронизира — и двата трезора вече са актуализирани.",

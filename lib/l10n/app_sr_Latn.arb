@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Dodeli mapi",
   "folderConflictTitle": "Sukob mapa",
+  "syncFieldConflictContent": "„{title}“ ima različitu vrednost za {field} na svakom uređaju. Zadržati svoju vrednost ili koristiti vrednost drugog uređaja?",
+  "syncFieldConflictUseIncoming": "Koristi vrednost drugog uređaja",
   "syncFailedTitle": "Sinhronizacija nije uspela",
   "syncFromFileTitle": "Sinhronizuj iz datoteke",
   "nothingToSync": "Nema šta da se sinhronizuje — oba trezora su već ažurirana.",

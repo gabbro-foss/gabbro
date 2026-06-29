@@ -19,18 +19,23 @@ MergeSummary _summary({
   int updated = 0,
   List<PendingDeleteItem> pendingDeletes = const [],
   List<FolderConflictItem> folderConflicts = const [],
+  List<FieldConflictItem> fieldConflicts = const [],
+  List<PendingItemDeleteItem> pendingItemDeletes = const [],
 }) =>
     MergeSummary(
       added: added,
       updated: updated,
       pendingDeletes: pendingDeletes,
       folderConflicts: folderConflicts,
+      fieldConflicts: fieldConflicts,
+      pendingItemDeletes: pendingItemDeletes,
     );
 
 Widget _buildScreen({
   required Future<MergeSummary> Function(String, List<int>) mergeVault,
   String? pickedPath,
   Future<String?> Function()? onPickSyncFile,
+  Future<void> Function(String, String, bool, String)? onResolveFieldConflict,
 }) =>
     testApp(VaultListScreen(
       vaultPath: '/tmp/test.gabbro',
@@ -38,6 +43,8 @@ Widget _buildScreen({
       yubikeyRecords: [],
       onPickSyncFile: onPickSyncFile ?? () async => pickedPath,
       mergeVault: mergeVault,
+      // No-op by default so tests never reach the real FFI resolution path.
+      onResolveFieldConflict: onResolveFieldConflict ?? (_, _, _, _) async {},
     ));
 
 Future<void> _openMenu(WidgetTester tester) async {
@@ -317,6 +324,56 @@ void main() {
       expect(find.textContaining("'Work note'"), findsOneWidget);
       expect(find.textContaining('Work'), findsWidgets);
       expect(find.textContaining('Personal'), findsWidgets);
+    });
+
+    testWidgets('field clash surfaces a keep/use-theirs dialog (not nothing-to-sync)',
+        (tester) async {
+      String? gotField;
+      bool? gotKeepIncoming;
+      await tester.pumpWidget(_buildScreen(
+        pickedPath: '/tmp/other.gabbro',
+        mergeVault: (_, _) async => _summary(
+          fieldConflicts: [
+            const FieldConflictItem(
+              id: 'uuid-3',
+              title: 'Example',
+              field: 'password',
+              localValue: 'mine',
+              incomingValue: 'theirs',
+            ),
+          ],
+        ),
+        onResolveFieldConflict: (id, field, keepIncoming, incomingValue) async {
+          gotField = field;
+          gotKeepIncoming = keepIncoming;
+        },
+      ));
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+        'passphrase',
+      );
+      await tester.tap(find.text('Sync'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pump(const Duration(milliseconds: 350));
+
+      // The clash is surfaced, not swallowed as "nothing to sync".
+      expect(find.textContaining('Nothing to sync'), findsNothing);
+      expect(find.text("Use the other device's value"), findsOneWidget);
+      expect(find.textContaining("'Example'"), findsOneWidget);
+
+      // Tapping Keep applies keep-mine (keepIncoming == false).
+      await tester.tap(find.text('Keep'));
+      await tester.pumpAndSettle();
+      expect(gotField, 'password');
+      expect(gotKeepIncoming, false);
     });
 
     // A passphrase-only source never taps a YubiKey, so the "tap now" note must

@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Priradiť k priečinku",
   "folderConflictTitle": "Konflikt priečinkov",
+  "syncFieldConflictContent": "„{title}“ má na každom zariadení inú hodnotu poľa {field}. Ponechať vlastnú hodnotu alebo použiť hodnotu druhého zariadenia?",
+  "syncFieldConflictUseIncoming": "Použiť hodnotu druhého zariadenia",
   "syncFailedTitle": "Synchronizácia zlyhala",
   "syncFromFileTitle": "Synchronizovať zo súboru",
   "nothingToSync": "Nie je čo synchronizovať — oba trezory sú už aktuálne.",

@@ -542,6 +542,14 @@
       "incoming": {"type": "String"}
     }
   },
+  "syncFieldConflictContent": "'{title}' has a different value for {field} on each device. Keep your value, or use the other device's?",
+  "@syncFieldConflictContent": {
+    "placeholders": {
+      "title": {"type": "String"},
+      "field": {"type": "String"}
+    }
+  },
+  "syncFieldConflictUseIncoming": "Use the other device's value",
   "folderConflictKeepUnfoldered": "Keep unfoldered",
   "folderConflictKeepLocal": "Keep \"{folder}\"",
   "@folderConflictKeepLocal": {

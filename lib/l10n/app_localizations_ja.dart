@@ -1093,6 +1093,14 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '「$title」は $field の値がデバイスごとに異なります。自分の値を保持しますか、それとも他のデバイスの値を使用しますか？';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => '他のデバイスの値を使用';
+
+  @override
   String get folderConflictKeepUnfoldered => 'フォルダなしで保持';
 
   @override

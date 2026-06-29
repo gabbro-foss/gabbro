@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Attribuer à un dossier",
   "folderConflictTitle": "Conflit de dossier",
+  "syncFieldConflictContent": "«{title}» a une valeur différente pour {field} sur chaque appareil. Conserver votre valeur ou utiliser celle de l'autre appareil ?",
+  "syncFieldConflictUseIncoming": "Utiliser la valeur de l'autre appareil",
   "syncFailedTitle": "Échec de la synchronisation",
   "syncFromFileTitle": "Synchroniser depuis un fichier",
   "nothingToSync": "Rien à synchroniser — les deux coffres sont déjà à jour.",

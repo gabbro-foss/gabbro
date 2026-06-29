@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Karpetari esleitu",
   "folderConflictTitle": "Karpeta gatazka",
+  "syncFieldConflictContent": "'{title}' elementuak {field} eremurako balio desberdina du gailu bakoitzean. Zure balioa mantendu edo beste gailuarena erabili?",
+  "syncFieldConflictUseIncoming": "Erabili beste gailuaren balioa",
   "syncFailedTitle": "Sinkronizazioa huts egin du",
   "syncFromFileTitle": "Fitxategitik sinkronizatu",
   "nothingToSync": "Ez dago sinkronizatzeko ezer — bi gandegiak eguneratuta daude dagoeneko.",

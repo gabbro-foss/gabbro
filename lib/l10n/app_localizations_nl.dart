@@ -1112,6 +1112,15 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '\'$title\' heeft op elk apparaat een andere waarde voor $field. Je eigen waarde behouden of die van het andere apparaat gebruiken?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'Waarde van het andere apparaat gebruiken';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Zonder map bewaren';
 
   @override

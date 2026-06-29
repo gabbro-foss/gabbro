@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "分配到文件夹",
   "folderConflictTitle": "文件夹冲突",
+  "syncFieldConflictContent": "'{title}' 在每台设备上的 {field} 值不同。保留你的值，还是使用另一台设备的值？",
+  "syncFieldConflictUseIncoming": "使用另一台设备的值",
   "syncFailedTitle": "同步失败",
   "syncFromFileTitle": "从文件同步",
   "nothingToSync": "没有需要同步的内容 — 两个保险库均已是最新状态。",

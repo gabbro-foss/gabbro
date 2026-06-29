@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Қалтаға тағайындау",
   "folderConflictTitle": "Қалта қайшылығы",
+  "syncFieldConflictContent": "«{title}» әр құрылғыда {field} үшін әртүрлі мәнге ие. Өз мәніңізді сақтайсыз ба, әлде басқа құрылғының мәнін қолданасыз ба?",
+  "syncFieldConflictUseIncoming": "Басқа құрылғының мәнін қолдану",
   "syncFailedTitle": "Синхрондау сәтсіз болды",
   "syncFromFileTitle": "Файлдан синхрондау",
   "nothingToSync": "Синхрондайтын ештеңе жоқ — екі сейф те жаңартылған.",

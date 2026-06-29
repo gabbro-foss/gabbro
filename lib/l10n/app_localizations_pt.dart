@@ -1110,6 +1110,15 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '«$title» tem um valor diferente para $field em cada dispositivo. Manter o seu valor ou usar o do outro dispositivo?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'Usar o valor do outro dispositivo';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Manter sem pasta';
 
   @override
@@ -3095,6 +3104,15 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '\'$title\' tem um valor diferente para $field em cada dispositivo. Manter o seu valor ou usar o do outro dispositivo?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'Usar o valor do outro dispositivo';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Manter sem pasta';
 
   @override
@@ -5075,6 +5093,15 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String folderConflictContent(String title, String local, String incoming) {
     return '\'$title\' está em pastas diferentes em cada dispositivo.\n\nEste dispositivo: $local\nOutro dispositivo: $incoming';
   }
+
+  @override
+  String syncFieldConflictContent(String title, String field) {
+    return '«$title» tem um valor diferente para $field em cada dispositivo. Manter o seu valor ou usar o do outro dispositivo?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'Usar o valor do outro dispositivo';
 
   @override
   String get folderConflictKeepUnfoldered => 'Manter sem pasta';

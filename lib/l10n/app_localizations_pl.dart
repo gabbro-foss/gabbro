@@ -1117,6 +1117,15 @@ class AppLocalizationsPl extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '„$title” ma inną wartość pola $field na każdym urządzeniu. Zachować własną wartość czy użyć z drugiego urządzenia?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'Użyj wartości z drugiego urządzenia';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Zachowaj bez folderu';
 
   @override

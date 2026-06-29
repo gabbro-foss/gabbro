@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Tildel til mappe",
   "folderConflictTitle": "Mappekonflikt",
+  "syncFieldConflictContent": "'{title}' har ulik verdi for {field} på kvar eining. Behald din verdi, eller bruk den andre eininga sin?",
+  "syncFieldConflictUseIncoming": "Bruk verdien frå den andre eininga",
   "syncFailedTitle": "Synkronisering mislukkast",
   "syncFromFileTitle": "Synkroniser frå fil",
   "nothingToSync": "Inkje å synkronisere — begge kvelva er allereie oppdaterte.",

@@ -1115,6 +1115,15 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '«$title» имеет разное значение поля $field на устройствах. Оставить ваше значение или использовать значение другого устройства?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'Использовать значение другого устройства';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Оставить без папки';
 
   @override

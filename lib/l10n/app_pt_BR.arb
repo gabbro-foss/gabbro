@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Atribuir a pasta",
   "folderConflictTitle": "Conflito de pasta",
+  "syncFieldConflictContent": "'{title}' tem um valor diferente para {field} em cada dispositivo. Manter o seu valor ou usar o do outro dispositivo?",
+  "syncFieldConflictUseIncoming": "Usar o valor do outro dispositivo",
   "syncFailedTitle": "Sincronização falhou",
   "syncFromFileTitle": "Sincronizar de arquivo",
   "nothingToSync": "Nada a sincronizar — ambos os cofres já estão atualizados.",

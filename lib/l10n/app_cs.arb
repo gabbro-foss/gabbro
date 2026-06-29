@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Přiřadit ke složce",
   "folderConflictTitle": "Konflikt složek",
+  "syncFieldConflictContent": "„{title}“ má na každém zařízení jinou hodnotu pole {field}. Ponechat vlastní hodnotu, nebo použít hodnotu z druhého zařízení?",
+  "syncFieldConflictUseIncoming": "Použít hodnotu z druhého zařízení",
   "syncFailedTitle": "Synchronizace selhala",
   "syncFromFileTitle": "Synchronizovat ze souboru",
   "nothingToSync": "Není co synchronizovat — oba trezory jsou již aktuální.",

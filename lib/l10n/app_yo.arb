@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Yàn si folda",
   "folderConflictTitle": "Ikọlu folda",
+  "syncFieldConflictContent": "'{title}' ní iye tó yàtọ̀ fún {field} lórí ẹ̀rọ kọ̀ọ̀kan. Pa iye tìrẹ mọ́, tàbí lo ti ẹ̀rọ òmíràn?",
+  "syncFieldConflictUseIncoming": "Lo iye ẹ̀rọ òmíràn",
   "syncFailedTitle": "Iṣọkan kuna",
   "syncFromFileTitle": "Ṣọkan lati faili",
   "nothingToSync": "Ko si ohun lati ṣọkan — awọn vọọliti mejeeji ti wa ni imudojuiwọn.",

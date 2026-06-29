@@ -1114,6 +1114,15 @@ class AppLocalizationsSk extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '„$title“ má na každom zariadení inú hodnotu poľa $field. Ponechať vlastnú hodnotu alebo použiť hodnotu druhého zariadenia?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'Použiť hodnotu druhého zariadenia';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Ponechať bez priečinka';
 
   @override

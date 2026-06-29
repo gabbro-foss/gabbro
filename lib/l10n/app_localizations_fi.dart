@@ -1111,6 +1111,14 @@ class AppLocalizationsFi extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return 'Kohteella \'$title\' on eri arvo kentälle $field kullakin laitteella. Säilytetäänkö oma arvo vai käytetäänkö toisen laitteen arvoa?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => 'Käytä toisen laitteen arvoa';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Säilytä ilman kansiota';
 
   @override

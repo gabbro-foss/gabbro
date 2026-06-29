@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Tildel til mappe",
   "folderConflictTitle": "Mappekonflikt",
+  "syncFieldConflictContent": "'{title}' har en anden værdi for {field} på hver enhed. Behold din værdi, eller brug den anden enheds?",
+  "syncFieldConflictUseIncoming": "Brug den anden enheds værdi",
   "syncFailedTitle": "Synkronisering mislykkedes",
   "syncFromFileTitle": "Synkronisér fra fil",
   "nothingToSync": "Intet at synkronisere — begge hvælvinger er allerede opdaterede.",

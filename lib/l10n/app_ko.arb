@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "폴더에 할당",
   "folderConflictTitle": "폴더 충돌",
+  "syncFieldConflictContent": "'{title}'의 {field} 값이 기기마다 다릅니다. 내 값을 유지할까요, 아니면 다른 기기의 값을 사용할까요?",
+  "syncFieldConflictUseIncoming": "다른 기기의 값 사용",
   "syncFailedTitle": "동기화에 실패했습니다",
   "syncFromFileTitle": "파일에서 동기화",
   "nothingToSync": "동기화할 것이 없습니다 — 두 볼트 모두 이미 최신 상태입니다.",

@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "指派到資料夾",
   "folderConflictTitle": "資料夾衝突",
+  "syncFieldConflictContent": "'{title}' 在每台裝置上的 {field} 值不同。保留你的值，還是使用另一台裝置的值？",
+  "syncFieldConflictUseIncoming": "使用另一台裝置的值",
   "syncFailedTitle": "同步失敗",
   "syncFromFileTitle": "從檔案同步",
   "nothingToSync": "沒有需要同步的內容 — 兩個保險庫均已是最新狀態。",

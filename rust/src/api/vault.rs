@@ -153,8 +153,8 @@ pub struct FieldConflictItem {
 
 /// An item (custom pair / attachment) the incoming side deleted more recently than
 /// the local side last changed it. Surfaced as a keep/delete prompt; the item is
-/// kept until the user confirms — never silently dropped. `field` is the item key
-/// ("custom_fields:<label>" or "attachments:<uuid>").
+/// kept until the user confirms — never silently dropped. `field` is the item key,
+/// for example "custom_fields:PIN" (a custom pair) or "attachments:ID" (an attachment).
 pub struct PendingItemDeleteItem {
     pub id: String,
     pub title: String,

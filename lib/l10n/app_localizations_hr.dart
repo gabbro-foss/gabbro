@@ -1111,6 +1111,15 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '„$title“ ima različitu vrijednost za $field na svakom uređaju. Zadržati svoju vrijednost ili upotrijebiti vrijednost drugog uređaja?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'Upotrijebi vrijednost drugog uređaja';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Zadrži bez mape';
 
   @override

@@ -1110,6 +1110,15 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return 'A(z) „$title” eltérő értékkel rendelkezik a(z) $field mezőhöz minden eszközön. Megtartja a saját értékét, vagy a másik eszközét használja?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'A másik eszköz értékének használata';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Tartás mappa nélkül';
 
   @override

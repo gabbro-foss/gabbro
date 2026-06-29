@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Toewijzen aan map",
   "folderConflictTitle": "Mapconflict",
+  "syncFieldConflictContent": "'{title}' heeft op elk apparaat een andere waarde voor {field}. Je eigen waarde behouden of die van het andere apparaat gebruiken?",
+  "syncFieldConflictUseIncoming": "Waarde van het andere apparaat gebruiken",
   "syncFailedTitle": "Synchronisatie mislukt",
   "syncFromFileTitle": "Synchroniseren vanuit bestand",
   "nothingToSync": "Niets te synchroniseren — beide kluizen zijn al up-to-date.",

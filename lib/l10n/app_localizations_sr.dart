@@ -1113,6 +1113,14 @@ class AppLocalizationsSr extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '„$title“ има различиту вредност за $field на сваком уређају. Задржати своју вредност или користити вредност другог уређаја?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => 'Користи вредност другог уређаја';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Zadrži bez mape';
 
   @override
@@ -3093,6 +3101,14 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String folderConflictContent(String title, String local, String incoming) {
     return '«$title» je u različitim mapama na dva uređaja.\n\nOvaj uređaj: $local\nDrugi uređaj: $incoming';
   }
+
+  @override
+  String syncFieldConflictContent(String title, String field) {
+    return '„$title“ ima različitu vrednost za $field na svakom uređaju. Zadržati svoju vrednost ili koristiti vrednost drugog uređaja?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming => 'Koristi vrednost drugog uređaja';
 
   @override
   String get folderConflictKeepUnfoldered => 'Zadrži bez mape';

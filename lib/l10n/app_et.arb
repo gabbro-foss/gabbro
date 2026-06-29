@@ -265,6 +265,8 @@
 
   "assignToFolderTitle": "Määra kausta",
   "folderConflictTitle": "Kaustade konflikt",
+  "syncFieldConflictContent": "Väljal {field} on kirjel '{title}' igas seadmes erinev väärtus. Kas säilitada oma väärtus või kasutada teise seadme oma?",
+  "syncFieldConflictUseIncoming": "Kasuta teise seadme väärtust",
   "syncFailedTitle": "Sünkroonimine ebaõnnestus",
   "syncFromFileTitle": "Sünkrooni failist",
   "nothingToSync": "Midagi ei ole sünkroonida — mõlemad seifid on juba ajakohased.",

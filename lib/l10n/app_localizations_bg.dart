@@ -1113,6 +1113,15 @@ class AppLocalizationsBg extends AppLocalizations {
   }
 
   @override
+  String syncFieldConflictContent(String title, String field) {
+    return '„$title“ има различна стойност за $field на всяко устройство. Да запазите ли своята стойност, или да използвате тази от другото устройство?';
+  }
+
+  @override
+  String get syncFieldConflictUseIncoming =>
+      'Използвай стойността от другото устройство';
+
+  @override
   String get folderConflictKeepUnfoldered => 'Запази без папка';
 
   @override
