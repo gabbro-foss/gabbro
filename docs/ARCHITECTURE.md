@@ -76,12 +76,10 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
-**Test isolation (non-negotiable):** no test may touch the user's real settings or
-vault folders. All config/data directories resolve through `GabbroPaths`
-(`lib/app_paths.dart`), and `test/flutter_test_config.dart` roots every `flutter test`
-run in a throwaway temp sandbox — so even a test that forgets to isolate itself reads an
-empty registry and can never reach a real vault (wherever the user saved it). Mirrors the
-`rust/tests/fixtures/` ethos of never operating on real data.
+**Test isolation (non-negotiable):** no test may touch real settings or vault folders. All
+config/data resolves through `GabbroPaths` (`lib/app_paths.dart`); `test/flutter_test_config.dart`
+roots every `flutter test` in a throwaway temp sandbox, so even a non-isolating test reads
+an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`.
 
 ---
 
@@ -89,62 +87,46 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Active task: additive, field-level vault sync
+### Active task: additive, field-level vault sync (`granular-sync-v9`)
 
-**Why.** The old merge is whole-entry last-writer-wins on one coarse `updated_at`:
-independent field edits on two devices silently lose one side, and equal-time edits report
-a false "nothing to sync". Gabbro has no server, so sync is file-to-file and must be
-additive and user-reviewed, with nothing lost.
+**Why.** Old merge is whole-entry last-writer-wins on one coarse `updated_at`: independent
+field edits on two devices silently lose one side. No server — sync is file-to-file, must
+be additive, user-reviewed, nothing lost.
 
-**The model (agreed 2026-06-29).** Sync runs one direction at a time (A into B), additive,
-and you review it; running B into A afterwards converges both sides. For each entry
-(matched by a permanent id), compared per field and per custom pair:
+**Model (agreed 2026-06-29).** One direction at a time (A into B), additive, reviewed;
+running B into A afterwards converges. Per entry (matched by permanent id), per field and
+per custom pair:
 
 ```
-entry only on A ............ NEW: added to B by default, shown to you, you can drop it.
-entry only on B ............ stays. additive never auto-removes.
-a field changed only on A .. A's value comes over; B's replaced value -> entry history.
-a field same on both ....... nothing to do.
-a field changed on BOTH .... CONFLICT: both values shown, you pick one; the value not
-                             picked -> entry history. NEVER auto-picked by timestamp.
-item/entry the other device
-   deleted ................. keep-or-delete prompt (predates this branch; now per-item too).
-
-result on B = (A + B) minus what you dropped.
-nothing overwritten is lost: every replaced value lives in that entry's history.
+entry only on A ........ NEW: added to B, shown, droppable.
+entry only on B ........ stays (additive never auto-removes).
+field changed on A ..... A's value comes over; B's replaced value -> entry history.
+field changed on BOTH .. CONFLICT: both shown, you pick; unpicked -> history. Never by clock.
+item deleted on other .. keep-or-delete prompt, per item.
+result on B = (A + B) minus what you dropped; every replaced value kept in entry history.
 ```
 
-Four properties this gives: **granularity** (per field/pair), **visibility** (every
-incoming change shown before it lands), **control** (drop anything; pick on a real
-conflict), **fallback** (replaced values kept in per-entry history, recoverable later).
+`field_times` (ms) detect WHICH side edited a field, never pick a winner — clocks aren't trusted.
 
-Change-times (`field_times`, integer ms) are used only to detect WHICH side edited a
-field, never to pick a winner. A same-field divergence is always a user choice, because
-device clocks are not trustworthy.
+**v8 -> v9.** New app reads v8, migrates on save (no loss); old app refuses v9 (fail-safe).
+Import (`merge_source_into_session`) stays first-wins by UUID — sync path only. Transport
+(moving the file) is out of scope.
 
-**v8 -> v9 / safety.** A new app reads v8 and migrates on save (no loss); an old app
-*refuses* a v9 file (fail-safe). Hardware tests run on **mock vaults only** until trust is
-rebuilt. Transport (moving the file between devices) is out of scope (Syncthing/USB/etc).
-Import (`merge_source_into_session`) stays first-wins by UUID — sync path only.
+**Status.** Engine + v9 format + backward-compat gate + review UI
+(`lib/widgets/sync_review.dart`) + recovery history (`recovery_history_screen.dart`) built
+and unit-green. Key code: `merge_entry_pair`, `MergeSummary`, `replace_field_with_history`
+(session.rs).
 
-**Status.** The whole model is **built and green** on branch `granular-sync-v9` (engine,
-v9 format + backward-compat gate, one-by-one review UI `lib/widgets/sync_review.dart`,
-recovery history `lib/screens/recovery_history_screen.dart`). Key code: `merge_entry_pair`,
-`MergeSummary`, `replace_field_with_history` (session.rs). Option A (one-by-one) and the
-dropped option B share the same `MergeSummary`, so swapping the UI later touches no Rust.
-
-**Remaining — maintainer, then release decision:**
-1. Run the gate (`gabbro_test`, ~100 min) — see [BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md).
-   Watch the backward-compat leg (new serde-default `history` field must not break v6-v9).
-2. Hardware-verify on the MOCK vaults — procedure in
-   `test_data/sync_test_vaults/README.md`.
+**BLOCKED.** Linux hardware test 2026-06-29 surfaced 6 review-UI defects (see Bikeshed >
+Bugs). The merge model is sound; the review UI is not shippable. Fix the six, re-verify on
+MOCK vaults only (`test_data/sync_test_vaults/README.md`), run the gate (`gabbro_test`,
+~100min, watch the backward-compat leg), then release decision.
 
 ---
 
 ## Build & Release
 
-Build-environment notes (Android/Kotlin/Java setup, SAF export) and the full
-release process live in their own document:
+Build environment (Android/Kotlin/Java, SAF export) and full release process:
 [BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md).
 
 ---
@@ -154,14 +136,23 @@ release process live in their own document:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Bugs
-- **CRITICAL — biometric unlock rejects the correct passphrase (GrapheneOS).** Observed
-  2026-06-29 on a freshly-built test vault: enable biometric → it asks for and accepts the
-  passphrase; then unlocking *with biometric* reports "wrong passphrase", while typing the
-  same passphrase unlocks fine. Vault is NOT bricked (passphrase opens it). Seen while
-  testing the `granular-sync-v9` branch; that branch changed no biometric/unlock source
-  (only the regenerated FFI bridge) — so suspect pre-existing, the build/regen, or stale
-  AndroidKeyStore on reinstall. Needs investigation (Kotlin `BiometricHelper`/the stored
-  secret vs. what unlock receives). May relate to the Android-tablet biometric item below.
+- **granular-sync-v9 review UI — 5 defects, BLOCKS the branch (Linux hardware test 2026-06-29):**
+  1. Secret diffs can't be revealed — passwords show as dots, no unhide, in both the
+     value-changed and the keep-mine/use-other cases. Diff unusable.
+  2. Per-entry toggle unlabeled — no text for what ON vs OFF does; delete prompt worst (am
+     I keeping or deleting?).
+  3. Summary doesn't match choices — "12 updated" after toggling some not all; count
+     ignores selections, not itemized.
+  4. Recovery history empty — after a sync replaces values, no per-entry history appears.
+  5. Apply very slow in a `--release` build (long spinner) — suspect whole-vault Argon2id
+     reseal per applied change; profile before fixing.
+- **Enter does not submit the passphrase** (unlock + other screens) — cross-cutting; audit
+  every passphrase/password field for an Enter-submit handler.
+- **CRITICAL — biometric unlock rejects the correct passphrase (GrapheneOS, 2026-06-29).**
+  Enabling biometric accepts the passphrase; unlocking *with* biometric then reports "wrong
+  passphrase" while typing the same passphrase works. Vault NOT bricked. Branch changed no
+  unlock source (only regen FFI) — suspect pre-existing / build-regen / stale AndroidKeyStore
+  on reinstall. Investigate Kotlin `BiometricHelper`; may relate to the tablet item below.
 - **JSON export hard-codes `gabbro version 1.0.0`.** Wrong and brittle (needs a bump
   every release). Fix to read the real version (single source: `pubspec.yaml`) or drop
   the field.
