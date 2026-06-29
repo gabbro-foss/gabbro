@@ -1619,7 +1619,11 @@ mod tests {
         let passphrase = b"integrity test";
         let plaintext = b"secret vault body";
         let sealed = seal_vault(passphrase, plaintext, None).unwrap();
-        assert_eq!(sealed.version, 8, "new vaults are VERSION 8");
+        assert_eq!(
+            sealed.version,
+            crate::vault::file_format::VERSION,
+            "new vaults are written at the current VERSION"
+        );
 
         // Tamper with the alias in the serialised vault bytes.
         let mut bytes = sealed.to_bytes();
