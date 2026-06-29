@@ -137,14 +137,21 @@ resolution *model* above is NOT yet what the code does. On branch `granular-sync
   prompt, the fuzz harness (3 devices, varied order), the FFI bridge, and the 3-vault
   test corpus (`test_data/sync_test_vaults/`, distinct per-device edit times, varied-order
   convergence proven).
+- Additive review (visibility + drop): `MergeSummary` now LISTS each added entry and each
+  brought-over field/pair/attachment (old + new value), not just counts them. Drop reuses
+  existing calls: new entry -> `deleteEntry`; field/pair -> `resolve_field_conflict` with the
+  old value; attachment -> `resolve_item_delete`. Rust half done + green; the Flutter
+  one-by-one review UI is still to do.
 - Diverges from the agreed model, still to do:
-  1. Additive review/visibility: show the incoming changes (new entries, brought-over field
-     values) so the user can drop any, instead of merging non-conflicts silently.
+  1. Flutter review UI: step through incoming changes **one entry per step** (all of that
+     entry's new/changed fields, conflicts, item-deletes together), keep by default, drop
+     reverts, conflicts force a pick. Same one-by-one flow on Linux and Android (no room for
+     a full list on a phone).
   2. Per-entry history for ANY replaced field value (generalise beyond `previous_password`).
   3. Deletion keep/delete prompt: keep the pre-existing entry-level one and the new per-item
      one; verify both still work.
 
-Next: net-first, then the test list for review, then code, per the model above.
+Next: the Flutter one-by-one review UI (item 1), net-first then red-first per the model.
 
 Note: import (`import.rs` `merge_source_into_session`) stays first-wins by UUID; the sync
 model above is scoped to the sync path only.
