@@ -147,6 +147,14 @@ release process live in their own document:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Bugs
+- **CRITICAL — biometric unlock rejects the correct passphrase (GrapheneOS).** Observed
+  2026-06-29 on a freshly-built test vault: enable biometric → it asks for and accepts the
+  passphrase; then unlocking *with biometric* reports "wrong passphrase", while typing the
+  same passphrase unlocks fine. Vault is NOT bricked (passphrase opens it). Seen while
+  testing the `granular-sync-v9` branch; that branch changed no biometric/unlock source
+  (only the regenerated FFI bridge) — so suspect pre-existing, the build/regen, or stale
+  AndroidKeyStore on reinstall. Needs investigation (Kotlin `BiometricHelper`/the stored
+  secret vs. what unlock receives). May relate to the Android-tablet biometric item below.
 - **JSON export hard-codes `gabbro version 1.0.0`.** Wrong and brittle (needs a bump
   every release). Fix to read the real version (single source: `pubspec.yaml`) or drop
   the field.
