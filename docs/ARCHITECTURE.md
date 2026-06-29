@@ -118,8 +118,13 @@ Checklist (tick as completed):
 - [x] 5. Sync summary: `MergeSummary` gains `field_conflicts` + `pending_item_deletes`; `do_merge` populates them; flutter_rust_bridge regenerated (Dart `fieldConflicts`/`pendingItemDeletes`/`PendingItemDeleteItem`).
 - [x] 6. Format v8 -> v9: `VERSION=9` + fail-closed "newer Gabbro, please update" message (crypto byte-identical to v8); v9 gate fixtures + gate extended (v6-v9 open/migrate verified); `migration_vaults/v9.gabbro` + docs. Full re-seal gate scenarios (Argon2) left for the maintainer's gate run.
 - [x] 7. Fuzz proof (`session.rs` `sync_fuzz`): 12-entry/all-6-types base, 3 divergent copies, random edits/adds/deletes across EVERY field (all scalars incl. notes/password/card fields/data, custom pairs, AND attachments) + random sync orders, deterministic seed; asserts no-loss vs an independent oracle, order-independence, convergence. 120 passes, ~0.7s. Bug-injection verified it catches a mishandled field.
-- [ ] 8. Flutter: bridge regen + clash & item-delete prompts; fix false "nothing to sync".
-- [ ] 9. Docs: ARCHITECTURE / CHANGELOG / MIGRATION_TESTS.
+- [x] 8. Flutter: bridge regen + clash prompt (keep mine / use theirs) & item-delete prompt (keep / delete); fixed false "nothing to sync"; 2 new strings across all 37 locales; widget test. (Clash-string translations for et/eu/kk/sr/sr_Latn/yo are best-effort — verify.)
+- [x] 9. Docs: ARCHITECTURE checklist, CHANGELOG ([Unreleased]), MIGRATION_TESTS (v9 row + pending hardware), FIXTURES.
+
+**Build complete and green** on branch `granular-sync-v9` (all 9 steps; ~8 commits). Remaining
+before merge/release: maintainer **hardware verification on MOCK vaults only** (MIGRATION_TESTS
+S1–S5, Linux + S23 + GrapheneOS), then the release decision. The full Rust gate (slow Argon2
+re-seal scenarios now covering v9) is the maintainer's to run.
 
 Note: import (`import.rs:439` `merge_source_into_session`) stays first-wins by UUID — it
 brings a foreign lineage with no shared change-time provenance; field-level merge is scoped

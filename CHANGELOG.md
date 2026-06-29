@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **Vault sync is now field-level (format v8 → v9).** Editing different fields — or different custom key/value pairs — of the same entry on two devices now keeps both, instead of the newer whole entry overwriting the other. A genuine clash (same field changed to different values) and an item another device deleted are surfaced for you to resolve (keep mine / use theirs; keep / delete) — never silent loss. Fixes the false "nothing to sync". Cryptography is unchanged from v8; an older Gabbro refuses a v9 vault rather than opening it and silently dropping the new per-field data. Backed by a deterministic multi-device sync fuzz proof.
+
 ## [0.1.0-alpha.10] – 2026-06-26
 
 ### Security
