@@ -32,6 +32,7 @@ import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/widgets/yubikey_tap.dart';
+import 'package:gabbro/widgets/sync_review.dart';
 
 List<String> _defaultListFolders() => listFolders();
 Future<MergeSummary> _defaultMergeVault(String path, List<int> passphrase) =>
@@ -65,15 +66,6 @@ Future<void> _defaultResolveFieldConflict(
 
 Future<void> _defaultResolveItemDelete(String id, String field, bool delete) =>
     resolveItemDelete(id: id, field: field, delete: delete);
-
-/// Friendly label for a merge field key: strips the "custom_fields:"/"attachments:"
-/// prefix (so a custom pair shows its label); scalar keys are shown as-is.
-String _fieldLabel(String field) {
-  for (final prefix in const ['custom_fields:', 'attachments:']) {
-    if (field.startsWith(prefix)) return field.substring(prefix.length);
-  }
-  return field;
-}
 
 /// Reads the source vault's YubiKey records to decide whether a key is required.
 /// Non-empty means key-protected. Sync — header read only.
@@ -746,6 +738,8 @@ class _VaultListScreenState extends State<VaultListScreen>
       final isIdentical =
           summary.added == 0 &&
           summary.updated == 0 &&
+          summary.addedEntries.isEmpty &&
+          summary.broughtOver.isEmpty &&
           summary.pendingDeletes.isEmpty &&
           summary.folderConflicts.isEmpty &&
           summary.fieldConflicts.isEmpty &&
@@ -760,174 +754,53 @@ class _VaultListScreenState extends State<VaultListScreen>
 
       _loadEntries();
 
-      // --- Pending deletes: ask user to confirm each deletion ---
+      // One-by-one review: step through every entry's incoming changes (new
+      // entries, brought-over values, clashes, item-deletes), then apply what the
+      // user kept/picked/dropped. Drops and picks reuse the existing FFI calls.
+      final steps = buildSyncReviewSteps(summary);
       var deletedCount = 0;
-      for (final item in summary.pendingDeletes) {
-        if (!mounted) break;
-        final confirmed = await showDialog<bool>(
-          context: context,
-          barrierDismissible: false,
-          builder: (ctx) {
-            final l = AppLocalizations.of(ctx);
-            return AlertDialog(
-              title: Text(l.deleteEntryTitle),
-              content: Text(l.syncDeleteEntryContent(item.title)),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(false),
-                  child: Text(l.keep),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(true),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(ctx).colorScheme.error,
-                  ),
-                  child: Text(l.delete),
-                ),
-              ],
+      if (steps.isNotEmpty && mounted) {
+        final decisions = await showSyncReview(context: context, steps: steps);
+        if (decisions != null) {
+          for (final f in decisions.fieldResolutions) {
+            await widget.onResolveFieldConflict(
+              f.id,
+              f.field,
+              f.keepIncoming,
+              f.value,
             );
-          },
-        );
-        if (confirmed == true) {
-          await deleteEntry(id: item.id);
-          deletedCount++;
+          }
+          for (final d in decisions.itemDeletes) {
+            await widget.onResolveItemDelete(d.id, d.field, d.delete);
+          }
+          for (final fo in decisions.folders) {
+            final fn = widget.onAssignFolderFn;
+            if (fn != null) {
+              await fn([fo.id], fo.folder);
+            } else {
+              await assignFolderToEntries(ids: [fo.id], folder: fo.folder);
+            }
+          }
+          for (final id in decisions.entryDeletes) {
+            final fn = widget.onDeleteEntryFn;
+            if (fn != null) {
+              await fn(id);
+            } else {
+              await deleteEntry(id: id);
+            }
+            deletedCount++;
+          }
+          if (mounted) _loadEntries();
         }
-      }
-
-      // --- Folder conflicts: ask user to pick which folder ---
-      var folderChangedCount = 0;
-      for (final conflict in summary.folderConflicts) {
-        if (!mounted) break;
-        final chosenFolder = await showDialog<String>(
-          context: context,
-          barrierDismissible: false,
-          builder: (ctx) {
-            final l = AppLocalizations.of(ctx);
-            final noFolder = l.noFolder;
-            return AlertDialog(
-              title: Text(l.folderConflictTitle),
-              content: Text(
-                l.folderConflictContent(
-                  conflict.title,
-                  conflict.localFolder.isEmpty
-                      ? noFolder
-                      : conflict.localFolder,
-                  conflict.incomingFolder.isEmpty
-                      ? noFolder
-                      : conflict.incomingFolder,
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(conflict.localFolder),
-                  child: Text(
-                    conflict.localFolder.isEmpty
-                        ? l.folderConflictKeepUnfoldered
-                        : l.folderConflictKeepLocal(conflict.localFolder),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () =>
-                      Navigator.of(ctx).pop(conflict.incomingFolder),
-                  child: Text(
-                    conflict.incomingFolder.isEmpty
-                        ? l.folderConflictMoveUnfoldered
-                        : l.folderConflictMoveIncoming(conflict.incomingFolder),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-        if (chosenFolder != null) {
-          await assignFolderToEntries(ids: [conflict.id], folder: chosenFolder);
-          if (chosenFolder != conflict.localFolder) folderChangedCount++;
-        }
-      }
-
-      // --- Field clashes: keep mine (default) or use the other device's value ---
-      for (final c in summary.fieldConflicts) {
-        if (!mounted) break;
-        final useTheirs = await showDialog<bool>(
-          context: context,
-          barrierDismissible: false,
-          builder: (ctx) {
-            final l = AppLocalizations.of(ctx);
-            return AlertDialog(
-              content: Text(
-                l.syncFieldConflictContent(c.title, _fieldLabel(c.field)),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(false),
-                  child: Text(l.keep),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(true),
-                  child: Text(l.syncFieldConflictUseIncoming),
-                ),
-              ],
-            );
-          },
-        );
-        if (useTheirs != null) {
-          await widget.onResolveFieldConflict(
-            c.id,
-            c.field,
-            useTheirs,
-            c.incomingValue,
-          );
-        }
-      }
-
-      // --- Pending item-deletes: an item another device removed; keep or delete ---
-      for (final item in summary.pendingItemDeletes) {
-        if (!mounted) break;
-        final del = await showDialog<bool>(
-          context: context,
-          barrierDismissible: false,
-          builder: (ctx) {
-            final l = AppLocalizations.of(ctx);
-            return AlertDialog(
-              title: Text(l.deleteEntryTitle),
-              content: Text(l.syncDeleteEntryContent(_fieldLabel(item.field))),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(false),
-                  child: Text(l.keep),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(true),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Theme.of(ctx).colorScheme.error,
-                  ),
-                  child: Text(l.delete),
-                ),
-              ],
-            );
-          },
-        );
-        if (del != null) {
-          await widget.onResolveItemDelete(item.id, item.field, del);
-        }
-      }
-
-      if (deletedCount > 0 ||
-          summary.folderConflicts.isNotEmpty ||
-          summary.fieldConflicts.isNotEmpty ||
-          summary.pendingItemDeletes.isNotEmpty) {
-        _loadEntries();
       }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              AppLocalizations.of(context).vaultSynced(
-                summary.added,
-                summary.updated + folderChangedCount,
-                deletedCount,
-              ),
+              AppLocalizations.of(
+                context,
+              ).vaultSynced(summary.added, summary.updated, deletedCount),
             ),
           ),
         );
@@ -1579,9 +1452,10 @@ class _VaultListScreenState extends State<VaultListScreen>
                                 // (desktop thumb, mobile flick).
                                 behavior: ScrollConfiguration.of(context)
                                     .copyWith(
-                                  scrollbars:
-                                      isIndexableLocale(_locale) ? false : null,
-                                ),
+                                      scrollbars: isIndexableLocale(_locale)
+                                          ? false
+                                          : null,
+                                    ),
                                 child: ScrollablePositionedList.builder(
                                   itemScrollController: _itemScrollController,
                                   padding: const EdgeInsets.only(bottom: 80),
@@ -1870,9 +1744,7 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
                     icon: Icon(
                       _pinObscured ? Icons.visibility : Icons.visibility_off,
                     ),
-                    tooltip: _pinObscured
-                        ? l.tooltipShowPin
-                        : l.tooltipHidePin,
+                    tooltip: _pinObscured ? l.tooltipShowPin : l.tooltipHidePin,
                     onPressed: () =>
                         setState(() => _pinObscured = !_pinObscured),
                   ),
