@@ -127,8 +127,9 @@ device clocks are not trustworthy.
 only** until trust is rebuilt. Transport (moving the file between devices) is out of scope;
 users use Syncthing/Nextcloud/USB.
 
-**Status — honest.** The field-level *engine* and the v9 *format* are built; the
-resolution *model* above is NOT yet what the code does. On branch `granular-sync-v9`:
+**Status — honest.** The whole agreed model is built and green on branch
+`granular-sync-v9`; what remains is maintainer hardware verification on MOCK vaults and
+the release decision. Built:
 
 - Built: per-field diff/merge (`merge_entry_pair`), `field_times` schema + stamping,
   presence-based collisions (a field edited on both sides ALWAYS becomes a user conflict;
@@ -148,12 +149,15 @@ resolution *model* above is NOT yet what the code does. On branch `granular-sync
   l10n strings (reuses existing). Built + green (widget + grouping unit tests). Option A and
   the dropped option B both consume the same `MergeSummary`, so swapping the widget after
   hardware testing touches no Rust.
-- Diverges from the agreed model, still to do:
-  1. Per-entry history for ANY replaced field value (generalise beyond `previous_password`).
-  2. Maintainer hardware verification of the whole sync flow on MOCK vaults (Linux + Android),
-     then a release decision (A may be revisited vs B after that run).
+- Per-entry recovery history (the fallback property): a general `history: Vec<HistoryRecord>`
+  on `EntryMeta` (serde-default, so v9 stays backward-compatible; v9 is unreleased here).
+  A kept brought-over edit or a clash resolved to theirs keeps the replaced value via
+  `replace_field_with_history`; merge unions history from both sides; unlock purges expired
+  records. Viewer in entry detail (`lib/screens/recovery_history_screen.dart`) lists replaced
+  values with restore/delete. Zero new l10n strings.
 
-Next: per-entry history (item 1), then hardware verification.
+Remaining: maintainer hardware verification of the whole sync flow on MOCK vaults (Linux +
+Android), then the release decision (option A may be revisited vs B after that run).
 
 Note: import (`import.rs` `merge_source_into_session`) stays first-wins by UUID; the sync
 model above is scoped to the sync path only.
