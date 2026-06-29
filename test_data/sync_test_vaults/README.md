@@ -41,30 +41,47 @@ field → clash).
 | File | A→filename, B→notes, C→data | A & C → data (clash); B → filename |
 | Custom | A→edits `api_key`, B→adds `env`, C→title | A & C → `token` (clash); B → adds `scope` |
 
-## How to run it
+## Hardware test procedure
 
-All three share passphrase `0123456789a`; **Sync from file** only merges vaults that share
-a passphrase, so create your vaults with that one.
+Run the gate first (`gabbro_test`) and only proceed if green. **Mock vaults only** —
+never your real vault. All three share passphrase `0123456789a`.
 
-### Single device (fastest — exercises the full merge, no file copying)
+### Steps (single device — exercises the full merge, no file copying)
 
 1. Create a new vault, passphrase `0123456789a`.
-2. **Import entries** → **Gabbro vault** section → pick `sync_test_A.gabbro`, type
-   `0123456789a` in **Vault passphrase**, tap **Sync from vault**.
-3. Menu → **Sync from file** → `sync_test_B.gabbro`, passphrase `0123456789a`.
-4. Menu → **Sync from file** → `sync_test_C.gabbro`, passphrase `0123456789a`.
+2. **Import entries** → **Gabbro vault** → pick `sync_test_A.gabbro`, type `0123456789a`,
+   tap **Sync from vault**. (You now hold device A's copy.)
+3. Menu → **Sync from file** → `sync_test_B.gabbro`, passphrase `0123456789a`. The
+   **one-by-one review** opens (one entry per step). Step through it (see checks below).
+4. Menu → **Sync from file** → `sync_test_C.gabbro`, passphrase `0123456789a`. Review again.
+
+### What to check in the review (per step)
+
+- [ ] **New entry** → shown with a keep/drop checkbox (default keep); drop one and confirm
+      it does not appear in the list afterwards.
+- [ ] **Brought-over field** → shows `old → new`; **secret fields are masked** (password,
+      cvv, pin); each has a keep/drop checkbox (default keep). Drop one and confirm the old
+      value stays.
+- [ ] **Clash** (the six `*-co` entries) → both values shown, **must pick** keep-mine or
+      use-theirs; **Continue/OK is disabled until picked**. Pick "use theirs" on a couple.
+- [ ] **`OldNote`** (on `login-nc`) → a keep/delete toggle; the item is kept unless you set
+      it to delete.
+- [ ] After the last step, a **"Vault synced"** snackbar; all 12 entries survive.
+
+### Recovery history
+
+- [ ] Open an entry where you kept a changed field or picked **use theirs** → tap the
+      **Previous** tile → the replaced value is listed → **Revert** restores it; **Delete**
+      removes it.
+
+### Order independence
+
+- [ ] On a second fresh vault, do steps 1–4 but sync **C before B**. The same six clashes
+      must surface and the non-colliding fields converge to the same values.
 
 ### Three devices
 
-Do steps 1–2 with A / B / C on the three devices, then **Sync from file** the other two
-files (passphrase `0123456789a`) on any device — the merge result is identical.
-
-## Expected result — nothing lost
-
-- Every `*-nc` entry shows **all three devices' edits** (different fields/pairs merged).
-- Every `*-co` entry raises **one clash prompt** (keep mine / use theirs) on the shared
-  field — **six in total, one per type**.
-- Login `OldNote` raises **one keep/delete prompt** (the item is kept until you choose).
-- All 12 entries survive; nothing is silently dropped.
+Do steps 1–2 with A / B / C on three devices, then **Sync from file** the other two files
+on any device — the result is identical regardless of order.
 
 These vaults use cheap Argon2 params (test only) — never use them for real data.

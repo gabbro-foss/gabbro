@@ -123,44 +123,21 @@ field, never to pick a winner. A same-field divergence is always a user choice, 
 device clocks are not trustworthy.
 
 **v8 -> v9 / safety.** A new app reads v8 and migrates on save (no loss); an old app
-*refuses* a v9 file (fail-safe, never strips data). Hardware tests run on **mock vaults
-only** until trust is rebuilt. Transport (moving the file between devices) is out of scope;
-users use Syncthing/Nextcloud/USB.
+*refuses* a v9 file (fail-safe). Hardware tests run on **mock vaults only** until trust is
+rebuilt. Transport (moving the file between devices) is out of scope (Syncthing/USB/etc).
+Import (`merge_source_into_session`) stays first-wins by UUID — sync path only.
 
-**Status — honest.** The whole agreed model is built and green on branch
-`granular-sync-v9`; what remains is maintainer hardware verification on MOCK vaults and
-the release decision. Built:
+**Status.** The whole model is **built and green** on branch `granular-sync-v9` (engine,
+v9 format + backward-compat gate, one-by-one review UI `lib/widgets/sync_review.dart`,
+recovery history `lib/screens/recovery_history_screen.dart`). Key code: `merge_entry_pair`,
+`MergeSummary`, `replace_field_with_history` (session.rs). Option A (one-by-one) and the
+dropped option B share the same `MergeSummary`, so swapping the UI later touches no Rust.
 
-- Built: per-field diff/merge (`merge_entry_pair`), `field_times` schema + stamping,
-  presence-based collisions (a field edited on both sides ALWAYS becomes a user conflict;
-  the clock is only an edit-mark, never picks a winner), format v8->v9 with the
-  backward-compat gate (v6-v9 open/migrate green), item-delete tombstones + keep/delete
-  prompt, the fuzz harness (3 devices, varied order), the FFI bridge, and the 3-vault
-  test corpus (`test_data/sync_test_vaults/`, distinct per-device edit times, varied-order
-  convergence proven).
-- Additive review (visibility + drop): `MergeSummary` LISTS each added entry and each
-  brought-over field/pair/attachment (old + new value), not just counts them. Drop reuses
-  existing calls: new entry -> `deleteEntry`; field/pair -> `resolve_field_conflict` with the
-  old value; attachment -> `resolve_item_delete`.
-- Flutter one-by-one review UI (`lib/widgets/sync_review.dart`, option A): steps through
-  incoming changes **one entry per step** (new entries, brought-over values keep/drop,
-  clashes picked, item-deletes, whole-entry deletes, folder picks), keep by default, secrets
-  masked, clashes block until picked. Replaces the old four sequential dialogs. Zero new
-  l10n strings (reuses existing). Built + green (widget + grouping unit tests). Option A and
-  the dropped option B both consume the same `MergeSummary`, so swapping the widget after
-  hardware testing touches no Rust.
-- Per-entry recovery history (the fallback property): a general `history: Vec<HistoryRecord>`
-  on `EntryMeta` (serde-default, so v9 stays backward-compatible; v9 is unreleased here).
-  A kept brought-over edit or a clash resolved to theirs keeps the replaced value via
-  `replace_field_with_history`; merge unions history from both sides; unlock purges expired
-  records. Viewer in entry detail (`lib/screens/recovery_history_screen.dart`) lists replaced
-  values with restore/delete. Zero new l10n strings.
-
-Remaining: maintainer hardware verification of the whole sync flow on MOCK vaults (Linux +
-Android), then the release decision (option A may be revisited vs B after that run).
-
-Note: import (`import.rs` `merge_source_into_session`) stays first-wins by UUID; the sync
-model above is scoped to the sync path only.
+**Remaining — maintainer, then release decision:**
+1. Run the gate (`gabbro_test`, ~100 min) — see [BUILD_AND_RELEASE.md](BUILD_AND_RELEASE.md).
+   Watch the backward-compat leg (new serde-default `history` field must not break v6-v9).
+2. Hardware-verify on the MOCK vaults — procedure in
+   `test_data/sync_test_vaults/README.md`.
 
 ---
 
