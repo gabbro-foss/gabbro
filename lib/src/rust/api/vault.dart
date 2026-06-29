@@ -40,6 +40,70 @@ Future<BigInt> nowMs() => RustLib.instance.api.crateApiVaultNowMs();
 /// Uses std only — no chrono dependency needed at this stage.
 Future<String> chronoNow() => RustLib.instance.api.crateApiVaultChronoNow();
 
+/// An entry added from the incoming vault during sync (its UUID was not present
+/// locally). Surfaced so the user can review and drop it before keeping it
+/// (drop = delete the entry). `title` is the display title.
+class AddedEntryItem {
+  final String id;
+  final String title;
+
+  const AddedEntryItem({required this.id, required this.title});
+
+  @override
+  int get hashCode => id.hashCode ^ title.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AddedEntryItem &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title;
+}
+
+/// A non-conflicting value brought over from the incoming vault during sync: the
+/// other device edited this field/pair/attachment and this side did not, so the
+/// incoming value wins additively. Surfaced so the user can review and drop it
+/// (drop = restore `old_value`). `field` is the field key (e.g. "password",
+/// "custom_fields:Tag", "attachments:ID"). For a newly added pair/attachment,
+/// `old_value` is empty and `new_value` is the item's value/name. Values are
+/// decrypted plaintext — mask secrets in the UI. Genuine clashes are NOT here;
+/// see `field_conflicts`.
+class BroughtOverItem {
+  final String id;
+  final String title;
+  final String field;
+  final String oldValue;
+  final String newValue;
+
+  const BroughtOverItem({
+    required this.id,
+    required this.title,
+    required this.field,
+    required this.oldValue,
+    required this.newValue,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      title.hashCode ^
+      field.hashCode ^
+      oldValue.hashCode ^
+      newValue.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BroughtOverItem &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title &&
+          field == other.field &&
+          oldValue == other.oldValue &&
+          newValue == other.newValue;
+}
+
 /// A card entry as seen by Flutter.
 class CardEntryData {
   final String id;
@@ -469,6 +533,14 @@ class MergeSummary {
   /// Entries updated because the incoming version had a newer timestamp.
   final int updated;
 
+  /// Entries added from the incoming vault, listed for one-by-one review so the
+  /// user can drop any (drop = delete the entry). Same count as `added`.
+  final List<AddedEntryItem> addedEntries;
+
+  /// Non-conflicting values brought over from the incoming vault, listed for
+  /// review so the user can drop any (drop = restore the old value).
+  final List<BroughtOverItem> broughtOver;
+
   /// Incoming tombstones that matched local entries — awaiting user consent.
   /// Flutter shows a Delete/Keep dialog for each; no deletion occurs automatically.
   final List<PendingDeleteItem> pendingDeletes;
@@ -488,6 +560,8 @@ class MergeSummary {
   const MergeSummary({
     required this.added,
     required this.updated,
+    required this.addedEntries,
+    required this.broughtOver,
     required this.pendingDeletes,
     required this.folderConflicts,
     required this.fieldConflicts,
@@ -498,6 +572,8 @@ class MergeSummary {
   int get hashCode =>
       added.hashCode ^
       updated.hashCode ^
+      addedEntries.hashCode ^
+      broughtOver.hashCode ^
       pendingDeletes.hashCode ^
       folderConflicts.hashCode ^
       fieldConflicts.hashCode ^
@@ -510,6 +586,8 @@ class MergeSummary {
           runtimeType == other.runtimeType &&
           added == other.added &&
           updated == other.updated &&
+          addedEntries == other.addedEntries &&
+          broughtOver == other.broughtOver &&
           pendingDeletes == other.pendingDeletes &&
           folderConflicts == other.folderConflicts &&
           fieldConflicts == other.fieldConflicts &&

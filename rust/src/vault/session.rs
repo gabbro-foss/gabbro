@@ -1428,6 +1428,7 @@ struct FieldMerger<'a> {
     times: std::collections::BTreeMap<String, u64>,
     conflicts: Vec<FieldConflictItem>,
     pending: Vec<PendingItemDeleteItem>,
+    brought_over: Vec<crate::api::vault::BroughtOverItem>,
 }
 
 impl<'a> FieldMerger<'a> {
@@ -1440,7 +1441,20 @@ impl<'a> FieldMerger<'a> {
             times: std::collections::BTreeMap::new(),
             conflicts: Vec::new(),
             pending: Vec::new(),
+            brought_over: Vec::new(),
         }
+    }
+
+    // Record a non-conflicting incoming value that won additively, so the user can
+    // review and drop it (drop = restore `old`).
+    fn record_brought_over(&mut self, key: &str, old: &str, new: &str) {
+        self.brought_over.push(crate::api::vault::BroughtOverItem {
+            id: self.id.clone(),
+            title: self.title.clone(),
+            field: key.to_string(),
+            old_value: old.to_string(),
+            new_value: new.to_string(),
+        });
     }
 
     fn decide(&mut self, key: &str, equal: bool, l_disp: &str, i_disp: &str) -> Side {
@@ -1459,6 +1473,10 @@ impl<'a> FieldMerger<'a> {
                 local_value: l_disp.to_string(),
                 incoming_value: i_disp.to_string(),
             });
+        } else if matches!(side, Side::Incoming) {
+            // Incoming won an unequal field that this side never edited: a
+            // brought-over change to surface for review.
+            self.record_brought_over(key, l_disp, i_disp);
         }
         side
     }
@@ -1490,8 +1508,9 @@ impl<'a> FieldMerger<'a> {
 
     // An item present on only one side: keep it, but if the OTHER side deleted it
     // (a "del:<key>" tombstone) more recently than this side last changed it,
-    // record a pending delete for the user to confirm. Never auto-drops.
-    fn carry_or_flag_delete(&mut self, key: &str, present_on_incoming: bool) {
+    // record a pending delete for the user to confirm. Never auto-drops. Returns
+    // true if a pending delete was flagged.
+    fn carry_or_flag_delete(&mut self, key: &str, present_on_incoming: bool) -> bool {
         let del_key = format!("del:{key}");
         let (present_meta, other_meta) = if present_on_incoming {
             (self.im, self.lm)
@@ -1499,6 +1518,7 @@ impl<'a> FieldMerger<'a> {
             (self.lm, self.im)
         };
         let item_ts = present_meta.field_times.get(key).copied().unwrap_or(0);
+        let mut flagged = false;
         if let Some(del_ts) = other_meta.field_times.get(&del_key).copied() {
             if del_ts > item_ts {
                 self.pending.push(PendingItemDeleteItem {
@@ -1506,9 +1526,11 @@ impl<'a> FieldMerger<'a> {
                     title: self.title.clone(),
                     field: key.to_string(),
                 });
+                flagged = true;
             }
         }
         self.carry_one_sided(key, present_on_incoming);
+        flagged
     }
 
     fn merge_custom(
@@ -1540,7 +1562,9 @@ impl<'a> FieldMerger<'a> {
                     out.push((*lf).clone());
                 }
                 (None, Some(inf)) => {
-                    self.carry_or_flag_delete(&key, true);
+                    if !self.carry_or_flag_delete(&key, true) {
+                        self.record_brought_over(&key, "", &inf.value);
+                    }
                     out.push((*inf).clone());
                 }
                 (None, None) => unreachable!(),
@@ -1578,7 +1602,9 @@ impl<'a> FieldMerger<'a> {
                     out.push((*la).clone());
                 }
                 (None, Some(ia)) => {
-                    self.carry_or_flag_delete(&key, true);
+                    if !self.carry_or_flag_delete(&key, true) {
+                        self.record_brought_over(&key, "", &ia.name);
+                    }
                     out.push((*ia).clone());
                 }
                 (None, None) => unreachable!(),
@@ -1599,6 +1625,7 @@ pub(crate) fn merge_entry_pair(
     VaultEntry,
     Vec<FieldConflictItem>,
     Vec<PendingItemDeleteItem>,
+    Vec<crate::api::vault::BroughtOverItem>,
 ) {
     let lm = meta_of(local);
     let im = meta_of(incoming);
@@ -1736,7 +1763,9 @@ pub(crate) fn merge_entry_pair(
                         fields.insert(k.clone(), lf.clone());
                     }
                     (None, Some(inf)) => {
-                        m.carry_or_flag_delete(&key, true);
+                        if !m.carry_or_flag_delete(&key, true) {
+                            m.record_brought_over(&key, "", &inf.value);
+                        }
                         fields.insert(k.clone(), inf.clone());
                     }
                     (None, None) => unreachable!(),
@@ -1756,13 +1785,14 @@ pub(crate) fn merge_entry_pair(
             } else {
                 local
             };
-            return (winner.clone(), Vec::new(), Vec::new());
+            return (winner.clone(), Vec::new(), Vec::new(), Vec::new());
         }
     };
 
     let merged_updated = std::cmp::max(lm.updated_at.clone(), im.updated_at.clone());
     let conflicts = std::mem::take(&mut m.conflicts);
     let pending = std::mem::take(&mut m.pending);
+    let brought_over = std::mem::take(&mut m.brought_over);
     let mut times = std::mem::take(&mut m.times);
     // Propagate per-item deletion tombstones from both sides (newer wins) so a
     // delete is not lost on the next merge.
@@ -1784,7 +1814,7 @@ pub(crate) fn merge_entry_pair(
         meta.updated_at = merged_updated;
         meta.field_times = times;
     }
-    (merged, conflicts, pending)
+    (merged, conflicts, pending, brought_over)
 }
 
 #[cfg(test)]
@@ -1827,7 +1857,7 @@ mod field_merge_tests {
                 for e in &body.entries {
                     let id = meta_of(e).id.clone();
                     if let Some(local) = acc.get(&id) {
-                        let (m, cs, mut ps) = merge_entry_pair(local, e);
+                        let (m, cs, mut ps, _bo) = merge_entry_pair(local, e);
                         for cc in cs {
                             collisions.insert((cc.id, cc.field));
                         }
@@ -1991,7 +2021,7 @@ mod field_merge_tests {
         // local edited title, incoming edited content — the headline fix.
         let local = note("n1", "T-local", "C", "t", &[("title", 200)]);
         let incoming = note("n1", "T", "C-remote", "t", &[("content", 300)]);
-        let (merged, conflicts, _dels) = merge_entry_pair(&local, &incoming);
+        let (merged, conflicts, _dels, _bo) = merge_entry_pair(&local, &incoming);
         assert_eq!(note_title(&merged), "T-local");
         assert_eq!(note_content(&merged), "C-remote");
         assert!(conflicts.is_empty());
@@ -2003,7 +2033,7 @@ mod field_merge_tests {
         // times. The newer one is NOT auto-picked; it is surfaced for the user.
         let local = note("n1", "T", "A", "t", &[("content", 100)]);
         let incoming = note("n1", "T", "B", "t", &[("content", 999)]);
-        let (merged, conflicts, _) = merge_entry_pair(&local, &incoming);
+        let (merged, conflicts, _, _bo) = merge_entry_pair(&local, &incoming);
         assert_eq!(
             note_content(&merged),
             "A",
@@ -2021,7 +2051,7 @@ mod field_merge_tests {
         // comes over additively, no prompt. Empty does not lose.
         let local = note("n1", "T", "text", "t", &[]);
         let incoming = note("n1", "T", "", "t", &[("content", 200)]);
-        let (merged, conflicts, _) = merge_entry_pair(&local, &incoming);
+        let (merged, conflicts, _, _bo) = merge_entry_pair(&local, &incoming);
         assert_eq!(note_content(&merged), "");
         assert!(
             conflicts.is_empty(),
@@ -2033,7 +2063,7 @@ mod field_merge_tests {
     fn merge_field_edited_only_on_local_is_kept() {
         let local = note("n1", "T", "A", "t", &[("content", 100)]);
         let incoming = note("n1", "T", "base", "t", &[]);
-        let (merged, conflicts, _) = merge_entry_pair(&local, &incoming);
+        let (merged, conflicts, _, _bo) = merge_entry_pair(&local, &incoming);
         assert_eq!(note_content(&merged), "A");
         assert!(conflicts.is_empty(), "local-only edit kept, no conflict");
     }
@@ -2042,7 +2072,7 @@ mod field_merge_tests {
     fn merge_equal_field_ts_different_value_is_clash_keeps_local() {
         let local = note("n1", "T", "A", "t", &[("content", 100)]);
         let incoming = note("n1", "T", "B", "t", &[("content", 100)]);
-        let (merged, conflicts, _dels) = merge_entry_pair(&local, &incoming);
+        let (merged, conflicts, _dels, _bo) = merge_entry_pair(&local, &incoming);
         assert_eq!(note_content(&merged), "A", "clash keeps local");
         assert_eq!(conflicts.len(), 1);
         assert_eq!(conflicts[0].field, "content");
@@ -2055,7 +2085,7 @@ mod field_merge_tests {
         // Pre-v9 vaults: no per-field times -> whole-entry updated_at decides.
         let local = note("n1", "T", "A", "2025-01-01T00:00:01Z", &[]);
         let incoming = note("n1", "T", "B", "2025-01-01T00:00:02Z", &[]);
-        let (merged, conflicts, _dels) = merge_entry_pair(&local, &incoming);
+        let (merged, conflicts, _dels, _bo) = merge_entry_pair(&local, &incoming);
         assert_eq!(note_content(&merged), "B", "newer whole entry wins");
         assert!(conflicts.is_empty());
     }
@@ -2064,7 +2094,7 @@ mod field_merge_tests {
     fn merge_both_without_field_times_equal_updated_at_different_value_is_clash() {
         let local = note("n1", "T", "A", "2025-01-01T00:00:01Z", &[]);
         let incoming = note("n1", "T", "B", "2025-01-01T00:00:01Z", &[]);
-        let (merged, conflicts, _dels) = merge_entry_pair(&local, &incoming);
+        let (merged, conflicts, _dels, _bo) = merge_entry_pair(&local, &incoming);
         assert_eq!(note_content(&merged), "A");
         assert_eq!(conflicts.len(), 1, "equal-time divergence must surface");
     }
@@ -2073,9 +2103,160 @@ mod field_merge_tests {
     fn merge_is_commutative_for_independent_field_edits() {
         let a = note("n1", "T-a", "C", "t", &[("title", 200)]);
         let b = note("n1", "T", "C-b", "t", &[("content", 300)]);
-        let (ab, _, _) = merge_entry_pair(&a, &b);
-        let (ba, _, _) = merge_entry_pair(&b, &a);
+        let (ab, _, _, _) = merge_entry_pair(&a, &b);
+        let (ba, _, _, _) = merge_entry_pair(&b, &a);
         assert_eq!(ab, ba, "merge order must not change the result");
+    }
+
+    // ── brought-over: non-conflicting incoming values surfaced for review ─────
+
+    #[test]
+    fn merge_lists_brought_over_field_with_old_and_new() {
+        // Incoming edited content; local never touched it -> the new value comes
+        // over additively and is listed so the user can drop it (restore old).
+        let local = note("n1", "T", "old", "t", &[]);
+        let incoming = note("n1", "T", "new", "t", &[("content", 200)]);
+        let (_m, conflicts, _d, brought) = merge_entry_pair(&local, &incoming);
+        assert!(conflicts.is_empty());
+        assert_eq!(brought.len(), 1);
+        assert_eq!(brought[0].field, "content");
+        assert_eq!(brought[0].old_value, "old");
+        assert_eq!(brought[0].new_value, "new");
+    }
+
+    #[test]
+    fn merge_conflict_is_not_listed_as_brought_over() {
+        // A clash is a user pick, not a silent bring-over.
+        let local = note("n1", "T", "A", "t", &[("content", 100)]);
+        let incoming = note("n1", "T", "B", "t", &[("content", 999)]);
+        let (_m, conflicts, _d, brought) = merge_entry_pair(&local, &incoming);
+        assert_eq!(conflicts.len(), 1);
+        assert!(brought.is_empty());
+    }
+
+    #[test]
+    fn merge_local_only_edit_is_not_brought_over() {
+        let local = note("n1", "T", "A", "t", &[("content", 100)]);
+        let incoming = note("n1", "T", "base", "t", &[]);
+        let (_m, _c, _d, brought) = merge_entry_pair(&local, &incoming);
+        assert!(
+            brought.is_empty(),
+            "local kept its own value -> nothing came over"
+        );
+    }
+
+    #[test]
+    fn merge_lists_brought_over_custom_pair_add() {
+        use crate::vault::entry::CustomField;
+        let cf = CustomField {
+            label: String::from("Tag"),
+            value: String::from("blue"),
+            hidden: false,
+        };
+        // Incoming added a pair local never had -> brought over (old empty).
+        let local = note_cf("n1", vec![], &[]);
+        let incoming = note_cf("n1", vec![cf], &[("custom_fields:Tag", 200)]);
+        let (_m, _c, dels, brought) = merge_entry_pair(&local, &incoming);
+        assert!(dels.is_empty());
+        assert_eq!(brought.len(), 1);
+        assert_eq!(brought[0].field, "custom_fields:Tag");
+        assert_eq!(brought[0].old_value, "");
+        assert_eq!(brought[0].new_value, "blue");
+    }
+
+    #[test]
+    fn merge_lists_brought_over_attachment_by_name_not_bytes() {
+        use crate::vault::entry::EntryAttachment;
+        let att = EntryAttachment {
+            uuid: String::from("att-1"),
+            name: String::from("passport.pdf"),
+            kind: String::from("application/pdf"),
+            data: vec![1, 2, 3],
+        };
+        let local = VaultEntry::Note(NoteEntry {
+            meta: meta("n1", "t", &[]),
+            title: String::from("T"),
+            content: String::from("C"),
+            custom_fields: vec![],
+            attachments: vec![],
+        });
+        let incoming = VaultEntry::Note(NoteEntry {
+            meta: meta("n1", "t", &[("attachments:att-1", 200)]),
+            title: String::from("T"),
+            content: String::from("C"),
+            custom_fields: vec![],
+            attachments: vec![att],
+        });
+        let (_m, _c, dels, brought) = merge_entry_pair(&local, &incoming);
+        assert!(dels.is_empty());
+        assert_eq!(brought.len(), 1);
+        assert_eq!(brought[0].field, "attachments:att-1");
+        assert_eq!(
+            brought[0].new_value, "passport.pdf",
+            "name, never raw bytes"
+        );
+    }
+
+    #[test]
+    fn merge_reentry_over_local_delete_is_pending_not_brought_over() {
+        use crate::vault::entry::CustomField;
+        let cf = CustomField {
+            label: String::from("PIN"),
+            value: String::from("1"),
+            hidden: false,
+        };
+        // Incoming still has PIN; local deleted it more recently -> keep/delete
+        // prompt, NOT a silent bring-over.
+        let local = note_cf("n1", vec![], &[("del:custom_fields:PIN", 300)]);
+        let incoming = note_cf("n1", vec![cf], &[("custom_fields:PIN", 200)]);
+        let (_m, _c, dels, brought) = merge_entry_pair(&local, &incoming);
+        assert_eq!(dels.len(), 1);
+        assert!(brought.is_empty());
+    }
+
+    fn test_session(entries: Vec<VaultEntry>) -> VaultSession {
+        VaultSession {
+            folders: vec![],
+            entries,
+            path: std::path::PathBuf::new(),
+            passphrase: Zeroizing::new(b"x".to_vec()),
+            yubikey: None,
+            yubikey_aliases: std::collections::HashMap::new(),
+            deleted_ids: vec![],
+        }
+    }
+
+    #[test]
+    fn do_merge_lists_added_entries_for_review() {
+        let mut session = test_session(vec![note("local-1", "Local", "C", "t", &[])]);
+        let incoming = crate::vault::serialization::VaultBody {
+            entries: vec![
+                note("local-1", "Local", "C", "t", &[]),
+                note("remote-1", "Remote", "C", "t", &[]),
+            ],
+            folders: vec![],
+            ..Default::default()
+        };
+        let summary = do_merge(&mut session, incoming);
+        assert_eq!(summary.added, 1);
+        assert_eq!(summary.added_entries.len(), 1);
+        assert_eq!(summary.added_entries[0].id, "remote-1");
+        assert_eq!(summary.added_entries[0].title, "Remote");
+    }
+
+    #[test]
+    fn do_merge_aggregates_brought_over_across_entries() {
+        let mut session = test_session(vec![note("n1", "T", "old", "t", &[])]);
+        let incoming = crate::vault::serialization::VaultBody {
+            entries: vec![note("n1", "T", "new", "t", &[("content", 200)])],
+            folders: vec![],
+            ..Default::default()
+        };
+        let summary = do_merge(&mut session, incoming);
+        assert_eq!(summary.brought_over.len(), 1);
+        assert_eq!(summary.brought_over[0].id, "n1");
+        assert_eq!(summary.brought_over[0].field, "content");
+        assert_eq!(summary.brought_over[0].new_value, "new");
     }
 
     #[test]
@@ -2107,7 +2288,7 @@ mod field_merge_tests {
             vec![cf("PIN", "1111"), cf("Recovery", "x@example.com")],
             &[("custom_fields:Recovery", 300)],
         );
-        let (merged, _, _) = merge_entry_pair(&local, &incoming);
+        let (merged, _, _, _) = merge_entry_pair(&local, &incoming);
         match &merged {
             VaultEntry::Login(e) => {
                 let by: std::collections::HashMap<_, _> = e
@@ -2155,7 +2336,7 @@ mod field_merge_tests {
         // local still has PIN (last changed at 100); incoming deleted it at 200.
         let local = note_cf("n1", vec![cf], &[("custom_fields:PIN", 100)]);
         let incoming = note_cf("n1", vec![], &[("del:custom_fields:PIN", 200)]);
-        let (merged, _conflicts, dels) = merge_entry_pair(&local, &incoming);
+        let (merged, _conflicts, dels, _bo) = merge_entry_pair(&local, &incoming);
         assert_eq!(dels.len(), 1, "a newer delete must surface as pending");
         assert_eq!(dels[0].field, "custom_fields:PIN");
         assert_eq!(dels[0].id, "n1");
@@ -2178,7 +2359,7 @@ mod field_merge_tests {
         // local edited PIN at 300, AFTER incoming's delete at 200 -> edit wins.
         let local = note_cf("n1", vec![cf], &[("custom_fields:PIN", 300)]);
         let incoming = note_cf("n1", vec![], &[("del:custom_fields:PIN", 200)]);
-        let (merged, _conflicts, dels) = merge_entry_pair(&local, &incoming);
+        let (merged, _conflicts, dels, _bo) = merge_entry_pair(&local, &incoming);
         assert!(
             dels.is_empty(),
             "edit newer than delete -> no pending delete"
@@ -2215,7 +2396,7 @@ mod field_merge_tests {
         // kept pending the user's choice, and its history follows the kept value.
         let local = login("new-local", "old-local", &[("password", 200)]);
         let incoming = login("new-remote", "old-remote", &[("password", 300)]);
-        let (merged, conflicts, _) = merge_entry_pair(&local, &incoming);
+        let (merged, conflicts, _, _bo) = merge_entry_pair(&local, &incoming);
         match &merged {
             VaultEntry::Login(e) => {
                 assert_eq!(e.password, "new-local");
@@ -2248,6 +2429,8 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
     let mut folder_conflicts: Vec<crate::api::vault::FolderConflictItem> = Vec::new();
     let mut field_conflicts: Vec<FieldConflictItem> = Vec::new();
     let mut pending_item_deletes: Vec<PendingItemDeleteItem> = Vec::new();
+    let mut added_entries: Vec<crate::api::vault::AddedEntryItem> = Vec::new();
+    let mut brought_over: Vec<crate::api::vault::BroughtOverItem> = Vec::new();
 
     // Build lookup maps.
     let local_by_id: std::collections::HashMap<&str, &VaultEntry> =
@@ -2281,13 +2464,14 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
             // Field-level merge: each field's newer change-time wins; falls back
             // to whole-entry LWW when neither side has per-field times (pre-v9).
             // Genuine clashes and newer-deletes are surfaced to the user.
-            let (merged, mut conflicts, mut item_deletes) =
+            let (merged, mut conflicts, mut item_deletes, mut carried) =
                 merge_entry_pair(local_entry, inc_entry);
             if merged != *local_entry {
                 updated += 1;
             }
             field_conflicts.append(&mut conflicts);
             pending_item_deletes.append(&mut item_deletes);
+            brought_over.append(&mut carried);
             result_entries.push(merged);
         } else if incoming_deletions.contains_key(id) {
             // Incoming tombstone — requires user consent before deletion; keep entry for now.
@@ -2307,6 +2491,10 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
         let id = entry_id(inc_entry);
         if !local_by_id.contains_key(id) {
             // Not present locally — always add, even if a local tombstone exists.
+            added_entries.push(crate::api::vault::AddedEntryItem {
+                id: id.to_string(),
+                title: entry_display_title(inc_entry),
+            });
             result_entries.push(inc_entry.clone());
             added += 1;
         }
@@ -2346,6 +2534,8 @@ fn do_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
     MergeSummary {
         added,
         updated,
+        added_entries,
+        brought_over,
         pending_deletes,
         folder_conflicts,
         field_conflicts,
@@ -6394,7 +6584,7 @@ mod sync_fuzz {
         for id in &ids {
             match (a_by.get(id.as_str()), b_by.get(id.as_str())) {
                 (Some(x), Some(y)) => {
-                    let (m, cs, _pending) = merge_entry_pair(x, y);
+                    let (m, cs, _pending, _bo) = merge_entry_pair(x, y);
                     for c in cs {
                         conflicts.push((c.id.clone(), c.field.clone()));
                     }

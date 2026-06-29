@@ -172,12 +172,42 @@ pub struct FolderConflictItem {
     pub incoming_folder: String,
 }
 
+/// An entry added from the incoming vault during sync (its UUID was not present
+/// locally). Surfaced so the user can review and drop it before keeping it
+/// (drop = delete the entry). `title` is the display title.
+pub struct AddedEntryItem {
+    pub id: String,
+    pub title: String,
+}
+
+/// A non-conflicting value brought over from the incoming vault during sync: the
+/// other device edited this field/pair/attachment and this side did not, so the
+/// incoming value wins additively. Surfaced so the user can review and drop it
+/// (drop = restore `old_value`). `field` is the field key (e.g. "password",
+/// "custom_fields:Tag", "attachments:ID"). For a newly added pair/attachment,
+/// `old_value` is empty and `new_value` is the item's value/name. Values are
+/// decrypted plaintext — mask secrets in the UI. Genuine clashes are NOT here;
+/// see `field_conflicts`.
+pub struct BroughtOverItem {
+    pub id: String,
+    pub title: String,
+    pub field: String,
+    pub old_value: String,
+    pub new_value: String,
+}
+
 /// Summary returned to Flutter after a vault merge operation.
 pub struct MergeSummary {
     /// Entries added from the incoming vault (UUIDs not present locally).
     pub added: u32,
     /// Entries updated because the incoming version had a newer timestamp.
     pub updated: u32,
+    /// Entries added from the incoming vault, listed for one-by-one review so the
+    /// user can drop any (drop = delete the entry). Same count as `added`.
+    pub added_entries: Vec<AddedEntryItem>,
+    /// Non-conflicting values brought over from the incoming vault, listed for
+    /// review so the user can drop any (drop = restore the old value).
+    pub brought_over: Vec<BroughtOverItem>,
     /// Incoming tombstones that matched local entries — awaiting user consent.
     /// Flutter shows a Delete/Keep dialog for each; no deletion occurs automatically.
     pub pending_deletes: Vec<PendingDeleteItem>,

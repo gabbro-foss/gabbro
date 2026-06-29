@@ -17,6 +17,8 @@ import 'package:gabbro/widgets/yubikey_tap.dart';
 MergeSummary _summary({
   int added = 0,
   int updated = 0,
+  List<AddedEntryItem> addedEntries = const [],
+  List<BroughtOverItem> broughtOver = const [],
   List<PendingDeleteItem> pendingDeletes = const [],
   List<FolderConflictItem> folderConflicts = const [],
   List<FieldConflictItem> fieldConflicts = const [],
@@ -25,6 +27,8 @@ MergeSummary _summary({
     MergeSummary(
       added: added,
       updated: updated,
+      addedEntries: addedEntries,
+      broughtOver: broughtOver,
       pendingDeletes: pendingDeletes,
       folderConflicts: folderConflicts,
       fieldConflicts: fieldConflicts,

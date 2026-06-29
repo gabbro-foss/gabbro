@@ -2327,10 +2327,40 @@ impl SseDecode for String {
     }
 }
 
+impl SseDecode for crate::api::vault::AddedEntryItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <String>::sse_decode(deserializer);
+        let mut var_title = <String>::sse_decode(deserializer);
+        return crate::api::vault::AddedEntryItem {
+            id: var_id,
+            title: var_title,
+        };
+    }
+}
+
 impl SseDecode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         deserializer.cursor.read_u8().unwrap() != 0
+    }
+}
+
+impl SseDecode for crate::api::vault::BroughtOverItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_id = <String>::sse_decode(deserializer);
+        let mut var_title = <String>::sse_decode(deserializer);
+        let mut var_field = <String>::sse_decode(deserializer);
+        let mut var_oldValue = <String>::sse_decode(deserializer);
+        let mut var_newValue = <String>::sse_decode(deserializer);
+        return crate::api::vault::BroughtOverItem {
+            id: var_id,
+            title: var_title,
+            field: var_field,
+            old_value: var_oldValue,
+            new_value: var_newValue,
+        };
     }
 }
 
@@ -2723,6 +2753,34 @@ impl SseDecode for Vec<String> {
     }
 }
 
+impl SseDecode for Vec<crate::api::vault::AddedEntryItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::vault::AddedEntryItem>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::api::vault::BroughtOverItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = Vec::with_capacity(len_ as usize);
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::vault::BroughtOverItem>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::api::vault::CustomFieldData> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2968,6 +3026,10 @@ impl SseDecode for crate::api::vault::MergeSummary {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_added = <u32>::sse_decode(deserializer);
         let mut var_updated = <u32>::sse_decode(deserializer);
+        let mut var_addedEntries =
+            <Vec<crate::api::vault::AddedEntryItem>>::sse_decode(deserializer);
+        let mut var_broughtOver =
+            <Vec<crate::api::vault::BroughtOverItem>>::sse_decode(deserializer);
         let mut var_pendingDeletes =
             <Vec<crate::api::vault::PendingDeleteItem>>::sse_decode(deserializer);
         let mut var_folderConflicts =
@@ -2979,6 +3041,8 @@ impl SseDecode for crate::api::vault::MergeSummary {
         return crate::api::vault::MergeSummary {
             added: var_added,
             updated: var_updated,
+            added_entries: var_addedEntries,
+            brought_over: var_broughtOver,
             pending_deletes: var_pendingDeletes,
             folder_conflicts: var_folderConflicts,
             field_conflicts: var_fieldConflicts,
@@ -3518,6 +3582,51 @@ fn pde_ffi_dispatcher_sync_impl(
 // Section: rust2dart
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::vault::AddedEntryItem {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.title.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::vault::AddedEntryItem
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::AddedEntryItem>
+    for crate::api::vault::AddedEntryItem
+{
+    fn into_into_dart(self) -> crate::api::vault::AddedEntryItem {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::vault::BroughtOverItem {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.id.into_into_dart().into_dart(),
+            self.title.into_into_dart().into_dart(),
+            self.field.into_into_dart().into_dart(),
+            self.old_value.into_into_dart().into_dart(),
+            self.new_value.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::vault::BroughtOverItem
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::BroughtOverItem>
+    for crate::api::vault::BroughtOverItem
+{
+    fn into_into_dart(self) -> crate::api::vault::BroughtOverItem {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::vault::CardEntryData {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -4029,6 +4138,8 @@ impl flutter_rust_bridge::IntoDart for crate::api::vault::MergeSummary {
         [
             self.added.into_into_dart().into_dart(),
             self.updated.into_into_dart().into_dart(),
+            self.added_entries.into_into_dart().into_dart(),
+            self.brought_over.into_into_dart().into_dart(),
             self.pending_deletes.into_into_dart().into_dart(),
             self.folder_conflicts.into_into_dart().into_dart(),
             self.field_conflicts.into_into_dart().into_dart(),
@@ -4367,10 +4478,29 @@ impl SseEncode for String {
     }
 }
 
+impl SseEncode for crate::api::vault::AddedEntryItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.title, serializer);
+    }
+}
+
 impl SseEncode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         serializer.cursor.write_u8(self as _).unwrap();
+    }
+}
+
+impl SseEncode for crate::api::vault::BroughtOverItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.id, serializer);
+        <String>::sse_encode(self.title, serializer);
+        <String>::sse_encode(self.field, serializer);
+        <String>::sse_encode(self.old_value, serializer);
+        <String>::sse_encode(self.new_value, serializer);
     }
 }
 
@@ -4636,6 +4766,26 @@ impl SseEncode for Vec<String> {
     }
 }
 
+impl SseEncode for Vec<crate::api::vault::AddedEntryItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::vault::AddedEntryItem>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::api::vault::BroughtOverItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::vault::BroughtOverItem>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::api::vault::CustomFieldData> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4813,6 +4963,8 @@ impl SseEncode for crate::api::vault::MergeSummary {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <u32>::sse_encode(self.added, serializer);
         <u32>::sse_encode(self.updated, serializer);
+        <Vec<crate::api::vault::AddedEntryItem>>::sse_encode(self.added_entries, serializer);
+        <Vec<crate::api::vault::BroughtOverItem>>::sse_encode(self.brought_over, serializer);
         <Vec<crate::api::vault::PendingDeleteItem>>::sse_encode(self.pending_deletes, serializer);
         <Vec<crate::api::vault::FolderConflictItem>>::sse_encode(self.folder_conflicts, serializer);
         <Vec<crate::api::vault::FieldConflictItem>>::sse_encode(self.field_conflicts, serializer);

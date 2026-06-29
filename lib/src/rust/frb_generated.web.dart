@@ -32,6 +32,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String dco_decode_String(dynamic raw);
 
   @protected
+  AddedEntryItem dco_decode_added_entry_item(dynamic raw);
+
+  @protected
   bool dco_decode_bool(dynamic raw);
 
   @protected
@@ -71,6 +74,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   VaultEntryData dco_decode_box_autoadd_vault_entry_data(dynamic raw);
+
+  @protected
+  BroughtOverItem dco_decode_brought_over_item(dynamic raw);
 
   @protected
   CardEntryData dco_decode_card_entry_data(dynamic raw);
@@ -137,6 +143,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<String> dco_decode_list_String(dynamic raw);
+
+  @protected
+  List<AddedEntryItem> dco_decode_list_added_entry_item(dynamic raw);
+
+  @protected
+  List<BroughtOverItem> dco_decode_list_brought_over_item(dynamic raw);
 
   @protected
   List<CustomFieldData> dco_decode_list_custom_field_data(dynamic raw);
@@ -266,6 +278,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String sse_decode_String(SseDeserializer deserializer);
 
   @protected
+  AddedEntryItem sse_decode_added_entry_item(SseDeserializer deserializer);
+
+  @protected
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
@@ -325,6 +340,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   VaultEntryData sse_decode_box_autoadd_vault_entry_data(
     SseDeserializer deserializer,
   );
+
+  @protected
+  BroughtOverItem sse_decode_brought_over_item(SseDeserializer deserializer);
 
   @protected
   CardEntryData sse_decode_card_entry_data(SseDeserializer deserializer);
@@ -405,6 +423,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<String> sse_decode_list_String(SseDeserializer deserializer);
+
+  @protected
+  List<AddedEntryItem> sse_decode_list_added_entry_item(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<BroughtOverItem> sse_decode_list_brought_over_item(
+    SseDeserializer deserializer,
+  );
 
   @protected
   List<CustomFieldData> sse_decode_list_custom_field_data(
@@ -568,6 +596,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_String(String self, SseSerializer serializer);
 
   @protected
+  void sse_encode_added_entry_item(
+    AddedEntryItem self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
@@ -636,6 +670,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_vault_entry_data(
     VaultEntryData self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_brought_over_item(
+    BroughtOverItem self,
     SseSerializer serializer,
   );
 
@@ -743,6 +783,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_list_String(List<String> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_added_entry_item(
+    List<AddedEntryItem> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_brought_over_item(
+    List<BroughtOverItem> self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_list_custom_field_data(
