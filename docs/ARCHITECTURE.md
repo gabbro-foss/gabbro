@@ -89,28 +89,41 @@ empty registry and can never reach a real vault (wherever the user saved it). Mi
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task
+### Active task: granular vault sync (v8 -> v9)
 
-**Redesign vault sync — it is fundamentally broken (critical).** Today's merge is
-whole-entry last-writer-wins on a single second-precision `meta.updated_at`; there are
-no per-field timestamps (`session.rs` `do_merge`, ~1293). Two failures:
-- False "no differences": the summary is entry-granular and `session.rs:1328` keeps
-  local silently when timestamps are equal.
-- Cannot merge independent field edits across devices — the newer *whole* entry wins
-  and the other side's field change is silently lost. Data loss.
+**Why:** today's merge is whole-entry last-writer-wins on a single second-precision
+`meta.updated_at` (`session.rs` `do_merge`, ~1293) — independent field edits on two
+devices silently lose one side, and equal-second edits report a false "nothing to sync".
+Data loss; sync is not credible.
 
-Fix needs a new vault format version (v8 -> v9): per-field modification timestamps,
-field-level LWW (a *cleared* field is a real edit, not "empty loses"), migration + new
-backward-compat fixtures + gate. Net-first; failing backward-compat test before any
-production change (vault format is the bricking-risk area). Dedicated design session first.
+**Approach (don't reinvent):** copy KeePass's offline file-to-file merge (permanent
+per-item id, newer change wins, loser kept) and go one level finer — merge per scalar
+field and per custom k:v pair. Each mergeable thing carries a change-time stored as an
+**integer millisecond** (std `SystemTime`, **no new dependency**; the `chrono_now` name is
+misleading — it uses no date crate). Genuine clashes (same thing, same instant, different
+value) are surfaced for the user (keep mine / theirs / both / merge), never silently
+dropped. Transport (moving the file between devices) stays out of scope — users use
+Syncthing/Nextcloud/Synology/USB. Net-first + canon-TDD; failing backward-compat test
+before any format change.
 
-Recovery context (maintainer's 3-device case, full notes in `.scratchpad`): the
-hypothesis — export each device, import all three into a fresh vault so divergent
-same-title entries land separately = zero loss — is FALSE. Gabbro import dedups by UUID and silently drops
-same-UUID losers (first file imported wins): `import.rs:439` `merge_source_into_session`
-keys on `meta.id`, never compares content. Lossless route: JSON-export each device
-(`session.rs:717`, full plaintext dump) + reconcile per-field by hand; import is only
-safe for entries unique to one device.
+**v8 -> v9 safety:** new app reads v8 and migrates on save (no loss); an old app *refuses*
+a v9 file (fail-safe, never strips data). Hardware tests run on **mock vaults only** until
+trust is rebuilt — the fuzz proof must be green first.
+
+Checklist (tick as completed):
+- [x] 1. Net-first: pin current merge tests green (baseline).
+- [x] 2. Schema: `field_times` (ms) on `EntryMeta` (covers scalars + custom pairs keyed by label + attachments by uuid); hand Zeroize. Custom-field identity = its label, so `CustomField` is unchanged (also gives the rename-surfaces-to-user semantics for free).
+- [x] 3. Stamping: ms `now()` (std-only) + `update_entry` stamps only changed fields/pairs (old entry is source of truth; field_times accumulates).
+- [x] 4. Granular merge: field/pair/attachment LWW + clash detection + per-item delete tombstones (`merge_entry_pair`/`FieldMerger`; deletions via a `del:` key prefix in `field_times`, no new schema field). `do_merge` uses it; 13 fast unit tests. Clashes + pending item-deletes are produced but not yet surfaced through the bridge — done with task 8 regen (kept-local/kept-item meanwhile, never silent loss).
+- [ ] 5. Sync summary: field-clash + item-delete reporting across the bridge.
+- [x] 6. Format v8 -> v9: `VERSION=9` + fail-closed "newer Gabbro, please update" message (crypto byte-identical to v8); v9 gate fixtures + gate extended (v6-v9 open/migrate verified); `migration_vaults/v9.gabbro` + docs. Full re-seal gate scenarios (Argon2) left for the maintainer's gate run.
+- [x] 7. Fuzz proof (`session.rs` `sync_fuzz`): 12-entry/all-6-types base, 3 divergent copies, random edits/adds/deletes across EVERY field (all scalars incl. notes/password/card fields/data, custom pairs, AND attachments) + random sync orders, deterministic seed; asserts no-loss vs an independent oracle, order-independence, convergence. 120 passes, ~0.7s. Bug-injection verified it catches a mishandled field.
+- [ ] 8. Flutter: bridge regen + clash & item-delete prompts; fix false "nothing to sync".
+- [ ] 9. Docs: ARCHITECTURE / CHANGELOG / MIGRATION_TESTS.
+
+Note: import (`import.rs:439` `merge_source_into_session`) stays first-wins by UUID — it
+brings a foreign lineage with no shared change-time provenance; field-level merge is scoped
+to the sync path only.
 
 ---
 
@@ -127,6 +140,13 @@ release process live in their own document:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Bugs
+- **JSON export hard-codes `gabbro version 1.0.0`.** Wrong and brittle (needs a bump
+  every release). Fix to read the real version (single source: `pubspec.yaml`) or drop
+  the field.
+- **Linux: passphrase breakdown not shown.** Long-click on an unhidden (revealed)
+  passphrase shows no breakdown sheet.
+- **Detail view: entry fields not consistently ordered.** Different Gabbro instances on
+  the same vault/entry show different field ordering.
 - **Android tablet biometric toggle doesn't persist.** Fresh alpha.10 install on an
   Android tablet: enabling biometrics doesn't stick — after logout no biometric is
   offered. Not yet investigated.
