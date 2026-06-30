@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Kvelvet ditt er sletta. Opprett eit nytt for å halde fram.",
 
   "syncFilePassphraseLabel": "Kvelvet sin passfrase",
+  "syncSafeToRetry": "Viss ei synkronisering blir avbroten, køyr ho berre på nytt. Ingenting går tapt.",
+  "syncThisVault": "Bruk dette kvelvet",
+  "syncOtherVault": "Bruk det andre kvelvet",
 
   "historyWarning": "Berre 1 tidlegare verdi vert behaldt. Historikken vert tømt automatisk basert på tryggleiksinnstillingane dine.",
   "historyCurrent": "Gjeldande",
-  "historyPrevious": "Tidlegare",
+  "historyPrevious": "Førre tilstand",
   "historySavedOn": "Lagra {date}",
   "@historySavedOn": {
     "placeholders": {

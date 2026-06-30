@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "ボルトが削除されました。続けるには新しいボルトを作成してください。",
 
   "syncFilePassphraseLabel": "ボルトのパスフレーズ",
+  "syncSafeToRetry": "同期が中断された場合は、もう一度実行するだけです。データは失われません。",
+  "syncThisVault": "このボルトを使用",
+  "syncOtherVault": "別のボルトを使用",
 
   "historyWarning": "以前の値は1つだけ保持されます。履歴はセキュリティ設定に基づいて自動的に削除されます。",
   "historyCurrent": "現在",
-  "historyPrevious": "以前",
+  "historyPrevious": "以前の状態",
   "historySavedOn": "{date}に保存",
   "@historySavedOn": {
     "placeholders": {

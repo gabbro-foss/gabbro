@@ -608,6 +608,15 @@ fn set_entry_scalar(entry: &mut VaultEntry, key: &str, value: &str) {
         VaultEntry::File(e) => match key {
             "filename" => e.filename = s,
             "notes" => e.notes = Some(s),
+            // Binary file contents ride the string resolution path as base64
+            // (see merge_entry_pair's File branch). Decode back to raw bytes; a
+            // malformed value leaves the data untouched.
+            "data" => {
+                use base64::Engine;
+                if let Ok(bytes) = base64::engine::general_purpose::STANDARD.decode(&s) {
+                    e.data = bytes;
+                }
+            }
             _ => {}
         },
         VaultEntry::Custom(e) => {
@@ -2033,6 +2042,25 @@ mod tests {
         match &e {
             VaultEntry::Login(l) => assert_eq!(l.password, "new-pw"),
             _ => panic!("expected Login"),
+        }
+    }
+
+    #[test]
+    fn set_entry_field_by_key_sets_file_data_from_base64() {
+        use crate::vault::entry::{EntryMeta, FileEntry};
+        use base64::Engine;
+        let mut e = VaultEntry::File(FileEntry {
+            meta: EntryMeta::default(),
+            filename: String::from("k.txt"),
+            data: b"old".to_vec(),
+            notes: None,
+            custom_fields: vec![],
+        });
+        let encoded = base64::engine::general_purpose::STANDARD.encode(b"newbytes");
+        set_entry_field_by_key(&mut e, "data", &encoded);
+        match &e {
+            VaultEntry::File(f) => assert_eq!(f.data, b"newbytes"),
+            _ => panic!("expected File"),
         }
     }
 

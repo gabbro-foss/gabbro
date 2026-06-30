@@ -42,6 +42,28 @@ MergeSummary _summary({
 
 void main() {
   group('sync review secret reveal', () {
+    testWidgets('a file-data clash shows <binary>, never the raw value', (
+      tester,
+    ) async {
+      await openReview(
+        tester,
+        _summary(
+          fieldConflicts: [
+            const FieldConflictItem(
+              id: 'x',
+              title: 'key.txt',
+              field: 'data',
+              localValue: 'RAWLOCALBASE64',
+              incomingValue: 'RAWINCOMINGBASE64',
+            ),
+          ],
+        ),
+      );
+      expect(find.textContaining('<binary>'), findsWidgets);
+      expect(find.textContaining('RAWLOCALBASE64'), findsNothing);
+      expect(find.textContaining('RAWINCOMINGBASE64'), findsNothing);
+    });
+
     testWidgets('a secret conflict field is masked by default', (tester) async {
       await openReview(
         tester,

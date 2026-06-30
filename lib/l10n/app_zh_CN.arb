@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "您的保险库已删除。请创建新的保险库以继续。",
 
   "syncFilePassphraseLabel": "保险库密码短语",
+  "syncSafeToRetry": "如果同步中断，只需重新运行即可。不会丢失任何数据。",
+  "syncThisVault": "使用此保险库",
+  "syncOtherVault": "使用其他保险库",
 
   "historyWarning": "只保留 1 个历史值。历史记录根据安全设置自动删除。",
   "historyCurrent": "当前",
-  "historyPrevious": "以前",
+  "historyPrevious": "先前状态",
   "historySavedOn": "保存于 {date}",
   "@historySavedOn": {
     "placeholders": {

@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Vọọliti rẹ ti pa. Ṣẹda tuntun lati tẹsiwaju.",
 
   "syncFilePassphraseLabel": "Gbolohun ọrọ igbaniwọle vọọliti",
+  "syncSafeToRetry": "Tí ìmúdọ́gba bá dáwọ́dúró, kàn ṣàṣàrò rẹ̀ lẹ́ẹ̀kan sí i. Kò sí ohun tí yóò sọnù.",
+  "syncThisVault": "Lo ìfinú yìí",
+  "syncOtherVault": "Lo ìfinú mìíràn",
 
   "historyWarning": "Iye iṣaaju 1 nikan ni a tọju. Itan ni a pa laifọwọyi da lori awọn eto aabo.",
   "historyCurrent": "Lọwọlọwọ",
-  "historyPrevious": "Iṣaaju",
+  "historyPrevious": "Ipò iṣáájú",
   "historySavedOn": "Ti pamọ {date}",
   "@historySavedOn": {
     "placeholders": {

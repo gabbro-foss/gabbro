@@ -159,6 +159,26 @@ void main() {
       expect(find.text('/tmp/other.gabbro'), findsOneWidget);
     });
 
+    testWidgets('passphrase dialog announces the safe-to-retry hint', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(),
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('run it again'), findsOneWidget);
+      // Exposed to screen readers, not just painted.
+      expect(find.bySemanticsLabel(RegExp('run it again')), findsOneWidget);
+      handle.dispose();
+    });
+
     // Net-first: pin the passphrase show/hide eye toggle so the later a11y
     // label work cannot regress the flip. Field starts obscured -> the eye
     // icon offers "show" (Icons.visibility); tapping flips to visibility_off.
@@ -322,7 +342,7 @@ void main() {
       expect(find.textContaining('different passphrase'), findsOneWidget);
     });
 
-    testWidgets('whole-entry delete shows in the review as a delete toggle', (
+    testWidgets('whole-entry delete shows keep/delete chips in the review', (
       tester,
     ) async {
       String? deletedId;
@@ -342,8 +362,8 @@ void main() {
       expect(find.textContaining('Review changes'), findsOneWidget);
       expect(find.textContaining('Example'), findsOneWidget);
 
-      // Turn the delete toggle on, then finish.
-      await tester.tap(find.byType(SwitchListTile));
+      // Pick Delete, then finish.
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Delete'));
       await _settle(tester);
       await tester.tap(find.text('OK'));
       await _settle(tester);
@@ -438,7 +458,7 @@ void main() {
 
         expect(find.textContaining('Nothing to sync'), findsNothing);
         expect(
-          find.textContaining("Use the other device's value"),
+          find.textContaining('Use other vault'),
           findsOneWidget,
         );
         expect(find.textContaining('Example'), findsOneWidget);
@@ -447,7 +467,7 @@ void main() {
         expect(find.textContaining('theirs'), findsNothing);
 
         // Pick keep-mine, then finish (keepIncoming == false).
-        await tester.tap(find.textContaining('Keep ('));
+        await tester.tap(find.textContaining('Use this vault'));
         await _settle(tester);
         await tester.tap(find.text('OK'));
         await _settle(tester);
@@ -472,8 +492,8 @@ void main() {
       await _startSync(tester);
 
       expect(find.textContaining('Bank login'), findsOneWidget);
-      // Default is keep; uncheck to drop.
-      await tester.tap(find.byType(CheckboxListTile));
+      // Default is keep; pick Skip to drop.
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Skip'));
       await _settle(tester);
       await tester.tap(find.text('OK'));
       await _settle(tester);
@@ -530,7 +550,7 @@ void main() {
         // A url is not secret, so the new value is visible.
         expect(find.textContaining('new.example.com'), findsOneWidget);
         // Drop it (uncheck).
-        await tester.tap(find.byType(CheckboxListTile));
+        await tester.tap(find.textContaining('Use this vault'));
         await _settle(tester);
         await tester.tap(find.text('OK'));
         await _settle(tester);
@@ -610,7 +630,7 @@ void main() {
         ),
       );
       await _startSync(tester);
-      await tester.tap(find.textContaining("Use the other device's value"));
+      await tester.tap(find.textContaining('Use other vault'));
       await _settle(tester);
       await tester.tap(find.text('OK'));
       await _settle(tester);
@@ -643,7 +663,7 @@ void main() {
         ),
       );
       await _startSync(tester);
-      await tester.tap(find.byType(CheckboxListTile)); // uncheck = drop
+      await tester.tap(find.textContaining('Use this vault')); // pick Revert = drop
       await _settle(tester);
       await tester.tap(find.text('OK'));
       await _settle(tester);
@@ -672,7 +692,7 @@ void main() {
       expect(find.textContaining('passport.pdf'), findsOneWidget);
     });
 
-    testWidgets('an item-delete shows as a delete toggle in the entry step', (
+    testWidgets('an item-delete shows keep/delete chips in the entry step', (
       tester,
     ) async {
       String? gotField;
@@ -698,7 +718,7 @@ void main() {
       await _startSync(tester);
 
       expect(find.textContaining('OldNote'), findsOneWidget);
-      await tester.tap(find.byType(SwitchListTile));
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Delete'));
       await _settle(tester);
       await tester.tap(find.text('OK'));
       await _settle(tester);
@@ -737,7 +757,7 @@ void main() {
         find.ancestor(of: find.text('OK'), matching: find.byType(TextButton)),
       );
       expect(okButton().onPressed, isNull);
-      await tester.tap(find.textContaining("Use the other device's value"));
+      await tester.tap(find.textContaining('Use other vault'));
       await _settle(tester);
       expect(okButton().onPressed, isNotNull);
     });

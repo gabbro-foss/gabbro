@@ -1035,13 +1035,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncFilePassphraseLabel => '保险库密码短语';
 
   @override
+  String get syncSafeToRetry => '如果同步中断，只需重新运行即可。不会丢失任何数据。';
+
+  @override
+  String get syncThisVault => '使用此保险库';
+
+  @override
+  String get syncOtherVault => '使用其他保险库';
+
+  @override
   String get historyWarning => '只保留 1 个历史值。历史记录根据安全设置自动删除。';
 
   @override
   String get historyCurrent => '当前';
 
   @override
-  String get historyPrevious => '以前';
+  String get historyPrevious => '先前状态';
 
   @override
   String historySavedOn(String date) {
@@ -2935,13 +2944,22 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get syncFilePassphraseLabel => '保险库密码短语';
 
   @override
+  String get syncSafeToRetry => '如果同步中断，只需重新运行即可。不会丢失任何数据。';
+
+  @override
+  String get syncThisVault => '使用此保险库';
+
+  @override
+  String get syncOtherVault => '使用其他保险库';
+
+  @override
   String get historyWarning => '只保留 1 个历史值。历史记录根据安全设置自动删除。';
 
   @override
   String get historyCurrent => '当前';
 
   @override
-  String get historyPrevious => '以前';
+  String get historyPrevious => '先前状态';
 
   @override
   String historySavedOn(String date) {
@@ -4835,13 +4853,22 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get syncFilePassphraseLabel => '保險庫密碼片語';
 
   @override
+  String get syncSafeToRetry => '如果同步中斷，只需重新執行即可。不會遺失任何資料。';
+
+  @override
+  String get syncThisVault => '使用此保險庫';
+
+  @override
+  String get syncOtherVault => '使用其他保險庫';
+
+  @override
   String get historyWarning => '只保留 1 個歷史值。歷史記錄根據安全設定自動刪除。';
 
   @override
   String get historyCurrent => '目前';
 
   @override
-  String get historyPrevious => '之前';
+  String get historyPrevious => '先前狀態';
 
   @override
   String historySavedOn(String date) {

@@ -1051,6 +1051,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Széf jelmondatja';
 
   @override
+  String get syncSafeToRetry =>
+      'Ha egy szinkronizálás megszakad, egyszerűen futtasd le újra. Semmi nem vész el.';
+
+  @override
+  String get syncThisVault => 'Ezt a széfet használ';
+
+  @override
+  String get syncOtherVault => 'Másik széfet használ';
+
+  @override
   String get historyWarning =>
       'Csak 1 korábbi érték kerül megőrzésre. Az előzmények automatikusan törlődnek a biztonsági beállítások alapján.';
 
@@ -1058,7 +1068,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get historyCurrent => 'Jelenlegi';
 
   @override
-  String get historyPrevious => 'Korábbi';
+  String get historyPrevious => 'Korábbi állapot';
 
   @override
   String historySavedOn(String date) {

@@ -1051,6 +1051,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Frase secreta do cofre';
 
   @override
+  String get syncSafeToRetry =>
+      'Se uma sincronização for interrompida, basta executá-la novamente. Nada se perde.';
+
+  @override
+  String get syncThisVault => 'Usar este cofre';
+
+  @override
+  String get syncOtherVault => 'Usar outro cofre';
+
+  @override
   String get historyWarning =>
       'Apenas 1 valor anterior é mantido. O histórico é excluído automaticamente com base nas configurações de segurança.';
 
@@ -1058,7 +1068,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get historyCurrent => 'Atual';
 
   @override
-  String get historyPrevious => 'Anterior';
+  String get historyPrevious => 'Estado anterior';
 
   @override
   String historySavedOn(String date) {
@@ -3045,6 +3055,16 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get syncFilePassphraseLabel => 'Frase secreta do cofre';
 
   @override
+  String get syncSafeToRetry =>
+      'Se uma sincronização for interrompida, basta executá-la novamente. Nada é perdido.';
+
+  @override
+  String get syncThisVault => 'Usar este cofre';
+
+  @override
+  String get syncOtherVault => 'Usar outro cofre';
+
+  @override
   String get historyWarning =>
       'Apenas 1 valor anterior é mantido. O histórico é excluído automaticamente com base nas configurações de segurança.';
 
@@ -3052,7 +3072,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get historyCurrent => 'Atual';
 
   @override
-  String get historyPrevious => 'Anterior';
+  String get historyPrevious => 'Estado anterior';
 
   @override
   String historySavedOn(String date) {
@@ -5036,6 +5056,16 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get syncFilePassphraseLabel => 'Frase-passe do cofre';
 
   @override
+  String get syncSafeToRetry =>
+      'Se uma sincronização for interrompida, basta executá-la novamente. Não se perde nada.';
+
+  @override
+  String get syncThisVault => 'Usar este cofre';
+
+  @override
+  String get syncOtherVault => 'Usar outro cofre';
+
+  @override
   String get historyWarning =>
       'Apenas 1 valor anterior é mantido. O histórico é eliminado automaticamente com base nas definições de segurança.';
 
@@ -5043,7 +5073,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get historyCurrent => 'Atual';
 
   @override
-  String get historyPrevious => 'Anterior';
+  String get historyPrevious => 'Estado anterior';
 
   @override
   String historySavedOn(String date) {

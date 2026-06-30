@@ -1052,6 +1052,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Passphrase archivio';
 
   @override
+  String get syncSafeToRetry =>
+      'Se una sincronizzazione viene interrotta, basta eseguirla di nuovo. Non si perde nulla.';
+
+  @override
+  String get syncThisVault => 'Usa questa cassaforte';
+
+  @override
+  String get syncOtherVault => 'Usa altra cassaforte';
+
+  @override
   String get historyWarning =>
       'Viene conservato solo 1 valore precedente. La cronologia viene eliminata automaticamente in base alle impostazioni di sicurezza.';
 
@@ -1059,7 +1069,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get historyCurrent => 'Attuale';
 
   @override
-  String get historyPrevious => 'Precedente';
+  String get historyPrevious => 'Stato precedente';
 
   @override
   String historySavedOn(String date) {

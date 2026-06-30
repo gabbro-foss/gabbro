@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Сейфіңіз жойылды. Жалғастыру үшін жаңа сейф жасаңыз.",
 
   "syncFilePassphraseLabel": "Сейфтің кілт фразасы",
+  "syncSafeToRetry": "Синхрондау үзілсе, оны қайта іске қосыңыз. Ештеңе жоғалмайды.",
+  "syncThisVault": "Осы қойманы пайдалану",
+  "syncOtherVault": "Басқа қойманы пайдалану",
 
   "historyWarning": "Тек 1 алдыңғы мән сақталады. Тарих қауіпсіздік параметрлеріне сәйкес автоматты жойылады.",
   "historyCurrent": "Ағымдағы",
-  "historyPrevious": "Алдыңғы",
+  "historyPrevious": "Алдыңғы күй",
   "historySavedOn": "{date} сақталды",
   "@historySavedOn": {
     "placeholders": {

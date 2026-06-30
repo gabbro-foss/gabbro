@@ -781,6 +781,10 @@ class _VaultListScreenState extends State<VaultListScreen>
       // entries, brought-over values, clashes, item-deletes), then apply what the
       // user kept/picked/dropped. Drops and picks reuse the existing FFI calls.
       final steps = buildSyncReviewSteps(summary);
+      // Default to the merge-time tally; once the user reviews, the snackbar
+      // reflects what they actually kept/picked/dropped (decisions.*).
+      var addedCount = summary.added;
+      var updatedCount = summary.updated;
       var deletedCount = 0;
       if (steps.isNotEmpty && mounted) {
         final decisions = await showSyncReview(context: context, steps: steps);
@@ -819,8 +823,10 @@ class _VaultListScreenState extends State<VaultListScreen>
             } else {
               await deleteEntry(id: id);
             }
-            deletedCount++;
           }
+          addedCount = decisions.added;
+          updatedCount = decisions.updated;
+          deletedCount = decisions.deleted;
           if (mounted) _loadEntries();
         }
       }
@@ -831,7 +837,7 @@ class _VaultListScreenState extends State<VaultListScreen>
             content: Text(
               AppLocalizations.of(
                 context,
-              ).vaultSynced(summary.added, summary.updated, deletedCount),
+              ).vaultSynced(addedCount, updatedCount, deletedCount),
             ),
           ),
         );
@@ -1744,6 +1750,24 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
                   onPressed: () => setState(() => _showPass = !_showPass),
                 ),
               ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  size: 18,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l.syncSafeToRetry,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+              ],
             ),
             if (widget.isKeyProtected) ...[
               const SizedBox(height: 12),

@@ -1052,6 +1052,16 @@ class AppLocalizationsEt extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Seifi pääslause';
 
   @override
+  String get syncSafeToRetry =>
+      'Kui sünkroonimine katkeb, käivita see lihtsalt uuesti. Midagi ei lähe kaduma.';
+
+  @override
+  String get syncThisVault => 'Kasuta seda hoidlat';
+
+  @override
+  String get syncOtherVault => 'Kasuta teist hoidlat';
+
+  @override
   String get historyWarning =>
       'Säilitatakse ainult 1 eelmine väärtus. Ajalugu tühjendatakse automaatselt turvalisuse sätete alusel.';
 
@@ -1059,7 +1069,7 @@ class AppLocalizationsEt extends AppLocalizations {
   String get historyCurrent => 'Praegune';
 
   @override
-  String get historyPrevious => 'Eelmine';
+  String get historyPrevious => 'Eelmine olek';
 
   @override
   String historySavedOn(String date) {

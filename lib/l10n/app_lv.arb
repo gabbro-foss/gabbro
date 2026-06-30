@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Jūsu seifs ir dzēsts. Izveidojiet jaunu, lai turpinātu.",
 
   "syncFilePassphraseLabel": "Seifa ieejas frāze",
+  "syncSafeToRetry": "Ja sinhronizācija tiek pārtraukta, vienkārši palaidiet to vēlreiz. Nekas netiek zaudēts.",
+  "syncThisVault": "Izmantot šo glabātavu",
+  "syncOtherVault": "Izmantot citu glabātavu",
 
   "historyWarning": "Tiek glabāta tikai 1 iepriekšējā vērtība. Vēsture tiek automātiski dzēsta, pamatojoties uz drošības iestatījumiem.",
   "historyCurrent": "Pašreizējā",
-  "historyPrevious": "Iepriekšējā",
+  "historyPrevious": "Iepriekšējais stāvoklis",
   "historySavedOn": "Saglabāts {date}",
   "@historySavedOn": {
     "placeholders": {

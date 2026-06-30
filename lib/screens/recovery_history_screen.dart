@@ -34,8 +34,14 @@ String _fieldLabel(String field) {
   return field;
 }
 
+/// File contents are stored as base64 here; never show the raw value.
+bool _isBinary(String field) => field == 'data';
+
 class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
   late final List<HistoryRecordData> _records = List.of(widget.records);
+
+  /// Record rows (by index) whose masked secret the user has revealed.
+  final Set<int> _revealed = {};
 
   Future<void> _act(int index, Future<void> Function(int) action) async {
     try {
@@ -62,13 +68,18 @@ class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
         separatorBuilder: (_, _) => const Divider(height: 1),
         itemBuilder: (context, index) {
           final r = _records[index];
-          final masked = _secretFields.contains(r.field);
+          final secret = _secretFields.contains(r.field);
+          final binary = _isBinary(r.field);
+          final revealed = _revealed.contains(index);
+          final display = binary
+              ? '<binary>'
+              : (secret && !revealed ? '••••' : r.value);
           return ListTile(
             title: Text(_fieldLabel(r.field)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(masked ? '••••' : r.value),
+                Text(display),
                 Text(
                   l.historySavedOn(
                     formatTimestamp(
@@ -84,6 +95,20 @@ class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (secret)
+                  IconButton(
+                    icon: Icon(
+                      revealed ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    tooltip: revealed ? l.tooltipHide : l.tooltipShow,
+                    onPressed: () => setState(() {
+                      if (revealed) {
+                        _revealed.remove(index);
+                      } else {
+                        _revealed.add(index);
+                      }
+                    }),
+                  ),
                 TextButton(
                   onPressed: () => _act(index, widget.onRestore),
                   child: Text(l.revert),

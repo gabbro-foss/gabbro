@@ -1861,7 +1861,14 @@ pub(crate) fn merge_entry_pair(
             })
         }
         (VaultEntry::File(l), VaultEntry::File(i)) => {
-            let data = match m.decide("data", l.data == i.data, "<binary>", "<binary>") {
+            // File contents are binary, so they ride the string resolution path
+            // as base64 (decoded back by set_entry_scalar's "data" arm). Carrying
+            // the real bytes here is what lets "use other" actually swap the file
+            // (the old "<binary>" placeholder made that a no-op). The UI still
+            // renders "<binary>", never the base64.
+            use base64::Engine;
+            let b64 = |b: &[u8]| base64::engine::general_purpose::STANDARD.encode(b);
+            let data = match m.decide("data", l.data == i.data, &b64(&l.data), &b64(&i.data)) {
                 Side::Local => l.data.clone(),
                 Side::Incoming => i.data.clone(),
             };
@@ -1961,15 +1968,127 @@ pub(crate) fn merge_entry_pair(
     (merged, conflicts, pending, brought_over)
 }
 
+/// Asserts a vault matches the known end-state of the hardware walk in
+/// `test_data/sync_test_vaults/README.md` (import A, sync B keeping all, sync C
+/// with the dictated picks). Shared by the JSON checker (`check_sync_walk_export`)
+/// and the in-code simulation (`sync_walk_simulation_matches_checker`).
+#[cfg(test)]
+fn assert_walk_end_state(ents: &[VaultEntry]) {
+    let get = |id: &str| {
+        ents.iter()
+            .find(|e| meta_of(e).id == id)
+            .unwrap_or_else(|| panic!("missing entry: {id}"))
+    };
+    let cf = |fields: &[crate::vault::entry::CustomField], label: &str| -> Option<String> {
+        fields.iter().find(|f| f.label == label).map(|f| f.value.clone())
+    };
+
+    // Whole-entry decisions.
+    assert!(ents.iter().all(|e| meta_of(e).id != "delme"), "delme must be deleted");
+    assert!(
+        ents.iter().any(|e| meta_of(e).id == "extra-b"),
+        "extra-b (new on B) must be kept"
+    );
+    assert_eq!(ents.len(), 13, "12 base + extra-b, delme removed");
+
+    // Non-colliding fields: B's and C's edits all merged.
+    match get("login-nc") {
+        VaultEntry::Login(e) => {
+            assert_eq!(e.password, "p0-B");
+            assert_eq!(e.url, "https://mail-C.example.com");
+            assert!(cf(&e.custom_fields, "OldNote").is_none(), "OldNote deleted");
+        }
+        _ => panic!("login-nc not a Login"),
+    }
+    match get("note-nc") {
+        VaultEntry::Note(e) => {
+            assert_eq!(e.content, "milk-B");
+            assert_eq!(cf(&e.custom_fields, "Tag").as_deref(), Some("tag-C"));
+        }
+        _ => panic!(),
+    }
+    match get("id-nc") {
+        VaultEntry::Identity(e) => {
+            assert_eq!(e.email, "alex-B@example.com");
+            assert_eq!(e.address.as_deref(), Some("addr-C"));
+        }
+        _ => panic!(),
+    }
+    match get("card-nc") {
+        VaultEntry::Card(e) => {
+            assert_eq!(e.expiry, "06/29");
+            assert_eq!(e.bank_name.as_deref(), Some("ING-C"));
+        }
+        _ => panic!(),
+    }
+    match get("file-nc") {
+        VaultEntry::File(e) => {
+            assert_eq!(e.data, b"original-C");
+            assert_eq!(e.notes.as_deref(), Some("notes-B"));
+        }
+        _ => panic!(),
+    }
+    match get("custom-nc") {
+        VaultEntry::Custom(e) => {
+            assert_eq!(e.title, "API creds (C)");
+            assert_eq!(e.fields.get("env").map(|f| f.value.as_str()), Some("prod-B"));
+        }
+        _ => panic!(),
+    }
+
+    // Clashes: use-other on Bank/Sam/key, keep-mine on Ideas/Amex/Tokens.
+    match get("login-co") {
+        VaultEntry::Login(e) => {
+            assert_eq!(e.username, "bob-B");
+            assert_eq!(e.password, "qC", "Bank password -> use other");
+            assert!(
+                e.meta.history.iter().any(|h| h.field == "password" && h.value == "qA"),
+                "the replaced password (qA) is kept in recovery history"
+            );
+        }
+        _ => panic!(),
+    }
+    match get("note-co") {
+        VaultEntry::Note(e) => assert_eq!(e.content, "ideaA", "Ideas -> keep mine"),
+        _ => panic!(),
+    }
+    match get("id-co") {
+        VaultEntry::Identity(e) => {
+            assert_eq!(e.first_name, "Sam-B");
+            assert_eq!(e.last_name, "StoneC", "Sam last name -> use other");
+        }
+        _ => panic!(),
+    }
+    match get("card-co") {
+        VaultEntry::Card(e) => {
+            assert_eq!(e.cvv, "555A", "Amex CVV -> keep mine");
+            assert_eq!(e.expiry, "07/29");
+        }
+        _ => panic!(),
+    }
+    match get("file-co") {
+        VaultEntry::File(e) => assert_eq!(e.data, b"dataC", "key.txt data -> use other"),
+        _ => panic!(),
+    }
+    match get("custom-co") {
+        VaultEntry::Custom(e) => {
+            assert_eq!(e.fields.get("token").map(|f| f.value.as_str()), Some("tokA"), "Tokens -> keep mine");
+            assert_eq!(e.fields.get("scope").map(|f| f.value.as_str()), Some("scope-B"));
+        }
+        _ => panic!(),
+    }
+}
+
 #[cfg(test)]
 mod field_merge_tests {
     use super::*;
 
     // Loads the SAME three divergent vaults shipped for hardware testing
-    // (test_data/sync_test_vaults/ — 12 entries, two of every type, see its README),
-    // converges them, and asserts the full result: non-colliding edits all survive,
-    // every type's colliding edit clashes, the item-delete is flagged, no entry is
-    // lost. Read-only + cheap Argon2 params, so it runs in the normal suite.
+    // (test_data/sync_test_vaults/ — 12 shared entries, two of every type, plus a
+    // B-only new entry and a C-tombstoned entry; see its README), converges them,
+    // and asserts the full result: non-colliding edits all survive, every type's
+    // colliding edit clashes, the item-delete is flagged, no entry is lost.
+    // Read-only + cheap Argon2 params, so it runs in the normal suite.
     #[test]
     fn sync_test_corpus_converges_without_loss() {
         use crate::vault::serialization::VaultBody;
@@ -2038,7 +2157,15 @@ mod field_merge_tests {
         for order in [[&a, &b, &c], [&c, &b, &a], [&b, &a, &c], [&c, &a, &b]] {
             let (acc, collisions, pending) = converge(&order);
 
-            assert_eq!(acc.len(), 12, "all entries survive");
+            assert_eq!(acc.len(), 14, "all entries survive");
+            assert!(
+                acc.contains_key("delme"),
+                "entry on A and B survives the merge"
+            );
+            assert!(
+                acc.contains_key("extra-b"),
+                "B-only new entry survives the merge"
+            );
             assert_eq!(
                 collisions, expected_collisions,
                 "the same six collisions must surface regardless of sync order"
@@ -2114,6 +2241,554 @@ mod field_merge_tests {
                     .any(|d| d.id == "login-nc" && d.field == "custom_fields:OldNote"),
                 "the deleted item must surface as a pending delete"
             );
+        }
+    }
+
+    // Walk the hardware procedure through the real merge: hold A, sync B (B's
+    // extra entry must show as NEW), then sync C (C's tombstone must surface the
+    // shared entry as a whole-entry delete). Locks the two review paths the
+    // corpus was extended to cover.
+    #[test]
+    fn corpus_surfaces_new_entry_then_whole_entry_delete() {
+        let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .join("test_data/sync_test_vaults");
+        let pass = b"0123456789a";
+        let load = |n: &str| {
+            crate::api::vault::load_vault(pass, &dir.join(format!("sync_test_{n}.gabbro"))).unwrap()
+        };
+        let a = load("A");
+
+        let mut session = test_session(a.entries);
+        let sb = do_merge(&mut session, load("B"));
+        assert!(
+            sb.added_entries.iter().any(|e| e.id == "extra-b"),
+            "B's extra entry shows as a NEW entry"
+        );
+        assert!(
+            sb.pending_deletes.is_empty(),
+            "no whole-entry delete on the B sync"
+        );
+
+        let sc = do_merge(&mut session, load("C"));
+        assert!(
+            sc.pending_deletes.iter().any(|d| d.id == "delme"),
+            "C's tombstone surfaces the shared entry as a whole-entry delete"
+        );
+    }
+
+    // Proves "if a sync is interrupted, just run it again": a re-merge of the
+    // same source neither duplicates already-applied changes nor loses data, and
+    // an unresolved clash re-surfaces unchanged. This is the convergence the
+    // post-sync message relies on.
+    #[test]
+    fn re_syncing_the_same_source_converges_without_loss() {
+        let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .join("test_data/sync_test_vaults");
+        let pass = b"0123456789a";
+        let load = |n: &str| {
+            crate::api::vault::load_vault(pass, &dir.join(format!("sync_test_{n}.gabbro"))).unwrap()
+        };
+        let mut session = test_session(load("A").entries);
+
+        // First sync of B brings values over; a second sync of B is a no-op.
+        let first = do_merge(&mut session, load("B"));
+        assert!(!first.brought_over.is_empty(), "B has values to bring over");
+        let again = do_merge(&mut session, load("B"));
+        assert_eq!(again.added, 0, "re-sync adds nothing");
+        assert!(again.brought_over.is_empty(), "re-sync repeats no brought-over");
+        assert!(again.field_conflicts.is_empty(), "re-sync invents no clashes");
+
+        // C clashes on six fields. Leaving them unresolved (an interrupted
+        // review), a re-sync of C re-surfaces the same clashes and still repeats
+        // nothing already applied.
+        let c1 = do_merge(&mut session, load("C"));
+        assert_eq!(c1.field_conflicts.len(), 6, "C surfaces its six clashes");
+        let c2 = do_merge(&mut session, load("C"));
+        assert_eq!(
+            c2.field_conflicts.len(),
+            6,
+            "unresolved clashes re-surface on a re-sync"
+        );
+        assert!(c2.brought_over.is_empty(), "already-applied values are not repeated");
+        assert_eq!(c2.added, 0);
+    }
+
+    // A File-content clash must carry the incoming bytes (base64) so the user's
+    // "use other" can actually restore them — not the "<binary>" placeholder,
+    // which made the choice a silent no-op (found 2026-06-30).
+    #[test]
+    fn file_data_clash_carries_incoming_bytes_as_base64() {
+        use crate::vault::entry::FileEntry;
+        use base64::Engine;
+        let local = VaultEntry::File(FileEntry {
+            meta: meta("f", "t", &[("data", 100)]),
+            filename: String::from("k.txt"),
+            data: b"localbytes".to_vec(),
+            notes: None,
+            custom_fields: vec![],
+        });
+        let incoming = VaultEntry::File(FileEntry {
+            meta: meta("f", "t", &[("data", 200)]),
+            filename: String::from("k.txt"),
+            data: b"incomingbytes".to_vec(),
+            notes: None,
+            custom_fields: vec![],
+        });
+        let (_merged, conflicts, _pending, _bo) = merge_entry_pair(&local, &incoming);
+        assert_eq!(conflicts.len(), 1, "differing data on both sides is a clash");
+        let c = &conflicts[0];
+        assert_eq!(c.field, "data");
+        let decode = |s: &str| base64::engine::general_purpose::STANDARD.decode(s).unwrap();
+        assert_eq!(decode(&c.incoming_value), b"incomingbytes", "use other restores incoming");
+        assert_eq!(decode(&c.local_value), b"localbytes");
+    }
+
+    // Checks a JSON vault exported after the exact hardware walk in
+    // test_data/sync_test_vaults/README.md (import A, sync B keeping all, sync C
+    // with the dictated picks). Run after exporting:
+    //   GABBRO_WALK_JSON=/path/to/sync_walk.json \
+    //     cargo test --release --lib check_sync_walk_export -- --ignored
+    #[test]
+    #[ignore = "validates a hardware-walk export; set GABBRO_WALK_JSON to the .json path"]
+    fn check_sync_walk_export() {
+        let path = std::env::var("GABBRO_WALK_JSON")
+            .expect("set GABBRO_WALK_JSON to the exported sync_walk.json path");
+        let data = std::fs::read_to_string(&path).expect("read export json");
+
+        #[derive(serde::Deserialize)]
+        struct Export {
+            entries: Vec<VaultEntry>,
+        }
+        let export: Export = serde_json::from_str(&data).expect("parse export json");
+        assert_walk_end_state(&export.entries);
+    }
+
+    // ── Sync-test corpus generator ────────────────────────────────────────
+    // Mints the three divergent vaults in test_data/sync_test_vaults/ that the
+    // converge test above and the hardware walk both use. Run on demand:
+    //   cargo test --release regenerate_sync_test_corpus -- --ignored
+    // Presence in `field_times` marks the side that edited a field (see
+    // decide_field): both present + differ = clash; one present = brought over;
+    // a "del:<key>" time = a deletion. A oldest, then B, then C.
+    const TA: u64 = 1000;
+    const TB: u64 = 2000;
+    const TC: u64 = 3000;
+    const BT: &str = "2025-01-01T00:00:00Z";
+
+    fn cf(label: &str, value: &str) -> CustomField {
+        CustomField {
+            label: label.into(),
+            value: value.into(),
+            hidden: false,
+        }
+    }
+    fn login(
+        id: &str,
+        title: &str,
+        url: &str,
+        user: &str,
+        pass: &str,
+        customs: Vec<CustomField>,
+    ) -> VaultEntry {
+        VaultEntry::Login(LoginEntry {
+            meta: meta(id, BT, &[]),
+            title: title.into(),
+            url: url.into(),
+            username: user.into(),
+            password: pass.into(),
+            notes: None,
+            custom_fields: customs,
+            attachments: vec![],
+            previous_password: None,
+            app_id: None,
+            email: None,
+        })
+    }
+    fn ident(
+        id: &str,
+        first: &str,
+        last: &str,
+        email: &str,
+        phone: &str,
+        address: &str,
+    ) -> VaultEntry {
+        VaultEntry::Identity(IdentityEntry {
+            meta: meta(id, BT, &[]),
+            first_name: first.into(),
+            last_name: last.into(),
+            email: email.into(),
+            phone: Some(phone.into()),
+            address: Some(address.into()),
+            custom_fields: vec![],
+            attachments: vec![],
+        })
+    }
+    fn card(
+        id: &str,
+        name: &str,
+        holder: &str,
+        number: &str,
+        expiry: &str,
+        cvv: &str,
+        bank: &str,
+    ) -> VaultEntry {
+        VaultEntry::Card(CardEntry {
+            meta: meta(id, BT, &[]),
+            card_name: Some(name.into()),
+            status: "active".into(),
+            cardholder_name: holder.into(),
+            card_number: number.into(),
+            expiry: expiry.into(),
+            cvv: cvv.into(),
+            credit_limit: None,
+            card_account_number: None,
+            payment_network: None,
+            pin: None,
+            bank_name: Some(bank.into()),
+            transaction_password: None,
+            notes: None,
+            custom_fields: vec![],
+            attachments: vec![],
+            previous_cvv: None,
+            previous_pin: None,
+        })
+    }
+    fn file(id: &str, filename: &str, data: &[u8], notes: &str) -> VaultEntry {
+        VaultEntry::File(FileEntry {
+            meta: meta(id, BT, &[]),
+            filename: filename.into(),
+            data: data.to_vec(),
+            notes: Some(notes.into()),
+            custom_fields: vec![],
+        })
+    }
+    fn custom(id: &str, title: &str, fields: &[(&str, &str)]) -> VaultEntry {
+        let mut m = std::collections::HashMap::new();
+        for (k, v) in fields {
+            m.insert((*k).to_string(), cf(k, v));
+        }
+        VaultEntry::Custom(CustomEntry {
+            meta: meta(id, BT, &[]),
+            title: title.into(),
+            fields: m,
+            attachments: vec![],
+        })
+    }
+
+    fn lg(e: &mut VaultEntry) -> &mut LoginEntry {
+        match e {
+            VaultEntry::Login(x) => x,
+            _ => panic!("not a login"),
+        }
+    }
+    fn nt(e: &mut VaultEntry) -> &mut NoteEntry {
+        match e {
+            VaultEntry::Note(x) => x,
+            _ => panic!("not a note"),
+        }
+    }
+    fn idn(e: &mut VaultEntry) -> &mut IdentityEntry {
+        match e {
+            VaultEntry::Identity(x) => x,
+            _ => panic!("not an identity"),
+        }
+    }
+    fn cd(e: &mut VaultEntry) -> &mut CardEntry {
+        match e {
+            VaultEntry::Card(x) => x,
+            _ => panic!("not a card"),
+        }
+    }
+    fn fl(e: &mut VaultEntry) -> &mut FileEntry {
+        match e {
+            VaultEntry::File(x) => x,
+            _ => panic!("not a file"),
+        }
+    }
+    fn cu(e: &mut VaultEntry) -> &mut CustomEntry {
+        match e {
+            VaultEntry::Custom(x) => x,
+            _ => panic!("not a custom"),
+        }
+    }
+    fn stamp(e: &mut VaultEntry, key: &str, t: u64) {
+        meta_of_mut(e).field_times.insert(key.into(), t);
+    }
+    fn edit(v: &mut [VaultEntry], id: &str, f: impl FnOnce(&mut VaultEntry)) {
+        f(v.iter_mut()
+            .find(|e| meta_of(e).id == id)
+            .expect("entry id present"));
+    }
+
+    // The 12 shared base entries (two of every type), identical on all devices.
+    fn base() -> Vec<VaultEntry> {
+        vec![
+            login(
+                "login-nc",
+                "Email",
+                "https://mail.example.com",
+                "alice",
+                "p0",
+                vec![cf("OldNote", "keep")],
+            ),
+            login(
+                "login-co",
+                "Bank",
+                "https://bank.example.com",
+                "bob",
+                "q0",
+                vec![],
+            ),
+            note("note-nc", "Shopping", "milk", BT, &[]),
+            note("note-co", "Ideas", "idea0", BT, &[]),
+            ident("id-nc", "Alex", "Stone", "alex@example.com", "+31", "addr"),
+            ident("id-co", "Sam", "Stone", "sam@example.com", "+1", "road"),
+            card(
+                "card-nc",
+                "Visa",
+                "Alex Stone",
+                "4111",
+                "01/28",
+                "123",
+                "Bank1",
+            ),
+            card(
+                "card-co",
+                "Amex",
+                "Sam Stone",
+                "3711",
+                "02/28",
+                "999",
+                "Bank2",
+            ),
+            file("file-nc", "passport.txt", b"original", "n0"),
+            file("file-co", "key.txt", b"base", "n1"),
+            custom(
+                "custom-nc",
+                "API creds",
+                &[("api_key", "k0"), ("secret", "s0")],
+            ),
+            custom("custom-co", "Tokens", &[("token", "t0")]),
+        ]
+    }
+
+    #[test]
+    #[ignore = "writes the committed corpus; run explicitly to regenerate"]
+    fn regenerate_sync_test_corpus() {
+        // Device A (oldest): one non-colliding field per type, plus the A side of
+        // each colliding field.
+        let mut a = base();
+        edit(&mut a, "login-nc", |e| {
+            lg(e).username = "alice-A".into();
+            stamp(e, "username", TA);
+        });
+        edit(&mut a, "login-co", |e| {
+            lg(e).password = "qA".into();
+            stamp(e, "password", TA);
+        });
+        edit(&mut a, "note-nc", |e| {
+            nt(e).title = "Shopping-A".into();
+            stamp(e, "title", TA);
+        });
+        edit(&mut a, "note-co", |e| {
+            nt(e).content = "ideaA".into();
+            stamp(e, "content", TA);
+        });
+        edit(&mut a, "id-nc", |e| {
+            idn(e).phone = Some("+31-A".into());
+            stamp(e, "phone", TA);
+        });
+        edit(&mut a, "id-co", |e| {
+            idn(e).last_name = "StoneA".into();
+            stamp(e, "last_name", TA);
+        });
+        edit(&mut a, "card-nc", |e| {
+            cd(e).cvv = "456".into();
+            stamp(e, "cvv", TA);
+        });
+        edit(&mut a, "card-co", |e| {
+            cd(e).cvv = "555A".into();
+            stamp(e, "cvv", TA);
+        });
+        edit(&mut a, "file-nc", |e| {
+            fl(e).filename = "passport-A.txt".into();
+            stamp(e, "filename", TA);
+        });
+        edit(&mut a, "file-co", |e| {
+            fl(e).data = b"dataA".to_vec();
+            stamp(e, "data", TA);
+        });
+        edit(&mut a, "custom-nc", |e| {
+            cu(e).fields.get_mut("api_key").unwrap().value = "k0-A".into();
+            stamp(e, "custom_fields:api_key", TA);
+        });
+        edit(&mut a, "custom-co", |e| {
+            cu(e).fields.get_mut("token").unwrap().value = "tokA".into();
+            stamp(e, "custom_fields:token", TA);
+        });
+        a.push(note("delme", "Delete me", "gone", BT, &[]));
+
+        // Device B: a different non-colliding field per type, no colliding edits.
+        let mut b = base();
+        edit(&mut b, "login-nc", |e| {
+            lg(e).password = "p0-B".into();
+            stamp(e, "password", TB);
+        });
+        edit(&mut b, "login-co", |e| {
+            lg(e).username = "bob-B".into();
+            stamp(e, "username", TB);
+        });
+        edit(&mut b, "note-nc", |e| {
+            nt(e).content = "milk-B".into();
+            stamp(e, "content", TB);
+        });
+        edit(&mut b, "note-co", |e| {
+            nt(e).title = "Ideas-B".into();
+            stamp(e, "title", TB);
+        });
+        edit(&mut b, "id-nc", |e| {
+            idn(e).email = "alex-B@example.com".into();
+            stamp(e, "email", TB);
+        });
+        edit(&mut b, "id-co", |e| {
+            idn(e).first_name = "Sam-B".into();
+            stamp(e, "first_name", TB);
+        });
+        edit(&mut b, "card-nc", |e| {
+            cd(e).expiry = "06/29".into();
+            stamp(e, "expiry", TB);
+        });
+        edit(&mut b, "card-co", |e| {
+            cd(e).expiry = "07/29".into();
+            stamp(e, "expiry", TB);
+        });
+        edit(&mut b, "file-nc", |e| {
+            fl(e).notes = Some("notes-B".into());
+            stamp(e, "notes", TB);
+        });
+        edit(&mut b, "file-co", |e| {
+            fl(e).filename = "key-B.txt".into();
+            stamp(e, "filename", TB);
+        });
+        edit(&mut b, "custom-nc", |e| {
+            cu(e).fields.insert("env".into(), cf("env", "prod-B"));
+            stamp(e, "custom_fields:env", TB);
+        });
+        edit(&mut b, "custom-co", |e| {
+            cu(e).fields.insert("scope".into(), cf("scope", "scope-B"));
+            stamp(e, "custom_fields:scope", TB);
+        });
+        b.push(note("delme", "Delete me", "gone", BT, &[]));
+        b.push(login(
+            "extra-b",
+            "New on B",
+            "https://new.example.com",
+            "carol",
+            "z9",
+            vec![],
+        )); // entry only on B -> NEW on sync
+
+        // Device C: the last non-colliding field per type, the C side of each
+        // colliding field, and the OldNote item deletion.
+        let mut c = base();
+        edit(&mut c, "login-nc", |e| {
+            lg(e).url = "https://mail-C.example.com".into();
+            lg(e).custom_fields.retain(|f| f.label != "OldNote");
+            stamp(e, "url", TC);
+            stamp(e, "del:custom_fields:OldNote", TC);
+        });
+        edit(&mut c, "login-co", |e| {
+            lg(e).password = "qC".into();
+            stamp(e, "password", TC);
+        });
+        edit(&mut c, "note-nc", |e| {
+            nt(e).custom_fields.push(cf("Tag", "tag-C"));
+            stamp(e, "custom_fields:Tag", TC);
+        });
+        edit(&mut c, "note-co", |e| {
+            nt(e).content = "ideaC".into();
+            stamp(e, "content", TC);
+        });
+        edit(&mut c, "id-nc", |e| {
+            idn(e).address = Some("addr-C".into());
+            stamp(e, "address", TC);
+        });
+        edit(&mut c, "id-co", |e| {
+            idn(e).last_name = "StoneC".into();
+            stamp(e, "last_name", TC);
+        });
+        edit(&mut c, "card-nc", |e| {
+            cd(e).bank_name = Some("ING-C".into());
+            stamp(e, "bank_name", TC);
+        });
+        edit(&mut c, "card-co", |e| {
+            cd(e).cvv = "555C".into();
+            stamp(e, "cvv", TC);
+        });
+        edit(&mut c, "file-nc", |e| {
+            fl(e).data = b"original-C".to_vec();
+            stamp(e, "data", TC);
+        });
+        edit(&mut c, "file-co", |e| {
+            fl(e).data = b"dataC".to_vec();
+            stamp(e, "data", TC);
+        });
+        edit(&mut c, "custom-nc", |e| {
+            cu(e).title = "API creds (C)".into();
+            stamp(e, "title", TC);
+        });
+        edit(&mut c, "custom-co", |e| {
+            cu(e).fields.get_mut("token").unwrap().value = "tokC".into();
+            stamp(e, "custom_fields:token", TC);
+        });
+
+        let body = |entries: Vec<VaultEntry>, deleted: Vec<DeletedEntry>| {
+            crate::vault::serialization::VaultBody {
+                entries,
+                deleted_ids: deleted,
+                vault_updated_at: BT.into(),
+                ..Default::default()
+            }
+        };
+        let bodies = [
+            ("A", body(a, vec![])),
+            ("B", body(b, vec![])),
+            (
+                "C",
+                body(
+                    c,
+                    vec![DeletedEntry {
+                        id: "delme".into(),
+                        deleted_at: "2025-06-01T00:00:00Z".into(),
+                    }],
+                ),
+            ),
+        ];
+
+        let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .join("test_data/sync_test_vaults");
+        for (name, b) in &bodies {
+            let params = crate::crypto::kdf::Argon2idParams {
+                m_cost: 64,
+                t_cost: 1,
+                p_cost: 1,
+            };
+            let pt = crate::vault::serialization::serialize_vault_body(b).expect("serialize");
+            let sealed = crate::crypto::vault_crypto::seal_vault_with_params(
+                b"0123456789a",
+                &pt,
+                Some("synctest".into()),
+                params,
+            )
+            .expect("seal");
+            crate::vault::io::write_vault(&sealed, &dir.join(format!("sync_test_{name}.gabbro")))
+                .expect("write");
         }
     }
 
@@ -5596,6 +6271,61 @@ mod merge_tests {
         }
     }
 
+    // Runs the README hardware walk entirely in code (no UI): import A, sync B
+    // keeping all defaults, sync C with the dictated picks, and assert the same
+    // end-state the JSON checker verifies. Proves the walk's expected result is
+    // exactly what the engine produces — so a failing hardware checker means a
+    // mis-click, not a code bug.
+    #[test]
+    #[serial]
+    #[ignore = "production-Argon saves; run in release via the gate"]
+    fn sync_walk_simulation_matches_checker() {
+        let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .join("test_data/sync_test_vaults");
+        let pass = b"0123456789a";
+        let load = |n: &str| {
+            crate::api::vault::load_vault(pass, &dir.join(format!("sync_test_{n}.gabbro"))).unwrap()
+        };
+
+        let path = setup(pass, "walk_sim", load("A").entries);
+        unlock_vault(pass, path.clone()).unwrap();
+
+        // Sync B: keeping all defaults is just the additive merge.
+        session_merge_vault_from_body(load("B")).unwrap();
+        // Sync C, then apply the dictated picks.
+        let sc = session_merge_vault_from_body(load("C")).unwrap();
+        for (id, field) in [
+            ("login-co", "password"),
+            ("id-co", "last_name"),
+            ("file-co", "data"),
+        ] {
+            let c = sc
+                .field_conflicts
+                .iter()
+                .find(|c| c.id == id && c.field == field)
+                .unwrap_or_else(|| panic!("expected clash {id}/{field}"));
+            session_replace_field_with_history(
+                id.to_string(),
+                field.to_string(),
+                c.incoming_value.clone(),
+                c.local_value.clone(),
+            )
+            .unwrap();
+        }
+        // keep-mine on Ideas/Amex/Tokens needs no value change.
+        session_resolve_item_delete("login-nc".into(), "custom_fields:OldNote".into(), true)
+            .unwrap();
+        session_delete_entry("delme").unwrap();
+
+        {
+            let session = VAULT_SESSION.lock().unwrap();
+            assert_walk_end_state(&session.as_ref().unwrap().entries);
+        }
+        teardown(&path);
+    }
+
     fn setup(pass: &[u8], path_suffix: &str, entries: Vec<VaultEntry>) -> std::path::PathBuf {
         let mut path = temp_dir();
         path.push(format!("gabbro_merge_{path_suffix}.gabbro"));
@@ -5656,6 +6386,38 @@ mod merge_tests {
             _ => panic!("expected Note"),
         }
         assert!(session_get_entry_history("n1".into()).unwrap().is_empty());
+
+        teardown(&path);
+    }
+
+    #[test]
+    #[serial]
+    fn recovery_history_survives_a_disk_round_trip() {
+        // The hardware sequence: a sync records history and saves; the app later
+        // auto-locks and the user re-opens the vault. The record must survive
+        // the disk round-trip (serialize + reload + purge), not just live in the
+        // session that wrote it.
+        let pass = b"merge-test-pass";
+        let path = setup(
+            pass,
+            "history_roundtrip",
+            vec![note("n1", "T", "2026-01-01T00:00:00Z")],
+        );
+        unlock_vault(pass, path.clone()).unwrap();
+        session_replace_field_with_history(
+            "n1".into(),
+            "content".into(),
+            "new".into(),
+            "old".into(),
+        )
+        .unwrap();
+
+        // Re-open from disk, as after an auto-lock.
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let hist = session_get_entry_history("n1".into()).unwrap();
+        assert_eq!(hist.len(), 1, "history must survive the disk round-trip");
+        assert_eq!(hist[0].value, "old");
 
         teardown(&path);
     }

@@ -487,10 +487,16 @@
   "deleteVaultPostDeletion": "Your vault has been deleted. Create a new one to continue.",
 
   "syncFilePassphraseLabel": "Vault passphrase",
+  "syncSafeToRetry": "If a sync is interrupted, just run it again. Nothing is lost.",
+  "syncThisVault": "Use this vault",
+  "syncOtherVault": "Use other vault",
+  "@syncSafeToRetry": {
+    "description": "Reassurance shown on the sync passphrase dialog, before a sync runs: an interrupted sync is safe to repeat (crash-safe writes + convergent re-merge)."
+  },
 
   "historyWarning": "Only 1 previous value is kept. History auto-purges based on your security settings.",
   "historyCurrent": "Current",
-  "historyPrevious": "Previous",
+  "historyPrevious": "Previous state",
   "historySavedOn": "Saved {date}",
   "@historySavedOn": {
     "placeholders": {

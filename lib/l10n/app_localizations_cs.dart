@@ -1054,6 +1054,16 @@ class AppLocalizationsCs extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Přístupová fráze trezoru';
 
   @override
+  String get syncSafeToRetry =>
+      'Pokud se synchronizace přeruší, jednoduše ji spusťte znovu. Nic se neztratí.';
+
+  @override
+  String get syncThisVault => 'Použít tento trezor';
+
+  @override
+  String get syncOtherVault => 'Použít druhý trezor';
+
+  @override
   String get historyWarning =>
       'Je uchována pouze 1 předchozí hodnota. Historie se automaticky maže na základě nastavení zabezpečení.';
 
@@ -1061,7 +1071,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get historyCurrent => 'Aktuální';
 
   @override
-  String get historyPrevious => 'Předchozí';
+  String get historyPrevious => 'Předchozí stav';
 
   @override
   String historySavedOn(String date) {

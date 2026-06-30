@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Uw kluis is verwijderd. Maak een nieuwe aan om door te gaan.",
 
   "syncFilePassphraseLabel": "Kluiswachtwoordzin",
+  "syncSafeToRetry": "Als een synchronisatie wordt onderbroken, voer je deze gewoon opnieuw uit. Er gaat niets verloren.",
+  "syncThisVault": "Deze kluis gebruiken",
+  "syncOtherVault": "Andere kluis gebruiken",
 
   "historyWarning": "Er wordt slechts 1 vorige waarde bewaard. Geschiedenis wordt automatisch gewist op basis van uw beveiligingsinstellingen.",
   "historyCurrent": "Huidig",
-  "historyPrevious": "Vorig",
+  "historyPrevious": "Vorige staat",
   "historySavedOn": "Opgeslagen op {date}",
   "@historySavedOn": {
     "placeholders": {

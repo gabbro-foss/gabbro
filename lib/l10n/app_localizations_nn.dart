@@ -1051,6 +1051,16 @@ class AppLocalizationsNn extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Kvelvet sin passfrase';
 
   @override
+  String get syncSafeToRetry =>
+      'Viss ei synkronisering blir avbroten, køyr ho berre på nytt. Ingenting går tapt.';
+
+  @override
+  String get syncThisVault => 'Bruk dette kvelvet';
+
+  @override
+  String get syncOtherVault => 'Bruk det andre kvelvet';
+
+  @override
   String get historyWarning =>
       'Berre 1 tidlegare verdi vert behaldt. Historikken vert tømt automatisk basert på tryggleiksinnstillingane dine.';
 
@@ -1058,7 +1068,7 @@ class AppLocalizationsNn extends AppLocalizations {
   String get historyCurrent => 'Gjeldande';
 
   @override
-  String get historyPrevious => 'Tidlegare';
+  String get historyPrevious => 'Førre tilstand';
 
   @override
   String historySavedOn(String date) {

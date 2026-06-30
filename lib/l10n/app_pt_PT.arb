@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "O cofre foi eliminado. Crie um novo para continuar.",
 
   "syncFilePassphraseLabel": "Frase-passe do cofre",
+  "syncSafeToRetry": "Se uma sincronização for interrompida, basta executá-la novamente. Não se perde nada.",
+  "syncThisVault": "Usar este cofre",
+  "syncOtherVault": "Usar outro cofre",
 
   "historyWarning": "Apenas 1 valor anterior é mantido. O histórico é eliminado automaticamente com base nas definições de segurança.",
   "historyCurrent": "Atual",
-  "historyPrevious": "Anterior",
+  "historyPrevious": "Estado anterior",
   "historySavedOn": "Guardado em {date}",
   "@historySavedOn": {
     "placeholders": {

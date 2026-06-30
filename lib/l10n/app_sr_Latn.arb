@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Vaš trezor je obrisan. Napravite novi za nastavak.",
 
   "syncFilePassphraseLabel": "Pristupna fraza trezora",
+  "syncSafeToRetry": "Ako se sinhronizacija prekine, samo je ponovo pokrenite. Ništa se ne gubi.",
+  "syncThisVault": "Koristi ovaj sef",
+  "syncOtherVault": "Koristi drugi sef",
 
   "historyWarning": "Čuva se samo 1 prethodna vrednost. Istorija se automatski briše prema bezbednosnim podešavanjima.",
   "historyCurrent": "Trenutna",
-  "historyPrevious": "Prethodna",
+  "historyPrevious": "Prethodno stanje",
   "historySavedOn": "Sačuvano {date}",
   "@historySavedOn": {
     "placeholders": {

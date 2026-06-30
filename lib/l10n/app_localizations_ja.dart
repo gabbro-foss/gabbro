@@ -1038,13 +1038,22 @@ class AppLocalizationsJa extends AppLocalizations {
   String get syncFilePassphraseLabel => 'ボルトのパスフレーズ';
 
   @override
+  String get syncSafeToRetry => '同期が中断された場合は、もう一度実行するだけです。データは失われません。';
+
+  @override
+  String get syncThisVault => 'このボルトを使用';
+
+  @override
+  String get syncOtherVault => '別のボルトを使用';
+
+  @override
   String get historyWarning => '以前の値は1つだけ保持されます。履歴はセキュリティ設定に基づいて自動的に削除されます。';
 
   @override
   String get historyCurrent => '現在';
 
   @override
-  String get historyPrevious => '以前';
+  String get historyPrevious => '以前の状態';
 
   @override
   String historySavedOn(String date) {

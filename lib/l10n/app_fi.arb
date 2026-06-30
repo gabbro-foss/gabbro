@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Holvisi on poistettu. Luo uusi jatkaaksesi.",
 
   "syncFilePassphraseLabel": "Holvin salauslause",
+  "syncSafeToRetry": "Jos synkronointi keskeytyy, suorita se vain uudelleen. Mitään ei katoa.",
+  "syncThisVault": "Käytä tätä holvia",
+  "syncOtherVault": "Käytä toista holvia",
 
   "historyWarning": "Vain 1 aiempi arvo säilytetään. Historia tyhjennetään automaattisesti tietoturva-asetusten mukaan.",
   "historyCurrent": "Nykyinen",
-  "historyPrevious": "Aiempi",
+  "historyPrevious": "Edellinen tila",
   "historySavedOn": "Tallennettu {date}",
   "@historySavedOn": {
     "placeholders": {

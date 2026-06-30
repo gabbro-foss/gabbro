@@ -1051,6 +1051,16 @@ class AppLocalizationsYo extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Gbolohun ọrọ igbaniwọle vọọliti';
 
   @override
+  String get syncSafeToRetry =>
+      'Tí ìmúdọ́gba bá dáwọ́dúró, kàn ṣàṣàrò rẹ̀ lẹ́ẹ̀kan sí i. Kò sí ohun tí yóò sọnù.';
+
+  @override
+  String get syncThisVault => 'Lo ìfinú yìí';
+
+  @override
+  String get syncOtherVault => 'Lo ìfinú mìíràn';
+
+  @override
   String get historyWarning =>
       'Iye iṣaaju 1 nikan ni a tọju. Itan ni a pa laifọwọyi da lori awọn eto aabo.';
 
@@ -1058,7 +1068,7 @@ class AppLocalizationsYo extends AppLocalizations {
   String get historyCurrent => 'Lọwọlọwọ';
 
   @override
-  String get historyPrevious => 'Iṣaaju';
+  String get historyPrevious => 'Ipò iṣáájú';
 
   @override
   String historySavedOn(String date) {

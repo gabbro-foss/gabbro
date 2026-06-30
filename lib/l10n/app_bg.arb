@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Твоят трезор е изтрит. Създай нов, за да продължиш.",
 
   "syncFilePassphraseLabel": "Паролна фраза на трезора",
+  "syncSafeToRetry": "Ако синхронизирането прекъсне, просто го стартирайте отново. Нищо не се губи.",
+  "syncThisVault": "Използвай това хранилище",
+  "syncOtherVault": "Използвай другото хранилище",
 
   "historyWarning": "Запазва се само 1 предишна стойност. Историята се изчиства автоматично въз основа на настройките за сигурност.",
   "historyCurrent": "Текуща",
-  "historyPrevious": "Предишна",
+  "historyPrevious": "Предишно състояние",
   "historySavedOn": "Запазено на {date}",
   "@historySavedOn": {
     "placeholders": {

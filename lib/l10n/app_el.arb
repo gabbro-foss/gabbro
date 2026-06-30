@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Το θησαυροφυλάκιό σας διαγράφηκε. Δημιουργήστε νέο για να συνεχίσετε.",
 
   "syncFilePassphraseLabel": "Φράση πρόσβασης θησαυροφυλακίου",
+  "syncSafeToRetry": "Αν ο συγχρονισμός διακοπεί, απλώς εκτελέστε τον ξανά. Δεν χάνεται τίποτα.",
+  "syncThisVault": "Χρήση αυτού του θησαυροφυλακίου",
+  "syncOtherVault": "Χρήση άλλου θησαυροφυλακίου",
 
   "historyWarning": "Διατηρείται μόνο 1 προηγούμενη τιμή. Το ιστορικό διαγράφεται αυτόματα βάσει των ρυθμίσεων ασφαλείας.",
   "historyCurrent": "Τρέχον",
-  "historyPrevious": "Προηγούμενο",
+  "historyPrevious": "Προηγούμενη κατάσταση",
   "historySavedOn": "Αποθηκεύτηκε {date}",
   "@historySavedOn": {
     "placeholders": {

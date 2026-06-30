@@ -1057,6 +1057,16 @@ class AppLocalizationsSl extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Geslo za dostop do trezorja';
 
   @override
+  String get syncSafeToRetry =>
+      'Če se sinhronizacija prekine, jo preprosto znova zaženite. Nič se ne izgubi.';
+
+  @override
+  String get syncThisVault => 'Uporabi ta trezor';
+
+  @override
+  String get syncOtherVault => 'Uporabi drugi trezor';
+
+  @override
   String get historyWarning =>
       'Shranjuje se samo 1 prejšnja vrednost. Zgodovina se samodejno briše glede na varnostne nastavitve.';
 
@@ -1064,7 +1074,7 @@ class AppLocalizationsSl extends AppLocalizations {
   String get historyCurrent => 'Trenutno';
 
   @override
-  String get historyPrevious => 'Prejšnje';
+  String get historyPrevious => 'Prejšnje stanje';
 
   @override
   String historySavedOn(String date) {

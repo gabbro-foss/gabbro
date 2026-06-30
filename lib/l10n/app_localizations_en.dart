@@ -1049,6 +1049,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Vault passphrase';
 
   @override
+  String get syncSafeToRetry =>
+      'If a sync is interrupted, just run it again. Nothing is lost.';
+
+  @override
+  String get syncThisVault => 'Use this vault';
+
+  @override
+  String get syncOtherVault => 'Use other vault';
+
+  @override
   String get historyWarning =>
       'Only 1 previous value is kept. History auto-purges based on your security settings.';
 
@@ -1056,7 +1066,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get historyCurrent => 'Current';
 
   @override
-  String get historyPrevious => 'Previous';
+  String get historyPrevious => 'Previous state';
 
   @override
   String historySavedOn(String date) {

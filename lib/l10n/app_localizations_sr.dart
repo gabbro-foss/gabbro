@@ -1053,6 +1053,16 @@ class AppLocalizationsSr extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Pristupna fraza trezora';
 
   @override
+  String get syncSafeToRetry =>
+      'Ако се синхронизација прекине, само је поново покрените. Ништа се не губи.';
+
+  @override
+  String get syncThisVault => 'Користи овај сеф';
+
+  @override
+  String get syncOtherVault => 'Користи други сеф';
+
+  @override
   String get historyWarning =>
       'Čuva se samo 1 prethodna vrednost. Istorija se automatski briše prema bezbednosnim podešavanjima.';
 
@@ -1060,7 +1070,7 @@ class AppLocalizationsSr extends AppLocalizations {
   String get historyCurrent => 'Trenutna';
 
   @override
-  String get historyPrevious => 'Prethodna';
+  String get historyPrevious => 'Претходно стање';
 
   @override
   String historySavedOn(String date) {
@@ -3043,6 +3053,16 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get syncFilePassphraseLabel => 'Pristupna fraza trezora';
 
   @override
+  String get syncSafeToRetry =>
+      'Ako se sinhronizacija prekine, samo je ponovo pokrenite. Ništa se ne gubi.';
+
+  @override
+  String get syncThisVault => 'Koristi ovaj sef';
+
+  @override
+  String get syncOtherVault => 'Koristi drugi sef';
+
+  @override
   String get historyWarning =>
       'Čuva se samo 1 prethodna vrednost. Istorija se automatski briše prema bezbednosnim podešavanjima.';
 
@@ -3050,7 +3070,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get historyCurrent => 'Trenutna';
 
   @override
-  String get historyPrevious => 'Prethodna';
+  String get historyPrevious => 'Prethodno stanje';
 
   @override
   String historySavedOn(String date) {

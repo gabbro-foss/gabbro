@@ -1039,13 +1039,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String get syncFilePassphraseLabel => '볼트 암호 문구';
 
   @override
+  String get syncSafeToRetry => '동기화가 중단되면 다시 실행하기만 하면 됩니다. 아무것도 손실되지 않습니다.';
+
+  @override
+  String get syncThisVault => '이 보관함 사용';
+
+  @override
+  String get syncOtherVault => '다른 보관함 사용';
+
+  @override
   String get historyWarning => '이전 값은 1개만 유지됩니다. 기록은 보안 설정에 따라 자동으로 삭제됩니다.';
 
   @override
   String get historyCurrent => '현재';
 
   @override
-  String get historyPrevious => '이전';
+  String get historyPrevious => '이전 상태';
 
   @override
   String historySavedOn(String date) {

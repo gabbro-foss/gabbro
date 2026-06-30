@@ -1053,6 +1053,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Kluiswachtwoordzin';
 
   @override
+  String get syncSafeToRetry =>
+      'Als een synchronisatie wordt onderbroken, voer je deze gewoon opnieuw uit. Er gaat niets verloren.';
+
+  @override
+  String get syncThisVault => 'Deze kluis gebruiken';
+
+  @override
+  String get syncOtherVault => 'Andere kluis gebruiken';
+
+  @override
   String get historyWarning =>
       'Er wordt slechts 1 vorige waarde bewaard. Geschiedenis wordt automatisch gewist op basis van uw beveiligingsinstellingen.';
 
@@ -1060,7 +1070,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get historyCurrent => 'Huidig';
 
   @override
-  String get historyPrevious => 'Vorig';
+  String get historyPrevious => 'Vorige staat';
 
   @override
   String historySavedOn(String date) {

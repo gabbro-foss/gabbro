@@ -90,8 +90,18 @@ pub fn seal_vault(
     plaintext: &[u8],
     alias: Option<String>,
 ) -> Result<SealedVault, String> {
-    let params = Argon2idParams::default();
+    seal_vault_with_params(passphrase, plaintext, alias, Argon2idParams::default())
+}
 
+/// Like [`seal_vault`] but with caller-chosen Argon2id cost. Production sealing
+/// always uses the default; this exists only to mint the cheap-param
+/// sync-test corpus (`test_data/sync_test_vaults/`).
+pub(crate) fn seal_vault_with_params(
+    passphrase: &[u8],
+    plaintext: &[u8],
+    alias: Option<String>,
+    params: Argon2idParams,
+) -> Result<SealedVault, String> {
     // Step 1: random salt for Argon2id
     let mut argon2_salt = [0u8; 32];
     OsRng.fill_bytes(&mut argon2_salt);

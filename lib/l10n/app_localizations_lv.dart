@@ -1051,6 +1051,16 @@ class AppLocalizationsLv extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Seifa ieejas frāze';
 
   @override
+  String get syncSafeToRetry =>
+      'Ja sinhronizācija tiek pārtraukta, vienkārši palaidiet to vēlreiz. Nekas netiek zaudēts.';
+
+  @override
+  String get syncThisVault => 'Izmantot šo glabātavu';
+
+  @override
+  String get syncOtherVault => 'Izmantot citu glabātavu';
+
+  @override
   String get historyWarning =>
       'Tiek glabāta tikai 1 iepriekšējā vērtība. Vēsture tiek automātiski dzēsta, pamatojoties uz drošības iestatījumiem.';
 
@@ -1058,7 +1068,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get historyCurrent => 'Pašreizējā';
 
   @override
-  String get historyPrevious => 'Iepriekšējā';
+  String get historyPrevious => 'Iepriekšējais stāvoklis';
 
   @override
   String historySavedOn(String date) {

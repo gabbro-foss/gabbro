@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Váš trezor byl smazán. Vytvořte nový pro pokračování.",
 
   "syncFilePassphraseLabel": "Přístupová fráze trezoru",
+  "syncSafeToRetry": "Pokud se synchronizace přeruší, jednoduše ji spusťte znovu. Nic se neztratí.",
+  "syncThisVault": "Použít tento trezor",
+  "syncOtherVault": "Použít druhý trezor",
 
   "historyWarning": "Je uchována pouze 1 předchozí hodnota. Historie se automaticky maže na základě nastavení zabezpečení.",
   "historyCurrent": "Aktuální",
-  "historyPrevious": "Předchozí",
+  "historyPrevious": "Předchozí stav",
   "historySavedOn": "Uloženo {date}",
   "@historySavedOn": {
     "placeholders": {

@@ -1052,6 +1052,16 @@ class AppLocalizationsFi extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Holvin salauslause';
 
   @override
+  String get syncSafeToRetry =>
+      'Jos synkronointi keskeytyy, suorita se vain uudelleen. Mitään ei katoa.';
+
+  @override
+  String get syncThisVault => 'Käytä tätä holvia';
+
+  @override
+  String get syncOtherVault => 'Käytä toista holvia';
+
+  @override
   String get historyWarning =>
       'Vain 1 aiempi arvo säilytetään. Historia tyhjennetään automaattisesti tietoturva-asetusten mukaan.';
 
@@ -1059,7 +1069,7 @@ class AppLocalizationsFi extends AppLocalizations {
   String get historyCurrent => 'Nykyinen';
 
   @override
-  String get historyPrevious => 'Aiempi';
+  String get historyPrevious => 'Edellinen tila';
 
   @override
   String historySavedOn(String date) {

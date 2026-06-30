@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Ваше сховище видалено. Створіть нове для продовження.",
 
   "syncFilePassphraseLabel": "Кодова фраза сховища",
+  "syncSafeToRetry": "Якщо синхронізацію перервано, просто запустіть її знову. Нічого не втрачено.",
+  "syncThisVault": "Використати це сховище",
+  "syncOtherVault": "Використати інше сховище",
 
   "historyWarning": "Зберігається лише 1 попереднє значення. Історія автоматично очищається відповідно до налаштувань безпеки.",
   "historyCurrent": "Поточний",
-  "historyPrevious": "Попередній",
+  "historyPrevious": "Попередній стан",
   "historySavedOn": "Збережено {date}",
   "@historySavedOn": {
     "placeholders": {

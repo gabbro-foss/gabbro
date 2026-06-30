@@ -1053,6 +1053,16 @@ class AppLocalizationsEu extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Gandegiko pasaesaldia';
 
   @override
+  String get syncSafeToRetry =>
+      'Sinkronizazioa eteten bada, exekutatu berriro. Ez da ezer galtzen.';
+
+  @override
+  String get syncThisVault => 'Erabili kutxa hau';
+
+  @override
+  String get syncOtherVault => 'Erabili beste kutxa';
+
+  @override
   String get historyWarning =>
       'Aurreko balio 1 bakarrik gordetzen da. Historia segurtasun-ezarpenen arabera automatikoki ezabatzen da.';
 
@@ -1060,7 +1070,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get historyCurrent => 'Unekoa';
 
   @override
-  String get historyPrevious => 'Aurrekoa';
+  String get historyPrevious => 'Aurreko egoera';
 
   @override
   String historySavedOn(String date) {

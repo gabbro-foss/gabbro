@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Din hvælving er slettet. Opret en ny for at fortsætte.",
 
   "syncFilePassphraseLabel": "Hvælvingens adgangssætning",
+  "syncSafeToRetry": "Hvis en synkronisering afbrydes, så kør den bare igen. Intet går tabt.",
+  "syncThisVault": "Brug denne boks",
+  "syncOtherVault": "Brug den anden boks",
 
   "historyWarning": "Kun 1 tidligere værdi bevares. Historikken ryddes automatisk baseret på dine sikkerhedsindstillinger.",
   "historyCurrent": "Nuværende",
-  "historyPrevious": "Tidligere",
+  "historyPrevious": "Forrige tilstand",
   "historySavedOn": "Gemt {date}",
   "@historySavedOn": {
     "placeholders": {

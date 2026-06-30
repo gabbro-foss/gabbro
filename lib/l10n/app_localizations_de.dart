@@ -1054,6 +1054,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Tresor-Passphrase';
 
   @override
+  String get syncSafeToRetry =>
+      'Wird eine Synchronisierung unterbrochen, führe sie einfach erneut aus. Es geht nichts verloren.';
+
+  @override
+  String get syncThisVault => 'Diesen Tresor verwenden';
+
+  @override
+  String get syncOtherVault => 'Anderen Tresor verwenden';
+
+  @override
   String get historyWarning =>
       'Es wird nur 1 früherer Wert aufbewahrt. Der Verlauf wird automatisch basierend auf den Sicherheitseinstellungen bereinigt.';
 
@@ -1061,7 +1071,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get historyCurrent => 'Aktuell';
 
   @override
-  String get historyPrevious => 'Vorherig';
+  String get historyPrevious => 'Vorheriger Zustand';
 
   @override
   String historySavedOn(String date) {

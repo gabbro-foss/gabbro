@@ -1050,6 +1050,16 @@ class AppLocalizationsKk extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Сейфтің кілт фразасы';
 
   @override
+  String get syncSafeToRetry =>
+      'Синхрондау үзілсе, оны қайта іске қосыңыз. Ештеңе жоғалмайды.';
+
+  @override
+  String get syncThisVault => 'Осы қойманы пайдалану';
+
+  @override
+  String get syncOtherVault => 'Басқа қойманы пайдалану';
+
+  @override
   String get historyWarning =>
       'Тек 1 алдыңғы мән сақталады. Тарих қауіпсіздік параметрлеріне сәйкес автоматты жойылады.';
 
@@ -1057,7 +1067,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get historyCurrent => 'Ағымдағы';
 
   @override
-  String get historyPrevious => 'Алдыңғы';
+  String get historyPrevious => 'Алдыңғы күй';
 
   @override
   String historySavedOn(String date) {

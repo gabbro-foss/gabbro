@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Votre coffre a été supprimé. Créez-en un nouveau pour continuer.",
 
   "syncFilePassphraseLabel": "Mot de passe du coffre",
+  "syncSafeToRetry": "Si une synchronisation est interrompue, relancez-la simplement. Rien n'est perdu.",
+  "syncThisVault": "Utiliser ce coffre",
+  "syncOtherVault": "Utiliser cet autre coffre",
 
   "historyWarning": "Seule 1 valeur précédente est conservée. L'historique est automatiquement purgé selon vos paramètres de sécurité.",
   "historyCurrent": "Actuel",
-  "historyPrevious": "Précédent",
+  "historyPrevious": "État précédent",
   "historySavedOn": "Enregistré le {date}",
   "@historySavedOn": {
     "placeholders": {

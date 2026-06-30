@@ -1054,6 +1054,16 @@ class AppLocalizationsLt extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Saugyklos slaptafrazė';
 
   @override
+  String get syncSafeToRetry =>
+      'Jei sinchronizavimas nutrūksta, tiesiog paleiskite jį dar kartą. Niekas neprarandama.';
+
+  @override
+  String get syncThisVault => 'Naudoti šį seifą';
+
+  @override
+  String get syncOtherVault => 'Naudoti kitą seifą';
+
+  @override
   String get historyWarning =>
       'Saugoma tik 1 ankstesnė reikšmė. Istorija automatiškai valoma pagal saugumo nustatymus.';
 
@@ -1061,7 +1071,7 @@ class AppLocalizationsLt extends AppLocalizations {
   String get historyCurrent => 'Dabartinis';
 
   @override
-  String get historyPrevious => 'Ankstesnis';
+  String get historyPrevious => 'Ankstesnė būsena';
 
   @override
   String historySavedOn(String date) {

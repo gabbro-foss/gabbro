@@ -1051,6 +1051,16 @@ class AppLocalizationsNb extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Hvelvets passfrase';
 
   @override
+  String get syncSafeToRetry =>
+      'Hvis en synkronisering avbrytes, kjør den bare igjen. Ingenting går tapt.';
+
+  @override
+  String get syncThisVault => 'Bruk dette hvelvet';
+
+  @override
+  String get syncOtherVault => 'Bruk det andre hvelvet';
+
+  @override
   String get historyWarning =>
       'Bare 1 tidligere verdi beholdes. Historikken tømmes automatisk basert på sikkerhetsinnstillingene dine.';
 
@@ -1058,7 +1068,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get historyCurrent => 'Gjeldende';
 
   @override
-  String get historyPrevious => 'Tidligere';
+  String get historyPrevious => 'Forrige tilstand';
 
   @override
   String historySavedOn(String date) {

@@ -1057,6 +1057,16 @@ class AppLocalizationsPl extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Hasło główne skarbca';
 
   @override
+  String get syncSafeToRetry =>
+      'Jeśli synchronizacja zostanie przerwana, po prostu uruchom ją ponownie. Nic nie ginie.';
+
+  @override
+  String get syncThisVault => 'Użyj tego sejfu';
+
+  @override
+  String get syncOtherVault => 'Użyj innego sejfu';
+
+  @override
   String get historyWarning =>
       'Przechowywana jest tylko 1 poprzednia wartość. Historia jest automatycznie czyszczona na podstawie ustawień bezpieczeństwa.';
 
@@ -1064,7 +1074,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get historyCurrent => 'Aktualne';
 
   @override
-  String get historyPrevious => 'Poprzednie';
+  String get historyPrevious => 'Poprzedni stan';
 
   @override
   String historySavedOn(String date) {

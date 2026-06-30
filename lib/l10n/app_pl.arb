@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Twój skarbiec został usunięty. Utwórz nowy, aby kontynuować.",
 
   "syncFilePassphraseLabel": "Hasło główne skarbca",
+  "syncSafeToRetry": "Jeśli synchronizacja zostanie przerwana, po prostu uruchom ją ponownie. Nic nie ginie.",
+  "syncThisVault": "Użyj tego sejfu",
+  "syncOtherVault": "Użyj innego sejfu",
 
   "historyWarning": "Przechowywana jest tylko 1 poprzednia wartość. Historia jest automatycznie czyszczona na podstawie ustawień bezpieczeństwa.",
   "historyCurrent": "Aktualne",
-  "historyPrevious": "Poprzednie",
+  "historyPrevious": "Poprzedni stan",
   "historySavedOn": "Zapisano {date}",
   "@historySavedOn": {
     "placeholders": {

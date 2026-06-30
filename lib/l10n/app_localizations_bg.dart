@@ -1054,6 +1054,16 @@ class AppLocalizationsBg extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Паролна фраза на трезора';
 
   @override
+  String get syncSafeToRetry =>
+      'Ако синхронизирането прекъсне, просто го стартирайте отново. Нищо не се губи.';
+
+  @override
+  String get syncThisVault => 'Използвай това хранилище';
+
+  @override
+  String get syncOtherVault => 'Използвай другото хранилище';
+
+  @override
   String get historyWarning =>
       'Запазва се само 1 предишна стойност. Историята се изчиства автоматично въз основа на настройките за сигурност.';
 
@@ -1061,7 +1071,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get historyCurrent => 'Текуща';
 
   @override
-  String get historyPrevious => 'Предишна';
+  String get historyPrevious => 'Предишно състояние';
 
   @override
   String historySavedOn(String date) {

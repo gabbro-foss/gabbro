@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "볼트가 삭제됐습니다. 계속하려면 새 볼트를 만드세요.",
 
   "syncFilePassphraseLabel": "볼트 암호 문구",
+  "syncSafeToRetry": "동기화가 중단되면 다시 실행하기만 하면 됩니다. 아무것도 손실되지 않습니다.",
+  "syncThisVault": "이 보관함 사용",
+  "syncOtherVault": "다른 보관함 사용",
 
   "historyWarning": "이전 값은 1개만 유지됩니다. 기록은 보안 설정에 따라 자동으로 삭제됩니다.",
   "historyCurrent": "현재",
-  "historyPrevious": "이전",
+  "historyPrevious": "이전 상태",
   "historySavedOn": "{date}에 저장됨",
   "@historySavedOn": {
     "placeholders": {

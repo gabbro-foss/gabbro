@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Tu almacén ha sido eliminado. Crea uno nuevo para continuar.",
 
   "syncFilePassphraseLabel": "Contraseña del almacén",
+  "syncSafeToRetry": "Si una sincronización se interrumpe, simplemente vuelve a ejecutarla. No se pierde nada.",
+  "syncThisVault": "Usar esta caja fuerte",
+  "syncOtherVault": "Usar otra caja fuerte",
 
   "historyWarning": "Solo se conserva 1 valor anterior. El historial se purga automáticamente según tu configuración de seguridad.",
   "historyCurrent": "Actual",
-  "historyPrevious": "Anterior",
+  "historyPrevious": "Estado anterior",
   "historySavedOn": "Guardado el {date}",
   "@historySavedOn": {
     "placeholders": {

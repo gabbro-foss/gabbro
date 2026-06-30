@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Jūsų saugykla buvo ištrinta. Sukurkite naują, kad galėtumėte tęsti.",
 
   "syncFilePassphraseLabel": "Saugyklos slaptafrazė",
+  "syncSafeToRetry": "Jei sinchronizavimas nutrūksta, tiesiog paleiskite jį dar kartą. Niekas neprarandama.",
+  "syncThisVault": "Naudoti šį seifą",
+  "syncOtherVault": "Naudoti kitą seifą",
 
   "historyWarning": "Saugoma tik 1 ankstesnė reikšmė. Istorija automatiškai valoma pagal saugumo nustatymus.",
   "historyCurrent": "Dabartinis",
-  "historyPrevious": "Ankstesnis",
+  "historyPrevious": "Ankstesnė būsena",
   "historySavedOn": "Išsaugota {date}",
   "@historySavedOn": {
     "placeholders": {

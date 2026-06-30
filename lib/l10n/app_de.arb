@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Dein Tresor wurde gelöscht. Erstelle einen neuen, um fortzufahren.",
 
   "syncFilePassphraseLabel": "Tresor-Passphrase",
+  "syncSafeToRetry": "Wird eine Synchronisierung unterbrochen, führe sie einfach erneut aus. Es geht nichts verloren.",
+  "syncThisVault": "Diesen Tresor verwenden",
+  "syncOtherVault": "Anderen Tresor verwenden",
 
   "historyWarning": "Es wird nur 1 früherer Wert aufbewahrt. Der Verlauf wird automatisch basierend auf den Sicherheitseinstellungen bereinigt.",
   "historyCurrent": "Aktuell",
-  "historyPrevious": "Vorherig",
+  "historyPrevious": "Vorheriger Zustand",
   "historySavedOn": "Gespeichert am {date}",
   "@historySavedOn": {
     "placeholders": {

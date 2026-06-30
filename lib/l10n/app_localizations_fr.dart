@@ -1057,6 +1057,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Mot de passe du coffre';
 
   @override
+  String get syncSafeToRetry =>
+      'Si une synchronisation est interrompue, relancez-la simplement. Rien n\'est perdu.';
+
+  @override
+  String get syncThisVault => 'Utiliser ce coffre';
+
+  @override
+  String get syncOtherVault => 'Utiliser cet autre coffre';
+
+  @override
   String get historyWarning =>
       'Seule 1 valeur précédente est conservée. L\'historique est automatiquement purgé selon vos paramètres de sécurité.';
 
@@ -1064,7 +1074,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get historyCurrent => 'Actuel';
 
   @override
-  String get historyPrevious => 'Précédent';
+  String get historyPrevious => 'État précédent';
 
   @override
   String historySavedOn(String date) {

@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Hvelvet ditt er slettet. Opprett et nytt for å fortsette.",
 
   "syncFilePassphraseLabel": "Hvelvets passfrase",
+  "syncSafeToRetry": "Hvis en synkronisering avbrytes, kjør den bare igjen. Ingenting går tapt.",
+  "syncThisVault": "Bruk dette hvelvet",
+  "syncOtherVault": "Bruk det andre hvelvet",
 
   "historyWarning": "Bare 1 tidligere verdi beholdes. Historikken tømmes automatisk basert på sikkerhetsinnstillingene dine.",
   "historyCurrent": "Gjeldende",
-  "historyPrevious": "Tidligere",
+  "historyPrevious": "Forrige tilstand",
   "historySavedOn": "Lagret {date}",
   "@historySavedOn": {
     "placeholders": {

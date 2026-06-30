@@ -1055,6 +1055,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Кодовая фраза хранилища';
 
   @override
+  String get syncSafeToRetry =>
+      'Если синхронизация прервётся, просто запустите её снова. Ничего не потеряется.';
+
+  @override
+  String get syncThisVault => 'Использовать это хранилище';
+
+  @override
+  String get syncOtherVault => 'Использовать другое хранилище';
+
+  @override
   String get historyWarning =>
       'Хранится только 1 предыдущее значение. История автоматически очищается в соответствии с настройками безопасности.';
 
@@ -1062,7 +1072,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get historyCurrent => 'Текущий';
 
   @override
-  String get historyPrevious => 'Предыдущий';
+  String get historyPrevious => 'Предыдущее состояние';
 
   @override
   String historySavedOn(String date) {

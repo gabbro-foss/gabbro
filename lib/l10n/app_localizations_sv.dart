@@ -1052,6 +1052,16 @@ class AppLocalizationsSv extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Valvets lösenfras';
 
   @override
+  String get syncSafeToRetry =>
+      'Om en synkronisering avbryts, kör den bara igen. Inget går förlorat.';
+
+  @override
+  String get syncThisVault => 'Använd detta valv';
+
+  @override
+  String get syncOtherVault => 'Använd det andra valvet';
+
+  @override
   String get historyWarning =>
       'Bara 1 tidigare värde behålls. Historiken rensas automatiskt baserat på dina säkerhetsinställningar.';
 
@@ -1059,7 +1069,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get historyCurrent => 'Aktuell';
 
   @override
-  String get historyPrevious => 'Tidigare';
+  String get historyPrevious => 'Tidigare tillstånd';
 
   @override
   String historySavedOn(String date) {

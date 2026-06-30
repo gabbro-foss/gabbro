@@ -1060,6 +1060,16 @@ class AppLocalizationsEl extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Φράση πρόσβασης θησαυροφυλακίου';
 
   @override
+  String get syncSafeToRetry =>
+      'Αν ο συγχρονισμός διακοπεί, απλώς εκτελέστε τον ξανά. Δεν χάνεται τίποτα.';
+
+  @override
+  String get syncThisVault => 'Χρήση αυτού του θησαυροφυλακίου';
+
+  @override
+  String get syncOtherVault => 'Χρήση άλλου θησαυροφυλακίου';
+
+  @override
   String get historyWarning =>
       'Διατηρείται μόνο 1 προηγούμενη τιμή. Το ιστορικό διαγράφεται αυτόματα βάσει των ρυθμίσεων ασφαλείας.';
 
@@ -1067,7 +1077,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get historyCurrent => 'Τρέχον';
 
   @override
-  String get historyPrevious => 'Προηγούμενο';
+  String get historyPrevious => 'Προηγούμενη κατάσταση';
 
   @override
   String historySavedOn(String date) {

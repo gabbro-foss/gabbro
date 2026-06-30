@@ -68,6 +68,7 @@ Widget _buildScreen(
       ClipboardClearTimeout.sixtySeconds,
   Future<void> Function(String url)? onLaunchUrl,
   Future<String?> Function(String filename)? exportFilePicker,
+  Future<List<HistoryRecordData>> Function(String id)? onFetchHistory,
 }) =>
     testApp(EntryDetailScreen(
       entry: entry,
@@ -76,6 +77,7 @@ Widget _buildScreen(
       clipboardClearTimeout: clipboardClearTimeout,
       onLaunchUrl: onLaunchUrl ?? (_) async {},
       exportFilePicker: exportFilePicker ?? (_) async => null,
+      onFetchHistory: onFetchHistory ?? (_) async => const [],
     ));
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -98,6 +100,36 @@ void main() {
       expect(formatTimestamp('not-a-date'), 'Unknown');
     });
   });
+  testWidgets('recovery-history tile appears when history exists', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _buildScreen(
+        VaultEntryData.login(_loginEntry()),
+        onFetchHistory: (_) async => [
+          const HistoryRecordData(
+            field: 'password',
+            value: 'old',
+            savedAt: '2025-01-02T00:00:00Z',
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.history), findsOneWidget);
+  });
+
+  testWidgets('no recovery-history tile when history is empty', (tester) async {
+    await tester.pumpWidget(
+      _buildScreen(
+        VaultEntryData.login(_loginEntry()),
+        onFetchHistory: (_) async => const [],
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.history), findsNothing);
+  });
+
   testWidgets('login entry renders fields correctly', (tester) async {
     await tester.pumpWidget(
       _buildScreen(VaultEntryData.login(_loginEntry())),

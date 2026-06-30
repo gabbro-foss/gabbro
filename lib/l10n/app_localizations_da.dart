@@ -1051,6 +1051,16 @@ class AppLocalizationsDa extends AppLocalizations {
   String get syncFilePassphraseLabel => 'Hvælvingens adgangssætning';
 
   @override
+  String get syncSafeToRetry =>
+      'Hvis en synkronisering afbrydes, så kør den bare igen. Intet går tabt.';
+
+  @override
+  String get syncThisVault => 'Brug denne boks';
+
+  @override
+  String get syncOtherVault => 'Brug den anden boks';
+
+  @override
   String get historyWarning =>
       'Kun 1 tidligere værdi bevares. Historikken ryddes automatisk baseret på dine sikkerhedsindstillinger.';
 
@@ -1058,7 +1068,7 @@ class AppLocalizationsDa extends AppLocalizations {
   String get historyCurrent => 'Nuværende';
 
   @override
-  String get historyPrevious => 'Tidligere';
+  String get historyPrevious => 'Forrige tilstand';
 
   @override
   String historySavedOn(String date) {

@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Sinu seif on kustutatud. Loo uus jätkamiseks.",
 
   "syncFilePassphraseLabel": "Seifi pääslause",
+  "syncSafeToRetry": "Kui sünkroonimine katkeb, käivita see lihtsalt uuesti. Midagi ei lähe kaduma.",
+  "syncThisVault": "Kasuta seda hoidlat",
+  "syncOtherVault": "Kasuta teist hoidlat",
 
   "historyWarning": "Säilitatakse ainult 1 eelmine väärtus. Ajalugu tühjendatakse automaatselt turvalisuse sätete alusel.",
   "historyCurrent": "Praegune",
-  "historyPrevious": "Eelmine",
+  "historyPrevious": "Eelmine olek",
   "historySavedOn": "Salvestatud {date}",
   "@historySavedOn": {
     "placeholders": {

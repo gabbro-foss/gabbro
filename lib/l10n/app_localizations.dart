@@ -2107,6 +2107,24 @@ abstract class AppLocalizations {
   /// **'Vault passphrase'**
   String get syncFilePassphraseLabel;
 
+  /// Reassurance shown on the sync passphrase dialog, before a sync runs: an interrupted sync is safe to repeat (crash-safe writes + convergent re-merge).
+  ///
+  /// In en, this message translates to:
+  /// **'If a sync is interrupted, just run it again. Nothing is lost.'**
+  String get syncSafeToRetry;
+
+  /// No description provided for @syncThisVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this vault'**
+  String get syncThisVault;
+
+  /// No description provided for @syncOtherVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Use other vault'**
+  String get syncOtherVault;
+
   /// No description provided for @historyWarning.
   ///
   /// In en, this message translates to:
@@ -2122,7 +2140,7 @@ abstract class AppLocalizations {
   /// No description provided for @historyPrevious.
   ///
   /// In en, this message translates to:
-  /// **'Previous'**
+  /// **'Previous state'**
   String get historyPrevious;
 
   /// No description provided for @historySavedOn.

@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Ditt valv har tagits bort. Skapa ett nytt för att fortsätta.",
 
   "syncFilePassphraseLabel": "Valvets lösenfras",
+  "syncSafeToRetry": "Om en synkronisering avbryts, kör den bara igen. Inget går förlorat.",
+  "syncThisVault": "Använd detta valv",
+  "syncOtherVault": "Använd det andra valvet",
 
   "historyWarning": "Bara 1 tidigare värde behålls. Historiken rensas automatiskt baserat på dina säkerhetsinställningar.",
   "historyCurrent": "Aktuell",
-  "historyPrevious": "Tidigare",
+  "historyPrevious": "Tidigare tillstånd",
   "historySavedOn": "Sparad {date}",
   "@historySavedOn": {
     "placeholders": {

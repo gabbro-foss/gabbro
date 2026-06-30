@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Il tuo archivio è stato eliminato. Creane uno nuovo per continuare.",
 
   "syncFilePassphraseLabel": "Passphrase archivio",
+  "syncSafeToRetry": "Se una sincronizzazione viene interrotta, basta eseguirla di nuovo. Non si perde nulla.",
+  "syncThisVault": "Usa questa cassaforte",
+  "syncOtherVault": "Usa altra cassaforte",
 
   "historyWarning": "Viene conservato solo 1 valore precedente. La cronologia viene eliminata automaticamente in base alle impostazioni di sicurezza.",
   "historyCurrent": "Attuale",
-  "historyPrevious": "Precedente",
+  "historyPrevious": "Stato precedente",
   "historySavedOn": "Salvato il {date}",
   "@historySavedOn": {
     "placeholders": {

@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "A széfed törölve lett. Hozz létre egy újat a folytatáshoz.",
 
   "syncFilePassphraseLabel": "Széf jelmondatja",
+  "syncSafeToRetry": "Ha egy szinkronizálás megszakad, egyszerűen futtasd le újra. Semmi nem vész el.",
+  "syncThisVault": "Ezt a széfet használ",
+  "syncOtherVault": "Másik széfet használ",
 
   "historyWarning": "Csak 1 korábbi érték kerül megőrzésre. Az előzmények automatikusan törlődnek a biztonsági beállítások alapján.",
   "historyCurrent": "Jelenlegi",
-  "historyPrevious": "Korábbi",
+  "historyPrevious": "Korábbi állapot",
   "historySavedOn": "Mentve: {date}",
   "@historySavedOn": {
     "placeholders": {

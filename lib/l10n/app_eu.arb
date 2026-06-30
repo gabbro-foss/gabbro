@@ -453,10 +453,13 @@
   "deleteVaultPostDeletion": "Zure gandegiak ezabatu da. Jarraitzeko gandegi berria sortu.",
 
   "syncFilePassphraseLabel": "Gandegiko pasaesaldia",
+  "syncSafeToRetry": "Sinkronizazioa eteten bada, exekutatu berriro. Ez da ezer galtzen.",
+  "syncThisVault": "Erabili kutxa hau",
+  "syncOtherVault": "Erabili beste kutxa",
 
   "historyWarning": "Aurreko balio 1 bakarrik gordetzen da. Historia segurtasun-ezarpenen arabera automatikoki ezabatzen da.",
   "historyCurrent": "Unekoa",
-  "historyPrevious": "Aurrekoa",
+  "historyPrevious": "Aurreko egoera",
   "historySavedOn": "{date}-(e)an gordeta",
   "@historySavedOn": {
     "placeholders": {
