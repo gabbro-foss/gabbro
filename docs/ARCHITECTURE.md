@@ -118,7 +118,7 @@ and unit-green. Key code: `merge_entry_pair`, `MergeSummary`, `replace_field_wit
 (session.rs).
 
 **BLOCKED.** Linux hardware test 2026-06-29 surfaced 6 review-UI defects (see Bikeshed >
-Bugs). The merge model is sound; the review UI is not shippable. Fix the six, re-verify on
+Bugs). The merge model is sound; the review UI is not shippable. Fix them, re-verify on
 MOCK vaults only (`test_data/sync_test_vaults/README.md`), run the gate (`gabbro_test`,
 ~100min, watch the backward-compat leg), then release decision.
 
@@ -136,15 +136,13 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Bugs
-- **granular-sync-v9 review UI — 5 defects, BLOCKS the branch (Linux hardware test 2026-06-29):**
-  1. Secret diffs can't be revealed — passwords show as dots, no unhide, in both the
-     value-changed and the keep-mine/use-other cases. Diff unusable.
-  2. Per-entry toggle unlabeled — no text for what ON vs OFF does; delete prompt worst (am
+- **granular-sync-v9 review UI — 4 defects, BLOCKS the branch (Linux hardware test 2026-06-29):**
+  1. Per-entry toggle unlabeled — no text for what ON vs OFF does; delete prompt worst (am
      I keeping or deleting?).
-  3. Summary doesn't match choices — "12 updated" after toggling some not all; count
+  2. Summary doesn't match choices — "12 updated" after toggling some not all; count
      ignores selections, not itemized.
-  4. Recovery history empty — after a sync replaces values, no per-entry history appears.
-  5. Apply very slow in a `--release` build (long spinner) — suspect whole-vault Argon2id
+  3. Recovery history empty — after a sync replaces values, no per-entry history appears.
+  4. Apply very slow in a `--release` build (long spinner) — suspect whole-vault Argon2id
      reseal per applied change; profile before fixing.
 - **Enter does not submit the passphrase** (unlock + other screens) — cross-cutting; audit
   every passphrase/password field for an Enter-submit handler.
@@ -173,6 +171,7 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   sync redesign (which reshapes the vault format anyway). v1 direction in commit 9f158b5.
 
 ### Features & UX
+- Autofill via `auto-type` (Linux/desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
 
 ### Code Quality
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
@@ -182,7 +181,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 ### V2+ / Defer
 - UI locales deferred (RTL layout work required): Hebrew, Kurdish.
 - Passphrase wordlists — not viable without significant pipeline work: `yo` Yoruba (no frequency ordering, complex tonal diacritics); `sr_Latn` Serbian Latin (only Cyrillic corpora; needs transliteration pipeline); `lb` Luxembourgish (small speaker base); `wa` Walloon (nothing usable, French covers Wallonia).
-- Autofill via `auto-type` (Linux/desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
 - Passkey (WebAuthn discoverable credential) support.
 - Vault sync across devices.
 - Data breach alerts / HaveIBeenPwned integration.

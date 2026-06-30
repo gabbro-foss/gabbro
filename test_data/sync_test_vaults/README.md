@@ -60,8 +60,8 @@ never your real vault. All three share passphrase `0123456789a`.
 - [ ] **New entry** → shown with a keep/drop checkbox (default keep); drop one and confirm
       it does not appear in the list afterwards.
 - [ ] **Brought-over field** → shows `old → new`; **secret fields are masked** (password,
-      cvv, pin); each has a keep/drop checkbox (default keep). Drop one and confirm the old
-      value stays.
+      cvv, pin) with an eye to reveal; each has a keep/drop checkbox (default keep). Drop
+      one and confirm the old value stays.
 - [ ] **Clash** (the six `*-co` entries) → both values shown, **must pick** keep-mine or
       use-theirs; **Continue/OK is disabled until picked**. Pick "use theirs" on a couple.
 - [ ] **`OldNote`** (on `login-nc`) → a keep/delete toggle; the item is kept unless you set
