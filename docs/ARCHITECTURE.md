@@ -89,7 +89,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Active task: additive, field-level vault sync (`granular-sync-v9`)
+### Active task: vault sync (fast auto-merge + granular review)
 
 **Why.** Old merge is whole-entry last-writer-wins on one coarse `updated_at`: independent
 field edits on two devices silently lose one side. No server — sync is file-to-file, must
@@ -114,18 +114,36 @@ result on B = (A + B) minus what you dropped; every replaced value kept in entry
 Import (`merge_source_into_session`) stays first-wins by UUID — sync path only. Transport
 (moving the file) is out of scope.
 
-**Status.** Engine + v9 format + backward-compat gate + review UI
-(`lib/widgets/sync_review.dart`) + recovery history (`recovery_history_screen.dart`) built
-and unit-green. Key code: `merge_entry_pair`, `MergeSummary`, `replace_field_with_history`
-(session.rs).
+**Status.** Engine + v9 format + backward-compat gate + granular review UI
+(`lib/widgets/sync_review.dart`) + recovery history (`recovery_history_screen.dart`) built,
+unit-green, and hardware-walk-verified. Key code: `merge_entry_pair`, `decide_field`,
+`MergeSummary`, `replace_field_with_history` (session.rs).
 
-**BLOCKED.** Linux hardware test 2026-06-29 surfaced 6 review-UI defects (see Bikeshed >
-Bugs). Fixing one at a time, failing-test-first, on MOCK vaults; maintainer walks each.
-The hardware walk is now an **exact step-by-step** in `test_data/sync_test_vaults/README.md`
-with deterministic picks, validated by a JSON-export checker (`check_sync_walk_export`):
-walk it, export JSON, run the checker. Commit + remove from Bikeshed only after that walk.
-Then run the gate (`gabbro_test`, ~100min, watch the backward-compat leg) and decide on
-release.
+**Two paths (decided 2026-06-30).** Per-field review doesn't scale (13 entries = a slog,
+100+ intractable). Market scan: every mainstream syncer resolves whole-item, auto, no
+per-field prompt (KeePassXC = per-entry by timestamp + history). So offer both, user-chosen:
+- **Fast auto-merge** — apply all one-sided/additive changes (brought-over values, new
+  entries; never auto-delete) with no dialog; surface only genuine two-sided collisions and
+  folder conflicts. The "edited on one device" daily case has none -> instant, no clicks.
+- **Granular review** — the existing one-by-one UI, to deliberately reconcile diverged vaults
+  inside Gabbro (drop brought-over values, confirm deletes) instead of dumping to JSON.
+
+Open sub-question: how fast mode treats a genuine collision — surface a quick pick, or keep
+local with the incoming value pushed to history. Default: surface (clocks untrusted, lose nothing).
+
+**Steps (tick off):**
+- [x] Fix stale `password_history_screen_test` (the "Previous" -> "Previous state" relabel).
+- [ ] Fast-path toggle (mostly Dart): build decisions for one-sided changes straight from
+      `MergeSummary`, skip the dialog, surface only collisions/folder-conflicts; add a
+      Quick-vs-Review choose dialog. Branch at `vault_list_screen.dart:789`; engine unchanged.
+- [ ] Batched apply (perf): the per-decision FFI loop (`vault_list_screen.dart:792-826`)
+      reseals the whole vault (Argon2id) once PER decision. Replace with one "apply all" FFI
+      that reseals once. Rust+Dart; speeds up both paths.
+- [ ] Itemized post-sync summary: list which entries added/updated/deleted (data already in
+      `SyncReviewDecisions`), not just totals.
+- [ ] Edge-case hardening pass (none done deliberately yet).
+
+Then run the gate (`gabbro_test`, ~100min, watch the backward-compat leg) and decide on release.
 
 ---
 
@@ -141,19 +159,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Bugs
-- **granular-sync-v9 review UI — core done, hardware-walk-verified 2026-06-30**
-  (secret reveal, keep/delete/skip + use-this-vault/use-other-vault chips, accurate summary
-  counts, recovery-history reveal, file-binary clash, crash-safe + convergent re-sync with
-  the "just run it again" hint). **Still open — NOT done:**
-  1. **Summary not itemized.** Post-sync counts are accurate, but it does not list *what*
-     changed (which entries added / updated / deleted) — only totals.
-  2. **Apply very slow in a `--release` build** (long spinner). Untouched. Profile first
-     (suspect a whole-vault Argon2id reseal per applied change) before fixing.
-  3. **Edge cases untested.** No deliberate edge-case pass has been done — the file-binary
-     clash was found by the hardware walk, not by testing. Keep hardening.
 - **Two history screens overlap (cleanup, deferred).** In-app `previousPassword` ("password
   history", typo recovery) and the sync `meta.history` ("Previous state") are separate places
-  that both look like "previous values". Unify or relabel later. Not urgent.
+  that both look like "previous values". Relabelled to disambiguate; unify later. Not urgent.
 - **Enter does not submit the passphrase** (unlock + other screens) — cross-cutting; audit
   every passphrase/password field for an Enter-submit handler.
 - **CRITICAL — biometric unlock rejects the correct passphrase (GrapheneOS, 2026-06-29).**
