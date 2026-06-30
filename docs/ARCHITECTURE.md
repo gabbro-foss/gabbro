@@ -50,8 +50,8 @@ gabbro/
 │   ├── fido/             # FIDO2/libfido2 FFI (Linux only)
 │   ├── import/           # enpass, bitwarden, google_pm, dashlane, csv
 │   ├── hardening.rs      # Process hardening (R-04): core-dump + ptrace/mem disable (Linux)
-│   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics; wordlist gen; gen_fixtures
-├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + frozen golden fixtures (FIXTURES.md)
+│   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer; wordlist gen; gen_fixtures
+├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper (+ Robolectric tests)
 ├── docs/                 # ARCHITECTURE, LEARNINGS, SECURITY, AI_*; decisions/ (ADRs); artefacts/
 ├── test/  integration_test/  test_driver/   # Flutter widget/unit + Linux real-FFI device suites
@@ -72,6 +72,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust (`cargo test -q`) | 541 | 8 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 12 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
+| Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
+| Rust sync-walk simulation (`cargo test --release --lib sync_walk_simulation_matches_checker -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 998 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
@@ -118,9 +120,12 @@ and unit-green. Key code: `merge_entry_pair`, `MergeSummary`, `replace_field_wit
 (session.rs).
 
 **BLOCKED.** Linux hardware test 2026-06-29 surfaced 6 review-UI defects (see Bikeshed >
-Bugs). The merge model is sound; the review UI is not shippable. Fix them, re-verify on
-MOCK vaults only (`test_data/sync_test_vaults/README.md`), run the gate (`gabbro_test`,
-~100min, watch the backward-compat leg), then release decision.
+Bugs). Fixing one at a time, failing-test-first, on MOCK vaults; maintainer walks each.
+The hardware walk is now an **exact step-by-step** in `test_data/sync_test_vaults/README.md`
+with deterministic picks, validated by a JSON-export checker (`check_sync_walk_export`):
+walk it, export JSON, run the checker. Commit + remove from Bikeshed only after that walk.
+Then run the gate (`gabbro_test`, ~100min, watch the backward-compat leg) and decide on
+release.
 
 ---
 
@@ -136,14 +141,19 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Bugs
-- **granular-sync-v9 review UI — 4 defects, BLOCKS the branch (Linux hardware test 2026-06-29):**
-  1. Per-entry toggle unlabeled — no text for what ON vs OFF does; delete prompt worst (am
-     I keeping or deleting?).
-  2. Summary doesn't match choices — "12 updated" after toggling some not all; count
-     ignores selections, not itemized.
-  3. Recovery history empty — after a sync replaces values, no per-entry history appears.
-  4. Apply very slow in a `--release` build (long spinner) — suspect whole-vault Argon2id
-     reseal per applied change; profile before fixing.
+- **granular-sync-v9 review UI — core done, hardware-walk-verified 2026-06-30**
+  (secret reveal, keep/delete/skip + use-this-vault/use-other-vault chips, accurate summary
+  counts, recovery-history reveal, file-binary clash, crash-safe + convergent re-sync with
+  the "just run it again" hint). **Still open — NOT done:**
+  1. **Summary not itemized.** Post-sync counts are accurate, but it does not list *what*
+     changed (which entries added / updated / deleted) — only totals.
+  2. **Apply very slow in a `--release` build** (long spinner). Untouched. Profile first
+     (suspect a whole-vault Argon2id reseal per applied change) before fixing.
+  3. **Edge cases untested.** No deliberate edge-case pass has been done — the file-binary
+     clash was found by the hardware walk, not by testing. Keep hardening.
+- **Two history screens overlap (cleanup, deferred).** In-app `previousPassword` ("password
+  history", typo recovery) and the sync `meta.history` ("Previous state") are separate places
+  that both look like "previous values". Unify or relabel later. Not urgent.
 - **Enter does not submit the passphrase** (unlock + other screens) — cross-cutting; audit
   every passphrase/password field for an Enter-submit handler.
 - **CRITICAL — biometric unlock rejects the correct passphrase (GrapheneOS, 2026-06-29).**

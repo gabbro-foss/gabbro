@@ -1,7 +1,8 @@
 # Sync-test vaults (three divergent devices)
 
-Three copies of the same 12-entry vault — **two of every entry type** — each with different
-edits, for hardware-testing N-device granular sync.
+Three copies of a shared 12-entry vault — **two of every entry type** — each with different
+edits, plus a **B-only new entry** and an entry **deleted on C**, for hardware-testing
+N-device granular sync.
 
 - **Alias:** `synctest` (all three)
 - **Passphrase:** `0123456789a` (all three)
@@ -26,6 +27,12 @@ payload `original`), `file-co` key.txt (`base`), `custom-nc` API creds (`api_key
 
 The two File entries hold a small one-word text payload so it's easy to edit.
 
+## Two extra entries (the add / delete review paths)
+
+- `delme` — a Note present on **A and B only**. **C deletes it** (tombstone), so syncing C
+  surfaces it as a **whole-entry delete**.
+- `extra-b` — a Login present on **B only**, so syncing B surfaces it as a **new entry**.
+
 ## What each device changed
 
 For every type, `*-nc` gets **non-colliding** edits (each device touches a *different*
@@ -41,47 +48,70 @@ field → clash).
 | File | A→filename, B→notes, C→data | A & C → data (clash); B → filename |
 | Custom | A→edits `api_key`, B→adds `env`, C→title | A & C → `token` (clash); B → adds `scope` |
 
-## Hardware test procedure
+## Hardware test — follow exactly
 
-Run the gate first (`gabbro_test`) and only proceed if green. **Mock vaults only** —
-never your real vault. All three share passphrase `0123456789a`.
+One device. Mock vaults only. Passphrase for everything: `0123456789a`.
+Make the picks below exactly; the result is then checked against a known answer.
 
-### Steps (single device — exercises the full merge, no file copying)
+**1.** Create a new vault, passphrase `0123456789a`.
 
-1. Create a new vault, passphrase `0123456789a`.
-2. **Import entries** → **Gabbro vault** → pick `sync_test_A.gabbro`, type `0123456789a`,
-   tap **Sync from vault**. (You now hold device A's copy.)
-3. Menu → **Sync from file** → `sync_test_B.gabbro`, passphrase `0123456789a`. The
-   **one-by-one review** opens (one entry per step). Step through it (see checks below).
-4. Menu → **Sync from file** → `sync_test_C.gabbro`, passphrase `0123456789a`. Review again.
+**2.** Menu → **Import entries** → **Gabbro vault** → `sync_test_A.gabbro` →
+**Sync from vault**.
 
-### What to check in the review (per step)
+**3. Sync B.** Menu → **Sync from file** → `sync_test_B.gabbro`. The review opens
+(13 screens). On **every** screen leave the default and tap **Continue**, then tap
+**OK**. (The first screen is the new entry **New on B** — leave **Keep**.)
 
-- [ ] **New entry** → shown with a keep/drop checkbox (default keep); drop one and confirm
-      it does not appear in the list afterwards.
-- [ ] **Brought-over field** → shows `old → new`; **secret fields are masked** (password,
-      cvv, pin) with an eye to reveal; each has a keep/drop checkbox (default keep). Drop
-      one and confirm the old value stays.
-- [ ] **Clash** (the six `*-co` entries) → both values shown, **must pick** keep-mine or
-      use-theirs; **Continue/OK is disabled until picked**. Pick "use theirs" on a couple.
-- [ ] **`OldNote`** (on `login-nc`) → a keep/delete toggle; the item is kept unless you set
-      it to delete.
-- [ ] After the last step, a **"Vault synced"** snackbar; all 12 entries survive.
+**4. Sync C.** Menu → **Sync from file** → `sync_test_C.gabbro`. The review opens
+(13 screens). Each screen's **title** is at the top — match it in the table and do
+exactly what it says, then **Continue**. Order is roughly top-to-bottom, but match by
+title, not position.
 
-### Recovery history
+Each value row has two chips: **Use this vault** (your value) and **Use other vault** (the
+incoming value). Brought-over rows default to **Use other vault** — leave them.
 
-- [ ] Open an entry where you kept a changed field or picked **use theirs** → tap the
-      **Previous** tile → the replaced value is listed → **Revert** restores it; **Delete**
-      removes it.
+| Screen title | What to do |
+|--------------|-----------|
+| **Email** | leave the URL row as-is (default **Use other vault**); on the **OldNote** row pick **Delete** |
+| **Shopping-A** | **Continue** (leave default) |
+| **Alex Stone** | **Continue** (leave default) |
+| **Visa** | **Continue** (leave default) |
+| **passport-A.txt** | **Continue** (leave default) |
+| **API creds** | **Continue** (leave default) |
+| **Bank** | tap the **eye** to reveal, then tap **Use other vault** |
+| **Ideas-B** | tap **Use this vault** |
+| **Sam-B StoneA** | tap **Use other vault** |
+| **Amex** | tap **Use this vault** |
+| **key-B.txt** | tap **Use other vault** |
+| **Tokens** | tap **Use this vault** |
+| **Delete me** | pick **Delete** |
 
-### Order independence
+Tap **OK** at the end.
 
-- [ ] On a second fresh vault, do steps 1–4 but sync **C before B**. The same six clashes
-      must surface and the non-colliding fields converge to the same values.
+**5.** Export the vault to **JSON** (Menu → Export → JSON), save as `/tmp/sync_walk.json`.
 
-### Three devices
+**6.** Run the checker from `rust/`:
 
-Do steps 1–2 with A / B / C on three devices, then **Sync from file** the other two files
-on any device — the result is identical regardless of order.
+```
+GABBRO_WALK_JSON=/tmp/sync_walk.json cargo test --release --lib check_sync_walk_export -- --ignored
+```
+
+Green = the resulting vault matches the known answer exactly. Red = it prints which
+field differs.
+
+Watch for (flag if wrong): every choice is a clearly labelled button (**Keep** /
+**Delete** / **Use other**); the **Bank** and **Amex** screens hide their two values
+behind dots with an **eye** to reveal.
+
+## Regenerate
+
+These are committed binaries. To rebuild them after changing the corpus, run the generator
+that defines them (in `rust/src/vault/session.rs`):
+
+```
+cargo test --release regenerate_sync_test_corpus -- --ignored
+```
+
+It writes all three files with cheap Argon2 params and alias `synctest`.
 
 These vaults use cheap Argon2 params (test only) — never use them for real data.
