@@ -68,7 +68,7 @@ void main() {
       entry: _entryWithHistory(),
     ));
 
-    expect(find.text('Previous'), findsOneWidget);
+    expect(find.text('Previous state'), findsOneWidget);
     expect(find.text('Delete previous entry'), findsOneWidget);
   });
 
@@ -77,7 +77,7 @@ void main() {
       entry: _entryWithoutHistory(),
     ));
 
-    expect(find.text('Previous'), findsNothing);
+    expect(find.text('Previous state'), findsNothing);
     expect(find.text('Delete previous entry'), findsNothing);
   });
 
