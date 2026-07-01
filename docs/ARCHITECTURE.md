@@ -74,6 +74,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust sync-walk simulation (`cargo test --release --lib sync_walk_simulation_matches_checker -- --ignored`) | 1 | 1 (opt-in by default) |
+| Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 998 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
@@ -119,30 +120,21 @@ Import (`merge_source_into_session`) stays first-wins by UUID — sync path only
 unit-green, and hardware-walk-verified. Key code: `merge_entry_pair`, `decide_field`,
 `MergeSummary`, `replace_field_with_history` (session.rs).
 
-**Two paths (decided 2026-06-30).** Per-field review doesn't scale (13 entries = a slog,
-100+ intractable). Market scan: every mainstream syncer resolves whole-item, auto, no
-per-field prompt (KeePassXC = per-entry by timestamp + history). So offer both, user-chosen:
-- **Fast auto-merge** (KeePassXC-style) — apply all one-sided/additive changes (brought-over
-  values, new entries) AND tombstoned deletes with no dialog; surface only genuine two-sided
-  collisions and folder conflicts. Deletes are safe to auto-apply: `pending_deletes` is
-  tombstone-driven (`session.rs:3350`), never absence-driven, so an un-synced entry is never
-  removed. The "edited on one device" daily case has no collisions -> instant, no clicks.
-- **Granular review** — the existing one-by-one UI, to deliberately reconcile diverged vaults
-  inside Gabbro (drop brought-over values, confirm deletes) instead of dumping to JSON.
-
-Genuine collisions surface (clocks untrusted, lose nothing) via the existing review dialog for
-just the conflicting steps.
+**Two paths (decided 2026-06-30), both shipped.** A "Merge automatically / Review all changes"
+chooser (`vault_list_screen.dart`) picks per sync:
+- **Fast auto-merge** (KeePassXC-style, `session_fast_merge_from_body`) — fully automatic, no
+  prompts: incoming wins every collision (the losing local value kept in history), folder
+  conflicts take incoming, tombstoned deletes are applied, brought-over edits keep the replaced
+  value in history. Deterministic per order; nothing lost (replaced values live in history).
+  `pending_deletes` is tombstone-driven (`session.rs`), so an un-synced entry is never removed
+  — but a still-present entry on the incoming side is re-added even past a tombstone (additive).
+- **Granular review** — the one-by-one UI to reconcile diverged vaults by hand.
 
 **Steps (tick off):**
-- [ ] Fast-path toggle (mostly Dart): build decisions for one-sided changes + tombstoned
-      deletes straight from `MergeSummary`, skip the dialog, surface only collisions/folder-
-      conflicts via the existing review dialog; add a Quick-vs-Review choose dialog. Branch at
-      `vault_list_screen.dart:789`; engine unchanged.
-- [ ] Batched apply (perf): the per-decision FFI loop (`vault_list_screen.dart:792-826`)
+- [ ] Batched apply (perf, granular only): the per-decision FFI loop in `_syncFromFile`
       reseals the whole vault (Argon2id) once PER decision. Replace with one "apply all" FFI
-      that reseals once. Rust+Dart; speeds up both paths.
-- [ ] Itemized post-sync summary: list which entries added/updated/deleted (data already in
-      `SyncReviewDecisions`), not just totals.
+      that reseals once. (Fast path already reseals once via `session_fast_merge_from_body`.)
+- [ ] Itemized post-sync summary: list which entries added/updated/deleted, not just totals.
 - [ ] Edge-case hardening pass (none done deliberately yet).
 
 Then run the gate (`gabbro_test`, ~100min, watch the backward-compat leg) and decide on release.
