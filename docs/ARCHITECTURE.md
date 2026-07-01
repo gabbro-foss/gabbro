@@ -92,16 +92,13 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Active task: finish granular sync
+### Next task
 
-Fast auto-merge, the unified history model, and the v9 format are done and
-hardware-verified (see git log / CHANGELOG). Remaining work is the granular review path:
+_(empty — awaiting agreement on the next task)_
 
-- [ ] Edge-case hardening: quick-confirm empty-title, self-sync, and duplicate
-      custom-label display (the larger cases — cross-version, cleared fields,
-      atomic cancel — are done; see git log).
-
-Then run the gate (`gabbro_test`, ~100min, watch the backward-compat leg) and decide on release.
+Granular sync is complete (see git log / CHANGELOG). Before release: run the gate
+(`gabbro_test`, ~100min, watch the backward-compat leg) and hardware-walk the sync
+flows on mock vaults (procedures in `test_data/sync_test_vaults/README.md`).
 
 ---
 
