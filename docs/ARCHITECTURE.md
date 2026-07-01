@@ -122,20 +122,53 @@ unit-green, and hardware-walk-verified. Key code: `merge_entry_pair`, `decide_fi
 **Two paths (decided 2026-06-30).** Per-field review doesn't scale (13 entries = a slog,
 100+ intractable). Market scan: every mainstream syncer resolves whole-item, auto, no
 per-field prompt (KeePassXC = per-entry by timestamp + history). So offer both, user-chosen:
-- **Fast auto-merge** — apply all one-sided/additive changes (brought-over values, new
-  entries; never auto-delete) with no dialog; surface only genuine two-sided collisions and
-  folder conflicts. The "edited on one device" daily case has none -> instant, no clicks.
+- **Fast auto-merge** (KeePassXC-style) — apply all one-sided/additive changes (brought-over
+  values, new entries) AND tombstoned deletes with no dialog; surface only genuine two-sided
+  collisions and folder conflicts. Deletes are safe to auto-apply: `pending_deletes` is
+  tombstone-driven (`session.rs:3350`), never absence-driven, so an un-synced entry is never
+  removed. The "edited on one device" daily case has no collisions -> instant, no clicks.
 - **Granular review** — the existing one-by-one UI, to deliberately reconcile diverged vaults
   inside Gabbro (drop brought-over values, confirm deletes) instead of dumping to JSON.
 
-Open sub-question: how fast mode treats a genuine collision — surface a quick pick, or keep
-local with the incoming value pushed to history. Default: surface (clocks untrusted, lose nothing).
+Genuine collisions surface (clocks untrusted, lose nothing) via the existing review dialog for
+just the conflicting steps.
 
-**Steps (tick off):**
-- [x] Fix stale `password_history_screen_test` (the "Previous" -> "Previous state" relabel).
-- [ ] Fast-path toggle (mostly Dart): build decisions for one-sided changes straight from
-      `MergeSummary`, skip the dialog, surface only collisions/folder-conflicts; add a
-      Quick-vs-Review choose dialog. Branch at `vault_list_screen.dart:789`; engine unchanged.
+**Active sub-task: unify the entry history model (must land before the two paths).**
+Today an entry has two overlapping history stores: single-slot
+`previous_password`/`previous_cvv`/`previous_pin` (one previous per secret field, expiry-purged,
+"Password history" screen) + unbounded `meta.history` (multiple-per-field, sync-only, "Previous
+state" screen). Two buttons, two models = slop. Mainstream keeps ONE per-entry history
+(Bitwarden: last-5 values; KeePassXC: full snapshots). Agreed: ONE store, ONE "History" button,
+**one previous value per field** (overwritten each change). Secret fields keep expiry-purge;
+non-secret kept until deleted. `previous_*` fold into `meta.history`. Reshape v9 in place
+(unreleased; alpha.10 shipped v8); regenerate v9 fixtures. Security-screen copy updated (setting
+governs all secret fields, not just passwords) across all locales.
+Merge history resolution (agreed): history is never its own prompt.
+- Case 1 (field clashes, user picks this|other for the value): history follows that pick.
+- Case 2 (no clash, but the two sides' stored previous value differs): incoming wins.
+Fast-auto-merge base case = incoming always wins.
+
+- [x] Rust: `replace_field_with_history` overwrites one-per-field; fold password/cvv/pin
+      capture into it; migrate v8 `previous_*` on load (done, tested).
+- [x] Rust: removed `previous_*` fields + `PreviousSecret`/`PreviousSecretData` + the
+      revert/clear-password FFIs; purge over unified history; merge keeps local history
+      (dead carry deleted); bridge regenerated; v9 fixtures regenerated. Compiles, clippy
+      clean, fast unit tests green. (Argon2 session/merge tests + v8->v9 gate: run by gate.)
+- [x] Flutter: single History button; password-history screen + FFIs removed;
+      `flutter analyze` clean, full `flutter test` green.
+- [x] Security-screen copy reworded (all 37 locales) to cover all secret fields; history
+      button renamed "Previous state" -> "History"; unused l10n strings dropped.
+      `flutter test` (incl. l10n_test) green.
+
+History unification is code-complete and green in-session (Rust build+clippy+fast tests;
+`flutter analyze`+`flutter test`). Pending the release gate (Argon2 session/merge + v8->v9
+backward-compat), which the maintainer runs. Next: back to the two sync paths below.
+
+**Steps after history (tick off):**
+- [ ] Fast-path toggle (mostly Dart): build decisions for one-sided changes + tombstoned
+      deletes straight from `MergeSummary`, skip the dialog, surface only collisions/folder-
+      conflicts via the existing review dialog; add a Quick-vs-Review choose dialog. Branch at
+      `vault_list_screen.dart:789`; engine unchanged.
 - [ ] Batched apply (perf): the per-decision FFI loop (`vault_list_screen.dart:792-826`)
       reseals the whole vault (Argon2id) once PER decision. Replace with one "apply all" FFI
       that reseals once. Rust+Dart; speeds up both paths.
@@ -159,6 +192,11 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Bugs
+- **Passphrase breakdown legend: "letter" row shows a CJK example.** The caseless-letter
+  category (`_CharType.letter`, catches Lo/Lt/Lm) has a hard-coded example glyph `字`
+  (`password_breakdown_sheet.dart` `_kExample`), shown in the legend even when the passphrase
+  is Latin-only. Looks wrong / confusing. Pick a script-appropriate or neutral example, or
+  hide the row when no caseless letters are present.
 - **Two history screens overlap (cleanup, deferred).** In-app `previousPassword` ("password
   history", typo recovery) and the sync `meta.history` ("Previous state") are separate places
   that both look like "previous values". Relabelled to disambiguate; unify later. Not urgent.
