@@ -68,6 +68,9 @@ Future<MergeSummary> _defaultFastMergeVaultWithKey(
   credentialId: credentialId,
 );
 
+/// Cancel an in-progress granular sync: roll the vault back to its pre-sync state.
+Future<void> _defaultCancelSync() => cancelSync();
+
 /// Apply a whole granular-sync review in one FFI call (one vault re-seal for the
 /// entire review, instead of one per decision).
 Future<void> _defaultApplySyncDecisions({
@@ -231,6 +234,10 @@ class VaultListScreen extends StatefulWidget {
   })
   applySyncDecisions;
 
+  /// Rolls an in-progress granular sync back to the pre-sync state (the review's
+  /// "Cancel sync"). Injectable for tests.
+  final Future<void> Function() cancelSync;
+
   /// Pre-injected YubiKey records. `null` = auto-detect from vault file at
   /// construction time. Pass `[]` to force passphrase-only mode (tests).
   final List<YubikeyRecordData>? yubikeyRecords;
@@ -254,6 +261,7 @@ class VaultListScreen extends StatefulWidget {
     this.alphabetBarPosition,
     this.onAssignFolderFn,
     this.applySyncDecisions = _defaultApplySyncDecisions,
+    this.cancelSync = _defaultCancelSync,
     this.yubikeyRecords,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
@@ -866,6 +874,17 @@ class _VaultListScreenState extends State<VaultListScreen>
       var deletedTitles = const <String>[];
       if (steps.isNotEmpty && mounted) {
         final decisions = await showSyncReview(context: context, steps: steps);
+        if (decisions != null && decisions.cancelled) {
+          // Full cancel: roll the vault back to the pre-sync state, apply nothing.
+          await widget.cancelSync();
+          if (mounted) _loadEntries();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(AppLocalizations.of(context).syncCancelled)),
+            );
+          }
+          return;
+        }
         if (decisions != null) {
           // Apply the whole review in one call: one vault re-seal (Argon2id) for
           // all decisions, instead of one per decision. An interrupted review

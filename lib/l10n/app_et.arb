@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Lisatud",
   "syncSummaryUpdated": "Uuendatud",
   "syncSummaryDeleted": "Kustutatud",
+  "syncStopTitle": "Kas lõpetada ülevaatamine?",
+  "syncStopBody": "Vali, kuidas see sünkroonimine lõpetada.",
+  "syncStopKeepReviewing": "Jätka ülevaatamist",
+  "syncStopCancel": "Tühista sünkroonimine",
+  "syncCancelled": "Sünkroonimine tühistatud.",
 
   "importedEntries": "{count, plural, one{1 kirje imporditud.} other{{count} kirjet imporditud.}}",
   "@importedEntries": {

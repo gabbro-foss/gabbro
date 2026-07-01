@@ -705,6 +705,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncSummaryDeleted => '已删除';
 
   @override
+  String get syncStopTitle => '停止查看？';
+
+  @override
+  String get syncStopBody => '选择如何完成此次同步。';
+
+  @override
+  String get syncStopKeepReviewing => '继续查看';
+
+  @override
+  String get syncStopCancel => '取消同步';
+
+  @override
+  String get syncCancelled => '已取消同步。';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -2619,6 +2634,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get syncSummaryDeleted => '已删除';
 
   @override
+  String get syncStopTitle => '停止查看？';
+
+  @override
+  String get syncStopBody => '选择如何完成此次同步。';
+
+  @override
+  String get syncStopKeepReviewing => '继续查看';
+
+  @override
+  String get syncStopCancel => '取消同步';
+
+  @override
+  String get syncCancelled => '已取消同步。';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -4531,6 +4561,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get syncSummaryDeleted => '已刪除';
+
+  @override
+  String get syncStopTitle => '停止檢視？';
+
+  @override
+  String get syncStopBody => '選擇如何完成這次同步。';
+
+  @override
+  String get syncStopKeepReviewing => '繼續檢視';
+
+  @override
+  String get syncStopCancel => '取消同步';
+
+  @override
+  String get syncCancelled => '已取消同步。';
 
   @override
   String importedEntries(int count) {

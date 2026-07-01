@@ -1513,6 +1513,36 @@ abstract class AppLocalizations {
   /// **'Deleted'**
   String get syncSummaryDeleted;
 
+  /// Title of the bail-out chooser shown when the user stops a granular sync review partway.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop reviewing?'**
+  String get syncStopTitle;
+
+  /// Body of the bail-out chooser: pick cancel, merge-the-rest, or keep reviewing.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how to finish this sync.'**
+  String get syncStopBody;
+
+  /// Bail-out chooser button: dismiss and continue reviewing changes one by one.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep reviewing'**
+  String get syncStopKeepReviewing;
+
+  /// Bail-out chooser button: discard the whole sync and roll back to the pre-sync state.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel sync'**
+  String get syncStopCancel;
+
+  /// Snackbar shown after the user cancels a sync; nothing was changed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync cancelled.'**
+  String get syncCancelled;
+
   /// No description provided for @importedEntries.
   ///
   /// In en, this message translates to:

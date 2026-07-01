@@ -717,6 +717,21 @@ class AppLocalizationsSk extends AppLocalizations {
   String get syncSummaryDeleted => 'Vymazané';
 
   @override
+  String get syncStopTitle => 'Zastaviť kontrolu?';
+
+  @override
+  String get syncStopBody => 'Vyberte, ako dokončiť túto synchronizáciu.';
+
+  @override
+  String get syncStopKeepReviewing => 'Pokračovať v kontrole';
+
+  @override
+  String get syncStopCancel => 'Zrušiť synchronizáciu';
+
+  @override
+  String get syncCancelled => 'Synchronizácia zrušená.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

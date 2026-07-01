@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Pridané",
   "syncSummaryUpdated": "Aktualizované",
   "syncSummaryDeleted": "Vymazané",
+  "syncStopTitle": "Zastaviť kontrolu?",
+  "syncStopBody": "Vyberte, ako dokončiť túto synchronizáciu.",
+  "syncStopKeepReviewing": "Pokračovať v kontrole",
+  "syncStopCancel": "Zrušiť synchronizáciu",
+  "syncCancelled": "Synchronizácia zrušená.",
 
   "importedEntries": "{count, plural, one{Importovaný 1 záznam.} few{Importované {count} záznamy.} other{Importovaných {count} záznamov.}}",
   "@importedEntries": {

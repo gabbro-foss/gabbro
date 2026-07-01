@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Pievienoti",
   "syncSummaryUpdated": "Atjaunināti",
   "syncSummaryDeleted": "Dzēsti",
+  "syncStopTitle": "Pārtraukt pārskatīšanu?",
+  "syncStopBody": "Izvēlieties, kā pabeigt šo sinhronizāciju.",
+  "syncStopKeepReviewing": "Turpināt pārskatīšanu",
+  "syncStopCancel": "Atcelt sinhronizāciju",
+  "syncCancelled": "Sinhronizācija atcelta.",
 
   "importedEntries": "{count, plural, one{1 ieraksts importēts.} other{{count} ieraksti importēti.}}",
   "@importedEntries": {

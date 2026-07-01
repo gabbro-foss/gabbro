@@ -38,6 +38,7 @@ MergeSummary _summary({
 // review (one call for the whole review). Tests assert on the aggregated lists.
 class _Applied {
   bool called = false;
+  bool cancelCalled = false;
   List<SyncFieldResolutionInput> fields = const [];
   List<SyncHistoryReplacementInput> history = const [];
   List<SyncItemDeleteInput> items = const [];
@@ -77,6 +78,9 @@ Widget _buildScreen({
             applied.entryDeletes = entryDeletes;
           }
         },
+    cancelSync: () async {
+      if (applied != null) applied.cancelCalled = true;
+    },
   ),
 );
 
@@ -603,6 +607,65 @@ void main() {
         expect(applied.fields.single.keepIncoming, false);
       },
     );
+
+    testWidgets('cancelling the review rolls back and applies nothing', (
+      tester,
+    ) async {
+      final applied = _Applied();
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(
+            addedEntries: [
+              const AddedEntryItem(id: 'new-1', title: 'Bank login'),
+            ],
+          ),
+          applied: applied,
+        ),
+      );
+      await _startSync(tester);
+      await tester.tap(find.text('Cancel')); // bail button
+      await _settle(tester);
+      await tester.tap(find.text('Cancel sync')); // chooser: discard
+      await _settle(tester);
+
+      expect(applied.cancelCalled, isTrue, reason: 'cancel FFI runs');
+      expect(applied.called, isFalse, reason: 'no decisions applied on cancel');
+      expect(find.textContaining('Sync cancelled'), findsOneWidget);
+    });
+
+    testWidgets('Merge the rest applies remaining changes incoming-wins', (
+      tester,
+    ) async {
+      final applied = _Applied();
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(
+            fieldConflicts: [
+              const FieldConflictItem(
+                id: 'x',
+                title: 'Mail',
+                field: 'username',
+                localValue: 'mine',
+                incomingValue: 'theirs',
+              ),
+            ],
+          ),
+          applied: applied,
+        ),
+      );
+      await _startSync(tester);
+      await tester.tap(find.text('Cancel')); // bail button
+      await _settle(tester);
+      await tester.tap(find.text('Merge automatically')); // finish rest fast
+      await _settle(tester);
+
+      expect(applied.cancelCalled, isFalse, reason: 'this commits, not cancels');
+      expect(applied.called, isTrue, reason: 'decisions applied once');
+      expect(applied.history.single.field, 'username');
+      expect(applied.history.single.newValue, 'theirs');
+    });
 
     testWidgets('a new entry can be dropped', (tester) async {
       final applied = _Applied();

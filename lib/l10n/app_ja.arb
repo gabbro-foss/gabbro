@@ -277,6 +277,11 @@
   "syncSummaryAdded": "追加",
   "syncSummaryUpdated": "更新",
   "syncSummaryDeleted": "削除",
+  "syncStopTitle": "確認を中止しますか？",
+  "syncStopBody": "この同期の完了方法を選択してください。",
+  "syncStopKeepReviewing": "確認を続ける",
+  "syncStopCancel": "同期をキャンセル",
+  "syncCancelled": "同期をキャンセルしました。",
 
   "importedEntries": "{count, plural, other{{count}件のエントリをインポートしました。}}",
   "@importedEntries": {

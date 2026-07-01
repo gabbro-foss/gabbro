@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Toegevoegd",
   "syncSummaryUpdated": "Bijgewerkt",
   "syncSummaryDeleted": "Verwijderd",
+  "syncStopTitle": "Controle stoppen?",
+  "syncStopBody": "Kies hoe je deze synchronisatie wilt afronden.",
+  "syncStopKeepReviewing": "Doorgaan met controleren",
+  "syncStopCancel": "Synchronisatie annuleren",
+  "syncCancelled": "Synchronisatie geannuleerd.",
 
   "importedEntries": "{count, plural, one{1 item geïmporteerd.} other{{count} items geïmporteerd.}}",
   "@importedEntries": {

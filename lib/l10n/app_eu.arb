@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Gehituta",
   "syncSummaryUpdated": "Eguneratuta",
   "syncSummaryDeleted": "Ezabatuta",
+  "syncStopTitle": "Berrikuspena gelditu?",
+  "syncStopBody": "Aukeratu sinkronizazio hau nola amaitu.",
+  "syncStopKeepReviewing": "Jarraitu berrikusten",
+  "syncStopCancel": "Utzi sinkronizazioa",
+  "syncCancelled": "Sinkronizazioa bertan behera utzita.",
 
   "importedEntries": "{count, plural, one{1 sarrera inportatu da.} other{{count} sarrera inportatu dira.}}",
   "@importedEntries": {

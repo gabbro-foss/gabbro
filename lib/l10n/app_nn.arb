@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Lagt til",
   "syncSummaryUpdated": "Oppdatert",
   "syncSummaryDeleted": "Sletta",
+  "syncStopTitle": "Avslutte gjennomgangen?",
+  "syncStopBody": "Vel korleis denne synkroniseringa skal fullførast.",
+  "syncStopKeepReviewing": "Hald fram gjennomgangen",
+  "syncStopCancel": "Avbryt synkronisering",
+  "syncCancelled": "Synkronisering avbroten.",
 
   "importedEntries": "{count, plural, one{1 oppføring importert.} other{{count} oppføringer importerte.}}",
   "@importedEntries": {

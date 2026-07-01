@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Lisätty",
   "syncSummaryUpdated": "Päivitetty",
   "syncSummaryDeleted": "Poistettu",
+  "syncStopTitle": "Lopetetaanko tarkistus?",
+  "syncStopBody": "Valitse, miten tämä synkronointi viimeistellään.",
+  "syncStopKeepReviewing": "Jatka tarkistusta",
+  "syncStopCancel": "Peruuta synkronointi",
+  "syncCancelled": "Synkronointi peruutettu.",
 
   "importedEntries": "{count, plural, one{1 merkintä tuotu.} other{{count} merkintää tuotu.}}",
   "@importedEntries": {

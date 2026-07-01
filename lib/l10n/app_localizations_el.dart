@@ -719,6 +719,21 @@ class AppLocalizationsEl extends AppLocalizations {
   String get syncSummaryDeleted => 'Διαγράφηκαν';
 
   @override
+  String get syncStopTitle => 'Διακοπή ελέγχου;';
+
+  @override
+  String get syncStopBody => 'Επιλέξτε πώς θα ολοκληρωθεί ο συγχρονισμός.';
+
+  @override
+  String get syncStopKeepReviewing => 'Συνέχεια ελέγχου';
+
+  @override
+  String get syncStopCancel => 'Ακύρωση συγχρονισμού';
+
+  @override
+  String get syncCancelled => 'Ο συγχρονισμός ακυρώθηκε.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

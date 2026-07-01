@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Hozzáadva",
   "syncSummaryUpdated": "Frissítve",
   "syncSummaryDeleted": "Törölve",
+  "syncStopTitle": "Megszakítja az áttekintést?",
+  "syncStopBody": "Válassza ki, hogyan fejezze be a szinkronizálást.",
+  "syncStopKeepReviewing": "Áttekintés folytatása",
+  "syncStopCancel": "Szinkronizálás megszakítása",
+  "syncCancelled": "Szinkronizálás megszakítva.",
 
   "importedEntries": "{count, plural, one{1 bejegyzés importálva.} other{{count} bejegyzés importálva.}}",
   "@importedEntries": {

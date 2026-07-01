@@ -716,6 +716,21 @@ class AppLocalizationsEu extends AppLocalizations {
   String get syncSummaryDeleted => 'Ezabatuta';
 
   @override
+  String get syncStopTitle => 'Berrikuspena gelditu?';
+
+  @override
+  String get syncStopBody => 'Aukeratu sinkronizazio hau nola amaitu.';
+
+  @override
+  String get syncStopKeepReviewing => 'Jarraitu berrikusten';
+
+  @override
+  String get syncStopCancel => 'Utzi sinkronizazioa';
+
+  @override
+  String get syncCancelled => 'Sinkronizazioa bertan behera utzita.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

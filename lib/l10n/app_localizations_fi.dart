@@ -717,6 +717,21 @@ class AppLocalizationsFi extends AppLocalizations {
   String get syncSummaryDeleted => 'Poistettu';
 
   @override
+  String get syncStopTitle => 'Lopetetaanko tarkistus?';
+
+  @override
+  String get syncStopBody => 'Valitse, miten tämä synkronointi viimeistellään.';
+
+  @override
+  String get syncStopKeepReviewing => 'Jatka tarkistusta';
+
+  @override
+  String get syncStopCancel => 'Peruuta synkronointi';
+
+  @override
+  String get syncCancelled => 'Synkronointi peruutettu.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

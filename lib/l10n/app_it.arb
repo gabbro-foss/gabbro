@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Aggiunti",
   "syncSummaryUpdated": "Aggiornati",
   "syncSummaryDeleted": "Eliminati",
+  "syncStopTitle": "Interrompere la revisione?",
+  "syncStopBody": "Scegli come completare questa sincronizzazione.",
+  "syncStopKeepReviewing": "Continua la revisione",
+  "syncStopCancel": "Annulla sincronizzazione",
+  "syncCancelled": "Sincronizzazione annullata.",
 
   "importedEntries": "{count, plural, one{1 voce importata.} other{{count} voci importate.}}",
   "@importedEntries": {

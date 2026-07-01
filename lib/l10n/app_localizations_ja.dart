@@ -707,6 +707,21 @@ class AppLocalizationsJa extends AppLocalizations {
   String get syncSummaryDeleted => '削除';
 
   @override
+  String get syncStopTitle => '確認を中止しますか？';
+
+  @override
+  String get syncStopBody => 'この同期の完了方法を選択してください。';
+
+  @override
+  String get syncStopKeepReviewing => '確認を続ける';
+
+  @override
+  String get syncStopCancel => '同期をキャンセル';
+
+  @override
+  String get syncCancelled => '同期をキャンセルしました。';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

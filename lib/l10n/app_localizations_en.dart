@@ -714,6 +714,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncSummaryDeleted => 'Deleted';
 
   @override
+  String get syncStopTitle => 'Stop reviewing?';
+
+  @override
+  String get syncStopBody => 'Choose how to finish this sync.';
+
+  @override
+  String get syncStopKeepReviewing => 'Keep reviewing';
+
+  @override
+  String get syncStopCancel => 'Cancel sync';
+
+  @override
+  String get syncCancelled => 'Sync cancelled.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

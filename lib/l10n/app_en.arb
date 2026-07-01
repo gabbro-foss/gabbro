@@ -330,6 +330,26 @@
   "@syncSummaryDeleted": {
     "description": "Group heading for entries deleted by the sync; followed by a count in parentheses."
   },
+  "syncStopTitle": "Stop reviewing?",
+  "@syncStopTitle": {
+    "description": "Title of the bail-out chooser shown when the user stops a granular sync review partway."
+  },
+  "syncStopBody": "Choose how to finish this sync.",
+  "@syncStopBody": {
+    "description": "Body of the bail-out chooser: pick cancel, merge-the-rest, or keep reviewing."
+  },
+  "syncStopKeepReviewing": "Keep reviewing",
+  "@syncStopKeepReviewing": {
+    "description": "Bail-out chooser button: dismiss and continue reviewing changes one by one."
+  },
+  "syncStopCancel": "Cancel sync",
+  "@syncStopCancel": {
+    "description": "Bail-out chooser button: discard the whole sync and roll back to the pre-sync state."
+  },
+  "syncCancelled": "Sync cancelled.",
+  "@syncCancelled": {
+    "description": "Snackbar shown after the user cancels a sync; nothing was changed."
+  },
 
   "importedEntries": "{count, plural, one{Imported 1 entry.} other{Imported {count} entries.}}",
   "@importedEntries": {

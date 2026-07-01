@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Àfikún",
   "syncSummaryUpdated": "Ìmúdójúìwọ̀n",
   "syncSummaryDeleted": "Pípa",
+  "syncStopTitle": "Dá àyẹ̀wò dúró?",
+  "syncStopBody": "Yan bí o ṣe fẹ́ parí ìṣọ̀kan yìí.",
+  "syncStopKeepReviewing": "Máa bá àyẹ̀wò lọ",
+  "syncStopCancel": "Fagilé ìṣọ̀kan",
+  "syncCancelled": "A ti fagilé ìṣọ̀kan.",
 
   "importedEntries": "{count, plural, other{A mu awọn titẹ sii {count} wọle.}}",
   "@importedEntries": {

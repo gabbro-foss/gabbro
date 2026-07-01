@@ -715,6 +715,21 @@ class AppLocalizationsSv extends AppLocalizations {
   String get syncSummaryDeleted => 'Borttagna';
 
   @override
+  String get syncStopTitle => 'Avbryta granskningen?';
+
+  @override
+  String get syncStopBody => 'Välj hur den här synkroniseringen ska slutföras.';
+
+  @override
+  String get syncStopKeepReviewing => 'Fortsätt granska';
+
+  @override
+  String get syncStopCancel => 'Avbryt synkronisering';
+
+  @override
+  String get syncCancelled => 'Synkronisering avbruten.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

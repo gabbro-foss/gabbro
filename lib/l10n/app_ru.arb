@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Добавлено",
   "syncSummaryUpdated": "Обновлено",
   "syncSummaryDeleted": "Удалено",
+  "syncStopTitle": "Остановить просмотр?",
+  "syncStopBody": "Выберите, как завершить эту синхронизацию.",
+  "syncStopKeepReviewing": "Продолжить просмотр",
+  "syncStopCancel": "Отменить синхронизацию",
+  "syncCancelled": "Синхронизация отменена.",
 
   "importedEntries": "{count, plural, one{Импортирована 1 запись.} few{Импортированы {count} записи.} other{Импортировано {count} записей.}}",
   "@importedEntries": {

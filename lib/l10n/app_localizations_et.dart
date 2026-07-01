@@ -716,6 +716,21 @@ class AppLocalizationsEt extends AppLocalizations {
   String get syncSummaryDeleted => 'Kustutatud';
 
   @override
+  String get syncStopTitle => 'Kas lõpetada ülevaatamine?';
+
+  @override
+  String get syncStopBody => 'Vali, kuidas see sünkroonimine lõpetada.';
+
+  @override
+  String get syncStopKeepReviewing => 'Jätka ülevaatamist';
+
+  @override
+  String get syncStopCancel => 'Tühista sünkroonimine';
+
+  @override
+  String get syncCancelled => 'Sünkroonimine tühistatud.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

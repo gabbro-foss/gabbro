@@ -279,6 +279,50 @@ void main() {
     expect(d!.deleted, 1);
   });
 
+  testWidgets('Cancel sync returns cancelled decisions', (tester) async {
+    SyncReviewDecisions? d;
+    await openReview(
+      tester,
+      _summary(addedEntries: [const AddedEntryItem(id: 'n', title: 'New')]),
+      (r) => d = r,
+    );
+    await tester.tap(find.text('Cancel')); // bail button in the review
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancel sync')); // chooser: discard everything
+    await tester.pumpAndSettle();
+    expect(d!.cancelled, isTrue);
+  });
+
+  testWidgets('Merge the rest resolves undecided clashes incoming-wins', (
+    tester,
+  ) async {
+    SyncReviewDecisions? d;
+    await openReview(
+      tester,
+      _summary(
+        fieldConflicts: [
+          const FieldConflictItem(
+            id: 'x',
+            title: 'Mail',
+            field: 'username',
+            localValue: 'mine',
+            incomingValue: 'theirs',
+          ),
+        ],
+      ),
+      (r) => d = r,
+    );
+    await tester.tap(find.text('Cancel')); // bail
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Merge automatically')); // finish the rest fast
+    await tester.pumpAndSettle();
+    expect(d!.cancelled, isFalse);
+    // The undecided clash is resolved to theirs, losing local kept in history.
+    expect(d!.historyReplacements.single.field, 'username');
+    expect(d!.historyReplacements.single.newValue, 'theirs');
+    expect(d!.historyReplacements.single.replacedValue, 'mine');
+  });
+
   testWidgets('moving an entry to the incoming folder marks it updated', (
     tester,
   ) async {

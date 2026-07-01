@@ -197,6 +197,10 @@ class SyncReviewDecisions {
   final List<String> updatedTitles;
   final List<String> deletedTitles;
 
+  /// True when the user cancelled the whole sync from the review. The caller must
+  /// then roll back to the pre-sync state (apply nothing).
+  final bool cancelled;
+
   const SyncReviewDecisions({
     this.fieldResolutions = const [],
     this.historyReplacements = const [],
@@ -209,6 +213,7 @@ class SyncReviewDecisions {
     this.addedTitles = const [],
     this.updatedTitles = const [],
     this.deletedTitles = const [],
+    this.cancelled = false,
   });
 }
 
@@ -330,7 +335,10 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
     }),
   );
 
-  void _finish() {
+  /// Build and return the decisions. [fastRest] resolves every step the user has
+  /// NOT explicitly decided in favour of the incoming vault (the "merge the rest
+  /// automatically" bail-out); hand-made picks are always honoured.
+  void _finish({bool fastRest = false}) {
     final fields = <SyncFieldResolution>[];
     final history = <SyncHistoryReplacement>[];
     final items = <SyncItemDeleteResolution>[];
@@ -343,6 +351,7 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
     for (final step in widget.steps) {
       switch (step.kind) {
         case SyncStepKind.newEntry:
+          // Both modes keep a new entry unless the user chose Skip.
           if (_keepNewEntry[step.id] == false) {
             entryDeletes.add(step.id);
           } else {
@@ -350,7 +359,8 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
           }
           break;
         case SyncStepKind.deleteEntry:
-          if (_confirmEntryDelete[step.id] == true) {
+          // Fast-rest applies the incoming delete; normal keeps unless confirmed.
+          if (_confirmEntryDelete[step.id] ?? fastRest) {
             entryDeletes.add(step.id);
             deletedTitles.add(step.title);
           }
@@ -379,7 +389,8 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
             }
           }
           for (final c in step.conflicts) {
-            final useTheirs = _conflictUseTheirs[_k(c.id, c.field)] ?? false;
+            // Undecided clashes take theirs under fast-rest, mine otherwise.
+            final useTheirs = _conflictUseTheirs[_k(c.id, c.field)] ?? fastRest;
             if (useTheirs) {
               // Apply theirs; keep the losing local value in history.
               stepChanged = true;
@@ -393,13 +404,16 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
             }
           }
           for (final d in step.itemDeletes) {
-            final del = _deleteItem[_k(d.id, d.field)] ?? false;
+            // Undecided item-deletes apply the incoming delete under fast-rest.
+            final del = _deleteItem[_k(d.id, d.field)] ?? fastRest;
             if (del) stepChanged = true;
             items.add(SyncItemDeleteResolution(d.id, d.field, del));
           }
           final fc = step.folderConflict;
           if (fc != null) {
-            final chosen = _folderChoice[step.id] ?? fc.localFolder;
+            // Undecided folder clashes take the incoming folder under fast-rest.
+            final chosen = _folderChoice[step.id] ??
+                (fastRest ? fc.incomingFolder : fc.localFolder);
             if (chosen != fc.localFolder) stepChanged = true;
             folders.add(SyncFolderResolution(fc.id, chosen));
           }
@@ -421,6 +435,42 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
         addedTitles: addedTitles,
         updatedTitles: updatedTitles,
         deletedTitles: deletedTitles,
+      ),
+    );
+  }
+
+  /// Bail-out chooser: stop stepping through and either cancel the whole sync or
+  /// merge everything remaining automatically (incoming wins). "Keep reviewing"
+  /// just dismisses the chooser.
+  Future<void> _bail() async {
+    final l = AppLocalizations.of(context);
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.syncStopTitle),
+        content: Text(l.syncStopBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l.syncStopKeepReviewing),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _finish(fastRest: true);
+            },
+            child: Text(l.syncMergeAutomatically),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              Navigator.of(
+                context,
+              ).pop(const SyncReviewDecisions(cancelled: true));
+            },
+            child: Text(l.syncStopCancel),
+          ),
+        ],
       ),
     );
   }
@@ -447,6 +497,7 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
         ),
       ),
       actions: [
+        TextButton(onPressed: _bail, child: Text(l.cancel)),
         TextButton(
           onPressed: canAdvance
               ? (isLast ? _finish : () => setState(() => _index++))

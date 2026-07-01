@@ -715,6 +715,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String get syncSummaryDeleted => 'Törölve';
 
   @override
+  String get syncStopTitle => 'Megszakítja az áttekintést?';
+
+  @override
+  String get syncStopBody =>
+      'Válassza ki, hogyan fejezze be a szinkronizálást.';
+
+  @override
+  String get syncStopKeepReviewing => 'Áttekintés folytatása';
+
+  @override
+  String get syncStopCancel => 'Szinkronizálás megszakítása';
+
+  @override
+  String get syncCancelled => 'Szinkronizálás megszakítva.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

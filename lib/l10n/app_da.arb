@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Tilføjet",
   "syncSummaryUpdated": "Opdateret",
   "syncSummaryDeleted": "Slettet",
+  "syncStopTitle": "Stop gennemgang?",
+  "syncStopBody": "Vælg, hvordan denne synkronisering skal afsluttes.",
+  "syncStopKeepReviewing": "Fortsæt gennemgang",
+  "syncStopCancel": "Annullér synkronisering",
+  "syncCancelled": "Synkronisering annulleret.",
 
   "importedEntries": "{count, plural, one{1 post importeret.} other{{count} poster importeret.}}",
   "@importedEntries": {

@@ -714,6 +714,21 @@ class AppLocalizationsKk extends AppLocalizations {
   String get syncSummaryDeleted => 'Жойылды';
 
   @override
+  String get syncStopTitle => 'Қарауды тоқтату керек пе?';
+
+  @override
+  String get syncStopBody => 'Осы синхрондауды қалай аяқтауды таңдаңыз.';
+
+  @override
+  String get syncStopKeepReviewing => 'Қарауды жалғастыру';
+
+  @override
+  String get syncStopCancel => 'Синхрондаудан бас тарту';
+
+  @override
+  String get syncCancelled => 'Синхрондау тоқтатылды.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

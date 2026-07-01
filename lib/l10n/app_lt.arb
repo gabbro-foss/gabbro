@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Pridėta",
   "syncSummaryUpdated": "Atnaujinta",
   "syncSummaryDeleted": "Ištrinta",
+  "syncStopTitle": "Stabdyti peržiūrą?",
+  "syncStopBody": "Pasirinkite, kaip užbaigti šį sinchronizavimą.",
+  "syncStopKeepReviewing": "Tęsti peržiūrą",
+  "syncStopCancel": "Atšaukti sinchronizavimą",
+  "syncCancelled": "Sinchronizavimas atšauktas.",
 
   "importedEntries": "{count, plural, one{1 įrašas importuotas.} other{{count} įrašai importuoti.}}",
   "@importedEntries": {

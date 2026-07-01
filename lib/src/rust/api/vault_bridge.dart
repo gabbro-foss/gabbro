@@ -370,6 +370,13 @@ Future<void> applySyncDecisions({
   entryDeletes: entryDeletes,
 );
 
+/// Cancel an in-progress granular sync: roll the session and the vault file back
+/// to the pre-sync snapshot the merge took, discarding the additive merge and any
+/// partial review picks. No-op if no sync is in progress. Persists (async — a
+/// single vault save).
+Future<void> cancelSync() =>
+    RustLib.instance.api.crateApiVaultBridgeCancelSync();
+
 /// Restore a recovery-history record (`index` into the entry's history): set its
 /// field back to the saved value and remove the record. Persists.
 Future<void> restoreHistory({required String id, required int index}) => RustLib

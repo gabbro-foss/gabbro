@@ -1806,6 +1806,20 @@ mod tests {
     }
 
     #[test]
+    fn update_entry_stamps_field_time_when_scalar_cleared_to_empty() {
+        // Clearing a field (value -> "") is a real edit and must be stamped, so a
+        // later sync can tell the clear apart from an untouched field.
+        let mut entries = vec![note_with("id-1", "Title", "old")];
+        let updated = note_with("id-1", "Title", "");
+        update_entry(&mut entries, updated, None).unwrap();
+        let times = note_field_times(&entries[0]);
+        assert!(
+            times.contains_key("content"),
+            "clearing a field to empty must stamp it as changed"
+        );
+    }
+
+    #[test]
     fn update_entry_does_not_stamp_unchanged_scalar() {
         let mut entries = vec![note_with("id-1", "Title", "old")];
         let updated = note_with("id-1", "Title", "new");

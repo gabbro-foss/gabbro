@@ -707,6 +707,21 @@ class AppLocalizationsKo extends AppLocalizations {
   String get syncSummaryDeleted => '삭제됨';
 
   @override
+  String get syncStopTitle => '검토를 중지할까요?';
+
+  @override
+  String get syncStopBody => '이 동기화를 완료할 방법을 선택하세요.';
+
+  @override
+  String get syncStopKeepReviewing => '검토 계속';
+
+  @override
+  String get syncStopCancel => '동기화 취소';
+
+  @override
+  String get syncCancelled => '동기화가 취소되었습니다.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

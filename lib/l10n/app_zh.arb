@@ -277,6 +277,11 @@
   "syncSummaryAdded": "已添加",
   "syncSummaryUpdated": "已更新",
   "syncSummaryDeleted": "已删除",
+  "syncStopTitle": "停止查看？",
+  "syncStopBody": "选择如何完成此次同步。",
+  "syncStopKeepReviewing": "继续查看",
+  "syncStopCancel": "取消同步",
+  "syncCancelled": "已取消同步。",
 
   "importedEntries": "{count, plural, other{已导入 {count} 个条目。}}",
   "@importedEntries": {

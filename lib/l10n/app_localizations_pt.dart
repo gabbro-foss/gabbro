@@ -716,6 +716,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get syncSummaryDeleted => 'Excluídos';
 
   @override
+  String get syncStopTitle => 'Parar a revisão?';
+
+  @override
+  String get syncStopBody => 'Escolha como concluir esta sincronização.';
+
+  @override
+  String get syncStopKeepReviewing => 'Continuar a rever';
+
+  @override
+  String get syncStopCancel => 'Cancelar sincronização';
+
+  @override
+  String get syncCancelled => 'Sincronização cancelada.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -2724,6 +2739,21 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get syncSummaryDeleted => 'Excluídos';
 
   @override
+  String get syncStopTitle => 'Parar a revisão?';
+
+  @override
+  String get syncStopBody => 'Escolha como concluir esta sincronização.';
+
+  @override
+  String get syncStopKeepReviewing => 'Continuar revisando';
+
+  @override
+  String get syncStopCancel => 'Cancelar sincronização';
+
+  @override
+  String get syncCancelled => 'Sincronização cancelada.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -4727,6 +4757,21 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get syncSummaryDeleted => 'Eliminados';
+
+  @override
+  String get syncStopTitle => 'Parar a revisão?';
+
+  @override
+  String get syncStopBody => 'Escolha como concluir esta sincronização.';
+
+  @override
+  String get syncStopKeepReviewing => 'Continuar a rever';
+
+  @override
+  String get syncStopCancel => 'Cancelar sincronização';
+
+  @override
+  String get syncCancelled => 'Sincronização cancelada.';
 
   @override
   String importedEntries(int count) {

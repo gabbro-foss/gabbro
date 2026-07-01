@@ -277,6 +277,11 @@
   "syncSummaryAdded": "추가됨",
   "syncSummaryUpdated": "업데이트됨",
   "syncSummaryDeleted": "삭제됨",
+  "syncStopTitle": "검토를 중지할까요?",
+  "syncStopBody": "이 동기화를 완료할 방법을 선택하세요.",
+  "syncStopKeepReviewing": "검토 계속",
+  "syncStopCancel": "동기화 취소",
+  "syncCancelled": "동기화가 취소되었습니다.",
 
   "importedEntries": "{count, plural, other{{count}개의 항목을 가져왔습니다.}}",
   "@importedEntries": {

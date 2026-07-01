@@ -717,6 +717,21 @@ class AppLocalizationsLt extends AppLocalizations {
   String get syncSummaryDeleted => 'Ištrinta';
 
   @override
+  String get syncStopTitle => 'Stabdyti peržiūrą?';
+
+  @override
+  String get syncStopBody => 'Pasirinkite, kaip užbaigti šį sinchronizavimą.';
+
+  @override
+  String get syncStopKeepReviewing => 'Tęsti peržiūrą';
+
+  @override
+  String get syncStopCancel => 'Atšaukti sinchronizavimą';
+
+  @override
+  String get syncCancelled => 'Sinchronizavimas atšauktas.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Добавени",
   "syncSummaryUpdated": "Актуализирани",
   "syncSummaryDeleted": "Изтрити",
+  "syncStopTitle": "Да се спре ли прегледът?",
+  "syncStopBody": "Изберете как да завършите тази синхронизация.",
+  "syncStopKeepReviewing": "Продължи прегледа",
+  "syncStopCancel": "Отказ на синхронизацията",
+  "syncCancelled": "Синхронизацията е отменена.",
 
   "importedEntries": "{count, plural, one{Импортиран 1 запис.} other{Импортирани {count} записа.}}",
   "@importedEntries": {

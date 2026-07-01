@@ -715,6 +715,22 @@ class AppLocalizationsNn extends AppLocalizations {
   String get syncSummaryDeleted => 'Sletta';
 
   @override
+  String get syncStopTitle => 'Avslutte gjennomgangen?';
+
+  @override
+  String get syncStopBody =>
+      'Vel korleis denne synkroniseringa skal fullførast.';
+
+  @override
+  String get syncStopKeepReviewing => 'Hald fram gjennomgangen';
+
+  @override
+  String get syncStopCancel => 'Avbryt synkronisering';
+
+  @override
+  String get syncCancelled => 'Synkronisering avbroten.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

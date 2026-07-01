@@ -714,6 +714,22 @@ class AppLocalizationsDa extends AppLocalizations {
   String get syncSummaryDeleted => 'Slettet';
 
   @override
+  String get syncStopTitle => 'Stop gennemgang?';
+
+  @override
+  String get syncStopBody =>
+      'Vælg, hvordan denne synkronisering skal afsluttes.';
+
+  @override
+  String get syncStopKeepReviewing => 'Fortsæt gennemgang';
+
+  @override
+  String get syncStopCancel => 'Annullér synkronisering';
+
+  @override
+  String get syncCancelled => 'Synkronisering annulleret.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

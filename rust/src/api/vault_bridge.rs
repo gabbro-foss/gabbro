@@ -902,6 +902,14 @@ pub async fn apply_sync_decisions(
     )
 }
 
+/// Cancel an in-progress granular sync: roll the session and the vault file back
+/// to the pre-sync snapshot the merge took, discarding the additive merge and any
+/// partial review picks. No-op if no sync is in progress. Persists (async — a
+/// single vault save).
+pub async fn cancel_sync() -> Result<(), String> {
+    session::session_cancel_sync()
+}
+
 /// Restore a recovery-history record (`index` into the entry's history): set its
 /// field back to the saved value and remove the record. Persists.
 pub async fn restore_history(id: String, index: u32) -> Result<(), String> {

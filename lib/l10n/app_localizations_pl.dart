@@ -718,6 +718,21 @@ class AppLocalizationsPl extends AppLocalizations {
   String get syncSummaryDeleted => 'Usunięto';
 
   @override
+  String get syncStopTitle => 'Zatrzymać przeglądanie?';
+
+  @override
+  String get syncStopBody => 'Wybierz, jak zakończyć tę synchronizację.';
+
+  @override
+  String get syncStopKeepReviewing => 'Kontynuuj przeglądanie';
+
+  @override
+  String get syncStopCancel => 'Anuluj synchronizację';
+
+  @override
+  String get syncCancelled => 'Synchronizacja anulowana.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

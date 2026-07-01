@@ -717,6 +717,21 @@ class AppLocalizationsCs extends AppLocalizations {
   String get syncSummaryDeleted => 'Smazáno';
 
   @override
+  String get syncStopTitle => 'Ukončit kontrolu?';
+
+  @override
+  String get syncStopBody => 'Zvolte, jak dokončit tuto synchronizaci.';
+
+  @override
+  String get syncStopKeepReviewing => 'Pokračovat v kontrole';
+
+  @override
+  String get syncStopCancel => 'Zrušit synchronizaci';
+
+  @override
+  String get syncCancelled => 'Synchronizace zrušena.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

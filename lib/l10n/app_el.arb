@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Προστέθηκαν",
   "syncSummaryUpdated": "Ενημερώθηκαν",
   "syncSummaryDeleted": "Διαγράφηκαν",
+  "syncStopTitle": "Διακοπή ελέγχου;",
+  "syncStopBody": "Επιλέξτε πώς θα ολοκληρωθεί ο συγχρονισμός.",
+  "syncStopKeepReviewing": "Συνέχεια ελέγχου",
+  "syncStopCancel": "Ακύρωση συγχρονισμού",
+  "syncCancelled": "Ο συγχρονισμός ακυρώθηκε.",
 
   "importedEntries": "{count, plural, one{Εισήχθη 1 καταχώριση.} other{Εισήχθησαν {count} καταχωρίσεις.}}",
   "@importedEntries": {

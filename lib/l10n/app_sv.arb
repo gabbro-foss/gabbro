@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Tillagda",
   "syncSummaryUpdated": "Uppdaterade",
   "syncSummaryDeleted": "Borttagna",
+  "syncStopTitle": "Avbryta granskningen?",
+  "syncStopBody": "Välj hur den här synkroniseringen ska slutföras.",
+  "syncStopKeepReviewing": "Fortsätt granska",
+  "syncStopCancel": "Avbryt synkronisering",
+  "syncCancelled": "Synkronisering avbruten.",
 
   "importedEntries": "{count, plural, one{1 post importerad.} other{{count} poster importerade.}}",
   "@importedEntries": {

@@ -717,6 +717,21 @@ class AppLocalizationsRu extends AppLocalizations {
   String get syncSummaryDeleted => 'Удалено';
 
   @override
+  String get syncStopTitle => 'Остановить просмотр?';
+
+  @override
+  String get syncStopBody => 'Выберите, как завершить эту синхронизацию.';
+
+  @override
+  String get syncStopKeepReviewing => 'Продолжить просмотр';
+
+  @override
+  String get syncStopCancel => 'Отменить синхронизацию';
+
+  @override
+  String get syncCancelled => 'Синхронизация отменена.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

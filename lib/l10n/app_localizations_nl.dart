@@ -717,6 +717,21 @@ class AppLocalizationsNl extends AppLocalizations {
   String get syncSummaryDeleted => 'Verwijderd';
 
   @override
+  String get syncStopTitle => 'Controle stoppen?';
+
+  @override
+  String get syncStopBody => 'Kies hoe je deze synchronisatie wilt afronden.';
+
+  @override
+  String get syncStopKeepReviewing => 'Doorgaan met controleren';
+
+  @override
+  String get syncStopCancel => 'Synchronisatie annuleren';
+
+  @override
+  String get syncCancelled => 'Synchronisatie geannuleerd.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

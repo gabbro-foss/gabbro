@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Додано",
   "syncSummaryUpdated": "Оновлено",
   "syncSummaryDeleted": "Видалено",
+  "syncStopTitle": "Зупинити перегляд?",
+  "syncStopBody": "Виберіть, як завершити цю синхронізацію.",
+  "syncStopKeepReviewing": "Продовжити перегляд",
+  "syncStopCancel": "Скасувати синхронізацію",
+  "syncCancelled": "Синхронізацію скасовано.",
 
   "importedEntries": "{count, plural, one{Імпортовано 1 запис.} few{Імпортовано {count} записи.} other{Імпортовано {count} записів.}}",
   "@importedEntries": {

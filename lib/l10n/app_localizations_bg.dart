@@ -717,6 +717,21 @@ class AppLocalizationsBg extends AppLocalizations {
   String get syncSummaryDeleted => 'Изтрити';
 
   @override
+  String get syncStopTitle => 'Да се спре ли прегледът?';
+
+  @override
+  String get syncStopBody => 'Изберете как да завършите тази синхронизация.';
+
+  @override
+  String get syncStopKeepReviewing => 'Продължи прегледа';
+
+  @override
+  String get syncStopCancel => 'Отказ на синхронизацията';
+
+  @override
+  String get syncCancelled => 'Синхронизацията е отменена.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

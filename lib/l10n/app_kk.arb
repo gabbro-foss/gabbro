@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Қосылды",
   "syncSummaryUpdated": "Жаңартылды",
   "syncSummaryDeleted": "Жойылды",
+  "syncStopTitle": "Қарауды тоқтату керек пе?",
+  "syncStopBody": "Осы синхрондауды қалай аяқтауды таңдаңыз.",
+  "syncStopKeepReviewing": "Қарауды жалғастыру",
+  "syncStopCancel": "Синхрондаудан бас тарту",
+  "syncCancelled": "Синхрондау тоқтатылды.",
 
   "importedEntries": "{count, plural, other{{count} жазба импортталды.}}",
   "@importedEntries": {

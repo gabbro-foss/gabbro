@@ -717,6 +717,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get syncSummaryDeleted => 'Supprimés';
 
   @override
+  String get syncStopTitle => 'Arrêter la vérification ?';
+
+  @override
+  String get syncStopBody =>
+      'Choisissez comment terminer cette synchronisation.';
+
+  @override
+  String get syncStopKeepReviewing => 'Continuer la vérification';
+
+  @override
+  String get syncStopCancel => 'Annuler la synchronisation';
+
+  @override
+  String get syncCancelled => 'Synchronisation annulée.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

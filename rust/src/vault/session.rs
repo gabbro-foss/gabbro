@@ -46,6 +46,16 @@ pub struct YubikeyMaterial {
     pub wrapping_key: Option<Zeroizing<[u8; 32]>>,
 }
 
+/// Pre-sync snapshot kept for the duration of a granular review so the user can
+/// fully cancel. Holds the exact state from just before the merge mutated the
+/// session. `entries` are `ZeroizeOnDrop`, so dropping the backup (on finish or
+/// cancel) wipes the plaintext copy. Purely in-memory - never written to disk.
+pub(crate) struct SyncBackup {
+    folders: Vec<String>,
+    entries: Vec<VaultEntry>,
+    deleted_ids: Vec<DeletedEntry>,
+}
+
 pub struct VaultSession {
     pub folders: Vec<String>,
     pub entries: Vec<VaultEntry>,
@@ -57,6 +67,9 @@ pub struct VaultSession {
     pub yubikey_aliases: std::collections::HashMap<String, String>,
     /// Tombstones for intentionally deleted entries, propagated during vault sync.
     pub deleted_ids: Vec<DeletedEntry>,
+    /// Snapshot taken before a granular-sync merge, so the review can be cancelled
+    /// back to the pre-sync state. `None` outside an in-progress granular sync.
+    pub(crate) pre_sync_backup: Option<SyncBackup>,
 }
 
 static VAULT_SESSION: LazyLock<Mutex<Option<VaultSession>>> = LazyLock::new(|| Mutex::new(None));
@@ -78,6 +91,7 @@ pub fn unlock_vault(passphrase: &[u8], path: PathBuf) -> Result<(), String> {
         path,
         passphrase: Zeroizing::new(passphrase.to_vec()),
         yubikey: None,
+        pre_sync_backup: None,
     });
     Ok(())
 }
@@ -107,6 +121,7 @@ pub fn unlock_vault_with_yubikey(
             wrapping_key: None,
             credential_id,
         }),
+        pre_sync_backup: None,
     });
     Ok(())
 }
@@ -140,6 +155,7 @@ pub fn unlock_vault_with_key_record(
             vault_key_master: Some(master),
             wrapping_key,
         }),
+        pre_sync_backup: None,
     });
     Ok(())
 }
@@ -172,6 +188,9 @@ pub fn lock_vault() -> Result<(), String> {
             }
         }
         s.entries.clear();
+        // Drop any in-progress sync snapshot: its entries are ZeroizeOnDrop, so
+        // this wipes that plaintext copy too.
+        s.pre_sync_backup = None;
     }
     *session = None;
     Ok(())
@@ -2757,6 +2776,69 @@ mod field_merge_tests {
     }
 
     #[test]
+    fn merge_mixed_field_times_incoming_prev9_has_no_mark_local_wins() {
+        // Cross-version sync: local (v9) edited a field so it carries a field-time
+        // mark; the incoming entry comes from a pre-v9 vault so it has NO field
+        // times at all, even though its whole-entry updated_at is newer. An absent
+        // mark counts as "oldest", so the marked (local) value wins and no clash is
+        // raised - the incoming value cannot be proven to be a real edit.
+        let local = note(
+            "n1",
+            "T",
+            "local-val",
+            "2025-01-01T00:00:01Z",
+            &[("content", 200)],
+        );
+        let incoming = note("n1", "T", "incoming-val", "2025-01-01T00:00:09Z", &[]);
+        let (merged, conflicts, _dels, _bo) = merge_entry_pair(&local, &incoming);
+        assert_eq!(
+            note_content(&merged),
+            "local-val",
+            "marked side wins; unmarked pre-v9 field counts as oldest"
+        );
+        assert!(
+            conflicts.is_empty(),
+            "no clash - incoming has no proven edit"
+        );
+    }
+
+    #[test]
+    fn merge_cleared_field_clashes_and_is_not_lost() {
+        // Local cleared the field (empty, marked); incoming kept a value (marked).
+        // Empty is a value like any other: both edited -> a real clash, surfaced;
+        // the local (cleared) value is kept pending the user's choice, not dropped.
+        let local = note("n1", "T", "", "t", &[("content", 300)]);
+        let incoming = note("n1", "T", "keep", "t", &[("content", 200)]);
+        let (merged, conflicts, _dels, _bo) = merge_entry_pair(&local, &incoming);
+        assert_eq!(conflicts.len(), 1, "cleared-vs-value is a real clash");
+        assert_eq!(conflicts[0].field, "content");
+        assert_eq!(
+            note_content(&merged),
+            "",
+            "local cleared value kept pending"
+        );
+    }
+
+    #[test]
+    fn merge_incoming_cleared_field_is_brought_over_recoverable() {
+        // Incoming cleared the field (empty, marked); local never touched it. The
+        // clear wins additively and is surfaced as a brought-over change whose old
+        // value stays recoverable if the user drops it.
+        let local = note("n1", "T", "keep", "t", &[]);
+        let incoming = note("n1", "T", "", "t", &[("content", 200)]);
+        let (merged, _c, _dels, brought) = merge_entry_pair(&local, &incoming);
+        assert_eq!(
+            note_content(&merged),
+            "",
+            "incoming clear wins (newer, marked)"
+        );
+        assert_eq!(brought.len(), 1);
+        assert_eq!(brought[0].field, "content");
+        assert_eq!(brought[0].old_value, "keep", "pre-clear value recoverable");
+        assert_eq!(brought[0].new_value, "");
+    }
+
+    #[test]
     fn merge_both_without_field_times_equal_updated_at_different_value_is_clash() {
         let local = note("n1", "T", "A", "2025-01-01T00:00:01Z", &[]);
         let incoming = note("n1", "T", "B", "2025-01-01T00:00:01Z", &[]);
@@ -2889,6 +2971,7 @@ mod field_merge_tests {
             yubikey: None,
             yubikey_aliases: std::collections::HashMap::new(),
             deleted_ids: vec![],
+            pre_sync_backup: None,
         }
     }
 
@@ -3445,6 +3528,13 @@ pub fn session_merge_vault_from_body(incoming: VaultBody) -> Result<MergeSummary
     let (body, passphrase, path, yubikey, summary) = {
         let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
         let session = session.as_mut().ok_or("Vault is locked")?;
+        // Snapshot the pre-sync state so a granular review can be fully cancelled.
+        // Kept in memory only; entries are ZeroizeOnDrop.
+        session.pre_sync_backup = Some(SyncBackup {
+            folders: session.folders.clone(),
+            entries: session.entries.clone(),
+            deleted_ids: session.deleted_ids.clone(),
+        });
         let summary = do_merge(session, incoming);
         let body = build_body(session);
         let yubikey = extract_yubikey(session);
@@ -3660,6 +3750,9 @@ pub fn session_apply_sync_decisions(
             &folders,
             &entry_deletes,
         )?;
+        // The sync is being committed; drop the cancel snapshot (zeroizes its
+        // plaintext entries) so a later cancel is a no-op.
+        session.pre_sync_backup = None;
         let body = build_body(session);
         let yubikey = extract_yubikey(session);
         (
@@ -3669,6 +3762,36 @@ pub fn session_apply_sync_decisions(
             yubikey,
         )
     }; // ← lock released here
+    do_save(&body, &passphrase, &path, yubikey)?;
+    Ok(())
+}
+
+/// Cancel an in-progress granular sync: restore the session to the pre-sync
+/// snapshot taken by the merge and persist that state, so the vault ends exactly
+/// where it was before the sync began (additive merge and any partial picks
+/// discarded). No-op if there is no snapshot. The snapshot is dropped (its
+/// plaintext entries zeroized) either way.
+pub fn session_cancel_sync() -> Result<(), String> {
+    let saved = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        let Some(backup) = session.pre_sync_backup.take() else {
+            return Ok(()); // nothing to cancel
+        };
+        session.folders = backup.folders.clone();
+        session.entries = backup.entries.clone();
+        session.deleted_ids = backup.deleted_ids.clone();
+        // `backup` drops here -> its ZeroizeOnDrop entries are wiped.
+        let body = build_body(session);
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            session.passphrase.clone(),
+            session.path.clone(),
+            yubikey,
+        )
+    }; // ← lock released here
+    let (body, passphrase, path, yubikey) = saved;
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(())
 }
@@ -6334,6 +6457,190 @@ mod merge_tests {
             let session = VAULT_SESSION.lock().unwrap();
             assert_walk_end_state(&session.as_ref().unwrap().entries);
         }
+        teardown(&path);
+    }
+
+    // Cross-version sync end to end: load a real pre-v9 (v8) vault file as the
+    // incoming body - through the same load_vault -> deserialize path the app uses
+    // - and merge it into a current-format session. Proves the whole flow loads an
+    // older format, upgrades it (empty field_times), and merges without loss or
+    // panic: the v8 entry is added, the local entry survives.
+    #[test]
+    #[serial]
+    #[ignore = "loads a production-Argon golden fixture + saves; run via the gate"]
+    fn cross_version_sync_loads_and_merges_a_v8_file() {
+        let fixture = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/vaults/v8_passphrase.gabbro");
+        let fixture_pass = b"correct horse battery staple -- gabbro fixture";
+        let incoming =
+            crate::api::vault::load_vault(fixture_pass, &fixture).expect("load v8 fixture");
+        // The v8 canary deserializes with no per-field marks (pre-v9).
+        let canary_id = "00000000-0000-0000-0000-000000000001";
+        let canary = incoming
+            .entries
+            .iter()
+            .find(|e| entry_id(e) == canary_id)
+            .expect("v8 fixture has the canary entry");
+        assert!(
+            meta_of(canary).field_times.is_empty(),
+            "a pre-v9 entry carries no field times"
+        );
+
+        // Current-format local session with a distinct entry.
+        let pass = b"xversion-local-pass";
+        let path = setup(
+            pass,
+            "xversion",
+            vec![note("local-only", "Local", "2026-01-01T00:00:00Z")],
+        );
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+
+        assert_eq!(summary.added, 1, "the v8 canary is the one added entry");
+        {
+            let s = VAULT_SESSION.lock().unwrap();
+            let ents = &s.as_ref().unwrap().entries;
+            assert!(
+                ents.iter().any(|e| entry_id(e) == "local-only"),
+                "local entry preserved across the cross-version merge"
+            );
+            assert!(
+                ents.iter().any(|e| entry_id(e) == canary_id),
+                "v8 entry added without loss"
+            );
+        }
+        teardown(&path);
+    }
+
+    // Atomic cancel: after a merge, session_cancel_sync must roll the whole sync
+    // back - the merged-in entry is gone from both the session and disk, and the
+    // pre-sync backup is cleared.
+    #[test]
+    #[serial]
+    #[ignore = "production-Argon saves; run via the gate"]
+    fn cancel_sync_rolls_back_to_pre_sync_state() {
+        use crate::vault::serialization::VaultBody;
+        let pass = b"cancel-sync-pass";
+        let path = setup(
+            pass,
+            "cancel_rollback",
+            vec![note("keep", "Keep", "2026-01-01T00:00:00Z")],
+        );
+        unlock_vault(pass, path.clone()).unwrap();
+
+        let incoming = VaultBody {
+            entries: vec![note("incoming-new", "New", "2026-02-01T00:00:00Z")],
+            folders: vec![],
+            ..Default::default()
+        };
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+        assert_eq!(summary.added, 1, "merge brought in the new entry");
+
+        session_cancel_sync().unwrap();
+        {
+            let s = VAULT_SESSION.lock().unwrap();
+            let sess = s.as_ref().unwrap();
+            let ids: Vec<&str> = sess.entries.iter().map(entry_id).collect();
+            assert_eq!(ids, vec!["keep"], "cancel discards the merged-in entry");
+            assert!(
+                sess.pre_sync_backup.is_none(),
+                "backup cleared after cancel"
+            );
+        }
+        let on_disk = crate::api::vault::load_vault(pass, &path).unwrap();
+        let disk_ids: Vec<String> = on_disk
+            .entries
+            .iter()
+            .map(|e| entry_id(e).to_string())
+            .collect();
+        assert_eq!(disk_ids, vec!["keep"], "disk rolled back to pre-sync state");
+        teardown(&path);
+    }
+
+    // Committing the sync (apply_sync_decisions) clears the cancel snapshot, so a
+    // later cancel is a no-op and cannot undo the committed merge.
+    #[test]
+    #[serial]
+    #[ignore = "production-Argon saves; run via the gate"]
+    fn apply_sync_decisions_clears_backup_so_cancel_is_noop() {
+        use crate::vault::serialization::VaultBody;
+        let pass = b"apply-clears-pass";
+        let path = setup(
+            pass,
+            "apply_clears",
+            vec![note("keep", "Keep", "2026-01-01T00:00:00Z")],
+        );
+        unlock_vault(pass, path.clone()).unwrap();
+        let incoming = VaultBody {
+            entries: vec![note("incoming-new", "New", "2026-02-01T00:00:00Z")],
+            folders: vec![],
+            ..Default::default()
+        };
+        session_merge_vault_from_body(incoming).unwrap();
+        session_apply_sync_decisions(vec![], vec![], vec![], vec![], vec![]).unwrap();
+        {
+            let s = VAULT_SESSION.lock().unwrap();
+            assert!(
+                s.as_ref().unwrap().pre_sync_backup.is_none(),
+                "backup cleared once the sync is committed"
+            );
+        }
+        session_cancel_sync().unwrap(); // no-op
+        {
+            let s = VAULT_SESSION.lock().unwrap();
+            let ids: Vec<&str> = s.as_ref().unwrap().entries.iter().map(entry_id).collect();
+            assert!(
+                ids.contains(&"incoming-new") && ids.contains(&"keep"),
+                "cancel after commit must not undo the merge"
+            );
+        }
+        teardown(&path);
+    }
+
+    // Leakage guard: a secret carried through a sync (merge, then cancel) is never
+    // written to disk in cleartext - the vault file (and its .bak) stay sealed and
+    // reopen correctly at every step.
+    #[test]
+    #[serial]
+    #[ignore = "production-Argon saves; run via the gate"]
+    fn sync_never_writes_plaintext_secret_to_disk() {
+        use crate::vault::serialization::VaultBody;
+        let pass = b"leak-check-pass";
+        let secret = "SUPER-SECRET-do-not-leak-9XyZ";
+        let assert_sealed = |path: &std::path::Path| {
+            let contains =
+                |bytes: &[u8]| bytes.windows(secret.len()).any(|w| w == secret.as_bytes());
+            assert!(
+                !contains(&std::fs::read(path).unwrap()),
+                "plaintext secret on disk"
+            );
+            let bak = format!("{}.bak", path.display());
+            if let Ok(b) = std::fs::read(&bak) {
+                assert!(!contains(&b), "plaintext secret in .bak");
+            }
+            assert!(
+                crate::api::vault::load_vault(pass, path).is_ok(),
+                "file must stay a sealed, openable vault"
+            );
+        };
+
+        // The secret rides as a note title (inside the encrypted body).
+        let path = setup(
+            pass,
+            "leak",
+            vec![note("s1", secret, "2026-01-01T00:00:00Z")],
+        );
+        unlock_vault(pass, path.clone()).unwrap();
+        let incoming = VaultBody {
+            entries: vec![note("incoming-new", "New", "2026-02-01T00:00:00Z")],
+            folders: vec![],
+            ..Default::default()
+        };
+        session_merge_vault_from_body(incoming).unwrap();
+        assert_sealed(&path);
+        session_cancel_sync().unwrap();
+        assert_sealed(&path);
         teardown(&path);
     }
 

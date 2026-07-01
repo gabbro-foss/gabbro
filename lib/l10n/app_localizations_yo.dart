@@ -715,6 +715,21 @@ class AppLocalizationsYo extends AppLocalizations {
   String get syncSummaryDeleted => 'Pípa';
 
   @override
+  String get syncStopTitle => 'Dá àyẹ̀wò dúró?';
+
+  @override
+  String get syncStopBody => 'Yan bí o ṣe fẹ́ parí ìṣọ̀kan yìí.';
+
+  @override
+  String get syncStopKeepReviewing => 'Máa bá àyẹ̀wò lọ';
+
+  @override
+  String get syncStopCancel => 'Fagilé ìṣọ̀kan';
+
+  @override
+  String get syncCancelled => 'A ti fagilé ìṣọ̀kan.';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

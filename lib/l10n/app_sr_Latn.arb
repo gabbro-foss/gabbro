@@ -277,6 +277,11 @@
   "syncSummaryAdded": "Dodato",
   "syncSummaryUpdated": "Ažurirano",
   "syncSummaryDeleted": "Obrisano",
+  "syncStopTitle": "Zaustaviti pregled?",
+  "syncStopBody": "Izaberite kako da završite ovu sinhronizaciju.",
+  "syncStopKeepReviewing": "Nastavi pregled",
+  "syncStopCancel": "Otkaži sinhronizaciju",
+  "syncCancelled": "Sinhronizacija otkazana.",
 
   "importedEntries": "{count, plural, one{Uvezen 1 unos.} few{Uvezena {count} unosa.} other{Uvezeno {count} unosa.}}",
   "@importedEntries": {
