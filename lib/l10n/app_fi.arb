@@ -272,6 +272,11 @@
   "syncMethodTitle": "Miten tämä synkronointi otetaan käyttöön?",
   "syncMergeAutomatically": "Yhdistä automaattisesti",
   "syncReviewAllChanges": "Tarkista kaikki muutokset",
+  "syncDetailsAction": "Tiedot",
+  "syncSummaryTitle": "Synkronoinnin tiedot",
+  "syncSummaryAdded": "Lisätty",
+  "syncSummaryUpdated": "Päivitetty",
+  "syncSummaryDeleted": "Poistettu",
 
   "importedEntries": "{count, plural, one{1 merkintä tuotu.} other{{count} merkintää tuotu.}}",
   "@importedEntries": {

@@ -702,6 +702,21 @@ class AppLocalizationsBg extends AppLocalizations {
   String get syncReviewAllChanges => 'Преглед на всички промени';
 
   @override
+  String get syncDetailsAction => 'Подробности';
+
+  @override
+  String get syncSummaryTitle => 'Подробности за синхронизирането';
+
+  @override
+  String get syncSummaryAdded => 'Добавени';
+
+  @override
+  String get syncSummaryUpdated => 'Актуализирани';
+
+  @override
+  String get syncSummaryDeleted => 'Изтрити';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

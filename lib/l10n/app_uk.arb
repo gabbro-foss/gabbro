@@ -272,6 +272,11 @@
   "syncMethodTitle": "Як застосувати цю синхронізацію?",
   "syncMergeAutomatically": "Обʼєднати автоматично",
   "syncReviewAllChanges": "Переглянути всі зміни",
+  "syncDetailsAction": "Подробиці",
+  "syncSummaryTitle": "Подробиці синхронізації",
+  "syncSummaryAdded": "Додано",
+  "syncSummaryUpdated": "Оновлено",
+  "syncSummaryDeleted": "Видалено",
 
   "importedEntries": "{count, plural, one{Імпортовано 1 запис.} few{Імпортовано {count} записи.} other{Імпортовано {count} записів.}}",
   "@importedEntries": {

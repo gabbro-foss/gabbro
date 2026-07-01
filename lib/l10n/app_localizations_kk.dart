@@ -699,6 +699,21 @@ class AppLocalizationsKk extends AppLocalizations {
   String get syncReviewAllChanges => 'Барлық өзгерістерді қарау';
 
   @override
+  String get syncDetailsAction => 'Мәліметтер';
+
+  @override
+  String get syncSummaryTitle => 'Синхрондау мәліметтері';
+
+  @override
+  String get syncSummaryAdded => 'Қосылды';
+
+  @override
+  String get syncSummaryUpdated => 'Жаңартылды';
+
+  @override
+  String get syncSummaryDeleted => 'Жойылды';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

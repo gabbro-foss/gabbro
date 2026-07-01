@@ -860,6 +860,10 @@ class _VaultListScreenState extends State<VaultListScreen>
       var addedCount = summary.added;
       var updatedCount = summary.updated;
       var deletedCount = 0;
+      // Entry titles behind the tallies, for the granular "Details" summary.
+      var addedTitles = const <String>[];
+      var updatedTitles = const <String>[];
+      var deletedTitles = const <String>[];
       if (steps.isNotEmpty && mounted) {
         final decisions = await showSyncReview(context: context, steps: steps);
         if (decisions != null) {
@@ -899,18 +903,34 @@ class _VaultListScreenState extends State<VaultListScreen>
           addedCount = decisions.added;
           updatedCount = decisions.updated;
           deletedCount = decisions.deleted;
+          addedTitles = decisions.addedTitles;
+          updatedTitles = decisions.updatedTitles;
+          deletedTitles = decisions.deletedTitles;
           if (mounted) _loadEntries();
         }
       }
 
       if (mounted) {
+        final l = AppLocalizations.of(context);
+        // Offer an itemized breakdown only when a review produced per-entry
+        // titles (the fast-merge path keeps the totals-only snackbar).
+        final hasDetails =
+            addedTitles.isNotEmpty ||
+            updatedTitles.isNotEmpty ||
+            deletedTitles.isNotEmpty;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              AppLocalizations.of(
-                context,
-              ).vaultSynced(addedCount, updatedCount, deletedCount),
-            ),
+            content: Text(l.vaultSynced(addedCount, updatedCount, deletedCount)),
+            action: hasDetails
+                ? SnackBarAction(
+                    label: l.syncDetailsAction,
+                    onPressed: () => _showSyncSummary(
+                      addedTitles,
+                      updatedTitles,
+                      deletedTitles,
+                    ),
+                  )
+                : null,
           ),
         );
       }
@@ -943,6 +963,60 @@ class _VaultListScreenState extends State<VaultListScreen>
     } finally {
       if (mounted) setState(() => _isSyncing = false);
     }
+  }
+
+  /// Itemized "what changed" summary from a granular sync: entries grouped
+  /// Added / Updated / Deleted. Each group shows only when it has entries.
+  Future<void> _showSyncSummary(
+    List<String> added,
+    List<String> updated,
+    List<String> deleted,
+  ) {
+    final l = AppLocalizations.of(context);
+    Widget group(String heading, List<String> titles) {
+      if (titles.isEmpty) return const SizedBox.shrink();
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 4),
+            child: Text(
+              '$heading (${titles.length})',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          for (final t in titles)
+            Padding(
+              padding: const EdgeInsets.only(left: 8, top: 2),
+              child: Text('- $t'),
+            ),
+        ],
+      );
+    }
+
+    return showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.syncSummaryTitle),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              group(l.syncSummaryAdded, added),
+              group(l.syncSummaryUpdated, updated),
+              group(l.syncSummaryDeleted, deleted),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l.ok),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _onMenuSelected(String value) async {

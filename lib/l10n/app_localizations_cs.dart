@@ -702,6 +702,21 @@ class AppLocalizationsCs extends AppLocalizations {
   String get syncReviewAllChanges => 'Zkontrolovat všechny změny';
 
   @override
+  String get syncDetailsAction => 'Podrobnosti';
+
+  @override
+  String get syncSummaryTitle => 'Podrobnosti synchronizace';
+
+  @override
+  String get syncSummaryAdded => 'Přidáno';
+
+  @override
+  String get syncSummaryUpdated => 'Aktualizováno';
+
+  @override
+  String get syncSummaryDeleted => 'Smazáno';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

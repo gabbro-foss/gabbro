@@ -272,6 +272,11 @@
   "syncMethodTitle": "Korleis skal denne synkroniseringa brukast?",
   "syncMergeAutomatically": "Slå saman automatisk",
   "syncReviewAllChanges": "Gå gjennom alle endringar",
+  "syncDetailsAction": "Detaljar",
+  "syncSummaryTitle": "Synkroniseringsdetaljar",
+  "syncSummaryAdded": "Lagt til",
+  "syncSummaryUpdated": "Oppdatert",
+  "syncSummaryDeleted": "Sletta",
 
   "importedEntries": "{count, plural, one{1 oppføring importert.} other{{count} oppføringer importerte.}}",
   "@importedEntries": {

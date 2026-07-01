@@ -702,6 +702,21 @@ class AppLocalizationsFi extends AppLocalizations {
   String get syncReviewAllChanges => 'Tarkista kaikki muutokset';
 
   @override
+  String get syncDetailsAction => 'Tiedot';
+
+  @override
+  String get syncSummaryTitle => 'Synkronoinnin tiedot';
+
+  @override
+  String get syncSummaryAdded => 'Lisätty';
+
+  @override
+  String get syncSummaryUpdated => 'Päivitetty';
+
+  @override
+  String get syncSummaryDeleted => 'Poistettu';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

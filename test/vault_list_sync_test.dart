@@ -356,6 +356,63 @@ void main() {
       expect(find.textContaining('1 updated'), findsOneWidget);
     });
 
+    testWidgets('granular snackbar offers a Details action after a review', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(
+            addedEntries: [
+              const AddedEntryItem(id: 'new-1', title: 'Bank login'),
+            ],
+          ),
+        ),
+      );
+      await _startSync(tester);
+      // One step (the new entry): keep the default, finish.
+      await tester.tap(find.text('OK'));
+      await _settle(tester);
+
+      expect(find.textContaining('Vault synced'), findsOneWidget);
+      expect(find.widgetWithText(SnackBarAction, 'Details'), findsOneWidget);
+    });
+
+    testWidgets('Details opens a dialog listing changed entries by group', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(
+            addedEntries: [
+              const AddedEntryItem(id: 'new-1', title: 'Bank login'),
+            ],
+            pendingDeletes: [
+              const PendingDeleteItem(id: 'g', title: 'Old note'),
+            ],
+          ),
+        ),
+      );
+      await _startSync(tester);
+      // Step 1 (new entry): keep -> Continue. Step 2 (delete): confirm -> OK.
+      await tester.tap(find.text('Continue'));
+      await _settle(tester);
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Delete'));
+      await _settle(tester);
+      await tester.tap(find.text('OK'));
+      await _settle(tester);
+
+      await tester.tap(find.widgetWithText(SnackBarAction, 'Details'));
+      await tester.pumpAndSettle();
+
+      // Grouped list: the kept new entry under Added, the delete under Deleted.
+      expect(find.textContaining('Bank login'), findsOneWidget);
+      expect(find.textContaining('Old note'), findsOneWidget);
+      expect(find.textContaining('Added'), findsWidgets);
+      expect(find.textContaining('Deleted'), findsWidgets);
+    });
+
     testWidgets('passphrase is passed to mergeVault', (tester) async {
       List<int>? capturedPassphrase;
       await tester.pumpWidget(

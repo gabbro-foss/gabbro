@@ -272,6 +272,11 @@
   "syncMethodTitle": "Πώς να εφαρμοστεί αυτός ο συγχρονισμός;",
   "syncMergeAutomatically": "Αυτόματη συγχώνευση",
   "syncReviewAllChanges": "Έλεγχος όλων των αλλαγών",
+  "syncDetailsAction": "Λεπτομέρειες",
+  "syncSummaryTitle": "Λεπτομέρειες συγχρονισμού",
+  "syncSummaryAdded": "Προστέθηκαν",
+  "syncSummaryUpdated": "Ενημερώθηκαν",
+  "syncSummaryDeleted": "Διαγράφηκαν",
 
   "importedEntries": "{count, plural, one{Εισήχθη 1 καταχώριση.} other{Εισήχθησαν {count} καταχωρίσεις.}}",
   "@importedEntries": {

@@ -272,6 +272,11 @@
   "syncMethodTitle": "此次同步應如何套用？",
   "syncMergeAutomatically": "自動合併",
   "syncReviewAllChanges": "查看所有變更",
+  "syncDetailsAction": "詳細資料",
+  "syncSummaryTitle": "同步詳細資料",
+  "syncSummaryAdded": "已新增",
+  "syncSummaryUpdated": "已更新",
+  "syncSummaryDeleted": "已刪除",
 
   "importedEntries": "{count, plural, other{已匯入 {count} 個項目。}}",
   "@importedEntries": {

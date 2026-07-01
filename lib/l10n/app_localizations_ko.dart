@@ -692,6 +692,21 @@ class AppLocalizationsKo extends AppLocalizations {
   String get syncReviewAllChanges => '모든 변경 사항 검토';
 
   @override
+  String get syncDetailsAction => '세부 정보';
+
+  @override
+  String get syncSummaryTitle => '동기화 세부 정보';
+
+  @override
+  String get syncSummaryAdded => '추가됨';
+
+  @override
+  String get syncSummaryUpdated => '업데이트됨';
+
+  @override
+  String get syncSummaryDeleted => '삭제됨';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

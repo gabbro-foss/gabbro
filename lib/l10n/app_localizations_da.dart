@@ -699,6 +699,21 @@ class AppLocalizationsDa extends AppLocalizations {
   String get syncReviewAllChanges => 'Gennemgå alle ændringer';
 
   @override
+  String get syncDetailsAction => 'Detaljer';
+
+  @override
+  String get syncSummaryTitle => 'Synkroniseringsdetaljer';
+
+  @override
+  String get syncSummaryAdded => 'Tilføjet';
+
+  @override
+  String get syncSummaryUpdated => 'Opdateret';
+
+  @override
+  String get syncSummaryDeleted => 'Slettet';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -690,6 +690,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncReviewAllChanges => '查看所有更改';
 
   @override
+  String get syncDetailsAction => '详情';
+
+  @override
+  String get syncSummaryTitle => '同步详情';
+
+  @override
+  String get syncSummaryAdded => '已添加';
+
+  @override
+  String get syncSummaryUpdated => '已更新';
+
+  @override
+  String get syncSummaryDeleted => '已删除';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -2589,6 +2604,21 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get syncReviewAllChanges => '查看所有更改';
 
   @override
+  String get syncDetailsAction => '详情';
+
+  @override
+  String get syncSummaryTitle => '同步详情';
+
+  @override
+  String get syncSummaryAdded => '已添加';
+
+  @override
+  String get syncSummaryUpdated => '已更新';
+
+  @override
+  String get syncSummaryDeleted => '已删除';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -4486,6 +4516,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get syncReviewAllChanges => '查看所有變更';
+
+  @override
+  String get syncDetailsAction => '詳細資料';
+
+  @override
+  String get syncSummaryTitle => '同步詳細資料';
+
+  @override
+  String get syncSummaryAdded => '已新增';
+
+  @override
+  String get syncSummaryUpdated => '已更新';
+
+  @override
+  String get syncSummaryDeleted => '已刪除';
 
   @override
   String importedEntries(int count) {

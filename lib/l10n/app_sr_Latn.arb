@@ -272,6 +272,11 @@
   "syncMethodTitle": "Kako primeniti ovu sinhronizaciju?",
   "syncMergeAutomatically": "Automatski spoji",
   "syncReviewAllChanges": "Pregledaj sve promene",
+  "syncDetailsAction": "Detalji",
+  "syncSummaryTitle": "Detalji sinhronizacije",
+  "syncSummaryAdded": "Dodato",
+  "syncSummaryUpdated": "Ažurirano",
+  "syncSummaryDeleted": "Obrisano",
 
   "importedEntries": "{count, plural, one{Uvezen 1 unos.} few{Uvezena {count} unosa.} other{Uvezeno {count} unosa.}}",
   "@importedEntries": {

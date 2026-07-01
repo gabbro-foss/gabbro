@@ -702,6 +702,21 @@ class AppLocalizationsSk extends AppLocalizations {
   String get syncReviewAllChanges => 'Skontrolovať všetky zmeny';
 
   @override
+  String get syncDetailsAction => 'Podrobnosti';
+
+  @override
+  String get syncSummaryTitle => 'Podrobnosti synchronizácie';
+
+  @override
+  String get syncSummaryAdded => 'Pridané';
+
+  @override
+  String get syncSummaryUpdated => 'Aktualizované';
+
+  @override
+  String get syncSummaryDeleted => 'Vymazané';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

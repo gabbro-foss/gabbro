@@ -700,6 +700,21 @@ class AppLocalizationsYo extends AppLocalizations {
   String get syncReviewAllChanges => 'Ṣàyẹ̀wò gbogbo àwọn ìyípadà';
 
   @override
+  String get syncDetailsAction => 'Àwọn àlàyé';
+
+  @override
+  String get syncSummaryTitle => 'Àwọn àlàyé ìṣọ̀kan';
+
+  @override
+  String get syncSummaryAdded => 'Àfikún';
+
+  @override
+  String get syncSummaryUpdated => 'Ìmúdójúìwọ̀n';
+
+  @override
+  String get syncSummaryDeleted => 'Pípa';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

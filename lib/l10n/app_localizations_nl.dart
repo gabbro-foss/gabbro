@@ -702,6 +702,21 @@ class AppLocalizationsNl extends AppLocalizations {
   String get syncReviewAllChanges => 'Alle wijzigingen bekijken';
 
   @override
+  String get syncDetailsAction => 'Details';
+
+  @override
+  String get syncSummaryTitle => 'Synchronisatiedetails';
+
+  @override
+  String get syncSummaryAdded => 'Toegevoegd';
+
+  @override
+  String get syncSummaryUpdated => 'Bijgewerkt';
+
+  @override
+  String get syncSummaryDeleted => 'Verwijderd';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

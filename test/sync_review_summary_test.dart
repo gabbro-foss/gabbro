@@ -238,6 +238,47 @@ void main() {
     expect(d!.updated, 1);
   });
 
+  testWidgets('collects entry titles per group for the itemized summary', (
+    tester,
+  ) async {
+    SyncReviewDecisions? d;
+    await openReview(
+      tester,
+      _summary(
+        addedEntries: [const AddedEntryItem(id: 'n', title: 'New')],
+        broughtOver: [
+          const BroughtOverItem(
+            id: 'x',
+            title: 'Mail',
+            field: 'url',
+            oldValue: 'a',
+            newValue: 'b',
+          ),
+        ],
+        pendingDeletes: [const PendingDeleteItem(id: 'g', title: 'Gone')],
+      ),
+      (r) => d = r,
+    );
+    // Step 1 (New): keep. Step 2 (Mail): keep the brought-over change.
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+    // Step 3 (Gone): confirm the delete, then finish.
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Delete'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    expect(d!.addedTitles, ['New']);
+    expect(d!.updatedTitles, ['Mail']);
+    expect(d!.deletedTitles, ['Gone']);
+    // Counts stay consistent with the title lists.
+    expect(d!.added, 1);
+    expect(d!.updated, 1);
+    expect(d!.deleted, 1);
+  });
+
   testWidgets('moving an entry to the incoming folder marks it updated', (
     tester,
   ) async {

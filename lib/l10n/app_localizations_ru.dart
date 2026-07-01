@@ -702,6 +702,21 @@ class AppLocalizationsRu extends AppLocalizations {
   String get syncReviewAllChanges => 'Просмотреть все изменения';
 
   @override
+  String get syncDetailsAction => 'Подробности';
+
+  @override
+  String get syncSummaryTitle => 'Сведения о синхронизации';
+
+  @override
+  String get syncSummaryAdded => 'Добавлено';
+
+  @override
+  String get syncSummaryUpdated => 'Обновлено';
+
+  @override
+  String get syncSummaryDeleted => 'Удалено';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

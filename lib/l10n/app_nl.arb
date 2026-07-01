@@ -272,6 +272,11 @@
   "syncMethodTitle": "Hoe moet deze synchronisatie worden toegepast?",
   "syncMergeAutomatically": "Automatisch samenvoegen",
   "syncReviewAllChanges": "Alle wijzigingen bekijken",
+  "syncDetailsAction": "Details",
+  "syncSummaryTitle": "Synchronisatiedetails",
+  "syncSummaryAdded": "Toegevoegd",
+  "syncSummaryUpdated": "Bijgewerkt",
+  "syncSummaryDeleted": "Verwijderd",
 
   "importedEntries": "{count, plural, one{1 item geïmporteerd.} other{{count} items geïmporteerd.}}",
   "@importedEntries": {

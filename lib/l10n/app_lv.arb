@@ -272,6 +272,11 @@
   "syncMethodTitle": "Kā piemērot šo sinhronizāciju?",
   "syncMergeAutomatically": "Apvienot automātiski",
   "syncReviewAllChanges": "Pārskatīt visas izmaiņas",
+  "syncDetailsAction": "Detaļas",
+  "syncSummaryTitle": "Sinhronizācijas detaļas",
+  "syncSummaryAdded": "Pievienoti",
+  "syncSummaryUpdated": "Atjaunināti",
+  "syncSummaryDeleted": "Dzēsti",
 
   "importedEntries": "{count, plural, one{1 ieraksts importēts.} other{{count} ieraksti importēti.}}",
   "@importedEntries": {

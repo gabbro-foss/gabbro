@@ -701,6 +701,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get syncReviewAllChanges => 'Rever todas as alterações';
 
   @override
+  String get syncDetailsAction => 'Detalhes';
+
+  @override
+  String get syncSummaryTitle => 'Detalhes da sincronização';
+
+  @override
+  String get syncSummaryAdded => 'Adicionados';
+
+  @override
+  String get syncSummaryUpdated => 'Atualizados';
+
+  @override
+  String get syncSummaryDeleted => 'Excluídos';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -2694,6 +2709,21 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get syncReviewAllChanges => 'Revisar todas as alterações';
 
   @override
+  String get syncDetailsAction => 'Detalhes';
+
+  @override
+  String get syncSummaryTitle => 'Detalhes da sincronização';
+
+  @override
+  String get syncSummaryAdded => 'Adicionados';
+
+  @override
+  String get syncSummaryUpdated => 'Atualizados';
+
+  @override
+  String get syncSummaryDeleted => 'Excluídos';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -4682,6 +4712,21 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get syncReviewAllChanges => 'Rever todas as alterações';
+
+  @override
+  String get syncDetailsAction => 'Detalhes';
+
+  @override
+  String get syncSummaryTitle => 'Detalhes da sincronização';
+
+  @override
+  String get syncSummaryAdded => 'Adicionados';
+
+  @override
+  String get syncSummaryUpdated => 'Atualizados';
+
+  @override
+  String get syncSummaryDeleted => 'Eliminados';
 
   @override
   String importedEntries(int count) {

@@ -701,6 +701,21 @@ class AppLocalizationsEt extends AppLocalizations {
   String get syncReviewAllChanges => 'Vaata kõik muudatused üle';
 
   @override
+  String get syncDetailsAction => 'Üksikasjad';
+
+  @override
+  String get syncSummaryTitle => 'Sünkroonimise üksikasjad';
+
+  @override
+  String get syncSummaryAdded => 'Lisatud';
+
+  @override
+  String get syncSummaryUpdated => 'Uuendatud';
+
+  @override
+  String get syncSummaryDeleted => 'Kustutatud';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

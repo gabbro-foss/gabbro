@@ -272,6 +272,11 @@
   "syncMethodTitle": "Hvordan skal denne synkronisering anvendes?",
   "syncMergeAutomatically": "Flet automatisk",
   "syncReviewAllChanges": "Gennemgå alle ændringer",
+  "syncDetailsAction": "Detaljer",
+  "syncSummaryTitle": "Synkroniseringsdetaljer",
+  "syncSummaryAdded": "Tilføjet",
+  "syncSummaryUpdated": "Opdateret",
+  "syncSummaryDeleted": "Slettet",
 
   "importedEntries": "{count, plural, one{1 post importeret.} other{{count} poster importeret.}}",
   "@importedEntries": {

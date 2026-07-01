@@ -272,6 +272,11 @@
   "syncMethodTitle": "Hur ska den här synkroniseringen tillämpas?",
   "syncMergeAutomatically": "Slå samman automatiskt",
   "syncReviewAllChanges": "Granska alla ändringar",
+  "syncDetailsAction": "Detaljer",
+  "syncSummaryTitle": "Synkroniseringsdetaljer",
+  "syncSummaryAdded": "Tillagda",
+  "syncSummaryUpdated": "Uppdaterade",
+  "syncSummaryDeleted": "Borttagna",
 
   "importedEntries": "{count, plural, one{1 post importerad.} other{{count} poster importerade.}}",
   "@importedEntries": {

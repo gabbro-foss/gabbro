@@ -272,6 +272,11 @@
   "syncMethodTitle": "Báwo ni ó ṣe yẹ kí a lo ìṣọ̀kan yìí?",
   "syncMergeAutomatically": "Dàpọ̀ láìfọwọ́yi",
   "syncReviewAllChanges": "Ṣàyẹ̀wò gbogbo àwọn ìyípadà",
+  "syncDetailsAction": "Àwọn àlàyé",
+  "syncSummaryTitle": "Àwọn àlàyé ìṣọ̀kan",
+  "syncSummaryAdded": "Àfikún",
+  "syncSummaryUpdated": "Ìmúdójúìwọ̀n",
+  "syncSummaryDeleted": "Pípa",
 
   "importedEntries": "{count, plural, other{A mu awọn titẹ sii {count} wọle.}}",
   "@importedEntries": {

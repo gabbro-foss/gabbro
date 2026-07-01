@@ -272,6 +272,11 @@
   "syncMethodTitle": "Kuidas seda sünkroonimist rakendada?",
   "syncMergeAutomatically": "Ühenda automaatselt",
   "syncReviewAllChanges": "Vaata kõik muudatused üle",
+  "syncDetailsAction": "Üksikasjad",
+  "syncSummaryTitle": "Sünkroonimise üksikasjad",
+  "syncSummaryAdded": "Lisatud",
+  "syncSummaryUpdated": "Uuendatud",
+  "syncSummaryDeleted": "Kustutatud",
 
   "importedEntries": "{count, plural, one{1 kirje imporditud.} other{{count} kirjet imporditud.}}",
   "@importedEntries": {

@@ -272,6 +272,11 @@
   "syncMethodTitle": "이 동기화를 어떻게 적용하시겠습니까?",
   "syncMergeAutomatically": "자동으로 병합",
   "syncReviewAllChanges": "모든 변경 사항 검토",
+  "syncDetailsAction": "세부 정보",
+  "syncSummaryTitle": "동기화 세부 정보",
+  "syncSummaryAdded": "추가됨",
+  "syncSummaryUpdated": "업데이트됨",
+  "syncSummaryDeleted": "삭제됨",
 
   "importedEntries": "{count, plural, other{{count}개의 항목을 가져왔습니다.}}",
   "@importedEntries": {

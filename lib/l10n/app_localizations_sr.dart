@@ -702,6 +702,21 @@ class AppLocalizationsSr extends AppLocalizations {
   String get syncReviewAllChanges => 'Прегледај све промене';
 
   @override
+  String get syncDetailsAction => 'Детаљи';
+
+  @override
+  String get syncSummaryTitle => 'Детаљи синхронизације';
+
+  @override
+  String get syncSummaryAdded => 'Додато';
+
+  @override
+  String get syncSummaryUpdated => 'Ажурирано';
+
+  @override
+  String get syncSummaryDeleted => 'Обрисано';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -2689,6 +2704,21 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get syncReviewAllChanges => 'Pregledaj sve promene';
+
+  @override
+  String get syncDetailsAction => 'Detalji';
+
+  @override
+  String get syncSummaryTitle => 'Detalji sinhronizacije';
+
+  @override
+  String get syncSummaryAdded => 'Dodato';
+
+  @override
+  String get syncSummaryUpdated => 'Ažurirano';
+
+  @override
+  String get syncSummaryDeleted => 'Obrisano';
 
   @override
   String importedEntries(int count) {

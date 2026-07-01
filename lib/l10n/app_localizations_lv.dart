@@ -700,6 +700,21 @@ class AppLocalizationsLv extends AppLocalizations {
   String get syncReviewAllChanges => 'Pārskatīt visas izmaiņas';
 
   @override
+  String get syncDetailsAction => 'Detaļas';
+
+  @override
+  String get syncSummaryTitle => 'Sinhronizācijas detaļas';
+
+  @override
+  String get syncSummaryAdded => 'Pievienoti';
+
+  @override
+  String get syncSummaryUpdated => 'Atjaunināti';
+
+  @override
+  String get syncSummaryDeleted => 'Dzēsti';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

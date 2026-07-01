@@ -703,6 +703,21 @@ class AppLocalizationsUk extends AppLocalizations {
   String get syncReviewAllChanges => 'Переглянути всі зміни';
 
   @override
+  String get syncDetailsAction => 'Подробиці';
+
+  @override
+  String get syncSummaryTitle => 'Подробиці синхронізації';
+
+  @override
+  String get syncSummaryAdded => 'Додано';
+
+  @override
+  String get syncSummaryUpdated => 'Оновлено';
+
+  @override
+  String get syncSummaryDeleted => 'Видалено';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

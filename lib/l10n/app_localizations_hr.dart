@@ -701,6 +701,21 @@ class AppLocalizationsHr extends AppLocalizations {
   String get syncReviewAllChanges => 'Pregledaj sve promjene';
 
   @override
+  String get syncDetailsAction => 'Pojedinosti';
+
+  @override
+  String get syncSummaryTitle => 'Pojedinosti sinkronizacije';
+
+  @override
+  String get syncSummaryAdded => 'Dodano';
+
+  @override
+  String get syncSummaryUpdated => 'Ažurirano';
+
+  @override
+  String get syncSummaryDeleted => 'Izbrisano';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

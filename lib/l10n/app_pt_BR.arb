@@ -272,6 +272,11 @@
   "syncMethodTitle": "Como esta sincronização deve ser aplicada?",
   "syncMergeAutomatically": "Mesclar automaticamente",
   "syncReviewAllChanges": "Revisar todas as alterações",
+  "syncDetailsAction": "Detalhes",
+  "syncSummaryTitle": "Detalhes da sincronização",
+  "syncSummaryAdded": "Adicionados",
+  "syncSummaryUpdated": "Atualizados",
+  "syncSummaryDeleted": "Excluídos",
 
   "importedEntries": "{count, plural, one{1 entrada importada.} other{{count} entradas importadas.}}",
   "@importedEntries": {

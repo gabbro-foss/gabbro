@@ -272,6 +272,11 @@
   "syncMethodTitle": "この同期をどのように適用しますか？",
   "syncMergeAutomatically": "自動的にマージ",
   "syncReviewAllChanges": "すべての変更を確認",
+  "syncDetailsAction": "詳細",
+  "syncSummaryTitle": "同期の詳細",
+  "syncSummaryAdded": "追加",
+  "syncSummaryUpdated": "更新",
+  "syncSummaryDeleted": "削除",
 
   "importedEntries": "{count, plural, other{{count}件のエントリをインポートしました。}}",
   "@importedEntries": {

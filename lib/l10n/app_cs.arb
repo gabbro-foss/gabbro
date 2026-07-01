@@ -272,6 +272,11 @@
   "syncMethodTitle": "Jak použít tuto synchronizaci?",
   "syncMergeAutomatically": "Sloučit automaticky",
   "syncReviewAllChanges": "Zkontrolovat všechny změny",
+  "syncDetailsAction": "Podrobnosti",
+  "syncSummaryTitle": "Podrobnosti synchronizace",
+  "syncSummaryAdded": "Přidáno",
+  "syncSummaryUpdated": "Aktualizováno",
+  "syncSummaryDeleted": "Smazáno",
 
   "importedEntries": "{count, plural, one{Importován 1 záznam.} few{Importovány {count} záznamy.} other{Importováno {count} záznamů.}}",
   "@importedEntries": {

@@ -272,6 +272,11 @@
   "syncMethodTitle": "Hogyan legyen alkalmazva ez a szinkronizálás?",
   "syncMergeAutomatically": "Automatikus egyesítés",
   "syncReviewAllChanges": "Összes módosítás áttekintése",
+  "syncDetailsAction": "Részletek",
+  "syncSummaryTitle": "Szinkronizálás részletei",
+  "syncSummaryAdded": "Hozzáadva",
+  "syncSummaryUpdated": "Frissítve",
+  "syncSummaryDeleted": "Törölve",
 
   "importedEntries": "{count, plural, one{1 bejegyzés importálva.} other{{count} bejegyzés importálva.}}",
   "@importedEntries": {

@@ -701,6 +701,21 @@ class AppLocalizationsEu extends AppLocalizations {
   String get syncReviewAllChanges => 'Berrikusi aldaketa guztiak';
 
   @override
+  String get syncDetailsAction => 'Xehetasunak';
+
+  @override
+  String get syncSummaryTitle => 'Sinkronizazioaren xehetasunak';
+
+  @override
+  String get syncSummaryAdded => 'Gehituta';
+
+  @override
+  String get syncSummaryUpdated => 'Eguneratuta';
+
+  @override
+  String get syncSummaryDeleted => 'Ezabatuta';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

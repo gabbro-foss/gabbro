@@ -701,6 +701,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get syncReviewAllChanges => 'Revisar todos los cambios';
 
   @override
+  String get syncDetailsAction => 'Detalles';
+
+  @override
+  String get syncSummaryTitle => 'Detalles de sincronización';
+
+  @override
+  String get syncSummaryAdded => 'Añadidos';
+
+  @override
+  String get syncSummaryUpdated => 'Actualizados';
+
+  @override
+  String get syncSummaryDeleted => 'Eliminados';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

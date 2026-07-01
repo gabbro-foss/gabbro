@@ -272,6 +272,11 @@
   "syncMethodTitle": "Kaip taikyti šią sinchronizaciją?",
   "syncMergeAutomatically": "Sulieti automatiškai",
   "syncReviewAllChanges": "Peržiūrėti visus pakeitimus",
+  "syncDetailsAction": "Išsami informacija",
+  "syncSummaryTitle": "Sinchronizavimo informacija",
+  "syncSummaryAdded": "Pridėta",
+  "syncSummaryUpdated": "Atnaujinta",
+  "syncSummaryDeleted": "Ištrinta",
 
   "importedEntries": "{count, plural, one{1 įrašas importuotas.} other{{count} įrašai importuoti.}}",
   "@importedEntries": {

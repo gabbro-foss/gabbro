@@ -272,6 +272,11 @@
   "syncMethodTitle": "Как да се приложи тази синхронизация?",
   "syncMergeAutomatically": "Обединяване автоматично",
   "syncReviewAllChanges": "Преглед на всички промени",
+  "syncDetailsAction": "Подробности",
+  "syncSummaryTitle": "Подробности за синхронизирането",
+  "syncSummaryAdded": "Добавени",
+  "syncSummaryUpdated": "Актуализирани",
+  "syncSummaryDeleted": "Изтрити",
 
   "importedEntries": "{count, plural, one{Импортиран 1 запис.} other{Импортирани {count} записа.}}",
   "@importedEntries": {

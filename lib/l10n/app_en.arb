@@ -310,6 +310,26 @@
   "@syncReviewAllChanges": {
     "description": "Button: step through every change one by one and choose (slower)."
   },
+  "syncDetailsAction": "Details",
+  "@syncDetailsAction": {
+    "description": "Snackbar action button that opens the itemized list of what the sync changed."
+  },
+  "syncSummaryTitle": "Sync details",
+  "@syncSummaryTitle": {
+    "description": "Title of the dialog listing which entries a sync added, updated, or deleted."
+  },
+  "syncSummaryAdded": "Added",
+  "@syncSummaryAdded": {
+    "description": "Group heading for entries added by the sync; followed by a count in parentheses."
+  },
+  "syncSummaryUpdated": "Updated",
+  "@syncSummaryUpdated": {
+    "description": "Group heading for entries changed by the sync; followed by a count in parentheses."
+  },
+  "syncSummaryDeleted": "Deleted",
+  "@syncSummaryDeleted": {
+    "description": "Group heading for entries deleted by the sync; followed by a count in parentheses."
+  },
 
   "importedEntries": "{count, plural, one{Imported 1 entry.} other{Imported {count} entries.}}",
   "@importedEntries": {

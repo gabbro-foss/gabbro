@@ -700,6 +700,21 @@ class AppLocalizationsHu extends AppLocalizations {
   String get syncReviewAllChanges => 'Összes módosítás áttekintése';
 
   @override
+  String get syncDetailsAction => 'Részletek';
+
+  @override
+  String get syncSummaryTitle => 'Szinkronizálás részletei';
+
+  @override
+  String get syncSummaryAdded => 'Hozzáadva';
+
+  @override
+  String get syncSummaryUpdated => 'Frissítve';
+
+  @override
+  String get syncSummaryDeleted => 'Törölve';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -1483,6 +1483,36 @@ abstract class AppLocalizations {
   /// **'Review all changes'**
   String get syncReviewAllChanges;
 
+  /// Snackbar action button that opens the itemized list of what the sync changed.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get syncDetailsAction;
+
+  /// Title of the dialog listing which entries a sync added, updated, or deleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync details'**
+  String get syncSummaryTitle;
+
+  /// Group heading for entries added by the sync; followed by a count in parentheses.
+  ///
+  /// In en, this message translates to:
+  /// **'Added'**
+  String get syncSummaryAdded;
+
+  /// Group heading for entries changed by the sync; followed by a count in parentheses.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated'**
+  String get syncSummaryUpdated;
+
+  /// Group heading for entries deleted by the sync; followed by a count in parentheses.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted'**
+  String get syncSummaryDeleted;
+
   /// No description provided for @importedEntries.
   ///
   /// In en, this message translates to:

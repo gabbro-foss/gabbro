@@ -272,6 +272,11 @@
   "syncMethodTitle": "Nola aplikatu behar da sinkronizazio hau?",
   "syncMergeAutomatically": "Batu automatikoki",
   "syncReviewAllChanges": "Berrikusi aldaketa guztiak",
+  "syncDetailsAction": "Xehetasunak",
+  "syncSummaryTitle": "Sinkronizazioaren xehetasunak",
+  "syncSummaryAdded": "Gehituta",
+  "syncSummaryUpdated": "Eguneratuta",
+  "syncSummaryDeleted": "Ezabatuta",
 
   "importedEntries": "{count, plural, one{1 sarrera inportatu da.} other{{count} sarrera inportatu dira.}}",
   "@importedEntries": {

@@ -272,6 +272,11 @@
   "syncMethodTitle": "Како применити ову синхронизацију?",
   "syncMergeAutomatically": "Аутоматски споји",
   "syncReviewAllChanges": "Прегледај све промене",
+  "syncDetailsAction": "Детаљи",
+  "syncSummaryTitle": "Детаљи синхронизације",
+  "syncSummaryAdded": "Додато",
+  "syncSummaryUpdated": "Ажурирано",
+  "syncSummaryDeleted": "Обрисано",
 
   "importedEntries": "{count, plural, one{Uvezen 1 unos.} few{Uvezena {count} unosa.} other{Uvezeno {count} unosa.}}",
   "@importedEntries": {

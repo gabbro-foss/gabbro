@@ -272,6 +272,11 @@
   "syncMethodTitle": "Бұл синхрондау қалай қолданылсын?",
   "syncMergeAutomatically": "Автоматты біріктіру",
   "syncReviewAllChanges": "Барлық өзгерістерді қарау",
+  "syncDetailsAction": "Мәліметтер",
+  "syncSummaryTitle": "Синхрондау мәліметтері",
+  "syncSummaryAdded": "Қосылды",
+  "syncSummaryUpdated": "Жаңартылды",
+  "syncSummaryDeleted": "Жойылды",
 
   "importedEntries": "{count, plural, other{{count} жазба импортталды.}}",
   "@importedEntries": {
