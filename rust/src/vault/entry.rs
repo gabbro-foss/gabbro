@@ -423,8 +423,14 @@ mod tests {
         meta.record_previous("password", "pw-old", "2026-01-01T00:00:00Z", None);
         meta.record_previous("content", "note-old", "2026-01-01T00:00:00Z", None);
         assert_eq!(meta.history.len(), 2);
-        assert!(meta.history.iter().any(|h| h.field == "password" && h.value == "pw-old"));
-        assert!(meta.history.iter().any(|h| h.field == "content" && h.value == "note-old"));
+        assert!(meta
+            .history
+            .iter()
+            .any(|h| h.field == "password" && h.value == "pw-old"));
+        assert!(meta
+            .history
+            .iter()
+            .any(|h| h.field == "content" && h.value == "note-old"));
     }
 
     #[test]

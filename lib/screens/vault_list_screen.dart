@@ -68,31 +68,20 @@ Future<MergeSummary> _defaultFastMergeVaultWithKey(
   credentialId: credentialId,
 );
 
-Future<void> _defaultResolveFieldConflict(
-  String id,
-  String field,
-  bool keepIncoming,
-  String incomingValue,
-) => resolveFieldConflict(
-  id: id,
-  field: field,
-  keepIncoming: keepIncoming,
-  incomingValue: incomingValue,
-);
-
-Future<void> _defaultResolveItemDelete(String id, String field, bool delete) =>
-    resolveItemDelete(id: id, field: field, delete: delete);
-
-Future<void> _defaultReplaceFieldWithHistory(
-  String id,
-  String field,
-  String newValue,
-  String replacedValue,
-) => replaceFieldWithHistory(
-  id: id,
-  field: field,
-  newValue: newValue,
-  replacedValue: replacedValue,
+/// Apply a whole granular-sync review in one FFI call (one vault re-seal for the
+/// entire review, instead of one per decision).
+Future<void> _defaultApplySyncDecisions({
+  required List<SyncFieldResolutionInput> fieldResolutions,
+  required List<SyncHistoryReplacementInput> historyReplacements,
+  required List<SyncItemDeleteInput> itemDeletes,
+  required List<SyncFolderInput> folders,
+  required List<String> entryDeletes,
+}) => applySyncDecisions(
+  fieldResolutions: fieldResolutions,
+  historyReplacements: historyReplacements,
+  itemDeletes: itemDeletes,
+  folders: folders,
+  entryDeletes: entryDeletes,
 );
 
 /// Reads the source vault's YubiKey records to decide whether a key is required.
@@ -230,28 +219,17 @@ class VaultListScreen extends StatefulWidget {
   final Future<void> Function(List<String> ids, String folder)?
   onAssignFolderFn;
 
-  /// Applies a field-clash resolution (keep mine / use theirs). Injectable for tests.
-  final Future<void> Function(
-    String id,
-    String field,
-    bool keepIncoming,
-    String incomingValue,
-  )
-  onResolveFieldConflict;
-
-  /// Applies a pending item-delete resolution (keep / delete). Injectable for tests.
-  final Future<void> Function(String id, String field, bool delete)
-  onResolveItemDelete;
-
-  /// Sets a field and keeps the replaced value in recovery history (kept brought-
-  /// over edit / clash resolved to theirs). Injectable for tests.
-  final Future<void> Function(
-    String id,
-    String field,
-    String newValue,
-    String replacedValue,
-  )
-  onReplaceFieldWithHistory;
+  /// Applies a whole granular-sync review in one call (one vault re-seal for the
+  /// entire review, instead of one FFI call + re-seal per decision). Injectable
+  /// for tests.
+  final Future<void> Function({
+    required List<SyncFieldResolutionInput> fieldResolutions,
+    required List<SyncHistoryReplacementInput> historyReplacements,
+    required List<SyncItemDeleteInput> itemDeletes,
+    required List<SyncFolderInput> folders,
+    required List<String> entryDeletes,
+  })
+  applySyncDecisions;
 
   /// Pre-injected YubiKey records. `null` = auto-detect from vault file at
   /// construction time. Pass `[]` to force passphrase-only mode (tests).
@@ -275,9 +253,7 @@ class VaultListScreen extends StatefulWidget {
     this.onRefreshFn,
     this.alphabetBarPosition,
     this.onAssignFolderFn,
-    this.onResolveFieldConflict = _defaultResolveFieldConflict,
-    this.onResolveItemDelete = _defaultResolveItemDelete,
-    this.onReplaceFieldWithHistory = _defaultReplaceFieldWithHistory,
+    this.applySyncDecisions = _defaultApplySyncDecisions,
     this.yubikeyRecords,
     bool? isAndroid,
   }) : isAndroid = isAndroid ?? Platform.isAndroid;
@@ -887,41 +863,39 @@ class _VaultListScreenState extends State<VaultListScreen>
       if (steps.isNotEmpty && mounted) {
         final decisions = await showSyncReview(context: context, steps: steps);
         if (decisions != null) {
-          for (final f in decisions.fieldResolutions) {
-            await widget.onResolveFieldConflict(
-              f.id,
-              f.field,
-              f.keepIncoming,
-              f.value,
-            );
-          }
-          for (final h in decisions.historyReplacements) {
-            await widget.onReplaceFieldWithHistory(
-              h.id,
-              h.field,
-              h.newValue,
-              h.replacedValue,
-            );
-          }
-          for (final d in decisions.itemDeletes) {
-            await widget.onResolveItemDelete(d.id, d.field, d.delete);
-          }
-          for (final fo in decisions.folders) {
-            final fn = widget.onAssignFolderFn;
-            if (fn != null) {
-              await fn([fo.id], fo.folder);
-            } else {
-              await assignFolderToEntries(ids: [fo.id], folder: fo.folder);
-            }
-          }
-          for (final id in decisions.entryDeletes) {
-            final fn = widget.onDeleteEntryFn;
-            if (fn != null) {
-              await fn(id);
-            } else {
-              await deleteEntry(id: id);
-            }
-          }
+          // Apply the whole review in one call: one vault re-seal (Argon2id) for
+          // all decisions, instead of one per decision. An interrupted review
+          // therefore applies all-or-nothing — re-syncing re-surfaces the same
+          // choices with nothing lost.
+          await widget.applySyncDecisions(
+            fieldResolutions: [
+              for (final f in decisions.fieldResolutions)
+                SyncFieldResolutionInput(
+                  id: f.id,
+                  field: f.field,
+                  keepIncoming: f.keepIncoming,
+                  value: f.value,
+                ),
+            ],
+            historyReplacements: [
+              for (final h in decisions.historyReplacements)
+                SyncHistoryReplacementInput(
+                  id: h.id,
+                  field: h.field,
+                  newValue: h.newValue,
+                  replacedValue: h.replacedValue,
+                ),
+            ],
+            itemDeletes: [
+              for (final d in decisions.itemDeletes)
+                SyncItemDeleteInput(id: d.id, field: d.field, delete: d.delete),
+            ],
+            folders: [
+              for (final fo in decisions.folders)
+                SyncFolderInput(id: fo.id, folder: fo.folder),
+            ],
+            entryDeletes: decisions.entryDeletes,
+          );
           addedCount = decisions.added;
           updatedCount = decisions.updated;
           deletedCount = decisions.deleted;

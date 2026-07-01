@@ -34,17 +34,23 @@ MergeSummary _summary({
   pendingItemDeletes: pendingItemDeletes,
 );
 
+// Captures the single batched decision-set applied at the end of a granular
+// review (one call for the whole review). Tests assert on the aggregated lists.
+class _Applied {
+  bool called = false;
+  List<SyncFieldResolutionInput> fields = const [];
+  List<SyncHistoryReplacementInput> history = const [];
+  List<SyncItemDeleteInput> items = const [];
+  List<SyncFolderInput> folders = const [];
+  List<String> entryDeletes = const [];
+}
+
 Widget _buildScreen({
   required Future<MergeSummary> Function(String, List<int>) mergeVault,
   Future<MergeSummary> Function(String, List<int>)? fastMergeVault,
   String? pickedPath,
   Future<String?> Function()? onPickSyncFile,
-  Future<void> Function(String, String, bool, String)? onResolveFieldConflict,
-  Future<void> Function(String, String, bool)? onResolveItemDelete,
-  Future<void> Function(String, String, String, String)?
-  onReplaceFieldWithHistory,
-  Future<void> Function(String)? onDeleteEntryFn,
-  Future<void> Function(List<String>, String)? onAssignFolderFn,
+  _Applied? applied,
 }) => testApp(
   VaultListScreen(
     vaultPath: '/tmp/test.gabbro',
@@ -53,13 +59,24 @@ Widget _buildScreen({
     onPickSyncFile: onPickSyncFile ?? () async => pickedPath,
     mergeVault: mergeVault,
     fastMergeVault: fastMergeVault ?? (_, _) async => _summary(),
-    // No-op by default so tests never reach the real FFI resolution path.
-    onResolveFieldConflict: onResolveFieldConflict ?? (_, _, _, _) async {},
-    onResolveItemDelete: onResolveItemDelete ?? (_, _, _) async {},
-    onReplaceFieldWithHistory:
-        onReplaceFieldWithHistory ?? (_, _, _, _) async {},
-    onDeleteEntryFn: onDeleteEntryFn,
-    onAssignFolderFn: onAssignFolderFn,
+    // Recording stand-in so tests never reach the real FFI; captures the batch.
+    applySyncDecisions:
+        ({
+          required fieldResolutions,
+          required historyReplacements,
+          required itemDeletes,
+          required folders,
+          required entryDeletes,
+        }) async {
+          if (applied != null) {
+            applied.called = true;
+            applied.fields = fieldResolutions;
+            applied.history = historyReplacements;
+            applied.items = itemDeletes;
+            applied.folders = folders;
+            applied.entryDeletes = entryDeletes;
+          }
+        },
   ),
 );
 
@@ -407,7 +424,7 @@ void main() {
     testWidgets('whole-entry delete shows keep/delete chips in the review', (
       tester,
     ) async {
-      String? deletedId;
+      final applied = _Applied();
       await tester.pumpWidget(
         _buildScreen(
           pickedPath: '/tmp/other.gabbro',
@@ -416,7 +433,7 @@ void main() {
               const PendingDeleteItem(id: 'uuid-1', title: 'Example'),
             ],
           ),
-          onDeleteEntryFn: (id) async => deletedId = id,
+          applied: applied,
         ),
       );
       await _startSync(tester);
@@ -429,11 +446,11 @@ void main() {
       await _settle(tester);
       await tester.tap(find.text('OK'));
       await _settle(tester);
-      expect(deletedId, 'uuid-1');
+      expect(applied.entryDeletes, ['uuid-1']);
     });
 
     testWidgets('a kept whole-entry delete is not deleted', (tester) async {
-      var deleteCalled = false;
+      final applied = _Applied();
       await tester.pumpWidget(
         _buildScreen(
           pickedPath: '/tmp/other.gabbro',
@@ -442,20 +459,19 @@ void main() {
               const PendingDeleteItem(id: 'uuid-1', title: 'Example'),
             ],
           ),
-          onDeleteEntryFn: (_) async => deleteCalled = true,
+          applied: applied,
         ),
       );
       await _startSync(tester);
       await tester.tap(find.text('OK')); // leave delete off (keep)
       await _settle(tester);
-      expect(deleteCalled, isFalse);
+      expect(applied.entryDeletes, isEmpty);
     });
 
     testWidgets('folder conflict shows folder chips in the review', (
       tester,
     ) async {
-      List<String>? assignedIds;
-      String? assignedFolder;
+      final applied = _Applied();
       await tester.pumpWidget(
         _buildScreen(
           pickedPath: '/tmp/other.gabbro',
@@ -469,10 +485,7 @@ void main() {
               ),
             ],
           ),
-          onAssignFolderFn: (ids, folder) async {
-            assignedIds = ids;
-            assignedFolder = folder;
-          },
+          applied: applied,
         ),
       );
       await _startSync(tester);
@@ -486,15 +499,15 @@ void main() {
       await _settle(tester);
       await tester.tap(find.text('OK'));
       await _settle(tester);
-      expect(assignedIds, ['uuid-2']);
-      expect(assignedFolder, 'Personal');
+      expect(applied.folders, [
+        const SyncFolderInput(id: 'uuid-2', folder: 'Personal'),
+      ]);
     });
 
     testWidgets(
       'field clash shows a pick in the review (not nothing-to-sync)',
       (tester) async {
-        String? gotField;
-        bool? gotKeepIncoming;
+        final applied = _Applied();
         await tester.pumpWidget(
           _buildScreen(
             pickedPath: '/tmp/other.gabbro',
@@ -509,11 +522,7 @@ void main() {
                 ),
               ],
             ),
-            onResolveFieldConflict:
-                (id, field, keepIncoming, incomingValue) async {
-                  gotField = field;
-                  gotKeepIncoming = keepIncoming;
-                },
+            applied: applied,
           ),
         );
         await _startSync(tester);
@@ -533,13 +542,13 @@ void main() {
         await _settle(tester);
         await tester.tap(find.text('OK'));
         await _settle(tester);
-        expect(gotField, 'password');
-        expect(gotKeepIncoming, false);
+        expect(applied.fields.single.field, 'password');
+        expect(applied.fields.single.keepIncoming, false);
       },
     );
 
     testWidgets('a new entry can be dropped', (tester) async {
-      String? deletedId;
+      final applied = _Applied();
       await tester.pumpWidget(
         _buildScreen(
           pickedPath: '/tmp/other.gabbro',
@@ -548,7 +557,7 @@ void main() {
               const AddedEntryItem(id: 'new-1', title: 'Bank login'),
             ],
           ),
-          onDeleteEntryFn: (id) async => deletedId = id,
+          applied: applied,
         ),
       );
       await _startSync(tester);
@@ -559,32 +568,30 @@ void main() {
       await _settle(tester);
       await tester.tap(find.text('OK'));
       await _settle(tester);
-      expect(deletedId, 'new-1');
+      expect(applied.entryDeletes, ['new-1']);
     });
 
     testWidgets('a kept new entry is not deleted', (tester) async {
-      var deleteCalled = false;
+      final applied = _Applied();
       await tester.pumpWidget(
         _buildScreen(
           pickedPath: '/tmp/other.gabbro',
           mergeVault: (_, _) async => _summary(
             addedEntries: [const AddedEntryItem(id: 'new-1', title: 'Bank')],
           ),
-          onDeleteEntryFn: (_) async => deleteCalled = true,
+          applied: applied,
         ),
       );
       await _startSync(tester);
       await tester.tap(find.text('OK'));
       await _settle(tester);
-      expect(deleteCalled, isFalse);
+      expect(applied.entryDeletes, isEmpty);
     });
 
     testWidgets(
       'a brought-over field can be dropped to restore the old value',
       (tester) async {
-        String? gotField;
-        bool? gotKeep;
-        String? gotValue;
+        final applied = _Applied();
         await tester.pumpWidget(
           _buildScreen(
             pickedPath: '/tmp/other.gabbro',
@@ -599,11 +606,7 @@ void main() {
                 ),
               ],
             ),
-            onResolveFieldConflict: (id, field, keep, value) async {
-              gotField = field;
-              gotKeep = keep;
-              gotValue = value;
-            },
+            applied: applied,
           ),
         );
         await _startSync(tester);
@@ -616,23 +619,21 @@ void main() {
         await _settle(tester);
         await tester.tap(find.text('OK'));
         await _settle(tester);
-        expect(gotField, 'url');
+        final r = applied.fields.single;
+        expect(r.field, 'url');
         expect(
-          gotKeep,
+          r.keepIncoming,
           true,
           reason: 'restore sets the field to the old value',
         );
-        expect(gotValue, 'old.example.com');
+        expect(r.value, 'old.example.com');
       },
     );
 
     testWidgets('a kept brought-over edit retains the old value in history', (
       tester,
     ) async {
-      String? field;
-      String? newV;
-      String? replaced;
-      var resolveCalled = false;
+      final applied = _Applied();
       await tester.pumpWidget(
         _buildScreen(
           pickedPath: '/tmp/other.gabbro',
@@ -647,29 +648,23 @@ void main() {
               ),
             ],
           ),
-          onResolveFieldConflict: (_, _, _, _) async => resolveCalled = true,
-          onReplaceFieldWithHistory: (id, f, n, r) async {
-            field = f;
-            newV = n;
-            replaced = r;
-          },
+          applied: applied,
         ),
       );
       await _startSync(tester);
       await tester.tap(find.text('OK')); // keep (default)
       await _settle(tester);
-      expect(resolveCalled, isFalse);
-      expect(field, 'url');
-      expect(newV, 'b');
-      expect(replaced, 'a', reason: 'old value goes to recovery history');
+      expect(applied.fields, isEmpty);
+      final h = applied.history.single;
+      expect(h.field, 'url');
+      expect(h.newValue, 'b');
+      expect(h.replacedValue, 'a', reason: 'old value goes to recovery history');
     });
 
     testWidgets('use-theirs keeps the losing local value in history', (
       tester,
     ) async {
-      String? field;
-      String? newV;
-      String? replaced;
+      final applied = _Applied();
       await tester.pumpWidget(
         _buildScreen(
           pickedPath: '/tmp/other.gabbro',
@@ -684,11 +679,7 @@ void main() {
               ),
             ],
           ),
-          onReplaceFieldWithHistory: (id, f, n, r) async {
-            field = f;
-            newV = n;
-            replaced = r;
-          },
+          applied: applied,
         ),
       );
       await _startSync(tester);
@@ -696,14 +687,18 @@ void main() {
       await _settle(tester);
       await tester.tap(find.text('OK'));
       await _settle(tester);
-      expect(field, 'content');
-      expect(newV, 'theirs');
-      expect(replaced, 'mine', reason: 'the losing local value is recoverable');
+      final h = applied.history.single;
+      expect(h.field, 'content');
+      expect(h.newValue, 'theirs');
+      expect(
+        h.replacedValue,
+        'mine',
+        reason: 'the losing local value is recoverable',
+      );
     });
 
     testWidgets('dropping a brought-over added pair removes it', (tester) async {
-      String? delField;
-      bool? delDo;
+      final applied = _Applied();
       await tester.pumpWidget(
         _buildScreen(
           pickedPath: '/tmp/other.gabbro',
@@ -718,10 +713,7 @@ void main() {
               ),
             ],
           ),
-          onResolveItemDelete: (id, f, d) async {
-            delField = f;
-            delDo = d;
-          },
+          applied: applied,
         ),
       );
       await _startSync(tester);
@@ -729,8 +721,9 @@ void main() {
       await _settle(tester);
       await tester.tap(find.text('OK'));
       await _settle(tester);
-      expect(delField, 'custom_fields:Tag');
-      expect(delDo, true, reason: 'a dropped add is removed, not restored');
+      final d = applied.items.single;
+      expect(d.field, 'custom_fields:Tag');
+      expect(d.delete, true, reason: 'a dropped add is removed, not restored');
     });
 
     testWidgets('a brought-over attachment shows its name', (tester) async {
@@ -757,8 +750,7 @@ void main() {
     testWidgets('an item-delete shows keep/delete chips in the entry step', (
       tester,
     ) async {
-      String? gotField;
-      bool? gotDelete;
+      final applied = _Applied();
       await tester.pumpWidget(
         _buildScreen(
           pickedPath: '/tmp/other.gabbro',
@@ -771,10 +763,7 @@ void main() {
               ),
             ],
           ),
-          onResolveItemDelete: (id, field, delete) async {
-            gotField = field;
-            gotDelete = delete;
-          },
+          applied: applied,
         ),
       );
       await _startSync(tester);
@@ -784,8 +773,9 @@ void main() {
       await _settle(tester);
       await tester.tap(find.text('OK'));
       await _settle(tester);
-      expect(gotField, 'custom_fields:OldNote');
-      expect(gotDelete, true);
+      final d = applied.items.single;
+      expect(d.field, 'custom_fields:OldNote');
+      expect(d.delete, true);
     });
 
     testWidgets('finishing is blocked until a clash is picked', (tester) async {

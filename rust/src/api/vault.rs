@@ -191,6 +191,42 @@ pub struct BroughtOverItem {
     pub new_value: String,
 }
 
+// ── Granular-sync apply inputs ────────────────────────────────────────────────
+// The user's review decisions, batched so the whole review applies in one vault
+// re-seal instead of one per decision.
+
+/// Set a field/pair on a clash: keep-mine (`keep_incoming` false, `value` ignored)
+/// or a dropped brought-over edit (`keep_incoming` true, `value` = value to set).
+/// No history is recorded.
+pub struct SyncFieldResolutionInput {
+    pub id: String,
+    pub field: String,
+    pub keep_incoming: bool,
+    pub value: String,
+}
+
+/// Set `field` to `new_value` and keep `replaced_value` in the entry's history:
+/// a kept brought-over edit or a clash resolved to the other device's value.
+pub struct SyncHistoryReplacementInput {
+    pub id: String,
+    pub field: String,
+    pub new_value: String,
+    pub replaced_value: String,
+}
+
+/// Keep or delete an item (custom pair / attachment) the other side removed.
+pub struct SyncItemDeleteInput {
+    pub id: String,
+    pub field: String,
+    pub delete: bool,
+}
+
+/// Assign a chosen folder to an entry (mirrors `session_assign_folder_to_entries`).
+pub struct SyncFolderInput {
+    pub id: String,
+    pub folder: String,
+}
+
 /// Summary returned to Flutter after a vault merge operation.
 pub struct MergeSummary {
     /// Entries added from the incoming vault (UUIDs not present locally).

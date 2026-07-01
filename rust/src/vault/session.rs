@@ -609,117 +609,6 @@ pub fn session_change_passphrase(
     Ok(())
 }
 
-/// Apply a field-conflict resolution. If `keep_incoming`, the field takes the
-/// incoming value; either way the field's change-time is bumped to now so the
-/// choice wins future merges (otherwise the equal-timestamp clash would recur).
-pub fn session_resolve_field_conflict(
-    id: String,
-    field: String,
-    keep_incoming: bool,
-    incoming_value: String,
-) -> Result<(), String> {
-    let (body, passphrase, path, yubikey) = {
-        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
-        let session = session.as_mut().ok_or("Vault is locked")?;
-        let entry = session
-            .entries
-            .iter_mut()
-            .find(|e| entry_id(e) == id)
-            .ok_or_else(|| format!("No entry found with id: {id}"))?;
-        if keep_incoming {
-            crate::api::vault::set_entry_field_by_key(entry, &field, &incoming_value);
-        }
-        let meta = meta_of_mut(entry);
-        meta.field_times.insert(field, crate::api::vault::now_ms());
-        meta.updated_at = crate::api::vault::chrono_now();
-        let body = build_body(session);
-        let yubikey = extract_yubikey(session);
-        (
-            body,
-            session.passphrase.clone(),
-            session.path.clone(),
-            yubikey,
-        )
-    };
-    do_save(&body, &passphrase, &path, yubikey)?;
-    Ok(())
-}
-
-/// Apply a pending item-delete resolution. If `delete`, the item is removed and a
-/// tombstone stamped; otherwise the item's change-time is bumped so it stops being
-/// re-flagged on future merges.
-pub fn session_resolve_item_delete(id: String, field: String, delete: bool) -> Result<(), String> {
-    let (body, passphrase, path, yubikey) = {
-        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
-        let session = session.as_mut().ok_or("Vault is locked")?;
-        let entry = session
-            .entries
-            .iter_mut()
-            .find(|e| entry_id(e) == id)
-            .ok_or_else(|| format!("No entry found with id: {id}"))?;
-        let now_ms = crate::api::vault::now_ms();
-        if delete {
-            crate::api::vault::remove_entry_item_by_key(entry, &field);
-            let meta = meta_of_mut(entry);
-            meta.field_times.insert(format!("del:{field}"), now_ms);
-            meta.field_times.remove(&field);
-        } else {
-            meta_of_mut(entry).field_times.insert(field, now_ms);
-        }
-        meta_of_mut(entry).updated_at = crate::api::vault::chrono_now();
-        let body = build_body(session);
-        let yubikey = extract_yubikey(session);
-        (
-            body,
-            session.passphrase.clone(),
-            session.path.clone(),
-            yubikey,
-        )
-    };
-    do_save(&body, &passphrase, &path, yubikey)?;
-    Ok(())
-}
-
-/// Set `field` to `new_value` and keep the `replaced_value` in the entry's
-/// recovery history (the sync model's fallback). Used when a brought-over edit is
-/// kept (old local value retained) or a clash is resolved to the other device's
-/// value (the losing local value retained). The replaced value is kept until the
-/// user restores or deletes it.
-pub fn session_replace_field_with_history(
-    id: String,
-    field: String,
-    new_value: String,
-    replaced_value: String,
-) -> Result<(), String> {
-    let (body, passphrase, path, yubikey) = {
-        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
-        let session = session.as_mut().ok_or("Vault is locked")?;
-        let entry = session
-            .entries
-            .iter_mut()
-            .find(|e| entry_id(e) == id)
-            .ok_or_else(|| format!("No entry found with id: {id}"))?;
-        crate::api::vault::set_entry_field_by_key(entry, &field, &new_value);
-        let now = crate::api::vault::chrono_now();
-        let meta = meta_of_mut(entry);
-        // One previous value per field: overwrite any existing record for this
-        // field rather than accumulating (unified history model).
-        meta.record_previous(&field, &replaced_value, &now, None);
-        meta.field_times.insert(field, crate::api::vault::now_ms());
-        meta.updated_at = now;
-        let body = build_body(session);
-        let yubikey = extract_yubikey(session);
-        (
-            body,
-            session.passphrase.clone(),
-            session.path.clone(),
-            yubikey,
-        )
-    };
-    do_save(&body, &passphrase, &path, yubikey)?;
-    Ok(())
-}
-
 /// Restore a recovery-history record: set its field back to the saved value and
 /// remove the record (it is now the current value). `index` is the record's
 /// position in the entry's history list.
@@ -1904,11 +1793,17 @@ fn assert_walk_end_state(ents: &[VaultEntry]) {
             .unwrap_or_else(|| panic!("missing entry: {id}"))
     };
     let cf = |fields: &[crate::vault::entry::CustomField], label: &str| -> Option<String> {
-        fields.iter().find(|f| f.label == label).map(|f| f.value.clone())
+        fields
+            .iter()
+            .find(|f| f.label == label)
+            .map(|f| f.value.clone())
     };
 
     // Whole-entry decisions.
-    assert!(ents.iter().all(|e| meta_of(e).id != "delme"), "delme must be deleted");
+    assert!(
+        ents.iter().all(|e| meta_of(e).id != "delme"),
+        "delme must be deleted"
+    );
     assert!(
         ents.iter().any(|e| meta_of(e).id == "extra-b"),
         "extra-b (new on B) must be kept"
@@ -1955,7 +1850,10 @@ fn assert_walk_end_state(ents: &[VaultEntry]) {
     match get("custom-nc") {
         VaultEntry::Custom(e) => {
             assert_eq!(e.title, "API creds (C)");
-            assert_eq!(e.fields.get("env").map(|f| f.value.as_str()), Some("prod-B"));
+            assert_eq!(
+                e.fields.get("env").map(|f| f.value.as_str()),
+                Some("prod-B")
+            );
         }
         _ => panic!(),
     }
@@ -1966,7 +1864,10 @@ fn assert_walk_end_state(ents: &[VaultEntry]) {
             assert_eq!(e.username, "bob-B");
             assert_eq!(e.password, "qC", "Bank password -> use other");
             assert!(
-                e.meta.history.iter().any(|h| h.field == "password" && h.value == "qA"),
+                e.meta
+                    .history
+                    .iter()
+                    .any(|h| h.field == "password" && h.value == "qA"),
                 "the replaced password (qA) is kept in recovery history"
             );
         }
@@ -1996,8 +1897,15 @@ fn assert_walk_end_state(ents: &[VaultEntry]) {
     }
     match get("custom-co") {
         VaultEntry::Custom(e) => {
-            assert_eq!(e.fields.get("token").map(|f| f.value.as_str()), Some("tokA"), "Tokens -> keep mine");
-            assert_eq!(e.fields.get("scope").map(|f| f.value.as_str()), Some("scope-B"));
+            assert_eq!(
+                e.fields.get("token").map(|f| f.value.as_str()),
+                Some("tokA"),
+                "Tokens -> keep mine"
+            );
+            assert_eq!(
+                e.fields.get("scope").map(|f| f.value.as_str()),
+                Some("scope-B")
+            );
         }
         _ => panic!(),
     }
@@ -2223,8 +2131,14 @@ mod field_merge_tests {
         assert!(!first.brought_over.is_empty(), "B has values to bring over");
         let again = do_merge(&mut session, load("B"));
         assert_eq!(again.added, 0, "re-sync adds nothing");
-        assert!(again.brought_over.is_empty(), "re-sync repeats no brought-over");
-        assert!(again.field_conflicts.is_empty(), "re-sync invents no clashes");
+        assert!(
+            again.brought_over.is_empty(),
+            "re-sync repeats no brought-over"
+        );
+        assert!(
+            again.field_conflicts.is_empty(),
+            "re-sync invents no clashes"
+        );
 
         // C clashes on six fields. Leaving them unresolved (an interrupted
         // review), a re-sync of C re-surfaces the same clashes and still repeats
@@ -2237,7 +2151,10 @@ mod field_merge_tests {
             6,
             "unresolved clashes re-surface on a re-sync"
         );
-        assert!(c2.brought_over.is_empty(), "already-applied values are not repeated");
+        assert!(
+            c2.brought_over.is_empty(),
+            "already-applied values are not repeated"
+        );
         assert_eq!(c2.added, 0);
     }
 
@@ -2263,11 +2180,19 @@ mod field_merge_tests {
             custom_fields: vec![],
         });
         let (_merged, conflicts, _pending, _bo) = merge_entry_pair(&local, &incoming);
-        assert_eq!(conflicts.len(), 1, "differing data on both sides is a clash");
+        assert_eq!(
+            conflicts.len(),
+            1,
+            "differing data on both sides is a clash"
+        );
         let c = &conflicts[0];
         assert_eq!(c.field, "data");
         let decode = |s: &str| base64::engine::general_purpose::STANDARD.decode(s).unwrap();
-        assert_eq!(decode(&c.incoming_value), b"incomingbytes", "use other restores incoming");
+        assert_eq!(
+            decode(&c.incoming_value),
+            b"incomingbytes",
+            "use other restores incoming"
+        );
         assert_eq!(decode(&c.local_value), b"localbytes");
     }
 
@@ -3000,6 +2925,174 @@ mod field_merge_tests {
         assert_eq!(summary.brought_over[0].new_value, "new");
     }
 
+    // Interruption/restart safety: if a sync is interrupted before the user's
+    // picks are applied, restarting must re-surface the SAME decisions and lose
+    // nothing. Modelled as do_merge run twice with the same incoming and no picks
+    // applied between - the unresolved surface (clashes, pending deletes) must be
+    // identical and every entry preserved. Pins the "just sync again" guarantee.
+    #[test]
+    fn re_merge_after_unapplied_sync_resurfaces_same_decisions() {
+        use crate::vault::serialization::VaultBody;
+        let mut session = test_session(vec![
+            note("clash", "T", "local", "t", &[("content", TA)]),
+            note("victim", "Doomed", "keep", "t", &[]),
+        ]);
+        let incoming = || VaultBody {
+            entries: vec![note("clash", "T", "incoming", "t", &[("content", TC)])],
+            folders: vec![],
+            deleted_ids: vec![DeletedEntry {
+                id: "victim".into(),
+                deleted_at: "2025-02-01T00:00:00Z".into(),
+            }],
+            ..Default::default()
+        };
+
+        let s1 = do_merge(&mut session, incoming());
+        // Interrupted here: the user never resolved the clash or confirmed the delete.
+        let s2 = do_merge(&mut session, incoming());
+
+        let clash = |s: &MergeSummary| -> Vec<(String, String)> {
+            s.field_conflicts
+                .iter()
+                .map(|c| (c.id.clone(), c.field.clone()))
+                .collect()
+        };
+        let del = |s: &MergeSummary| -> Vec<String> {
+            s.pending_deletes.iter().map(|d| d.id.clone()).collect()
+        };
+        assert_eq!(clash(&s1), vec![("clash".into(), "content".into())]);
+        assert_eq!(clash(&s2), clash(&s1), "restart re-surfaces the same clash");
+        assert_eq!(del(&s1), vec![String::from("victim")]);
+        assert_eq!(
+            del(&s2),
+            del(&s1),
+            "restart re-surfaces the same pending delete"
+        );
+
+        // Nothing lost: both entries still present, and the unresolved clash kept
+        // the local value (never silently overwritten while pending).
+        let ids: Vec<&str> = session.entries.iter().map(entry_id).collect();
+        assert!(
+            ids.contains(&"clash") && ids.contains(&"victim"),
+            "no entry lost across the re-merge"
+        );
+        match session
+            .entries
+            .iter()
+            .find(|e| entry_id(e) == "clash")
+            .unwrap()
+        {
+            VaultEntry::Note(n) => {
+                assert_eq!(n.content, "local", "unresolved clash keeps the local value")
+            }
+            _ => panic!("clash entry is a note"),
+        }
+    }
+
+    // Batched granular apply (in-memory part): one call applies every review
+    // decision - keep-mine, kept clash with history, item delete, folder assign,
+    // whole-entry delete - so the whole review re-seals the vault once instead of
+    // once per decision. Mirrors the per-decision session_* mutations exactly.
+    #[test]
+    fn do_apply_sync_decisions_applies_every_decision_kind() {
+        use crate::api::vault::{
+            SyncFieldResolutionInput, SyncFolderInput, SyncHistoryReplacementInput,
+            SyncItemDeleteInput,
+        };
+        let mut session = test_session(vec![
+            login("keepmine", "T", "u", "url", "mine", vec![]),
+            note("hist", "T", "loser", "t", &[]),
+            custom("itemdel", "T", &[("old_key", "v")]),
+            note("foldered", "T", "c", "t", &[]),
+            note("gone", "T", "c", "t", &[]),
+        ]);
+        session.folders = vec![String::from("Work")];
+
+        do_apply_sync_decisions(
+            &mut session,
+            &[SyncFieldResolutionInput {
+                id: "keepmine".into(),
+                field: "password".into(),
+                keep_incoming: false,
+                value: "theirs".into(), // ignored: keep-mine
+            }],
+            &[SyncHistoryReplacementInput {
+                id: "hist".into(),
+                field: "content".into(),
+                new_value: "winner".into(),
+                replaced_value: "loser".into(),
+            }],
+            &[SyncItemDeleteInput {
+                id: "itemdel".into(),
+                field: "custom_fields:old_key".into(),
+                delete: true,
+            }],
+            &[SyncFolderInput {
+                id: "foldered".into(),
+                folder: "Work".into(),
+            }],
+            &["gone".into()],
+        )
+        .unwrap();
+
+        let get = |id: &str| session.entries.iter().find(|e| entry_id(e) == id);
+
+        // keep-mine: value unchanged, but field marked edited so it stops clashing.
+        match get("keepmine").unwrap() {
+            VaultEntry::Login(l) => {
+                assert_eq!(l.password, "mine", "keep-mine leaves the local value");
+                assert!(l.meta.field_times.contains_key("password"));
+            }
+            _ => panic!(),
+        }
+        // history replacement: new value set, replaced value kept in history.
+        match get("hist").unwrap() {
+            VaultEntry::Note(n) => {
+                assert_eq!(n.content, "winner");
+                assert!(
+                    n.meta.history.iter().any(|h| h.value == "loser"),
+                    "replaced value kept in history"
+                );
+            }
+            _ => panic!(),
+        }
+        // item delete: the custom pair is gone, a del: mark stamped.
+        match get("itemdel").unwrap() {
+            VaultEntry::Custom(c) => {
+                assert!(!c.fields.contains_key("old_key"), "item removed");
+                assert!(c.meta.field_times.contains_key("del:custom_fields:old_key"));
+            }
+            _ => panic!(),
+        }
+        // folder assign.
+        assert_eq!(meta_of(get("foldered").unwrap()).folder, "Work");
+        // whole-entry delete: entry gone, tombstone recorded so future syncs see it.
+        assert!(get("gone").is_none(), "entry deleted");
+        assert!(
+            session.deleted_ids.iter().any(|d| d.id == "gone"),
+            "tombstone recorded for the deleted entry"
+        );
+    }
+
+    #[test]
+    fn do_apply_sync_decisions_rejects_unknown_folder() {
+        use crate::api::vault::SyncFolderInput;
+        let mut session = test_session(vec![note("n1", "T", "c", "t", &[])]);
+        let err = do_apply_sync_decisions(
+            &mut session,
+            &[],
+            &[],
+            &[],
+            &[SyncFolderInput {
+                id: "n1".into(),
+                folder: "Nope".into(),
+            }],
+            &[],
+        )
+        .unwrap_err();
+        assert!(err.contains("Folder not found"), "got: {err}");
+    }
+
     #[test]
     fn merge_unions_entry_history_from_both_sides() {
         use crate::vault::entry::HistoryRecord;
@@ -3392,7 +3485,12 @@ fn do_fast_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummar
             continue;
         }
         if let Some(i) = find(session, &b.id) {
-            meta_of_mut(&mut session.entries[i]).record_previous(&b.field, &b.old_value, &now, None);
+            meta_of_mut(&mut session.entries[i]).record_previous(
+                &b.field,
+                &b.old_value,
+                &now,
+                None,
+            );
         }
     }
     // Field collisions -> incoming value; losing local value kept in history.
@@ -3451,6 +3549,128 @@ pub fn session_fast_merge_from_body(incoming: VaultBody) -> Result<MergeSummary,
     }; // ← lock released here
     do_save(&body, &passphrase, &path, yubikey)?;
     Ok(summary)
+}
+
+/// Apply a batch of granular-sync review decisions to the session in memory.
+/// Mirrors the per-decision `session_*` mutations exactly but performs no save,
+/// so the public wrapper can re-seal the vault once for the whole review.
+/// Application order matches Flutter's apply loop: field resolutions, history
+/// replacements, item deletes, folder assignments, then whole-entry deletes.
+/// One timestamp stamps the whole batch (deterministic within one review).
+fn do_apply_sync_decisions(
+    session: &mut VaultSession,
+    field_resolutions: &[crate::api::vault::SyncFieldResolutionInput],
+    history_replacements: &[crate::api::vault::SyncHistoryReplacementInput],
+    item_deletes: &[crate::api::vault::SyncItemDeleteInput],
+    folders: &[crate::api::vault::SyncFolderInput],
+    entry_deletes: &[String],
+) -> Result<(), String> {
+    let now = crate::api::vault::chrono_now();
+    let now_ms = crate::api::vault::now_ms();
+    let find = |session: &mut VaultSession, id: &str| -> Option<usize> {
+        session.entries.iter().position(|e| entry_id(e) == id)
+    };
+
+    // Clash resolved to keep-mine (value untouched) or a dropped brought-over edit
+    // (field set to the restored value). Either way the field is marked edited so
+    // it stops re-clashing; no history recorded.
+    for f in field_resolutions {
+        if let Some(i) = find(session, &f.id) {
+            let e = &mut session.entries[i];
+            if f.keep_incoming {
+                crate::api::vault::set_entry_field_by_key(e, &f.field, &f.value);
+            }
+            let meta = meta_of_mut(e);
+            meta.field_times.insert(f.field.clone(), now_ms);
+            meta.updated_at = now.clone();
+        }
+    }
+    // Kept clash-to-theirs / kept brought-over edit: set the new value, keep the
+    // replaced local value in history.
+    for h in history_replacements {
+        if let Some(i) = find(session, &h.id) {
+            let e = &mut session.entries[i];
+            crate::api::vault::set_entry_field_by_key(e, &h.field, &h.new_value);
+            let meta = meta_of_mut(e);
+            meta.record_previous(&h.field, &h.replaced_value, &now, None);
+            meta.field_times.insert(h.field.clone(), now_ms);
+            meta.updated_at = now.clone();
+        }
+    }
+    // Item (custom pair / attachment) delete/keep the other side removed.
+    for d in item_deletes {
+        if let Some(i) = find(session, &d.id) {
+            let e = &mut session.entries[i];
+            if d.delete {
+                crate::api::vault::remove_entry_item_by_key(e, &d.field);
+                let meta = meta_of_mut(e);
+                meta.field_times.insert(format!("del:{}", d.field), now_ms);
+                meta.field_times.remove(&d.field);
+            } else {
+                meta_of_mut(e).field_times.insert(d.field.clone(), now_ms);
+            }
+            meta_of_mut(e).updated_at = now.clone();
+        }
+    }
+    // Folder pick. Validate up front like session_assign_folder_to_entries; on an
+    // unknown folder we bail before any save (caller discards the session change).
+    for f in folders {
+        if !f.folder.is_empty() && !session.folders.contains(&f.folder) {
+            return Err(format!("Folder not found: {}", f.folder));
+        }
+        if let Some(i) = find(session, &f.id) {
+            let meta = meta_of_mut(&mut session.entries[i]);
+            meta.folder = f.folder.clone();
+            meta.updated_at = now.clone();
+        }
+    }
+    // Whole-entry deletes: dropped new entries and confirmed incoming tombstones.
+    // Stamp a tombstone so future syncs see the delete.
+    for id in entry_deletes {
+        if session.entries.iter().any(|e| entry_id(e) == id.as_str()) {
+            crate::api::vault::delete_entry(&mut session.entries, id)?;
+            session.deleted_ids.push(DeletedEntry {
+                id: id.clone(),
+                deleted_at: now.clone(),
+            });
+        }
+    }
+    Ok(())
+}
+
+/// Apply a batch of granular-sync review decisions and persist the vault once:
+/// field resolutions, kept-value history replacements, item keeps/deletes, folder
+/// picks, and whole-entry deletes. One lock, one Argon2id re-seal for the whole
+/// review, instead of one re-seal per decision.
+pub fn session_apply_sync_decisions(
+    field_resolutions: Vec<crate::api::vault::SyncFieldResolutionInput>,
+    history_replacements: Vec<crate::api::vault::SyncHistoryReplacementInput>,
+    item_deletes: Vec<crate::api::vault::SyncItemDeleteInput>,
+    folders: Vec<crate::api::vault::SyncFolderInput>,
+    entry_deletes: Vec<String>,
+) -> Result<(), String> {
+    let (body, passphrase, path, yubikey) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        do_apply_sync_decisions(
+            session,
+            &field_resolutions,
+            &history_replacements,
+            &item_deletes,
+            &folders,
+            &entry_deletes,
+        )?;
+        let body = build_body(session);
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            session.passphrase.clone(),
+            session.path.clone(),
+            yubikey,
+        )
+    }; // ← lock released here
+    do_save(&body, &passphrase, &path, yubikey)?;
+    Ok(())
 }
 
 #[cfg(test)]
@@ -6032,14 +6252,18 @@ mod merge_tests {
     }
 
     // Runs the README hardware walk entirely in code (no UI): import A, sync B
-    // keeping all defaults, sync C with the dictated picks, and assert the same
-    // end-state the JSON checker verifies. Proves the walk's expected result is
-    // exactly what the engine produces — so a failing hardware checker means a
-    // mis-click, not a code bug.
+    // keeping all defaults, sync C applying the dictated picks through the single
+    // batched `session_apply_sync_decisions` call, and assert the same end-state
+    // the JSON checker verifies. Proves the walk's expected result is exactly what
+    // the engine produces — so a failing hardware checker means a mis-click, not a
+    // code bug.
     #[test]
     #[serial]
     #[ignore = "production-Argon saves; run in release via the gate"]
-    fn sync_walk_simulation_matches_checker() {
+    fn sync_walk_batched_apply_matches_checker() {
+        use crate::api::vault::{
+            SyncFieldResolutionInput, SyncHistoryReplacementInput, SyncItemDeleteInput,
+        };
         let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .unwrap()
@@ -6049,35 +6273,62 @@ mod merge_tests {
             crate::api::vault::load_vault(pass, &dir.join(format!("sync_test_{n}.gabbro"))).unwrap()
         };
 
-        let path = setup(pass, "walk_sim", load("A").entries);
+        let path = setup(pass, "walk_batched", load("A").entries);
         unlock_vault(pass, path.clone()).unwrap();
 
-        // Sync B: keeping all defaults is just the additive merge.
         session_merge_vault_from_body(load("B")).unwrap();
-        // Sync C, then apply the dictated picks.
         let sc = session_merge_vault_from_body(load("C")).unwrap();
-        for (id, field) in [
+
+        // Clashes resolved to the other device's value keep the losing local value
+        // in history.
+        let history_replacements = [
             ("login-co", "password"),
             ("id-co", "last_name"),
             ("file-co", "data"),
-        ] {
+        ]
+        .iter()
+        .map(|(id, field)| {
             let c = sc
                 .field_conflicts
                 .iter()
-                .find(|c| c.id == id && c.field == field)
+                .find(|c| c.id == *id && c.field == *field)
                 .unwrap_or_else(|| panic!("expected clash {id}/{field}"));
-            session_replace_field_with_history(
-                id.to_string(),
-                field.to_string(),
-                c.incoming_value.clone(),
-                c.local_value.clone(),
-            )
-            .unwrap();
-        }
-        // keep-mine on Ideas/Amex/Tokens needs no value change.
-        session_resolve_item_delete("login-nc".into(), "custom_fields:OldNote".into(), true)
-            .unwrap();
-        session_delete_entry("delme").unwrap();
+            SyncHistoryReplacementInput {
+                id: (*id).to_string(),
+                field: (*field).to_string(),
+                new_value: c.incoming_value.clone(),
+                replaced_value: c.local_value.clone(),
+            }
+        })
+        .collect();
+        // Clashes resolved keep-mine: value untouched (matches the real UI, which
+        // still sends a resolution so the field stops re-clashing).
+        let field_resolutions = [
+            ("note-co", "content"),
+            ("card-co", "cvv"),
+            ("custom-co", "custom_fields:token"),
+        ]
+        .iter()
+        .map(|(id, field)| SyncFieldResolutionInput {
+            id: (*id).to_string(),
+            field: (*field).to_string(),
+            keep_incoming: false,
+            value: String::new(),
+        })
+        .collect();
+
+        session_apply_sync_decisions(
+            field_resolutions,
+            history_replacements,
+            vec![SyncItemDeleteInput {
+                id: "login-nc".into(),
+                field: "custom_fields:OldNote".into(),
+                delete: true,
+            }],
+            vec![],
+            vec!["delme".into()],
+        )
+        .unwrap();
 
         {
             let session = VAULT_SESSION.lock().unwrap();
@@ -6153,7 +6404,10 @@ mod merge_tests {
 
         // Order matters via delete/re-add: C deletes `delme`.
         assert!(!has(&abc, "delme"), "A->B->C: C's delete of delme sticks");
-        assert!(has(&acb, "delme"), "A->C->B: B re-adds delme after C deleted it");
+        assert!(
+            has(&acb, "delme"),
+            "A->C->B: B re-adds delme after C deleted it"
+        );
 
         // The B-only new entry is kept in both orders.
         assert!(has(&abc, "extra-b"), "extra-b kept (A->B->C)");
@@ -6264,12 +6518,19 @@ mod merge_tests {
         );
         unlock_vault(pass, path.clone()).unwrap();
 
-        // Overwrite content, keeping the old value in recovery history.
-        session_replace_field_with_history(
-            "n1".into(),
-            "content".into(),
-            "new".into(),
-            "content".into(),
+        // Overwrite content via the live sync-apply path, keeping the old value
+        // in recovery history.
+        session_apply_sync_decisions(
+            vec![],
+            vec![crate::api::vault::SyncHistoryReplacementInput {
+                id: "n1".into(),
+                field: "content".into(),
+                new_value: "new".into(),
+                replaced_value: "content".into(),
+            }],
+            vec![],
+            vec![],
+            vec![],
         )
         .unwrap();
 
@@ -6307,11 +6568,17 @@ mod merge_tests {
             vec![note("n1", "T", "2026-01-01T00:00:00Z")],
         );
         unlock_vault(pass, path.clone()).unwrap();
-        session_replace_field_with_history(
-            "n1".into(),
-            "content".into(),
-            "new".into(),
-            "old".into(),
+        session_apply_sync_decisions(
+            vec![],
+            vec![crate::api::vault::SyncHistoryReplacementInput {
+                id: "n1".into(),
+                field: "content".into(),
+                new_value: "new".into(),
+                replaced_value: "old".into(),
+            }],
+            vec![],
+            vec![],
+            vec![],
         )
         .unwrap();
 
@@ -6335,11 +6602,17 @@ mod merge_tests {
             vec![note("n1", "T", "2026-01-01T00:00:00Z")],
         );
         unlock_vault(pass, path.clone()).unwrap();
-        session_replace_field_with_history(
-            "n1".into(),
-            "content".into(),
-            "new".into(),
-            "content".into(),
+        session_apply_sync_decisions(
+            vec![],
+            vec![crate::api::vault::SyncHistoryReplacementInput {
+                id: "n1".into(),
+                field: "content".into(),
+                new_value: "new".into(),
+                replaced_value: "content".into(),
+            }],
+            vec![],
+            vec![],
+            vec![],
         )
         .unwrap();
 

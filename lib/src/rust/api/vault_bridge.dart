@@ -352,46 +352,22 @@ Future<MergeSummary> mergeVaultFromFile({
   passphrase: passphrase,
 );
 
-/// Resolve one field-level clash surfaced by a merge (`MergeSummary.field_conflicts`).
-/// `keep_incoming` true applies the other device's value; either way the choice is
-/// stamped so it wins future merges. Persists (async — vault save).
-Future<void> resolveFieldConflict({
-  required String id,
-  required String field,
-  required bool keepIncoming,
-  required String incomingValue,
-}) => RustLib.instance.api.crateApiVaultBridgeResolveFieldConflict(
-  id: id,
-  field: field,
-  keepIncoming: keepIncoming,
-  incomingValue: incomingValue,
-);
-
-/// Resolve one pending item-delete surfaced by a merge (`MergeSummary.pending_item_deletes`).
-/// `delete` true removes the item; false keeps it. Persists (async — vault save).
-Future<void> resolveItemDelete({
-  required String id,
-  required String field,
-  required bool delete,
-}) => RustLib.instance.api.crateApiVaultBridgeResolveItemDelete(
-  id: id,
-  field: field,
-  delete: delete,
-);
-
-/// Set `field` to `new_value` and keep `replaced_value` in the entry's recovery
-/// history. Used when a kept brought-over edit or a clash-resolved-to-theirs
-/// overwrites a local value. Persists (async — vault save).
-Future<void> replaceFieldWithHistory({
-  required String id,
-  required String field,
-  required String newValue,
-  required String replacedValue,
-}) => RustLib.instance.api.crateApiVaultBridgeReplaceFieldWithHistory(
-  id: id,
-  field: field,
-  newValue: newValue,
-  replacedValue: replacedValue,
+/// Apply a whole granular-sync review in one call: field resolutions, kept-value
+/// history replacements, item deletes, folder picks, and whole-entry deletes.
+/// Re-seals the vault once for the entire review instead of once per decision.
+/// Persists (async — a single vault save).
+Future<void> applySyncDecisions({
+  required List<SyncFieldResolutionInput> fieldResolutions,
+  required List<SyncHistoryReplacementInput> historyReplacements,
+  required List<SyncItemDeleteInput> itemDeletes,
+  required List<SyncFolderInput> folders,
+  required List<String> entryDeletes,
+}) => RustLib.instance.api.crateApiVaultBridgeApplySyncDecisions(
+  fieldResolutions: fieldResolutions,
+  historyReplacements: historyReplacements,
+  itemDeletes: itemDeletes,
+  folders: folders,
+  entryDeletes: entryDeletes,
 );
 
 /// Restore a recovery-history record (`index` into the entry's history): set its

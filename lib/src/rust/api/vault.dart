@@ -699,3 +699,108 @@ class PendingItemDeleteItem {
           title == other.title &&
           field == other.field;
 }
+
+/// Set a field/pair on a clash: keep-mine (`keep_incoming` false, `value` ignored)
+/// or a dropped brought-over edit (`keep_incoming` true, `value` = value to set).
+/// No history is recorded.
+class SyncFieldResolutionInput {
+  final String id;
+  final String field;
+  final bool keepIncoming;
+  final String value;
+
+  const SyncFieldResolutionInput({
+    required this.id,
+    required this.field,
+    required this.keepIncoming,
+    required this.value,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^ field.hashCode ^ keepIncoming.hashCode ^ value.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SyncFieldResolutionInput &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          field == other.field &&
+          keepIncoming == other.keepIncoming &&
+          value == other.value;
+}
+
+/// Assign a chosen folder to an entry (mirrors `session_assign_folder_to_entries`).
+class SyncFolderInput {
+  final String id;
+  final String folder;
+
+  const SyncFolderInput({required this.id, required this.folder});
+
+  @override
+  int get hashCode => id.hashCode ^ folder.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SyncFolderInput &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          folder == other.folder;
+}
+
+/// Set `field` to `new_value` and keep `replaced_value` in the entry's history:
+/// a kept brought-over edit or a clash resolved to the other device's value.
+class SyncHistoryReplacementInput {
+  final String id;
+  final String field;
+  final String newValue;
+  final String replacedValue;
+
+  const SyncHistoryReplacementInput({
+    required this.id,
+    required this.field,
+    required this.newValue,
+    required this.replacedValue,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^ field.hashCode ^ newValue.hashCode ^ replacedValue.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SyncHistoryReplacementInput &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          field == other.field &&
+          newValue == other.newValue &&
+          replacedValue == other.replacedValue;
+}
+
+/// Keep or delete an item (custom pair / attachment) the other side removed.
+class SyncItemDeleteInput {
+  final String id;
+  final String field;
+  final bool delete;
+
+  const SyncItemDeleteInput({
+    required this.id,
+    required this.field,
+    required this.delete,
+  });
+
+  @override
+  int get hashCode => id.hashCode ^ field.hashCode ^ delete.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SyncItemDeleteInput &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          field == other.field &&
+          delete == other.delete;
+}

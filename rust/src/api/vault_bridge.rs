@@ -882,34 +882,24 @@ pub async fn merge_vault_from_file(
     session::session_merge_vault_from_body(incoming_body)
 }
 
-/// Resolve one field-level clash surfaced by a merge (`MergeSummary.field_conflicts`).
-/// `keep_incoming` true applies the other device's value; either way the choice is
-/// stamped so it wins future merges. Persists (async — vault save).
-pub async fn resolve_field_conflict(
-    id: String,
-    field: String,
-    keep_incoming: bool,
-    incoming_value: String,
+/// Apply a whole granular-sync review in one call: field resolutions, kept-value
+/// history replacements, item deletes, folder picks, and whole-entry deletes.
+/// Re-seals the vault once for the entire review instead of once per decision.
+/// Persists (async — a single vault save).
+pub async fn apply_sync_decisions(
+    field_resolutions: Vec<crate::api::vault::SyncFieldResolutionInput>,
+    history_replacements: Vec<crate::api::vault::SyncHistoryReplacementInput>,
+    item_deletes: Vec<crate::api::vault::SyncItemDeleteInput>,
+    folders: Vec<crate::api::vault::SyncFolderInput>,
+    entry_deletes: Vec<String>,
 ) -> Result<(), String> {
-    session::session_resolve_field_conflict(id, field, keep_incoming, incoming_value)
-}
-
-/// Resolve one pending item-delete surfaced by a merge (`MergeSummary.pending_item_deletes`).
-/// `delete` true removes the item; false keeps it. Persists (async — vault save).
-pub async fn resolve_item_delete(id: String, field: String, delete: bool) -> Result<(), String> {
-    session::session_resolve_item_delete(id, field, delete)
-}
-
-/// Set `field` to `new_value` and keep `replaced_value` in the entry's recovery
-/// history. Used when a kept brought-over edit or a clash-resolved-to-theirs
-/// overwrites a local value. Persists (async — vault save).
-pub async fn replace_field_with_history(
-    id: String,
-    field: String,
-    new_value: String,
-    replaced_value: String,
-) -> Result<(), String> {
-    session::session_replace_field_with_history(id, field, new_value, replaced_value)
+    session::session_apply_sync_decisions(
+        field_resolutions,
+        history_replacements,
+        item_deletes,
+        folders,
+        entry_deletes,
+    )
 }
 
 /// Restore a recovery-history record (`index` into the entry's history): set its

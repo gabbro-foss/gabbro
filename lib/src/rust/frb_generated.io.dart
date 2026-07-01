@@ -193,6 +193,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<SkippedEntryData> dco_decode_list_skipped_entry_data(dynamic raw);
 
   @protected
+  List<SyncFieldResolutionInput> dco_decode_list_sync_field_resolution_input(
+    dynamic raw,
+  );
+
+  @protected
+  List<SyncFolderInput> dco_decode_list_sync_folder_input(dynamic raw);
+
+  @protected
+  List<SyncHistoryReplacementInput>
+  dco_decode_list_sync_history_replacement_input(dynamic raw);
+
+  @protected
+  List<SyncItemDeleteInput> dco_decode_list_sync_item_delete_input(dynamic raw);
+
+  @protected
   List<YubiKeyInitData> dco_decode_list_yubi_key_init_data(dynamic raw);
 
   @protected
@@ -236,6 +251,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   StrengthTier dco_decode_strength_tier(dynamic raw);
+
+  @protected
+  SyncFieldResolutionInput dco_decode_sync_field_resolution_input(dynamic raw);
+
+  @protected
+  SyncFolderInput dco_decode_sync_folder_input(dynamic raw);
+
+  @protected
+  SyncHistoryReplacementInput dco_decode_sync_history_replacement_input(
+    dynamic raw,
+  );
+
+  @protected
+  SyncItemDeleteInput dco_decode_sync_item_delete_input(dynamic raw);
 
   @protected
   int dco_decode_u_32(dynamic raw);
@@ -492,6 +521,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  List<SyncFieldResolutionInput> sse_decode_list_sync_field_resolution_input(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<SyncFolderInput> sse_decode_list_sync_folder_input(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  List<SyncHistoryReplacementInput>
+  sse_decode_list_sync_history_replacement_input(SseDeserializer deserializer);
+
+  @protected
+  List<SyncItemDeleteInput> sse_decode_list_sync_item_delete_input(
+    SseDeserializer deserializer,
+  );
+
+  @protected
   List<YubiKeyInitData> sse_decode_list_yubi_key_init_data(
     SseDeserializer deserializer,
   );
@@ -547,6 +595,24 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   StrengthTier sse_decode_strength_tier(SseDeserializer deserializer);
+
+  @protected
+  SyncFieldResolutionInput sse_decode_sync_field_resolution_input(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SyncFolderInput sse_decode_sync_folder_input(SseDeserializer deserializer);
+
+  @protected
+  SyncHistoryReplacementInput sse_decode_sync_history_replacement_input(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  SyncItemDeleteInput sse_decode_sync_item_delete_input(
+    SseDeserializer deserializer,
+  );
 
   @protected
   int sse_decode_u_32(SseDeserializer deserializer);
@@ -866,6 +932,30 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   );
 
   @protected
+  void sse_encode_list_sync_field_resolution_input(
+    List<SyncFieldResolutionInput> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_sync_folder_input(
+    List<SyncFolderInput> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_sync_history_replacement_input(
+    List<SyncHistoryReplacementInput> self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_list_sync_item_delete_input(
+    List<SyncItemDeleteInput> self,
+    SseSerializer serializer,
+  );
+
+  @protected
   void sse_encode_list_yubi_key_init_data(
     List<YubiKeyInitData> self,
     SseSerializer serializer,
@@ -939,6 +1029,30 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_strength_tier(StrengthTier self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_sync_field_resolution_input(
+    SyncFieldResolutionInput self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_sync_folder_input(
+    SyncFolderInput self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_sync_history_replacement_input(
+    SyncHistoryReplacementInput self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void sse_encode_sync_item_delete_input(
+    SyncItemDeleteInput self,
+    SseSerializer serializer,
+  );
 
   @protected
   void sse_encode_u_32(int self, SseSerializer serializer);
