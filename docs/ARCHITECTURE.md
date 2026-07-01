@@ -74,6 +74,8 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust sync-walk batched apply (`cargo test --release --lib sync_walk_batched_apply_matches_checker -- --ignored`) | 1 | 1 (opt-in by default) |
+| Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
+| Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 998 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
@@ -95,7 +97,9 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 Fast auto-merge, the unified history model, and the v9 format are done and
 hardware-verified (see git log / CHANGELOG). Remaining work is the granular review path:
 
-- [ ] Edge-case hardening pass (none done deliberately yet).
+- [ ] Edge-case hardening: quick-confirm empty-title, self-sync, and duplicate
+      custom-label display (the larger cases — cross-version, cleared fields,
+      atomic cancel — are done; see git log).
 
 Then run the gate (`gabbro_test`, ~100min, watch the backward-compat leg) and decide on release.
 

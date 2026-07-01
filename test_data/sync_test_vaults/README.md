@@ -137,6 +137,49 @@ Expected outcome (no prompts): every `*-co` clash field takes **C's** value; `de
 (deleted on C) is **gone**; `extra-b` (new on B) is **kept**; the `login-nc` `OldNote`
 item C deleted is **removed**.
 
+## Hardware test — cancel and "merge the rest"
+
+Exercises the granular review's bail-out (the **Cancel** button → **Cancel sync** /
+**Merge automatically** chooser). One device, mock vaults, passphrase `0123456789a`.
+
+### Cancel = nothing changes
+
+**1.** Create a new vault, passphrase `0123456789a`.
+
+**2.** Menu → **Import entries** → **Gabbro vault** → `sync_test_A.gabbro` →
+**Sync from vault**.
+
+**3.** Menu → **Sync from file** → `sync_test_B.gabbro` → **Review all changes**.
+When the review opens, tap **Cancel** → **Cancel sync**.
+
+**4.** Expect a **Sync cancelled** snackbar and the vault **unchanged**: the B-only
+entry **New on B** is absent, and **Email** (`login-nc`) still shows A's password
+`p0` (not `p0-B`).
+
+### Merge the rest = same result as the fast auto-merge
+
+Reaching **Merge automatically** from inside the review *without making any picks
+first* must produce exactly the up-front fast auto-merge result — so the same
+checker verifies it.
+
+**1.** Create a new vault, passphrase `0123456789a`; import `sync_test_A.gabbro` as above.
+
+**2. Sync B.** Menu → **Sync from file** → `sync_test_B.gabbro` → **Review all
+changes** → immediately tap **Cancel** → **Merge automatically**.
+
+**3. Sync C.** Menu → **Sync from file** → `sync_test_C.gabbro` → **Review all
+changes** → immediately **Cancel** → **Merge automatically**.
+
+**4.** Export the vault to **JSON**, save as `/tmp/fast_sync_walk.json`.
+
+**5.** Run the fast checker from `rust/` (the same one the fast auto-merge walk uses):
+
+```
+GABBRO_FAST_WALK_JSON=/tmp/fast_sync_walk.json cargo test --release --lib check_fast_sync_walk_export -- --ignored
+```
+
+Green = "merge the rest" mid-review produced exactly the fast-merge result.
+
 ## Regenerate
 
 These are committed binaries. To rebuild them after changing the corpus, run the generator
