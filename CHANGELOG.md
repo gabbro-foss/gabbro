@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Entry history unified into one place (part of v9).** An entry's past values now live in a single history — one previous value per field, shown under one "History" button — instead of a separate single-slot "Password history" plus a growing "Previous state" list. Old vaults migrate losslessly on load; secret fields still auto-expire per your retention setting.
 - **Vault sync is now field-level (format v8 → v9).** Editing different fields — or different custom key/value pairs — of the same entry on two devices now keeps both, instead of the newer whole entry overwriting the other. A genuine clash (same field changed to different values) and an item another device deleted are surfaced for you to resolve (keep mine / use theirs; keep / delete) — never silent loss. Fixes the false "nothing to sync". Cryptography is unchanged from v8; an older Gabbro refuses a v9 vault rather than opening it and silently dropping the new per-field data. Backed by a deterministic multi-device sync fuzz proof.
 
+### Fixed
+- The post-sync "Vault synced…" bar no longer lingers on the unlock screen after locking (and its **Details** button can no longer crash the app when tapped there). The bar now carries a close (X) button so it can be dismissed — an actioned snackbar never times out on its own — with the close and Details controls labelled for screen readers.
+
 ## [0.1.0-alpha.10] – 2026-06-26
 
 ### Security

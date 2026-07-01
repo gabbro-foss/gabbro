@@ -1,194 +1,120 @@
 # Sync-test vaults (three divergent devices)
 
-Three copies of a shared 12-entry vault — **two of every entry type** — each with different
-edits, plus a **B-only new entry** and an entry **deleted on C**, for hardware-testing
-N-device granular sync.
+Three copies of a shared 12-entry vault — two of every entry type — with divergent
+edits, plus a **B-only** new entry (`extra-b`, shown as **New on B**) and an entry
+**deleted on C** (`delme`, shown as **Delete me**). The same files back the automated
+test `rust/src/vault/session.rs::sync_test_corpus_converges_without_loss`.
 
-- **Alias:** `synctest` (all three)
-- **Passphrase:** `0123456789a` (all three)
+- **Alias:** `synctest` — **passphrase:** `0123456789a` (all three).
+- One device, **mock vaults only**.
 
-The **same files** back the automated test
-`rust/src/vault/session.rs::sync_test_corpus_converges_without_loss`, so software and
-hardware exercise the identical artifacts. The test converges them in **several different
-sync orders** and asserts the same result every time (order must not matter).
+**Shared start** (both required walks begin here): create a new vault (passphrase
+`0123456789a`), then Menu → **Import entries** → **Gabbro vault** →
+`sync_test_A.gabbro` → **Sync from vault**.
 
-Each device stamps its edits at a **different time** (A oldest, then B, then C), so a
-colliding field genuinely differs in time — a real two-device clash, not an artificial
-same-millisecond tie. A clash is raised because **both sides edited the field**, never
-because the times match; the newer time is not used to silently pick a winner.
+> **Order matters — always sync A, then B, then C.** The checkers validate the
+> **A→B→C** result. Syncing C before B produces a *different but still-correct*
+> vault that won't match — `delme` reappears, because a device that still holds a
+> deleted entry re-adds it on sync (union: a sync never silently loses an entry).
+> A checker failing with `delme` present means you synced out of order, not a bug.
 
-## The 12-entry base (identical on all three)
+---
 
-`login-nc` Email (alice / p0; custom `OldNote`), `login-co` Bank (bob / q0),
-`note-nc` Shopping, `note-co` Ideas, `id-nc` Me (Alex Stone), `id-co` Partner (Sam Stone),
-`card-nc` Visa (cvv 123), `card-co` Amex (cvv 999), `file-nc` passport.txt (one-word text
-payload `original`), `file-co` key.txt (`base`), `custom-nc` API creds (`api_key`,`secret`),
-`custom-co` Tokens (`token`).
+# Required — do these three
 
-The two File entries hold a small one-word text payload so it's easy to edit.
+## Walk 1 — granular review
 
-## Two extra entries (the add / delete review paths)
+1. **Sync B:** Menu → **Sync from file** → `sync_test_B.gabbro` → **Review all
+   changes**. On every screen leave the default and tap **Continue**; the first
+   screen (**New on B**) leave as **Keep**. Tap **OK**.
+2. **Sync C:** Menu → **Sync from file** → `sync_test_C.gabbro` → **Review all
+   changes**. Match each screen by its **title** and do what the table says, then
+   **Continue**. Tap **OK** at the end. (Rows default to **Use other vault**.)
 
-- `delme` — a Note present on **A and B only**. **C deletes it** (tombstone), so syncing C
-  surfaces it as a **whole-entry delete**.
-- `extra-b` — a Login present on **B only**, so syncing B surfaces it as a **new entry**.
+   | Screen title | What to do |
+   |--------------|-----------|
+   | **Email** | leave the URL row default; on the **OldNote** row pick **Delete** |
+   | **Shopping-A** | **Continue** (default) |
+   | **Alex Stone** | **Continue** (default) |
+   | **Visa** | **Continue** (default) |
+   | **passport-A.txt** | **Continue** (default) |
+   | **API creds** | **Continue** (default) |
+   | **Bank** | tap the **eye** to reveal, then **Use other vault** |
+   | **Ideas-B** | **Use this vault** |
+   | **Sam-B StoneA** | **Use other vault** |
+   | **Amex** | **Use this vault** |
+   | **key-B.txt** | **Use other vault** |
+   | **Tokens** | **Use this vault** |
+   | **Delete me** | pick **Delete** |
 
-## What each device changed
+3. On the C-sync snackbar (*"Vault synced — 0 added, 9 updated, 1 deleted"*) tap
+   **Details** before it fades. Confirm the dialog lists **Updated (9)**,
+   **Deleted (1): Delete me**, **no Added**, and no Ideas-B / Amex / Tokens.
+4. Export the vault to **JSON**, save as `/tmp/sync_walk.json`.
 
-For every type, `*-nc` gets **non-colliding** edits (each device touches a *different*
-field → all merge) and `*-co` gets a **colliding** edit (two devices change the *same*
-field → clash).
-
-| Type | `*-nc` (non-colliding) | `*-co` (colliding) |
-|------|------------------------|--------------------|
-| Login | A→username, B→password, C→url; **C deletes custom `OldNote`** | A & C → password (clash); B → username |
-| Note | A→title, B→content, C→adds custom `Tag` | A & C → content (clash); B → title |
-| Identity | A→phone, B→email, C→address | A & C → last name (clash); B → first name |
-| Card | A→CVV, B→expiry, C→bank name | A & C → CVV (clash); B → expiry |
-| File | A→filename, B→notes, C→data | A & C → data (clash); B → filename |
-| Custom | A→edits `api_key`, B→adds `env`, C→title | A & C → `token` (clash); B → adds `scope` |
-
-## Hardware test — granular flow: follow exactly
-
-One device. Mock vaults only. Passphrase for everything: `0123456789a`.
-Make the picks below exactly; the result is then checked against a known answer.
-
-**1.** Create a new vault, passphrase `0123456789a`.
-
-**2.** Menu → **Import entries** → **Gabbro vault** → `sync_test_A.gabbro` →
-**Sync from vault**.
-
-**3. Sync B.** Menu → **Sync from file** → `sync_test_B.gabbro`. The review opens
-(13 screens). On **every** screen leave the default and tap **Continue**, then tap
-**OK**. (The first screen is the new entry **New on B** — leave **Keep**.)
-
-**4. Sync C.** Menu → **Sync from file** → `sync_test_C.gabbro`. The review opens
-(13 screens). Each screen's **title** is at the top — match it in the table and do
-exactly what it says, then **Continue**. Order is roughly top-to-bottom, but match by
-title, not position.
-
-Each value row has two chips: **Use this vault** (your value) and **Use other vault** (the
-incoming value). Brought-over rows default to **Use other vault** — leave them.
-
-| Screen title | What to do |
-|--------------|-----------|
-| **Email** | leave the URL row as-is (default **Use other vault**); on the **OldNote** row pick **Delete** |
-| **Shopping-A** | **Continue** (leave default) |
-| **Alex Stone** | **Continue** (leave default) |
-| **Visa** | **Continue** (leave default) |
-| **passport-A.txt** | **Continue** (leave default) |
-| **API creds** | **Continue** (leave default) |
-| **Bank** | tap the **eye** to reveal, then tap **Use other vault** |
-| **Ideas-B** | tap **Use this vault** |
-| **Sam-B StoneA** | tap **Use other vault** |
-| **Amex** | tap **Use this vault** |
-| **key-B.txt** | tap **Use other vault** |
-| **Tokens** | tap **Use this vault** |
-| **Delete me** | pick **Delete** |
-
-Tap **OK** at the end.
-
-**5.** Export the vault to **JSON** (Menu → Export → JSON), save as `/tmp/sync_walk.json`.
-
-**6.** Run the checker from `rust/`:
+**Command** (from `rust/`):
 
 ```
 GABBRO_WALK_JSON=/tmp/sync_walk.json cargo test --release --lib check_sync_walk_export -- --ignored
 ```
 
-Green = the resulting vault matches the known answer exactly. Red = it prints which
-field differs.
+**Expected:** green — the vault matches the known answer. Red prints the field that differs.
 
-Watch for (flag if wrong): every choice is a clearly labelled button (**Keep** /
-**Delete** / **Use other**); the **Bank** and **Amex** screens hide their two values
-behind dots with an **eye** to reveal.
+## Walk 2 — fast auto-merge
 
-## Hardware test — fast auto-merge
+From the shared start:
+1. **Sync B:** Menu → **Sync from file** → `sync_test_B.gabbro` → **Merge
+   automatically** (no review).
+2. **Sync C:** `sync_test_C.gabbro` → **Merge automatically**.
+3. Export to **JSON**, save as `/tmp/fast_sync_walk.json`.
 
-The same corpus, but exercising the **Merge automatically** path (no per-change
-review; the incoming vault wins every clash, replaced values kept in history).
-One device, mock vaults only, passphrase `0123456789a`.
-
-**1.** Create a new vault, passphrase `0123456789a`.
-
-**2.** Menu → **Import entries** → **Gabbro vault** → `sync_test_A.gabbro` →
-**Sync from vault**.
-
-**3. Sync B.** Menu → **Sync from file** → `sync_test_B.gabbro`. On the
-"How should this sync apply?" prompt, tap **Merge automatically**. No review opens.
-
-**4. Sync C.** Menu → **Sync from file** → `sync_test_C.gabbro` → **Merge
-automatically**.
-
-**5.** Export the vault to **JSON** (Menu → Export → JSON), save as
-`/tmp/fast_sync_walk.json`.
-
-**6.** Run the checker from `rust/`:
+**Command** (from `rust/`):
 
 ```
 GABBRO_FAST_WALK_JSON=/tmp/fast_sync_walk.json cargo test --release --lib check_fast_sync_walk_export -- --ignored
 ```
 
-Green = the export matches a fresh in-process fast A→B→C merge of the same corpus
-(compared by field values, ignoring timestamps/history). Red = it prints the entry
-that differs.
+**Expected:** green — matches a fresh in-process fast A→B→C merge (`delme` gone,
+`extra-b` kept, incoming wins every clash).
 
-Expected outcome (no prompts): every `*-co` clash field takes **C's** value; `delme`
-(deleted on C) is **gone**; `extra-b` (new on B) is **kept**; the `login-nc` `OldNote`
-item C deleted is **removed**.
+## Editor check — duplicate custom-field label (30 seconds, no command)
 
-## Hardware test — cancel and "merge the rest"
+Any vault: add a new entry (any type) → **Add custom field** (Label `dup`, Value
+`one`) → **Add custom field** again (Label `dup`, Value `two`) → **Save**.
 
-Exercises the granular review's bail-out (the **Cancel** button → **Cancel sync** /
-**Merge automatically** chooser). One device, mock vaults, passphrase `0123456789a`.
+**Expected:** save **blocked**; the **Label** fields show **"Label must be unique"**.
+Rename one to `dup2` → **Save** succeeds.
 
-### Cancel = nothing changes
+---
 
-**1.** Create a new vault, passphrase `0123456789a`.
+# Optional — already gate-green
 
-**2.** Menu → **Import entries** → **Gabbro vault** → `sync_test_A.gabbro` →
-**Sync from vault**.
+These behaviours are proven by automated Rust tests in the release gate. Run them only
+for extra on-device confidence.
 
-**3.** Menu → **Sync from file** → `sync_test_B.gabbro` → **Review all changes**.
-When the review opens, tap **Cancel** → **Cancel sync**.
+- **Cancel = nothing changes** (`cancel_sync_rolls_back_to_pre_sync_state`). Shared
+  start → **Sync from file** → `sync_test_B.gabbro` → **Review all changes** →
+  **Cancel** → **Cancel sync**. Expect a **Sync cancelled** snackbar and no change
+  (**New on B** absent; **Email** still shows `p0`).
 
-**4.** Expect a **Sync cancelled** snackbar and the vault **unchanged**: the B-only
-entry **New on B** is absent, and **Email** (`login-nc`) still shows A's password
-`p0` (not `p0-B`).
+- **"Merge the rest" mid-review** (`fast_merge_walk...`). Like Walk 2 but reach the
+  fast path from inside the review: for B and C, **Sync from file** → **Review all
+  changes** → **Cancel** → **Merge automatically**. Export to `/tmp/fast_sync_walk.json`
+  and run Walk 2's command — expect the **same** green result.
 
-### Merge the rest = same result as the fast auto-merge
+- **Cross-version source** (`cross_version_sync_loads_and_merges_a_v8_file`). New vault
+  with one Login **`Local Only`** → **Sync from file** → `migration_vaults/v8.gabbro`
+  → passphrase `0123456789a` → **Review all changes** → keep **Migration Test Login**.
+  Expect both entries present, nothing lost.
 
-Reaching **Merge automatically** from inside the review *without making any picks
-first* must produce exactly the up-front fast auto-merge result — so the same
-checker verifies it.
-
-**1.** Create a new vault, passphrase `0123456789a`; import `sync_test_A.gabbro` as above.
-
-**2. Sync B.** Menu → **Sync from file** → `sync_test_B.gabbro` → **Review all
-changes** → immediately tap **Cancel** → **Merge automatically**.
-
-**3. Sync C.** Menu → **Sync from file** → `sync_test_C.gabbro` → **Review all
-changes** → immediately **Cancel** → **Merge automatically**.
-
-**4.** Export the vault to **JSON**, save as `/tmp/fast_sync_walk.json`.
-
-**5.** Run the fast checker from `rust/` (the same one the fast auto-merge walk uses):
-
-```
-GABBRO_FAST_WALK_JSON=/tmp/fast_sync_walk.json cargo test --release --lib check_fast_sync_walk_export -- --ignored
-```
-
-Green = "merge the rest" mid-review produced exactly the fast-merge result.
+---
 
 ## Regenerate
 
-These are committed binaries. To rebuild them after changing the corpus, run the generator
-that defines them (in `rust/src/vault/session.rs`):
+Committed binaries. To rebuild after changing the corpus (from `rust/`):
 
 ```
 cargo test --release regenerate_sync_test_corpus -- --ignored
 ```
 
-It writes all three files with cheap Argon2 params and alias `synctest`.
-
-These vaults use cheap Argon2 params (test only) — never use them for real data.
+Cheap Argon2 params, alias `synctest` — test only, never for real data.

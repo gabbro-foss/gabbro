@@ -77,7 +77,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 998 | 0 |
+| Flutter (`flutter test`) | 1057 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -94,18 +94,26 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task: land granular sync
 
-Granular sync is code-complete (see git log). To close it out:
+Granular sync is code-complete. Remaining to land:
 
-1. **Add three hardware-walk procedures** to `test_data/sync_test_vaults/README.md`:
-   - itemized post-sync summary (the **Details** dialog after a granular sync);
-   - duplicate custom-field label rejected at save (editor check, any entry type);
-   - cross-version sync (sync an older-format source — e.g. a `migration_vaults`
-     vault — into a current vault; incoming entries merge without loss).
-2. **Run all the hardware walks** on mock vaults (granular, fast, cancel/merge-rest,
-   plus the three above). Must be green.
-3. Gate: `gabbro_test` (~100min) must be green.
-4. When the gate **and** the hardware walks are green, **merge `granular-sync-v9`
-   into `master`**.
+1. **Hardware walks** — `test_data/sync_test_vaults/README.md` restructured this
+   session into two paths (granular / auto-merge) + an editor check. Maintainer ran
+   on mock vaults: granular Walk 1 checker, fast Walk 2 (order A→B→C), dup-label
+   editor check, cancel, cross-version — **all green**. Gotcha (documented in the
+   walk, **not a bug**): syncing Walk 2 out of order resurrects `delme` — expected
+   union behaviour (a device still holding a deleted entry re-adds it on sync).
+2. **Sync-snackbar fix** (this session; `flutter test` green, **not yet
+   hardware-verified**). The "Vault synced… Details" bar rode the app-level
+   messenger onto the unlock screen after lock and crashed when Details was tapped
+   (disposed State). `vault_list_screen.dart`: clear snackbars on dispose + a
+   `mounted` guard, plus a `showCloseIcon` dismiss button (an actioned snackbar
+   never auto-dismisses; close + Details are localized + screen-reader-labelled via
+   MaterialLocalizations). Tests in `vault_list_sync_test.dart`. **Device check
+   still owed:** the close (X) dismisses on hardware + a screen reader announces
+   Details/Close.
+3. **`gabbro_test` gate** (~100min) — NOT run since these changes.
+4. Gate **and** the device close-button/a11y check green → **merge
+   `granular-sync-v9` → `master`** and move the CHANGELOG `[Unreleased]` block.
 5. Then back to the **Bikeshed / Bugs** list.
 
 ---
