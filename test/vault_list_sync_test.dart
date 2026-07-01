@@ -417,6 +417,95 @@ void main() {
       expect(find.textContaining('Deleted'), findsWidgets);
     });
 
+    // The synced bar is shown on the app-level messenger, so it outlives the
+    // screen. Locking disposes the vault screen (pushAndRemoveUntil) -> the bar
+    // must go with it, or it lingers on the unlock screen and tapping Details
+    // there dereferences a disposed State (crash).
+    testWidgets('leaving the vault screen clears the sync snackbar', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(
+            addedEntries: [
+              const AddedEntryItem(id: 'new-1', title: 'Bank login'),
+            ],
+          ),
+        ),
+      );
+      await _startSync(tester);
+      await tester.tap(find.text('OK'));
+      await _settle(tester);
+      expect(find.widgetWithText(SnackBarAction, 'Details'), findsOneWidget);
+
+      // Same MaterialApp (messenger stays alive); only the vault screen is
+      // replaced with another Scaffold, mirroring lock's swap to the unlock
+      // screen (which has its own Scaffold for the messenger to render into).
+      await tester.pumpWidget(testApp(const Scaffold(body: SizedBox.shrink())));
+      await tester.pump(); // start the clear-on-dispose exit animation
+      await tester.pump(const Duration(seconds: 1)); // let it finish
+
+      expect(find.widgetWithText(SnackBarAction, 'Details'), findsNothing);
+      expect(find.textContaining('Vault synced'), findsNothing);
+    });
+
+    // The Details bar has no timeout (an actioned snackbar never auto-dismisses),
+    // so it needs an explicit close affordance to be self-explanatory.
+    testWidgets('the granular sync snackbar has a working close button', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(
+            addedEntries: [
+              const AddedEntryItem(id: 'new-1', title: 'Bank login'),
+            ],
+          ),
+        ),
+      );
+      await _startSync(tester);
+      await tester.tap(find.text('OK'));
+      await _settle(tester);
+      expect(find.textContaining('Vault synced'), findsOneWidget);
+
+      // A close (X) affordance is present alongside the Details action...
+      expect(find.byIcon(Icons.close), findsOneWidget);
+      // ...and tapping it dismisses the bar.
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1)); // exit animation
+      expect(find.textContaining('Vault synced'), findsNothing);
+    });
+
+    // Both controls must be reachable by screen readers: the Details action by
+    // its label, the close icon by MaterialLocalizations' localized "Close".
+    testWidgets('the sync snackbar controls carry screen-reader labels', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(
+            addedEntries: [
+              const AddedEntryItem(id: 'new-1', title: 'Bank login'),
+            ],
+          ),
+        ),
+      );
+      await _startSync(tester);
+      await tester.tap(find.text('OK'));
+      await _settle(tester);
+
+      // Details is a labelled button; the close icon is announced via its
+      // localized "Close" tooltip (exposed as SemanticsNode.tooltip).
+      expect(find.bySemanticsLabel('Details'), findsOneWidget);
+      expect(find.byTooltip('Close'), findsOneWidget);
+      handle.dispose();
+    });
+
     testWidgets('passphrase is passed to mergeVault', (tester) async {
       List<int>? capturedPassphrase;
       await tester.pumpWidget(

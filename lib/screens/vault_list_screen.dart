@@ -307,6 +307,11 @@ class _VaultListScreenState extends State<VaultListScreen>
   // Active UI locale; picks the index alphabet (script). Set in
   // didChangeDependencies so it tracks locale changes.
   Locale _locale = const Locale('en');
+  // The app-level messenger, captured while mounted so dispose() can clear any
+  // sync snackbar. Otherwise the "Vault synced" bar (shown on the app messenger)
+  // outlives this screen and lingers on the unlock screen after lock, where its
+  // Details action would dereference this disposed State.
+  ScaffoldMessengerState? _messenger;
 
   List<YubikeyRecordData> _detectYubikeyRecords() {
     try {
@@ -339,11 +344,15 @@ class _VaultListScreenState extends State<VaultListScreen>
   void didChangeDependencies() {
     super.didChangeDependencies();
     _locale = Localizations.localeOf(context);
+    _messenger = ScaffoldMessenger.of(context);
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateChevrons());
   }
 
   @override
   void dispose() {
+    // Clear any sync snackbar so it can't linger on the next screen (e.g. the
+    // unlock screen after lock) and crash when its Details action is tapped.
+    _messenger?.clearSnackBars();
     WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
     _chipScrollController.removeListener(_updateChevrons);
@@ -940,6 +949,10 @@ class _VaultListScreenState extends State<VaultListScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l.vaultSynced(addedCount, updatedCount, deletedCount)),
+            // An actioned snackbar never auto-dismisses (Material accessibility
+            // rule), so give it an explicit close button. Its "Close" label is
+            // localized + screen-reader-exposed via MaterialLocalizations.
+            showCloseIcon: hasDetails,
             action: hasDetails
                 ? SnackBarAction(
                     label: l.syncDetailsAction,
@@ -991,6 +1004,9 @@ class _VaultListScreenState extends State<VaultListScreen>
     List<String> updated,
     List<String> deleted,
   ) {
+    // Defensive: a Details tap that races in after this screen is gone must be a
+    // no-op, not a null-check crash on the disposed State's context.
+    if (!mounted) return Future.value();
     final l = AppLocalizations.of(context);
     Widget group(String heading, List<String> titles) {
       if (titles.isEmpty) return const SizedBox.shrink();
