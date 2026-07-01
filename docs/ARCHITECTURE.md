@@ -133,38 +133,7 @@ per-field prompt (KeePassXC = per-entry by timestamp + history). So offer both, 
 Genuine collisions surface (clocks untrusted, lose nothing) via the existing review dialog for
 just the conflicting steps.
 
-**Active sub-task: unify the entry history model (must land before the two paths).**
-Today an entry has two overlapping history stores: single-slot
-`previous_password`/`previous_cvv`/`previous_pin` (one previous per secret field, expiry-purged,
-"Password history" screen) + unbounded `meta.history` (multiple-per-field, sync-only, "Previous
-state" screen). Two buttons, two models = slop. Mainstream keeps ONE per-entry history
-(Bitwarden: last-5 values; KeePassXC: full snapshots). Agreed: ONE store, ONE "History" button,
-**one previous value per field** (overwritten each change). Secret fields keep expiry-purge;
-non-secret kept until deleted. `previous_*` fold into `meta.history`. Reshape v9 in place
-(unreleased; alpha.10 shipped v8); regenerate v9 fixtures. Security-screen copy updated (setting
-governs all secret fields, not just passwords) across all locales.
-Merge history resolution (agreed): history is never its own prompt.
-- Case 1 (field clashes, user picks this|other for the value): history follows that pick.
-- Case 2 (no clash, but the two sides' stored previous value differs): incoming wins.
-Fast-auto-merge base case = incoming always wins.
-
-- [x] Rust: `replace_field_with_history` overwrites one-per-field; fold password/cvv/pin
-      capture into it; migrate v8 `previous_*` on load (done, tested).
-- [x] Rust: removed `previous_*` fields + `PreviousSecret`/`PreviousSecretData` + the
-      revert/clear-password FFIs; purge over unified history; merge keeps local history
-      (dead carry deleted); bridge regenerated; v9 fixtures regenerated. Compiles, clippy
-      clean, fast unit tests green. (Argon2 session/merge tests + v8->v9 gate: run by gate.)
-- [x] Flutter: single History button; password-history screen + FFIs removed;
-      `flutter analyze` clean, full `flutter test` green.
-- [x] Security-screen copy reworded (all 37 locales) to cover all secret fields; history
-      button renamed "Previous state" -> "History"; unused l10n strings dropped.
-      `flutter test` (incl. l10n_test) green.
-
-History unification is code-complete and green in-session (Rust build+clippy+fast tests;
-`flutter analyze`+`flutter test`). Pending the release gate (Argon2 session/merge + v8->v9
-backward-compat), which the maintainer runs. Next: back to the two sync paths below.
-
-**Steps after history (tick off):**
+**Steps (tick off):**
 - [ ] Fast-path toggle (mostly Dart): build decisions for one-sided changes + tombstoned
       deletes straight from `MergeSummary`, skip the dialog, surface only collisions/folder-
       conflicts via the existing review dialog; add a Quick-vs-Review choose dialog. Branch at
