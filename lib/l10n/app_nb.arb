@@ -802,6 +802,7 @@
   "validatorExpiryMonth": "Måned må være 01–12",
   "validatorCvvLength": "CVV må ha 3 eller 4 sifre",
   "validatorLabelRequired": "Etikett er påkrevd",
+  "validatorLabelDuplicate": "Etiketten må være unik",
   "validatorStatusRequired": "Status er påkrevd",
 
   "sectionBiometricUnlock": "Biometrisk opplåsing",

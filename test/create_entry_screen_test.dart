@@ -642,6 +642,78 @@ void main() {
     expect(note.customFields[0].value, equals('abc123'));
   });
 
+  // Custom-field labels are the per-field sync keys (custom_fields:<label>), so a
+  // duplicate label within one entry would collapse on merge and lose data. The
+  // shared custom-fields section must reject duplicate labels at save, for EVERY
+  // entry type that can carry custom fields.
+  for (final type in const ['Login', 'Note', 'Identity', 'Card', 'File', 'Custom']) {
+    testWidgets('duplicate custom-field labels are rejected ($type)', (
+      tester,
+    ) async {
+      var created = false;
+      await tester.pumpWidget(
+        _buildCreateScreen(type, onCreateEntry: (_) async => created = true),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Add custom field'));
+      await tester.tap(find.text('Add custom field'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Add custom field'));
+      await tester.tap(find.text('Add custom field'));
+      await tester.pumpAndSettle();
+
+      final labels = find.widgetWithText(TextFormField, 'Label');
+      expect(labels, findsNWidgets(2));
+      await tester.enterText(labels.at(0), 'API');
+      await tester.enterText(labels.at(1), 'API');
+
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(created, isFalse, reason: 'duplicate labels must block save');
+      expect(
+        find.text('Label must be unique'),
+        findsWidgets,
+        reason: '$type must reject the duplicate label',
+      );
+    });
+  }
+
+  testWidgets('two distinct custom-field labels save fine', (tester) async {
+    VaultEntryData? captured;
+    await tester.pumpWidget(
+      _buildCreateScreen('Note', onCreateEntry: (e) async => captured = e),
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Title'),
+      'Notes',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, 'Content'),
+      'body',
+    );
+    await tester.ensureVisible(find.text('Add custom field'));
+    await tester.tap(find.text('Add custom field'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Add custom field'));
+    await tester.tap(find.text('Add custom field'));
+    await tester.pumpAndSettle();
+
+    final labels = find.widgetWithText(TextFormField, 'Label');
+    await tester.enterText(labels.at(0), 'One');
+    await tester.enterText(labels.at(1), 'Two');
+
+    await tester.ensureVisible(find.text('Save'));
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(captured, isA<VaultEntryData_Note>());
+    final note = (captured! as VaultEntryData_Note).field0;
+    expect(note.customFields.map((f) => f.label), containsAll(['One', 'Two']));
+  });
+
   testWidgets('note edit mode pre-populates custom fields', (tester) async {
     final entry = NoteEntryData(
       id: 'note-1',

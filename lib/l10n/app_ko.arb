@@ -801,6 +801,7 @@
   "validatorExpiryMonth": "월은 01~12여야 합니다",
   "validatorCvvLength": "CVV는 3자리 또는 4자리여야 합니다",
   "validatorLabelRequired": "레이블은 필수입니다",
+  "validatorLabelDuplicate": "레이블은 고유해야 합니다",
   "validatorStatusRequired": "상태는 필수입니다",
 
   "sectionBiometricUnlock": "생체 인증 잠금 해제",

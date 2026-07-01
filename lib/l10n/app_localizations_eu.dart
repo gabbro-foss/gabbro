@@ -1820,6 +1820,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get validatorLabelRequired => 'Etiketa nahitaezkoa da';
 
   @override
+  String get validatorLabelDuplicate => 'Etiketak bakarra izan behar du';
+
+  @override
   String get validatorStatusRequired => 'Egoera nahitaezkoa da';
 
   @override

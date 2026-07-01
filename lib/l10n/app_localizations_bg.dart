@@ -1823,6 +1823,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get validatorLabelRequired => 'Етикетът е задължителен';
 
   @override
+  String get validatorLabelDuplicate => 'Етикетът трябва да е уникален';
+
+  @override
   String get validatorStatusRequired => 'Статусът е задължителен';
 
   @override

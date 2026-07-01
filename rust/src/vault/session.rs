@@ -2803,6 +2803,30 @@ mod field_merge_tests {
     }
 
     #[test]
+    fn self_sync_identical_vault_reports_nothing_to_sync() {
+        // Syncing a vault into an identical copy of itself (same entries, same
+        // field marks) must surface no changes at all -> the UI shows "nothing to
+        // sync" and never a spurious clash.
+        use crate::vault::serialization::VaultBody;
+        let entry = note("n1", "T", "C", "t", &[("content", 100)]);
+        let mut session = test_session(vec![entry.clone()]);
+        let incoming = VaultBody {
+            entries: vec![entry],
+            folders: vec![],
+            ..Default::default()
+        };
+        let s = do_merge(&mut session, incoming);
+        assert_eq!(s.added, 0);
+        assert_eq!(s.updated, 0);
+        assert!(s.field_conflicts.is_empty());
+        assert!(s.brought_over.is_empty());
+        assert!(s.pending_deletes.is_empty());
+        assert!(s.pending_item_deletes.is_empty());
+        assert!(s.folder_conflicts.is_empty());
+        assert!(s.added_entries.is_empty());
+    }
+
+    #[test]
     fn merge_cleared_field_clashes_and_is_not_lost() {
         // Local cleared the field (empty, marked); incoming kept a value (marked).
         // Empty is a value like any other: both edited -> a real clash, surfaced;

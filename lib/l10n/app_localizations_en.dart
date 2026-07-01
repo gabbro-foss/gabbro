@@ -1809,6 +1809,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get validatorLabelRequired => 'Label required';
 
   @override
+  String get validatorLabelDuplicate => 'Label must be unique';
+
+  @override
   String get validatorStatusRequired => 'Status is required';
 
   @override

@@ -802,6 +802,7 @@
   "validatorExpiryMonth": "Maand moet 01–12 zijn",
   "validatorCvvLength": "CVV moet 3 of 4 cijfers bevatten",
   "validatorLabelRequired": "Label is vereist",
+  "validatorLabelDuplicate": "Label moet uniek zijn",
   "validatorStatusRequired": "Status is vereist",
 
   "sectionBiometricUnlock": "Biometrisch ontgrendelen",

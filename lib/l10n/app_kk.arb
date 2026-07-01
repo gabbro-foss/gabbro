@@ -801,6 +801,7 @@
   "validatorExpiryMonth": "Ай 01–12 болуы керек",
   "validatorCvvLength": "CVV 3 немесе 4 цифрдан тұруы керек",
   "validatorLabelRequired": "Жапсырма міндетті",
+  "validatorLabelDuplicate": "Жапсырма бірегей болуы керек",
   "validatorStatusRequired": "Күй міндетті",
 
   "sectionBiometricUnlock": "Биометриялық бекітуді ашу",

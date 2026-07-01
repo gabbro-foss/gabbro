@@ -801,6 +801,7 @@
   "validatorExpiryMonth": "月份必須為 01-12",
   "validatorCvvLength": "CVV 必須為 3 或 4 位數字",
   "validatorLabelRequired": "標籤為必填項",
+  "validatorLabelDuplicate": "標籤必須是唯一的",
   "validatorStatusRequired": "狀態為必填項",
 
   "sectionBiometricUnlock": "生物特徵解鎖",

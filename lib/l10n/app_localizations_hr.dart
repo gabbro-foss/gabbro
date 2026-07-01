@@ -1821,6 +1821,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get validatorLabelRequired => 'Oznaka je obavezna';
 
   @override
+  String get validatorLabelDuplicate => 'Oznaka mora biti jedinstvena';
+
+  @override
   String get validatorStatusRequired => 'Status je obavezan';
 
   @override

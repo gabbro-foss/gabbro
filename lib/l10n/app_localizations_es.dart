@@ -1837,6 +1837,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get validatorLabelRequired => 'La etiqueta es obligatoria';
 
   @override
+  String get validatorLabelDuplicate => 'La etiqueta debe ser única';
+
+  @override
   String get validatorStatusRequired => 'El estado es obligatorio';
 
   @override

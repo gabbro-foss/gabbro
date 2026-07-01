@@ -801,6 +801,7 @@
   "validatorExpiryMonth": "Il mese deve essere compreso tra 01 e 12",
   "validatorCvvLength": "Il CVV deve avere 3 o 4 cifre",
   "validatorLabelRequired": "L'etichetta è obbligatoria",
+  "validatorLabelDuplicate": "L'etichetta deve essere univoca",
   "validatorStatusRequired": "Lo stato è obbligatorio",
 
   "sectionBiometricUnlock": "Sblocco biometrico",

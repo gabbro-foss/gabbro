@@ -802,6 +802,7 @@
   "validatorExpiryMonth": "O mês deve ser 01–12",
   "validatorCvvLength": "O CVV deve ter 3 ou 4 dígitos",
   "validatorLabelRequired": "O rótulo é obrigatório",
+  "validatorLabelDuplicate": "O rótulo deve ser único",
   "validatorStatusRequired": "O status é obrigatório",
 
   "sectionBiometricUnlock": "Desbloqueio biométrico",

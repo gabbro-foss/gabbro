@@ -1820,6 +1820,9 @@ class AppLocalizationsYo extends AppLocalizations {
   String get validatorLabelRequired => 'Aami jẹ dandan';
 
   @override
+  String get validatorLabelDuplicate => 'Aami gbọ́dọ̀ jẹ́ aláìlẹ́gbẹ́';
+
+  @override
   String get validatorStatusRequired => 'Ipo jẹ dandan';
 
   @override

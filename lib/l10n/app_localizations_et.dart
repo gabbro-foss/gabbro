@@ -1821,6 +1821,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get validatorLabelRequired => 'Silt on nõutav';
 
   @override
+  String get validatorLabelDuplicate => 'Silt peab olema kordumatu';
+
+  @override
   String get validatorStatusRequired => 'Olek on nõutav';
 
   @override

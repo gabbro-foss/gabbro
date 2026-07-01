@@ -1762,6 +1762,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get validatorLabelRequired => '标签为必填项';
 
   @override
+  String get validatorLabelDuplicate => '标签必须唯一';
+
+  @override
   String get validatorStatusRequired => '状态为必填项';
 
   @override
@@ -3691,6 +3694,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get validatorLabelRequired => '标签为必填项';
 
   @override
+  String get validatorLabelDuplicate => '标签必须唯一';
+
+  @override
   String get validatorStatusRequired => '状态为必填项';
 
   @override
@@ -5618,6 +5624,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get validatorLabelRequired => '標籤為必填項';
+
+  @override
+  String get validatorLabelDuplicate => '標籤必須是唯一的';
 
   @override
   String get validatorStatusRequired => '狀態為必填項';

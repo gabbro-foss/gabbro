@@ -801,6 +801,7 @@
   "validatorExpiryMonth": "Le mois doit être compris entre 01 et 12",
   "validatorCvvLength": "Le CVV doit comporter 3 ou 4 chiffres",
   "validatorLabelRequired": "L'étiquette est requise",
+  "validatorLabelDuplicate": "L'étiquette doit être unique",
   "validatorStatusRequired": "Le statut est requis",
 
   "sectionBiometricUnlock": "Déverrouillage biométrique",

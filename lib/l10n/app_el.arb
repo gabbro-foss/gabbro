@@ -801,6 +801,7 @@
   "validatorExpiryMonth": "Ο μήνας πρέπει να είναι 01–12",
   "validatorCvvLength": "Το CVV πρέπει να έχει 3 ή 4 ψηφία",
   "validatorLabelRequired": "Η ετικέτα είναι υποχρεωτική",
+  "validatorLabelDuplicate": "Η ετικέτα πρέπει να είναι μοναδική",
   "validatorStatusRequired": "Η κατάσταση είναι υποχρεωτική",
 
   "sectionBiometricUnlock": "Βιομετρικό ξεκλείδωμα",

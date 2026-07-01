@@ -1824,6 +1824,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get validatorLabelRequired => 'O rótulo é obrigatório';
 
   @override
+  String get validatorLabelDuplicate => 'O rótulo deve ser único';
+
+  @override
   String get validatorStatusRequired => 'O status é obrigatório';
 
   @override
@@ -3844,6 +3847,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get validatorLabelRequired => 'O rótulo é obrigatório';
+
+  @override
+  String get validatorLabelDuplicate => 'O rótulo deve ser único';
 
   @override
   String get validatorStatusRequired => 'O status é obrigatório';
@@ -5868,6 +5874,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get validatorLabelRequired => 'A etiqueta é obrigatória';
+
+  @override
+  String get validatorLabelDuplicate => 'A etiqueta deve ser única';
 
   @override
   String get validatorStatusRequired => 'O estado é obrigatório';

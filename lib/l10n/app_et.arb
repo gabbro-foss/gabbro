@@ -802,6 +802,7 @@
   "validatorExpiryMonth": "Kuu peab olema 01–12",
   "validatorCvvLength": "CVV peab olema 3 või 4 numbrit",
   "validatorLabelRequired": "Silt on nõutav",
+  "validatorLabelDuplicate": "Silt peab olema kordumatu",
   "validatorStatusRequired": "Olek on nõutav",
 
   "sectionBiometricUnlock": "Biomeetriline avamine",

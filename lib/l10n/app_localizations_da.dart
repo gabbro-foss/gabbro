@@ -1822,6 +1822,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get validatorLabelRequired => 'Etiket er påkrævet';
 
   @override
+  String get validatorLabelDuplicate => 'Etiket skal være unik';
+
+  @override
   String get validatorStatusRequired => 'Status er påkrævet';
 
   @override

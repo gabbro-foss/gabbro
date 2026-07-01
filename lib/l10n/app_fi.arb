@@ -802,6 +802,7 @@
   "validatorExpiryMonth": "Kuukauden tulee olla 01–12",
   "validatorCvvLength": "CVV:n tulee olla 3 tai 4 numeroa",
   "validatorLabelRequired": "Tunniste vaaditaan",
+  "validatorLabelDuplicate": "Tunnisteen on oltava yksilöllinen",
   "validatorStatusRequired": "Tila vaaditaan",
 
   "sectionBiometricUnlock": "Biometrinen avaaminen",

@@ -802,6 +802,7 @@
   "validatorExpiryMonth": "A hónapnak 01–12 között kell lennie",
   "validatorCvvLength": "A CVV-nek 3 vagy 4 számjegyből kell állnia",
   "validatorLabelRequired": "A felirat kötelező",
+  "validatorLabelDuplicate": "A feliratnak egyedinek kell lennie",
   "validatorStatusRequired": "Az állapot kötelező",
 
   "sectionBiometricUnlock": "Biometrikus feloldás",

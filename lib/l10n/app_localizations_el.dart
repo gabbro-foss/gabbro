@@ -1840,6 +1840,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get validatorLabelRequired => 'Η ετικέτα είναι υποχρεωτική';
 
   @override
+  String get validatorLabelDuplicate => 'Η ετικέτα πρέπει να είναι μοναδική';
+
+  @override
   String get validatorStatusRequired => 'Η κατάσταση είναι υποχρεωτική';
 
   @override

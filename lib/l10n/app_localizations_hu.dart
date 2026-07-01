@@ -1825,6 +1825,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get validatorLabelRequired => 'A felirat kötelező';
 
   @override
+  String get validatorLabelDuplicate => 'A feliratnak egyedinek kell lennie';
+
+  @override
   String get validatorStatusRequired => 'Az állapot kötelező';
 
   @override

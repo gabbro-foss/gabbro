@@ -1823,6 +1823,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get validatorLabelRequired => 'Štítok je povinný';
 
   @override
+  String get validatorLabelDuplicate => 'Štítok musí byť jedinečný';
+
+  @override
   String get validatorStatusRequired => 'Stav je povinný';
 
   @override

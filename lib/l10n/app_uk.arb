@@ -802,6 +802,7 @@
   "validatorExpiryMonth": "Місяць повинен бути від 01 до 12",
   "validatorCvvLength": "CVV повинен містити 3 або 4 цифри",
   "validatorLabelRequired": "Мітка обов'язкова",
+  "validatorLabelDuplicate": "Мітка має бути унікальною",
   "validatorStatusRequired": "Статус обов'язковий",
 
   "sectionBiometricUnlock": "Біометричне розблокування",

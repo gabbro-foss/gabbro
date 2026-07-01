@@ -1832,6 +1832,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get validatorLabelRequired => 'Etykieta jest wymagana';
 
   @override
+  String get validatorLabelDuplicate => 'Etykieta musi być unikalna';
+
+  @override
   String get validatorStatusRequired => 'Status jest wymagany';
 
   @override

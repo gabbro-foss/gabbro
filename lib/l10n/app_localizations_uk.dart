@@ -1829,6 +1829,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get validatorLabelRequired => 'Мітка обов\'язкова';
 
   @override
+  String get validatorLabelDuplicate => 'Мітка має бути унікальною';
+
+  @override
   String get validatorStatusRequired => 'Статус обов\'язковий';
 
   @override

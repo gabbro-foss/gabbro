@@ -801,6 +801,7 @@
   "validatorExpiryMonth": "Osu gbọdọ jẹ 01-12",
   "validatorCvvLength": "CVV gbọdọ ni awọn nọmba 3 tabi 4",
   "validatorLabelRequired": "Aami jẹ dandan",
+  "validatorLabelDuplicate": "Aami gbọ́dọ̀ jẹ́ aláìlẹ́gbẹ́",
   "validatorStatusRequired": "Ipo jẹ dandan",
 
   "sectionBiometricUnlock": "Ṣii ẹya ara",

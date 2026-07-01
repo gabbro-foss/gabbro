@@ -1821,6 +1821,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get validatorLabelRequired => 'Жапсырма міндетті';
 
   @override
+  String get validatorLabelDuplicate => 'Жапсырма бірегей болуы керек';
+
+  @override
   String get validatorStatusRequired => 'Күй міндетті';
 
   @override

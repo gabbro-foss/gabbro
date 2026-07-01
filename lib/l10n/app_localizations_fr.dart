@@ -1843,6 +1843,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get validatorLabelRequired => 'L\'étiquette est requise';
 
   @override
+  String get validatorLabelDuplicate => 'L\'étiquette doit être unique';
+
+  @override
   String get validatorStatusRequired => 'Le statut est requis';
 
   @override

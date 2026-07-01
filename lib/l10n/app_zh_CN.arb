@@ -801,6 +801,7 @@
   "validatorExpiryMonth": "月份必须为 01-12",
   "validatorCvvLength": "CVV 必须为 3 或 4 位数字",
   "validatorLabelRequired": "标签为必填项",
+  "validatorLabelDuplicate": "标签必须唯一",
   "validatorStatusRequired": "状态为必填项",
 
   "sectionBiometricUnlock": "生物特征解锁",

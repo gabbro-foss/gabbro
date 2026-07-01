@@ -1777,6 +1777,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get validatorLabelRequired => 'ラベルは必須です';
 
   @override
+  String get validatorLabelDuplicate => 'ラベルは一意である必要があります';
+
+  @override
   String get validatorStatusRequired => 'ステータスは必須です';
 
   @override

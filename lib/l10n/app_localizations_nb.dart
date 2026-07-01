@@ -1818,6 +1818,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get validatorLabelRequired => 'Etikett er påkrevd';
 
   @override
+  String get validatorLabelDuplicate => 'Etiketten må være unik';
+
+  @override
   String get validatorStatusRequired => 'Status er påkrevd';
 
   @override

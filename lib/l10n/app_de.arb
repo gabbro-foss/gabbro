@@ -801,6 +801,7 @@
   "validatorExpiryMonth": "Monat muss zwischen 01 und 12 liegen",
   "validatorCvvLength": "CVV muss 3 oder 4 Ziffern haben",
   "validatorLabelRequired": "Bezeichnung ist erforderlich",
+  "validatorLabelDuplicate": "Bezeichnung muss eindeutig sein",
   "validatorStatusRequired": "Status ist erforderlich",
 
   "sectionBiometricUnlock": "Biometrische Entsperrung",

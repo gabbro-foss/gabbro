@@ -899,6 +899,10 @@
   "validatorExpiryMonth": "Month must be 01–12",
   "validatorCvvLength": "CVV must be 3 or 4 digits",
   "validatorLabelRequired": "Label required",
+  "validatorLabelDuplicate": "Label must be unique",
+  "@validatorLabelDuplicate": {
+    "description": "Validation error when a custom-field label duplicates another label in the same entry."
+  },
   "validatorStatusRequired": "Status is required",
 
   "sectionBiometricUnlock": "Biometric unlock",

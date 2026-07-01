@@ -802,6 +802,7 @@
   "validatorExpiryMonth": "Mēnesim jābūt 01–12",
   "validatorCvvLength": "CVV jābūt 3 vai 4 ciparus garam",
   "validatorLabelRequired": "Etiķete ir nepieciešama",
+  "validatorLabelDuplicate": "Etiķetei jābūt unikālai",
   "validatorStatusRequired": "Statuss ir nepieciešams",
 
   "sectionBiometricUnlock": "Biometriskā atbloķēšana",

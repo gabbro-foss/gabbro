@@ -3439,6 +3439,12 @@ abstract class AppLocalizations {
   /// **'Label required'**
   String get validatorLabelRequired;
 
+  /// Validation error when a custom-field label duplicates another label in the same entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Label must be unique'**
+  String get validatorLabelDuplicate;
+
   /// No description provided for @validatorStatusRequired.
   ///
   /// In en, this message translates to:

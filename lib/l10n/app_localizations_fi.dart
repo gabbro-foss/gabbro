@@ -1824,6 +1824,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get validatorLabelRequired => 'Tunniste vaaditaan';
 
   @override
+  String get validatorLabelDuplicate => 'Tunnisteen on oltava yksilöllinen';
+
+  @override
   String get validatorStatusRequired => 'Tila vaaditaan';
 
   @override

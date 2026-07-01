@@ -1817,6 +1817,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get validatorLabelRequired => 'Etikett krävs';
 
   @override
+  String get validatorLabelDuplicate => 'Etiketten måste vara unik';
+
+  @override
   String get validatorStatusRequired => 'Status krävs';
 
   @override

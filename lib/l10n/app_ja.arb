@@ -801,6 +801,7 @@
   "validatorExpiryMonth": "月は01〜12である必要があります",
   "validatorCvvLength": "CVVは3桁または4桁である必要があります",
   "validatorLabelRequired": "ラベルは必須です",
+  "validatorLabelDuplicate": "ラベルは一意である必要があります",
   "validatorStatusRequired": "ステータスは必須です",
 
   "sectionBiometricUnlock": "生体認証ロック解除",

@@ -1780,6 +1780,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get validatorLabelRequired => '레이블은 필수입니다';
 
   @override
+  String get validatorLabelDuplicate => '레이블은 고유해야 합니다';
+
+  @override
   String get validatorStatusRequired => '상태는 필수입니다';
 
   @override

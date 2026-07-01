@@ -1826,6 +1826,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get validatorLabelRequired => 'Etiķete ir nepieciešama';
 
   @override
+  String get validatorLabelDuplicate => 'Etiķetei jābūt unikālai';
+
+  @override
   String get validatorStatusRequired => 'Statuss ir nepieciešams';
 
   @override

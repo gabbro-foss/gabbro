@@ -1835,6 +1835,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get validatorLabelRequired => 'Bezeichnung ist erforderlich';
 
   @override
+  String get validatorLabelDuplicate => 'Bezeichnung muss eindeutig sein';
+
+  @override
   String get validatorStatusRequired => 'Status ist erforderlich';
 
   @override

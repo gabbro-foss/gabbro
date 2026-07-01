@@ -1830,6 +1830,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get validatorLabelRequired => 'Label is vereist';
 
   @override
+  String get validatorLabelDuplicate => 'Label moet uniek zijn';
+
+  @override
   String get validatorStatusRequired => 'Status is vereist';
 
   @override

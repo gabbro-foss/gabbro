@@ -1830,6 +1830,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get validatorLabelRequired => 'L\'etichetta è obbligatoria';
 
   @override
+  String get validatorLabelDuplicate => 'L\'etichetta deve essere univoca';
+
+  @override
   String get validatorStatusRequired => 'Lo stato è obbligatorio';
 
   @override

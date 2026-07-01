@@ -1625,8 +1625,16 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                       labelText: l.fieldLabel,
                       border: const OutlineInputBorder(),
                     ),
-                    validator: (v) =>
-                        (v == null || v.isEmpty) ? l.validatorLabelRequired : null,
+                    // Labels are the per-field sync keys, so they must be unique
+                    // within the entry - a duplicate would collapse on merge.
+                    validator: (v) {
+                      final label = v ?? '';
+                      if (label.isEmpty) return l.validatorLabelRequired;
+                      final count = fields
+                          .where((g) => g.labelController.text == label)
+                          .length;
+                      return count > 1 ? l.validatorLabelDuplicate : null;
+                    },
                   ),
                 ),
                 const SizedBox(width: 8),

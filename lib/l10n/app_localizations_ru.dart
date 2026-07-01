@@ -1828,6 +1828,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get validatorLabelRequired => 'Метка обязательна';
 
   @override
+  String get validatorLabelDuplicate => 'Метка должна быть уникальной';
+
+  @override
   String get validatorStatusRequired => 'Статус обязателен';
 
   @override

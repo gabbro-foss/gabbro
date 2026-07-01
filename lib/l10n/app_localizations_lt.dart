@@ -1828,6 +1828,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get validatorLabelRequired => 'Žyma yra privaloma';
 
   @override
+  String get validatorLabelDuplicate => 'Žyma turi būti unikali';
+
+  @override
   String get validatorStatusRequired => 'Būsena yra privaloma';
 
   @override

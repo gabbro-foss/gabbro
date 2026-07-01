@@ -801,6 +801,7 @@
   "validatorExpiryMonth": "Mjesec mora biti 01–12",
   "validatorCvvLength": "CVV mora imati 3 ili 4 znamenke",
   "validatorLabelRequired": "Oznaka je obavezna",
+  "validatorLabelDuplicate": "Oznaka mora biti jedinstvena",
   "validatorStatusRequired": "Status je obavezan",
 
   "sectionBiometricUnlock": "Biometrijsko otključavanje",

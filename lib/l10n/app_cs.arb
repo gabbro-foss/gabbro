@@ -802,6 +802,7 @@
   "validatorExpiryMonth": "Měsíc musí být 01–12",
   "validatorCvvLength": "CVV musí mít 3 nebo 4 číslice",
   "validatorLabelRequired": "Štítek je povinný",
+  "validatorLabelDuplicate": "Štítek musí být jedinečný",
   "validatorStatusRequired": "Stav je povinný",
 
   "sectionBiometricUnlock": "Biometrické odemknutí",

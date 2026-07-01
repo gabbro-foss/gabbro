@@ -801,6 +801,7 @@
   "validatorExpiryMonth": "Hilabeteak 01-12 artean egon behar du",
   "validatorCvvLength": "CVV-k 3 edo 4 zifra izan behar ditu",
   "validatorLabelRequired": "Etiketa nahitaezkoa da",
+  "validatorLabelDuplicate": "Etiketak bakarra izan behar du",
   "validatorStatusRequired": "Egoera nahitaezkoa da",
 
   "sectionBiometricUnlock": "Desblokeo biometrikoa",

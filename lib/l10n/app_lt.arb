@@ -802,6 +802,7 @@
   "validatorExpiryMonth": "Mėnuo turi būti nuo 01 iki 12",
   "validatorCvvLength": "CVV turi būti 3 arba 4 skaitmenys",
   "validatorLabelRequired": "Žyma yra privaloma",
+  "validatorLabelDuplicate": "Žyma turi būti unikali",
   "validatorStatusRequired": "Būsena yra privaloma",
 
   "sectionBiometricUnlock": "Biometrinis atrakinimas",
