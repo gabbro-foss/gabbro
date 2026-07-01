@@ -92,13 +92,21 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task
+### Next task: land granular sync
 
-_(empty — awaiting agreement on the next task)_
+Granular sync is code-complete (see git log). To close it out:
 
-Granular sync is complete (see git log / CHANGELOG). Before release: run the gate
-(`gabbro_test`, ~100min, watch the backward-compat leg) and hardware-walk the sync
-flows on mock vaults (procedures in `test_data/sync_test_vaults/README.md`).
+1. **Add three hardware-walk procedures** to `test_data/sync_test_vaults/README.md`:
+   - itemized post-sync summary (the **Details** dialog after a granular sync);
+   - duplicate custom-field label rejected at save (editor check, any entry type);
+   - cross-version sync (sync an older-format source — e.g. a `migration_vaults`
+     vault — into a current vault; incoming entries merge without loss).
+2. **Run all the hardware walks** on mock vaults (granular, fast, cancel/merge-rest,
+   plus the three above). Must be green.
+3. Gate: `gabbro_test` (~100min) must be green.
+4. When the gate **and** the hardware walks are green, **merge `granular-sync-v9`
+   into `master`**.
+5. Then back to the **Bikeshed / Bugs** list.
 
 ---
 
