@@ -95,7 +95,6 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 Fast auto-merge, the unified history model, and the v9 format are done and
 hardware-verified (see git log / CHANGELOG). Remaining work is the granular review path:
 
-- [ ] Itemized post-sync summary: list which entries added/updated/deleted, not just totals.
 - [ ] Edge-case hardening pass (none done deliberately yet).
 
 Then run the gate (`gabbro_test`, ~100min, watch the backward-compat leg) and decide on release.
@@ -119,9 +118,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   (`password_breakdown_sheet.dart` `_kExample`), shown in the legend even when the passphrase
   is Latin-only. Looks wrong / confusing. Pick a script-appropriate or neutral example, or
   hide the row when no caseless letters are present.
-- **Two history screens overlap (cleanup, deferred).** In-app `previousPassword` ("password
-  history", typo recovery) and the sync `meta.history` ("Previous state") are separate places
-  that both look like "previous values". Relabelled to disambiguate; unify later. Not urgent.
 - **Enter does not submit the passphrase** (unlock + other screens) — cross-cutting; audit
   every passphrase/password field for an Enter-submit handler.
 - **CRITICAL — biometric unlock rejects the correct passphrase (GrapheneOS, 2026-06-29).**
@@ -145,8 +141,8 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 - Draft the free external crypto-review outreach (narrow ask: the construction only —
-  hybrid combiner / transcript binding / header AAD / vault format). Deferred behind the
-  sync redesign (which reshapes the vault format anyway). v1 direction in commit 9f158b5.
+  hybrid combiner / transcript binding / header AAD / vault format). Vault format is now
+  stable at VERSION 9, so this is no longer blocked. v1 direction in commit 9f158b5.
 
 ### Features & UX
 - Autofill via `auto-type` (Linux/desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
