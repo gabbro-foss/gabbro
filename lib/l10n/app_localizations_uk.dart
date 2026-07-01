@@ -694,6 +694,15 @@ class AppLocalizationsUk extends AppLocalizations {
       'Нічого синхронізувати — обидва сховища вже актуальні.';
 
   @override
+  String get syncMethodTitle => 'Як застосувати цю синхронізацію?';
+
+  @override
+  String get syncMergeAutomatically => 'Обʼєднати автоматично';
+
+  @override
+  String get syncReviewAllChanges => 'Переглянути всі зміни';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -692,6 +692,15 @@ class AppLocalizationsEu extends AppLocalizations {
       'Ez dago sinkronizatzeko ezer — bi gandegiak eguneratuta daude dagoeneko.';
 
   @override
+  String get syncMethodTitle => 'Nola aplikatu behar da sinkronizazio hau?';
+
+  @override
+  String get syncMergeAutomatically => 'Batu automatikoki';
+
+  @override
+  String get syncReviewAllChanges => 'Berrikusi aldaketa guztiak';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -693,6 +693,15 @@ class AppLocalizationsRu extends AppLocalizations {
       'Нечего синхронизировать — оба хранилища уже актуальны.';
 
   @override
+  String get syncMethodTitle => 'Как применить эту синхронизацию?';
+
+  @override
+  String get syncMergeAutomatically => 'Объединить автоматически';
+
+  @override
+  String get syncReviewAllChanges => 'Просмотреть все изменения';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

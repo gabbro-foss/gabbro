@@ -695,6 +695,15 @@ class AppLocalizationsEl extends AppLocalizations {
       'Δεν υπάρχει τίποτα για συγχρονισμό — και τα δύο θησαυροφυλάκια είναι ήδη ενημερωμένα.';
 
   @override
+  String get syncMethodTitle => 'Πώς να εφαρμοστεί αυτός ο συγχρονισμός;';
+
+  @override
+  String get syncMergeAutomatically => 'Αυτόματη συγχώνευση';
+
+  @override
+  String get syncReviewAllChanges => 'Έλεγχος όλων των αλλαγών';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

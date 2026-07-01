@@ -269,6 +269,9 @@
   "syncFailedTitle": "Szinkronizálás sikertelen",
   "syncFromFileTitle": "Szinkronizálás fájlból",
   "nothingToSync": "Nincs szinkronizálnivaló — mindkét széf már naprakész.",
+  "syncMethodTitle": "Hogyan legyen alkalmazva ez a szinkronizálás?",
+  "syncMergeAutomatically": "Automatikus egyesítés",
+  "syncReviewAllChanges": "Összes módosítás áttekintése",
 
   "importedEntries": "{count, plural, one{1 bejegyzés importálva.} other{{count} bejegyzés importálva.}}",
   "@importedEntries": {

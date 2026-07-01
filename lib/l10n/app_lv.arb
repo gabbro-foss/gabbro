@@ -269,6 +269,9 @@
   "syncFailedTitle": "Sinhronizācija neizdevās",
   "syncFromFileTitle": "Sinhronizēt no faila",
   "nothingToSync": "Nav ko sinhronizēt — abi seifi jau ir atjaunināti.",
+  "syncMethodTitle": "Kā piemērot šo sinhronizāciju?",
+  "syncMergeAutomatically": "Apvienot automātiski",
+  "syncReviewAllChanges": "Pārskatīt visas izmaiņas",
 
   "importedEntries": "{count, plural, one{1 ieraksts importēts.} other{{count} ieraksti importēti.}}",
   "@importedEntries": {

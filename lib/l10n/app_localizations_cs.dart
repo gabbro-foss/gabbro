@@ -693,6 +693,15 @@ class AppLocalizationsCs extends AppLocalizations {
       'Není co synchronizovat — oba trezory jsou již aktuální.';
 
   @override
+  String get syncMethodTitle => 'Jak použít tuto synchronizaci?';
+
+  @override
+  String get syncMergeAutomatically => 'Sloučit automaticky';
+
+  @override
+  String get syncReviewAllChanges => 'Zkontrolovat všechny změny';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

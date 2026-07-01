@@ -693,6 +693,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Rien à synchroniser — les deux coffres sont déjà à jour.';
 
   @override
+  String get syncMethodTitle => 'Comment appliquer cette synchronisation ?';
+
+  @override
+  String get syncMergeAutomatically => 'Fusionner automatiquement';
+
+  @override
+  String get syncReviewAllChanges => 'Vérifier toutes les modifications';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

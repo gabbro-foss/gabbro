@@ -683,6 +683,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get nothingToSync => '동기화할 것이 없습니다 — 두 볼트 모두 이미 최신 상태입니다.';
 
   @override
+  String get syncMethodTitle => '이 동기화를 어떻게 적용하시겠습니까?';
+
+  @override
+  String get syncMergeAutomatically => '자동으로 병합';
+
+  @override
+  String get syncReviewAllChanges => '모든 변경 사항 검토';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

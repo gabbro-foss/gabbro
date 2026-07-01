@@ -693,6 +693,15 @@ class AppLocalizationsFi extends AppLocalizations {
       'Ei synkronoitavaa — molemmat holvit ovat jo ajan tasalla.';
 
   @override
+  String get syncMethodTitle => 'Miten tämä synkronointi otetaan käyttöön?';
+
+  @override
+  String get syncMergeAutomatically => 'Yhdistä automaattisesti';
+
+  @override
+  String get syncReviewAllChanges => 'Tarkista kaikki muutokset';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

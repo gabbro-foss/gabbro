@@ -693,6 +693,15 @@ class AppLocalizationsLt extends AppLocalizations {
       'Nėra ko sinchronizuoti — abi saugyklos jau atnaujintos.';
 
   @override
+  String get syncMethodTitle => 'Kaip taikyti šią sinchronizaciją?';
+
+  @override
+  String get syncMergeAutomatically => 'Sulieti automatiškai';
+
+  @override
+  String get syncReviewAllChanges => 'Peržiūrėti visus pakeitimus';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

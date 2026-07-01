@@ -691,6 +691,15 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nincs szinkronizálnivaló — mindkét széf már naprakész.';
 
   @override
+  String get syncMethodTitle => 'Hogyan legyen alkalmazva ez a szinkronizálás?';
+
+  @override
+  String get syncMergeAutomatically => 'Automatikus egyesítés';
+
+  @override
+  String get syncReviewAllChanges => 'Összes módosítás áttekintése';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -269,6 +269,9 @@
   "syncFailedTitle": "Synkronisering misslyckades",
   "syncFromFileTitle": "Synkronisera från fil",
   "nothingToSync": "Inget att synkronisera — båda valven är redan uppdaterade.",
+  "syncMethodTitle": "Hur ska den här synkroniseringen tillämpas?",
+  "syncMergeAutomatically": "Slå samman automatiskt",
+  "syncReviewAllChanges": "Granska alla ändringar",
 
   "importedEntries": "{count, plural, one{1 post importerad.} other{{count} poster importerade.}}",
   "@importedEntries": {

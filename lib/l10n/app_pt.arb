@@ -269,6 +269,9 @@
   "syncFailedTitle": "Sincronização falhou",
   "syncFromFileTitle": "Sincronizar de arquivo",
   "nothingToSync": "Nada a sincronizar — ambos os cofres já estão atualizados.",
+  "syncMethodTitle": "Como aplicar esta sincronização?",
+  "syncMergeAutomatically": "Mesclar automaticamente",
+  "syncReviewAllChanges": "Rever todas as alterações",
 
   "importedEntries": "{count, plural, one{1 entrada importada.} other{{count} entradas importadas.}}",
   "@importedEntries": {

@@ -269,6 +269,9 @@
   "syncFailedTitle": "Synkronisering mislykkedes",
   "syncFromFileTitle": "Synkronisér fra fil",
   "nothingToSync": "Intet at synkronisere — begge hvælvinger er allerede opdaterede.",
+  "syncMethodTitle": "Hvordan skal denne synkronisering anvendes?",
+  "syncMergeAutomatically": "Flet automatisk",
+  "syncReviewAllChanges": "Gennemgå alle ændringer",
 
   "importedEntries": "{count, plural, one{1 post importeret.} other{{count} poster importeret.}}",
   "@importedEntries": {

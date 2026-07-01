@@ -269,6 +269,9 @@
   "syncFailedTitle": "同步失敗",
   "syncFromFileTitle": "從檔案同步",
   "nothingToSync": "沒有需要同步的內容 — 兩個保險庫均已是最新狀態。",
+  "syncMethodTitle": "此次同步應如何套用？",
+  "syncMergeAutomatically": "自動合併",
+  "syncReviewAllChanges": "查看所有變更",
 
   "importedEntries": "{count, plural, other{已匯入 {count} 個項目。}}",
   "@importedEntries": {

@@ -693,6 +693,15 @@ class AppLocalizationsSr extends AppLocalizations {
       'Nema šta da se sinhronizuje — oba trezora su već ažurirana.';
 
   @override
+  String get syncMethodTitle => 'Како применити ову синхронизацију?';
+
+  @override
+  String get syncMergeAutomatically => 'Аутоматски споји';
+
+  @override
+  String get syncReviewAllChanges => 'Прегледај све промене';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -2671,6 +2680,15 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get nothingToSync =>
       'Nema šta da se sinhronizuje — oba trezora su već ažurirana.';
+
+  @override
+  String get syncMethodTitle => 'Kako primeniti ovu sinhronizaciju?';
+
+  @override
+  String get syncMergeAutomatically => 'Automatski spoji';
+
+  @override
+  String get syncReviewAllChanges => 'Pregledaj sve promene';
 
   @override
   String importedEntries(int count) {

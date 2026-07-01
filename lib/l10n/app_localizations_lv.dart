@@ -691,6 +691,15 @@ class AppLocalizationsLv extends AppLocalizations {
       'Nav ko sinhronizēt — abi seifi jau ir atjaunināti.';
 
   @override
+  String get syncMethodTitle => 'Kā piemērot šo sinhronizāciju?';
+
+  @override
+  String get syncMergeAutomatically => 'Apvienot automātiski';
+
+  @override
+  String get syncReviewAllChanges => 'Pārskatīt visas izmaiņas';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

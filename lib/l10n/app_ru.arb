@@ -269,6 +269,9 @@
   "syncFailedTitle": "Синхронизация не удалась",
   "syncFromFileTitle": "Синхронизировать из файла",
   "nothingToSync": "Нечего синхронизировать — оба хранилища уже актуальны.",
+  "syncMethodTitle": "Как применить эту синхронизацию?",
+  "syncMergeAutomatically": "Объединить автоматически",
+  "syncReviewAllChanges": "Просмотреть все изменения",
 
   "importedEntries": "{count, plural, one{Импортирована 1 запись.} few{Импортированы {count} записи.} other{Импортировано {count} записей.}}",
   "@importedEntries": {

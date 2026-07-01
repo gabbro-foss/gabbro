@@ -435,6 +435,33 @@ Future<MergeSummary> mergeVaultFromFileWithKey({
   credentialId: credentialId,
 );
 
+/// Fast auto-merge a `.gabbro` file into the current session: apply everything
+/// automatically, incoming wins (no prompts). The analogue of
+/// [`merge_vault_from_file`] for the fast path. Returns the summary of what was
+/// applied. Persists (async — vault save).
+Future<MergeSummary> fastMergeVaultFromFile({
+  required String path,
+  required List<int> passphrase,
+}) => RustLib.instance.api.crateApiVaultBridgeFastMergeVaultFromFile(
+  path: path,
+  passphrase: passphrase,
+);
+
+/// Fast auto-merge a **key-protected** `.gabbro` file (ADR-013). The analogue of
+/// [`merge_vault_from_file_with_key`] for the fast path. `hmac_secret` must be 32
+/// bytes. Persists (async — vault save).
+Future<MergeSummary> fastMergeVaultFromFileWithKey({
+  required String path,
+  required List<int> passphrase,
+  required List<int> hmacSecret,
+  required List<int> credentialId,
+}) => RustLib.instance.api.crateApiVaultBridgeFastMergeVaultFromFileWithKey(
+  path: path,
+  passphrase: passphrase,
+  hmacSecret: hmacSecret,
+  credentialId: credentialId,
+);
+
 /// Lightweight entry summary returned by `list_entry_summaries()`.
 ///
 /// Contains just enough for Flutter to render a list row — no secrets.

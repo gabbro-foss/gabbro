@@ -693,6 +693,15 @@ class AppLocalizationsBg extends AppLocalizations {
       'Няма какво да се синхронизира — и двата трезора вече са актуализирани.';
 
   @override
+  String get syncMethodTitle => 'Как да се приложи тази синхронизация?';
+
+  @override
+  String get syncMergeAutomatically => 'Обединяване автоматично';
+
+  @override
+  String get syncReviewAllChanges => 'Преглед на всички промени';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

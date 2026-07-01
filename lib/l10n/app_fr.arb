@@ -269,6 +269,9 @@
   "syncFailedTitle": "Échec de la synchronisation",
   "syncFromFileTitle": "Synchroniser depuis un fichier",
   "nothingToSync": "Rien à synchroniser — les deux coffres sont déjà à jour.",
+  "syncMethodTitle": "Comment appliquer cette synchronisation ?",
+  "syncMergeAutomatically": "Fusionner automatiquement",
+  "syncReviewAllChanges": "Vérifier toutes les modifications",
 
   "importedEntries": "{count, plural, one{1 entrée importée.} other{{count} entrées importées.}}",
   "@importedEntries": {

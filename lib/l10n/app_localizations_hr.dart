@@ -692,6 +692,15 @@ class AppLocalizationsHr extends AppLocalizations {
       'Nema što sinkronizirati — oba trezora su već ažurirana.';
 
   @override
+  String get syncMethodTitle => 'Kako primijeniti ovu sinkronizaciju?';
+
+  @override
+  String get syncMergeAutomatically => 'Automatski spoji';
+
+  @override
+  String get syncReviewAllChanges => 'Pregledaj sve promjene';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

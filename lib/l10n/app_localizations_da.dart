@@ -690,6 +690,15 @@ class AppLocalizationsDa extends AppLocalizations {
       'Intet at synkronisere — begge hvælvinger er allerede opdaterede.';
 
   @override
+  String get syncMethodTitle => 'Hvordan skal denne synkronisering anvendes?';
+
+  @override
+  String get syncMergeAutomatically => 'Flet automatisk';
+
+  @override
+  String get syncReviewAllChanges => 'Gennemgå alle ændringer';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

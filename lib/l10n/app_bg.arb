@@ -269,6 +269,9 @@
   "syncFailedTitle": "Синхронизацията не успя",
   "syncFromFileTitle": "Синхронизирай от файл",
   "nothingToSync": "Няма какво да се синхронизира — и двата трезора вече са актуализирани.",
+  "syncMethodTitle": "Как да се приложи тази синхронизация?",
+  "syncMergeAutomatically": "Обединяване автоматично",
+  "syncReviewAllChanges": "Преглед на всички промени",
 
   "importedEntries": "{count, plural, one{Импортиран 1 запис.} other{Импортирани {count} записа.}}",
   "@importedEntries": {

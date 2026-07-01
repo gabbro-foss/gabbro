@@ -690,6 +690,15 @@ class AppLocalizationsKk extends AppLocalizations {
       'Синхрондайтын ештеңе жоқ — екі сейф те жаңартылған.';
 
   @override
+  String get syncMethodTitle => 'Бұл синхрондау қалай қолданылсын?';
+
+  @override
+  String get syncMergeAutomatically => 'Автоматты біріктіру';
+
+  @override
+  String get syncReviewAllChanges => 'Барлық өзгерістерді қарау';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

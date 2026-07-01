@@ -269,6 +269,9 @@
   "syncFailedTitle": "Синхрондау сәтсіз болды",
   "syncFromFileTitle": "Файлдан синхрондау",
   "nothingToSync": "Синхрондайтын ештеңе жоқ — екі сейф те жаңартылған.",
+  "syncMethodTitle": "Бұл синхрондау қалай қолданылсын?",
+  "syncMergeAutomatically": "Автоматты біріктіру",
+  "syncReviewAllChanges": "Барлық өзгерістерді қарау",
 
   "importedEntries": "{count, plural, other{{count} жазба импортталды.}}",
   "@importedEntries": {

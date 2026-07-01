@@ -36,6 +36,7 @@ MergeSummary _summary({
 
 Widget _buildScreen({
   required Future<MergeSummary> Function(String, List<int>) mergeVault,
+  Future<MergeSummary> Function(String, List<int>)? fastMergeVault,
   String? pickedPath,
   Future<String?> Function()? onPickSyncFile,
   Future<void> Function(String, String, bool, String)? onResolveFieldConflict,
@@ -51,6 +52,7 @@ Widget _buildScreen({
     yubikeyRecords: [],
     onPickSyncFile: onPickSyncFile ?? () async => pickedPath,
     mergeVault: mergeVault,
+    fastMergeVault: fastMergeVault ?? (_, _) async => _summary(),
     // No-op by default so tests never reach the real FFI resolution path.
     onResolveFieldConflict: onResolveFieldConflict ?? (_, _, _, _) async {},
     onResolveItemDelete: onResolveItemDelete ?? (_, _, _) async {},
@@ -85,6 +87,10 @@ Future<void> _startSync(WidgetTester tester) async {
     'passphrase',
   );
   await tester.tap(find.text('Sync'));
+  await tester.pumpAndSettle();
+  // The Quick-vs-Review chooser now appears; take the granular review path so the
+  // existing assertions (review dialog + per-decision apply) still hold.
+  await tester.tap(find.text('Review all changes'));
   await _settle(tester);
 }
 
@@ -157,6 +163,54 @@ void main() {
       expect(find.text('Cancel'), findsOneWidget);
       expect(find.text('Sync'), findsOneWidget);
       expect(find.text('/tmp/other.gabbro'), findsOneWidget);
+    });
+
+    testWidgets('Merge automatically runs the fast merge, no review dialog', (
+      tester,
+    ) async {
+      var fastCalled = false;
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          // The review-path merge must NOT run when the user picks automatic.
+          mergeVault: (_, _) async =>
+              throw StateError('review merge must not run in fast mode'),
+          fastMergeVault: (_, _) async {
+            fastCalled = true;
+            return _summary(added: 2, updated: 1);
+          },
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+        'passphrase',
+      );
+      await tester.tap(find.text('Sync'));
+      await tester.pumpAndSettle();
+
+      // The Quick-vs-Review chooser appears.
+      expect(find.text('How should this sync apply?'), findsOneWidget);
+      await tester.tap(find.text('Merge automatically'));
+      await _settle(tester);
+
+      expect(fastCalled, isTrue, reason: 'fast merge FFI must run');
+      expect(
+        find.text('Review changes  1/1'),
+        findsNothing,
+        reason: 'automatic merge shows no per-change review',
+      );
+      expect(
+        find.text('Sync failed'),
+        findsNothing,
+        reason: 'the review-path merge must not have been called',
+      );
+      expect(find.textContaining('synced'), findsOneWidget);
     });
 
     testWidgets('passphrase dialog announces the safe-to-retry hint', (
@@ -251,6 +305,8 @@ void main() {
       );
       await tester.tap(find.text('Sync'));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
 
       expect(find.textContaining('Nothing to sync'), findsOneWidget);
     });
@@ -274,6 +330,8 @@ void main() {
         'passphrase',
       );
       await tester.tap(find.text('Sync'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
 
       expect(find.textContaining('Vault synced'), findsOneWidget);
@@ -305,6 +363,8 @@ void main() {
       );
       await tester.tap(find.text('Sync'));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
 
       expect(capturedPassphrase, equals(utf8.encode('mypassword')));
     });
@@ -330,10 +390,12 @@ void main() {
         'wrongpassword',
       );
       await tester.tap(find.text('Sync'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
       // Use explicit pumps: cursor blink timer prevents pumpAndSettle from
       // settling while the passphrase dialog exit animation is in progress.
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 350)); // passphrase exit
+      await tester.pump(const Duration(milliseconds: 350)); // chooser exit
       await tester.pump(
         const Duration(milliseconds: 350),
       ); // error dialog enter
@@ -826,6 +888,12 @@ void main() {
         // Passphrase-only merge must never be reached for a key-protected source.
         mergeVault: (_, _) async =>
             throw StateError('passphrase-only merge must not be called'),
+        // These tests take the granular review path; the fast keyed variant
+        // should never fire.
+        fastMergeVault: (_, _) async =>
+            throw StateError('passphrase-only fast merge must not be called'),
+        fastMergeVaultWithKey: (_, _, _, _) async =>
+            throw StateError('fast keyed merge must not be called'),
         onDetectSyncSourceRecords: (_) => sourceRecords,
         onGetSyncYubikeyHmac:
             onGetSyncYubikeyHmac ??
@@ -960,6 +1028,8 @@ void main() {
       await tester.enterText(fields.at(1), '123456');
       await tester.tap(find.text('Sync'));
       await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
+      await tester.pumpAndSettle();
 
       expect(capturedPassphrase, equals(utf8.encode('sharedpass')));
       expect(capturedHmac, equals(const [0x42]));
@@ -1030,6 +1100,8 @@ void main() {
       expect(find.byType(AlertDialog), findsOneWidget);
 
       tapGate.complete((hmac: const [0x11], credentialId: const [0xA1]));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Review all changes'));
       await tester.pumpAndSettle();
 
       // Tap done: note gone, dialog closed, merge reported.

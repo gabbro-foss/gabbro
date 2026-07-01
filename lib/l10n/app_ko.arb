@@ -269,6 +269,9 @@
   "syncFailedTitle": "동기화에 실패했습니다",
   "syncFromFileTitle": "파일에서 동기화",
   "nothingToSync": "동기화할 것이 없습니다 — 두 볼트 모두 이미 최신 상태입니다.",
+  "syncMethodTitle": "이 동기화를 어떻게 적용하시겠습니까?",
+  "syncMergeAutomatically": "자동으로 병합",
+  "syncReviewAllChanges": "모든 변경 사항 검토",
 
   "importedEntries": "{count, plural, other{{count}개의 항목을 가져왔습니다.}}",
   "@importedEntries": {

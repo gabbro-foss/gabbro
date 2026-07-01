@@ -269,6 +269,9 @@
   "syncFailedTitle": "Synchronizácia zlyhala",
   "syncFromFileTitle": "Synchronizovať zo súboru",
   "nothingToSync": "Nie je čo synchronizovať — oba trezory sú už aktuálne.",
+  "syncMethodTitle": "Ako použiť túto synchronizáciu?",
+  "syncMergeAutomatically": "Zlúčiť automaticky",
+  "syncReviewAllChanges": "Skontrolovať všetky zmeny",
 
   "importedEntries": "{count, plural, one{Importovaný 1 záznam.} few{Importované {count} záznamy.} other{Importovaných {count} záznamov.}}",
   "@importedEntries": {

@@ -269,6 +269,9 @@
   "syncFailedTitle": "Synchronizacja nie powiodła się",
   "syncFromFileTitle": "Synchronizuj z pliku",
   "nothingToSync": "Nie ma nic do synchronizowania — oba skarbce są już aktualne.",
+  "syncMethodTitle": "Jak zastosować tę synchronizację?",
+  "syncMergeAutomatically": "Scal automatycznie",
+  "syncReviewAllChanges": "Przejrzyj wszystkie zmiany",
 
   "importedEntries": "{count, plural, one{Zaimportowano 1 wpis.} few{Zaimportowano {count} wpisy.} other{Zaimportowano {count} wpisów.}}",
   "@importedEntries": {

@@ -692,6 +692,15 @@ class AppLocalizationsEs extends AppLocalizations {
       'Nada que sincronizar — ambos almacenes ya están actualizados.';
 
   @override
+  String get syncMethodTitle => '¿Cómo debe aplicarse esta sincronización?';
+
+  @override
+  String get syncMergeAutomatically => 'Combinar automáticamente';
+
+  @override
+  String get syncReviewAllChanges => 'Revisar todos los cambios';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

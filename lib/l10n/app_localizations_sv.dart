@@ -691,6 +691,15 @@ class AppLocalizationsSv extends AppLocalizations {
       'Inget att synkronisera — båda valven är redan uppdaterade.';
 
   @override
+  String get syncMethodTitle => 'Hur ska den här synkroniseringen tillämpas?';
+
+  @override
+  String get syncMergeAutomatically => 'Slå samman automatiskt';
+
+  @override
+  String get syncReviewAllChanges => 'Granska alla ändringar';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

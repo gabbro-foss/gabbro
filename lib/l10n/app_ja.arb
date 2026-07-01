@@ -269,6 +269,9 @@
   "syncFailedTitle": "同期に失敗しました",
   "syncFromFileTitle": "ファイルから同期",
   "nothingToSync": "同期するものはありません — 両方のボルトはすでに最新です。",
+  "syncMethodTitle": "この同期をどのように適用しますか？",
+  "syncMergeAutomatically": "自動的にマージ",
+  "syncReviewAllChanges": "すべての変更を確認",
 
   "importedEntries": "{count, plural, other{{count}件のエントリをインポートしました。}}",
   "@importedEntries": {

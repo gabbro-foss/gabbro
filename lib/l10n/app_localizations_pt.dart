@@ -692,6 +692,15 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nada a sincronizar — ambos os cofres já estão atualizados.';
 
   @override
+  String get syncMethodTitle => 'Como aplicar esta sincronização?';
+
+  @override
+  String get syncMergeAutomatically => 'Mesclar automaticamente';
+
+  @override
+  String get syncReviewAllChanges => 'Rever todas as alterações';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -2676,6 +2685,15 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
       'Nada a sincronizar — ambos os cofres já estão atualizados.';
 
   @override
+  String get syncMethodTitle => 'Como esta sincronização deve ser aplicada?';
+
+  @override
+  String get syncMergeAutomatically => 'Mesclar automaticamente';
+
+  @override
+  String get syncReviewAllChanges => 'Revisar todas as alterações';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -4655,6 +4673,15 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get nothingToSync =>
       'Nada a sincronizar — ambos os cofres já estão atualizados.';
+
+  @override
+  String get syncMethodTitle => 'Como aplicar esta sincronização?';
+
+  @override
+  String get syncMergeAutomatically => 'Intercalar automaticamente';
+
+  @override
+  String get syncReviewAllChanges => 'Rever todas as alterações';
 
   @override
   String importedEntries(int count) {

@@ -690,6 +690,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'Nothing to sync — both vaults are already up to date.';
 
   @override
+  String get syncMethodTitle => 'How should this sync apply?';
+
+  @override
+  String get syncMergeAutomatically => 'Merge automatically';
+
+  @override
+  String get syncReviewAllChanges => 'Review all changes';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

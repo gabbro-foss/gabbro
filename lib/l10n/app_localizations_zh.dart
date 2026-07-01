@@ -681,6 +681,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nothingToSync => '没有需要同步的内容 — 两个保险库均已是最新状态。';
 
   @override
+  String get syncMethodTitle => '此次同步应如何应用？';
+
+  @override
+  String get syncMergeAutomatically => '自动合并';
+
+  @override
+  String get syncReviewAllChanges => '查看所有更改';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -2571,6 +2580,15 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get nothingToSync => '没有需要同步的内容 — 两个保险库均已是最新状态。';
 
   @override
+  String get syncMethodTitle => '此次同步应如何应用？';
+
+  @override
+  String get syncMergeAutomatically => '自动合并';
+
+  @override
+  String get syncReviewAllChanges => '查看所有更改';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -4459,6 +4477,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get nothingToSync => '沒有需要同步的內容 — 兩個保險庫均已是最新狀態。';
+
+  @override
+  String get syncMethodTitle => '此次同步應如何套用？';
+
+  @override
+  String get syncMergeAutomatically => '自動合併';
+
+  @override
+  String get syncReviewAllChanges => '查看所有變更';
 
   @override
   String importedEntries(int count) {

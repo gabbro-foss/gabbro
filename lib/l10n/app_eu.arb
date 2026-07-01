@@ -269,6 +269,9 @@
   "syncFailedTitle": "Sinkronizazioa huts egin du",
   "syncFromFileTitle": "Fitxategitik sinkronizatu",
   "nothingToSync": "Ez dago sinkronizatzeko ezer — bi gandegiak eguneratuta daude dagoeneko.",
+  "syncMethodTitle": "Nola aplikatu behar da sinkronizazio hau?",
+  "syncMergeAutomatically": "Batu automatikoki",
+  "syncReviewAllChanges": "Berrikusi aldaketa guztiak",
 
   "importedEntries": "{count, plural, one{1 sarrera inportatu da.} other{{count} sarrera inportatu dira.}}",
   "@importedEntries": {

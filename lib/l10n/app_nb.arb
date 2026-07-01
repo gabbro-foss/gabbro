@@ -269,6 +269,9 @@
   "syncFailedTitle": "Synkronisering mislyktes",
   "syncFromFileTitle": "Synkroniser fra fil",
   "nothingToSync": "Ingenting å synkronisere — begge hvelvingene er allerede oppdatert.",
+  "syncMethodTitle": "Hvordan skal denne synkroniseringen brukes?",
+  "syncMergeAutomatically": "Slå sammen automatisk",
+  "syncReviewAllChanges": "Gjennomgå alle endringer",
 
   "importedEntries": "{count, plural, one{1 oppføring importert.} other{{count} oppføringer importert.}}",
   "@importedEntries": {

@@ -269,6 +269,9 @@
   "syncFailedTitle": "Synchronisierung fehlgeschlagen",
   "syncFromFileTitle": "Aus Datei synchronisieren",
   "nothingToSync": "Nichts zu synchronisieren — beide Tresore sind bereits aktuell.",
+  "syncMethodTitle": "Wie soll diese Synchronisierung angewendet werden?",
+  "syncMergeAutomatically": "Automatisch zusammenführen",
+  "syncReviewAllChanges": "Alle Änderungen überprüfen",
 
   "importedEntries": "{count, plural, one{1 Eintrag importiert.} other{{count} Einträge importiert.}}",
   "@importedEntries": {

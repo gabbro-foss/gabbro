@@ -269,6 +269,9 @@
   "syncFailedTitle": "Sinchronizavimas nepavyko",
   "syncFromFileTitle": "Sinchronizuoti iš failo",
   "nothingToSync": "Nėra ko sinchronizuoti — abi saugyklos jau atnaujintos.",
+  "syncMethodTitle": "Kaip taikyti šią sinchronizaciją?",
+  "syncMergeAutomatically": "Sulieti automatiškai",
+  "syncReviewAllChanges": "Peržiūrėti visus pakeitimus",
 
   "importedEntries": "{count, plural, one{1 įrašas importuotas.} other{{count} įrašai importuoti.}}",
   "@importedEntries": {

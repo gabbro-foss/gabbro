@@ -298,6 +298,18 @@
   "syncFailedTitle": "Sync failed",
   "syncFromFileTitle": "Sync from file",
   "nothingToSync": "Nothing to sync — both vaults are already up to date.",
+  "syncMethodTitle": "How should this sync apply?",
+  "@syncMethodTitle": {
+    "description": "Title of the dialog asking whether to auto-merge or review each change."
+  },
+  "syncMergeAutomatically": "Merge automatically",
+  "@syncMergeAutomatically": {
+    "description": "Button: apply all incoming changes automatically (incoming wins), no review."
+  },
+  "syncReviewAllChanges": "Review all changes",
+  "@syncReviewAllChanges": {
+    "description": "Button: step through every change one by one and choose (slower)."
+  },
 
   "importedEntries": "{count, plural, one{Imported 1 entry.} other{Imported {count} entries.}}",
   "@importedEntries": {

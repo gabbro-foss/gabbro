@@ -269,6 +269,9 @@
   "syncFailedTitle": "Sincronizzazione fallita",
   "syncFromFileTitle": "Sincronizza da file",
   "nothingToSync": "Niente da sincronizzare — entrambi gli archivi sono già aggiornati.",
+  "syncMethodTitle": "Come applicare questa sincronizzazione?",
+  "syncMergeAutomatically": "Unisci automaticamente",
+  "syncReviewAllChanges": "Rivedi tutte le modifiche",
 
   "importedEntries": "{count, plural, one{1 voce importata.} other{{count} voci importate.}}",
   "@importedEntries": {

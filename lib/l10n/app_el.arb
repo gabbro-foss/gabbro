@@ -269,6 +269,9 @@
   "syncFailedTitle": "Αποτυχία συγχρονισμού",
   "syncFromFileTitle": "Συγχρονισμός από αρχείο",
   "nothingToSync": "Δεν υπάρχει τίποτα για συγχρονισμό — και τα δύο θησαυροφυλάκια είναι ήδη ενημερωμένα.",
+  "syncMethodTitle": "Πώς να εφαρμοστεί αυτός ο συγχρονισμός;",
+  "syncMergeAutomatically": "Αυτόματη συγχώνευση",
+  "syncReviewAllChanges": "Έλεγχος όλων των αλλαγών",
 
   "importedEntries": "{count, plural, one{Εισήχθη 1 καταχώριση.} other{Εισήχθησαν {count} καταχωρίσεις.}}",
   "@importedEntries": {

@@ -691,6 +691,15 @@ class AppLocalizationsNn extends AppLocalizations {
       'Inkje å synkronisere — begge kvelva er allereie oppdaterte.';
 
   @override
+  String get syncMethodTitle => 'Korleis skal denne synkroniseringa brukast?';
+
+  @override
+  String get syncMergeAutomatically => 'Slå saman automatisk';
+
+  @override
+  String get syncReviewAllChanges => 'Gå gjennom alle endringar';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

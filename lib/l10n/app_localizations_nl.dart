@@ -692,6 +692,16 @@ class AppLocalizationsNl extends AppLocalizations {
       'Niets te synchroniseren — beide kluizen zijn al up-to-date.';
 
   @override
+  String get syncMethodTitle =>
+      'Hoe moet deze synchronisatie worden toegepast?';
+
+  @override
+  String get syncMergeAutomatically => 'Automatisch samenvoegen';
+
+  @override
+  String get syncReviewAllChanges => 'Alle wijzigingen bekijken';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

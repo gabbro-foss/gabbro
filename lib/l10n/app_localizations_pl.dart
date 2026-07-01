@@ -694,6 +694,15 @@ class AppLocalizationsPl extends AppLocalizations {
       'Nie ma nic do synchronizowania — oba skarbce są już aktualne.';
 
   @override
+  String get syncMethodTitle => 'Jak zastosować tę synchronizację?';
+
+  @override
+  String get syncMergeAutomatically => 'Scal automatycznie';
+
+  @override
+  String get syncReviewAllChanges => 'Przejrzyj wszystkie zmiany';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

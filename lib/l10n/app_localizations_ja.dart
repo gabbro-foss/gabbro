@@ -683,6 +683,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get nothingToSync => '同期するものはありません — 両方のボルトはすでに最新です。';
 
   @override
+  String get syncMethodTitle => 'この同期をどのように適用しますか？';
+
+  @override
+  String get syncMergeAutomatically => '自動的にマージ';
+
+  @override
+  String get syncReviewAllChanges => 'すべての変更を確認';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

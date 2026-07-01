@@ -692,6 +692,15 @@ class AppLocalizationsEt extends AppLocalizations {
       'Midagi ei ole sünkroonida — mõlemad seifid on juba ajakohased.';
 
   @override
+  String get syncMethodTitle => 'Kuidas seda sünkroonimist rakendada?';
+
+  @override
+  String get syncMergeAutomatically => 'Ühenda automaatselt';
+
+  @override
+  String get syncReviewAllChanges => 'Vaata kõik muudatused üle';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

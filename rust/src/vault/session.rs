@@ -3367,6 +3367,92 @@ pub fn session_merge_vault_from_body(incoming: VaultBody) -> Result<MergeSummary
     Ok(summary)
 }
 
+/// Fast auto-merge: like [`do_merge`], but every surfaced decision is resolved
+/// automatically in favour of the incoming vault (KeePassXC-style whole-incoming
+/// wins), so the outcome is deterministic. Field collisions take the incoming
+/// value (the losing local value kept in history); folder conflicts take the
+/// incoming folder; tombstoned deletes (whole-entry and per-item) are applied;
+/// and brought-over edits keep the replaced local value in history. Nothing is
+/// lost — every replaced value lives in the entry's unified history.
+fn do_fast_merge(session: &mut VaultSession, incoming: VaultBody) -> MergeSummary {
+    let summary = do_merge(session, incoming);
+    let now = crate::api::vault::chrono_now();
+    let now_ms = crate::api::vault::now_ms();
+
+    let find = |session: &mut VaultSession, id: &str| -> Option<usize> {
+        session.entries.iter().position(|e| entry_id(e) == id)
+    };
+
+    // Brought-over edits (incoming edited a field the local side did not): the
+    // value is already applied by do_merge; keep the replaced local value in
+    // history. Added items (new attachments / new custom pairs) have no prior
+    // value to preserve.
+    for b in &summary.brought_over {
+        if b.old_value.is_empty() || b.field.starts_with("attachments:") {
+            continue;
+        }
+        if let Some(i) = find(session, &b.id) {
+            meta_of_mut(&mut session.entries[i]).record_previous(&b.field, &b.old_value, &now, None);
+        }
+    }
+    // Field collisions -> incoming value; losing local value kept in history.
+    for c in &summary.field_conflicts {
+        if let Some(i) = find(session, &c.id) {
+            let e = &mut session.entries[i];
+            crate::api::vault::set_entry_field_by_key(e, &c.field, &c.incoming_value);
+            let meta = meta_of_mut(e);
+            meta.record_previous(&c.field, &c.local_value, &now, None);
+            meta.field_times.insert(c.field.clone(), now_ms);
+            meta.updated_at = now.clone();
+        }
+    }
+    // Folder conflicts -> incoming folder.
+    for f in &summary.folder_conflicts {
+        if let Some(i) = find(session, &f.id) {
+            let meta = meta_of_mut(&mut session.entries[i]);
+            meta.folder = f.incoming_folder.clone();
+            meta.updated_at = now.clone();
+        }
+    }
+    // Per-item deletes (custom pair / attachment the other side removed) -> apply.
+    for d in &summary.pending_item_deletes {
+        if let Some(i) = find(session, &d.id) {
+            let e = &mut session.entries[i];
+            crate::api::vault::remove_entry_item_by_key(e, &d.field);
+            let meta = meta_of_mut(e);
+            meta.field_times.insert(format!("del:{}", d.field), now_ms);
+            meta.field_times.remove(&d.field);
+            meta.updated_at = now.clone();
+        }
+    }
+    // Whole-entry deletes (incoming tombstone) -> apply.
+    for d in &summary.pending_deletes {
+        session.entries.retain(|e| entry_id(e) != d.id);
+    }
+    summary
+}
+
+/// Fast auto-merge an already-decrypted incoming `VaultBody` into the live
+/// session and persist. Deterministic, no user prompts; see [`do_fast_merge`].
+pub fn session_fast_merge_from_body(incoming: VaultBody) -> Result<MergeSummary, String> {
+    let (body, passphrase, path, yubikey, summary) = {
+        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
+        let session = session.as_mut().ok_or("Vault is locked")?;
+        let summary = do_fast_merge(session, incoming);
+        let body = build_body(session);
+        let yubikey = extract_yubikey(session);
+        (
+            body,
+            session.passphrase.clone(),
+            session.path.clone(),
+            yubikey,
+            summary,
+        )
+    }; // ← lock released here
+    do_save(&body, &passphrase, &path, yubikey)?;
+    Ok(summary)
+}
+
 #[cfg(test)]
 mod assign_folder_tests {
     use super::*;
@@ -5998,6 +6084,80 @@ mod merge_tests {
             assert_walk_end_state(&session.as_ref().unwrap().entries);
         }
         teardown(&path);
+    }
+
+    // Fast auto-merge walk: load A, then fast-merge the other two (no prompts,
+    // incoming always wins). Proves (1) every A-vs-C clash resolves to C's value
+    // regardless of B/C order, and (2) order still matters via the delete/re-add
+    // path: C tombstones `delme`, so A->B->C drops it, but A->C->B re-adds it from
+    // B (additive rule: an incoming entry is re-added even past a tombstone).
+    // Equivalent of `check_sync_walk_export`, for the fast path.
+    #[test]
+    #[serial]
+    #[ignore = "fast-merge walk on the sync_test corpus (cheap Argon2); opt-in"]
+    fn fast_merge_walk_incoming_wins_and_order_dependent() {
+        use crate::vault::serialization::VaultBody;
+        let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .join("test_data/sync_test_vaults");
+        let pass = b"0123456789a";
+        let load = |n: &str| {
+            crate::api::vault::load_vault(pass, &dir.join(format!("sync_test_{n}.gabbro"))).unwrap()
+        };
+        let a = load("A");
+        let b = load("B");
+        let c = load("C");
+
+        // The four simple scalar clash fields (login-co/password, note-co/content,
+        // id-co/last_name, card-co/cvv), extracted by the entry's type.
+        let scalar = |ents: &[VaultEntry], id: &str| -> String {
+            match ents.iter().find(|e| entry_id(e) == id).expect(id) {
+                VaultEntry::Login(l) => l.password.clone(),
+                VaultEntry::Note(n) => n.content.clone(),
+                VaultEntry::Identity(i) => i.last_name.clone(),
+                VaultEntry::Card(cc) => cc.cvv.clone(),
+                _ => panic!("unexpected type for {id}"),
+            }
+        };
+        let has = |ents: &[VaultEntry], id: &str| ents.iter().any(|e| entry_id(e) == id);
+
+        let c_login = scalar(&c.entries, "login-co");
+        let c_note = scalar(&c.entries, "note-co");
+        let c_id = scalar(&c.entries, "id-co");
+        let c_card = scalar(&c.entries, "card-co");
+
+        let run = |first: &VaultBody, second: &VaultBody, suffix: &str| -> Vec<VaultEntry> {
+            let path = setup(pass, suffix, a.entries.clone());
+            unlock_vault(pass, path.clone()).unwrap();
+            session_fast_merge_from_body(first.clone()).unwrap();
+            session_fast_merge_from_body(second.clone()).unwrap();
+            let ents = {
+                let s = VAULT_SESSION.lock().unwrap();
+                s.as_ref().unwrap().entries.clone()
+            };
+            teardown(&path);
+            ents
+        };
+
+        let abc = run(&b, &c, "fast_abc");
+        let acb = run(&c, &b, "fast_acb");
+
+        // Incoming (C) wins every A-vs-C clash, regardless of B/C order.
+        for ents in [&abc, &acb] {
+            assert_eq!(scalar(ents, "login-co"), c_login, "login-co password -> C");
+            assert_eq!(scalar(ents, "note-co"), c_note, "note-co content -> C");
+            assert_eq!(scalar(ents, "id-co"), c_id, "id-co last_name -> C");
+            assert_eq!(scalar(ents, "card-co"), c_card, "card-co cvv -> C");
+        }
+
+        // Order matters via delete/re-add: C deletes `delme`.
+        assert!(!has(&abc, "delme"), "A->B->C: C's delete of delme sticks");
+        assert!(has(&acb, "delme"), "A->C->B: B re-adds delme after C deleted it");
+
+        // The B-only new entry is kept in both orders.
+        assert!(has(&abc, "extra-b"), "extra-b kept (A->B->C)");
+        assert!(has(&acb, "extra-b"), "extra-b kept (A->C->B)");
     }
 
     fn setup(pass: &[u8], path_suffix: &str, entries: Vec<VaultEntry>) -> std::path::PathBuf {

@@ -269,6 +269,9 @@
   "syncFailedTitle": "Синхронізація не вдалася",
   "syncFromFileTitle": "Синхронізувати з файлу",
   "nothingToSync": "Нічого синхронізувати — обидва сховища вже актуальні.",
+  "syncMethodTitle": "Як застосувати цю синхронізацію?",
+  "syncMergeAutomatically": "Обʼєднати автоматично",
+  "syncReviewAllChanges": "Переглянути всі зміни",
 
   "importedEntries": "{count, plural, one{Імпортовано 1 запис.} few{Імпортовано {count} записи.} other{Імпортовано {count} записів.}}",
   "@importedEntries": {

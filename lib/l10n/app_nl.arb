@@ -269,6 +269,9 @@
   "syncFailedTitle": "Synchronisatie mislukt",
   "syncFromFileTitle": "Synchroniseren vanuit bestand",
   "nothingToSync": "Niets te synchroniseren — beide kluizen zijn al up-to-date.",
+  "syncMethodTitle": "Hoe moet deze synchronisatie worden toegepast?",
+  "syncMergeAutomatically": "Automatisch samenvoegen",
+  "syncReviewAllChanges": "Alle wijzigingen bekijken",
 
   "importedEntries": "{count, plural, one{1 item geïmporteerd.} other{{count} items geïmporteerd.}}",
   "@importedEntries": {

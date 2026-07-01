@@ -269,6 +269,9 @@
   "syncFailedTitle": "Sünkroonimine ebaõnnestus",
   "syncFromFileTitle": "Sünkrooni failist",
   "nothingToSync": "Midagi ei ole sünkroonida — mõlemad seifid on juba ajakohased.",
+  "syncMethodTitle": "Kuidas seda sünkroonimist rakendada?",
+  "syncMergeAutomatically": "Ühenda automaatselt",
+  "syncReviewAllChanges": "Vaata kõik muudatused üle",
 
   "importedEntries": "{count, plural, one{1 kirje imporditud.} other{{count} kirjet imporditud.}}",
   "@importedEntries": {

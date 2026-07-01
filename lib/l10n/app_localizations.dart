@@ -1465,6 +1465,24 @@ abstract class AppLocalizations {
   /// **'Nothing to sync — both vaults are already up to date.'**
   String get nothingToSync;
 
+  /// Title of the dialog asking whether to auto-merge or review each change.
+  ///
+  /// In en, this message translates to:
+  /// **'How should this sync apply?'**
+  String get syncMethodTitle;
+
+  /// Button: apply all incoming changes automatically (incoming wins), no review.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge automatically'**
+  String get syncMergeAutomatically;
+
+  /// Button: step through every change one by one and choose (slower).
+  ///
+  /// In en, this message translates to:
+  /// **'Review all changes'**
+  String get syncReviewAllChanges;
+
   /// No description provided for @importedEntries.
   ///
   /// In en, this message translates to:

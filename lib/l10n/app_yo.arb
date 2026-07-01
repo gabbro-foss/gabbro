@@ -269,6 +269,9 @@
   "syncFailedTitle": "Iṣọkan kuna",
   "syncFromFileTitle": "Ṣọkan lati faili",
   "nothingToSync": "Ko si ohun lati ṣọkan — awọn vọọliti mejeeji ti wa ni imudojuiwọn.",
+  "syncMethodTitle": "Báwo ni ó ṣe yẹ kí a lo ìṣọ̀kan yìí?",
+  "syncMergeAutomatically": "Dàpọ̀ láìfọwọ́yi",
+  "syncReviewAllChanges": "Ṣàyẹ̀wò gbogbo àwọn ìyípadà",
 
   "importedEntries": "{count, plural, other{A mu awọn titẹ sii {count} wọle.}}",
   "@importedEntries": {

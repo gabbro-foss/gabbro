@@ -269,6 +269,9 @@
   "syncFailedTitle": "Error de sincronización",
   "syncFromFileTitle": "Sincronizar desde archivo",
   "nothingToSync": "Nada que sincronizar — ambos almacenes ya están actualizados.",
+  "syncMethodTitle": "¿Cómo debe aplicarse esta sincronización?",
+  "syncMergeAutomatically": "Combinar automáticamente",
+  "syncReviewAllChanges": "Revisar todos los cambios",
 
   "importedEntries": "{count, plural, one{1 entrada importada.} other{{count} entradas importadas.}}",
   "@importedEntries": {

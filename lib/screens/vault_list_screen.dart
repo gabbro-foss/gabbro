@@ -52,6 +52,22 @@ Future<MergeSummary> _defaultMergeVaultWithKey(
   credentialId: credentialId,
 );
 
+/// Fast auto-merge (incoming wins, no prompts) — the "Merge automatically" path.
+Future<MergeSummary> _defaultFastMergeVault(String path, List<int> passphrase) =>
+    fastMergeVaultFromFile(path: path, passphrase: passphrase);
+
+Future<MergeSummary> _defaultFastMergeVaultWithKey(
+  String path,
+  List<int> passphrase,
+  List<int> hmac,
+  List<int> credentialId,
+) => fastMergeVaultFromFileWithKey(
+  path: path,
+  passphrase: passphrase,
+  hmacSecret: hmac,
+  credentialId: credentialId,
+);
+
 Future<void> _defaultResolveFieldConflict(
   String id,
   String field,
@@ -181,6 +197,18 @@ class VaultListScreen extends StatefulWidget {
   )
   mergeVaultWithKey;
 
+  /// Fast auto-merge variants (incoming wins, no review) for the "Merge
+  /// automatically" path. Mirror [mergeVault] / [mergeVaultWithKey].
+  final Future<MergeSummary> Function(String path, List<int> passphrase)
+  fastMergeVault;
+  final Future<MergeSummary> Function(
+    String path,
+    List<int> passphrase,
+    List<int> hmac,
+    List<int> credentialId,
+  )
+  fastMergeVaultWithKey;
+
   /// Detects whether the chosen `.gabbro` sync source is key-protected.
   final List<YubikeyRecordData> Function(String path) onDetectSyncSourceRecords;
 
@@ -237,6 +265,8 @@ class VaultListScreen extends StatefulWidget {
     this.listFolders,
     this.mergeVault = _defaultMergeVault,
     this.mergeVaultWithKey = _defaultMergeVaultWithKey,
+    this.fastMergeVault = _defaultFastMergeVault,
+    this.fastMergeVaultWithKey = _defaultFastMergeVaultWithKey,
     this.onDetectSyncSourceRecords = _defaultDetectSyncSourceRecords,
     this.onGetSyncYubikeyHmac = _defaultGetSyncYubikeyHmac,
     this.onPickSyncFile = _defaultPickSyncFile,
@@ -740,9 +770,77 @@ class _VaultListScreenState extends State<VaultListScreen>
     );
     if (creds == null || !mounted) return;
 
+    // Choose how to apply: automatically (incoming wins, no prompts) or a
+    // granular one-by-one review.
+    final chooseL = AppLocalizations.of(context);
+    final fast = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(chooseL.syncMethodTitle),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(chooseL.syncReviewAllChanges),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(chooseL.syncMergeAutomatically),
+          ),
+        ],
+      ),
+    );
+    if (fast == null || !mounted) return;
+
     final passphraseBytes = utf8.encode(creds.passphrase);
     setState(() => _isSyncing = true);
     try {
+      if (fast) {
+        // Fast auto-merge: everything applied, incoming wins, no review dialog.
+        final MergeSummary fastSummary = isKeyProtected
+            ? await widget.fastMergeVaultWithKey(
+                path,
+                passphraseBytes,
+                creds.hmac!,
+                creds.credentialId!,
+              )
+            : await widget.fastMergeVault(path, passphraseBytes);
+        if (!mounted) return;
+        _loadEntries();
+        final nothing =
+            fastSummary.added == 0 &&
+            fastSummary.updated == 0 &&
+            fastSummary.addedEntries.isEmpty &&
+            fastSummary.broughtOver.isEmpty &&
+            fastSummary.pendingDeletes.isEmpty &&
+            fastSummary.folderConflicts.isEmpty &&
+            fastSummary.fieldConflicts.isEmpty &&
+            fastSummary.pendingItemDeletes.isEmpty;
+        if (!mounted) return;
+        if (nothing) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context).nothingToSync)),
+          );
+        } else {
+          final updatedIds = <String>{
+            ...fastSummary.broughtOver.map((b) => b.id),
+            ...fastSummary.fieldConflicts.map((c) => c.id),
+            ...fastSummary.pendingItemDeletes.map((d) => d.id),
+            ...fastSummary.folderConflicts.map((f) => f.id),
+          };
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context).vaultSynced(
+                  fastSummary.added,
+                  updatedIds.length,
+                  fastSummary.pendingDeletes.length,
+                ),
+              ),
+            ),
+          );
+        }
+        return;
+      }
       final MergeSummary summary;
       if (isKeyProtected) {
         // The dialog already tapped the key (showing the inline tap note); use

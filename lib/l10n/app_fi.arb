@@ -269,6 +269,9 @@
   "syncFailedTitle": "Synkronointi epäonnistui",
   "syncFromFileTitle": "Synkronoi tiedostosta",
   "nothingToSync": "Ei synkronoitavaa — molemmat holvit ovat jo ajan tasalla.",
+  "syncMethodTitle": "Miten tämä synkronointi otetaan käyttöön?",
+  "syncMergeAutomatically": "Yhdistä automaattisesti",
+  "syncReviewAllChanges": "Tarkista kaikki muutokset",
 
   "importedEntries": "{count, plural, one{1 merkintä tuotu.} other{{count} merkintää tuotu.}}",
   "@importedEntries": {

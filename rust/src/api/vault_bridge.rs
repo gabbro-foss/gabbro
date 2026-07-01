@@ -963,6 +963,41 @@ pub async fn merge_vault_from_file_with_key(
     session::session_merge_vault_from_body(incoming_body)
 }
 
+/// Fast auto-merge a `.gabbro` file into the current session: apply everything
+/// automatically, incoming wins (no prompts). The analogue of
+/// [`merge_vault_from_file`] for the fast path. Returns the summary of what was
+/// applied. Persists (async — vault save).
+pub async fn fast_merge_vault_from_file(
+    path: String,
+    passphrase: Vec<u8>,
+) -> Result<crate::api::vault::MergeSummary, String> {
+    let file_path = PathBuf::from(path);
+    let incoming_body = crate::api::vault::load_vault(&passphrase, &file_path)?;
+    session::session_fast_merge_from_body(incoming_body)
+}
+
+/// Fast auto-merge a **key-protected** `.gabbro` file (ADR-013). The analogue of
+/// [`merge_vault_from_file_with_key`] for the fast path. `hmac_secret` must be 32
+/// bytes. Persists (async — vault save).
+pub async fn fast_merge_vault_from_file_with_key(
+    path: String,
+    passphrase: Vec<u8>,
+    hmac_secret: Vec<u8>,
+    credential_id: Vec<u8>,
+) -> Result<crate::api::vault::MergeSummary, String> {
+    let secret: [u8; 32] = hmac_secret
+        .try_into()
+        .map_err(|_| "hmac_secret must be exactly 32 bytes".to_string())?;
+    let file_path = PathBuf::from(path);
+    let (incoming_body, _master, _wrapping) = crate::api::vault::load_vault_with_key_record(
+        &passphrase,
+        &secret,
+        &credential_id,
+        &file_path,
+    )?;
+    session::session_fast_merge_from_body(incoming_body)
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]

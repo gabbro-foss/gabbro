@@ -692,6 +692,15 @@ class AppLocalizationsIt extends AppLocalizations {
       'Niente da sincronizzare — entrambi gli archivi sono già aggiornati.';
 
   @override
+  String get syncMethodTitle => 'Come applicare questa sincronizzazione?';
+
+  @override
+  String get syncMergeAutomatically => 'Unisci automaticamente';
+
+  @override
+  String get syncReviewAllChanges => 'Rivedi tutte le modifiche';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

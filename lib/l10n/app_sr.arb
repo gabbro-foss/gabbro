@@ -269,6 +269,9 @@
   "syncFailedTitle": "Sinhronizacija nije uspela",
   "syncFromFileTitle": "Sinhronizuj iz datoteke",
   "nothingToSync": "Nema šta da se sinhronizuje — oba trezora su već ažurirana.",
+  "syncMethodTitle": "Како применити ову синхронизацију?",
+  "syncMergeAutomatically": "Аутоматски споји",
+  "syncReviewAllChanges": "Прегледај све промене",
 
   "importedEntries": "{count, plural, one{Uvezen 1 unos.} few{Uvezena {count} unosa.} other{Uvezeno {count} unosa.}}",
   "@importedEntries": {

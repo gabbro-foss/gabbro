@@ -269,6 +269,9 @@
   "syncFailedTitle": "Synchronizace selhala",
   "syncFromFileTitle": "Synchronizovat ze souboru",
   "nothingToSync": "Není co synchronizovat — oba trezory jsou již aktuální.",
+  "syncMethodTitle": "Jak použít tuto synchronizaci?",
+  "syncMergeAutomatically": "Sloučit automaticky",
+  "syncReviewAllChanges": "Zkontrolovat všechny změny",
 
   "importedEntries": "{count, plural, one{Importován 1 záznam.} few{Importovány {count} záznamy.} other{Importováno {count} záznamů.}}",
   "@importedEntries": {

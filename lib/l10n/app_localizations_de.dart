@@ -693,6 +693,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'Nichts zu synchronisieren — beide Tresore sind bereits aktuell.';
 
   @override
+  String get syncMethodTitle =>
+      'Wie soll diese Synchronisierung angewendet werden?';
+
+  @override
+  String get syncMergeAutomatically => 'Automatisch zusammenführen';
+
+  @override
+  String get syncReviewAllChanges => 'Alle Änderungen überprüfen';
+
+  @override
   String importedEntries(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
