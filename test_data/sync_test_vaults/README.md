@@ -48,7 +48,7 @@ field → clash).
 | File | A→filename, B→notes, C→data | A & C → data (clash); B → filename |
 | Custom | A→edits `api_key`, B→adds `env`, C→title | A & C → `token` (clash); B → adds `scope` |
 
-## Hardware test — follow exactly
+## Hardware test — granular flow: follow exactly
 
 One device. Mock vaults only. Passphrase for everything: `0123456789a`.
 Make the picks below exactly; the result is then checked against a known answer.
@@ -102,6 +102,40 @@ field differs.
 Watch for (flag if wrong): every choice is a clearly labelled button (**Keep** /
 **Delete** / **Use other**); the **Bank** and **Amex** screens hide their two values
 behind dots with an **eye** to reveal.
+
+## Hardware test — fast auto-merge
+
+The same corpus, but exercising the **Merge automatically** path (no per-change
+review; the incoming vault wins every clash, replaced values kept in history).
+One device, mock vaults only, passphrase `0123456789a`.
+
+**1.** Create a new vault, passphrase `0123456789a`.
+
+**2.** Menu → **Import entries** → **Gabbro vault** → `sync_test_A.gabbro` →
+**Sync from vault**.
+
+**3. Sync B.** Menu → **Sync from file** → `sync_test_B.gabbro`. On the
+"How should this sync apply?" prompt, tap **Merge automatically**. No review opens.
+
+**4. Sync C.** Menu → **Sync from file** → `sync_test_C.gabbro` → **Merge
+automatically**.
+
+**5.** Export the vault to **JSON** (Menu → Export → JSON), save as
+`/tmp/fast_sync_walk.json`.
+
+**6.** Run the checker from `rust/`:
+
+```
+GABBRO_FAST_WALK_JSON=/tmp/fast_sync_walk.json cargo test --release --lib check_fast_sync_walk_export -- --ignored
+```
+
+Green = the export matches a fresh in-process fast A→B→C merge of the same corpus
+(compared by field values, ignoring timestamps/history). Red = it prints the entry
+that differs.
+
+Expected outcome (no prompts): every `*-co` clash field takes **C's** value; `delme`
+(deleted on C) is **gone**; `extra-b` (new on B) is **kept**; the `login-nc` `OldNote`
+item C deleted is **removed**.
 
 ## Regenerate
 

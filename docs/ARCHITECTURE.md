@@ -90,47 +90,11 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Active task: vault sync (fast auto-merge + granular review)
+### Active task: finish granular sync
 
-**Why.** Old merge is whole-entry last-writer-wins on one coarse `updated_at`: independent
-field edits on two devices silently lose one side. No server — sync is file-to-file, must
-be additive, user-reviewed, nothing lost.
+Fast auto-merge, the unified history model, and the v9 format are done and
+hardware-verified (see git log / CHANGELOG). Remaining work is the granular review path:
 
-**Model (agreed 2026-06-29).** One direction at a time (A into B), additive, reviewed;
-running B into A afterwards converges. Per entry (matched by permanent id), per field and
-per custom pair:
-
-```
-entry only on A ........ NEW: added to B, shown, droppable.
-entry only on B ........ stays (additive never auto-removes).
-field changed on A ..... A's value comes over; B's replaced value -> entry history.
-field changed on BOTH .. CONFLICT: both shown, you pick; unpicked -> history. Never by clock.
-item deleted on other .. keep-or-delete prompt, per item.
-result on B = (A + B) minus what you dropped; every replaced value kept in entry history.
-```
-
-`field_times` (ms) detect WHICH side edited a field, never pick a winner — clocks aren't trusted.
-
-**v8 -> v9.** New app reads v8, migrates on save (no loss); old app refuses v9 (fail-safe).
-Import (`merge_source_into_session`) stays first-wins by UUID — sync path only. Transport
-(moving the file) is out of scope.
-
-**Status.** Engine + v9 format + backward-compat gate + granular review UI
-(`lib/widgets/sync_review.dart`) + recovery history (`recovery_history_screen.dart`) built,
-unit-green, and hardware-walk-verified. Key code: `merge_entry_pair`, `decide_field`,
-`MergeSummary`, `replace_field_with_history` (session.rs).
-
-**Two paths (decided 2026-06-30), both shipped.** A "Merge automatically / Review all changes"
-chooser (`vault_list_screen.dart`) picks per sync:
-- **Fast auto-merge** (KeePassXC-style, `session_fast_merge_from_body`) — fully automatic, no
-  prompts: incoming wins every collision (the losing local value kept in history), folder
-  conflicts take incoming, tombstoned deletes are applied, brought-over edits keep the replaced
-  value in history. Deterministic per order; nothing lost (replaced values live in history).
-  `pending_deletes` is tombstone-driven (`session.rs`), so an un-synced entry is never removed
-  — but a still-present entry on the incoming side is re-added even past a tombstone (additive).
-- **Granular review** — the one-by-one UI to reconcile diverged vaults by hand.
-
-**Steps (tick off):**
 - [ ] Batched apply (perf, granular only): the per-decision FFI loop in `_syncFromFile`
       reseals the whole vault (Argon2id) once PER decision. Replace with one "apply all" FFI
       that reseals once. (Fast path already reseals once via `session_fast_merge_from_body`.)
