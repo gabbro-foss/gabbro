@@ -73,7 +73,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 12 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
-| Rust sync-walk simulation (`cargo test --release --lib sync_walk_simulation_matches_checker -- --ignored`) | 1 | 1 (opt-in by default) |
+| Rust sync-walk batched apply (`cargo test --release --lib sync_walk_batched_apply_matches_checker -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
 | Flutter (`flutter test`) | 998 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 7 | 0 |
@@ -95,9 +95,6 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 Fast auto-merge, the unified history model, and the v9 format are done and
 hardware-verified (see git log / CHANGELOG). Remaining work is the granular review path:
 
-- [ ] Batched apply (perf, granular only): the per-decision FFI loop in `_syncFromFile`
-      reseals the whole vault (Argon2id) once PER decision. Replace with one "apply all" FFI
-      that reseals once. (Fast path already reseals once via `session_fast_merge_from_body`.)
 - [ ] Itemized post-sync summary: list which entries added/updated/deleted, not just totals.
 - [ ] Edge-case hardening pass (none done deliberately yet).
 
