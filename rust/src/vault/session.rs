@@ -6160,6 +6160,75 @@ mod merge_tests {
         assert!(has(&acb, "extra-b"), "extra-b kept (A->C->B)");
     }
 
+    // Hardware check for the FAST auto-merge path — the analogue of
+    // `check_sync_walk_export`. Export a vault built by: import A, then Sync B and
+    // Sync C both via "Merge automatically", to JSON at $GABBRO_FAST_WALK_JSON.
+    // This recomputes the reference fast A->B->C merge from the same corpus in
+    // process and compares by content (ignoring timestamps / field_times /
+    // history, which legitimately differ run-to-run).
+    #[test]
+    #[serial]
+    #[ignore = "validates a FAST-merge hardware export; set GABBRO_FAST_WALK_JSON to the .json path"]
+    fn check_fast_sync_walk_export() {
+        use std::collections::BTreeMap;
+        let json_path = std::env::var("GABBRO_FAST_WALK_JSON")
+            .expect("set GABBRO_FAST_WALK_JSON to the exported fast-merge json path");
+        let data = std::fs::read_to_string(&json_path).expect("read export json");
+        #[derive(serde::Deserialize)]
+        struct Export {
+            entries: Vec<VaultEntry>,
+        }
+        let export: Export = serde_json::from_str(&data).expect("parse export json");
+
+        let dir = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .join("test_data/sync_test_vaults");
+        let pass = b"0123456789a";
+        let load = |n: &str| {
+            crate::api::vault::load_vault(pass, &dir.join(format!("sync_test_{n}.gabbro"))).unwrap()
+        };
+
+        // Reference: fast auto-merge A, then B, then C (the README order).
+        let path = setup(pass, "fast_walk_check", load("A").entries);
+        unlock_vault(pass, path.clone()).unwrap();
+        session_fast_merge_from_body(load("B")).unwrap();
+        session_fast_merge_from_body(load("C")).unwrap();
+        let reference = {
+            let s = VAULT_SESSION.lock().unwrap();
+            s.as_ref().unwrap().entries.clone()
+        };
+        teardown(&path);
+
+        // Compare by content: clear volatile metadata that differs run-to-run.
+        let normalize = |ents: &[VaultEntry]| -> BTreeMap<String, VaultEntry> {
+            ents.iter()
+                .map(|e| {
+                    let mut e = e.clone();
+                    let m = meta_of_mut(&mut e);
+                    m.updated_at.clear();
+                    m.created_at.clear();
+                    m.field_times.clear();
+                    m.history.clear();
+                    (entry_id(&e).to_string(), e)
+                })
+                .collect()
+        };
+        let want = normalize(&reference);
+        let got = normalize(&export.entries);
+
+        let want_ids: Vec<&String> = want.keys().collect();
+        let got_ids: Vec<&String> = got.keys().collect();
+        assert_eq!(got_ids, want_ids, "export has the same set of entries");
+        for (id, w) in &want {
+            assert_eq!(
+                got.get(id),
+                Some(w),
+                "entry {id} does not match the fast A->B->C reference"
+            );
+        }
+    }
+
     fn setup(pass: &[u8], path_suffix: &str, entries: Vec<VaultEntry>) -> std::path::PathBuf {
         let mut path = temp_dir();
         path.push(format!("gabbro_merge_{path_suffix}.gabbro"));
