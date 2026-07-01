@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Administrer mapper",
   "manageVaultsTitle": "Administrer hvelvinger",
   "manageYubiKeysTitle": "Administrer YubiKeys",
-  "passwordHistoryTitle": "Passordhistorikk",
   "reviewChangesTitle": "Gjennomgå endringer",
   "unlockGabbroTitle": "Lås opp Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Lås etter denne inaktivitetsperioden mens appen er åpen.",
   "backgroundLockDescription": "Lås etter at appen har vært i bakgrunnen i denne perioden.",
-  "passwordHistoryDescription": "Hvor lenge et tidligere passord beholdes etter endring. «Behold alltid» betyr at historikken bare slettes manuelt.",
+  "passwordHistoryDescription": "Hvor lenge den forrige verdien av en endret hemmelighet beholdes (passord, CVV, PIN).",
   "passphraseCopyPasteDescription": "Blokker kopiering og innliming på passfrase­felt. Anbefalt: forhindrer lekkasje av passfrase via utklippstavlen.",
   "passphraseCopyPasteNote": "Merk: Dette blokkerer kontekstmenyen ved langt trykk og tekstvalg. Tastaturets innebygde lim-knapp kan fortsatt fungere — dette er en plattformbegrensning.",
   "blockCopyPasteTitle": "Blokker kopier/lim",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Slett tidligere oppføring",
-  "failedToClearHistory": "Kunne ikke tømme historikk: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Kunne ikke gjenopprette passord: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Endre navn på mappe",
   "addFolderTitle": "Legg til mappe",
@@ -457,9 +444,7 @@
   "syncThisVault": "Bruk dette hvelvet",
   "syncOtherVault": "Bruk det andre hvelvet",
 
-  "historyWarning": "Bare 1 tidligere verdi beholdes. Historikken tømmes automatisk basert på sikkerhetsinnstillingene dine.",
-  "historyCurrent": "Gjeldende",
-  "historyPrevious": "Forrige tilstand",
+  "historyPrevious": "Historikk",
   "historySavedOn": "Lagret {date}",
   "@historySavedOn": {
     "placeholders": {

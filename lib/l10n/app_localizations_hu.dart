@@ -190,9 +190,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get manageYubiKeysTitle => 'YubiKey-ek kezelése';
 
   @override
-  String get passwordHistoryTitle => 'Jelszóelőzmények';
-
-  @override
   String get reviewChangesTitle => 'Változtatások áttekintése';
 
   @override
@@ -393,7 +390,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Mennyi ideig tároljuk az előző jelszót módosítás után. A «Mindig megőrzi» azt jelenti, hogy az előzmények csak manuálisan törölhetők.';
+      'Meddig őrizze meg egy módosított titok korábbi értékét (jelszó, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -735,16 +732,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Korábbi bejegyzés törlése';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Az előzmények törlése sikertelen: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'A jelszó visszaállítása sikertelen: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Mappa átnevezése';
 
   @override
@@ -1061,14 +1048,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get syncOtherVault => 'Másik széfet használ';
 
   @override
-  String get historyWarning =>
-      'Csak 1 korábbi érték kerül megőrzésre. Az előzmények automatikusan törlődnek a biztonsági beállítások alapján.';
-
-  @override
-  String get historyCurrent => 'Jelenlegi';
-
-  @override
-  String get historyPrevious => 'Korábbi állapot';
+  String get historyPrevious => 'Előzmények';
 
   @override
   String historySavedOn(String date) {

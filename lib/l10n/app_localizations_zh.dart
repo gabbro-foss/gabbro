@@ -188,9 +188,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get manageYubiKeysTitle => '管理 YubiKey';
 
   @override
-  String get passwordHistoryTitle => '密码历史';
-
-  @override
   String get reviewChangesTitle => '检查更改';
 
   @override
@@ -386,7 +383,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get backgroundLockDescription => '应用进入后台此时间后锁定。';
 
   @override
-  String get passwordHistoryDescription => '更改后保留旧密码的时长。«始终保留»表示只能手动删除历史记录。';
+  String get passwordHistoryDescription => '更改后保留机密信息旧值的时长（密码、CVV、PIN）。';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -724,16 +721,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => '删除历史条目';
 
   @override
-  String failedToClearHistory(String error) {
-    return '清除历史失败：$error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return '还原密码失败：$error';
-  }
-
-  @override
   String get renameFolderTitle => '重命名文件夹';
 
   @override
@@ -1044,13 +1031,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get syncOtherVault => '使用其他保险库';
 
   @override
-  String get historyWarning => '只保留 1 个历史值。历史记录根据安全设置自动删除。';
-
-  @override
-  String get historyCurrent => '当前';
-
-  @override
-  String get historyPrevious => '先前状态';
+  String get historyPrevious => '历史记录';
 
   @override
   String historySavedOn(String date) {
@@ -2097,9 +2078,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get manageYubiKeysTitle => '管理 YubiKey';
 
   @override
-  String get passwordHistoryTitle => '密码历史';
-
-  @override
   String get reviewChangesTitle => '检查更改';
 
   @override
@@ -2295,7 +2273,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get backgroundLockDescription => '应用进入后台此时间后锁定。';
 
   @override
-  String get passwordHistoryDescription => '更改后保留旧密码的时长。«始终保留»表示只能手动删除历史记录。';
+  String get passwordHistoryDescription => '更改后保留机密信息旧值的时长（密码、CVV、PIN）。';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -2633,16 +2611,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get deleteEntryFromHistoryLabel => '删除历史条目';
 
   @override
-  String failedToClearHistory(String error) {
-    return '清除历史失败：$error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return '还原密码失败：$error';
-  }
-
-  @override
   String get renameFolderTitle => '重命名文件夹';
 
   @override
@@ -2953,13 +2921,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get syncOtherVault => '使用其他保险库';
 
   @override
-  String get historyWarning => '只保留 1 个历史值。历史记录根据安全设置自动删除。';
-
-  @override
-  String get historyCurrent => '当前';
-
-  @override
-  String get historyPrevious => '先前状态';
+  String get historyPrevious => '历史记录';
 
   @override
   String historySavedOn(String date) {
@@ -4006,9 +3968,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get manageYubiKeysTitle => '管理 YubiKey';
 
   @override
-  String get passwordHistoryTitle => '密碼歷史記錄';
-
-  @override
   String get reviewChangesTitle => '檢查變更';
 
   @override
@@ -4204,7 +4163,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get backgroundLockDescription => '應用程式進入背景此時間後鎖定。';
 
   @override
-  String get passwordHistoryDescription => '變更後保留舊密碼的時長。«永遠保留»表示只能手動刪除歷史記錄。';
+  String get passwordHistoryDescription => '變更後保留機密資訊舊值的時長（密碼、CVV、PIN）。';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -4542,16 +4501,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get deleteEntryFromHistoryLabel => '刪除歷史項目';
 
   @override
-  String failedToClearHistory(String error) {
-    return '清除歷史記錄失敗：$error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return '還原密碼失敗：$error';
-  }
-
-  @override
   String get renameFolderTitle => '重新命名資料夾';
 
   @override
@@ -4862,13 +4811,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get syncOtherVault => '使用其他保險庫';
 
   @override
-  String get historyWarning => '只保留 1 個歷史值。歷史記錄根據安全設定自動刪除。';
-
-  @override
-  String get historyCurrent => '目前';
-
-  @override
-  String get historyPrevious => '先前狀態';
+  String get historyPrevious => '歷史記錄';
 
   @override
   String historySavedOn(String date) {

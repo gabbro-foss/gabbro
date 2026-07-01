@@ -114,7 +114,6 @@ LoginEntryData _original() => LoginEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      previousPassword: null,
     );
 
 LoginEntryData _updatedPasswordAndUrl() => LoginEntryData(
@@ -128,7 +127,6 @@ LoginEntryData _updatedPasswordAndUrl() => LoginEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      previousPassword: null,
     );
 
 LoginEntryData _updatedUrlOnly() => LoginEntryData(
@@ -142,7 +140,6 @@ LoginEntryData _updatedUrlOnly() => LoginEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      previousPassword: null,
     );
 
 // Generic login to isolate a single-field diff (app_id or email).
@@ -157,7 +154,6 @@ LoginEntryData _appIdLogin({String? appId, String? email}) => LoginEntryData(
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: 'Personal',
-      previousPassword: null,
       appId: appId,
       email: email,
     );
@@ -584,7 +580,6 @@ void main() {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
-      previousPassword: null,
     );
     final updated = LoginEntryData(
       id: 'test-id-1',
@@ -599,7 +594,6 @@ void main() {
       createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z',
       folder: '',
-      previousPassword: null,
     );
     await tester.pumpWidget(_buildReviewScreen(
       original: VaultEntryData.login(original),
@@ -739,14 +733,12 @@ void main() {
       username: 'user@example.com', password: 'old_password', notes: null,
       customFields: [], createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z', folder: 'Work',
-      previousPassword: null,
     );
     final updated = LoginEntryData(
       id: 'test-id-1', title: 'Example', url: 'https://example.com',
       username: 'user@example.com', password: 'old_password', notes: null,
       customFields: [], createdAt: '2025-01-01T00:00:00Z',
       updatedAt: '2025-01-01T00:00:00Z', folder: 'Personal',
-      previousPassword: null,
     );
     await tester.pumpWidget(_buildReviewScreen(
       original: VaultEntryData.login(original),

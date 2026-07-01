@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Ordner verwalten",
   "manageVaultsTitle": "Tresore verwalten",
   "manageYubiKeysTitle": "YubiKeys verwalten",
-  "passwordHistoryTitle": "Passwortverlauf",
   "reviewChangesTitle": "Änderungen prüfen",
   "unlockGabbroTitle": "Gabbro entsperren",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Nach dieser Inaktivitätsdauer sperren, während die App geöffnet ist.",
   "backgroundLockDescription": "Sperren, nachdem die App so lange im Hintergrund war.",
-  "passwordHistoryDescription": "Wie lange ein früheres Passwort nach einer Änderung aufbewahrt wird. «Für immer behalten» bedeutet, dass der Verlauf nur manuell gelöscht wird.",
+  "passwordHistoryDescription": "Wie lange der vorherige Wert eines geänderten Geheimnisses aufbewahrt wird (Passwort, CVV, PIN).",
   "passphraseCopyPasteDescription": "Kopieren und Einfügen für Passphrase-Felder blockieren. Empfohlen: verhindert das Durchsickern der Passphrase über die Zwischenablage.",
   "passphraseCopyPasteNote": "Hinweis: Dies blockiert das Kontextmenü bei langem Drücken und die Textauswahl. Die integrierte Einfügen-Taste der Tastatur funktioniert möglicherweise noch — dies ist eine Plattformbeschränkung.",
   "blockCopyPasteTitle": "Kopieren/Einfügen blockieren",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Früheren Eintrag löschen",
-  "failedToClearHistory": "Verlauf konnte nicht geleert werden: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Passwort konnte nicht wiederhergestellt werden: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Ordner umbenennen",
   "addFolderTitle": "Ordner hinzufügen",
@@ -457,9 +444,7 @@
   "syncThisVault": "Diesen Tresor verwenden",
   "syncOtherVault": "Anderen Tresor verwenden",
 
-  "historyWarning": "Es wird nur 1 früherer Wert aufbewahrt. Der Verlauf wird automatisch basierend auf den Sicherheitseinstellungen bereinigt.",
-  "historyCurrent": "Aktuell",
-  "historyPrevious": "Vorheriger Zustand",
+  "historyPrevious": "Verlauf",
   "historySavedOn": "Gespeichert am {date}",
   "@historySavedOn": {
     "placeholders": {

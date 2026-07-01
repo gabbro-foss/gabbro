@@ -190,9 +190,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get manageYubiKeysTitle => 'Gérer les YubiKeys';
 
   @override
-  String get passwordHistoryTitle => 'Historique des mots de passe';
-
-  @override
   String get reviewChangesTitle => 'Vérifier les modifications';
 
   @override
@@ -395,7 +392,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Durée de conservation d\'un mot de passe précédent après modification. « Conserver indéfiniment » signifie que l\'historique n\'est supprimé que manuellement.';
+      'Durée de conservation de la valeur précédente d\'un secret modifié (mot de passe, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -737,16 +734,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Supprimer l\'entrée précédente';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Échec de la suppression de l\'historique : $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Échec de la restauration du mot de passe : $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Renommer le dossier';
 
   @override
@@ -1067,14 +1054,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get syncOtherVault => 'Utiliser cet autre coffre';
 
   @override
-  String get historyWarning =>
-      'Seule 1 valeur précédente est conservée. L\'historique est automatiquement purgé selon vos paramètres de sécurité.';
-
-  @override
-  String get historyCurrent => 'Actuel';
-
-  @override
-  String get historyPrevious => 'État précédent';
+  String get historyPrevious => 'Historique';
 
   @override
   String historySavedOn(String date) {

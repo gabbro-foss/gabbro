@@ -81,11 +81,10 @@ void main() {
       password: newPassword,
       notes: current.notes,
       customFields: current.customFields,
-      previousPassword: current.previousPassword,
     );
   }
 
-  test('edit -> updateEntry records previous_password; real getEntry reads it back',
+  test('edit -> updateEntry records the prior password in unified history',
       () async {
     final id = await seedLogin(password: 'first-pass');
 
@@ -97,46 +96,49 @@ void main() {
     final fetched = (getEntry(id: id) as VaultEntryData_Login).field0;
     expect(fetched.password, 'second-pass',
         reason: 'updateEntry should persist the new password');
-    expect(fetched.previousPassword, isNotNull,
-        reason: 'changing the password auto-records the prior one as history');
+    final hist = await getEntryHistory(id: id);
+    expect(hist.any((h) => h.field == 'password' && h.value == 'first-pass'),
+        isTrue,
+        reason: 'changing the password records the prior one in meta.history');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('clear history -> real getEntry refresh shows no previous_password '
-      '(entry_detail_screen.dart:355)', () async {
+  test('delete history record -> real getEntry refresh shows it gone', () async {
     final id = await seedLogin(password: 'first-pass');
     await updateEntry(
       entry: VaultEntryData_Login(editedPassword(id, 'second-pass')),
       expiryDays: null,
     );
-    expect((getEntry(id: id) as VaultEntryData_Login).field0.previousPassword,
-        isNotNull,
-        reason: 'precondition: history exists before we clear it');
+    final before = await getEntryHistory(id: id);
+    final idx = before.indexWhere((h) => h.field == 'password');
+    expect(idx, isNonNegative,
+        reason: 'precondition: password history exists before we delete it');
 
-    // The injectable callback the screen calls, then the un-injectable getEntry
-    // refresh it does at :355 to rebuild the detail view.
-    await sessionClearPasswordHistory(id: id);
-    final fresh = (getEntry(id: id) as VaultEntryData_Login).field0;
-    expect(fresh.previousPassword, isNull,
-        reason: 'clearing history drops previous_password');
-    expect(fresh.password, 'second-pass',
-        reason: 'clearing history must not touch the current password');
+    await deleteHistory(id: id, index: idx);
+    final after = await getEntryHistory(id: id);
+    expect(after.any((h) => h.field == 'password'), isFalse,
+        reason: 'deleting the record drops it from history');
+    expect((getEntry(id: id) as VaultEntryData_Login).field0.password,
+        'second-pass',
+        reason: 'deleting history must not touch the current password');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
-  test('revert password -> real getEntry refresh restores the prior password '
-      '(entry_detail_screen.dart:374)', () async {
+  test('restore history record -> restores the prior password', () async {
     final id = await seedLogin(password: 'first-pass');
     await updateEntry(
       entry: VaultEntryData_Login(editedPassword(id, 'second-pass')),
       expiryDays: null,
     );
+    final before = await getEntryHistory(id: id);
+    final idx = before.indexWhere((h) => h.field == 'password');
+    expect(idx, isNonNegative, reason: 'precondition: password history exists');
 
-    // Injectable revert callback, then the un-injectable getEntry refresh at :374.
-    await sessionRevertPassword(id: id);
+    await restoreHistory(id: id, index: idx);
     final fresh = (getEntry(id: id) as VaultEntryData_Login).field0;
     expect(fresh.password, 'first-pass',
-        reason: 'revert swaps the current password back to the prior one');
-    expect(fresh.previousPassword, isNull,
-        reason: 'revert consumes the history entry');
+        reason: 'restore sets the field back to the recorded value');
+    final after = await getEntryHistory(id: id);
+    expect(after.any((h) => h.field == 'password'), isFalse,
+        reason: 'restore consumes the record');
   }, timeout: const Timeout(Duration(minutes: 3)));
 
   test('recorded history survives a real lock -> unlock disk round-trip',
@@ -153,7 +155,8 @@ void main() {
 
     final reopened = (getEntry(id: id) as VaultEntryData_Login).field0;
     expect(reopened.password, 'second-pass');
-    expect(reopened.previousPassword, isNotNull,
+    final hist = await getEntryHistory(id: id);
+    expect(hist.any((h) => h.field == 'password'), isTrue,
         reason: 'password history must persist through encryption + disk');
   }, timeout: const Timeout(Duration(minutes: 3)));
 }

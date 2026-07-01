@@ -10,7 +10,7 @@ use std::path::PathBuf;
 
 use crate::api::vault::{
     CardEntryData, CustomEntryData, CustomFieldData, FileEntryData, IdentityEntryData,
-    LoginEntryData, NoteEntryData, PreviousSecretData,
+    LoginEntryData, NoteEntryData,
 };
 use crate::vault::entry::{
     CardEntry, CustomEntry, CustomField, EntryMeta, FileEntry, IdentityEntry, LoginEntry,
@@ -73,11 +73,6 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                     hidden: f.hidden,
                 })
                 .collect(),
-            previous_password: e.previous_password.as_ref().map(|p| PreviousSecretData {
-                value: p.value.clone(),
-                saved_at: p.saved_at.clone(),
-                expires_at: p.expires_at.clone(),
-            }),
             app_id: e.app_id.clone(),
             email: e.email.clone(),
         }),
@@ -145,16 +140,6 @@ fn vault_entry_to_data(entry: &VaultEntry) -> VaultEntryData {
                     hidden: f.hidden,
                 })
                 .collect(),
-            previous_cvv: e.previous_cvv.as_ref().map(|p| PreviousSecretData {
-                value: crate::api::vault::MASKED_VALUE.to_string(),
-                saved_at: p.saved_at.clone(),
-                expires_at: p.expires_at.clone(),
-            }),
-            previous_pin: e.previous_pin.as_ref().map(|p| PreviousSecretData {
-                value: crate::api::vault::MASKED_VALUE.to_string(),
-                saved_at: p.saved_at.clone(),
-                expires_at: p.expires_at.clone(),
-            }),
         }),
         VaultEntry::File(e) => VaultEntryData::File(FileEntryData {
             id: e.meta.id.clone(),
@@ -221,13 +206,6 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 })
                 .collect(),
             attachments: vec![],
-            previous_password: d
-                .previous_password
-                .map(|p| crate::vault::entry::PreviousSecret {
-                    value: p.value,
-                    saved_at: p.saved_at,
-                    expires_at: p.expires_at,
-                }),
             app_id: d.app_id,
             email: d.email,
         })),
@@ -313,8 +291,6 @@ fn vault_entry_from_data(data: VaultEntryData) -> Result<VaultEntry, String> {
                 d.notes,
                 custom_fields,
                 vec![],
-                None,
-                None,
             )?;
             Ok(VaultEntry::Card(entry))
         }
@@ -558,20 +534,6 @@ pub async fn restore_vault_from_file(path: String, source: String) -> Result<(),
         std::path::Path::new(&path),
         std::path::Path::new(&source),
     )
-}
-
-/// Clear the previous password history for a Login entry and persist.
-///
-/// Async — triggers a full vault save.
-pub async fn session_clear_password_history(id: String) -> Result<(), String> {
-    session::session_clear_password_history(&id)
-}
-
-/// Revert the current password to the previous password for a Login entry and persist.
-///
-/// Async — triggers a full vault save.
-pub async fn session_revert_password(id: String) -> Result<(), String> {
-    session::session_revert_password(&id)
 }
 
 /// Assign a folder to a set of entries by UUID and persist.
@@ -1345,7 +1307,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         })];
@@ -1483,7 +1444,6 @@ mod tests {
                 notes: None,
                 custom_fields: vec![],
                 attachments: vec![],
-                previous_password: None,
                 app_id: None,
                 email: None,
             }),
@@ -1775,8 +1735,6 @@ mod tests {
                     hidden: true,
                 },
             ],
-            previous_cvv: None,
-            previous_pin: None,
         });
 
         let entry = vault_entry_from_data(data).unwrap();
@@ -1812,7 +1770,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: Some(String::from("com.company.app")),
             email: Some(String::from("user@example.com")),
         });
@@ -2224,8 +2181,6 @@ mod tests {
                     value: String::from("LN-9876"),
                     hidden: false,
                 }],
-                previous_cvv: None,
-                previous_pin: None,
             },
         )))
         .unwrap();

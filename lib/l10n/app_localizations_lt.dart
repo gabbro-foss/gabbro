@@ -190,9 +190,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get manageYubiKeysTitle => 'Tvarkyti YubiKey raktus';
 
   @override
-  String get passwordHistoryTitle => 'Slaptažodžių istorija';
-
-  @override
   String get reviewChangesTitle => 'Peržiūrėti pakeitimus';
 
   @override
@@ -395,7 +392,7 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Kiek laiko saugoti ankstesnį slaptažodį po pakeitimo. «Laikyti visada» reiškia, kad istorija ištriname tik rankiniu būdu.';
+      'Kiek laiko saugoti ankstesnę pakeistos paslapties reikšmę (slaptažodis, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -737,16 +734,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Ištrinti ankstesnį įrašą';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Nepavyko išvalyti istorijos: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Nepavyko atkurti slaptažodžio: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Pervadinti aplanką';
 
   @override
@@ -1064,14 +1051,7 @@ class AppLocalizationsLt extends AppLocalizations {
   String get syncOtherVault => 'Naudoti kitą seifą';
 
   @override
-  String get historyWarning =>
-      'Saugoma tik 1 ankstesnė reikšmė. Istorija automatiškai valoma pagal saugumo nustatymus.';
-
-  @override
-  String get historyCurrent => 'Dabartinis';
-
-  @override
-  String get historyPrevious => 'Ankstesnė būsena';
+  String get historyPrevious => 'Istorija';
 
   @override
   String historySavedOn(String date) {

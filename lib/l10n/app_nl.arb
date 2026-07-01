@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Mappen beheren",
   "manageVaultsTitle": "Kluizen beheren",
   "manageYubiKeysTitle": "YubiKeys beheren",
-  "passwordHistoryTitle": "Wachtwoordgeschiedenis",
   "reviewChangesTitle": "Wijzigingen controleren",
   "unlockGabbroTitle": "Gabbro ontgrendelen",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Vergrendelen na deze hoeveelheid inactiviteit terwijl de app open is.",
   "backgroundLockDescription": "Vergrendelen nadat de app zo lang op de achtergrond is geweest.",
-  "passwordHistoryDescription": "Hoe lang een vorig wachtwoord bewaard blijft na een wijziging. \"Voor altijd bewaren\" betekent dat de geschiedenis alleen handmatig wordt verwijderd.",
+  "passwordHistoryDescription": "Hoe lang de vorige waarde van een gewijzigd geheim bewaard blijft (wachtwoord, CVV, PIN).",
   "passphraseCopyPasteDescription": "Kopiëren en plakken blokkeren op velden voor de hoofdwachtwoordzin. Aanbevolen: voorkomt lekken van de wachtwoordzin via het klembord.",
   "passphraseCopyPasteNote": "Opmerking: dit blokkeert het contextmenu bij lang indrukken en tekstselectie. De inline plakknop van uw toetsenbord kan nog steeds werken — dit is een platformbeperking die niet geblokkeerd kan worden.",
   "blockCopyPasteTitle": "Kopiëren/plakken blokkeren",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Vorig item verwijderen",
-  "failedToClearHistory": "Geschiedenis wissen mislukt: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Wachtwoord terugzetten mislukt: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Map hernoemen",
   "addFolderTitle": "Map toevoegen",
@@ -457,9 +444,7 @@
   "syncThisVault": "Deze kluis gebruiken",
   "syncOtherVault": "Andere kluis gebruiken",
 
-  "historyWarning": "Er wordt slechts 1 vorige waarde bewaard. Geschiedenis wordt automatisch gewist op basis van uw beveiligingsinstellingen.",
-  "historyCurrent": "Huidig",
-  "historyPrevious": "Vorige staat",
+  "historyPrevious": "Geschiedenis",
   "historySavedOn": "Opgeslagen op {date}",
   "@historySavedOn": {
     "placeholders": {

@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Hallinnoi kansioita",
   "manageVaultsTitle": "Hallinnoi holveja",
   "manageYubiKeysTitle": "Hallinnoi YubiKey-avaimia",
-  "passwordHistoryTitle": "Salasanahistoria",
   "reviewChangesTitle": "Tarkista muutokset",
   "unlockGabbroTitle": "Avaa Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Lukitse tämän käyttämättömyysajan jälkeen, kun sovellus on auki.",
   "backgroundLockDescription": "Lukitse, kun sovellus on ollut taustalla tämän ajan.",
-  "passwordHistoryDescription": "Kuinka kauan vanhaa salasanaa säilytetään muutoksen jälkeen. «Säilytä aina» tarkoittaa, että historia poistetaan vain manuaalisesti.",
+  "passwordHistoryDescription": "Kuinka kauan säilytetään muutetun salaisuuden edellinen arvo (salasana, CVV, PIN).",
   "passphraseCopyPasteDescription": "Estä kopiointi ja liittäminen salauslausekentissä. Suositeltu: estää salauslauseen vuotamisen leikepöydän kautta.",
   "passphraseCopyPasteNote": "Huom.: Tämä estää pikavalikon pitkällä painalluksella ja tekstin valinnan. Näppäimistön sisäänrakennettu liitä-painike saattaa silti toimia — tämä on alustan rajoitus.",
   "blockCopyPasteTitle": "Estä kopiointi/liittäminen",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Poista aiempi merkintä",
-  "failedToClearHistory": "Historian tyhjentäminen epäonnistui: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Salasanan palauttaminen epäonnistui: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Nimeä kansio uudelleen",
   "addFolderTitle": "Lisää kansio",
@@ -457,9 +444,7 @@
   "syncThisVault": "Käytä tätä holvia",
   "syncOtherVault": "Käytä toista holvia",
 
-  "historyWarning": "Vain 1 aiempi arvo säilytetään. Historia tyhjennetään automaattisesti tietoturva-asetusten mukaan.",
-  "historyCurrent": "Nykyinen",
-  "historyPrevious": "Edellinen tila",
+  "historyPrevious": "Historia",
   "historySavedOn": "Tallennettu {date}",
   "@historySavedOn": {
     "placeholders": {

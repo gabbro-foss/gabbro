@@ -190,9 +190,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get manageYubiKeysTitle => 'YubiKeys beheren';
 
   @override
-  String get passwordHistoryTitle => 'Wachtwoordgeschiedenis';
-
-  @override
   String get reviewChangesTitle => 'Wijzigingen controleren';
 
   @override
@@ -394,7 +391,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Hoe lang een vorig wachtwoord bewaard blijft na een wijziging. \"Voor altijd bewaren\" betekent dat de geschiedenis alleen handmatig wordt verwijderd.';
+      'Hoe lang de vorige waarde van een gewijzigd geheim bewaard blijft (wachtwoord, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -736,16 +733,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Vorig item verwijderen';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Geschiedenis wissen mislukt: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Wachtwoord terugzetten mislukt: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Map hernoemen';
 
   @override
@@ -1063,14 +1050,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get syncOtherVault => 'Andere kluis gebruiken';
 
   @override
-  String get historyWarning =>
-      'Er wordt slechts 1 vorige waarde bewaard. Geschiedenis wordt automatisch gewist op basis van uw beveiligingsinstellingen.';
-
-  @override
-  String get historyCurrent => 'Huidig';
-
-  @override
-  String get historyPrevious => 'Vorige staat';
+  String get historyPrevious => 'Geschiedenis';
 
   @override
   String historySavedOn(String date) {

@@ -190,9 +190,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get manageYubiKeysTitle => 'Hallinnoi YubiKey-avaimia';
 
   @override
-  String get passwordHistoryTitle => 'Salasanahistoria';
-
-  @override
   String get reviewChangesTitle => 'Tarkista muutokset';
 
   @override
@@ -395,7 +392,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Kuinka kauan vanhaa salasanaa säilytetään muutoksen jälkeen. «Säilytä aina» tarkoittaa, että historia poistetaan vain manuaalisesti.';
+      'Kuinka kauan säilytetään muutetun salaisuuden edellinen arvo (salasana, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -737,16 +734,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Poista aiempi merkintä';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Historian tyhjentäminen epäonnistui: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Salasanan palauttaminen epäonnistui: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Nimeä kansio uudelleen';
 
   @override
@@ -1062,14 +1049,7 @@ class AppLocalizationsFi extends AppLocalizations {
   String get syncOtherVault => 'Käytä toista holvia';
 
   @override
-  String get historyWarning =>
-      'Vain 1 aiempi arvo säilytetään. Historia tyhjennetään automaattisesti tietoturva-asetusten mukaan.';
-
-  @override
-  String get historyCurrent => 'Nykyinen';
-
-  @override
-  String get historyPrevious => 'Edellinen tila';
+  String get historyPrevious => 'Historia';
 
   @override
   String historySavedOn(String date) {

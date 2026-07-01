@@ -190,9 +190,6 @@ class AppLocalizationsUk extends AppLocalizations {
   String get manageYubiKeysTitle => 'Керування ключами YubiKey';
 
   @override
-  String get passwordHistoryTitle => 'Історія паролів';
-
-  @override
   String get reviewChangesTitle => 'Перегляд змін';
 
   @override
@@ -395,7 +392,7 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Як довго зберігати попередній пароль після зміни. «Зберігати завжди» означає, що історія видаляється лише вручну.';
+      'Як довго зберігати попереднє значення зміненого секрету (пароль, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -739,16 +736,6 @@ class AppLocalizationsUk extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Видалити попередній запис';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Не вдалося очистити історію: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Не вдалося відновити пароль: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Перейменувати папку';
 
   @override
@@ -1066,14 +1053,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get syncOtherVault => 'Використати інше сховище';
 
   @override
-  String get historyWarning =>
-      'Зберігається лише 1 попереднє значення. Історія автоматично очищається відповідно до налаштувань безпеки.';
-
-  @override
-  String get historyCurrent => 'Поточний';
-
-  @override
-  String get historyPrevious => 'Попередній стан';
+  String get historyPrevious => 'Історія';
 
   @override
   String historySavedOn(String date) {

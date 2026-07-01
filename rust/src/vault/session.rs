@@ -609,76 +609,6 @@ pub fn session_change_passphrase(
     Ok(())
 }
 
-/// Clear the previous password history for a Login entry and persist.
-///
-/// Sets `previous_password` to `None` on the identified entry.
-/// Returns `Err` if the entry is not found or is not a Login entry.
-pub fn session_clear_password_history(id: &str) -> Result<(), String> {
-    let (body, passphrase, path, yubikey) = {
-        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
-        let session = session.as_mut().ok_or("Vault is locked")?;
-        let entry = session
-            .entries
-            .iter_mut()
-            .find(|e| entry_id(e) == id)
-            .ok_or_else(|| format!("No entry found with id: {id}"))?;
-        match entry {
-            VaultEntry::Login(ref mut e) => {
-                e.previous_password = None;
-                e.meta.updated_at = crate::api::vault::chrono_now();
-            }
-            _ => return Err(format!("Entry {id} is not a Login entry")),
-        }
-        let body = build_body(session);
-        let yubikey = extract_yubikey(session);
-        (
-            body,
-            session.passphrase.clone(),
-            session.path.clone(),
-            yubikey,
-        )
-    }; // ← lock released here
-    do_save(&body, &passphrase, &path, yubikey)?;
-    Ok(())
-}
-
-/// Revert the current password to the previous password for a Login entry and persist.
-///
-/// Swaps `password` ← `previous_password.value`, then clears `previous_password`.
-/// Returns `Err` if the entry is not found, is not a Login entry, or has no history.
-pub fn session_revert_password(id: &str) -> Result<(), String> {
-    let (body, passphrase, path, yubikey) = {
-        let mut session = VAULT_SESSION.lock().map_err(|e| e.to_string())?;
-        let session = session.as_mut().ok_or("Vault is locked")?;
-        let entry = session
-            .entries
-            .iter_mut()
-            .find(|e| entry_id(e) == id)
-            .ok_or_else(|| format!("No entry found with id: {id}"))?;
-        match entry {
-            VaultEntry::Login(ref mut e) => {
-                let prev = e
-                    .previous_password
-                    .take()
-                    .ok_or_else(|| format!("Entry {id} has no password history to revert"))?;
-                e.password = prev.value.clone();
-                e.meta.updated_at = crate::api::vault::chrono_now();
-            }
-            _ => return Err(format!("Entry {id} is not a Login entry")),
-        }
-        let body = build_body(session);
-        let yubikey = extract_yubikey(session);
-        (
-            body,
-            session.passphrase.clone(),
-            session.path.clone(),
-            yubikey,
-        )
-    }; // ← lock released here
-    do_save(&body, &passphrase, &path, yubikey)?;
-    Ok(())
-}
-
 /// Apply a field-conflict resolution. If `keep_incoming`, the field takes the
 /// incoming value; either way the field's change-time is bumped to now so the
 /// choice wins future merges (otherwise the equal-timestamp clash would recur).
@@ -772,12 +702,9 @@ pub fn session_replace_field_with_history(
         crate::api::vault::set_entry_field_by_key(entry, &field, &new_value);
         let now = crate::api::vault::chrono_now();
         let meta = meta_of_mut(entry);
-        meta.history.push(crate::vault::entry::HistoryRecord {
-            field: field.clone(),
-            value: replaced_value,
-            saved_at: now.clone(),
-            expires_at: None,
-        });
+        // One previous value per field: overwrite any existing record for this
+        // field rather than accumulating (unified history model).
+        meta.record_previous(&field, &replaced_value, &now, None);
         meta.field_times.insert(field, crate::api::vault::now_ms());
         meta.updated_at = now;
         let body = build_body(session);
@@ -1775,9 +1702,9 @@ pub(crate) fn merge_entry_pair(
                 &l.password,
                 &i.password,
             );
-            let (password, previous_password) = match pw_side {
-                Side::Local => (l.password.clone(), l.previous_password.clone()),
-                Side::Incoming => (i.password.clone(), i.previous_password.clone()),
+            let password = match pw_side {
+                Side::Local => l.password.clone(),
+                Side::Incoming => i.password.clone(),
             };
             VaultEntry::Login(LoginEntry {
                 meta: lm.clone(),
@@ -1788,7 +1715,6 @@ pub(crate) fn merge_entry_pair(
                 notes: m.pick_opt("notes", &l.notes, &i.notes),
                 custom_fields: m.merge_custom(&l.custom_fields, &i.custom_fields),
                 attachments: m.merge_attachments(&l.attachments, &i.attachments),
-                previous_password,
                 app_id: m.pick_opt("app_id", &l.app_id, &i.app_id),
                 email: m.pick_opt("email", &l.email, &i.email),
             })
@@ -1812,16 +1738,16 @@ pub(crate) fn merge_entry_pair(
         }),
         (VaultEntry::Card(l), VaultEntry::Card(i)) => {
             let cvv_side = m.decide("cvv", l.cvv == i.cvv, &l.cvv, &i.cvv);
-            let (cvv, previous_cvv) = match cvv_side {
-                Side::Local => (l.cvv.clone(), l.previous_cvv.clone()),
-                Side::Incoming => (i.cvv.clone(), i.previous_cvv.clone()),
+            let cvv = match cvv_side {
+                Side::Local => l.cvv.clone(),
+                Side::Incoming => i.cvv.clone(),
             };
             let l_pin = l.pin.clone().unwrap_or_default();
             let i_pin = i.pin.clone().unwrap_or_default();
             let pin_side = m.decide("pin", l.pin == i.pin, &l_pin, &i_pin);
-            let (pin, previous_pin) = match pin_side {
-                Side::Local => (l.pin.clone(), l.previous_pin.clone()),
-                Side::Incoming => (i.pin.clone(), i.previous_pin.clone()),
+            let pin = match pin_side {
+                Side::Local => l.pin.clone(),
+                Side::Incoming => i.pin.clone(),
             };
             VaultEntry::Card(CardEntry {
                 meta: lm.clone(),
@@ -1856,8 +1782,6 @@ pub(crate) fn merge_entry_pair(
                 notes: m.pick_opt("notes", &l.notes, &i.notes),
                 custom_fields: m.merge_custom(&l.custom_fields, &i.custom_fields),
                 attachments: m.merge_attachments(&l.attachments, &i.attachments),
-                previous_cvv,
-                previous_pin,
             })
         }
         (VaultEntry::File(l), VaultEntry::File(i)) => {
@@ -2403,7 +2327,6 @@ mod field_merge_tests {
             notes: None,
             custom_fields: customs,
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         })
@@ -2453,8 +2376,6 @@ mod field_merge_tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_cvv: None,
-            previous_pin: None,
         })
     }
     fn file(id: &str, filename: &str, data: &[u8], notes: &str) -> VaultEntry {
@@ -3150,7 +3071,6 @@ mod field_merge_tests {
                 notes: None,
                 custom_fields: custom,
                 attachments: vec![],
-                previous_password: None,
                 app_id: None,
                 email: None,
             })
@@ -3245,10 +3165,17 @@ mod field_merge_tests {
 
     #[test]
     fn merge_collision_keeps_local_password_and_its_history() {
-        use crate::vault::entry::PreviousSecret;
+        use crate::vault::entry::HistoryRecord;
         let login = |pw: &str, prev: &str, times: &[(&str, u64)]| {
+            let mut m = meta("l1", "t", times);
+            m.history.push(HistoryRecord {
+                field: String::from("password"),
+                value: prev.to_string(),
+                saved_at: String::from("2025-01-01T00:00:00Z"),
+                expires_at: None,
+            });
             VaultEntry::Login(LoginEntry {
-                meta: meta("l1", "t", times),
+                meta: m,
                 title: String::from("Acct"),
                 url: String::new(),
                 username: String::from("u"),
@@ -3256,24 +3183,25 @@ mod field_merge_tests {
                 notes: None,
                 custom_fields: vec![],
                 attachments: vec![],
-                previous_password: Some(PreviousSecret {
-                    value: prev.to_string(),
-                    saved_at: String::from("2025-01-01T00:00:00Z"),
-                    expires_at: None,
-                }),
                 app_id: None,
                 email: None,
             })
         };
         // Both devices edited the password (different times) -> collision. Local is
-        // kept pending the user's choice, and its history follows the kept value.
+        // kept pending the user's choice, and its history (local) is kept with it.
         let local = login("new-local", "old-local", &[("password", 200)]);
         let incoming = login("new-remote", "old-remote", &[("password", 300)]);
         let (merged, conflicts, _, _bo) = merge_entry_pair(&local, &incoming);
         match &merged {
             VaultEntry::Login(e) => {
                 assert_eq!(e.password, "new-local");
-                assert_eq!(e.previous_password.as_ref().unwrap().value, "old-local");
+                let rec = e
+                    .meta
+                    .history
+                    .iter()
+                    .find(|h| h.field == "password")
+                    .expect("local password history kept");
+                assert_eq!(rec.value, "old-local");
             }
             _ => panic!("expected Login"),
         }
@@ -3477,7 +3405,6 @@ mod assign_folder_tests {
                 notes: None,
                 custom_fields: vec![],
                 attachments: vec![],
-                previous_password: None,
                 app_id: None,
                 email: None,
             }),
@@ -3954,7 +3881,6 @@ mod autofill_tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -4038,7 +3964,6 @@ mod autofill_tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -4420,7 +4345,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -4453,7 +4377,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -4494,8 +4417,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_cvv: None,
-            previous_pin: None,
         });
 
         let summary = entry_to_summary(&entry);
@@ -4507,263 +4428,30 @@ mod tests {
 
     #[test]
     #[serial]
-    fn clear_password_history_removes_previous_password() {
-        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
-
-        let pass = b"test passphrase";
-        let mut path = temp_dir();
-        path.push("gabbro_clear_history_test.gabbro");
-
-        let entry = VaultEntry::Login(LoginEntry {
-            meta: EntryMeta {
-                field_times: Default::default(),
-                history: Vec::new(),
-                id: String::from("login-001"),
-                created_at: String::from("2025-01-01T00:00:00Z"),
-                updated_at: String::from("2025-01-01T00:00:00Z"),
-                folder: String::from("Personal"),
-            },
-            title: String::from("Example"),
-            url: String::from("https://example.com"),
-            username: String::from("user"),
-            password: String::from("current_password"),
-            notes: None,
-            custom_fields: vec![],
-            attachments: vec![],
-            previous_password: Some(PreviousSecret {
-                value: String::from("old_password"),
-                saved_at: String::from("2025-01-01T00:00:00Z"),
-                expires_at: None,
-            }),
-            app_id: None,
-            email: None,
-        });
-
-        save_vault(
-            &VaultBody {
-                folders: vec![],
-                entries: vec![entry],
-                ..Default::default()
-            },
-            pass,
-            &path,
-        )
-        .unwrap();
-        unlock_vault(pass, path.clone()).unwrap();
-
-        session_clear_password_history("login-001").unwrap();
-
-        let result = get_entry("login-001").unwrap();
-        match result {
-            VaultEntry::Login(ref e) => {
-                assert!(e.previous_password.is_none());
-                assert_eq!(e.password, "current_password");
-            }
-            _ => panic!("Expected Login variant"),
-        }
-
-        teardown(&path);
-    }
-
-    #[test]
-    #[serial]
-    fn clear_password_history_persists_to_disk() {
-        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
-
-        let pass = b"test passphrase";
-        let mut path = temp_dir();
-        path.push("gabbro_clear_history_persist_test.gabbro");
-
-        let entry = VaultEntry::Login(LoginEntry {
-            meta: EntryMeta {
-                field_times: Default::default(),
-                history: Vec::new(),
-                id: String::from("login-001"),
-                created_at: String::from("2025-01-01T00:00:00Z"),
-                updated_at: String::from("2025-01-01T00:00:00Z"),
-                folder: String::from("Personal"),
-            },
-            title: String::from("Example"),
-            url: String::from("https://example.com"),
-            username: String::from("user"),
-            password: String::from("current_password"),
-            notes: None,
-            custom_fields: vec![],
-            attachments: vec![],
-            previous_password: Some(PreviousSecret {
-                value: String::from("old_password"),
-                saved_at: String::from("2025-01-01T00:00:00Z"),
-                expires_at: None,
-            }),
-            app_id: None,
-            email: None,
-        });
-
-        save_vault(
-            &VaultBody {
-                folders: vec![],
-                entries: vec![entry],
-                ..Default::default()
-            },
-            pass,
-            &path,
-        )
-        .unwrap();
-        unlock_vault(pass, path.clone()).unwrap();
-        session_clear_password_history("login-001").unwrap();
-
-        // Lock and reload to verify disk persistence
-        lock_vault().unwrap();
-        unlock_vault(pass, path.clone()).unwrap();
-        let result = get_entry("login-001").unwrap();
-        match result {
-            VaultEntry::Login(ref e) => assert!(e.previous_password.is_none()),
-            _ => panic!("Expected Login variant"),
-        }
-
-        teardown(&path);
-    }
-
-    #[test]
-    #[serial]
-    fn clear_password_history_on_non_login_returns_error() {
-        let pass = b"test passphrase";
-        let path = setup_vault(pass); // Note entry with id "id-001"
-
-        unlock_vault(pass, path.clone()).unwrap();
-        let result = session_clear_password_history("id-001");
-        assert!(result.is_err());
-
-        teardown(&path);
-    }
-
-    #[test]
-    #[serial]
-    fn revert_password_swaps_current_and_previous() {
-        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
-
-        let pass = b"test passphrase";
-        let mut path = temp_dir();
-        path.push("gabbro_revert_test.gabbro");
-
-        let entry = VaultEntry::Login(LoginEntry {
-            meta: EntryMeta {
-                field_times: Default::default(),
-                history: Vec::new(),
-                id: String::from("login-001"),
-                created_at: String::from("2025-01-01T00:00:00Z"),
-                updated_at: String::from("2025-01-01T00:00:00Z"),
-                folder: String::from("Personal"),
-            },
-            title: String::from("Example"),
-            url: String::from("https://example.com"),
-            username: String::from("user"),
-            password: String::from("current_password"),
-            notes: None,
-            custom_fields: vec![],
-            attachments: vec![],
-            previous_password: Some(PreviousSecret {
-                value: String::from("old_password"),
-                saved_at: String::from("2025-01-01T00:00:00Z"),
-                expires_at: None,
-            }),
-            app_id: None,
-            email: None,
-        });
-
-        save_vault(
-            &VaultBody {
-                folders: vec![],
-                entries: vec![entry],
-                ..Default::default()
-            },
-            pass,
-            &path,
-        )
-        .unwrap();
-        unlock_vault(pass, path.clone()).unwrap();
-
-        session_revert_password("login-001").unwrap();
-
-        let result = get_entry("login-001").unwrap();
-        match result {
-            VaultEntry::Login(ref e) => {
-                assert_eq!(e.password, "old_password");
-                assert!(e.previous_password.is_none());
-            }
-            _ => panic!("Expected Login variant"),
-        }
-
-        teardown(&path);
-    }
-
-    #[test]
-    #[serial]
-    fn revert_password_with_no_history_returns_error() {
-        use crate::vault::entry::{EntryMeta, LoginEntry, VaultEntry};
-
-        let pass = b"test passphrase";
-        let mut path = temp_dir();
-        path.push("gabbro_revert_no_history_test.gabbro");
-
-        let entry = VaultEntry::Login(LoginEntry {
-            meta: EntryMeta {
-                field_times: Default::default(),
-                history: Vec::new(),
-                id: String::from("login-001"),
-                created_at: String::from("2025-01-01T00:00:00Z"),
-                updated_at: String::from("2025-01-01T00:00:00Z"),
-                folder: String::from("Personal"),
-            },
-            title: String::from("Example"),
-            url: String::from("https://example.com"),
-            username: String::from("user"),
-            password: String::from("current_password"),
-            notes: None,
-            custom_fields: vec![],
-            attachments: vec![],
-            previous_password: None,
-            app_id: None,
-            email: None,
-        });
-
-        save_vault(
-            &VaultBody {
-                folders: vec![],
-                entries: vec![entry],
-                ..Default::default()
-            },
-            pass,
-            &path,
-        )
-        .unwrap();
-        unlock_vault(pass, path.clone()).unwrap();
-
-        let result = session_revert_password("login-001");
-        assert!(result.is_err());
-
-        teardown(&path);
-    }
-
-    #[test]
-    #[serial]
     fn unexpired_history_is_preserved_on_unlock() {
-        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
+        use crate::vault::entry::{EntryMeta, HistoryRecord, LoginEntry, VaultEntry};
 
         let pass = b"test passphrase";
         let mut path = temp_dir();
         path.push("gabbro_unexpired_history_test.gabbro");
 
-        // expires_at is far in the future — 2099-12-31
+        // expires_at is far in the future - 2099-12-31
+        let mut meta = EntryMeta {
+            field_times: Default::default(),
+            history: Vec::new(),
+            id: String::from("login-unexp-001"),
+            created_at: String::from("2025-01-01T00:00:00Z"),
+            updated_at: String::from("2025-01-01T00:00:00Z"),
+            folder: String::from("Personal"),
+        };
+        meta.history.push(HistoryRecord {
+            field: String::from("password"),
+            value: String::from("old"),
+            saved_at: String::from("2025-01-01T00:00:00Z"),
+            expires_at: Some(String::from("2099-12-31T00:00:00Z")),
+        });
         let entry = VaultEntry::Login(LoginEntry {
-            meta: EntryMeta {
-                field_times: Default::default(),
-                history: Vec::new(),
-                id: String::from("login-unexp-001"),
-                created_at: String::from("2025-01-01T00:00:00Z"),
-                updated_at: String::from("2025-01-01T00:00:00Z"),
-                folder: String::from("Personal"),
-            },
+            meta,
             title: String::from("Unexpired"),
             url: String::from("https://example.com"),
             username: String::from("user"),
@@ -4771,11 +4459,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: Some(PreviousSecret {
-                value: String::from("old"),
-                saved_at: String::from("2025-01-01T00:00:00Z"),
-                expires_at: Some(String::from("2099-12-31T00:00:00Z")),
-            }),
             app_id: None,
             email: None,
         });
@@ -4796,7 +4479,7 @@ mod tests {
         match result {
             VaultEntry::Login(ref e) => {
                 assert!(
-                    e.previous_password.is_some(),
+                    e.meta.history.iter().any(|h| h.field == "password"),
                     "unexpired history must be preserved on unlock"
                 );
             }
@@ -4809,21 +4492,28 @@ mod tests {
     #[test]
     #[serial]
     fn keep_forever_history_is_preserved_on_unlock() {
-        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
+        use crate::vault::entry::{EntryMeta, HistoryRecord, LoginEntry, VaultEntry};
 
         let pass = b"test passphrase";
         let mut path = temp_dir();
         path.push("gabbro_keep_forever_history_test.gabbro");
 
+        let mut meta = EntryMeta {
+            field_times: Default::default(),
+            history: Vec::new(),
+            id: String::from("login-forever-001"),
+            created_at: String::from("2025-01-01T00:00:00Z"),
+            updated_at: String::from("2025-01-01T00:00:00Z"),
+            folder: String::from("Personal"),
+        };
+        meta.history.push(HistoryRecord {
+            field: String::from("password"),
+            value: String::from("old"),
+            saved_at: String::from("2025-01-01T00:00:00Z"),
+            expires_at: None,
+        });
         let entry = VaultEntry::Login(LoginEntry {
-            meta: EntryMeta {
-                field_times: Default::default(),
-                history: Vec::new(),
-                id: String::from("login-forever-001"),
-                created_at: String::from("2025-01-01T00:00:00Z"),
-                updated_at: String::from("2025-01-01T00:00:00Z"),
-                folder: String::from("Personal"),
-            },
+            meta,
             title: String::from("Forever"),
             url: String::from("https://example.com"),
             username: String::from("user"),
@@ -4831,11 +4521,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: Some(PreviousSecret {
-                value: String::from("old"),
-                saved_at: String::from("2025-01-01T00:00:00Z"),
-                expires_at: None,
-            }),
             app_id: None,
             email: None,
         });
@@ -4856,7 +4541,7 @@ mod tests {
         match result {
             VaultEntry::Login(ref e) => {
                 assert!(
-                    e.previous_password.is_some(),
+                    e.meta.history.iter().any(|h| h.field == "password"),
                     "keep-forever history (expires_at: None) must never be purged"
                 );
             }
@@ -4869,22 +4554,29 @@ mod tests {
     #[test]
     #[serial]
     fn expired_history_is_purged_on_unlock() {
-        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
+        use crate::vault::entry::{EntryMeta, HistoryRecord, LoginEntry, VaultEntry};
 
         let pass = b"test passphrase";
         let mut path = temp_dir();
         path.push("gabbro_expired_history_test.gabbro");
 
-        // expires_at is in the past — 2000-01-01
+        // expires_at is in the past - 2000-01-01
+        let mut meta = EntryMeta {
+            field_times: Default::default(),
+            history: Vec::new(),
+            id: String::from("login-exp-001"),
+            created_at: String::from("2025-01-01T00:00:00Z"),
+            updated_at: String::from("2025-01-01T00:00:00Z"),
+            folder: String::from("Personal"),
+        };
+        meta.history.push(HistoryRecord {
+            field: String::from("password"),
+            value: String::from("old"),
+            saved_at: String::from("2000-01-01T00:00:00Z"),
+            expires_at: Some(String::from("2000-01-02T00:00:00Z")),
+        });
         let entry = VaultEntry::Login(LoginEntry {
-            meta: EntryMeta {
-                field_times: Default::default(),
-                history: Vec::new(),
-                id: String::from("login-exp-001"),
-                created_at: String::from("2025-01-01T00:00:00Z"),
-                updated_at: String::from("2025-01-01T00:00:00Z"),
-                folder: String::from("Personal"),
-            },
+            meta,
             title: String::from("Expired"),
             url: String::from("https://example.com"),
             username: String::from("user"),
@@ -4892,11 +4584,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: Some(PreviousSecret {
-                value: String::from("old"),
-                saved_at: String::from("2000-01-01T00:00:00Z"),
-                expires_at: Some(String::from("2000-01-02T00:00:00Z")),
-            }),
             app_id: None,
             email: None,
         });
@@ -4917,7 +4604,7 @@ mod tests {
         match result {
             VaultEntry::Login(ref e) => {
                 assert!(
-                    e.previous_password.is_none(),
+                    !e.meta.history.iter().any(|h| h.field == "password"),
                     "expired history should be purged on unlock"
                 );
                 assert_eq!(
@@ -4960,8 +4647,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_cvv: None,
-            previous_pin: None,
         });
 
         let summary = entry_to_summary(&entry);
@@ -5677,7 +5362,6 @@ mod json_export_tests {
                 notes: None,
                 custom_fields: vec![],
                 attachments: vec![],
-                previous_password: None,
                 app_id: None,
                 email: None,
             }),
@@ -5768,7 +5452,6 @@ mod json_export_tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -5802,7 +5485,6 @@ mod json_export_tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -5832,7 +5514,6 @@ mod json_export_tests {
             notes: Some("corporate access only".to_string()),
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -5866,7 +5547,6 @@ mod json_export_tests {
                 hidden: false,
             }],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -5906,7 +5586,6 @@ mod json_export_tests {
                 hidden: true,
             }],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -6003,8 +5682,6 @@ mod json_export_tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_cvv: None,
-            previous_pin: None,
         });
         let s = entry_to_summary(&entry);
         assert!(
@@ -6052,7 +5729,6 @@ mod json_export_tests {
                 },
             ],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -6088,7 +5764,6 @@ mod json_export_tests {
             notes: Some("reset link is sent to your email".to_string()),
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -6209,7 +5884,6 @@ mod json_export_tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -7531,7 +7205,6 @@ mod sync_fuzz {
                 notes: None,
                 custom_fields: pairs(),
                 attachments: att(),
-                previous_password: None,
                 app_id: None,
                 email: None,
             }));
@@ -7569,8 +7242,6 @@ mod sync_fuzz {
                 notes: None,
                 custom_fields: pairs(),
                 attachments: att(),
-                previous_cvv: None,
-                previous_pin: None,
             }));
             out.push(VaultEntry::File(FileEntry {
                 meta: blank_meta(&format!("file-{i}")),

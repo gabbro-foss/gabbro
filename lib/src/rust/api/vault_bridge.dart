@@ -153,18 +153,6 @@ Future<void> restoreVaultFromFile({
   source: source,
 );
 
-/// Clear the previous password history for a Login entry and persist.
-///
-/// Async — triggers a full vault save.
-Future<void> sessionClearPasswordHistory({required String id}) =>
-    RustLib.instance.api.crateApiVaultBridgeSessionClearPasswordHistory(id: id);
-
-/// Revert the current password to the previous password for a Login entry and persist.
-///
-/// Async — triggers a full vault save.
-Future<void> sessionRevertPassword({required String id}) =>
-    RustLib.instance.api.crateApiVaultBridgeSessionRevertPassword(id: id);
-
 /// Assign a folder to a set of entries by UUID and persist.
 ///
 /// Pass `folder: ""` to move entries to unfoldered.

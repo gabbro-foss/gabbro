@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Správa priečinkov",
   "manageVaultsTitle": "Správa trezorov",
   "manageYubiKeysTitle": "Správa kľúčov YubiKey",
-  "passwordHistoryTitle": "História hesiel",
   "reviewChangesTitle": "Skontrolovať zmeny",
   "unlockGabbroTitle": "Odomknúť Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Zamknúť po tomto čase nečinnosti, keď je aplikácia otvorená.",
   "backgroundLockDescription": "Zamknúť po tom, čo aplikácia je na pozadí po túto dobu.",
-  "passwordHistoryDescription": "Ako dlho uchovávať predchádzajúce heslo po zmene. «Uchovávať vždy» znamená, že história sa maže len ručne.",
+  "passwordHistoryDescription": "Ako dlho uchovávať predchádzajúcu hodnotu zmeneného tajomstva (heslo, CVV, PIN).",
   "passphraseCopyPasteDescription": "Blokovať kopírovanie a vkladanie v poliach prístupovej frázy. Odporúčané: zabraňuje úniku frázy cez schránku.",
   "passphraseCopyPasteNote": "Poznámka: toto blokuje kontextové menu pri dlhom stlačení a výber textu. Vstavaný tlačidlo vkladania klávesnice môže stále fungovať — to je obmedzenie platformy.",
   "blockCopyPasteTitle": "Blokovať kopírovanie/vkladanie",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Vymazať predchádzajúci záznam",
-  "failedToClearHistory": "Nepodarilo sa vymazať históriu: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Nepodarilo sa obnoviť heslo: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Premenovať priečinok",
   "addFolderTitle": "Pridať priečinok",
@@ -457,9 +444,7 @@
   "syncThisVault": "Použiť tento trezor",
   "syncOtherVault": "Použiť druhý trezor",
 
-  "historyWarning": "Je uchovaná iba 1 predchádzajúca hodnota. História sa automaticky maže na základe nastavení zabezpečenia.",
-  "historyCurrent": "Aktuálna",
-  "historyPrevious": "Predchádzajúci stav",
+  "historyPrevious": "História",
   "historySavedOn": "Uložené {date}",
   "@historySavedOn": {
     "placeholders": {

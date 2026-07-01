@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Mappák kezelése",
   "manageVaultsTitle": "Széfek kezelése",
   "manageYubiKeysTitle": "YubiKey-ek kezelése",
-  "passwordHistoryTitle": "Jelszóelőzmények",
   "reviewChangesTitle": "Változtatások áttekintése",
   "unlockGabbroTitle": "Gabbro feloldása",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Zárolás ennyi inaktivitás után, amíg az alkalmazás nyitva van.",
   "backgroundLockDescription": "Zárolás, miután az alkalmazás ennyi ideig háttérben volt.",
-  "passwordHistoryDescription": "Mennyi ideig tároljuk az előző jelszót módosítás után. A «Mindig megőrzi» azt jelenti, hogy az előzmények csak manuálisan törölhetők.",
+  "passwordHistoryDescription": "Meddig őrizze meg egy módosított titok korábbi értékét (jelszó, CVV, PIN).",
   "passphraseCopyPasteDescription": "Másolás és beillesztés tiltása a jelmondat mezőkben. Ajánlott: megakadályozza a jelmondat vágólapon keresztüli kiszivárgását.",
   "passphraseCopyPasteNote": "Megjegyzés: ez blokkolja a hosszú érintés helyi menüjét és a szövegkijelölést. A billentyűzet beépített beillesztés gombja esetleg még működik — ez platformkorlátozás.",
   "blockCopyPasteTitle": "Másolás/beillesztés tiltása",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Korábbi bejegyzés törlése",
-  "failedToClearHistory": "Az előzmények törlése sikertelen: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "A jelszó visszaállítása sikertelen: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Mappa átnevezése",
   "addFolderTitle": "Mappa hozzáadása",
@@ -457,9 +444,7 @@
   "syncThisVault": "Ezt a széfet használ",
   "syncOtherVault": "Másik széfet használ",
 
-  "historyWarning": "Csak 1 korábbi érték kerül megőrzésre. Az előzmények automatikusan törlődnek a biztonsági beállítások alapján.",
-  "historyCurrent": "Jelenlegi",
-  "historyPrevious": "Korábbi állapot",
+  "historyPrevious": "Előzmények",
   "historySavedOn": "Mentve: {date}",
   "@historySavedOn": {
     "placeholders": {

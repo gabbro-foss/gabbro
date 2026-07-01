@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Pārvaldīt mapes",
   "manageVaultsTitle": "Pārvaldīt seifus",
   "manageYubiKeysTitle": "Pārvaldīt YubiKey atslēgas",
-  "passwordHistoryTitle": "Paroļu vēsture",
   "reviewChangesTitle": "Pārskatīt izmaiņas",
   "unlockGabbroTitle": "Atbloķēt Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Bloķēt pēc šī neaktivitātes laika, kamēr lietotne ir atvērta.",
   "backgroundLockDescription": "Bloķēt pēc tam, kad lietotne ir bijusi fonā šādu laiku.",
-  "passwordHistoryDescription": "Cik ilgi glabāt iepriekšējo paroli pēc maiņas. «Vienmēr paturēt» nozīmē, ka vēsture tiek dzēsta tikai manuāli.",
+  "passwordHistoryDescription": "Cik ilgi glabāt mainīta noslēpuma iepriekšējo vērtību (parole, CVV, PIN).",
   "passphraseCopyPasteDescription": "Bloķēt kopēšanu un ielīmēšanu ieejas frāzes laukos. Ieteicams: novērš ieejas frāzes noplūdi caur starpliktuvi.",
   "passphraseCopyPasteNote": "Piezīme: tas bloķē konteksta izvēlni ar ilgu pieskārienu un teksta atlasi. Tastatūras iebūvētā ielīmēšanas poga joprojām var darboties — tā ir platformas ierobežojums.",
   "blockCopyPasteTitle": "Bloķēt kopēšanu/ielīmēšanu",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Dzēst iepriekšējo ierakstu",
-  "failedToClearHistory": "Neizdevās notīrīt vēsturi: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Neizdevās atjaunot paroli: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Pārdēvēt mapi",
   "addFolderTitle": "Pievienot mapi",
@@ -457,9 +444,7 @@
   "syncThisVault": "Izmantot šo glabātavu",
   "syncOtherVault": "Izmantot citu glabātavu",
 
-  "historyWarning": "Tiek glabāta tikai 1 iepriekšējā vērtība. Vēsture tiek automātiski dzēsta, pamatojoties uz drošības iestatījumiem.",
-  "historyCurrent": "Pašreizējā",
-  "historyPrevious": "Iepriekšējais stāvoklis",
+  "historyPrevious": "Vēsture",
   "historySavedOn": "Saglabāts {date}",
   "@historySavedOn": {
     "placeholders": {

@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Karpetak kudeatu",
   "manageVaultsTitle": "Gandegiak kudeatu",
   "manageYubiKeysTitle": "YubiKey gakoak kudeatu",
-  "passwordHistoryTitle": "Pasahitz historia",
   "reviewChangesTitle": "Aldaketak berrikusi",
   "unlockGabbroTitle": "Gabbro desblokeatu",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Aplikazioa irekita dagoenean inaktibitate-denbora hau igarotakoan blokeatu.",
   "backgroundLockDescription": "Aplikazioa atzeko planoan denbora hau egon ondoren blokeatu.",
-  "passwordHistoryDescription": "Aldaketa egin ondoren aurreko pasahitza zenbat denbora gordetzea. «Beti gorde»-k esan nahi du historia eskuz soilik ezabatzen dela.",
+  "passwordHistoryDescription": "Aldatutako sekretu baten aurreko balioa zenbat denbora gorde (pasahitza, CVV, PIN).",
   "passphraseCopyPasteDescription": "Pasaesaldiaren eremuetan kopiatzea eta itsastea blokeatu. Gomendatua: pasaesaldia arbelaren bidez ihes egitea saihesten du.",
   "passphraseCopyPasteNote": "Oharra: honek luze sakatutako testuinguru-menua eta testu hautaketa blokeatzen ditu. Teklatuaren barneko itsasteko botoiak oraindik funtziona dezake — hori plataformaren mugapena da.",
   "blockCopyPasteTitle": "Kopiatzea/itsastea blokeatu",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Aurreko sarrera ezabatu",
-  "failedToClearHistory": "Historiaren garbiketa huts egin du: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Pasahitza berrezartzeak huts egin du: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Karpeta berrizendatu",
   "addFolderTitle": "Karpeta gehitu",
@@ -457,9 +444,7 @@
   "syncThisVault": "Erabili kutxa hau",
   "syncOtherVault": "Erabili beste kutxa",
 
-  "historyWarning": "Aurreko balio 1 bakarrik gordetzen da. Historia segurtasun-ezarpenen arabera automatikoki ezabatzen da.",
-  "historyCurrent": "Unekoa",
-  "historyPrevious": "Aurreko egoera",
+  "historyPrevious": "Historia",
   "historySavedOn": "{date}-(e)an gordeta",
   "@historySavedOn": {
     "placeholders": {

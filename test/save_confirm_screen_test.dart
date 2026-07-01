@@ -22,7 +22,6 @@ VaultEntryData _login(String id, {String password = 'old', String username = 'al
       password: password,
       notes: null,
       customFields: const [],
-      previousPassword: null,
       appId: null,
       email: null,
     ));

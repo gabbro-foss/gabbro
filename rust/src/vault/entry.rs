@@ -67,6 +67,31 @@ impl Zeroize for EntryMeta {
 
 impl ZeroizeOnDrop for EntryMeta {}
 
+impl EntryMeta {
+    /// Record `value` as the previous value of `field`, keeping at most one
+    /// history record per field: an existing record for the same field is
+    /// overwritten. This is the unified history model — one previous value per
+    /// field, shared by the sync path and the on-save secret-field capture.
+    pub fn record_previous(
+        &mut self,
+        field: &str,
+        value: &str,
+        saved_at: &str,
+        expires_at: Option<String>,
+    ) {
+        let record = HistoryRecord {
+            field: field.to_string(),
+            value: value.to_string(),
+            saved_at: saved_at.to_string(),
+            expires_at,
+        };
+        match self.history.iter_mut().find(|h| h.field == field) {
+            Some(existing) => *existing = record,
+            None => self.history.push(record),
+        }
+    }
+}
+
 /// A binary attachment belonging to a vault entry.
 ///
 /// Imported from Enpass exports; data is base64-decoded on import.
@@ -101,8 +126,6 @@ pub struct LoginEntry {
     #[serde(default)]
     pub custom_fields: Vec<CustomField>,
     pub attachments: Vec<EntryAttachment>,
-    /// Previous password value, retained for typo recovery.
-    pub previous_password: Option<PreviousSecret>,
     /// Android application id (package name, e.g. "com.company.app") this login
     /// belongs to, for native-app autofill matching. `None` until the user sets
     /// it; an unset value matches no app (no loose substring matching).
@@ -112,18 +135,6 @@ pub struct LoginEntry {
     /// email-typed fields. `None` if unset.
     #[serde(default)]
     pub email: Option<String>,
-}
-
-/// Holds one previous value of a sensitive field, for typo recovery.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
-pub struct PreviousSecret {
-    /// The previous secret value.
-    pub value: String,
-    /// ISO 8601 timestamp: when the current value replaced this one.
-    pub saved_at: String,
-    /// ISO 8601 timestamp: when this record auto-purges.
-    /// `None` means keep until manually deleted.
-    pub expires_at: Option<String>,
 }
 
 /// A single user-defined key/value field on an entry.
@@ -193,10 +204,6 @@ pub struct CardEntry {
     #[serde(default)]
     pub custom_fields: Vec<CustomField>,
     pub attachments: Vec<EntryAttachment>,
-    /// Previous CVV value, retained for typo recovery.
-    pub previous_cvv: Option<PreviousSecret>,
-    /// Previous PIN value, retained for typo recovery.
-    pub previous_pin: Option<PreviousSecret>,
 }
 
 impl CardEntry {
@@ -220,8 +227,6 @@ impl CardEntry {
         notes: Option<String>,
         custom_fields: Vec<CustomField>,
         attachments: Vec<EntryAttachment>,
-        previous_cvv: Option<PreviousSecret>,
-        previous_pin: Option<PreviousSecret>,
     ) -> Result<CardEntry, String> {
         let mut errors: Vec<&str> = Vec::new();
 
@@ -256,8 +261,6 @@ impl CardEntry {
             notes,
             custom_fields,
             attachments,
-            previous_cvv,
-            previous_pin,
         })
     }
 }
@@ -402,6 +405,29 @@ mod tests {
     }
 
     #[test]
+    fn record_previous_keeps_one_record_per_field() {
+        // The unified history model: at most one previous value per field. A
+        // second change to the same field overwrites its record rather than
+        // appending a new one.
+        let mut meta = default_meta();
+        meta.record_previous("password", "old-1", "2026-01-01T00:00:00Z", None);
+        meta.record_previous("password", "old-2", "2026-01-02T00:00:00Z", None);
+        assert_eq!(meta.history.len(), 1);
+        assert_eq!(meta.history[0].value, "old-2");
+        assert_eq!(meta.history[0].saved_at, "2026-01-02T00:00:00Z");
+    }
+
+    #[test]
+    fn record_previous_tracks_distinct_fields_separately() {
+        let mut meta = default_meta();
+        meta.record_previous("password", "pw-old", "2026-01-01T00:00:00Z", None);
+        meta.record_previous("content", "note-old", "2026-01-01T00:00:00Z", None);
+        assert_eq!(meta.history.len(), 2);
+        assert!(meta.history.iter().any(|h| h.field == "password" && h.value == "pw-old"));
+        assert!(meta.history.iter().any(|h| h.field == "content" && h.value == "note-old"));
+    }
+
+    #[test]
     fn login_entry_stores_basic_fields() {
         let entry = LoginEntry {
             meta: default_meta(),
@@ -412,7 +438,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         };
@@ -434,7 +459,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         };
@@ -453,7 +477,6 @@ mod tests {
             notes: Some(String::from("my example account")),
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         };
@@ -478,7 +501,6 @@ mod tests {
             notes: None,
             custom_fields: vec![field],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         };
@@ -499,7 +521,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: Some(String::from("com.company.app")),
             email: None,
         };
@@ -517,7 +538,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: Some(String::from("com.example.app")),
             email: None,
         };
@@ -561,7 +581,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: Some(String::from("user@example.com")),
         };
@@ -579,7 +598,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: Some(String::from("user@example.com")),
         };
@@ -684,8 +702,6 @@ mod tests {
             None,
             vec![],
             vec![],
-            None,
-            None,
         )
         .unwrap();
 
@@ -714,8 +730,6 @@ mod tests {
             None,
             vec![],
             vec![],
-            None,
-            None,
         );
         assert!(result.is_ok(), "6-digit card number should be accepted");
     }
@@ -739,8 +753,6 @@ mod tests {
             None,
             vec![],
             vec![],
-            None,
-            None,
         );
 
         assert!(result.is_err());
@@ -765,8 +777,6 @@ mod tests {
             None,
             vec![],
             vec![],
-            None,
-            None,
         );
         let err = result.unwrap_err();
         assert!(
@@ -799,8 +809,6 @@ mod tests {
             None,
             vec![],
             vec![],
-            None,
-            None,
         );
         assert!(result.is_ok(), "empty CVV should be accepted");
     }
@@ -824,8 +832,6 @@ mod tests {
             None,
             vec![],
             vec![],
-            None,
-            None,
         );
 
         assert!(result.is_err());
@@ -865,130 +871,6 @@ mod tests {
         assert_eq!(entry.custom_fields.len(), 1);
         assert_eq!(entry.custom_fields[0].label, "Classification");
         assert!(!entry.custom_fields[0].hidden);
-    }
-
-    #[test]
-    fn previous_secret_is_none_by_default_on_login() {
-        let entry = LoginEntry {
-            meta: default_meta(),
-            title: String::from("Example"),
-            url: String::from("https://example.com"),
-            username: String::from("user"),
-            password: String::from("hunter2"),
-            notes: None,
-            custom_fields: vec![],
-            attachments: vec![],
-            previous_password: None,
-            app_id: None,
-            email: None,
-        };
-        assert!(entry.previous_password.is_none());
-    }
-
-    #[test]
-    fn previous_secret_stores_expires_at() {
-        let prev = PreviousSecret {
-            value: String::from("old_hunter2"),
-            saved_at: String::from("2025-01-01T00:00:00Z"),
-            expires_at: Some(String::from("2025-01-31T00:00:00Z")),
-        };
-        assert_eq!(prev.expires_at, Some(String::from("2025-01-31T00:00:00Z")));
-
-        let prev_forever = PreviousSecret {
-            value: String::from("old_hunter2"),
-            saved_at: String::from("2025-01-01T00:00:00Z"),
-            expires_at: None,
-        };
-        assert!(prev_forever.expires_at.is_none());
-    }
-
-    #[test]
-    fn login_entry_can_store_previous_password() {
-        let prev = PreviousSecret {
-            value: String::from("old_hunter2"),
-            saved_at: String::from("2025-01-01T00:00:00Z"),
-            expires_at: Some(String::from("2025-01-31T00:00:00Z")),
-        };
-        let entry = LoginEntry {
-            meta: default_meta(),
-            title: String::from("Example"),
-            url: String::from("https://example.com"),
-            username: String::from("user"),
-            password: String::from("new_hunter2"),
-            notes: None,
-            custom_fields: vec![],
-            attachments: vec![],
-            previous_password: Some(prev),
-            app_id: None,
-            email: None,
-        };
-        assert!(entry.previous_password.is_some());
-        assert_eq!(
-            entry.previous_password.clone().unwrap().value,
-            "old_hunter2"
-        );
-    }
-
-    #[test]
-    fn card_entry_can_store_previous_cvv() {
-        let entry = CardEntry::new(
-            default_meta(),
-            None,
-            String::from("active"),
-            String::from("Alex Smith"),
-            String::from("4111111111111111"),
-            String::from("12/28"),
-            String::from("999"),
-            None,
-            None,
-            Some(String::from("Visa")),
-            None,
-            None,
-            None,
-            None,
-            vec![],
-            vec![],
-            Some(PreviousSecret {
-                value: String::from("123"),
-                saved_at: String::from("2025-01-01T00:00:00Z"),
-                expires_at: Some(String::from("2025-01-31T00:00:00Z")),
-            }),
-            None,
-        )
-        .unwrap();
-        assert!(entry.previous_cvv.is_some());
-        assert_eq!(entry.previous_cvv.clone().unwrap().value, "123");
-    }
-
-    #[test]
-    fn card_entry_can_store_previous_pin() {
-        let entry = CardEntry::new(
-            default_meta(),
-            None,
-            String::from("active"),
-            String::from("Alex Smith"),
-            String::from("4111111111111111"),
-            String::from("12/28"),
-            String::from("123"),
-            None,
-            None,
-            Some(String::from("Visa")),
-            None,
-            None,
-            None,
-            None,
-            vec![],
-            vec![],
-            None,
-            Some(PreviousSecret {
-                value: String::from("4321"),
-                saved_at: String::from("2025-01-01T00:00:00Z"),
-                expires_at: Some(String::from("2025-01-31T00:00:00Z")),
-            }),
-        )
-        .unwrap();
-        assert!(entry.previous_pin.is_some());
-        assert_eq!(entry.previous_pin.clone().unwrap().value, "4321");
     }
 
     #[test]

@@ -219,7 +219,6 @@ fn convert_login(
         notes,
         custom_fields,
         attachments: vec![],
-        previous_password: None,
         app_id: None,
         email: None,
     })
@@ -276,8 +275,6 @@ fn convert_card(
         notes,
         custom_fields,
         vec![],
-        None,
-        None,
     )
     .map(Some)
     .map_err(|reason| ParseFailure {

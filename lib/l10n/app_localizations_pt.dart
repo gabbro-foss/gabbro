@@ -190,9 +190,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get manageYubiKeysTitle => 'Gerenciar YubiKeys';
 
   @override
-  String get passwordHistoryTitle => 'Histórico de senhas';
-
-  @override
   String get reviewChangesTitle => 'Revisar alterações';
 
   @override
@@ -394,7 +391,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Por quanto tempo manter uma senha anterior após ser alterada. «Manter sempre» significa que o histórico só é excluído manualmente.';
+      'Por quanto tempo manter o valor anterior de um segredo alterado (senha, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -736,16 +733,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Excluir entrada anterior';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Falha ao limpar histórico: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Falha ao reverter senha: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Renomear pasta';
 
   @override
@@ -1061,14 +1048,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get syncOtherVault => 'Usar outro cofre';
 
   @override
-  String get historyWarning =>
-      'Apenas 1 valor anterior é mantido. O histórico é excluído automaticamente com base nas configurações de segurança.';
-
-  @override
-  String get historyCurrent => 'Atual';
-
-  @override
-  String get historyPrevious => 'Estado anterior';
+  String get historyPrevious => 'Histórico';
 
   @override
   String historySavedOn(String date) {
@@ -2194,9 +2174,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get manageYubiKeysTitle => 'Gerenciar YubiKeys';
 
   @override
-  String get passwordHistoryTitle => 'Histórico de senhas';
-
-  @override
   String get reviewChangesTitle => 'Revisar alterações';
 
   @override
@@ -2398,7 +2375,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get passwordHistoryDescription =>
-      'Por quanto tempo manter uma senha anterior após ser alterada. «Manter sempre» significa que o histórico só é excluído manualmente.';
+      'Por quanto tempo manter o valor anterior de um segredo alterado (senha, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -2740,16 +2717,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get deleteEntryFromHistoryLabel => 'Excluir entrada anterior';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Falha ao limpar histórico: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Falha ao reverter senha: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Renomear pasta';
 
   @override
@@ -3065,14 +3032,7 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get syncOtherVault => 'Usar outro cofre';
 
   @override
-  String get historyWarning =>
-      'Apenas 1 valor anterior é mantido. O histórico é excluído automaticamente com base nas configurações de segurança.';
-
-  @override
-  String get historyCurrent => 'Atual';
-
-  @override
-  String get historyPrevious => 'Estado anterior';
+  String get historyPrevious => 'Histórico';
 
   @override
   String historySavedOn(String date) {
@@ -4195,9 +4155,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get manageYubiKeysTitle => 'Gerir YubiKeys';
 
   @override
-  String get passwordHistoryTitle => 'Histórico de palavras-passe';
-
-  @override
   String get reviewChangesTitle => 'Rever alterações';
 
   @override
@@ -4399,7 +4356,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get passwordHistoryDescription =>
-      'Quanto tempo manter uma palavra-passe anterior após ser alterada. «Manter sempre» significa que o histórico só é eliminado manualmente.';
+      'Quanto tempo manter o valor anterior de um segredo alterado (palavra-passe, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -4741,16 +4698,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get deleteEntryFromHistoryLabel => 'Eliminar entrada anterior';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Falha ao limpar histórico: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Falha ao reverter palavra-passe: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Renomear pasta';
 
   @override
@@ -5066,14 +5013,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get syncOtherVault => 'Usar outro cofre';
 
   @override
-  String get historyWarning =>
-      'Apenas 1 valor anterior é mantido. O histórico é eliminado automaticamente com base nas definições de segurança.';
-
-  @override
-  String get historyCurrent => 'Atual';
-
-  @override
-  String get historyPrevious => 'Estado anterior';
+  String get historyPrevious => 'Histórico';
 
   @override
   String historySavedOn(String date) {

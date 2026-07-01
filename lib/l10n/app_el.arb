@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Διαχείριση φακέλων",
   "manageVaultsTitle": "Διαχείριση θησαυροφυλακίων",
   "manageYubiKeysTitle": "Διαχείριση κλειδιών YubiKey",
-  "passwordHistoryTitle": "Ιστορικό κωδικών",
   "reviewChangesTitle": "Έλεγχος αλλαγών",
   "unlockGabbroTitle": "Ξεκλείδωμα Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Κλείδωμα μετά από αυτό το χρονικό διάστημα αδράνειας όταν η εφαρμογή είναι ανοιχτή.",
   "backgroundLockDescription": "Κλείδωμα μετά από αυτό το χρονικό διάστημα στο παρασκήνιο.",
-  "passwordHistoryDescription": "Πόσο καιρό να διατηρείται ο προηγούμενος κωδικός μετά από αλλαγή. «Πάντα» σημαίνει ότι το ιστορικό διαγράφεται μόνο χειροκίνητα.",
+  "passwordHistoryDescription": "Για πόσο διατηρείται η προηγούμενη τιμή ενός αλλαγμένου μυστικού (κωδικός, CVV, PIN).",
   "passphraseCopyPasteDescription": "Αποκλεισμός αντιγραφής και επικόλλησης στα πεδία φράσης πρόσβασης. Συνιστάται: αποτρέπει τη διαρροή φράσης μέσω προχείρου.",
   "passphraseCopyPasteNote": "Σημείωση: αυτό αποκλείει το μενού περιβάλλοντος με παρατεταμένο πάτημα και την επιλογή κειμένου. Το ενσωματωμένο κουμπί επικόλλησης του πληκτρολογίου μπορεί να λειτουργεί ακόμα — αυτό είναι περιορισμός πλατφόρμας.",
   "blockCopyPasteTitle": "Αποκλεισμός αντιγραφής/επικόλλησης",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Διαγραφή προηγούμενης καταχώρισης",
-  "failedToClearHistory": "Αποτυχία εκκαθάρισης ιστορικού: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Αποτυχία επαναφοράς κωδικού: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Μετονομασία φακέλου",
   "addFolderTitle": "Προσθήκη φακέλου",
@@ -457,9 +444,7 @@
   "syncThisVault": "Χρήση αυτού του θησαυροφυλακίου",
   "syncOtherVault": "Χρήση άλλου θησαυροφυλακίου",
 
-  "historyWarning": "Διατηρείται μόνο 1 προηγούμενη τιμή. Το ιστορικό διαγράφεται αυτόματα βάσει των ρυθμίσεων ασφαλείας.",
-  "historyCurrent": "Τρέχον",
-  "historyPrevious": "Προηγούμενη κατάσταση",
+  "historyPrevious": "Ιστορικό",
   "historySavedOn": "Αποθηκεύτηκε {date}",
   "@historySavedOn": {
     "placeholders": {

@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Қалталарды басқару",
   "manageVaultsTitle": "Сейфтерді басқару",
   "manageYubiKeysTitle": "YubiKey кілттерін басқару",
-  "passwordHistoryTitle": "Құпия сөз тарихы",
   "reviewChangesTitle": "Өзгерістерді тексеру",
   "unlockGabbroTitle": "Gabbroны ашу",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Қосымша ашық тұрғанда осы белсенсіздік уақытынан кейін бекіту.",
   "backgroundLockDescription": "Қосымша фонда осыншама уақыт болғаннан кейін бекіту.",
-  "passwordHistoryDescription": "Өзгеріс жасалғаннан кейін алдыңғы құпия сөзді қанша уақыт сақтау керек. «Әрқашан сақтау» — тарихты тек қолмен өшіруге болады.",
+  "passwordHistoryDescription": "Өзгертілген құпияның алдыңғы мәнін қанша уақыт сақтау керек (құпия сөз, CVV, PIN).",
   "passphraseCopyPasteDescription": "Кілт фразасы өрістерінде көшіруді және қоюды блоктау. Ұсынылады: фразаның алмасу буфері арқылы ағып кетуін болдырмайды.",
   "passphraseCopyPasteNote": "Ескерту: бұл ұзақ басқанда контекстік мәзірді және мәтін таңдауды блоктайды. Пернетақтаның кірістірілген қою түймесі жұмыс жасай беруі мүмкін — бұл платформаның шектеуі.",
   "blockCopyPasteTitle": "Көшіруді/қоюды блоктау",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Алдыңғы жазбаны жою",
-  "failedToClearHistory": "Тарихты тазалау сәтсіз болды: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Құпия сөзді қайтару сәтсіз болды: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Қалтаның атауын өзгерту",
   "addFolderTitle": "Қалта қосу",
@@ -457,9 +444,7 @@
   "syncThisVault": "Осы қойманы пайдалану",
   "syncOtherVault": "Басқа қойманы пайдалану",
 
-  "historyWarning": "Тек 1 алдыңғы мән сақталады. Тарих қауіпсіздік параметрлеріне сәйкес автоматты жойылады.",
-  "historyCurrent": "Ағымдағы",
-  "historyPrevious": "Алдыңғы күй",
+  "historyPrevious": "Тарих",
   "historySavedOn": "{date} сақталды",
   "@historySavedOn": {
     "placeholders": {

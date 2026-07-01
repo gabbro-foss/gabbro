@@ -190,9 +190,6 @@ class AppLocalizationsYo extends AppLocalizations {
   String get manageYubiKeysTitle => 'Ṣakoso awọn bọtini YubiKey';
 
   @override
-  String get passwordHistoryTitle => 'Itan ọrọ igbaniwọle';
-
-  @override
   String get reviewChangesTitle => 'Ṣayẹwo awọn ayipada';
 
   @override
@@ -393,7 +390,7 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Iye akoko lati tọju ọrọ igbaniwọle tẹlẹ lẹhin ayipada. «Tọju nigbagbogbo» tumọ si pe itan naa ma n pa ni ọwọ nikan.';
+      'Iye akoko lati tọju iye iṣaaju ti aṣiri ti a yipada (ọrọ igbaniwọle, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -734,16 +731,6 @@ class AppLocalizationsYo extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Pa titẹ sii iṣaaju rẹ';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Piparẹ itan kuna: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Didabọ ọrọ igbaniwọle kuna: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Tún orukọ folda ṣe';
 
   @override
@@ -1061,14 +1048,7 @@ class AppLocalizationsYo extends AppLocalizations {
   String get syncOtherVault => 'Lo ìfinú mìíràn';
 
   @override
-  String get historyWarning =>
-      'Iye iṣaaju 1 nikan ni a tọju. Itan ni a pa laifọwọyi da lori awọn eto aabo.';
-
-  @override
-  String get historyCurrent => 'Lọwọlọwọ';
-
-  @override
-  String get historyPrevious => 'Ipò iṣáájú';
+  String get historyPrevious => 'Itan';
 
   @override
   String historySavedOn(String date) {

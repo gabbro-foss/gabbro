@@ -190,9 +190,6 @@ class AppLocalizationsNb extends AppLocalizations {
   String get manageYubiKeysTitle => 'Administrer YubiKeys';
 
   @override
-  String get passwordHistoryTitle => 'Passordhistorikk';
-
-  @override
   String get reviewChangesTitle => 'Gjennomgå endringer';
 
   @override
@@ -393,7 +390,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Hvor lenge et tidligere passord beholdes etter endring. «Behold alltid» betyr at historikken bare slettes manuelt.';
+      'Hvor lenge den forrige verdien av en endret hemmelighet beholdes (passord, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -735,16 +732,6 @@ class AppLocalizationsNb extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Slett tidligere oppføring';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Kunne ikke tømme historikk: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Kunne ikke gjenopprette passord: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Endre navn på mappe';
 
   @override
@@ -1061,14 +1048,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get syncOtherVault => 'Bruk det andre hvelvet';
 
   @override
-  String get historyWarning =>
-      'Bare 1 tidligere verdi beholdes. Historikken tømmes automatisk basert på sikkerhetsinnstillingene dine.';
-
-  @override
-  String get historyCurrent => 'Gjeldende';
-
-  @override
-  String get historyPrevious => 'Forrige tilstand';
+  String get historyPrevious => 'Historikk';
 
   @override
   String historySavedOn(String date) {

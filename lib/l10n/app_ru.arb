@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Управление папками",
   "manageVaultsTitle": "Управление хранилищами",
   "manageYubiKeysTitle": "Управление ключами YubiKey",
-  "passwordHistoryTitle": "История паролей",
   "reviewChangesTitle": "Просмотр изменений",
   "unlockGabbroTitle": "Разблокировать Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Блокировать после этого периода бездействия, пока приложение открыто.",
   "backgroundLockDescription": "Блокировать после нахождения приложения в фоне в течение этого времени.",
-  "passwordHistoryDescription": "Как долго хранить предыдущий пароль после изменения. «Хранить всегда» означает, что история удаляется только вручную.",
+  "passwordHistoryDescription": "Как долго хранить предыдущее значение изменённого секрета (пароль, CVV, PIN).",
   "passphraseCopyPasteDescription": "Блокировать копирование и вставку в полях кодовой фразы. Рекомендуется: предотвращает утечку кодовой фразы через буфер обмена.",
   "passphraseCopyPasteNote": "Примечание: это блокирует контекстное меню при долгом нажатии и выделение текста. Встроенная кнопка вставки клавиатуры может по-прежнему работать — это ограничение платформы.",
   "blockCopyPasteTitle": "Блокировать копирование/вставку",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Удалить предыдущую запись",
-  "failedToClearHistory": "Не удалось очистить историю: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Не удалось восстановить пароль: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Переименовать папку",
   "addFolderTitle": "Добавить папку",
@@ -457,9 +444,7 @@
   "syncThisVault": "Использовать это хранилище",
   "syncOtherVault": "Использовать другое хранилище",
 
-  "historyWarning": "Хранится только 1 предыдущее значение. История автоматически очищается в соответствии с настройками безопасности.",
-  "historyCurrent": "Текущий",
-  "historyPrevious": "Предыдущее состояние",
+  "historyPrevious": "История",
   "historySavedOn": "Сохранено {date}",
   "@historySavedOn": {
     "placeholders": {

@@ -190,9 +190,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get manageYubiKeysTitle => 'Управление на YubiKey ключове';
 
   @override
-  String get passwordHistoryTitle => 'История на паролите';
-
-  @override
   String get reviewChangesTitle => 'Преглед на промените';
 
   @override
@@ -395,7 +392,7 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Колко дълго да се пази предишната парола след промяна. «Запази завинаги» означава, че историята се изтрива само ръчно.';
+      'Колко дълго да се пази предишната стойност на променена тайна (парола, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -737,16 +734,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Изтрий предишен запис';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Неуспешно изчистване на историята: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Неуспешно възстановяване на паролата: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Преименувай папка';
 
   @override
@@ -1064,14 +1051,7 @@ class AppLocalizationsBg extends AppLocalizations {
   String get syncOtherVault => 'Използвай другото хранилище';
 
   @override
-  String get historyWarning =>
-      'Запазва се само 1 предишна стойност. Историята се изчиства автоматично въз основа на настройките за сигурност.';
-
-  @override
-  String get historyCurrent => 'Текуща';
-
-  @override
-  String get historyPrevious => 'Предишно състояние';
+  String get historyPrevious => 'История';
 
   @override
   String historySavedOn(String date) {

@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Ṣakoso awọn folda",
   "manageVaultsTitle": "Ṣakoso awọn vọọliti",
   "manageYubiKeysTitle": "Ṣakoso awọn bọtini YubiKey",
-  "passwordHistoryTitle": "Itan ọrọ igbaniwọle",
   "reviewChangesTitle": "Ṣayẹwo awọn ayipada",
   "unlockGabbroTitle": "Ṣii Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Titi lẹhin akoko aiṣiṣẹ yii nigba ti app ṣii.",
   "backgroundLockDescription": "Titi lẹhin ti app wa ni ẹhin fun akoko yii.",
-  "passwordHistoryDescription": "Iye akoko lati tọju ọrọ igbaniwọle tẹlẹ lẹhin ayipada. «Tọju nigbagbogbo» tumọ si pe itan naa ma n pa ni ọwọ nikan.",
+  "passwordHistoryDescription": "Iye akoko lati tọju iye iṣaaju ti aṣiri ti a yipada (ọrọ igbaniwọle, CVV, PIN).",
   "passphraseCopyPasteDescription": "Dena daakọ ati lẹmọ ni awọn aaye gbolohun ọrọ igbaniwọle. Ti a gba ni: ṣe idiwọ jijẹki gbolohun nipasẹ paapo.",
   "passphraseCopyPasteNote": "Akiyesi: eyi dena mẹnu ọrọ ti a tẹ gigun ati yiyan ọrọ. Bọtini lẹmọ ti a kọ sinu keyboard le tun ṣiṣẹ — iyẹn jẹ idinwo ẹrọ pẹpẹ.",
   "blockCopyPasteTitle": "Dena daakọ/lẹmọ",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Pa titẹ sii iṣaaju rẹ",
-  "failedToClearHistory": "Piparẹ itan kuna: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Didabọ ọrọ igbaniwọle kuna: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Tún orukọ folda ṣe",
   "addFolderTitle": "Fi folda kun",
@@ -457,9 +444,7 @@
   "syncThisVault": "Lo ìfinú yìí",
   "syncOtherVault": "Lo ìfinú mìíràn",
 
-  "historyWarning": "Iye iṣaaju 1 nikan ni a tọju. Itan ni a pa laifọwọyi da lori awọn eto aabo.",
-  "historyCurrent": "Lọwọlọwọ",
-  "historyPrevious": "Ipò iṣáájú",
+  "historyPrevious": "Itan",
   "historySavedOn": "Ti pamọ {date}",
   "@historySavedOn": {
     "placeholders": {

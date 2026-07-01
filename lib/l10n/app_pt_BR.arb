@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Gerenciar pastas",
   "manageVaultsTitle": "Gerenciar cofres",
   "manageYubiKeysTitle": "Gerenciar YubiKeys",
-  "passwordHistoryTitle": "Histórico de senhas",
   "reviewChangesTitle": "Revisar alterações",
   "unlockGabbroTitle": "Desbloquear Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Bloquear após este tempo de inatividade com o aplicativo aberto.",
   "backgroundLockDescription": "Bloquear após o aplicativo ficar em segundo plano por este tempo.",
-  "passwordHistoryDescription": "Por quanto tempo manter uma senha anterior após ser alterada. «Manter sempre» significa que o histórico só é excluído manualmente.",
+  "passwordHistoryDescription": "Por quanto tempo manter o valor anterior de um segredo alterado (senha, CVV, PIN).",
   "passphraseCopyPasteDescription": "Bloquear copiar e colar nos campos da frase secreta principal. Recomendado: evita o vazamento da frase secreta pela área de transferência.",
   "passphraseCopyPasteNote": "Nota: isso bloqueia o menu de contexto de pressão longa e a seleção de texto. O botão de colar inline do teclado pode ainda funcionar — é uma limitação da plataforma que não pode ser bloqueada.",
   "blockCopyPasteTitle": "Bloquear copiar/colar",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Excluir entrada anterior",
-  "failedToClearHistory": "Falha ao limpar histórico: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Falha ao reverter senha: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Renomear pasta",
   "addFolderTitle": "Adicionar pasta",
@@ -457,9 +444,7 @@
   "syncThisVault": "Usar este cofre",
   "syncOtherVault": "Usar outro cofre",
 
-  "historyWarning": "Apenas 1 valor anterior é mantido. O histórico é excluído automaticamente com base nas configurações de segurança.",
-  "historyCurrent": "Atual",
-  "historyPrevious": "Estado anterior",
+  "historyPrevious": "Histórico",
   "historySavedOn": "Salvo em {date}",
   "@historySavedOn": {
     "placeholders": {

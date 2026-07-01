@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Hantera mappar",
   "manageVaultsTitle": "Hantera valv",
   "manageYubiKeysTitle": "Hantera YubiKeys",
-  "passwordHistoryTitle": "Lösenordshistorik",
   "reviewChangesTitle": "Granska ändringar",
   "unlockGabbroTitle": "Lås upp Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Lås efter denna inaktivitetsperiod medan appen är öppen.",
   "backgroundLockDescription": "Lås efter att appen har varit i bakgrunden under denna tid.",
-  "passwordHistoryDescription": "Hur länge ett tidigare lösenord behålls efter ändring. «Behåll alltid» innebär att historiken bara raderas manuellt.",
+  "passwordHistoryDescription": "Hur länge det tidigare värdet för en ändrad hemlighet behålls (lösenord, CVV, PIN).",
   "passphraseCopyPasteDescription": "Blockera kopiering och inklistring i lösenfrasfält. Rekommenderas: förhindrar läckage av lösenfras via urklipp.",
   "passphraseCopyPasteNote": "Obs: Detta blockerar snabbmenyn vid långt tryck och textmarkering. Tangentbordets inbyggda klista-knapp kan fortfarande fungera — detta är en plattformsbegränsning.",
   "blockCopyPasteTitle": "Blockera kopiera/klistra",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Ta bort tidigare post",
-  "failedToClearHistory": "Kunde inte rensa historik: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Kunde inte återställa lösenord: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Byt namn på mapp",
   "addFolderTitle": "Lägg till mapp",
@@ -457,9 +444,7 @@
   "syncThisVault": "Använd detta valv",
   "syncOtherVault": "Använd det andra valvet",
 
-  "historyWarning": "Bara 1 tidigare värde behålls. Historiken rensas automatiskt baserat på dina säkerhetsinställningar.",
-  "historyCurrent": "Aktuell",
-  "historyPrevious": "Tidigare tillstånd",
+  "historyPrevious": "Historik",
   "historySavedOn": "Sparad {date}",
   "@historySavedOn": {
     "placeholders": {

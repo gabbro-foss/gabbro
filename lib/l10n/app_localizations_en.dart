@@ -189,9 +189,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get manageYubiKeysTitle => 'Manage YubiKeys';
 
   @override
-  String get passwordHistoryTitle => 'Password history';
-
-  @override
   String get reviewChangesTitle => 'Review changes';
 
   @override
@@ -392,7 +389,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'How long to keep a previous password after it is changed. \"Keep forever\" means history is only deleted manually.';
+      'How long to keep a changed secret\'s previous value (password, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -734,16 +731,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Delete previous entry';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Failed to clear history: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Failed to revert password: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Rename folder';
 
   @override
@@ -1059,14 +1046,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncOtherVault => 'Use other vault';
 
   @override
-  String get historyWarning =>
-      'Only 1 previous value is kept. History auto-purges based on your security settings.';
-
-  @override
-  String get historyCurrent => 'Current';
-
-  @override
-  String get historyPrevious => 'Previous state';
+  String get historyPrevious => 'History';
 
   @override
   String historySavedOn(String date) {

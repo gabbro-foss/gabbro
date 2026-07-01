@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Gérer les dossiers",
   "manageVaultsTitle": "Gérer les coffres",
   "manageYubiKeysTitle": "Gérer les YubiKeys",
-  "passwordHistoryTitle": "Historique des mots de passe",
   "reviewChangesTitle": "Vérifier les modifications",
   "unlockGabbroTitle": "Déverrouiller Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Verrouiller après cette période d'inactivité lorsque l'application est ouverte.",
   "backgroundLockDescription": "Verrouiller après que l'application a été en arrière-plan pendant ce temps.",
-  "passwordHistoryDescription": "Durée de conservation d'un mot de passe précédent après modification. « Conserver indéfiniment » signifie que l'historique n'est supprimé que manuellement.",
+  "passwordHistoryDescription": "Durée de conservation de la valeur précédente d'un secret modifié (mot de passe, CVV, PIN).",
   "passphraseCopyPasteDescription": "Bloquer le copier-coller sur les champs de mot de passe principal. Recommandé : empêche la fuite du mot de passe via le presse-papiers.",
   "passphraseCopyPasteNote": "Remarque : cela bloque le menu contextuel d'appui long et la sélection de texte. Le bouton de collage intégré du clavier peut encore fonctionner — il s'agit d'une limitation de la plateforme.",
   "blockCopyPasteTitle": "Bloquer le copier/coller",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Supprimer l'entrée précédente",
-  "failedToClearHistory": "Échec de la suppression de l'historique : {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Échec de la restauration du mot de passe : {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Renommer le dossier",
   "addFolderTitle": "Ajouter un dossier",
@@ -457,9 +444,7 @@
   "syncThisVault": "Utiliser ce coffre",
   "syncOtherVault": "Utiliser cet autre coffre",
 
-  "historyWarning": "Seule 1 valeur précédente est conservée. L'historique est automatiquement purgé selon vos paramètres de sécurité.",
-  "historyCurrent": "Actuel",
-  "historyPrevious": "État précédent",
+  "historyPrevious": "Historique",
   "historySavedOn": "Enregistré le {date}",
   "@historySavedOn": {
     "placeholders": {

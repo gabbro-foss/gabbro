@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Zarządzaj folderami",
   "manageVaultsTitle": "Zarządzaj skarbcami",
   "manageYubiKeysTitle": "Zarządzaj kluczami YubiKey",
-  "passwordHistoryTitle": "Historia haseł",
   "reviewChangesTitle": "Sprawdź zmiany",
   "unlockGabbroTitle": "Odblokuj Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Blokuj po tym czasie bezczynności, gdy aplikacja jest otwarta.",
   "backgroundLockDescription": "Blokuj po tym czasie przebywania aplikacji w tle.",
-  "passwordHistoryDescription": "Jak długo przechowywać poprzednie hasło po zmianie. «Zachowaj zawsze» oznacza, że historia jest usuwana tylko ręcznie.",
+  "passwordHistoryDescription": "Jak długo przechowywać poprzednią wartość zmienionego sekretu (hasło, CVV, PIN).",
   "passphraseCopyPasteDescription": "Blokuj kopiowanie i wklejanie w polach hasła głównego. Zalecane: zapobiega wyciekowi hasła przez schowek.",
   "passphraseCopyPasteNote": "Uwaga: to blokuje menu kontekstowe przy długim naciśnięciu i zaznaczanie tekstu. Wbudowany przycisk wklejania klawiatury może nadal działać — to ograniczenie platformy.",
   "blockCopyPasteTitle": "Blokuj kopiowanie/wklejanie",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Usuń poprzedni wpis",
-  "failedToClearHistory": "Nie udało się wyczyścić historii: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Nie udało się przywrócić hasła: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Zmień nazwę folderu",
   "addFolderTitle": "Dodaj folder",
@@ -457,9 +444,7 @@
   "syncThisVault": "Użyj tego sejfu",
   "syncOtherVault": "Użyj innego sejfu",
 
-  "historyWarning": "Przechowywana jest tylko 1 poprzednia wartość. Historia jest automatycznie czyszczona na podstawie ustawień bezpieczeństwa.",
-  "historyCurrent": "Aktualne",
-  "historyPrevious": "Poprzedni stan",
+  "historyPrevious": "Historia",
   "historySavedOn": "Zapisano {date}",
   "@historySavedOn": {
     "placeholders": {

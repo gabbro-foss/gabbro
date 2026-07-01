@@ -190,9 +190,6 @@ class AppLocalizationsKk extends AppLocalizations {
   String get manageYubiKeysTitle => 'YubiKey кілттерін басқару';
 
   @override
-  String get passwordHistoryTitle => 'Құпия сөз тарихы';
-
-  @override
   String get reviewChangesTitle => 'Өзгерістерді тексеру';
 
   @override
@@ -393,7 +390,7 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Өзгеріс жасалғаннан кейін алдыңғы құпия сөзді қанша уақыт сақтау керек. «Әрқашан сақтау» — тарихты тек қолмен өшіруге болады.';
+      'Өзгертілген құпияның алдыңғы мәнін қанша уақыт сақтау керек (құпия сөз, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -733,16 +730,6 @@ class AppLocalizationsKk extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Алдыңғы жазбаны жою';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Тарихты тазалау сәтсіз болды: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Құпия сөзді қайтару сәтсіз болды: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Қалтаның атауын өзгерту';
 
   @override
@@ -1060,14 +1047,7 @@ class AppLocalizationsKk extends AppLocalizations {
   String get syncOtherVault => 'Басқа қойманы пайдалану';
 
   @override
-  String get historyWarning =>
-      'Тек 1 алдыңғы мән сақталады. Тарих қауіпсіздік параметрлеріне сәйкес автоматты жойылады.';
-
-  @override
-  String get historyCurrent => 'Ағымдағы';
-
-  @override
-  String get historyPrevious => 'Алдыңғы күй';
+  String get historyPrevious => 'Тарих';
 
   @override
   String historySavedOn(String date) {

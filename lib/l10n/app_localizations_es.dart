@@ -190,9 +190,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get manageYubiKeysTitle => 'Gestionar YubiKeys';
 
   @override
-  String get passwordHistoryTitle => 'Historial de contraseñas';
-
-  @override
   String get reviewChangesTitle => 'Revisar cambios';
 
   @override
@@ -394,7 +391,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Cuánto tiempo conservar una contraseña anterior tras cambiarla. «Conservar siempre» significa que el historial solo se elimina manualmente.';
+      'Cuánto tiempo conservar el valor anterior de un secreto modificado (contraseña, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -736,16 +733,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Eliminar entrada anterior';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Error al borrar el historial: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Error al restaurar la contraseña: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Renombrar carpeta';
 
   @override
@@ -1062,14 +1049,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get syncOtherVault => 'Usar otra caja fuerte';
 
   @override
-  String get historyWarning =>
-      'Solo se conserva 1 valor anterior. El historial se purga automáticamente según tu configuración de seguridad.';
-
-  @override
-  String get historyCurrent => 'Actual';
-
-  @override
-  String get historyPrevious => 'Estado anterior';
+  String get historyPrevious => 'Historial';
 
   @override
   String historySavedOn(String date) {

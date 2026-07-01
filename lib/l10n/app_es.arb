@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Gestionar carpetas",
   "manageVaultsTitle": "Gestionar almacenes",
   "manageYubiKeysTitle": "Gestionar YubiKeys",
-  "passwordHistoryTitle": "Historial de contraseñas",
   "reviewChangesTitle": "Revisar cambios",
   "unlockGabbroTitle": "Desbloquear Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Bloquear tras este período de inactividad mientras la app está abierta.",
   "backgroundLockDescription": "Bloquear después de que la app haya estado en segundo plano durante este tiempo.",
-  "passwordHistoryDescription": "Cuánto tiempo conservar una contraseña anterior tras cambiarla. «Conservar siempre» significa que el historial solo se elimina manualmente.",
+  "passwordHistoryDescription": "Cuánto tiempo conservar el valor anterior de un secreto modificado (contraseña, CVV, PIN).",
   "passphraseCopyPasteDescription": "Bloquear copiar y pegar en los campos de contraseña maestra. Recomendado: evita que la contraseña se filtre a través del portapapeles.",
   "passphraseCopyPasteNote": "Nota: esto bloquea el menú contextual de pulsación larga y la selección de texto. El botón de pegado integrado del teclado puede seguir funcionando — es una limitación de la plataforma.",
   "blockCopyPasteTitle": "Bloquear copiar/pegar",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Eliminar entrada anterior",
-  "failedToClearHistory": "Error al borrar el historial: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Error al restaurar la contraseña: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Renombrar carpeta",
   "addFolderTitle": "Añadir carpeta",
@@ -457,9 +444,7 @@
   "syncThisVault": "Usar esta caja fuerte",
   "syncOtherVault": "Usar otra caja fuerte",
 
-  "historyWarning": "Solo se conserva 1 valor anterior. El historial se purga automáticamente según tu configuración de seguridad.",
-  "historyCurrent": "Actual",
-  "historyPrevious": "Estado anterior",
+  "historyPrevious": "Historial",
   "historySavedOn": "Guardado el {date}",
   "@historySavedOn": {
     "placeholders": {

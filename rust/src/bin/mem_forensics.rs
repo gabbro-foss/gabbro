@@ -67,7 +67,6 @@ fn main() {
                 password: String::from_utf8_lossy(&entry_canary).into_owned(),
                 notes: None,
                 custom_fields: Vec::new(),
-                previous_password: None,
                 app_id: None,
                 email: None,
             });

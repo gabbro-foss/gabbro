@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Správa složek",
   "manageVaultsTitle": "Správa trezorů",
   "manageYubiKeysTitle": "Správa klíčů YubiKey",
-  "passwordHistoryTitle": "Historie hesel",
   "reviewChangesTitle": "Zkontrolovat změny",
   "unlockGabbroTitle": "Odemknout Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Zamknout po tomto čase nečinnosti, když je aplikace otevřená.",
   "backgroundLockDescription": "Zamknout po tom, co aplikace je na pozadí po tuto dobu.",
-  "passwordHistoryDescription": "Jak dlouho uchovávat předchozí heslo po změně. «Uchovávat vždy» znamená, že historie se maže pouze ručně.",
+  "passwordHistoryDescription": "Jak dlouho uchovávat předchozí hodnotu změněného tajemství (heslo, CVV, PIN).",
   "passphraseCopyPasteDescription": "Blokovat kopírování a vkládání v polích přístupové fráze. Doporučeno: zabrání úniku fráze přes schránku.",
   "passphraseCopyPasteNote": "Poznámka: toto blokuje kontextové menu při dlouhém stisknutí a výběr textu. Vestavěné tlačítko vložení klávesnice může stále fungovat — to je omezení platformy.",
   "blockCopyPasteTitle": "Blokovat kopírování/vkládání",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Smazat předchozí záznam",
-  "failedToClearHistory": "Nepodařilo se vymazat historii: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Nepodařilo se obnovit heslo: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Přejmenovat složku",
   "addFolderTitle": "Přidat složku",
@@ -457,9 +444,7 @@
   "syncThisVault": "Použít tento trezor",
   "syncOtherVault": "Použít druhý trezor",
 
-  "historyWarning": "Je uchována pouze 1 předchozí hodnota. Historie se automaticky maže na základě nastavení zabezpečení.",
-  "historyCurrent": "Aktuální",
-  "historyPrevious": "Předchozí stav",
+  "historyPrevious": "Historie",
   "historySavedOn": "Uloženo {date}",
   "@historySavedOn": {
     "placeholders": {

@@ -188,9 +188,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get manageYubiKeysTitle => 'YubiKeyの管理';
 
   @override
-  String get passwordHistoryTitle => 'パスワード履歴';
-
-  @override
   String get reviewChangesTitle => '変更を確認';
 
   @override
@@ -387,7 +384,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      '変更後に以前のパスワードを保持する期間。«常に保持»は手動でのみ履歴が削除されることを意味します。';
+      '変更した秘密情報の以前の値を保持する期間（パスワード、CVV、PIN）。';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -726,16 +723,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => '以前のエントリを削除';
 
   @override
-  String failedToClearHistory(String error) {
-    return '履歴のクリアに失敗しました: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'パスワードの元に戻す操作に失敗しました: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'フォルダの名前変更';
 
   @override
@@ -1047,13 +1034,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get syncOtherVault => '別のボルトを使用';
 
   @override
-  String get historyWarning => '以前の値は1つだけ保持されます。履歴はセキュリティ設定に基づいて自動的に削除されます。';
-
-  @override
-  String get historyCurrent => '現在';
-
-  @override
-  String get historyPrevious => '以前の状態';
+  String get historyPrevious => '履歴';
 
   @override
   String historySavedOn(String date) {

@@ -6,7 +6,7 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `add_days_to_timestamp`, `changed_field_keys`, `custom_field_to_data`, `days_from_ymd`, `days_to_ymd`, `entry_custom_fields_mut`, `entry_id`, `entry_meta_mut`, `entry_meta`, `is_expired`, `is_leap`, `item_keys`, `login_entry_to_data`, `mask_entry`, `previous_secret_to_data`, `purge_expired_history`, `remove_entry_item_by_key`, `set_entry_field_by_key`, `set_entry_scalar`, `write_sha256_companion`
+// These functions are ignored because they are not marked as `pub`: `add_days_to_timestamp`, `changed_field_keys`, `custom_field_to_data`, `days_from_ymd`, `days_to_ymd`, `entry_custom_fields_mut`, `entry_id`, `entry_meta_mut`, `entry_meta`, `is_expired`, `is_leap`, `item_keys`, `login_entry_to_data`, `mask_entry`, `purge_expired_history`, `remove_entry_item_by_key`, `set_entry_field_by_key`, `set_entry_scalar`, `write_sha256_companion`
 // These functions are ignored (category: IgnoreBecauseExplicitAttribute): `add_yubikey_to_vault`, `build_passphrase_only_bytes`, `change_passphrase_with_keys`, `change_passphrase`, `delete_entry`, `delete_whole_vault`, `export_vault_preserving`, `export_vault`, `list_entries`, `load_vault_with_key_record`, `load_vault_with_yubikey`, `load_vault`, `remove_yubikey_from_vault`, `reseal_vault_body`, `save_vault_with_keys`, `save_vault_with_yubikey`, `save_vault`, `sha256_line`, `update_entry`
 
 /// Creates a new login entry with a generated UUID and current timestamp.
@@ -125,12 +125,6 @@ class CardEntryData {
   final String? notes;
   final List<CustomFieldData> customFields;
 
-  /// Previous CVV, masked by default. `None` if no history exists.
-  final PreviousSecretData? previousCvv;
-
-  /// Previous PIN, masked by default. `None` if no history exists.
-  final PreviousSecretData? previousPin;
-
   const CardEntryData({
     required this.id,
     required this.createdAt,
@@ -150,8 +144,6 @@ class CardEntryData {
     this.transactionPassword,
     this.notes,
     required this.customFields,
-    this.previousCvv,
-    this.previousPin,
   });
 
   @override
@@ -173,9 +165,7 @@ class CardEntryData {
       bankName.hashCode ^
       transactionPassword.hashCode ^
       notes.hashCode ^
-      customFields.hashCode ^
-      previousCvv.hashCode ^
-      previousPin.hashCode;
+      customFields.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -199,9 +189,7 @@ class CardEntryData {
           bankName == other.bankName &&
           transactionPassword == other.transactionPassword &&
           notes == other.notes &&
-          customFields == other.customFields &&
-          previousCvv == other.previousCvv &&
-          previousPin == other.previousPin;
+          customFields == other.customFields;
 }
 
 /// A custom entry as seen by Flutter.
@@ -494,9 +482,6 @@ class LoginEntryData {
   final String? notes;
   final List<CustomFieldData> customFields;
 
-  /// Previous password, masked by default. `None` if no history exists.
-  final PreviousSecretData? previousPassword;
-
   /// Android application id for native-app autofill matching; `None` if unset.
   final String? appId;
 
@@ -514,7 +499,6 @@ class LoginEntryData {
     required this.password,
     this.notes,
     required this.customFields,
-    this.previousPassword,
     this.appId,
     this.email,
   });
@@ -531,7 +515,6 @@ class LoginEntryData {
       password.hashCode ^
       notes.hashCode ^
       customFields.hashCode ^
-      previousPassword.hashCode ^
       appId.hashCode ^
       email.hashCode;
 
@@ -550,7 +533,6 @@ class LoginEntryData {
           password == other.password &&
           notes == other.notes &&
           customFields == other.customFields &&
-          previousPassword == other.previousPassword &&
           appId == other.appId &&
           email == other.email;
 }
@@ -716,30 +698,4 @@ class PendingItemDeleteItem {
           id == other.id &&
           title == other.title &&
           field == other.field;
-}
-
-/// A previous sensitive value as seen by Flutter.
-/// `value` is always masked at the bridge boundary — Flutter unmasks on toggle.
-class PreviousSecretData {
-  final String value;
-  final String savedAt;
-  final String? expiresAt;
-
-  const PreviousSecretData({
-    required this.value,
-    required this.savedAt,
-    this.expiresAt,
-  });
-
-  @override
-  int get hashCode => value.hashCode ^ savedAt.hashCode ^ expiresAt.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is PreviousSecretData &&
-          runtimeType == other.runtimeType &&
-          value == other.value &&
-          savedAt == other.savedAt &&
-          expiresAt == other.expiresAt;
 }

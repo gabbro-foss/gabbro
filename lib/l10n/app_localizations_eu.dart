@@ -190,9 +190,6 @@ class AppLocalizationsEu extends AppLocalizations {
   String get manageYubiKeysTitle => 'YubiKey gakoak kudeatu';
 
   @override
-  String get passwordHistoryTitle => 'Pasahitz historia';
-
-  @override
   String get reviewChangesTitle => 'Aldaketak berrikusi';
 
   @override
@@ -394,7 +391,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Aldaketa egin ondoren aurreko pasahitza zenbat denbora gordetzea. «Beti gorde»-k esan nahi du historia eskuz soilik ezabatzen dela.';
+      'Aldatutako sekretu baten aurreko balioa zenbat denbora gorde (pasahitza, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -736,16 +733,6 @@ class AppLocalizationsEu extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Aurreko sarrera ezabatu';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Historiaren garbiketa huts egin du: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Pasahitza berrezartzeak huts egin du: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Karpeta berrizendatu';
 
   @override
@@ -1063,14 +1050,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get syncOtherVault => 'Erabili beste kutxa';
 
   @override
-  String get historyWarning =>
-      'Aurreko balio 1 bakarrik gordetzen da. Historia segurtasun-ezarpenen arabera automatikoki ezabatzen da.';
-
-  @override
-  String get historyCurrent => 'Unekoa';
-
-  @override
-  String get historyPrevious => 'Aurreko egoera';
+  String get historyPrevious => 'Historia';
 
   @override
   String historySavedOn(String date) {

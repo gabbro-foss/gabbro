@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Tvarkyti aplankus",
   "manageVaultsTitle": "Tvarkyti saugyklas",
   "manageYubiKeysTitle": "Tvarkyti YubiKey raktus",
-  "passwordHistoryTitle": "Slaptažodžių istorija",
   "reviewChangesTitle": "Peržiūrėti pakeitimus",
   "unlockGabbroTitle": "Atrakinti Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Užrakinti po tokio neveiklumo laiko, kai programa yra atidaryta.",
   "backgroundLockDescription": "Užrakinti, kai programa buvo fone tiek laiko.",
-  "passwordHistoryDescription": "Kiek laiko saugoti ankstesnį slaptažodį po pakeitimo. «Laikyti visada» reiškia, kad istorija ištriname tik rankiniu būdu.",
+  "passwordHistoryDescription": "Kiek laiko saugoti ankstesnę pakeistos paslapties reikšmę (slaptažodis, CVV, PIN).",
   "passphraseCopyPasteDescription": "Blokuoti kopijavimą ir įklijavimą slaptafrazės laukuose. Rekomenduojama: neleidžia slaptafrazei nutekėti per iškarpinę.",
   "passphraseCopyPasteNote": "Pastaba: tai blokuoja kontekstinį meniu ilgu paspaudimu ir teksto žymėjimą. Klaviatūros įmontuotas įklijavimo mygtukas vis tiek gali veikti — tai platformos apribojimas.",
   "blockCopyPasteTitle": "Blokuoti kopijavimą / įklijavimą",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Ištrinti ankstesnį įrašą",
-  "failedToClearHistory": "Nepavyko išvalyti istorijos: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Nepavyko atkurti slaptažodžio: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Pervadinti aplanką",
   "addFolderTitle": "Pridėti aplanką",
@@ -457,9 +444,7 @@
   "syncThisVault": "Naudoti šį seifą",
   "syncOtherVault": "Naudoti kitą seifą",
 
-  "historyWarning": "Saugoma tik 1 ankstesnė reikšmė. Istorija automatiškai valoma pagal saugumo nustatymus.",
-  "historyCurrent": "Dabartinis",
-  "historyPrevious": "Ankstesnė būsena",
+  "historyPrevious": "Istorija",
   "historySavedOn": "Išsaugota {date}",
   "@historySavedOn": {
     "placeholders": {

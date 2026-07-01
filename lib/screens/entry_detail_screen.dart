@@ -10,7 +10,6 @@ import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/safe_file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
-import 'package:gabbro/screens/password_history_screen.dart';
 import 'package:gabbro/screens/recovery_history_screen.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -62,10 +61,6 @@ Future<String?> _defaultExportFilePicker(String filename) async {
   return FilePicker.saveFile(fileName: filename);
 }
 
-Future<void> _defaultClearHistory(String id) =>
-    sessionClearPasswordHistory(id: id);
-Future<void> _defaultRevertPassword(String id) =>
-    sessionRevertPassword(id: id);
 Future<List<HistoryRecordData>> _defaultFetchHistory(String id) =>
     getEntryHistory(id: id);
 Future<void> _defaultRestoreHistory(String id, int index) =>
@@ -78,8 +73,6 @@ class EntryDetailScreen extends StatefulWidget {
   final Future<void> Function(String id) onDeleteEntry;
   final Future<void> Function(String value) onCopyToClipboard;
   final ClipboardClearTimeout clipboardClearTimeout;
-  final Future<void> Function(String id) onClearPasswordHistory;
-  final Future<void> Function(String id) onRevertPassword;
 
   /// Recovery history (values replaced during sync). Injectable for tests; the
   /// fetch is best-effort and failures simply hide the section.
@@ -108,8 +101,6 @@ class EntryDetailScreen extends StatefulWidget {
     this.onDeleteEntry = _defaultDelete,
     this.onCopyToClipboard = _defaultCopy,
     this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
-    this.onClearPasswordHistory = _defaultClearHistory,
-    this.onRevertPassword = _defaultRevertPassword,
     this.onFetchHistory = _defaultFetchHistory,
     this.onRestoreHistory = _defaultRestoreHistory,
     this.onDeleteHistory = _defaultDeleteHistory,
@@ -383,59 +374,6 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             builder: (_) => PasswordBreakdownSheet(password: e.password),
           ),
           l: l,
-        ),
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          title: Text(
-            l.passwordHistoryTitle,
-            style: const TextStyle(fontSize: 14),
-          ),
-          trailing: const Icon(Icons.chevron_right, size: 18),
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => PasswordHistoryScreen(
-                entry: e,
-                onDeleteHistory: () async {
-                  final id = _entryId();
-                  try {
-                    await widget.onClearPasswordHistory(id);
-                    final fresh = getEntry(id: id);
-                    if (mounted) setState(() => _entry = fresh);
-                    if (context.mounted) Navigator.of(context).pop();
-                  } catch (err) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(AppLocalizations.of(context).failedToClearHistory(err.toString())),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.error,
-                        ),
-                      );
-                    }
-                  }
-                },
-                onRevert: () async {
-                  final id = _entryId();
-                  try {
-                    await widget.onRevertPassword(id);
-                    final fresh = getEntry(id: id);
-                    if (mounted) setState(() => _entry = fresh);
-                    if (context.mounted) Navigator.of(context).pop();
-                  } catch (err) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(AppLocalizations.of(context).failedToRevertPassword(err.toString())),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.error,
-                        ),
-                      );
-                    }
-                  }
-                },
-              ),
-            ),
-          ),
         ),
         if (e.notes != null) _field(l.reviewFieldNotes, e.notes!, l),
         if (e.appId != null && e.appId!.isNotEmpty)

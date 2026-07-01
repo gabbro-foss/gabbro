@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Administrer mapper",
   "manageVaultsTitle": "Administrer kvelv",
   "manageYubiKeysTitle": "Administrer YubiKeys",
-  "passwordHistoryTitle": "Passordhistorikk",
   "reviewChangesTitle": "Gå gjennom endringar",
   "unlockGabbroTitle": "Lås opp Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Lås etter denne inaktivitetsperioden medan appen er open.",
   "backgroundLockDescription": "Lås etter at appen har vore i bakgrunnen i denne perioden.",
-  "passwordHistoryDescription": "Kor lenge eit tidlegare passord vert behaldt etter endring. «Behold alltid» tyder at historikken berre vert sletta manuelt.",
+  "passwordHistoryDescription": "Kor lenge den førre verdien av ein endra løyndom vert behalden (passord, CVV, PIN).",
   "passphraseCopyPasteDescription": "Blokker kopiering og innliming på passfrasefelt. Tilrådd: hindrar lekkasje av passfrase via utklippstavla.",
   "passphraseCopyPasteNote": "Merk: Dette blokkerer kontekstmenyen ved langt trykk og tekstval. Tastaturet sin innebygde lim-knapp kan framleis fungere — dette er ei plattformbegrensing.",
   "blockCopyPasteTitle": "Blokker kopier/lim",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Slett tidlegare oppføring",
-  "failedToClearHistory": "Klarte ikkje tøme historikk: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Klarte ikkje gjenopprette passord: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Endre namn på mappe",
   "addFolderTitle": "Legg til mappe",
@@ -457,9 +444,7 @@
   "syncThisVault": "Bruk dette kvelvet",
   "syncOtherVault": "Bruk det andre kvelvet",
 
-  "historyWarning": "Berre 1 tidlegare verdi vert behaldt. Historikken vert tømt automatisk basert på tryggleiksinnstillingane dine.",
-  "historyCurrent": "Gjeldande",
-  "historyPrevious": "Førre tilstand",
+  "historyPrevious": "Historikk",
   "historySavedOn": "Lagra {date}",
   "@historySavedOn": {
     "placeholders": {

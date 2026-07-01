@@ -190,9 +190,6 @@ class AppLocalizationsSr extends AppLocalizations {
   String get manageYubiKeysTitle => 'Upravljanje YubiKey ključevima';
 
   @override
-  String get passwordHistoryTitle => 'Istorija lozinki';
-
-  @override
   String get reviewChangesTitle => 'Pregled promena';
 
   @override
@@ -394,7 +391,7 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Koliko dugo čuvati prethodnu lozinku nakon promene. «Čuvaj uvek» znači da se istorija briše samo ručno.';
+      'Колико дуго чувати претходну вредност измењене тајне (лозинка, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -738,16 +735,6 @@ class AppLocalizationsSr extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Obriši prethodni unos';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Brisanje istorije nije uspelo: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Vraćanje lozinke nije uspelo: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Preimenuj mapu';
 
   @override
@@ -1063,14 +1050,7 @@ class AppLocalizationsSr extends AppLocalizations {
   String get syncOtherVault => 'Користи други сеф';
 
   @override
-  String get historyWarning =>
-      'Čuva se samo 1 prethodna vrednost. Istorija se automatski briše prema bezbednosnim podešavanjima.';
-
-  @override
-  String get historyCurrent => 'Trenutna';
-
-  @override
-  String get historyPrevious => 'Претходно стање';
+  String get historyPrevious => 'Историја';
 
   @override
   String historySavedOn(String date) {
@@ -2190,9 +2170,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get manageYubiKeysTitle => 'Upravljanje YubiKey ključevima';
 
   @override
-  String get passwordHistoryTitle => 'Istorija lozinki';
-
-  @override
   String get reviewChangesTitle => 'Pregled promena';
 
   @override
@@ -2394,7 +2371,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get passwordHistoryDescription =>
-      'Koliko dugo čuvati prethodnu lozinku nakon promene. «Čuvaj uvek» znači da se istorija briše samo ručno.';
+      'Koliko dugo čuvati prethodnu vrednost izmenjene tajne (lozinka, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -2738,16 +2715,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get deleteEntryFromHistoryLabel => 'Obriši prethodni unos';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Brisanje istorije nije uspelo: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Vraćanje lozinke nije uspelo: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Preimenuj mapu';
 
   @override
@@ -3063,14 +3030,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   String get syncOtherVault => 'Koristi drugi sef';
 
   @override
-  String get historyWarning =>
-      'Čuva se samo 1 prethodna vrednost. Istorija se automatski briše prema bezbednosnim podešavanjima.';
-
-  @override
-  String get historyCurrent => 'Trenutna';
-
-  @override
-  String get historyPrevious => 'Prethodno stanje';
+  String get historyPrevious => 'Istorija';
 
   @override
   String historySavedOn(String date) {

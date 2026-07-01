@@ -95,7 +95,6 @@
   "manageFoldersTitle": "Manage folders",
   "manageVaultsTitle": "Manage vaults",
   "manageYubiKeysTitle": "Manage YubiKeys",
-  "passwordHistoryTitle": "Password history",
   "reviewChangesTitle": "Review changes",
   "unlockGabbroTitle": "Unlock Gabbro",
 
@@ -168,7 +167,7 @@
 
   "foregroundLockDescription": "Lock after this much inactivity while the app is open.",
   "backgroundLockDescription": "Lock after the app has been in the background for this long.",
-  "passwordHistoryDescription": "How long to keep a previous password after it is changed. \"Keep forever\" means history is only deleted manually.",
+  "passwordHistoryDescription": "How long to keep a changed secret's previous value (password, CVV, PIN).",
   "passphraseCopyPasteDescription": "Block copy and paste on master passphrase fields. Recommended: prevents passphrase leaking via clipboard.",
   "passphraseCopyPasteNote": "Note: this blocks the long-press context menu and text selection. Your keyboard's inline paste button may still work — this is a platform limitation that cannot be blocked.",
   "blockCopyPasteTitle": "Block copy/paste",
@@ -332,18 +331,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Delete previous entry",
-  "failedToClearHistory": "Failed to clear history: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Failed to revert password: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Rename folder",
   "addFolderTitle": "Add folder",
@@ -494,9 +481,7 @@
     "description": "Reassurance shown on the sync passphrase dialog, before a sync runs: an interrupted sync is safe to repeat (crash-safe writes + convergent re-merge)."
   },
 
-  "historyWarning": "Only 1 previous value is kept. History auto-purges based on your security settings.",
-  "historyCurrent": "Current",
-  "historyPrevious": "Previous state",
+  "historyPrevious": "History",
   "historySavedOn": "Saved {date}",
   "@historySavedOn": {
     "placeholders": {

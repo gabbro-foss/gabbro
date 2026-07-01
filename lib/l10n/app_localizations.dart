@@ -517,12 +517,6 @@ abstract class AppLocalizations {
   /// **'Manage YubiKeys'**
   String get manageYubiKeysTitle;
 
-  /// No description provided for @passwordHistoryTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Password history'**
-  String get passwordHistoryTitle;
-
   /// No description provided for @reviewChangesTitle.
   ///
   /// In en, this message translates to:
@@ -916,7 +910,7 @@ abstract class AppLocalizations {
   /// No description provided for @passwordHistoryDescription.
   ///
   /// In en, this message translates to:
-  /// **'How long to keep a previous password after it is changed. \"Keep forever\" means history is only deleted manually.'**
+  /// **'How long to keep a changed secret\'s previous value (password, CVV, PIN).'**
   String get passwordHistoryDescription;
 
   /// No description provided for @passphraseCopyPasteDescription.
@@ -1525,18 +1519,6 @@ abstract class AppLocalizations {
   /// **'Delete previous entry'**
   String get deleteEntryFromHistoryLabel;
 
-  /// No description provided for @failedToClearHistory.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to clear history: {error}'**
-  String failedToClearHistory(String error);
-
-  /// No description provided for @failedToRevertPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to revert password: {error}'**
-  String failedToRevertPassword(String error);
-
   /// No description provided for @renameFolderTitle.
   ///
   /// In en, this message translates to:
@@ -2125,22 +2107,10 @@ abstract class AppLocalizations {
   /// **'Use other vault'**
   String get syncOtherVault;
 
-  /// No description provided for @historyWarning.
-  ///
-  /// In en, this message translates to:
-  /// **'Only 1 previous value is kept. History auto-purges based on your security settings.'**
-  String get historyWarning;
-
-  /// No description provided for @historyCurrent.
-  ///
-  /// In en, this message translates to:
-  /// **'Current'**
-  String get historyCurrent;
-
   /// No description provided for @historyPrevious.
   ///
   /// In en, this message translates to:
-  /// **'Previous state'**
+  /// **'History'**
   String get historyPrevious;
 
   /// No description provided for @historySavedOn.

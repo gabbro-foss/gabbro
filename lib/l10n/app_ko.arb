@@ -64,7 +64,6 @@
   "manageFoldersTitle": "폴더 관리",
   "manageVaultsTitle": "볼트 관리",
   "manageYubiKeysTitle": "YubiKey 관리",
-  "passwordHistoryTitle": "비밀번호 기록",
   "reviewChangesTitle": "변경 사항 검토",
   "unlockGabbroTitle": "Gabbro 잠금 해제",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "앱이 열려 있을 때 이 비활성 시간 이후 잠급니다.",
   "backgroundLockDescription": "앱이 이 시간 동안 백그라운드에 있은 후 잠급니다.",
-  "passwordHistoryDescription": "변경 후 이전 비밀번호를 보관하는 기간. «항상 유지»는 수동으로만 기록이 삭제됨을 의미합니다.",
+  "passwordHistoryDescription": "변경된 비밀 정보의 이전 값을 보관하는 기간 (비밀번호, CVV, PIN).",
   "passphraseCopyPasteDescription": "암호 문구 필드에서 복사 및 붙여넣기를 차단합니다. 권장: 클립보드를 통한 문구 유출을 방지합니다.",
   "passphraseCopyPasteNote": "참고: 이렇게 하면 길게 누르기 컨텍스트 메뉴와 텍스트 선택이 차단됩니다. 키보드 내장 붙여넣기 버튼은 여전히 작동할 수 있습니다 — 이는 플랫폼 제한입니다.",
   "blockCopyPasteTitle": "복사/붙여넣기 차단",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "이전 항목 삭제",
-  "failedToClearHistory": "기록 지우기에 실패했습니다: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "비밀번호 되돌리기에 실패했습니다: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "폴더 이름 변경",
   "addFolderTitle": "폴더 추가",
@@ -457,9 +444,7 @@
   "syncThisVault": "이 보관함 사용",
   "syncOtherVault": "다른 보관함 사용",
 
-  "historyWarning": "이전 값은 1개만 유지됩니다. 기록은 보안 설정에 따라 자동으로 삭제됩니다.",
-  "historyCurrent": "현재",
-  "historyPrevious": "이전 상태",
+  "historyPrevious": "기록",
   "historySavedOn": "{date}에 저장됨",
   "@historySavedOn": {
     "placeholders": {

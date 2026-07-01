@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Upravljanje mapama",
   "manageVaultsTitle": "Upravljanje trezorima",
   "manageYubiKeysTitle": "Upravljanje YubiKey ključevima",
-  "passwordHistoryTitle": "Povijest lozinki",
   "reviewChangesTitle": "Pregled promjena",
   "unlockGabbroTitle": "Otključaj Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Zaključaj nakon ovog vremena neaktivnosti dok je aplikacija otvorena.",
   "backgroundLockDescription": "Zaključaj nakon što aplikacija bude u pozadini toliko dugo.",
-  "passwordHistoryDescription": "Koliko dugo čuvati prethodnu lozinku nakon promjene. «Čuvaj uvijek» znači da se povijest briše samo ručno.",
+  "passwordHistoryDescription": "Koliko dugo čuvati prethodnu vrijednost promijenjene tajne (lozinka, CVV, PIN).",
   "passphraseCopyPasteDescription": "Blokiraj kopiranje i lijepljenje u poljima pristupne fraze. Preporučeno: sprječava curenje fraze kroz međuspremnik.",
   "passphraseCopyPasteNote": "Napomena: ovo blokira kontekstni izbornik pri dugom pritisku i odabir teksta. Ugrađena tipka za lijepljenje tipkovnice možda će i dalje raditi — to je ograničenje platforme.",
   "blockCopyPasteTitle": "Blokiraj kopiranje/lijepljenje",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Izbriši prethodni unos",
-  "failedToClearHistory": "Nije uspjelo brisanje povijesti: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Nije uspjelo vraćanje lozinke: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Preimenuj mapu",
   "addFolderTitle": "Dodaj mapu",
@@ -457,9 +444,7 @@
   "syncThisVault": "Koristi ovaj trezor",
   "syncOtherVault": "Koristi drugi trezor",
 
-  "historyWarning": "Čuva se samo 1 prethodna vrijednost. Povijest se automatski briše prema sigurnosnim postavkama.",
-  "historyCurrent": "Trenutna",
-  "historyPrevious": "Prethodno stanje",
+  "historyPrevious": "Povijest",
   "historySavedOn": "Spremljeno {date}",
   "@historySavedOn": {
     "placeholders": {

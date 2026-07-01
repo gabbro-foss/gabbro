@@ -83,7 +83,6 @@ void main() {
         password: 'second-pass',
         notes: current.notes,
         customFields: current.customFields,
-        previousPassword: current.previousPassword,
       )),
       expiryDays: null,
     );
@@ -145,7 +144,6 @@ void main() {
         password: 'second-pass',
         notes: current.notes,
         customFields: current.customFields,
-        previousPassword: current.previousPassword,
       )),
       expiryDays: null,
     );
@@ -193,7 +191,6 @@ void main() {
         password: newPassword,
         notes: current.notes,
         customFields: current.customFields,
-        previousPassword: current.previousPassword,
       );
     }
 

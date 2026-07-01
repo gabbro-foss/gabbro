@@ -611,7 +611,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   ),
                 )
                 .toList(),
-            previousPassword: field0.previousPassword,
             appId: _appIdOrNull(),
             email: _loginEmailOrNull(),
           ),
@@ -702,8 +701,6 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                   ),
                 )
                 .toList(),
-            previousCvv: field0.previousCvv,
-            previousPin: field0.previousPin,
           ),
         );
       case VaultEntryData_File(:final field0):

@@ -190,9 +190,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get manageYubiKeysTitle => 'Pārvaldīt YubiKey atslēgas';
 
   @override
-  String get passwordHistoryTitle => 'Paroļu vēsture';
-
-  @override
   String get reviewChangesTitle => 'Pārskatīt izmaiņas';
 
   @override
@@ -393,7 +390,7 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Cik ilgi glabāt iepriekšējo paroli pēc maiņas. «Vienmēr paturēt» nozīmē, ka vēsture tiek dzēsta tikai manuāli.';
+      'Cik ilgi glabāt mainīta noslēpuma iepriekšējo vērtību (parole, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -735,16 +732,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Dzēst iepriekšējo ierakstu';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Neizdevās notīrīt vēsturi: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Neizdevās atjaunot paroli: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Pārdēvēt mapi';
 
   @override
@@ -1061,14 +1048,7 @@ class AppLocalizationsLv extends AppLocalizations {
   String get syncOtherVault => 'Izmantot citu glabātavu';
 
   @override
-  String get historyWarning =>
-      'Tiek glabāta tikai 1 iepriekšējā vērtība. Vēsture tiek automātiski dzēsta, pamatojoties uz drošības iestatījumiem.';
-
-  @override
-  String get historyCurrent => 'Pašreizējā';
-
-  @override
-  String get historyPrevious => 'Iepriekšējais stāvoklis';
+  String get historyPrevious => 'Vēsture';
 
   @override
   String historySavedOn(String date) {

@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Управление на папки",
   "manageVaultsTitle": "Управление на трезори",
   "manageYubiKeysTitle": "Управление на YubiKey ключове",
-  "passwordHistoryTitle": "История на паролите",
   "reviewChangesTitle": "Преглед на промените",
   "unlockGabbroTitle": "Отключи Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Заключи след този период на неактивност, докато приложението е отворено.",
   "backgroundLockDescription": "Заключи след като приложението е било на заден план за толкова дълго.",
-  "passwordHistoryDescription": "Колко дълго да се пази предишната парола след промяна. «Запази завинаги» означава, че историята се изтрива само ръчно.",
+  "passwordHistoryDescription": "Колко дълго да се пази предишната стойност на променена тайна (парола, CVV, PIN).",
   "passphraseCopyPasteDescription": "Блокирай копирането и поставянето в полетата за паролна фраза. Препоръчва се: предотвратява изтичане на паролната фраза чрез клипборд.",
   "passphraseCopyPasteNote": "Забележка: това блокира контекстното меню при дълго натискане и избора на текст. Вграденият бутон за поставяне на клавиатурата може все още да работи — това е ограничение на платформата.",
   "blockCopyPasteTitle": "Блокирай копиране/поставяне",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Изтрий предишен запис",
-  "failedToClearHistory": "Неуспешно изчистване на историята: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Неуспешно възстановяване на паролата: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Преименувай папка",
   "addFolderTitle": "Добави папка",
@@ -457,9 +444,7 @@
   "syncThisVault": "Използвай това хранилище",
   "syncOtherVault": "Използвай другото хранилище",
 
-  "historyWarning": "Запазва се само 1 предишна стойност. Историята се изчиства автоматично въз основа на настройките за сигурност.",
-  "historyCurrent": "Текуща",
-  "historyPrevious": "Предишно състояние",
+  "historyPrevious": "История",
   "historySavedOn": "Запазено на {date}",
   "@historySavedOn": {
     "placeholders": {

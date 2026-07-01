@@ -64,7 +64,6 @@
   "manageFoldersTitle": "管理資料夾",
   "manageVaultsTitle": "管理保險庫",
   "manageYubiKeysTitle": "管理 YubiKey",
-  "passwordHistoryTitle": "密碼歷史記錄",
   "reviewChangesTitle": "檢查變更",
   "unlockGabbroTitle": "解鎖 Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "應用程式開啟時在此閒置時間後鎖定。",
   "backgroundLockDescription": "應用程式進入背景此時間後鎖定。",
-  "passwordHistoryDescription": "變更後保留舊密碼的時長。«永遠保留»表示只能手動刪除歷史記錄。",
+  "passwordHistoryDescription": "變更後保留機密資訊舊值的時長（密碼、CVV、PIN）。",
   "passphraseCopyPasteDescription": "阻止密碼片語欄位中的複製和貼上。建議：防止片語透過剪貼簿洩露。",
   "passphraseCopyPasteNote": "注意：這會阻止長按操作選單和文字選擇。鍵盤內建貼上按鈕可能仍然有效 — 這是平台限制。",
   "blockCopyPasteTitle": "阻止複製/貼上",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "刪除歷史項目",
-  "failedToClearHistory": "清除歷史記錄失敗：{error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "還原密碼失敗：{error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "重新命名資料夾",
   "addFolderTitle": "新增資料夾",
@@ -457,9 +444,7 @@
   "syncThisVault": "使用此保險庫",
   "syncOtherVault": "使用其他保險庫",
 
-  "historyWarning": "只保留 1 個歷史值。歷史記錄根據安全設定自動刪除。",
-  "historyCurrent": "目前",
-  "historyPrevious": "先前狀態",
+  "historyPrevious": "歷史記錄",
   "historySavedOn": "儲存於 {date}",
   "@historySavedOn": {
     "placeholders": {

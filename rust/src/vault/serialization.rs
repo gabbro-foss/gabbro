@@ -76,8 +76,15 @@ pub fn deserialize_vault_body(bytes: &[u8]) -> Result<VaultBody, String> {
     // Detect legacy format by checking the first non-whitespace byte.
     let first = bytes.iter().find(|&&b| !b.is_ascii_whitespace());
     if first == Some(&b'[') {
-        // Legacy bare array — migrate.
-        let entries: Vec<VaultEntry> = serde_json::from_slice(bytes)
+        // Legacy bare array — migrate folders + fold previous_* into history.
+        let mut value: serde_json::Value = serde_json::from_slice(bytes)
+            .map_err(|e| format!("Failed to deserialize legacy entries: {e}"))?;
+        if let Some(arr) = value.as_array_mut() {
+            for entry in arr.iter_mut() {
+                fold_previous_secrets(entry);
+            }
+        }
+        let entries: Vec<VaultEntry> = serde_json::from_value(value)
             .map_err(|e| format!("Failed to deserialize legacy entries: {e}"))?;
         let entries = migrate_folders(entries);
         return Ok(VaultBody {
@@ -88,7 +95,75 @@ pub fn deserialize_vault_body(bytes: &[u8]) -> Result<VaultBody, String> {
             deleted_ids: vec![],
         });
     }
-    serde_json::from_slice(bytes).map_err(|e| format!("Failed to deserialize vault body: {e}"))
+    // Fold pre-v9 single-slot secrets into meta.history before typed decode.
+    let mut value: serde_json::Value = serde_json::from_slice(bytes)
+        .map_err(|e| format!("Failed to deserialize vault body: {e}"))?;
+    if let Some(entries) = value.get_mut("entries").and_then(|e| e.as_array_mut()) {
+        for entry in entries.iter_mut() {
+            fold_previous_secrets(entry);
+        }
+    }
+    serde_json::from_value(value).map_err(|e| format!("Failed to deserialize vault body: {e}"))
+}
+
+/// Fold the pre-v9 single-slot `previous_password`/`previous_cvv`/`previous_pin`
+/// values of one externally-tagged entry (`{"Login": {...}}`) into its
+/// `meta.history` as one-per-field records, then null out the old slots. Lossless
+/// migration to the unified history model; a no-op for entries without them.
+fn fold_previous_secrets(entry: &mut serde_json::Value) {
+    if let Some(obj) = entry.as_object_mut() {
+        for inner in obj.values_mut() {
+            fold_inner_previous_secrets(inner);
+        }
+    }
+}
+
+fn fold_inner_previous_secrets(inner: &mut serde_json::Value) {
+    use serde_json::{json, Value};
+    let Some(map) = inner.as_object_mut() else {
+        return;
+    };
+    const SLOTS: [(&str, &str); 3] = [
+        ("previous_password", "password"),
+        ("previous_cvv", "cvv"),
+        ("previous_pin", "pin"),
+    ];
+    let mut records: Vec<Value> = Vec::new();
+    for (key, field) in SLOTS {
+        if let Some(Value::Object(prev)) = map.get(key).cloned() {
+            let value = prev.get("value").cloned().unwrap_or_else(|| json!(""));
+            let saved_at = prev.get("saved_at").cloned().unwrap_or_else(|| json!(""));
+            let expires_at = prev.get("expires_at").cloned().unwrap_or(Value::Null);
+            records.push(json!({
+                "field": field,
+                "value": value,
+                "saved_at": saved_at,
+                "expires_at": expires_at,
+            }));
+            map.insert(key.to_string(), Value::Null);
+        }
+    }
+    if records.is_empty() {
+        return;
+    }
+    let meta = map.entry("meta").or_insert_with(|| json!({}));
+    let Some(meta_map) = meta.as_object_mut() else {
+        return;
+    };
+    let history = meta_map.entry("history").or_insert_with(|| json!([]));
+    let Some(hist) = history.as_array_mut() else {
+        return;
+    };
+    for rec in records {
+        let field = rec.get("field").and_then(|f| f.as_str());
+        // One previous value per field: never duplicate an existing record.
+        let exists = hist
+            .iter()
+            .any(|h| h.get("field").and_then(|f| f.as_str()) == field);
+        if !exists {
+            hist.push(rec);
+        }
+    }
 }
 
 /// Migrate legacy `folder == "Personal"` entries to `folder == ""`.
@@ -162,7 +237,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -200,7 +274,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -237,7 +310,6 @@ mod tests {
                     hidden: true,
                 }],
                 attachments: vec![],
-                previous_password: None,
                 app_id: None,
                 email: None,
             }),
@@ -263,6 +335,39 @@ mod tests {
     fn invalid_bytes_returns_error() {
         let result = deserialize_vault_body(b"this is not json");
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn deserialize_folds_previous_password_into_history() {
+        // A v8-shaped Login carrying the old single-slot previous_password must
+        // surface as a one-per-field meta.history record after load - lossless
+        // migration for the unified history model.
+        let v8 = br#"{
+            "folders": ["Work"],
+            "entries": [
+                {"Login": {
+                    "meta": {"id":"id-1","created_at":"2025-01-01T00:00:00Z","updated_at":"2025-06-01T00:00:00Z","folder":""},
+                    "title":"Example","url":"https://example.com","username":"user",
+                    "password":"new_pw","notes":null,"custom_fields":[],"attachments":[],
+                    "previous_password":{"value":"old_pw","saved_at":"2025-05-01T00:00:00Z","expires_at":null},
+                    "app_id":null,"email":null
+                }}
+            ]
+        }"#;
+        let body = deserialize_vault_body(v8).unwrap();
+        match &body.entries[0] {
+            VaultEntry::Login(e) => {
+                let rec = e
+                    .meta
+                    .history
+                    .iter()
+                    .find(|h| h.field == "password")
+                    .expect("previous_password should fold into meta.history");
+                assert_eq!(rec.value, "old_pw");
+                assert_eq!(rec.saved_at, "2025-05-01T00:00:00Z");
+            }
+            _ => panic!("Expected Login"),
+        }
     }
 
     #[test]

@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Керування папками",
   "manageVaultsTitle": "Керування сховищами",
   "manageYubiKeysTitle": "Керування ключами YubiKey",
-  "passwordHistoryTitle": "Історія паролів",
   "reviewChangesTitle": "Перегляд змін",
   "unlockGabbroTitle": "Розблокувати Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Блокувати після цього часу бездіяльності, поки програма відкрита.",
   "backgroundLockDescription": "Блокувати після перебування програми у фоні протягом цього часу.",
-  "passwordHistoryDescription": "Як довго зберігати попередній пароль після зміни. «Зберігати завжди» означає, що історія видаляється лише вручну.",
+  "passwordHistoryDescription": "Як довго зберігати попереднє значення зміненого секрету (пароль, CVV, PIN).",
   "passphraseCopyPasteDescription": "Блокувати копіювання та вставлення в полях кодової фрази. Рекомендовано: запобігає витоку кодової фрази через буфер обміну.",
   "passphraseCopyPasteNote": "Примітка: це блокує контекстне меню при довгому натисканні та виділення тексту. Вбудована кнопка вставлення клавіатури може і надалі працювати — це обмеження платформи.",
   "blockCopyPasteTitle": "Блокувати копіювання/вставлення",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Видалити попередній запис",
-  "failedToClearHistory": "Не вдалося очистити історію: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Не вдалося відновити пароль: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Перейменувати папку",
   "addFolderTitle": "Додати папку",
@@ -457,9 +444,7 @@
   "syncThisVault": "Використати це сховище",
   "syncOtherVault": "Використати інше сховище",
 
-  "historyWarning": "Зберігається лише 1 попереднє значення. Історія автоматично очищається відповідно до налаштувань безпеки.",
-  "historyCurrent": "Поточний",
-  "historyPrevious": "Попередній стан",
+  "historyPrevious": "Історія",
   "historySavedOn": "Збережено {date}",
   "@historySavedOn": {
     "placeholders": {

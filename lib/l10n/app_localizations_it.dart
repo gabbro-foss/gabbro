@@ -190,9 +190,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get manageYubiKeysTitle => 'Gestisci YubiKey';
 
   @override
-  String get passwordHistoryTitle => 'Cronologia password';
-
-  @override
   String get reviewChangesTitle => 'Verifica modifiche';
 
   @override
@@ -394,7 +391,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Per quanto tempo conservare una password precedente dopo la modifica. «Conserva per sempre» significa che la cronologia viene eliminata solo manualmente.';
+      'Per quanto tempo conservare il valore precedente di un segreto modificato (password, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -736,16 +733,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Elimina voce precedente';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Impossibile cancellare la cronologia: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Impossibile ripristinare la password: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Rinomina cartella';
 
   @override
@@ -1062,14 +1049,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get syncOtherVault => 'Usa altra cassaforte';
 
   @override
-  String get historyWarning =>
-      'Viene conservato solo 1 valore precedente. La cronologia viene eliminata automaticamente in base alle impostazioni di sicurezza.';
-
-  @override
-  String get historyCurrent => 'Attuale';
-
-  @override
-  String get historyPrevious => 'Stato precedente';
+  String get historyPrevious => 'Cronologia';
 
   @override
   String historySavedOn(String date) {

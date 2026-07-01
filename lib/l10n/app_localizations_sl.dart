@@ -190,9 +190,6 @@ class AppLocalizationsSl extends AppLocalizations {
   String get manageYubiKeysTitle => 'Upravljanje ključev YubiKey';
 
   @override
-  String get passwordHistoryTitle => 'Zgodovina gesel';
-
-  @override
   String get reviewChangesTitle => 'Pregled sprememb';
 
   @override
@@ -394,7 +391,7 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Kako dolgo hraniti prejšnje geslo po spremembi. «Vedno hrani» pomeni, da se zgodovina briše samo ročno.';
+      'Kako dolgo hraniti prejšnjo vrednost spremenjene skrivnosti (geslo, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -740,16 +737,6 @@ class AppLocalizationsSl extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Izbriši prejšnji vnos';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Brisanje zgodovine ni uspelo: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Povrnitev gesla ni uspela: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Preimenuj mapo';
 
   @override
@@ -1067,14 +1054,7 @@ class AppLocalizationsSl extends AppLocalizations {
   String get syncOtherVault => 'Uporabi drugi trezor';
 
   @override
-  String get historyWarning =>
-      'Shranjuje se samo 1 prejšnja vrednost. Zgodovina se samodejno briše glede na varnostne nastavitve.';
-
-  @override
-  String get historyCurrent => 'Trenutno';
-
-  @override
-  String get historyPrevious => 'Prejšnje stanje';
+  String get historyPrevious => 'Zgodovina';
 
   @override
   String historySavedOn(String date) {

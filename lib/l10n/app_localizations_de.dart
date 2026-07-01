@@ -191,9 +191,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get manageYubiKeysTitle => 'YubiKeys verwalten';
 
   @override
-  String get passwordHistoryTitle => 'Passwortverlauf';
-
-  @override
   String get reviewChangesTitle => 'Änderungen prüfen';
 
   @override
@@ -395,7 +392,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Wie lange ein früheres Passwort nach einer Änderung aufbewahrt wird. «Für immer behalten» bedeutet, dass der Verlauf nur manuell gelöscht wird.';
+      'Wie lange der vorherige Wert eines geänderten Geheimnisses aufbewahrt wird (Passwort, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -737,16 +734,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Früheren Eintrag löschen';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Verlauf konnte nicht geleert werden: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Passwort konnte nicht wiederhergestellt werden: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Ordner umbenennen';
 
   @override
@@ -1064,14 +1051,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get syncOtherVault => 'Anderen Tresor verwenden';
 
   @override
-  String get historyWarning =>
-      'Es wird nur 1 früherer Wert aufbewahrt. Der Verlauf wird automatisch basierend auf den Sicherheitseinstellungen bereinigt.';
-
-  @override
-  String get historyCurrent => 'Aktuell';
-
-  @override
-  String get historyPrevious => 'Vorheriger Zustand';
+  String get historyPrevious => 'Verlauf';
 
   @override
   String historySavedOn(String date) {

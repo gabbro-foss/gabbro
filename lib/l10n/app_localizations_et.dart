@@ -190,9 +190,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get manageYubiKeysTitle => 'Halda YubiKey\'sid';
 
   @override
-  String get passwordHistoryTitle => 'Paroolide ajalugu';
-
-  @override
   String get reviewChangesTitle => 'Vaata muudatused üle';
 
   @override
@@ -394,7 +391,7 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Kui kaua säilitatakse eelmist parooli pärast muutmist. «Hoia alati» tähendab, et ajalugu kustutatakse ainult käsitsi.';
+      'Kui kaua säilitada muudetud saladuse eelmist väärtust (parool, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -736,16 +733,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Kustuta eelmine kirje';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Ajaloo tühjendamine ebaõnnestus: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Parooli taastamine ebaõnnestus: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Nimeta kaust ümber';
 
   @override
@@ -1062,14 +1049,7 @@ class AppLocalizationsEt extends AppLocalizations {
   String get syncOtherVault => 'Kasuta teist hoidlat';
 
   @override
-  String get historyWarning =>
-      'Säilitatakse ainult 1 eelmine väärtus. Ajalugu tühjendatakse automaatselt turvalisuse sätete alusel.';
-
-  @override
-  String get historyCurrent => 'Praegune';
-
-  @override
-  String get historyPrevious => 'Eelmine olek';
+  String get historyPrevious => 'Ajalugu';
 
   @override
   String historySavedOn(String date) {

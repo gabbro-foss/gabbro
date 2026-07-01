@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Halda kaustu",
   "manageVaultsTitle": "Halda seife",
   "manageYubiKeysTitle": "Halda YubiKey'sid",
-  "passwordHistoryTitle": "Paroolide ajalugu",
   "reviewChangesTitle": "Vaata muudatused üle",
   "unlockGabbroTitle": "Ava Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Lukusta pärast seda kasutamata aega, kui rakendus on avatud.",
   "backgroundLockDescription": "Lukusta pärast seda, kui rakendus on olnud taustal selle aja.",
-  "passwordHistoryDescription": "Kui kaua säilitatakse eelmist parooli pärast muutmist. «Hoia alati» tähendab, et ajalugu kustutatakse ainult käsitsi.",
+  "passwordHistoryDescription": "Kui kaua säilitada muudetud saladuse eelmist väärtust (parool, CVV, PIN).",
   "passphraseCopyPasteDescription": "Blokeeri kopeerimine ja kleepimine pääsulause väljades. Soovitatav: takistab pääsulause leket lõikelaua kaudu.",
   "passphraseCopyPasteNote": "Märkus: see blokeerib pika vajutuse kontekstimenüü ja teksti valimise. Klaviatuuri sisseehitatud kleepimise nupp võib endiselt töötada — see on platvormi piirang.",
   "blockCopyPasteTitle": "Blokeeri kopeerimine/kleepimine",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Kustuta eelmine kirje",
-  "failedToClearHistory": "Ajaloo tühjendamine ebaõnnestus: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Parooli taastamine ebaõnnestus: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Nimeta kaust ümber",
   "addFolderTitle": "Lisa kaust",
@@ -457,9 +444,7 @@
   "syncThisVault": "Kasuta seda hoidlat",
   "syncOtherVault": "Kasuta teist hoidlat",
 
-  "historyWarning": "Säilitatakse ainult 1 eelmine väärtus. Ajalugu tühjendatakse automaatselt turvalisuse sätete alusel.",
-  "historyCurrent": "Praegune",
-  "historyPrevious": "Eelmine olek",
+  "historyPrevious": "Ajalugu",
   "historySavedOn": "Salvestatud {date}",
   "@historySavedOn": {
     "placeholders": {

@@ -190,9 +190,6 @@ class AppLocalizationsSk extends AppLocalizations {
   String get manageYubiKeysTitle => 'Správa kľúčov YubiKey';
 
   @override
-  String get passwordHistoryTitle => 'História hesiel';
-
-  @override
   String get reviewChangesTitle => 'Skontrolovať zmeny';
 
   @override
@@ -394,7 +391,7 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Ako dlho uchovávať predchádzajúce heslo po zmene. «Uchovávať vždy» znamená, že história sa maže len ručne.';
+      'Ako dlho uchovávať predchádzajúcu hodnotu zmeneného tajomstva (heslo, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -738,16 +735,6 @@ class AppLocalizationsSk extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Vymazať predchádzajúci záznam';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Nepodarilo sa vymazať históriu: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Nepodarilo sa obnoviť heslo: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Premenovať priečinok';
 
   @override
@@ -1064,14 +1051,7 @@ class AppLocalizationsSk extends AppLocalizations {
   String get syncOtherVault => 'Použiť druhý trezor';
 
   @override
-  String get historyWarning =>
-      'Je uchovaná iba 1 predchádzajúca hodnota. História sa automaticky maže na základe nastavení zabezpečenia.';
-
-  @override
-  String get historyCurrent => 'Aktuálna';
-
-  @override
-  String get historyPrevious => 'Predchádzajúci stav';
+  String get historyPrevious => 'História';
 
   @override
   String historySavedOn(String date) {

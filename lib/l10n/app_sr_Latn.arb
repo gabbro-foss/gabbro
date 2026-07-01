@@ -64,7 +64,6 @@
   "manageFoldersTitle": "Upravljanje mapama",
   "manageVaultsTitle": "Upravljanje trezorima",
   "manageYubiKeysTitle": "Upravljanje YubiKey ključevima",
-  "passwordHistoryTitle": "Istorija lozinki",
   "reviewChangesTitle": "Pregled promena",
   "unlockGabbroTitle": "Otključaj Gabbro",
 
@@ -137,7 +136,7 @@
 
   "foregroundLockDescription": "Zaključaj nakon ovog vremena neaktivnosti dok je aplikacija otvorena.",
   "backgroundLockDescription": "Zaključaj nakon što aplikacija bude u pozadini toliko dugo.",
-  "passwordHistoryDescription": "Koliko dugo čuvati prethodnu lozinku nakon promene. «Čuvaj uvek» znači da se istorija briše samo ručno.",
+  "passwordHistoryDescription": "Koliko dugo čuvati prethodnu vrednost izmenjene tajne (lozinka, CVV, PIN).",
   "passphraseCopyPasteDescription": "Blokiraj kopiranje i lepljenje u poljima pristupne fraze. Preporučeno: sprečava curenje fraze kroz privremenu memoriju.",
   "passphraseCopyPasteNote": "Napomena: ovo blokira kontekstni meni pri dugom pritisku i izbor teksta. Ugrađeno dugme za lepljenje tastature možda će i dalje raditi — to je ograničenje platforme.",
   "blockCopyPasteTitle": "Blokiraj kopiranje/lepljenje",
@@ -303,18 +302,6 @@
   },
 
   "deleteEntryFromHistoryLabel": "Obriši prethodni unos",
-  "failedToClearHistory": "Brisanje istorije nije uspelo: {error}",
-  "@failedToClearHistory": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
-  "failedToRevertPassword": "Vraćanje lozinke nije uspelo: {error}",
-  "@failedToRevertPassword": {
-    "placeholders": {
-      "error": {"type": "String"}
-    }
-  },
 
   "renameFolderTitle": "Preimenuj mapu",
   "addFolderTitle": "Dodaj mapu",
@@ -457,9 +444,7 @@
   "syncThisVault": "Koristi ovaj sef",
   "syncOtherVault": "Koristi drugi sef",
 
-  "historyWarning": "Čuva se samo 1 prethodna vrednost. Istorija se automatski briše prema bezbednosnim podešavanjima.",
-  "historyCurrent": "Trenutna",
-  "historyPrevious": "Prethodno stanje",
+  "historyPrevious": "Istorija",
   "historySavedOn": "Sačuvano {date}",
   "@historySavedOn": {
     "placeholders": {

@@ -188,9 +188,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get manageYubiKeysTitle => 'YubiKey 관리';
 
   @override
-  String get passwordHistoryTitle => '비밀번호 기록';
-
-  @override
   String get reviewChangesTitle => '변경 사항 검토';
 
   @override
@@ -387,7 +384,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      '변경 후 이전 비밀번호를 보관하는 기간. «항상 유지»는 수동으로만 기록이 삭제됨을 의미합니다.';
+      '변경된 비밀 정보의 이전 값을 보관하는 기간 (비밀번호, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -726,16 +723,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => '이전 항목 삭제';
 
   @override
-  String failedToClearHistory(String error) {
-    return '기록 지우기에 실패했습니다: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return '비밀번호 되돌리기에 실패했습니다: $error';
-  }
-
-  @override
   String get renameFolderTitle => '폴더 이름 변경';
 
   @override
@@ -1048,13 +1035,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get syncOtherVault => '다른 보관함 사용';
 
   @override
-  String get historyWarning => '이전 값은 1개만 유지됩니다. 기록은 보안 설정에 따라 자동으로 삭제됩니다.';
-
-  @override
-  String get historyCurrent => '현재';
-
-  @override
-  String get historyPrevious => '이전 상태';
+  String get historyPrevious => '기록';
 
   @override
   String historySavedOn(String date) {

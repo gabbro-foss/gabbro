@@ -132,7 +132,6 @@ pub(crate) fn parse(data: &[u8]) -> Result<(Vec<VaultEntry>, Vec<ParseFailure>),
             notes,
             custom_fields,
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         }));

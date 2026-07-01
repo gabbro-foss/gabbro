@@ -190,9 +190,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get manageYubiKeysTitle => 'Hantera YubiKeys';
 
   @override
-  String get passwordHistoryTitle => 'Lösenordshistorik';
-
-  @override
   String get reviewChangesTitle => 'Granska ändringar';
 
   @override
@@ -393,7 +390,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Hur länge ett tidigare lösenord behålls efter ändring. «Behåll alltid» innebär att historiken bara raderas manuellt.';
+      'Hur länge det tidigare värdet för en ändrad hemlighet behålls (lösenord, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -735,16 +732,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Ta bort tidigare post';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Kunde inte rensa historik: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Kunde inte återställa lösenord: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Byt namn på mapp';
 
   @override
@@ -1062,14 +1049,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get syncOtherVault => 'Använd det andra valvet';
 
   @override
-  String get historyWarning =>
-      'Bara 1 tidigare värde behålls. Historiken rensas automatiskt baserat på dina säkerhetsinställningar.';
-
-  @override
-  String get historyCurrent => 'Aktuell';
-
-  @override
-  String get historyPrevious => 'Tidigare tillstånd';
+  String get historyPrevious => 'Historik';
 
   @override
   String historySavedOn(String date) {

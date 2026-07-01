@@ -191,9 +191,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get manageYubiKeysTitle => 'Διαχείριση κλειδιών YubiKey';
 
   @override
-  String get passwordHistoryTitle => 'Ιστορικό κωδικών';
-
-  @override
   String get reviewChangesTitle => 'Έλεγχος αλλαγών';
 
   @override
@@ -396,7 +393,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get passwordHistoryDescription =>
-      'Πόσο καιρό να διατηρείται ο προηγούμενος κωδικός μετά από αλλαγή. «Πάντα» σημαίνει ότι το ιστορικό διαγράφεται μόνο χειροκίνητα.';
+      'Για πόσο διατηρείται η προηγούμενη τιμή ενός αλλαγμένου μυστικού (κωδικός, CVV, PIN).';
 
   @override
   String get passphraseCopyPasteDescription =>
@@ -740,16 +737,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get deleteEntryFromHistoryLabel => 'Διαγραφή προηγούμενης καταχώρισης';
 
   @override
-  String failedToClearHistory(String error) {
-    return 'Αποτυχία εκκαθάρισης ιστορικού: $error';
-  }
-
-  @override
-  String failedToRevertPassword(String error) {
-    return 'Αποτυχία επαναφοράς κωδικού: $error';
-  }
-
-  @override
   String get renameFolderTitle => 'Μετονομασία φακέλου';
 
   @override
@@ -1070,14 +1057,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get syncOtherVault => 'Χρήση άλλου θησαυροφυλακίου';
 
   @override
-  String get historyWarning =>
-      'Διατηρείται μόνο 1 προηγούμενη τιμή. Το ιστορικό διαγράφεται αυτόματα βάσει των ρυθμίσεων ασφαλείας.';
-
-  @override
-  String get historyCurrent => 'Τρέχον';
-
-  @override
-  String get historyPrevious => 'Προηγούμενη κατάσταση';
+  String get historyPrevious => 'Ιστορικό';
 
   @override
   String historySavedOn(String date) {

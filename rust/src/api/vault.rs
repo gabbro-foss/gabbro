@@ -26,14 +26,6 @@ pub struct CustomFieldData {
     pub hidden: bool,
 }
 
-/// A previous sensitive value as seen by Flutter.
-/// `value` is always masked at the bridge boundary — Flutter unmasks on toggle.
-pub struct PreviousSecretData {
-    pub value: String,
-    pub saved_at: String,
-    pub expires_at: Option<String>,
-}
-
 /// A recovery-history record for Flutter: a value replaced during sync, kept so
 /// the user can restore it. `value` is plaintext — Flutter masks secret fields.
 pub struct HistoryRecordData {
@@ -57,8 +49,6 @@ pub struct LoginEntryData {
     pub password: String,
     pub notes: Option<String>,
     pub custom_fields: Vec<CustomFieldData>,
-    /// Previous password, masked by default. `None` if no history exists.
-    pub previous_password: Option<PreviousSecretData>,
     /// Android application id for native-app autofill matching; `None` if unset.
     pub app_id: Option<String>,
     /// Email/identifier routed to email-typed fields; `None` if unset.
@@ -110,10 +100,6 @@ pub struct CardEntryData {
     pub transaction_password: Option<String>,
     pub notes: Option<String>,
     pub custom_fields: Vec<CustomFieldData>,
-    /// Previous CVV, masked by default. `None` if no history exists.
-    pub previous_cvv: Option<PreviousSecretData>,
-    /// Previous PIN, masked by default. `None` if no history exists.
-    pub previous_pin: Option<PreviousSecretData>,
 }
 
 /// A file entry as seen by Flutter.
@@ -244,14 +230,6 @@ fn custom_field_to_data(f: &CustomField) -> CustomFieldData {
     }
 }
 
-fn previous_secret_to_data(p: &crate::vault::entry::PreviousSecret) -> PreviousSecretData {
-    PreviousSecretData {
-        value: MASKED_VALUE.to_string(),
-        saved_at: p.saved_at.clone(),
-        expires_at: p.expires_at.clone(),
-    }
-}
-
 fn login_entry_to_data(e: &LoginEntry) -> LoginEntryData {
     LoginEntryData {
         id: e.meta.id.clone(),
@@ -264,7 +242,6 @@ fn login_entry_to_data(e: &LoginEntry) -> LoginEntryData {
         password: e.password.clone(),
         notes: e.notes.clone(),
         custom_fields: e.custom_fields.iter().map(custom_field_to_data).collect(),
-        previous_password: e.previous_password.as_ref().map(previous_secret_to_data),
         app_id: e.app_id.clone(),
         email: e.email.clone(),
     }
@@ -311,7 +288,6 @@ pub fn create_login_entry(
         notes,
         custom_fields: internal_fields,
         attachments: vec![],
-        previous_password: None,
         app_id: None,
         email: None,
     };
@@ -740,40 +716,30 @@ pub fn update_entry(
         new_field_times.remove(&format!("del:{present}"));
     }
 
+    // History is not round-tripped by Flutter (like field_times), so the stored
+    // entry is the source of truth: seed from it, then record changed secret
+    // fields into the unified one-per-field history below.
+    entry_meta_mut(&mut updated).history = entry_meta(&entries[pos]).history.clone();
+
     // Snapshot sensitive fields that have changed, then stamp updated_at.
     match (&entries[pos], &mut updated) {
         (VaultEntry::Login(old), VaultEntry::Login(ref mut new)) => {
             new.meta.updated_at = now.clone();
             if old.password != new.password {
-                new.previous_password = Some(crate::vault::entry::PreviousSecret {
-                    value: old.password.clone(),
-                    saved_at: now.clone(),
-                    expires_at: expires_at.clone(),
-                });
-            } else {
-                // Password unchanged — preserve existing history.
-                new.previous_password = old.previous_password.clone();
+                new.meta
+                    .record_previous("password", &old.password, &now, expires_at.clone());
             }
         }
         (VaultEntry::Card(old), VaultEntry::Card(ref mut new)) => {
             new.meta.updated_at = now.clone();
             if old.cvv != new.cvv {
-                new.previous_cvv = Some(crate::vault::entry::PreviousSecret {
-                    value: old.cvv.clone(),
-                    saved_at: now.clone(),
-                    expires_at: expires_at.clone(),
-                });
-            } else {
-                new.previous_cvv = old.previous_cvv.clone();
+                new.meta
+                    .record_previous("cvv", &old.cvv, &now, expires_at.clone());
             }
             if old.pin != new.pin {
-                new.previous_pin = Some(crate::vault::entry::PreviousSecret {
-                    value: old.pin.clone().unwrap_or_default(),
-                    saved_at: now.clone(),
-                    expires_at: expires_at.clone(),
-                });
-            } else {
-                new.previous_pin = old.previous_pin.clone();
+                let old_pin = old.pin.clone().unwrap_or_default();
+                new.meta
+                    .record_previous("pin", &old_pin, &now, expires_at.clone());
             }
         }
         (_, VaultEntry::Note(ref mut e)) => {
@@ -905,7 +871,6 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
                 })
                 .collect(),
             attachments: e.attachments.clone(),
-            previous_password: e.previous_password.clone(),
             app_id: e.app_id.clone(),
             email: e.email.clone(),
         }),
@@ -926,8 +891,6 @@ fn mask_entry(entry: &VaultEntry) -> VaultEntry {
             notes: e.notes.clone(),
             custom_fields: e.custom_fields.clone(),
             attachments: e.attachments.clone(),
-            previous_cvv: e.previous_cvv.clone(),
-            previous_pin: e.previous_pin.clone(),
         }),
         VaultEntry::Note(e) => VaultEntry::Note(NoteEntry {
             meta: e.meta.clone(),
@@ -1363,42 +1326,15 @@ pub(crate) fn is_expired(expires_at: Option<&str>) -> bool {
     expires_days < now_days
 }
 
-/// Purge expired `previous_password`, `previous_cvv`, and `previous_pin`
-/// from all entries in the session.
+/// Purge expired records from every entry's unified `meta.history`.
 ///
 /// Called on every unlock — silent, no-op for entries with no history
 /// or future/keep-forever expiry.
 pub(crate) fn purge_expired_history(entries: &mut [VaultEntry]) {
     for entry in entries.iter_mut() {
-        match entry {
-            VaultEntry::Login(ref mut e) => {
-                if is_expired(
-                    e.previous_password
-                        .as_ref()
-                        .and_then(|p| p.expires_at.as_deref()),
-                ) {
-                    e.previous_password = None;
-                }
-            }
-            VaultEntry::Card(ref mut e) => {
-                if is_expired(
-                    e.previous_cvv
-                        .as_ref()
-                        .and_then(|p| p.expires_at.as_deref()),
-                ) {
-                    e.previous_cvv = None;
-                }
-                if is_expired(
-                    e.previous_pin
-                        .as_ref()
-                        .and_then(|p| p.expires_at.as_deref()),
-                ) {
-                    e.previous_pin = None;
-                }
-            }
-            _ => {}
-        }
-        // General sync recovery history (all entry types): drop expired records.
+        // Unified per-field history (all entry types): drop expired records.
+        // Secret fields carry an expiry from the on-save capture; non-secret
+        // records have `expires_at = None` and are kept until manually deleted.
         entry_meta_mut(entry)
             .history
             .retain(|h| !is_expired(h.expires_at.as_deref()));
@@ -1893,7 +1829,6 @@ mod tests {
                     hidden: true,
                 }],
                 attachments: vec![],
-                previous_password: None,
                 app_id: None,
                 email: None,
             })
@@ -1931,7 +1866,6 @@ mod tests {
                 notes: None,
                 custom_fields: custom,
                 attachments: vec![],
-                previous_password: None,
                 app_id: None,
                 email: None,
             })
@@ -1971,7 +1905,6 @@ mod tests {
                 notes: None,
                 custom_fields: custom,
                 attachments: vec![],
-                previous_password: None,
                 app_id: None,
                 email: None,
             })
@@ -2029,7 +1962,6 @@ mod tests {
                 kind: String::from("text"),
                 data: vec![],
             }],
-            previous_password: None,
             app_id: None,
             email: None,
         })
@@ -2244,7 +2176,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         })];
@@ -2276,7 +2207,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         })];
@@ -2319,8 +2249,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_cvv: None,
-            previous_pin: None,
         })];
 
         let result = list_entries(&entries, true);
@@ -2364,7 +2292,6 @@ mod tests {
                 },
             ],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         })];
@@ -2400,7 +2327,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         })];
@@ -2414,7 +2340,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -2425,9 +2350,11 @@ mod tests {
             VaultEntry::Login(e) => {
                 assert_eq!(e.password, "new_password");
                 let prev = e
-                    .previous_password
-                    .as_ref()
-                    .expect("previous_password should be set");
+                    .meta
+                    .history
+                    .iter()
+                    .find(|h| h.field == "password")
+                    .expect("password history record should be set");
                 assert_eq!(prev.value, "old_password");
                 assert!(prev.expires_at.is_some());
             }
@@ -2456,7 +2383,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         })];
@@ -2470,7 +2396,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -2481,9 +2406,11 @@ mod tests {
             VaultEntry::Login(e) => {
                 assert_eq!(e.password, "new_password");
                 let prev = e
-                    .previous_password
-                    .as_ref()
-                    .expect("previous_password should be set");
+                    .meta
+                    .history
+                    .iter()
+                    .find(|h| h.field == "password")
+                    .expect("password history record should be set");
                 assert_eq!(prev.value, "old_password");
                 assert!(prev.expires_at.is_none());
             }
@@ -2493,9 +2420,9 @@ mod tests {
 
     #[test]
     fn update_entry_unchanged_password_does_not_overwrite_history() {
-        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
+        use crate::vault::entry::{EntryMeta, HistoryRecord, LoginEntry, VaultEntry};
 
-        let meta = EntryMeta {
+        let mut meta = EntryMeta {
             field_times: Default::default(),
             history: Vec::new(),
             id: String::from("id-001"),
@@ -2503,11 +2430,12 @@ mod tests {
             updated_at: String::from("2025-01-01T00:00:00Z"),
             folder: String::from("Personal"),
         };
-        let existing_prev = PreviousSecret {
+        meta.history.push(HistoryRecord {
+            field: String::from("password"),
             value: String::from("even_older"),
             saved_at: String::from("2024-12-01T00:00:00Z"),
             expires_at: Some(String::from("2024-12-31T00:00:00Z")),
-        };
+        });
         let mut entries = vec![VaultEntry::Login(LoginEntry {
             meta: meta.clone(),
             title: String::from("Example"),
@@ -2517,21 +2445,23 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: Some(existing_prev),
             app_id: None,
             email: None,
         })];
 
+        // Flutter does not round-trip history, so the incoming entry carries none.
         let updated = VaultEntry::Login(LoginEntry {
-            meta: meta.clone(),
-            title: String::from("Example — updated title"),
+            meta: EntryMeta {
+                history: Vec::new(),
+                ..meta.clone()
+            },
+            title: String::from("Example - updated title"),
             url: String::from("https://example.com"),
             username: String::from("user"),
             password: String::from("same_password"),
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -2540,11 +2470,13 @@ mod tests {
 
         match &entries[0] {
             VaultEntry::Login(e) => {
-                assert_eq!(e.title, "Example — updated title");
-                // password unchanged — existing history must be preserved as-is
+                assert_eq!(e.title, "Example - updated title");
+                // password unchanged - existing history must be preserved as-is
                 let prev = e
-                    .previous_password
-                    .as_ref()
+                    .meta
+                    .history
+                    .iter()
+                    .find(|h| h.field == "password")
                     .expect("history should be preserved");
                 assert_eq!(prev.value, "even_older");
             }
@@ -2554,12 +2486,12 @@ mod tests {
 
     #[test]
     fn update_keeps_only_the_most_recent_previous_password() {
-        // Single-slot history: an entry that already holds a previous password, then
-        // one password change, keeps exactly one previous (the value it just replaced)
-        // and drops the pre-existing one — history is a slot, not a growing stack.
-        use crate::vault::entry::{EntryMeta, LoginEntry, PreviousSecret, VaultEntry};
+        // One previous value per field: an entry that already holds a previous
+        // password, then one password change, keeps exactly one previous (the value
+        // it just replaced) and drops the pre-existing one - a slot, not a stack.
+        use crate::vault::entry::{EntryMeta, HistoryRecord, LoginEntry, VaultEntry};
 
-        let meta = EntryMeta {
+        let mut meta = EntryMeta {
             field_times: Default::default(),
             history: Vec::new(),
             id: String::from("id-001"),
@@ -2567,11 +2499,12 @@ mod tests {
             updated_at: String::from("2025-01-01T00:00:00Z"),
             folder: String::from("Personal"),
         };
-        let pre_existing = PreviousSecret {
+        meta.history.push(HistoryRecord {
+            field: String::from("password"),
             value: String::from("older_pw"),
             saved_at: String::from("2024-12-01T00:00:00Z"),
             expires_at: Some(String::from("2024-12-31T00:00:00Z")),
-        };
+        });
         let mut entries = vec![VaultEntry::Login(LoginEntry {
             meta: meta.clone(),
             title: String::from("Example"),
@@ -2581,13 +2514,15 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: Some(pre_existing),
             app_id: None,
             email: None,
         })];
 
         let updated = VaultEntry::Login(LoginEntry {
-            meta: meta.clone(),
+            meta: EntryMeta {
+                history: Vec::new(),
+                ..meta.clone()
+            },
             title: String::from("Example"),
             url: String::from("https://example.com"),
             username: String::from("alice"),
@@ -2595,7 +2530,6 @@ mod tests {
             notes: None,
             custom_fields: vec![],
             attachments: vec![],
-            previous_password: None,
             app_id: None,
             email: None,
         });
@@ -2605,14 +2539,16 @@ mod tests {
         match &entries[0] {
             VaultEntry::Login(e) => {
                 assert_eq!(e.password, "new_pw");
-                let prev = e
-                    .previous_password
-                    .as_ref()
-                    .expect("previous_password should hold the just-replaced value");
-                // The just-replaced current becomes the one previous...
-                assert_eq!(prev.value, "current_pw");
-                // ...and the pre-existing previous is dropped (single slot, not a stack).
-                assert_ne!(prev.value, "older_pw");
+                let pw: Vec<_> = e
+                    .meta
+                    .history
+                    .iter()
+                    .filter(|h| h.field == "password")
+                    .collect();
+                // The just-replaced current becomes the one previous, and the
+                // pre-existing "older_pw" is dropped (single slot per field).
+                assert_eq!(pw.len(), 1, "one previous value per field");
+                assert_eq!(pw[0].value, "current_pw");
             }
             _ => panic!("Expected Login variant"),
         }
