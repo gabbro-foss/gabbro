@@ -748,12 +748,12 @@ class _VaultListScreenState extends State<VaultListScreen>
     }
     final isKeyProtected = sourceRecords.isNotEmpty;
 
-    // _SyncPassphraseDialog owns the controllers; returns passphrase (+ PIN and
+    // SyncPassphraseDialog owns the controllers; returns passphrase (+ PIN and
     // transport when key-protected), or null on cancel.
-    final creds = await showDialog<_SyncCredentials>(
+    final creds = await showDialog<SyncCredentials>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => _SyncPassphraseDialog(
+      builder: (ctx) => SyncPassphraseDialog(
         filePath: path,
         isKeyProtected: isKeyProtected,
         isAndroid: widget.isAndroid,
@@ -1793,9 +1793,10 @@ class _VaultListScreenState extends State<VaultListScreen>
 /// Owns its TextEditingController so Flutter can dispose it safely during the
 /// dialog exit animation via State.dispose(), avoiding use-after-dispose errors.
 /// Returns the entered passphrase text on confirm, or null on cancel.
-/// Credentials gathered by [_SyncPassphraseDialog]. `pin` and `transport` are
+/// Credentials gathered by [SyncPassphraseDialog]. `pin` and `transport` are
 /// only meaningful when the source is key-protected (ADR-013).
-class _SyncCredentials {
+@visibleForTesting
+class SyncCredentials {
   final String passphrase;
   final String pin;
   final String transport;
@@ -1803,7 +1804,7 @@ class _SyncCredentials {
   // dialog runs the YubiKey tap itself (so it can show the inline tap note).
   final List<int>? hmac;
   final List<int>? credentialId;
-  const _SyncCredentials({
+  const SyncCredentials({
     required this.passphrase,
     this.pin = '',
     this.transport = 'usb',
@@ -1812,7 +1813,8 @@ class _SyncCredentials {
   });
 }
 
-class _SyncPassphraseDialog extends StatefulWidget {
+@visibleForTesting
+class SyncPassphraseDialog extends StatefulWidget {
   final String filePath;
   final bool isKeyProtected;
   final bool isAndroid;
@@ -1825,7 +1827,8 @@ class _SyncPassphraseDialog extends StatefulWidget {
     String transport,
   )
   onGetYubikeyHmac;
-  const _SyncPassphraseDialog({
+  const SyncPassphraseDialog({
+    super.key,
     required this.filePath,
     required this.sourceRecords,
     required this.onGetYubikeyHmac,
@@ -1834,12 +1837,13 @@ class _SyncPassphraseDialog extends StatefulWidget {
   });
 
   @override
-  State<_SyncPassphraseDialog> createState() => _SyncPassphraseDialogState();
+  State<SyncPassphraseDialog> createState() => SyncPassphraseDialogState();
 }
 
-class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
+class SyncPassphraseDialogState extends State<SyncPassphraseDialog> {
   final _ctrl = TextEditingController();
   final _pinCtrl = TextEditingController();
+  final _pinFocus = FocusNode();
   bool _showPass = false;
   bool _pinObscured = true;
   String _transport = 'usb';
@@ -1852,13 +1856,14 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
   void dispose() {
     _ctrl.dispose();
     _pinCtrl.dispose();
+    _pinFocus.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
     // Passphrase-only source: no key tap, return the passphrase straight away.
     if (!widget.isKeyProtected) {
-      Navigator.of(context).pop(_SyncCredentials(passphrase: _ctrl.text));
+      Navigator.of(context).pop(SyncCredentials(passphrase: _ctrl.text));
       return;
     }
     // A key-protected source needs a YubiKey PIN to run the CTAP2 assertion.
@@ -1881,7 +1886,7 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
       );
       if (!mounted) return;
       Navigator.of(context).pop(
-        _SyncCredentials(
+        SyncCredentials(
           passphrase: _ctrl.text,
           pin: _pinCtrl.text,
           transport: _transport,
@@ -1920,6 +1925,11 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
             TextField(
               controller: _ctrl,
               obscureText: !_showPass,
+              // A key-protected source needs a PIN, so advance to it; otherwise
+              // Enter submits.
+              onSubmitted: (_) => widget.isKeyProtected
+                  ? _pinFocus.requestFocus()
+                  : _submit(),
               decoration: InputDecoration(
                 labelText: l.vaultPassphraseLabel,
                 border: const OutlineInputBorder(),
@@ -1972,7 +1982,9 @@ class _SyncPassphraseDialogState extends State<_SyncPassphraseDialog> {
               const SizedBox(height: 12),
               TextField(
                 controller: _pinCtrl,
+                focusNode: _pinFocus,
                 obscureText: _pinObscured,
+                onSubmitted: (_) => _submit(),
                 decoration: InputDecoration(
                   labelText: l.yubiKeyPinLabel,
                   border: const OutlineInputBorder(),
