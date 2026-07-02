@@ -94,6 +94,12 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task:
 
+**Text-size control: replace the discrete list with a continuous slider.** The current
+fixed choice list tops out too small (insufficient max on a tablet). Swap it for a
+GrapheneOS-style slider with live preview and a much larger maximum derived from
+screen size/resolution (not a fixed cap). Drops the per-size label strings (trims l10n).
+Settings key stays a scale factor; migrate old discrete values on load. No ADR needed.
+
 ---
 
 ## Build & Release
@@ -114,12 +120,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   stable at VERSION 9, so this is no longer blocked. v1 direction in commit 9f158b5.
 
 ### Features & UX
-- **Text-size control: replace the discrete list with a continuous slider.** The
-  current fixed choice list tops out too small — on a tablet the max is still
-  insufficient. Swap it for a GrapheneOS-style slider (live preview), with a much
-  larger maximum derived from screen size/resolution (not a fixed cap). Also drops
-  the per-size label strings, trimming l10n weight. Settings key stays a scale
-  factor; migrate old discrete values on load. No ADR needed.
 - Autofill via `auto-type` (Linux/desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
 
 ### Code Quality
