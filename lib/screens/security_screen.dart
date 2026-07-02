@@ -80,6 +80,9 @@ class SecurityScreen extends StatefulWidget {
 class _SecurityScreenState extends State<SecurityScreen> {
   late AppSettings _settings;
   bool _biometricEnrolled = false;
+  // Owned by the State (not the dialog) so it is never disposed mid-exit-
+  // animation; cleared before and after each prompt to wipe the passphrase.
+  final _enrollPassController = TextEditingController();
 
   @override
   void initState() {
@@ -90,6 +93,12 @@ class _SecurityScreenState extends State<SecurityScreen> {
         if (mounted) setState(() => _biometricEnrolled = enrolled);
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _enrollPassController.dispose();
+    super.dispose();
   }
 
   void _update(AppSettings updated) {
@@ -172,7 +181,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
   }
 
   Future<List<int>?> _promptPassphrase(AppLocalizations l) async {
-    final controller = TextEditingController();
+    final controller = _enrollPassController..clear();
     // obscured lives outside the StatefulBuilder so it survives rebuilds.
     bool obscured = true;
     final result = await showDialog<List<int>>(
@@ -189,6 +198,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 controller: controller,
                 obscureText: obscured,
                 autofocus: true,
+                onSubmitted: (_) =>
+                    Navigator.of(ctx2).pop(controller.text.codeUnits),
                 decoration: InputDecoration(
                   labelText: l.passphraseLabel,
                   border: const OutlineInputBorder(),
@@ -217,7 +228,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
         ),
       ),
     );
-    controller.dispose();
+    controller.clear(); // wipe the passphrase; the controller lives on the State
     return result;
   }
 

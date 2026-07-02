@@ -298,6 +298,27 @@ void main() {
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
       handle.dispose();
     });
+
+    testWidgets('Enter in the enroll passphrase dialog confirms enrollment',
+        (tester) async {
+      List<int>? enrolled;
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        onBiometricAvailable: () async => true,
+        onBiometricEnroll: (pass, _) async => enrolled = pass,
+      ));
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      await tester.tap(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'mypass');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+      expect(enrolled, 'mypass'.codeUnits);
+    });
   });
 
   // ── Vault list section removed (ADR-014) ──────────────────────────────────
