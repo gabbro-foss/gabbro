@@ -288,6 +288,7 @@ class _UnlockScreenState extends State<UnlockScreen>
     with WidgetsBindingObserver {
   final _passphraseController = TextEditingController();
   final _pinController = TextEditingController();
+  final _pinFocus = FocusNode();
   bool _obscured = true;
   bool _pinObscured = true;
   bool _isUnlocking = false;
@@ -490,6 +491,7 @@ class _UnlockScreenState extends State<UnlockScreen>
     WidgetsBinding.instance.removeObserver(this);
     _passphraseController.dispose();
     _pinController.dispose();
+    _pinFocus.dispose();
     super.dispose();
   }
 
@@ -876,7 +878,14 @@ class _UnlockScreenState extends State<UnlockScreen>
                       obscureText: _obscured,
                       enableInteractiveSelection:
                           !widget.blockPassphraseCopyPaste,
-                      onSubmitted: (_) => _isUnlocking ? null : _unlock(),
+                      // In YubiKey mode a PIN is still required, so Enter
+                      // advances to the PIN field rather than submitting; a
+                      // passphrase-only vault submits directly.
+                      onSubmitted: (_) => _isUnlocking
+                          ? null
+                          : _isYubikeyMode
+                              ? _pinFocus.requestFocus()
+                              : _unlock(),
                       onChanged: (v) => setState(
                         () => _entropy = widget.onEstimateEntropy(v),
                       ),
@@ -925,9 +934,11 @@ class _UnlockScreenState extends State<UnlockScreen>
                       const SizedBox(height: 16),
                       TextField(
                         controller: _pinController,
+                        focusNode: _pinFocus,
                         obscureText: _pinObscured,
                         enableInteractiveSelection:
                             !widget.blockPassphraseCopyPaste,
+                        onSubmitted: (_) => _isUnlocking ? null : _unlock(),
                         decoration: InputDecoration(
                           labelText: l.yubiKeyPinLabel,
                           border: const OutlineInputBorder(),

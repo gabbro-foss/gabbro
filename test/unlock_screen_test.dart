@@ -339,6 +339,68 @@ void main() {
     expect(called, isTrue);
   });
 
+  testWidgets(
+      'Net A: in YubiKey mode, Enter on the passphrase advances to the PIN (no submit)',
+      (tester) async {
+    var submitted = false;
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      onUnlock: (a, b) async => submitted = true,
+      onUnlockWithYubikey: (a, b, c, d, e, f) async => submitted = true,
+      onUnlockWithAnyYubikey: (a, b, c, d, e) async => submitted = true,
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pump();
+
+    expect(submitted, isFalse,
+        reason: 'Enter on the passphrase must not submit while a PIN is still needed');
+    final pin = tester.widget<TextField>(find.byType(TextField).at(1));
+    expect(pin.focusNode?.hasFocus, isTrue,
+        reason: 'Enter should move focus to the YubiKey PIN field');
+  });
+
+  testWidgets('Net A: in YubiKey mode, Enter on the PIN field submits',
+      (tester) async {
+    var ykCalled = false;
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      onUnlockWithYubikey: (a, b, c, d, e, f) async => ykCalled = true,
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.enterText(find.byType(TextField).at(1), '123456');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(ykCalled, isTrue);
+  });
+
+  testWidgets('Net A: Enter on the PIN field does not double-submit while unlocking',
+      (tester) async {
+    var count = 0;
+    final gate = Completer<void>();
+    await tester.pumpWidget(_buildScreen(
+      yubikeyRecords: [_fakeRecord()],
+      onUnlockWithYubikey: (a, b, c, d, e, f) async {
+        count++;
+        await gate.future;
+      },
+    ));
+
+    await tester.enterText(find.byType(TextField).first, 'anypassphrase');
+    await tester.enterText(find.byType(TextField).at(1), '123456');
+    await tester.testTextInput.receiveAction(TextInputAction.done); // first submit; hangs
+    await tester.pump();
+    await tester.testTextInput.receiveAction(TextInputAction.done); // must be ignored
+    await tester.pump();
+
+    expect(count, 1);
+    gate.complete();
+    await tester.pumpAndSettle();
+  });
+
   testWidgets('Net A: unlock button is disabled with a spinner while unlocking',
       (tester) async {
     final gate = Completer<void>();
