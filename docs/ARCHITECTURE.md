@@ -77,7 +77,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1057 | 0 |
+| Flutter (`flutter test`) | 1078 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -92,15 +92,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Enter submits the passphrase (usability)
-
-**Enter / keyboard Go does not submit the passphrase** — on the unlock screen and
-elsewhere. Cross-cutting usability enhancement. Net-first: FIRST audit and list
-every passphrase/password/PIN field (unlock, onboarding, change-passphrase,
-biometric-enroll prompt, YubiKey PIN, import, sync, manage-vaults, generator), pin
-current behaviour, then wire an Enter-submit per field (`onSubmitted` /
-`TextInputAction.done`/`go`). Exclude fields where Enter must NOT submit (multi-line
-notes). Watch YubiKey/PIN two-field flows (Enter should advance/submit sensibly).
+### Next task:
 
 ---
 
