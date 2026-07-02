@@ -460,6 +460,28 @@ void main() {
       expect(deleteCalled, isTrue);
     });
 
+    testWidgets('single-key: Enter on the PIN authorizes (same as Authorize button)',
+        (tester) async {
+      bool confirmCalled = false;
+      bool deleteCalled = false;
+      await tester.pumpWidget(_buildScreen(
+        registry: ykRegistry,
+        listYubikeyRecords: (_) => [_fakeYkRecord()],
+        onConfirmYubikey: (_, _, _, _) async => confirmCalled = true,
+        onDelete: (_) async => deleteCalled = true,
+      ));
+      await throughStep2(tester);
+      await tester.enterText(
+        find.byKey(const Key('delete_vault_yubikey_pin_field')),
+        '123456',
+      );
+      await tester.pump();
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+      expect(confirmCalled, isTrue);
+      expect(deleteCalled, isTrue);
+    });
+
     testWidgets('multi-key: calls onConfirmAnyYubikey then onDelete on authorize', (tester) async {
       bool confirmAnyCalled = false;
       bool deleteCalled = false;

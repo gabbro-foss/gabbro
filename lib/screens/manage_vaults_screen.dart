@@ -299,6 +299,44 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
         builder: (ctx) => StatefulBuilder(
           builder: (ctx, setDialogState) {
             final l = AppLocalizations.of(ctx);
+            Future<void> authorize() async {
+              setDialogState(() {
+                isAuthorizing = true;
+                authError = null;
+              });
+              try {
+                if (ykRecords.length == 1) {
+                  final r = ykRecords.first;
+                  await widget.onConfirmYubikey(
+                    r.credentialId,
+                    r.salt,
+                    pinController.text,
+                    dialogTransport,
+                  );
+                } else {
+                  await widget.onConfirmAnyYubikey(
+                    ykRecords,
+                    pinController.text,
+                    dialogTransport,
+                  );
+                }
+                if (ctx.mounted) Navigator.of(ctx).pop(true);
+              } catch (e) {
+                if (ctx.mounted) {
+                  setDialogState(() {
+                    isAuthorizing = false;
+                    authError = switch (e) {
+                      PlatformException(code: 'TRANSPORT_ERROR') =>
+                        e.message ?? l.transportError,
+                      PlatformException(code: 'NO_FIDO2_DEVICE') =>
+                        e.message ?? l.noFidoDeviceFound,
+                      _ => l.authorizationFailed,
+                    };
+                  });
+                }
+              }
+            }
+
             return AlertDialog(
               title: Text(l.touchYourYubiKey),
               content: Column(
@@ -312,6 +350,11 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                     controller: pinController,
                     obscureText: obscurePin,
                     autofocus: true,
+                    onSubmitted: (_) {
+                      if (!isAuthorizing && pinController.text.isNotEmpty) {
+                        authorize();
+                      }
+                    },
                     decoration: InputDecoration(
                       labelText: l.yubiKeyPinLabel,
                       border: const OutlineInputBorder(),
@@ -362,43 +405,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                 TextButton(
                   onPressed: (isAuthorizing || pinController.text.isEmpty)
                       ? null
-                      : () async {
-                          setDialogState(() {
-                            isAuthorizing = true;
-                            authError = null;
-                          });
-                          try {
-                            if (ykRecords.length == 1) {
-                              final r = ykRecords.first;
-                              await widget.onConfirmYubikey(
-                                r.credentialId,
-                                r.salt,
-                                pinController.text,
-                                dialogTransport,
-                              );
-                            } else {
-                              await widget.onConfirmAnyYubikey(
-                                ykRecords,
-                                pinController.text,
-                                dialogTransport,
-                              );
-                            }
-                            if (ctx.mounted) Navigator.of(ctx).pop(true);
-                          } catch (e) {
-                            if (ctx.mounted) {
-                              setDialogState(() {
-                                isAuthorizing = false;
-                                authError = switch (e) {
-                                  PlatformException(code: 'TRANSPORT_ERROR') =>
-                                    e.message ?? l.transportError,
-                                  PlatformException(code: 'NO_FIDO2_DEVICE') =>
-                                    e.message ?? l.noFidoDeviceFound,
-                                  _ => l.authorizationFailed,
-                                };
-                              });
-                            }
-                          }
-                        },
+                      : authorize,
                   style: TextButton.styleFrom(
                     foregroundColor: Theme.of(ctx).colorScheme.error,
                   ),
