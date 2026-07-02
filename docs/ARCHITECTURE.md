@@ -92,20 +92,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: investigate CRITICAL biometric-unlock bug
-
-**CRITICAL — biometric unlock rejects the correct passphrase (GrapheneOS,
-2026-06-29).** Enabling biometric accepts the passphrase; unlocking *with*
-biometric then reports "wrong passphrase" while typing the same passphrase works.
-Vault NOT bricked.
-
-**Status (2026-07-02):** maintainer can no longer replicate on hardware — may
-already be fixed incidentally. First job is to establish whether it still
-reproduces, then find the mechanism (don't assume fixed). Suspects: pre-existing /
-build-regen / stale AndroidKeyStore on reinstall. Investigate Kotlin
-`BiometricHelper`; may relate to the "Android tablet biometric toggle doesn't
-persist" bikeshed item. Android/Kotlin session -> use Opus, hardware-test before
-any commit.
+### Next task:
 
 ---
 
@@ -135,9 +122,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   passphrase shows no breakdown sheet.
 - **Detail view: entry fields not consistently ordered.** Different Gabbro instances on
   the same vault/entry show different field ordering.
-- **Android tablet biometric toggle doesn't persist.** Fresh alpha.10 install on an
-  Android tablet: enabling biometrics doesn't stick — after logout no biometric is
-  offered. Not yet investigated.
 - **DuckDuckGo browser autofill not working** (Android). Likely DDG blocking autofill
   modifications, not a Gabbro bug — probably WONTFIX/YAGNI; confirm before closing.
 
