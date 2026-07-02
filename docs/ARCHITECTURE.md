@@ -113,9 +113,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   (`password_breakdown_sheet.dart` `_kExample`), shown in the legend even when the passphrase
   is Latin-only. Looks wrong / confusing. Pick a script-appropriate or neutral example, or
   hide the row when no caseless letters are present.
-- **JSON export hard-codes `gabbro version 1.0.0`.** Wrong and brittle (needs a bump
-  every release). Fix to read the real version (single source: `pubspec.yaml`) or drop
-  the field.
 - **Linux: passphrase breakdown not shown.** Long-click on an unhidden (revealed)
   passphrase shows no breakdown sheet.
 - **Detail view: entry fields not consistently ordered.** Different Gabbro instances on

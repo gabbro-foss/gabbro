@@ -139,8 +139,18 @@ real fix.
 4. Commit the version + CHANGELOG bump. **The tag is pushed last** — after the artifacts are built (see Tag, below).
 
 **Build:**
-- **Linux:** `flutter build linux --release` → self-contained bundle in `build/linux/x64/release/bundle/`; package with `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.) Then sign the tarball: `gpg --detach-sign --armor gabbro-<ver>-linux-x86_64.tar.gz` → `.tar.gz.asc` (asks for the key passphrase). Signing key fingerprint `369B E2CE CFD0 A528 7155 895A 4775 4EEE 7F9A ABFC`; public key + verify steps are in README.
-- **Android:** `flutter build apk --release` → `build/app/outputs/flutter-apk/app-release.apk`; rename to `gabbro-<ver>-android.apk`. The signing keystore (`android/app/gabbro-upload.jks`) and `android/key.properties` are already configured and gitignored.
+
+> **Version string (About screen).** Both release builds inject the app version at
+> build time from `pubspec.yaml` (build metadata after `+` stripped) via
+> `--dart-define`, so the About screen always shows the real version with no manual
+> edit and no runtime dependency. The shared flag:
+> ```bash
+> --dart-define=APP_VERSION="$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1)"
+> ```
+> Omitting it (e.g. `flutter run` during dev) makes About show `dev` — harmless.
+
+- **Linux:** `flutter build linux --release --dart-define=APP_VERSION="$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1)"` → self-contained bundle in `build/linux/x64/release/bundle/`; package with `tar -czf gabbro-<ver>-linux-x86_64.tar.gz -C build/linux/x64/release bundle`. (The Arch-built bundle runs on Debian trixie / Mint — glibc ≤ 2.34, verified; only build in a `debian:trixie` container if a future release raises that above 2.41.) Then sign the tarball: `gpg --detach-sign --armor gabbro-<ver>-linux-x86_64.tar.gz` → `.tar.gz.asc` (asks for the key passphrase). Signing key fingerprint `369B E2CE CFD0 A528 7155 895A 4775 4EEE 7F9A ABFC`; public key + verify steps are in README.
+- **Android:** `flutter build apk --release --dart-define=APP_VERSION="$(sed -n 's/^version: *//p' pubspec.yaml | cut -d+ -f1)"` → `build/app/outputs/flutter-apk/app-release.apk`; rename to `gabbro-<ver>-android.apk`. The signing keystore (`android/app/gabbro-upload.jks`) and `android/key.properties` are already configured and gitignored.
   - **Dependency lock:** the release runtime dependency graph is locked in `android/app/gradle.lockfile` (osv-scannable, reproducible). After any change to Android dependencies (incl. a plugin/Flutter bump), regenerate it: `cd android && ./gradlew :app:dependencies --write-locks --configuration releaseRuntimeClasspath`, then re-scan: `osv-scanner scan --lockfile android/app/gradle.lockfile`. A stale lock fails the release build (by design).
 
 **Tag (last — only after the artifacts above exist and verify):** `git tag -a v0.1.0-alpha.N -m "v0.1.0-alpha.N" && git push origin v0.1.0-alpha.N`. Never push the tag before the build + sign succeed: a pushed tag forces every clone to re-fetch, so it goes last.
