@@ -77,7 +77,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1078 | 0 |
+| Flutter (`flutter test`) | 1084 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -108,13 +108,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
 ### Bugs
-- **Passphrase breakdown legend: "letter" row shows a CJK example.** The caseless-letter
-  category (`_CharType.letter`, catches Lo/Lt/Lm) has a hard-coded example glyph `字`
-  (`password_breakdown_sheet.dart` `_kExample`), shown in the legend even when the passphrase
-  is Latin-only. Looks wrong / confusing. Pick a script-appropriate or neutral example, or
-  hide the row when no caseless letters are present.
-- **Linux: passphrase breakdown not shown.** Long-click on an unhidden (revealed)
-  passphrase shows no breakdown sheet.
 - **Detail view: entry fields not consistently ordered.** Different Gabbro instances on
   the same vault/entry show different field ordering.
 - **DuckDuckGo browser autofill not working** (Android). Likely DDG blocking autofill
