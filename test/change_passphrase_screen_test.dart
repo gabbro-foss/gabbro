@@ -115,6 +115,54 @@ Future<void> _fillAndSubmit(WidgetTester tester, {String? yubikeyPin}) async {
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
+  // ── Enter-submit / focus chain ──────────────────────────────────────────────
+  group('Enter-submit chain', () {
+    bool focused(WidgetTester tester, String label) => tester
+        .widget<TextField>(find.widgetWithText(TextField, label))
+        .focusNode!
+        .hasFocus;
+
+    testWidgets('Enter on current advances to the new passphrase',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Current passphrase'), 'oldpass');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(focused(tester, 'New passphrase'), isTrue);
+    });
+
+    testWidgets('Enter on new advances to the confirm field', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'New passphrase'), _newPass);
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(focused(tester, 'Confirm new passphrase'), isTrue);
+    });
+
+    testWidgets('Enter on the YubiKey PIN advances to the current passphrase',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'YubiKey PIN'), '123456');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(focused(tester, 'Current passphrase'), isTrue);
+    });
+
+    testWidgets('meets labelled-tap-target guideline (passphrase + yubikey modes)',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      for (final records in [<YubikeyRecordData>[], [_fakeRecord()]]) {
+        await tester.pumpWidget(_buildScreen(yubikeyRecords: records));
+        await tester.pumpAndSettle();
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+      }
+      handle.dispose();
+    });
+  });
+
   testWidgets('change passphrase screen renders key elements', (tester) async {
     await tester.pumpWidget(_buildScreen());
 

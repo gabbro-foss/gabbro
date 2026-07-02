@@ -152,6 +152,10 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
   final _oldController = TextEditingController();
   final _newController = TextEditingController();
   final _confirmController = TextEditingController();
+  // Enter/keyboard focus chain: [PIN] -> current -> new -> confirm -> submit.
+  final _oldFocus = FocusNode();
+  final _newFocus = FocusNode();
+  final _confirmFocus = FocusNode();
 
   bool _oldObscured = true;
   bool _newObscured = true;
@@ -194,6 +198,9 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
     _newController.dispose();
     _confirmController.dispose();
     _pinController.dispose();
+    _oldFocus.dispose();
+    _newFocus.dispose();
+    _confirmFocus.dispose();
     super.dispose();
   }
 
@@ -344,6 +351,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                     TextFormField(
                       controller: _pinController,
                       obscureText: _pinObscured,
+                      onFieldSubmitted: (_) => _oldFocus.requestFocus(),
                       decoration: InputDecoration(
                         labelText: l.yubiKeyPinLabel,
                         border: const OutlineInputBorder(),
@@ -383,8 +391,10 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                   ],
                   TextFormField(
                     controller: _oldController,
+                    focusNode: _oldFocus,
                     obscureText: _oldObscured,
                     enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
+                    onFieldSubmitted: (_) => _newFocus.requestFocus(),
                     decoration: InputDecoration(
                       labelText: l.currentPassphraseLabel,
                       border: const OutlineInputBorder(),
@@ -406,9 +416,11 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                   const SizedBox(height: 24),
                   TextFormField(
                     controller: _newController,
+                    focusNode: _newFocus,
                     obscureText: _newObscured,
                     enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
                     onChanged: _onNewPassphraseChanged,
+                    onFieldSubmitted: (_) => _confirmFocus.requestFocus(),
                     decoration: InputDecoration(
                       labelText: l.newPassphraseLabel,
                       border: const OutlineInputBorder(),
@@ -470,6 +482,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _confirmController,
+                    focusNode: _confirmFocus,
                     obscureText: _confirmObscured,
                     enableInteractiveSelection: !widget.blockPassphraseCopyPaste,
                     onFieldSubmitted: (_) => _changePassphrase(),
