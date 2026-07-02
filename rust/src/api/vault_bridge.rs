@@ -1429,7 +1429,10 @@ mod tests {
             raw.contains("Bridge JSON export test"),
             "note title must appear in JSON export"
         );
-        assert!(raw.contains("gabbro_version"), "must include version field");
+        assert!(
+            !raw.contains("gabbro_version"),
+            "gabbro_version was dropped from the JSON export (brittle hard-coded value)"
+        );
 
         lock_vault().unwrap();
         let _ = std::fs::remove_file(&vault_path);
