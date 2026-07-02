@@ -92,7 +92,15 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task:
+### Next task: Enter submits the passphrase (usability)
+
+**Enter / keyboard Go does not submit the passphrase** — on the unlock screen and
+elsewhere. Cross-cutting usability enhancement. Net-first: FIRST audit and list
+every passphrase/password/PIN field (unlock, onboarding, change-passphrase,
+biometric-enroll prompt, YubiKey PIN, import, sync, manage-vaults, generator), pin
+current behaviour, then wire an Enter-submit per field (`onSubmitted` /
+`TextInputAction.done`/`go`). Exclude fields where Enter must NOT submit (multi-line
+notes). Watch YubiKey/PIN two-field flows (Enter should advance/submit sensibly).
 
 ---
 
@@ -113,8 +121,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   (`password_breakdown_sheet.dart` `_kExample`), shown in the legend even when the passphrase
   is Latin-only. Looks wrong / confusing. Pick a script-appropriate or neutral example, or
   hide the row when no caseless letters are present.
-- **Enter does not submit the passphrase** (unlock + other screens) — cross-cutting; audit
-  every passphrase/password field for an Enter-submit handler.
 - **JSON export hard-codes `gabbro version 1.0.0`.** Wrong and brittle (needs a bump
   every release). Fix to read the real version (single source: `pubspec.yaml`) or drop
   the field.
