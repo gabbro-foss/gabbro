@@ -258,5 +258,55 @@ void main() {
 
       expect(controller.offset, greaterThan(before));
     });
+
+    // ── Legend shows only the character types present in the password ─────────
+    testWidgets('legend omits the caseless-letter row for a Latin-only password',
+        (tester) async {
+      // Regression: the Letter (Lo/Lt/Lm) legend row hard-codes a CJK example
+      // (字) and was shown even when the password has no caseless letters.
+      const password = 'Abcd12!';
+
+      await tester.pumpWidget(
+        testApp(Scaffold(body: PasswordBreakdownSheet(password: password))),
+      );
+
+      expect(find.text('字'), findsNothing);
+      expect(find.text('Letter'), findsNothing);
+      // Types that ARE present still show.
+      expect(find.text('Uppercase'), findsOneWidget);
+      expect(find.text('Lowercase'), findsOneWidget);
+      expect(find.text('Digit'), findsOneWidget);
+      expect(find.text('Symbol'), findsOneWidget);
+    });
+
+    testWidgets('legend includes the Letter row when a caseless letter is present',
+        (tester) async {
+      const password = 'café字'; // 字 is a caseless (Lo) letter
+
+      await tester.pumpWidget(
+        testApp(Scaffold(body: PasswordBreakdownSheet(password: password))),
+      );
+
+      expect(find.text('Letter'), findsOneWidget);
+      // No uppercase/digit/symbol here -> those rows are omitted.
+      expect(find.text('Uppercase'), findsNothing);
+      expect(find.text('Digit'), findsNothing);
+      expect(find.text('Symbol'), findsNothing);
+    });
+
+    testWidgets('legend shows only the lowercase row for an all-lowercase password',
+        (tester) async {
+      const password = 'abcdef';
+
+      await tester.pumpWidget(
+        testApp(Scaffold(body: PasswordBreakdownSheet(password: password))),
+      );
+
+      expect(find.text('Lowercase'), findsOneWidget);
+      expect(find.text('Uppercase'), findsNothing);
+      expect(find.text('Digit'), findsNothing);
+      expect(find.text('Symbol'), findsNothing);
+      expect(find.text('Letter'), findsNothing);
+    });
   });
 }
