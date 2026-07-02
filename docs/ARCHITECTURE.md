@@ -99,14 +99,34 @@ drives text **and** controls in unison; screen-derived max (600dp tiers — phon
 tablet ~6x, **calibrate on hardware**); targets scale proportionally, capped ~2x.
 Design fixed in [ADR-016](decisions/ADR-016-large-text-and-target-scaling-accessibility.md).
 
-**Phase 0 — Calibrate.** On-device MediaQuery read (logical size, devicePixelRatio,
-600dp tier) on phone + tablet to set the real 4x/6x/2x constants.
+**Phase 0 — Calibrate [DONE 2026-07-02].** Measured shortest side: S23 360dp, GOS
+411dp (both phone tier), Idea Tab Pro 866dp (tablet). Phone tier = 360-411dp (360 =
+worst case, the overflow-probe phone surface); tablet 866dp. Starting maxes phone 6x /
+tablet 8x / target cap 2x, dialled in live during P1. Probe added + reverted (uncommitted).
 
-**Phase 1 — Slider + model + onboarding.** `TextSizeChoice` enum -> `double textScale`
-[0.8..max] with migration + clamp; exponential slider (Smaller/Larger labels, live
-preview) as one reusable widget on appearance + onboarding; onboarding toggle ON ->
-~3x + reveal slider + hide logo (OFF reverses); `main.dart` apply + remove
-`textScaleFor`/duplicate `_textScale`; drop the 5 per-size l10n labels. Full TDD.
+**Phase 1 — Slider + model + onboarding** (canon-TDD list agreed 2026-07-02, decisions
+LOCKED; branch `accessibility_initiative`). Starting consts phone 6x / tablet 8x /
+target cap 2x / onboarding toggle 3x (ADR-016; tuned live). Build red-first:
+- **Model** (`settings.dart`): `TextSizeChoice` enum -> `double textScale`. Persist new
+  numeric key `text_scale`; still READ legacy `text_size` word + migrate
+  (small/regular/large/extra_large/xxLarge -> 0.85/1.0/1.15/1.3/1.5); if both, new wins.
+  Clamp to hard [0.8, 8.0].
+- **New `lib/text_scale.dart`** (pure, unit-tested): `deviceMaxScale(shortestDp)` = 6.0
+  (<600) / 8.0 (>=600); `targetScaleFor(textScale, deviceMax)` = lerp 1.0->2.0 clamped;
+  exponential `scaleForPos`/`posForScale` (0->0.8, 1->deviceMax, exact inverse);
+  `clampToDevice(stored, shortestDp)` (e.g. 8x stored on 411dp phone -> 6x).
+- **`main.dart`**: MediaQuery textScaler = `clampToDevice(textScale, screen)`; REMOVE
+  `TextSizeChoice`, `textScaleFor`, duplicate `_textScale` getter.
+- **New `TextSizeSlider` widget** (reused on appearance + onboarding): ends = Material
+  `Icons.text_decrease`/`text_increase` glyphs (language-neutral, NO l10n words); live
+  preview via `textSizePreview`; 0.8->deviceMax via the exponential map.
+- **Appearance**: replace `SegmentedRow` with the slider. **Onboarding**: accessibility
+  toggle ON -> textScale 3.0 + reveal slider + HIDE logo; OFF reverses; toggle reflects
+  current scale.
+- **l10n**: drop the 5 per-size labels (`textSizeSmall`..`textSizeXXL`) from all ARBs +
+  `l10n_test`; keep `sectionTextSize` + `textSizePreview`.
+- Scenario groups: A model+migration, B pure helpers, C apply+cleanup, D slider widget,
+  E onboarding toggle, F l10n.
 
 **Phase 2 — Text overflow hardening** (evidence from a headless 5x overflow probe on
 phone+tablet surfaces): fixed-box clippers (csv_mapping `width:88`, import_skipped

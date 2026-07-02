@@ -49,11 +49,15 @@ accessibility requirement.
    controls" toggle.
 
 2. **Screen-derived maximum, reusing the 600 dp breakpoint** (the same phone-vs-tablet
-   split used for the two-pane layout):
-   - **Phone tier (<600 dp): max ~4×.**
-   - **Tablet tier (≥600 dp): max ~6×.**
-   The exact ceilings are **calibrated from on-device MediaQuery readings** (logical
-   size + devicePixelRatio) on real phone and tablet hardware, not assumed.
+   split used for the two-pane layout). **Phase-0 hardware readings (2026-07-02):**
+   phones — **S23 = 360 dp** (dpr 3.0), **GrapheneOS = 411 dp** (dpr 2.63); tablet —
+   **Idea Tab Pro = 866 dp** (dpr 2.125, 1840×2944 @ 340 dpi). Phone tier spans
+   **360–411 dp** (360 dp = worst case → the phone surface for the overflow probe);
+   tablet has ~2.1–2.4× the room.
+   - **Phone tier (<600 dp): starting max 6×.**
+   - **Tablet tier (≥600 dp): starting max 8×.**
+   Phase 0 fixed the tiers and the ratio; the final ceilings are **dialled in live on
+   the slider in Phase 1** ("can't know without seeing").
    A stored value is **clamped to the current device's max on load**, so a large value
    set on a tablet cannot break the UI when the vault is opened on a phone.
 
@@ -63,9 +67,12 @@ accessibility requirement.
    hit, never large enough to consume the screen. Cap calibrated on hardware.
 
 4. **Continuous slider with a perceptual (exponential) slope.** Replaces the discrete
-   list: a `Smaller`–`Larger` slider with live-preview sample text. The position →
-   scale mapping is exponential so the everyday range (~0.8–2.0) occupies most of the
-   track for fine control, accelerating toward the device max. Minimum 0.8×.
+   list: a slider bracketed by **language-neutral text-size glyph icons**
+   (`Icons.text_decrease` / `Icons.text_increase`, not localized words — the universal
+   text-size convention, so no "foreign A" for Cyrillic/Greek/CJK users and no l10n),
+   with live-preview sample text. The position → scale mapping is exponential so the
+   everyday range (~0.8–2.0) occupies most of the track for fine control, accelerating
+   toward the device max. Minimum 0.8×.
 
 5. **Onboarding surfaces it prominently.** The accessibility toggle, when ON, sets a
    strong (~3×) scale, **reveals the slider inline**, and **hides the logo** to reclaim
