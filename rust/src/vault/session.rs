@@ -1711,7 +1711,7 @@ pub(crate) fn merge_entry_pair(
             })
         }
         (VaultEntry::Custom(l), VaultEntry::Custom(i)) => {
-            let mut fields = std::collections::HashMap::new();
+            let mut fields = indexmap::IndexMap::new();
             let mut keys: Vec<&String> = l.fields.keys().chain(i.fields.keys()).collect();
             keys.sort();
             keys.dedup();
@@ -2330,7 +2330,7 @@ mod field_merge_tests {
         })
     }
     fn custom(id: &str, title: &str, fields: &[(&str, &str)]) -> VaultEntry {
-        let mut m = std::collections::HashMap::new();
+        let mut m = indexmap::IndexMap::new();
         for (k, v) in fields {
             m.insert((*k).to_string(), cf(k, v));
         }
@@ -6233,8 +6233,7 @@ mod json_export_tests {
         // values-not-labels applies to Custom entries too: a field labelled
         // "Router" must not match a "router" search; its value still matches.
         use crate::vault::entry::{CustomEntry, CustomField, EntryMeta, VaultEntry};
-        use std::collections::HashMap;
-        let mut fields = HashMap::new();
+        let mut fields = indexmap::IndexMap::new();
         fields.insert(
             "f1".to_string(),
             CustomField {
@@ -6273,8 +6272,7 @@ mod json_export_tests {
         // field values searchable, and never leak hidden values. (Independent of
         // whether field labels are folded in.)
         use crate::vault::entry::{CustomEntry, CustomField, EntryMeta, VaultEntry};
-        use std::collections::HashMap;
-        let mut fields = HashMap::new();
+        let mut fields = indexmap::IndexMap::new();
         fields.insert(
             "f1".to_string(),
             CustomField {
@@ -7970,7 +7968,7 @@ mod sync_fuzz {
     }
     fn del_pair(e: &mut VaultEntry, label: &str) {
         if let VaultEntry::Custom(x) = e {
-            x.fields.remove(label);
+            x.fields.shift_remove(label);
         } else {
             custom_vec_mut(e).retain(|f| f.label != label);
         }
@@ -8084,7 +8082,7 @@ mod sync_fuzz {
                 notes: None,
                 custom_fields: pairs(),
             }));
-            let mut fields = HashMap::new();
+            let mut fields = indexmap::IndexMap::new();
             fields.insert(String::from("k0"), cf("k0", "v0"));
             fields.insert(String::from("k1"), cf("k1", "v1"));
             out.push(VaultEntry::Custom(CustomEntry {

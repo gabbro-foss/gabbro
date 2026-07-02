@@ -3,8 +3,9 @@
 //! All sensitive data lives in Rust. Flutter never constructs
 //! these types directly — it calls API functions that build them.
 
+use indexmap::IndexMap;
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// Common metadata shared by every entry, regardless of type.
@@ -282,7 +283,11 @@ pub struct FileEntry {
 pub struct CustomEntry {
     pub meta: EntryMeta,
     pub title: String,
-    pub fields: HashMap<String, CustomField>,
+    /// User-defined fields keyed by label. `IndexMap` (not `HashMap`) so the
+    /// order is deterministic and preserved: two Gabbro instances rendering the
+    /// same vault must show fields in the same order, and new fields keep their
+    /// creation order. Serializes as a JSON object, unchanged from `HashMap`.
+    pub fields: IndexMap<String, CustomField>,
     pub attachments: Vec<EntryAttachment>,
 }
 
@@ -881,7 +886,7 @@ mod tests {
 
     #[test]
     fn custom_entry_stores_fields_in_map() {
-        let mut fields = HashMap::new();
+        let mut fields = IndexMap::new();
         fields.insert(
             String::from("api_key"),
             CustomField {

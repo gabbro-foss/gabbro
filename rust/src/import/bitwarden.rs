@@ -4,6 +4,7 @@
 //! (Tools → Export Vault → Format: .json) and converts items into
 //! `Vec<VaultEntry>`.
 
+use indexmap::IndexMap;
 use serde::Deserialize;
 use std::collections::HashMap;
 
@@ -339,7 +340,7 @@ fn convert_identity(
         }
     }
 
-    let fields: HashMap<String, CustomField> = custom_fields
+    let fields: IndexMap<String, CustomField> = custom_fields
         .into_iter()
         .map(|f| (f.label.clone(), f))
         .collect();

@@ -684,7 +684,9 @@ pub(crate) fn remove_entry_item_by_key(entry: &mut VaultEntry, key: &str) {
     if let Some(label) = key.strip_prefix("custom_fields:") {
         match entry {
             VaultEntry::Custom(e) => {
-                e.fields.remove(label);
+                // shift_remove (not swap_remove) keeps the remaining fields in
+                // their original order.
+                e.fields.shift_remove(label);
             }
             _ => {
                 if let Some(v) = entry_custom_fields_mut(entry) {

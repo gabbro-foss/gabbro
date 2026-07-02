@@ -226,6 +226,45 @@ mod tests {
     }
 
     #[test]
+    fn custom_entry_field_order_survives_body_roundtrip() {
+        // A Custom entry's fields must come back in creation order after a full
+        // serialize -> deserialize cycle. Regression: the load path parses into
+        // serde_json::Value first; without serde_json's preserve_order that map
+        // sorts keys alphabetically, so reopening a vault reshuffled the fields.
+        use crate::vault::entry::CustomEntry;
+        use indexmap::IndexMap;
+
+        let order = ["Zeta", "Alpha", "Mike", "Bravo", "Yankee", "Charlie"];
+        let mut fields = IndexMap::new();
+        for label in order {
+            fields.insert(
+                label.to_string(),
+                CustomField {
+                    label: label.to_string(),
+                    value: format!("val-{label}"),
+                    hidden: false,
+                },
+            );
+        }
+        let body = VaultBody {
+            entries: vec![VaultEntry::Custom(CustomEntry {
+                meta: default_meta("custom-order"),
+                title: String::from("Ordered"),
+                fields,
+                attachments: vec![],
+            })],
+            ..Default::default()
+        };
+        let bytes = serialize_vault_body(&body).unwrap();
+        let recovered = deserialize_vault_body(&bytes).unwrap();
+        let VaultEntry::Custom(e) = &recovered.entries[0] else {
+            panic!("expected a Custom entry");
+        };
+        let got: Vec<&str> = e.fields.keys().map(|k| k.as_str()).collect();
+        assert_eq!(got, order, "fields must keep creation order after reload");
+    }
+
+    #[test]
     fn deserialize_vault_body_migrates_legacy_array() {
         // Simulate an old vault: bare JSON array, entry with folder="Personal"
         let legacy_entry = VaultEntry::Login(LoginEntry {

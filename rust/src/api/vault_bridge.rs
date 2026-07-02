@@ -2490,4 +2490,125 @@ mod tests {
         let _ = std::fs::remove_file(format!("{}.bak", path.display()));
         let _ = std::fs::remove_file(&out);
     }
+
+    // ── Custom entry field ordering ───────────────────────────────────────────
+    // A Custom entry's fields must render in a stable, consistent order so two
+    // Gabbro instances viewing the same vault agree (Bikeshed bug: fields not
+    // consistently ordered). The store must preserve insertion/creation order.
+
+    fn custom_data_with_fields(labels: &[&str]) -> VaultEntryData {
+        VaultEntryData::Custom(CustomEntryData {
+            id: "custom-order-id".to_string(),
+            created_at: "2026-01-01T00:00:00Z".to_string(),
+            updated_at: "2026-01-01T00:00:00Z".to_string(),
+            folder: "Personal".to_string(),
+            title: "Ordered custom".to_string(),
+            fields: labels
+                .iter()
+                .map(|l| CustomFieldData {
+                    label: l.to_string(),
+                    value: format!("val-{l}"),
+                    hidden: false,
+                })
+                .collect(),
+        })
+    }
+
+    fn dto_field_labels(data: &VaultEntryData) -> Vec<String> {
+        match data {
+            VaultEntryData::Custom(e) => e.fields.iter().map(|f| f.label.clone()).collect(),
+            _ => panic!("expected a Custom entry"),
+        }
+    }
+
+    // (1) Pin: a round-trip preserves all field content regardless of order.
+    #[test]
+    fn custom_entry_roundtrip_preserves_field_content() {
+        let data = custom_data_with_fields(&["Alpha", "Beta", "Gamma"]);
+        let entry = vault_entry_from_data(data).unwrap();
+        let back = vault_entry_to_data(&entry);
+        match back {
+            VaultEntryData::Custom(e) => {
+                let mut got: Vec<_> = e
+                    .fields
+                    .iter()
+                    .map(|f| (f.label.clone(), f.value.clone(), f.hidden))
+                    .collect();
+                got.sort();
+                let mut want = vec![
+                    ("Alpha".to_string(), "val-Alpha".to_string(), false),
+                    ("Beta".to_string(), "val-Beta".to_string(), false),
+                    ("Gamma".to_string(), "val-Gamma".to_string(), false),
+                ];
+                want.sort();
+                assert_eq!(got, want);
+            }
+            _ => panic!("expected Custom"),
+        }
+    }
+
+    // (2) Pin/backward-compat: a legacy vault stores fields as a JSON object;
+    // it must still deserialize with every field intact.
+    #[test]
+    fn custom_entry_loads_from_legacy_json_object() {
+        let json = r#"{
+            "meta": {"id":"x","created_at":"2025-01-01T00:00:00Z","updated_at":"2025-01-01T00:00:00Z","folder":"Personal"},
+            "title":"Legacy",
+            "fields": {
+                "First": {"label":"First","value":"1","hidden":false},
+                "Second": {"label":"Second","value":"2","hidden":true}
+            },
+            "attachments": []
+        }"#;
+        let entry: CustomEntry = serde_json::from_str(json).unwrap();
+        assert_eq!(entry.fields.len(), 2);
+        assert_eq!(entry.fields.get("First").unwrap().value, "1");
+        assert!(entry.fields.get("Second").unwrap().hidden);
+    }
+
+    // (3) New behaviour: fields deserialized from a JSON object convert to the
+    // DTO in the same order they appear in the file. Many fields make a HashMap
+    // passing by chance (1/24!) effectively impossible.
+    #[test]
+    fn custom_entry_dto_preserves_field_order_from_json() {
+        let labels: Vec<String> = (0..24).map(|i| format!("f{i:02}")).collect();
+        let fields_json: String = labels
+            .iter()
+            .map(|l| format!("\"{l}\":{{\"label\":\"{l}\",\"value\":\"v\",\"hidden\":false}}"))
+            .collect::<Vec<_>>()
+            .join(",");
+        let json = format!(
+            r#"{{"meta":{{"id":"x","created_at":"2025-01-01T00:00:00Z","updated_at":"2025-01-01T00:00:00Z","folder":"P"}},"title":"T","fields":{{{fields_json}}},"attachments":[]}}"#
+        );
+        let entry: CustomEntry = serde_json::from_str(&json).unwrap();
+        let data = vault_entry_to_data(&VaultEntry::Custom(entry));
+        assert_eq!(dto_field_labels(&data), labels);
+    }
+
+    // (4) New behaviour: fields keep creation order end-to-end (from_data ->
+    // internal store -> to_data), not alphabetical or random.
+    #[test]
+    fn custom_entry_dto_preserves_creation_order() {
+        let labels = [
+            "Gamma", "Alpha", "Mu", "Beta", "Zeta", "Delta", "Epsilon", "Theta", "Kappa", "Lambda",
+        ];
+        let data = custom_data_with_fields(&labels);
+        let entry = vault_entry_from_data(data).unwrap();
+        let back = vault_entry_to_data(&entry);
+        let want: Vec<String> = labels.iter().map(|s| s.to_string()).collect();
+        assert_eq!(dto_field_labels(&back), want);
+    }
+
+    // (5) New behaviour: removing a middle field keeps the rest in order (no
+    // swap-to-end reshuffle).
+    #[test]
+    fn custom_entry_field_removal_preserves_order() {
+        use crate::api::vault::remove_entry_item_by_key;
+        let labels = ["One", "Two", "Three", "Four", "Five"];
+        let data = custom_data_with_fields(&labels);
+        let mut entry = vault_entry_from_data(data).unwrap();
+        remove_entry_item_by_key(&mut entry, "custom_fields:Three");
+        let back = vault_entry_to_data(&entry);
+        assert_eq!(dto_field_labels(&back), vec!["One", "Two", "Four", "Five"]);
+    }
 }

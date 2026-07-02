@@ -19,8 +19,8 @@ use crate::vault::entry::{
     VaultEntry,
 };
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
+use indexmap::IndexMap;
 use serde::Deserialize;
-use std::collections::HashMap;
 
 // ── Enpass JSON structs ───────────────────────────────────────────────────────
 
@@ -290,7 +290,7 @@ fn convert_custom(
     fields: &[&EnpassField],
     attachments: Vec<EntryAttachment>,
 ) -> CustomEntry {
-    let mut field_map: HashMap<String, CustomField> = HashMap::new();
+    let mut field_map: IndexMap<String, CustomField> = IndexMap::new();
 
     for f in fields {
         let key = sanitise_key(&f.label);
