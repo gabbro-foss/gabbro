@@ -286,6 +286,75 @@ void main() {
       await tester.pump();
     });
 
+    // ── Enter-submit / focus chain (Gabbro source) ───────────────────────────
+    testWidgets('Enter on the passphrase runs the import (passphrase-only source)',
+        (tester) async {
+      final tmp = tempGabbroFile();
+      var plainCalled = false;
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [],
+        onImportGabbro: (_, _) async {
+          plainCalled = true;
+          return GabbroImportResult(imported: BigInt.zero, skipped: []);
+        },
+      )));
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      await tester.pump();
+      expect(plainCalled, isTrue);
+    });
+
+    testWidgets('Enter on the passphrase advances to the PIN (key-protected source)',
+        (tester) async {
+      final tmp = tempGabbroFile();
+      var hmacCalled = false;
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [fakeRecord()],
+        onGetYubikeyHmac: (_, _, _) async {
+          hmacCalled = true;
+          return (hmac: <int>[1], credentialId: <int>[1, 2]);
+        },
+      )));
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(hmacCalled, isFalse, reason: 'must not submit before the PIN');
+      final pin =
+          tester.widget<TextField>(find.widgetWithText(TextField, 'YubiKey PIN'));
+      expect(pin.focusNode?.hasFocus, isTrue);
+    });
+
+    testWidgets('Enter on the PIN runs the key-protected import', (tester) async {
+      final tmp = tempGabbroFile();
+      var tapPin = '';
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [fakeRecord()],
+        onGetYubikeyHmac: (records, pin, transport) async {
+          tapPin = pin;
+          return (hmac: <int>[9], credentialId: <int>[1, 2]);
+        },
+        onImportGabbroWithKey: (_, _, _, _) async =>
+            GabbroImportResult(imported: BigInt.one, skipped: []),
+      )));
+      await tester.enterText(
+          find.widgetWithText(TextField, 'Vault passphrase'), 'pw');
+      await tester.enterText(
+          find.widgetWithText(TextField, 'YubiKey PIN'), '1234');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      await tester.pump();
+      expect(tapPin, '1234');
+    });
+
     // ── No-file validation for each importer ─────────────────────────────────
 
     testWidgets('shows error when Enpass import attempted with no file',

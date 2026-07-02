@@ -135,6 +135,7 @@ class _ImportScreenState extends State<ImportScreen> {
   // registered YubiKey (plus a PIN, and a transport choice on Android) to sync.
   List<YubikeyRecordData> _gabbroSourceRecords = [];
   final _yubikeyPinController = TextEditingController();
+  final _yubikeyPinFocus = FocusNode();
   bool _yubikeyPinObscured = true;
   String _gabbroTransport = 'usb';
 
@@ -158,6 +159,7 @@ class _ImportScreenState extends State<ImportScreen> {
   void dispose() {
     _passphraseController.dispose();
     _yubikeyPinController.dispose();
+    _yubikeyPinFocus.dispose();
     super.dispose();
   }
 
@@ -573,6 +575,11 @@ class _ImportScreenState extends State<ImportScreen> {
         TextField(
           controller: _passphraseController,
           obscureText: !_showPassphrase,
+          // A key-protected source still needs a PIN, so advance to it;
+          // otherwise Enter runs the import.
+          onSubmitted: (_) => _gabbroSourceIsKeyProtected
+              ? _yubikeyPinFocus.requestFocus()
+              : _importGabbro(),
           decoration: InputDecoration(
             labelText: l.vaultPassphraseLabel,
             border: const OutlineInputBorder(),
@@ -605,7 +612,9 @@ class _ImportScreenState extends State<ImportScreen> {
           const SizedBox(height: 12),
           TextField(
             controller: _yubikeyPinController,
+            focusNode: _yubikeyPinFocus,
             obscureText: _yubikeyPinObscured,
+            onSubmitted: (_) => _importGabbro(),
             decoration: InputDecoration(
               labelText: l.yubiKeyPinLabel,
               border: const OutlineInputBorder(),
