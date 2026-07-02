@@ -304,6 +304,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     TextEditingController(),
     TextEditingController(),
   ];
+  // Enter/keyboard focus chain: passphrase -> confirm -> (per-key PIN) -> submit.
+  final _confirmFocus = FocusNode();
+  final List<FocusNode> _pinFocusNodes = [FocusNode(), FocusNode()];
   String _vaultPath = '';
   String? _defaultDir;
   bool _pathManuallySet = false;
@@ -401,6 +404,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _confirmController.dispose();
     for (final c in _pinControllers) {
       c.dispose();
+    }
+    _confirmFocus.dispose();
+    for (final f in _pinFocusNodes) {
+      f.dispose();
     }
     final c = _backupKeyCompleter;
     if (c != null && !c.isCompleted) {
@@ -906,6 +913,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             enableInteractiveSelection:
                                 !widget.blockPassphraseCopyPaste,
                             onChanged: _onPassphraseChanged,
+                            onFieldSubmitted: (_) => _confirmFocus.requestFocus(),
                             decoration: InputDecoration(
                               labelText: l.masterPassphraseLabel,
                               border: const OutlineInputBorder(),
@@ -976,10 +984,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           const SizedBox(height: 16),
                           TextFormField(
                             controller: _confirmController,
+                            focusNode: _confirmFocus,
                             obscureText: _confirmObscured,
                             enableInteractiveSelection:
                                 !widget.blockPassphraseCopyPaste,
-                            onFieldSubmitted: (_) => _createVault(),
+                            // With a YubiKey a PIN is still needed, so advance
+                            // to the first PIN field instead of submitting.
+                            onFieldSubmitted: (_) => _useYubikey
+                                ? _pinFocusNodes.first.requestFocus()
+                                : _createVault(),
                             onChanged: (v) {
                               setState(
                                 () => _confirmMatches = v.isEmpty
@@ -1050,7 +1063,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 const SizedBox(height: 12),
                                 TextFormField(
                                   controller: _pinControllers[i],
+                                  focusNode: _pinFocusNodes[i],
                                   obscureText: _pinObscured[i],
+                                  onFieldSubmitted: (_) =>
+                                      i == _pinControllers.length - 1
+                                          ? _createVault()
+                                          : _pinFocusNodes[i + 1].requestFocus(),
                                   decoration: InputDecoration(
                                     labelText: _pinLabel(i, l),
                                     border: const OutlineInputBorder(),

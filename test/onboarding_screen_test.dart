@@ -64,6 +64,117 @@ void main() {
     expect(find.text('Create vault'), findsOneWidget);
   });
 
+  // ── Enter-submit / focus chain ──────────────────────────────────────────────
+  group('Enter-submit chain', () {
+    const passphrase = 'correct horse battery staple one two three four';
+
+    bool focused(WidgetTester tester, String label) => tester
+        .widget<TextField>(find.widgetWithText(TextField, label))
+        .focusNode!
+        .hasFocus;
+
+    Future<void> enableYubikey(WidgetTester tester) async {
+      await tester.ensureVisible(find.byType(SwitchListTile));
+      await tester.tap(find.byType(SwitchListTile));
+      await tester.pump();
+    }
+
+    testWidgets('Enter on the passphrase advances to the confirm field',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(focused(tester, 'Confirm passphrase'), isTrue);
+    });
+
+    testWidgets('Enter on confirm submits when not using YubiKey',
+        (tester) async {
+      var called = false;
+      await tester.pumpWidget(
+          _buildScreen(onInitVault: (a, b, c) async => called = true));
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Alias'), 'Test');
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
+      await tester.pump();
+      await tester.runAsync(() async {
+        await tester.testTextInput.receiveAction(TextInputAction.done);
+        await Future.delayed(const Duration(milliseconds: 300));
+      });
+      await tester.pump();
+      expect(called, isTrue);
+    });
+
+    testWidgets('Enter on confirm advances to the first PIN when using YubiKey',
+        (tester) async {
+      var submitted = false;
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        onInitVault: (a, b, c) async => submitted = true,
+        onInitVaultWithYubikey:
+            (a, b, c, d, e, f, g, h, i) async => submitted = true,
+      ));
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Alias'), 'Test');
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
+      await tester.pump();
+      await enableYubikey(tester);
+      // Re-focus confirm (enabling the switch moved focus away).
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(submitted, isFalse);
+      expect(focused(tester, 'Primary key PIN'), isTrue);
+    });
+
+    testWidgets('Enter on the primary PIN advances to the backup PIN',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(isAndroid: true));
+      await enableYubikey(tester);
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Primary key PIN'), '111111');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pump();
+      expect(focused(tester, 'Backup key PIN'), isTrue);
+    });
+
+    testWidgets('Enter on the backup PIN submits with YubiKey', (tester) async {
+      List<String>? pins;
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        onInitVaultWithYubikey:
+            (a, capturedPins, c, d, e, f, g, h, i) async => pins = capturedPins,
+      ));
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Alias'), 'Test');
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Master passphrase'), passphrase);
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Confirm passphrase'), passphrase);
+      await tester.pump();
+      await enableYubikey(tester);
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Primary key PIN'), 'pin-primary');
+      await tester.enterText(
+          find.widgetWithText(TextFormField, 'Backup key PIN'), 'pin-backup');
+      await tester.pump();
+      await tester.runAsync(() async {
+        await tester.testTextInput.receiveAction(TextInputAction.done);
+        await Future.delayed(const Duration(milliseconds: 300));
+      });
+      await tester.pump();
+      expect(pins, ['pin-primary', 'pin-backup']);
+    });
+  });
+
   // ── Language button ────────────────────────────────────────────────────────
 
   testWidgets('language button shown on first launch (cannot pop)', (tester) async {
