@@ -5,6 +5,7 @@ import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/generator_widget.dart';
+import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 import 'package:gabbro/src/rust/api/password_generator.dart';
 import 'package:gabbro/src/rust/api/passphrase_generator.dart';
 import 'package:gabbro/src/rust/api/types.dart';
@@ -101,6 +102,34 @@ void main() {
     testWidgets('shows show/hide toggle', (tester) async {
       await tester.pumpWidget(_wrap(_stubWidget()));
       expect(find.byKey(const Key('visibility_toggle')), findsOneWidget);
+    });
+
+    testWidgets('breakdown button appears only when revealed and opens the sheet',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(_wrap(_stubWidget()));
+      // Obscured by default -> no breakdown affordance.
+      expect(find.byKey(const Key('breakdown_button')), findsNothing);
+
+      await tester.tap(find.byKey(const Key('visibility_toggle')));
+      await tester.pump();
+      expect(find.byKey(const Key('breakdown_button')), findsOneWidget);
+
+      // ADR-015: announced as a button with an accessible name (its tooltip),
+      // not a bare "button".
+      expect(find.byTooltip('Password breakdown'), findsOneWidget);
+      expect(
+        tester
+            .getSemantics(find.byKey(const Key('breakdown_button')))
+            .flagsCollection
+            .isButton,
+        isTrue,
+      );
+
+      await tester.tap(find.byKey(const Key('breakdown_button')));
+      await tester.pumpAndSettle();
+      expect(find.byType(PasswordBreakdownSheet), findsOneWidget);
+      handle.dispose();
     });
 
     testWidgets('shows entropy display', (tester) async {

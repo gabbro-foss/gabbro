@@ -7,6 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
+import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -153,6 +154,47 @@ void main() {
 
     expect(find.text('s3cr3tP@ss'), findsOneWidget);
     expect(find.text('••••••••'), findsNothing);
+  });
+
+  testWidgets('breakdown button appears on the revealed password and opens the sheet',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    await tester.pumpWidget(
+      _buildScreen(VaultEntryData.login(_loginEntry())),
+    );
+    // Hidden -> no breakdown affordance.
+    expect(find.byKey(const Key('breakdown_button')), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.visibility_off).first);
+    await tester.pump();
+    expect(find.byKey(const Key('breakdown_button')), findsOneWidget);
+
+    // ADR-015: announced as a button with an accessible name (its tooltip),
+    // not a bare "button".
+    expect(find.byTooltip('Password breakdown'), findsOneWidget);
+    expect(
+      tester
+          .getSemantics(find.byKey(const Key('breakdown_button')))
+          .flagsCollection
+          .isButton,
+      isTrue,
+    );
+
+    await tester.tap(find.byKey(const Key('breakdown_button')));
+    await tester.pumpAndSettle();
+    expect(find.byType(PasswordBreakdownSheet), findsOneWidget);
+    handle.dispose();
+  });
+
+  testWidgets('card fields never show the breakdown button, even when revealed',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(VaultEntryData.card(_cardEntry())));
+    // Reveal every obscured card field (number / CVV / PIN).
+    while (find.byIcon(Icons.visibility_off).evaluate().isNotEmpty) {
+      await tester.tap(find.byIcon(Icons.visibility_off).first);
+      await tester.pump();
+    }
+    expect(find.byKey(const Key('breakdown_button')), findsNothing);
   });
 
   testWidgets('copy button shows copied snackbar', (tester) async {

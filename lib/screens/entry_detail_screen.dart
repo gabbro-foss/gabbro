@@ -797,6 +797,16 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                   ),
                 ),
               ),
+              // Breakdown — only for fields wired with a breakdown (the
+              // password) and only while revealed. onLongPress carries the
+              // same action, so a tap here mirrors the long-press.
+              if (onLongPress != null && !obscured)
+                IconButton(
+                  key: const Key('breakdown_button'),
+                  icon: const Icon(Icons.analytics_outlined, size: 18),
+                  tooltip: l.passwordBreakdownTitle,
+                  onPressed: onLongPress,
+                ),
               IconButton(
                 icon: const Icon(Icons.copy_outlined, size: 18),
                 tooltip: l.tooltipCopy,

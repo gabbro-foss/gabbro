@@ -496,6 +496,11 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
     );
   }
 
+  void _showBreakdown() => showModalBottomSheet<void>(
+        context: context,
+        builder: (_) => PasswordBreakdownSheet(password: _generated),
+      );
+
   Widget _buildValueCard(ColorScheme colorScheme, AppLocalizations l) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -507,13 +512,8 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
         children: [
           Expanded(
             child: GestureDetector(
-              onLongPress: (_obscured || _generated.isEmpty)
-                  ? null
-                  : () => showModalBottomSheet<void>(
-                        context: context,
-                        builder: (_) =>
-                            PasswordBreakdownSheet(password: _generated),
-                      ),
+              onLongPress:
+                  (_obscured || _generated.isEmpty) ? null : _showBreakdown,
               child: Text(
                 key: const Key('generated_value'),
                 _generated.isEmpty
@@ -531,6 +531,14 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
               ),
             ),
           ),
+          // Breakdown — only when revealed + non-empty (matches the long-press).
+          if (!_obscured && _generated.isNotEmpty)
+            IconButton(
+              key: const Key('breakdown_button'),
+              icon: const Icon(Icons.analytics_outlined),
+              tooltip: l.passwordBreakdownTitle,
+              onPressed: _showBreakdown,
+            ),
           // Visibility toggle
           IconButton(
             key: const Key('visibility_toggle'),
