@@ -170,6 +170,7 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
         screen = SecurityScreen(
           settings: appState.settings,
           onUpdate: (updated) => appState.updateSettings(updated),
+          vaultPath: widget.vaultPath,
         );
       case 3:
         screen = const AboutScreen();

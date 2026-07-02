@@ -5,6 +5,7 @@ import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
+import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/vault_registry.dart';
@@ -429,6 +430,30 @@ void main() {
 
       // _selectedEntryId ('id-1') is no longer in filteredEntries — must reset.
       expect(find.text('Select an entry'), findsOneWidget);
+    });
+
+    // -----------------------------------------------------------------------
+    // Test 13: The Security rail destination must hand the vault path to
+    // SecurityScreen. Biometric enrollment is keyed per vault; without the
+    // path the tablet enrolls against "" so it never persists / is never
+    // offered at unlock. The phone layout passes it; the tablet layout did
+    // not (regression once a device crosses the 600dp threshold).
+    // -----------------------------------------------------------------------
+    testWidgets('Security rail destination passes the vault path to SecurityScreen', (
+      tester,
+    ) async {
+      _setWidth(tester, 700);
+      await tester.pumpWidget(_buildScreen());
+      await tester.pumpAndSettle();
+
+      // Tap Security in the NavigationRail (security_outlined is unique to it).
+      await tester.tap(find.byIcon(Icons.security_outlined));
+      await tester.pumpAndSettle();
+
+      final security = tester.widget<SecurityScreen>(
+        find.byType(SecurityScreen),
+      );
+      expect(security.vaultPath, '/tmp/test.gabbro');
     });
   });
 }
