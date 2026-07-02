@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Enter now submits (or advances) in every passphrase and PIN field** — unlock, onboarding, change-passphrase, import, sync-from-file, biometric enrollment and vault-delete authorization. In multi-field flows Enter moves to the next field and submits from the last; a YubiKey vault advances passphrase → PIN before submitting. Previously Enter did nothing in most of these fields. Also fixes a latent crash when confirming the biometric-enrollment passphrase dialog.
 - Biometric unlock now works on wide screens (the tablet two-pane layout). Enabling it there previously did nothing — the toggle wouldn't stick and no biometric button appeared at unlock — because the Security screen wasn't told which vault it was for, so enrollment keyed against an empty path. Phone-width layouts were unaffected. Hardware-verified on an Android 16 tablet.
 - The post-sync "Vault synced…" bar no longer lingers on the unlock screen after locking (and its **Details** button can no longer crash the app when tapped there). The bar now carries a close (X) button so it can be dismissed — an actioned snackbar never times out on its own — with the close and Details controls labelled for screen readers.
+- Custom entry fields now show in a stable, consistent order (the order they were created) across devices and app restarts. They were stored in an unordered map, so two instances viewing the same vault could list the same fields differently.
 
 ## [0.1.0-alpha.10] – 2026-06-26
 
