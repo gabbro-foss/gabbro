@@ -57,8 +57,8 @@ Adopt screen-reader accessibility as a first-class, **tested** requirement.
   touched (e.g. the current Enter-submit pass double-checks every passphrase/PIN
   field's labelling); no full audit is mandated, but no new gaps are permitted.
 - **Not covered here:** visual/low-vision accessibility (contrast, larger
-  text-size slider). A high-contrast theme already exists; the slider is a backlog
-  item.
+  text-size slider). A high-contrast theme already exists; low-vision text scaling
+  is now specified in [ADR-016](ADR-016-large-text-and-target-scaling-accessibility.md).
 
 ## References
 - Flutter test guidelines: `labeledTapTargetGuideline`, `androidTapTargetGuideline`,

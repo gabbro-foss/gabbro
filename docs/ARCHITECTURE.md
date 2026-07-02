@@ -92,13 +92,38 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task:
+### Next task: Large-text accessibility initiative (ADR-016)
 
-**Text-size control: replace the discrete list with a continuous slider.** The current
-fixed choice list tops out too small (insufficient max on a tablet). Swap it for a
-GrapheneOS-style slider with live preview and a much larger maximum derived from
-screen size/resolution (not a fixed cap). Drops the per-size label strings (trims l10n).
-Settings key stays a scale factor; migrate old discrete values on load. No ADR needed.
+Make Gabbro usable at very large text (low-vision): one absolute `textScale` knob
+drives text **and** controls in unison; screen-derived max (600dp tiers — phone ~4x,
+tablet ~6x, **calibrate on hardware**); targets scale proportionally, capped ~2x.
+Design fixed in [ADR-016](decisions/ADR-016-large-text-and-target-scaling-accessibility.md).
+
+**Phase 0 — Calibrate.** On-device MediaQuery read (logical size, devicePixelRatio,
+600dp tier) on phone + tablet to set the real 4x/6x/2x constants.
+
+**Phase 1 — Slider + model + onboarding.** `TextSizeChoice` enum -> `double textScale`
+[0.8..max] with migration + clamp; exponential slider (Smaller/Larger labels, live
+preview) as one reusable widget on appearance + onboarding; onboarding toggle ON ->
+~3x + reveal slider + hide logo (OFF reverses); `main.dart` apply + remove
+`textScaleFor`/duplicate `_textScale`; drop the 5 per-size l10n labels. Full TDD.
+
+**Phase 2 — Text overflow hardening** (evidence from a headless 5x overflow probe on
+phone+tablet surfaces): fixed-box clippers (csv_mapping `width:88`, import_skipped
+`height:300`), help page-dot spacing, onboarding accessibility button, import
+`SegmentedButton`, entry_detail AppBar crowding.
+
+**Phase 2b — Help-screen pinch-to-zoom** (its own feature, not a layout fix):
+`FLAG_SECURE` blocks screenshots, so a low-vision user cannot magnify the help
+pages externally — add in-app pinch/zoom (InteractiveViewer) on help content,
+especially any images, which `textScaler` does not touch.
+
+**Phase 3 — Target scaling** (the core payoff): `scaledControl` helper off `textScale`
+(capped ~2x); alphabet bar (hide on phone tier / scale on tablet tier); password
+breakdown sheet; FABs; drop `VisualDensity.compact`. Per-control >=48dp touch-target
+tests at every scale; hardware-verified per screen.
+
+Slider ships first and becomes the probe for Phases 2-3.
 
 ---
 
