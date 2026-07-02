@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
+import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 Widget _buildScreen() => testApp(VaultListScreen(
@@ -136,7 +137,7 @@ void main() {
     await tester.tap(find.text('About'));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('0.1.0'), findsOneWidget);
+    expect(find.byType(AboutScreen), findsOneWidget);
   });
 
   testWidgets('tapping Manage vaults is null-safe when no GabbroApp', (tester) async {

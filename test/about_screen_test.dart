@@ -13,7 +13,11 @@ void main() {
   testWidgets('AboutScreen shows app version string', (tester) async {
     await tester.pumpWidget(testApp(const AboutScreen()));
     await tester.pumpAndSettle();
-    expect(find.textContaining('0.1.0'), findsOneWidget);
+    // The version is injected at build time via --dart-define=APP_VERSION
+    // (from pubspec, build metadata stripped); test builds pass no define, so
+    // the version line falls back to "dev". Release builds show e.g.
+    // "0.1.0-alpha.10" — see BUILD_AND_RELEASE.md.
+    expect(find.text('Version dev'), findsOneWidget);
   });
 
   testWidgets('AboutScreen link tile tapped opens dialog with URL', (tester) async {

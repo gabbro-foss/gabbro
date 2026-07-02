@@ -3,10 +3,10 @@ import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Hard-coded version string — updated manually when pubspec.yaml version
-/// changes. Avoids the package_info_plus dependency for a value that changes
-/// rarely and always coincides with other source edits.
-const _kAppVersion = '0.1.0';
+/// Injected at build time from `pubspec.yaml` (build metadata stripped) via
+/// `--dart-define=APP_VERSION=...` — see BUILD_AND_RELEASE.md. No dependency,
+/// no manual drift. Local/dev builds (no define) show "dev".
+const _kAppVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'dev');
 
 const _kGitHubUrl = 'https://github.com/Zabamund/gabbro';
 const _kIssuesUrl = 'https://github.com/Zabamund/gabbro/issues';

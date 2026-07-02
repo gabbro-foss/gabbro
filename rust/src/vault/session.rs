@@ -762,14 +762,12 @@ pub fn session_export_vault_json(export_path: PathBuf) -> Result<(), String> {
     #[derive(serde::Serialize)]
     struct JsonExport<'a> {
         exported_at: String,
-        gabbro_version: &'static str,
         folders: &'a [String],
         entries: &'a [VaultEntry],
     }
 
     let export = JsonExport {
         exported_at: crate::api::vault::chrono_now(),
-        gabbro_version: "1.0.0",
         folders: &session.folders,
         entries: &session.entries,
     };
@@ -5841,7 +5839,10 @@ mod json_export_tests {
             parsed["exported_at"].is_string(),
             "must have exported_at timestamp"
         );
-        assert_eq!(parsed["gabbro_version"], "1.0.0");
+        assert!(
+            parsed.get("gabbro_version").is_none(),
+            "gabbro_version was dropped from the JSON export (brittle hard-coded value)"
+        );
         assert_eq!(parsed["folders"].as_array().unwrap().len(), 2);
         assert_eq!(parsed["entries"].as_array().unwrap().len(), 2);
         assert!(
