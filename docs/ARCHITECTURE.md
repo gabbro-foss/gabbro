@@ -107,10 +107,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 
 **Procedure:** items sit here until work begins. When picked up, move the item to Current Focus and delete it from here. When done, delete it entirely — the git log is the record.
 
-### Bugs
-- **DuckDuckGo browser autofill not working** (Android). Likely DDG blocking autofill
-  modifications, not a Gabbro bug — probably WONTFIX/YAGNI; confirm before closing.
-
 ### Security (pre-v1)
 - Human expert cryptography review of `rust/src/crypto/` (academic outreach, RustCrypto maintainers, or formal audit) — **welcome, not blocking** (F-03, the one open design question, is addressed at VERSION 8; this is now defence-in-depth, not a release gate).
 - Draft the free external crypto-review outreach (narrow ask: the construction only —
