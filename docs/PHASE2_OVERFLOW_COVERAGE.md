@@ -19,7 +19,7 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | about_screen | in-probe (pass) | | |
 | appearance_screen | in-probe (pass) | P1 slider holds at 4x/6x | |
 | change_passphrase_screen | todo | | |
-| create_entry_screen | in-probe (pass) | throws nothing, BUT folder chooser is a **silent clip** (not a RenderFlex overflow — corrected 2026-07-03); see watchlist | |
+| create_entry_screen | in-probe (pass) | **fixed** the silent clip: `isExpanded:true` on all 3 DropdownButtonFormFields (folder + card-status + generic). Silent clips aren't test-assertable -> hardware is the check | pending |
 | csv_mapping_screen | todo | **fixed `width:88` cell — silent clip** | |
 | entry_detail_screen | todo | AppBar action crowding | |
 | export_screen | todo | | |
@@ -66,9 +66,9 @@ Sweep run 2026-07-03: 339 raw hits, the large majority `SizedBox(height:/width:)
 **spacers** (benign). Real clip-risk = a fixed dimension on a box *containing text*. Triage
 ongoing — confirmed/suspected below:
 
-- **create_entry_screen folder chooser** — `DropdownButtonFormField` (line ~1686) + the
-  `_dropdownField` helper (~1726): selected text clips at max scale (maintainer saw it on
-  Android). Candidate fix `isExpanded: true` — VERIFY it's a clip first (probe throws nothing).
+- **create_entry_screen folder chooser** — FIXED: `isExpanded: true` on all 3
+  `DropdownButtonFormField`s (folder ~1686, `_dropdownField` ~1726, card-status ~1304) so a
+  long value wraps instead of clipping. Not test-assertable (silent) -> pending hardware.
 - csv_mapping_screen `width:88` cell.
 - import_skipped_dialog `height:300` box.
 - (continue triaging the 339-hit sweep; add each real risk here.)
