@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/about_screen.dart';
@@ -321,12 +322,15 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                     ? MergeSemantics(
                                         child: Semantics(
                                           label: widget.displayTitle(entry),
-                                          child: Checkbox(
-                                            value: widget.selectedIds.contains(
-                                              entry.id,
+                                          child: scaledSelectionCheckbox(
+                                            context,
+                                            Checkbox(
+                                              value: widget.selectedIds.contains(
+                                                entry.id,
+                                              ),
+                                              onChanged: (_) => widget
+                                                  .onToggleSelection(entry.id),
                                             ),
-                                            onChanged: (_) => widget
-                                                .onToggleSelection(entry.id),
                                           ),
                                         ),
                                       )

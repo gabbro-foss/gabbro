@@ -1198,15 +1198,18 @@ class _VaultListScreenState extends State<VaultListScreen>
     return MergeSemantics(
       child: Semantics(
         label: label,
-        child: Checkbox(
-          value: _selectedIds.contains(entry.id),
-          onChanged: (_) => setState(() {
-            if (_selectedIds.contains(entry.id)) {
-              _selectedIds.remove(entry.id);
-            } else {
-              _selectedIds.add(entry.id);
-            }
-          }),
+        child: scaledSelectionCheckbox(
+          context,
+          Checkbox(
+            value: _selectedIds.contains(entry.id),
+            onChanged: (_) => setState(() {
+              if (_selectedIds.contains(entry.id)) {
+                _selectedIds.remove(entry.id);
+              } else {
+                _selectedIds.add(entry.id);
+              }
+            }),
+          ),
         ),
       ),
     );

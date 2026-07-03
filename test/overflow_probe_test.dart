@@ -145,14 +145,9 @@ final Map<String, Widget Function()> _screens = {
 };
 
 // Screens with a KNOWN unfixed large-text layout issue, skipped (not silently
-// passing) and tracked in PHASE2_OVERFLOW_COVERAGE.md; remove the entry once
-// fixed so the probe re-arms on it.
-const Map<String, String> _knownOverflow = {
-  // Phone only (tablet fits): the ListTile trailing action-button Row can't fit
-  // beside the title at max scale, so the item fails to size. A control-layout
-  // problem (controls don't fit) -> deferred to Phase 3, not a text fix.
-  'recovery_history': 'ListTile trailing-actions do not fit on phone (Phase 3)',
-};
+// passing); remove the entry once fixed so the probe re-arms on it. Empty now:
+// recovery_history's ListTile-trailing case was fixed in Phase 3 Slice C.
+const Map<String, String> _knownOverflow = <String, String>{};
 
 void main() {
   for (final surface in const [_phone, _tablet]) {
