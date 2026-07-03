@@ -77,7 +77,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1153 | 2 |
+| Flutter (`flutter test`) | 1163 | 2 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -92,71 +92,26 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Large-text accessibility (ADR-016) — Phase 2 (text overflow hardening)
+### Next task: Large-text accessibility (ADR-016) — Phase 2b (help pinch-to-zoom)
 
-Make Gabbro usable at very large text (low-vision): one absolute `textScale` knob
-drives text **and** (later phases) controls in unison; screen-derived max (600dp tiers —
-phone 3.5x, tablet 5x); targets scale proportionally, capped ~2x. Design in
+Make Gabbro usable at very large text (low-vision): one absolute `textScale` knob drives
+text **and** (later phases) controls in unison; screen-derived max (600dp tiers — phone 2x,
+tablet 3x); targets scale proportionally, capped ~2x. Design in
 [ADR-016](decisions/ADR-016-large-text-and-target-scaling-accessibility.md).
 
-**Phase 0 — Calibrate [DONE 2026-07-02].** Phone tier 360-411dp (S23 360 / GOS 411),
-tablet 866dp (Idea Tab Pro). Consts (hardware-tuned 2026-07-03, was 6x/8x, then 4x/6x): phone 3.5x /
-tablet 5x / target cap 2x / onboarding toggle 3x.
+**Phases 0-2 DONE** (hardware-verified S23/GOS/tablet): calibrate; slider + `text_scale`
+model + onboarding (`lib/text_scale.dart`, `TextSizeSlider`); text-overflow hardening across
+every screen/dropdown/dialog. Maxes settled at **2x phone / 3x tablet**.
 
-**Phase 1 — Slider + model + onboarding [DONE + COMMITTED 2026-07-03; hardware-confirmed
-S23/GOS/tablet; commits 75ae07f code + 2d3f8cf docs on `accessibility_initiative`, NOT
-pushed].** `double textScale` + `text_scale` key (migrates legacy `text_size`; clamp
-[0.8,8.0]); pure `lib/text_scale.dart` (`deviceMaxScale`, exponential `scaleForPos`<->
-`posForScale`, `targetScaleFor`, `clampToDevice`); `main.dart` applies `clampToDevice`
-at all 3 MediaQuery sites (old `TextSizeChoice`/`textScaleFor`/`_textScale` removed);
-reusable `TextSizeSlider` (letter-free `zoom_out`/`zoom_in` glyphs, live preview) on
-appearance + onboarding; onboarding toggle -> 3x + reveal slider + hide logo (high-contrast
-coupling kept), preview = "Gabbro" onboarding / full sentence appearance; 5 per-size l10n
-labels dropped; `updateSettings` optimistic (setState before save). Maxes 4x/6x confirmed
-good (maintainer wants it very large for the few who need it).
+**Phase 2b — Help-screen pinch-to-zoom [NEXT].** `FLAG_SECURE` blocks screenshots, so a
+low-vision user cannot magnify the help pages externally — add in-app pinch/zoom
+(`InteractiveViewer`) on help content, especially images, which `textScaler` does not touch.
 
-**Phase 2 — Text overflow hardening [NEXT].** Hardware finding 2026-07-03: at max scale on
-Android the **folder chooser** text clips at ~half width. Build the ADR-016 s7 **headless
-overflow probe** (render each screen at max scale on phone 360dp->4x + tablet 866dp->6x
-surfaces; assert no `RenderFlex` overflow + no clipped text) to find ALL bleed-off
-mechanically, then fix each (hardware-verified). Suspects from an earlier headless probe:
-fixed-box clippers (csv_mapping `width:88`, import_skipped `height:300`), help page-dot
-spacing, onboarding accessibility button, import `SegmentedButton`, entry_detail AppBar
-crowding — plus the folder chooser (create/edit-entry folder dropdown or manage-folders).
-
-**P2 progress [2026-07-03] — text overflow substantially DONE; scope = Option C** (fix
-text overflows, defer control-layout to Phase 3). Max trimmed 6x/8x -> 4x/6x -> **3.5x/5x**
-for margin (maintainer, may trim again). Full exhaustive ledger of every surface:
-`docs/PHASE2_OVERFLOW_COVERAGE.md` (delete at P2 close). All committed, `flutter test` green.
-DONE: probe `test/overflow_probe_test.dart` covers **15 screens** (phone 3.5x + tablet 5x,
-asserts `takeException()` null); throwing overflows fixed (help pages scroll, onboarding
-a11y-button row, language note-in-scroll, generator label/value rows); **every dropdown**
-app-wide (6 sites: `isExpanded`+`itemHeight:null`+`selectedItemBuilder` ellipsis); **every
-multi-widget dialog** (~13: `AlertDialog(scrollable:true)` + one chip `Row`->`Wrap`);
-csv_mapping (label-stack + DataTable) + import_skipped (list-in-dialog). Each is
-hardware-`pending` (maintainer verified: help, onboarding, folder filter, biometric dialog).
-NOT probed (FFI fixtures too costly) -> **maintainer hardware-walk** (checklist in
-`gabbro/.scratchpad`): import, unlock, vault_list, save_confirm, review_changes,
-manage_yubikeys, tablet_vault_layout. Their dropdowns/dialogs are already fixed app-wide;
-only screen-specific Row/Column layout is unverified there. DEFERRED to Phase 3
-(control-layout, not text): **recovery_history** — ListTile trailing action-buttons don't fit
-on phone at max (item mis-sizes); same class likely on other ListTile-with-trailing screens.
-NEXT SESSION: read `.scratchpad` walk results, fix any findings, then close Phase 2 and start
-**Phase 3 — target/control scaling** (ADR-016 s3/s6: scaledControl off textScale capped ~2x;
-alphabet bar; password breakdown sheet; FABs; drop VisualDensity.compact; the ListTile class).
-Phase 2b (help pinch-to-zoom) also outstanding.
-
-**Phase 2b — Help-screen pinch-to-zoom** (its own feature, not a layout fix):
-`FLAG_SECURE` blocks screenshots, so a low-vision user cannot magnify the help
-pages externally — add in-app pinch/zoom (InteractiveViewer) on help content,
-especially any images, which `textScaler` does not touch.
-
-**Phase 3 — Target scaling** (the core payoff): `scaledControl` helper off `textScale`
-(capped ~2x); alphabet bar (hide on phone tier / scale on tablet tier); password
-breakdown sheet; FABs; drop `VisualDensity.compact`. Per-control >=48dp touch-target
-tests at every scale; hardware-verified per screen.
-
-Slider ships first and becomes the probe for Phases 2-3.
+**Phase 3 — Target/control scaling** (the core payoff): `scaledControl` helper off
+`textScale` (capped ~2x); alphabet bar (hide on phone tier / scale on tablet tier); password
+breakdown sheet; FABs; drop `VisualDensity.compact`; the **ListTile-with-trailing-buttons
+class** (recovery_history et al. — deferred here from Phase 2, controls don't fit at max).
+Per-control >=48dp touch-target tests at every scale; hardware-verified per screen.
 
 ---
 

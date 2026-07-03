@@ -54,11 +54,13 @@ accessibility requirement.
    **Idea Tab Pro = 866 dp** (dpr 2.125, 1840×2944 @ 340 dpi). Phone tier spans
    **360–411 dp** (360 dp = worst case → the phone surface for the overflow probe);
    tablet has ~2.1–2.4× the room.
-   - **Phone tier (<600 dp): max 3.5×.**
-   - **Tablet tier (≥600 dp): max 5×.**
+   - **Phone tier (<600 dp): max 2×** (the WCAG 1.4.4 resize bar; severe low-vision
+     belongs on a tablet, where the phone form factor stops fighting back).
+   - **Tablet tier (≥600 dp): max 3×.**
    Phase 0 fixed the tiers and the ratio; the ceilings were **dialled in live on the
-   slider in Phase 1** — a first hardware pass (2026-07-03) found the initial 6×/8× left
-   too little content on screen, so the ceilings are **3.5× / 5×** (trimmed from 4×/6× for layout margin; subject to re-test).
+   slider in Phase 1-2** — each hardware pass (2026-07-03) found the top of the range
+   unusable / still clipping, so the ceilings were trimmed in stages
+   (6×/8× -> 4×/6× -> 3.5×/5× -> 3.0×/5× -> 2×/4×) to the final **2× / 3×**.
    A stored value is **clamped to the current device's max on load**, so a large value
    set on a tablet cannot break the UI when the vault is opened on a phone.
 
@@ -110,8 +112,8 @@ accessibility requirement.
   (tracked in `ARCHITECTURE.md` → Current Focus); the slider ships first and becomes
   the probe for the rest.
 - **Calibration dependency:** the ADR fixes the *model*, not the constants. Measured on
-  the maintainer's phone and tablet (2026-07-03): phone 3.5× / tablet 5× / target cap 2×
-  (subject to further re-test); an earlier 6×/8× was too large.
+  the maintainer's phone and tablet (2026-07-03): phone 2× / tablet 3× / target cap 2×;
+  earlier 6×/8×, 4×/6×, 3.5×/5×, 3.0×/5×, 2×/4× were all too large / still clipping.
 - **Not covered here:** contrast (a high-contrast theme already exists) and
   screen-reader labelling (ADR-015) — this ADR composes with both.
 
