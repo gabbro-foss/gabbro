@@ -70,12 +70,7 @@ final Map<String, Widget Function()> _screens = {
 // Screens with a KNOWN throwing overflow at max scale, awaiting a layout fix.
 // Skipped (not silently passing) and tracked in PHASE2_OVERFLOW_COVERAGE.md;
 // remove the entry as each screen is fixed so the probe re-arms on it.
-const Map<String, String> _knownOverflow = {
-  'help':
-      'ADR-016 P2: pages do not scroll at max scale (see PHASE2_OVERFLOW_COVERAGE.md)',
-  'onboarding':
-      'ADR-016 P2: accessibility-button row overflows (see PHASE2_OVERFLOW_COVERAGE.md)',
-};
+const Map<String, String> _knownOverflow = {};
 
 void main() {
   for (final surface in const [_phone, _tablet]) {

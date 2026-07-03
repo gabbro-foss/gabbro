@@ -747,6 +747,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Row(
+                // spaceBetween (not Spacer) so the accessibility button can be
+                // Flexible and shrink instead of overflowing at large text.
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   if (Navigator.canPop(context))
                     IconButton(
@@ -760,25 +763,37 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       tooltip: AppLocalizations.of(context).sectionLanguage,
                       onPressed: _showLanguagePicker,
                     ),
-                  const Spacer(),
-                  AnimatedOpacity(
-                    opacity: MediaQuery.of(context).viewInsets.bottom > 0
-                        ? 0.0
-                        : 1.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: OutlinedButton.icon(
-                        icon: Icon(
-                          Icons.accessibility_new,
-                          color: isAccessibilityOn
-                              ? Theme.of(context).colorScheme.primary
-                              : null,
-                        ),
-                        label: Text(AppLocalizations.of(context).accessibilityButton),
-                        onPressed: _toggleAccessibility,
-                        style: OutlinedButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
+                  Flexible(
+                    child: AnimatedOpacity(
+                      opacity: MediaQuery.of(context).viewInsets.bottom > 0
+                          ? 0.0
+                          : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: OutlinedButton(
+                          onPressed: _toggleAccessibility,
+                          style: OutlinedButton.styleFrom(
+                            visualDensity: VisualDensity.compact,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.accessibility_new,
+                                color: isAccessibilityOn
+                                    ? Theme.of(context).colorScheme.primary
+                                    : null,
+                              ),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  l.accessibilityButton,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

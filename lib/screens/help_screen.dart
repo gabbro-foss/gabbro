@@ -76,24 +76,38 @@ class _HelpScreenState extends State<HelpScreen> {
                 controller: _controller,
                 onPageChanged: (i) => setState(() => _currentPage = i),
                 itemCount: count,
-                itemBuilder: (context, i) => Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Image.asset(
-                          _kAssets[i],
-                          fit: BoxFit.contain,
+                itemBuilder: (context, i) => LayoutBuilder(
+                  // Fill the page when content fits; scroll when it doesn't (large
+                  // text). The image is capped so the caption always has room.
+                  builder: (context, constraints) => SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: constraints.maxHeight * 0.5,
+                              ),
+                              child: Image.asset(
+                                _kAssets[i],
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              captions[i],
+                              style: textTheme.bodyMedium,
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        captions[i],
-                        style: textTheme.bodyMedium,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                    ],
+                    ),
                   ),
                 ),
               ),
