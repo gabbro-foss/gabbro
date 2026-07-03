@@ -77,7 +77,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1183 | 0 |
+| Flutter (`flutter test`) | 1186 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -92,41 +92,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Large-text accessibility (ADR-016) — Phase 3 (control/target scaling)
-
-Make Gabbro usable at very large text (low-vision): one absolute `textScale` knob drives
-text **and** (later phases) controls in unison; screen-derived max (600dp tiers — phone 2x,
-tablet 3x); targets scale proportionally, capped ~2x. Design in
-[ADR-016](decisions/ADR-016-large-text-and-target-scaling-accessibility.md).
-
-**Phases 0-2b DONE** (hardware-verified S23/GOS/tablet): calibrate; slider + `text_scale`
-model + onboarding (`lib/text_scale.dart`, `TextSizeSlider`); text-overflow hardening across
-every screen/dropdown/dialog (maxes settled at **2x phone / 3x tablet**); help screenshots
-tap to a full-screen `InteractiveViewer` (pinch/pan, close) since `textScaler` can't scale a
-PNG and `FLAG_SECURE` blocks an external magnifier.
-
-**Phase 3 — Target/control scaling [IN PROGRESS]** (the core payoff): `textScaler` grows
-text only, so at large text icons/targets/controls stay small. Generalise
-`targetScaleFor` (1.0->2.0) into a reusable control-scale and apply it. Per-control >=48dp
-touch-target tests at every scale; hardware-verified per screen. Sliced (net-first +
-canon-TDD each), tick as we go:
-
-- [x] **Slice A — the primitive [DONE, hardware-verified].** `lib/control_scale.dart`
-  `controlScaleFor(BuildContext)` on `targetScaleFor` (+ tests); biometric icon refactored
-  onto it; dropped the 3 `VisualDensity.compact` overrides (2 selection checkboxes now
-  standard >=48dp; onboarding a11y button is a fixed-size `noScaling` control).
-- [x] **Slice B — icons / FAB / chevrons [DONE, hardware-verified].** `scaledIconSize`
-  helper; applied to the 3 FABs (scaled child icon), the help prev/next chevrons, and the
-  vault-list app-bar actions (checklist/lock/menu — the title ellipsizes so no overflow).
-  Deferred to later passes (agreed): reveal-eye toggles (13 scattered/constrained sites) and
-  other screens' app bars.
-- [x] **Slice C — checkboxes + ListTile-trailing [DONE, hardware-verified].** Selection
-  checkboxes scale gently (capped 1.4x via `scaledSelectionCheckbox`, so they don't crowd the
-  row). recovery_history's ListTile-trailing overflow turned out to be already fixed by the
-  2x/3x max cut (net-first discovery) — un-skipped in the probe, no stacking code needed. The
-  overflow probe now runs with **0 skips**.
-- [ ] **Slice D — alphabet bar** (hide on phone tier / scale on tablet tier) **+
-  password-breakdown sheet.**
+### Next task
 
 ---
 
@@ -149,6 +115,13 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 
 ### Features & UX
 - Autofill via `auto-type` (Linux/desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
+
+### Accessibility polish (ADR-016 follow-ups, deferred)
+- **Scale the reveal-eye (show/hide) toggles** at large text (13 scattered, some in
+  constrained field-suffix/row positions — needs care per site).
+- **Scale app-bar action icons on the remaining screens** (Slice B did the vault list only).
+- **Scale the alphabet bar's own up/down scroll chevrons** (their size is baked into the
+  bar's windowing height math — touch with care).
 
 ### Code Quality
 - **Tablet pane-resize handle has no screen-reader label.** The two-pane (tablet)

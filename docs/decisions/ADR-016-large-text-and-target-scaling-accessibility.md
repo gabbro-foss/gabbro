@@ -1,7 +1,7 @@
 # ADR-016: Large-Text and Target Scaling as a Tested Accessibility Requirement
 
 ## Status
-Accepted.
+Accepted — **Implemented** (all phases hardware-verified 2026-07-03; see CHANGELOG / git log).
 
 ## Date
 2026-07-02
