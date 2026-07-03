@@ -135,11 +135,16 @@ app-wide (6 sites: `isExpanded`+`itemHeight:null`+`selectedItemBuilder` ellipsis
 multi-widget dialog** (~13: `AlertDialog(scrollable:true)` + one chip `Row`->`Wrap`);
 csv_mapping (label-stack + DataTable) + import_skipped (list-in-dialog). Each is
 hardware-`pending` (maintainer verified: help, onboarding, folder filter, biometric dialog).
-NOT probed yet (need FFI fixtures): import, unlock, vault_list, save_confirm, review_changes,
-manage_yubikeys, tablet_vault_layout. DEFERRED to Phase 3 (control-layout, not text):
-**recovery_history** — ListTile trailing action-buttons don't fit on phone at max (item fails
-to size); same class likely on other ListTile-with-trailing screens.
-NEXT: add the un-probed screens (fix any TEXT overflows), then close P2 -> Phase 3.
+NOT probed (FFI fixtures too costly) -> **maintainer hardware-walk** (checklist in
+`gabbro/.scratchpad`): import, unlock, vault_list, save_confirm, review_changes,
+manage_yubikeys, tablet_vault_layout. Their dropdowns/dialogs are already fixed app-wide;
+only screen-specific Row/Column layout is unverified there. DEFERRED to Phase 3
+(control-layout, not text): **recovery_history** — ListTile trailing action-buttons don't fit
+on phone at max (item mis-sizes); same class likely on other ListTile-with-trailing screens.
+NEXT SESSION: read `.scratchpad` walk results, fix any findings, then close Phase 2 and start
+**Phase 3 — target/control scaling** (ADR-016 s3/s6: scaledControl off textScale capped ~2x;
+alphabet bar; password breakdown sheet; FABs; drop VisualDensity.compact; the ListTile class).
+Phase 2b (help pinch-to-zoom) also outstanding.
 
 **Phase 2b — Help-screen pinch-to-zoom** (its own feature, not a layout fix):
 `FLAG_SECURE` blocks screenshots, so a low-vision user cannot magnify the help
