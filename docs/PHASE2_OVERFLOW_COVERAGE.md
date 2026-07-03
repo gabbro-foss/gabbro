@@ -87,7 +87,14 @@ bounds: content clips AND bleeds over the action buttons (maintainer hit this on
 manage-folders delete dialog, 2026-07-03). Fix = wrap `content` in `SingleChildScrollView`.
 Audit every `AlertDialog` with Column/ListView content:
 
-- DONE: manage_folders_screen (delete-folder dialog).
-- TODO: vault_list_screen (2), manage_vaults_screen (3), manage_yubikeys_screen (2),
-  security_screen (2), entry_detail_screen (1), import_failures_dialog (1),
-  import_skipped_dialog (1). Skip the short single-TextField dialogs (rename/add folder).
+- DONE: manage_folders (delete), manage_vaults (YubiKey-auth-delete), manage_yubikeys
+  (add-key steps, add-key transport+PIN — also raw chip `Row`->`Wrap`, remove-key warning),
+  security (biometric-enroll; the consent dialog already scrolled), entry_detail
+  (export-file), import_failures.
+- Skipped (short single-TextField, won't overflow): rename-vault, rename/add-folder,
+  edit-alias.
+- TODO: **import_skipped_dialog** (`content: SizedBox(height:300)` — the `height:300`
+  watchlist item; inspect its internal ListView scroll at 4x). vault_list dialogs were
+  already Text/SingleChildScrollView (no action).
+- **Enumeration gap learned:** grep for `content: Column(` MISSES content built into a
+  variable (e.g. yubikeys `warningContent`) — re-audit with `content: <ident>` too.
