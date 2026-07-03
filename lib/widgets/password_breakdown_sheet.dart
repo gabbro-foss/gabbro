@@ -1,6 +1,7 @@
 import 'dart:ui' show PointerDeviceKind;
 
 import 'package:flutter/material.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 
 enum _CharType { uppercase, lowercase, digit, letter, symbol }
@@ -113,6 +114,9 @@ class _PasswordBreakdownSheetState extends State<PasswordBreakdownSheet> {
     // Button semantics + a desktop hover tooltip, matching the alphabet index
     // bar. The Tooltip sits inside the excludeSemantics wrapper so the label is
     // announced once, not twice.
+    // Icons don't apply textScaler; scale the chevron (gently) so it keeps pace
+    // with the enlarged content at large text (ADR-016 Phase 3 Slice D).
+    final s = controlScaleFor(context).clamp(1.0, 1.5).toDouble();
     return Semantics(
       button: true,
       label: label,
@@ -124,13 +128,13 @@ class _PasswordBreakdownSheetState extends State<PasswordBreakdownSheet> {
           child: GestureDetector(
             onTap: onTap,
             child: Container(
-              width: 24,
-              height: 24,
+              width: 24 * s,
+              height: 24 * s,
               decoration: BoxDecoration(
                 color: primary,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 16, color: onPrimary),
+              child: Icon(icon, size: 16 * s, color: onPrimary),
             ),
           ),
         ),

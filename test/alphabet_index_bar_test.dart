@@ -422,4 +422,19 @@ void main() {
 
     expect(selected, isNotEmpty);
   });
+
+  // ADR-016 Phase 3 Slice D: the letters scale with text but are CAPPED so they
+  // never bleed off the 48px strip — the bar stays usable at every text size.
+  testWidgets('letter size is capped at large text (no bleed)', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpBar(
+      tester,
+      height: 900,
+      presentLetters: {'A'},
+      initialLetter: 'A',
+    );
+    // base 14 * cap 1.5 = 21; uncapped would be 14 * 2.0 = 28.
+    expect(tester.getSize(find.text('A').first).height, lessThanOrEqualTo(22));
+  });
 }
