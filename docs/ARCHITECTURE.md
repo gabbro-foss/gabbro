@@ -115,7 +115,11 @@ canon-TDD each), tick as we go:
   `controlScaleFor(BuildContext)` on `targetScaleFor` (+ tests); biometric icon refactored
   onto it; dropped the 3 `VisualDensity.compact` overrides (2 selection checkboxes now
   standard >=48dp; onboarding a11y button is a fixed-size `noScaling` control).
-- [ ] **Slice B — icons / FAB / chevrons** apply the factor.
+- [x] **Slice B — icons / FAB / chevrons [DONE, hardware-verified].** `scaledIconSize`
+  helper; applied to the 3 FABs (scaled child icon), the help prev/next chevrons, and the
+  vault-list app-bar actions (checklist/lock/menu — the title ellipsizes so no overflow).
+  Deferred to later passes (agreed): reveal-eye toggles (13 scattered/constrained sites) and
+  other screens' app bars.
 - [ ] **Slice C — checkboxes + the ListTile-with-trailing-buttons layout** (recovery_history
   et al. — deferred here from Phase 2; row can't fit at max -> stack/wrap).
 - [ ] **Slice D — alphabet bar** (hide on phone tier / scale on tablet tier) **+
