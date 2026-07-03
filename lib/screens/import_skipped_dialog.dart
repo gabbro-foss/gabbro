@@ -24,6 +24,10 @@ class _SkippedEntriesDialog extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return AlertDialog(
+      // scrollable scrolls the note + list + actions together; the list below
+      // is shrinkWrapped + non-scrolling so there is no fixed height to clip and
+      // no nested scroll (ADR-016).
+      scrollable: true,
       title: Row(
         children: [
           Icon(Icons.info_outline, color: colorScheme.primary),
@@ -38,8 +42,8 @@ class _SkippedEntriesDialog extends StatelessWidget {
       ),
       content: SizedBox(
         width: double.maxFinite,
-        height: 300,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -49,24 +53,24 @@ class _SkippedEntriesDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Expanded(
-              child: ListView.separated(
-                itemCount: skipped.length,
-                separatorBuilder: (_, _) => const Divider(height: 1),
-                itemBuilder: (_, i) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(skipped[i].title, style: theme.textTheme.bodyMedium),
-                      Text(
-                        skipped[i].reason,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: skipped.length,
+              separatorBuilder: (_, _) => const Divider(height: 1),
+              itemBuilder: (_, i) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(skipped[i].title, style: theme.textTheme.bodyMedium),
+                    Text(
+                      skipped[i].reason,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
