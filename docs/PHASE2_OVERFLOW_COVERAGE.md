@@ -28,7 +28,7 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | help_screen | **fixed** | pages now fill-or-scroll (was 728px phone / 168px tablet bottom), image capped 50%; page-dot spacing minor/open; Phase 2b pinch-zoom separate | pending |
 | import_screen | todo | `SegmentedButton` may overflow | |
 | language_screen | todo | | |
-| manage_folders_screen | todo | reassign dropdown fixed (large-text pattern) | |
+| manage_folders_screen | todo | reassign dropdown + delete-dialog content scroll fixed | pending |
 | manage_vaults_screen | todo | | |
 | manage_yubikeys_screen | todo | | |
 | onboarding_screen | **fixed** | a11y-button row: Spacer->spaceBetween + Flexible ellipsizing button (was 457/315px right) | pending |
@@ -79,3 +79,15 @@ ongoing — confirmed/suspected below:
 - csv_mapping_screen `width:88` cell.
 - import_skipped_dialog `height:300` box.
 - (continue triaging the 339-hit sweep; add each real risk here.)
+
+## AlertDialog scrollability (another probe blind spot — dialogs are action-triggered)
+
+At large text a multi-widget dialog `content` (Column/ListView) overflows past the dialog
+bounds: content clips AND bleeds over the action buttons (maintainer hit this on the
+manage-folders delete dialog, 2026-07-03). Fix = wrap `content` in `SingleChildScrollView`.
+Audit every `AlertDialog` with Column/ListView content:
+
+- DONE: manage_folders_screen (delete-folder dialog).
+- TODO: vault_list_screen (2), manage_vaults_screen (3), manage_yubikeys_screen (2),
+  security_screen (2), entry_detail_screen (1), import_failures_dialog (1),
+  import_skipped_dialog (1). Skip the short single-TextField dialogs (rename/add folder).
