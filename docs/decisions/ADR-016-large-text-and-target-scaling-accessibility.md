@@ -54,10 +54,11 @@ accessibility requirement.
    **Idea Tab Pro = 866 dp** (dpr 2.125, 1840×2944 @ 340 dpi). Phone tier spans
    **360–411 dp** (360 dp = worst case → the phone surface for the overflow probe);
    tablet has ~2.1–2.4× the room.
-   - **Phone tier (<600 dp): starting max 6×.**
-   - **Tablet tier (≥600 dp): starting max 8×.**
-   Phase 0 fixed the tiers and the ratio; the final ceilings are **dialled in live on
-   the slider in Phase 1** ("can't know without seeing").
+   - **Phone tier (<600 dp): max 4×.**
+   - **Tablet tier (≥600 dp): max 6×.**
+   Phase 0 fixed the tiers and the ratio; the ceilings were **dialled in live on the
+   slider in Phase 1** — a first hardware pass (2026-07-03) found the initial 6×/8× left
+   too little content on screen, so the ceilings are **4× / 6×** (subject to a re-test).
    A stored value is **clamped to the current device's max on load**, so a large value
    set on a tablet cannot break the UI when the vault is opened on a phone.
 
@@ -67,10 +68,12 @@ accessibility requirement.
    hit, never large enough to consume the screen. Cap calibrated on hardware.
 
 4. **Continuous slider with a perceptual (exponential) slope.** Replaces the discrete
-   list: a slider bracketed by **language-neutral text-size glyph icons**
-   (`Icons.text_decrease` / `Icons.text_increase`, not localized words — the universal
-   text-size convention, so no "foreign A" for Cyrillic/Greek/CJK users and no l10n),
-   with live-preview sample text. The position → scale mapping is exponential so the
+   list: a slider bracketed by **letter-free zoom glyph icons** (`Icons.zoom_out` /
+   `Icons.zoom_in`, not localized words and — unlike the originally-planned
+   `Icons.text_decrease` / `Icons.text_increase`, which depict a Latin **A** — carrying
+   no letter, so nothing foreign for Cyrillic/Greek/CJK users and no l10n), with
+   live-preview sample text (the brand word in onboarding, a full sample sentence on the
+   appearance screen). The position → scale mapping is exponential so the
    everyday range (~0.8–2.0) occupies most of the track for fine control, accelerating
    toward the device max. Minimum 0.8×.
 
@@ -106,8 +109,9 @@ accessibility requirement.
   multi-session, screen-by-screen effort, each hardware-verified. Delivered in phases
   (tracked in `ARCHITECTURE.md` → Current Focus); the slider ships first and becomes
   the probe for the rest.
-- **Calibration dependency:** the 4×/6×/2× figures are placeholders until measured on
-  the maintainer's phone and tablet; the ADR fixes the *model*, not the constants.
+- **Calibration dependency:** the ADR fixes the *model*, not the constants. Measured on
+  the maintainer's phone and tablet (2026-07-03): phone 4× / tablet 6× / target cap 2×
+  (subject to further re-test); an earlier 6×/8× was too large.
 - **Not covered here:** contrast (a high-contrast theme already exists) and
   screen-reader labelling (ADR-015) — this ADR composes with both.
 

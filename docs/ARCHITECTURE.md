@@ -24,7 +24,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Password generator:** classic (32–256 chars) and passphrase (4–20 words, many languages, EFF-style wordlists embedded at compile time). Classic mode is script-aware (Latin/Greek/Cyrillic pools). All generation in Rust.
 
-**Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text size, high-contrast, alphabet bar position.
+**Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text scale (`text_scale`, 0.8-8.0), high-contrast, alphabet bar position.
 
 **Platforms:** v1: Linux (Arch + Mint/deb), Android (F-Droid + Play Store). Later: Windows. Android smoke-tested on GrapheneOS (2026-06-20): onboarding, vault sync, web autofill, l10n, settings all work — not yet exhaustive.
 
@@ -40,9 +40,9 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 gabbro/
 ├── lib/                  # Flutter app
 │   ├── screens/          # unlock, vault list, export, import, generator, settings, manage vaults/folders, …
-│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, …
+│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, text_size_slider, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
-│   └── *.dart            # main, app_paths (GabbroPaths), settings, vault_registry, safe_file_picker
+│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, vault_registry, safe_file_picker
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, keypair, ml_kem, hkdf, aes_gcm, vault_crypto
@@ -77,7 +77,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1084 | 0 |
+| Flutter (`flutter test`) | 1126 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -92,41 +92,32 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Large-text accessibility initiative (ADR-016)
+### Next task: Large-text accessibility (ADR-016) — Phase 1 hardware calibration, then Phase 2
 
 Make Gabbro usable at very large text (low-vision): one absolute `textScale` knob
-drives text **and** controls in unison; screen-derived max (600dp tiers — phone ~4x,
-tablet ~6x, **calibrate on hardware**); targets scale proportionally, capped ~2x.
-Design fixed in [ADR-016](decisions/ADR-016-large-text-and-target-scaling-accessibility.md).
+drives text **and** (later phases) controls in unison; screen-derived max (600dp tiers —
+phone 4x, tablet 6x); targets scale proportionally, capped ~2x. Design in
+[ADR-016](decisions/ADR-016-large-text-and-target-scaling-accessibility.md).
 
-**Phase 0 — Calibrate [DONE 2026-07-02].** Measured shortest side: S23 360dp, GOS
-411dp (both phone tier), Idea Tab Pro 866dp (tablet). Phone tier = 360-411dp (360 =
-worst case, the overflow-probe phone surface); tablet 866dp. Starting maxes phone 6x /
-tablet 8x / target cap 2x, dialled in live during P1. Probe added + reverted (uncommitted).
+**Phase 0 — Calibrate [DONE 2026-07-02].** Phone tier 360-411dp (S23 360 / GOS 411),
+tablet 866dp (Idea Tab Pro). Consts (hardware-tuned 2026-07-03, was 6x/8x): phone 4x /
+tablet 6x / target cap 2x / onboarding toggle 3x.
 
-**Phase 1 — Slider + model + onboarding** (canon-TDD list agreed 2026-07-02, decisions
-LOCKED; branch `accessibility_initiative`). Starting consts phone 6x / tablet 8x /
-target cap 2x / onboarding toggle 3x (ADR-016; tuned live). Build red-first:
-- **Model** (`settings.dart`): `TextSizeChoice` enum -> `double textScale`. Persist new
-  numeric key `text_scale`; still READ legacy `text_size` word + migrate
-  (small/regular/large/extra_large/xxLarge -> 0.85/1.0/1.15/1.3/1.5); if both, new wins.
-  Clamp to hard [0.8, 8.0].
-- **New `lib/text_scale.dart`** (pure, unit-tested): `deviceMaxScale(shortestDp)` = 6.0
-  (<600) / 8.0 (>=600); `targetScaleFor(textScale, deviceMax)` = lerp 1.0->2.0 clamped;
-  exponential `scaleForPos`/`posForScale` (0->0.8, 1->deviceMax, exact inverse);
-  `clampToDevice(stored, shortestDp)` (e.g. 8x stored on 411dp phone -> 6x).
-- **`main.dart`**: MediaQuery textScaler = `clampToDevice(textScale, screen)`; REMOVE
-  `TextSizeChoice`, `textScaleFor`, duplicate `_textScale` getter.
-- **New `TextSizeSlider` widget** (reused on appearance + onboarding): ends = Material
-  `Icons.text_decrease`/`text_increase` glyphs (language-neutral, NO l10n words); live
-  preview via `textSizePreview`; 0.8->deviceMax via the exponential map.
-- **Appearance**: replace `SegmentedRow` with the slider. **Onboarding**: accessibility
-  toggle ON -> textScale 3.0 + reveal slider + HIDE logo; OFF reverses; toggle reflects
-  current scale.
-- **l10n**: drop the 5 per-size labels (`textSizeSmall`..`textSizeXXL`) from all ARBs +
-  `l10n_test`; keep `sectionTextSize` + `textSizePreview`.
-- Scenario groups: A model+migration, B pure helpers, C apply+cleanup, D slider widget,
-  E onboarding toggle, F l10n.
+**Phase 1 — Slider + model + onboarding [CODE DONE 2026-07-03; full `flutter test`
+green + analyze clean; branch `accessibility_initiative`, NOT yet committed; PENDING
+maintainer hardware calibration].** `settings.dart` `double textScale` + `text_scale`
+key (reads/migrates legacy `text_size` word; clamp [0.8,8.0]); pure `lib/text_scale.dart`
+(`deviceMaxScale`, exponential `scaleForPos`<->`posForScale`, `targetScaleFor`,
+`clampToDevice`); `main.dart` applies `clampToDevice(textScale, screen)` at all 3
+MediaQuery sites (`TextSizeChoice`/`textScaleFor`/`_textScale` removed); reusable
+`TextSizeSlider` (letter-free `zoom_out`/`zoom_in` glyphs, live preview) on appearance +
+onboarding; onboarding toggle -> 3x + reveal slider + hide logo (high-contrast coupling
+kept), onboarding preview = brand word "Gabbro" / appearance = full sample sentence; 5
+per-size l10n labels dropped. `updateSettings` now optimistic (setState before save).
+First hardware pass 2026-07-03 (S23 / GOS / tablet): 6x/8x maxes were too large -> **now
+phone 4x / tablet 6x**; A+/A- Material glyphs contain a Latin letter -> switched to zoom
+glyphs (ADR-016 s4 was wrong, corrected). **Pending: maintainer re-test of 4x/6x, then
+commit Phase 1.**
 
 **Phase 2 — Text overflow hardening** (evidence from a headless 5x overflow probe on
 phone+tablet surfaces): fixed-box clippers (csv_mapping `width:88`, import_skipped
