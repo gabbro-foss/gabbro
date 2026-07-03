@@ -93,12 +93,14 @@ throw); remove the manual wrap when adding `scrollable: true`.
 
 Audit every `AlertDialog` with Column/ListView content:
 
-- security biometric consent + enroll: **converted to `scrollable: true`** (correct fix) —
-  awaiting maintainer re-verify.
-- Applied the OLD (content-only) wrap, **must convert to `scrollable: true`**: manage_folders
-  (delete), manage_vaults (YubiKey-auth-delete), manage_yubikeys (add-key steps, add-key
-  transport+PIN [+ chip `Row`->`Wrap`], remove-key warning), entry_detail (export-file),
-  import_failures. Chip `Row`->`Wrap` stays.
+- **ALL dialogs now use `scrollable: true`** (verified pattern; biometric-consent
+  hardware-confirmed). Converted: security (consent + enroll), manage_folders (delete),
+  manage_vaults (YubiKey-auth-delete + backup-info), manage_yubikeys (add-key steps,
+  add-key transport+PIN [+ chip `Row`->`Wrap`], remove-key warning), entry_detail
+  (export-file), import_failures, vault_list (sync-summary + sync-from-file). No
+  `content: SingleChildScrollView` remains in lib/. Chip `Row`->`Wrap` stays.
+- Skipped (short single-TextField, plain-Text content, won't strand buttons): rename-vault,
+  rename/add-folder, edit-alias, delete-vault-warning, delete-entry-confirm.
 - Skipped (short single-TextField, won't overflow): rename-vault, rename/add-folder,
   edit-alias.
 - TODO: **import_skipped_dialog** (`content: SizedBox(height:300)` — the `height:300`
