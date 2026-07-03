@@ -19,7 +19,8 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | about_screen | in-probe (pass) | | |
 | appearance_screen | in-probe (pass) | P1 slider holds at 4x/6x | |
 | change_passphrase_screen | todo | | |
-| create_entry_screen | in-probe (pass) | **fixed** the silent clip: `isExpanded:true` on all 3 DropdownButtonFormFields (folder + card-status + generic). Silent clips aren't test-assertable -> hardware is the check | pending |
+| create_entry_screen | in-probe (pass) | `isExpanded:true` on 3 dropdowns (stops throw). **NOT the reported bug** (that was vault_list). Selected value still one-line -> also needs `selectedItemBuilder` ellipsis like vault_list; apply after that verifies | pending |
+| vault_list_screen (phone) | todo (probe) | **folder-filter dropdown FIXED** (the actual maintainer report): `selectedItemBuilder` ellipsis on BOTH phone (~1629) + tablet (~1548) paths, else the one-line selection hard-clips at 4x | **re-verify** |
 | csv_mapping_screen | todo | **fixed `width:88` cell — silent clip** | |
 | entry_detail_screen | todo | AppBar action crowding | |
 | export_screen | todo | | |
@@ -36,8 +37,7 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | save_confirm_screen | todo | | |
 | security_screen | todo | | |
 | unlock_screen | todo | | |
-| vault_list_screen (phone) | todo | | |
-| tablet_vault_layout (two-pane) | todo | tablet-only 6x path | |
+| tablet_vault_layout (two-pane) | todo | tablet-only 6x path (folder-filter dropdown covered above) | |
 
 ## Overlays / dialogs / sheets
 
