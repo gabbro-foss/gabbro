@@ -1302,6 +1302,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     ),
     const SizedBox(height: 12),
     DropdownButtonFormField<String>(
+      isExpanded: true, // fill the field so a long value wraps, never clips (ADR-016)
       initialValue: _cardStatuses.contains(_cardStatusController.text)
           ? _cardStatusController.text
           : 'active',
@@ -1684,6 +1685,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     if (_selectedFolder.isNotEmpty) folderSet.add(_selectedFolder);
     final folderItems = folderSet.toList()..sort();
     return DropdownButtonFormField<String>(
+      isExpanded: true, // fill the field so a long folder wraps, never clips (ADR-016)
       initialValue: _selectedFolder,
       decoration: InputDecoration(
         labelText: l.fieldFolder,
@@ -1724,6 +1726,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     bool required = true,
   }) {
     return DropdownButtonFormField<String>(
+      isExpanded: true, // fill the field so a long value wraps, never clips (ADR-016)
       initialValue: initialValue,
       decoration: InputDecoration(
         labelText: label,
