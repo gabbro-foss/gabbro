@@ -168,6 +168,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - Autofill via `auto-type` (Linux/desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
 
 ### Code Quality
+- **Tablet pane-resize handle has no screen-reader label.** The two-pane (tablet)
+  vault-list column-width drag handle exposes no tooltip / `Semantics` label (ADR-015).
+  Add one. (found 2026-07-03 during large-text work.)
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
   translations.
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
