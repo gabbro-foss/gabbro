@@ -82,15 +82,23 @@ ongoing — confirmed/suspected below:
 
 ## AlertDialog scrollability (another probe blind spot — dialogs are action-triggered)
 
-At large text a multi-widget dialog `content` (Column/ListView) overflows past the dialog
-bounds: content clips AND bleeds over the action buttons (maintainer hit this on the
-manage-folders delete dialog, 2026-07-03). Fix = wrap `content` in `SingleChildScrollView`.
+At large text a multi-widget dialog overflows past the dialog bounds. **CORRECTED FIX
+(2026-07-03): use `AlertDialog(scrollable: true)` with a plain Column** — NOT a
+`SingleChildScrollView` around `content`. Content-only wrapping scrolls the content but
+leaves the title + action buttons fixed, so a dialog taller than the screen still strands
+the buttons off-screen (maintainer hit this on the biometric-consent dialog, which already
+had the content wrap). `scrollable: true` scrolls title + content + actions together. Do
+NOT combine it with an inner `SingleChildScrollView` (nested scroll -> unbounded-height
+throw); remove the manual wrap when adding `scrollable: true`.
+
 Audit every `AlertDialog` with Column/ListView content:
 
-- DONE: manage_folders (delete), manage_vaults (YubiKey-auth-delete), manage_yubikeys
-  (add-key steps, add-key transport+PIN — also raw chip `Row`->`Wrap`, remove-key warning),
-  security (biometric-enroll; the consent dialog already scrolled), entry_detail
-  (export-file), import_failures.
+- security biometric consent + enroll: **converted to `scrollable: true`** (correct fix) —
+  awaiting maintainer re-verify.
+- Applied the OLD (content-only) wrap, **must convert to `scrollable: true`**: manage_folders
+  (delete), manage_vaults (YubiKey-auth-delete), manage_yubikeys (add-key steps, add-key
+  transport+PIN [+ chip `Row`->`Wrap`], remove-key warning), entry_detail (export-file),
+  import_failures. Chip `Row`->`Wrap` stays.
 - Skipped (short single-TextField, won't overflow): rename-vault, rename/add-folder,
   edit-alias.
 - TODO: **import_skipped_dialog** (`content: SizedBox(height:300)` — the `height:300`
