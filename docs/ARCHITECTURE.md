@@ -77,7 +77,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1163 | 2 |
+| Flutter (`flutter test`) | 1183 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -120,8 +120,11 @@ canon-TDD each), tick as we go:
   vault-list app-bar actions (checklist/lock/menu — the title ellipsizes so no overflow).
   Deferred to later passes (agreed): reveal-eye toggles (13 scattered/constrained sites) and
   other screens' app bars.
-- [ ] **Slice C — checkboxes + the ListTile-with-trailing-buttons layout** (recovery_history
-  et al. — deferred here from Phase 2; row can't fit at max -> stack/wrap).
+- [x] **Slice C — checkboxes + ListTile-trailing [DONE, hardware-verified].** Selection
+  checkboxes scale gently (capped 1.4x via `scaledSelectionCheckbox`, so they don't crowd the
+  row). recovery_history's ListTile-trailing overflow turned out to be already fixed by the
+  2x/3x max cut (net-first discovery) — un-skipped in the probe, no stacking code needed. The
+  overflow probe now runs with **0 skips**.
 - [ ] **Slice D — alphabet bar** (hide on phone tier / scale on tablet tier) **+
   password-breakdown sheet.**
 
