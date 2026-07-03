@@ -35,32 +35,29 @@ Future<void> _defaultRemoveKey(List<int> credId) =>
 Future<FidoCredentialData> _defaultFidoRegister({
   required String devicePath,
   required String pin,
-}) =>
-    fidoRegister(devicePath: devicePath, pin: pin);
+}) => fidoRegister(devicePath: devicePath, pin: pin);
 
 Future<List<int>> _defaultFidoGetHmacSecret({
   required String devicePath,
   required List<int> credentialId,
   required List<int> salt,
   required String pin,
-}) =>
-    fidoGetHmacSecret(
-      devicePath: devicePath,
-      credentialId: credentialId,
-      salt: salt,
-      pin: pin,
-    );
+}) => fidoGetHmacSecret(
+  devicePath: devicePath,
+  credentialId: credentialId,
+  salt: salt,
+  pin: pin,
+);
 
 Future<void> _defaultAddYubikey({
   required List<int> newCredId,
   required List<int> newHmacSecret,
   required List<int> newSalt,
-}) =>
-    addYubikey(
-      newCredId: newCredId,
-      newHmacSecret: newHmacSecret,
-      newSalt: newSalt,
-    );
+}) => addYubikey(
+  newCredId: newCredId,
+  newHmacSecret: newHmacSecret,
+  newSalt: newSalt,
+);
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -80,20 +77,23 @@ class ManageYubiKeysScreen extends StatefulWidget {
     required List<int> newCredId,
     required List<int> newHmacSecret,
     required List<int> newSalt,
-  }) onAddYubikey;
+  })
+  onAddYubikey;
 
   // ── Linux FIDO callbacks ──────────────────────────────────────────────────
   final List<String> Function() onFidoListDevices;
   final Future<FidoCredentialData> Function({
     required String devicePath,
     required String pin,
-  }) onFidoRegister;
+  })
+  onFidoRegister;
   final Future<List<int>> Function({
     required String devicePath,
     required List<int> credentialId,
     required List<int> salt,
     required String pin,
-  }) onFidoGetHmacSecret;
+  })
+  onFidoGetHmacSecret;
 
   const ManageYubiKeysScreen({
     super.key,
@@ -194,9 +194,13 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
         await _load();
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(AppLocalizations.of(context)
-                  .failedToSaveAlias(e.toString()))));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context).failedToSaveAlias(e.toString()),
+              ),
+            ),
+          );
         }
       }
     }
@@ -233,10 +237,10 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(isSecondToLast
-            ? l.yubiKeySecurityWarning
-            : l.removeYubiKeyTitle),
-        content: warningContent,
+        title: Text(
+          isSecondToLast ? l.yubiKeySecurityWarning : l.removeYubiKeyTitle,
+        ),
+        content: SingleChildScrollView(child: warningContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -258,14 +262,21 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
         await widget.onRemoveKey(record.credentialId);
         await _load();
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(AppLocalizations.of(context).yubiKeyRemoved)));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AppLocalizations.of(context).yubiKeyRemoved),
+            ),
+          );
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(AppLocalizations.of(context)
-                  .failedToRemoveKey(e.toString()))));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context).failedToRemoveKey(e.toString()),
+              ),
+            ),
+          );
         }
       }
     }
@@ -290,9 +301,9 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     final devices = widget.onFidoListDevices();
     if (devices.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l.noFidoDeviceFound)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l.noFidoDeviceFound)));
       return;
     }
     final pin = await _promptPin();
@@ -302,12 +313,13 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     _showLinuxProgress(l.tapYubiKeyToRegister);
     try {
       final cred = await widget.onFidoRegister(
-          devicePath: devicePath, pin: pin);
+        devicePath: devicePath,
+        pin: pin,
+      );
       if (!mounted) return;
       Navigator.of(context).pop();
 
-      _showLinuxProgress(
-          AppLocalizations.of(context).tapYubiKeyToActivate);
+      _showLinuxProgress(AppLocalizations.of(context).tapYubiKeyToActivate);
       final hmac = await widget.onFidoGetHmacSecret(
         devicePath: devicePath,
         credentialId: cred.credentialId,
@@ -324,18 +336,22 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
       );
       await _load();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-                Text(AppLocalizations.of(context).yubiKeyAdded)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).yubiKeyAdded)),
+        );
       }
     } catch (e) {
       if (mounted) {
         try {
           Navigator.of(context).pop();
         } catch (_) {}
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .failedToAddKey(e.toString()))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).failedToAddKey(e.toString()),
+            ),
+          ),
+        );
       }
     }
   }
@@ -346,7 +362,8 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     final (pin, transport) = options;
 
     final salt = Uint8List.fromList(
-        List.generate(32, (_) => Random.secure().nextInt(256)));
+      List.generate(32, (_) => Random.secure().nextInt(256)),
+    );
 
     final isNfc = transport == 'nfc';
     // step: 0 = step 1 in progress, 1 = step 1 done / step 2 in progress
@@ -363,24 +380,25 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
           final dl = AppLocalizations.of(ctx);
           return AlertDialog(
             title: Text(dl.addYubiKeyTitle),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _stepRow(
-                  ctx,
-                  label: isNfc ? dl.tapRegisterNfc : dl.tapRegisterUsb,
-                  done: step >= 1,
-                  active: step == 0,
-                ),
-                const SizedBox(height: 16),
-                _stepRow(
-                  ctx,
-                  label:
-                      isNfc ? dl.tapActivateNfc : dl.tapActivateUsb,
-                  done: false,
-                  active: step == 1,
-                ),
-              ],
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _stepRow(
+                    ctx,
+                    label: isNfc ? dl.tapRegisterNfc : dl.tapRegisterUsb,
+                    done: step >= 1,
+                    active: step == 0,
+                  ),
+                  const SizedBox(height: 16),
+                  _stepRow(
+                    ctx,
+                    label: isNfc ? dl.tapActivateNfc : dl.tapActivateUsb,
+                    done: false,
+                    active: step == 1,
+                  ),
+                ],
+              ),
             ),
             actions: [
               TextButton(
@@ -402,10 +420,10 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
 
     try {
       // Step 1: register — obtain credentialId.
-      final cred = await _yubikeyChannel.invokeMethod<String>(
-        'register',
-        {'pin': pin, 'transport': transport},
-      );
+      final cred = await _yubikeyChannel.invokeMethod<String>('register', {
+        'pin': pin,
+        'transport': transport,
+      });
       if (!mounted) return;
       if (cred == null) throw Exception('No result from YubiKey');
       credIdHex = cred;
@@ -414,15 +432,13 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
       if (!mounted) return;
 
       // Step 2: get_hmac_secret — obtain HMAC secret using the new credential.
-      final hmacHex = await _yubikeyChannel.invokeMethod<String>(
-        'get_hmac_secret',
-        {
-          'credentialId': credIdHex,
-          'salt': _toHex(salt),
-          'pin': pin,
-          'transport': transport,
-        },
-      );
+      final hmacHex = await _yubikeyChannel
+          .invokeMethod<String>('get_hmac_secret', {
+            'credentialId': credIdHex,
+            'salt': _toHex(salt),
+            'pin': pin,
+            'transport': transport,
+          });
       if (!mounted) return;
       if (_progressShown) {
         Navigator.of(context).pop();
@@ -437,9 +453,9 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
       );
       await _silentRefresh();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-                Text(AppLocalizations.of(context).yubiKeyAdded)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).yubiKeyAdded)),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -452,11 +468,15 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
         // The user cancelled the tap: no error to report.
         if (e is PlatformException && e.code == 'TAP_CANCELLED') return;
         final al = AppLocalizations.of(context);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(credIdHex == null
-              ? al.failedToRegisterKey(e.toString())
-              : al.failedToActivateKey(e.toString())),
-        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              credIdHex == null
+                  ? al.failedToRegisterKey(e.toString())
+                  : al.failedToActivateKey(e.toString()),
+            ),
+          ),
+        );
       }
     } finally {
       stepNotifier.dispose();
@@ -472,18 +492,26 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     final theme = Theme.of(context);
     final Widget indicator;
     if (done) {
-      indicator = Icon(Icons.check_circle_rounded,
-          color: theme.colorScheme.primary, size: 24);
+      indicator = Icon(
+        Icons.check_circle_rounded,
+        color: theme.colorScheme.primary,
+        size: 24,
+      );
     } else if (active) {
       indicator = SizedBox(
         width: 20,
         height: 20,
         child: CircularProgressIndicator(
-            strokeWidth: 2.5, color: theme.colorScheme.primary),
+          strokeWidth: 2.5,
+          color: theme.colorScheme.primary,
+        ),
       );
     } else {
-      indicator = Icon(Icons.radio_button_unchecked,
-          color: theme.disabledColor, size: 24);
+      indicator = Icon(
+        Icons.radio_button_unchecked,
+        color: theme.disabledColor,
+        size: 24,
+      );
     }
     return Row(
       children: [
@@ -555,8 +583,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
               decoration: InputDecoration(
                 labelText: l.pinLabel,
                 suffixIcon: IconButton(
-                  icon:
-                      Icon(obscure ? Icons.visibility_off : Icons.visibility),
+                  icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
                   tooltip: obscure ? l.tooltipShowPin : l.tooltipHidePin,
                   onPressed: () => setLocal(() => obscure = !obscure),
                 ),
@@ -592,53 +619,59 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
           final l = AppLocalizations.of(ctx);
           return AlertDialog(
             title: Text(l.addYubiKeyTitle),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Transport choice only when the device has NFC; otherwise the
-                // single USB option is implicit (selectedTransport stays 'usb').
-                if (nfcAvailable) ...[
-                  Text(l.transportLabel),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      ChoiceChip(
-                        label: Text(l.transportUsb),
-                        selected: selectedTransport == 'usb',
-                        onSelected: (_) =>
-                            setLocal(() => selectedTransport = 'usb'),
-                      ),
-                      const SizedBox(width: 8),
-                      ChoiceChip(
-                        label: Text(l.transportNfc),
-                        selected: selectedTransport == 'nfc',
-                        onSelected: (_) =>
-                            setLocal(() => selectedTransport = 'nfc'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                TextField(
-                  controller: controller,
-                  autofocus: true,
-                  obscureText: obscure,
-                  decoration: InputDecoration(
-                    labelText: l.pinLabel,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                          obscure ? Icons.visibility_off : Icons.visibility),
-                      tooltip: obscure ? l.tooltipShowPin : l.tooltipHidePin,
-                      onPressed: () => setLocal(() => obscure = !obscure),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Transport choice only when the device has NFC; otherwise the
+                  // single USB option is implicit (selectedTransport stays 'usb').
+                  if (nfcAvailable) ...[
+                    Text(l.transportLabel),
+                    const SizedBox(height: 8),
+                    // Wrap (not Row) so the chips reflow instead of overflowing
+                    // horizontally at large text (ADR-016).
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        ChoiceChip(
+                          label: Text(l.transportUsb),
+                          selected: selectedTransport == 'usb',
+                          onSelected: (_) =>
+                              setLocal(() => selectedTransport = 'usb'),
+                        ),
+                        ChoiceChip(
+                          label: Text(l.transportNfc),
+                          selected: selectedTransport == 'nfc',
+                          onSelected: (_) =>
+                              setLocal(() => selectedTransport = 'nfc'),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 16),
+                  ],
+                  TextField(
+                    controller: controller,
+                    autofocus: true,
+                    obscureText: obscure,
+                    decoration: InputDecoration(
+                      labelText: l.pinLabel,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          obscure ? Icons.visibility_off : Icons.visibility,
+                        ),
+                        tooltip: obscure ? l.tooltipShowPin : l.tooltipHidePin,
+                        onPressed: () => setLocal(() => obscure = !obscure),
+                      ),
+                    ),
+                    onSubmitted: (_) => Navigator.of(ctx).pop({
+                      'pin': controller.text,
+                      'transport': selectedTransport,
+                    }),
                   ),
-                  onSubmitted: (_) => Navigator.of(ctx).pop({
-                    'pin': controller.text,
-                    'transport': selectedTransport,
-                  }),
-                ),
-              ],
+                ],
+              ),
             ),
             actions: [
               TextButton(
@@ -646,10 +679,9 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
                 child: Text(l.cancel),
               ),
               TextButton(
-                onPressed: () => Navigator.of(ctx).pop({
-                  'pin': controller.text,
-                  'transport': selectedTransport,
-                }),
+                onPressed: () => Navigator.of(
+                  ctx,
+                ).pop({'pin': controller.text, 'transport': selectedTransport}),
                 child: Text(l.register),
               ),
             ],
@@ -670,99 +702,91 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
         title: Text(l.manageYubiKeysTitle),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(
-            height: 1,
-            color: Theme.of(context).dividerColor,
-          ),
+          child: Container(height: 1, color: Theme.of(context).dividerColor),
         ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? Center(child: Text(l.manageYubiKeysError(_error!)))
-              : _records.isEmpty
-                  ? Center(child: Text(l.noYubiKeysRegistered))
-                  : Column(
+          ? Center(child: Text(l.manageYubiKeysError(_error!)))
+          : _records.isEmpty
+          ? Center(child: Text(l.noYubiKeysRegistered))
+          : Column(
+              children: [
+                if (_records.length == 1)
+                  Container(
+                    width: double.infinity,
+                    color: Theme.of(context).colorScheme.errorContainer,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    child: Row(
                       children: [
-                        if (_records.length == 1)
-                          Container(
-                            width: double.infinity,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .errorContainer,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 10),
-                            child: Row(
-                              children: [
-                                Icon(Icons.warning_amber_rounded,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onErrorContainer),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    l.onlyOneKeyRegisteredWarning,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onErrorContainer,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          color: Theme.of(context).colorScheme.onErrorContainer,
+                        ),
+                        const SizedBox(width: 8),
                         Expanded(
-                          child: ListView.builder(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 8),
-                            itemCount: _records.length,
-                            itemBuilder: (context, i) {
-                              final record = _records[i];
-                              final hex = _toHex(record.credentialId);
-                              final alias = _aliases[hex] ?? '';
-                              final isOnly = _records.length == 1;
-                              final bl = AppLocalizations.of(context);
-                              return ListTile(
-                                leading: const Icon(Icons.security),
-                                title: Text(alias.isEmpty
-                                    ? bl.keyDefaultTitle(i + 1)
-                                    : alias),
-                                subtitle:
-                                    Text(_credHint(record.credentialId)),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.edit_outlined),
-                                      tooltip: bl.editAliasTooltip,
-                                      onPressed: () =>
-                                          _editAlias(record, i),
-                                    ),
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.delete_outline,
-                                        color: isOnly
-                                            ? Theme.of(context).disabledColor
-                                            : Theme.of(context)
-                                                .colorScheme
-                                                .error,
-                                      ),
-                                      tooltip: isOnly
-                                          ? bl.cannotRemoveLastKey
-                                          : bl.removeKeyTooltip,
-                                      onPressed: isOnly
-                                          ? null
-                                          : () => _removeKey(record, i),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                          child: Text(
+                            l.onlyOneKeyRegisteredWarning,
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onErrorContainer,
+                            ),
                           ),
                         ),
                       ],
                     ),
+                  ),
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: _records.length,
+                    itemBuilder: (context, i) {
+                      final record = _records[i];
+                      final hex = _toHex(record.credentialId);
+                      final alias = _aliases[hex] ?? '';
+                      final isOnly = _records.length == 1;
+                      final bl = AppLocalizations.of(context);
+                      return ListTile(
+                        leading: const Icon(Icons.security),
+                        title: Text(
+                          alias.isEmpty ? bl.keyDefaultTitle(i + 1) : alias,
+                        ),
+                        subtitle: Text(_credHint(record.credentialId)),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit_outlined),
+                              tooltip: bl.editAliasTooltip,
+                              onPressed: () => _editAlias(record, i),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete_outline,
+                                color: isOnly
+                                    ? Theme.of(context).disabledColor
+                                    : Theme.of(context).colorScheme.error,
+                              ),
+                              tooltip: isOnly
+                                  ? bl.cannotRemoveLastKey
+                                  : bl.removeKeyTooltip,
+                              onPressed: isOnly
+                                  ? null
+                                  : () => _removeKey(record, i),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
       floatingActionButton: _records.length < 4
           ? FloatingActionButton.extended(
               onPressed: _addKey,

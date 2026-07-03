@@ -32,10 +32,8 @@ Future<int> showImportFailuresDialog(
       );
       final saved = await Navigator.of(context).push<bool>(
         MaterialPageRoute(
-          builder: (_) => CreateEntryScreen(
-            entryType: entryType,
-            prefill: prefill,
-          ),
+          builder: (_) =>
+              CreateEntryScreen(entryType: entryType, prefill: prefill),
         ),
       );
       if (saved == true) savedViaEdit++;
@@ -86,40 +84,42 @@ class _ImportFailureDialog extends StatelessWidget {
           ),
         ],
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(failure.title, style: theme.textTheme.titleSmall),
-          const SizedBox(height: 4),
-          Text(
-            l.importIssueType(failure.category),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: colorScheme.errorContainer,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              failure.reason,
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(failure.title, style: theme.textTheme.titleSmall),
+            const SizedBox(height: 4),
+            Text(
+              l.importIssueType(failure.category),
               style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onErrorContainer,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            l.importIssueHelp,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurfaceVariant,
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: colorScheme.errorContainer,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                failure.reason,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onErrorContainer,
+                ),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            Text(
+              l.importIssueHelp,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
       ),
       actions: [
         TextButton(

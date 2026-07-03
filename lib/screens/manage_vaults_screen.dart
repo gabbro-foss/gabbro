@@ -10,10 +10,7 @@ import 'package:gabbro/widgets/segmented_row.dart';
 class _RenameDialog extends StatefulWidget {
   final String initialAlias;
   final Set<String> takenAliases;
-  const _RenameDialog({
-    required this.initialAlias,
-    required this.takenAliases,
-  });
+  const _RenameDialog({required this.initialAlias, required this.takenAliases});
 
   @override
   State<_RenameDialog> createState() => _RenameDialogState();
@@ -96,10 +93,19 @@ class ManageVaultsScreen extends StatefulWidget {
   final VoidCallback onAddVault;
   final void Function(String path, String alias) onSwitchToVault;
 
-  final Future<void> Function(List<int> credentialId, List<int> salt, String pin, String transport)
-      onConfirmYubikey;
-  final Future<void> Function(List<YubikeyRecordData> records, String pin, String transport)
-      onConfirmAnyYubikey;
+  final Future<void> Function(
+    List<int> credentialId,
+    List<int> salt,
+    String pin,
+    String transport,
+  )
+  onConfirmYubikey;
+  final Future<void> Function(
+    List<YubikeyRecordData> records,
+    String pin,
+    String transport,
+  )
+  onConfirmAnyYubikey;
 
   /// Injected for testing; defaults to reading the vault file.
   final List<YubikeyRecordData> Function(String path) listYubikeyRecords;
@@ -137,10 +143,8 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
         .toSet();
     final String? newAlias = await showDialog<String>(
       context: context,
-      builder: (_) => _RenameDialog(
-        initialAlias: record.alias,
-        takenAliases: takenAliases,
-      ),
+      builder: (_) =>
+          _RenameDialog(initialAlias: record.alias, takenAliases: takenAliases),
     );
     if (newAlias != null) {
       setState(() => _registry = _registry.updateAlias(record.path, newAlias));
@@ -270,8 +274,9 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                 child: Text(l.cancel),
               ),
               TextButton(
-                onPressed:
-                    understood ? () => Navigator.of(ctx).pop(true) : null,
+                onPressed: understood
+                    ? () => Navigator.of(ctx).pop(true)
+                    : null,
                 style: TextButton.styleFrom(
                   foregroundColor: Theme.of(ctx).colorScheme.error,
                 ),
@@ -339,63 +344,71 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
 
             return AlertDialog(
               title: Text(l.touchYourYubiKey),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l.yubiKeyAuthorizeDeletion),
-                  const SizedBox(height: 12),
-                  TextField(
-                    key: const Key('delete_vault_yubikey_pin_field'),
-                    controller: pinController,
-                    obscureText: obscurePin,
-                    autofocus: true,
-                    onSubmitted: (_) {
-                      if (!isAuthorizing && pinController.text.isNotEmpty) {
-                        authorize();
-                      }
-                    },
-                    decoration: InputDecoration(
-                      labelText: l.yubiKeyPinLabel,
-                      border: const OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          obscurePin ? Icons.visibility_off : Icons.visibility,
-                        ),
-                        tooltip: obscurePin ? l.tooltipShowPin : l.tooltipHidePin,
-                        onPressed: () => setDialogState(() => obscurePin = !obscurePin),
-                      ),
-                    ),
-                    onChanged: (_) => setDialogState(() {}),
-                  ),
-                  if (!Platform.isLinux && nfcAvailable) ...[
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l.yubiKeyAuthorizeDeletion),
                     const SizedBox(height: 12),
-                    SegmentedRow<String>(
-                      values: const ['usb', 'nfc'],
-                      selected: dialogTransport,
-                      label: (v) => v.toUpperCase(),
-                      onSelected: (v) => setDialogState(() => dialogTransport = v),
-                    ),
-                  ],
-                  if (isAuthorizing) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      l.tapYubiKeyNow,
-                      style: const TextStyle(fontSize: 12),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                  if (authError != null) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      authError!,
-                      style: TextStyle(
-                        color: Theme.of(ctx).colorScheme.error,
-                        fontSize: 12,
+                    TextField(
+                      key: const Key('delete_vault_yubikey_pin_field'),
+                      controller: pinController,
+                      obscureText: obscurePin,
+                      autofocus: true,
+                      onSubmitted: (_) {
+                        if (!isAuthorizing && pinController.text.isNotEmpty) {
+                          authorize();
+                        }
+                      },
+                      decoration: InputDecoration(
+                        labelText: l.yubiKeyPinLabel,
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            obscurePin
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          tooltip: obscurePin
+                              ? l.tooltipShowPin
+                              : l.tooltipHidePin,
+                          onPressed: () =>
+                              setDialogState(() => obscurePin = !obscurePin),
+                        ),
                       ),
+                      onChanged: (_) => setDialogState(() {}),
                     ),
+                    if (!Platform.isLinux && nfcAvailable) ...[
+                      const SizedBox(height: 12),
+                      SegmentedRow<String>(
+                        values: const ['usb', 'nfc'],
+                        selected: dialogTransport,
+                        label: (v) => v.toUpperCase(),
+                        onSelected: (v) =>
+                            setDialogState(() => dialogTransport = v),
+                      ),
+                    ],
+                    if (isAuthorizing) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        l.tapYubiKeyNow,
+                        style: const TextStyle(fontSize: 12),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                    if (authError != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        authError!,
+                        style: TextStyle(
+                          color: Theme.of(ctx).colorScheme.error,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
               actions: [
                 TextButton(
@@ -422,7 +435,9 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
           },
         ),
       );
-      WidgetsBinding.instance.addPostFrameCallback((_) => pinController.dispose());
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => pinController.dispose(),
+      );
       if (mounted) setState(() => _transport = dialogTransport);
       if (step3 != true) return;
       if (!mounted) return;
