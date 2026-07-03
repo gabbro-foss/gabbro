@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/import.dart';
 
-Future<ImportResult> _defaultImportCsv(String input, CsvImportConfigData config) =>
-    importFromCsv(input: input, config: config);
+Future<ImportResult> _defaultImportCsv(
+  String input,
+  CsvImportConfigData config,
+) => importFromCsv(input: input, config: config);
 
 class CsvMappingScreen extends StatefulWidget {
   final String csvContent;
   final CsvPreviewData preview;
-  final Future<ImportResult> Function(String input, CsvImportConfigData config) onImport;
+  final Future<ImportResult> Function(String input, CsvImportConfigData config)
+  onImport;
 
   const CsvMappingScreen({
     super.key,
@@ -98,14 +101,17 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ── Preview table ─────────────────────────────────────────────
-              Text(l.csvPreviewLabel, style: Theme.of(context).textTheme.titleSmall),
+              Text(
+                l.csvPreviewLabel,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
               const SizedBox(height: 8),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: DataTable(
-                  headingRowHeight: 32,
-                  dataRowMinHeight: 28,
-                  dataRowMaxHeight: 28,
+                  // No fixed row heights: at large text a capped row clips the
+                  // cell text vertically. Let rows grow to their content (ADR-016).
+                  dataRowMaxHeight: double.infinity,
                   columnSpacing: 16,
                   columns: headers
                       .map(
@@ -222,34 +228,56 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
     List<DropdownMenuItem<String>> items,
     void Function(String?) onChanged,
   ) {
+    final labelWidget = Text(
+      label,
+      style: const TextStyle(fontWeight: FontWeight.w500),
+    );
+    final dropdown = DropdownButtonFormField<String>(
+      isExpanded: true, // fill width (ADR-016)
+      itemHeight: null, // menu items grow to wrapped height at large text
+      initialValue: value,
+      isDense: true,
+      decoration: const InputDecoration(
+        border: OutlineInputBorder(),
+        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      ),
+      // Ellipsize the collapsed one-line selection. Items are all Text by
+      // construction (see the `items` list), so read their label back.
+      selectedItemBuilder: (context) => items
+          .map(
+            (it) => Text(
+              it.child is Text ? ((it.child as Text).data ?? '') : '',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          )
+          .toList(),
+      items: items,
+      onChanged: onChanged,
+    );
+    // A fixed 88px label column is illegible at large text (wraps to a couple of
+    // chars); stack the label above the dropdown instead of beside it (ADR-016).
+    final stack = MediaQuery.textScalerOf(context).scale(1) > 1.5;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 88,
-            child: Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-          Expanded(
-            child: DropdownButtonFormField<String>(
-              initialValue: value,
-              isDense: true,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+      child: stack
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: labelWidget,
                 ),
-              ),
-              items: items,
-              onChanged: onChanged,
+                dropdown,
+              ],
+            )
+          : Row(
+              children: [
+                SizedBox(width: 88, child: labelWidget),
+                const SizedBox(width: 8),
+                Expanded(child: dropdown),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
