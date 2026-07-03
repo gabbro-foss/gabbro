@@ -437,4 +437,68 @@ void main() {
     // base 14 * cap 1.5 = 21; uncapped would be 14 * 2.0 = 28.
     expect(tester.getSize(find.text('A').first).height, lessThanOrEqualTo(22));
   });
+
+  // ── Chevron scaling (ADR-016 accessibility follow-up) ─────────────────────
+  // The windowed-mode up/down chevrons grow with the text scale so a low-vision
+  // user gets bigger targets, capped at 1.5x (the 48px strip). At normal text
+  // the glyph stays 18 so the windowing height math is unchanged.
+
+  double upChevronSize(WidgetTester tester) =>
+      tester.widget<Icon>(find.byIcon(Icons.keyboard_arrow_up)).size!;
+
+  testWidgets('chevron grows at large text (windowed mode)', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpBar(tester, height: 400, presentLetters: {'A', 'M', 'Z'},
+        initialLetter: 'M');
+    expect(upChevronSize(tester), greaterThan(18));
+  });
+
+  testWidgets('chevron is capped at large text (no bleed off the strip)',
+      (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpBar(tester, height: 400, presentLetters: {'A', 'M', 'Z'},
+        initialLetter: 'M');
+    // base 18 * cap 1.5 = 27; uncapped would be 18 * 2.0 = 36.
+    expect(upChevronSize(tester), lessThanOrEqualTo(27));
+  });
+
+  testWidgets('windowed mode stays overflow-free with a bigger chevron',
+      (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpBar(tester, height: 400, presentLetters: {'A', 'M', 'Z'},
+        initialLetter: 'M');
+    expect(tester.takeException(), isNull);
+    // The window still centres on M, so at least one letter remains visible.
+    expect(find.text('M'), findsOneWidget);
+  });
+
+  testWidgets('chevron size is unchanged at normal text (no-op guard)',
+      (tester) async {
+    await pumpBar(tester, height: 400, presentLetters: {'A', 'M', 'Z'},
+        initialLetter: 'M');
+    expect(upChevronSize(tester), 18);
+  });
+
+  // Script-agnostic: the same scaling + overflow safety must hold for a
+  // non-Latin canon (Russian Cyrillic here) that still renders the bar.
+  testWidgets('chevron grows and stays overflow-free with a Cyrillic canon',
+      (tester) async {
+    const russian = [
+      'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ж', 'З', 'И', 'К', 'Л', 'М',
+      'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш',
+      'Щ', 'Э', 'Ю', 'Я', '#',
+    ];
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpBar(tester, height: 400, letters: russian,
+        presentLetters: {'М'}, initialLetter: 'М');
+
+    expect(upChevronSize(tester), greaterThan(18));
+    expect(upChevronSize(tester), lessThanOrEqualTo(27));
+    expect(tester.takeException(), isNull);
+    expect(find.text('М'), findsOneWidget); // window still centres on present
+  });
 }

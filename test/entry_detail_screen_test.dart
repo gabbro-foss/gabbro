@@ -737,4 +737,28 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  // ADR-016 accessibility follow-up: the History tile's trailing chevron grows
+  // with the text scale (free ListTile, full control-scale, no strip cap).
+  testWidgets('history-tile chevron scales up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(
+      _buildScreen(
+        VaultEntryData.login(_loginEntry()),
+        onFetchHistory: (_) async => [
+          const HistoryRecordData(
+            field: 'password',
+            value: 'old',
+            savedAt: '2025-01-02T00:00:00Z',
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final chevron = tester.widget<Icon>(find.byIcon(Icons.chevron_right));
+    expect(chevron.size, greaterThan(18));
+    expect(tester.takeException(), isNull);
+  });
 }

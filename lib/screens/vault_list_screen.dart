@@ -2148,6 +2148,9 @@ class _ChipRowFadeEdge extends StatelessWidget {
   Widget build(BuildContext context) {
     final isRight = alignment == Alignment.centerRight;
     final color = Theme.of(context).scaffoldBackgroundColor;
+    // Grow the chevron with the text scale (capped 1.5x — it lives in a fixed
+    // 48px edge), matching the alphabet bar and breakdown sheet.
+    final s = controlScaleFor(context).clamp(1.0, 1.5).toDouble();
     // Button semantics + a desktop hover tooltip, matching the alphabet index
     // bar. The Tooltip sits inside the excludeSemantics wrapper so the label is
     // announced once, not twice.
@@ -2171,8 +2174,8 @@ class _ChipRowFadeEdge extends StatelessWidget {
             ),
             child: Center(
               child: Container(
-                width: 28,
-                height: 28,
+                width: 28 * s,
+                height: 28 * s,
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary,
                   shape: BoxShape.circle,
@@ -2180,7 +2183,7 @@ class _ChipRowFadeEdge extends StatelessWidget {
                 child: Icon(
                   isRight ? Icons.chevron_right : Icons.chevron_left,
                   color: Theme.of(context).colorScheme.onPrimary,
-                  size: 20,
+                  size: 20 * s,
                 ),
               ),
             ),

@@ -925,7 +925,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                   l.historyPrevious,
                   style: const TextStyle(fontSize: 14),
                 ),
-                trailing: const Icon(Icons.chevron_right, size: 18),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  size: scaledIconSize(context, 18),
+                ),
                 onTap: () async {
                   await Navigator.of(context).push(
                     MaterialPageRoute(

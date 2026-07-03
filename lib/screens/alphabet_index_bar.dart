@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/control_scale.dart';
 
 // Default (Latin) canon used when no locale-specific alphabet is supplied.
 const _kLatinCanon = [
@@ -101,9 +102,9 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
   // Reserves space for 2 chevrons and 2 ellipsis slots (worst case); the
   // ellipsis slots are only shown when needed but we reserve space for both
   // unconditionally so the layout height is stable regardless of window position.
-  int _windowSize(double availableHeight) {
+  int _windowSize(double availableHeight, double chevronHeight) {
     final forLetters =
-        availableHeight - 2 * _kChevronHeight - 2 * _kMinSlotHeight;
+        availableHeight - 2 * chevronHeight - 2 * _kMinSlotHeight;
     return (forLetters / _kMinSlotHeight).floor().clamp(
       1,
       widget.letters.length,
@@ -204,6 +205,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
     required bool enabled,
     required String label,
     required VoidCallback onTap,
+    required double scale,
   }) {
     final icon = up ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down;
     final primary = Theme.of(context).colorScheme.primary;
@@ -217,20 +219,20 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
       child: Tooltip(
         message: label,
         child: SizedBox(
-          height: _kChevronHeight,
+          height: _kChevronHeight * scale,
           child: Center(
             child: GestureDetector(
               onTap: enabled ? onTap : null,
               child: Container(
-                width: 28,
-                height: 28,
+                width: 28 * scale,
+                height: 28 * scale,
                 decoration: BoxDecoration(
                   color: enabled ? primary : primary.withValues(alpha: 0.25),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   icon,
-                  size: 18,
+                  size: 18 * scale,
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
@@ -292,6 +294,14 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
 
+    // Scroll chevrons grow with the text scale (bigger low-vision targets),
+    // capped at 1.5x like the letters so they never bleed off the 48px strip.
+    // The scaled reserved height feeds the windowed-mode layout math below so
+    // bigger chevrons simply leave room for a few fewer letters (no overflow).
+    // At normal text the factor is 1.0 -> every constant is unchanged.
+    final chevronScale = controlScaleFor(context).clamp(1.0, 1.5).toDouble();
+    final chevronHeight = _kChevronHeight * chevronScale;
+
     // The bar is a fixed 48px strip: let the letters grow with text for
     // readability but CAP the scale so they never bleed off it — the bar stays
     // usable at every text size instead of being hidden (ADR-016 Phase 3 D).
@@ -326,7 +336,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
           }
 
           // ── Windowed mode ──────────────────────────────────────────────────────
-          final winSize = _windowSize(availableHeight);
+          final winSize = _windowSize(availableHeight, chevronHeight);
 
           // Initialise window position once we have a real winSize from layout.
           if (!_windowInitialised) {
@@ -352,7 +362,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
           // Always reserve space for 2 ellipsis slots so layout height is stable.
           // When an ellipsis is absent its space is absorbed by a spacer below.
           final forSlots =
-              availableHeight - 2 * _kChevronHeight - 2 * _kMinSlotHeight;
+              availableHeight - 2 * chevronHeight - 2 * _kMinSlotHeight;
           final slotHeight = winSize > 0
               ? (forSlots / winSize).clamp(_kMinSlotHeight, 48.0)
               : _kMinSlotHeight;
@@ -373,6 +383,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
                 enabled: _canScrollUp,
                 label: widget.scrollUpLabel,
                 onTap: () => _shiftWindowAndNotify(false, winSize),
+                scale: chevronScale,
               ),
               if (showEllipsisTop)
                 _ellipsis(primary, ellipsisHeight)
@@ -390,6 +401,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
                 enabled: _canScrollDown(winSize),
                 label: widget.scrollDownLabel,
                 onTap: () => _shiftWindowAndNotify(true, winSize),
+                scale: chevronScale,
               ),
             ],
           );

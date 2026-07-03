@@ -104,5 +104,25 @@ void main() {
           findsOneWidget);
       handle.dispose();
     });
+
+    // ADR-016 accessibility follow-up: the fade-edge chevron grows with the
+    // text scale, capped at 1.5x (it sits in a fixed 48px edge).
+    double rightChevronSize(WidgetTester tester) =>
+        tester.widget<Icon>(find.byIcon(Icons.chevron_right)).size!;
+
+    testWidgets('right chevron grows at large text', (tester) async {
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await _pumpNarrow(tester);
+      expect(rightChevronSize(tester), greaterThan(20));
+    });
+
+    testWidgets('right chevron is capped at large text', (tester) async {
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await _pumpNarrow(tester);
+      // base 20 * cap 1.5 = 30; uncapped would be 20 * 2.0 = 40.
+      expect(rightChevronSize(tester), lessThanOrEqualTo(30));
+    });
   });
 }
