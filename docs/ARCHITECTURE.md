@@ -92,22 +92,20 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Large-text accessibility (ADR-016) — Phase 2b (help pinch-to-zoom)
+### Next task: Large-text accessibility (ADR-016) — Phase 3 (control/target scaling)
 
 Make Gabbro usable at very large text (low-vision): one absolute `textScale` knob drives
 text **and** (later phases) controls in unison; screen-derived max (600dp tiers — phone 2x,
 tablet 3x); targets scale proportionally, capped ~2x. Design in
 [ADR-016](decisions/ADR-016-large-text-and-target-scaling-accessibility.md).
 
-**Phases 0-2 DONE** (hardware-verified S23/GOS/tablet): calibrate; slider + `text_scale`
+**Phases 0-2b DONE** (hardware-verified S23/GOS/tablet): calibrate; slider + `text_scale`
 model + onboarding (`lib/text_scale.dart`, `TextSizeSlider`); text-overflow hardening across
-every screen/dropdown/dialog. Maxes settled at **2x phone / 3x tablet**.
+every screen/dropdown/dialog (maxes settled at **2x phone / 3x tablet**); help screenshots
+tap to a full-screen `InteractiveViewer` (pinch/pan, close) since `textScaler` can't scale a
+PNG and `FLAG_SECURE` blocks an external magnifier.
 
-**Phase 2b — Help-screen pinch-to-zoom [NEXT].** `FLAG_SECURE` blocks screenshots, so a
-low-vision user cannot magnify the help pages externally — add in-app pinch/zoom
-(`InteractiveViewer`) on help content, especially images, which `textScaler` does not touch.
-
-**Phase 3 — Target/control scaling** (the core payoff): `scaledControl` helper off
+**Phase 3 — Target/control scaling [NEXT]** (the core payoff): `scaledControl` helper off
 `textScale` (capped ~2x); alphabet bar (hide on phone tier / scale on tablet tier); password
 breakdown sheet; FABs; drop `VisualDensity.compact`; the **ListTile-with-trailing-buttons
 class** (recovery_history et al. — deferred here from Phase 2, controls don't fit at max).
