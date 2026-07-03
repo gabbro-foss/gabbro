@@ -22,17 +22,17 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | create_entry_screen | in-probe (pass) | **fixed** all dropdowns (folder + card-status + `_dropdownField`/payment-network): `isExpanded:true` + `itemHeight:null` + `selectedItemBuilder` ellipsis | pending |
 | vault_list_screen (phone) | todo (probe) | **folder-filter dropdown FIXED** (the actual maintainer report): `selectedItemBuilder` ellipsis on BOTH phone (~1629) + tablet (~1548) paths, else the one-line selection hard-clips at 4x | **re-verify** |
 | csv_mapping_screen | **fixed** | mapping rows stack label-above-dropdown at >1.5x (was illegible `width:88`); dropdown gets 3-part fix; preview DataTable row-height cap removed (`dataRowMaxHeight: infinity`) | pending |
-| entry_detail_screen | todo | AppBar action crowding | |
+| entry_detail_screen | in-probe (pass) | export dialog scrollable; AppBar OK at 4x in probe | pending |
 | export_screen | in-probe (pass) | | |
 | generator_screen | in-probe (pass) | embeds generator_widget | pending |
 | help_screen | **fixed** | pages now fill-or-scroll (was 728px phone / 168px tablet bottom), image capped 50%; page-dot spacing minor/open; Phase 2b pinch-zoom separate | pending |
 | import_screen | todo | `SegmentedButton` may overflow | |
 | language_screen | in-probe (pass) | **fixed**: note moved inside the scroll list (was Column+Expanded, overflowed 48px at 4x) | pending |
-| manage_folders_screen | todo | reassign dropdown + delete-dialog content scroll fixed | pending |
-| manage_vaults_screen | todo | | |
+| manage_folders_screen | in-probe (pass) | reassign dropdown + delete dialog (scrollable:true) fixed | pending |
+| manage_vaults_screen | in-probe (pass) | dialogs scrollable:true | pending |
 | manage_yubikeys_screen | todo | | |
 | onboarding_screen | **fixed** | a11y-button row: Spacer->spaceBetween + Flexible ellipsizing button (was 457/315px right) | pending |
-| recovery_history_screen | todo | | |
+| recovery_history_screen | **SKIP (probe)** | ListTile trailing-action Row cannot fit at 4x -> item fails to size (hasSize crash). Control-layout -> Phase 3. **Real bug, deferred** | |
 | review_changes_screen | todo | embeds sync_review | |
 | save_confirm_screen | todo | | |
 | security_screen | in-probe (pass) | dialogs scrollable:true | pending |
