@@ -24,13 +24,13 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | entry_detail_screen | todo | AppBar action crowding | |
 | export_screen | todo | | |
 | generator_screen | todo | embeds generator_widget | |
-| help_screen | **overflow found (skip)** | pages don't scroll at max (728px phone / 168px tablet bottom); + page-dot spacing; Phase 2b pinch-zoom separate | |
+| help_screen | **fixed** | pages now fill-or-scroll (was 728px phone / 168px tablet bottom), image capped 50%; page-dot spacing minor/open; Phase 2b pinch-zoom separate | pending |
 | import_screen | todo | `SegmentedButton` may overflow | |
 | language_screen | todo | | |
 | manage_folders_screen | todo | folder-name row clip? | |
 | manage_vaults_screen | todo | | |
 | manage_yubikeys_screen | todo | | |
-| onboarding_screen | **overflow found (skip)** | accessibility-button row overflows right (457px phone / 315px tablet) | |
+| onboarding_screen | **fixed** | a11y-button row: Spacer->spaceBetween + Flexible ellipsizing button (was 457/315px right) | pending |
 | recovery_history_screen | todo | | |
 | review_changes_screen | todo | embeds sync_review | |
 | save_confirm_screen | todo | | |
