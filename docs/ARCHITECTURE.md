@@ -77,7 +77,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1186 | 0 |
+| Flutter (`flutter test`) | 1190 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -119,7 +119,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 ### Accessibility polish (ADR-016 follow-ups, deferred)
 - **Scale the reveal-eye (show/hide) toggles** at large text (13 scattered, some in
   constrained field-suffix/row positions — needs care per site).
-- **Scale app-bar action icons on the remaining screens** (Slice B did the vault list only).
 - **Scale the alphabet bar's own up/down scroll chevrons** (their size is baked into the
   bar's windowing height math — touch with care).
 
