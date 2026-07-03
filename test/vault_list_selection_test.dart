@@ -111,6 +111,20 @@ void main() {
     },
   );
 
+  // ADR-016 Phase 3 (Slice A): selection checkboxes must NOT force
+  // VisualDensity.compact — compact shrinks the tap target below the standard
+  // 48dp, the opposite of the accessibility goal.
+  testWidgets('narrow: selection checkbox does not force compact density',
+      (tester) async {
+    _setNarrow(tester);
+    await tester.pumpWidget(_buildScreen(_twoEntries));
+    await tester.tap(find.byIcon(Icons.checklist));
+    await tester.pump();
+
+    final box = tester.widget<Checkbox>(find.byType(Checkbox).first);
+    expect(box.visualDensity, isNot(VisualDensity.compact));
+  });
+
   // A11y: the selection-mode app-bar actions (delete, close) carry semantic
   // labels (tooltips). A full labelledTapTargetGuideline assertion is NOT made
   // here: selection mode also exposes the per-row checkboxes and the alphabet

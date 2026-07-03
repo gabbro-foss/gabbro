@@ -322,8 +322,6 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                         child: Semantics(
                                           label: widget.displayTitle(entry),
                                           child: Checkbox(
-                                            visualDensity:
-                                                VisualDensity.compact,
                                             value: widget.selectedIds.contains(
                                               entry.id,
                                             ),

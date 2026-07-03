@@ -10,7 +10,7 @@ import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
-import 'package:gabbro/text_scale.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
@@ -725,10 +725,7 @@ class _UnlockScreenState extends State<UnlockScreen>
                         // (icon scaled to the target size) that keeps the
                         // screen-reader name via its tooltip.
                         if (mq.textScaler.scale(1) > 1.5) {
-                          final target = targetScaleFor(
-                            mq.textScaler.scale(1),
-                            deviceMaxScale(mq.size.shortestSide),
-                          );
+                          final target = controlScaleFor(context);
                           return IconButton.outlined(
                             onPressed:
                                 _isUnlocking ? null : _unlockWithBiometrics,

@@ -111,6 +111,21 @@ void main() {
       expect(find.byType(TextSizeSlider), findsOneWidget);
     });
 
+    // ADR-016 Phase 3: the accessibility toggle is a *control* for text size, so
+    // it must stay a fixed size and not balloon when large text is on (it sits
+    // beside fixed-size icon buttons). Its subtree renders at noScaling.
+    testWidgets('E2b accessibility button stays fixed size at large text',
+        (tester) async {
+      await tester.pumpWidget(
+        _buildInApp(settings: const AppSettings(textScale: 3.0)),
+      );
+      await tester.pumpAndSettle();
+      final scaler = MediaQuery.textScalerOf(
+        tester.element(find.byIcon(Icons.accessibility_new)),
+      );
+      expect(scaler, TextScaler.noScaling);
+    });
+
     testWidgets('E3 tap off: textScale 1.0, no highContrast, logo restored',
         (tester) async {
       await tester.pumpWidget(

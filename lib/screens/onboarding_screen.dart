@@ -236,7 +236,8 @@ Future<void> _defaultInitVaultWithYubikey(
 class OnboardingScreen extends StatefulWidget {
   final String? initialPath;
   final String? postDeletionMessage;
-  final Future<void> Function(List<int> passphrase, String path, String? alias) onInitVault;
+  final Future<void> Function(List<int> passphrase, String path, String? alias)
+  onInitVault;
   final EntropyResult Function(String password) onEstimateEntropy;
   final bool blockPassphraseCopyPaste;
 
@@ -376,8 +377,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       _vaultPath = dirPath == null
           ? ''
           : (alias.isEmpty
-              ? _firstFreeVaultPath(dirPath)
-              : _aliasBasedPath(dirPath, alias));
+                ? _firstFreeVaultPath(dirPath)
+                : _aliasBasedPath(dirPath, alias));
     });
   }
 
@@ -480,7 +481,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           alias.isEmpty ? null : alias,
         );
       }
-      await widget.onVaultCreated?.call(_vaultPath, _aliasController.text.trim());
+      await widget.onVaultCreated?.call(
+        _vaultPath,
+        _aliasController.text.trim(),
+      );
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -542,10 +546,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final current = app.settings;
     final isOn = current.textScale > 1.0;
     await app.updateSettings(
-      current.copyWith(
-        highContrast: !isOn,
-        textScale: isOn ? 1.0 : 3.0,
-      ),
+      current.copyWith(highContrast: !isOn, textScale: isOn ? 1.0 : 3.0),
     );
   }
 
@@ -771,28 +772,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       duration: const Duration(milliseconds: 200),
                       child: Padding(
                         padding: const EdgeInsets.only(right: 8.0),
-                        child: OutlinedButton(
-                          onPressed: _toggleAccessibility,
-                          style: OutlinedButton.styleFrom(
-                            visualDensity: VisualDensity.compact,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.accessibility_new,
-                                color: isAccessibilityOn
-                                    ? Theme.of(context).colorScheme.primary
-                                    : null,
-                              ),
-                              const SizedBox(width: 8),
-                              Flexible(
-                                child: Text(
-                                  l.accessibilityButton,
-                                  overflow: TextOverflow.ellipsis,
+                        // This button *controls* the text size, so keep it a
+                        // fixed size (like the icon buttons beside it) — it must
+                        // not balloon when large text is on (ADR-016 Phase 3).
+                        child: MediaQuery(
+                          data: MediaQuery.of(
+                            context,
+                          ).copyWith(textScaler: TextScaler.noScaling),
+                          child: OutlinedButton(
+                            onPressed: _toggleAccessibility,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.accessibility_new,
+                                  color: isAccessibilityOn
+                                      ? Theme.of(context).colorScheme.primary
+                                      : null,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    l.accessibilityButton,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -916,7 +922,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           const SizedBox(height: 8),
                           if (widget.isAndroid)
                             Text(
-                              _vaultPath.isEmpty ? l.onboardingLoadingPath : _vaultPath,
+                              _vaultPath.isEmpty
+                                  ? l.onboardingLoadingPath
+                                  : _vaultPath,
                               style: Theme.of(context).textTheme.bodySmall,
                             )
                           else
@@ -952,7 +960,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             enableInteractiveSelection:
                                 !widget.blockPassphraseCopyPaste,
                             onChanged: _onPassphraseChanged,
-                            onFieldSubmitted: (_) => _confirmFocus.requestFocus(),
+                            onFieldSubmitted: (_) =>
+                                _confirmFocus.requestFocus(),
                             decoration: InputDecoration(
                               labelText: l.masterPassphraseLabel,
                               border: const OutlineInputBorder(),
@@ -1085,7 +1094,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             const SizedBox(height: 16),
                             const Divider(),
                             SwitchListTile(
-                              title: Text(AppLocalizations.of(context).protectWithYubiKey),
+                              title: Text(
+                                AppLocalizations.of(context).protectWithYubiKey,
+                              ),
                               subtitle: Text(
                                 AppLocalizations.of(context).yubiKeySubtitle,
                               ),
@@ -1106,8 +1117,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   obscureText: _pinObscured[i],
                                   onFieldSubmitted: (_) =>
                                       i == _pinControllers.length - 1
-                                          ? _createVault()
-                                          : _pinFocusNodes[i + 1].requestFocus(),
+                                      ? _createVault()
+                                      : _pinFocusNodes[i + 1].requestFocus(),
                                   decoration: InputDecoration(
                                     labelText: _pinLabel(i, l),
                                     border: const OutlineInputBorder(),
@@ -1200,7 +1211,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : Text(AppLocalizations.of(context).createVault),
+                                : Text(
+                                    AppLocalizations.of(context).createVault,
+                                  ),
                           ),
                         ],
                       ),

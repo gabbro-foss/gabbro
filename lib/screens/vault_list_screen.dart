@@ -1198,7 +1198,6 @@ class _VaultListScreenState extends State<VaultListScreen>
       child: Semantics(
         label: label,
         child: Checkbox(
-          visualDensity: VisualDensity.compact,
           value: _selectedIds.contains(entry.id),
           onChanged: (_) => setState(() {
             if (_selectedIds.contains(entry.id)) {
