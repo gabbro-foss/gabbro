@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -453,6 +454,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
+            iconSize: scaledIconSize(context),
             tooltip: l.backupEmergencyHeading,
             onPressed: () => _showBackupInfoDialog(l),
           ),

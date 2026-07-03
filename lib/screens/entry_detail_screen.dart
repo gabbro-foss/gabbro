@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/safe_file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -290,11 +291,13 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           if (_entry case VaultEntryData_File(:final field0))
             IconButton(
               icon: const Icon(Icons.download_outlined),
+              iconSize: scaledIconSize(context),
               tooltip: l.tooltipExportFile,
               onPressed: () => _exportFile(field0),
             ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
+            iconSize: scaledIconSize(context),
             tooltip: l.tooltipEditEntry,
             onPressed: () async {
               final entryType = switch (_entry) {
@@ -319,6 +322,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
+            iconSize: scaledIconSize(context),
             tooltip: l.tooltipDeleteEntry,
             onPressed: () => _confirmDelete(context),
           ),

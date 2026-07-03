@@ -74,6 +74,7 @@ class _HelpScreenState extends State<HelpScreen> {
             foregroundColor: Colors.white,
             leading: IconButton(
               icon: const Icon(Icons.close),
+              iconSize: scaledIconSize(context),
               tooltip: l.close,
               onPressed: () => Navigator.of(ctx).pop(),
             ),

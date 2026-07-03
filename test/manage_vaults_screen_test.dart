@@ -600,4 +600,24 @@ void main() {
       expect(find.textContaining('it is not a backup'), findsOneWidget);
     });
   });
+
+  // ADR-016 accessibility follow-up: the app-bar info icon grows with the text
+  // scale so a low-vision user gets a bigger target (24 at normal text).
+  testWidgets('app-bar info icon scales up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_buildScreen(registry: registry));
+    await tester.pumpAndSettle();
+
+    final infoBtn = tester.widget<IconButton>(
+      find
+          .ancestor(
+            of: find.byIcon(Icons.info_outline),
+            matching: find.byType(IconButton),
+          )
+          .first,
+    );
+    expect(infoBtn.iconSize, greaterThan(24));
+    expect(tester.takeException(), isNull);
+  });
 }

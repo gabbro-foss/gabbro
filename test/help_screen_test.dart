@@ -134,4 +134,30 @@ void main() {
     );
     expect(next.iconSize, greaterThan(24));
   });
+
+  // ADR-016 accessibility follow-up: the full-screen zoom viewer's close icon
+  // grows with the text scale so a low-vision user gets a bigger target.
+  testWidgets('full-screen viewer close icon scales up at large text', (
+    tester,
+  ) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(testApp(const HelpScreen()));
+    await tester.pumpAndSettle();
+
+    // Tap the screenshot to open the full-screen pinch-zoom route.
+    await tester.tap(find.byType(InkWell).first);
+    await tester.pumpAndSettle();
+
+    final closeBtn = tester.widget<IconButton>(
+      find
+          .ancestor(
+            of: find.byIcon(Icons.close),
+            matching: find.byType(IconButton),
+          )
+          .first,
+    );
+    expect(closeBtn.iconSize, greaterThan(24));
+    expect(tester.takeException(), isNull);
+  });
 }
