@@ -133,6 +133,29 @@ UnlockScreen _bareUnlock({List<YubikeyRecordData> yubikeyRecords = const []}) =>
       onBiometricIsEnrolled: (_) async => false,
     );
 
+// Biometric-enrolled UnlockScreen at a chosen text scale on a phone-sized
+// surface (ADR-016): past 1.5x the button drops its label for an icon.
+Widget _biometricAtScale(
+  double scale, {
+  Future<List<int>?> Function(String)? onAuth,
+}) =>
+    testApp(MediaQuery(
+      data: MediaQueryData(
+        textScaler: TextScaler.linear(scale),
+        size: const Size(360, 800),
+      ),
+      child: UnlockScreen(
+        vaultPath: '/tmp/test.gabbro',
+        onEstimateEntropy: _fakeEntropy,
+        yubikeyRecords: const [],
+        biometricEnabled: true,
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: onAuth ?? (_) async => null,
+        onVaultIsReadable: (_) async => true,
+        onBackupUsable: (_) async => false,
+      ),
+    ));
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
@@ -710,6 +733,40 @@ void main() {
       ));
       await tester.pump();
       await tester.tap(find.text('Use biometrics'));
+      await tester.pumpAndSettle();
+      expect(called, isTrue);
+    });
+
+    // ── large text (ADR-016): icon-only past 1.5x ────────────────────────────
+    testWidgets('keeps the labelled button at normal text scale', (tester) async {
+      await tester.pumpWidget(_biometricAtScale(1.0));
+      await tester.pump();
+      expect(find.text('Use biometrics'), findsOneWidget);
+    });
+
+    testWidgets('drops the label for an icon at large text scale', (tester) async {
+      await tester.pumpWidget(_biometricAtScale(3.0));
+      await tester.pump();
+      // Label text gone (it wrapped over several lines on hardware)...
+      expect(find.text('Use biometrics'), findsNothing);
+      // ...replaced by a fingerprint icon that keeps the screen-reader name
+      // (the tooltip is the button's accessible label).
+      expect(find.byIcon(Icons.fingerprint), findsOneWidget);
+      expect(find.byTooltip('Use biometrics'), findsOneWidget);
+    });
+
+    testWidgets('icon-only button still authenticates when tapped', (tester) async {
+      bool called = false;
+      await tester.pumpWidget(_biometricAtScale(
+        3.0,
+        onAuth: (_) async {
+          called = true;
+          return null;
+        },
+      ));
+      await tester.pump();
+      await tester.ensureVisible(find.byIcon(Icons.fingerprint));
+      await tester.tap(find.byIcon(Icons.fingerprint));
       await tester.pumpAndSettle();
       expect(called, isTrue);
     });

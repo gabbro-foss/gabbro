@@ -85,6 +85,11 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final headers = widget.preview.headers;
+    // The heading row has a fixed default height (56px); at large text the bold
+    // header text is taller and clips mid-height (hardware: tablet 5x). Grow the
+    // heading row with the text scale, default below normal (ADR-016).
+    final headerScale = MediaQuery.textScalerOf(context).scale(1);
+    final headingRowHeight = headerScale > 1.0 ? 56.0 * headerScale : null;
     // Dropdown items: a "(none)" option + all headers
     final items = [
       DropdownMenuItem<String>(value: null, child: Text(l.csvColumnNone)),
@@ -111,6 +116,7 @@ class _CsvMappingScreenState extends State<CsvMappingScreen> {
                 child: DataTable(
                   // No fixed row heights: at large text a capped row clips the
                   // cell text vertically. Let rows grow to their content (ADR-016).
+                  headingRowHeight: headingRowHeight,
                   dataRowMaxHeight: double.infinity,
                   columnSpacing: 16,
                   columns: headers

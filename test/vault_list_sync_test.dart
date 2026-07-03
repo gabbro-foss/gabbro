@@ -234,6 +234,37 @@ void main() {
       expect(find.textContaining('synced'), findsOneWidget);
     });
 
+    // ADR-016: the chooser's two long buttons must stay reachable at large text.
+    testWidgets('the sync-method chooser is a scrollable dialog', (tester) async {
+      await tester.pumpWidget(
+        _buildScreen(
+          pickedPath: '/tmp/other.gabbro',
+          mergeVault: (_, _) async => _summary(),
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+        'passphrase',
+      );
+      await tester.tap(find.text('Sync'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('How should this sync apply?'), findsOneWidget);
+      final chooser = tester.widget<AlertDialog>(
+        find.ancestor(
+          of: find.text('How should this sync apply?'),
+          matching: find.byType(AlertDialog),
+        ),
+      );
+      expect(chooser.scrollable, isTrue);
+    });
+
     testWidgets('passphrase dialog announces the safe-to-retry hint', (
       tester,
     ) async {

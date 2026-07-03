@@ -195,7 +195,7 @@ void main() {
       });
     }
 
-    testWidgets('stored 8.0 clamps to device max 3.5 on a phone-sized surface',
+    testWidgets('stored 8.0 clamps to device max 2.0 on a phone-sized surface',
         (tester) async {
       tester.view.physicalSize = const Size(360 * 3, 800 * 3);
       tester.view.devicePixelRatio = 3.0;
@@ -203,7 +203,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
       await tester.pumpWidget(buildWithScale(8.0));
       await tester.pump();
-      expect(find.text('3.50'), findsOneWidget);
+      expect(find.text('2.00'), findsOneWidget);
     });
   });
 }

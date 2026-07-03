@@ -62,6 +62,21 @@ void main() {
       expect(find.text('About'), findsOneWidget);
       expect(find.text('Manage folders'), findsOneWidget);
     });
+    testWidgets('menu items do not overflow at large text', (tester) async {
+      // ADR-016: hardware walk #4 found the bare-Text menu items (e.g. Manage
+      // YubiKeys) clip off the edge at large text; the Expanded ones ellipsize.
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen());
+      await _setNarrow(tester);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+
   testWidgets('each menu item has an icon', (tester) async {
       await tester.pumpWidget(_buildScreen());
       await _setNarrow(tester);

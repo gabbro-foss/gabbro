@@ -10,6 +10,7 @@ import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
@@ -716,11 +717,32 @@ class _UnlockScreenState extends State<UnlockScreen>
                             textAlign: TextAlign.center,
                           ),
                         ),
-                      OutlinedButton.icon(
-                        onPressed: _isUnlocking ? null : _unlockWithBiometrics,
-                        icon: const Icon(Icons.fingerprint),
-                        label: Text(AppLocalizations.of(context).useBiometrics),
-                      ),
+                      Builder(builder: (context) {
+                        final label = AppLocalizations.of(context).useBiometrics;
+                        final mq = MediaQuery.of(context);
+                        // At large text the labelled button wraps over several
+                        // lines (ADR-016); past 1.5x show an icon-only button
+                        // (icon scaled to the target size) that keeps the
+                        // screen-reader name via its tooltip.
+                        if (mq.textScaler.scale(1) > 1.5) {
+                          final target = targetScaleFor(
+                            mq.textScaler.scale(1),
+                            deviceMaxScale(mq.size.shortestSide),
+                          );
+                          return IconButton.outlined(
+                            onPressed:
+                                _isUnlocking ? null : _unlockWithBiometrics,
+                            icon: const Icon(Icons.fingerprint),
+                            iconSize: 24 * target,
+                            tooltip: label,
+                          );
+                        }
+                        return OutlinedButton.icon(
+                          onPressed: _isUnlocking ? null : _unlockWithBiometrics,
+                          icon: const Icon(Icons.fingerprint),
+                          label: Text(label),
+                        );
+                      }),
                       const SizedBox(height: 16),
                     ],
                     // R-03: corruption banner + explicit recovery flow. Shown

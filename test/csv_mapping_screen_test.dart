@@ -51,12 +51,52 @@ Widget _buildViaRoute({
       ),
     ));
 
+// Renders the screen at a chosen text scale (ADR-016 large-text checks).
+Widget _buildScreenScaled({
+  required CsvPreviewData preview,
+  required double scale,
+}) =>
+    testApp(MediaQuery(
+      data: MediaQueryData(textScaler: TextScaler.linear(scale)),
+      child: CsvMappingScreen(
+        csvContent: 'csv',
+        preview: preview,
+        onImport: (_, _) async => _ok(0),
+      ),
+    ));
+
+DataTable _previewTable(WidgetTester tester) =>
+    tester.widget<DataTable>(find.byType(DataTable));
+
 Future<void> _tapImport(WidgetTester tester) async {
   await tester.ensureVisible(find.byType(FilledButton));
   await tester.tap(find.byType(FilledButton));
 }
 
 void main() {
+  // ── Large-text preview table (ADR-016) ────────────────────────────────────
+  // On hardware the preview heading row ([name, url, username]) clipped
+  // mid-height at tablet 5x (default 56px row); it must grow with the scale.
+
+  testWidgets('preview heading row grows with the text scale', (tester) async {
+    await tester.pumpWidget(_buildScreenScaled(
+      preview: _preview(['Name', 'URL', 'Username']),
+      scale: 3.0,
+    ));
+    final h = _previewTable(tester).headingRowHeight;
+    expect(h, isNotNull);
+    expect(h! > 56, isTrue);
+  });
+
+  testWidgets('preview heading row keeps the default at normal text scale',
+      (tester) async {
+    await tester.pumpWidget(_buildScreenScaled(
+      preview: _preview(['Name', 'URL', 'Username']),
+      scale: 1.0,
+    ));
+    expect(_previewTable(tester).headingRowHeight, isNull);
+  });
+
   // ── Column auto-detection ─────────────────────────────────────────────────
 
   testWidgets('standard column names are all pre-selected on open',

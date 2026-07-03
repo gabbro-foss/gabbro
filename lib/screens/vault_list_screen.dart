@@ -771,15 +771,30 @@ class _VaultListScreenState extends State<VaultListScreen>
     final fast = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        // The two choices are long buttons; at large text they must stay
+        // reachable, so they live in scrollable content, not the actions bar
+        // (which does not scroll). Cancel replaces the barrier tap (ADR-016).
+        scrollable: true,
         title: Text(chooseL.syncMethodTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(chooseL.syncMergeAutomatically),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(chooseL.syncReviewAllChanges),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(chooseL.syncReviewAllChanges),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(chooseL.syncMergeAutomatically),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(chooseL.cancel),
           ),
         ],
       ),
@@ -1356,7 +1371,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                       children: [
                         const Icon(Icons.security_outlined, size: 20),
                         const SizedBox(width: 12),
-                        Text(ml.menuManageYubiKeys),
+                        Expanded(child: Text(ml.menuManageYubiKeys)),
                       ],
                     ),
                   ),
@@ -1367,7 +1382,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                       children: [
                         const Icon(Icons.palette_outlined, size: 20),
                         const SizedBox(width: 12),
-                        Text(ml.menuAppearance),
+                        Expanded(child: Text(ml.menuAppearance)),
                       ],
                     ),
                   ),
@@ -1377,7 +1392,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                       children: [
                         const Icon(Icons.language_outlined, size: 20),
                         const SizedBox(width: 12),
-                        Text(ml.sectionLanguage),
+                        Expanded(child: Text(ml.sectionLanguage)),
                       ],
                     ),
                   ),
@@ -1387,7 +1402,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                       children: [
                         const Icon(Icons.shield_outlined, size: 20),
                         const SizedBox(width: 12),
-                        Text(ml.menuSecurity),
+                        Expanded(child: Text(ml.menuSecurity)),
                       ],
                     ),
                   ),
@@ -1418,7 +1433,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                       children: [
                         const Icon(Icons.help_outline, size: 20),
                         const SizedBox(width: 12),
-                        Text(ml.menuHelp),
+                        Expanded(child: Text(ml.menuHelp)),
                       ],
                     ),
                   ),
@@ -1428,7 +1443,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                       children: [
                         const Icon(Icons.info_outline, size: 20),
                         const SizedBox(width: 12),
-                        Text(ml.menuAbout),
+                        Expanded(child: Text(ml.menuAbout)),
                       ],
                     ),
                   ),
