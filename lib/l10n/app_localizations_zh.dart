@@ -239,21 +239,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get themeDark => '深色';
 
   @override
-  String get textSizeSmall => '小';
-
-  @override
-  String get textSizeRegular => '常规';
-
-  @override
-  String get textSizeLarge => '大';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote => '仅限手机 — 平板电脑始终使用左侧。';
 
   @override
@@ -2171,21 +2156,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get themeDark => '深色';
 
   @override
-  String get textSizeSmall => '小';
-
-  @override
-  String get textSizeRegular => '常规';
-
-  @override
-  String get textSizeLarge => '大';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote => '仅限手机 — 平板电脑始终使用左侧。';
 
   @override
@@ -4101,21 +4071,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get themeDark => '深色';
-
-  @override
-  String get textSizeSmall => '小';
-
-  @override
-  String get textSizeRegular => '一般';
-
-  @override
-  String get textSizeLarge => '大';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
 
   @override
   String get alphabetBarNote => '僅限手機 — 平板電腦始終使用左側。';

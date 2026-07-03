@@ -241,21 +241,6 @@ class AppLocalizationsYo extends AppLocalizations {
   String get themeDark => 'Okunkun';
 
   @override
-  String get textSizeSmall => 'Kekere';
-
-  @override
-  String get textSizeRegular => 'Deede';
-
-  @override
-  String get textSizeLarge => 'Nla';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Fun foonu nikan — tabulẹti ma n lo apa osi nigbagbogbo.';
 

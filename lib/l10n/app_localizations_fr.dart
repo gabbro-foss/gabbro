@@ -242,21 +242,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get themeDark => 'Sombre';
 
   @override
-  String get textSizeSmall => 'Petit';
-
-  @override
-  String get textSizeRegular => 'Normal';
-
-  @override
-  String get textSizeLarge => 'Grand';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Disposition téléphone uniquement — tablette toujours à gauche.';
 

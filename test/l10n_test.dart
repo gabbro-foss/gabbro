@@ -164,13 +164,13 @@ void main() {
     expect(find.byType(AppearanceScreen), findsOneWidget);
   });
 
-  // ── _textScale switch arms ─────────────────────────────────────────────────
+  // ── textScale applied to MediaQuery (ADR-016) ──────────────────────────────
 
-  group('_textScale', () {
-    Widget buildWithSize(TextSizeChoice size) => GabbroApp(
+  group('textScale applied to MediaQuery', () {
+    Widget buildWithScale(double scale) => GabbroApp(
           registry: VaultRegistry([]),
           vaultPath: null,
-          settings: AppSettings(textSize: size),
+          settings: AppSettings(textScale: scale),
           initialScreen: Builder(
             builder: (ctx) => Text(
               MediaQuery.of(ctx).textScaler.scale(1.0).toStringAsFixed(2),
@@ -178,17 +178,32 @@ void main() {
           ),
         );
 
-    for (final (size, expected) in [
-      (TextSizeChoice.small, '0.85'),
-      (TextSizeChoice.large, '1.15'),
-      (TextSizeChoice.extraLarge, '1.30'),
-      (TextSizeChoice.xxLarge, '1.50'),
+    // Default test surface is 800x600 -> shortestSide 600 -> tablet tier
+    // (max 6.0), so these values apply unclamped.
+    for (final (scale, expected) in [
+      (0.85, '0.85'),
+      (1.15, '1.15'),
+      (1.30, '1.30'),
+      (1.50, '1.50'),
+      (2.00, '2.00'),
     ]) {
-      testWidgets('textSize $size applies ${expected}x scale', (tester) async {
-        await tester.pumpWidget(buildWithSize(size));
+      testWidgets('textScale $scale applies ${expected}x on tablet-tier surface',
+          (tester) async {
+        await tester.pumpWidget(buildWithScale(scale));
         await tester.pump();
         expect(find.text(expected), findsOneWidget);
       });
     }
+
+    testWidgets('stored 8.0 clamps to device max 4.0 on a phone-sized surface',
+        (tester) async {
+      tester.view.physicalSize = const Size(360 * 3, 800 * 3);
+      tester.view.devicePixelRatio = 3.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(buildWithScale(8.0));
+      await tester.pump();
+      expect(find.text('4.00'), findsOneWidget);
+    });
   });
 }

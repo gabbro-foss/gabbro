@@ -242,21 +242,6 @@ class AppLocalizationsSk extends AppLocalizations {
   String get themeDark => 'Tmavý';
 
   @override
-  String get textSizeSmall => 'Malý';
-
-  @override
-  String get textSizeRegular => 'Normálny';
-
-  @override
-  String get textSizeLarge => 'Veľký';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Iba na telefóne — tablet vždy používa ľavú stranu.';
 

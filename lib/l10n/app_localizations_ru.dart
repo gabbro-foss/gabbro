@@ -241,21 +241,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get themeDark => 'Тёмная';
 
   @override
-  String get textSizeSmall => 'Маленький';
-
-  @override
-  String get textSizeRegular => 'Обычный';
-
-  @override
-  String get textSizeLarge => 'Большой';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Только на телефоне — планшет всегда использует левую сторону.';
 

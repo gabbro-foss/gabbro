@@ -241,21 +241,6 @@ class AppLocalizationsNn extends AppLocalizations {
   String get themeDark => 'Mørkt';
 
   @override
-  String get textSizeSmall => 'Liten';
-
-  @override
-  String get textSizeRegular => 'Normal';
-
-  @override
-  String get textSizeLarge => 'Stor';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Berre på telefon — nettbrett brukar alltid venstre.';
 

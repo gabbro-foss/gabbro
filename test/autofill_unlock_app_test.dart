@@ -42,9 +42,9 @@ void main() {
     expect(app.darkTheme, isNotNull);
   });
 
-  testWidgets('applies the settings text scale (xxLarge => 1.5)', (tester) async {
+  testWidgets('applies the settings text scale (1.5)', (tester) async {
     await tester.pumpWidget(buildAutofillUnlockApp(
-      settings: AppSettings(textSize: TextSizeChoice.xxLarge),
+      settings: const AppSettings(textScale: 1.5),
       registry: _twoVaults(),
       initialVaultPath: '/tmp/a.gabbro',
       channel: channel,

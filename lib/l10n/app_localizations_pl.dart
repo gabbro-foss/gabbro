@@ -242,21 +242,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String get themeDark => 'Ciemny';
 
   @override
-  String get textSizeSmall => 'Mały';
-
-  @override
-  String get textSizeRegular => 'Normalny';
-
-  @override
-  String get textSizeLarge => 'Duży';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Tylko na telefonie — tablet zawsze używa lewej strony.';
 

@@ -5,6 +5,7 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
+import 'package:gabbro/widgets/text_size_slider.dart';
 
 Widget _buildScreen({AppSettings settings = const AppSettings()}) => GabbroApp(
   registry: VaultRegistry([]),
@@ -54,6 +55,34 @@ void main() {
       // onSelected — covered by the interaction test below.
       expect(find.text('Right'), findsOneWidget);
       expect(find.text('Left'), findsOneWidget);
+    });
+
+    testWidgets('D7 renders a TextSizeSlider seeded from textScale', (tester) async {
+      await tester.pumpWidget(
+        _buildScreen(settings: const AppSettings(textScale: 2.0)),
+      );
+      final slider = tester.widget<TextSizeSlider>(find.byType(TextSizeSlider));
+      expect(slider.scale, 2.0);
+    });
+
+    testWidgets('D8 committing the slider persists the new textScale',
+        (tester) async {
+      await tester.pumpWidget(
+        _buildScreen(settings: const AppSettings(textScale: 1.0)),
+      );
+      final slider = tester.widget<TextSizeSlider>(find.byType(TextSizeSlider));
+      slider.onChangeEnd!(3.0);
+      await tester.pumpAndSettle();
+      final ctx = tester.element(find.byType(AppearanceScreen));
+      expect(GabbroApp.of(ctx).settings.textScale, 3.0);
+    });
+
+    testWidgets('D9 old per-size label buttons are absent', (tester) async {
+      await tester.pumpWidget(_buildScreen());
+      expect(find.byType(TextSizeSlider), findsOneWidget);
+      for (final label in ['Small', 'XL', 'XXL']) {
+        expect(find.text(label), findsNothing, reason: label);
+      }
     });
 
     testWidgets('SegmentedRow uses Wrap not Row', (tester) async {

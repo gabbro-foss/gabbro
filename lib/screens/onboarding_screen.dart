@@ -9,13 +9,14 @@ import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/language_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
-import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
+import 'package:gabbro/widgets/text_size_slider.dart';
 
 // ── Hex helpers ───────────────────────────────────────────────────────────────
 
@@ -296,6 +297,10 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  /// Live text scale while the accessibility slider is dragged (preview without
+  /// persisting every frame); null when not dragging.
+  double? _dragScale;
   final _aliasController = TextEditingController();
   final _passphraseController = TextEditingController();
   final _confirmController = TextEditingController();
@@ -535,12 +540,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final app = GabbroApp.maybeOf(context);
     if (app == null) return;
     final current = app.settings;
-    final isOn =
-        current.highContrast && current.textSize == TextSizeChoice.xxLarge;
+    final isOn = current.textScale > 1.0;
     await app.updateSettings(
       current.copyWith(
         highContrast: !isOn,
-        textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.xxLarge,
+        textScale: isOn ? 1.0 : 3.0,
       ),
     );
   }
@@ -731,10 +735,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final app = GabbroApp.maybeOf(context);
-    final isAccessibilityOn =
-        app != null &&
-        app.settings.highContrast &&
-        app.settings.textSize == TextSizeChoice.xxLarge;
+    final isAccessibilityOn = app != null && app.settings.textScale > 1.0;
 
     return Scaffold(
       body: SafeArea(
@@ -802,7 +803,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Center(child: GabbroLogo(withText: true, width: 200)),
+                          // Accessibility ON reclaims the logo's vertical space
+                          // for the text-size slider (ADR-016).
+                          if (isAccessibilityOn)
+                            TextSizeSlider(
+                              scale: _dragScale ?? app.settings.textScale,
+                              deviceMax: deviceMaxScale(
+                                MediaQuery.of(context).size.shortestSide,
+                              ),
+                              // Onboarding preview is just the brand word (a
+                              // proper noun, same in every locale) — the full
+                              // sample sentence lives on the appearance screen.
+                              previewText: 'Gabbro',
+                              onChanged: (s) => setState(() => _dragScale = s),
+                              onChangeEnd: (s) {
+                                app.updateSettings(
+                                  app.settings.copyWith(textScale: s),
+                                );
+                                setState(() => _dragScale = null);
+                              },
+                            )
+                          else
+                            Center(
+                              child: GabbroLogo(withText: true, width: 200),
+                            ),
                           const SizedBox(height: 8),
                           if (widget.postDeletionMessage != null) ...[
                             Container(

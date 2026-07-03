@@ -241,21 +241,6 @@ class AppLocalizationsLv extends AppLocalizations {
   String get themeDark => 'Tumša';
 
   @override
-  String get textSizeSmall => 'Mazs';
-
-  @override
-  String get textSizeRegular => 'Parasts';
-
-  @override
-  String get textSizeLarge => 'Liels';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Tikai tālrunī — planšetdatorā vienmēr kreisajā pusē.';
 

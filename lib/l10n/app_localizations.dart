@@ -619,36 +619,6 @@ abstract class AppLocalizations {
   /// **'Dark'**
   String get themeDark;
 
-  /// No description provided for @textSizeSmall.
-  ///
-  /// In en, this message translates to:
-  /// **'Small'**
-  String get textSizeSmall;
-
-  /// No description provided for @textSizeRegular.
-  ///
-  /// In en, this message translates to:
-  /// **'Regular'**
-  String get textSizeRegular;
-
-  /// No description provided for @textSizeLarge.
-  ///
-  /// In en, this message translates to:
-  /// **'Large'**
-  String get textSizeLarge;
-
-  /// No description provided for @textSizeXL.
-  ///
-  /// In en, this message translates to:
-  /// **'XL'**
-  String get textSizeXL;
-
-  /// No description provided for @textSizeXXL.
-  ///
-  /// In en, this message translates to:
-  /// **'XXL'**
-  String get textSizeXXL;
-
   /// No description provided for @alphabetBarNote.
   ///
   /// In en, this message translates to:

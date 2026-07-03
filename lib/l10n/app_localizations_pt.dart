@@ -241,21 +241,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get themeDark => 'Escuro';
 
   @override
-  String get textSizeSmall => 'Pequeno';
-
-  @override
-  String get textSizeRegular => 'Normal';
-
-  @override
-  String get textSizeLarge => 'Grande';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Apenas em celular — tablet sempre usa a esquerda.';
 
@@ -2267,21 +2252,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get themeDark => 'Escuro';
 
   @override
-  String get textSizeSmall => 'Pequeno';
-
-  @override
-  String get textSizeRegular => 'Normal';
-
-  @override
-  String get textSizeLarge => 'Grande';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Apenas em celular — tablet sempre usa a esquerda.';
 
@@ -4288,21 +4258,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get themeDark => 'Escuro';
-
-  @override
-  String get textSizeSmall => 'Pequeno';
-
-  @override
-  String get textSizeRegular => 'Normal';
-
-  @override
-  String get textSizeLarge => 'Grande';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
 
   @override
   String get alphabetBarNote =>

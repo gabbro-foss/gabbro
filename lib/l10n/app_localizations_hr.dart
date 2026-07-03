@@ -242,21 +242,6 @@ class AppLocalizationsHr extends AppLocalizations {
   String get themeDark => 'Tamna';
 
   @override
-  String get textSizeSmall => 'Mali';
-
-  @override
-  String get textSizeRegular => 'Normalan';
-
-  @override
-  String get textSizeLarge => 'Veliki';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Samo na telefonu — tablet uvijek koristi lijevu stranu.';
 

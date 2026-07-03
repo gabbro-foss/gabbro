@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
+import 'package:gabbro/widgets/text_size_slider.dart';
 
 class AppearanceScreen extends StatefulWidget {
   const AppearanceScreen({super.key});
@@ -13,6 +15,10 @@ class AppearanceScreen extends StatefulWidget {
 
 class _AppearanceScreenState extends State<AppearanceScreen> {
   late AppSettings _settings;
+
+  /// Live text scale while the slider is being dragged (previews without
+  /// persisting every frame); null when not dragging.
+  double? _dragScale;
 
   @override
   void didChangeDependencies() {
@@ -28,8 +34,6 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: Text(l.appearanceTitle)),
@@ -58,29 +62,16 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               // ── Text size ──────────────────────────────────────────────
               SectionHeader(label: l.sectionTextSize),
               const SizedBox(height: 8),
-              SegmentedRow<TextSizeChoice>(
-                values: TextSizeChoice.values,
-                selected: _settings.textSize,
-                label: (v) => switch (v) {
-                  TextSizeChoice.small => l.textSizeSmall,
-                  TextSizeChoice.regular => l.textSizeRegular,
-                  TextSizeChoice.large => l.textSizeLarge,
-                  TextSizeChoice.extraLarge => l.textSizeXL,
-                  TextSizeChoice.xxLarge => l.textSizeXXL,
+              TextSizeSlider(
+                scale: _dragScale ?? _settings.textScale,
+                deviceMax:
+                    deviceMaxScale(MediaQuery.of(context).size.shortestSide),
+                previewText: l.textSizePreview,
+                onChanged: (s) => setState(() => _dragScale = s),
+                onChangeEnd: (s) {
+                  _update(_settings.copyWith(textScale: s));
+                  setState(() => _dragScale = null);
                 },
-                onSelected: (v) => _update(_settings.copyWith(textSize: v)),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  l.textSizePreview,
-                  style: textTheme.bodyMedium,
-                ),
               ),
               const SizedBox(height: 32),
 

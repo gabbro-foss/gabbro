@@ -84,11 +84,6 @@
   "themeLight": "Hell",
   "themeDark": "Dunkel",
 
-  "textSizeSmall": "Klein",
-  "textSizeRegular": "Normal",
-  "textSizeLarge": "Groß",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Nur für Telefonlayout — Tablet verwendet immer links.",
   "alphabetBarLeft": "Links",

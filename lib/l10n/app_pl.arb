@@ -84,11 +84,6 @@
   "themeLight": "Jasny",
   "themeDark": "Ciemny",
 
-  "textSizeSmall": "Mały",
-  "textSizeRegular": "Normalny",
-  "textSizeLarge": "Duży",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Tylko na telefonie — tablet zawsze używa lewej strony.",
   "alphabetBarLeft": "Lewa",

@@ -242,21 +242,6 @@ class AppLocalizationsSr extends AppLocalizations {
   String get themeDark => 'Tamna';
 
   @override
-  String get textSizeSmall => 'Mala';
-
-  @override
-  String get textSizeRegular => 'Normalna';
-
-  @override
-  String get textSizeLarge => 'Velika';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Samo na telefonu — tablet uvek koristi levu stranu.';
 
@@ -2262,21 +2247,6 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get themeDark => 'Tamna';
-
-  @override
-  String get textSizeSmall => 'Mala';
-
-  @override
-  String get textSizeRegular => 'Normalna';
-
-  @override
-  String get textSizeLarge => 'Velika';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
 
   @override
   String get alphabetBarNote =>

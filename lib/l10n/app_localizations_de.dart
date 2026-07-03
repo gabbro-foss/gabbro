@@ -242,21 +242,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get themeDark => 'Dunkel';
 
   @override
-  String get textSizeSmall => 'Klein';
-
-  @override
-  String get textSizeRegular => 'Normal';
-
-  @override
-  String get textSizeLarge => 'Groß';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Nur für Telefonlayout — Tablet verwendet immer links.';
 

@@ -242,21 +242,6 @@ class AppLocalizationsSl extends AppLocalizations {
   String get themeDark => 'Temna';
 
   @override
-  String get textSizeSmall => 'Majhna';
-
-  @override
-  String get textSizeRegular => 'Navadna';
-
-  @override
-  String get textSizeLarge => 'Velika';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Samo na telefonu — tablica vedno uporablja levo stran.';
 

@@ -4,10 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'test_helpers.dart';
 import 'package:gabbro/app_paths.dart';
+import 'package:gabbro/main.dart';
 import 'package:gabbro/nfc_capability.dart';
+import 'package:gabbro/settings.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
+import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
+import 'package:gabbro/widgets/text_size_slider.dart';
 
 // ── Fake entropy ──────────────────────────────────────────────────────────────
 
@@ -54,6 +58,28 @@ Widget _buildScreen({
       resolveDataDir: resolveDataDir ?? GabbroPaths.dataDir,
     ));
 
+// Wraps OnboardingScreen in a GabbroApp so the accessibility toggle's
+// GabbroApp.maybeOf(context) resolves and settings changes are observable.
+Widget _buildInApp({AppSettings settings = const AppSettings()}) => GabbroApp(
+      registry: VaultRegistry([]),
+      vaultPath: null,
+      settings: settings,
+      initialScreen: OnboardingScreen(
+        initialPath: '/tmp/test.gabbro',
+        onInitVault: (a, b, c) async {},
+        onEstimateEntropy: _fakeStrongEntropy,
+        blockPassphraseCopyPaste: true,
+        isAndroid: false,
+        showYubikey: false,
+        onInitVaultWithYubikey:
+            (a, b, c, onStep2, onStep3, onAwaitBackupKey, onStep4, t, alias) async {},
+        resolveDataDir: GabbroPaths.dataDir,
+      ),
+    );
+
+AppSettings _settingsOf(WidgetTester tester) =>
+    GabbroApp.of(tester.element(find.byType(OnboardingScreen))).settings;
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
@@ -62,6 +88,64 @@ void main() {
 
     expect(find.byType(GabbroLogo), findsOneWidget);
     expect(find.text('Create vault'), findsOneWidget);
+  });
+
+  // ── Accessibility toggle: text scale + slider reveal + logo hide (ADR-016) ──
+  group('accessibility toggle', () {
+    testWidgets('E1 default: logo shown, no slider', (tester) async {
+      await tester.pumpWidget(_buildInApp());
+      await tester.pumpAndSettle();
+      expect(find.byType(GabbroLogo), findsOneWidget);
+      expect(find.byType(TextSizeSlider), findsNothing);
+    });
+
+    testWidgets('E2 tap on: textScale 3.0 + highContrast, logo hidden, slider shown',
+        (tester) async {
+      await tester.pumpWidget(_buildInApp());
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.accessibility_new));
+      await tester.pumpAndSettle();
+      expect(_settingsOf(tester).textScale, 3.0);
+      expect(_settingsOf(tester).highContrast, isTrue);
+      expect(find.byType(GabbroLogo), findsNothing);
+      expect(find.byType(TextSizeSlider), findsOneWidget);
+    });
+
+    testWidgets('E3 tap off: textScale 1.0, no highContrast, logo restored',
+        (tester) async {
+      await tester.pumpWidget(
+        _buildInApp(settings: const AppSettings(textScale: 3.0, highContrast: true)),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.accessibility_new));
+      await tester.pumpAndSettle();
+      expect(_settingsOf(tester).textScale, 1.0);
+      expect(_settingsOf(tester).highContrast, isFalse);
+      expect(find.byType(GabbroLogo), findsOneWidget);
+      expect(find.byType(TextSizeSlider), findsNothing);
+    });
+
+    testWidgets('E4 entered large: starts expanded (logo hidden, slider shown)',
+        (tester) async {
+      await tester.pumpWidget(
+        _buildInApp(settings: const AppSettings(textScale: 3.0)),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(GabbroLogo), findsNothing);
+      expect(find.byType(TextSizeSlider), findsOneWidget);
+    });
+
+    testWidgets('E5 dragging the slider persists textScale and keeps it visible',
+        (tester) async {
+      await tester.pumpWidget(
+        _buildInApp(settings: const AppSettings(textScale: 3.0)),
+      );
+      await tester.pumpAndSettle();
+      tester.widget<TextSizeSlider>(find.byType(TextSizeSlider)).onChangeEnd!(2.0);
+      await tester.pumpAndSettle();
+      expect(_settingsOf(tester).textScale, 2.0);
+      expect(find.byType(TextSizeSlider), findsOneWidget);
+    });
   });
 
   // ── Enter-submit / focus chain ──────────────────────────────────────────────

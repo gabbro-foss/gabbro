@@ -16,6 +16,7 @@ import 'package:gabbro/screens/vault_list_screen.dart' show confirmYubikey, conf
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/frb_generated.dart';
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/vault_registry.dart';
 
 /// Maps a non-system [LanguageChoice] to the correct [Locale].
@@ -96,15 +97,6 @@ ThemeMode themeModeFor(ThemeChoice choice) => switch (choice) {
   ThemeChoice.dark => ThemeMode.dark,
 };
 
-/// Maps the text-size setting to a linear text-scale factor.
-double textScaleFor(TextSizeChoice choice) => switch (choice) {
-  TextSizeChoice.small => 0.85,
-  TextSizeChoice.regular => 1.0,
-  TextSizeChoice.large => 1.15,
-  TextSizeChoice.extraLarge => 1.3,
-  TextSizeChoice.xxLarge => 1.5,
-};
-
 @pragma('vm:entry-point')
 Future<void> autofillUnlockMain() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -181,9 +173,12 @@ class _AutofillUnlockAppState extends State<_AutofillUnlockApp> {
   @override
   Widget build(BuildContext context) {
     final hc = widget.settings.highContrast;
+    final mq = MediaQuery.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(
-        textScaler: TextScaler.linear(textScaleFor(widget.settings.textSize)),
+      data: mq.copyWith(
+        textScaler: TextScaler.linear(
+          clampToDevice(widget.settings.textScale, mq.size.shortestSide),
+        ),
       ),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -354,9 +349,12 @@ class _AutofillSaveAppState extends State<_AutofillSaveApp> {
   @override
   Widget build(BuildContext context) {
     final hc = widget.settings.highContrast;
+    final mq = MediaQuery.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(
-        textScaler: TextScaler.linear(textScaleFor(widget.settings.textSize)),
+      data: mq.copyWith(
+        textScaler: TextScaler.linear(
+          clampToDevice(widget.settings.textScale, mq.size.shortestSide),
+        ),
       ),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -755,9 +753,12 @@ class _GabbroAppState extends State<GabbroApp>
 
   @override
   Future<void> updateSettings(AppSettings updated) async {
-    await updated.save();
+    // Optimistic: reflect the change in the UI immediately, then persist.
+    // Settings are best-effort on disk; the live app state is the source of
+    // truth for the session.
     setState(() => _settings = updated);
     _resetForegroundTimer();
+    await updated.save();
   }
 
   @override
@@ -905,19 +906,16 @@ class _GabbroAppState extends State<GabbroApp>
     ThemeChoice.dark => ThemeMode.dark,
   };
 
-  double get _textScale => switch (_settings.textSize) {
-    TextSizeChoice.small => 0.85,
-    TextSizeChoice.regular => 1.0,
-    TextSizeChoice.large => 1.15,
-    TextSizeChoice.extraLarge => 1.3,
-    TextSizeChoice.xxLarge => 1.5,
-  };
-
   @override
   Widget build(BuildContext context) {
     final hc = _settings.highContrast;
+    final mq = MediaQuery.of(context);
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(_textScale)),
+      data: mq.copyWith(
+        textScaler: TextScaler.linear(
+          clampToDevice(_settings.textScale, mq.size.shortestSide),
+        ),
+      ),
       child: Listener(
         behavior: HitTestBehavior.translucent,
         onPointerDown: (_) => _resetForegroundTimer(),

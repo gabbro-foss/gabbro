@@ -242,21 +242,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get themeDark => 'Tumma';
 
   @override
-  String get textSizeSmall => 'Pieni';
-
-  @override
-  String get textSizeRegular => 'Normaali';
-
-  @override
-  String get textSizeLarge => 'Suuri';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Vain puhelimessa — tabletti käyttää aina vasenta.';
 

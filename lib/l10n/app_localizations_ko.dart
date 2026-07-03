@@ -239,21 +239,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get themeDark => '다크';
 
   @override
-  String get textSizeSmall => '작음';
-
-  @override
-  String get textSizeRegular => '보통';
-
-  @override
-  String get textSizeLarge => '큼';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote => '스마트폰에서만 사용 — 태블릿은 항상 왼쪽을 사용합니다.';
 
   @override

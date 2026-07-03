@@ -84,11 +84,6 @@
   "themeLight": "Chiaro",
   "themeDark": "Scuro",
 
-  "textSizeSmall": "Piccolo",
-  "textSizeRegular": "Normale",
-  "textSizeLarge": "Grande",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Solo layout telefono — tablet usa sempre sinistra.",
   "alphabetBarLeft": "Sinistra",

@@ -84,11 +84,6 @@
   "themeLight": "ライト",
   "themeDark": "ダーク",
 
-  "textSizeSmall": "小",
-  "textSizeRegular": "標準",
-  "textSizeLarge": "大",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "スマートフォンのみ — タブレットは常に左側を使用します。",
   "alphabetBarLeft": "左",

@@ -84,11 +84,6 @@
   "themeLight": "Claro",
   "themeDark": "Oscuro",
 
-  "textSizeSmall": "Pequeño",
-  "textSizeRegular": "Normal",
-  "textSizeLarge": "Grande",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Solo en diseño de teléfono — la tableta siempre usa la izquierda.",
   "alphabetBarLeft": "Izquierda",

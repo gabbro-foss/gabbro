@@ -239,21 +239,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get themeDark => 'ダーク';
 
   @override
-  String get textSizeSmall => '小';
-
-  @override
-  String get textSizeRegular => '標準';
-
-  @override
-  String get textSizeLarge => '大';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote => 'スマートフォンのみ — タブレットは常に左側を使用します。';
 
   @override
