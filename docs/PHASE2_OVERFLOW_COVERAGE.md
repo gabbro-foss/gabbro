@@ -28,7 +28,7 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | help_screen | **fixed** | pages now fill-or-scroll (was 728px phone / 168px tablet bottom), image capped 50%; page-dot spacing minor/open; Phase 2b pinch-zoom separate | pending |
 | import_screen | todo | `SegmentedButton` may overflow | |
 | language_screen | todo | | |
-| manage_folders_screen | todo | folder-name row clip? | |
+| manage_folders_screen | todo | reassign dropdown fixed (large-text pattern) | |
 | manage_vaults_screen | todo | | |
 | manage_yubikeys_screen | todo | | |
 | onboarding_screen | **fixed** | a11y-button row: Spacer->spaceBetween + Flexible ellipsizing button (was 457/315px right) | pending |
@@ -36,7 +36,7 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | review_changes_screen | todo | embeds sync_review | |
 | save_confirm_screen | todo | | |
 | security_screen | todo | | |
-| unlock_screen | todo | | |
+| unlock_screen | todo | vault-alias dropdown fixed (large-text pattern) | |
 | tablet_vault_layout (two-pane) | todo | tablet-only 6x path (folder-filter dropdown covered above) | |
 
 ## Overlays / dialogs / sheets
@@ -48,7 +48,7 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | password_breakdown_sheet | todo | (also a Phase 3 target-scaling item) | |
 | sync_review (widget) | todo | | |
 | yubikey_tap (widget) | todo | | |
-| generator_widget | todo | | |
+| generator_widget | todo | language dropdown fixed (large-text pattern) | |
 
 ## Deferred (NOT Phase 2 overflow — tracked so they aren't forgotten)
 
@@ -73,8 +73,9 @@ ongoing — confirmed/suspected below:
   ALL THREE: `isExpanded:true` (fill width), `itemHeight:null` (open-menu items grow to
   wrapped height, else clipped mid-height at 48px), `selectedItemBuilder` with
   `maxLines:1, overflow: ellipsis` (collapsed selection truncates cleanly, not hard-clip).
-  DONE: vault_list (both paths), create_entry (all). **TODO same treatment:**
-  unlock_screen, manage_folders_screen, csv_mapping_screen, generator_widget.
+  DONE: vault_list (both paths), create_entry (all), unlock_screen, manage_folders_screen,
+  generator_widget. **TODO:** csv_mapping_screen dropdown (deferred to its own pass with the
+  `width:88` label fix below).
 - csv_mapping_screen `width:88` cell.
 - import_skipped_dialog `height:300` box.
 - (continue triaging the 339-hit sweep; add each real risk here.)
