@@ -179,7 +179,7 @@ void main() {
         );
 
     // Default test surface is 800x600 -> shortestSide 600 -> tablet tier
-    // (max 6.0), so these values apply unclamped.
+    // (max 5.0), so these values apply unclamped.
     for (final (scale, expected) in [
       (0.85, '0.85'),
       (1.15, '1.15'),
@@ -195,7 +195,7 @@ void main() {
       });
     }
 
-    testWidgets('stored 8.0 clamps to device max 4.0 on a phone-sized surface',
+    testWidgets('stored 8.0 clamps to device max 3.5 on a phone-sized surface',
         (tester) async {
       tester.view.physicalSize = const Size(360 * 3, 800 * 3);
       tester.view.devicePixelRatio = 3.0;
@@ -203,7 +203,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
       await tester.pumpWidget(buildWithScale(8.0));
       await tester.pump();
-      expect(find.text('4.00'), findsOneWidget);
+      expect(find.text('3.50'), findsOneWidget);
     });
   });
 }

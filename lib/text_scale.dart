@@ -11,9 +11,10 @@ const double kMinTextScale = 0.8;
 /// Device-tier maximum text scales. Phones have less screen room than tablets,
 /// so they cap lower. Reused 600dp breakpoint (same as the two-pane layout).
 /// Calibrated on hardware (S23 / GrapheneOS / Idea Tab Pro, 2026-07-03): the
-/// original 6x/8x left too little content on screen at the far end.
-const double kPhoneMaxScale = 4.0;
-const double kTabletMaxScale = 6.0;
+/// original 6x/8x left too little content on screen; trimmed again to 3.5x/5x
+/// to give layouts wiggle-room at the far end (may reduce further).
+const double kPhoneMaxScale = 3.5;
+const double kTabletMaxScale = 5.0;
 const double kTabletBreakpointDp = 600.0;
 
 /// Controls/targets grow to at most this multiple at the device's max text

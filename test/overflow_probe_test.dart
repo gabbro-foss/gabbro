@@ -37,12 +37,12 @@ class _Surface {
 }
 
 // physical / dpr chosen so the logical shortest side lands in each tier:
-// phone 1080/3 = 360dp (-> 4x), tablet 1732/2 = 866dp (-> 6x).
-const _phone = _Surface('phone 360dp->4x', Size(1080, 2400), 3.0);
-const _tablet = _Surface('tablet 866dp->6x', Size(1732, 2400), 2.0);
+// phone 1080/3 = 360dp (-> 3.5x), tablet 1732/2 = 866dp (-> 5x).
+const _phone = _Surface('phone 360dp->3.5x', Size(1080, 2400), 3.0);
+const _tablet = _Surface('tablet 866dp->5x', Size(1732, 2400), 2.0);
 
 // textScale 8.0 is above every device max; clampToDevice caps it to the tier
-// max, so each surface renders at its ceiling (4x phone / 6x tablet).
+// max, so each surface renders at its ceiling (3.5x phone / 5x tablet).
 Widget _app(Widget screen) => GabbroApp(
   registry: VaultRegistry([]),
   vaultPath: null,
@@ -148,9 +148,10 @@ final Map<String, Widget Function()> _screens = {
 // passing) and tracked in PHASE2_OVERFLOW_COVERAGE.md; remove the entry once
 // fixed so the probe re-arms on it.
 const Map<String, String> _knownOverflow = {
-  // ListTile with a trailing action Row can't fit horizontally at 4x, so the
-  // list item fails to size (hasSize). A control-layout problem -> Phase 3.
-  'recovery_history': 'ListTile trailing-actions do not fit at 4x (Phase 3)',
+  // Phone only (tablet fits): the ListTile trailing action-button Row can't fit
+  // beside the title at max scale, so the item fails to size. A control-layout
+  // problem (controls don't fit) -> deferred to Phase 3, not a text fix.
+  'recovery_history': 'ListTile trailing-actions do not fit on phone (Phase 3)',
 };
 
 void main() {

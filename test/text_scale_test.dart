@@ -5,15 +5,15 @@ void main() {
   // ── deviceMaxScale (B1) ────────────────────────────────────────────────────
 
   group('deviceMaxScale', () {
-    test('phone tier (<600dp) maxes at 4.0', () {
-      expect(deviceMaxScale(360), 4.0);
-      expect(deviceMaxScale(411), 4.0);
-      expect(deviceMaxScale(599.9), 4.0);
+    test('phone tier (<600dp) maxes at 3.5', () {
+      expect(deviceMaxScale(360), 3.5);
+      expect(deviceMaxScale(411), 3.5);
+      expect(deviceMaxScale(599.9), 3.5);
     });
 
-    test('tablet tier (>=600dp) maxes at 6.0', () {
-      expect(deviceMaxScale(600), 6.0);
-      expect(deviceMaxScale(866), 6.0);
+    test('tablet tier (>=600dp) maxes at 5.0', () {
+      expect(deviceMaxScale(600), 5.0);
+      expect(deviceMaxScale(866), 5.0);
     });
   });
 
@@ -89,7 +89,7 @@ void main() {
 
   group('clampToDevice', () {
     test('caps a tablet-set value on a phone', () {
-      expect(clampToDevice(8.0, 411), 4.0);
+      expect(clampToDevice(8.0, 411), 3.5);
     });
 
     test('leaves an in-range value untouched', () {
@@ -98,7 +98,7 @@ void main() {
     });
 
     test('caps at the tablet max on a tablet', () {
-      expect(clampToDevice(8.0, 866), 6.0);
+      expect(clampToDevice(8.0, 866), 5.0);
     });
 
     test('floors at the minimum 0.8', () {
