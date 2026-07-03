@@ -237,10 +237,11 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true, // scroll title+content+actions together (ADR-016)
         title: Text(
           isSecondToLast ? l.yubiKeySecurityWarning : l.removeYubiKeyTitle,
         ),
-        content: SingleChildScrollView(child: warningContent),
+        content: warningContent,
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -379,26 +380,25 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
         builder: (ctx, step, _) {
           final dl = AppLocalizations.of(ctx);
           return AlertDialog(
+            scrollable: true, // scroll title+content+actions together (ADR-016)
             title: Text(dl.addYubiKeyTitle),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _stepRow(
-                    ctx,
-                    label: isNfc ? dl.tapRegisterNfc : dl.tapRegisterUsb,
-                    done: step >= 1,
-                    active: step == 0,
-                  ),
-                  const SizedBox(height: 16),
-                  _stepRow(
-                    ctx,
-                    label: isNfc ? dl.tapActivateNfc : dl.tapActivateUsb,
-                    done: false,
-                    active: step == 1,
-                  ),
-                ],
-              ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _stepRow(
+                  ctx,
+                  label: isNfc ? dl.tapRegisterNfc : dl.tapRegisterUsb,
+                  done: step >= 1,
+                  active: step == 0,
+                ),
+                const SizedBox(height: 16),
+                _stepRow(
+                  ctx,
+                  label: isNfc ? dl.tapActivateNfc : dl.tapActivateUsb,
+                  done: false,
+                  active: step == 1,
+                ),
+              ],
             ),
             actions: [
               TextButton(
@@ -618,60 +618,59 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
         builder: (ctx, setLocal) {
           final l = AppLocalizations.of(ctx);
           return AlertDialog(
+            scrollable: true, // scroll title+content+actions together (ADR-016)
             title: Text(l.addYubiKeyTitle),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Transport choice only when the device has NFC; otherwise the
-                  // single USB option is implicit (selectedTransport stays 'usb').
-                  if (nfcAvailable) ...[
-                    Text(l.transportLabel),
-                    const SizedBox(height: 8),
-                    // Wrap (not Row) so the chips reflow instead of overflowing
-                    // horizontally at large text (ADR-016).
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        ChoiceChip(
-                          label: Text(l.transportUsb),
-                          selected: selectedTransport == 'usb',
-                          onSelected: (_) =>
-                              setLocal(() => selectedTransport = 'usb'),
-                        ),
-                        ChoiceChip(
-                          label: Text(l.transportNfc),
-                          selected: selectedTransport == 'nfc',
-                          onSelected: (_) =>
-                              setLocal(() => selectedTransport = 'nfc'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                  TextField(
-                    controller: controller,
-                    autofocus: true,
-                    obscureText: obscure,
-                    decoration: InputDecoration(
-                      labelText: l.pinLabel,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          obscure ? Icons.visibility_off : Icons.visibility,
-                        ),
-                        tooltip: obscure ? l.tooltipShowPin : l.tooltipHidePin,
-                        onPressed: () => setLocal(() => obscure = !obscure),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Transport choice only when the device has NFC; otherwise the
+                // single USB option is implicit (selectedTransport stays 'usb').
+                if (nfcAvailable) ...[
+                  Text(l.transportLabel),
+                  const SizedBox(height: 8),
+                  // Wrap (not Row) so the chips reflow instead of overflowing
+                  // horizontally at large text (ADR-016).
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      ChoiceChip(
+                        label: Text(l.transportUsb),
+                        selected: selectedTransport == 'usb',
+                        onSelected: (_) =>
+                            setLocal(() => selectedTransport = 'usb'),
                       ),
-                    ),
-                    onSubmitted: (_) => Navigator.of(ctx).pop({
-                      'pin': controller.text,
-                      'transport': selectedTransport,
-                    }),
+                      ChoiceChip(
+                        label: Text(l.transportNfc),
+                        selected: selectedTransport == 'nfc',
+                        onSelected: (_) =>
+                            setLocal(() => selectedTransport = 'nfc'),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 16),
                 ],
-              ),
+                TextField(
+                  controller: controller,
+                  autofocus: true,
+                  obscureText: obscure,
+                  decoration: InputDecoration(
+                    labelText: l.pinLabel,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        obscure ? Icons.visibility_off : Icons.visibility,
+                      ),
+                      tooltip: obscure ? l.tooltipShowPin : l.tooltipHidePin,
+                      onPressed: () => setLocal(() => obscure = !obscure),
+                    ),
+                  ),
+                  onSubmitted: (_) => Navigator.of(ctx).pop({
+                    'pin': controller.text,
+                    'transport': selectedTransport,
+                  }),
+                ),
+              ],
             ),
             actions: [
               TextButton(

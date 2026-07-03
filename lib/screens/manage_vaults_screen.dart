@@ -160,33 +160,32 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true, // scroll title+content+actions together (ADR-016)
         title: Text(l.backupEmergencyHeading),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l.backupResponsibilityBody),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l.backupResponsibilityBody),
+            const SizedBox(height: 12),
+            // R-03: mention the automatic .bak without overselling it —
+            // it is same-disk corruption insurance, not a backup.
+            Text(l.backupDialogSafetyCopyNote),
+            const SizedBox(height: 16),
+            Text(
+              Platform.isAndroid
+                  ? l.emergencyWipeAndroidBody
+                  : l.emergencyWipeLinuxBody,
+            ),
+            if (!Platform.isAndroid) ...[
               const SizedBox(height: 12),
-              // R-03: mention the automatic .bak without overselling it —
-              // it is same-disk corruption insurance, not a backup.
-              Text(l.backupDialogSafetyCopyNote),
-              const SizedBox(height: 16),
-              Text(
-                Platform.isAndroid
-                    ? l.emergencyWipeAndroidBody
-                    : l.emergencyWipeLinuxBody,
+              const SelectableText(
+                'rm -rf ~/.local/share/app.gabbro.gabbro/\n'
+                'rm -rf ~/.config/gabbro/',
+                style: TextStyle(fontFamily: 'monospace', fontSize: 13),
               ),
-              if (!Platform.isAndroid) ...[
-                const SizedBox(height: 12),
-                const SelectableText(
-                  'rm -rf ~/.local/share/app.gabbro.gabbro/\n'
-                  'rm -rf ~/.config/gabbro/',
-                  style: TextStyle(fontFamily: 'monospace', fontSize: 13),
-                ),
-              ],
             ],
-          ),
+          ],
         ),
         actions: [
           TextButton(
@@ -343,72 +342,70 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
             }
 
             return AlertDialog(
+              scrollable:
+                  true, // scroll title+content+actions together (ADR-016)
               title: Text(l.touchYourYubiKey),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(l.yubiKeyAuthorizeDeletion),
-                    const SizedBox(height: 12),
-                    TextField(
-                      key: const Key('delete_vault_yubikey_pin_field'),
-                      controller: pinController,
-                      obscureText: obscurePin,
-                      autofocus: true,
-                      onSubmitted: (_) {
-                        if (!isAuthorizing && pinController.text.isNotEmpty) {
-                          authorize();
-                        }
-                      },
-                      decoration: InputDecoration(
-                        labelText: l.yubiKeyPinLabel,
-                        border: const OutlineInputBorder(),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            obscurePin
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
-                          tooltip: obscurePin
-                              ? l.tooltipShowPin
-                              : l.tooltipHidePin,
-                          onPressed: () =>
-                              setDialogState(() => obscurePin = !obscurePin),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l.yubiKeyAuthorizeDeletion),
+                  const SizedBox(height: 12),
+                  TextField(
+                    key: const Key('delete_vault_yubikey_pin_field'),
+                    controller: pinController,
+                    obscureText: obscurePin,
+                    autofocus: true,
+                    onSubmitted: (_) {
+                      if (!isAuthorizing && pinController.text.isNotEmpty) {
+                        authorize();
+                      }
+                    },
+                    decoration: InputDecoration(
+                      labelText: l.yubiKeyPinLabel,
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          obscurePin ? Icons.visibility_off : Icons.visibility,
                         ),
+                        tooltip: obscurePin
+                            ? l.tooltipShowPin
+                            : l.tooltipHidePin,
+                        onPressed: () =>
+                            setDialogState(() => obscurePin = !obscurePin),
                       ),
-                      onChanged: (_) => setDialogState(() {}),
                     ),
-                    if (!Platform.isLinux && nfcAvailable) ...[
-                      const SizedBox(height: 12),
-                      SegmentedRow<String>(
-                        values: const ['usb', 'nfc'],
-                        selected: dialogTransport,
-                        label: (v) => v.toUpperCase(),
-                        onSelected: (v) =>
-                            setDialogState(() => dialogTransport = v),
-                      ),
-                    ],
-                    if (isAuthorizing) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        l.tapYubiKeyNow,
-                        style: const TextStyle(fontSize: 12),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                    if (authError != null) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        authError!,
-                        style: TextStyle(
-                          color: Theme.of(ctx).colorScheme.error,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                    onChanged: (_) => setDialogState(() {}),
+                  ),
+                  if (!Platform.isLinux && nfcAvailable) ...[
+                    const SizedBox(height: 12),
+                    SegmentedRow<String>(
+                      values: const ['usb', 'nfc'],
+                      selected: dialogTransport,
+                      label: (v) => v.toUpperCase(),
+                      onSelected: (v) =>
+                          setDialogState(() => dialogTransport = v),
+                    ),
                   ],
-                ),
+                  if (isAuthorizing) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      l.tapYubiKeyNow,
+                      style: const TextStyle(fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                  if (authError != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      authError!,
+                      style: TextStyle(
+                        color: Theme.of(ctx).colorScheme.error,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ],
               ),
               actions: [
                 TextButton(

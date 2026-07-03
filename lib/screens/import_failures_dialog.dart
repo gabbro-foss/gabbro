@@ -72,6 +72,7 @@ class _ImportFailureDialog extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return AlertDialog(
+      scrollable: true, // scroll title+content+actions together (ADR-016)
       title: Row(
         children: [
           Icon(Icons.warning_amber_rounded, color: colorScheme.error),
@@ -84,42 +85,40 @@ class _ImportFailureDialog extends StatelessWidget {
           ),
         ],
       ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(failure.title, style: theme.textTheme.titleSmall),
-            const SizedBox(height: 4),
-            Text(
-              l.importIssueType(failure.category),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(failure.title, style: theme.textTheme.titleSmall),
+          const SizedBox(height: 4),
+          Text(
+            l.importIssueType(failure.category),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: colorScheme.errorContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              failure.reason,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+                color: colorScheme.onErrorContainer,
               ),
             ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: colorScheme.errorContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                failure.reason,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onErrorContainer,
-                ),
-              ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l.importIssueHelp,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
-            const SizedBox(height: 12),
-            Text(
-              l.importIssueHelp,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
       actions: [
         TextButton(

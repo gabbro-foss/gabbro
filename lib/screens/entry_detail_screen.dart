@@ -201,43 +201,42 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       builder: (ctx) {
         final dl = AppLocalizations.of(ctx);
         return AlertDialog(
+          scrollable: true, // scroll title+content+actions together (ADR-016)
           title: Text(dl.exportFileTitle),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(dl.saveDecryptedFileTo),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: pathController,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText: dl.exportPathLabel,
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.folder_open),
-                      tooltip: dl.tooltipBrowse,
-                      onPressed: () async {
-                        final String? picked;
-                        try {
-                          picked = await runPicker(
-                            () => widget.exportFilePicker(e.filename),
-                          );
-                        } on FilePickerUnavailable {
-                          if (ctx.mounted) showPickerUnavailable(ctx);
-                          return;
-                        }
-                        if (picked != null) {
-                          pathController.text = picked;
-                        }
-                      },
-                    ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(dl.saveDecryptedFileTo),
+              const SizedBox(height: 12),
+              TextField(
+                controller: pathController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: dl.exportPathLabel,
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.folder_open),
+                    tooltip: dl.tooltipBrowse,
+                    onPressed: () async {
+                      final String? picked;
+                      try {
+                        picked = await runPicker(
+                          () => widget.exportFilePicker(e.filename),
+                        );
+                      } on FilePickerUnavailable {
+                        if (ctx.mounted) showPickerUnavailable(ctx);
+                        return;
+                      }
+                      if (picked != null) {
+                        pathController.text = picked;
+                      }
+                    },
                   ),
-                  onSubmitted: (_) => Navigator.of(ctx).pop(true),
                 ),
-              ],
-            ),
+                onSubmitted: (_) => Navigator.of(ctx).pop(true),
+              ),
+            ],
           ),
           actions: [
             TextButton(

@@ -49,62 +49,60 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
         final l = AppLocalizations.of(context);
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
+            // scrollable scrolls title + content + actions together (ADR-016).
+            scrollable: true,
             title: Text(l.deleteFolderTitle),
-            // Scroll the content so tall text (large font) stays reachable and
-            // doesn't bleed over the action buttons (ADR-016).
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l.deleteFolderConfirm(folder)),
-                  if (hasOthers) ...[
-                    const SizedBox(height: 16),
-                    CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(l.reassignEntriesTo),
-                      value: reassignTarget != null,
-                      onChanged: (v) => setState(() {
-                        reassignTarget = v == true ? otherFolders.first : null;
-                        if (v == true) clearToNone = false;
-                      }),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l.deleteFolderConfirm(folder)),
+                if (hasOthers) ...[
+                  const SizedBox(height: 16),
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l.reassignEntriesTo),
+                    value: reassignTarget != null,
+                    onChanged: (v) => setState(() {
+                      reassignTarget = v == true ? otherFolders.first : null;
+                      if (v == true) clearToNone = false;
+                    }),
+                  ),
+                  if (reassignTarget != null)
+                    DropdownButton<String>(
+                      isExpanded: true,
+                      itemHeight:
+                          null, // menu items grow to wrapped height at large text
+                      value: reassignTarget,
+                      // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
+                      selectedItemBuilder: (context) => otherFolders
+                          .map(
+                            (f) => Text(
+                              f,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                          .toList(),
+                      items: otherFolders
+                          .map(
+                            (f) => DropdownMenuItem(value: f, child: Text(f)),
+                          )
+                          .toList(),
+                      onChanged: (v) => setState(() => reassignTarget = v),
                     ),
-                    if (reassignTarget != null)
-                      DropdownButton<String>(
-                        isExpanded: true,
-                        itemHeight:
-                            null, // menu items grow to wrapped height at large text
-                        value: reassignTarget,
-                        // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
-                        selectedItemBuilder: (context) => otherFolders
-                            .map(
-                              (f) => Text(
-                                f,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            )
-                            .toList(),
-                        items: otherFolders
-                            .map(
-                              (f) => DropdownMenuItem(value: f, child: Text(f)),
-                            )
-                            .toList(),
-                        onChanged: (v) => setState(() => reassignTarget = v),
-                      ),
-                    const SizedBox(height: 8),
-                    CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(l.clearToNone),
-                      value: clearToNone,
-                      onChanged: (v) => setState(() {
-                        clearToNone = v == true;
-                        if (v == true) reassignTarget = null;
-                      }),
-                    ),
-                  ],
+                  const SizedBox(height: 8),
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(l.clearToNone),
+                    value: clearToNone,
+                    onChanged: (v) => setState(() {
+                      clearToNone = v == true;
+                      if (v == true) reassignTarget = null;
+                    }),
+                  ),
                 ],
-              ),
+              ],
             ),
             actions: [
               TextButton(

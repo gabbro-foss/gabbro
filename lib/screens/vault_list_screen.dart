@@ -53,8 +53,10 @@ Future<MergeSummary> _defaultMergeVaultWithKey(
 );
 
 /// Fast auto-merge (incoming wins, no prompts) — the "Merge automatically" path.
-Future<MergeSummary> _defaultFastMergeVault(String path, List<int> passphrase) =>
-    fastMergeVaultFromFile(path: path, passphrase: passphrase);
+Future<MergeSummary> _defaultFastMergeVault(
+  String path,
+  List<int> passphrase,
+) => fastMergeVaultFromFile(path: path, passphrase: passphrase);
 
 Future<MergeSummary> _defaultFastMergeVaultWithKey(
   String path,
@@ -889,7 +891,9 @@ class _VaultListScreenState extends State<VaultListScreen>
           if (mounted) _loadEntries();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(AppLocalizations.of(context).syncCancelled)),
+              SnackBar(
+                content: Text(AppLocalizations.of(context).syncCancelled),
+              ),
             );
           }
           return;
@@ -948,7 +952,9 @@ class _VaultListScreenState extends State<VaultListScreen>
             deletedTitles.isNotEmpty;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l.vaultSynced(addedCount, updatedCount, deletedCount)),
+            content: Text(
+              l.vaultSynced(addedCount, updatedCount, deletedCount),
+            ),
             // An actioned snackbar never auto-dismisses (Material accessibility
             // rule), so give it an explicit close button. Its "Close" label is
             // localized + screen-reader-exposed via MaterialLocalizations.
@@ -1032,17 +1038,16 @@ class _VaultListScreenState extends State<VaultListScreen>
     return showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true, // scroll title+content+actions together (ADR-016)
         title: Text(l.syncSummaryTitle),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              group(l.syncSummaryAdded, added),
-              group(l.syncSummaryUpdated, updated),
-              group(l.syncSummaryDeleted, deleted),
-            ],
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            group(l.syncSummaryAdded, added),
+            group(l.syncSummaryUpdated, updated),
+            group(l.syncSummaryDeleted, deleted),
+          ],
         ),
         actions: [
           TextButton(
@@ -1555,10 +1560,18 @@ class _VaultListScreenState extends State<VaultListScreen>
                         // it so a long folder truncates cleanly instead of
                         // hard-clipping mid-glyph at large text (ADR-016).
                         selectedItemBuilder: (context) => [
-                          Text(l.allFolders,
-                              maxLines: 1, overflow: TextOverflow.ellipsis),
-                          ..._folders.map((f) => Text(f,
-                              maxLines: 1, overflow: TextOverflow.ellipsis)),
+                          Text(
+                            l.allFolders,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          ..._folders.map(
+                            (f) => Text(
+                              f,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                         onChanged: (value) =>
                             setState(() => _selectedFolder = value ?? ''),
@@ -1648,10 +1661,18 @@ class _VaultListScreenState extends State<VaultListScreen>
                       // folder truncates cleanly instead of hard-clipping at
                       // large text (ADR-016).
                       selectedItemBuilder: (context) => [
-                        Text(l.allFolders,
-                            maxLines: 1, overflow: TextOverflow.ellipsis),
-                        ..._folders.map((f) => Text(f,
-                            maxLines: 1, overflow: TextOverflow.ellipsis)),
+                        Text(
+                          l.allFolders,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        ..._folders.map(
+                          (f) => Text(
+                            f,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ],
                       onChanged: (value) =>
                           setState(() => _selectedFolder = value ?? ''),
@@ -1931,161 +1952,155 @@ class SyncPassphraseDialogState extends State<SyncPassphraseDialog> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return AlertDialog(
+      // scrollable scrolls title + content + actions together so neither the
+      // soft keyboard nor large text strands the action buttons (ADR-016).
+      scrollable: true,
       title: Text(l.syncFromFileTitle),
-      // Scroll the content so the soft keyboard never pushes the action buttons
-      // up over the fields (passphrase + PIN + transport can exceed the height
-      // left above the keyboard).
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.filePath,
-              style: Theme.of(context).textTheme.bodySmall,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _ctrl,
-              obscureText: !_showPass,
-              // A key-protected source needs a PIN, so advance to it; otherwise
-              // Enter submits.
-              onSubmitted: (_) => widget.isKeyProtected
-                  ? _pinFocus.requestFocus()
-                  : _submit(),
-              decoration: InputDecoration(
-                labelText: l.vaultPassphraseLabel,
-                border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _showPass ? Icons.visibility_off : Icons.visibility,
-                  ),
-                  tooltip: _showPass ? l.tooltipHide : l.tooltipShow,
-                  onPressed: () => setState(() => _showPass = !_showPass),
-                ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.filePath,
+            style: Theme.of(context).textTheme.bodySmall,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _ctrl,
+            obscureText: !_showPass,
+            // A key-protected source needs a PIN, so advance to it; otherwise
+            // Enter submits.
+            onSubmitted: (_) =>
+                widget.isKeyProtected ? _pinFocus.requestFocus() : _submit(),
+            decoration: InputDecoration(
+              labelText: l.vaultPassphraseLabel,
+              border: const OutlineInputBorder(),
+              suffixIcon: IconButton(
+                icon: Icon(_showPass ? Icons.visibility_off : Icons.visibility),
+                tooltip: _showPass ? l.tooltipHide : l.tooltipShow,
+                onPressed: () => setState(() => _showPass = !_showPass),
               ),
             ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l.syncSafeToRetry,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+            ],
+          ),
+          if (widget.isKeyProtected) ...[
             const SizedBox(height: 12),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
-                  Icons.info_outline,
-                  size: 18,
+                  Icons.usb,
+                  size: 20,
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    l.syncSafeToRetry,
+                    l.importSourceKeyProtected,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
               ],
             ),
-            if (widget.isKeyProtected) ...[
+            const SizedBox(height: 12),
+            TextField(
+              controller: _pinCtrl,
+              focusNode: _pinFocus,
+              obscureText: _pinObscured,
+              onSubmitted: (_) => _submit(),
+              decoration: InputDecoration(
+                labelText: l.yubiKeyPinLabel,
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _pinObscured ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  tooltip: _pinObscured ? l.tooltipShowPin : l.tooltipHidePin,
+                  onPressed: () => setState(() => _pinObscured = !_pinObscured),
+                ),
+              ),
+            ),
+            if (widget.isAndroid && nfcAvailable) ...[
               const SizedBox(height: 12),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.usb,
-                    size: 20,
-                    color: Theme.of(context).colorScheme.primary,
+                  Text(
+                    l.transportLabel,
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
+                  // Expanded so the segmented button fits the narrow dialog
+                  // width instead of overflowing the Row.
                   Expanded(
-                    child: Text(
-                      l.importSourceKeyProtected,
-                      style: Theme.of(context).textTheme.bodySmall,
+                    child: SegmentedButton<String>(
+                      segments: [
+                        ButtonSegment(
+                          value: 'usb',
+                          label: Text(l.transportUsb),
+                        ),
+                        ButtonSegment(
+                          value: 'nfc',
+                          label: Text(l.transportNfc),
+                        ),
+                      ],
+                      selected: {_transport},
+                      onSelectionChanged: (s) =>
+                          setState(() => _transport = s.first),
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _pinCtrl,
-                focusNode: _pinFocus,
-                obscureText: _pinObscured,
-                onSubmitted: (_) => _submit(),
-                decoration: InputDecoration(
-                  labelText: l.yubiKeyPinLabel,
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _pinObscured ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    tooltip: _pinObscured ? l.tooltipShowPin : l.tooltipHidePin,
-                    onPressed: () =>
-                        setState(() => _pinObscured = !_pinObscured),
-                  ),
-                ),
-              ),
-              if (widget.isAndroid && nfcAvailable) ...[
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Text(
-                      l.transportLabel,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    const SizedBox(width: 12),
-                    // Expanded so the segmented button fits the narrow dialog
-                    // width instead of overflowing the Row.
-                    Expanded(
-                      child: SegmentedButton<String>(
-                        segments: [
-                          ButtonSegment(
-                            value: 'usb',
-                            label: Text(l.transportUsb),
-                          ),
-                          ButtonSegment(
-                            value: 'nfc',
-                            label: Text(l.transportNfc),
-                          ),
-                        ],
-                        selected: {_transport},
-                        onSelectionChanged: (s) =>
-                            setState(() => _transport = s.first),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ],
-            if (_tapping) ...[
-              const SizedBox(height: 12),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.touch_app,
-                    size: 20,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      l.tapYubiKeyNow,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            if (_error != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                _error!,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.error,
-                  fontSize: 12,
-                ),
               ),
             ],
           ],
-        ),
+          if (_tapping) ...[
+            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.touch_app,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l.tapYubiKeyNow,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              _error!,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ],
       ),
       actions: [
         TextButton(
