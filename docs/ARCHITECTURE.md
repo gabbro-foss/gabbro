@@ -92,7 +92,7 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Large-text accessibility (ADR-016) — Phase 1 hardware calibration, then Phase 2
+### Next task: Large-text accessibility (ADR-016) — Phase 2 (text overflow hardening)
 
 Make Gabbro usable at very large text (low-vision): one absolute `textScale` knob
 drives text **and** (later phases) controls in unison; screen-derived max (600dp tiers —
@@ -103,26 +103,26 @@ phone 4x, tablet 6x); targets scale proportionally, capped ~2x. Design in
 tablet 866dp (Idea Tab Pro). Consts (hardware-tuned 2026-07-03, was 6x/8x): phone 4x /
 tablet 6x / target cap 2x / onboarding toggle 3x.
 
-**Phase 1 — Slider + model + onboarding [CODE DONE 2026-07-03; full `flutter test`
-green + analyze clean; branch `accessibility_initiative`, NOT yet committed; PENDING
-maintainer hardware calibration].** `settings.dart` `double textScale` + `text_scale`
-key (reads/migrates legacy `text_size` word; clamp [0.8,8.0]); pure `lib/text_scale.dart`
-(`deviceMaxScale`, exponential `scaleForPos`<->`posForScale`, `targetScaleFor`,
-`clampToDevice`); `main.dart` applies `clampToDevice(textScale, screen)` at all 3
-MediaQuery sites (`TextSizeChoice`/`textScaleFor`/`_textScale` removed); reusable
-`TextSizeSlider` (letter-free `zoom_out`/`zoom_in` glyphs, live preview) on appearance +
-onboarding; onboarding toggle -> 3x + reveal slider + hide logo (high-contrast coupling
-kept), onboarding preview = brand word "Gabbro" / appearance = full sample sentence; 5
-per-size l10n labels dropped. `updateSettings` now optimistic (setState before save).
-First hardware pass 2026-07-03 (S23 / GOS / tablet): 6x/8x maxes were too large -> **now
-phone 4x / tablet 6x**; A+/A- Material glyphs contain a Latin letter -> switched to zoom
-glyphs (ADR-016 s4 was wrong, corrected). **Pending: maintainer re-test of 4x/6x, then
-commit Phase 1.**
+**Phase 1 — Slider + model + onboarding [DONE + COMMITTED 2026-07-03; hardware-confirmed
+S23/GOS/tablet; commits 75ae07f code + 2d3f8cf docs on `accessibility_initiative`, NOT
+pushed].** `double textScale` + `text_scale` key (migrates legacy `text_size`; clamp
+[0.8,8.0]); pure `lib/text_scale.dart` (`deviceMaxScale`, exponential `scaleForPos`<->
+`posForScale`, `targetScaleFor`, `clampToDevice`); `main.dart` applies `clampToDevice`
+at all 3 MediaQuery sites (old `TextSizeChoice`/`textScaleFor`/`_textScale` removed);
+reusable `TextSizeSlider` (letter-free `zoom_out`/`zoom_in` glyphs, live preview) on
+appearance + onboarding; onboarding toggle -> 3x + reveal slider + hide logo (high-contrast
+coupling kept), preview = "Gabbro" onboarding / full sentence appearance; 5 per-size l10n
+labels dropped; `updateSettings` optimistic (setState before save). Maxes 4x/6x confirmed
+good (maintainer wants it very large for the few who need it).
 
-**Phase 2 — Text overflow hardening** (evidence from a headless 5x overflow probe on
-phone+tablet surfaces): fixed-box clippers (csv_mapping `width:88`, import_skipped
-`height:300`), help page-dot spacing, onboarding accessibility button, import
-`SegmentedButton`, entry_detail AppBar crowding.
+**Phase 2 — Text overflow hardening [NEXT].** Hardware finding 2026-07-03: at max scale on
+Android the **folder chooser** text clips at ~half width. Build the ADR-016 s7 **headless
+overflow probe** (render each screen at max scale on phone 360dp->4x + tablet 866dp->6x
+surfaces; assert no `RenderFlex` overflow + no clipped text) to find ALL bleed-off
+mechanically, then fix each (hardware-verified). Suspects from an earlier headless probe:
+fixed-box clippers (csv_mapping `width:88`, import_skipped `height:300`), help page-dot
+spacing, onboarding accessibility button, import `SegmentedButton`, entry_detail AppBar
+crowding — plus the folder chooser (create/edit-entry folder dropdown or manage-folders).
 
 **Phase 2b — Help-screen pinch-to-zoom** (its own feature, not a layout fix):
 `FLAG_SECURE` blocks screenshots, so a low-vision user cannot magnify the help
