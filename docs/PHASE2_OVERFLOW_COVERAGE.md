@@ -18,16 +18,16 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 |--------|-------|---------------------|----------|
 | about_screen | in-probe (pass) | | |
 | appearance_screen | in-probe (pass) | P1 slider holds at 4x/6x | |
-| change_passphrase_screen | todo | | |
+| change_passphrase_screen | in-probe (pass) | | |
 | create_entry_screen | in-probe (pass) | **fixed** all dropdowns (folder + card-status + `_dropdownField`/payment-network): `isExpanded:true` + `itemHeight:null` + `selectedItemBuilder` ellipsis | pending |
 | vault_list_screen (phone) | todo (probe) | **folder-filter dropdown FIXED** (the actual maintainer report): `selectedItemBuilder` ellipsis on BOTH phone (~1629) + tablet (~1548) paths, else the one-line selection hard-clips at 4x | **re-verify** |
 | csv_mapping_screen | **fixed** | mapping rows stack label-above-dropdown at >1.5x (was illegible `width:88`); dropdown gets 3-part fix; preview DataTable row-height cap removed (`dataRowMaxHeight: infinity`) | pending |
 | entry_detail_screen | todo | AppBar action crowding | |
-| export_screen | todo | | |
-| generator_screen | todo | embeds generator_widget | |
+| export_screen | in-probe (pass) | | |
+| generator_screen | in-probe (pass) | embeds generator_widget | pending |
 | help_screen | **fixed** | pages now fill-or-scroll (was 728px phone / 168px tablet bottom), image capped 50%; page-dot spacing minor/open; Phase 2b pinch-zoom separate | pending |
 | import_screen | todo | `SegmentedButton` may overflow | |
-| language_screen | todo | | |
+| language_screen | in-probe (pass) | **fixed**: note moved inside the scroll list (was Column+Expanded, overflowed 48px at 4x) | pending |
 | manage_folders_screen | todo | reassign dropdown + delete-dialog content scroll fixed | pending |
 | manage_vaults_screen | todo | | |
 | manage_yubikeys_screen | todo | | |
@@ -35,7 +35,7 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | recovery_history_screen | todo | | |
 | review_changes_screen | todo | embeds sync_review | |
 | save_confirm_screen | todo | | |
-| security_screen | todo | | |
+| security_screen | in-probe (pass) | dialogs scrollable:true | pending |
 | unlock_screen | todo | vault-alias dropdown fixed (large-text pattern) | |
 | tablet_vault_layout (two-pane) | todo | tablet-only 6x path (folder-filter dropdown covered above) | |
 
@@ -44,11 +44,11 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | Surface | Probe | Silent-clip / notes | Hardware |
 |---------|-------|---------------------|----------|
 | import_failures_dialog | todo | | |
-| import_skipped_dialog | **fixed** | was `SizedBox(height:300)` -> `scrollable:true` + shrinkWrap NeverScrollable ListView (adapts to large text); targeted test at 4x | pending |
+| import_skipped_dialog | **fixed** | was `SizedBox(height:300)` -> `scrollable:true` + plain Column of items (a ListView breaks scrollable's intrinsic-width pass); targeted test at 4x | pending |
 | password_breakdown_sheet | todo | (also a Phase 3 target-scaling item) | |
 | sync_review (widget) | todo | | |
 | yubikey_tap (widget) | todo | | |
-| generator_widget | todo | language dropdown fixed (large-text pattern) | |
+| generator_widget | in-probe (pass) | language dropdown fixed; length/words label-value Rows now Expanded+ellipsis (were spaceBetween, overflowed 122px) | pending |
 
 ## Deferred (NOT Phase 2 overflow — tracked so they aren't forgotten)
 
@@ -78,9 +78,9 @@ ongoing — confirmed/suspected below:
   `width:88` label fix below).
 - ~~csv_mapping_screen `width:88` cell~~ DONE (stack label-above-dropdown at large text;
   also removed the preview DataTable fixed row height).
-- ~~import_skipped_dialog `height:300`~~ DONE (scrollable:true + shrinkWrap NeverScrollable
-  ListView — the pattern for a list inside a dialog: outer scroll owns it, list doesn't
-  self-scroll).
+- ~~import_skipped_dialog `height:300`~~ DONE (scrollable:true + a plain Column of items;
+  a ListView throws in scrollable's intrinsic-width pass — for a short list-in-dialog use a
+  Column and let the dialog's own scroll own it).
 - (continue triaging the 339-hit sweep; add each real risk here.)
 
 ## AlertDialog scrollability (another probe blind spot — dialogs are action-triggered)
@@ -102,12 +102,7 @@ Audit every `AlertDialog` with Column/ListView content:
   add-key transport+PIN [+ chip `Row`->`Wrap`], remove-key warning), entry_detail
   (export-file), import_failures, vault_list (sync-summary + sync-from-file). No
   `content: SingleChildScrollView` remains in lib/. Chip `Row`->`Wrap` stays.
-- Skipped (short single-TextField, plain-Text content, won't strand buttons): rename-vault,
+- Skipped (short single-TextField / plain-Text content, won't strand buttons): rename-vault,
   rename/add-folder, edit-alias, delete-vault-warning, delete-entry-confirm.
-- Skipped (short single-TextField, won't overflow): rename-vault, rename/add-folder,
-  edit-alias.
-- TODO: **import_skipped_dialog** (`content: SizedBox(height:300)` — the `height:300`
-  watchlist item; inspect its internal ListView scroll at 4x). vault_list dialogs were
-  already Text/SingleChildScrollView (no action).
 - **Enumeration gap learned:** grep for `content: Column(` MISSES content built into a
   variable (e.g. yubikeys `warningContent`) — re-audit with `content: <ident>` too.
