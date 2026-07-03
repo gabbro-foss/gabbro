@@ -1548,6 +1548,15 @@ class _VaultListScreenState extends State<VaultListScreen>
                       child: DropdownButton<String>(
                         isExpanded: true,
                         value: _selectedFolder,
+                        // The button shows the selection on one line; ellipsize
+                        // it so a long folder truncates cleanly instead of
+                        // hard-clipping mid-glyph at large text (ADR-016).
+                        selectedItemBuilder: (context) => [
+                          Text(l.allFolders,
+                              maxLines: 1, overflow: TextOverflow.ellipsis),
+                          ..._folders.map((f) => Text(f,
+                              maxLines: 1, overflow: TextOverflow.ellipsis)),
+                        ],
                         onChanged: (value) =>
                             setState(() => _selectedFolder = value ?? ''),
                         items: [
@@ -1629,6 +1638,15 @@ class _VaultListScreenState extends State<VaultListScreen>
                     child: DropdownButton<String>(
                       isExpanded: true,
                       value: _selectedFolder,
+                      // Ellipsize the button's one-line selection so a long
+                      // folder truncates cleanly instead of hard-clipping at
+                      // large text (ADR-016).
+                      selectedItemBuilder: (context) => [
+                        Text(l.allFolders,
+                            maxLines: 1, overflow: TextOverflow.ellipsis),
+                        ..._folders.map((f) => Text(f,
+                            maxLines: 1, overflow: TextOverflow.ellipsis)),
+                      ],
                       onChanged: (value) =>
                           setState(() => _selectedFolder = value ?? ''),
                       items: [
