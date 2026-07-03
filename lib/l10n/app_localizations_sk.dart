@@ -499,6 +499,9 @@ class AppLocalizationsSk extends AppLocalizations {
   String get tooltipNextPage => 'Ďalšia strana';
 
   @override
+  String get helpEnlargeImage => 'Zväčšiť obrázok';
+
+  @override
   String get tooltipEditAlias => 'Upraviť alias';
 
   @override

@@ -499,6 +499,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tooltipNextPage => 'Sljedeća stranica';
 
   @override
+  String get helpEnlargeImage => 'Povećaj sliku';
+
+  @override
   String get tooltipEditAlias => 'Uredi alias';
 
   @override

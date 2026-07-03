@@ -501,6 +501,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get tooltipNextPage => 'Επόμενη σελίδα';
 
   @override
+  String get helpEnlargeImage => 'Μεγέθυνση εικόνας';
+
+  @override
   String get tooltipEditAlias => 'Επεξεργασία ψευδωνύμου';
 
   @override

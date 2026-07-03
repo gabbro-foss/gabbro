@@ -498,6 +498,9 @@ class AppLocalizationsNn extends AppLocalizations {
   String get tooltipNextPage => 'Neste side';
 
   @override
+  String get helpEnlargeImage => 'Forstørr biletet';
+
+  @override
   String get tooltipEditAlias => 'Rediger alias';
 
   @override

@@ -498,6 +498,9 @@ class AppLocalizationsLv extends AppLocalizations {
   String get tooltipNextPage => 'Nākamā lapa';
 
   @override
+  String get helpEnlargeImage => 'Palielināt attēlu';
+
+  @override
   String get tooltipEditAlias => 'Rediģēt aizstājvārdu';
 
   @override

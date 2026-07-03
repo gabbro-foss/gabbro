@@ -70,4 +70,49 @@ void main() {
     await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
     handle.dispose();
   });
+
+  // ── Phase 2b: pinch-to-zoom on help images (textScaler can't scale a PNG;
+  // FLAG_SECURE blocks an external magnifier) ──────────────────────────────────
+  group('image zoom', () {
+    testWidgets('help image carries an enlarge affordance and label',
+        (tester) async {
+      await tester.pumpWidget(testApp(const HelpScreen()));
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Enlarge image'), findsWidgets);
+      expect(find.byIcon(Icons.zoom_in), findsWidgets);
+    });
+
+    testWidgets('tapping a help image opens a full-screen zoom viewer',
+        (tester) async {
+      await tester.pumpWidget(testApp(const HelpScreen()));
+      await tester.pumpAndSettle();
+      expect(find.byType(InteractiveViewer), findsNothing);
+
+      await tester.tap(find.byTooltip('Enlarge image').first);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(InteractiveViewer), findsOneWidget);
+      // the same image is shown inside the zoomable viewer
+      expect(
+        find.descendant(
+          of: find.byType(InteractiveViewer),
+          matching: find.byType(Image),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the zoom viewer closes back to the help pages', (tester) async {
+      await tester.pumpWidget(testApp(const HelpScreen()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Enlarge image').first);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(InteractiveViewer), findsNothing);
+      expect(find.byType(PageView), findsOneWidget);
+    });
+  });
 }

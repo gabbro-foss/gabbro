@@ -499,6 +499,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tooltipNextPage => 'Pagina successiva';
 
   @override
+  String get helpEnlargeImage => 'Ingrandisci immagine';
+
+  @override
   String get tooltipEditAlias => 'Modifica alias';
 
   @override

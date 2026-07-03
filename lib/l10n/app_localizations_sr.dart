@@ -499,6 +499,9 @@ class AppLocalizationsSr extends AppLocalizations {
   String get tooltipNextPage => 'Следећа страница';
 
   @override
+  String get helpEnlargeImage => 'Увећај слику';
+
+  @override
   String get tooltipEditAlias => 'Uredi alias';
 
   @override
@@ -2504,6 +2507,9 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get tooltipNextPage => 'Sledeća stranica';
+
+  @override
+  String get helpEnlargeImage => 'Uvećaj sliku';
 
   @override
   String get tooltipEditAlias => 'Uredi alias';

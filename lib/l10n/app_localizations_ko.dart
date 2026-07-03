@@ -492,6 +492,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tooltipNextPage => '다음 페이지';
 
   @override
+  String get helpEnlargeImage => '이미지 확대';
+
+  @override
   String get tooltipEditAlias => '별칭 편집';
 
   @override

@@ -500,6 +500,9 @@ class AppLocalizationsLt extends AppLocalizations {
   String get tooltipNextPage => 'Kitas puslapis';
 
   @override
+  String get helpEnlargeImage => 'Padidinti vaizdą';
+
+  @override
   String get tooltipEditAlias => 'Redaguoti slapyvardį';
 
   @override

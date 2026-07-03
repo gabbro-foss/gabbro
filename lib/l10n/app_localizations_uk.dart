@@ -500,6 +500,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get tooltipNextPage => 'Наступна сторінка';
 
   @override
+  String get helpEnlargeImage => 'Збільшити зображення';
+
+  @override
   String get tooltipEditAlias => 'Змінити псевдонім';
 
   @override

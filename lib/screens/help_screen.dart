@@ -58,6 +58,37 @@ class _HelpScreenState extends State<HelpScreen> {
     );
   }
 
+  // Full-screen pinch-zoom/pan of a help screenshot. A separate route owns all
+  // gestures cleanly (an in-place InteractiveViewer would fight the PageView's
+  // horizontal swipe and the vertical scroll). ADR-016 Phase 2b.
+  void _openZoom(BuildContext context, String asset) {
+    final l = AppLocalizations.of(context);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (ctx) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            leading: IconButton(
+              icon: const Icon(Icons.close),
+              tooltip: l.close,
+              onPressed: () => Navigator.of(ctx).pop(),
+            ),
+          ),
+          body: Center(
+            child: InteractiveViewer(
+              minScale: 1,
+              maxScale: 5,
+              child: Image.asset(asset, fit: BoxFit.contain),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -92,9 +123,40 @@ class _HelpScreenState extends State<HelpScreen> {
                               constraints: BoxConstraints(
                                 maxHeight: constraints.maxHeight * 0.5,
                               ),
-                              child: Image.asset(
-                                _kAssets[i],
-                                fit: BoxFit.contain,
+                              // The screenshot is a PNG: textScaler can't grow
+                              // it and FLAG_SECURE blocks an external magnifier,
+                              // so tap to open a full-screen pinch-zoom viewer
+                              // (ADR-016 Phase 2b).
+                              child: Tooltip(
+                                message: l.helpEnlargeImage,
+                                child: InkWell(
+                                  onTap: () => _openZoom(context, _kAssets[i]),
+                                  child: Stack(
+                                    children: [
+                                      Image.asset(
+                                        _kAssets[i],
+                                        fit: BoxFit.contain,
+                                      ),
+                                      Positioned(
+                                        right: 4,
+                                        bottom: 4,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black54,
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          child: const Icon(
+                                            Icons.zoom_in,
+                                            color: Colors.white,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                             const SizedBox(height: 16),

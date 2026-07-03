@@ -498,6 +498,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tooltipNextPage => 'Következő oldal';
 
   @override
+  String get helpEnlargeImage => 'Kép nagyítása';
+
+  @override
   String get tooltipEditAlias => 'Alias szerkesztése';
 
   @override

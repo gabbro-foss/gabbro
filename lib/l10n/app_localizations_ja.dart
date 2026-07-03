@@ -492,6 +492,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get tooltipNextPage => '次のページ';
 
   @override
+  String get helpEnlargeImage => '画像を拡大';
+
+  @override
   String get tooltipEditAlias => 'エイリアスを編集';
 
   @override

@@ -499,6 +499,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get tooltipNextPage => 'Hurrengo orria';
 
   @override
+  String get helpEnlargeImage => 'Handitu irudia';
+
+  @override
   String get tooltipEditAlias => 'Ezizena editatu';
 
   @override

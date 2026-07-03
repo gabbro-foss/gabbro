@@ -499,6 +499,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tooltipNextPage => 'Próxima página';
 
   @override
+  String get helpEnlargeImage => 'Ampliar imagem';
+
+  @override
   String get tooltipEditAlias => 'Editar apelido';
 
   @override
@@ -2510,6 +2513,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get tooltipNextPage => 'Próxima página';
 
   @override
+  String get helpEnlargeImage => 'Ampliar imagem';
+
+  @override
   String get tooltipEditAlias => 'Editar apelido';
 
   @override
@@ -4516,6 +4522,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get tooltipNextPage => 'Página seguinte';
+
+  @override
+  String get helpEnlargeImage => 'Ampliar imagem';
 
   @override
   String get tooltipEditAlias => 'Editar alias';

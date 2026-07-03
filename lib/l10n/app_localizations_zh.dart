@@ -490,6 +490,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tooltipNextPage => '下一页';
 
   @override
+  String get helpEnlargeImage => '放大图片';
+
+  @override
   String get tooltipEditAlias => '编辑别名';
 
   @override
@@ -2407,6 +2410,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get tooltipNextPage => '下一页';
 
   @override
+  String get helpEnlargeImage => '放大图片';
+
+  @override
   String get tooltipEditAlias => '编辑别名';
 
   @override
@@ -4322,6 +4328,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get tooltipNextPage => '下一頁';
+
+  @override
+  String get helpEnlargeImage => '放大圖片';
 
   @override
   String get tooltipEditAlias => '編輯別名';

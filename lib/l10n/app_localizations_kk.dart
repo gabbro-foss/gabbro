@@ -498,6 +498,9 @@ class AppLocalizationsKk extends AppLocalizations {
   String get tooltipNextPage => 'Келесі бет';
 
   @override
+  String get helpEnlargeImage => 'Суретті үлкейту';
+
+  @override
   String get tooltipEditAlias => 'Бүркеншік атын өңдеу';
 
   @override

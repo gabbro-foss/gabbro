@@ -1117,6 +1117,12 @@ abstract class AppLocalizations {
   /// **'Next page'**
   String get tooltipNextPage;
 
+  /// No description provided for @helpEnlargeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enlarge image'**
+  String get helpEnlargeImage;
+
   /// No description provided for @tooltipEditAlias.
   ///
   /// In en, this message translates to:

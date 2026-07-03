@@ -499,6 +499,9 @@ class AppLocalizationsEt extends AppLocalizations {
   String get tooltipNextPage => 'Järgmine leht';
 
   @override
+  String get helpEnlargeImage => 'Suurenda pilti';
+
+  @override
   String get tooltipEditAlias => 'Muuda aliast';
 
   @override

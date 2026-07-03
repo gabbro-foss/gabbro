@@ -499,6 +499,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get tooltipNextPage => 'Další stránka';
 
   @override
+  String get helpEnlargeImage => 'Zvětšit obrázek';
+
+  @override
   String get tooltipEditAlias => 'Upravit alias';
 
   @override

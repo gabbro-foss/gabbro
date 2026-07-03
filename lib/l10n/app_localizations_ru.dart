@@ -499,6 +499,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tooltipNextPage => 'Следующая страница';
 
   @override
+  String get helpEnlargeImage => 'Увеличить изображение';
+
+  @override
   String get tooltipEditAlias => 'Изменить псевдоним';
 
   @override

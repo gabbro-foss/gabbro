@@ -500,6 +500,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tooltipNextPage => 'Seuraava sivu';
 
   @override
+  String get helpEnlargeImage => 'Suurenna kuvaa';
+
+  @override
   String get tooltipEditAlias => 'Muokkaa aliasta';
 
   @override

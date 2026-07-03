@@ -498,6 +498,9 @@ class AppLocalizationsYo extends AppLocalizations {
   String get tooltipNextPage => 'Ojú-ìwé tó kàn';
 
   @override
+  String get helpEnlargeImage => 'Sọ àwòrán di ńlá';
+
+  @override
   String get tooltipEditAlias => 'Ṣatunkọ orukọ apejuwe';
 
   @override

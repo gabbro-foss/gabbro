@@ -500,6 +500,9 @@ class AppLocalizationsBg extends AppLocalizations {
   String get tooltipNextPage => 'Следваща страница';
 
   @override
+  String get helpEnlargeImage => 'Уголеми изображението';
+
+  @override
   String get tooltipEditAlias => 'Редактирай псевдоним';
 
   @override

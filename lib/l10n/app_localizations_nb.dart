@@ -498,6 +498,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get tooltipNextPage => 'Neste side';
 
   @override
+  String get helpEnlargeImage => 'Forstørr bildet';
+
+  @override
   String get tooltipEditAlias => 'Rediger alias';
 
   @override

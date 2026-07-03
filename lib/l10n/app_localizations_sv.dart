@@ -498,6 +498,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tooltipNextPage => 'Nästa sida';
 
   @override
+  String get helpEnlargeImage => 'Förstora bild';
+
+  @override
   String get tooltipEditAlias => 'Redigera alias';
 
   @override

@@ -500,6 +500,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tooltipNextPage => 'Page suivante';
 
   @override
+  String get helpEnlargeImage => 'Agrandir l’image';
+
+  @override
   String get tooltipEditAlias => 'Modifier l\'alias';
 
   @override
