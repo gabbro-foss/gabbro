@@ -124,6 +124,15 @@ fixed-box clippers (csv_mapping `width:88`, import_skipped `height:300`), help p
 spacing, onboarding accessibility button, import `SegmentedButton`, entry_detail AppBar
 crowding — plus the folder chooser (create/edit-entry folder dropdown or manage-folders).
 
+**P2 progress [2026-07-03].** Probe built: `test/overflow_probe_test.dart` (phone 4x +
+tablet 6x, asserts `takeException()` null). Starter set about/appearance/create_entry pass;
+**help + onboarding throw RenderFlex overflows** (skipped-and-tracked pending fix). KEY:
+create_entry does NOT throw -> the folder chooser is a **silent clip**, a probe blind spot;
+silent clips get a grep-sweep + targeted test each (agreed). Full exhaustive ledger of every
+surface + the silent-clip watchlist: `docs/PHASE2_OVERFLOW_COVERAGE.md` (delete at P2 close).
+NEXT: fix help + onboarding overflows (un-skip), verify+fix folder chooser, extend probe to
+remaining screens/overlays, work the silent-clip watchlist.
+
 **Phase 2b — Help-screen pinch-to-zoom** (its own feature, not a layout fix):
 `FLAG_SECURE` blocks screenshots, so a low-vision user cannot magnify the help
 pages externally — add in-app pinch/zoom (InteractiveViewer) on help content,
