@@ -14,3 +14,9 @@ double controlScaleFor(BuildContext context) {
     deviceMaxScale(mq.size.shortestSide),
   );
 }
+
+/// An icon/target size scaled by [controlScaleFor] — [base] (the Material
+/// default 24) at normal text, up to `2 * base` at the device's max text scale.
+/// Use for `IconButton.iconSize`, FAB child icons, etc. (ADR-016 Phase 3).
+double scaledIconSize(BuildContext context, [double base = 24]) =>
+    base * controlScaleFor(context);

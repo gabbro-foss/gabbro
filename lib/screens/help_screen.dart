@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 
 class HelpScreen extends StatefulWidget {
@@ -182,6 +183,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.chevron_left),
+                    iconSize: scaledIconSize(context),
                     tooltip: l.tooltipPreviousPage,
                     onPressed: _currentPage > 0 ? () => _goTo(_currentPage - 1) : null,
                   ),
@@ -206,6 +208,7 @@ class _HelpScreenState extends State<HelpScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.chevron_right),
+                    iconSize: scaledIconSize(context),
                     tooltip: l.tooltipNextPage,
                     onPressed: _currentPage < count - 1 ? () => _goTo(_currentPage + 1) : null,
                   ),

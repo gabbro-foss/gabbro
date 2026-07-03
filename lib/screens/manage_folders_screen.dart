@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/control_scale.dart';
 
 class ManageFoldersScreen extends StatefulWidget {
   const ManageFoldersScreen({
@@ -229,7 +230,7 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,
         tooltip: l.addFolderTitle,
-        child: const Icon(Icons.add),
+        child: Icon(Icons.add, size: scaledIconSize(context)),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())

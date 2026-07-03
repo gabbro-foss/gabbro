@@ -115,4 +115,23 @@ void main() {
       expect(find.byType(PageView), findsOneWidget);
     });
   });
+
+  // ADR-016 Phase 3 Slice B: nav chevrons grow with the text scale so a
+  // low-vision user gets a bigger target (they stay 24 at normal text).
+  testWidgets('nav chevrons scale up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(testApp(const HelpScreen()));
+    await tester.pumpAndSettle();
+
+    final next = tester.widget<IconButton>(
+      find
+          .ancestor(
+            of: find.byIcon(Icons.chevron_right),
+            matching: find.byType(IconButton),
+          )
+          .first,
+    );
+    expect(next.iconSize, greaterThan(24));
+  });
 }

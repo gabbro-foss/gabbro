@@ -39,6 +39,45 @@ void main() {
     });
   });
 
+  // ADR-016 Phase 3 Slice B: app-bar action icons grow with the text scale
+  // (the title ellipsizes, so the bar does not overflow).
+  testWidgets('app-bar action icons scale up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_buildScreen());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    final selectBtn = tester.widget<IconButton>(
+      find
+          .ancestor(
+            of: find.byIcon(Icons.checklist),
+            matching: find.byType(IconButton),
+          )
+          .first,
+    );
+    expect(selectBtn.iconSize, greaterThan(24));
+    expect(tester.takeException(), isNull);
+  });
+
+  // ADR-016 Phase 3 Slice B: the add-entry FAB icon grows with the text scale.
+  testWidgets('FAB icon scales up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_buildScreen());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    final icon = tester.widget<Icon>(
+      find.descendant(
+        of: find.byType(FloatingActionButton),
+        matching: find.byIcon(Icons.add),
+      ),
+    );
+    expect(icon.size, isNotNull);
+    expect(icon.size, greaterThan(24));
+  });
+
   group('VaultListScreen menu items', () {
     testWidgets('all expected menu items are present', (tester) async {
       await tester.pumpWidget(_buildScreen());

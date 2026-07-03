@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
@@ -789,7 +790,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
       floatingActionButton: _records.length < 4
           ? FloatingActionButton.extended(
               onPressed: _addKey,
-              icon: const Icon(Icons.add),
+              icon: Icon(Icons.add, size: scaledIconSize(context)),
               label: Text(l.addYubiKey),
             )
           : null,

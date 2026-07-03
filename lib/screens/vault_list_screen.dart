@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
@@ -1296,16 +1297,19 @@ class _VaultListScreenState extends State<VaultListScreen>
           if (!_isSelecting) ...[
             IconButton(
               icon: const Icon(Icons.checklist),
+              iconSize: scaledIconSize(context),
               tooltip: l.tooltipSelectEntries,
               onPressed: () => setState(() => _selectionMode = true),
             ),
             IconButton(
               icon: const Icon(Icons.lock_outline),
+              iconSize: scaledIconSize(context),
               tooltip: l.tooltipLockVault,
               onPressed: _lockAndExit,
             ),
             PopupMenuButton<String>(
               icon: const Icon(Icons.menu),
+              iconSize: scaledIconSize(context),
               tooltip: l.tooltipMenu,
               onSelected: _onMenuSelected,
               itemBuilder: (context) {
@@ -1508,7 +1512,7 @@ class _VaultListScreenState extends State<VaultListScreen>
           : FloatingActionButton(
               onPressed: _showTypePicker,
               tooltip: l.newEntryTitle,
-              child: const Icon(Icons.add),
+              child: Icon(Icons.add, size: scaledIconSize(context)),
             ),
       body: LayoutBuilder(
         builder: (context, constraints) {

@@ -63,4 +63,50 @@ void main() {
     expect(await _scaleAt(tester, textScale: 3.0, size: _tablet),
         closeTo(2.0, 1e-9));
   });
+
+  // ── scaledIconSize (Slice B) ───────────────────────────────────────────────
+
+  group('scaledIconSize', () {
+    Future<double> sizeAt(
+      WidgetTester tester, {
+      required double textScale,
+      required Size size,
+      double? base,
+    }) async {
+      late double result;
+      await tester.pumpWidget(
+        MediaQuery(
+          data: MediaQueryData(
+            textScaler: TextScaler.linear(textScale),
+            size: size,
+          ),
+          child: Builder(
+            builder: (context) {
+              result = base == null
+                  ? scaledIconSize(context)
+                  : scaledIconSize(context, base);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      return result;
+    }
+
+    testWidgets('defaults to 24 at normal text', (tester) async {
+      expect(await sizeAt(tester, textScale: 1.0, size: _phone),
+          closeTo(24.0, 1e-9));
+    });
+
+    testWidgets('doubles to the cap at the device max', (tester) async {
+      expect(await sizeAt(tester, textScale: 2.0, size: _phone),
+          closeTo(48.0, 1e-9));
+    });
+
+    testWidgets('scales a custom base by the control factor', (tester) async {
+      // tablet @2.0x -> factor 1.5, so base 20 -> 30
+      expect(await sizeAt(tester, textScale: 2.0, size: _tablet, base: 20),
+          closeTo(30.0, 1e-9));
+    });
+  });
 }
