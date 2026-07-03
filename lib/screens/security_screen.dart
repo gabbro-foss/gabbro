@@ -131,27 +131,28 @@ class _SecurityScreenState extends State<SecurityScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        // scrollable scrolls title + content + actions together, so nothing is
+        // stranded off-screen at large text (ADR-016).
+        scrollable: true,
         title: Text(l.biometricDialogTitle),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(l.biometricDialogBody),
-              const SizedBox(height: 12),
-              Text(
-                l.biometricDialogAllBiometrics,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(l.biometricDialogInvalidation),
-              const SizedBox(height: 8),
-              Text(
-                l.biometricDialogRecommendation,
-                style: const TextStyle(fontStyle: FontStyle.italic),
-              ),
-            ],
-          ),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l.biometricDialogBody),
+            const SizedBox(height: 12),
+            Text(
+              l.biometricDialogAllBiometrics,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(l.biometricDialogInvalidation),
+            const SizedBox(height: 8),
+            Text(
+              l.biometricDialogRecommendation,
+              style: const TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -193,34 +194,32 @@ class _SecurityScreenState extends State<SecurityScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx2, setDialogState) => AlertDialog(
+          scrollable: true,
           title: Text(l.biometricEnrollTitle),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(l.biometricEnrollDescription),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: controller,
-                  obscureText: obscured,
-                  autofocus: true,
-                  onSubmitted: (_) =>
-                      Navigator.of(ctx2).pop(controller.text.codeUnits),
-                  decoration: InputDecoration(
-                    labelText: l.passphraseLabel,
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        obscured ? Icons.visibility_off : Icons.visibility,
-                      ),
-                      tooltip: obscured ? l.tooltipShow : l.tooltipHide,
-                      onPressed: () =>
-                          setDialogState(() => obscured = !obscured),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l.biometricEnrollDescription),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                obscureText: obscured,
+                autofocus: true,
+                onSubmitted: (_) =>
+                    Navigator.of(ctx2).pop(controller.text.codeUnits),
+                decoration: InputDecoration(
+                  labelText: l.passphraseLabel,
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      obscured ? Icons.visibility_off : Icons.visibility,
                     ),
+                    tooltip: obscured ? l.tooltipShow : l.tooltipHide,
+                    onPressed: () => setDialogState(() => obscured = !obscured),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           actions: [
             TextButton(
