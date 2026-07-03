@@ -44,7 +44,7 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | Surface | Probe | Silent-clip / notes | Hardware |
 |---------|-------|---------------------|----------|
 | import_failures_dialog | todo | | |
-| import_skipped_dialog | todo | **fixed `height:300` — silent clip** | |
+| import_skipped_dialog | **fixed** | was `SizedBox(height:300)` -> `scrollable:true` + shrinkWrap NeverScrollable ListView (adapts to large text); targeted test at 4x | pending |
 | password_breakdown_sheet | todo | (also a Phase 3 target-scaling item) | |
 | sync_review (widget) | todo | | |
 | yubikey_tap (widget) | todo | | |
@@ -77,7 +77,9 @@ ongoing — confirmed/suspected below:
   generator_widget. **TODO:** csv_mapping_screen dropdown (deferred to its own pass with the
   `width:88` label fix below).
 - csv_mapping_screen `width:88` cell.
-- import_skipped_dialog `height:300` box.
+- ~~import_skipped_dialog `height:300`~~ DONE (scrollable:true + shrinkWrap NeverScrollable
+  ListView — the pattern for a list inside a dialog: outer scroll owns it, list doesn't
+  self-scroll).
 - (continue triaging the 339-hit sweep; add each real risk here.)
 
 ## AlertDialog scrollability (another probe blind spot — dialogs are action-triggered)
