@@ -77,7 +77,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1190 | 0 |
+| Flutter (`flutter test`) | 1198 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -119,10 +119,18 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 ### Accessibility polish (ADR-016 follow-ups, deferred)
 - **Scale the reveal-eye (show/hide) toggles** at large text (13 scattered, some in
   constrained field-suffix/row positions — needs care per site).
-- **Scale the alphabet bar's own up/down scroll chevrons** (their size is baked into the
-  bar's windowing height math — touch with care).
+- **Scale the menu / list-row icons** at large text (all hardcoded ~20/24, none scale):
+  (a) app-bar popup-menu item icons (`vault_list_screen.dart`, ~12 items, `size: 20`);
+  (b) tablet `NavigationRail` destination icons (`tablet_vault_layout.dart`, 4);
+  (c) per-entry-type list-row + type-picker icons (`_entryTypeIcon`, sites 585/1532/1776).
 
 ### Code Quality
+- **Tablet two-pane: FAB overlaps the detail pane's bottom content.** The shared
+  add-entry FAB floats over the bottom-right of the detail pane, hiding the last
+  scrolled item (observed: entry-detail History tile's trailing chevron). Reserve
+  bottom padding in the detail pane so content clears the FAB. Pre-existing;
+  found 2026-07-03 during large-text chevron work. Phone (full-screen route, no
+  FAB) is unaffected.
 - **Tablet pane-resize handle has no screen-reader label.** The two-pane (tablet)
   vault-list column-width drag handle exposes no tooltip / `Semantics` label (ADR-015).
   Add one. (found 2026-07-03 during large-text work.)
