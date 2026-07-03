@@ -77,7 +77,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1126 | 0 |
+| Flutter (`flutter test`) | 1153 | 2 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -96,12 +96,12 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 Make Gabbro usable at very large text (low-vision): one absolute `textScale` knob
 drives text **and** (later phases) controls in unison; screen-derived max (600dp tiers —
-phone 4x, tablet 6x); targets scale proportionally, capped ~2x. Design in
+phone 3.5x, tablet 5x); targets scale proportionally, capped ~2x. Design in
 [ADR-016](decisions/ADR-016-large-text-and-target-scaling-accessibility.md).
 
 **Phase 0 — Calibrate [DONE 2026-07-02].** Phone tier 360-411dp (S23 360 / GOS 411),
-tablet 866dp (Idea Tab Pro). Consts (hardware-tuned 2026-07-03, was 6x/8x): phone 4x /
-tablet 6x / target cap 2x / onboarding toggle 3x.
+tablet 866dp (Idea Tab Pro). Consts (hardware-tuned 2026-07-03, was 6x/8x, then 4x/6x): phone 3.5x /
+tablet 5x / target cap 2x / onboarding toggle 3x.
 
 **Phase 1 — Slider + model + onboarding [DONE + COMMITTED 2026-07-03; hardware-confirmed
 S23/GOS/tablet; commits 75ae07f code + 2d3f8cf docs on `accessibility_initiative`, NOT
@@ -124,14 +124,22 @@ fixed-box clippers (csv_mapping `width:88`, import_skipped `height:300`), help p
 spacing, onboarding accessibility button, import `SegmentedButton`, entry_detail AppBar
 crowding — plus the folder chooser (create/edit-entry folder dropdown or manage-folders).
 
-**P2 progress [2026-07-03].** Probe built: `test/overflow_probe_test.dart` (phone 4x +
-tablet 6x, asserts `takeException()` null). Starter set about/appearance/create_entry pass;
-**help + onboarding throw RenderFlex overflows** (skipped-and-tracked pending fix). KEY:
-create_entry does NOT throw -> the folder chooser is a **silent clip**, a probe blind spot;
-silent clips get a grep-sweep + targeted test each (agreed). Full exhaustive ledger of every
-surface + the silent-clip watchlist: `docs/PHASE2_OVERFLOW_COVERAGE.md` (delete at P2 close).
-NEXT: fix help + onboarding overflows (un-skip), verify+fix folder chooser, extend probe to
-remaining screens/overlays, work the silent-clip watchlist.
+**P2 progress [2026-07-03] — text overflow substantially DONE; scope = Option C** (fix
+text overflows, defer control-layout to Phase 3). Max trimmed 6x/8x -> 4x/6x -> **3.5x/5x**
+for margin (maintainer, may trim again). Full exhaustive ledger of every surface:
+`docs/PHASE2_OVERFLOW_COVERAGE.md` (delete at P2 close). All committed, `flutter test` green.
+DONE: probe `test/overflow_probe_test.dart` covers **15 screens** (phone 3.5x + tablet 5x,
+asserts `takeException()` null); throwing overflows fixed (help pages scroll, onboarding
+a11y-button row, language note-in-scroll, generator label/value rows); **every dropdown**
+app-wide (6 sites: `isExpanded`+`itemHeight:null`+`selectedItemBuilder` ellipsis); **every
+multi-widget dialog** (~13: `AlertDialog(scrollable:true)` + one chip `Row`->`Wrap`);
+csv_mapping (label-stack + DataTable) + import_skipped (list-in-dialog). Each is
+hardware-`pending` (maintainer verified: help, onboarding, folder filter, biometric dialog).
+NOT probed yet (need FFI fixtures): import, unlock, vault_list, save_confirm, review_changes,
+manage_yubikeys, tablet_vault_layout. DEFERRED to Phase 3 (control-layout, not text):
+**recovery_history** — ListTile trailing action-buttons don't fit on phone at max (item fails
+to size); same class likely on other ListTile-with-trailing screens.
+NEXT: add the un-probed screens (fix any TEXT overflows), then close P2 -> Phase 3.
 
 **Phase 2b — Help-screen pinch-to-zoom** (its own feature, not a layout fix):
 `FLAG_SECURE` blocks screenshots, so a low-vision user cannot magnify the help
