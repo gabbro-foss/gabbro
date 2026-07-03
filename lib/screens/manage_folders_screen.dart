@@ -68,7 +68,14 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
                   ),
                   if (reassignTarget != null)
                     DropdownButton<String>(
+                      isExpanded: true,
+                      itemHeight: null, // menu items grow to wrapped height at large text
                       value: reassignTarget,
+                      // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
+                      selectedItemBuilder: (context) => otherFolders
+                          .map((f) => Text(f,
+                              maxLines: 1, overflow: TextOverflow.ellipsis))
+                          .toList(),
                       items: otherFolders
                           .map((f) => DropdownMenuItem(value: f, child: Text(f)))
                           .toList(),

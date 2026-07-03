@@ -855,7 +855,13 @@ class _UnlockScreenState extends State<UnlockScreen>
                     if (_showDropdown) ...[
                       DropdownButton<String>(
                         isExpanded: true,
+                        itemHeight: null, // menu items grow to wrapped height at large text
                         value: _selectedPath,
+                        // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
+                        selectedItemBuilder: (context) => widget.registry!.records
+                            .map((r) => Text(r.alias,
+                                maxLines: 1, overflow: TextOverflow.ellipsis))
+                            .toList(),
                         items: widget.registry!.records
                             .map(
                               (r) => DropdownMenuItem(
