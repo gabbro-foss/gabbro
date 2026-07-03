@@ -1547,6 +1547,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                       padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                       child: DropdownButton<String>(
                         isExpanded: true,
+                        // Let open-menu items grow to their wrapped height
+                        // instead of clipping at the default 48px (ADR-016).
+                        itemHeight: null,
                         value: _selectedFolder,
                         // The button shows the selection on one line; ellipsize
                         // it so a long folder truncates cleanly instead of
@@ -1637,6 +1640,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                     padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                     child: DropdownButton<String>(
                       isExpanded: true,
+                      // Let open-menu items grow to their wrapped height
+                      // instead of clipping at the default 48px (ADR-016).
+                      itemHeight: null,
                       value: _selectedFolder,
                       // Ellipsize the button's one-line selection so a long
                       // folder truncates cleanly instead of hard-clipping at
