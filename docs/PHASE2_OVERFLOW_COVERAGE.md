@@ -19,7 +19,7 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | about_screen | in-probe (pass) | | |
 | appearance_screen | in-probe (pass) | P1 slider holds at 4x/6x | |
 | change_passphrase_screen | todo | | |
-| create_entry_screen | in-probe (pass) | `isExpanded:true` on 3 dropdowns (stops throw). **NOT the reported bug** (that was vault_list). Selected value still one-line -> also needs `selectedItemBuilder` ellipsis like vault_list; apply after that verifies | pending |
+| create_entry_screen | in-probe (pass) | **fixed** all dropdowns (folder + card-status + `_dropdownField`/payment-network): `isExpanded:true` + `itemHeight:null` + `selectedItemBuilder` ellipsis | pending |
 | vault_list_screen (phone) | todo (probe) | **folder-filter dropdown FIXED** (the actual maintainer report): `selectedItemBuilder` ellipsis on BOTH phone (~1629) + tablet (~1548) paths, else the one-line selection hard-clips at 4x | **re-verify** |
 | csv_mapping_screen | todo | **fixed `width:88` cell — silent clip** | |
 | entry_detail_screen | todo | AppBar action crowding | |
@@ -69,6 +69,12 @@ ongoing — confirmed/suspected below:
 - **create_entry_screen folder chooser** — FIXED: `isExpanded: true` on all 3
   `DropdownButtonFormField`s (folder ~1686, `_dropdownField` ~1726, card-status ~1304) so a
   long value wraps instead of clipping. Not test-assertable (silent) -> pending hardware.
+- **Dropdown fix pattern (ADR-016):** at large text a `DropdownButton`/`FormField` needs
+  ALL THREE: `isExpanded:true` (fill width), `itemHeight:null` (open-menu items grow to
+  wrapped height, else clipped mid-height at 48px), `selectedItemBuilder` with
+  `maxLines:1, overflow: ellipsis` (collapsed selection truncates cleanly, not hard-clip).
+  DONE: vault_list (both paths), create_entry (all). **TODO same treatment:**
+  unlock_screen, manage_folders_screen, csv_mapping_screen, generator_widget.
 - csv_mapping_screen `width:88` cell.
 - import_skipped_dialog `height:300` box.
 - (continue triaging the 339-hit sweep; add each real risk here.)
