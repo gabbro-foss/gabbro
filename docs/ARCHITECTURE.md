@@ -105,11 +105,21 @@ every screen/dropdown/dialog (maxes settled at **2x phone / 3x tablet**); help s
 tap to a full-screen `InteractiveViewer` (pinch/pan, close) since `textScaler` can't scale a
 PNG and `FLAG_SECURE` blocks an external magnifier.
 
-**Phase 3 — Target/control scaling [NEXT]** (the core payoff): `scaledControl` helper off
-`textScale` (capped ~2x); alphabet bar (hide on phone tier / scale on tablet tier); password
-breakdown sheet; FABs; drop `VisualDensity.compact`; the **ListTile-with-trailing-buttons
-class** (recovery_history et al. — deferred here from Phase 2, controls don't fit at max).
-Per-control >=48dp touch-target tests at every scale; hardware-verified per screen.
+**Phase 3 — Target/control scaling [IN PROGRESS]** (the core payoff): `textScaler` grows
+text only, so at large text icons/targets/controls stay small. Generalise
+`targetScaleFor` (1.0->2.0) into a reusable control-scale and apply it. Per-control >=48dp
+touch-target tests at every scale; hardware-verified per screen. Sliced (net-first +
+canon-TDD each), tick as we go:
+
+- [x] **Slice A — the primitive [DONE, hardware-verified].** `lib/control_scale.dart`
+  `controlScaleFor(BuildContext)` on `targetScaleFor` (+ tests); biometric icon refactored
+  onto it; dropped the 3 `VisualDensity.compact` overrides (2 selection checkboxes now
+  standard >=48dp; onboarding a11y button is a fixed-size `noScaling` control).
+- [ ] **Slice B — icons / FAB / chevrons** apply the factor.
+- [ ] **Slice C — checkboxes + the ListTile-with-trailing-buttons layout** (recovery_history
+  et al. — deferred here from Phase 2; row can't fit at max -> stack/wrap).
+- [ ] **Slice D — alphabet bar** (hide on phone tier / scale on tablet tier) **+
+  password-breakdown sheet.**
 
 ---
 
