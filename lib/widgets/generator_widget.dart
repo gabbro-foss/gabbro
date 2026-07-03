@@ -19,79 +19,81 @@ String _defaultGeneratePassword(PasswordConfig config) =>
 Future<String> _defaultGeneratePassphrase(PassphraseConfig config) =>
     generatePassphrase(config: config);
 
-Future<double> _defaultPassphraseEntropyBits(int wordCount, Language language) =>
-    passphraseEntropyBits(wordCount: wordCount, language: language);
+Future<double> _defaultPassphraseEntropyBits(
+  int wordCount,
+  Language language,
+) => passphraseEntropyBits(wordCount: wordCount, language: language);
 
 double _defaultEntropyBits(int poolSize, int length) =>
     entropyBits(poolSize: poolSize, length: length);
 
 String _languageLabel(Language lang, AppLocalizations l) => switch (lang) {
-      Language.english => l.langEnglish,
-      Language.french => l.langFrench,
-      Language.german => l.langGerman,
-      Language.spanish => l.langSpanish,
-      Language.italian => l.langItalian,
-      Language.swedish => l.langSwedish,
-      Language.danish => l.langDanish,
-      Language.norwegian => l.langNorwegianBokmal,
-      Language.finnish => l.langFinnish,
-      Language.slovenian => l.langSlovenian,
-      Language.polish => l.langPolish,
-      Language.russian => l.langRussian,
-      Language.hungarian => l.langHungarian,
-      Language.czech => l.langCzech,
-      Language.greek => l.langGreek,
-      Language.portuguese => l.langPortuguesePt,
-      Language.estonian => l.langEstonian,
-      Language.slovak => l.langSlovak,
-      Language.bulgarian => l.langBulgarian,
-      Language.ukrainian => l.langUkrainian,
-      Language.japanese => l.langJapanese,
-      Language.korean => l.langKorean,
-      Language.chineseSimplified => l.langChineseSimplified,
-      Language.chineseTraditional => l.langChineseTraditional,
-      Language.dutch => l.langDutch,
-      Language.croatian => l.langCroatian,
-      Language.lithuanian => l.langLithuanian,
-      Language.latvian => l.langLatvian,
-      Language.kazakh => l.langKazakh,
-    };
+  Language.english => l.langEnglish,
+  Language.french => l.langFrench,
+  Language.german => l.langGerman,
+  Language.spanish => l.langSpanish,
+  Language.italian => l.langItalian,
+  Language.swedish => l.langSwedish,
+  Language.danish => l.langDanish,
+  Language.norwegian => l.langNorwegianBokmal,
+  Language.finnish => l.langFinnish,
+  Language.slovenian => l.langSlovenian,
+  Language.polish => l.langPolish,
+  Language.russian => l.langRussian,
+  Language.hungarian => l.langHungarian,
+  Language.czech => l.langCzech,
+  Language.greek => l.langGreek,
+  Language.portuguese => l.langPortuguesePt,
+  Language.estonian => l.langEstonian,
+  Language.slovak => l.langSlovak,
+  Language.bulgarian => l.langBulgarian,
+  Language.ukrainian => l.langUkrainian,
+  Language.japanese => l.langJapanese,
+  Language.korean => l.langKorean,
+  Language.chineseSimplified => l.langChineseSimplified,
+  Language.chineseTraditional => l.langChineseTraditional,
+  Language.dutch => l.langDutch,
+  Language.croatian => l.langCroatian,
+  Language.lithuanian => l.langLithuanian,
+  Language.latvian => l.langLatvian,
+  Language.kazakh => l.langKazakh,
+};
 
 /// Maps a [LanguageChoice] (app UI locale) to a [Language] (passphrase wordlist
 /// / character pool). Returns null when no wordlist exists for that language.
 /// For [LanguageChoice.system] the caller should resolve via the device locale.
 Language? _languageChoiceToLanguage(LanguageChoice choice) => switch (choice) {
-      LanguageChoice.en => Language.english,
-      LanguageChoice.fr => Language.french,
-      LanguageChoice.de => Language.german,
-      LanguageChoice.es => Language.spanish,
-      LanguageChoice.it => Language.italian,
-      LanguageChoice.sv => Language.swedish,
-      LanguageChoice.da => Language.danish,
-      LanguageChoice.nb || LanguageChoice.nn => Language.norwegian,
-      LanguageChoice.fi => Language.finnish,
-      LanguageChoice.sl => Language.slovenian,
-      LanguageChoice.pl => Language.polish,
-      LanguageChoice.ru => Language.russian,
-      LanguageChoice.hu => Language.hungarian,
-      LanguageChoice.cs => Language.czech,
-      LanguageChoice.el => Language.greek,
-      LanguageChoice.ptPt || LanguageChoice.ptBr => Language.portuguese,
-      LanguageChoice.et => Language.estonian,
-      LanguageChoice.sk => Language.slovak,
-      LanguageChoice.bg => Language.bulgarian,
-      LanguageChoice.uk => Language.ukrainian,
-      LanguageChoice.ja => Language.japanese,
-      LanguageChoice.ko => Language.korean,
-      LanguageChoice.zhCn => Language.chineseSimplified,
-      LanguageChoice.zhTw => Language.chineseTraditional,
-      LanguageChoice.hr => Language.croatian,
-      LanguageChoice.lt => Language.lithuanian,
-      LanguageChoice.lv => Language.latvian,
-      LanguageChoice.kk => Language.kazakh,
-      LanguageChoice.nl => Language.dutch,
-      _ => null, // no wordlist for this LanguageChoice
-    };
+  LanguageChoice.en => Language.english,
+  LanguageChoice.fr => Language.french,
+  LanguageChoice.de => Language.german,
+  LanguageChoice.es => Language.spanish,
+  LanguageChoice.it => Language.italian,
+  LanguageChoice.sv => Language.swedish,
+  LanguageChoice.da => Language.danish,
+  LanguageChoice.nb || LanguageChoice.nn => Language.norwegian,
+  LanguageChoice.fi => Language.finnish,
+  LanguageChoice.sl => Language.slovenian,
+  LanguageChoice.pl => Language.polish,
+  LanguageChoice.ru => Language.russian,
+  LanguageChoice.hu => Language.hungarian,
+  LanguageChoice.cs => Language.czech,
+  LanguageChoice.el => Language.greek,
+  LanguageChoice.ptPt || LanguageChoice.ptBr => Language.portuguese,
+  LanguageChoice.et => Language.estonian,
+  LanguageChoice.sk => Language.slovak,
+  LanguageChoice.bg => Language.bulgarian,
+  LanguageChoice.uk => Language.ukrainian,
+  LanguageChoice.ja => Language.japanese,
+  LanguageChoice.ko => Language.korean,
+  LanguageChoice.zhCn => Language.chineseSimplified,
+  LanguageChoice.zhTw => Language.chineseTraditional,
+  LanguageChoice.hr => Language.croatian,
+  LanguageChoice.lt => Language.lithuanian,
+  LanguageChoice.lv => Language.latvian,
+  LanguageChoice.kk => Language.kazakh,
+  LanguageChoice.nl => Language.dutch,
+  _ => null, // no wordlist for this LanguageChoice
+};
 
 /// Returns false for languages that have a classic character pool but no
 /// passphrase wordlist — the generator shows a "no wordlist" info message.
@@ -166,7 +168,7 @@ class GeneratorWidget extends StatefulWidget {
   final String Function(PasswordConfig config) generatePasswordFn;
   final Future<String> Function(PassphraseConfig config) generatePassphraseFn;
   final Future<double> Function(int wordCount, Language language)
-      passphraseEntropyBitsFn;
+  passphraseEntropyBitsFn;
   final double Function(int poolSize, int length) entropyBitsFn;
 
   const GeneratorWidget({
@@ -230,7 +232,8 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
       resolved = _languageChoiceToLanguage(choice);
     }
     final newLanguage = resolved ?? Language.english;
-    final newFallback = resolved == null || !_hasPassphraseWordlist(newLanguage);
+    final newFallback =
+        resolved == null || !_hasPassphraseWordlist(newLanguage);
     if (newLanguage != _language || newFallback != _showLangFallback) {
       setState(() {
         _language = newLanguage;
@@ -280,8 +283,9 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
   Future<void> _generatePassphrase() async {
     // Fall back to English wordlist for languages that have a classic pool but
     // no passphrase wordlist (CJK). The message already tells the user this.
-    final passphraseLanguage =
-        _hasPassphraseWordlist(_language) ? _language : Language.english;
+    final passphraseLanguage = _hasPassphraseWordlist(_language)
+        ? _language
+        : Language.english;
     final config = PassphraseConfig(
       wordCount: _wordCount.round(),
       separator: _separator,
@@ -405,8 +409,8 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
                   ? l.entropyBitsDisplay(_entropyBits.toStringAsFixed(1))
                   : l.selectAtLeastOneCharSet,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
           const SizedBox(height: 20),
@@ -422,24 +426,38 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
                 key: const Key('language_selector'),
                 value: _language,
                 isExpanded: true,
-                itemHeight: null, // menu items grow to wrapped height at large text
+                itemHeight:
+                    null, // menu items grow to wrapped height at large text
                 // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
-                selectedItemBuilder: (context) => (Language.values.toList()
-                      ..sort((a, b) =>
-                          _languageLabel(a, l).compareTo(_languageLabel(b, l))))
-                    .map((lang) => Text(_languageLabel(lang, l),
-                        maxLines: 1, overflow: TextOverflow.ellipsis))
-                    .toList(),
-                items: (Language.values.toList()
-                      ..sort((a, b) =>
-                          _languageLabel(a, l).compareTo(_languageLabel(b, l))))
-                    .map(
-                      (lang) => DropdownMenuItem<Language>(
-                        value: lang,
-                        child: Text(_languageLabel(lang, l)),
-                      ),
-                    )
-                    .toList(),
+                selectedItemBuilder: (context) =>
+                    (Language.values.toList()..sort(
+                          (a, b) => _languageLabel(
+                            a,
+                            l,
+                          ).compareTo(_languageLabel(b, l)),
+                        ))
+                        .map(
+                          (lang) => Text(
+                            _languageLabel(lang, l),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        )
+                        .toList(),
+                items:
+                    (Language.values.toList()..sort(
+                          (a, b) => _languageLabel(
+                            a,
+                            l,
+                          ).compareTo(_languageLabel(b, l)),
+                        ))
+                        .map(
+                          (lang) => DropdownMenuItem<Language>(
+                            value: lang,
+                            child: Text(_languageLabel(lang, l)),
+                          ),
+                        )
+                        .toList(),
                 onChanged: (lang) {
                   if (lang == null) return;
                   setState(() {
@@ -456,8 +474,8 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
             Text(
               l.passphraseNoWordlist,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
           const SizedBox(height: 20),
@@ -475,8 +493,8 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
               child: Text(
                 l.passwordMinLengthNote,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
 
@@ -505,9 +523,9 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
   }
 
   void _showBreakdown() => showModalBottomSheet<void>(
-        context: context,
-        builder: (_) => PasswordBreakdownSheet(password: _generated),
-      );
+    context: context,
+    builder: (_) => PasswordBreakdownSheet(password: _generated),
+  );
 
   Widget _buildValueCard(ColorScheme colorScheme, AppLocalizations l) {
     return Container(
@@ -520,22 +538,24 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
         children: [
           Expanded(
             child: GestureDetector(
-              onLongPress:
-                  (_obscured || _generated.isEmpty) ? null : _showBreakdown,
+              onLongPress: (_obscured || _generated.isEmpty)
+                  ? null
+                  : _showBreakdown,
               child: Text(
                 key: const Key('generated_value'),
                 _generated.isEmpty
                     ? '—'
                     : (_obscured
-                        ? '•' * _generated.length.clamp(0, 32)
-                        : _generated),
+                          ? '•' * _generated.length.clamp(0, 32)
+                          : _generated),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontFamily: 'monospace',
-                      letterSpacing: _obscured ? 2 : 0.5,
-                    ),
+                  fontFamily: 'monospace',
+                  letterSpacing: _obscured ? 2 : 0.5,
+                ),
                 maxLines: _obscured ? 1 : null,
-                overflow:
-                    _obscured ? TextOverflow.ellipsis : TextOverflow.visible,
+                overflow: _obscured
+                    ? TextOverflow.ellipsis
+                    : TextOverflow.visible,
               ),
             ),
           ),
@@ -569,141 +589,141 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
   // ── Classic controls ──────────────────────────────────────────────────────
 
   List<Widget> _classicControls(AppLocalizations l) => [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(l.lengthLabel),
-            Text('${_length.round()}'),
-          ],
-        ),
-        Slider(
-          key: const Key('length_slider'),
-          value: _length,
-          min: 12,
-          max: 256,
-          divisions: 244,
-          label: _length.round().toString(),
+    Row(
+      children: [
+        Expanded(child: Text(l.lengthLabel, overflow: TextOverflow.ellipsis)),
+        const SizedBox(width: 8),
+        Text('${_length.round()}'),
+      ],
+    ),
+    Slider(
+      key: const Key('length_slider'),
+      value: _length,
+      min: 12,
+      max: 256,
+      divisions: 244,
+      label: _length.round().toString(),
+      onChanged: (v) {
+        setState(() => _length = v);
+        _generateClassic();
+      },
+    ),
+    const SizedBox(height: 8),
+    SectionHeader(label: l.charSetsHeader),
+    const SizedBox(height: 8),
+    Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        _toggleChip(
+          key: const Key('toggle_uppercase'),
+          label: 'A–Z',
+          value: _useUppercase,
           onChanged: (v) {
-            setState(() => _length = v);
+            setState(() => _useUppercase = v);
             _generateClassic();
           },
         ),
-        const SizedBox(height: 8),
-        SectionHeader(label: l.charSetsHeader),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            _toggleChip(
-              key: const Key('toggle_uppercase'),
-              label: 'A–Z',
-              value: _useUppercase,
-              onChanged: (v) {
-                setState(() => _useUppercase = v);
-                _generateClassic();
-              },
-            ),
-            _toggleChip(
-              key: const Key('toggle_lowercase'),
-              label: 'a–z',
-              value: _useLowercase,
-              onChanged: (v) {
-                setState(() => _useLowercase = v);
-                _generateClassic();
-              },
-            ),
-            _toggleChip(
-              key: const Key('toggle_digits'),
-              label: '0–9',
-              value: _useDigits,
-              onChanged: (v) {
-                setState(() => _useDigits = v);
-                _generateClassic();
-              },
-            ),
-            _toggleChip(
-              key: const Key('toggle_symbols'),
-              label: '!@#…',
-              value: _useSymbols,
-              onChanged: (v) {
-                setState(() => _useSymbols = v);
-                _generateClassic();
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        _switchRow(
-          key: const Key('toggle_exclude_ambiguous'),
-          label: l.excludeAmbiguousChars,
-          value: _excludeAmbiguous,
+        _toggleChip(
+          key: const Key('toggle_lowercase'),
+          label: 'a–z',
+          value: _useLowercase,
           onChanged: (v) {
-            setState(() => _excludeAmbiguous = v);
+            setState(() => _useLowercase = v);
             _generateClassic();
           },
         ),
-      ];
+        _toggleChip(
+          key: const Key('toggle_digits'),
+          label: '0–9',
+          value: _useDigits,
+          onChanged: (v) {
+            setState(() => _useDigits = v);
+            _generateClassic();
+          },
+        ),
+        _toggleChip(
+          key: const Key('toggle_symbols'),
+          label: '!@#…',
+          value: _useSymbols,
+          onChanged: (v) {
+            setState(() => _useSymbols = v);
+            _generateClassic();
+          },
+        ),
+      ],
+    ),
+    const SizedBox(height: 12),
+    _switchRow(
+      key: const Key('toggle_exclude_ambiguous'),
+      label: l.excludeAmbiguousChars,
+      value: _excludeAmbiguous,
+      onChanged: (v) {
+        setState(() => _excludeAmbiguous = v);
+        _generateClassic();
+      },
+    ),
+  ];
 
   // ── Passphrase controls ───────────────────────────────────────────────────
 
   List<Widget> _passphraseControls(AppLocalizations l) => [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(l.wordsLabel),
-            Text('${_wordCount.round()}'),
-          ],
-        ),
-        Slider(
-          key: const Key('word_count_slider'),
-          value: _wordCount,
-          min: 4,
-          max: 20,
-          divisions: 16,
-          label: _wordCount.round().toString(),
-          onChanged: (v) {
-            setState(() => _wordCount = v);
-            _generatePassphrase();
-          },
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          initialValue: _separator,
-          decoration: InputDecoration(
-            labelText: l.separatorLabel,
-            border: const OutlineInputBorder(),
-          ),
-          maxLength: 3,
-          onChanged: (v) {
-            setState(() => _separator = v);
-            _generatePassphrase();
-          },
-        ),
-        const SizedBox(height: 8),
-        _switchRow(
-          key: const Key('toggle_capitalise'),
-          // Caseless CJK scripts have no capitalisation: show off + disabled,
-          // regardless of the stored preference.
-          label: l.capitaliseWords,
-          value: _isCjkLanguage(_language) ? false : _capitalise,
-          onChanged: _isCjkLanguage(_language)
-              ? null
-              : (v) {
-                  setState(() => _capitalise = v);
-                  _generatePassphrase();
-                },
-        ),
-        _switchRow(
-          key: const Key('toggle_append_number'),
-          label: l.appendDigit,
-          value: _appendNumber,
-          onChanged: (v) {
-            setState(() => _appendNumber = v);
-            _generatePassphrase();
-          },
-        ),
-      ];
+    Row(
+      children: [
+        Expanded(child: Text(l.wordsLabel, overflow: TextOverflow.ellipsis)),
+        const SizedBox(width: 8),
+        Text('${_wordCount.round()}'),
+      ],
+    ),
+    Slider(
+      key: const Key('word_count_slider'),
+      value: _wordCount,
+      min: 4,
+      max: 20,
+      divisions: 16,
+      label: _wordCount.round().toString(),
+      onChanged: (v) {
+        setState(() => _wordCount = v);
+        _generatePassphrase();
+      },
+    ),
+    const SizedBox(height: 8),
+    TextFormField(
+      initialValue: _separator,
+      decoration: InputDecoration(
+        labelText: l.separatorLabel,
+        border: const OutlineInputBorder(),
+      ),
+      maxLength: 3,
+      onChanged: (v) {
+        setState(() => _separator = v);
+        _generatePassphrase();
+      },
+    ),
+    const SizedBox(height: 8),
+    _switchRow(
+      key: const Key('toggle_capitalise'),
+      // Caseless CJK scripts have no capitalisation: show off + disabled,
+      // regardless of the stored preference.
+      label: l.capitaliseWords,
+      value: _isCjkLanguage(_language) ? false : _capitalise,
+      onChanged: _isCjkLanguage(_language)
+          ? null
+          : (v) {
+              setState(() => _capitalise = v);
+              _generatePassphrase();
+            },
+    ),
+    _switchRow(
+      key: const Key('toggle_append_number'),
+      label: l.appendDigit,
+      value: _appendNumber,
+      onChanged: (v) {
+        setState(() => _appendNumber = v);
+        _generatePassphrase();
+      },
+    ),
+  ];
 
   // ── Shared helpers ────────────────────────────────────────────────────────
 
@@ -720,8 +740,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
         backgroundColor: value
             ? colorScheme.primary
             : colorScheme.surfaceContainerHighest,
-        foregroundColor:
-            value ? colorScheme.onPrimary : colorScheme.onSurface,
+        foregroundColor: value ? colorScheme.onPrimary : colorScheme.onSurface,
       ),
       onPressed: () => onChanged(!value),
       child: Text(label),

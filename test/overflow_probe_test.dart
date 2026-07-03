@@ -6,9 +6,14 @@ import 'package:gabbro/settings.dart';
 import 'package:gabbro/vault_registry.dart';
 import 'package:gabbro/screens/about_screen.dart';
 import 'package:gabbro/screens/appearance_screen.dart';
+import 'package:gabbro/screens/change_passphrase_screen.dart';
 import 'package:gabbro/screens/create_entry_screen.dart';
+import 'package:gabbro/screens/export_screen.dart';
+import 'package:gabbro/screens/generator_screen.dart';
 import 'package:gabbro/screens/help_screen.dart';
+import 'package:gabbro/screens/language_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
+import 'package:gabbro/screens/security_screen.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 
 // ADR-016 Phase 2 headless overflow probe. Renders each screen at the device's
@@ -48,6 +53,13 @@ final Map<String, Widget Function()> _screens = {
   'about': () => const AboutScreen(),
   'help': () => const HelpScreen(),
   'appearance': () => const AppearanceScreen(),
+  'language': () => const LanguageScreen(),
+  'generator': () => const GeneratorScreen(),
+  'export': () => ExportScreen(isAndroid: false),
+  'change_passphrase': () =>
+      const ChangePassphraseScreen(vaultPath: '/tmp/probe.gabbro'),
+  'security': () =>
+      SecurityScreen(settings: const AppSettings(), onUpdate: (_) {}, isAndroid: false),
   'create_entry (card)': () => CreateEntryScreen(
         entryType: 'card',
         listFolders: () =>
