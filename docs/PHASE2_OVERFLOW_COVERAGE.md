@@ -21,7 +21,7 @@ Status: `todo` / `in-probe` (added, passing) / `fixed` (had a defect, fixed+veri
 | change_passphrase_screen | todo | | |
 | create_entry_screen | in-probe (pass) | **fixed** all dropdowns (folder + card-status + `_dropdownField`/payment-network): `isExpanded:true` + `itemHeight:null` + `selectedItemBuilder` ellipsis | pending |
 | vault_list_screen (phone) | todo (probe) | **folder-filter dropdown FIXED** (the actual maintainer report): `selectedItemBuilder` ellipsis on BOTH phone (~1629) + tablet (~1548) paths, else the one-line selection hard-clips at 4x | **re-verify** |
-| csv_mapping_screen | todo | **fixed `width:88` cell — silent clip** | |
+| csv_mapping_screen | **fixed** | mapping rows stack label-above-dropdown at >1.5x (was illegible `width:88`); dropdown gets 3-part fix; preview DataTable row-height cap removed (`dataRowMaxHeight: infinity`) | pending |
 | entry_detail_screen | todo | AppBar action crowding | |
 | export_screen | todo | | |
 | generator_screen | todo | embeds generator_widget | |
@@ -76,7 +76,8 @@ ongoing — confirmed/suspected below:
   DONE: vault_list (both paths), create_entry (all), unlock_screen, manage_folders_screen,
   generator_widget. **TODO:** csv_mapping_screen dropdown (deferred to its own pass with the
   `width:88` label fix below).
-- csv_mapping_screen `width:88` cell.
+- ~~csv_mapping_screen `width:88` cell~~ DONE (stack label-above-dropdown at large text;
+  also removed the preview DataTable fixed row height).
 - ~~import_skipped_dialog `height:300`~~ DONE (scrollable:true + shrinkWrap NeverScrollable
   ListView — the pattern for a list inside a dialog: outer scroll owns it, list doesn't
   self-scroll).
