@@ -50,49 +50,61 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
             title: Text(l.deleteFolderTitle),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l.deleteFolderConfirm(folder)),
-                if (hasOthers) ...[
-                  const SizedBox(height: 16),
-                  CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l.reassignEntriesTo),
-                    value: reassignTarget != null,
-                    onChanged: (v) => setState(() {
-                      reassignTarget = v == true ? otherFolders.first : null;
-                      if (v == true) clearToNone = false;
-                    }),
-                  ),
-                  if (reassignTarget != null)
-                    DropdownButton<String>(
-                      isExpanded: true,
-                      itemHeight: null, // menu items grow to wrapped height at large text
-                      value: reassignTarget,
-                      // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
-                      selectedItemBuilder: (context) => otherFolders
-                          .map((f) => Text(f,
-                              maxLines: 1, overflow: TextOverflow.ellipsis))
-                          .toList(),
-                      items: otherFolders
-                          .map((f) => DropdownMenuItem(value: f, child: Text(f)))
-                          .toList(),
-                      onChanged: (v) => setState(() => reassignTarget = v),
+            // Scroll the content so tall text (large font) stays reachable and
+            // doesn't bleed over the action buttons (ADR-016).
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l.deleteFolderConfirm(folder)),
+                  if (hasOthers) ...[
+                    const SizedBox(height: 16),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(l.reassignEntriesTo),
+                      value: reassignTarget != null,
+                      onChanged: (v) => setState(() {
+                        reassignTarget = v == true ? otherFolders.first : null;
+                        if (v == true) clearToNone = false;
+                      }),
                     ),
-                  const SizedBox(height: 8),
-                  CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(l.clearToNone),
-                    value: clearToNone,
-                    onChanged: (v) => setState(() {
-                      clearToNone = v == true;
-                      if (v == true) reassignTarget = null;
-                    }),
-                  ),
+                    if (reassignTarget != null)
+                      DropdownButton<String>(
+                        isExpanded: true,
+                        itemHeight:
+                            null, // menu items grow to wrapped height at large text
+                        value: reassignTarget,
+                        // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
+                        selectedItemBuilder: (context) => otherFolders
+                            .map(
+                              (f) => Text(
+                                f,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            )
+                            .toList(),
+                        items: otherFolders
+                            .map(
+                              (f) => DropdownMenuItem(value: f, child: Text(f)),
+                            )
+                            .toList(),
+                        onChanged: (v) => setState(() => reassignTarget = v),
+                      ),
+                    const SizedBox(height: 8),
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(l.clearToNone),
+                      value: clearToNone,
+                      onChanged: (v) => setState(() {
+                        clearToNone = v == true;
+                        if (v == true) reassignTarget = null;
+                      }),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
             actions: [
               TextButton(
@@ -227,41 +239,43 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   child: Text(
                     l.manageFoldersDefaultNote,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
                 Expanded(
                   child: ListView.builder(
-              itemCount: _folders.length,
-              itemBuilder: (context, index) {
-                final folder = _folders[index];
-                return ListTile(
-                  leading: const Icon(Icons.folder_outlined),
-                  title: Text(folder),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined),
-                        tooltip: l.rename,
-                        onPressed: () => _showRenameDialog(folder),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        tooltip: l.delete,
-                        onPressed: () => _showDeleteDialog(folder),
-                      ),
-                    ],
+                    itemCount: _folders.length,
+                    itemBuilder: (context, index) {
+                      final folder = _folders[index];
+                      return ListTile(
+                        leading: const Icon(Icons.folder_outlined),
+                        title: Text(folder),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit_outlined),
+                              tooltip: l.rename,
+                              onPressed: () => _showRenameDialog(folder),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              tooltip: l.delete,
+                              onPressed: () => _showDeleteDialog(folder),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
                 ),
               ],
             ),
