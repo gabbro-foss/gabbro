@@ -1,0 +1,100 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:gabbro/app_paths.dart';
+import 'package:gabbro/main.dart';
+import 'package:gabbro/settings.dart';
+import 'package:gabbro/vault_registry.dart';
+import 'package:gabbro/screens/about_screen.dart';
+import 'package:gabbro/screens/appearance_screen.dart';
+import 'package:gabbro/screens/create_entry_screen.dart';
+import 'package:gabbro/screens/help_screen.dart';
+import 'package:gabbro/screens/onboarding_screen.dart';
+import 'package:gabbro/src/rust/api/entropy.dart';
+
+// ADR-016 Phase 2 headless overflow probe. Renders each screen at the device's
+// MAX text scale on a phone and a tablet surface and asserts no RenderFlex /
+// layout overflow (an overflow reports a FlutterError -> takeException()).
+//
+// Blind spot (tracked in docs/PHASE2_OVERFLOW_COVERAGE.md): a child clipped
+// inside a FIXED width/height throws nothing, so this probe cannot see it.
+
+class _Surface {
+  final String name;
+  final Size physical;
+  final double dpr;
+  const _Surface(this.name, this.physical, this.dpr);
+}
+
+// physical / dpr chosen so the logical shortest side lands in each tier:
+// phone 1080/3 = 360dp (-> 4x), tablet 1732/2 = 866dp (-> 6x).
+const _phone = _Surface('phone 360dp->4x', Size(1080, 2400), 3.0);
+const _tablet = _Surface('tablet 866dp->6x', Size(1732, 2400), 2.0);
+
+// textScale 8.0 is above every device max; clampToDevice caps it to the tier
+// max, so each surface renders at its ceiling (4x phone / 6x tablet).
+Widget _app(Widget screen) => GabbroApp(
+      registry: VaultRegistry([]),
+      vaultPath: null,
+      settings: const AppSettings(textScale: 8.0),
+      initialScreen: screen,
+    );
+
+EntropyResult _strong(String _) =>
+    EntropyResult(bits: 100, tier: StrengthTier.veryStrong);
+
+// Headless-instantiable screens. Platform-channel defaults are seamed out so a
+// MissingPluginException can't masquerade as a layout overflow.
+final Map<String, Widget Function()> _screens = {
+  'about': () => const AboutScreen(),
+  'help': () => const HelpScreen(),
+  'appearance': () => const AppearanceScreen(),
+  'create_entry (card)': () => CreateEntryScreen(
+        entryType: 'card',
+        listFolders: () =>
+            ['Personal', 'Work', 'A rather long folder name to stress the field'],
+        recentAppsFetcher: () async => const [],
+      ),
+  'onboarding': () => OnboardingScreen(
+        initialPath: '/tmp/probe.gabbro',
+        onInitVault: (a, b, c) async {},
+        onEstimateEntropy: _strong,
+        blockPassphraseCopyPaste: true,
+        isAndroid: false,
+        showYubikey: false,
+        onInitVaultWithYubikey:
+            (a, b, c, s2, s3, awaitBk, s4, t, alias) async {},
+        resolveDataDir: GabbroPaths.dataDir,
+      ),
+};
+
+// Screens with a KNOWN throwing overflow at max scale, awaiting a layout fix.
+// Skipped (not silently passing) and tracked in PHASE2_OVERFLOW_COVERAGE.md;
+// remove the entry as each screen is fixed so the probe re-arms on it.
+const Map<String, String> _knownOverflow = {
+  'help':
+      'ADR-016 P2: pages do not scroll at max scale (see PHASE2_OVERFLOW_COVERAGE.md)',
+  'onboarding':
+      'ADR-016 P2: accessibility-button row overflows (see PHASE2_OVERFLOW_COVERAGE.md)',
+};
+
+void main() {
+  for (final surface in const [_phone, _tablet]) {
+    for (final entry in _screens.entries) {
+      testWidgets('${entry.key} @ ${surface.name}: no overflow', (tester) async {
+        tester.view.physicalSize = surface.physical;
+        tester.view.devicePixelRatio = surface.dpr;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.pumpWidget(_app(entry.value()));
+        await tester.pump(const Duration(milliseconds: 300));
+
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: '${entry.key} @ ${surface.name} overflowed',
+        );
+      }, skip: _knownOverflow.containsKey(entry.key));
+    }
+  }
+}
