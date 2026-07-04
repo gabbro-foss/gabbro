@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.11] – 2026-07-04
+
 ### Added
 - **Large-text accessibility — continuous text-size slider (phase 1).** An absolute text scale capped to your screen (up to 2x on phones, 3x on tablets) set by a zoom-glyph-bracketed slider with live preview, replacing the five fixed sizes. Onboarding's accessibility button reveals the slider inline (hiding the logo for room) and jumps to a strong scale. Old saved text sizes migrate automatically.
 - **Help screens can be pinch-zoomed.** Tap any help screenshot to open it full-screen and pinch to zoom / drag to pan — the images are pictures that the text-size setting can't enlarge, and screenshots are blocked in-app, so this is the way to read small detail.
