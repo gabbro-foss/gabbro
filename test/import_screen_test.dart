@@ -173,6 +173,33 @@ void main() {
       expect(find.textContaining('protected by a YubiKey'), findsOneWidget);
     });
 
+    // ADR-016 reveal-eye: the vault-passphrase + YubiKey-PIN eyes scale (capped)
+    // at large text and the screen does not overflow.
+    testWidgets('key-protected source eyes scale (capped) at large text',
+        (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      final tmp = tempGabbroFile();
+      await tester.pumpWidget(testApp(ImportScreen(
+        isAndroid: false,
+        initialGabbroPath: tmp.path,
+        onDetectSourceRecords: (_) => [fakeRecord()],
+      )));
+      await tester.pumpAndSettle();
+
+      expect(revealEyeButtons(), findsNWidgets(2));
+      for (final eye in tester.widgetList<IconButton>(revealEyeButtons())) {
+        expect(eye.iconSize, isNotNull);
+        expect(eye.iconSize, greaterThan(24));
+        expect(eye.iconSize, lessThanOrEqualTo(24 * 1.4));
+      }
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('transport selector follows NFC capability (Android, key-protected)',
         (tester) async {
       final tmp = tempGabbroFile();

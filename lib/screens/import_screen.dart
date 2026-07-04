@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/csv_mapping_screen.dart';
@@ -584,6 +585,7 @@ class _ImportScreenState extends State<ImportScreen> {
             labelText: l.vaultPassphraseLabel,
             border: const OutlineInputBorder(),
             suffixIcon: IconButton(
+              iconSize: scaledSuffixIconSize(context),
               icon: Icon(
                 _showPassphrase ? Icons.visibility_off : Icons.visibility,
               ),
@@ -619,6 +621,7 @@ class _ImportScreenState extends State<ImportScreen> {
               labelText: l.yubiKeyPinLabel,
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
+                iconSize: scaledSuffixIconSize(context),
                 icon: Icon(
                   _yubikeyPinObscured ? Icons.visibility : Icons.visibility_off,
                 ),

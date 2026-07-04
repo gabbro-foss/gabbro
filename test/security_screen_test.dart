@@ -252,6 +252,36 @@ void main() {
       expect(updated, isNull);
     });
 
+    // ADR-016 reveal-eye: the enroll passphrase dialog eye scales (capped) at
+    // large text and the dialog does not overflow.
+    testWidgets('enroll passphrase dialog eye scales (capped) at large text',
+        (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen(
+        isAndroid: true,
+        onBiometricAvailable: () async => true,
+      ));
+      await tester.scrollUntilVisible(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'), 300);
+      await tester.tap(
+        find.widgetWithText(SwitchListTile, 'Enable biometric unlock'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+
+      expect(revealEyeButtons(), findsNWidgets(1));
+      final eye = tester.widget<IconButton>(revealEyeButtons().first);
+      expect(eye.iconSize, isNotNull);
+      expect(eye.iconSize, greaterThan(24));
+      expect(eye.iconSize, lessThanOrEqualTo(24 * 1.4));
+      expect(tester.takeException(), isNull);
+    });
+
     // Net-first: pin the passphrase eye toggle in the enroll passphrase dialog
     // (switch on -> Continue -> passphrase prompt) so the later a11y label work
     // cannot regress the flip. Field starts obscured (Icons.visibility_off).

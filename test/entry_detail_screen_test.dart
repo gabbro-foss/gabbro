@@ -738,6 +738,20 @@ void main() {
     });
   });
 
+  // ADR-016 reveal-eye: the show/hide password toggle (an action-row button,
+  // base 18) grows with the text scale — full control-scale, not the suffix cap.
+  testWidgets('reveal-eye toggle scales up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_buildScreen(VaultEntryData.login(_loginEntry())));
+    await tester.pumpAndSettle();
+
+    final eye = tester.widget<IconButton>(revealEyeButtons().first);
+    expect(eye.iconSize, isNotNull);
+    expect(eye.iconSize, greaterThan(18));
+    expect(tester.takeException(), isNull);
+  });
+
   // ADR-016 accessibility follow-up: the History tile's trailing chevron grows
   // with the text scale (free ListTile, full control-scale, no strip cap).
   testWidgets('history-tile chevron scales up at large text', (tester) async {

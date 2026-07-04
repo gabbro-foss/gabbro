@@ -1191,6 +1191,35 @@ void main() {
     // Net-first: pin the PIN eye toggle (key-protected mode adds a second eye
     // below the passphrase eye). Both start showing Icons.visibility; tapping
     // the PIN one (last) flips it to visibility_off, leaving the passphrase eye.
+    // ADR-016 reveal-eye: the sync dialog's passphrase + PIN eyes scale
+    // (capped) at large text and the dialog does not overflow.
+    testWidgets('sync dialog eyes scale (capped) at large text', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(
+        buildKeyProtectedScreen(
+          mergeVaultWithKey: (_, _, _, _) async => _summary(added: 1),
+        ),
+      );
+      await _openMenu(tester);
+      await tester.tap(find.text('Sync from file'));
+      await tester.pumpAndSettle();
+
+      expect(revealEyeButtons(), findsNWidgets(2));
+      for (final eye in tester.widgetList<IconButton>(revealEyeButtons())) {
+        expect(eye.iconSize, isNotNull);
+        expect(eye.iconSize, greaterThan(24));
+        expect(eye.iconSize, lessThanOrEqualTo(24 * 1.4));
+      }
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('PIN eye toggle flips independently of the passphrase eye', (
       tester,
     ) async {

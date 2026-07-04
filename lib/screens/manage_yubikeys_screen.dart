@@ -584,6 +584,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
               decoration: InputDecoration(
                 labelText: l.pinLabel,
                 suffixIcon: IconButton(
+                  iconSize: scaledSuffixIconSize(context),
                   icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
                   tooltip: obscure ? l.tooltipShowPin : l.tooltipHidePin,
                   onPressed: () => setLocal(() => obscure = !obscure),
@@ -659,6 +660,7 @@ class _ManageYubiKeysScreenState extends State<ManageYubiKeysScreen> {
                   decoration: InputDecoration(
                     labelText: l.pinLabel,
                     suffixIcon: IconButton(
+                      iconSize: scaledSuffixIconSize(context),
                       icon: Icon(
                         obscure ? Icons.visibility_off : Icons.visibility,
                       ),

@@ -1999,6 +1999,7 @@ class SyncPassphraseDialogState extends State<SyncPassphraseDialog> {
               labelText: l.vaultPassphraseLabel,
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
+                iconSize: scaledSuffixIconSize(context),
                 icon: Icon(_showPass ? Icons.visibility_off : Icons.visibility),
                 tooltip: _showPass ? l.tooltipHide : l.tooltipShow,
                 onPressed: () => setState(() => _showPass = !_showPass),
@@ -2052,6 +2053,7 @@ class SyncPassphraseDialogState extends State<SyncPassphraseDialog> {
                 labelText: l.yubiKeyPinLabel,
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
+                  iconSize: scaledSuffixIconSize(context),
                   icon: Icon(
                     _pinObscured ? Icons.visibility : Icons.visibility_off,
                   ),

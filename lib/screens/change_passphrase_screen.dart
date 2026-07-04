@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
@@ -356,6 +357,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                         labelText: l.yubiKeyPinLabel,
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
+                          iconSize: scaledSuffixIconSize(context),
                           icon: Icon(
                             _pinObscured
                                 ? Icons.visibility_off
@@ -399,6 +401,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                       labelText: l.currentPassphraseLabel,
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
+                        iconSize: scaledSuffixIconSize(context),
                         icon: Icon(
                           _oldObscured
                               ? Icons.visibility_off
@@ -425,6 +428,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                       labelText: l.newPassphraseLabel,
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
+                        iconSize: scaledSuffixIconSize(context),
                         icon: Icon(
                           _newObscured
                               ? Icons.visibility_off
@@ -497,6 +501,7 @@ class _ChangePassphraseScreenState extends State<ChangePassphraseScreen> {
                       labelText: l.confirmPassphraseLabel,
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
+                        iconSize: scaledSuffixIconSize(context),
                         icon: Icon(
                           _confirmObscured
                               ? Icons.visibility_off

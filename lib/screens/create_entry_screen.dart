@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/safe_file_picker.dart';
@@ -1062,6 +1063,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: l.fieldPassword,
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
+          iconSize: scaledSuffixIconSize(context),
           icon: Icon(
             _passwordObscured ? Icons.visibility_off : Icons.visibility,
           ),
@@ -1416,6 +1418,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               labelText: l.fieldCvv,
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
+                iconSize: scaledSuffixIconSize(context),
                 icon: Icon(
                   _cvvObscured ? Icons.visibility_off : Icons.visibility,
                 ),
@@ -1449,6 +1452,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: l.fieldCardPin,
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
+          iconSize: scaledSuffixIconSize(context),
           icon: Icon(
             _pinObscured ? Icons.visibility_off : Icons.visibility,
           ),
@@ -1654,6 +1658,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                       labelText: l.fieldValue,
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
+                        iconSize: scaledSuffixIconSize(context),
                         icon: Icon(
                           f.hidden ? Icons.visibility_off : Icons.visibility,
                         ),

@@ -918,6 +918,7 @@ class _UnlockScreenState extends State<UnlockScreen>
                         labelText: l.passphraseLabel,
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
+                          iconSize: scaledSuffixIconSize(context),
                           icon: Icon(
                             _obscured
                                 ? Icons.visibility_off
@@ -968,6 +969,7 @@ class _UnlockScreenState extends State<UnlockScreen>
                           labelText: l.yubiKeyPinLabel,
                           border: const OutlineInputBorder(),
                           suffixIcon: IconButton(
+                            iconSize: scaledSuffixIconSize(context),
                             icon: Icon(
                               _pinObscured
                                   ? Icons.visibility_off

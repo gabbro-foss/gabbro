@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/settings.dart';
@@ -570,6 +571,7 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
           // Visibility toggle
           IconButton(
             key: const Key('visibility_toggle'),
+            iconSize: scaledIconSize(context),
             icon: Icon(_obscured ? Icons.visibility_off : Icons.visibility),
             tooltip: _obscured ? l.tooltipShow : l.tooltipHide,
             onPressed: () => setState(() => _obscured = !_obscured),

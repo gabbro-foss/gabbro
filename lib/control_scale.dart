@@ -21,6 +21,15 @@ double controlScaleFor(BuildContext context) {
 double scaledIconSize(BuildContext context, [double base = 24]) =>
     base * controlScaleFor(context);
 
+/// An icon size for a reveal-eye (show/hide) toggle that lives in a bounded box
+/// — a [TextField]'s `suffixIcon`. Grows with the text scale like
+/// [scaledIconSize] but is *gently* capped at 1.4x [base] (same idea as
+/// [scaledSelectionCheckbox]) so the enlarged glyph can't clip or balloon the
+/// field's fixed suffix box (ADR-016 Phase 3). Use full [scaledIconSize] for
+/// toggles in unconstrained rows.
+double scaledSuffixIconSize(BuildContext context, [double base = 24]) =>
+    base * controlScaleFor(context).clamp(1.0, 1.4);
+
 /// Scales a 48dp control (a selection [Checkbox]) up at large text — but only
 /// *gently* (capped at 1.4x, well below the full control factor) so it stays
 /// visible without dominating/crowding a list row. Returns [child] unchanged at

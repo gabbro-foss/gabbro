@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
@@ -97,6 +98,7 @@ class _RecoveryHistoryScreenState extends State<RecoveryHistoryScreen> {
               children: [
                 if (secret)
                   IconButton(
+                    iconSize: scaledIconSize(context),
                     icon: Icon(
                       revealed ? Icons.visibility : Icons.visibility_off,
                     ),

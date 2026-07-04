@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/app_paths.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
@@ -966,6 +967,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               labelText: l.masterPassphraseLabel,
                               border: const OutlineInputBorder(),
                               suffixIcon: IconButton(
+                                iconSize: scaledSuffixIconSize(context),
                                 icon: Icon(
                                   _passphraseObscured
                                       ? Icons.visibility_off
@@ -1052,6 +1054,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               labelText: l.confirmPassphraseLabelShort,
                               border: const OutlineInputBorder(),
                               suffixIcon: IconButton(
+                                iconSize: scaledSuffixIconSize(context),
                                 icon: Icon(
                                   _confirmObscured
                                       ? Icons.visibility_off
@@ -1123,6 +1126,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     labelText: _pinLabel(i, l),
                                     border: const OutlineInputBorder(),
                                     suffixIcon: IconButton(
+                                      iconSize: scaledSuffixIconSize(context),
                                       icon: Icon(
                                         _pinObscured[i]
                                             ? Icons.visibility_off

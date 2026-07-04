@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
@@ -351,9 +352,9 @@ class _ReviewChangesScreenState extends State<ReviewChangesScreen> {
                 ),
               ),
               IconButton(
+                iconSize: scaledIconSize(context, 18),
                 icon: Icon(
                   obscured ? Icons.visibility_off : Icons.visibility,
-                  size: 18,
                 ),
                 tooltip: obscured
                     ? AppLocalizations.of(context).tooltipShowValues

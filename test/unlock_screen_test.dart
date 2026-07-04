@@ -908,6 +908,42 @@ void main() {
     });
   });
 
+  // ── ADR-016 reveal-eye: suffix toggles scale (capped) at large text ────────
+  group('reveal-eye toggles scale (capped) at large text', () {
+    void setPhone(WidgetTester tester) {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+    }
+
+    testWidgets('passphrase and PIN eyes scale up and stay capped at 1.4x',
+        (tester) async {
+      setPhone(tester);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+      await tester.pumpAndSettle();
+
+      expect(revealEyeButtons(), findsNWidgets(2));
+      for (final eye in tester.widgetList<IconButton>(revealEyeButtons())) {
+        expect(eye.iconSize, isNotNull);
+        expect(eye.iconSize, greaterThan(24));
+        expect(eye.iconSize, lessThanOrEqualTo(24 * 1.4));
+      }
+    });
+
+    testWidgets('the fields do not overflow at large text', (tester) async {
+      setPhone(tester);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   // ── Passphrase visibility toggle ───────────────────────────────────────────
 
   testWidgets('passphrase visibility toggle switches icon', (tester) async {

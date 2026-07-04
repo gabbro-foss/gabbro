@@ -109,4 +109,65 @@ void main() {
           closeTo(30.0, 1e-9));
     });
   });
+
+  // ── scaledSuffixIconSize (reveal-eye toggles in bounded field boxes) ────────
+  // Grows gently and is capped at 1.4x so a scaled eye can't clip / balloon a
+  // TextField's suffix box (ADR-016; same gentle-cap idea as the selection
+  // checkbox).
+  group('scaledSuffixIconSize', () {
+    Future<double> suffixAt(
+      WidgetTester tester, {
+      required double textScale,
+      required Size size,
+      double? base,
+    }) async {
+      late double result;
+      await tester.pumpWidget(
+        MediaQuery(
+          data: MediaQueryData(
+            textScaler: TextScaler.linear(textScale),
+            size: size,
+          ),
+          child: Builder(
+            builder: (context) {
+              result = base == null
+                  ? scaledSuffixIconSize(context)
+                  : scaledSuffixIconSize(context, base);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      return result;
+    }
+
+    testWidgets('defaults to 24 at normal text', (tester) async {
+      expect(await suffixAt(tester, textScale: 1.0, size: _phone),
+          closeTo(24.0, 1e-9));
+    });
+
+    testWidgets('tracks the control factor while below the cap', (tester) async {
+      // phone @1.2x -> factor 1.2 (< 1.4 cap), so 24 -> 28.8
+      expect(await suffixAt(tester, textScale: 1.2, size: _phone),
+          closeTo(28.8, 1e-9));
+    });
+
+    testWidgets('caps at 1.4x on a phone at max text', (tester) async {
+      // phone @2.0x -> factor 2.0, clamped to 1.4, so 24 -> 33.6
+      expect(await suffixAt(tester, textScale: 2.0, size: _phone),
+          closeTo(33.6, 1e-9));
+    });
+
+    testWidgets('caps at 1.4x on a tablet at large text', (tester) async {
+      // tablet @2.0x -> factor 1.5, clamped to 1.4, so 24 -> 33.6
+      expect(await suffixAt(tester, textScale: 2.0, size: _tablet),
+          closeTo(33.6, 1e-9));
+    });
+
+    testWidgets('applies the cap to a custom base', (tester) async {
+      // phone @1.2x -> factor 1.2, base 18 -> 21.6
+      expect(await suffixAt(tester, textScale: 1.2, size: _phone, base: 18),
+          closeTo(21.6, 1e-9));
+    });
+  });
 }

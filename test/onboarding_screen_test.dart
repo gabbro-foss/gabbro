@@ -1045,6 +1045,46 @@ void main() {
     expect(find.byIcon(Icons.visibility_off), findsOneWidget);
   });
 
+  // ── ADR-016 reveal-eye: suffix toggles scale (capped) at large text ────────
+  group('reveal-eye toggles scale (capped) at large text', () {
+    void setPhone(WidgetTester tester) {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+    }
+
+    testWidgets('passphrase, confirm and both PIN eyes scale (capped)',
+        (tester) async {
+      setPhone(tester);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen(showYubikey: true, isAndroid: true));
+      await tester.ensureVisible(find.byType(SwitchListTile));
+      await tester.tap(find.byType(SwitchListTile));
+      await tester.pump();
+
+      expect(revealEyeButtons(), findsNWidgets(4));
+      for (final eye in tester.widgetList<IconButton>(revealEyeButtons())) {
+        expect(eye.iconSize, isNotNull);
+        expect(eye.iconSize, greaterThan(24));
+        expect(eye.iconSize, lessThanOrEqualTo(24 * 1.4));
+      }
+    });
+
+    testWidgets('the fields do not overflow at large text', (tester) async {
+      setPhone(tester);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen(showYubikey: true, isAndroid: true));
+      await tester.ensureVisible(find.byType(SwitchListTile));
+      await tester.tap(find.byType(SwitchListTile));
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   // ── YubiKey PIN visibility toggles ─────────────────────────────────────────
 
   testWidgets('primary PIN visibility toggle in yubikey mode switches icon',

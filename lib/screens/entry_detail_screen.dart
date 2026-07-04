@@ -824,9 +824,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 onPressed: () => _copyToClipboard(value),
               ),
               IconButton(
+                iconSize: scaledIconSize(context, 18),
                 icon: Icon(
                   obscured ? Icons.visibility_off : Icons.visibility,
-                  size: 18,
                 ),
                 tooltip: obscured ? l.tooltipShow : l.tooltipHide,
                 onPressed: onToggle,

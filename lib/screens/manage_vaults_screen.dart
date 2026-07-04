@@ -366,6 +366,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                       labelText: l.yubiKeyPinLabel,
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
+                        iconSize: scaledSuffixIconSize(context),
                         icon: Icon(
                           obscurePin ? Icons.visibility_off : Icons.visibility,
                         ),

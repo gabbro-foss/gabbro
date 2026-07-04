@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
@@ -211,6 +212,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                   labelText: l.passphraseLabel,
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
+                    iconSize: scaledSuffixIconSize(context),
                     icon: Icon(
                       obscured ? Icons.visibility_off : Icons.visibility,
                     ),

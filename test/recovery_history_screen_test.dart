@@ -11,6 +11,27 @@ HistoryRecordData _rec(String field, String value) => HistoryRecordData(
 );
 
 void main() {
+  // ADR-016 reveal-eye: the show/hide toggle scales fully with the text
+  // (unconstrained ListTile trailing row).
+  testWidgets('reveal-eye toggle scales up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(
+      testApp(
+        RecoveryHistoryScreen(
+          records: [_rec('password', 'hunter2')],
+          onRestore: (_) async {},
+          onDelete: (_) async {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final eye = tester.widget<IconButton>(revealEyeButtons().first);
+    expect(eye.iconSize, isNotNull);
+    expect(eye.iconSize, greaterThan(24));
+  });
+
   testWidgets('shows field labels and masks secret values', (tester) async {
     await tester.pumpWidget(
       testApp(

@@ -68,6 +68,21 @@ GeneratorWidget _stubWidget({void Function(String)? onUsePassword}) =>
     );
 
 void main() {
+  // ADR-016 reveal-eye: the generated-password show/hide toggle scales fully
+  // with the text (unconstrained action row).
+  testWidgets('reveal-eye toggle scales up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_wrap(_scriptWidget()));
+    await tester.pumpAndSettle();
+
+    final eye = tester.widget<IconButton>(
+      find.byKey(const Key('visibility_toggle')),
+    );
+    expect(eye.iconSize, isNotNull);
+    expect(eye.iconSize, greaterThan(24));
+  });
+
   group('GeneratorWidget - mode toggle', () {
     testWidgets('shows classic mode by default', (tester) async {
       await tester.pumpWidget(_wrap(_stubWidget()));

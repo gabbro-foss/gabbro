@@ -394,6 +394,29 @@ void main() {
       );
     });
 
+    // ADR-016 reveal-eye: the step-3 PIN dialog eye scales (capped) at large
+    // text and the dialog does not overflow.
+    testWidgets('step 3 PIN eye scales (capped) at large text', (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen(
+        registry: ykRegistry,
+        listYubikeyRecords: (_) => [_fakeYkRecord()],
+      ));
+      await throughStep2(tester);
+
+      expect(revealEyeButtons(), findsNWidgets(1));
+      final eye = tester.widget<IconButton>(revealEyeButtons().first);
+      expect(eye.iconSize, isNotNull);
+      expect(eye.iconSize, greaterThan(24));
+      expect(eye.iconSize, lessThanOrEqualTo(24 * 1.4));
+      expect(tester.takeException(), isNull);
+    });
+
     // Net-first: pin the PIN eye toggle in the step-3 dialog so the later a11y
     // label work cannot regress the flip. PIN starts obscured (visibility_off).
     testWidgets('step 3 PIN eye toggle flips', (tester) async {
