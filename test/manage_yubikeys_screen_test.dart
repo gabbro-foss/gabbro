@@ -360,6 +360,33 @@ void main() {
     expect(registered, isFalse);
   });
 
+  // ADR-016 reveal-eye: the Linux add-key PIN dialog eye scales (capped) at
+  // large text and the dialog does not overflow.
+  testWidgets('add key Linux: PIN dialog eye scales (capped) at large text',
+      (tester) async {
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_buildScreen(
+      records: [_record('10')],
+      onFidoListDevices: () => ['/dev/hidraw0'],
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle(); // PIN dialog appears
+
+    expect(revealEyeButtons(), findsNWidgets(1));
+    final eye = tester.widget<IconButton>(revealEyeButtons().first);
+    expect(eye.iconSize, isNotNull);
+    expect(eye.iconSize, greaterThan(24));
+    expect(eye.iconSize, lessThanOrEqualTo(24 * 1.4));
+    expect(tester.takeException(), isNull);
+  });
+
   // Net-first: pin the PIN eye toggle in the Linux add-key PIN dialog so the
   // later a11y label work cannot regress the flip. PIN starts obscured.
   testWidgets('add key Linux: PIN dialog eye toggle flips', (tester) async {

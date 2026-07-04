@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
@@ -11,8 +12,9 @@ const _biometricChannel = MethodChannel('app.gabbro.gabbro/biometric');
 Future<bool> _defaultBiometricIsEnrolled(String vaultPath) async {
   if (!Platform.isAndroid) return false;
   try {
-    return await _biometricChannel.invokeMethod<bool>(
-          'isEnrolled', {'vaultPath': vaultPath}) ??
+    return await _biometricChannel.invokeMethod<bool>('isEnrolled', {
+          'vaultPath': vaultPath,
+        }) ??
         false;
   } catch (_) {
     return false;
@@ -29,7 +31,9 @@ Future<bool> _defaultBiometricAvailable() async {
 }
 
 Future<void> _defaultBiometricEnroll(
-    List<int> passphrase, String vaultPath) async {
+  List<int> passphrase,
+  String vaultPath,
+) async {
   if (!Platform.isAndroid) return;
   await _biometricChannel.invokeMethod<void>('enroll', {
     'passphrase': passphrase
@@ -54,11 +58,13 @@ class SecurityScreen extends StatefulWidget {
   final bool isAndroid;
 
   final Future<bool> Function() onBiometricAvailable;
+
   /// Vault path the passphrase is being enrolled for (null only in tests that
   /// don't need vault-scoped biometrics).
   final String? vaultPath;
   final Future<bool> Function(String vaultPath) onBiometricIsEnrolled;
-  final Future<void> Function(List<int> passphrase, String vaultPath) onBiometricEnroll;
+  final Future<void> Function(List<int> passphrase, String vaultPath)
+  onBiometricEnroll;
   final Future<void> Function() onBiometricUnenroll;
 
   SecurityScreen({
@@ -117,36 +123,37 @@ class _SecurityScreenState extends State<SecurityScreen> {
     final available = await widget.onBiometricAvailable();
     if (!mounted) return;
     if (!available) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l.biometricUnavailable)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l.biometricUnavailable)));
       return;
     }
 
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        // scrollable scrolls title + content + actions together, so nothing is
+        // stranded off-screen at large text (ADR-016).
+        scrollable: true,
         title: Text(l.biometricDialogTitle),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(l.biometricDialogBody),
-              const SizedBox(height: 12),
-              Text(
-                l.biometricDialogAllBiometrics,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(l.biometricDialogInvalidation),
-              const SizedBox(height: 8),
-              Text(
-                l.biometricDialogRecommendation,
-                style: const TextStyle(fontStyle: FontStyle.italic),
-              ),
-            ],
-          ),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l.biometricDialogBody),
+            const SizedBox(height: 12),
+            Text(
+              l.biometricDialogAllBiometrics,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(l.biometricDialogInvalidation),
+            const SizedBox(height: 8),
+            Text(
+              l.biometricDialogRecommendation,
+              style: const TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -173,9 +180,9 @@ class _SecurityScreenState extends State<SecurityScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
   }
@@ -188,6 +195,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx2, setDialogState) => AlertDialog(
+          scrollable: true,
           title: Text(l.biometricEnrollTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -204,6 +212,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                   labelText: l.passphraseLabel,
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
+                    iconSize: scaledSuffixIconSize(context),
                     icon: Icon(
                       obscured ? Icons.visibility_off : Icons.visibility,
                     ),
@@ -228,7 +237,8 @@ class _SecurityScreenState extends State<SecurityScreen> {
         ),
       ),
     );
-    controller.clear(); // wipe the passphrase; the controller lives on the State
+    controller
+        .clear(); // wipe the passphrase; the controller lives on the State
     return result;
   }
 
@@ -248,7 +258,10 @@ class _SecurityScreenState extends State<SecurityScreen> {
               // ── Foreground lock ────────────────────────────────────────
               SectionHeader(label: l.sectionForegroundLock),
               const SizedBox(height: 4),
-              Text(l.foregroundLockDescription, style: const TextStyle(fontSize: 12)),
+              Text(
+                l.foregroundLockDescription,
+                style: const TextStyle(fontSize: 12),
+              ),
               const SizedBox(height: 8),
               SegmentedRow<ForegroundLockTimeout>(
                 values: ForegroundLockTimeout.values,
@@ -267,7 +280,10 @@ class _SecurityScreenState extends State<SecurityScreen> {
               // ── Background lock ────────────────────────────────────────
               SectionHeader(label: l.sectionBackgroundLock),
               const SizedBox(height: 4),
-              Text(l.backgroundLockDescription, style: const TextStyle(fontSize: 12)),
+              Text(
+                l.backgroundLockDescription,
+                style: const TextStyle(fontSize: 12),
+              ),
               const SizedBox(height: 8),
               SegmentedRow<BackgroundLockTimeout>(
                 values: BackgroundLockTimeout.values,
@@ -286,7 +302,10 @@ class _SecurityScreenState extends State<SecurityScreen> {
               // ── Password history ───────────────────────────────────────
               SectionHeader(label: l.sectionPasswordHistory),
               const SizedBox(height: 4),
-              Text(l.passwordHistoryDescription, style: const TextStyle(fontSize: 12)),
+              Text(
+                l.passwordHistoryDescription,
+                style: const TextStyle(fontSize: 12),
+              ),
               const SizedBox(height: 8),
               SegmentedRow<PasswordHistoryExpiry>(
                 values: PasswordHistoryExpiry.values,
@@ -305,7 +324,10 @@ class _SecurityScreenState extends State<SecurityScreen> {
               // ── Passphrase copy/paste ──────────────────────────────────
               SectionHeader(label: l.sectionPassphraseCopyPaste),
               const SizedBox(height: 4),
-              Text(l.passphraseCopyPasteDescription, style: const TextStyle(fontSize: 12)),
+              Text(
+                l.passphraseCopyPasteDescription,
+                style: const TextStyle(fontSize: 12),
+              ),
               const SizedBox(height: 8),
               SwitchListTile(
                 title: Text(l.blockCopyPasteTitle),
@@ -315,15 +337,20 @@ class _SecurityScreenState extends State<SecurityScreen> {
                 contentPadding: EdgeInsets.zero,
               ),
               const SizedBox(height: 4),
-              Text(l.passphraseCopyPasteNote, style: const TextStyle(fontSize: 11)),
+              Text(
+                l.passphraseCopyPasteNote,
+                style: const TextStyle(fontSize: 11),
+              ),
               const SizedBox(height: 32),
 
               // ── Biometric unlock (Android only) ───────────────────────
               if (widget.isAndroid) ...[
                 SectionHeader(label: l.sectionBiometricUnlock),
                 const SizedBox(height: 4),
-                Text(l.biometricUnlockDescription,
-                    style: const TextStyle(fontSize: 12)),
+                Text(
+                  l.biometricUnlockDescription,
+                  style: const TextStyle(fontSize: 12),
+                ),
                 const SizedBox(height: 8),
                 SwitchListTile(
                   title: Text(l.biometricUnlockTitle),
@@ -332,15 +359,20 @@ class _SecurityScreenState extends State<SecurityScreen> {
                   contentPadding: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 4),
-                Text(l.biometricUnlockNote,
-                    style: const TextStyle(fontSize: 11)),
+                Text(
+                  l.biometricUnlockNote,
+                  style: const TextStyle(fontSize: 11),
+                ),
                 const SizedBox(height: 32),
               ],
 
               // ── Clipboard clear ────────────────────────────────────────
               SectionHeader(label: l.sectionClipboardClear),
               const SizedBox(height: 4),
-              Text(l.clipboardClearDescription, style: const TextStyle(fontSize: 12)),
+              Text(
+                l.clipboardClearDescription,
+                style: const TextStyle(fontSize: 12),
+              ),
               const SizedBox(height: 8),
               SegmentedRow<ClipboardClearTimeout>(
                 values: ClipboardClearTimeout.values,

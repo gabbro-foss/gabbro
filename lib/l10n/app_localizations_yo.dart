@@ -241,21 +241,6 @@ class AppLocalizationsYo extends AppLocalizations {
   String get themeDark => 'Okunkun';
 
   @override
-  String get textSizeSmall => 'Kekere';
-
-  @override
-  String get textSizeRegular => 'Deede';
-
-  @override
-  String get textSizeLarge => 'Nla';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Fun foonu nikan — tabulẹti ma n lo apa osi nigbagbogbo.';
 
@@ -511,6 +496,9 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Ojú-ìwé tó kàn';
+
+  @override
+  String get helpEnlargeImage => 'Sọ àwòrán di ńlá';
 
   @override
   String get tooltipEditAlias => 'Ṣatunkọ orukọ apejuwe';

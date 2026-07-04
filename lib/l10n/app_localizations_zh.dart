@@ -239,21 +239,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get themeDark => '深色';
 
   @override
-  String get textSizeSmall => '小';
-
-  @override
-  String get textSizeRegular => '常规';
-
-  @override
-  String get textSizeLarge => '大';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote => '仅限手机 — 平板电脑始终使用左侧。';
 
   @override
@@ -503,6 +488,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tooltipNextPage => '下一页';
+
+  @override
+  String get helpEnlargeImage => '放大图片';
 
   @override
   String get tooltipEditAlias => '编辑别名';
@@ -2171,21 +2159,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get themeDark => '深色';
 
   @override
-  String get textSizeSmall => '小';
-
-  @override
-  String get textSizeRegular => '常规';
-
-  @override
-  String get textSizeLarge => '大';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote => '仅限手机 — 平板电脑始终使用左侧。';
 
   @override
@@ -2435,6 +2408,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get tooltipNextPage => '下一页';
+
+  @override
+  String get helpEnlargeImage => '放大图片';
 
   @override
   String get tooltipEditAlias => '编辑别名';
@@ -4103,21 +4079,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get themeDark => '深色';
 
   @override
-  String get textSizeSmall => '小';
-
-  @override
-  String get textSizeRegular => '一般';
-
-  @override
-  String get textSizeLarge => '大';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote => '僅限手機 — 平板電腦始終使用左側。';
 
   @override
@@ -4367,6 +4328,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get tooltipNextPage => '下一頁';
+
+  @override
+  String get helpEnlargeImage => '放大圖片';
 
   @override
   String get tooltipEditAlias => '編輯別名';

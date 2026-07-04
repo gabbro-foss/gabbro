@@ -243,21 +243,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get themeDark => 'Σκοτεινό';
 
   @override
-  String get textSizeSmall => 'Μικρό';
-
-  @override
-  String get textSizeRegular => 'Κανονικό';
-
-  @override
-  String get textSizeLarge => 'Μεγάλο';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Μόνο στο τηλέφωνο — το tablet χρησιμοποιεί πάντα την αριστερή πλευρά.';
 
@@ -514,6 +499,9 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Επόμενη σελίδα';
+
+  @override
+  String get helpEnlargeImage => 'Μεγέθυνση εικόνας';
 
   @override
   String get tooltipEditAlias => 'Επεξεργασία ψευδωνύμου';

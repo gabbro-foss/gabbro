@@ -84,11 +84,6 @@
   "themeLight": "Світла",
   "themeDark": "Темна",
 
-  "textSizeSmall": "Малий",
-  "textSizeRegular": "Звичайний",
-  "textSizeLarge": "Великий",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Лише на телефоні — планшет завжди використовує ліву сторону.",
   "alphabetBarLeft": "Зліва",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Огляд",
   "tooltipPreviousPage": "Попередня сторінка",
   "tooltipNextPage": "Наступна сторінка",
+  "helpEnlargeImage": "Збільшити зображення",
   "tooltipEditAlias": "Змінити псевдонім",
   "tooltipRemoveField": "Видалити поле",
   "tooltipRename": "Перейменувати",

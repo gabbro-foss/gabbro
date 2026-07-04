@@ -241,21 +241,6 @@ class AppLocalizationsKk extends AppLocalizations {
   String get themeDark => 'Қараңғы';
 
   @override
-  String get textSizeSmall => 'Кіші';
-
-  @override
-  String get textSizeRegular => 'Қалыпты';
-
-  @override
-  String get textSizeLarge => 'Үлкен';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Тек телефонда — планшет әрқашан сол жақты пайдаланады.';
 
@@ -511,6 +496,9 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Келесі бет';
+
+  @override
+  String get helpEnlargeImage => 'Суретті үлкейту';
 
   @override
   String get tooltipEditAlias => 'Бүркеншік атын өңдеу';

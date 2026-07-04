@@ -241,21 +241,6 @@ class AppLocalizationsEt extends AppLocalizations {
   String get themeDark => 'Tume';
 
   @override
-  String get textSizeSmall => 'Väike';
-
-  @override
-  String get textSizeRegular => 'Tavaline';
-
-  @override
-  String get textSizeLarge => 'Suur';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Ainult telefonil — tahvelarvutil kasutatakse alati vasakut.';
 
@@ -512,6 +497,9 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Järgmine leht';
+
+  @override
+  String get helpEnlargeImage => 'Suurenda pilti';
 
   @override
   String get tooltipEditAlias => 'Muuda aliast';

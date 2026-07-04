@@ -84,11 +84,6 @@
   "themeLight": "Hell",
   "themeDark": "Dunkel",
 
-  "textSizeSmall": "Klein",
-  "textSizeRegular": "Normal",
-  "textSizeLarge": "Groß",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Nur für Telefonlayout — Tablet verwendet immer links.",
   "alphabetBarLeft": "Links",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Durchsuchen",
   "tooltipPreviousPage": "Vorherige Seite",
   "tooltipNextPage": "Nächste Seite",
+  "helpEnlargeImage": "Bild vergrößern",
   "tooltipEditAlias": "Alias bearbeiten",
   "tooltipRemoveField": "Feld entfernen",
   "tooltipRename": "Umbenennen",

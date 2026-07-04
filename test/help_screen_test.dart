@@ -70,4 +70,94 @@ void main() {
     await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
     handle.dispose();
   });
+
+  // ── Phase 2b: pinch-to-zoom on help images (textScaler can't scale a PNG;
+  // FLAG_SECURE blocks an external magnifier) ──────────────────────────────────
+  group('image zoom', () {
+    testWidgets('help image carries an enlarge affordance and label',
+        (tester) async {
+      await tester.pumpWidget(testApp(const HelpScreen()));
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Enlarge image'), findsWidgets);
+      expect(find.byIcon(Icons.zoom_in), findsWidgets);
+    });
+
+    testWidgets('tapping a help image opens a full-screen zoom viewer',
+        (tester) async {
+      await tester.pumpWidget(testApp(const HelpScreen()));
+      await tester.pumpAndSettle();
+      expect(find.byType(InteractiveViewer), findsNothing);
+
+      await tester.tap(find.byTooltip('Enlarge image').first);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(InteractiveViewer), findsOneWidget);
+      // the same image is shown inside the zoomable viewer
+      expect(
+        find.descendant(
+          of: find.byType(InteractiveViewer),
+          matching: find.byType(Image),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the zoom viewer closes back to the help pages', (tester) async {
+      await tester.pumpWidget(testApp(const HelpScreen()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Enlarge image').first);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(InteractiveViewer), findsNothing);
+      expect(find.byType(PageView), findsOneWidget);
+    });
+  });
+
+  // ADR-016 Phase 3 Slice B: nav chevrons grow with the text scale so a
+  // low-vision user gets a bigger target (they stay 24 at normal text).
+  testWidgets('nav chevrons scale up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(testApp(const HelpScreen()));
+    await tester.pumpAndSettle();
+
+    final next = tester.widget<IconButton>(
+      find
+          .ancestor(
+            of: find.byIcon(Icons.chevron_right),
+            matching: find.byType(IconButton),
+          )
+          .first,
+    );
+    expect(next.iconSize, greaterThan(24));
+  });
+
+  // ADR-016 accessibility follow-up: the full-screen zoom viewer's close icon
+  // grows with the text scale so a low-vision user gets a bigger target.
+  testWidgets('full-screen viewer close icon scales up at large text', (
+    tester,
+  ) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(testApp(const HelpScreen()));
+    await tester.pumpAndSettle();
+
+    // Tap the screenshot to open the full-screen pinch-zoom route.
+    await tester.tap(find.byType(InkWell).first);
+    await tester.pumpAndSettle();
+
+    final closeBtn = tester.widget<IconButton>(
+      find
+          .ancestor(
+            of: find.byIcon(Icons.close),
+            matching: find.byType(IconButton),
+          )
+          .first,
+    );
+    expect(closeBtn.iconSize, greaterThan(24));
+    expect(tester.takeException(), isNull);
+  });
 }

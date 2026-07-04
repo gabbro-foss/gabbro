@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 
 class HelpScreen extends StatefulWidget {
@@ -58,6 +59,38 @@ class _HelpScreenState extends State<HelpScreen> {
     );
   }
 
+  // Full-screen pinch-zoom/pan of a help screenshot. A separate route owns all
+  // gestures cleanly (an in-place InteractiveViewer would fight the PageView's
+  // horizontal swipe and the vertical scroll). ADR-016 Phase 2b.
+  void _openZoom(BuildContext context, String asset) {
+    final l = AppLocalizations.of(context);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (ctx) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            leading: IconButton(
+              icon: const Icon(Icons.close),
+              iconSize: scaledIconSize(context),
+              tooltip: l.close,
+              onPressed: () => Navigator.of(ctx).pop(),
+            ),
+          ),
+          body: Center(
+            child: InteractiveViewer(
+              minScale: 1,
+              maxScale: 5,
+              child: Image.asset(asset, fit: BoxFit.contain),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -76,24 +109,69 @@ class _HelpScreenState extends State<HelpScreen> {
                 controller: _controller,
                 onPageChanged: (i) => setState(() => _currentPage = i),
                 itemCount: count,
-                itemBuilder: (context, i) => Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Image.asset(
-                          _kAssets[i],
-                          fit: BoxFit.contain,
+                itemBuilder: (context, i) => LayoutBuilder(
+                  // Fill the page when content fits; scroll when it doesn't (large
+                  // text). The image is capped so the caption always has room.
+                  builder: (context, constraints) => SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: constraints.maxHeight * 0.5,
+                              ),
+                              // The screenshot is a PNG: textScaler can't grow
+                              // it and FLAG_SECURE blocks an external magnifier,
+                              // so tap to open a full-screen pinch-zoom viewer
+                              // (ADR-016 Phase 2b).
+                              child: Tooltip(
+                                message: l.helpEnlargeImage,
+                                child: InkWell(
+                                  onTap: () => _openZoom(context, _kAssets[i]),
+                                  child: Stack(
+                                    children: [
+                                      Image.asset(
+                                        _kAssets[i],
+                                        fit: BoxFit.contain,
+                                      ),
+                                      Positioned(
+                                        right: 4,
+                                        bottom: 4,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black54,
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
+                                          child: const Icon(
+                                            Icons.zoom_in,
+                                            color: Colors.white,
+                                            size: 20,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              captions[i],
+                              style: textTheme.bodyMedium,
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      Text(
-                        captions[i],
-                        style: textTheme.bodyMedium,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -106,6 +184,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.chevron_left),
+                    iconSize: scaledIconSize(context),
                     tooltip: l.tooltipPreviousPage,
                     onPressed: _currentPage > 0 ? () => _goTo(_currentPage - 1) : null,
                   ),
@@ -130,6 +209,7 @@ class _HelpScreenState extends State<HelpScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.chevron_right),
+                    iconSize: scaledIconSize(context),
                     tooltip: l.tooltipNextPage,
                     onPressed: _currentPage < count - 1 ? () => _goTo(_currentPage + 1) : null,
                   ),

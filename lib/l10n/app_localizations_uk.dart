@@ -242,21 +242,6 @@ class AppLocalizationsUk extends AppLocalizations {
   String get themeDark => 'Темна';
 
   @override
-  String get textSizeSmall => 'Малий';
-
-  @override
-  String get textSizeRegular => 'Звичайний';
-
-  @override
-  String get textSizeLarge => 'Великий';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Лише на телефоні — планшет завжди використовує ліву сторону.';
 
@@ -513,6 +498,9 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Наступна сторінка';
+
+  @override
+  String get helpEnlargeImage => 'Збільшити зображення';
 
   @override
   String get tooltipEditAlias => 'Змінити псевдонім';

@@ -84,11 +84,6 @@
   "themeLight": "浅色",
   "themeDark": "深色",
 
-  "textSizeSmall": "小",
-  "textSizeRegular": "常规",
-  "textSizeLarge": "大",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "仅限手机 — 平板电脑始终使用左侧。",
   "alphabetBarLeft": "左",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "浏览",
   "tooltipPreviousPage": "上一页",
   "tooltipNextPage": "下一页",
+  "helpEnlargeImage": "放大图片",
   "tooltipEditAlias": "编辑别名",
   "tooltipRemoveField": "移除字段",
   "tooltipRename": "重命名",

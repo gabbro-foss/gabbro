@@ -133,6 +133,29 @@ UnlockScreen _bareUnlock({List<YubikeyRecordData> yubikeyRecords = const []}) =>
       onBiometricIsEnrolled: (_) async => false,
     );
 
+// Biometric-enrolled UnlockScreen at a chosen text scale on a phone-sized
+// surface (ADR-016): past 1.5x the button drops its label for an icon.
+Widget _biometricAtScale(
+  double scale, {
+  Future<List<int>?> Function(String)? onAuth,
+}) =>
+    testApp(MediaQuery(
+      data: MediaQueryData(
+        textScaler: TextScaler.linear(scale),
+        size: const Size(360, 800),
+      ),
+      child: UnlockScreen(
+        vaultPath: '/tmp/test.gabbro',
+        onEstimateEntropy: _fakeEntropy,
+        yubikeyRecords: const [],
+        biometricEnabled: true,
+        onBiometricIsEnrolled: (_) async => true,
+        onBiometricAuthenticate: onAuth ?? (_) async => null,
+        onVaultIsReadable: (_) async => true,
+        onBackupUsable: (_) async => false,
+      ),
+    ));
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
@@ -714,6 +737,40 @@ void main() {
       expect(called, isTrue);
     });
 
+    // ── large text (ADR-016): icon-only past 1.5x ────────────────────────────
+    testWidgets('keeps the labelled button at normal text scale', (tester) async {
+      await tester.pumpWidget(_biometricAtScale(1.0));
+      await tester.pump();
+      expect(find.text('Use biometrics'), findsOneWidget);
+    });
+
+    testWidgets('drops the label for an icon at large text scale', (tester) async {
+      await tester.pumpWidget(_biometricAtScale(3.0));
+      await tester.pump();
+      // Label text gone (it wrapped over several lines on hardware)...
+      expect(find.text('Use biometrics'), findsNothing);
+      // ...replaced by a fingerprint icon that keeps the screen-reader name
+      // (the tooltip is the button's accessible label).
+      expect(find.byIcon(Icons.fingerprint), findsOneWidget);
+      expect(find.byTooltip('Use biometrics'), findsOneWidget);
+    });
+
+    testWidgets('icon-only button still authenticates when tapped', (tester) async {
+      bool called = false;
+      await tester.pumpWidget(_biometricAtScale(
+        3.0,
+        onAuth: (_) async {
+          called = true;
+          return null;
+        },
+      ));
+      await tester.pump();
+      await tester.ensureVisible(find.byIcon(Icons.fingerprint));
+      await tester.tap(find.byIcon(Icons.fingerprint));
+      await tester.pumpAndSettle();
+      expect(called, isTrue);
+    });
+
     testWidgets('biometric cancelled shows hint message', (tester) async {
       await tester.pumpWidget(_buildScreen(
         biometricEnabled: true,
@@ -848,6 +905,42 @@ void main() {
       await tester.pumpAndSettle();
       expect(switchedPath, '/tmp/b.gabbro');
       expect(switchedAlias, 'Beta');
+    });
+  });
+
+  // ── ADR-016 reveal-eye: suffix toggles scale (capped) at large text ────────
+  group('reveal-eye toggles scale (capped) at large text', () {
+    void setPhone(WidgetTester tester) {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+    }
+
+    testWidgets('passphrase and PIN eyes scale up and stay capped at 1.4x',
+        (tester) async {
+      setPhone(tester);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+      await tester.pumpAndSettle();
+
+      expect(revealEyeButtons(), findsNWidgets(2));
+      for (final eye in tester.widgetList<IconButton>(revealEyeButtons())) {
+        expect(eye.iconSize, isNotNull);
+        expect(eye.iconSize, greaterThan(24));
+        expect(eye.iconSize, lessThanOrEqualTo(24 * 1.4));
+      }
+    });
+
+    testWidgets('the fields do not overflow at large text', (tester) async {
+      setPhone(tester);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
     });
   });
 

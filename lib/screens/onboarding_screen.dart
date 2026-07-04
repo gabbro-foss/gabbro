@@ -4,18 +4,20 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/app_paths.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/language_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart';
-import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/fido_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
+import 'package:gabbro/text_scale.dart';
 import 'package:gabbro/widgets/gabbro_logo.dart';
 import 'package:gabbro/widgets/path_field.dart';
 import 'package:gabbro/widgets/segmented_row.dart';
+import 'package:gabbro/widgets/text_size_slider.dart';
 
 // ── Hex helpers ───────────────────────────────────────────────────────────────
 
@@ -235,7 +237,8 @@ Future<void> _defaultInitVaultWithYubikey(
 class OnboardingScreen extends StatefulWidget {
   final String? initialPath;
   final String? postDeletionMessage;
-  final Future<void> Function(List<int> passphrase, String path, String? alias) onInitVault;
+  final Future<void> Function(List<int> passphrase, String path, String? alias)
+  onInitVault;
   final EntropyResult Function(String password) onEstimateEntropy;
   final bool blockPassphraseCopyPaste;
 
@@ -296,6 +299,10 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  /// Live text scale while the accessibility slider is dragged (preview without
+  /// persisting every frame); null when not dragging.
+  double? _dragScale;
   final _aliasController = TextEditingController();
   final _passphraseController = TextEditingController();
   final _confirmController = TextEditingController();
@@ -371,8 +378,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       _vaultPath = dirPath == null
           ? ''
           : (alias.isEmpty
-              ? _firstFreeVaultPath(dirPath)
-              : _aliasBasedPath(dirPath, alias));
+                ? _firstFreeVaultPath(dirPath)
+                : _aliasBasedPath(dirPath, alias));
     });
   }
 
@@ -475,7 +482,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           alias.isEmpty ? null : alias,
         );
       }
-      await widget.onVaultCreated?.call(_vaultPath, _aliasController.text.trim());
+      await widget.onVaultCreated?.call(
+        _vaultPath,
+        _aliasController.text.trim(),
+      );
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -535,13 +545,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final app = GabbroApp.maybeOf(context);
     if (app == null) return;
     final current = app.settings;
-    final isOn =
-        current.highContrast && current.textSize == TextSizeChoice.xxLarge;
+    final isOn = current.textScale > 1.0;
     await app.updateSettings(
-      current.copyWith(
-        highContrast: !isOn,
-        textSize: isOn ? TextSizeChoice.regular : TextSizeChoice.xxLarge,
-      ),
+      current.copyWith(highContrast: !isOn, textScale: isOn ? 1.0 : 3.0),
     );
   }
 
@@ -731,10 +737,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final app = GabbroApp.maybeOf(context);
-    final isAccessibilityOn =
-        app != null &&
-        app.settings.highContrast &&
-        app.settings.textSize == TextSizeChoice.xxLarge;
+    final isAccessibilityOn = app != null && app.settings.textScale > 1.0;
 
     return Scaffold(
       body: SafeArea(
@@ -746,6 +749,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Row(
+                // spaceBetween (not Spacer) so the accessibility button can be
+                // Flexible and shrink instead of overflowing at large text.
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   if (Navigator.canPop(context))
                     IconButton(
@@ -759,25 +765,42 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       tooltip: AppLocalizations.of(context).sectionLanguage,
                       onPressed: _showLanguagePicker,
                     ),
-                  const Spacer(),
-                  AnimatedOpacity(
-                    opacity: MediaQuery.of(context).viewInsets.bottom > 0
-                        ? 0.0
-                        : 1.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: OutlinedButton.icon(
-                        icon: Icon(
-                          Icons.accessibility_new,
-                          color: isAccessibilityOn
-                              ? Theme.of(context).colorScheme.primary
-                              : null,
-                        ),
-                        label: Text(AppLocalizations.of(context).accessibilityButton),
-                        onPressed: _toggleAccessibility,
-                        style: OutlinedButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
+                  Flexible(
+                    child: AnimatedOpacity(
+                      opacity: MediaQuery.of(context).viewInsets.bottom > 0
+                          ? 0.0
+                          : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        // This button *controls* the text size, so keep it a
+                        // fixed size (like the icon buttons beside it) — it must
+                        // not balloon when large text is on (ADR-016 Phase 3).
+                        child: MediaQuery(
+                          data: MediaQuery.of(
+                            context,
+                          ).copyWith(textScaler: TextScaler.noScaling),
+                          child: OutlinedButton(
+                            onPressed: _toggleAccessibility,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.accessibility_new,
+                                  color: isAccessibilityOn
+                                      ? Theme.of(context).colorScheme.primary
+                                      : null,
+                                ),
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    l.accessibilityButton,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -802,7 +825,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Center(child: GabbroLogo(withText: true, width: 200)),
+                          // Accessibility ON reclaims the logo's vertical space
+                          // for the text-size slider (ADR-016).
+                          if (isAccessibilityOn)
+                            TextSizeSlider(
+                              scale: _dragScale ?? app.settings.textScale,
+                              deviceMax: deviceMaxScale(
+                                MediaQuery.of(context).size.shortestSide,
+                              ),
+                              // Onboarding preview is just the brand word (a
+                              // proper noun, same in every locale) — the full
+                              // sample sentence lives on the appearance screen.
+                              previewText: 'Gabbro',
+                              onChanged: (s) => setState(() => _dragScale = s),
+                              onChangeEnd: (s) {
+                                app.updateSettings(
+                                  app.settings.copyWith(textScale: s),
+                                );
+                                setState(() => _dragScale = null);
+                              },
+                            )
+                          else
+                            Center(
+                              child: GabbroLogo(withText: true, width: 200),
+                            ),
                           const SizedBox(height: 8),
                           if (widget.postDeletionMessage != null) ...[
                             Container(
@@ -877,7 +923,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           const SizedBox(height: 8),
                           if (widget.isAndroid)
                             Text(
-                              _vaultPath.isEmpty ? l.onboardingLoadingPath : _vaultPath,
+                              _vaultPath.isEmpty
+                                  ? l.onboardingLoadingPath
+                                  : _vaultPath,
                               style: Theme.of(context).textTheme.bodySmall,
                             )
                           else
@@ -913,11 +961,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             enableInteractiveSelection:
                                 !widget.blockPassphraseCopyPaste,
                             onChanged: _onPassphraseChanged,
-                            onFieldSubmitted: (_) => _confirmFocus.requestFocus(),
+                            onFieldSubmitted: (_) =>
+                                _confirmFocus.requestFocus(),
                             decoration: InputDecoration(
                               labelText: l.masterPassphraseLabel,
                               border: const OutlineInputBorder(),
                               suffixIcon: IconButton(
+                                iconSize: scaledSuffixIconSize(context),
                                 icon: Icon(
                                   _passphraseObscured
                                       ? Icons.visibility_off
@@ -1004,6 +1054,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               labelText: l.confirmPassphraseLabelShort,
                               border: const OutlineInputBorder(),
                               suffixIcon: IconButton(
+                                iconSize: scaledSuffixIconSize(context),
                                 icon: Icon(
                                   _confirmObscured
                                       ? Icons.visibility_off
@@ -1046,7 +1097,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             const SizedBox(height: 16),
                             const Divider(),
                             SwitchListTile(
-                              title: Text(AppLocalizations.of(context).protectWithYubiKey),
+                              title: Text(
+                                AppLocalizations.of(context).protectWithYubiKey,
+                              ),
                               subtitle: Text(
                                 AppLocalizations.of(context).yubiKeySubtitle,
                               ),
@@ -1067,12 +1120,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   obscureText: _pinObscured[i],
                                   onFieldSubmitted: (_) =>
                                       i == _pinControllers.length - 1
-                                          ? _createVault()
-                                          : _pinFocusNodes[i + 1].requestFocus(),
+                                      ? _createVault()
+                                      : _pinFocusNodes[i + 1].requestFocus(),
                                   decoration: InputDecoration(
                                     labelText: _pinLabel(i, l),
                                     border: const OutlineInputBorder(),
                                     suffixIcon: IconButton(
+                                      iconSize: scaledSuffixIconSize(context),
                                       icon: Icon(
                                         _pinObscured[i]
                                             ? Icons.visibility_off
@@ -1161,7 +1215,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : Text(AppLocalizations.of(context).createVault),
+                                : Text(
+                                    AppLocalizations.of(context).createVault,
+                                  ),
                           ),
                         ],
                       ),

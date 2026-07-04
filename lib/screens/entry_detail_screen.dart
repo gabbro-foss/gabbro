@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/safe_file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -16,12 +17,13 @@ import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 
-String _localizeCardStatus(String status, AppLocalizations l) => switch (status) {
-  'active' => l.cardStatusActive,
-  'lapsed' => l.cardStatusLapsed,
-  'inactive' => l.cardStatusInactive,
-  _ => status,
-};
+String _localizeCardStatus(String status, AppLocalizations l) =>
+    switch (status) {
+      'active' => l.cardStatusActive,
+      'lapsed' => l.cardStatusLapsed,
+      'inactive' => l.cardStatusInactive,
+      _ => status,
+    };
 
 /// Formats an ISO 8601 UTC timestamp string into a locale-aware human-readable form.
 /// Returns [unknownLabel] for empty or unparseable input.
@@ -200,6 +202,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       builder: (ctx) {
         final dl = AppLocalizations.of(ctx);
         return AlertDialog(
+          scrollable: true, // scroll title+content+actions together (ADR-016)
           title: Text(dl.exportFileTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -257,15 +260,19 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       await file.parent.create(recursive: true);
       await file.writeAsBytes(e.data);
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context).exportedToPath(path))));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppLocalizations.of(context).exportedToPath(path)),
+          ),
+        );
       }
     } catch (err) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(AppLocalizations.of(context).exportFailed(err.toString())),
+            content: Text(
+              AppLocalizations.of(context).exportFailed(err.toString()),
+            ),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -284,11 +291,13 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           if (_entry case VaultEntryData_File(:final field0))
             IconButton(
               icon: const Icon(Icons.download_outlined),
+              iconSize: scaledIconSize(context),
               tooltip: l.tooltipExportFile,
               onPressed: () => _exportFile(field0),
             ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
+            iconSize: scaledIconSize(context),
             tooltip: l.tooltipEditEntry,
             onPressed: () async {
               final entryType = switch (_entry) {
@@ -313,6 +322,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
+            iconSize: scaledIconSize(context),
             tooltip: l.tooltipDeleteEntry,
             onPressed: () => _confirmDelete(context),
           ),
@@ -510,7 +520,8 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
             }),
             l: l,
           ),
-        if (e.creditLimit != null) _field(l.reviewFieldCreditLimit, e.creditLimit!, l),
+        if (e.creditLimit != null)
+          _field(l.reviewFieldCreditLimit, e.creditLimit!, l),
         if (e.cardAccountNumber != null)
           _field(l.reviewFieldAccountNumber, e.cardAccountNumber!, l),
         if (e.bankName != null) _field(l.reviewFieldBank, e.bankName!, l),
@@ -668,9 +679,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
           const SizedBox(height: 4),
           Row(
             children: [
-              Expanded(
-                child: Text(url, style: const TextStyle(fontSize: 16)),
-              ),
+              Expanded(child: Text(url, style: const TextStyle(fontSize: 16))),
               IconButton(
                 icon: const Icon(Icons.open_in_browser_outlined, size: 18),
                 tooltip: l.openInBrowser,
@@ -716,10 +725,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
         ClipboardClearTimeout.twoMinutes => l.copiedClears2min,
       };
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(label),
-          duration: const Duration(seconds: 3),
-        ),
+        SnackBar(content: Text(label), duration: const Duration(seconds: 3)),
       );
     }
   }
@@ -734,7 +740,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     );
   }
 
-  Widget _field(String label, String value, AppLocalizations l, {bool obscure = false}) {
+  Widget _field(
+    String label,
+    String value,
+    AppLocalizations l, {
+    bool obscure = false,
+  }) {
     if (value.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -813,9 +824,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                 onPressed: () => _copyToClipboard(value),
               ),
               IconButton(
+                iconSize: scaledIconSize(context, 18),
                 icon: Icon(
                   obscured ? Icons.visibility_off : Icons.visibility,
-                  size: 18,
                 ),
                 tooltip: obscured ? l.tooltipShow : l.tooltipHide,
                 onPressed: onToggle,
@@ -828,7 +839,12 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
     );
   }
 
-  Widget _timestampsRow(String createdAt, String updatedAt, String folder, AppLocalizations l) {
+  Widget _timestampsRow(
+    String createdAt,
+    String updatedAt,
+    String folder,
+    AppLocalizations l,
+  ) {
     final folderLabel = folder.isEmpty ? l.noFolder : folder;
     return Padding(
       padding: const EdgeInsets.only(top: 16),
@@ -842,7 +858,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
               children: [
                 Text(
                   l.fieldFolder,
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 Text(folderLabel, style: const TextStyle(fontSize: 13)),
               ],
@@ -856,10 +875,17 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                   children: [
                     Text(
                       l.timestampCreated,
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     Text(
-                      formatTimestamp(createdAt, unknownLabel: l.timestampUnknown, locale: l.localeName),
+                      formatTimestamp(
+                        createdAt,
+                        unknownLabel: l.timestampUnknown,
+                        locale: l.localeName,
+                      ),
                       style: const TextStyle(fontSize: 13),
                     ),
                   ],
@@ -871,10 +897,17 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                   children: [
                     Text(
                       l.timestampUpdated,
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     Text(
-                      formatTimestamp(updatedAt, unknownLabel: l.timestampUnknown, locale: l.localeName),
+                      formatTimestamp(
+                        updatedAt,
+                        unknownLabel: l.timestampUnknown,
+                        locale: l.localeName,
+                      ),
                       style: const TextStyle(fontSize: 13),
                     ),
                   ],
@@ -892,7 +925,10 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                   l.historyPrevious,
                   style: const TextStyle(fontSize: 14),
                 ),
-                trailing: const Icon(Icons.chevron_right, size: 18),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  size: scaledIconSize(context, 18),
+                ),
                 onTap: () async {
                   await Navigator.of(context).push(
                     MaterialPageRoute(
@@ -903,8 +939,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
                           final fresh = getEntry(id: _entryId());
                           if (mounted) setState(() => _entry = fresh);
                         },
-                        onDelete: (i) =>
-                            widget.onDeleteHistory(_entryId(), i),
+                        onDelete: (i) => widget.onDeleteHistory(_entryId(), i),
                       ),
                     ),
                   );

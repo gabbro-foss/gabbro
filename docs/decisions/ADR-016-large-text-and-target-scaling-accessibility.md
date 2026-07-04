@@ -1,7 +1,7 @@
 # ADR-016: Large-Text and Target Scaling as a Tested Accessibility Requirement
 
 ## Status
-Accepted.
+Accepted — **Implemented** (all phases hardware-verified 2026-07-03; see CHANGELOG / git log).
 
 ## Date
 2026-07-02
@@ -49,11 +49,18 @@ accessibility requirement.
    controls" toggle.
 
 2. **Screen-derived maximum, reusing the 600 dp breakpoint** (the same phone-vs-tablet
-   split used for the two-pane layout):
-   - **Phone tier (<600 dp): max ~4×.**
-   - **Tablet tier (≥600 dp): max ~6×.**
-   The exact ceilings are **calibrated from on-device MediaQuery readings** (logical
-   size + devicePixelRatio) on real phone and tablet hardware, not assumed.
+   split used for the two-pane layout). **Phase-0 hardware readings (2026-07-02):**
+   phones — **S23 = 360 dp** (dpr 3.0), **GrapheneOS = 411 dp** (dpr 2.63); tablet —
+   **Idea Tab Pro = 866 dp** (dpr 2.125, 1840×2944 @ 340 dpi). Phone tier spans
+   **360–411 dp** (360 dp = worst case → the phone surface for the overflow probe);
+   tablet has ~2.1–2.4× the room.
+   - **Phone tier (<600 dp): max 2×** (the WCAG 1.4.4 resize bar; severe low-vision
+     belongs on a tablet, where the phone form factor stops fighting back).
+   - **Tablet tier (≥600 dp): max 3×.**
+   Phase 0 fixed the tiers and the ratio; the ceilings were **dialled in live on the
+   slider in Phase 1-2** — each hardware pass (2026-07-03) found the top of the range
+   unusable / still clipping, so the ceilings were trimmed in stages
+   (6×/8× -> 4×/6× -> 3.5×/5× -> 3.0×/5× -> 2×/4×) to the final **2× / 3×**.
    A stored value is **clamped to the current device's max on load**, so a large value
    set on a tablet cannot break the UI when the vault is opened on a phone.
 
@@ -63,9 +70,14 @@ accessibility requirement.
    hit, never large enough to consume the screen. Cap calibrated on hardware.
 
 4. **Continuous slider with a perceptual (exponential) slope.** Replaces the discrete
-   list: a `Smaller`–`Larger` slider with live-preview sample text. The position →
-   scale mapping is exponential so the everyday range (~0.8–2.0) occupies most of the
-   track for fine control, accelerating toward the device max. Minimum 0.8×.
+   list: a slider bracketed by **letter-free zoom glyph icons** (`Icons.zoom_out` /
+   `Icons.zoom_in`, not localized words and — unlike the originally-planned
+   `Icons.text_decrease` / `Icons.text_increase`, which depict a Latin **A** — carrying
+   no letter, so nothing foreign for Cyrillic/Greek/CJK users and no l10n), with
+   live-preview sample text (the brand word in onboarding, a full sample sentence on the
+   appearance screen). The position → scale mapping is exponential so the
+   everyday range (~0.8–2.0) occupies most of the track for fine control, accelerating
+   toward the device max. Minimum 0.8×.
 
 5. **Onboarding surfaces it prominently.** The accessibility toggle, when ON, sets a
    strong (~3×) scale, **reveals the slider inline**, and **hides the logo** to reclaim
@@ -99,8 +111,9 @@ accessibility requirement.
   multi-session, screen-by-screen effort, each hardware-verified. Delivered in phases
   (tracked in `ARCHITECTURE.md` → Current Focus); the slider ships first and becomes
   the probe for the rest.
-- **Calibration dependency:** the 4×/6×/2× figures are placeholders until measured on
-  the maintainer's phone and tablet; the ADR fixes the *model*, not the constants.
+- **Calibration dependency:** the ADR fixes the *model*, not the constants. Measured on
+  the maintainer's phone and tablet (2026-07-03): phone 2× / tablet 3× / target cap 2×;
+  earlier 6×/8×, 4×/6×, 3.5×/5×, 3.0×/5×, 2×/4× were all too large / still clipping.
 - **Not covered here:** contrast (a high-contrast theme already exists) and
   screen-reader labelling (ADR-015) — this ADR composes with both.
 

@@ -84,11 +84,6 @@
   "themeLight": "Ашық",
   "themeDark": "Қараңғы",
 
-  "textSizeSmall": "Кіші",
-  "textSizeRegular": "Қалыпты",
-  "textSizeLarge": "Үлкен",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Тек телефонда — планшет әрқашан сол жақты пайдаланады.",
   "alphabetBarLeft": "Солға",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Шолу",
   "tooltipPreviousPage": "Алдыңғы бет",
   "tooltipNextPage": "Келесі бет",
+  "helpEnlargeImage": "Суретті үлкейту",
   "tooltipEditAlias": "Бүркеншік атын өңдеу",
   "tooltipRemoveField": "Өрісті жою",
   "tooltipRename": "Атауын өзгерту",

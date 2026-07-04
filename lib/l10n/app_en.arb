@@ -115,11 +115,6 @@
   "themeLight": "Light",
   "themeDark": "Dark",
 
-  "textSizeSmall": "Small",
-  "textSizeRegular": "Regular",
-  "textSizeLarge": "Large",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Phone layout only — tablet always uses left.",
   "alphabetBarLeft": "Left",
@@ -210,6 +205,7 @@
   "tooltipBrowse": "Browse",
   "tooltipPreviousPage": "Previous page",
   "tooltipNextPage": "Next page",
+  "helpEnlargeImage": "Enlarge image",
   "tooltipEditAlias": "Edit alias",
   "tooltipRemoveField": "Remove field",
   "tooltipRename": "Rename",

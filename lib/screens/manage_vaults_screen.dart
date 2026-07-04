@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -10,10 +11,7 @@ import 'package:gabbro/widgets/segmented_row.dart';
 class _RenameDialog extends StatefulWidget {
   final String initialAlias;
   final Set<String> takenAliases;
-  const _RenameDialog({
-    required this.initialAlias,
-    required this.takenAliases,
-  });
+  const _RenameDialog({required this.initialAlias, required this.takenAliases});
 
   @override
   State<_RenameDialog> createState() => _RenameDialogState();
@@ -96,10 +94,19 @@ class ManageVaultsScreen extends StatefulWidget {
   final VoidCallback onAddVault;
   final void Function(String path, String alias) onSwitchToVault;
 
-  final Future<void> Function(List<int> credentialId, List<int> salt, String pin, String transport)
-      onConfirmYubikey;
-  final Future<void> Function(List<YubikeyRecordData> records, String pin, String transport)
-      onConfirmAnyYubikey;
+  final Future<void> Function(
+    List<int> credentialId,
+    List<int> salt,
+    String pin,
+    String transport,
+  )
+  onConfirmYubikey;
+  final Future<void> Function(
+    List<YubikeyRecordData> records,
+    String pin,
+    String transport,
+  )
+  onConfirmAnyYubikey;
 
   /// Injected for testing; defaults to reading the vault file.
   final List<YubikeyRecordData> Function(String path) listYubikeyRecords;
@@ -137,10 +144,8 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
         .toSet();
     final String? newAlias = await showDialog<String>(
       context: context,
-      builder: (_) => _RenameDialog(
-        initialAlias: record.alias,
-        takenAliases: takenAliases,
-      ),
+      builder: (_) =>
+          _RenameDialog(initialAlias: record.alias, takenAliases: takenAliases),
     );
     if (newAlias != null) {
       setState(() => _registry = _registry.updateAlias(record.path, newAlias));
@@ -156,33 +161,32 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true, // scroll title+content+actions together (ADR-016)
         title: Text(l.backupEmergencyHeading),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l.backupResponsibilityBody),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l.backupResponsibilityBody),
+            const SizedBox(height: 12),
+            // R-03: mention the automatic .bak without overselling it —
+            // it is same-disk corruption insurance, not a backup.
+            Text(l.backupDialogSafetyCopyNote),
+            const SizedBox(height: 16),
+            Text(
+              Platform.isAndroid
+                  ? l.emergencyWipeAndroidBody
+                  : l.emergencyWipeLinuxBody,
+            ),
+            if (!Platform.isAndroid) ...[
               const SizedBox(height: 12),
-              // R-03: mention the automatic .bak without overselling it —
-              // it is same-disk corruption insurance, not a backup.
-              Text(l.backupDialogSafetyCopyNote),
-              const SizedBox(height: 16),
-              Text(
-                Platform.isAndroid
-                    ? l.emergencyWipeAndroidBody
-                    : l.emergencyWipeLinuxBody,
+              const SelectableText(
+                'rm -rf ~/.local/share/app.gabbro.gabbro/\n'
+                'rm -rf ~/.config/gabbro/',
+                style: TextStyle(fontFamily: 'monospace', fontSize: 13),
               ),
-              if (!Platform.isAndroid) ...[
-                const SizedBox(height: 12),
-                const SelectableText(
-                  'rm -rf ~/.local/share/app.gabbro.gabbro/\n'
-                  'rm -rf ~/.config/gabbro/',
-                  style: TextStyle(fontFamily: 'monospace', fontSize: 13),
-                ),
-              ],
             ],
-          ),
+          ],
         ),
         actions: [
           TextButton(
@@ -270,8 +274,9 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                 child: Text(l.cancel),
               ),
               TextButton(
-                onPressed:
-                    understood ? () => Navigator.of(ctx).pop(true) : null,
+                onPressed: understood
+                    ? () => Navigator.of(ctx).pop(true)
+                    : null,
                 style: TextButton.styleFrom(
                   foregroundColor: Theme.of(ctx).colorScheme.error,
                 ),
@@ -338,6 +343,8 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
             }
 
             return AlertDialog(
+              scrollable:
+                  true, // scroll title+content+actions together (ADR-016)
               title: Text(l.touchYourYubiKey),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -359,11 +366,15 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                       labelText: l.yubiKeyPinLabel,
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
+                        iconSize: scaledSuffixIconSize(context),
                         icon: Icon(
                           obscurePin ? Icons.visibility_off : Icons.visibility,
                         ),
-                        tooltip: obscurePin ? l.tooltipShowPin : l.tooltipHidePin,
-                        onPressed: () => setDialogState(() => obscurePin = !obscurePin),
+                        tooltip: obscurePin
+                            ? l.tooltipShowPin
+                            : l.tooltipHidePin,
+                        onPressed: () =>
+                            setDialogState(() => obscurePin = !obscurePin),
                       ),
                     ),
                     onChanged: (_) => setDialogState(() {}),
@@ -374,7 +385,8 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
                       values: const ['usb', 'nfc'],
                       selected: dialogTransport,
                       label: (v) => v.toUpperCase(),
-                      onSelected: (v) => setDialogState(() => dialogTransport = v),
+                      onSelected: (v) =>
+                          setDialogState(() => dialogTransport = v),
                     ),
                   ],
                   if (isAuthorizing) ...[
@@ -422,7 +434,9 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
           },
         ),
       );
-      WidgetsBinding.instance.addPostFrameCallback((_) => pinController.dispose());
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => pinController.dispose(),
+      );
       if (mounted) setState(() => _transport = dialogTransport);
       if (step3 != true) return;
       if (!mounted) return;
@@ -441,6 +455,7 @@ class _ManageVaultsScreenState extends State<ManageVaultsScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
+            iconSize: scaledIconSize(context),
             tooltip: l.backupEmergencyHeading,
             onPressed: () => _showBackupInfoDialog(l),
           ),

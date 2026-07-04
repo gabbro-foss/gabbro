@@ -308,5 +308,26 @@ void main() {
       expect(find.text('Symbol'), findsNothing);
       expect(find.text('Letter'), findsNothing);
     });
+
+    // ADR-016 Phase 3 Slice D: the scroll chevrons are icons (icons don't apply
+    // textScaler), so scale them at large text to match the enlarged content.
+    testWidgets('scroll chevrons scale up at large text', (tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(
+        testApp(
+          Scaffold(body: PasswordBreakdownSheet(password: r'Xy7$kQ9!mZ2pR8wL')),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final icon = tester.widget<Icon>(find.byIcon(Icons.chevron_right).first);
+      expect(icon.size, isNotNull);
+      expect(icon.size! > 16, isTrue);
+    });
   });
 }

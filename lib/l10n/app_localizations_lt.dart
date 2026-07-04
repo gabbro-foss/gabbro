@@ -242,21 +242,6 @@ class AppLocalizationsLt extends AppLocalizations {
   String get themeDark => 'Tamsus';
 
   @override
-  String get textSizeSmall => 'Mažas';
-
-  @override
-  String get textSizeRegular => 'Įprastas';
-
-  @override
-  String get textSizeLarge => 'Didelis';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Tik telefone — planšetiniame kompiuteryje visada kairėje.';
 
@@ -513,6 +498,9 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Kitas puslapis';
+
+  @override
+  String get helpEnlargeImage => 'Padidinti vaizdą';
 
   @override
   String get tooltipEditAlias => 'Redaguoti slapyvardį';

@@ -84,11 +84,6 @@
   "themeLight": "Gaiša",
   "themeDark": "Tumša",
 
-  "textSizeSmall": "Mazs",
-  "textSizeRegular": "Parasts",
-  "textSizeLarge": "Liels",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Tikai tālrunī — planšetdatorā vienmēr kreisajā pusē.",
   "alphabetBarLeft": "Pa kreisi",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Pārlūkot",
   "tooltipPreviousPage": "Iepriekšējā lapa",
   "tooltipNextPage": "Nākamā lapa",
+  "helpEnlargeImage": "Palielināt attēlu",
   "tooltipEditAlias": "Rediģēt aizstājvārdu",
   "tooltipRemoveField": "Noņemt lauku",
   "tooltipRename": "Pārdēvēt",

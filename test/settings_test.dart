@@ -37,18 +37,18 @@ void main() {
     test('parses all fields correctly', () {
       final s = AppSettings.fromJson({
         'theme': 'dark',
-        'text_size': 'large',
+        'text_scale': 1.15,
         'high_contrast': true,
       });
       expect(s.theme, ThemeChoice.dark);
-      expect(s.textSize, TextSizeChoice.large);
+      expect(s.textScale, 1.15);
       expect(s.highContrast, isTrue);
     });
 
     test('falls back to defaults for missing keys', () {
       final s = AppSettings.fromJson({});
       expect(s.theme, ThemeChoice.system);
-      expect(s.textSize, TextSizeChoice.regular);
+      expect(s.textScale, 1.0);
       expect(s.highContrast, isFalse);
     });
 
@@ -56,13 +56,6 @@ void main() {
       for (final choice in ThemeChoice.values) {
         final s = AppSettings.fromJson({'theme': choice.name});
         expect(s.theme, choice);
-      }
-    });
-
-    test('all TextSizeChoice values round-trip', () {
-      for (final choice in TextSizeChoice.values) {
-        final s = AppSettings.fromJson({'text_size': choice.name});
-        expect(s.textSize, choice);
       }
     });
   });
@@ -73,24 +66,24 @@ void main() {
     test('serialises all fields', () {
       const s = AppSettings(
         theme: ThemeChoice.light,
-        textSize: TextSizeChoice.small,
+        textScale: 0.85,
         highContrast: false,
       );
       final json = s.toJson();
       expect(json['theme'], 'light');
-      expect(json['text_size'], 'small');
+      expect(json['text_scale'], 0.85);
       expect(json['high_contrast'], isFalse);
     });
 
     test('round-trips through fromJson', () {
       const original = AppSettings(
         theme: ThemeChoice.dark,
-        textSize: TextSizeChoice.extraLarge,
+        textScale: 1.3,
         highContrast: false,
       );
       final restored = AppSettings.fromJson(original.toJson());
       expect(restored.theme, original.theme);
-      expect(restored.textSize, original.textSize);
+      expect(restored.textScale, original.textScale);
       expect(restored.highContrast, original.highContrast);
     });
 
@@ -112,18 +105,18 @@ void main() {
       const original = AppSettings();
       final updated = original.copyWith(theme: ThemeChoice.dark);
       expect(updated.theme, ThemeChoice.dark);
-      expect(updated.textSize, original.textSize);
+      expect(updated.textScale, original.textScale);
       expect(updated.highContrast, original.highContrast);
     });
 
     test('leaving all params null returns equivalent settings', () {
       const original = AppSettings(
         theme: ThemeChoice.light,
-        textSize: TextSizeChoice.large,
+        textScale: 1.15,
       );
       final copy = original.copyWith();
       expect(copy.theme, original.theme);
-      expect(copy.textSize, original.textSize);
+      expect(copy.textScale, original.textScale);
     });
 
     test('overrides highContrast only', () {
@@ -131,28 +124,28 @@ void main() {
       final updated = original.copyWith(highContrast: true);
       expect(updated.highContrast, isTrue);
       expect(updated.theme, original.theme);
-      expect(updated.textSize, original.textSize);
+      expect(updated.textScale, original.textScale);
     });
 
     test('round-trips highContrast true through fromJson', () {
       const original = AppSettings(
         theme: ThemeChoice.dark,
-        textSize: TextSizeChoice.extraLarge,
+        textScale: 1.3,
         highContrast: true,
       );
       final restored = AppSettings.fromJson(original.toJson());
       expect(restored.highContrast, isTrue);
       expect(restored.theme, original.theme);
-      expect(restored.textSize, original.textSize);
+      expect(restored.textScale, original.textScale);
     });
   });
 
   // ── defaults ─────────────────────────────────────────────────────────────
 
-  test('defaults are system theme, regular text, no high contrast', () {
+  test('defaults are system theme, normal text scale, no high contrast', () {
     final d = AppSettings.defaults;
     expect(d.theme, ThemeChoice.system);
-    expect(d.textSize, TextSizeChoice.regular);
+    expect(d.textScale, 1.0);
     expect(d.highContrast, isFalse);
   });
 
@@ -419,6 +412,74 @@ void main() {
       const original = AppSettings();
       final updated = original.copyWith(tabletListPaneWidth: 400.0);
       expect(updated.tabletListPaneWidth, 400.0);
+      expect(updated.theme, original.theme);
+      expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
+    });
+  });
+
+  // ── textScale (ADR-016) ───────────────────────────────────────────────────
+
+  group('textScale', () {
+    test('A1 numeric text_scale round-trips through fromJson', () {
+      final s = AppSettings.fromJson({'text_scale': 2.5});
+      expect(s.textScale, 2.5);
+    });
+
+    test('A1 toJson round-trips textScale', () {
+      const original = AppSettings(textScale: 3.25);
+      final restored = AppSettings.fromJson(original.toJson());
+      expect(restored.textScale, 3.25);
+    });
+
+    test('A2 legacy text_size words migrate to numeric scale', () {
+      const cases = {
+        'small': 0.85,
+        'regular': 1.0,
+        'large': 1.15,
+        'extraLarge': 1.3,
+        'xxLarge': 1.5,
+      };
+      cases.forEach((word, scale) {
+        final s = AppSettings.fromJson({'text_size': word});
+        expect(s.textScale, scale, reason: 'text_size=$word');
+      });
+    });
+
+    test('A2 legacy extra_large underscore form migrates', () {
+      final s = AppSettings.fromJson({'text_size': 'extra_large'});
+      expect(s.textScale, 1.3);
+    });
+
+    test('A3 when both keys present, numeric text_scale wins', () {
+      final s = AppSettings.fromJson({'text_scale': 2.0, 'text_size': 'small'});
+      expect(s.textScale, 2.0);
+    });
+
+    test('A4 neither key defaults to 1.0', () {
+      final s = AppSettings.fromJson({'theme': 'dark'});
+      expect(s.textScale, 1.0);
+    });
+
+    test('A5 out-of-range clamps to [0.8, 8.0]', () {
+      expect(AppSettings.fromJson({'text_scale': 99.0}).textScale, 8.0);
+      expect(AppSettings.fromJson({'text_scale': 0.1}).textScale, 0.8);
+    });
+
+    test('A5 integer JSON value accepted', () {
+      final s = AppSettings.fromJson({'text_scale': 3});
+      expect(s.textScale, 3.0);
+    });
+
+    test('A6 toJson emits numeric text_scale and no text_size key', () {
+      final json = const AppSettings(textScale: 2.0).toJson();
+      expect(json['text_scale'], 2.0);
+      expect(json.containsKey('text_size'), isFalse);
+    });
+
+    test('copyWith overrides textScale only', () {
+      const original = AppSettings();
+      final updated = original.copyWith(textScale: 4.0);
+      expect(updated.textScale, 4.0);
       expect(updated.theme, original.theme);
       expect(updated.foregroundLockTimeout, original.foregroundLockTimeout);
     });

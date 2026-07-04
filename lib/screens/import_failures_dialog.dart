@@ -32,10 +32,8 @@ Future<int> showImportFailuresDialog(
       );
       final saved = await Navigator.of(context).push<bool>(
         MaterialPageRoute(
-          builder: (_) => CreateEntryScreen(
-            entryType: entryType,
-            prefill: prefill,
-          ),
+          builder: (_) =>
+              CreateEntryScreen(entryType: entryType, prefill: prefill),
         ),
       );
       if (saved == true) savedViaEdit++;
@@ -74,6 +72,7 @@ class _ImportFailureDialog extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return AlertDialog(
+      scrollable: true, // scroll title+content+actions together (ADR-016)
       title: Row(
         children: [
           Icon(Icons.warning_amber_rounded, color: colorScheme.error),

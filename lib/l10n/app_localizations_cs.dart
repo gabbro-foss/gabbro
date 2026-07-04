@@ -242,21 +242,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get themeDark => 'Tmavý';
 
   @override
-  String get textSizeSmall => 'Malý';
-
-  @override
-  String get textSizeRegular => 'Normální';
-
-  @override
-  String get textSizeLarge => 'Velký';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Pouze na telefonu — tablet vždy používá levou stranu.';
 
@@ -512,6 +497,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Další stránka';
+
+  @override
+  String get helpEnlargeImage => 'Zvětšit obrázek';
 
   @override
   String get tooltipEditAlias => 'Upravit alias';

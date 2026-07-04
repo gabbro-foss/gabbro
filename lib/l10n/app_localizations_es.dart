@@ -241,21 +241,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get themeDark => 'Oscuro';
 
   @override
-  String get textSizeSmall => 'Pequeño';
-
-  @override
-  String get textSizeRegular => 'Normal';
-
-  @override
-  String get textSizeLarge => 'Grande';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Solo en diseño de teléfono — la tableta siempre usa la izquierda.';
 
@@ -512,6 +497,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Página siguiente';
+
+  @override
+  String get helpEnlargeImage => 'Ampliar imagen';
 
   @override
   String get tooltipEditAlias => 'Editar alias';

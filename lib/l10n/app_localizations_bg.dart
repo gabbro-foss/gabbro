@@ -242,21 +242,6 @@ class AppLocalizationsBg extends AppLocalizations {
   String get themeDark => 'Тъмна';
 
   @override
-  String get textSizeSmall => 'Малък';
-
-  @override
-  String get textSizeRegular => 'Обичаен';
-
-  @override
-  String get textSizeLarge => 'Голям';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Само на телефон — таблетът винаги използва ляво.';
 
@@ -513,6 +498,9 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Следваща страница';
+
+  @override
+  String get helpEnlargeImage => 'Уголеми изображението';
 
   @override
   String get tooltipEditAlias => 'Редактирай псевдоним';

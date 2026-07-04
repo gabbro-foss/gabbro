@@ -84,11 +84,6 @@
   "themeLight": "Hele",
   "themeDark": "Tume",
 
-  "textSizeSmall": "Väike",
-  "textSizeRegular": "Tavaline",
-  "textSizeLarge": "Suur",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Ainult telefonil — tahvelarvutil kasutatakse alati vasakut.",
   "alphabetBarLeft": "Vasak",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Sirvi",
   "tooltipPreviousPage": "Eelmine leht",
   "tooltipNextPage": "Järgmine leht",
+  "helpEnlargeImage": "Suurenda pilti",
   "tooltipEditAlias": "Muuda aliast",
   "tooltipRemoveField": "Eemalda väli",
   "tooltipRename": "Nimeta ümber",

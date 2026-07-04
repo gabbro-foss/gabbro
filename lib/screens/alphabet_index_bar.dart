@@ -1,9 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/control_scale.dart';
 
 // Default (Latin) canon used when no locale-specific alphabet is supplied.
 const _kLatinCanon = [
-  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-  'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '#',
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z',
+  '#',
 ];
 
 // Minimum slot height that keeps letters readable.
@@ -57,15 +83,18 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
   // present letter) is centred in the window. Called once we have a real
   // windowSize from LayoutBuilder.
   int _initialWindowStart(int windowSize) {
-    final anchor = widget.initialLetter ??
+    final anchor =
+        widget.initialLetter ??
         widget.letters.firstWhere(
           (l) => widget.presentLetters.contains(l),
           orElse: () => widget.letters.first,
         );
     final anchorIndex = widget.letters.indexOf(anchor);
     final half = windowSize ~/ 2;
-    final maxStart =
-        (widget.letters.length - windowSize).clamp(0, widget.letters.length - 1);
+    final maxStart = (widget.letters.length - windowSize).clamp(
+      0,
+      widget.letters.length - 1,
+    );
     return (anchorIndex - half).clamp(0, maxStart);
   }
 
@@ -73,10 +102,13 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
   // Reserves space for 2 chevrons and 2 ellipsis slots (worst case); the
   // ellipsis slots are only shown when needed but we reserve space for both
   // unconditionally so the layout height is stable regardless of window position.
-  int _windowSize(double availableHeight) {
+  int _windowSize(double availableHeight, double chevronHeight) {
     final forLetters =
-        availableHeight - 2 * _kChevronHeight - 2 * _kMinSlotHeight;
-    return (forLetters / _kMinSlotHeight).floor().clamp(1, widget.letters.length);
+        availableHeight - 2 * chevronHeight - 2 * _kMinSlotHeight;
+    return (forLetters / _kMinSlotHeight).floor().clamp(
+      1,
+      widget.letters.length,
+    );
   }
 
   List<String> _windowedLetters(int size) {
@@ -86,8 +118,10 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
 
   void _shiftWindow(bool down, int windowSize) {
     final step = (windowSize ~/ 2).clamp(1, windowSize);
-    final maxStart =
-        (widget.letters.length - windowSize).clamp(0, widget.letters.length - 1);
+    final maxStart = (widget.letters.length - windowSize).clamp(
+      0,
+      widget.letters.length - 1,
+    );
     setState(() {
       _windowStart = down
           ? (_windowStart + step).clamp(0, maxStart)
@@ -107,8 +141,12 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
     }
   }
 
-  Widget _letterSlot(String letter, Color primary, double slotHeight,
-      {required int winSize}) {
+  Widget _letterSlot(
+    String letter,
+    Color primary,
+    double slotHeight, {
+    required int winSize,
+  }) {
     final isActive = letter == _activeLetter;
     final isPresent = widget.presentLetters.contains(letter);
     final circleSize = (slotHeight * 0.85).clamp(20.0, 36.0);
@@ -140,8 +178,8 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
                   color: isActive
                       ? Theme.of(context).colorScheme.onPrimary
                       : isPresent
-                          ? primary
-                          : primary.withValues(alpha: 0.25),
+                      ? primary
+                      : primary.withValues(alpha: 0.25),
                 ),
               ),
             ),
@@ -167,6 +205,7 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
     required bool enabled,
     required String label,
     required VoidCallback onTap,
+    required double scale,
   }) {
     final icon = up ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down;
     final primary = Theme.of(context).colorScheme.primary;
@@ -180,20 +219,20 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
       child: Tooltip(
         message: label,
         child: SizedBox(
-          height: _kChevronHeight,
+          height: _kChevronHeight * scale,
           child: Center(
             child: GestureDetector(
               onTap: enabled ? onTap : null,
               child: Container(
-                width: 28,
-                height: 28,
+                width: 28 * scale,
+                height: 28 * scale,
                 decoration: BoxDecoration(
                   color: enabled ? primary : primary.withValues(alpha: 0.25),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   icon,
-                  size: 18,
+                  size: 18 * scale,
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
@@ -205,18 +244,18 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
   }
 
   Widget _ellipsis(Color primary, double slotHeight) => SizedBox(
-        height: slotHeight,
-        child: Center(
-          child: Text(
-            '…',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: primary.withValues(alpha: 0.4),
-            ),
-          ),
+    height: slotHeight,
+    child: Center(
+      child: Text(
+        '…',
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: primary.withValues(alpha: 0.4),
         ),
-      );
+      ),
+    ),
+  );
 
   double _dragAccumulator = 0.0;
 
@@ -237,7 +276,11 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
     if (first.isNotEmpty) _handleDragOver(first);
   }
 
-  void _onDragUpdate(DragUpdateDetails details, int winSize, double slotHeight) {
+  void _onDragUpdate(
+    DragUpdateDetails details,
+    int winSize,
+    double slotHeight,
+  ) {
     _dragAccumulator += details.delta.dy;
     if (_dragAccumulator.abs() >= slotHeight) {
       final steps = (_dragAccumulator / slotHeight).truncate();
@@ -251,84 +294,119 @@ class _AlphabetIndexBarState extends State<AlphabetIndexBar> {
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
 
-    return LayoutBuilder(builder: (context, constraints) {
-      final availableHeight = constraints.maxHeight;
+    // Scroll chevrons grow with the text scale (bigger low-vision targets),
+    // capped at 1.5x like the letters so they never bleed off the 48px strip.
+    // The scaled reserved height feeds the windowed-mode layout math below so
+    // bigger chevrons simply leave room for a few fewer letters (no overflow).
+    // At normal text the factor is 1.0 -> every constant is unchanged.
+    final chevronScale = controlScaleFor(context).clamp(1.0, 1.5).toDouble();
+    final chevronHeight = _kChevronHeight * chevronScale;
 
-      // ── Full mode ──────────────────────────────────────────────────────────
-      // Enough room to show every slot: distribute available height evenly
-      // across all of them so children exactly fill the box — no overflow.
-      final fullModeThreshold = widget.letters.length * _kMinSlotHeight;
-      if (availableHeight >= fullModeThreshold) {
-        final slotHeight = availableHeight / widget.letters.length;
-        return Column(
-          mainAxisSize: MainAxisSize.max,
-          children: widget.letters
-              .map((l) => _letterSlot(l, primary, slotHeight,
-                  winSize: widget.letters.length))
-              .toList(),
-        );
-      }
+    // The bar is a fixed 48px strip: let the letters grow with text for
+    // readability but CAP the scale so they never bleed off it — the bar stays
+    // usable at every text size instead of being hidden (ADR-016 Phase 3 D).
+    final cappedScaler = TextScaler.linear(
+      MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.5),
+    );
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaler: cappedScaler),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final availableHeight = constraints.maxHeight;
 
-      // ── Windowed mode ──────────────────────────────────────────────────────
-      final winSize = _windowSize(availableHeight);
+          // ── Full mode ──────────────────────────────────────────────────────────
+          // Enough room to show every slot: distribute available height evenly
+          // across all of them so children exactly fill the box — no overflow.
+          final fullModeThreshold = widget.letters.length * _kMinSlotHeight;
+          if (availableHeight >= fullModeThreshold) {
+            final slotHeight = availableHeight / widget.letters.length;
+            return Column(
+              mainAxisSize: MainAxisSize.max,
+              children: widget.letters
+                  .map(
+                    (l) => _letterSlot(
+                      l,
+                      primary,
+                      slotHeight,
+                      winSize: widget.letters.length,
+                    ),
+                  )
+                  .toList(),
+            );
+          }
 
-      // Initialise window position once we have a real winSize from layout.
-      if (!_windowInitialised) {
-        _windowStart = _initialWindowStart(winSize);
-        _windowInitialised = true;
-      }
+          // ── Windowed mode ──────────────────────────────────────────────────────
+          final winSize = _windowSize(availableHeight, chevronHeight);
 
-      // Clamp in case availableHeight shrank (e.g. rotation).
-      final maxStart =
-          (widget.letters.length - winSize).clamp(0, widget.letters.length - 1);
-      if (_windowStart > maxStart) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) setState(() => _windowStart = maxStart);
-        });
-      }
+          // Initialise window position once we have a real winSize from layout.
+          if (!_windowInitialised) {
+            _windowStart = _initialWindowStart(winSize);
+            _windowInitialised = true;
+          }
 
-      final visible = _windowedLetters(winSize);
-      final showEllipsisTop = _canScrollUp;
-      final showEllipsisBottom = _canScrollDown(winSize);
+          // Clamp in case availableHeight shrank (e.g. rotation).
+          final maxStart = (widget.letters.length - winSize).clamp(
+            0,
+            widget.letters.length - 1,
+          );
+          if (_windowStart > maxStart) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) setState(() => _windowStart = maxStart);
+            });
+          }
 
-      // Always reserve space for 2 ellipsis slots so layout height is stable.
-      // When an ellipsis is absent its space is absorbed by a spacer below.
-      final forSlots =
-          availableHeight - 2 * _kChevronHeight - 2 * _kMinSlotHeight;
-      final slotHeight =
-          winSize > 0 ? (forSlots / winSize).clamp(_kMinSlotHeight, 48.0) : _kMinSlotHeight;
-      const ellipsisHeight = _kMinSlotHeight;
-      // Spacer fills the gap when an ellipsis is absent, keeping total height stable.
-      final topSpacer = showEllipsisTop ? null : const SizedBox(height: _kMinSlotHeight);
-      final bottomSpacer = showEllipsisBottom ? null : const SizedBox(height: _kMinSlotHeight);
+          final visible = _windowedLetters(winSize);
+          final showEllipsisTop = _canScrollUp;
+          final showEllipsisBottom = _canScrollDown(winSize);
 
-      return Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          _chevron(
-            up: true,
-            enabled: _canScrollUp,
-            label: widget.scrollUpLabel,
-            onTap: () => _shiftWindowAndNotify(false, winSize),
-          ),
-          if (showEllipsisTop)
-            _ellipsis(primary, ellipsisHeight)
-          else
-            topSpacer!,
-          ...visible.map((l) =>
-              _letterSlot(l, primary, slotHeight, winSize: winSize)),
-          if (showEllipsisBottom)
-            _ellipsis(primary, ellipsisHeight)
-          else
-            bottomSpacer!,
-          _chevron(
-            up: false,
-            enabled: _canScrollDown(winSize),
-            label: widget.scrollDownLabel,
-            onTap: () => _shiftWindowAndNotify(true, winSize),
-          ),
-        ],
-      );
-    });
+          // Always reserve space for 2 ellipsis slots so layout height is stable.
+          // When an ellipsis is absent its space is absorbed by a spacer below.
+          final forSlots =
+              availableHeight - 2 * chevronHeight - 2 * _kMinSlotHeight;
+          final slotHeight = winSize > 0
+              ? (forSlots / winSize).clamp(_kMinSlotHeight, 48.0)
+              : _kMinSlotHeight;
+          const ellipsisHeight = _kMinSlotHeight;
+          // Spacer fills the gap when an ellipsis is absent, keeping total height stable.
+          final topSpacer = showEllipsisTop
+              ? null
+              : const SizedBox(height: _kMinSlotHeight);
+          final bottomSpacer = showEllipsisBottom
+              ? null
+              : const SizedBox(height: _kMinSlotHeight);
+
+          return Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              _chevron(
+                up: true,
+                enabled: _canScrollUp,
+                label: widget.scrollUpLabel,
+                onTap: () => _shiftWindowAndNotify(false, winSize),
+                scale: chevronScale,
+              ),
+              if (showEllipsisTop)
+                _ellipsis(primary, ellipsisHeight)
+              else
+                topSpacer!,
+              ...visible.map(
+                (l) => _letterSlot(l, primary, slotHeight, winSize: winSize),
+              ),
+              if (showEllipsisBottom)
+                _ellipsis(primary, ellipsisHeight)
+              else
+                bottomSpacer!,
+              _chevron(
+                up: false,
+                enabled: _canScrollDown(winSize),
+                label: widget.scrollDownLabel,
+                onTap: () => _shiftWindowAndNotify(true, winSize),
+                scale: chevronScale,
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 }

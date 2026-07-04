@@ -84,11 +84,6 @@
   "themeLight": "ライト",
   "themeDark": "ダーク",
 
-  "textSizeSmall": "小",
-  "textSizeRegular": "標準",
-  "textSizeLarge": "大",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "スマートフォンのみ — タブレットは常に左側を使用します。",
   "alphabetBarLeft": "左",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "参照",
   "tooltipPreviousPage": "前のページ",
   "tooltipNextPage": "次のページ",
+  "helpEnlargeImage": "画像を拡大",
   "tooltipEditAlias": "エイリアスを編集",
   "tooltipRemoveField": "フィールドを削除",
   "tooltipRename": "名前変更",

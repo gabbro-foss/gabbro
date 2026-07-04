@@ -84,11 +84,6 @@
   "themeLight": "Светла",
   "themeDark": "Тъмна",
 
-  "textSizeSmall": "Малък",
-  "textSizeRegular": "Обичаен",
-  "textSizeLarge": "Голям",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Само на телефон — таблетът винаги използва ляво.",
   "alphabetBarLeft": "Вляво",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Преглед",
   "tooltipPreviousPage": "Предишна страница",
   "tooltipNextPage": "Следваща страница",
+  "helpEnlargeImage": "Уголеми изображението",
   "tooltipEditAlias": "Редактирай псевдоним",
   "tooltipRemoveField": "Премахни поле",
   "tooltipRename": "Преименувай",

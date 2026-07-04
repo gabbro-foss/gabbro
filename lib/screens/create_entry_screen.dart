@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/safe_file_picker.dart';
@@ -1062,6 +1063,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: l.fieldPassword,
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
+          iconSize: scaledSuffixIconSize(context),
           icon: Icon(
             _passwordObscured ? Icons.visibility_off : Icons.visibility,
           ),
@@ -1302,6 +1304,8 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     ),
     const SizedBox(height: 12),
     DropdownButtonFormField<String>(
+      isExpanded: true, // fill the field so a long value wraps, never clips (ADR-016)
+      itemHeight: null, // open-menu items grow to their wrapped height at large text
       initialValue: _cardStatuses.contains(_cardStatusController.text)
           ? _cardStatusController.text
           : 'active',
@@ -1309,6 +1313,11 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: l.fieldCardStatus,
         border: const OutlineInputBorder(),
       ),
+      // Ellipsize the collapsed one-line selection (ADR-016).
+      selectedItemBuilder: (context) => _cardStatuses
+          .map((s) => Text(_localizeCardStatus(s, l),
+              maxLines: 1, overflow: TextOverflow.ellipsis))
+          .toList(),
       items: _cardStatuses.map((s) => DropdownMenuItem<String>(
         value: s,
         child: Text(_localizeCardStatus(s, l)),
@@ -1409,6 +1418,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
               labelText: l.fieldCvv,
               border: const OutlineInputBorder(),
               suffixIcon: IconButton(
+                iconSize: scaledSuffixIconSize(context),
                 icon: Icon(
                   _cvvObscured ? Icons.visibility_off : Icons.visibility,
                 ),
@@ -1442,6 +1452,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         labelText: l.fieldCardPin,
         border: const OutlineInputBorder(),
         suffixIcon: IconButton(
+          iconSize: scaledSuffixIconSize(context),
           icon: Icon(
             _pinObscured ? Icons.visibility_off : Icons.visibility,
           ),
@@ -1647,6 +1658,7 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
                       labelText: l.fieldValue,
                       border: const OutlineInputBorder(),
                       suffixIcon: IconButton(
+                        iconSize: scaledSuffixIconSize(context),
                         icon: Icon(
                           f.hidden ? Icons.visibility_off : Icons.visibility,
                         ),
@@ -1684,11 +1696,20 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     if (_selectedFolder.isNotEmpty) folderSet.add(_selectedFolder);
     final folderItems = folderSet.toList()..sort();
     return DropdownButtonFormField<String>(
+      isExpanded: true, // fill the field so a long folder wraps, never clips (ADR-016)
+      itemHeight: null, // open-menu items grow to their wrapped height at large text
       initialValue: _selectedFolder,
       decoration: InputDecoration(
         labelText: l.fieldFolder,
         border: const OutlineInputBorder(),
       ),
+      // Ellipsize the collapsed one-line selection (ADR-016).
+      selectedItemBuilder: (context) => [
+        Text(l.noFolder, maxLines: 1, overflow: TextOverflow.ellipsis),
+        ...folderItems.map(
+          (f) => Text(f, maxLines: 1, overflow: TextOverflow.ellipsis),
+        ),
+      ],
       items: [
         DropdownMenuItem(value: '', child: Text(l.noFolder)),
         ...folderItems.map((f) => DropdownMenuItem(value: f, child: Text(f))),
@@ -1724,11 +1745,17 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
     bool required = true,
   }) {
     return DropdownButtonFormField<String>(
+      isExpanded: true, // fill the field so a long value wraps, never clips (ADR-016)
+      itemHeight: null, // open-menu items grow to their wrapped height at large text
       initialValue: initialValue,
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
       ),
+      // Ellipsize the collapsed one-line selection (ADR-016).
+      selectedItemBuilder: (context) => items
+          .map((s) => Text(s, maxLines: 1, overflow: TextOverflow.ellipsis))
+          .toList(),
       items: items
           .map((s) => DropdownMenuItem(value: s, child: Text(s)))
           .toList(),

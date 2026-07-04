@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
 import 'package:gabbro/screens/about_screen.dart';
@@ -321,20 +322,21 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
                                     ? MergeSemantics(
                                         child: Semantics(
                                           label: widget.displayTitle(entry),
-                                          child: Checkbox(
-                                            visualDensity:
-                                                VisualDensity.compact,
-                                            value: widget.selectedIds.contains(
-                                              entry.id,
+                                          child: scaledSelectionCheckbox(
+                                            context,
+                                            Checkbox(
+                                              value: widget.selectedIds.contains(
+                                                entry.id,
+                                              ),
+                                              onChanged: (_) => widget
+                                                  .onToggleSelection(entry.id),
                                             ),
-                                            onChanged: (_) => widget
-                                                .onToggleSelection(entry.id),
                                           ),
                                         ),
                                       )
                                     : Icon(
                                         widget.entryTypeIcon(entry.entryType),
-                                        size: 20,
+                                        size: scaledIconSize(context, 20),
                                         color: theme.colorScheme.primary,
                                         semanticLabel: widget.displayType(
                                           entry.entryType,
@@ -393,23 +395,23 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
           labelType: NavigationRailLabelType.all,
           destinations: [
             NavigationRailDestination(
-              icon: const Icon(Icons.lock_outline),
-              selectedIcon: const Icon(Icons.lock),
+              icon: Icon(Icons.lock_outline, size: scaledIconSize(context)),
+              selectedIcon: Icon(Icons.lock, size: scaledIconSize(context)),
               label: Text(l.navVault),
             ),
             NavigationRailDestination(
-              icon: const Icon(Icons.palette_outlined),
-              selectedIcon: const Icon(Icons.palette),
+              icon: Icon(Icons.palette_outlined, size: scaledIconSize(context)),
+              selectedIcon: Icon(Icons.palette, size: scaledIconSize(context)),
               label: Text(l.appearanceTitle),
             ),
             NavigationRailDestination(
-              icon: const Icon(Icons.security_outlined),
-              selectedIcon: const Icon(Icons.security),
+              icon: Icon(Icons.security_outlined, size: scaledIconSize(context)),
+              selectedIcon: Icon(Icons.security, size: scaledIconSize(context)),
               label: Text(l.securityTitle),
             ),
             NavigationRailDestination(
-              icon: const Icon(Icons.info_outline),
-              selectedIcon: const Icon(Icons.info),
+              icon: Icon(Icons.info_outline, size: scaledIconSize(context)),
+              selectedIcon: Icon(Icons.info, size: scaledIconSize(context)),
               label: Text(l.navAbout),
             ),
           ],

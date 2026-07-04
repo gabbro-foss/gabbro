@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/control_scale.dart';
 
 class ManageFoldersScreen extends StatefulWidget {
   const ManageFoldersScreen({
@@ -49,6 +50,8 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
         final l = AppLocalizations.of(context);
         return StatefulBuilder(
           builder: (context, setState) => AlertDialog(
+            // scrollable scrolls title + content + actions together (ADR-016).
+            scrollable: true,
             title: Text(l.deleteFolderTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -68,9 +71,24 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
                   ),
                   if (reassignTarget != null)
                     DropdownButton<String>(
+                      isExpanded: true,
+                      itemHeight:
+                          null, // menu items grow to wrapped height at large text
                       value: reassignTarget,
+                      // Collapsed selection ellipsizes instead of hard-clipping (ADR-016).
+                      selectedItemBuilder: (context) => otherFolders
+                          .map(
+                            (f) => Text(
+                              f,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                          .toList(),
                       items: otherFolders
-                          .map((f) => DropdownMenuItem(value: f, child: Text(f)))
+                          .map(
+                            (f) => DropdownMenuItem(value: f, child: Text(f)),
+                          )
                           .toList(),
                       onChanged: (v) => setState(() => reassignTarget = v),
                     ),
@@ -212,7 +230,7 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,
         tooltip: l.addFolderTitle,
-        child: const Icon(Icons.add),
+        child: Icon(Icons.add, size: scaledIconSize(context)),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -220,41 +238,43 @@ class _ManageFoldersScreenState extends State<ManageFoldersScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   child: Text(
                     l.manageFoldersDefaultNote,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
                 Expanded(
                   child: ListView.builder(
-              itemCount: _folders.length,
-              itemBuilder: (context, index) {
-                final folder = _folders[index];
-                return ListTile(
-                  leading: const Icon(Icons.folder_outlined),
-                  title: Text(folder),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined),
-                        tooltip: l.rename,
-                        onPressed: () => _showRenameDialog(folder),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        tooltip: l.delete,
-                        onPressed: () => _showDeleteDialog(folder),
-                      ),
-                    ],
+                    itemCount: _folders.length,
+                    itemBuilder: (context, index) {
+                      final folder = _folders[index];
+                      return ListTile(
+                        leading: const Icon(Icons.folder_outlined),
+                        title: Text(folder),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit_outlined),
+                              tooltip: l.rename,
+                              onPressed: () => _showRenameDialog(folder),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              tooltip: l.delete,
+                              onPressed: () => _showDeleteDialog(folder),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
                 ),
               ],
             ),

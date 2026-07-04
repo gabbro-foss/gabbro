@@ -24,6 +24,10 @@ class _SkippedEntriesDialog extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return AlertDialog(
+      // scrollable scrolls the note + list + actions together; the list below
+      // is shrinkWrapped + non-scrolling so there is no fixed height to clip and
+      // no nested scroll (ADR-016).
+      scrollable: true,
       title: Row(
         children: [
           Icon(Icons.info_outline, color: colorScheme.primary),
@@ -36,42 +40,38 @@ class _SkippedEntriesDialog extends StatelessWidget {
           ),
         ],
       ),
-      content: SizedBox(
-        width: double.maxFinite,
-        height: 300,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l.skippedEntriesNote,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
+      // A plain Column (not a ListView) so it works inside scrollable:true's
+      // intrinsic-width pass; the dialog's own scroll handles overflow (ADR-016).
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l.skippedEntriesNote,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
             ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: ListView.separated(
-                itemCount: skipped.length,
-                separatorBuilder: (_, _) => const Divider(height: 1),
-                itemBuilder: (_, i) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(skipped[i].title, style: theme.textTheme.bodyMedium),
-                      Text(
-                        skipped[i].reason,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
+          ),
+          const SizedBox(height: 12),
+          for (var i = 0; i < skipped.length; i++) ...[
+            if (i > 0) const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(skipped[i].title, style: theme.textTheme.bodyMedium),
+                  Text(
+                    skipped[i].reason,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ],
-        ),
+        ],
       ),
       actions: [
         FilledButton(

@@ -84,11 +84,6 @@
   "themeLight": "Svetlý",
   "themeDark": "Tmavý",
 
-  "textSizeSmall": "Malý",
-  "textSizeRegular": "Normálny",
-  "textSizeLarge": "Veľký",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Iba na telefóne — tablet vždy používa ľavú stranu.",
   "alphabetBarLeft": "Vľavo",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Prehľadávať",
   "tooltipPreviousPage": "Predchádzajúca strana",
   "tooltipNextPage": "Ďalšia strana",
+  "helpEnlargeImage": "Zväčšiť obrázok",
   "tooltipEditAlias": "Upraviť alias",
   "tooltipRemoveField": "Odstrániť pole",
   "tooltipRename": "Premenovať",

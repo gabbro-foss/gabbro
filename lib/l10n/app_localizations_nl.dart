@@ -241,21 +241,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get themeDark => 'Donker';
 
   @override
-  String get textSizeSmall => 'Klein';
-
-  @override
-  String get textSizeRegular => 'Normaal';
-
-  @override
-  String get textSizeLarge => 'Groot';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Alleen voor telefoonindeling — tablet gebruikt altijd links.';
 
@@ -512,6 +497,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Volgende pagina';
+
+  @override
+  String get helpEnlargeImage => 'Afbeelding vergroten';
 
   @override
   String get tooltipEditAlias => 'Alias bewerken';

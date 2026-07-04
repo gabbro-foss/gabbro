@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
+import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/safe_file_picker.dart';
 import 'package:gabbro/screens/alphabet_index_bar.dart';
@@ -53,8 +54,10 @@ Future<MergeSummary> _defaultMergeVaultWithKey(
 );
 
 /// Fast auto-merge (incoming wins, no prompts) — the "Merge automatically" path.
-Future<MergeSummary> _defaultFastMergeVault(String path, List<int> passphrase) =>
-    fastMergeVaultFromFile(path: path, passphrase: passphrase);
+Future<MergeSummary> _defaultFastMergeVault(
+  String path,
+  List<int> passphrase,
+) => fastMergeVaultFromFile(path: path, passphrase: passphrase);
 
 Future<MergeSummary> _defaultFastMergeVaultWithKey(
   String path,
@@ -580,6 +583,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                 (t) => ListTile(
                   leading: Icon(
                     _entryTypeIcon(t.$1),
+                    size: scaledIconSize(context),
                     color: Theme.of(context).colorScheme.primary,
                     semanticLabel: t.$2,
                   ),
@@ -769,15 +773,30 @@ class _VaultListScreenState extends State<VaultListScreen>
     final fast = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        // The two choices are long buttons; at large text they must stay
+        // reachable, so they live in scrollable content, not the actions bar
+        // (which does not scroll). Cancel replaces the barrier tap (ADR-016).
+        scrollable: true,
         title: Text(chooseL.syncMethodTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(chooseL.syncMergeAutomatically),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(chooseL.syncReviewAllChanges),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(chooseL.syncReviewAllChanges),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(chooseL.syncMergeAutomatically),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(chooseL.cancel),
           ),
         ],
       ),
@@ -889,7 +908,9 @@ class _VaultListScreenState extends State<VaultListScreen>
           if (mounted) _loadEntries();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(AppLocalizations.of(context).syncCancelled)),
+              SnackBar(
+                content: Text(AppLocalizations.of(context).syncCancelled),
+              ),
             );
           }
           return;
@@ -948,7 +969,9 @@ class _VaultListScreenState extends State<VaultListScreen>
             deletedTitles.isNotEmpty;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l.vaultSynced(addedCount, updatedCount, deletedCount)),
+            content: Text(
+              l.vaultSynced(addedCount, updatedCount, deletedCount),
+            ),
             // An actioned snackbar never auto-dismisses (Material accessibility
             // rule), so give it an explicit close button. Its "Close" label is
             // localized + screen-reader-exposed via MaterialLocalizations.
@@ -1032,17 +1055,16 @@ class _VaultListScreenState extends State<VaultListScreen>
     return showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true, // scroll title+content+actions together (ADR-016)
         title: Text(l.syncSummaryTitle),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              group(l.syncSummaryAdded, added),
-              group(l.syncSummaryUpdated, updated),
-              group(l.syncSummaryDeleted, deleted),
-            ],
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            group(l.syncSummaryAdded, added),
+            group(l.syncSummaryUpdated, updated),
+            group(l.syncSummaryDeleted, deleted),
+          ],
         ),
         actions: [
           TextButton(
@@ -1177,16 +1199,18 @@ class _VaultListScreenState extends State<VaultListScreen>
     return MergeSemantics(
       child: Semantics(
         label: label,
-        child: Checkbox(
-          visualDensity: VisualDensity.compact,
-          value: _selectedIds.contains(entry.id),
-          onChanged: (_) => setState(() {
-            if (_selectedIds.contains(entry.id)) {
-              _selectedIds.remove(entry.id);
-            } else {
-              _selectedIds.add(entry.id);
-            }
-          }),
+        child: scaledSelectionCheckbox(
+          context,
+          Checkbox(
+            value: _selectedIds.contains(entry.id),
+            onChanged: (_) => setState(() {
+              if (_selectedIds.contains(entry.id)) {
+                _selectedIds.remove(entry.id);
+              } else {
+                _selectedIds.add(entry.id);
+              }
+            }),
+          ),
         ),
       ),
     );
@@ -1277,16 +1301,19 @@ class _VaultListScreenState extends State<VaultListScreen>
           if (!_isSelecting) ...[
             IconButton(
               icon: const Icon(Icons.checklist),
+              iconSize: scaledIconSize(context),
               tooltip: l.tooltipSelectEntries,
               onPressed: () => setState(() => _selectionMode = true),
             ),
             IconButton(
               icon: const Icon(Icons.lock_outline),
+              iconSize: scaledIconSize(context),
               tooltip: l.tooltipLockVault,
               onPressed: _lockAndExit,
             ),
             PopupMenuButton<String>(
               icon: const Icon(Icons.menu),
+              iconSize: scaledIconSize(context),
               tooltip: l.tooltipMenu,
               onSelected: _onMenuSelected,
               itemBuilder: (context) {
@@ -1296,7 +1323,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'export',
                     child: Row(
                       children: [
-                        const Icon(Icons.upload_outlined, size: 20),
+                        Icon(Icons.upload_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuExportVault)),
                       ],
@@ -1306,7 +1333,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'import',
                     child: Row(
                       children: [
-                        const Icon(Icons.download_outlined, size: 20),
+                        Icon(Icons.download_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuImportEntries)),
                       ],
@@ -1316,7 +1343,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'sync',
                     child: Row(
                       children: [
-                        const Icon(Icons.sync, size: 20),
+                        Icon(Icons.sync, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuSyncFromFile)),
                       ],
@@ -1327,7 +1354,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'manage_vaults',
                     child: Row(
                       children: [
-                        const Icon(Icons.folder_special_outlined, size: 20),
+                        Icon(Icons.folder_special_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuManageVaults)),
                       ],
@@ -1338,7 +1365,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'change_passphrase',
                     child: Row(
                       children: [
-                        const Icon(Icons.key_outlined, size: 20),
+                        Icon(Icons.key_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuChangePassphrase)),
                       ],
@@ -1349,9 +1376,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'yubikeys',
                     child: Row(
                       children: [
-                        const Icon(Icons.security_outlined, size: 20),
+                        Icon(Icons.security_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
-                        Text(ml.menuManageYubiKeys),
+                        Expanded(child: Text(ml.menuManageYubiKeys)),
                       ],
                     ),
                   ),
@@ -1360,9 +1387,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'appearance',
                     child: Row(
                       children: [
-                        const Icon(Icons.palette_outlined, size: 20),
+                        Icon(Icons.palette_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
-                        Text(ml.menuAppearance),
+                        Expanded(child: Text(ml.menuAppearance)),
                       ],
                     ),
                   ),
@@ -1370,9 +1397,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'language',
                     child: Row(
                       children: [
-                        const Icon(Icons.language_outlined, size: 20),
+                        Icon(Icons.language_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
-                        Text(ml.sectionLanguage),
+                        Expanded(child: Text(ml.sectionLanguage)),
                       ],
                     ),
                   ),
@@ -1380,9 +1407,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'security',
                     child: Row(
                       children: [
-                        const Icon(Icons.shield_outlined, size: 20),
+                        Icon(Icons.shield_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
-                        Text(ml.menuSecurity),
+                        Expanded(child: Text(ml.menuSecurity)),
                       ],
                     ),
                   ),
@@ -1390,7 +1417,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'manage_folders',
                     child: Row(
                       children: [
-                        const Icon(Icons.folder_outlined, size: 20),
+                        Icon(Icons.folder_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuManageFolders)),
                       ],
@@ -1400,7 +1427,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'generator',
                     child: Row(
                       children: [
-                        const Icon(Icons.casino_outlined, size: 20),
+                        Icon(Icons.casino_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuPasswordGenerator)),
                       ],
@@ -1411,9 +1438,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'help',
                     child: Row(
                       children: [
-                        const Icon(Icons.help_outline, size: 20),
+                        Icon(Icons.help_outline, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
-                        Text(ml.menuHelp),
+                        Expanded(child: Text(ml.menuHelp)),
                       ],
                     ),
                   ),
@@ -1421,9 +1448,9 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'about',
                     child: Row(
                       children: [
-                        const Icon(Icons.info_outline, size: 20),
+                        Icon(Icons.info_outline, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
-                        Text(ml.menuAbout),
+                        Expanded(child: Text(ml.menuAbout)),
                       ],
                     ),
                   ),
@@ -1489,7 +1516,7 @@ class _VaultListScreenState extends State<VaultListScreen>
           : FloatingActionButton(
               onPressed: _showTypePicker,
               tooltip: l.newEntryTitle,
-              child: const Icon(Icons.add),
+              child: Icon(Icons.add, size: scaledIconSize(context)),
             ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -1547,7 +1574,27 @@ class _VaultListScreenState extends State<VaultListScreen>
                       padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                       child: DropdownButton<String>(
                         isExpanded: true,
+                        // Let open-menu items grow to their wrapped height
+                        // instead of clipping at the default 48px (ADR-016).
+                        itemHeight: null,
                         value: _selectedFolder,
+                        // The button shows the selection on one line; ellipsize
+                        // it so a long folder truncates cleanly instead of
+                        // hard-clipping mid-glyph at large text (ADR-016).
+                        selectedItemBuilder: (context) => [
+                          Text(
+                            l.allFolders,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          ..._folders.map(
+                            (f) => Text(
+                              f,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                         onChanged: (value) =>
                             setState(() => _selectedFolder = value ?? ''),
                         items: [
@@ -1628,7 +1675,27 @@ class _VaultListScreenState extends State<VaultListScreen>
                     padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
                     child: DropdownButton<String>(
                       isExpanded: true,
+                      // Let open-menu items grow to their wrapped height
+                      // instead of clipping at the default 48px (ADR-016).
+                      itemHeight: null,
                       value: _selectedFolder,
+                      // Ellipsize the button's one-line selection so a long
+                      // folder truncates cleanly instead of hard-clipping at
+                      // large text (ADR-016).
+                      selectedItemBuilder: (context) => [
+                        Text(
+                          l.allFolders,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        ..._folders.map(
+                          (f) => Text(
+                            f,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                       onChanged: (value) =>
                           setState(() => _selectedFolder = value ?? ''),
                       items: [
@@ -1708,7 +1775,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                                             )
                                           : Icon(
                                               _entryTypeIcon(entry.entryType),
-                                              size: 20,
+                                              size: scaledIconSize(context, 20),
                                               color: Theme.of(
                                                 context,
                                               ).colorScheme.primary,
@@ -1907,161 +1974,157 @@ class SyncPassphraseDialogState extends State<SyncPassphraseDialog> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     return AlertDialog(
+      // scrollable scrolls title + content + actions together so neither the
+      // soft keyboard nor large text strands the action buttons (ADR-016).
+      scrollable: true,
       title: Text(l.syncFromFileTitle),
-      // Scroll the content so the soft keyboard never pushes the action buttons
-      // up over the fields (passphrase + PIN + transport can exceed the height
-      // left above the keyboard).
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.filePath,
-              style: Theme.of(context).textTheme.bodySmall,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _ctrl,
-              obscureText: !_showPass,
-              // A key-protected source needs a PIN, so advance to it; otherwise
-              // Enter submits.
-              onSubmitted: (_) => widget.isKeyProtected
-                  ? _pinFocus.requestFocus()
-                  : _submit(),
-              decoration: InputDecoration(
-                labelText: l.vaultPassphraseLabel,
-                border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _showPass ? Icons.visibility_off : Icons.visibility,
-                  ),
-                  tooltip: _showPass ? l.tooltipHide : l.tooltipShow,
-                  onPressed: () => setState(() => _showPass = !_showPass),
-                ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.filePath,
+            style: Theme.of(context).textTheme.bodySmall,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _ctrl,
+            obscureText: !_showPass,
+            // A key-protected source needs a PIN, so advance to it; otherwise
+            // Enter submits.
+            onSubmitted: (_) =>
+                widget.isKeyProtected ? _pinFocus.requestFocus() : _submit(),
+            decoration: InputDecoration(
+              labelText: l.vaultPassphraseLabel,
+              border: const OutlineInputBorder(),
+              suffixIcon: IconButton(
+                iconSize: scaledSuffixIconSize(context),
+                icon: Icon(_showPass ? Icons.visibility_off : Icons.visibility),
+                tooltip: _showPass ? l.tooltipHide : l.tooltipShow,
+                onPressed: () => setState(() => _showPass = !_showPass),
               ),
             ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l.syncSafeToRetry,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+            ],
+          ),
+          if (widget.isKeyProtected) ...[
             const SizedBox(height: 12),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
-                  Icons.info_outline,
-                  size: 18,
+                  Icons.usb,
+                  size: 20,
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    l.syncSafeToRetry,
+                    l.importSourceKeyProtected,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
               ],
             ),
-            if (widget.isKeyProtected) ...[
+            const SizedBox(height: 12),
+            TextField(
+              controller: _pinCtrl,
+              focusNode: _pinFocus,
+              obscureText: _pinObscured,
+              onSubmitted: (_) => _submit(),
+              decoration: InputDecoration(
+                labelText: l.yubiKeyPinLabel,
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  iconSize: scaledSuffixIconSize(context),
+                  icon: Icon(
+                    _pinObscured ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  tooltip: _pinObscured ? l.tooltipShowPin : l.tooltipHidePin,
+                  onPressed: () => setState(() => _pinObscured = !_pinObscured),
+                ),
+              ),
+            ),
+            if (widget.isAndroid && nfcAvailable) ...[
               const SizedBox(height: 12),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.usb,
-                    size: 20,
-                    color: Theme.of(context).colorScheme.primary,
+                  Text(
+                    l.transportLabel,
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
+                  // Expanded so the segmented button fits the narrow dialog
+                  // width instead of overflowing the Row.
                   Expanded(
-                    child: Text(
-                      l.importSourceKeyProtected,
-                      style: Theme.of(context).textTheme.bodySmall,
+                    child: SegmentedButton<String>(
+                      segments: [
+                        ButtonSegment(
+                          value: 'usb',
+                          label: Text(l.transportUsb),
+                        ),
+                        ButtonSegment(
+                          value: 'nfc',
+                          label: Text(l.transportNfc),
+                        ),
+                      ],
+                      selected: {_transport},
+                      onSelectionChanged: (s) =>
+                          setState(() => _transport = s.first),
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _pinCtrl,
-                focusNode: _pinFocus,
-                obscureText: _pinObscured,
-                onSubmitted: (_) => _submit(),
-                decoration: InputDecoration(
-                  labelText: l.yubiKeyPinLabel,
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _pinObscured ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    tooltip: _pinObscured ? l.tooltipShowPin : l.tooltipHidePin,
-                    onPressed: () =>
-                        setState(() => _pinObscured = !_pinObscured),
-                  ),
-                ),
-              ),
-              if (widget.isAndroid && nfcAvailable) ...[
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Text(
-                      l.transportLabel,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    const SizedBox(width: 12),
-                    // Expanded so the segmented button fits the narrow dialog
-                    // width instead of overflowing the Row.
-                    Expanded(
-                      child: SegmentedButton<String>(
-                        segments: [
-                          ButtonSegment(
-                            value: 'usb',
-                            label: Text(l.transportUsb),
-                          ),
-                          ButtonSegment(
-                            value: 'nfc',
-                            label: Text(l.transportNfc),
-                          ),
-                        ],
-                        selected: {_transport},
-                        onSelectionChanged: (s) =>
-                            setState(() => _transport = s.first),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ],
-            if (_tapping) ...[
-              const SizedBox(height: 12),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.touch_app,
-                    size: 20,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      l.tapYubiKeyNow,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            if (_error != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                _error!,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.error,
-                  fontSize: 12,
-                ),
               ),
             ],
           ],
-        ),
+          if (_tapping) ...[
+            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.touch_app,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    l.tapYubiKeyNow,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              _error!,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ],
       ),
       actions: [
         TextButton(
@@ -2088,6 +2151,9 @@ class _ChipRowFadeEdge extends StatelessWidget {
   Widget build(BuildContext context) {
     final isRight = alignment == Alignment.centerRight;
     final color = Theme.of(context).scaffoldBackgroundColor;
+    // Grow the chevron with the text scale (capped 1.5x — it lives in a fixed
+    // 48px edge), matching the alphabet bar and breakdown sheet.
+    final s = controlScaleFor(context).clamp(1.0, 1.5).toDouble();
     // Button semantics + a desktop hover tooltip, matching the alphabet index
     // bar. The Tooltip sits inside the excludeSemantics wrapper so the label is
     // announced once, not twice.
@@ -2111,8 +2177,8 @@ class _ChipRowFadeEdge extends StatelessWidget {
             ),
             child: Center(
               child: Container(
-                width: 28,
-                height: 28,
+                width: 28 * s,
+                height: 28 * s,
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.primary,
                   shape: BoxShape.circle,
@@ -2120,7 +2186,7 @@ class _ChipRowFadeEdge extends StatelessWidget {
                 child: Icon(
                   isRight ? Icons.chevron_right : Icons.chevron_left,
                   color: Theme.of(context).colorScheme.onPrimary,
-                  size: 20,
+                  size: 20 * s,
                 ),
               ),
             ),

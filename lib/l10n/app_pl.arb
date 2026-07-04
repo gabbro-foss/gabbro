@@ -84,11 +84,6 @@
   "themeLight": "Jasny",
   "themeDark": "Ciemny",
 
-  "textSizeSmall": "Mały",
-  "textSizeRegular": "Normalny",
-  "textSizeLarge": "Duży",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Tylko na telefonie — tablet zawsze używa lewej strony.",
   "alphabetBarLeft": "Lewa",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Przeglądaj",
   "tooltipPreviousPage": "Poprzednia strona",
   "tooltipNextPage": "Następna strona",
+  "helpEnlargeImage": "Powiększ obraz",
   "tooltipEditAlias": "Edytuj alias",
   "tooltipRemoveField": "Usuń pole",
   "tooltipRename": "Zmień nazwę",

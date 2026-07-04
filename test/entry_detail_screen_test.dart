@@ -694,4 +694,85 @@ void main() {
     await tester.pumpWidget(_buildScreen(VaultEntryData.login(entry)));
     expect(find.text('user@example.com'), findsOneWidget);
   });
+
+  // ADR-016 accessibility follow-up: app-bar action icons grow with the text
+  // scale so a low-vision user gets bigger targets (24 at normal text).
+  group('app-bar action icons scale at large text', () {
+    double iconSizeOf(WidgetTester tester, IconData icon) => tester
+        .widget<IconButton>(
+          find
+              .ancestor(of: find.byIcon(icon), matching: find.byType(IconButton))
+              .first,
+        )
+        .iconSize!;
+
+    testWidgets('edit and delete icons scale up', (tester) async {
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen(VaultEntryData.login(_loginEntry())));
+      await tester.pumpAndSettle();
+
+      expect(iconSizeOf(tester, Icons.edit_outlined), greaterThan(24));
+      expect(iconSizeOf(tester, Icons.delete_outline), greaterThan(24));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('file-export download icon scales up', (tester) async {
+      final entry = FileEntryData(
+        id: 'test-id-file-scale',
+        filename: 'secret.txt',
+        data: Uint8List.fromList([104, 105]),
+        notes: null,
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z',
+        folder: '',
+        customFields: const [],
+      );
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen(VaultEntryData.file(entry)));
+      await tester.pumpAndSettle();
+
+      expect(iconSizeOf(tester, Icons.download_outlined), greaterThan(24));
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  // ADR-016 reveal-eye: the show/hide password toggle (an action-row button,
+  // base 18) grows with the text scale — full control-scale, not the suffix cap.
+  testWidgets('reveal-eye toggle scales up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_buildScreen(VaultEntryData.login(_loginEntry())));
+    await tester.pumpAndSettle();
+
+    final eye = tester.widget<IconButton>(revealEyeButtons().first);
+    expect(eye.iconSize, isNotNull);
+    expect(eye.iconSize, greaterThan(18));
+    expect(tester.takeException(), isNull);
+  });
+
+  // ADR-016 accessibility follow-up: the History tile's trailing chevron grows
+  // with the text scale (free ListTile, full control-scale, no strip cap).
+  testWidgets('history-tile chevron scales up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(
+      _buildScreen(
+        VaultEntryData.login(_loginEntry()),
+        onFetchHistory: (_) async => [
+          const HistoryRecordData(
+            field: 'password',
+            value: 'old',
+            savedAt: '2025-01-02T00:00:00Z',
+          ),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final chevron = tester.widget<Icon>(find.byIcon(Icons.chevron_right));
+    expect(chevron.size, greaterThan(18));
+    expect(tester.takeException(), isNull);
+  });
 }

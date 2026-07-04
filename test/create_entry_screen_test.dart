@@ -63,6 +63,61 @@ Widget _buildEditScreen(VaultEntryData existing) => testApp(CreateEntryScreen(
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
+  // ── ADR-016 reveal-eye: suffix toggles scale (capped) at large text ────────
+  group('reveal-eye toggles scale (capped) at large text', () {
+    void setPhone(WidgetTester tester) {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+    }
+
+    void expectAllCapped(WidgetTester tester, int count) {
+      expect(revealEyeButtons(), findsNWidgets(count));
+      for (final eye in tester.widgetList<IconButton>(revealEyeButtons())) {
+        expect(eye.iconSize, isNotNull);
+        expect(eye.iconSize, greaterThan(24));
+        expect(eye.iconSize, lessThanOrEqualTo(24 * 1.4));
+      }
+    }
+
+    testWidgets('Login password eye scales (capped)', (tester) async {
+      setPhone(tester);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildCreateScreen('Login'));
+      await tester.pumpAndSettle();
+
+      expectAllCapped(tester, 1);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Card CVV and PIN eyes scale (capped)', (tester) async {
+      setPhone(tester);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildCreateScreen('Card'));
+      await tester.pumpAndSettle();
+
+      expectAllCapped(tester, 2);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('custom-field value eye scales (capped)', (tester) async {
+      setPhone(tester);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildCreateScreen('Custom'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Add custom field'));
+      await tester.tap(find.text('Add custom field'));
+      await tester.pumpAndSettle();
+
+      expectAllCapped(tester, 1);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   testWidgets('required field validation fires on empty save', (tester) async {
     await tester.pumpWidget(_buildCreateScreen('Login'));
     await tester.pumpAndSettle();

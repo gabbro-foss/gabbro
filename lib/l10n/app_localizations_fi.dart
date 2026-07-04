@@ -242,21 +242,6 @@ class AppLocalizationsFi extends AppLocalizations {
   String get themeDark => 'Tumma';
 
   @override
-  String get textSizeSmall => 'Pieni';
-
-  @override
-  String get textSizeRegular => 'Normaali';
-
-  @override
-  String get textSizeLarge => 'Suuri';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Vain puhelimessa — tabletti käyttää aina vasenta.';
 
@@ -513,6 +498,9 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Seuraava sivu';
+
+  @override
+  String get helpEnlargeImage => 'Suurenna kuvaa';
 
   @override
   String get tooltipEditAlias => 'Muokkaa aliasta';

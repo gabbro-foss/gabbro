@@ -241,21 +241,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get themeDark => 'Escuro';
 
   @override
-  String get textSizeSmall => 'Pequeno';
-
-  @override
-  String get textSizeRegular => 'Normal';
-
-  @override
-  String get textSizeLarge => 'Grande';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Apenas em celular — tablet sempre usa a esquerda.';
 
@@ -512,6 +497,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Próxima página';
+
+  @override
+  String get helpEnlargeImage => 'Ampliar imagem';
 
   @override
   String get tooltipEditAlias => 'Editar apelido';
@@ -2267,21 +2255,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   String get themeDark => 'Escuro';
 
   @override
-  String get textSizeSmall => 'Pequeno';
-
-  @override
-  String get textSizeRegular => 'Normal';
-
-  @override
-  String get textSizeLarge => 'Grande';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Apenas em celular — tablet sempre usa a esquerda.';
 
@@ -2538,6 +2511,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get tooltipNextPage => 'Próxima página';
+
+  @override
+  String get helpEnlargeImage => 'Ampliar imagem';
 
   @override
   String get tooltipEditAlias => 'Editar apelido';
@@ -4290,21 +4266,6 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   String get themeDark => 'Escuro';
 
   @override
-  String get textSizeSmall => 'Pequeno';
-
-  @override
-  String get textSizeRegular => 'Normal';
-
-  @override
-  String get textSizeLarge => 'Grande';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Apenas em telemóvel — tablet usa sempre a esquerda.';
 
@@ -4561,6 +4522,9 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get tooltipNextPage => 'Página seguinte';
+
+  @override
+  String get helpEnlargeImage => 'Ampliar imagem';
 
   @override
   String get tooltipEditAlias => 'Editar alias';

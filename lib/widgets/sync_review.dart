@@ -297,6 +297,54 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
 
   /// A two-choice keep-vs-other picker (keep / delete or keep / skip), matching
   /// the clash picker so every keep/remove decision is explicitly labelled.
+  // A ChoiceChip is locked to a single 48px line, so at large text it silently
+  // clips a long field value (a URL, a password) and it can't be read or
+  // compared (hardware: phone portrait, review-all). Past 1.5x render each
+  // choice as a full-width row — a radio marker + the value as wrapping Text
+  // (Flutter char-wraps even an unbroken password) — instead of a chip. Compact
+  // chips stay at normal text (ADR-016).
+  Widget _choiceRow(
+    List<({String label, bool selected, VoidCallback onSelect})> choices,
+  ) {
+    if (MediaQuery.textScalerOf(context).scale(1) <= 1.5) {
+      return Wrap(
+        spacing: 8,
+        children: [
+          for (final c in choices)
+            ChoiceChip(
+              label: Text(c.label),
+              selected: c.selected,
+              onSelected: (_) => c.onSelect(),
+            ),
+        ],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final c in choices)
+          InkWell(
+            onTap: c.onSelect,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    c.selected
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_unchecked,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(c.label)),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget _keepDeleteChips({
     required bool keepSelected,
     required String keepLabel,
@@ -305,21 +353,10 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
     required VoidCallback onOther,
   }) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 16),
-    child: Wrap(
-      spacing: 8,
-      children: [
-        ChoiceChip(
-          label: Text(keepLabel),
-          selected: keepSelected,
-          onSelected: (_) => onKeep(),
-        ),
-        ChoiceChip(
-          label: Text(otherLabel),
-          selected: !keepSelected,
-          onSelected: (_) => onOther(),
-        ),
-      ],
-    ),
+    child: _choiceRow([
+      (label: keepLabel, selected: keepSelected, onSelect: onKeep),
+      (label: otherLabel, selected: !keepSelected, onSelect: onOther),
+    ]),
   );
 
   /// Eye toggle for a secret field, mirroring the entry-detail reveal idiom.
@@ -447,6 +484,9 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
+        // Scroll the whole dialog so the three choices stay reachable at large
+        // text (ADR-016).
+        scrollable: true,
         title: Text(l.syncStopTitle),
         content: Text(l.syncStopBody),
         actions: [
@@ -483,18 +523,17 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
     final canAdvance = _stepSatisfied(step);
 
     return AlertDialog(
+      // Scroll the whole dialog (title + content + actions) so nothing is
+      // stranded off-screen at large text (ADR-016). A plain Column here, not an
+      // inner SingleChildScrollView, which would nest scrollables and throw.
+      scrollable: true,
       title: Text(
         '${l.reviewChangesTitle}  ${_index + 1}/${widget.steps.length}',
       ),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _buildStep(step, l),
-          ),
-        ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: _buildStep(step, l),
       ),
       actions: [
         TextButton(onPressed: _bail, child: Text(l.cancel)),
@@ -603,27 +642,22 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
           widgets.add(
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Wrap(
-                spacing: 8,
-                children: [
-                  ChoiceChip(
-                    label: Text(
+              child: _choiceRow([
+                (
+                  label:
                       '${l.syncThisVault}: ${_disp(c.field, c.localValue, l, revealed: revealed)}',
-                    ),
-                    selected: pick == false,
-                    onSelected: (_) =>
-                        setState(() => _conflictUseTheirs[key] = false),
-                  ),
-                  ChoiceChip(
-                    label: Text(
+                  selected: pick == false,
+                  onSelect: () =>
+                      setState(() => _conflictUseTheirs[key] = false),
+                ),
+                (
+                  label:
                       '${l.syncOtherVault}: ${_disp(c.field, c.incomingValue, l, revealed: revealed)}',
-                    ),
-                    selected: pick == true,
-                    onSelected: (_) =>
-                        setState(() => _conflictUseTheirs[key] = true),
-                  ),
-                ],
-              ),
+                  selected: pick == true,
+                  onSelect: () =>
+                      setState(() => _conflictUseTheirs[key] = true),
+                ),
+              ]),
             ),
           );
         }
@@ -661,32 +695,25 @@ class _SyncReviewSheetState extends State<_SyncReviewSheet> {
           widgets.add(
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Wrap(
-                spacing: 8,
-                children: [
-                  ChoiceChip(
-                    label: Text(
-                      fc.localFolder.isEmpty
-                          ? l.folderConflictKeepUnfoldered
-                          : l.folderConflictKeepLocal(fc.localFolder),
-                    ),
-                    selected: choice == fc.localFolder,
-                    onSelected: (_) =>
-                        setState(() => _folderChoice[step.id] = fc.localFolder),
+              child: _choiceRow([
+                (
+                  label: fc.localFolder.isEmpty
+                      ? l.folderConflictKeepUnfoldered
+                      : l.folderConflictKeepLocal(fc.localFolder),
+                  selected: choice == fc.localFolder,
+                  onSelect: () =>
+                      setState(() => _folderChoice[step.id] = fc.localFolder),
+                ),
+                (
+                  label: fc.incomingFolder.isEmpty
+                      ? l.folderConflictMoveUnfoldered
+                      : l.folderConflictMoveIncoming(fc.incomingFolder),
+                  selected: choice == fc.incomingFolder,
+                  onSelect: () => setState(
+                    () => _folderChoice[step.id] = fc.incomingFolder,
                   ),
-                  ChoiceChip(
-                    label: Text(
-                      fc.incomingFolder.isEmpty
-                          ? l.folderConflictMoveUnfoldered
-                          : l.folderConflictMoveIncoming(fc.incomingFolder),
-                    ),
-                    selected: choice == fc.incomingFolder,
-                    onSelected: (_) => setState(
-                      () => _folderChoice[step.id] = fc.incomingFolder,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ]),
             ),
           );
         }

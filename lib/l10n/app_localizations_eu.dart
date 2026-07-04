@@ -241,21 +241,6 @@ class AppLocalizationsEu extends AppLocalizations {
   String get themeDark => 'Iluna';
 
   @override
-  String get textSizeSmall => 'Txikia';
-
-  @override
-  String get textSizeRegular => 'Arrunta';
-
-  @override
-  String get textSizeLarge => 'Handia';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Telefonoan soilik — tabletak ezkerraldea erabiltzen du beti.';
 
@@ -512,6 +497,9 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Hurrengo orria';
+
+  @override
+  String get helpEnlargeImage => 'Handitu irudia';
 
   @override
   String get tooltipEditAlias => 'Ezizena editatu';

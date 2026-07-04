@@ -241,21 +241,6 @@ class AppLocalizationsNb extends AppLocalizations {
   String get themeDark => 'Mørkt';
 
   @override
-  String get textSizeSmall => 'Liten';
-
-  @override
-  String get textSizeRegular => 'Normal';
-
-  @override
-  String get textSizeLarge => 'Stor';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Kun på telefon — nettbrett bruker alltid venstre.';
 
@@ -511,6 +496,9 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Neste side';
+
+  @override
+  String get helpEnlargeImage => 'Forstørr bildet';
 
   @override
   String get tooltipEditAlias => 'Rediger alias';

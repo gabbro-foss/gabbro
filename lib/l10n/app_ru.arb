@@ -84,11 +84,6 @@
   "themeLight": "Светлая",
   "themeDark": "Тёмная",
 
-  "textSizeSmall": "Маленький",
-  "textSizeRegular": "Обычный",
-  "textSizeLarge": "Большой",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Только на телефоне — планшет всегда использует левую сторону.",
   "alphabetBarLeft": "Слева",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Обзор",
   "tooltipPreviousPage": "Предыдущая страница",
   "tooltipNextPage": "Следующая страница",
+  "helpEnlargeImage": "Увеличить изображение",
   "tooltipEditAlias": "Изменить псевдоним",
   "tooltipRemoveField": "Удалить поле",
   "tooltipRename": "Переименовать",

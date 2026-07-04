@@ -10,7 +10,11 @@ import 'package:gabbro/app_paths.dart';
 /// On Android: `<app support dir>/settings.jsonc`
 class AppSettings {
   final ThemeChoice theme;
-  final TextSizeChoice textSize;
+
+  /// Absolute interface text scale (1.0 = normal). Drives both text and, in
+  /// later phases, control/target sizing (ADR-016). Stored range [0.8, 8.0];
+  /// clamped to the device's screen-derived max on load (see text_scale.dart).
+  final double textScale;
   final bool highContrast; // placeholder — not yet implemented
   final ForegroundLockTimeout foregroundLockTimeout;
   final BackgroundLockTimeout backgroundLockTimeout;
@@ -30,7 +34,7 @@ class AppSettings {
 
   const AppSettings({
     this.theme = ThemeChoice.system,
-    this.textSize = TextSizeChoice.regular,
+    this.textScale = 1.0,
     this.highContrast = false,
     this.foregroundLockTimeout = ForegroundLockTimeout.thirtySeconds,
     this.backgroundLockTimeout = BackgroundLockTimeout.fiveMinutes,
@@ -50,7 +54,7 @@ class AppSettings {
 
   Map<String, dynamic> toJson() => {
     'theme': theme.name,
-    'text_size': textSize.name,
+    'text_scale': textScale,
     'high_contrast': highContrast,
     'foreground_lock_timeout': foregroundLockTimeout.name,
     'background_lock_timeout': backgroundLockTimeout.name,
@@ -67,9 +71,7 @@ class AppSettings {
   factory AppSettings.fromJson(Map<String, dynamic> json) {
     return AppSettings(
       theme: ThemeChoice.values.byName((json['theme'] as String? ?? 'system')),
-      textSize: TextSizeChoice.values.byName(
-        (json['text_size'] as String? ?? 'regular').replaceAll('extra_large', 'extraLarge'),
-      ),
+      textScale: _parseTextScale(json),
       highContrast: json['high_contrast'] as bool? ?? false,
       foregroundLockTimeout: ForegroundLockTimeout.values.byName(
         json['foreground_lock_timeout'] as String? ?? 'thirtySeconds',
@@ -99,9 +101,45 @@ class AppSettings {
     );
   }
 
+  // Hard bounds on the stored scale; the device-derived max is applied
+  // separately at load/render time (text_scale.dart, ADR-016).
+  static const double minTextScale = 0.8;
+  static const double maxTextScale = 8.0;
+
+  /// Resolves the interface text scale from persisted JSON. Prefers the new
+  /// numeric `text_scale` key; falls back to migrating the legacy `text_size`
+  /// word; defaults to 1.0. Result is clamped to [minTextScale, maxTextScale].
+  static double _parseTextScale(Map<String, dynamic> json) {
+    final numeric = json['text_scale'];
+    if (numeric is num) {
+      return numeric.toDouble().clamp(minTextScale, maxTextScale).toDouble();
+    }
+    final legacy = json['text_size'] as String?;
+    if (legacy != null) return _legacyTextSizeScale(legacy);
+    return 1.0;
+  }
+
+  /// Maps a pre-ADR-016 `text_size` word to its scale. Accepts both the
+  /// camelCase (`extraLarge`) and underscore (`extra_large`) legacy forms.
+  static double _legacyTextSizeScale(String word) {
+    switch (word.replaceAll('extra_large', 'extraLarge')) {
+      case 'small':
+        return 0.85;
+      case 'large':
+        return 1.15;
+      case 'extraLarge':
+        return 1.3;
+      case 'xxLarge':
+        return 1.5;
+      case 'regular':
+      default:
+        return 1.0;
+    }
+  }
+
   AppSettings copyWith({
     ThemeChoice? theme,
-    TextSizeChoice? textSize,
+    double? textScale,
     bool? highContrast,
     ForegroundLockTimeout? foregroundLockTimeout,
     BackgroundLockTimeout? backgroundLockTimeout,
@@ -115,7 +153,7 @@ class AppSettings {
     String? androidExportFolderUri,
   }) => AppSettings(
     theme: theme ?? this.theme,
-    textSize: textSize ?? this.textSize,
+    textScale: textScale ?? this.textScale,
     highContrast: highContrast ?? this.highContrast,
     foregroundLockTimeout: foregroundLockTimeout ?? this.foregroundLockTimeout,
     backgroundLockTimeout: backgroundLockTimeout ?? this.backgroundLockTimeout,
@@ -168,9 +206,9 @@ class AppSettings {
   // Options: "system" | "light" | "dark"
   "theme": "${theme.name}",
 
-  // Interface text size.
-  // Options: "small" | "regular" | "large" | "extraLarge" | "xxLarge"
-  "text_size": "${textSize.name}",
+  // Interface text scale (accessibility). 1.0 = normal; higher = larger text
+  // and controls. Stored range 0.8 - 8.0; capped to your device's screen on load.
+  "text_scale": $textScale,
 
   // High-contrast mode (not yet implemented — reserved for future use).
   // Options: true | false
@@ -241,8 +279,6 @@ class AppSettings {
 // ── Enums ──────────────────────────────────────────────────────────────────
 
 enum ThemeChoice { system, light, dark }
-
-enum TextSizeChoice { small, regular, large, extraLarge, xxLarge }
 
 enum ForegroundLockTimeout { thirtySeconds, oneMinute, fiveMinutes, never }
 

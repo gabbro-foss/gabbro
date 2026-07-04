@@ -84,11 +84,6 @@
   "themeLight": "Licht",
   "themeDark": "Donker",
 
-  "textSizeSmall": "Klein",
-  "textSizeRegular": "Normaal",
-  "textSizeLarge": "Groot",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Alleen voor telefoonindeling — tablet gebruikt altijd links.",
   "alphabetBarLeft": "Links",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Bladeren",
   "tooltipPreviousPage": "Vorige pagina",
   "tooltipNextPage": "Volgende pagina",
+  "helpEnlargeImage": "Afbeelding vergroten",
   "tooltipEditAlias": "Alias bewerken",
   "tooltipRemoveField": "Veld verwijderen",
   "tooltipRename": "Hernoemen",

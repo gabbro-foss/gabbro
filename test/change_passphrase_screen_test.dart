@@ -115,6 +115,42 @@ Future<void> _fillAndSubmit(WidgetTester tester, {String? yubikeyPin}) async {
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
+  // ── ADR-016 reveal-eye: suffix-icon toggles grow with text but are capped ───
+  group('reveal-eye toggles scale (capped) at large text', () {
+    void setPhone(WidgetTester tester) {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+    }
+
+    testWidgets('all four suffix eyes scale up and stay capped at 1.4x',
+        (tester) async {
+      setPhone(tester);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+      await tester.pumpAndSettle();
+
+      expect(revealEyeButtons(), findsNWidgets(4));
+      for (final eye in tester.widgetList<IconButton>(revealEyeButtons())) {
+        expect(eye.iconSize, isNotNull);
+        expect(eye.iconSize, greaterThan(24));
+        expect(eye.iconSize, lessThanOrEqualTo(24 * 1.4));
+      }
+    });
+
+    testWidgets('the fields do not overflow at large text', (tester) async {
+      setPhone(tester);
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(_buildScreen(yubikeyRecords: [_fakeRecord()]));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   // ── Enter-submit / focus chain ──────────────────────────────────────────────
   group('Enter-submit chain', () {
     bool focused(WidgetTester tester, String label) => tester

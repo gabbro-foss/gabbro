@@ -24,7 +24,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 
 **Password generator:** classic (32–256 chars) and passphrase (4–20 words, many languages, EFF-style wordlists embedded at compile time). Classic mode is script-aware (Latin/Greek/Cyrillic pools). All generation in Rust.
 
-**Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text size, high-contrast, alphabet bar position.
+**Settings:** `~/.config/gabbro/settings.jsonc` (Linux). JSONC format — human-editable. Theme, text scale (`text_scale`, 0.8-8.0), high-contrast, alphabet bar position.
 
 **Platforms:** v1: Linux (Arch + Mint/deb), Android (F-Droid + Play Store). Later: Windows. Android smoke-tested on GrapheneOS (2026-06-20): onboarding, vault sync, web autofill, l10n, settings all work — not yet exhaustive.
 
@@ -40,9 +40,9 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 gabbro/
 ├── lib/                  # Flutter app
 │   ├── screens/          # unlock, vault list, export, import, generator, settings, manage vaults/folders, …
-│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, …
+│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, text_size_slider, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
-│   └── *.dart            # main, app_paths (GabbroPaths), settings, vault_registry, safe_file_picker
+│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, vault_registry, safe_file_picker
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, keypair, ml_kem, hkdf, aes_gcm, vault_crypto
@@ -77,7 +77,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1084 | 0 |
+| Flutter (`flutter test`) | 1231 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -92,38 +92,9 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 > Update at the end of each session. First thing to read at the start of the next.
 
-### Next task: Large-text accessibility initiative (ADR-016)
+### Next task
 
-Make Gabbro usable at very large text (low-vision): one absolute `textScale` knob
-drives text **and** controls in unison; screen-derived max (600dp tiers — phone ~4x,
-tablet ~6x, **calibrate on hardware**); targets scale proportionally, capped ~2x.
-Design fixed in [ADR-016](decisions/ADR-016-large-text-and-target-scaling-accessibility.md).
-
-**Phase 0 — Calibrate.** On-device MediaQuery read (logical size, devicePixelRatio,
-600dp tier) on phone + tablet to set the real 4x/6x/2x constants.
-
-**Phase 1 — Slider + model + onboarding.** `TextSizeChoice` enum -> `double textScale`
-[0.8..max] with migration + clamp; exponential slider (Smaller/Larger labels, live
-preview) as one reusable widget on appearance + onboarding; onboarding toggle ON ->
-~3x + reveal slider + hide logo (OFF reverses); `main.dart` apply + remove
-`textScaleFor`/duplicate `_textScale`; drop the 5 per-size l10n labels. Full TDD.
-
-**Phase 2 — Text overflow hardening** (evidence from a headless 5x overflow probe on
-phone+tablet surfaces): fixed-box clippers (csv_mapping `width:88`, import_skipped
-`height:300`), help page-dot spacing, onboarding accessibility button, import
-`SegmentedButton`, entry_detail AppBar crowding.
-
-**Phase 2b — Help-screen pinch-to-zoom** (its own feature, not a layout fix):
-`FLAG_SECURE` blocks screenshots, so a low-vision user cannot magnify the help
-pages externally — add in-app pinch/zoom (InteractiveViewer) on help content,
-especially any images, which `textScaler` does not touch.
-
-**Phase 3 — Target scaling** (the core payoff): `scaledControl` helper off `textScale`
-(capped ~2x); alphabet bar (hide on phone tier / scale on tablet tier); password
-breakdown sheet; FABs; drop `VisualDensity.compact`. Per-control >=48dp touch-target
-tests at every scale; hardware-verified per screen.
-
-Slider ships first and becomes the probe for Phases 2-3.
+_(empty — agree the next task with the maintainer)_
 
 ---
 
@@ -148,6 +119,15 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 - Autofill via `auto-type` (Linux/desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
 
 ### Code Quality
+- **Tablet two-pane: FAB overlaps the detail pane's bottom content.** The shared
+  add-entry FAB floats over the bottom-right of the detail pane, hiding the last
+  scrolled item (observed: entry-detail History tile's trailing chevron). Reserve
+  bottom padding in the detail pane so content clears the FAB. Pre-existing;
+  found 2026-07-03 during large-text chevron work. Phone (full-screen route, no
+  FAB) is unaffected.
+- **Tablet pane-resize handle has no screen-reader label.** The two-pane (tablet)
+  vault-list column-width drag handle exposes no tooltip / `Semantics` label (ADR-015).
+  Add one. (found 2026-07-03 during large-text work.)
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
   translations.
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.

@@ -241,21 +241,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get themeDark => 'Mörkt';
 
   @override
-  String get textSizeSmall => 'Liten';
-
-  @override
-  String get textSizeRegular => 'Normal';
-
-  @override
-  String get textSizeLarge => 'Stor';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Endast på telefon — surfplatta använder alltid vänster.';
 
@@ -511,6 +496,9 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Nästa sida';
+
+  @override
+  String get helpEnlargeImage => 'Förstora bild';
 
   @override
   String get tooltipEditAlias => 'Redigera alias';

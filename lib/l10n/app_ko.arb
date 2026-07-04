@@ -84,11 +84,6 @@
   "themeLight": "라이트",
   "themeDark": "다크",
 
-  "textSizeSmall": "작음",
-  "textSizeRegular": "보통",
-  "textSizeLarge": "큼",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "스마트폰에서만 사용 — 태블릿은 항상 왼쪽을 사용합니다.",
   "alphabetBarLeft": "왼쪽",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "찾아보기",
   "tooltipPreviousPage": "이전 페이지",
   "tooltipNextPage": "다음 페이지",
+  "helpEnlargeImage": "이미지 확대",
   "tooltipEditAlias": "별칭 편집",
   "tooltipRemoveField": "필드 제거",
   "tooltipRename": "이름 변경",

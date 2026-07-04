@@ -43,6 +43,19 @@ Finder _header(String s) => find.byWidgetPredicate(
     );
 
 void main() {
+  // ADR-016 Phase 3 Slice D: the index bar STAYS visible at large text (its
+  // letters are capped so they don't bleed off the 48px strip) rather than
+  // hiding — on both tiers.
+  testWidgets('alphabet bar stays visible at large text (phone)',
+      (tester) async {
+    _setPhone(tester);
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_screen([_entry('1', 'Quartz')]));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlphabetIndexBar), findsOneWidget);
+  });
+
   // ── A. Bucketing (current Latin-only behaviour) ──────────────────────────
 
   testWidgets('Latin titles bucket under their uppercase first letter',

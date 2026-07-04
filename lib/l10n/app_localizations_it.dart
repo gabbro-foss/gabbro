@@ -241,21 +241,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get themeDark => 'Scuro';
 
   @override
-  String get textSizeSmall => 'Piccolo';
-
-  @override
-  String get textSizeRegular => 'Normale';
-
-  @override
-  String get textSizeLarge => 'Grande';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote =>
       'Solo layout telefono — tablet usa sempre sinistra.';
 
@@ -512,6 +497,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Pagina successiva';
+
+  @override
+  String get helpEnlargeImage => 'Ingrandisci immagine';
 
   @override
   String get tooltipEditAlias => 'Modifica alias';

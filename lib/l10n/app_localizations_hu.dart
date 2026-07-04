@@ -241,21 +241,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get themeDark => 'Sötét';
 
   @override
-  String get textSizeSmall => 'Kicsi';
-
-  @override
-  String get textSizeRegular => 'Normál';
-
-  @override
-  String get textSizeLarge => 'Nagy';
-
-  @override
-  String get textSizeXL => 'XL';
-
-  @override
-  String get textSizeXXL => 'XXL';
-
-  @override
   String get alphabetBarNote => 'Csak telefonon — táblagépen mindig bal.';
 
   @override
@@ -511,6 +496,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tooltipNextPage => 'Következő oldal';
+
+  @override
+  String get helpEnlargeImage => 'Kép nagyítása';
 
   @override
   String get tooltipEditAlias => 'Alias szerkesztése';

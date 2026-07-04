@@ -177,6 +177,22 @@ Future<void> _noOpSave(VaultEntryData entry, int? days) async {}
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 void main() {
+  // ADR-016 reveal-eye: the sensitive-values show/hide toggle (base 18, action
+  // row) scales fully with the text.
+  testWidgets('reveal-eye toggle scales up at large text', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_buildReviewScreen(
+      original: VaultEntryData.login(_original()),
+      updated: VaultEntryData.login(_updatedPasswordAndUrl()),
+    ));
+    await tester.pumpAndSettle();
+
+    final eye = tester.widget<IconButton>(revealEyeButtons().first);
+    expect(eye.iconSize, isNotNull);
+    expect(eye.iconSize, greaterThan(18));
+  });
+
   testWidgets('shows sensitive fields section when password changed',
       (tester) async {
     await tester.pumpWidget(_buildReviewScreen(

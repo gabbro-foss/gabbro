@@ -84,11 +84,6 @@
   "themeLight": "Lyst",
   "themeDark": "Mørkt",
 
-  "textSizeSmall": "Liten",
-  "textSizeRegular": "Normal",
-  "textSizeLarge": "Stor",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Berre på telefon — nettbrett brukar alltid venstre.",
   "alphabetBarLeft": "Venstre",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Bla gjennom",
   "tooltipPreviousPage": "Førre side",
   "tooltipNextPage": "Neste side",
+  "helpEnlargeImage": "Forstørr biletet",
   "tooltipEditAlias": "Rediger alias",
   "tooltipRemoveField": "Fjern felt",
   "tooltipRename": "Endre namn",

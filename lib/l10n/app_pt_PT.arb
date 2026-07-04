@@ -84,11 +84,6 @@
   "themeLight": "Claro",
   "themeDark": "Escuro",
 
-  "textSizeSmall": "Pequeno",
-  "textSizeRegular": "Normal",
-  "textSizeLarge": "Grande",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Apenas em telemóvel — tablet usa sempre a esquerda.",
   "alphabetBarLeft": "Esquerda",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Navegar",
   "tooltipPreviousPage": "Página anterior",
   "tooltipNextPage": "Página seguinte",
+  "helpEnlargeImage": "Ampliar imagem",
   "tooltipEditAlias": "Editar alias",
   "tooltipRemoveField": "Remover campo",
   "tooltipRename": "Renomear",

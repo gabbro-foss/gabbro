@@ -84,11 +84,6 @@
   "themeLight": "Clair",
   "themeDark": "Sombre",
 
-  "textSizeSmall": "Petit",
-  "textSizeRegular": "Normal",
-  "textSizeLarge": "Grand",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Disposition téléphone uniquement — tablette toujours à gauche.",
   "alphabetBarLeft": "Gauche",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Parcourir",
   "tooltipPreviousPage": "Page précédente",
   "tooltipNextPage": "Page suivante",
+  "helpEnlargeImage": "Agrandir l’image",
   "tooltipEditAlias": "Modifier l'alias",
   "tooltipRemoveField": "Supprimer le champ",
   "tooltipRename": "Renommer",

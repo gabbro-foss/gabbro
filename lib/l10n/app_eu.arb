@@ -84,11 +84,6 @@
   "themeLight": "Argia",
   "themeDark": "Iluna",
 
-  "textSizeSmall": "Txikia",
-  "textSizeRegular": "Arrunta",
-  "textSizeLarge": "Handia",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Telefonoan soilik — tabletak ezkerraldea erabiltzen du beti.",
   "alphabetBarLeft": "Ezkerra",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Arakatu",
   "tooltipPreviousPage": "Aurreko orria",
   "tooltipNextPage": "Hurrengo orria",
+  "helpEnlargeImage": "Handitu irudia",
   "tooltipEditAlias": "Ezizena editatu",
   "tooltipRemoveField": "Eremua kendu",
   "tooltipRename": "Berrizendatu",

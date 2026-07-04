@@ -84,11 +84,6 @@
   "themeLight": "Svjetla",
   "themeDark": "Tamna",
 
-  "textSizeSmall": "Mali",
-  "textSizeRegular": "Normalan",
-  "textSizeLarge": "Veliki",
-  "textSizeXL": "XL",
-  "textSizeXXL": "XXL",
 
   "alphabetBarNote": "Samo na telefonu — tablet uvijek koristi lijevu stranu.",
   "alphabetBarLeft": "Lijevo",
@@ -179,6 +174,7 @@
   "tooltipBrowse": "Pretraži",
   "tooltipPreviousPage": "Prethodna stranica",
   "tooltipNextPage": "Sljedeća stranica",
+  "helpEnlargeImage": "Povećaj sliku",
   "tooltipEditAlias": "Uredi alias",
   "tooltipRemoveField": "Ukloni polje",
   "tooltipRename": "Preimenuj",
