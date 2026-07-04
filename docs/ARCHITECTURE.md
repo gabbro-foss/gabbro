@@ -94,6 +94,11 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
+- **Scale the menu / list-row icons** at large text (all hardcoded ~20/24, none scale):
+  (a) app-bar popup-menu item icons (`vault_list_screen.dart`, ~12 items, `size: 20`);
+  (b) tablet `NavigationRail` destination icons (`tablet_vault_layout.dart`, 4);
+  (c) per-entry-type list-row + type-picker icons (`_entryTypeIcon`, sites 585/1532/1776).
+
 ---
 
 ## Build & Release
@@ -119,10 +124,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
 ### Accessibility polish (ADR-016 follow-ups, deferred)
 - **Scale the reveal-eye (show/hide) toggles** at large text (13 scattered, some in
   constrained field-suffix/row positions — needs care per site).
-- **Scale the menu / list-row icons** at large text (all hardcoded ~20/24, none scale):
-  (a) app-bar popup-menu item icons (`vault_list_screen.dart`, ~12 items, `size: 20`);
-  (b) tablet `NavigationRail` destination icons (`tablet_vault_layout.dart`, 4);
-  (c) per-entry-type list-row + type-picker icons (`_entryTypeIcon`, sites 585/1532/1776).
 
 ### Code Quality
 - **Tablet two-pane: FAB overlaps the detail pane's bottom content.** The shared
