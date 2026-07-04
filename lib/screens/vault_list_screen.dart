@@ -583,6 +583,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                 (t) => ListTile(
                   leading: Icon(
                     _entryTypeIcon(t.$1),
+                    size: scaledIconSize(context),
                     color: Theme.of(context).colorScheme.primary,
                     semanticLabel: t.$2,
                   ),
@@ -1322,7 +1323,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'export',
                     child: Row(
                       children: [
-                        const Icon(Icons.upload_outlined, size: 20),
+                        Icon(Icons.upload_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuExportVault)),
                       ],
@@ -1332,7 +1333,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'import',
                     child: Row(
                       children: [
-                        const Icon(Icons.download_outlined, size: 20),
+                        Icon(Icons.download_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuImportEntries)),
                       ],
@@ -1342,7 +1343,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'sync',
                     child: Row(
                       children: [
-                        const Icon(Icons.sync, size: 20),
+                        Icon(Icons.sync, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuSyncFromFile)),
                       ],
@@ -1353,7 +1354,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'manage_vaults',
                     child: Row(
                       children: [
-                        const Icon(Icons.folder_special_outlined, size: 20),
+                        Icon(Icons.folder_special_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuManageVaults)),
                       ],
@@ -1364,7 +1365,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'change_passphrase',
                     child: Row(
                       children: [
-                        const Icon(Icons.key_outlined, size: 20),
+                        Icon(Icons.key_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuChangePassphrase)),
                       ],
@@ -1375,7 +1376,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'yubikeys',
                     child: Row(
                       children: [
-                        const Icon(Icons.security_outlined, size: 20),
+                        Icon(Icons.security_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuManageYubiKeys)),
                       ],
@@ -1386,7 +1387,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'appearance',
                     child: Row(
                       children: [
-                        const Icon(Icons.palette_outlined, size: 20),
+                        Icon(Icons.palette_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuAppearance)),
                       ],
@@ -1396,7 +1397,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'language',
                     child: Row(
                       children: [
-                        const Icon(Icons.language_outlined, size: 20),
+                        Icon(Icons.language_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.sectionLanguage)),
                       ],
@@ -1406,7 +1407,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'security',
                     child: Row(
                       children: [
-                        const Icon(Icons.shield_outlined, size: 20),
+                        Icon(Icons.shield_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuSecurity)),
                       ],
@@ -1416,7 +1417,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'manage_folders',
                     child: Row(
                       children: [
-                        const Icon(Icons.folder_outlined, size: 20),
+                        Icon(Icons.folder_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuManageFolders)),
                       ],
@@ -1426,7 +1427,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'generator',
                     child: Row(
                       children: [
-                        const Icon(Icons.casino_outlined, size: 20),
+                        Icon(Icons.casino_outlined, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuPasswordGenerator)),
                       ],
@@ -1437,7 +1438,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'help',
                     child: Row(
                       children: [
-                        const Icon(Icons.help_outline, size: 20),
+                        Icon(Icons.help_outline, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuHelp)),
                       ],
@@ -1447,7 +1448,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                     value: 'about',
                     child: Row(
                       children: [
-                        const Icon(Icons.info_outline, size: 20),
+                        Icon(Icons.info_outline, size: scaledIconSize(context, 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Text(ml.menuAbout)),
                       ],
@@ -1774,7 +1775,7 @@ class _VaultListScreenState extends State<VaultListScreen>
                                             )
                                           : Icon(
                                               _entryTypeIcon(entry.entryType),
-                                              size: 20,
+                                              size: scaledIconSize(context, 20),
                                               color: Theme.of(
                                                 context,
                                               ).colorScheme.primary,

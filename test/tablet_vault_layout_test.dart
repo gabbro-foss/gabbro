@@ -41,7 +41,92 @@ TabletVaultLayout _layout({
   );
 }
 
+// A tablet-tier viewport (shortestSide >= 600) so control-scaling uses the
+// tablet ceiling (ADR-016). Optionally applies a large text scale.
+void _setTablet(WidgetTester tester, {double? textScale}) {
+  tester.view.physicalSize = const Size(900, 700);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  if (textScale != null) {
+    tester.platformDispatcher.textScaleFactorTestValue = textScale;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+  }
+}
+
+// getEntryFn is only invoked when an entry is tapped; these tests never tap, so
+// a throwing stub is never reached.
+TabletVaultLayout _listLayout() =>
+    _layout(getEntryFn: (id) => throw Exception('unused'));
+
+Finder _railIcons() => find.descendant(
+      of: find.byType(NavigationRail),
+      matching: find.byType(Icon),
+    );
+
 void main() {
+  // ADR-016 Phase 3: the NavigationRail destination icons (default 24) don't
+  // grow with the text scale — scale them for low-vision users.
+  testWidgets('NavigationRail destination icons are base 24 at normal text',
+      (tester) async {
+    _setTablet(tester);
+    await tester.pumpWidget(testApp(_listLayout()));
+    await tester.pumpAndSettle();
+
+    final icons = _railIcons();
+    expect(icons, findsWidgets);
+    for (final icon in tester.widgetList<Icon>(icons)) {
+      expect(icon.size, 24);
+    }
+  });
+
+  testWidgets('NavigationRail destination icons scale up at large text',
+      (tester) async {
+    _setTablet(tester, textScale: 2.0);
+    await tester.pumpWidget(testApp(_listLayout()));
+    await tester.pumpAndSettle();
+
+    final icons = _railIcons();
+    expect(icons, findsWidgets);
+    for (final icon in tester.widgetList<Icon>(icons)) {
+      expect(icon.size, isNotNull);
+      expect(icon.size, greaterThan(24));
+    }
+  });
+
+  // ADR-016 Phase 3: the tablet list-row type icon is a fixed size 20 — scale
+  // it with the text.
+  testWidgets('tablet list-row entry icon is base 20 at normal text',
+      (tester) async {
+    _setTablet(tester);
+    await tester.pumpWidget(testApp(_listLayout()));
+    await tester.pumpAndSettle();
+
+    final icon = tester.widget<Icon>(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Example'),
+        matching: find.byType(Icon),
+      ),
+    );
+    expect(icon.size, 20);
+  });
+
+  testWidgets('tablet list-row entry icon scales up at large text',
+      (tester) async {
+    _setTablet(tester, textScale: 2.0);
+    await tester.pumpWidget(testApp(_listLayout()));
+    await tester.pumpAndSettle();
+
+    final icon = tester.widget<Icon>(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Example'),
+        matching: find.byType(Icon),
+      ),
+    );
+    expect(icon.size, isNotNull);
+    expect(icon.size, greaterThan(20));
+  });
+
   testWidgets(
       'R-03 P6: selecting an entry whose getEntry throws falls back to the '
       'empty state instead of crashing the build', (tester) async {

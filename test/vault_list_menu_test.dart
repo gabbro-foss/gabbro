@@ -10,6 +10,43 @@ Widget _buildScreen() => testApp(VaultListScreen(
       listEntries: () => <EntrySummaryData>[],
     ));
 
+Widget _buildScreenWithLoginEntry() => testApp(VaultListScreen(
+      vaultPath: '/tmp/test.gabbro',
+      listEntries: () => <EntrySummaryData>[
+        EntrySummaryData(
+          id: 'e1',
+          entryType: 'Login',
+          title: 'Example',
+          folder: '',
+          searchBlob: 'example',
+        ),
+      ],
+    ));
+
+// Every Icon inside a popup-menu item (the leading glyph of each menu row).
+Finder _menuItemIcons() => find.descendant(
+      of: find.byType(PopupMenuItem<String>),
+      matching: find.byType(Icon),
+    );
+
+// The six entry-type labels shown by the add-entry type picker (English l10n).
+const _typePickerLabels = <String>[
+  'Password',
+  'Note',
+  'Identity',
+  'Card',
+  'File',
+  'Custom',
+];
+
+// The leading Icon of a picker/list ListTile identified by its label text.
+Icon _leadingIconOf(WidgetTester tester, String label) => tester.widget<Icon>(
+      find.descendant(
+        of: find.widgetWithText(ListTile, label),
+        matching: find.byType(Icon),
+      ),
+    );
+
 Future<void> _setNarrow(WidgetTester tester) async {
   tester.view.physicalSize = const Size(400, 800);
   tester.view.devicePixelRatio = 1.0;
@@ -76,6 +113,112 @@ void main() {
     );
     expect(icon.size, isNotNull);
     expect(icon.size, greaterThan(24));
+  });
+
+  // ADR-016 Phase 3: the app-bar popup-menu item icons are a fixed size 20 and
+  // don't grow with the text scale — scale them (base 20 kept for menu density)
+  // so a low-vision user gets proportionally larger menu glyphs.
+  testWidgets('popup-menu item icons keep base 20 at normal text',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+
+    final icons = _menuItemIcons();
+    expect(icons, findsWidgets);
+    for (final icon in tester.widgetList<Icon>(icons)) {
+      expect(icon.size, 20);
+    }
+  });
+
+  testWidgets('every popup-menu item icon scales up at large text',
+      (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_buildScreen());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.menu));
+    await tester.pumpAndSettle();
+
+    final icons = _menuItemIcons();
+    expect(icons, findsWidgets);
+    for (final icon in tester.widgetList<Icon>(icons)) {
+      expect(icon.size, isNotNull);
+      expect(icon.size, greaterThan(20));
+    }
+  });
+
+  // ADR-016 Phase 3: the add-entry type-picker rows use a default-size (24)
+  // leading icon that doesn't scale — scale it with the text.
+  testWidgets('type-picker leading icons are base 24 at normal text',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(FloatingActionButton),
+        matching: find.byIcon(Icons.add),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    for (final label in _typePickerLabels) {
+      expect(_leadingIconOf(tester, label).size, 24);
+    }
+  });
+
+  testWidgets('type-picker leading icons scale up at large text',
+      (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_buildScreen());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(FloatingActionButton),
+        matching: find.byIcon(Icons.add),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    for (final label in _typePickerLabels) {
+      final icon = _leadingIconOf(tester, label);
+      expect(icon.size, isNotNull);
+      expect(icon.size, greaterThan(24));
+    }
+  });
+
+  // ADR-016 Phase 3: the per-entry list-row type icon is a fixed size 20 —
+  // scale it with the text so it stays legible alongside the enlarged title.
+  testWidgets('phone list-row entry icon is base 20 at normal text',
+      (tester) async {
+    await tester.pumpWidget(_buildScreenWithLoginEntry());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    expect(_leadingIconOf(tester, 'Example').size, 20);
+  });
+
+  testWidgets('phone list-row entry icon scales up at large text',
+      (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await tester.pumpWidget(_buildScreenWithLoginEntry());
+    await _setNarrow(tester);
+    await tester.pumpAndSettle();
+
+    final icon = _leadingIconOf(tester, 'Example');
+    expect(icon.size, isNotNull);
+    expect(icon.size, greaterThan(20));
   });
 
   group('VaultListScreen menu items', () {
