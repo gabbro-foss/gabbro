@@ -40,7 +40,7 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 gabbro/
 ├── lib/                  # Flutter app
 │   ├── screens/          # unlock, vault list, export, import, generator, settings, manage vaults/folders, …
-│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, text_size_slider, …
+│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, text_size_slider, autotype_picker, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
 │   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, vault_registry, safe_file_picker, autotype_listener
 ├── rust/src/
@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1248 | 0 |
+| Flutter (`flutter test`) | 1265 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -130,8 +130,15 @@ Phases:
       fills `username ⇥ password ↵` and submits in Brave. Two hardware-found injection fixes:
       wait for trigger modifiers to release (else keys scramble), and inject Tab/Return via their
       real keycodes (Chromium ignores them on a remapped scratch keycode).
-  - [ ] **3.5** picker UI (Dart): all logins (ordered like the vault list), type-to-filter, focus
-    dance, the three sequence actions. Replaces 3.4b's "first login" with the user's choice.
+  - **3.5** picker UI (Dart):
+    - [x] **3.5a** `AutotypePicker` widget (`lib/widgets/autotype_picker.dart`): all logins,
+      type-to-filter, three actions (tap=full + per-row username-/password-only buttons with
+      tooltips), keyboard (arrows/Ctrl+J/K nav, Enter full, Ctrl+U/P variants, Esc cancel),
+      wrapping hint footer. 15 widget tests + overflow-probe (phone/tablet, no clip at max text,
+      ADR-016). Reuses existing search/empty strings; 3 new l10n keys across 37 locales.
+    - [ ] **3.5b** wire trigger -> capture -> **raise the Gabbro window** (C++ `gtk_window_present`
+      vs `window_manager` plugin — decide) -> show picker (ordered like vault list) -> `autotypeFill`;
+      focus dance / refocus stressed here; hardware.
 - [ ] **Phase 4** — unlock-then-type for a locked vault; opt-in setting; README key-binding
   examples; package `gabbro-autotype` into the release bundle (update BUILD_AND_RELEASE).
   Secret stays in Rust throughout; auto-lock preserved.
@@ -156,6 +163,12 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   stable at VERSION 9, so this is no longer blocked. v1 direction in commit 9f158b5.
 
 ### Code Quality
+- **Configurable auto-type picker shortcuts.** The picker's keys are fixed defaults
+  (arrows/Enter/Esc are universal; the vim `Ctrl+J/K/U/P` are logical, so they don't
+  fire on non-Latin *layouts* like Cyrillic/Greek — essentials still work via arrows +
+  the Tab-reachable row buttons). Proper fix (KeePassXC-style): let the user rebind them
+  in settings (capture UI + persistence + the hint footer reflects the binding). Not a
+  blocker — the picker is fully usable on every layout as-is. (ADR-017, deferred 2026-07-05.)
 - **Unify the two clipboard-clear paths.** `entry_detail_screen.dart` (cancellable
   `Timer`, respects `ClipboardClearTimeout`) and `generator_widget.dart` (fire-and-forget
   `Future.delayed`, no "never") each implement "copy secret then wipe" separately. Extract
