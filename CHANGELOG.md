@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Linux desktop auto-type (X11).** With a login open in Gabbro, a global hotkey types `username⇥password↵` into the focused window; uses the login's email when it has no username.
 
 ### Fixed
+- Generator copy now honours the clipboard-clear setting like entry copy: "never" no longer clears at all (was cleared after 24h), and re-copying resets the clear timer so a freshly copied password isn't wiped early.
 - Tablet two-pane: the detail pane reserves bottom space so its last item is no longer hidden behind the add-entry button.
 - Tablet two-pane: the column-resize handle now has a screen-reader label ("Resize columns") and its grip grows with the text size.
 

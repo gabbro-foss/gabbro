@@ -42,7 +42,7 @@ gabbro/
 │   ├── screens/          # unlock, vault list, export, import, generator, settings, manage vaults/folders, …
 │   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, text_size_slider, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
-│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, vault_registry, safe_file_picker, autotype_listener, autotype_target
+│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, vault_registry, safe_file_picker, autotype_listener, autotype_target, clipboard_clear
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, autotype_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, keypair, ml_kem, hkdf, aes_gcm, vault_crypto
@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1254 | 0 |
+| Flutter (`flutter test`) | 1264 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -94,6 +94,15 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 > Update at the end of each session. First thing to read at the start of the next.
 
 ### Next task
+
+**BUG (important): Android biometric unlock only holds on one vault at a time.**
+With multiple vaults, enabling biometric on vault C silently clears it from vault
+B (both passphrase-only + biometric). Repro (Android): vaults A (passphrase+YK, no
+bio), B (passphrase), C (passphrase); enable bio on B -> works; then enable bio on
+C -> works, but B reverts to passphrase-only and loses its biometric setting. Looks
+like the biometric-protected secret / setting is stored under a single fixed
+key/alias instead of per-vault. Verify root cause (AndroidKeyStore alias + where the
+per-vault bio flag persists) before fixing.
 
 ---
 
@@ -119,12 +128,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
   an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the
   release bundle (update BUILD_AND_RELEASE). Secret stays in Rust; auto-lock preserved.
-- **Unify the two clipboard-clear paths.** `entry_detail_screen.dart` (cancellable
-  `Timer`, respects `ClipboardClearTimeout`) and `generator_widget.dart` (fire-and-forget
-  `Future.delayed`, no "never") each implement "copy secret then wipe" separately. Extract
-  one shared helper — and add the missing **generator** clear test as part of it (not
-  unit-testable today: the generator needs FFI to produce a password, absent in `flutter
-  test`; entry-detail clear is pinned). (Found 2026-07-05 during auto-type Phase 3.1 net-first.)
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
   translations (and the `resizeColumns` label added the same way).
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
