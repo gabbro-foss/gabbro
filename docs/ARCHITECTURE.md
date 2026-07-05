@@ -50,7 +50,8 @@ gabbro/
 │   ├── fido/             # FIDO2/libfido2 FFI (Linux only)
 │   ├── import/           # enpass, bitwarden, google_pm, dashlane, csv
 │   ├── hardening.rs      # Process hardening (R-04): core-dump + ptrace/mem disable (Linux)
-│   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer; wordlist gen; gen_fixtures
+│   ├── autotype/         # Linux auto-type (ADR-017): keysym mapping + XTEST injection (Linux-only)
+│   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_spike; wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper (+ Robolectric tests)
 ├── docs/                 # ARCHITECTURE, LEARNINGS, SECURITY, AI_*; decisions/ (ADRs); artefacts/
@@ -69,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 597 | 17 |
+| Rust (`cargo test -q`) | 608 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 14 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -94,15 +95,18 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Linux desktop auto-type — implement per [ADR-017](decisions/ADR-017-linux-autotype.md)**
-(design agreed 2026-07-05; phasing TBD). Scope locked: X11-only (Wayland keeps
-copy-paste), **logins only** (cards deferred), user-bound trigger `gabbro --autotype`
-via a local socket (no Gabbro key grab, no default hotkey, no tray), own picker
-listing all logins with type-to-filter, sequences `{user}{TAB}{pass}{ENTER}` +
-username-only + password-only. Secret stays in Rust (`x11rb` reads active window +
-`XTEST` injects; never crosses the bridge); auto-lock preserved (locked -> unlock
-then type). Main risk to prove first on hardware: arbitrary-Unicode keystroke
-injection (Greek/Cyrillic/CJK passphrases) via the keycode-remap trick. Opt-in.
+**Linux desktop auto-type — implement per [ADR-017](decisions/ADR-017-linux-autotype.md).**
+Phases:
+- [x] **Phase 1 — arbitrary-Unicode keystroke injection.** keysym mapping + `XTEST`
+  scratch-keycode remap. Hardware-proven 2026-07-05 on X11/qtile (typed into a browser
+  login field: Latin/accented/Greek/Cyrillic/CJK/symbols, layout-independent).
+  `rust/src/autotype/` + diagnostic bin `autotype_spike`.
+- [ ] **Phase 2** — read the active window; single-instance trigger IPC
+  (`gabbro --autotype` over a local socket). No Gabbro key grab; user binds the key.
+- [ ] **Phase 3** — own picker (all logins, type-to-filter) + focus dance; sequences
+  `{user}{TAB}{pass}{ENTER}` + username-only + password-only.
+- [ ] **Phase 4** — unlock-then-type for a locked vault; opt-in setting; README key-binding
+  examples. Secret stays in Rust throughout; auto-lock preserved.
 
 ---
 
