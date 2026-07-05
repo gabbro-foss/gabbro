@@ -91,6 +91,33 @@ pub fn window_title(conn: &impl Connection, win: Window) -> Result<Option<String
     }
 }
 
+/// A snapshot of the focused window taken at trigger time -- enough to refocus
+/// it and verify focus hasn't moved before typing (ADR-017).
+#[derive(Debug, Clone)]
+pub struct CapturedWindow {
+    pub id: Window,
+    pub class: Option<(String, String)>,
+    pub title: Option<String>,
+}
+
+/// Capture the active window plus its class and title in one call (hardware).
+/// `Ok(None)` means no window is active. Class/title are best-effort: a read
+/// that fails (e.g. the window vanished mid-capture) yields `None` for that
+/// field rather than failing the whole capture.
+pub fn capture_active(
+    conn: &impl Connection,
+    root: Window,
+) -> Result<Option<CapturedWindow>, WindowError> {
+    let Some(id) = active_window(conn, root)? else {
+        return Ok(None);
+    };
+    Ok(Some(CapturedWindow {
+        id,
+        class: wm_class(conn, id).ok().flatten(),
+        title: window_title(conn, id).ok().flatten(),
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
