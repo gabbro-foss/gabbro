@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1238 | 0 |
+| Flutter (`flutter test`) | 1241 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -108,10 +108,15 @@ Phases:
 - [x] **Phase 2b — trigger IPC.** Rust unix-socket listener + send + token (`rust/src/autotype/trigger.rs`,
   6 tests, host-proven; no hardware needed) + diagnostic bin `autotype_trigger`. Listener in Rust
   (active-window capture must be at trigger instant). No key grab; user binds the command.
-- [ ] **Phase 3** — wire it into the app: `gabbro --autotype` client (C++ runner short-circuit
-  vs helper bin — decide here) -> Rust listener notifies Dart (frb stream) -> picker (all logins,
-  type-to-filter) -> capture/refocus window -> sequences (full / username-only / password-only).
-  net-first: pin the launch path + clipboard auto-clear before touching them.
+- **Phase 3** — wire it into the app (sub-steps):
+  - [x] **3.1** net-first pins: launch path already covered by existing tests; entry-detail
+    clipboard auto-clear pinned (3 tests). Generator clear deferred to the unify (see Bikeshed).
+  - [ ] **3.2** sequence building (Rust, pure): `{user}{TAB}{pass}{ENTER}` + user-only + pass-only.
+  - [ ] **3.3** `gabbro --autotype` client (C++ runner short-circuit vs helper bin — DECIDE) +
+    start the Rust listener on launch; prove keypress -> app logs the captured active window.
+  - [ ] **3.4** bridge `autotype_fill` (refocus/verify window, read secret from Rust session,
+    inject); prove keypress auto-fills the first login into the focused field.
+  - [ ] **3.5** picker UI (Dart): all logins, type-to-filter, focus dance, the three actions.
 - [ ] **Phase 3** — own picker (all logins, type-to-filter) + focus dance; sequences
   `{user}{TAB}{pass}{ENTER}` + username-only + password-only.
 - [ ] **Phase 4** — unlock-then-type for a locked vault; opt-in setting; README key-binding
@@ -137,6 +142,12 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   stable at VERSION 9, so this is no longer blocked. v1 direction in commit 9f158b5.
 
 ### Code Quality
+- **Unify the two clipboard-clear paths.** `entry_detail_screen.dart` (cancellable
+  `Timer`, respects `ClipboardClearTimeout`) and `generator_widget.dart` (fire-and-forget
+  `Future.delayed`, no "never") each implement "copy secret then wipe" separately. Extract
+  one shared helper — and add the missing **generator** clear test as part of it (not
+  unit-testable today: the generator needs FFI to produce a password, absent in `flutter
+  test`; entry-detail clear is pinned). (Found 2026-07-05 during auto-type Phase 3.1 net-first.)
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
   translations (and the `resizeColumns` label added the same way).
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
