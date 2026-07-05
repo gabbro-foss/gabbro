@@ -50,8 +50,8 @@ gabbro/
 │   ├── fido/             # FIDO2/libfido2 FFI (Linux only)
 │   ├── import/           # enpass, bitwarden, google_pm, dashlane, csv
 │   ├── hardening.rs      # Process hardening (R-04): core-dump + ptrace/mem disable (Linux)
-│   ├── autotype/         # Linux auto-type (ADR-017): keysym mapping, XTEST injection, active-window read (Linux-only)
-│   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_spike, autotype_window; wordlist gen; gen_fixtures
+│   ├── autotype/         # Linux auto-type (ADR-017): keysym mapping, XTEST injection, active-window read, trigger IPC (Linux-only)
+│   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_spike, autotype_window, autotype_trigger; wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper (+ Robolectric tests)
 ├── docs/                 # ARCHITECTURE, LEARNINGS, SECURITY, AI_*; decisions/ (ADRs); artefacts/
@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 616 | 17 |
+| Rust (`cargo test -q`) | 622 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 14 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -105,8 +105,13 @@ Phases:
   Hardware-proven 2026-07-05 on X11/qtile (tracked focus across terminal/Brave/editor;
   browsers expose page title not URL, as expected). `rust/src/autotype/window.rs` +
   diagnostic bin `autotype_window`.
-- [ ] **Phase 2b** — single-instance trigger IPC (`gabbro --autotype` over a local
-  socket). No Gabbro key grab; user binds the key. (Open: socket listener in Dart or Rust.)
+- [x] **Phase 2b — trigger IPC.** Rust unix-socket listener + send + token (`rust/src/autotype/trigger.rs`,
+  6 tests, host-proven; no hardware needed) + diagnostic bin `autotype_trigger`. Listener in Rust
+  (active-window capture must be at trigger instant). No key grab; user binds the command.
+- [ ] **Phase 3** — wire it into the app: `gabbro --autotype` client (C++ runner short-circuit
+  vs helper bin — decide here) -> Rust listener notifies Dart (frb stream) -> picker (all logins,
+  type-to-filter) -> capture/refocus window -> sequences (full / username-only / password-only).
+  net-first: pin the launch path + clipboard auto-clear before touching them.
 - [ ] **Phase 3** — own picker (all logins, type-to-filter) + focus dance; sequences
   `{user}{TAB}{pass}{ENTER}` + username-only + password-only.
 - [ ] **Phase 4** — unlock-then-type for a locked vault; opt-in setting; README key-binding
