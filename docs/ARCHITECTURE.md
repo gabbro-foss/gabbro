@@ -77,7 +77,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1231 | 0 |
+| Flutter (`flutter test`) | 1238 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -94,7 +94,14 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-_(empty — agree the next task with the maintainer)_
+**Autofill via `auto-type` (Linux/desktop).** Global hotkey -> foreground-window
+detection -> synthesised keystrokes into another app (the KeePass/KeePassXC model,
+no browser extension). Needs a dedicated design session + ADR: Wayland blocks
+synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's
+own auto-type is partial there), it's a new secret->input-subsystem security
+surface, and it cuts across "secrets live in Rust" (Rust holds the secret +
+synthesises input, Flutter registers the hotkey, per-platform window detection).
+Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
 
 ---
 
@@ -115,21 +122,9 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   hybrid combiner / transcript binding / header AAD / vault format). Vault format is now
   stable at VERSION 9, so this is no longer blocked. v1 direction in commit 9f158b5.
 
-### Features & UX
-- Autofill via `auto-type` (Linux/desktop) — global hotkey → foreground-window detection → synthesised keystrokes into another app (the KeePass/KeePassXC model, no browser extension). Needs a dedicated design session + ADR: Wayland blocks synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's own auto-type is partial there), it's a new secret→input-subsystem security surface, and it cuts across "secrets live in Rust" (Rust holds the secret + synthesises input, Flutter registers the hotkey, per-platform window detection). Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
-
 ### Code Quality
-- **Tablet two-pane: FAB overlaps the detail pane's bottom content.** The shared
-  add-entry FAB floats over the bottom-right of the detail pane, hiding the last
-  scrolled item (observed: entry-detail History tile's trailing chevron). Reserve
-  bottom padding in the detail pane so content clears the FAB. Pre-existing;
-  found 2026-07-03 during large-text chevron work. Phone (full-screen route, no
-  FAB) is unaffected.
-- **Tablet pane-resize handle has no screen-reader label.** The two-pane (tablet)
-  vault-list column-width drag handle exposes no tooltip / `Semantics` label (ADR-015).
-  Add one. (found 2026-07-03 during large-text work.)
 - **Autofill save loose ends.** Native review of the best-effort `eu`/`kk`/`yo` save-flow
-  translations.
+  translations (and the `resizeColumns` label added the same way).
 - KGP warning: `file_picker` and `url_launcher_android` apply Kotlin Gradle Plugin (KGP) via the old per-plugin `buildscript` classpath pattern. Flutter warns this will become a hard build error in a future Flutter version. Both plugins are at their latest pub versions — fix must come from upstream. Monitor for `file_picker 12.x` and `url_launcher_android` releases that remove per-plugin KGP application.
 
 ### V2+ / Defer

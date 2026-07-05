@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Tablet two-pane: the detail pane reserves bottom space so its last item is no longer hidden behind the add-entry button.
+- Tablet two-pane: the column-resize handle now has a screen-reader label ("Resize columns") and its grip grows with the text size.
+
 ## [0.1.0-alpha.11] – 2026-07-04
 
 ### Added
