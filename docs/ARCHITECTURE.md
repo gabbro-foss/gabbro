@@ -42,7 +42,7 @@ gabbro/
 │   ├── screens/          # unlock, vault list, export, import, generator, settings, manage vaults/folders, …
 │   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, text_size_slider, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
-│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, vault_registry, safe_file_picker
+│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, vault_registry, safe_file_picker, autotype_listener
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, autotype_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, keypair, ml_kem, hkdf, aes_gcm, vault_crypto
@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 634 | 17 |
+| Rust (`cargo test -q`) | 644 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 14 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1241 | 0 |
+| Flutter (`flutter test`) | 1248 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -125,9 +125,13 @@ Phases:
       inject; secret never crosses the bridge), `autotype_socket_path`, `autotype_trigger_token`.
       Non-gated bridge + `pub(crate)` `cfg` impls so the frb glue links on Android. 7 unit tests;
       frb codegen run. Refocus is built-but-unproven (hardware-tune in 3.4b).
-    - [ ] **3.4b** Dart unix-socket listener in `main()` (Linux) → on trigger call capture then
-      fill the FIRST login. Hardware-prove keypress fills the focused field.
-  - [ ] **3.5** picker UI (Dart): all logins, type-to-filter, focus dance, the three actions.
+    - [x] **3.4b** Dart unix-socket listener (`lib/autotype_listener.dart`) started in `main()`
+      (Linux); on trigger → capture, fill the first login. Hardware-proven 2026-07-05: keypress
+      fills `username ⇥ password ↵` and submits in Brave. Two hardware-found injection fixes:
+      wait for trigger modifiers to release (else keys scramble), and inject Tab/Return via their
+      real keycodes (Chromium ignores them on a remapped scratch keycode).
+  - [ ] **3.5** picker UI (Dart): all logins (ordered like the vault list), type-to-filter, focus
+    dance, the three sequence actions. Replaces 3.4b's "first login" with the user's choice.
 - [ ] **Phase 4** — unlock-then-type for a locked vault; opt-in setting; README key-binding
   examples; package `gabbro-autotype` into the release bundle (update BUILD_AND_RELEASE).
   Secret stays in Rust throughout; auto-lock preserved.
