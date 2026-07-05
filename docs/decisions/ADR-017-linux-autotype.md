@@ -1,10 +1,32 @@
 # ADR-017: Linux Desktop Auto-Type (Global-Hotkey Autofill, X11-only)
 
 ## Status
-Proposed — design agreed with the maintainer 2026-07-05; **not yet implemented**.
+Accepted — Phases 1–3 implemented 2026-07-05 (Phase 4 deferred; see the Bikeshed).
+**Amended 2026-07-05** (see Amendment below): the trigger-time picker was reverted for
+per-entry direct-type.
 
 ## Date
 2026-07-05
+
+## Amendment (2026-07-05): picker -> per-entry direct-type
+
+This supersedes every reference to the **picker** in this ADR (notably §6 and §8).
+
+The trigger-time picker was implemented then removed after hardware testing: showing
+Gabbro's own window to choose an entry steals X focus, and handing focus back to the
+browser to type proved unreliable on qtile (especially across virtual desktops) — the
+fill frequently failed or landed in the wrong place.
+
+Replacement — **per-entry direct-type**: the user opens a Login in Gabbro (it becomes the
+auto-type target); the hotkey then types that entry into the **already-focused** window,
+so no window is shown and no focus is stolen. If the login's `username` is empty its
+`email` is typed instead. A trigger with no Login open, or a locked/closed Gabbro, does
+nothing — cold-start (unlock-then-type) is Phase 4, deferred.
+
+The username-only / password-only sequences (two-step forms) were removed with the
+picker; re-add if a concrete need returns. Everything else here stands: X11-only, no
+extension, `XTEST` injection, secret-stays-in-Rust, capture-window + wrong-window abort,
+opt-in, auto-lock unchanged.
 
 ## Context
 

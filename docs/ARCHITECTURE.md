@@ -40,9 +40,9 @@ Cross-platform: Linux (Arch, Mint), Android; Windows later. FOSS, GPL-3.0-only.
 gabbro/
 ├── lib/                  # Flutter app
 │   ├── screens/          # unlock, vault list, export, import, generator, settings, manage vaults/folders, …
-│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, text_size_slider, autotype_picker, …
+│   ├── widgets/          # path_field, generator_widget, yubikey_tap, password_breakdown_sheet, sync_review, text_size_slider, …
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
-│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, vault_registry, safe_file_picker, autotype_listener
+│   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, vault_registry, safe_file_picker, autotype_listener, autotype_target
 ├── rust/src/
 │   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, autotype_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, keypair, ml_kem, hkdf, aes_gcm, vault_crypto
@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 644 | 17 |
+| Rust (`cargo test -q`) | 645 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 14 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -78,7 +78,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1265 | 0 |
+| Flutter (`flutter test`) | 1254 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
 | Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
 
@@ -94,56 +94,6 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 > Update at the end of each session. First thing to read at the start of the next.
 
 ### Next task
-
-**Linux desktop auto-type — implement per [ADR-017](decisions/ADR-017-linux-autotype.md).**
-Phases:
-- [x] **Phase 1 — arbitrary-Unicode keystroke injection.** keysym mapping + `XTEST`
-  scratch-keycode remap. Hardware-proven 2026-07-05 on X11/qtile (typed into a browser
-  login field: Latin/accented/Greek/Cyrillic/CJK/symbols, layout-independent).
-  `rust/src/autotype/` + diagnostic bin `autotype_spike`.
-- [x] **Phase 2a — read the active window.** `_NET_ACTIVE_WINDOW` + `WM_CLASS` + title.
-  Hardware-proven 2026-07-05 on X11/qtile (tracked focus across terminal/Brave/editor;
-  browsers expose page title not URL, as expected). `rust/src/autotype/window.rs` +
-  diagnostic bin `autotype_window`.
-- [x] **Phase 2b — trigger IPC.** Rust unix-socket listener + send + token (`rust/src/autotype/trigger.rs`,
-  6 tests, host-proven; no hardware needed) + diagnostic bin `autotype_trigger`. Listener in Rust
-  (active-window capture must be at trigger instant). No key grab; user binds the command.
-- **Phase 3** — wire it into the app (sub-steps):
-  - [x] **3.1** net-first pins: launch path already covered by existing tests; entry-detail
-    clipboard auto-clear pinned (3 tests). Generator clear deferred to the unify (see Bikeshed).
-  - [x] **3.2** sequence building (Rust, pure): `{user}{TAB}{pass}{ENTER}` + user-only + pass-only.
-    `rust/src/autotype/sequence.rs` (`SequenceKind` + `build_sequence`, 5 tests).
-  - [x] **3.3** trigger client + active-window capture. Chose the helper-binary client
-    (`gabbro-autotype`, reuses the tested `send()`); `window::capture_active`; the
-    `autotype_trigger` diagnostic captures the focused window per trigger. Hardware-proven
-    2026-07-05 on qtile (key -> captured Brave/terminal/Gabbro correctly). Listener-on-launch
-    moved to 3.4 (bridge).
-  - **3.4** bridge + Dart wiring (listener is **Dart**, not Rust — no frb streams exist;
-    `dart:io` unix-socket spike passed 2026-07-05):
-    - [x] **3.4a** Rust bridge (`api/autotype_bridge.rs`): `autotype_capture_active_window`,
-      `autotype_fill` (refocus via `_NET_ACTIVE_WINDOW` + verify-focus safeguard + read session +
-      inject; secret never crosses the bridge), `autotype_socket_path`, `autotype_trigger_token`.
-      Non-gated bridge + `pub(crate)` `cfg` impls so the frb glue links on Android. 7 unit tests;
-      frb codegen run. Refocus is built-but-unproven (hardware-tune in 3.4b).
-    - [x] **3.4b** Dart unix-socket listener (`lib/autotype_listener.dart`) started in `main()`
-      (Linux); on trigger → capture, fill the first login. Hardware-proven 2026-07-05: keypress
-      fills `username ⇥ password ↵` and submits in Brave. Two hardware-found injection fixes:
-      wait for trigger modifiers to release (else keys scramble), and inject Tab/Return via their
-      real keycodes (Chromium ignores them on a remapped scratch keycode).
-  - **3.5** picker UI (Dart):
-    - [x] **3.5a** `AutotypePicker` widget (`lib/widgets/autotype_picker.dart`): all logins,
-      type-to-filter, three actions (tap=full + per-row username-/password-only buttons with
-      tooltips), keyboard (arrows/Ctrl+J/K nav, Enter full, Ctrl+U/P variants, Esc cancel),
-      wrapping hint footer. 15 widget tests + overflow-probe (phone/tablet, no clip at max text,
-      ADR-016). Reuses existing search/empty strings; 3 new l10n keys across 37 locales.
-    - [ ] **3.5b** wire trigger -> capture -> **raise the Gabbro window** (Option C: Rust EWMH
-      self-raise — find own window via `_NET_WM_PID`==pid in the root's `_NET_CLIENT_LIST`, send
-      `_NET_ACTIVE_WINDOW`; reuses `fill.rs` `request_activate`; no C++, no dependency) -> show
-      picker (ordered like vault list) -> `autotypeFill`. Refocus-after-focus-steal stressed here;
-      hardware (expect qtile tuning). Keep Gabbro on the browser's qtile group to avoid flicker.
-- [ ] **Phase 4** — unlock-then-type for a locked vault; opt-in setting; README key-binding
-  examples; package `gabbro-autotype` into the release bundle (update BUILD_AND_RELEASE).
-  Secret stays in Rust throughout; auto-lock preserved.
 
 ---
 
@@ -165,12 +115,10 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   stable at VERSION 9, so this is no longer blocked. v1 direction in commit 9f158b5.
 
 ### Code Quality
-- **Configurable auto-type picker shortcuts.** The picker's keys are fixed defaults
-  (arrows/Enter/Esc are universal; the vim `Ctrl+J/K/U/P` are logical, so they don't
-  fire on non-Latin *layouts* like Cyrillic/Greek — essentials still work via arrows +
-  the Tab-reachable row buttons). Proper fix (KeePassXC-style): let the user rebind them
-  in settings (capture UI + persistence + the hint footer reflects the binding). Not a
-  blocker — the picker is fully usable on every layout as-is. (ADR-017, deferred 2026-07-05.)
+- **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
+  vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
+  an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the
+  release bundle (update BUILD_AND_RELEASE). Secret stays in Rust; auto-lock preserved.
 - **Unify the two clipboard-clear paths.** `entry_detail_screen.dart` (cancellable
   `Timer`, respects `ClipboardClearTimeout`) and `generator_widget.dart` (fire-and-forget
   `Future.delayed`, no "never") each implement "copy secret then wipe" separately. Extract

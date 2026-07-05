@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Linux desktop auto-type (X11).** With a login open in Gabbro, a global hotkey types `username⇥password↵` into the focused window; uses the login's email when it has no username.
+
 ### Fixed
 - Tablet two-pane: the detail pane reserves bottom space so its last item is no longer hidden behind the add-entry button.
 - Tablet two-pane: the column-resize handle now has a screen-reader label ("Resize columns") and its grip grows with the text size.
