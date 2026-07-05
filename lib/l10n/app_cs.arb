@@ -856,5 +856,8 @@
   "restoreFromFileButton": "Obnovit ze záložního souboru",
   "vaultRestoredMessage": "Trezor obnoven. Odemkněte pomocí svých přihlašovacích údajů.",
   "restoreFromFileInvalidError": "Tento soubor není použitelný trezor Gabbro.",
-  "resizeColumns": "Změnit velikost sloupců"
+  "resizeColumns": "Změnit velikost sloupců",
+  "autotypeTypeUsername": "Napsat pouze uživatelské jméno",
+  "autotypeTypePassword": "Napsat pouze heslo",
+  "autotypeKeyHints": "Nahoru/Dolů nebo Ctrl+J/K pohyb, Enter vyplnit, Ctrl+U uživatel, Ctrl+P heslo, Esc zrušit"
 }

@@ -855,5 +855,8 @@
   "restoreFromFileButton": "Επαναφορά από αρχείο αντιγράφου ασφαλείας",
   "vaultRestoredMessage": "Το θησαυροφυλάκιο επαναφέρθηκε. Ξεκλειδώστε με τα διαπιστευτήριά σας.",
   "restoreFromFileInvalidError": "Αυτό το αρχείο δεν είναι χρησιμοποιήσιμο θησαυροφυλάκιο Gabbro.",
-  "resizeColumns": "Αλλαγή μεγέθους στηλών"
+  "resizeColumns": "Αλλαγή μεγέθους στηλών",
+  "autotypeTypeUsername": "Πληκτρολόγηση μόνο του ονόματος χρήστη",
+  "autotypeTypePassword": "Πληκτρολόγηση μόνο του κωδικού",
+  "autotypeKeyHints": "Πάνω/Κάτω ή Ctrl+J/K μετακίνηση, Enter συμπλήρωση, Ctrl+U χρήστης, Ctrl+P κωδικός, Esc ακύρωση"
 }

@@ -2014,4 +2014,14 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Změnit velikost sloupců';
+
+  @override
+  String get autotypeTypeUsername => 'Napsat pouze uživatelské jméno';
+
+  @override
+  String get autotypeTypePassword => 'Napsat pouze heslo';
+
+  @override
+  String get autotypeKeyHints =>
+      'Nahoru/Dolů nebo Ctrl+J/K pohyb, Enter vyplnit, Ctrl+U uživatel, Ctrl+P heslo, Esc zrušit';
 }

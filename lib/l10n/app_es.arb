@@ -855,5 +855,8 @@
   "restoreFromFileButton": "Restaurar desde un archivo de copia de seguridad",
   "vaultRestoredMessage": "Caja fuerte restaurada. Desbloquea con tus credenciales.",
   "restoreFromFileInvalidError": "Ese archivo no es una caja fuerte de Gabbro utilizable.",
-  "resizeColumns": "Ajustar columnas"
+  "resizeColumns": "Ajustar columnas",
+  "autotypeTypeUsername": "Escribir solo el usuario",
+  "autotypeTypePassword": "Escribir solo la contraseña",
+  "autotypeKeyHints": "Arriba/Abajo o Ctrl+J/K para mover, Enter para rellenar, Ctrl+U usuario, Ctrl+P contraseña, Esc para cancelar"
 }

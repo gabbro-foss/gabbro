@@ -855,5 +855,8 @@
   "restoreFromFileButton": "Restaurer depuis un fichier de sauvegarde",
   "vaultRestoredMessage": "Coffre restauré. Déverrouillez avec vos identifiants.",
   "restoreFromFileInvalidError": "Ce fichier n'est pas un coffre Gabbro utilisable.",
-  "resizeColumns": "Redimensionner les colonnes"
+  "resizeColumns": "Redimensionner les colonnes",
+  "autotypeTypeUsername": "Saisir uniquement l'identifiant",
+  "autotypeTypePassword": "Saisir uniquement le mot de passe",
+  "autotypeKeyHints": "Haut/Bas ou Ctrl+J/K pour naviguer, Entrée pour remplir, Ctrl+U identifiant, Ctrl+P mot de passe, Échap pour annuler"
 }

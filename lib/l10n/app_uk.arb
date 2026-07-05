@@ -856,5 +856,8 @@
   "restoreFromFileButton": "Відновити з файлу резервної копії",
   "vaultRestoredMessage": "Сховище відновлено. Розблокуйте за допомогою своїх облікових даних.",
   "restoreFromFileInvalidError": "Цей файл не є придатним сховищем Gabbro.",
-  "resizeColumns": "Змінити розмір стовпців"
+  "resizeColumns": "Змінити розмір стовпців",
+  "autotypeTypeUsername": "Ввести лише ім'я користувача",
+  "autotypeTypePassword": "Ввести лише пароль",
+  "autotypeKeyHints": "Вгору/Вниз або Ctrl+J/K переміщення, Enter заповнити, Ctrl+U користувач, Ctrl+P пароль, Esc скасувати"
 }

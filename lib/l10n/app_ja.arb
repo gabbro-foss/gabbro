@@ -855,5 +855,8 @@
   "restoreFromFileButton": "バックアップファイルから復元",
   "vaultRestoredMessage": "ボールトを復元しました。認証情報でロックを解除してください。",
   "restoreFromFileInvalidError": "このファイルは使用可能な Gabbro ボールトではありません。",
-  "resizeColumns": "列のサイズを変更"
+  "resizeColumns": "列のサイズを変更",
+  "autotypeTypeUsername": "ユーザー名のみ入力",
+  "autotypeTypePassword": "パスワードのみ入力",
+  "autotypeKeyHints": "上/下 または Ctrl+J/K で移動、Enter で入力、Ctrl+U ユーザー名、Ctrl+P パスワード、Esc で取消"
 }

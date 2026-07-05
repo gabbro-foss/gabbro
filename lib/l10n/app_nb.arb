@@ -856,5 +856,8 @@
   "restoreFromFileButton": "Gjenopprett fra en sikkerhetskopifil",
   "vaultRestoredMessage": "Hvelv gjenopprettet. Lås opp med påloggingsinformasjonen din.",
   "restoreFromFileInvalidError": "Den filen er ikke et brukbart Gabbro-hvelv.",
-  "resizeColumns": "Endre kolonnestørrelse"
+  "resizeColumns": "Endre kolonnestørrelse",
+  "autotypeTypeUsername": "Skriv bare brukernavn",
+  "autotypeTypePassword": "Skriv bare passord",
+  "autotypeKeyHints": "Opp/Ned eller Ctrl+J/K flytt, Enter fyll ut, Ctrl+U brukernavn, Ctrl+P passord, Esc avbryt"
 }

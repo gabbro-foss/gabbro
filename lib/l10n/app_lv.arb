@@ -856,5 +856,8 @@
   "restoreFromFileButton": "Atjaunot no dublējuma faila",
   "vaultRestoredMessage": "Seifs atjaunots. Atbloķējiet ar saviem akreditācijas datiem.",
   "restoreFromFileInvalidError": "Šis fails nav izmantojams Gabbro seifs.",
-  "resizeColumns": "Mainīt kolonnu izmērus"
+  "resizeColumns": "Mainīt kolonnu izmērus",
+  "autotypeTypeUsername": "Ievadīt tikai lietotājvārdu",
+  "autotypeTypePassword": "Ievadīt tikai paroli",
+  "autotypeKeyHints": "Uz augšu/leju vai Ctrl+J/K pārvietoties, Enter aizpildīt, Ctrl+U lietotājs, Ctrl+P parole, Esc atcelt"
 }

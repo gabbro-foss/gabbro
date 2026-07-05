@@ -855,5 +855,8 @@
   "restoreFromFileButton": "Vrati iz datoteke rezervne kopije",
   "vaultRestoredMessage": "Sef vraćen. Otključajte svojim akreditivima.",
   "restoreFromFileInvalidError": "Ta datoteka nije upotrebljiv Gabbro sef.",
-  "resizeColumns": "Promeni veličinu kolona"
+  "resizeColumns": "Promeni veličinu kolona",
+  "autotypeTypeUsername": "Unesi samo korisničko ime",
+  "autotypeTypePassword": "Unesi samo lozinku",
+  "autotypeKeyHints": "Gore/Dole ili Ctrl+J/K kretanje, Enter popuni, Ctrl+U korisnik, Ctrl+P lozinka, Esc otkaži"
 }

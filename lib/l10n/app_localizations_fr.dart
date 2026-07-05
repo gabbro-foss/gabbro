@@ -2039,4 +2039,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Redimensionner les colonnes';
+
+  @override
+  String get autotypeTypeUsername => 'Saisir uniquement l\'identifiant';
+
+  @override
+  String get autotypeTypePassword => 'Saisir uniquement le mot de passe';
+
+  @override
+  String get autotypeKeyHints =>
+      'Haut/Bas ou Ctrl+J/K pour naviguer, Entrée pour remplir, Ctrl+U identifiant, Ctrl+P mot de passe, Échap pour annuler';
 }

@@ -2015,6 +2015,16 @@ class AppLocalizationsSr extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Промени величину колона';
+
+  @override
+  String get autotypeTypeUsername => 'Унеси само корисничко име';
+
+  @override
+  String get autotypeTypePassword => 'Унеси само лозинку';
+
+  @override
+  String get autotypeKeyHints =>
+      'Горе/Доле или Ctrl+J/K кретање, Enter попуни, Ctrl+U корисник, Ctrl+P лозинка, Esc откажи';
 }
 
 /// The translations for Serbian, using the Latin script (`sr_Latn`).
@@ -4028,4 +4038,14 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
 
   @override
   String get resizeColumns => 'Promeni veličinu kolona';
+
+  @override
+  String get autotypeTypeUsername => 'Unesi samo korisničko ime';
+
+  @override
+  String get autotypeTypePassword => 'Unesi samo lozinku';
+
+  @override
+  String get autotypeKeyHints =>
+      'Gore/Dole ili Ctrl+J/K kretanje, Enter popuni, Ctrl+U korisnik, Ctrl+P lozinka, Esc otkaži';
 }

@@ -855,5 +855,8 @@
   "restoreFromFileButton": "从备份文件恢复",
   "vaultRestoredMessage": "保险库已恢复。请使用你的凭据解锁。",
   "restoreFromFileInvalidError": "该文件不是可用的 Gabbro 保险库。",
-  "resizeColumns": "调整列宽"
+  "resizeColumns": "调整列宽",
+  "autotypeTypeUsername": "仅输入用户名",
+  "autotypeTypePassword": "仅输入密码",
+  "autotypeKeyHints": "上/下 或 Ctrl+J/K 移动，Enter 填充，Ctrl+U 用户名，Ctrl+P 密码，Esc 取消"
 }

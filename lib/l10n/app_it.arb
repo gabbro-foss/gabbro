@@ -855,5 +855,8 @@
   "restoreFromFileButton": "Ripristina da un file di backup",
   "vaultRestoredMessage": "Cassaforte ripristinata. Sblocca con le tue credenziali.",
   "restoreFromFileInvalidError": "Questo file non è una cassaforte Gabbro utilizzabile.",
-  "resizeColumns": "Ridimensiona colonne"
+  "resizeColumns": "Ridimensiona colonne",
+  "autotypeTypeUsername": "Digita solo il nome utente",
+  "autotypeTypePassword": "Digita solo la password",
+  "autotypeKeyHints": "Su/Giù o Ctrl+J/K per spostarti, Invio per compilare, Ctrl+U utente, Ctrl+P password, Esc per annullare"
 }

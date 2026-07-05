@@ -2013,4 +2013,14 @@ class AppLocalizationsNn extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Endre kolonnestorleik';
+
+  @override
+  String get autotypeTypeUsername => 'Skriv berre brukarnamn';
+
+  @override
+  String get autotypeTypePassword => 'Skriv berre passord';
+
+  @override
+  String get autotypeKeyHints =>
+      'Opp/Ned eller Ctrl+J/K flytt, Enter fyll ut, Ctrl+U brukarnamn, Ctrl+P passord, Esc avbryt';
 }

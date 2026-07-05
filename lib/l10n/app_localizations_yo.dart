@@ -2012,4 +2012,14 @@ class AppLocalizationsYo extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n';
+
+  @override
+  String get autotypeTypeUsername => 'Tẹ orúkọ olùmúlò nìkan';
+
+  @override
+  String get autotypeTypePassword => 'Tẹ ọ̀rọ̀ìgbaniwọlé nìkan';
+
+  @override
+  String get autotypeKeyHints =>
+      'Òkè/Ìsàlẹ̀ tàbí Ctrl+J/K láti rìn, Enter láti kún, Ctrl+U olùmúlò, Ctrl+P ọ̀rọ̀ìgbaniwọlé, Esc láti fagilé';
 }

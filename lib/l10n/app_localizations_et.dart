@@ -2012,4 +2012,14 @@ class AppLocalizationsEt extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Muuda veergude suurust';
+
+  @override
+  String get autotypeTypeUsername => 'Sisesta ainult kasutajanimi';
+
+  @override
+  String get autotypeTypePassword => 'Sisesta ainult parool';
+
+  @override
+  String get autotypeKeyHints =>
+      'Üles/Alla või Ctrl+J/K liikumine, Enter täitmine, Ctrl+U kasutaja, Ctrl+P parool, Esc tühista';
 }

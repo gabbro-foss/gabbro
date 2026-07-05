@@ -18,6 +18,7 @@ import 'package:gabbro/screens/manage_vaults_screen.dart';
 import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/recovery_history_screen.dart';
 import 'package:gabbro/screens/security_screen.dart';
+import 'package:gabbro/widgets/autotype_picker.dart';
 import 'package:gabbro/src/rust/api/entropy.dart';
 import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
@@ -141,6 +142,26 @@ final Map<String, Widget Function()> _screens = {
     showYubikey: false,
     onInitVaultWithYubikey: (a, b, c, s2, s3, awaitBk, s4, t, alias) async {},
     resolveDataDir: GabbroPaths.dataDir,
+  ),
+  'autotype_picker': () => AutotypePicker(
+    logins: [
+      const EntrySummaryData(
+        id: 'a',
+        entryType: 'Login',
+        title: 'A rather long login title to stress the picker row at large text',
+        folder: '',
+        searchBlob: 'a',
+      ),
+      const EntrySummaryData(
+        id: 'b',
+        entryType: 'Login',
+        title: 'Beta',
+        folder: '',
+        searchBlob: 'b',
+      ),
+    ],
+    onSelect: (_, _) {},
+    onCancel: () {},
   ),
 };
 

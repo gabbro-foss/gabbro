@@ -3750,6 +3750,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Resize columns'**
   String get resizeColumns;
+
+  /// No description provided for @autotypeTypeUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Type username only'**
+  String get autotypeTypeUsername;
+
+  /// No description provided for @autotypeTypePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Type password only'**
+  String get autotypeTypePassword;
+
+  /// No description provided for @autotypeKeyHints.
+  ///
+  /// In en, this message translates to:
+  /// **'Up/Down or Ctrl+J/K to move, Enter to fill, Ctrl+U username, Ctrl+P password, Esc to cancel'**
+  String get autotypeKeyHints;
 }
 
 class _AppLocalizationsDelegate

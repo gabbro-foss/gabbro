@@ -1999,4 +1999,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Resize columns';
+
+  @override
+  String get autotypeTypeUsername => 'Type username only';
+
+  @override
+  String get autotypeTypePassword => 'Type password only';
+
+  @override
+  String get autotypeKeyHints =>
+      'Up/Down or Ctrl+J/K to move, Enter to fill, Ctrl+U username, Ctrl+P password, Esc to cancel';
 }

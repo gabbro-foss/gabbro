@@ -1952,4 +1952,14 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get resizeColumns => '列のサイズを変更';
+
+  @override
+  String get autotypeTypeUsername => 'ユーザー名のみ入力';
+
+  @override
+  String get autotypeTypePassword => 'パスワードのみ入力';
+
+  @override
+  String get autotypeKeyHints =>
+      '上/下 または Ctrl+J/K で移動、Enter で入力、Ctrl+U ユーザー名、Ctrl+P パスワード、Esc で取消';
 }

@@ -2032,4 +2032,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Ajustar columnas';
+
+  @override
+  String get autotypeTypeUsername => 'Escribir solo el usuario';
+
+  @override
+  String get autotypeTypePassword => 'Escribir solo la contraseña';
+
+  @override
+  String get autotypeKeyHints =>
+      'Arriba/Abajo o Ctrl+J/K para mover, Enter para rellenar, Ctrl+U usuario, Ctrl+P contraseña, Esc para cancelar';
 }

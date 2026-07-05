@@ -2015,4 +2015,14 @@ class AppLocalizationsSk extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Zmeniť veľkosť stĺpcov';
+
+  @override
+  String get autotypeTypeUsername => 'Napísať iba používateľské meno';
+
+  @override
+  String get autotypeTypePassword => 'Napísať iba heslo';
+
+  @override
+  String get autotypeKeyHints =>
+      'Hore/Dole alebo Ctrl+J/K pohyb, Enter vyplniť, Ctrl+U používateľ, Ctrl+P heslo, Esc zrušiť';
 }

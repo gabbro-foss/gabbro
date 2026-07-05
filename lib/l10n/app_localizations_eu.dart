@@ -2014,4 +2014,14 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Aldatu zutabeen tamaina';
+
+  @override
+  String get autotypeTypeUsername => 'Idatzi erabiltzaile-izena soilik';
+
+  @override
+  String get autotypeTypePassword => 'Idatzi pasahitza soilik';
+
+  @override
+  String get autotypeKeyHints =>
+      'Gora/Behera edo Ctrl+J/K mugitzeko, Enter betetzeko, Ctrl+U erabiltzailea, Ctrl+P pasahitza, Esc uzteko';
 }

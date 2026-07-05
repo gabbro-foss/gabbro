@@ -855,5 +855,8 @@
   "restoreFromFileButton": "Berreskuratu babeskopia-fitxategi batetik",
   "vaultRestoredMessage": "Kutxa gotorra berreskuratu da. Desblokeatu zure kredentzialekin.",
   "restoreFromFileInvalidError": "Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat.",
-  "resizeColumns": "Aldatu zutabeen tamaina"
+  "resizeColumns": "Aldatu zutabeen tamaina",
+  "autotypeTypeUsername": "Idatzi erabiltzaile-izena soilik",
+  "autotypeTypePassword": "Idatzi pasahitza soilik",
+  "autotypeKeyHints": "Gora/Behera edo Ctrl+J/K mugitzeko, Enter betetzeko, Ctrl+U erabiltzailea, Ctrl+P pasahitza, Esc uzteko"
 }

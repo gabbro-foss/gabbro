@@ -2017,4 +2017,14 @@ class AppLocalizationsSl extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Spremeni velikost stolpcev';
+
+  @override
+  String get autotypeTypeUsername => 'Vnesi samo uporabniško ime';
+
+  @override
+  String get autotypeTypePassword => 'Vnesi samo geslo';
+
+  @override
+  String get autotypeKeyHints =>
+      'Gor/Dol ali Ctrl+J/K premik, Enter izpolni, Ctrl+U uporabnik, Ctrl+P geslo, Esc prekliči';
 }

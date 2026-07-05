@@ -855,5 +855,8 @@
   "restoreFromFileButton": "從備份檔案復原",
   "vaultRestoredMessage": "保險庫已復原。請使用你的憑證解鎖。",
   "restoreFromFileInvalidError": "該檔案不是可用的 Gabbro 保險庫。",
-  "resizeColumns": "調整欄寬"
+  "resizeColumns": "調整欄寬",
+  "autotypeTypeUsername": "僅輸入使用者名稱",
+  "autotypeTypePassword": "僅輸入密碼",
+  "autotypeKeyHints": "上/下 或 Ctrl+J/K 移動，Enter 填入，Ctrl+U 使用者名稱，Ctrl+P 密碼，Esc 取消"
 }

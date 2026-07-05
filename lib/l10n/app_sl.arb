@@ -855,5 +855,8 @@
   "restoreFromFileButton": "Obnovi iz datoteke varnostne kopije",
   "vaultRestoredMessage": "Trezor obnovljen. Odklenite s svojimi poverilnicami.",
   "restoreFromFileInvalidError": "Ta datoteka ni uporaben trezor Gabbro.",
-  "resizeColumns": "Spremeni velikost stolpcev"
+  "resizeColumns": "Spremeni velikost stolpcev",
+  "autotypeTypeUsername": "Vnesi samo uporabniško ime",
+  "autotypeTypePassword": "Vnesi samo geslo",
+  "autotypeKeyHints": "Gor/Dol ali Ctrl+J/K premik, Enter izpolni, Ctrl+U uporabnik, Ctrl+P geslo, Esc prekliči"
 }
