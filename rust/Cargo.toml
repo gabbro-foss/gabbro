@@ -19,6 +19,7 @@ rand = "0.8"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = { version = "1.0.149", features = ["preserve_order"] }
 sha2 = "0.11.0"
+thiserror = "1"
 uuid = { version = "1.23.0", features = ["v4"] }
 x25519-dalek = { version = "2.0.1", features = ["reusable_secrets"] }
 zeroize = { version = "1.8.2", features = ["zeroize_derive"] }
@@ -38,6 +39,11 @@ required-features = ["forensics"]
 
 [target.'cfg(not(target_os = "android"))'.dependencies]
 libfido2-sys = "0.5.1"
+
+# Linux desktop auto-type (ADR-017): X11 keystroke injection via XTEST. Pure-Rust
+# backend (no system X library linked). Linux-only, so Android never pulls it.
+[target.'cfg(target_os = "linux")'.dependencies]
+x11rb = { version = "0.13", features = ["xtest"] }
 
 [target.'cfg(target_os = "android")'.dependencies]
 jni = { version = "0.21", features = ["invocation"] }
