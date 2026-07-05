@@ -12,15 +12,9 @@ class GeneratorScreen extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final timeout = GabbroApp.maybeOf(context)?.settings.clipboardClearTimeout
         ?? ClipboardClearTimeout.sixtySeconds;
-    final duration = switch (timeout) {
-      ClipboardClearTimeout.never         => const Duration(hours: 24),
-      ClipboardClearTimeout.thirtySeconds => const Duration(seconds: 30),
-      ClipboardClearTimeout.sixtySeconds  => const Duration(seconds: 60),
-      ClipboardClearTimeout.twoMinutes    => const Duration(minutes: 2),
-    };
     return Scaffold(
       appBar: AppBar(title: Text(l.generatorTitle)),
-      body: GeneratorWidget(clipboardClearDuration: duration),
+      body: GeneratorWidget(clipboardClearTimeout: timeout),
     );
   }
 }

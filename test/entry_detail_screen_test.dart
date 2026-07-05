@@ -65,7 +65,6 @@ CustomEntryData _customEntry() => CustomEntryData(
 Widget _buildScreen(
   VaultEntryData entry, {
   Future<void> Function(String id)? onDeleteEntry,
-  Future<void> Function(String value)? onCopyToClipboard,
   ClipboardClearTimeout clipboardClearTimeout =
       ClipboardClearTimeout.sixtySeconds,
   Future<void> Function(String url)? onLaunchUrl,
@@ -75,7 +74,6 @@ Widget _buildScreen(
     testApp(EntryDetailScreen(
       entry: entry,
       onDeleteEntry: onDeleteEntry ?? (_) async {},
-      onCopyToClipboard: onCopyToClipboard ?? (_) async {},
       clipboardClearTimeout: clipboardClearTimeout,
       onLaunchUrl: onLaunchUrl ?? (_) async {},
       exportFilePicker: exportFilePicker ?? (_) async => null,
@@ -225,6 +223,7 @@ void main() {
   });
 
   testWidgets('copy button shows copied snackbar', (tester) async {
+    recordClipboardWrites(tester); // the copy now goes through the real channel
     await tester.pumpWidget(
       _buildScreen(VaultEntryData.login(_loginEntry())),
     );
@@ -248,6 +247,7 @@ void main() {
   });
 
   testWidgets('copy button snackbar mentions clear timeout', (tester) async {
+    recordClipboardWrites(tester);
     await tester.pumpWidget(
       _buildScreen(
         VaultEntryData.login(_loginEntry()),
@@ -263,6 +263,7 @@ void main() {
 
   testWidgets('copy snackbar says "never clears" when timeout is never',
       (tester) async {
+    recordClipboardWrites(tester);
     await tester.pumpWidget(
       _buildScreen(
         VaultEntryData.login(_loginEntry()),
@@ -390,7 +391,6 @@ void main() {
       testApp(EntryDetailScreen(
         entry: VaultEntryData.login(_loginEntry()),
         onDeleteEntry: (_) async { deleteEntryCalled = true; },
-        onCopyToClipboard: (_) async {},
         onDeleted: () { deletedCalled = true; },
       )),
     );
@@ -417,7 +417,6 @@ void main() {
                 builder: (_) => EntryDetailScreen(
                   entry: VaultEntryData.login(_loginEntry()),
                   onDeleteEntry: (_) async { deleteEntryCalled = true; },
-                  onCopyToClipboard: (_) async {},
                 ),
               ),
             );
@@ -878,7 +877,6 @@ void main() {
     await tester.pumpWidget(testApp(EntryDetailScreen(
       entry: VaultEntryData.login(_loginEntry()),
       onDeleteEntry: (_) async {},
-      onCopyToClipboard: (_) async {},
       onLaunchUrl: (_) async {},
       exportFilePicker: (_) async => null,
       onFetchHistory: (_) async => const [],
@@ -887,25 +885,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(bodyScrollPadding(tester).bottom, 16 + 88);
   });
-}
-
-/// Installs a mock for the `Clipboard` platform channel and returns a growing
-/// list of every text written via `Clipboard.setData` — the auto-clear writes
-/// an empty string, which is what the pin tests assert on.
-List<String> recordClipboardWrites(WidgetTester tester) {
-  final writes = <String>[];
-  tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-    SystemChannels.platform,
-    (call) async {
-      if (call.method == 'Clipboard.setData') {
-        writes.add((call.arguments as Map)['text'] as String? ?? '');
-      }
-      return null;
-    },
-  );
-  addTearDown(() => tester.binding.defaultBinaryMessenger
-      .setMockMethodCallHandler(SystemChannels.platform, null));
-  return writes;
 }
 
 /// The bottom [EdgeInsets] of the detail body's scroll view (the SafeArea >

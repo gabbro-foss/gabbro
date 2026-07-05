@@ -1085,18 +1085,12 @@ class _CreateEntryScreenState extends State<CreateEntryScreen> {
         label: Text(l.generate),
         onPressed: () async {
           final settings = GabbroApp.of(context).settings;
-          final duration = switch (settings.clipboardClearTimeout) {
-            ClipboardClearTimeout.never         => const Duration(hours: 24),
-            ClipboardClearTimeout.thirtySeconds => const Duration(seconds: 30),
-            ClipboardClearTimeout.sixtySeconds  => const Duration(seconds: 60),
-            ClipboardClearTimeout.twoMinutes    => const Duration(minutes: 2),
-          };
           await Navigator.of(context).push(
             MaterialPageRoute(
               builder: (ctx) => Scaffold(
                 appBar: AppBar(title: Text(AppLocalizations.of(ctx).generatorTitle)),
                 body: GeneratorWidget(
-                  clipboardClearDuration: duration,
+                  clipboardClearTimeout: settings.clipboardClearTimeout,
                   onUsePassword: (value) {
                     setState(() => _passwordController.text = value);
                     Navigator.of(context).pop();

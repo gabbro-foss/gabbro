@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:gabbro/clipboard_clear.dart';
 import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/main.dart';
@@ -162,8 +162,9 @@ class GeneratorWidget extends StatefulWidget {
   /// callback with the currently generated value.
   final void Function(String value)? onUsePassword;
 
-  /// Duration after which the clipboard is cleared. Defaults to 60 seconds.
-  final Duration clipboardClearDuration;
+  /// How long before the copied value is wiped from the clipboard. Defaults to
+  /// 60 seconds. Threaded to the shared [ClipboardClearMixin].
+  final ClipboardClearTimeout clipboardClearTimeout;
 
   // Injectable for testing — defaults call Rust FFI.
   final String Function(PasswordConfig config) generatePasswordFn;
@@ -175,7 +176,7 @@ class GeneratorWidget extends StatefulWidget {
   const GeneratorWidget({
     super.key,
     this.onUsePassword,
-    this.clipboardClearDuration = const Duration(seconds: 60),
+    this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
     this.generatePasswordFn = _defaultGeneratePassword,
     this.generatePassphraseFn = _defaultGeneratePassphrase,
     this.passphraseEntropyBitsFn = _defaultPassphraseEntropyBits,
@@ -186,7 +187,8 @@ class GeneratorWidget extends StatefulWidget {
   State<GeneratorWidget> createState() => _GeneratorWidgetState();
 }
 
-class _GeneratorWidgetState extends State<GeneratorWidget> {
+class _GeneratorWidgetState extends State<GeneratorWidget>
+    with ClipboardClearMixin<GeneratorWidget> {
   // ── Mode ─────────────────────────────────────────────────────────────────
   _GeneratorMode _mode = _GeneratorMode.classic;
 
@@ -357,11 +359,8 @@ class _GeneratorWidgetState extends State<GeneratorWidget> {
 
   Future<void> _copy() async {
     if (_generated.isEmpty) return;
-    await Clipboard.setData(ClipboardData(text: _generated));
+    await copyThenClear(_generated, widget.clipboardClearTimeout);
     setState(() => _copied = true);
-    Future.delayed(widget.clipboardClearDuration, () {
-      Clipboard.setData(const ClipboardData(text: ''));
-    });
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _copied = false);
     });

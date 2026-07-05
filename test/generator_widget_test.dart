@@ -67,6 +67,20 @@ GeneratorWidget _stubWidget({void Function(String)? onUsePassword}) =>
       entropyBitsFn: _stubEntropy,
     );
 
+/// Stub widget with an explicit clipboard-clear [timeout], for the auto-clear
+/// pins. Classic mode + [_stubPassword] means the generated value is 32 'A's.
+GeneratorWidget _clearStubWidget(ClipboardClearTimeout timeout) =>
+    GeneratorWidget(
+      clipboardClearTimeout: timeout,
+      generatePasswordFn: _stubPassword,
+      generatePassphraseFn: _stubPassphrase,
+      passphraseEntropyBitsFn: _stubEntropyBits,
+      entropyBitsFn: _stubEntropy,
+    );
+
+/// The value [_stubPassword] produces at the default length (32).
+final String _stubGenerated = 'A' * 32;
+
 void main() {
   // ADR-016 reveal-eye: the generated-password show/hide toggle scales fully
   // with the text (unconstrained action row).
@@ -640,5 +654,70 @@ void _uiToGeneratorLanguageMappingTests() {
         );
       });
     }
+  });
+
+  // ── Clipboard auto-clear (shared ClipboardClearMixin) ─────────────────────
+  // The generator now copies through the mixin: the value is the generated
+  // password; the auto-clear writes an empty string after the timeout, "never"
+  // wipes nothing, and re-copying cancels the prior wipe.
+  group('GeneratorWidget - clipboard clear', () {
+    testWidgets('copy writes the generated value to the clipboard',
+        (tester) async {
+      final writes = recordClipboardWrites(tester);
+      await tester.pumpWidget(
+          _wrap(_clearStubWidget(ClipboardClearTimeout.thirtySeconds)));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('copy_button')));
+      await tester.pump();
+      expect(writes, contains(_stubGenerated));
+      await tester.pump(const Duration(seconds: 30)); // flush pending timers
+    });
+
+    testWidgets('copy clears the clipboard after the configured timeout',
+        (tester) async {
+      final writes = recordClipboardWrites(tester);
+      await tester.pumpWidget(
+          _wrap(_clearStubWidget(ClipboardClearTimeout.thirtySeconds)));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('copy_button')));
+      await tester.pump();
+      expect(writes, isNot(contains('')), reason: 'must not clear immediately');
+      await tester.pump(const Duration(seconds: 30));
+      expect(writes, contains(''),
+          reason: 'clipboard is emptied when the timeout elapses');
+    });
+
+    testWidgets('a never timeout leaves the clipboard untouched',
+        (tester) async {
+      final writes = recordClipboardWrites(tester);
+      await tester
+          .pumpWidget(_wrap(_clearStubWidget(ClipboardClearTimeout.never)));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('copy_button')));
+      await tester.pump();
+      await tester.pump(const Duration(hours: 25));
+      expect(writes, isNot(contains('')),
+          reason: 'never must not wipe (no 24h fallback)');
+    });
+
+    testWidgets('re-copying cancels the prior clear timer', (tester) async {
+      final writes = recordClipboardWrites(tester);
+      await tester.pumpWidget(
+          _wrap(_clearStubWidget(ClipboardClearTimeout.thirtySeconds)));
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('copy_button')));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 15));
+      await tester.tap(find.byKey(const Key('copy_button'))); // cancels first
+      await tester.pump();
+      // 35s since the first copy (its timer would fire at 30s) but only 20s
+      // since the second: nothing wiped yet.
+      await tester.pump(const Duration(seconds: 20));
+      expect(writes, isNot(contains('')),
+          reason: 'the first timer was cancelled, the second is not yet due');
+      await tester.pump(const Duration(seconds: 15)); // 35s since the second
+      expect(writes, contains(''),
+          reason: 'the reset timer wipes once it elapses');
+    });
   });
 }

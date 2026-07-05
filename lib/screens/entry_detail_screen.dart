@@ -5,8 +5,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:gabbro/autotype_target.dart';
+import 'package:gabbro/clipboard_clear.dart';
 import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/safe_file_picker.dart';
@@ -43,8 +43,6 @@ String formatTimestamp(
 }
 
 Future<void> _defaultDelete(String id) => deleteEntry(id: id);
-Future<void> _defaultCopy(String value) =>
-    Clipboard.setData(ClipboardData(text: value));
 Future<void> _defaultLaunchUrl(String url) async {
   var uri = Uri.tryParse(url);
   if (uri == null) return;
@@ -74,7 +72,6 @@ Future<void> _defaultDeleteHistory(String id, int index) =>
 class EntryDetailScreen extends StatefulWidget {
   final VaultEntryData entry;
   final Future<void> Function(String id) onDeleteEntry;
-  final Future<void> Function(String value) onCopyToClipboard;
   final ClipboardClearTimeout clipboardClearTimeout;
 
   /// Recovery history (values replaced during sync). Injectable for tests; the
@@ -108,7 +105,6 @@ class EntryDetailScreen extends StatefulWidget {
     super.key,
     required this.entry,
     this.onDeleteEntry = _defaultDelete,
-    this.onCopyToClipboard = _defaultCopy,
     this.clipboardClearTimeout = ClipboardClearTimeout.sixtySeconds,
     this.onFetchHistory = _defaultFetchHistory,
     this.onRestoreHistory = _defaultRestoreHistory,
@@ -124,9 +120,9 @@ class EntryDetailScreen extends StatefulWidget {
   State<EntryDetailScreen> createState() => _EntryDetailScreenState();
 }
 
-class _EntryDetailScreenState extends State<EntryDetailScreen> {
+class _EntryDetailScreenState extends State<EntryDetailScreen>
+    with ClipboardClearMixin<EntryDetailScreen> {
   late VaultEntryData _entry;
-  Timer? _clipboardClearTimer;
 
   bool _passwordObscured = true;
   bool _cardNumberObscured = true;
@@ -156,9 +152,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
 
   @override
   void dispose() {
-    _clipboardClearTimer?.cancel();
     // Stop targeting this Login once its screen closes, unless a newer screen
-    // has already claimed the target (clearIf guards that).
+    // has already claimed the target (clearIf guards that). The pending
+    // clipboard wipe is cancelled by ClipboardClearMixin.dispose via super.
     if (_entry is VaultEntryData_Login) autotypeTarget.clearIf(_entryId());
     super.dispose();
   }
@@ -713,26 +709,11 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   }
 
   Future<void> _copyToClipboard(String value) async {
-    await widget.onCopyToClipboard(value);
-    _clipboardClearTimer?.cancel();
-
-    final timeout = widget.clipboardClearTimeout;
-    final duration = switch (timeout) {
-      ClipboardClearTimeout.never => null,
-      ClipboardClearTimeout.thirtySeconds => const Duration(seconds: 30),
-      ClipboardClearTimeout.sixtySeconds => const Duration(seconds: 60),
-      ClipboardClearTimeout.twoMinutes => const Duration(minutes: 2),
-    };
-
-    if (duration != null) {
-      _clipboardClearTimer = Timer(duration, () {
-        Clipboard.setData(const ClipboardData(text: ''));
-      });
-    }
+    await copyThenClear(value, widget.clipboardClearTimeout);
 
     if (mounted) {
       final l = AppLocalizations.of(context);
-      final label = switch (timeout) {
+      final label = switch (widget.clipboardClearTimeout) {
         ClipboardClearTimeout.never => l.copiedNeverClears,
         ClipboardClearTimeout.thirtySeconds => l.copiedClears30s,
         ClipboardClearTimeout.sixtySeconds => l.copiedClears60s,
