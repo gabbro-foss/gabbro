@@ -117,8 +117,6 @@ Phases:
   - [ ] **3.4** bridge `autotype_fill` (refocus/verify window, read secret from Rust session,
     inject); prove keypress auto-fills the first login into the focused field.
   - [ ] **3.5** picker UI (Dart): all logins, type-to-filter, focus dance, the three actions.
-- [ ] **Phase 3** — own picker (all logins, type-to-filter) + focus dance; sequences
-  `{user}{TAB}{pass}{ENTER}` + username-only + password-only.
 - [ ] **Phase 4** — unlock-then-type for a locked vault; opt-in setting; README key-binding
   examples. Secret stays in Rust throughout; auto-lock preserved.
 
