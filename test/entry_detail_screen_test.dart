@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -247,6 +247,61 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('never'), findsOneWidget);
+  });
+
+  // ── Clipboard auto-clear (net-first pin, ADR-017 Phase 3.1) ───────────────
+  // These pin the *actual* clear (existing tests only checked the snackbar
+  // label). The copy goes through the injected stub, so the only writes that
+  // reach the platform channel are the auto-clear's empty writes.
+
+  testWidgets('copy clears the clipboard after a finite timeout',
+      (tester) async {
+    final writes = recordClipboardWrites(tester);
+    await tester.pumpWidget(_buildScreen(
+      VaultEntryData.login(_loginEntry()),
+      clipboardClearTimeout: ClipboardClearTimeout.thirtySeconds,
+    ));
+    await tester.tap(find.byIcon(Icons.copy_outlined).first);
+    await tester.pump(); // run the async copy + register the clear timer
+    expect(writes, isNot(contains('')), reason: 'must not clear immediately');
+    await tester.pump(const Duration(seconds: 30));
+    expect(writes, contains(''),
+        reason: 'clipboard is emptied when the timer fires');
+  });
+
+  testWidgets('copy never clears the clipboard when timeout is never',
+      (tester) async {
+    final writes = recordClipboardWrites(tester);
+    await tester.pumpWidget(_buildScreen(
+      VaultEntryData.login(_loginEntry()),
+      clipboardClearTimeout: ClipboardClearTimeout.never,
+    ));
+    await tester.tap(find.byIcon(Icons.copy_outlined).first);
+    await tester.pump();
+    await tester.pump(const Duration(minutes: 5));
+    expect(writes, isNot(contains('')),
+        reason: 'a never timeout must not clear the clipboard');
+  });
+
+  testWidgets('re-copying resets the clear timer', (tester) async {
+    final writes = recordClipboardWrites(tester);
+    await tester.pumpWidget(_buildScreen(
+      VaultEntryData.login(_loginEntry()),
+      clipboardClearTimeout: ClipboardClearTimeout.thirtySeconds,
+    ));
+    await tester.tap(find.byIcon(Icons.copy_outlined).first);
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 15));
+    await tester.tap(find.byIcon(Icons.copy_outlined).first); // cancels first
+    await tester.pump();
+    // 35s since the first copy (its timer would have fired at 30s), but only
+    // 20s since the second: nothing should have cleared yet.
+    await tester.pump(const Duration(seconds: 20));
+    expect(writes, isNot(contains('')),
+        reason: 'the first timer was cancelled and the second has not elapsed');
+    await tester.pump(const Duration(seconds: 15)); // 35s since the second copy
+    expect(writes, contains(''),
+        reason: 'the reset timer clears once it elapses');
   });
 
   testWidgets('timestamps section shows Created and Updated labels',
@@ -805,6 +860,25 @@ void main() {
     await tester.pumpAndSettle();
     expect(bodyScrollPadding(tester).bottom, 16 + 88);
   });
+}
+
+/// Installs a mock for the `Clipboard` platform channel and returns a growing
+/// list of every text written via `Clipboard.setData` — the auto-clear writes
+/// an empty string, which is what the pin tests assert on.
+List<String> recordClipboardWrites(WidgetTester tester) {
+  final writes = <String>[];
+  tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+    SystemChannels.platform,
+    (call) async {
+      if (call.method == 'Clipboard.setData') {
+        writes.add((call.arguments as Map)['text'] as String? ?? '');
+      }
+      return null;
+    },
+  );
+  addTearDown(() => tester.binding.defaultBinaryMessenger
+      .setMockMethodCallHandler(SystemChannels.platform, null));
+  return writes;
 }
 
 /// The bottom [EdgeInsets] of the detail body's scroll view (the SafeArea >
