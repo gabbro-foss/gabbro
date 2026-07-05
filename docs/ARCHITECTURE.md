@@ -136,9 +136,11 @@ Phases:
       tooltips), keyboard (arrows/Ctrl+J/K nav, Enter full, Ctrl+U/P variants, Esc cancel),
       wrapping hint footer. 15 widget tests + overflow-probe (phone/tablet, no clip at max text,
       ADR-016). Reuses existing search/empty strings; 3 new l10n keys across 37 locales.
-    - [ ] **3.5b** wire trigger -> capture -> **raise the Gabbro window** (C++ `gtk_window_present`
-      vs `window_manager` plugin — decide) -> show picker (ordered like vault list) -> `autotypeFill`;
-      focus dance / refocus stressed here; hardware.
+    - [ ] **3.5b** wire trigger -> capture -> **raise the Gabbro window** (Option C: Rust EWMH
+      self-raise — find own window via `_NET_WM_PID`==pid in the root's `_NET_CLIENT_LIST`, send
+      `_NET_ACTIVE_WINDOW`; reuses `fill.rs` `request_activate`; no C++, no dependency) -> show
+      picker (ordered like vault list) -> `autotypeFill`. Refocus-after-focus-steal stressed here;
+      hardware (expect qtile tuning). Keep Gabbro on the browser's qtile group to avoid flicker.
 - [ ] **Phase 4** — unlock-then-type for a locked vault; opt-in setting; README key-binding
   examples; package `gabbro-autotype` into the release bundle (update BUILD_AND_RELEASE).
   Secret stays in Rust throughout; auto-lock preserved.
