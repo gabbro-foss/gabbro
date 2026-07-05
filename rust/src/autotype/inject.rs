@@ -44,20 +44,23 @@ const KEY_DELAY: Duration = Duration::from_millis(12);
 /// Empty input is a no-op. The scratch keycode is always restored to its
 /// unmapped state, even if injection fails partway.
 pub fn type_text(text: &str) -> Result<(), InjectError> {
-    let keysyms = plan_string(text);
+    let (conn, _screen) = x11rb::connect(None)?;
+    type_keysyms(&conn, &plan_string(text))
+}
+
+/// Inject a prepared keysym sequence on an existing connection. Empty input is
+/// a no-op. The scratch keycode is always restored, even if injection fails
+/// partway. Callers that must verify window focus immediately before typing
+/// should use the *same* `conn` for both, to minimise the race window.
+pub fn type_keysyms(conn: &impl Connection, keysyms: &[u32]) -> Result<(), InjectError> {
     if keysyms.is_empty() {
         return Ok(());
     }
-
-    let (conn, _screen) = x11rb::connect(None)?;
-    let (scratch, per) = find_scratch_keycode(&conn)?;
-
-    let injected = inject_all(&conn, scratch, per, &keysyms);
-
+    let (scratch, per) = find_scratch_keycode(conn)?;
+    let injected = inject_all(conn, scratch, per, keysyms);
     // Restore the scratch keycode to NoSymbol regardless of the outcome above.
-    let restored = restore_keycode(&conn, scratch, per);
+    let restored = restore_keycode(conn, scratch, per);
     conn.flush()?;
-
     injected.and(restored)
 }
 

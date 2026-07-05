@@ -6,6 +6,7 @@
 //! layer (later) binds them to a scratch keycode and synthesises key events via
 //! `XTEST`. Gated behind `cfg(target_os = "linux")` at the crate root.
 
+pub mod fill;
 pub mod inject;
 pub mod keysym;
 pub mod sequence;

@@ -18,9 +18,16 @@ pub enum TriggerError {
     Io(#[from] std::io::Error),
 }
 
-/// The exact bytes a trigger client sends; a connection carrying anything else
-/// is ignored, so a stray connection can't fire a fill.
-const TRIGGER_TOKEN: &[u8] = b"gabbro-autotype-trigger";
+/// The exact token a trigger client sends; a connection carrying anything else
+/// is ignored, so a stray connection can't fire a fill. Exposed via
+/// [`trigger_token`] so the Dart listener matches it without duplicating the
+/// literal.
+const TRIGGER_TOKEN: &str = "gabbro-autotype-trigger";
+
+/// The trigger token the client sends and any listener must match.
+pub fn trigger_token() -> &'static str {
+    TRIGGER_TOKEN
+}
 
 /// The socket path: `<XDG_RUNTIME_DIR>/gabbro/autotype.sock` when the runtime
 /// dir is known, otherwise under `fallback_dir` (e.g. the temp dir).
@@ -57,7 +64,7 @@ pub fn bind(path: &Path) -> Result<UnixListener, TriggerError> {
 /// that Gabbro isn't open.
 pub fn send(path: &Path) -> Result<(), TriggerError> {
     let mut stream = UnixStream::connect(path)?;
-    stream.write_all(TRIGGER_TOKEN)?;
+    stream.write_all(TRIGGER_TOKEN.as_bytes())?;
     stream.flush()?;
     Ok(())
 }
@@ -81,7 +88,7 @@ fn accept_one(listener: &UnixListener) -> Result<bool, TriggerError> {
     let (mut stream, _addr) = listener.accept()?;
     let mut buf = Vec::new();
     stream.read_to_end(&mut buf)?;
-    Ok(buf == TRIGGER_TOKEN)
+    Ok(buf == TRIGGER_TOKEN.as_bytes())
 }
 
 #[cfg(test)]
