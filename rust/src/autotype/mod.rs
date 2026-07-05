@@ -8,5 +8,6 @@
 
 pub mod inject;
 pub mod keysym;
+pub mod sequence;
 pub mod trigger;
 pub mod window;
