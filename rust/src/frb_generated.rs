@@ -237,16 +237,11 @@ fn wire__crate__api__autotype_bridge__autotype_fill_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_window_id = <u32>::sse_decode(&mut deserializer);
             let api_entry_id = <String>::sse_decode(&mut deserializer);
-            let api_kind =
-                <crate::api::autotype_bridge::AutotypeSequenceKind>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
                 transform_result_sse::<_, String>((move || {
-                    let output_ok = crate::api::autotype_bridge::autotype_fill(
-                        api_window_id,
-                        api_entry_id,
-                        api_kind,
-                    )?;
+                    let output_ok =
+                        crate::api::autotype_bridge::autotype_fill(api_window_id, api_entry_id)?;
                     Ok(output_ok)
                 })())
             }
@@ -2603,19 +2598,6 @@ impl SseDecode for crate::api::vault::AddedEntryItem {
     }
 }
 
-impl SseDecode for crate::api::autotype_bridge::AutotypeSequenceKind {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <i32>::sse_decode(deserializer);
-        return match inner {
-            0 => crate::api::autotype_bridge::AutotypeSequenceKind::Full,
-            1 => crate::api::autotype_bridge::AutotypeSequenceKind::UsernameOnly,
-            2 => crate::api::autotype_bridge::AutotypeSequenceKind::PasswordOnly,
-            _ => unreachable!("Invalid variant for AutotypeSequenceKind: {}", inner),
-        };
-    }
-}
-
 impl SseDecode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -4041,28 +4023,6 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::vault::AddedEntryItem>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::autotype_bridge::AutotypeSequenceKind {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        match self {
-            Self::Full => 0.into_dart(),
-            Self::UsernameOnly => 1.into_dart(),
-            Self::PasswordOnly => 2.into_dart(),
-            _ => unreachable!(),
-        }
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::autotype_bridge::AutotypeSequenceKind
-{
-}
-impl flutter_rust_bridge::IntoIntoDart<crate::api::autotype_bridge::AutotypeSequenceKind>
-    for crate::api::autotype_bridge::AutotypeSequenceKind
-{
-    fn into_into_dart(self) -> crate::api::autotype_bridge::AutotypeSequenceKind {
-        self
-    }
-}
-// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::vault::BroughtOverItem {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -5052,23 +5012,6 @@ impl SseEncode for crate::api::vault::AddedEntryItem {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.id, serializer);
         <String>::sse_encode(self.title, serializer);
-    }
-}
-
-impl SseEncode for crate::api::autotype_bridge::AutotypeSequenceKind {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(
-            match self {
-                crate::api::autotype_bridge::AutotypeSequenceKind::Full => 0,
-                crate::api::autotype_bridge::AutotypeSequenceKind::UsernameOnly => 1,
-                crate::api::autotype_bridge::AutotypeSequenceKind::PasswordOnly => 2,
-                _ => {
-                    unimplemented!("");
-                }
-            },
-            serializer,
-        );
     }
 }
 

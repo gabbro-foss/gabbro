@@ -112,7 +112,6 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiAutotypeBridgeAutotypeFill({
     required int windowId,
     required String entryId,
-    required AutotypeSequenceKind kind,
   });
 
   Future<String> crateApiAutotypeBridgeAutotypeSocketPath();
@@ -536,7 +535,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<void> crateApiAutotypeBridgeAutotypeFill({
     required int windowId,
     required String entryId,
-    required AutotypeSequenceKind kind,
   }) {
     return handler.executeNormal(
       NormalTask(
@@ -544,7 +542,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           final serializer = SseSerializer(generalizedFrbRustBinding);
           sse_encode_u_32(windowId, serializer);
           sse_encode_String(entryId, serializer);
-          sse_encode_autotype_sequence_kind(kind, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -557,7 +554,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeErrorData: sse_decode_String,
         ),
         constMeta: kCrateApiAutotypeBridgeAutotypeFillConstMeta,
-        argValues: [windowId, entryId, kind],
+        argValues: [windowId, entryId],
         apiImpl: this,
       ),
     );
@@ -566,7 +563,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiAutotypeBridgeAutotypeFillConstMeta =>
       const TaskConstMeta(
         debugName: "autotype_fill",
-        argNames: ["windowId", "entryId", "kind"],
+        argNames: ["windowId", "entryId"],
       );
 
   @override
@@ -2577,12 +2574,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  AutotypeSequenceKind dco_decode_autotype_sequence_kind(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return AutotypeSequenceKind.values[raw as int];
-  }
-
-  @protected
   bool dco_decode_bool(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as bool;
@@ -3490,15 +3481,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_id = sse_decode_String(deserializer);
     var var_title = sse_decode_String(deserializer);
     return AddedEntryItem(id: var_id, title: var_title);
-  }
-
-  @protected
-  AutotypeSequenceKind sse_decode_autotype_sequence_kind(
-    SseDeserializer deserializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_i_32(deserializer);
-    return AutotypeSequenceKind.values[inner];
   }
 
   @protected
@@ -4656,15 +4638,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.id, serializer);
     sse_encode_String(self.title, serializer);
-  }
-
-  @protected
-  void sse_encode_autotype_sequence_kind(
-    AutotypeSequenceKind self,
-    SseSerializer serializer,
-  ) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.index, serializer);
   }
 
   @protected

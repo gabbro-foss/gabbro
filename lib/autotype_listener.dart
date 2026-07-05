@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:gabbro/src/rust/api/vault_bridge.dart';
-
 /// Listens on a unix-domain socket for the `gabbro-autotype` trigger and fires
 /// [onTrigger] when the exact token arrives (ADR-017, Linux desktop auto-type).
 ///
@@ -72,13 +70,4 @@ class AutotypeListener {
       cancelOnError: true,
     );
   }
-}
-
-/// The id of the first `Login` entry in [summaries], or `null` if there are
-/// none. Temporary 3.4b behaviour — the picker (3.5) replaces "first login".
-String? firstLoginId(List<EntrySummaryData> summaries) {
-  for (final summary in summaries) {
-    if (summary.entryType == 'Login') return summary.id;
-  }
-  return null;
 }

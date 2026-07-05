@@ -856,8 +856,5 @@
   "restoreFromFileButton": "Herstellen vanaf een back-upbestand",
   "vaultRestoredMessage": "Kluis hersteld. Ontgrendel met je gegevens.",
   "restoreFromFileInvalidError": "Dat bestand is geen bruikbare Gabbro-kluis.",
-  "resizeColumns": "Kolommen aanpassen",
-  "autotypeTypeUsername": "Alleen gebruikersnaam typen",
-  "autotypeTypePassword": "Alleen wachtwoord typen",
-  "autotypeKeyHints": "Omhoog/Omlaag of Ctrl+J/K navigeren, Enter invullen, Ctrl+U gebruikersnaam, Ctrl+P wachtwoord, Esc annuleren"
+  "resizeColumns": "Kolommen aanpassen"
 }

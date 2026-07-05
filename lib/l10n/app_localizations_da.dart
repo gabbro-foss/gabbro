@@ -2014,14 +2014,4 @@ class AppLocalizationsDa extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Ændr kolonnestørrelse';
-
-  @override
-  String get autotypeTypeUsername => 'Indtast kun brugernavn';
-
-  @override
-  String get autotypeTypePassword => 'Indtast kun adgangskode';
-
-  @override
-  String get autotypeKeyHints =>
-      'Op/Ned eller Ctrl+J/K flyt, Enter udfyld, Ctrl+U brugernavn, Ctrl+P adgangskode, Esc annuller';
 }

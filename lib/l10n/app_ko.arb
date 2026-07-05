@@ -855,8 +855,5 @@
   "restoreFromFileButton": "백업 파일에서 복원",
   "vaultRestoredMessage": "보관함이 복원되었습니다. 자격 증명으로 잠금을 해제하세요.",
   "restoreFromFileInvalidError": "이 파일은 사용할 수 있는 Gabbro 보관함이 아닙니다.",
-  "resizeColumns": "열 크기 조정",
-  "autotypeTypeUsername": "사용자 이름만 입력",
-  "autotypeTypePassword": "비밀번호만 입력",
-  "autotypeKeyHints": "위/아래 또는 Ctrl+J/K 이동, Enter 채우기, Ctrl+U 사용자 이름, Ctrl+P 비밀번호, Esc 취소"
+  "resizeColumns": "열 크기 조정"
 }

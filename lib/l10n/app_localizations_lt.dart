@@ -2021,14 +2021,4 @@ class AppLocalizationsLt extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Keisti stulpelių dydį';
-
-  @override
-  String get autotypeTypeUsername => 'Įvesti tik naudotojo vardą';
-
-  @override
-  String get autotypeTypePassword => 'Įvesti tik slaptažodį';
-
-  @override
-  String get autotypeKeyHints =>
-      'Aukštyn/Žemyn arba Ctrl+J/K judėti, Enter užpildyti, Ctrl+U naudotojas, Ctrl+P slaptažodis, Esc atšaukti';
 }

@@ -855,8 +855,5 @@
   "restoreFromFileButton": "Сақтық көшірме файлынан қалпына келтіру",
   "vaultRestoredMessage": "Қойма қалпына келтірілді. Өз деректеріңізбен ашыңыз.",
   "restoreFromFileInvalidError": "Бұл файл жарамды Gabbro қоймасы емес.",
-  "resizeColumns": "Бағандар өлшемін өзгерту",
-  "autotypeTypeUsername": "Тек пайдаланушы атын теру",
-  "autotypeTypePassword": "Тек құпия сөзді теру",
-  "autotypeKeyHints": "Жоғары/Төмен немесе Ctrl+J/K жылжу, Enter толтыру, Ctrl+U пайдаланушы, Ctrl+P құпия сөз, Esc бас тарту"
+  "resizeColumns": "Бағандар өлшемін өзгерту"
 }

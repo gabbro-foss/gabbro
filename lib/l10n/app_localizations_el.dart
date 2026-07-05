@@ -2036,14 +2036,4 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Αλλαγή μεγέθους στηλών';
-
-  @override
-  String get autotypeTypeUsername => 'Πληκτρολόγηση μόνο του ονόματος χρήστη';
-
-  @override
-  String get autotypeTypePassword => 'Πληκτρολόγηση μόνο του κωδικού';
-
-  @override
-  String get autotypeKeyHints =>
-      'Πάνω/Κάτω ή Ctrl+J/K μετακίνηση, Enter συμπλήρωση, Ctrl+U χρήστης, Ctrl+P κωδικός, Esc ακύρωση';
 }

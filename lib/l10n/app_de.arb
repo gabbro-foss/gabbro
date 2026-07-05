@@ -855,8 +855,5 @@
   "restoreFromFileButton": "Aus einer Sicherungsdatei wiederherstellen",
   "vaultRestoredMessage": "Tresor wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.",
   "restoreFromFileInvalidError": "Diese Datei ist kein verwendbarer Gabbro-Tresor.",
-  "resizeColumns": "Spalten anpassen",
-  "autotypeTypeUsername": "Nur Benutzernamen eingeben",
-  "autotypeTypePassword": "Nur Passwort eingeben",
-  "autotypeKeyHints": "Auf/Ab oder Strg+J/K bewegen, Enter ausfüllen, Strg+U Benutzername, Strg+P Passwort, Esc abbrechen"
+  "resizeColumns": "Spalten anpassen"
 }

@@ -2030,14 +2030,4 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Spalten anpassen';
-
-  @override
-  String get autotypeTypeUsername => 'Nur Benutzernamen eingeben';
-
-  @override
-  String get autotypeTypePassword => 'Nur Passwort eingeben';
-
-  @override
-  String get autotypeKeyHints =>
-      'Auf/Ab oder Strg+J/K bewegen, Enter ausfüllen, Strg+U Benutzername, Strg+P Passwort, Esc abbrechen';
 }

@@ -855,8 +855,5 @@
   "restoreFromFileButton": "Врати из датотеке резервне копије",
   "vaultRestoredMessage": "Сеф враћен. Откључајте својим акредитивима.",
   "restoreFromFileInvalidError": "Та датотека није употребљив Gabbro сеф.",
-  "resizeColumns": "Промени величину колона",
-  "autotypeTypeUsername": "Унеси само корисничко име",
-  "autotypeTypePassword": "Унеси само лозинку",
-  "autotypeKeyHints": "Горе/Доле или Ctrl+J/K кретање, Enter попуни, Ctrl+U корисник, Ctrl+P лозинка, Esc откажи"
+  "resizeColumns": "Промени величину колона"
 }

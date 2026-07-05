@@ -2017,14 +2017,4 @@ class AppLocalizationsLv extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Mainīt kolonnu izmērus';
-
-  @override
-  String get autotypeTypeUsername => 'Ievadīt tikai lietotājvārdu';
-
-  @override
-  String get autotypeTypePassword => 'Ievadīt tikai paroli';
-
-  @override
-  String get autotypeKeyHints =>
-      'Uz augšu/leju vai Ctrl+J/K pārvietoties, Enter aizpildīt, Ctrl+U lietotājs, Ctrl+P parole, Esc atcelt';
 }

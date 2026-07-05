@@ -2015,14 +2015,4 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Muuta sarakkeiden kokoa';
-
-  @override
-  String get autotypeTypeUsername => 'Kirjoita vain käyttäjänimi';
-
-  @override
-  String get autotypeTypePassword => 'Kirjoita vain salasana';
-
-  @override
-  String get autotypeKeyHints =>
-      'Ylös/Alas tai Ctrl+J/K siirtyminen, Enter täyttö, Ctrl+U käyttäjä, Ctrl+P salasana, Esc peruuta';
 }

@@ -6,23 +6,19 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `captured_to_data`, `impl_capture`, `impl_fill`, `impl_socket_path`, `impl_token`, `seq_kind`
+// These functions are ignored because they are not marked as `pub`: `captured_to_data`, `impl_capture`, `impl_fill`, `impl_socket_path`, `impl_token`
 
 /// Capture the currently focused window (Linux only).
 Future<CapturedWindowData?> autotypeCaptureActiveWindow() =>
     RustLib.instance.api.crateApiAutotypeBridgeAutotypeCaptureActiveWindow();
 
-/// Fill `entry_id` into `window_id` using `kind` (Linux only). The secret is
-/// read from the Rust session and injected without crossing the bridge.
-Future<void> autotypeFill({
-  required int windowId,
-  required String entryId,
-  required AutotypeSequenceKind kind,
-}) => RustLib.instance.api.crateApiAutotypeBridgeAutotypeFill(
-  windowId: windowId,
-  entryId: entryId,
-  kind: kind,
-);
+/// Fill `entry_id` into `window_id` (Linux only). The secret is read from the
+/// Rust session and injected without crossing the bridge.
+Future<void> autotypeFill({required int windowId, required String entryId}) =>
+    RustLib.instance.api.crateApiAutotypeBridgeAutotypeFill(
+      windowId: windowId,
+      entryId: entryId,
+    );
 
 /// The unix-socket path the Dart listener should bind and the client uses.
 Future<String> autotypeSocketPath() =>
@@ -31,19 +27,6 @@ Future<String> autotypeSocketPath() =>
 /// The trigger token the Dart listener must match (avoids duplicating it).
 Future<String> autotypeTriggerToken() =>
     RustLib.instance.api.crateApiAutotypeBridgeAutotypeTriggerToken();
-
-/// Which part(s) of a login to type -- the bridge-facing mirror of the internal
-/// `autotype::sequence::SequenceKind`.
-enum AutotypeSequenceKind {
-  /// username Tab password Return.
-  full,
-
-  /// Just the username (for two-step forms).
-  usernameOnly,
-
-  /// Just the password (for two-step forms).
-  passwordOnly,
-}
 
 /// The window captured at trigger time, flattened for the bridge.
 class CapturedWindowData {

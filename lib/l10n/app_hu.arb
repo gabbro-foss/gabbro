@@ -856,8 +856,5 @@
   "restoreFromFileButton": "Helyreállítás biztonsági mentési fájlból",
   "vaultRestoredMessage": "Széf helyreállítva. Oldja fel a hitelesítő adataival.",
   "restoreFromFileInvalidError": "Ez a fájl nem használható Gabbro-széf.",
-  "resizeColumns": "Oszlopok átméretezése",
-  "autotypeTypeUsername": "Csak a felhasználónév beírása",
-  "autotypeTypePassword": "Csak a jelszó beírása",
-  "autotypeKeyHints": "Fel/Le vagy Ctrl+J/K mozgás, Enter kitöltés, Ctrl+U felhasználó, Ctrl+P jelszó, Esc mégse"
+  "resizeColumns": "Oszlopok átméretezése"
 }

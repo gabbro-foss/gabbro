@@ -2022,14 +2022,4 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Змінити розмір стовпців';
-
-  @override
-  String get autotypeTypeUsername => 'Ввести лише ім\'я користувача';
-
-  @override
-  String get autotypeTypePassword => 'Ввести лише пароль';
-
-  @override
-  String get autotypeKeyHints =>
-      'Вгору/Вниз або Ctrl+J/K переміщення, Enter заповнити, Ctrl+U користувач, Ctrl+P пароль, Esc скасувати';
 }

@@ -856,8 +856,5 @@
   "restoreFromFileButton": "Atkurti iš atsarginės kopijos failo",
   "vaultRestoredMessage": "Saugykla atkurta. Atrakinkite savo prisijungimo duomenimis.",
   "restoreFromFileInvalidError": "Šis failas nėra tinkama Gabbro saugykla.",
-  "resizeColumns": "Keisti stulpelių dydį",
-  "autotypeTypeUsername": "Įvesti tik naudotojo vardą",
-  "autotypeTypePassword": "Įvesti tik slaptažodį",
-  "autotypeKeyHints": "Aukštyn/Žemyn arba Ctrl+J/K judėti, Enter užpildyti, Ctrl+U naudotojas, Ctrl+P slaptažodis, Esc atšaukti"
+  "resizeColumns": "Keisti stulpelių dydį"
 }

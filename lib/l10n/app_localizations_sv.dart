@@ -2010,14 +2010,4 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Ändra kolumnstorlek';
-
-  @override
-  String get autotypeTypeUsername => 'Skriv endast användarnamn';
-
-  @override
-  String get autotypeTypePassword => 'Skriv endast lösenord';
-
-  @override
-  String get autotypeKeyHints =>
-      'Upp/Ned eller Ctrl+J/K flytta, Enter fyll i, Ctrl+U användarnamn, Ctrl+P lösenord, Esc avbryt';
 }

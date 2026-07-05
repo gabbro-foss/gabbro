@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'test_helpers.dart';
+import 'package:gabbro/autotype_target.dart';
 import 'package:gabbro/screens/entry_detail_screen.dart';
 import 'package:gabbro/widgets/password_breakdown_sheet.dart';
 import 'package:gabbro/settings.dart';
@@ -101,6 +102,32 @@ void main() {
       expect(formatTimestamp('not-a-date'), 'Unknown');
     });
   });
+
+  group('auto-type target registration (ADR-017)', () {
+    setUp(autotypeTarget.clear);
+    tearDown(autotypeTarget.clear);
+
+    testWidgets('opening a Login detail registers it as the target',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(VaultEntryData.login(_loginEntry())));
+      expect(autotypeTarget.loginId, 'test-id-1');
+    });
+
+    testWidgets('opening a non-Login detail leaves the target unset',
+        (tester) async {
+      await tester.pumpWidget(_buildScreen(VaultEntryData.card(_cardEntry())));
+      expect(autotypeTarget.loginId, isNull);
+    });
+
+    testWidgets('disposing the Login detail clears the target', (tester) async {
+      await tester.pumpWidget(_buildScreen(VaultEntryData.login(_loginEntry())));
+      expect(autotypeTarget.loginId, 'test-id-1');
+      // Replace the tree so the detail screen is disposed.
+      await tester.pumpWidget(const SizedBox());
+      expect(autotypeTarget.loginId, isNull);
+    });
+  });
+
   testWidgets('recovery-history tile appears when history exists', (
     tester,
   ) async {

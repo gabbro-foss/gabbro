@@ -2017,14 +2017,4 @@ class AppLocalizationsBg extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Преоразмеряване на колоните';
-
-  @override
-  String get autotypeTypeUsername => 'Въвеждане само на потребителското име';
-
-  @override
-  String get autotypeTypePassword => 'Въвеждане само на паролата';
-
-  @override
-  String get autotypeKeyHints =>
-      'Нагоре/Надолу или Ctrl+J/K за навигация, Enter за попълване, Ctrl+U потребител, Ctrl+P парола, Esc за отказ';
 }

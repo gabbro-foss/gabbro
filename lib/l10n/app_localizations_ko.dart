@@ -1957,14 +1957,4 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get resizeColumns => '열 크기 조정';
-
-  @override
-  String get autotypeTypeUsername => '사용자 이름만 입력';
-
-  @override
-  String get autotypeTypePassword => '비밀번호만 입력';
-
-  @override
-  String get autotypeKeyHints =>
-      '위/아래 또는 Ctrl+J/K 이동, Enter 채우기, Ctrl+U 사용자 이름, Ctrl+P 비밀번호, Esc 취소';
 }

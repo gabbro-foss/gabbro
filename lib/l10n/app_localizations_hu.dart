@@ -2020,14 +2020,4 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Oszlopok átméretezése';
-
-  @override
-  String get autotypeTypeUsername => 'Csak a felhasználónév beírása';
-
-  @override
-  String get autotypeTypePassword => 'Csak a jelszó beírása';
-
-  @override
-  String get autotypeKeyHints =>
-      'Fel/Le vagy Ctrl+J/K mozgás, Enter kitöltés, Ctrl+U felhasználó, Ctrl+P jelszó, Esc mégse';
 }

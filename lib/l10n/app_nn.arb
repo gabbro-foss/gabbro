@@ -856,8 +856,5 @@
   "restoreFromFileButton": "Gjenopprett frå ei tryggleikskopifil",
   "vaultRestoredMessage": "Kvelv gjenoppretta. Lås opp med innloggingsinformasjonen din.",
   "restoreFromFileInvalidError": "Den fila er ikkje eit brukbart Gabbro-kvelv.",
-  "resizeColumns": "Endre kolonnestorleik",
-  "autotypeTypeUsername": "Skriv berre brukarnamn",
-  "autotypeTypePassword": "Skriv berre passord",
-  "autotypeKeyHints": "Opp/Ned eller Ctrl+J/K flytt, Enter fyll ut, Ctrl+U brukarnamn, Ctrl+P passord, Esc avbryt"
+  "resizeColumns": "Endre kolonnestorleik"
 }

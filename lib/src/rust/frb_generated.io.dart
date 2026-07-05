@@ -34,9 +34,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AddedEntryItem dco_decode_added_entry_item(dynamic raw);
 
   @protected
-  AutotypeSequenceKind dco_decode_autotype_sequence_kind(dynamic raw);
-
-  @protected
   bool dco_decode_bool(dynamic raw);
 
   @protected
@@ -316,11 +313,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   AddedEntryItem sse_decode_added_entry_item(SseDeserializer deserializer);
-
-  @protected
-  AutotypeSequenceKind sse_decode_autotype_sequence_kind(
-    SseDeserializer deserializer,
-  );
 
   @protected
   bool sse_decode_bool(SseDeserializer deserializer);
@@ -687,12 +679,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_added_entry_item(
     AddedEntryItem self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_autotype_sequence_kind(
-    AutotypeSequenceKind self,
     SseSerializer serializer,
   );
 

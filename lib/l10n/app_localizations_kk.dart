@@ -2014,14 +2014,4 @@ class AppLocalizationsKk extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Бағандар өлшемін өзгерту';
-
-  @override
-  String get autotypeTypeUsername => 'Тек пайдаланушы атын теру';
-
-  @override
-  String get autotypeTypePassword => 'Тек құпия сөзді теру';
-
-  @override
-  String get autotypeKeyHints =>
-      'Жоғары/Төмен немесе Ctrl+J/K жылжу, Enter толтыру, Ctrl+U пайдаланушы, Ctrl+P құпия сөз, Esc бас тарту';
 }

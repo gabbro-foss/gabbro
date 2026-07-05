@@ -855,8 +855,5 @@
   "restoreFromFileButton": "Dá padà láti fáìlì àfẹyìntì",
   "vaultRestoredMessage": "A ti dá àpótí ìṣúra padà. Ṣí i pẹ̀lú àwọn ìwé-ẹ̀rí rẹ.",
   "restoreFromFileInvalidError": "Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò.",
-  "resizeColumns": "Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n",
-  "autotypeTypeUsername": "Tẹ orúkọ olùmúlò nìkan",
-  "autotypeTypePassword": "Tẹ ọ̀rọ̀ìgbaniwọlé nìkan",
-  "autotypeKeyHints": "Òkè/Ìsàlẹ̀ tàbí Ctrl+J/K láti rìn, Enter láti kún, Ctrl+U olùmúlò, Ctrl+P ọ̀rọ̀ìgbaniwọlé, Esc láti fagilé"
+  "resizeColumns": "Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n"
 }

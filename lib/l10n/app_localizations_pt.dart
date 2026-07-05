@@ -2019,16 +2019,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Redimensionar colunas';
-
-  @override
-  String get autotypeTypeUsername => 'Escrever apenas o utilizador';
-
-  @override
-  String get autotypeTypePassword => 'Escrever apenas a palavra-passe';
-
-  @override
-  String get autotypeKeyHints =>
-      'Cima/Baixo ou Ctrl+J/K mover, Enter preencher, Ctrl+U utilizador, Ctrl+P palavra-passe, Esc cancelar';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -4043,16 +4033,6 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
 
   @override
   String get resizeColumns => 'Redimensionar colunas';
-
-  @override
-  String get autotypeTypeUsername => 'Digitar apenas o usuário';
-
-  @override
-  String get autotypeTypePassword => 'Digitar apenas a senha';
-
-  @override
-  String get autotypeKeyHints =>
-      'Cima/Baixo ou Ctrl+J/K mover, Enter preencher, Ctrl+U usuário, Ctrl+P senha, Esc cancelar';
 }
 
 /// The translations for Portuguese, as used in Portugal (`pt_PT`).
@@ -6073,14 +6053,4 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
 
   @override
   String get resizeColumns => 'Redimensionar colunas';
-
-  @override
-  String get autotypeTypeUsername => 'Escrever apenas o utilizador';
-
-  @override
-  String get autotypeTypePassword => 'Escrever apenas a palavra-passe';
-
-  @override
-  String get autotypeKeyHints =>
-      'Cima/Baixo ou Ctrl+J/K mover, Enter preencher, Ctrl+U utilizador, Ctrl+P palavra-passe, Esc cancelar';
 }

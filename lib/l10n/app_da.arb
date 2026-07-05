@@ -856,8 +856,5 @@
   "restoreFromFileButton": "Gendan fra en sikkerhedskopifil",
   "vaultRestoredMessage": "Boks gendannet. Lås op med dine loginoplysninger.",
   "restoreFromFileInvalidError": "Den fil er ikke en brugbar Gabbro-boks.",
-  "resizeColumns": "Ændr kolonnestørrelse",
-  "autotypeTypeUsername": "Indtast kun brugernavn",
-  "autotypeTypePassword": "Indtast kun adgangskode",
-  "autotypeKeyHints": "Op/Ned eller Ctrl+J/K flyt, Enter udfyld, Ctrl+U brugernavn, Ctrl+P adgangskode, Esc annuller"
+  "resizeColumns": "Ændr kolonnestørrelse"
 }

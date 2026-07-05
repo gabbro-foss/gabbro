@@ -856,8 +856,5 @@
   "restoreFromFileButton": "Възстановяване от резервен файл",
   "vaultRestoredMessage": "Сейфът е възстановен. Отключете с вашите данни.",
   "restoreFromFileInvalidError": "Този файл не е използваем сейф на Gabbro.",
-  "resizeColumns": "Преоразмеряване на колоните",
-  "autotypeTypeUsername": "Въвеждане само на потребителското име",
-  "autotypeTypePassword": "Въвеждане само на паролата",
-  "autotypeKeyHints": "Нагоре/Надолу или Ctrl+J/K за навигация, Enter за попълване, Ctrl+U потребител, Ctrl+P парола, Esc за отказ"
+  "resizeColumns": "Преоразмеряване на колоните"
 }

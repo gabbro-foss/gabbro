@@ -956,8 +956,5 @@
   "restoreFromFileButton": "Restore from a backup file",
   "vaultRestoredMessage": "Vault restored. Unlock with your credentials.",
   "restoreFromFileInvalidError": "That file is not a usable Gabbro vault.",
-  "resizeColumns": "Resize columns",
-  "autotypeTypeUsername": "Type username only",
-  "autotypeTypePassword": "Type password only",
-  "autotypeKeyHints": "Up/Down or Ctrl+J/K to move, Enter to fill, Ctrl+U username, Ctrl+P password, Esc to cancel"
+  "resizeColumns": "Resize columns"
 }

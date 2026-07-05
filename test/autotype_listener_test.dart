@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/autotype_listener.dart';
-import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 // A unique socket path per test (distinct name + pid) under the system temp
 // dir, so parallel tests never collide.
@@ -20,14 +19,6 @@ Future<void> _send(String path, List<int> bytes) async {
   await s.close();
   await s.done;
 }
-
-EntrySummaryData _summary(String id, String type) => EntrySummaryData(
-      id: id,
-      entryType: type,
-      title: id,
-      folder: '',
-      searchBlob: id,
-    );
 
 void main() {
   group('AutotypeListener', () {
@@ -93,22 +84,6 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 50));
       expect(firstFired, 1);
       await first.stop();
-    });
-  });
-
-  group('firstLoginId', () {
-    test('returns the first Login id, skipping non-Login entries', () {
-      final id = firstLoginId([
-        _summary('n1', 'Note'),
-        _summary('c1', 'Card'),
-        _summary('login-a', 'Login'),
-        _summary('login-b', 'Login'),
-      ]);
-      expect(id, 'login-a');
-    });
-
-    test('returns null when there are no Login entries', () {
-      expect(firstLoginId([_summary('n1', 'Note')]), isNull);
     });
   });
 }

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gabbro/autotype_target.dart';
 import 'package:gabbro/control_scale.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/safe_file_picker.dart';
@@ -138,6 +139,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   void initState() {
     super.initState();
     _entry = widget.entry;
+    // Designate this Login as the Linux auto-type target while it is open
+    // (ADR-017). Harmless on other platforms — only the Linux listener reads it.
+    if (_entry is VaultEntryData_Login) autotypeTarget.setLogin(_entryId());
     _loadHistory();
   }
 
@@ -153,6 +157,9 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
   @override
   void dispose() {
     _clipboardClearTimer?.cancel();
+    // Stop targeting this Login once its screen closes, unless a newer screen
+    // has already claimed the target (clearIf guards that).
+    if (_entry is VaultEntryData_Login) autotypeTarget.clearIf(_entryId());
     super.dispose();
   }
 

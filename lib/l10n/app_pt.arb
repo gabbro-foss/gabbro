@@ -856,8 +856,5 @@
   "restoreFromFileButton": "Restaurar a partir de um ficheiro de cópia de segurança",
   "vaultRestoredMessage": "Cofre restaurado. Desbloqueie com as suas credenciais.",
   "restoreFromFileInvalidError": "Esse ficheiro não é um cofre Gabbro utilizável.",
-  "resizeColumns": "Redimensionar colunas",
-  "autotypeTypeUsername": "Escrever apenas o utilizador",
-  "autotypeTypePassword": "Escrever apenas a palavra-passe",
-  "autotypeKeyHints": "Cima/Baixo ou Ctrl+J/K mover, Enter preencher, Ctrl+U utilizador, Ctrl+P palavra-passe, Esc cancelar"
+  "resizeColumns": "Redimensionar colunas"
 }

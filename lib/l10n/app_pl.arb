@@ -856,8 +856,5 @@
   "restoreFromFileButton": "Przywróć z pliku kopii zapasowej",
   "vaultRestoredMessage": "Sejf przywrócony. Odblokuj swoimi danymi.",
   "restoreFromFileInvalidError": "Ten plik nie jest prawidłowym sejfem Gabbro.",
-  "resizeColumns": "Zmień rozmiar kolumn",
-  "autotypeTypeUsername": "Wpisz tylko nazwę użytkownika",
-  "autotypeTypePassword": "Wpisz tylko hasło",
-  "autotypeKeyHints": "Góra/Dół lub Ctrl+J/K przechodzenie, Enter wypełnij, Ctrl+U użytkownik, Ctrl+P hasło, Esc anuluj"
+  "resizeColumns": "Zmień rozmiar kolumn"
 }

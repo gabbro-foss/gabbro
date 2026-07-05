@@ -856,8 +856,5 @@
   "restoreFromFileButton": "Taasta varukoopia failist",
   "vaultRestoredMessage": "Hoidla taastatud. Avage oma mandaatidega.",
   "restoreFromFileInvalidError": "See fail ei ole kasutatav Gabbro hoidla.",
-  "resizeColumns": "Muuda veergude suurust",
-  "autotypeTypeUsername": "Sisesta ainult kasutajanimi",
-  "autotypeTypePassword": "Sisesta ainult parool",
-  "autotypeKeyHints": "Üles/Alla või Ctrl+J/K liikumine, Enter täitmine, Ctrl+U kasutaja, Ctrl+P parool, Esc tühista"
+  "resizeColumns": "Muuda veergude suurust"
 }

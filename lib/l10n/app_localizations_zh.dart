@@ -1925,16 +1925,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get resizeColumns => '调整列宽';
-
-  @override
-  String get autotypeTypeUsername => '仅输入用户名';
-
-  @override
-  String get autotypeTypePassword => '仅输入密码';
-
-  @override
-  String get autotypeKeyHints =>
-      '上/下 或 Ctrl+J/K 移动，Enter 填充，Ctrl+U 用户名，Ctrl+P 密码，Esc 取消';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3858,16 +3848,6 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get resizeColumns => '调整列宽';
-
-  @override
-  String get autotypeTypeUsername => '仅输入用户名';
-
-  @override
-  String get autotypeTypePassword => '仅输入密码';
-
-  @override
-  String get autotypeKeyHints =>
-      '上/下 或 Ctrl+J/K 移动，Enter 填充，Ctrl+U 用户名，Ctrl+P 密码，Esc 取消';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -5791,14 +5771,4 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get resizeColumns => '調整欄寬';
-
-  @override
-  String get autotypeTypeUsername => '僅輸入使用者名稱';
-
-  @override
-  String get autotypeTypePassword => '僅輸入密碼';
-
-  @override
-  String get autotypeKeyHints =>
-      '上/下 或 Ctrl+J/K 移動，Enter 填入，Ctrl+U 使用者名稱，Ctrl+P 密碼，Esc 取消';
 }

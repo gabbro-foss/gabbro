@@ -1,11 +1,10 @@
 //! The auto-type fill orchestration (ADR-017), Linux-only.
 //!
-//! Given the window captured at trigger time, an entry id and a sequence kind:
-//! read the Login's secret from the session, build the keystroke sequence,
-//! ask the window manager to re-activate the target window (the picker stole
-//! focus), verify focus actually landed on the target, and only then inject.
-//! The secret never leaves Rust. If focus did not return to the captured
-//! window, we abort rather than type it somewhere else.
+//! Given the window captured at trigger time and an entry id: read the Login's
+//! secret from the session, build the `username` Tab `password` Return keystroke
+//! sequence, re-assert focus on the captured window and verify it actually holds
+//! focus, and only then inject. The secret never leaves Rust. If focus is not on
+//! the captured window, we abort rather than type it somewhere else.
 
 use std::{thread, time::Duration};
 
@@ -17,7 +16,7 @@ use crate::vault::entry::VaultEntry;
 use crate::vault::session::{get_entry, is_vault_unlocked};
 
 use super::inject;
-use super::sequence::{build_sequence, SequenceKind};
+use super::sequence::build_sequence;
 use super::window::{active_window, WindowError};
 
 /// Time allowed for the window manager to action the activate request before we
@@ -47,6 +46,18 @@ pub enum FillError {
     Inject(#[from] inject::InjectError),
 }
 
+/// The identifier to type into the login field: the `username` if it has one,
+/// otherwise the `email` (which many sites accept as the login). Empty when
+/// neither is set, so the sequence types nothing before Tab. Mirrors how web
+/// autofill treats a login's email as an alternate identifier.
+fn login_identifier<'a>(username: &'a str, email: Option<&'a str>) -> &'a str {
+    if !username.is_empty() {
+        username
+    } else {
+        email.unwrap_or_default()
+    }
+}
+
 /// Whether the currently active window is the one we captured -- the
 /// wrong-window safeguard. `None` (no active window) never matches, so we never
 /// type a secret into nothing.
@@ -54,8 +65,8 @@ pub fn focus_matches(active: Option<Window>, target: Window) -> bool {
     active == Some(target)
 }
 
-/// Fill `entry_id` into `window_id` using `kind`. See module docs.
-pub fn fill(window_id: Window, entry_id: &str, kind: SequenceKind) -> Result<(), FillError> {
+/// Fill `entry_id` into `window_id`. See module docs.
+pub fn fill(window_id: Window, entry_id: &str) -> Result<(), FillError> {
     if !is_vault_unlocked() {
         return Err(FillError::Locked);
     }
@@ -66,7 +77,10 @@ pub fn fill(window_id: Window, entry_id: &str, kind: SequenceKind) -> Result<(),
     // also carries the secret, via Zeroizing.
     let entry = get_entry(entry_id).map_err(FillError::Session)?;
     let seq = match &entry {
-        VaultEntry::Login(e) => Zeroizing::new(build_sequence(&e.username, &e.password, kind)),
+        VaultEntry::Login(e) => {
+            let user = login_identifier(&e.username, e.email.as_deref());
+            Zeroizing::new(build_sequence(user, &e.password))
+        }
         _ => return Err(FillError::NotLogin),
     };
 
@@ -121,5 +135,25 @@ mod tests {
     #[test]
     fn no_active_window_does_not_match() {
         assert!(!focus_matches(None, 0x1a0_000f));
+    }
+
+    #[test]
+    fn identifier_prefers_a_non_empty_username() {
+        assert_eq!(login_identifier("alice", Some("a@example.com")), "alice");
+    }
+
+    #[test]
+    fn identifier_falls_back_to_email_when_username_empty() {
+        assert_eq!(login_identifier("", Some("a@example.com")), "a@example.com");
+    }
+
+    #[test]
+    fn identifier_is_empty_when_username_empty_and_no_email() {
+        assert_eq!(login_identifier("", None), "");
+    }
+
+    #[test]
+    fn identifier_is_empty_when_username_and_email_both_empty() {
+        assert_eq!(login_identifier("", Some("")), "");
     }
 }

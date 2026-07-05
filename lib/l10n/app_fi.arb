@@ -856,8 +856,5 @@
   "restoreFromFileButton": "Palauta varmuuskopiotiedostosta",
   "vaultRestoredMessage": "Holvi palautettu. Avaa lukitus tunnuksillasi.",
   "restoreFromFileInvalidError": "Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi.",
-  "resizeColumns": "Muuta sarakkeiden kokoa",
-  "autotypeTypeUsername": "Kirjoita vain käyttäjänimi",
-  "autotypeTypePassword": "Kirjoita vain salasana",
-  "autotypeKeyHints": "Ylös/Alas tai Ctrl+J/K siirtyminen, Enter täyttö, Ctrl+U käyttäjä, Ctrl+P salasana, Esc peruuta"
+  "resizeColumns": "Muuta sarakkeiden kokoa"
 }

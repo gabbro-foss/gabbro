@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gabbro/app_paths.dart';
 import 'package:gabbro/autotype_listener.dart';
+import 'package:gabbro/autotype_target.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
@@ -446,19 +447,17 @@ Future<void> _startAutotypeListener() async {
   }
 }
 
-/// 3.4b behaviour (no picker yet): fill the first Login into the window that was
-/// focused when the trigger fired. The secret is read and injected in Rust.
+/// Per-entry direct-type (ADR-017): fill the Login the user has open in Gabbro
+/// into the window that was focused when the trigger fired. No picker, so no
+/// focus is stolen. Nothing open (or a locked vault, which cleared the target)
+/// => nothing to type. The secret is read and injected in Rust.
 Future<void> _onAutotypeTrigger() async {
   try {
+    final id = autotypeTarget.loginId;
+    if (id == null) return;
     final window = await autotypeCaptureActiveWindow();
     if (window == null) return;
-    final id = firstLoginId(listEntrySummaries());
-    if (id == null) return;
-    await autotypeFill(
-      windowId: window.id,
-      entryId: id,
-      kind: AutotypeSequenceKind.full,
-    );
+    await autotypeFill(windowId: window.id, entryId: id);
   } catch (e) {
     debugPrint('autotype: fill failed: $e');
   }
@@ -743,6 +742,7 @@ class _GabbroAppState extends State<GabbroApp>
     _foregroundTimer?.cancel();
     _backgroundTimer?.cancel();
     _backgroundedAt = null;
+    autotypeTarget.clear(); // a locked vault has no auto-type target
     try {
       lockVault();
     } catch (_) {}

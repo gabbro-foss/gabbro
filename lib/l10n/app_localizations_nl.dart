@@ -2022,14 +2022,4 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Kolommen aanpassen';
-
-  @override
-  String get autotypeTypeUsername => 'Alleen gebruikersnaam typen';
-
-  @override
-  String get autotypeTypePassword => 'Alleen wachtwoord typen';
-
-  @override
-  String get autotypeKeyHints =>
-      'Omhoog/Omlaag of Ctrl+J/K navigeren, Enter invullen, Ctrl+U gebruikersnaam, Ctrl+P wachtwoord, Esc annuleren';
 }

@@ -856,8 +856,5 @@
   "restoreFromFileButton": "Восстановить из файла резервной копии",
   "vaultRestoredMessage": "Хранилище восстановлено. Разблокируйте с помощью своих учётных данных.",
   "restoreFromFileInvalidError": "Этот файл не является пригодным хранилищем Gabbro.",
-  "resizeColumns": "Изменить размер столбцов",
-  "autotypeTypeUsername": "Ввести только имя пользователя",
-  "autotypeTypePassword": "Ввести только пароль",
-  "autotypeKeyHints": "Вверх/Вниз или Ctrl+J/K перемещение, Enter заполнить, Ctrl+U пользователь, Ctrl+P пароль, Esc отмена"
+  "resizeColumns": "Изменить размер столбцов"
 }

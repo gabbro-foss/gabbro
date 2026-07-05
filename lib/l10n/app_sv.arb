@@ -856,8 +856,5 @@
   "restoreFromFileButton": "Återställ från en säkerhetskopia",
   "vaultRestoredMessage": "Valv återställt. Lås upp med dina uppgifter.",
   "restoreFromFileInvalidError": "Den filen är inte ett användbart Gabbro-valv.",
-  "resizeColumns": "Ändra kolumnstorlek",
-  "autotypeTypeUsername": "Skriv endast användarnamn",
-  "autotypeTypePassword": "Skriv endast lösenord",
-  "autotypeKeyHints": "Upp/Ned eller Ctrl+J/K flytta, Enter fyll i, Ctrl+U användarnamn, Ctrl+P lösenord, Esc avbryt"
+  "resizeColumns": "Ändra kolumnstorlek"
 }

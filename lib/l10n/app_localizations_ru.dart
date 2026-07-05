@@ -2021,14 +2021,4 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Изменить размер столбцов';
-
-  @override
-  String get autotypeTypeUsername => 'Ввести только имя пользователя';
-
-  @override
-  String get autotypeTypePassword => 'Ввести только пароль';
-
-  @override
-  String get autotypeKeyHints =>
-      'Вверх/Вниз или Ctrl+J/K перемещение, Enter заполнить, Ctrl+U пользователь, Ctrl+P пароль, Esc отмена';
 }

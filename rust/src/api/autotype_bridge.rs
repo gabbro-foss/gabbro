@@ -7,17 +7,6 @@
 //! either the public fn or the impl, compiles on Android too. Only the Linux
 //! impls touch the `cfg(target_os = "linux")`-gated `autotype` module.
 
-/// Which part(s) of a login to type -- the bridge-facing mirror of the internal
-/// `autotype::sequence::SequenceKind`.
-pub enum AutotypeSequenceKind {
-    /// username Tab password Return.
-    Full,
-    /// Just the username (for two-step forms).
-    UsernameOnly,
-    /// Just the password (for two-step forms).
-    PasswordOnly,
-}
-
 /// The window captured at trigger time, flattened for the bridge.
 pub struct CapturedWindowData {
     pub id: u32,
@@ -30,14 +19,10 @@ pub fn autotype_capture_active_window() -> Result<Option<CapturedWindowData>, St
     impl_capture()
 }
 
-/// Fill `entry_id` into `window_id` using `kind` (Linux only). The secret is
-/// read from the Rust session and injected without crossing the bridge.
-pub fn autotype_fill(
-    window_id: u32,
-    entry_id: String,
-    kind: AutotypeSequenceKind,
-) -> Result<(), String> {
-    impl_fill(window_id, entry_id, kind)
+/// Fill `entry_id` into `window_id` (Linux only). The secret is read from the
+/// Rust session and injected without crossing the bridge.
+pub fn autotype_fill(window_id: u32, entry_id: String) -> Result<(), String> {
+    impl_fill(window_id, entry_id)
 }
 
 /// The unix-socket path the Dart listener should bind and the client uses.
@@ -63,12 +48,8 @@ pub(crate) fn impl_capture() -> Result<Option<CapturedWindowData>, String> {
 }
 
 #[cfg(target_os = "linux")]
-pub(crate) fn impl_fill(
-    window_id: u32,
-    entry_id: String,
-    kind: AutotypeSequenceKind,
-) -> Result<(), String> {
-    crate::autotype::fill::fill(window_id, &entry_id, seq_kind(kind)).map_err(|e| e.to_string())
+pub(crate) fn impl_fill(window_id: u32, entry_id: String) -> Result<(), String> {
+    crate::autotype::fill::fill(window_id, &entry_id).map_err(|e| e.to_string())
 }
 
 #[cfg(target_os = "linux")]
@@ -94,16 +75,6 @@ fn captured_to_data(w: crate::autotype::window::CapturedWindow) -> CapturedWindo
     }
 }
 
-#[cfg(target_os = "linux")]
-fn seq_kind(k: AutotypeSequenceKind) -> crate::autotype::sequence::SequenceKind {
-    use crate::autotype::sequence::SequenceKind;
-    match k {
-        AutotypeSequenceKind::Full => SequenceKind::Full,
-        AutotypeSequenceKind::UsernameOnly => SequenceKind::UsernameOnly,
-        AutotypeSequenceKind::PasswordOnly => SequenceKind::PasswordOnly,
-    }
-}
-
 // ── Non-Linux stubs (keep the symbols present so frb glue links) ─────────────
 
 #[cfg(not(target_os = "linux"))]
@@ -112,12 +83,8 @@ pub(crate) fn impl_capture() -> Result<Option<CapturedWindowData>, String> {
 }
 
 #[cfg(not(target_os = "linux"))]
-pub(crate) fn impl_fill(
-    window_id: u32,
-    entry_id: String,
-    kind: AutotypeSequenceKind,
-) -> Result<(), String> {
-    let _ = (window_id, entry_id, kind);
+pub(crate) fn impl_fill(window_id: u32, entry_id: String) -> Result<(), String> {
+    let _ = (window_id, entry_id);
     Err("auto-type is Linux-only".to_string())
 }
 
@@ -133,8 +100,7 @@ pub(crate) fn impl_token() -> String {
 
 #[cfg(all(test, target_os = "linux"))]
 mod tests {
-    use super::{captured_to_data, seq_kind, AutotypeSequenceKind};
-    use crate::autotype::sequence::SequenceKind;
+    use super::captured_to_data;
     use crate::autotype::window::CapturedWindow;
 
     #[test]
@@ -170,18 +136,5 @@ mod tests {
         });
         assert_eq!(d.app_class, "C");
         assert_eq!(d.title, "");
-    }
-
-    #[test]
-    fn sequence_kind_maps_each_variant() {
-        assert_eq!(seq_kind(AutotypeSequenceKind::Full), SequenceKind::Full);
-        assert_eq!(
-            seq_kind(AutotypeSequenceKind::UsernameOnly),
-            SequenceKind::UsernameOnly
-        );
-        assert_eq!(
-            seq_kind(AutotypeSequenceKind::PasswordOnly),
-            SequenceKind::PasswordOnly
-        );
     }
 }

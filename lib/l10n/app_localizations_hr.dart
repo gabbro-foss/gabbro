@@ -2013,14 +2013,4 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get resizeColumns => 'Promijeni veličinu stupaca';
-
-  @override
-  String get autotypeTypeUsername => 'Upiši samo korisničko ime';
-
-  @override
-  String get autotypeTypePassword => 'Upiši samo lozinku';
-
-  @override
-  String get autotypeKeyHints =>
-      'Gore/Dolje ili Ctrl+J/K pomicanje, Enter ispuni, Ctrl+U korisnik, Ctrl+P lozinka, Esc odustani';
 }
