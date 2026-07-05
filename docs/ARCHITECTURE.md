@@ -94,14 +94,15 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Autofill via `auto-type` (Linux/desktop).** Global hotkey -> foreground-window
-detection -> synthesised keystrokes into another app (the KeePass/KeePassXC model,
-no browser extension). Needs a dedicated design session + ADR: Wayland blocks
-synthetic input outside the freedesktop RemoteDesktop portal / `libei` (KeePassXC's
-own auto-type is partial there), it's a new secret->input-subsystem security
-surface, and it cuts across "secrets live in Rust" (Rust holds the secret +
-synthesises input, Flutter registers the hotkey, per-platform window detection).
-Desktop-first; shares no code with Android autofill. Discuss-then-plan-or-drop.
+**Linux desktop auto-type — implement per [ADR-017](decisions/ADR-017-linux-autotype.md)**
+(design agreed 2026-07-05; phasing TBD). Scope locked: X11-only (Wayland keeps
+copy-paste), **logins only** (cards deferred), user-bound trigger `gabbro --autotype`
+via a local socket (no Gabbro key grab, no default hotkey, no tray), own picker
+listing all logins with type-to-filter, sequences `{user}{TAB}{pass}{ENTER}` +
+username-only + password-only. Secret stays in Rust (`x11rb` reads active window +
+`XTEST` injects; never crosses the bridge); auto-lock preserved (locked -> unlock
+then type). Main risk to prove first on hardware: arbitrary-Unicode keystroke
+injection (Greek/Cyrillic/CJK passphrases) via the keycode-remap trick. Opt-in.
 
 ---
 
