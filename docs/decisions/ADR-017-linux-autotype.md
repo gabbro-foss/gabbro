@@ -74,7 +74,7 @@ This ADR records the scope and rationale agreed in a design discussion. It fixes
 
 ### 5. User-bound trigger (no Gabbro key grab), no default hotkey, no system tray
 - **The user owns the key, not Gabbro.** Gabbro does **not** grab a global hotkey.
-  Instead it exposes a trigger command — `gabbro --autotype` — that pokes the
+  Instead it exposes a trigger command — `gabbro-autotype` — that pokes the
   already-running instance over a small local socket, which then performs the fill on
   the currently-focused window. The user binds their own chosen key to that command
   in whatever they already use for shortcuts.
@@ -89,8 +89,8 @@ This ADR records the scope and rationale agreed in a design discussion. It fixes
   key's *owner* differs.
 - **Documentation, not a per-WM matrix.** The command is universal. We document it
   plus two examples: a tiling-WM line (qtile `config.py`:
-  `Key([mod], "slash", lazy.spawn("gabbro --autotype"))`) and a desktop-environment
-  note (GNOME/KDE/XFCE: add a custom keyboard shortcut running `gabbro --autotype`).
+  `Key([mod], "slash", lazy.spawn("gabbro-autotype"))`) and a desktop-environment
+  note (GNOME/KDE/XFCE: add a custom keyboard shortcut running `gabbro-autotype`).
   Every environment can bind a command to a key; users map it onto their own setup.
 - **No tray:** the trigger works whenever the Gabbro *process* is alive, regardless of
   window focus. A tray only buys "survive window close" — which KISS does not need:
@@ -170,7 +170,7 @@ This ADR records the scope and rationale agreed in a design discussion. It fixes
   by the user's WM/DE (see §5), so there is no grab, no `BadAccess` handling, and no
   in-app hotkey picker to build.
 - **Trigger IPC:** the running instance listens on a local unix socket (under
-  `$XDG_RUNTIME_DIR`); `gabbro --autotype` is a thin client that connects, sends
+  `$XDG_RUNTIME_DIR`); `gabbro-autotype` is a thin client that connects, sends
   "trigger", and exits. Single-instance pattern; the socket is the trigger surface.
 - **Flutter** owns the config UI (enable/disable, sequence defaults) and the picker
   window.

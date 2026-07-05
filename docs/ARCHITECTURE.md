@@ -51,7 +51,7 @@ gabbro/
 │   ├── import/           # enpass, bitwarden, google_pm, dashlane, csv
 │   ├── hardening.rs      # Process hardening (R-04): core-dump + ptrace/mem disable (Linux)
 │   ├── autotype/         # Linux auto-type (ADR-017): keysym mapping, XTEST injection, active-window read, trigger IPC, fill sequences (Linux-only)
-│   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_spike, autotype_window, autotype_trigger; wordlist gen; gen_fixtures
+│   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper (+ Robolectric tests)
 ├── docs/                 # ARCHITECTURE, LEARNINGS, SECURITY, AI_*; decisions/ (ADRs); artefacts/
@@ -113,13 +113,18 @@ Phases:
     clipboard auto-clear pinned (3 tests). Generator clear deferred to the unify (see Bikeshed).
   - [x] **3.2** sequence building (Rust, pure): `{user}{TAB}{pass}{ENTER}` + user-only + pass-only.
     `rust/src/autotype/sequence.rs` (`SequenceKind` + `build_sequence`, 5 tests).
-  - [ ] **3.3** `gabbro --autotype` client (C++ runner short-circuit vs helper bin — DECIDE) +
-    start the Rust listener on launch; prove keypress -> app logs the captured active window.
-  - [ ] **3.4** bridge `autotype_fill` (refocus/verify window, read secret from Rust session,
-    inject); prove keypress auto-fills the first login into the focused field.
+  - [x] **3.3** trigger client + active-window capture. Chose the helper-binary client
+    (`gabbro-autotype`, reuses the tested `send()`); `window::capture_active`; the
+    `autotype_trigger` diagnostic captures the focused window per trigger. Hardware-proven
+    2026-07-05 on qtile (key -> captured Brave/terminal/Gabbro correctly). Listener-on-launch
+    moved to 3.4 (bridge).
+  - [ ] **3.4** start the Rust listener on app launch (frb) + bridge `autotype_fill`
+    (refocus/verify window, read secret from Rust session, inject); prove keypress auto-fills
+    the first login into the focused field.
   - [ ] **3.5** picker UI (Dart): all logins, type-to-filter, focus dance, the three actions.
 - [ ] **Phase 4** — unlock-then-type for a locked vault; opt-in setting; README key-binding
-  examples. Secret stays in Rust throughout; auto-lock preserved.
+  examples; package `gabbro-autotype` into the release bundle (update BUILD_AND_RELEASE).
+  Secret stays in Rust throughout; auto-lock preserved.
 
 ---
 
