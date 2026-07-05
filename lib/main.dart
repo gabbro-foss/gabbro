@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:gabbro/app_paths.dart';
+import 'package:gabbro/autotype_listener.dart';
 import 'package:gabbro/l10n/app_localizations.dart';
 import 'package:gabbro/nfc_capability.dart';
 import 'package:gabbro/screens/manage_vaults_screen.dart';
@@ -13,6 +14,7 @@ import 'package:gabbro/screens/onboarding_screen.dart';
 import 'package:gabbro/screens/save_confirm_screen.dart';
 import 'package:gabbro/screens/unlock_screen.dart';
 import 'package:gabbro/screens/vault_list_screen.dart' show confirmYubikey, confirmAnyYubikey;
+import 'package:gabbro/src/rust/api/autotype_bridge.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 import 'package:gabbro/settings.dart';
 import 'package:gabbro/src/rust/frb_generated.dart';
@@ -413,6 +415,9 @@ Future<void> main() async {
   final registry = await VaultRegistry.load();
   final lastUsed = registry.lastUsed;
   final settings = await AppSettings.load();
+  if (Platform.isLinux) {
+    await _startAutotypeListener();
+  }
   runApp(
     GabbroApp(
       registry: registry,
@@ -420,6 +425,43 @@ Future<void> main() async {
       settings: settings,
     ),
   );
+}
+
+/// Start the Linux auto-type trigger listener (ADR-017). The socket path and
+/// token come from Rust so nothing is duplicated. Best-effort: a failure (or
+/// another instance already owning the socket) just leaves auto-type inactive
+/// in this instance — it never blocks launch.
+Future<void> _startAutotypeListener() async {
+  try {
+    final listener = AutotypeListener(
+      socketPath: await autotypeSocketPath(),
+      token: await autotypeTriggerToken(),
+      onTrigger: _onAutotypeTrigger,
+    );
+    if (!await listener.start()) {
+      debugPrint('autotype: another instance owns the socket; listener not started');
+    }
+  } catch (e) {
+    debugPrint('autotype: listener failed to start: $e');
+  }
+}
+
+/// 3.4b behaviour (no picker yet): fill the first Login into the window that was
+/// focused when the trigger fired. The secret is read and injected in Rust.
+Future<void> _onAutotypeTrigger() async {
+  try {
+    final window = await autotypeCaptureActiveWindow();
+    if (window == null) return;
+    final id = firstLoginId(listEntrySummaries());
+    if (id == null) return;
+    await autotypeFill(
+      windowId: window.id,
+      entryId: id,
+      kind: AutotypeSequenceKind.full,
+    );
+  } catch (e) {
+    debugPrint('autotype: fill failed: $e');
+  }
 }
 
 /// Where to go after a vault is deleted from Manage Vaults (ADR-014).
