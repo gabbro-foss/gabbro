@@ -44,13 +44,13 @@ gabbro/
 │   ├── src/rust/         # Auto-generated bridge (do not edit)
 │   └── *.dart            # main, app_paths (GabbroPaths), settings, text_scale, control_scale, vault_registry, safe_file_picker
 ├── rust/src/
-│   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, entropy, types
+│   ├── api/              # Bridge surface: vault, vault_bridge, import, *_generator, fido_bridge, autofill_bridge, autotype_bridge, entropy, types
 │   ├── crypto/           # Internal (not bridge-exposed): kdf, keypair, ml_kem, hkdf, aes_gcm, vault_crypto
 │   ├── vault/            # Domain model: entry, file_format, io, serialization, session
 │   ├── fido/             # FIDO2/libfido2 FFI (Linux only)
 │   ├── import/           # enpass, bitwarden, google_pm, dashlane, csv
 │   ├── hardening.rs      # Process hardening (R-04): core-dump + ptrace/mem disable (Linux)
-│   ├── autotype/         # Linux auto-type (ADR-017): keysym mapping, XTEST injection, active-window read, trigger IPC, fill sequences (Linux-only)
+│   ├── autotype/         # Linux auto-type (ADR-017): keysym, XTEST inject, active-window read, trigger IPC, sequences, fill orchestration (Linux-only)
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_{spike,window,trigger} (diagnostics), gabbro-autotype (shipped trigger client); wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper (+ Robolectric tests)
@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 627 | 17 |
+| Rust (`cargo test -q`) | 634 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 14 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -118,9 +118,15 @@ Phases:
     `autotype_trigger` diagnostic captures the focused window per trigger. Hardware-proven
     2026-07-05 on qtile (key -> captured Brave/terminal/Gabbro correctly). Listener-on-launch
     moved to 3.4 (bridge).
-  - [ ] **3.4** start the Rust listener on app launch (frb) + bridge `autotype_fill`
-    (refocus/verify window, read secret from Rust session, inject); prove keypress auto-fills
-    the first login into the focused field.
+  - **3.4** bridge + Dart wiring (listener is **Dart**, not Rust — no frb streams exist;
+    `dart:io` unix-socket spike passed 2026-07-05):
+    - [x] **3.4a** Rust bridge (`api/autotype_bridge.rs`): `autotype_capture_active_window`,
+      `autotype_fill` (refocus via `_NET_ACTIVE_WINDOW` + verify-focus safeguard + read session +
+      inject; secret never crosses the bridge), `autotype_socket_path`, `autotype_trigger_token`.
+      Non-gated bridge + `pub(crate)` `cfg` impls so the frb glue links on Android. 7 unit tests;
+      frb codegen run. Refocus is built-but-unproven (hardware-tune in 3.4b).
+    - [ ] **3.4b** Dart unix-socket listener in `main()` (Linux) → on trigger call capture then
+      fill the FIRST login. Hardware-prove keypress fills the focused field.
   - [ ] **3.5** picker UI (Dart): all logins, type-to-filter, focus dance, the three actions.
 - [ ] **Phase 4** — unlock-then-type for a locked vault; opt-in setting; README key-binding
   examples; package `gabbro-autotype` into the release bundle (update BUILD_AND_RELEASE).
