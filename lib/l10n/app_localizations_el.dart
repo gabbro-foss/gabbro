@@ -2033,4 +2033,7 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Αυτό το αρχείο δεν είναι χρησιμοποιήσιμο θησαυροφυλάκιο Gabbro.';
+
+  @override
+  String get resizeColumns => 'Αλλαγή μεγέθους στηλών';
 }

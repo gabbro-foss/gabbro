@@ -2018,4 +2018,7 @@ class AppLocalizationsLt extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Šis failas nėra tinkama Gabbro saugykla.';
+
+  @override
+  String get resizeColumns => 'Keisti stulpelių dydį';
 }

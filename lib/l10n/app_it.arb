@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "Eliminare definitivamente questa cassaforte? Il file illeggibile e la sua copia di sicurezza verranno rimossi da questo dispositivo. L'operazione non può essere annullata.",
   "restoreFromFileButton": "Ripristina da un file di backup",
   "vaultRestoredMessage": "Cassaforte ripristinata. Sblocca con le tue credenziali.",
-  "restoreFromFileInvalidError": "Questo file non è una cassaforte Gabbro utilizzabile."
+  "restoreFromFileInvalidError": "Questo file non è una cassaforte Gabbro utilizzabile.",
+  "resizeColumns": "Ridimensiona colonne"
 }

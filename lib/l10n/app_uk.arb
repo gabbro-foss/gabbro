@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Остаточно видалити це сховище? Нечитабельний файл і його аварійна копія будуть видалені з цього пристрою. Цю дію неможливо скасувати.",
   "restoreFromFileButton": "Відновити з файлу резервної копії",
   "vaultRestoredMessage": "Сховище відновлено. Розблокуйте за допомогою своїх облікових даних.",
-  "restoreFromFileInvalidError": "Цей файл не є придатним сховищем Gabbro."
+  "restoreFromFileInvalidError": "Цей файл не є придатним сховищем Gabbro.",
+  "resizeColumns": "Змінити розмір стовпців"
 }

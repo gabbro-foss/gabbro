@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Slette dette hvelvet permanent? Den uleselige filen og reservekopien fjernes fra denne enheten. Dette kan ikke angres.",
   "restoreFromFileButton": "Gjenopprett fra en sikkerhetskopifil",
   "vaultRestoredMessage": "Hvelv gjenopprettet. Lås opp med påloggingsinformasjonen din.",
-  "restoreFromFileInvalidError": "Den filen er ikke et brukbart Gabbro-hvelv."
+  "restoreFromFileInvalidError": "Den filen er ikke et brukbart Gabbro-hvelv.",
+  "resizeColumns": "Endre kolonnestørrelse"
 }

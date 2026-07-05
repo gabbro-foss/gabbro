@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Slette dette kvelvet permanent? Den uleselege fila og reservekopien blir fjerna frå denne eininga. Dette kan ikkje angrast.",
   "restoreFromFileButton": "Gjenopprett frå ei tryggleikskopifil",
   "vaultRestoredMessage": "Kvelv gjenoppretta. Lås opp med innloggingsinformasjonen din.",
-  "restoreFromFileInvalidError": "Den fila er ikkje eit brukbart Gabbro-kvelv."
+  "restoreFromFileInvalidError": "Den fila er ikkje eit brukbart Gabbro-kvelv.",
+  "resizeColumns": "Endre kolonnestorleik"
 }

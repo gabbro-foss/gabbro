@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gabbro/screens/tablet_vault_layout.dart';
 import 'package:gabbro/settings.dart';
+import 'package:gabbro/src/rust/api/vault.dart';
 import 'package:gabbro/src/rust/api/vault_bridge.dart';
 
 import 'test_helpers.dart';
@@ -125,6 +126,87 @@ void main() {
     );
     expect(icon.size, isNotNull);
     expect(icon.size, greaterThan(20));
+  });
+
+  // ── Resize handle: accessibility (screen-reader label + icon scaling) ──────
+
+  // Net-first: the drag handle renders at tablet width (pins current wiring).
+  testWidgets('resize handle divider is present at tablet width',
+      (tester) async {
+    _setTablet(tester);
+    await tester.pumpWidget(testApp(_listLayout()));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('list-pane-divider')), findsOneWidget);
+  });
+
+  // Net-first: grip glyph is the fixed base size 16 at normal text.
+  testWidgets('resize grip icon is base 16 at normal text', (tester) async {
+    _setTablet(tester);
+    await tester.pumpWidget(testApp(_listLayout()));
+    await tester.pumpAndSettle();
+
+    final icon = tester.widget<Icon>(find.byIcon(Icons.drag_handle));
+    expect(icon.size, 16);
+  });
+
+  // New: the resize handle must announce a screen-reader label (ADR-015).
+  testWidgets('resize handle exposes a screen-reader label', (tester) async {
+    _setTablet(tester);
+    await tester.pumpWidget(testApp(_listLayout()));
+    await tester.pumpAndSettle();
+
+    expect(find.bySemanticsLabel('Resize columns'), findsOneWidget);
+  });
+
+  // New: the grip glyph scales with the text, capped at 1.5x (ADR-016).
+  testWidgets('resize grip icon scales up at large text, capped 1.5x',
+      (tester) async {
+    _setTablet(tester, textScale: 2.0);
+    await tester.pumpWidget(testApp(_listLayout()));
+    await tester.pumpAndSettle();
+
+    final icon = tester.widget<Icon>(find.byIcon(Icons.drag_handle));
+    expect(icon.size, isNotNull);
+    expect(icon.size, greaterThan(16));
+    expect(icon.size, lessThanOrEqualTo(24)); // 16 * 1.5
+  });
+
+  // New: the detail pane reserves bottom padding so its content clears the
+  // Scaffold-level FAB that floats over the bottom-right in two-pane mode.
+  testWidgets('detail pane reserves bottom padding to clear the FAB',
+      (tester) async {
+    _setTablet(tester);
+    await tester.pumpWidget(testApp(_layout(
+      getEntryFn: (id) => VaultEntryData.login(
+        LoginEntryData(
+          id: id,
+          title: 'Example',
+          url: '',
+          username: 'user@example.com',
+          password: 'secret',
+          notes: null,
+          customFields: const [],
+          createdAt: '2025-01-01T00:00:00Z',
+          updatedAt: '2025-01-01T00:00:00Z',
+          folder: '',
+        ),
+      ),
+    )));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Example'));
+    await tester.pumpAndSettle();
+
+    final scroll = tester.widget<SingleChildScrollView>(
+      find.descendant(
+        of: find.byType(SafeArea),
+        matching: find.byType(SingleChildScrollView),
+      ),
+    );
+    final padding = scroll.padding as EdgeInsets;
+    // FAB is 56dp + 16dp margin = 72dp of bottom-right footprint to clear.
+    expect(padding.bottom, greaterThanOrEqualTo(72));
   });
 
   testWidgets(

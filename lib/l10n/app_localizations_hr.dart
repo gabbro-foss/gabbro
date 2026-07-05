@@ -2010,4 +2010,7 @@ class AppLocalizationsHr extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Ta datoteka nije upotrebljiv Gabbro trezor.';
+
+  @override
+  String get resizeColumns => 'Promijeni veličinu stupaca';
 }

@@ -2012,4 +2012,7 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi.';
+
+  @override
+  String get resizeColumns => 'Muuta sarakkeiden kokoa';
 }

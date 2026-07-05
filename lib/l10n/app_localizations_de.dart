@@ -2027,4 +2027,7 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Diese Datei ist kein verwendbarer Gabbro-Tresor.';
+
+  @override
+  String get resizeColumns => 'Spalten anpassen';
 }

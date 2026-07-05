@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Deze kluis definitief verwijderen? Het onleesbare bestand en de reservekopie worden van dit apparaat verwijderd. Dit kan niet ongedaan worden gemaakt.",
   "restoreFromFileButton": "Herstellen vanaf een back-upbestand",
   "vaultRestoredMessage": "Kluis hersteld. Ontgrendel met je gegevens.",
-  "restoreFromFileInvalidError": "Dat bestand is geen bruikbare Gabbro-kluis."
+  "restoreFromFileInvalidError": "Dat bestand is geen bruikbare Gabbro-kluis.",
+  "resizeColumns": "Kolommen aanpassen"
 }

@@ -1922,6 +1922,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get restoreFromFileInvalidError => '该文件不是可用的 Gabbro 保险库。';
+
+  @override
+  String get resizeColumns => '调整列宽';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -3842,6 +3845,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get restoreFromFileInvalidError => '该文件不是可用的 Gabbro 保险库。';
+
+  @override
+  String get resizeColumns => '调整列宽';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -5762,4 +5768,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get restoreFromFileInvalidError => '該檔案不是可用的 Gabbro 保險庫。';
+
+  @override
+  String get resizeColumns => '調整欄寬';
 }

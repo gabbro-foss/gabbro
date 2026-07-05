@@ -3744,6 +3744,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'That file is not a usable Gabbro vault.'**
   String get restoreFromFileInvalidError;
+
+  /// No description provided for @resizeColumns.
+  ///
+  /// In en, this message translates to:
+  /// **'Resize columns'**
+  String get resizeColumns;
 }
 
 class _AppLocalizationsDelegate

@@ -2008,4 +2008,7 @@ class AppLocalizationsNb extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Den filen er ikke et brukbart Gabbro-hvelv.';
+
+  @override
+  String get resizeColumns => 'Endre kolonnestørrelse';
 }

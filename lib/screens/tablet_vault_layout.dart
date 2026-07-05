@@ -28,6 +28,13 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 //   browse   — list selection active, detail shows selected entry or empty state
 //   editing  — detail pane is edit form; list pane dimmed + non-interactive
 // ---------------------------------------------------------------------------
+
+// Bottom padding reserved in the detail pane so its last item clears the
+// Scaffold-level add-entry FAB (56dp diameter + 16dp margin) that floats over
+// the bottom-right corner in two-pane mode. The FAB box is a fixed size — only
+// its child icon scales at large text — so a constant clearance suffices.
+const double _detailPaneFabClearance = 88;
+
 class TabletVaultLayout extends StatefulWidget {
   /// All entries currently loaded (filtered + grouped by the parent).
   final List<dynamic> groupedEntries;
@@ -224,6 +231,9 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
     return EntryDetailScreen(
       key: ValueKey(_selectedEntryId),
       entry: entry,
+      // Clear the Scaffold-level add-entry FAB (56dp + 16dp margin) that floats
+      // over the detail pane's bottom-right corner in two-pane mode.
+      bottomReserve: _detailPaneFabClearance,
       clipboardClearTimeout: widget.clipboardClearTimeout,
       onDeleteEntry: widget.onDeleteEntryFn ?? (id) => deleteEntry(id: id),
       onDeleted: () {
@@ -424,51 +434,65 @@ class _TabletVaultLayoutState extends State<TabletVaultLayout> {
           child: _buildListPane(context),
         ),
         // ── Drag handle ────────────────────────────────────────────────────
-        GestureDetector(
-          key: const ValueKey('list-pane-divider'),
-          onHorizontalDragUpdate: (details) {
-            setState(() {
-              _listPaneWidth = (_listPaneWidth + details.delta.dx)
-                  .clamp(180.0, _maxListPaneWidth(context));
-            });
-          },
-          onHorizontalDragEnd: (_) {
-            final appState = GabbroApp.maybeOf(context);
-            appState?.updateSettings(
-              appState.settings.copyWith(tabletListPaneWidth: _listPaneWidth),
-            );
-          },
-          child: MouseRegion(
-            cursor: SystemMouseCursors.resizeColumn,
-            child: Stack(
-              children: [
-                VerticalDivider(
-                  width: 20,
-                  thickness: 1,
-                  color: theme.dividerColor,
-                ),
-                Center(
-                  child: Container(
-                    key: const ValueKey('list-pane-grip'),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 6,
-                      horizontal: 2,
+        // Screen-reader label + hover tooltip (ADR-015). Grip glyph grows with
+        // the text scale, gently capped at 1.5x, as it lives in the fixed 20dp
+        // divider (ADR-016).
+        Semantics(
+          label: l.resizeColumns,
+          container: true,
+          child: Tooltip(
+            message: l.resizeColumns,
+            child: GestureDetector(
+              key: const ValueKey('list-pane-divider'),
+              onHorizontalDragUpdate: (details) {
+                setState(() {
+                  _listPaneWidth = (_listPaneWidth + details.delta.dx)
+                      .clamp(180.0, _maxListPaneWidth(context));
+                });
+              },
+              onHorizontalDragEnd: (_) {
+                final appState = GabbroApp.maybeOf(context);
+                appState?.updateSettings(
+                  appState.settings
+                      .copyWith(tabletListPaneWidth: _listPaneWidth),
+                );
+              },
+              child: MouseRegion(
+                cursor: SystemMouseCursors.resizeColumn,
+                child: Stack(
+                  children: [
+                    VerticalDivider(
+                      width: 20,
+                      thickness: 1,
+                      color: theme.dividerColor,
                     ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: RotatedBox(
-                      quarterTurns: 1,
-                      child: Icon(
-                        Icons.drag_handle,
-                        size: 16,
-                        color: theme.colorScheme.onSurfaceVariant,
+                    Center(
+                      child: Container(
+                        key: const ValueKey('list-pane-grip'),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 6,
+                          horizontal: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: RotatedBox(
+                          quarterTurns: 1,
+                          child: Icon(
+                            Icons.drag_handle,
+                            size: 16 *
+                                controlScaleFor(context)
+                                    .clamp(1.0, 1.5)
+                                    .toDouble(),
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

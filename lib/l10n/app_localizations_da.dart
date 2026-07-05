@@ -2011,4 +2011,7 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Den fil er ikke en brugbar Gabbro-boks.';
+
+  @override
+  String get resizeColumns => 'Ændr kolonnestørrelse';
 }

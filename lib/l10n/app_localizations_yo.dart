@@ -2009,4 +2009,7 @@ class AppLocalizationsYo extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò.';
+
+  @override
+  String get resizeColumns => 'Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n';
 }

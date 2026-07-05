@@ -2011,4 +2011,7 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Tento soubor není použitelný trezor Gabbro.';
+
+  @override
+  String get resizeColumns => 'Změnit velikost sloupců';
 }

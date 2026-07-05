@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Trwale usunąć ten sejf? Nieczytelny plik i jego kopia awaryjna zostaną usunięte z tego urządzenia. Tej operacji nie można cofnąć.",
   "restoreFromFileButton": "Przywróć z pliku kopii zapasowej",
   "vaultRestoredMessage": "Sejf przywrócony. Odblokuj swoimi danymi.",
-  "restoreFromFileInvalidError": "Ten plik nie jest prawidłowym sejfem Gabbro."
+  "restoreFromFileInvalidError": "Ten plik nie jest prawidłowym sejfem Gabbro.",
+  "resizeColumns": "Zmień rozmiar kolumn"
 }

@@ -955,5 +955,6 @@
   "deleteVaultFileConfirmBody": "Delete this vault permanently? The unreadable file and its safety copy will be removed from this device. This cannot be undone.",
   "restoreFromFileButton": "Restore from a backup file",
   "vaultRestoredMessage": "Vault restored. Unlock with your credentials.",
-  "restoreFromFileInvalidError": "That file is not a usable Gabbro vault."
+  "restoreFromFileInvalidError": "That file is not a usable Gabbro vault.",
+  "resizeColumns": "Resize columns"
 }

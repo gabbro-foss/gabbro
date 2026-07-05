@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Да се изтрие ли окончателно този сейф? Нечетимият файл и аварийното му копие ще бъдат премахнати от това устройство. Това действие е необратимо.",
   "restoreFromFileButton": "Възстановяване от резервен файл",
   "vaultRestoredMessage": "Сейфът е възстановен. Отключете с вашите данни.",
-  "restoreFromFileInvalidError": "Този файл не е използваем сейф на Gabbro."
+  "restoreFromFileInvalidError": "Този файл не е използваем сейф на Gabbro.",
+  "resizeColumns": "Преоразмеряване на колоните"
 }

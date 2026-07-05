@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "Supprimer définitivement ce coffre ? Le fichier illisible et sa copie de secours seront supprimés de cet appareil. Cette action est irréversible.",
   "restoreFromFileButton": "Restaurer depuis un fichier de sauvegarde",
   "vaultRestoredMessage": "Coffre restauré. Déverrouillez avec vos identifiants.",
-  "restoreFromFileInvalidError": "Ce fichier n'est pas un coffre Gabbro utilisable."
+  "restoreFromFileInvalidError": "Ce fichier n'est pas un coffre Gabbro utilisable.",
+  "resizeColumns": "Redimensionner les colonnes"
 }

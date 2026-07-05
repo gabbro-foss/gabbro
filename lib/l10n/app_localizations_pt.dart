@@ -2016,6 +2016,9 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Esse ficheiro não é um cofre Gabbro utilizável.';
+
+  @override
+  String get resizeColumns => 'Redimensionar colunas';
 }
 
 /// The translations for Portuguese, as used in Brazil (`pt_BR`).
@@ -4027,6 +4030,9 @@ class AppLocalizationsPtBr extends AppLocalizationsPt {
   @override
   String get restoreFromFileInvalidError =>
       'Esse arquivo não é um cofre Gabbro utilizável.';
+
+  @override
+  String get resizeColumns => 'Redimensionar colunas';
 }
 
 /// The translations for Portuguese, as used in Portugal (`pt_PT`).
@@ -6044,4 +6050,7 @@ class AppLocalizationsPtPt extends AppLocalizationsPt {
   @override
   String get restoreFromFileInvalidError =>
       'Esse ficheiro não é um cofre Gabbro utilizável.';
+
+  @override
+  String get resizeColumns => 'Redimensionar colunas';
 }

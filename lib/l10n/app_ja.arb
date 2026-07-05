@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "このボールトを完全に削除しますか？ 読み取れないファイルとそのセーフティコピーがこのデバイスから削除されます。この操作は元に戻せません。",
   "restoreFromFileButton": "バックアップファイルから復元",
   "vaultRestoredMessage": "ボールトを復元しました。認証情報でロックを解除してください。",
-  "restoreFromFileInvalidError": "このファイルは使用可能な Gabbro ボールトではありません。"
+  "restoreFromFileInvalidError": "このファイルは使用可能な Gabbro ボールトではありません。",
+  "resizeColumns": "列のサイズを変更"
 }

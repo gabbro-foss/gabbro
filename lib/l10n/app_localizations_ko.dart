@@ -1954,4 +1954,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get restoreFromFileInvalidError => '이 파일은 사용할 수 있는 Gabbro 보관함이 아닙니다.';
+
+  @override
+  String get resizeColumns => '열 크기 조정';
 }

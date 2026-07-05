@@ -1949,4 +1949,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get restoreFromFileInvalidError => 'このファイルは使用可能な Gabbro ボールトではありません。';
+
+  @override
+  String get resizeColumns => '列のサイズを変更';
 }

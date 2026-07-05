@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "Natrvalo odstrániť tento trezor? Nečitateľný súbor a jeho záchranná kópia sa odstránia z tohto zariadenia. Túto akciu nie je možné vrátiť späť.",
   "restoreFromFileButton": "Obnoviť zo záložného súboru",
   "vaultRestoredMessage": "Trezor obnovený. Odomknite pomocou svojich prihlasovacích údajov.",
-  "restoreFromFileInvalidError": "Tento súbor nie je použiteľný trezor Gabbro."
+  "restoreFromFileInvalidError": "Tento súbor nie je použiteľný trezor Gabbro.",
+  "resizeColumns": "Zmeniť veľkosť stĺpcov"
 }

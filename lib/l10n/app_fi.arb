@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Poistetaanko tämä holvi pysyvästi? Lukukelvoton tiedosto ja sen varakopio poistetaan tästä laitteesta. Tätä ei voi kumota.",
   "restoreFromFileButton": "Palauta varmuuskopiotiedostosta",
   "vaultRestoredMessage": "Holvi palautettu. Avaa lukitus tunnuksillasi.",
-  "restoreFromFileInvalidError": "Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi."
+  "restoreFromFileInvalidError": "Tämä tiedosto ei ole käyttökelpoinen Gabbro-holvi.",
+  "resizeColumns": "Muuta sarakkeiden kokoa"
 }

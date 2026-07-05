@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "永久删除此保险库？无法读取的文件及其安全副本将从此设备中移除。此操作无法撤销。",
   "restoreFromFileButton": "从备份文件恢复",
   "vaultRestoredMessage": "保险库已恢复。请使用你的凭据解锁。",
-  "restoreFromFileInvalidError": "该文件不是可用的 Gabbro 保险库。"
+  "restoreFromFileInvalidError": "该文件不是可用的 Gabbro 保险库。",
+  "resizeColumns": "调整列宽"
 }

@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "Pa àpótí ìṣúra yìí rẹ́ pátápátá? A ó yọ fáìlì tí kò ṣeé ka àti àdàkọ ààbò rẹ̀ kúrò lórí ẹ̀rọ yìí. Kò ṣeé yí ìṣe yìí padà.",
   "restoreFromFileButton": "Dá padà láti fáìlì àfẹyìntì",
   "vaultRestoredMessage": "A ti dá àpótí ìṣúra padà. Ṣí i pẹ̀lú àwọn ìwé-ẹ̀rí rẹ.",
-  "restoreFromFileInvalidError": "Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò."
+  "restoreFromFileInvalidError": "Fáìlì yẹn kì í ṣe àpótí ìṣúra Gabbro tó ṣeé lò.",
+  "resizeColumns": "Ṣàtúnṣe ìwọ̀n àwọn ọ̀wọ́n"
 }

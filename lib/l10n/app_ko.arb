@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "이 보관함을 영구적으로 삭제하시겠습니까? 읽을 수 없는 파일과 안전 사본이 이 기기에서 제거됩니다. 이 작업은 되돌릴 수 없습니다.",
   "restoreFromFileButton": "백업 파일에서 복원",
   "vaultRestoredMessage": "보관함이 복원되었습니다. 자격 증명으로 잠금을 해제하세요.",
-  "restoreFromFileInvalidError": "이 파일은 사용할 수 있는 Gabbro 보관함이 아닙니다."
+  "restoreFromFileInvalidError": "이 파일은 사용할 수 있는 Gabbro 보관함이 아닙니다.",
+  "resizeColumns": "열 크기 조정"
 }

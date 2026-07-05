@@ -2036,4 +2036,7 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Ce fichier n\'est pas un coffre Gabbro utilisable.';
+
+  @override
+  String get resizeColumns => 'Redimensionner les colonnes';
 }

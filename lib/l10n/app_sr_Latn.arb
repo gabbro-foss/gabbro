@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "Trajno izbrisati ovaj sef? Nečitljiva datoteka i njena pomoćna kopija biće uklonjeni sa ovog uređaja. Ova radnja ne može da se poništi.",
   "restoreFromFileButton": "Vrati iz datoteke rezervne kopije",
   "vaultRestoredMessage": "Sef vraćen. Otključajte svojim akreditivima.",
-  "restoreFromFileInvalidError": "Ta datoteka nije upotrebljiv Gabbro sef."
+  "restoreFromFileInvalidError": "Ta datoteka nije upotrebljiv Gabbro sef.",
+  "resizeColumns": "Promeni veličinu kolona"
 }

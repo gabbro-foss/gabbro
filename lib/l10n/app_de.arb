@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "Diesen Tresor endgültig löschen? Die unlesbare Datei und ihre Sicherheitskopie werden von diesem Gerät entfernt. Dies kann nicht rückgängig gemacht werden.",
   "restoreFromFileButton": "Aus einer Sicherungsdatei wiederherstellen",
   "vaultRestoredMessage": "Tresor wiederhergestellt. Entsperren Sie mit Ihren Zugangsdaten.",
-  "restoreFromFileInvalidError": "Diese Datei ist kein verwendbarer Gabbro-Tresor."
+  "restoreFromFileInvalidError": "Diese Datei ist kein verwendbarer Gabbro-Tresor.",
+  "resizeColumns": "Spalten anpassen"
 }

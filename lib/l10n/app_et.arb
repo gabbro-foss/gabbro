@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Kas kustutada see hoidla jäädavalt? Loetamatu fail ja selle kaitsekoopia eemaldatakse sellest seadmest. Seda toimingut ei saa tagasi võtta.",
   "restoreFromFileButton": "Taasta varukoopia failist",
   "vaultRestoredMessage": "Hoidla taastatud. Avage oma mandaatidega.",
-  "restoreFromFileInvalidError": "See fail ei ole kasutatav Gabbro hoidla."
+  "restoreFromFileInvalidError": "See fail ei ole kasutatav Gabbro hoidla.",
+  "resizeColumns": "Muuda veergude suurust"
 }

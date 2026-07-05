@@ -2017,4 +2017,7 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Ez a fájl nem használható Gabbro-széf.';
+
+  @override
+  String get resizeColumns => 'Oszlopok átméretezése';
 }

@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Visam laikui ištrinti šią saugyklą? Neįskaitomas failas ir jo apsauginė kopija bus pašalinti iš šio įrenginio. Šio veiksmo anuliuoti negalima.",
   "restoreFromFileButton": "Atkurti iš atsarginės kopijos failo",
   "vaultRestoredMessage": "Saugykla atkurta. Atrakinkite savo prisijungimo duomenimis.",
-  "restoreFromFileInvalidError": "Šis failas nėra tinkama Gabbro saugykla."
+  "restoreFromFileInvalidError": "Šis failas nėra tinkama Gabbro saugykla.",
+  "resizeColumns": "Keisti stulpelių dydį"
 }

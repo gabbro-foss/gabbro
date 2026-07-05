@@ -2009,4 +2009,7 @@ class AppLocalizationsEt extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'See fail ei ole kasutatav Gabbro hoidla.';
+
+  @override
+  String get resizeColumns => 'Muuda veergude suurust';
 }

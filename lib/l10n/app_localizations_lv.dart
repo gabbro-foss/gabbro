@@ -2014,4 +2014,7 @@ class AppLocalizationsLv extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Šis fails nav izmantojams Gabbro seifs.';
+
+  @override
+  String get resizeColumns => 'Mainīt kolonnu izmērus';
 }

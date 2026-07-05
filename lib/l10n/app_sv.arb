@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Ta bort det här valvet permanent? Den oläsliga filen och dess reservkopia tas bort från den här enheten. Det går inte att ångra.",
   "restoreFromFileButton": "Återställ från en säkerhetskopia",
   "vaultRestoredMessage": "Valv återställt. Lås upp med dina uppgifter.",
-  "restoreFromFileInvalidError": "Den filen är inte ett användbart Gabbro-valv."
+  "restoreFromFileInvalidError": "Den filen är inte ett användbart Gabbro-valv.",
+  "resizeColumns": "Ändra kolumnstorlek"
 }

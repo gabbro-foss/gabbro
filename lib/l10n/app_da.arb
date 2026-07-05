@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Slet denne boks permanent? Den ulæselige fil og dens reservekopi fjernes fra denne enhed. Dette kan ikke fortrydes.",
   "restoreFromFileButton": "Gendan fra en sikkerhedskopifil",
   "vaultRestoredMessage": "Boks gendannet. Lås op med dine loginoplysninger.",
-  "restoreFromFileInvalidError": "Den fil er ikke en brugbar Gabbro-boks."
+  "restoreFromFileInvalidError": "Den fil er ikke en brugbar Gabbro-boks.",
+  "resizeColumns": "Ændr kolonnestørrelse"
 }

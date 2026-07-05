@@ -2029,4 +2029,7 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Ese archivo no es una caja fuerte de Gabbro utilizable.';
+
+  @override
+  String get resizeColumns => 'Ajustar columnas';
 }

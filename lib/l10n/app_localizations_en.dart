@@ -1996,4 +1996,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'That file is not a usable Gabbro vault.';
+
+  @override
+  String get resizeColumns => 'Resize columns';
 }

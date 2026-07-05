@@ -2007,4 +2007,7 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Den filen är inte ett användbart Gabbro-valv.';
+
+  @override
+  String get resizeColumns => 'Ändra kolumnstorlek';
 }

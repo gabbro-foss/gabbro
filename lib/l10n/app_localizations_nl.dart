@@ -2019,4 +2019,7 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Dat bestand is geen bruikbare Gabbro-kluis.';
+
+  @override
+  String get resizeColumns => 'Kolommen aanpassen';
 }

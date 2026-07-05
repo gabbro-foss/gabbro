@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Neatgriezeniski dzēst šo seifu? Nelasāmais fails un tā rezerves kopija tiks noņemti no šīs ierīces. Šo darbību nevar atsaukt.",
   "restoreFromFileButton": "Atjaunot no dublējuma faila",
   "vaultRestoredMessage": "Seifs atjaunots. Atbloķējiet ar saviem akreditācijas datiem.",
-  "restoreFromFileInvalidError": "Šis fails nav izmantojams Gabbro seifs."
+  "restoreFromFileInvalidError": "Šis fails nav izmantojams Gabbro seifs.",
+  "resizeColumns": "Mainīt kolonnu izmērus"
 }

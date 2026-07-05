@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Excluir permanentemente este cofre? O arquivo ilegível e sua cópia de recuperação serão removidos deste dispositivo. Esta ação não pode ser desfeita.",
   "restoreFromFileButton": "Restaurar de um arquivo de backup",
   "vaultRestoredMessage": "Cofre restaurado. Desbloqueie com suas credenciais.",
-  "restoreFromFileInvalidError": "Esse arquivo não é um cofre Gabbro utilizável."
+  "restoreFromFileInvalidError": "Esse arquivo não é um cofre Gabbro utilizável.",
+  "resizeColumns": "Redimensionar colunas"
 }

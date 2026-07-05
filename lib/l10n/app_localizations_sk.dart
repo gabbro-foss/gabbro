@@ -2012,4 +2012,7 @@ class AppLocalizationsSk extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Tento súbor nie je použiteľný trezor Gabbro.';
+
+  @override
+  String get resizeColumns => 'Zmeniť veľkosť stĺpcov';
 }

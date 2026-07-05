@@ -2011,4 +2011,7 @@ class AppLocalizationsKk extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Бұл файл жарамды Gabbro қоймасы емес.';
+
+  @override
+  String get resizeColumns => 'Бағандар өлшемін өзгерту';
 }

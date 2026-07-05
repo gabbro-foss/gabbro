@@ -2014,4 +2014,7 @@ class AppLocalizationsSl extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Ta datoteka ni uporaben trezor Gabbro.';
+
+  @override
+  String get resizeColumns => 'Spremeni velikost stolpcev';
 }

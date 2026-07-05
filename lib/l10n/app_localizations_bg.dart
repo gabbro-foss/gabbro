@@ -2014,4 +2014,7 @@ class AppLocalizationsBg extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Този файл не е използваем сейф на Gabbro.';
+
+  @override
+  String get resizeColumns => 'Преоразмеряване на колоните';
 }

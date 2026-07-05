@@ -2011,4 +2011,7 @@ class AppLocalizationsEu extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat.';
+
+  @override
+  String get resizeColumns => 'Aldatu zutabeen tamaina';
 }

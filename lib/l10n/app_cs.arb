@@ -855,5 +855,6 @@
   "deleteVaultFileConfirmBody": "Trvale smazat tento trezor? Nečitelný soubor a jeho záchranná kopie budou odstraněny z tohoto zařízení. Tuto akci nelze vrátit zpět.",
   "restoreFromFileButton": "Obnovit ze záložního souboru",
   "vaultRestoredMessage": "Trezor obnoven. Odemkněte pomocí svých přihlašovacích údajů.",
-  "restoreFromFileInvalidError": "Tento soubor není použitelný trezor Gabbro."
+  "restoreFromFileInvalidError": "Tento soubor není použitelný trezor Gabbro.",
+  "resizeColumns": "Změnit velikost sloupců"
 }

@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "Kutxa gotor hau betiko ezabatu? Fitxategi irakurtezina eta haren segurtasun-kopia gailu honetatik kenduko dira. Ekintza hau ezin da desegin.",
   "restoreFromFileButton": "Berreskuratu babeskopia-fitxategi batetik",
   "vaultRestoredMessage": "Kutxa gotorra berreskuratu da. Desblokeatu zure kredentzialekin.",
-  "restoreFromFileInvalidError": "Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat."
+  "restoreFromFileInvalidError": "Fitxategi hori ez da erabilgarri den Gabbro kutxa gotor bat.",
+  "resizeColumns": "Aldatu zutabeen tamaina"
 }

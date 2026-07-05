@@ -2021,4 +2021,7 @@ class AppLocalizationsPl extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Ten plik nie jest prawidłowym sejfem Gabbro.';
+
+  @override
+  String get resizeColumns => 'Zmień rozmiar kolumn';
 }

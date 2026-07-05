@@ -2012,6 +2012,9 @@ class AppLocalizationsSr extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Та датотека није употребљив Gabbro сеф.';
+
+  @override
+  String get resizeColumns => 'Промени величину колона';
 }
 
 /// The translations for Serbian, using the Latin script (`sr_Latn`).
@@ -4022,4 +4025,7 @@ class AppLocalizationsSrLatn extends AppLocalizationsSr {
   @override
   String get restoreFromFileInvalidError =>
       'Ta datoteka nije upotrebljiv Gabbro sef.';
+
+  @override
+  String get resizeColumns => 'Promeni veličinu kolona';
 }

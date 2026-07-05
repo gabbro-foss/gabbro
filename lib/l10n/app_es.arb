@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "¿Eliminar permanentemente esta caja fuerte? El archivo ilegible y su copia de respaldo se eliminarán de este dispositivo. Esta acción no se puede deshacer.",
   "restoreFromFileButton": "Restaurar desde un archivo de copia de seguridad",
   "vaultRestoredMessage": "Caja fuerte restaurada. Desbloquea con tus credenciales.",
-  "restoreFromFileInvalidError": "Ese archivo no es una caja fuerte de Gabbro utilizable."
+  "restoreFromFileInvalidError": "Ese archivo no es una caja fuerte de Gabbro utilizable.",
+  "resizeColumns": "Ajustar columnas"
 }

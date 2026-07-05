@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "永久刪除此保險庫？無法讀取的檔案及其安全副本將從此裝置中移除。此操作無法復原。",
   "restoreFromFileButton": "從備份檔案復原",
   "vaultRestoredMessage": "保險庫已復原。請使用你的憑證解鎖。",
-  "restoreFromFileInvalidError": "該檔案不是可用的 Gabbro 保險庫。"
+  "restoreFromFileInvalidError": "該檔案不是可用的 Gabbro 保險庫。",
+  "resizeColumns": "調整欄寬"
 }

@@ -2019,4 +2019,7 @@ class AppLocalizationsUk extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Цей файл не є придатним сховищем Gabbro.';
+
+  @override
+  String get resizeColumns => 'Змінити розмір стовпців';
 }

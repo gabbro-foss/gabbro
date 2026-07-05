@@ -2018,4 +2018,7 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Этот файл не является пригодным хранилищем Gabbro.';
+
+  @override
+  String get resizeColumns => 'Изменить размер столбцов';
 }

@@ -2021,4 +2021,7 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get restoreFromFileInvalidError =>
       'Questo file non è una cassaforte Gabbro utilizzabile.';
+
+  @override
+  String get resizeColumns => 'Ridimensiona colonne';
 }

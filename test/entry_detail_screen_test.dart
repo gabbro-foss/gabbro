@@ -775,4 +775,46 @@ void main() {
     expect(chevron.size, greaterThan(18));
     expect(tester.takeException(), isNull);
   });
+
+  // ── Bottom reserve (tablet FAB clearance) ─────────────────────────────────
+  // The shared screen is used both as the phone full-screen route (no FAB) and
+  // as the tablet detail pane (a Scaffold-level FAB floats over its bottom).
+  // A tablet-only bottomReserve keeps content clear of the FAB without leaking
+  // padding into the phone route.
+
+  // Net-first: phone route reserves no extra bottom padding (default 16 all).
+  testWidgets('detail body has 16 bottom padding by default (phone route)',
+      (tester) async {
+    await tester.pumpWidget(_buildScreen(VaultEntryData.login(_loginEntry())));
+    await tester.pumpAndSettle();
+    expect(bodyScrollPadding(tester).bottom, 16);
+  });
+
+  // New: bottomReserve adds to the scroll view's bottom padding.
+  testWidgets('bottomReserve adds to the detail body bottom padding',
+      (tester) async {
+    await tester.pumpWidget(testApp(EntryDetailScreen(
+      entry: VaultEntryData.login(_loginEntry()),
+      onDeleteEntry: (_) async {},
+      onCopyToClipboard: (_) async {},
+      onLaunchUrl: (_) async {},
+      exportFilePicker: (_) async => null,
+      onFetchHistory: (_) async => const [],
+      bottomReserve: 88,
+    )));
+    await tester.pumpAndSettle();
+    expect(bodyScrollPadding(tester).bottom, 16 + 88);
+  });
+}
+
+/// The bottom [EdgeInsets] of the detail body's scroll view (the SafeArea >
+/// SingleChildScrollView in [EntryDetailScreen.build]).
+EdgeInsets bodyScrollPadding(WidgetTester tester) {
+  final scroll = tester.widget<SingleChildScrollView>(
+    find.descendant(
+      of: find.byType(SafeArea),
+      matching: find.byType(SingleChildScrollView),
+    ),
+  );
+  return scroll.padding as EdgeInsets;
 }

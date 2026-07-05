@@ -97,6 +97,12 @@ class EntryDetailScreen extends StatefulWidget {
   /// native dialog; may throw when the file portal is unavailable (sandbox).
   final Future<String?> Function(String filename) exportFilePicker;
 
+  /// Extra bottom padding below the scrollable body, on top of the normal
+  /// content padding. The tablet two-pane layout passes this so the detail
+  /// pane's last item clears the Scaffold-level FAB that floats over its
+  /// bottom-right corner; the phone full-screen route (no FAB) leaves it 0.
+  final double bottomReserve;
+
   const EntryDetailScreen({
     super.key,
     required this.entry,
@@ -110,6 +116,7 @@ class EntryDetailScreen extends StatefulWidget {
     this.onDeleted,
     this.onEdited,
     this.exportFilePicker = _defaultExportFilePicker,
+    this.bottomReserve = 0,
   });
 
   @override
@@ -330,7 +337,7 @@ class _EntryDetailScreenState extends State<EntryDetailScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + widget.bottomReserve),
           child: _buildBody(l),
         ),
       ),

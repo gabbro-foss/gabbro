@@ -854,5 +854,6 @@
   "deleteVaultFileConfirmBody": "Осы қойманы біржола жою керек пе? Оқылмайтын файл мен оның қосалқы көшірмесі осы құрылғыдан жойылады. Бұл әрекетті қайтару мүмкін емес.",
   "restoreFromFileButton": "Сақтық көшірме файлынан қалпына келтіру",
   "vaultRestoredMessage": "Қойма қалпына келтірілді. Өз деректеріңізбен ашыңыз.",
-  "restoreFromFileInvalidError": "Бұл файл жарамды Gabbro қоймасы емес."
+  "restoreFromFileInvalidError": "Бұл файл жарамды Gabbro қоймасы емес.",
+  "resizeColumns": "Бағандар өлшемін өзгерту"
 }
