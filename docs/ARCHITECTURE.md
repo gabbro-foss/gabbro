@@ -50,7 +50,7 @@ gabbro/
 │   ├── fido/             # FIDO2/libfido2 FFI (Linux only)
 │   ├── import/           # enpass, bitwarden, google_pm, dashlane, csv
 │   ├── hardening.rs      # Process hardening (R-04): core-dump + ptrace/mem disable (Linux)
-│   ├── autotype/         # Linux auto-type (ADR-017): keysym mapping, XTEST injection, active-window read, trigger IPC (Linux-only)
+│   ├── autotype/         # Linux auto-type (ADR-017): keysym mapping, XTEST injection, active-window read, trigger IPC, fill sequences (Linux-only)
 │   └── bin/  scripts/  examples/   # bench_kdf, mem_forensics, crash_writer, autotype_spike, autotype_window, autotype_trigger; wordlist gen; gen_fixtures
 ├── rust/tests/           # Backward-compat gate + state-machine fuzzer + parse fuzzer + crash-safety (kill mid-write) + frozen golden fixtures (FIXTURES.md)
 ├── android/…/kotlin/…/   # GabbroUnlockHostActivity (base) + MainActivity/UnlockActivity/SaveActivity, GabbroAutofillService, TapFlow, YubiKeyManager, BiometricHelper (+ Robolectric tests)
@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 622 | 17 |
+| Rust (`cargo test -q`) | 627 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 14 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -111,7 +111,8 @@ Phases:
 - **Phase 3** — wire it into the app (sub-steps):
   - [x] **3.1** net-first pins: launch path already covered by existing tests; entry-detail
     clipboard auto-clear pinned (3 tests). Generator clear deferred to the unify (see Bikeshed).
-  - [ ] **3.2** sequence building (Rust, pure): `{user}{TAB}{pass}{ENTER}` + user-only + pass-only.
+  - [x] **3.2** sequence building (Rust, pure): `{user}{TAB}{pass}{ENTER}` + user-only + pass-only.
+    `rust/src/autotype/sequence.rs` (`SequenceKind` + `build_sequence`, 5 tests).
   - [ ] **3.3** `gabbro --autotype` client (C++ runner short-circuit vs helper bin — DECIDE) +
     start the Rust listener on launch; prove keypress -> app logs the captured active window.
   - [ ] **3.4** bridge `autotype_fill` (refocus/verify window, read secret from Rust session,
