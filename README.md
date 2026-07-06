@@ -181,7 +181,10 @@ do not run it.
 
 1. Enable **Install from unknown sources** on your device:
    - Android 8+: Settings → Apps → Special app access → Install unknown apps → select your file manager → Allow
-2. Transfer `gabbro-<version>-android.apk` to your device (USB, email, or file transfer).
+2. Transfer the APK for your device to it (USB, email, or file transfer). Pick by device type:
+   - `gabbro-<version>-android-arm64-v8a.apk` — modern phones (almost everyone; use this if unsure)
+   - `gabbro-<version>-android-armeabi-v7a.apk` — old 32-bit phones
+   - `gabbro-<version>-android-x86_64.apk` — emulators / Chromebooks
 3. Tap the APK file in your file manager to install.
 
 Tested on Android 11+ (including GrapheneOS). YubiKey authentication requires a YubiKey 5 series key (USB-A/C for all devices; NFC where supported).
@@ -199,8 +202,8 @@ SHA-256: 0F:0A:B8:1B:9B:B8:F0:21:68:25:83:73:17:C6:49:F3:64:F4:47:B0:D0:93:5B:FA
 
 - **GrapheneOS / Accrescent users:** install [AppVerifier](https://github.com/soupslurpr/AppVerifier),
   open it, pick Gabbro (or the APK file), and check the reported hash matches the one above.
-- **Any platform:** run `apksigner verify --print-certs gabbro-<version>-android.apk` and compare the
-  `SHA-256` certificate digest.
+- **Any platform:** run `apksigner verify --print-certs gabbro-<version>-android-<abi>.apk` and compare the
+  `SHA-256` certificate digest (`<abi>` is whichever file you downloaded — `arm64-v8a`, `armeabi-v7a` or `x86_64`). All three per-ABI APKs are signed by the same key and share this fingerprint.
 
 A mismatch means the file is **not** an official Gabbro build — do not install it.
 
@@ -255,8 +258,8 @@ from `gabbro` root folder:
 ```bash
 flutter build linux --release   # Linux desktop
 ./build/linux/x64/release/bundle/gabbro # Run on linux
-flutter build apk --release     # Android device
-adb install build/app/outputs/flutter-apk/app-release.apk # install on Android device
+flutter build apk --split-per-abi --release   # Android (per-ABI APKs)
+adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk # install on a modern phone
 ```
 
 ### Tests

@@ -104,7 +104,8 @@ entry staged under `[Unreleased]`.
 
 Steps: run `gabbro_test` green -> bump `pubspec.yaml` to `0.1.0-alpha.12` and move the
 CHANGELOG `[Unreleased]` block -> build + sign artifacts -> tag last. See
-BUILD_AND_RELEASE.
+BUILD_AND_RELEASE. First release to ship per-ABI APKs (arm64-v8a ~29 MB) instead of
+the ~76 MB universal one.
 
 ---
 
@@ -126,12 +127,6 @@ Build environment (Android/Kotlin/Java, SAF export) and full release process:
   stable at VERSION 9, so this is no longer blocked. v1 direction in commit 9f158b5.
 
 ### Code Quality
-- **Shrink the Android APK (~76MB -> ~30MB).** It's a *universal* APK: ~50MB is native
-  libs (`libflutter`/`libapp`/`librust_lib_gabbro`) for 3 ABIs. Ship `--split-per-abi` and
-  give testers the `arm64-v8a` APK (x86_64 = emulator-only, armeabi-v7a = old 32-bit);
-  update BUILD_AND_RELEASE + naming. Optional extra few MB: `rust/Cargo.toml`
-  `[profile.release]` `strip=true`, `opt-level="s"`, `lto=true` — NOT `panic="abort"` (FRB
-  unwinds Rust panics into Dart exceptions). The Rust `.so` is currently unstripped.
 - **Auto-type: unlock-then-type + cold start (ADR-017 Phase 4).** A trigger while the
   vault is locked or Gabbro is closed does nothing today. Add: prompt-unlock-then-type,
   an opt-in setting, README key-binding examples, and package `gabbro-autotype` into the

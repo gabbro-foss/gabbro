@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Linux desktop auto-type (X11).** With a login open in Gabbro, a global hotkey types `username⇥password↵` into the focused window; uses the login's email when it has no username.
 
+### Changed
+- **Smaller, per-device Android downloads.** Releases now ship a separate APK per phone type (modern `arm64-v8a` ~29 MB, old 32-bit `armeabi-v7a`, emulator/Chromebook `x86_64`) instead of one ~76 MB file bundling all three. Download the one for your device — use `arm64-v8a` if unsure. All are signed by the same key (same fingerprint).
+
 ### Fixed
 - Biometric unlock is now per vault. Enabling it on one vault no longer clears it from another — previously all vaults shared a single key and slot, so enrolling a second vault silently disabled the first. Each vault keeps its own biometric independently on each device, and it survives syncing a vault to another device and back. Hardware-verified on Android.
 - Generator copy now honours the clipboard-clear setting like entry copy: "never" no longer clears at all (was cleared after 24h), and re-copying resets the clear timer so a freshly copied password isn't wiped early.
