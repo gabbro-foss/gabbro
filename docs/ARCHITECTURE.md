@@ -131,31 +131,33 @@ Net-first throughout: pin current behaviour green BEFORE changing it.
 **Execution order: start with the biometric fix (D + E) and hardware-verify, then A, B, C.**
 
 **A. Rust — multi-vault session isolation (`session.rs` tests)**
-- [ ] 1. [PIN] unlock A -> unlock B -> A's `.gabbro` bytes unchanged on disk
-- [ ] 2. [PIN] after unlock B, a CRUD save writes to B's path, never A's
-- [ ] 3. [PIN] lock scrubs passphrase + YubiKey material (no A material readable after switching to B)
-- [ ] 4. [PIN] failed unlock of B leaves prior A session intact (or cleanly locked) — never a half-session
-- [ ] 5. [PIN] wrong passphrase for B never opens A's body
+- [✓] 1. unlock A -> unlock B -> A's `.gabbro` bytes unchanged on disk
+- [✓] 2. after unlock B, a CRUD save writes to B's path, never A's
+- [✓] 3. lock clears the session (observable: locked -> reads error; in-memory zeroize is a type guarantee, not black-box tested)
+- [✓] 4. failed unlock of B leaves prior A session intact — never a half-session
+- [✓] 5. each vault opens only with its own passphrase (no cross-open)
 
 **B. Rust — YubiKey per-vault (`session`/`vault_bridge` tests)**
-- [ ] 6. [PIN] add YubiKey to B doesn't alter A's header records
-- [ ] 7. [PIN] remove/rotate on B leaves A's key records + openability intact
-- [ ] 8. [PIN] A (passphrase-only) and B (YubiKey) coexist: each opens only with its own credentials
+- [✓] 6. add YubiKey to B doesn't alter A's header records
+- [✓] 7. remove YubiKey on B leaves A's records + openability intact
+- [✓] 8. A (passphrase-only) and B (YubiKey) coexist: each opens only with its own credentials
+
+(Items 1-8 green: `multi_vault_isolation_tests`, 8 pass in release.)
 
 **C. Rust — sync isolation (extend `merge_tests`)**
 - [ ] 9. [PIN] syncing B from a file doesn't mutate A's auth header/body
 - [ ] 10. [PIN] a vault written on "Android" (fast Argon params) opens on "Linux" and keeps its auth after a sync round-trip (cross-version already partly covered by `cross_version_sync_*`)
 
 **D. Kotlin — biometric per-vault (`BiometricHelperTest`, Robolectric for prefs)**
-- [x] 0. [NET] pinned: single-vault `isEnrolled` contract green (Robolectric) + partial-enrolment guard added; enroll/authenticate/unenroll are `@Ignore` (AndroidKeyStore not backed by Robolectric) -> the fix must split prefs bookkeeping from key lifecycle to make 11-13 unit-testable
-- [x] 11. store A + store B -> both `isEnrolled` true (green via new `BiometricStore` seam)
-- [x] 12. `forget`/`unenroll(vaultPath)` A leaves B enrolled (green via seam)
-- [x] 13. distinct KeyStore alias per vault (green via seam); `BiometricHelper` refactored to per-vault alias + prefs, channel updated
-- [x] 14. enroll -> authenticate per vault: HARDWARE-VERIFIED 2026-07-06 on device (mock vaults A/B/C). Passed: reported bug (B survives enrolling C), disable-independence, change-passphrase staleness, Android->Linux->Android sync round-trip. Key-invalidation left as optional.
+- [✓] 0. [NET] pinned: single-vault `isEnrolled` contract green (Robolectric) + partial-enrolment guard added; enroll/authenticate/unenroll are `@Ignore` (AndroidKeyStore not backed by Robolectric) -> the fix must split prefs bookkeeping from key lifecycle to make 11-13 unit-testable
+- [✓] 11. store A + store B -> both `isEnrolled` true (green via new `BiometricStore` seam)
+- [✓] 12. `forget`/`unenroll(vaultPath)` A leaves B enrolled (green via seam)
+- [✓] 13. distinct KeyStore alias per vault (green via seam); `BiometricHelper` refactored to per-vault alias + prefs, channel updated
+- [✓] 14. enroll -> authenticate per vault: HARDWARE-VERIFIED 2026-07-06 on device (mock vaults A/B/C). Passed: reported bug (B survives enrolling C), disable-independence, change-passphrase staleness, Android->Linux->Android sync round-trip. Key-invalidation left as optional.
 
 **E. Dart — drop the global bool, gate on per-vault enrollment (widget tests)**
-- [x] 15. enabling biometric on B doesn't affect C: global `settings.jsonc` bool REMOVED; UI gates on `isEnrolled(vaultPath)` only; `unenroll(vaultPath)` threaded through security/change-passphrase/tablet call sites (green)
-- [x] 16. unlock offers biometric only for the enrolled vault: gate removed from widget, `vaultPath` now a required param on both phone + tablet paths (two-layout trap structurally prevented); per-vault display pinned in unlock_screen_test
+- [✓] 15. enabling biometric on B doesn't affect C: global `settings.jsonc` bool REMOVED; UI gates on `isEnrolled(vaultPath)` only; `unenroll(vaultPath)` threaded through security/change-passphrase/tablet call sites (green)
+- [✓] 16. unlock offers biometric only for the enrolled vault: gate removed from widget, `vaultPath` now a required param on both phone + tablet paths (two-layout trap structurally prevented); per-vault display pinned in unlock_screen_test
 
 ---
 

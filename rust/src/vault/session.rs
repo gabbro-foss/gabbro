@@ -8336,3 +8336,287 @@ mod sync_fuzz {
         }
     }
 }
+
+// Phase B: prove the global VAULT_SESSION singleton never lets one vault's
+// authentication or data cross-pollinate another. All #[serial] (they share the
+// process-global session). Two distinct on-disk vaults A & B per test.
+#[cfg(test)]
+mod multi_vault_isolation_tests {
+    use super::*;
+    use crate::api::vault::{save_vault, save_vault_with_keys};
+    use crate::crypto::vault_crypto::YubiKeyRegistration;
+    use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
+    use crate::vault::io::read_vault_header;
+    use crate::vault::serialization::VaultBody;
+    use serial_test::serial;
+    use std::env::temp_dir;
+    use std::path::PathBuf;
+
+    fn note(id: &str, content: &str) -> VaultEntry {
+        VaultEntry::Note(NoteEntry {
+            meta: EntryMeta {
+                field_times: Default::default(),
+                history: Vec::new(),
+                id: String::from(id),
+                created_at: String::from("2025-01-01T00:00:00Z"),
+                updated_at: String::from("2025-01-01T00:00:00Z"),
+                folder: String::new(),
+            },
+            title: String::from("note"),
+            content: String::from(content),
+            custom_fields: vec![],
+            attachments: vec![],
+        })
+    }
+
+    fn body(id: &str) -> VaultBody {
+        VaultBody {
+            folders: vec![],
+            entries: vec![note(id, "content")],
+            ..Default::default()
+        }
+    }
+
+    fn passphrase_vault(suffix: &str, passphrase: &[u8], id: &str) -> PathBuf {
+        let mut path = temp_dir();
+        path.push(format!("gabbro_iso_{suffix}.gabbro"));
+        save_vault(&body(id), passphrase, &path).unwrap();
+        path
+    }
+
+    // key1: cred 0x01 x64 / hmac 0x11 / salt 0x22 ; key2: cred 0x02 x48 / hmac 0x33 / salt 0x44
+    fn multikey_vault(suffix: &str, passphrase: &[u8], id: &str) -> PathBuf {
+        let mut path = temp_dir();
+        path.push(format!("gabbro_iso_{suffix}.gabbro"));
+        let keys = [
+            YubiKeyRegistration {
+                credential_id: vec![0x01u8; 64],
+                hmac_secret: [0x11u8; 32],
+                salt: [0x22u8; 32],
+            },
+            YubiKeyRegistration {
+                credential_id: vec![0x02u8; 48],
+                hmac_secret: [0x33u8; 32],
+                salt: [0x44u8; 32],
+            },
+        ];
+        save_vault_with_keys(&body(id), passphrase, &keys, &path).unwrap();
+        path
+    }
+
+    fn teardown(paths: &[&PathBuf]) {
+        let _ = lock_vault();
+        for p in paths {
+            let _ = std::fs::remove_file(p);
+            let _ = std::fs::remove_file(format!("{}.bak", p.display()));
+        }
+    }
+
+    // 1. unlock A -> unlock B -> A's file bytes on disk unchanged.
+    #[test]
+    #[serial]
+    fn switching_vaults_leaves_prior_file_untouched() {
+        let a = passphrase_vault("1a", b"pass-a", "a-001");
+        let b = passphrase_vault("1b", b"pass-b", "b-001");
+        let a_before = std::fs::read(&a).unwrap();
+        unlock_vault(b"pass-a", a.clone()).unwrap();
+        unlock_vault(b"pass-b", b.clone()).unwrap();
+        assert_eq!(
+            a_before,
+            std::fs::read(&a).unwrap(),
+            "A's file changed after switching to B"
+        );
+        teardown(&[&a, &b]);
+    }
+
+    // 2. after unlock B, a CRUD save writes to B's path, never A's.
+    #[test]
+    #[serial]
+    fn crud_after_switch_targets_only_the_active_vault() {
+        let a = passphrase_vault("2a", b"pass-a", "a-001");
+        let b = passphrase_vault("2b", b"pass-b", "b-001");
+        unlock_vault(b"pass-a", a.clone()).unwrap();
+        unlock_vault(b"pass-b", b.clone()).unwrap();
+        let a_before = std::fs::read(&a).unwrap();
+        let b_before = std::fs::read(&b).unwrap();
+        session_create_entry(note("b-002", "added")).unwrap();
+        assert_eq!(
+            a_before,
+            std::fs::read(&a).unwrap(),
+            "A's file changed by a CRUD on B"
+        );
+        assert_ne!(
+            b_before,
+            std::fs::read(&b).unwrap(),
+            "B's file did not change after CRUD"
+        );
+        lock_vault().unwrap();
+        unlock_vault(b"pass-b", b.clone()).unwrap();
+        assert_eq!(
+            list_entry_summaries().unwrap().len(),
+            2,
+            "B should have 2 entries"
+        );
+        lock_vault().unwrap();
+        unlock_vault(b"pass-a", a.clone()).unwrap();
+        assert_eq!(
+            list_entry_summaries().unwrap().len(),
+            1,
+            "A should still have 1 entry"
+        );
+        teardown(&[&a, &b]);
+    }
+
+    // 3. lock clears the session: nothing readable afterward.
+    #[test]
+    #[serial]
+    fn lock_clears_session_no_residual_entries() {
+        let a = passphrase_vault("3a", b"pass-a", "a-001");
+        unlock_vault(b"pass-a", a.clone()).unwrap();
+        lock_vault().unwrap();
+        assert!(!is_vault_unlocked());
+        assert!(get_entry("a-001").is_err(), "entry readable after lock");
+        teardown(&[&a]);
+    }
+
+    // 4. a failed unlock of B leaves the prior A session intact (never a half-session).
+    #[test]
+    #[serial]
+    fn failed_unlock_leaves_prior_session_intact() {
+        let a = passphrase_vault("4a", b"pass-a", "a-001");
+        let b = passphrase_vault("4b", b"pass-b", "b-001");
+        unlock_vault(b"pass-a", a.clone()).unwrap();
+        assert!(unlock_vault(b"wrong-pass", b.clone()).is_err());
+        assert!(is_vault_unlocked(), "session lost after a failed unlock");
+        assert!(
+            get_entry("a-001").is_ok(),
+            "A's entry lost after a failed unlock of B"
+        );
+        assert!(
+            get_entry("b-001").is_err(),
+            "B leaked into the session after a failed unlock"
+        );
+        teardown(&[&a, &b]);
+    }
+
+    // 5. each vault opens only with its own passphrase (no cross-open).
+    #[test]
+    #[serial]
+    fn each_vault_opens_only_with_its_own_passphrase() {
+        let a = passphrase_vault("5a", b"pass-a", "a-001");
+        let b = passphrase_vault("5b", b"pass-b", "b-001");
+        assert!(unlock_vault(b"pass-a", a.clone()).is_ok());
+        lock_vault().unwrap();
+        assert!(
+            unlock_vault(b"pass-a", b.clone()).is_err(),
+            "B opened with A's passphrase"
+        );
+        assert!(unlock_vault(b"pass-b", b.clone()).is_ok());
+        teardown(&[&a, &b]);
+    }
+
+    // 6. add a YubiKey to B doesn't alter A's header records.
+    #[test]
+    #[serial]
+    fn add_yubikey_to_one_vault_leaves_another_vaults_records() {
+        let a = passphrase_vault("6a", b"pass-a", "a-001");
+        let b = multikey_vault("6b", b"pass-b", "b-001");
+        let a_before = read_vault_header(&a).unwrap().yubikey_records.len();
+        unlock_vault_with_key_record(
+            b"pass-b",
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            b.clone(),
+        )
+        .unwrap();
+        session_add_yubikey(vec![0x03u8; 32], vec![0x55u8; 32], vec![0x66u8; 32]).unwrap();
+        lock_vault().unwrap();
+        assert_eq!(
+            a_before,
+            read_vault_header(&a).unwrap().yubikey_records.len(),
+            "A's YubiKey records changed"
+        );
+        assert_eq!(
+            read_vault_header(&b).unwrap().yubikey_records.len(),
+            3,
+            "B did not gain the new key"
+        );
+        teardown(&[&a, &b]);
+    }
+
+    // 7. remove a YubiKey on B leaves A's records + openability intact.
+    #[test]
+    #[serial]
+    fn remove_yubikey_on_one_vault_leaves_another_intact() {
+        let a = passphrase_vault("7a", b"pass-a", "a-001");
+        let b = multikey_vault("7b", b"pass-b", "b-001");
+        unlock_vault_with_key_record(
+            b"pass-b",
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            b.clone(),
+        )
+        .unwrap();
+        session_remove_yubikey(vec![0x02u8; 48]).unwrap();
+        lock_vault().unwrap();
+        assert_eq!(
+            read_vault_header(&a).unwrap().yubikey_records.len(),
+            0,
+            "A's records changed"
+        );
+        assert!(
+            unlock_vault(b"pass-a", a.clone()).is_ok(),
+            "A no longer opens with its passphrase"
+        );
+        lock_vault().unwrap();
+        assert_eq!(
+            read_vault_header(&b).unwrap().yubikey_records.len(),
+            1,
+            "B key count wrong after removal"
+        );
+        teardown(&[&a, &b]);
+    }
+
+    // 8. passphrase-only A and YubiKey B coexist: each opens only with its own credentials.
+    #[test]
+    #[serial]
+    fn passphrase_and_yubikey_vaults_coexist_isolated() {
+        let a = passphrase_vault("8a", b"pass-a", "a-001");
+        let b = multikey_vault("8b", b"pass-b", "b-001");
+        assert!(
+            unlock_vault(b"pass-a", a.clone()).is_ok(),
+            "A did not open with its passphrase alone"
+        );
+        lock_vault().unwrap();
+        assert!(
+            unlock_vault(b"pass-b", b.clone()).is_err(),
+            "key-protected B opened passphrase-only"
+        );
+        assert!(
+            unlock_vault_with_key_record(
+                b"pass-b",
+                &[0x11u8; 32],
+                vec![0x01u8; 64],
+                &[0x22u8; 32],
+                b.clone()
+            )
+            .is_ok(),
+            "B did not open with its key"
+        );
+        lock_vault().unwrap();
+        assert!(
+            unlock_vault_with_key_record(
+                b"pass-a",
+                &[0x11u8; 32],
+                vec![0x01u8; 64],
+                &[0x22u8; 32],
+                a.clone()
+            )
+            .is_err(),
+            "passphrase-only A opened via a key record"
+        );
+        teardown(&[&a, &b]);
+    }
+}
