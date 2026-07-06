@@ -70,7 +70,7 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 
 | Suite | Passing | Ignored |
 |-------|---------|---------|
-| Rust (`cargo test -q`) | 645 | 17 |
+| Rust (`cargo test -q`) | 656 | 17 |
 | Rust vault backward-compat gate (`cargo test --release --test vault_backward_compat`) | 14 | 0 |
 | Rust state-machine fuzzer (`cargo test --release --test vault_state_machine_fuzz -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust crash-safety, kill mid-write (`cargo test --release --test crash_safety -- --ignored`) | 1 | 1 (opt-in by default) |
@@ -145,8 +145,10 @@ Net-first throughout: pin current behaviour green BEFORE changing it.
 (Items 1-8 green: `multi_vault_isolation_tests`, 8 pass in release.)
 
 **C. Rust — sync isolation (extend `merge_tests`)**
-- [ ] 9. [PIN] syncing B from a file doesn't mutate A's auth header/body
-- [ ] 10. [PIN] a vault written on "Android" (fast Argon params) opens on "Linux" and keeps its auth after a sync round-trip (cross-version already partly covered by `cross_version_sync_*`)
+- [✓] 9. syncing an incoming file into B doesn't touch uninvolved vault A; B's auth survives the re-seal
+- [✓] 10. auth survives a sync round-trip: 10a passphrase (merge -> lock -> reopen), 10b YubiKey (records intact, reopens with the key). Literal fast-Argon cross-platform param diff is fixture/gate-only; the version-mismatch merge itself stays covered by the ignored `cross_version_sync_*`.
+
+(Items 9-10 green: `multi_vault_isolation_tests`, 11 pass total in release.)
 
 **D. Kotlin — biometric per-vault (`BiometricHelperTest`, Robolectric for prefs)**
 - [✓] 0. [NET] pinned: single-vault `isEnrolled` contract green (Robolectric) + partial-enrolment guard added; enroll/authenticate/unenroll are `@Ignore` (AndroidKeyStore not backed by Robolectric) -> the fix must split prefs bookkeeping from key lifecycle to make 11-13 unit-testable

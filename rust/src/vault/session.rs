@@ -8343,7 +8343,7 @@ mod sync_fuzz {
 #[cfg(test)]
 mod multi_vault_isolation_tests {
     use super::*;
-    use crate::api::vault::{save_vault, save_vault_with_keys};
+    use crate::api::vault::{load_vault, save_vault, save_vault_with_keys};
     use crate::crypto::vault_crypto::YubiKeyRegistration;
     use crate::vault::entry::{EntryMeta, NoteEntry, VaultEntry};
     use crate::vault::io::read_vault_header;
@@ -8618,5 +8618,91 @@ mod multi_vault_isolation_tests {
             "passphrase-only A opened via a key record"
         );
         teardown(&[&a, &b]);
+    }
+
+    // 9. syncing an incoming file into B doesn't touch uninvolved vault A, and
+    //    B's own auth survives the sync re-seal.
+    #[test]
+    #[serial]
+    fn sync_leaves_uninvolved_vault_untouched_and_preserves_active_auth() {
+        let a = passphrase_vault("9a", b"pass-a", "a-001");
+        let b = passphrase_vault("9b", b"pass-b", "b-001");
+        let c = passphrase_vault("9c", b"pass-c", "c-001"); // incoming source
+        let a_before = std::fs::read(&a).unwrap();
+        let incoming = load_vault(b"pass-c", &c).unwrap();
+        unlock_vault(b"pass-b", b.clone()).unwrap();
+        let summary = session_merge_vault_from_body(incoming).unwrap();
+        assert_eq!(summary.added, 1, "the incoming entry should be added");
+        lock_vault().unwrap();
+        assert_eq!(
+            a_before,
+            std::fs::read(&a).unwrap(),
+            "A's file changed by a sync into B"
+        );
+        // B still opens with its own passphrase and holds both entries.
+        unlock_vault(b"pass-b", b.clone()).unwrap();
+        assert_eq!(
+            list_entry_summaries().unwrap().len(),
+            2,
+            "B lost an entry across sync"
+        );
+        teardown(&[&a, &b, &c]);
+    }
+
+    // 10a. passphrase auth survives a full sync round-trip (merge -> lock -> reopen).
+    #[test]
+    #[serial]
+    fn passphrase_auth_survives_a_sync_round_trip() {
+        let b = passphrase_vault("10a", b"pass-b", "b-001");
+        let c = passphrase_vault("10ac", b"pass-c", "c-001");
+        let incoming = load_vault(b"pass-c", &c).unwrap();
+        unlock_vault(b"pass-b", b.clone()).unwrap();
+        session_merge_vault_from_body(incoming).unwrap();
+        lock_vault().unwrap();
+        unlock_vault(b"pass-b", b.clone()).unwrap();
+        assert_eq!(
+            list_entry_summaries().unwrap().len(),
+            2,
+            "entries lost across the sync round-trip"
+        );
+        teardown(&[&b, &c]);
+    }
+
+    // 10b. YubiKey auth survives a sync re-seal: records intact, still opens with the key.
+    #[test]
+    #[serial]
+    fn yubikey_auth_survives_a_sync_re_seal() {
+        let b = multikey_vault("10b", b"pass-b", "b-001");
+        let c = passphrase_vault("10bc", b"pass-c", "c-001");
+        let incoming = load_vault(b"pass-c", &c).unwrap();
+        unlock_vault_with_key_record(
+            b"pass-b",
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            b.clone(),
+        )
+        .unwrap();
+        session_merge_vault_from_body(incoming).unwrap();
+        lock_vault().unwrap();
+        assert_eq!(
+            read_vault_header(&b).unwrap().yubikey_records.len(),
+            2,
+            "sync dropped a YubiKey record"
+        );
+        unlock_vault_with_key_record(
+            b"pass-b",
+            &[0x11u8; 32],
+            vec![0x01u8; 64],
+            &[0x22u8; 32],
+            b.clone(),
+        )
+        .unwrap();
+        assert_eq!(
+            list_entry_summaries().unwrap().len(),
+            2,
+            "entries lost across the YubiKey sync re-seal"
+        );
+        teardown(&[&b, &c]);
     }
 }
