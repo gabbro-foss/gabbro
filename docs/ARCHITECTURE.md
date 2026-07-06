@@ -95,14 +95,67 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**BUG (important): Android biometric unlock only holds on one vault at a time.**
-With multiple vaults, enabling biometric on vault C silently clears it from vault
-B (both passphrase-only + biometric). Repro (Android): vaults A (passphrase+YK, no
-bio), B (passphrase), C (passphrase); enable bio on B -> works; then enable bio on
-C -> works, but B reverts to passphrase-only and loses its biometric setting. Looks
-like the biometric-protected secret / setting is stored under a single fixed
-key/alias instead of per-vault. Verify root cause (AndroidKeyStore alias + where the
-per-vault bio flag persists) before fixing.
+**Per-vault authentication isolation — full fix + cross-pollution harness.**
+
+Goal: every vault manages its own authentication alone. No auth mechanism
+(passphrase, change-passphrase, YubiKey enroll/add/remove/rotate, Android biometric,
+or a vault opened on Android then Linux via sync) may cross-pollinate another vault.
+
+**Root cause (verified).** Android biometric stores ONE AndroidKeyStore alias
+(`gabbro_biometric_key`) + ONE SharedPreferences slot (`ct`/`iv`/`vault_path`) + a
+single global `settings.jsonc` `biometric_unlock` bool. Enrolling vault C wipes B's
+key + slot, so `isEnrolled(B)` goes false and B reverts to passphrase-only. All other
+auth is crypto-bound per `.gabbro` file; the only shared mutable surface is the global
+`VAULT_SESSION` singleton (holds its own path + zeroizing passphrase, one vault at a time).
+
+**Design (plain terms) — biometric is per-device, not per-vault.**
+- The biometric **secret** (the encrypted passphrase + the AndroidKeyStore key) is
+  **bound to one phone's hardware** and never travels. Each device keeps its own secret,
+  stored **per vault** (per-vault KeyStore alias + per-vault prefs slot).
+- **No in-vault flag, no `vaults.jsonc` mirror, no version bump.** The single global
+  `settings.jsonc` `biometric_unlock` bool is dropped.
+- **The on-device secret is the single source of truth.** A device offers biometric for
+  a vault iff it holds its own secret for that vault (`isEnrolled(vaultPath)`, readable
+  while locked). Linux holds none, so it never offers.
+- Why per-device and not a travelling flag: a vault synced across Linux + S23 +
+  GrapheneOS has independent biometric on each phone (same fingerprint, but a unique
+  hardware key per device). Disabling biometric on one phone must NOT disable it on the
+  other — a single shared flag can't represent that. Sync only moves the vault file and
+  never touches any device's secret, so back-and-forth sync leaves each device's
+  biometric intact.
+- (Linux fingerprint-reader support = bikeshed v2; same model, one more device with its
+  own local secret.)
+
+Net-first throughout: pin current behaviour green BEFORE changing it.
+`[NET]`/`[PIN]` = expected green (must-not-regress / proves isolation); `[RED]` = fails now (bug).
+**Execution order: start with the biometric fix (D + E) and hardware-verify, then A, B, C.**
+
+**A. Rust — multi-vault session isolation (`session.rs` tests)**
+- [ ] 1. [PIN] unlock A -> unlock B -> A's `.gabbro` bytes unchanged on disk
+- [ ] 2. [PIN] after unlock B, a CRUD save writes to B's path, never A's
+- [ ] 3. [PIN] lock scrubs passphrase + YubiKey material (no A material readable after switching to B)
+- [ ] 4. [PIN] failed unlock of B leaves prior A session intact (or cleanly locked) — never a half-session
+- [ ] 5. [PIN] wrong passphrase for B never opens A's body
+
+**B. Rust — YubiKey per-vault (`session`/`vault_bridge` tests)**
+- [ ] 6. [PIN] add YubiKey to B doesn't alter A's header records
+- [ ] 7. [PIN] remove/rotate on B leaves A's key records + openability intact
+- [ ] 8. [PIN] A (passphrase-only) and B (YubiKey) coexist: each opens only with its own credentials
+
+**C. Rust — sync isolation (extend `merge_tests`)**
+- [ ] 9. [PIN] syncing B from a file doesn't mutate A's auth header/body
+- [ ] 10. [PIN] a vault written on "Android" (fast Argon params) opens on "Linux" and keeps its auth after a sync round-trip (cross-version already partly covered by `cross_version_sync_*`)
+
+**D. Kotlin — biometric per-vault (`BiometricHelperTest`, Robolectric for prefs)**
+- [ ] 0. [NET] pin current single-vault flow green + must-not-regress sweep BEFORE any change: enroll -> authenticate round-trip, `isEnrolled` true/false, `unenroll` clears
+- [ ] 11. [RED] enroll A, enroll B -> both `isEnrolled` true
+- [ ] 12. [RED] unenroll A leaves B enrolled (needs `unenroll(vaultPath)`)
+- [ ] 13. [PIN] each vault gets a distinct KeyStore alias (hardware-ignored assertion + prefs-key assertion)
+- [ ] 14. [RED -> hardware] enroll -> authenticate returns the right vault's passphrase per vault (hardware `@Ignore`, in the device matrix)
+
+**E. Dart — drop the global bool, gate on per-vault enrollment (widget tests)**
+- [ ] 15. [RED] enabling biometric on B does not affect C (drop the global `settings.jsonc` bool; the UI derives per-vault state from `isEnrolled(vaultPath)`)
+- [ ] 16. [PIN] unlock screen shows biometric only for the vault it's enrolled on — both phone and tablet two-pane paths (the two-layout-paths trap)
 
 ---
 
