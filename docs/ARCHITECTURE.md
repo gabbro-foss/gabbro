@@ -78,9 +78,9 @@ Shipped features are recorded in `CHANGELOG.md`. Planned and deferred work lives
 | Rust cross-version sync, v8 file (`cargo test --release --lib cross_version_sync_loads_and_merges_a_v8_file -- --ignored`) | 1 | 1 (opt-in by default) |
 | Rust cancel-sync + no-plaintext-leak (`cargo test --release --lib {cancel_sync_rolls_back_to_pre_sync_state,apply_sync_decisions_clears_backup_so_cancel_is_noop,sync_never_writes_plaintext_secret_to_disk} -- --ignored`) | 3 | 3 (opt-in by default) |
 | Rust fast-merge walk (`cargo test --release --lib fast_merge_walk_incoming_wins_and_order_dependent -- --ignored`) | 1 | 1 (opt-in by default) |
-| Flutter (`flutter test`) | 1264 | 0 |
+| Flutter (`flutter test`) | 1257 | 0 |
 | Flutter integration (`flutter drive … -d linux --profile`) | 12 | 0 |
-| Android (`./gradlew :app:testDebugUnitTest`) | 140 | 15 |
+| Android (`./gradlew :app:testDebugUnitTest`) | 148 | 15 |
 
 **Test isolation (non-negotiable):** no test may touch real settings or vault folders. All
 config/data resolves through `GabbroPaths` (`lib/app_paths.dart`); `test/flutter_test_config.dart`
@@ -95,71 +95,16 @@ an empty registry and never reaches a real vault. Mirrors `rust/tests/fixtures/`
 
 ### Next task
 
-**Per-vault authentication isolation — full fix + cross-pollution harness.**
+**Release `v0.1.0-alpha.12` — only if the full gate (`gabbro_test`) is green.**
 
-Goal: every vault manages its own authentication alone. No auth mechanism
-(passphrase, change-passphrase, YubiKey enroll/add/remove/rotate, Android biometric,
-or a vault opened on Android then Linux via sync) may cross-pollinate another vault.
+Per-vault authentication isolation is done and committed: biometric per-vault fix
+(`c2cfea5`, hardware-verified on device 2026-07-06) + cross-pollination harness
+`multi_vault_isolation_tests` (`8d72b2a` session/YubiKey, `10d89e1` sync). CHANGELOG
+entry staged under `[Unreleased]`.
 
-**Root cause (verified).** Android biometric stores ONE AndroidKeyStore alias
-(`gabbro_biometric_key`) + ONE SharedPreferences slot (`ct`/`iv`/`vault_path`) + a
-single global `settings.jsonc` `biometric_unlock` bool. Enrolling vault C wipes B's
-key + slot, so `isEnrolled(B)` goes false and B reverts to passphrase-only. All other
-auth is crypto-bound per `.gabbro` file; the only shared mutable surface is the global
-`VAULT_SESSION` singleton (holds its own path + zeroizing passphrase, one vault at a time).
-
-**Design (plain terms) — biometric is per-device, not per-vault.**
-- The biometric **secret** (the encrypted passphrase + the AndroidKeyStore key) is
-  **bound to one phone's hardware** and never travels. Each device keeps its own secret,
-  stored **per vault** (per-vault KeyStore alias + per-vault prefs slot).
-- **No in-vault flag, no `vaults.jsonc` mirror, no version bump.** The single global
-  `settings.jsonc` `biometric_unlock` bool is dropped.
-- **The on-device secret is the single source of truth.** A device offers biometric for
-  a vault iff it holds its own secret for that vault (`isEnrolled(vaultPath)`, readable
-  while locked). Linux holds none, so it never offers.
-- Why per-device and not a travelling flag: a vault synced across Linux + S23 +
-  GrapheneOS has independent biometric on each phone (same fingerprint, but a unique
-  hardware key per device). Disabling biometric on one phone must NOT disable it on the
-  other — a single shared flag can't represent that. Sync only moves the vault file and
-  never touches any device's secret, so back-and-forth sync leaves each device's
-  biometric intact.
-- (Linux fingerprint-reader support = bikeshed v2; same model, one more device with its
-  own local secret.)
-
-Net-first throughout: pin current behaviour green BEFORE changing it.
-`[NET]`/`[PIN]` = expected green (must-not-regress / proves isolation); `[RED]` = fails now (bug).
-**Execution order: start with the biometric fix (D + E) and hardware-verify, then A, B, C.**
-
-**A. Rust — multi-vault session isolation (`session.rs` tests)**
-- [✓] 1. unlock A -> unlock B -> A's `.gabbro` bytes unchanged on disk
-- [✓] 2. after unlock B, a CRUD save writes to B's path, never A's
-- [✓] 3. lock clears the session (observable: locked -> reads error; in-memory zeroize is a type guarantee, not black-box tested)
-- [✓] 4. failed unlock of B leaves prior A session intact — never a half-session
-- [✓] 5. each vault opens only with its own passphrase (no cross-open)
-
-**B. Rust — YubiKey per-vault (`session`/`vault_bridge` tests)**
-- [✓] 6. add YubiKey to B doesn't alter A's header records
-- [✓] 7. remove YubiKey on B leaves A's records + openability intact
-- [✓] 8. A (passphrase-only) and B (YubiKey) coexist: each opens only with its own credentials
-
-(Items 1-8 green: `multi_vault_isolation_tests`, 8 pass in release.)
-
-**C. Rust — sync isolation (extend `merge_tests`)**
-- [✓] 9. syncing an incoming file into B doesn't touch uninvolved vault A; B's auth survives the re-seal
-- [✓] 10. auth survives a sync round-trip: 10a passphrase (merge -> lock -> reopen), 10b YubiKey (records intact, reopens with the key). Literal fast-Argon cross-platform param diff is fixture/gate-only; the version-mismatch merge itself stays covered by the ignored `cross_version_sync_*`.
-
-(Items 9-10 green: `multi_vault_isolation_tests`, 11 pass total in release.)
-
-**D. Kotlin — biometric per-vault (`BiometricHelperTest`, Robolectric for prefs)**
-- [✓] 0. [NET] pinned: single-vault `isEnrolled` contract green (Robolectric) + partial-enrolment guard added; enroll/authenticate/unenroll are `@Ignore` (AndroidKeyStore not backed by Robolectric) -> the fix must split prefs bookkeeping from key lifecycle to make 11-13 unit-testable
-- [✓] 11. store A + store B -> both `isEnrolled` true (green via new `BiometricStore` seam)
-- [✓] 12. `forget`/`unenroll(vaultPath)` A leaves B enrolled (green via seam)
-- [✓] 13. distinct KeyStore alias per vault (green via seam); `BiometricHelper` refactored to per-vault alias + prefs, channel updated
-- [✓] 14. enroll -> authenticate per vault: HARDWARE-VERIFIED 2026-07-06 on device (mock vaults A/B/C). Passed: reported bug (B survives enrolling C), disable-independence, change-passphrase staleness, Android->Linux->Android sync round-trip. Key-invalidation left as optional.
-
-**E. Dart — drop the global bool, gate on per-vault enrollment (widget tests)**
-- [✓] 15. enabling biometric on B doesn't affect C: global `settings.jsonc` bool REMOVED; UI gates on `isEnrolled(vaultPath)` only; `unenroll(vaultPath)` threaded through security/change-passphrase/tablet call sites (green)
-- [✓] 16. unlock offers biometric only for the enrolled vault: gate removed from widget, `vaultPath` now a required param on both phone + tablet paths (two-layout trap structurally prevented); per-vault display pinned in unlock_screen_test
+Steps: run `gabbro_test` green -> bump `pubspec.yaml` to `0.1.0-alpha.12` and move the
+CHANGELOG `[Unreleased]` block -> build + sign artifacts -> tag last. See
+BUILD_AND_RELEASE.
 
 ---
 
